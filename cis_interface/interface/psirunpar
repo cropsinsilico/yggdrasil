@@ -1,0 +1,42 @@
+#!/bin/bash -f
+
+usage () {
+cat << END
+  Usage:  psirunpar [ <#instances> <model-yaml> ] ...
+  
+  Picks up the PSI environment variables and current code base and runs a number of models in parallel.
+
+  Recommendations for modelers:
+    - Program should print to standard output, local logs are not collected by default.
+    - Resources(files) in yaml specifications are transferred, output resources are collected.
+END
+}
+
+case $1 in 
+ -h)  usage ;; 
+  h)  usage ;;
+help)  usage ;;
+'') usage ;;
+esac
+
+
+RELPATH=$( realpath --relative-to $(git rev-parse --show-toplevel) $(pwd) )
+WDIR=$(pwd)
+
+# Make the environment
+PAR_ENV="--env PATH --env _"
+
+# Make the script file
+TMPFILE=$(mktemp -t psirunparXXX)
+while [[ $# -ne 0 ]]; do
+  INSTANCES=$1
+  PROG=$2
+  for i in $(seq $INSTANCES); do
+    echo "psirun ${PROG}" >> $TMPFILE 
+  done
+shift 2
+done
+
+. /usr/local/bin/env_parallel.bash
+cat $TMPFILE | env_parallel -j 8 --workdir $WDIR --lb --term SIGINT,2000,SIGINT,2000,SIGINT,2000,SIGINT,2000 --filter-hosts --sshlogin ${PSI_CLUSTER} 
+
