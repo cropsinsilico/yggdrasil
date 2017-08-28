@@ -1,6 +1,6 @@
 import nose.tools as nt
 import os
-from pycis import PsiRun
+from cis_interface import PsiRun
 import test_RMQConnection as parent
 
 

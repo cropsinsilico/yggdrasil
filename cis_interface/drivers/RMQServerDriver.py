@@ -19,8 +19,7 @@ class RMQServerDriver(RMQDriver, RPCDriver):
             __init__ method. 
 
     Attributes (in addition to the parent class's):  
-        n_clients (int): The number of clients that are submitting requests to
-            the server.
+        clients (set): The unique clients subscribed to this server.
     
     """
 
@@ -29,7 +28,13 @@ class RMQServerDriver(RMQDriver, RPCDriver):
             args = name + '_SERVER'
         super(RMQServerDriver, self).__init__(name, queue=args, **kwargs)
         self.debug()
-        self.n_clients = 0
+        self.clients = set([])
+
+    @property
+    def n_clients(self):
+        r"""int: The number of clients that are submitting requests to the
+        server."""
+        return len(self.clients)
 
     def start_communication(self, no_ack=False):
         r"""Start consuming messages from the queue."""
@@ -50,11 +55,14 @@ class RMQServerDriver(RMQDriver, RPCDriver):
         r"""Actions to perform when a message is received."""
         # TODO: handle possibility of message larger than AMQP server memory
         if body == _new_client_msg:
-            self.debug('::New client')
-            self.n_clients += 1
+            self.debug('::New client (%s)' % props.reply_to)
+            self.clients.add(props.reply_to)
         elif body == _end_client_msg:
-            self.debug('::Client signed off')
-            self.n_clients -= 1
+            self.debug('::Client signed off (%s)' % props.reply_to)
+            self.clients.remove(props.reply_to)
+            if self.n_clients == 0:
+                self.debug('::All clients have signed off. Stopping.')
+                self.stop()
         else:
             self.debug('::Message received')
             self.iipc.ipc_send_nolimit(body)

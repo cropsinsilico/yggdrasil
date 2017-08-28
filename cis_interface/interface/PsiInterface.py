@@ -10,8 +10,8 @@ if PY_MAJOR_VERSION == 2:
 else:
     import pickle
     
-from pycis.io.AsciiFile import AsciiFile
-from pycis.io.AsciiTable import AsciiTable
+from cis_interface.io.AsciiFile import AsciiFile
+from cis_interface.io.AsciiTable import AsciiTable
 
 def sprintf(buf, fmt, *args):
     buf.write(fmt % args)

@@ -1,11 +1,7 @@
 import os
 import numpy as np
 from scipy.io import savemat
-from Driver import PY_MAJOR_VERSION
-if PY_MAJOR_VERSION == 2:
-    import cPickle as pickle
-else:
-    import pickle
+from cis_interface.backwards import pickle
 import nose.tools as nt
 import test_IODriver as parent
 

@@ -29,12 +29,13 @@ def pprint(*args):
 
     
 def import_driver(driver):
-    # from pycis import drivers
+    # from cis_interface import drivers
     # drv = getattr(drivers, driver)
     # debug("loaded %s", drv)
     # class_ = getattr(drv, driver)
-    # class_ = importlib.import_module('pycis.drivers.%s.%s' % (driver, driver))
-    drv = importlib.import_module('pycis.drivers.%s' % driver)
+    # class_ = importlib.import_module(
+    #     'cis_interface.drivers.%s.%s' % (driver, driver))
+    drv = importlib.import_module('cis_interface.drivers.%s' % driver)
     debug("loaded %s", drv)
     class_ = getattr(drv, driver)
     return class_

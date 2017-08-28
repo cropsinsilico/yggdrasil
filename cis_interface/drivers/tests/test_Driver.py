@@ -1,7 +1,7 @@
 import os
 import signal
 import nose.tools as nt
-from pycis import PsiRun
+from cis_interface import PsiRun
 
 
 # TODO: Test Ctrl-C interruption

@@ -1,12 +1,8 @@
 import numpy as np
 import nose.tools as nt
-from Driver import PY_MAJOR_VERSION
-from IODriver import maxMsgSize
-if PY_MAJOR_VERSION == 2:
-    import cPickle as pickle
-else:
-    import pickle
-import test_Driver as parent
+from cis_interface.drivers.IODriver import maxMsgSize
+from cis_interface.backwards import pickle
+from cis_interface.drivers.tests import test_Driver as parent
 
 
 class IOInfo(object):

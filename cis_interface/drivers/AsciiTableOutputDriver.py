@@ -3,9 +3,9 @@ from logging import *
 import os
 import time
 from scanf import scanf
-from pycis.drivers.AsciiFileOutputDriver import AsciiFileOutputDriver
-from pycis.drivers.FileOutputDriver import FileOutputDriver
-from pycis.io.AsciiTable import AsciiTable
+from cis_interface.drivers.AsciiFileOutputDriver import AsciiFileOutputDriver
+from cis_interface.drivers.FileOutputDriver import FileOutputDriver
+from cis_interface.io.AsciiTable import AsciiTable
 
 
 class AsciiTableOutputDriver(AsciiFileOutputDriver):

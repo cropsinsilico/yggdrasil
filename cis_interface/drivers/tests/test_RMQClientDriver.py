@@ -2,7 +2,8 @@ import pika
 import nose.tools as nt
 import test_RMQDriver as parent1
 import test_RPCDriver as parent2
-from RMQClientDriver import _new_client_msg, _end_client_msg
+from cis_interface.drivers.RMQClientDriver import (
+    _new_client_msg, _end_client_msg)
 
 
 class TestRMQClientDriver(parent1.TestRMQDriver, parent2.TestRPCDriver):
@@ -29,13 +30,13 @@ class TestRMQClientDriver(parent1.TestRMQDriver, parent2.TestRPCDriver):
         
     def teardown(self):
         r"""Recover end client message on teardown."""
-    #     self.instance.stop()
-    #     # End client message
-    #     method_frame, props, rmq_msg = self.temp_basic_get()
-    #     print 'received teardown', rmq_msg
-    #     self.channel.basic_ack(delivery_tag = method_frame.delivery_tag)
-    #     nt.assert_equal(rmq_msg, _end_client_msg)
-    # #     self.temp_basic_pub(rmq_msg)
+        self.instance.stop()
+        # End client message
+        method_frame, props, rmq_msg = self.temp_basic_get()
+        print 'received teardown', rmq_msg
+        self.channel.basic_ack(delivery_tag = method_frame.delivery_tag)
+        nt.assert_equal(rmq_msg, _end_client_msg)
+    #     self.temp_basic_pub(rmq_msg)
         # Purge queues
         self.channel.queue_purge(queue=self.temp_queue)
         self.instance.purge_queue()

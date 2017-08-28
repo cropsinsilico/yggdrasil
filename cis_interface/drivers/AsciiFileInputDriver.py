@@ -3,9 +3,9 @@ from logging import *
 import os
 import time
 from scanf import scanf
-from pycis.drivers.FileInputDriver import FileInputDriver
-from pycis.io.AsciiFile import AsciiFile
-from pycis.interface.PsiInterface import PSI_MSG_EOF
+from cis_interface.drivers.FileInputDriver import FileInputDriver
+from cis_interface.io.AsciiFile import AsciiFile
+from cis_interface.interface.PsiInterface import PSI_MSG_EOF
 
 
 class AsciiFileInputDriver(FileInputDriver):

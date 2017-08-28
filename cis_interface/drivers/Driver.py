@@ -4,7 +4,6 @@ import os
 import sys
 import time
 import inspect
-PY_MAJOR_VERSION = sys.version_info[0]
 
 
 class Driver(Thread):

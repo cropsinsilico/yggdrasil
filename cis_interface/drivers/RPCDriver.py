@@ -13,10 +13,10 @@ class RPCDriver(Driver):
             __init__ method.
 
     Attributes (in addition to parent class's):
-        iipc (:class:`pycis.drivers.IODriver`): Driver for the input message
-            queue.
-        oipc (:class:`pycis.drivers.IODriver`): Driver for the output message
-            queue.
+        iipc (:class:`cis_interface.drivers.IODriver`): Driver for the input
+            message queue.
+        oipc (:class:`cis_interface.drivers.IODriver`): Driver for the output
+            message ueue.
 
     """
     def __init__(self, name, args=None, **kwargs):

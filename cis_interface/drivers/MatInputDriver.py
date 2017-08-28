@@ -4,11 +4,7 @@ import os
 import time
 from scanf import scanf
 from scipy.io import loadmat
-from Driver import PY_MAJOR_VERSION
-if PY_MAJOR_VERSION == 2:
-    import cPickle as pickle
-else:
-    import pickle
+from cis_interface.backwards import pickle
 from FileInputDriver import FileInputDriver
 
 
