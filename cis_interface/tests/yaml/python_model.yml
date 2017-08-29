@@ -1,0 +1,6 @@
+model:
+  name: python_model
+  driver: PythonModelDriver
+  args:
+    - ../scripts/python_model.py
+      

@@ -1,0 +1,6 @@
+model:
+  name: matlab_model
+  driver: MatlabModelDriver
+  args:
+    - ../scripts/matlab_model.m
+      
