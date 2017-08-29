@@ -8,14 +8,13 @@ cache:
 env:
   global:
     NUMPY=numpy
-    CYTHON=cython
     MATPLOTLIB=matplotlib
     MPLBACKEND=agg
 
 matrix:
   include:
     - python: 2.7
-      env: NUMPY=numpy==1.10.4 CYTHON=cython==0.24 MATPLOTLIB=matplotlib==1.5.3
+      env: NUMPY=numpy==1.10.4 MATPLOTLIB=matplotlib==1.5.3
     - python: 2.7
     - python: 3.4
     - python: 3.5
@@ -52,7 +51,8 @@ install:
     pip install --upgrade wheel
     pip install --upgrade setuptools
     # Install dependencies
-    pip install $NUMPY $CYTHON $MATPLOTLIB nose coverage coveralls flake8 sysv_ipc pystache pika
+    pip install $NUMPY $MATPLOTLIB
+    pip install nose coverage coveralls flake8 sysv_ipc pystache pika
     # install cis_interface
     pip install -e .
     

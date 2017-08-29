@@ -159,5 +159,6 @@ class TestDriver(object):
 
     def test_wait(self):
         r"""Test mechanism to wait on driver to finish."""
+        self.instance.terminate()
         self.instance.wait()
         assert(not self.instance.isAlive())
