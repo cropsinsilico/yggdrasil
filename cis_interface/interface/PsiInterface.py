@@ -4,21 +4,18 @@ import sys
 import time
 from scanf import scanf
 from sysv_ipc import MessageQueue
-PY_MAJOR_VERSION = sys.version_info[0]
-if PY_MAJOR_VERSION == 2:
-    import cPickle as pickle
-else:
-    import pickle
-    
+from cis_interface.backwards import pickle    
 from cis_interface.io.AsciiFile import AsciiFile
 from cis_interface.io.AsciiTable import AsciiTable
-
-def sprintf(buf, fmt, *args):
-    buf.write(fmt % args)
 
 
 PSI_MSG_MAX = 1024*64
 PSI_MSG_EOF = "EOF!!!"
+
+
+# def sprintf(buf, fmt, *args):
+#     buf.write(fmt % args)
+
 
 class PsiInput(object):
     r"""Class for handling input from a message queue.

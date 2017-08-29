@@ -1,4 +1,4 @@
-
+"""This driver handles RabbitMQ connections."""
 import os
 from logging import debug, info
 import logging
@@ -6,10 +6,12 @@ import pika
 from IODriver import IODriver, maxMsgSize
 from pika.connection import LOGGER as pika_logger
 
+
 class LoggerFilterNormalCloseIsFine(logging.Filter):
     def filter(self, record):
         return not record.getMessage().endswith('(200): Normal shutdown')
 pika_logger.addFilter(LoggerFilterNormalCloseIsFine())
+
 
 class RMQConnection(IODriver):
     r"""Class for handling RabbitMQ communications.
@@ -96,7 +98,7 @@ class RMQConnection(IODriver):
     def terminate(self):
         r"""Terminate the driver by closing the RabbitMQ connection."""
         self.debug('::terminate: Closing connection')
-        IODriver.terminate(self)
+        super(RMQConnection, self).terminate()
         self._closing = True
         if self.connection is not None:
             self.connection.close()

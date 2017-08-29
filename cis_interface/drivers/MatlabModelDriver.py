@@ -10,11 +10,8 @@ import os
 import sys
 import matlab.engine
 from ModelDriver import ModelDriver, preexec
-from Driver import PY_MAJOR_VERSION
-if PY_MAJOR_VERSION == 2:
-    import StringIO as sio
-else:
-    import sio
+from cis_interface.backwards import sio
+
 
 _top_dir = os.path.normpath(os.path.join(os.path.dirname(__file__), '../'))
 _incl_interface = os.path.join(_top_dir, 'interface')
@@ -107,9 +104,8 @@ class MatlabModelDriver(ModelDriver):
             eng = self.mlengine
             self.mlengine = None
             try:
-                eng.quit()
-                # self.mlengine.quit()
-                # self.mlengine = None
+                if eng is not None:
+                    eng.quit()
             except SystemError:
                 self.error('.terminate failed to quit matlab engine')
             if self.screen_session is not None:

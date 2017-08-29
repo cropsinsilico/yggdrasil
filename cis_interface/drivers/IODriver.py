@@ -7,9 +7,10 @@ from Driver import Driver
 import traceback
 import os
 
-maxMsgSize=1024*64
 
+maxMsgSize=1024*64
 DEBUG_SLEEPS=True
+
 
 class IODriver(Driver):
     r"""Base driver for any driver that requires access to a message queue.

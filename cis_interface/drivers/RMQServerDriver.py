@@ -84,4 +84,5 @@ class RMQServerDriver(RMQDriver, RPCDriver):
             
     def on_cancelok(self, unused_frame):
         r"""Actions to perform after succesfully cancelling consumption."""
-        self.channel.close()
+        if self.channel:
+            self.channel.close()

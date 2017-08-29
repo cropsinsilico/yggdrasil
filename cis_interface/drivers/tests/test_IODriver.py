@@ -3,6 +3,7 @@ import nose.tools as nt
 from cis_interface.drivers.IODriver import maxMsgSize
 from cis_interface.backwards import pickle
 from cis_interface.drivers.tests import test_Driver as parent
+from cis_interface.tools import ipc_queues
 
 
 class IOInfo(object):
@@ -103,6 +104,17 @@ class TestIODriver(parent.TestDriver, IOInfo):
         self.driver = 'IODriver'
         self.args = '_TEST'
         self.attr_list += ['state', 'numSent', 'numReceived', 'env', 'mq']
+        self.nprev_queues = 0
+
+    def setup(self):
+        r"""Get a count of existing queues."""
+        self.nprev_queues = len(ipc_queues())
+        super(TestIODriver, self).setup()
+
+    def teardown(self):
+        r"""Make sure that all new message queues were deleted."""
+        super(TestIODriver, self).teardown()
+        nt.assert_equal(len(ipc_queues()), self.nprev_queues)
 
     def test_send_recv(self):
         r"""Test sending/receiving small message."""
