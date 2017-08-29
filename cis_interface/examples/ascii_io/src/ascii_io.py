@@ -2,13 +2,14 @@ import os
 import sys
 import signal
 import numpy as np
-from pycis.interface.PsiInterface import *
+from cis_interface.interface.PsiInterface import *
 
 
 def signal_handler(signal, frame):
     print('You pressed Ctrl+C!')
     sys.exit(0)
 
+    
 if __name__ == '__main__':
     signal.signal(signal.SIGINT, signal_handler)
     

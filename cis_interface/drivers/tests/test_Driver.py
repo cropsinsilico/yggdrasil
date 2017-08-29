@@ -1,6 +1,7 @@
 import os
 import signal
 import nose.tools as nt
+from threading import Timer
 from cis_interface import PsiRun
 
 
@@ -160,6 +161,6 @@ class TestDriver(object):
     # This only works for some drivers
     # def test_wait(self):
     #     r"""Test mechanism to wait on driver to finish."""
-    #     self.instance.terminate()
+    #     t = Timer(1, self.instance.stop)
     #     self.instance.wait()
     #     assert(not self.instance.isAlive())

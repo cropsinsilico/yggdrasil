@@ -25,6 +25,7 @@ setup(
         'drivers/matlab_screenrc',
         'interface/*.h', 'interface/*.hpp', 'interface/*.m',
         'tests/scripts/*', 'tests/data/*'],
+    },
     include_package_data=True,
     version="0.0.0",
     description=("A framework for combining interdependent models from "
@@ -48,5 +49,8 @@ setup(
         "Topic :: Scientific/Engineering :: Bio-Informatics",
         "Development Status :: 3 - Alpha",
     ],
+    entry_points = {
+        'console_scripts': ['psirun=cis_interface.command_line:cisrun'],
+    },
     license="BSD",
 )

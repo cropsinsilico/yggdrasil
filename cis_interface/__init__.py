@@ -9,7 +9,7 @@ import interface
 import drivers
 import dataio
 import tests
-from interface import PsiRun, PsiInterface
+import examples
 
 
 # Set paths so that c headers are located
@@ -26,6 +26,7 @@ if cis_include not in cpath:
     os.environ['CPATH'] = cis_include + ':' + cpath
 
 
-__all__ = ['backwards', 'config', 'PsiRun', 'PsiInterface',
-           'tools', 'interface', 'driver', 'dataio', 'tests']
+__all__ = ['backwards', 'config', 'tools',
+           'interface', 'driver', 'dataio',
+           'tests', 'examples']
            

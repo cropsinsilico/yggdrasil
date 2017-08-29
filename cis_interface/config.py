@@ -18,9 +18,11 @@ files = [def_config_file, usr_config_file, loc_config_file]
 cis_cfg.read(files)
 
 # Set associated environment variables
+# TODO: Remove dependence on environment variables
 env_map = [('debug', 'psi', 'PSI_DEBUG'),
            ('debug', 'rmq', 'RMQ_DEBUG'),
            ('debug', 'client', 'PSI_CLIENT_DEBUG'),
+           ('RMQ', 'namespace', 'PSI_NAMESPACE'),
            ('RMQ', 'server', 'PSI_MSG_SERVER'),
            ('RMQ', 'user', 'PSI_MSG_USER'),
            ('RMQ', 'password', 'PSI_MSG_PW'),

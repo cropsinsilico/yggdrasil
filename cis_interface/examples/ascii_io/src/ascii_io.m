@@ -1,4 +1,4 @@
-PsiInterface = py.importlib.import_module('pycis.interface.PsiInterface');
+PsiInterface = py.importlib.import_module('cis_interface.interface.PsiInterface');
 
 % IO Objects
 in_file = PsiInterface.PsiAsciiFileInput('inputM_file');
