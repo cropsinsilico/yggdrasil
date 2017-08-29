@@ -2,12 +2,15 @@ import os
 import numpy as np
 from nose.tools import istest, nottest, assert_raises, assert_equal
 from cis_interface.dataio import AsciiTable
+from cis_interface.tests import data
 
 
-input_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), "Input")
-output_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), "Output")
-input_file = os.path.join(input_dir, "ascii_table.txt")
-output_file = os.path.join(output_dir, "ascii_table.txt")
+input_file = data['table']
+output_dir = os.path.join(os.getcwd(), 'temp_cis_testing')
+if not os.path.isdir(output_dir):
+    os.mkdir(output_dir)
+output_file = os.path.join(output_dir, os.path.basename(input_file))
+
 ncols = 3
 nrows = 3
 input_ncomments = 2  # Names & formats

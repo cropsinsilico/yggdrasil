@@ -19,6 +19,12 @@ except (ImportError, IOError):
 setup(
     name="cis_interface",
     packages=find_packages(),
+    package_data={'cis_interface': [
+        'defaults.cfg',
+        'dataio/*.h',
+        'drivers/matlab_screenrc',
+        'interface/*.h',
+        'tests/scripts/*', 'tests/data/*'],
     include_package_data=True,
     version="0.0.0",
     description=("A framework for combining interdependent models from "

@@ -5,7 +5,7 @@ import time
 from scanf import scanf
 from cis_interface.drivers.AsciiFileInputDriver import AsciiFileInputDriver
 from cis_interface.drivers.FileInputDriver import FileInputDriver
-from cis_interface.io.AsciiTable import AsciiTable
+from cis_interface.dataio.AsciiTable import AsciiTable
 
 
 class AsciiTableInputDriver(AsciiFileInputDriver):

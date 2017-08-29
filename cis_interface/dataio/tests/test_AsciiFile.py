@@ -2,12 +2,15 @@ import os
 import numpy as np
 from nose.tools import istest, nottest, assert_raises, assert_equal
 from cis_interface.dataio import AsciiFile
+from cis_interface.tests import data
 
-input_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), "Input")
-output_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), "Output")
 
-input_file = os.path.join(input_dir, "ascii_file.txt")
-output_file = os.path.join(output_dir, "ascii_file.txt")
+input_file = data['txt']
+output_dir = os.path.join(os.getcwd(), 'temp_cis_testing')
+if not os.path.isdir(output_dir):
+    os.mkdir(output_dir)
+output_file = os.path.join(output_dir, os.path.basename(input_file))
+
 input_ncomments = 1
 input_nlines = 3
 output_ncomments = 0

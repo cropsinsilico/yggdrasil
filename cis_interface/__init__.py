@@ -7,10 +7,11 @@ import tools
 import interface
 import drivers
 import dataio
+import tests
 
 from interface import PsiRun, PsiInterface
 
 
 __all__ = ['backwards', 'config', 'PsiRun', 'PsiInterface',
-           'tools', 'interface', 'driver', 'dataio']
+           'tools', 'interface', 'driver', 'dataio', 'tests']
            

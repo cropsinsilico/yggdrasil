@@ -5,7 +5,7 @@ import time
 from scanf import scanf
 from cis_interface.interface.PsiInterface import PSI_MSG_EOF
 from cis_interface.drivers.FileOutputDriver import FileOutputDriver
-from cis_interface.io.AsciiFile import AsciiFile
+from cis_interface.dataio.AsciiFile import AsciiFile
 
 
 class AsciiFileOutputDriver(FileOutputDriver):
