@@ -2,13 +2,13 @@ import pika
 import time
 import nose.tools as nt
 import test_RMQDriver as parent1
-import test_RPCDriver as parent2
+from test_IODriver import IOInfo
 from cis_interface.drivers.RMQServerDriver import (
         _new_client_msg, _end_client_msg)
 
 
 #@nt.nottest
-class TestRMQServerDriver(parent1.TestRMQDriver, parent2.TestRPCDriver):
+class TestRMQServerDriver(parent1.TestRMQDriver, IOInfo):
     r"""Test class for RMQServerDriver class."""
 
     def __init__(self):

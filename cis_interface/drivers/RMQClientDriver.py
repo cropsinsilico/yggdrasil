@@ -65,10 +65,11 @@ class RMQClientDriver(RMQDriver, RPCDriver):
         r"""Start publishing messages to the queue."""
         self.debug('::start_communication')
         self.channel.add_on_cancel_callback(self.on_consumer_cancelled)
+        # self.channel.basic_qos(prefetch_count=1)
+        self.publish_to_server(_new_client_msg)
         self.consumer_tag = self.channel.basic_consume(self.on_response,
-                                                       no_ack=True,
+                                                       # no_ack=True,
                                                        queue=self.queue)
-        self.call(_new_client_msg)
         self.start_publishing()
 
     def start_publishing(self):
@@ -92,7 +93,7 @@ class RMQClientDriver(RMQDriver, RPCDriver):
     #         self._acked += 1
     #     elif confirmation_type == 'nack':
     #         self._nacked += 1
-    #     print self._deliveries, method_frame.method.delivery_tag
+    #     print(self._deliveries, method_frame.method.delivery_tag)
     #     self._deliveries.remove(method_frame.method.delivery_tag)
     #     self.debug('Published %i messages, %i have yet to be confirmed, '
     #                '%i were acked and %i were nacked',
@@ -101,33 +102,44 @@ class RMQClientDriver(RMQDriver, RPCDriver):
 
     def schedule_next_message(self):
         r"""Wait for next message."""
-        while True:
-            if self._closing:
-                return
-            self.debug('Checking IPC queue.')
-            message = self.oipc.ipc_recv_nolimit()
-            if message is None:
-                self.debug("::IPC queue closed!")
-                break
-            elif len(message) == 0:
-                self.debug('::Checking in IPC queue again in %0.1f seconds',
-                           self.sleeptime)
-                self.connection.add_timeout(self.sleeptime,
-                                            self.schedule_next_message)
-                break
-            self.debug("::IPC recv got %d byte request",
-                       len(message))
-            response = self.call(message)
-            self.debug("::Sending %d byte response to IPC", len(response))
-            self.iipc.ipc_send_nolimit(response)
-
-    def call(self, message, timeout=None, no_response=False):
-        r"""Look for message in IPC queue to publish."""
-        if self._closing and not no_response:
+        if self._closing:
             return
-        print message[:min(len(message), 10)]
+        self.debug('Checking IPC queue.')
+        message = self.oipc.ipc_recv_nolimit()
+        if message is None:
+            self.debug("::IPC queue closed!")
+            return
+        elif len(message) == 0:
+            self.debug('::Checking in IPC queue again in %0.1f seconds',
+                       self.sleeptime)
+            self.connection.add_timeout(self.sleeptime,
+                                        self.schedule_next_message)
+        else:
+            self.debug("::IPC recv got %d byte request", len(message))
+            self.publish_to_server(message)
+            self.schedule_next_response()
+
+    def schedule_next_response(self):
+        r"""Wait for next response."""
+        if self._closing:
+            return
+        if self.response is None:
+            self.debug('::Checking RMQ response queue again in %0.1f seconds',
+                       self.sleeptime)
+            self.connection.add_timeout(self.sleeptime,
+                                        self.schedule_next_response)
+        else:
+            self.debug("::Sending %d byte response to IPC", len(self.response))
+            self.iipc.ipc_send_nolimit(self.response)
+            self.schedule_next_message()
+
+    def publish_to_server(self, message, properties=None):
+        r"""Publish a message to the server queue."""
+        if self._closing:
+            return
         self.debug(".publish_message(): sending %d bytes to AMQP", len(message))
         self.response = None
+        self.response_time = 0.0
         self.corr_id = str(uuid.uuid4())
         self.channel.basic_publish(exchange=self.exchange,
                                    routing_key=self.request_queue,
@@ -137,18 +149,6 @@ class RMQClientDriver(RMQDriver, RPCDriver):
                                    body=message)
         self._message_number += 1
         self._deliveries.append(self._message_number)
-        print 'published', self._deliveries
-        if no_response:
-            return None
-        time_elapsed = 0.0
-        while self.response is None:
-            if (timeout is not None) and (time_elapsed >= timeout):
-                break
-            # self.connection.process_data_events()
-            self.sleep()
-            time_elapsed += self.sleeptime
-        print 'response', self.response
-        return self.response
 
     def on_consumer_cancelled(self, method_frame):
         r"""Actions to perform when consumption is cancelled."""
@@ -162,18 +162,14 @@ class RMQClientDriver(RMQDriver, RPCDriver):
         if self.corr_id == props.correlation_id:
             self.debug("::Received %d byte response", len(body))
             self.response = body
+        ch.basic_ack(delivery_tag = method.delivery_tag)
         # TODO: put message back in queue if its wrong?
 
     def stop_communication(self):
         r"""Stop consuming messages from the queue."""
-        self._closing = True
         if self.channel:
             self.debug("::Cancelling consumption.")
-            # print 'calling ', _end_client_msg
-            # self.call(_end_client_msg, no_response=True)
-            # print 'call done'
+            self.publish_to_server(_end_client_msg)
+        self._closing = True
+        if self.channel:
             self.channel.close()
-            print 'channel closed'
-            # self.channel.basic_publish(exchange=self.exchange,
-            #                            routing_key=self.request_queue,
-            #                            body=_end_client_msg)

@@ -62,9 +62,11 @@ class TestRMQDriver(parent.TestDriver):
             raise Exception("Msg receive timed out.")
         return out
 
-    def temp_basic_pub(self, msg, properties=None):
+    def temp_basic_pub(self, msg, routing_key=None, properties=None):
         r"""Do basic_publish tot he temporary queue."""
+        if routing_key is None:
+            routing_key = self.temp_queue
         self.channel.basic_publish(exchange=self.instance.exchange,
-                                   routing_key=self.temp_queue,
+                                   routing_key=routing_key,
                                    properties=properties,
                                    body=msg)
