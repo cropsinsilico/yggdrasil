@@ -1,0 +1,21 @@
+[run]
+omit =
+    */python?.?/*
+    */lib-python/?.?/*.py
+    */lib_pypy/_*.py
+    */site-packages/ordereddict.py
+    */site-packages/nose/*
+    */unittest2/*
+    cis_interface/drivers/tests/python_model.py
+
+[report]
+sort = Cover
+ignore_errors = True
+exclude_lines =
+    pragma: no cover
+    pragma: debug
+    def __repr__
+    if 0:
+    if False:
+    if __name__ == .__main__.:
+    pragma: Python 3

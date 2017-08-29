@@ -50,14 +50,6 @@ class RMQInputDriver(RMQConnection):
         # one at a time, don't stuff the Qs
         self.channel.basic_qos(prefetch_count=1)
 
-    # def on_consumer_cancelled(self, method_frame):
-    #     r"""Actions to perform when consumption is cancelled."""
-    #     self.debug(': Consumer was cancelled remotely, shutting down: %r',
-    #                method_frame)
-    #     self._closing = True
-    #     if self.channel:
-    #        self.channel.close()
-
     def on_message(self, unused_channel, basic_deliver, properties, body):
         r"""Action to perform when a message is received. Send it to the
         local queue and acknowledge the message."""
@@ -71,30 +63,15 @@ class RMQInputDriver(RMQConnection):
         self.debug(':ack message %s', delivery_tag)
         self.channel.basic_ack(delivery_tag)
 
-    def stop_consuming(self):
-        r"""Stop message consumption."""
-        if self.channel:
-            self.debug('::Sending a Basic.Cancel RPC command to RabbitMQ')
-            self.channel.add_on_cancel_callback(self.on_consumer_cancelled)
-            self.channel.basic_cancel(self.on_consumer_cancelled, self._consumer_tag)
-
-    # def stop(self):
-    #     r"""Stop the driver. Close the connection."""
-    #     self.debug('.Stopping')
-    #     RMQConnection.stop(self)  
-    #     self._closing = True
-    #     #self.stop_consuming()
-    #     self.debug('.stop returns')
-
-    def on_delete(self):
-        r"""Delete the driver. Unbinding and deleting the queue and closing
-        the connection."""
-        self.debug('::delete')
-        try:
-            self.channel.queue_unbind(exchange=os.environ['PSI_NAMESPACE'], queue=self.args)
-            # self.channel.queue_delete(queue=self.args, if_unused=True)
-            # self.connection.close()
-        except:
-            self.debug("::delete(): exception (IGNORED)")
-        self.debug('::delete done')
+    # def on_delete(self):
+    #     r"""Delete the driver. Unbinding and deleting the queue and closing
+    #     the connection."""
+    #     self.debug('::delete')
+    #     try:
+    #         self.channel.queue_unbind(exchange=os.environ['PSI_NAMESPACE'], queue=self.args)
+    #         # self.channel.queue_delete(queue=self.args, if_unused=True)
+    #         # self.connection.close()
+    #     except:
+    #         self.debug("::delete(): exception (IGNORED)")
+    #     self.debug('::delete done')
 

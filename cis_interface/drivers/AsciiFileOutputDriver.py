@@ -45,7 +45,7 @@ class AsciiFileOutputDriver(FileOutputDriver):
             args = args_new
         elif isinstance(args, dict):
             pass
-        else:
+        else:  # pragma: debug
             raise TypeError("args is incorrect type, check the yaml.")
         if filepath is None:
             filepath = args.pop('filename', None)
@@ -79,7 +79,7 @@ class AsciiFileOutputDriver(FileOutputDriver):
         try:
             with self.lock:
                 self.file.open()
-        except:
+        except:  # pragma: debug
             self.exception('Could not open file.')
             return
         while self.file.is_open:
@@ -95,7 +95,7 @@ class AsciiFileOutputDriver(FileOutputDriver):
                 with self.lock:
                     if self.file.is_open:
                         self.file.writeline_full(data)
-                    else:
+                    else:  # pragma: debug
                         break
             else:
                 self.debug(':recv: no data')

@@ -77,7 +77,7 @@ def test_AsciiFile_line_full():
         eof, line = AF_out.readline_full()
         if not eof:
             if line is None:
-                count_comments+=1
+                count_comments+=1  # pragma: no cover
             else:
                 count_lines+=1
     AF_out.close()
@@ -104,9 +104,9 @@ def test_AsciiFile_line():
         eof, line = AF_in.readline()
         if not eof:
             if line is None:
-                count_comments+=1
+                count_comments+=1  # pragma: no cover
             else:
-                AF_out.writeline(line)
+                AF_out.writeline(line.rstrip('\n'))
                 count_lines+=1
     AF_in.close()
     AF_out.close()
@@ -122,7 +122,7 @@ def test_AsciiFile_line():
         eof, line = AF_out.readline()
         if not eof:
             if line is None:
-                count_comments+=1
+                count_comments+=1  # pragma: no cover
             else:
                 count_lines+=1
     AF_out.close()

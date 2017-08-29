@@ -13,10 +13,6 @@ PSI_MSG_MAX = 1024*64
 PSI_MSG_EOF = "EOF!!!"
 
 
-# def sprintf(buf, fmt, *args):
-#     buf.write(fmt % args)
-
-
 class PsiInput(object):
     r"""Class for handling input from a message queue.
 

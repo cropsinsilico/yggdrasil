@@ -3,6 +3,7 @@ import pika
 from RMQDriver import RMQDriver
 from RPCDriver import RPCDriver
 
+
 _new_client_msg = "PSI_NEW_CLIENT"
 _end_client_msg = "PSI_END_CLIENT"
 
@@ -39,17 +40,9 @@ class RMQServerDriver(RMQDriver, RPCDriver):
     def start_communication(self, no_ack=False):
         r"""Start consuming messages from the queue."""
         self.debug('::start_consuming')
-        self.channel.add_on_cancel_callback(self.on_consumer_cancelled)
         self.channel.basic_qos(prefetch_count=1)
         self.consumer_tag = self.channel.basic_consume(self.on_message,
                                                        queue=self.queue)
-
-    def on_consumer_cancelled(self, method_frame):
-        r"""Actions to perform when consumption is cancelled."""
-        self.debug('::Consumer was cancelled remotely, shutting down: %r',
-                   method_frame)
-        if self.channel:
-            self.channel.close()
 
     def on_message(self, ch, method, props, body):
         r"""Actions to perform when a message is received."""

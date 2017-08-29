@@ -54,7 +54,7 @@ class AsciiTableInputDriver(AsciiFileInputDriver):
                 with self.lock:
                     if self.file.is_open:
                         eof, data = self.file.readline_full()
-                    else:
+                    else:  # pragma: debug
                         break
                 if eof:
                     self.debug(':run, End of file encountered')
@@ -64,7 +64,7 @@ class AsciiTableInputDriver(AsciiFileInputDriver):
                     self.debug(':run: read: %d bytes', len(data))
                     self.ipc_send_nolimit(data)
                     nread += 1
-            if nread == 0:
+            if nread == 0:  # pragma: debug
                 self.debug(':run, no input')
         self.debug(':run returned')
 

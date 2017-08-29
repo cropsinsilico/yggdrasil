@@ -50,16 +50,16 @@ class FileInputDriver(IODriver):
         try:
             with self.lock:
                 self.fd = open(self.args, 'rb')
-        except:
+        except:  # pragma: debug
             self.exception('Could not open file.')
             return
         with self.lock:
-            if self.fd is None:
+            if self.fd is None:  # pragma: debug
                 data = ''
             else:
                 data = self.fd.read()
         self.debug(':run: read: %d bytes', len(data))
-        if len(data) == 0:
+        if len(data) == 0:  # pragma: debug
             self.debug(':run, no input')
         else:
             self.ipc_send(data)

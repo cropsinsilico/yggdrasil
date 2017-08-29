@@ -11,7 +11,8 @@ from Driver import Driver
 import time
 
 
-def preexec(): # Don't forward signals - used to ignore signals
+def preexec():  # pragma: no cover
+    # Don't forward signals - used to ignore signals
     os.setpgrp()
 
 
@@ -53,19 +54,19 @@ class ModelDriver(Driver):
             self.process = subprocess.Popen(['stdbuf', '-o0'] + self.args, bufsize=0, \
                 stdin=subprocess.PIPE, stderr=subprocess.STDOUT, stdout=subprocess.PIPE, \
                 env=self.env, cwd=self.workingDir, preexec_fn=preexec)
-        except:
+        except:  # pragma: debug
             self.exception('(%s): Exception starting in %s with wd %s',
                            self.args, os.getcwd, self.workingDir)
             return
         
         # Re-direct output
         while True:
-            #self.debug(':run readline')
+            # self.debug(':run readline')
             time.sleep(0)
             line = self.process.stdout.readline()
-            #self.debug(': got line: %d bytes', len(line))
+            # self.debug(': got line: %d bytes', len(line))
             if not line:
-                #self.debug(': got line: NONE')
+                # self.debug(': got line: NONE')
                 break
             sys.stdout.write(line)
             sys.stdout.flush()
@@ -81,4 +82,4 @@ class ModelDriver(Driver):
 
     def delete(self):
         r"""Perform necessary deletion operations."""
-        pass
+        pass  # pragma: no cover

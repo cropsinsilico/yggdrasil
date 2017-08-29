@@ -67,6 +67,7 @@ class RPCDriver(Driver):
             data = self.oipc.recv_wait()
         else:
             data = self.iipc.recv_wait()
+        return data
 
     def recv_wait_nolimit(self, use_output=False):
         r"""Receive a message larger than maxMsgSize. This method will wait 
@@ -84,6 +85,7 @@ class RPCDriver(Driver):
             data = self.oipc.recv_wait_nolimit()
         else:
             data = self.iipc.recv_wait_nolimit()
+        return data
 
     def ipc_send(self, data, use_input=False):
         r"""Send message smaller than maxMsgSize to the output queue.

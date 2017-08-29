@@ -39,8 +39,9 @@ class Driver(Thread):
                  workingDir=None):
         # Check if thread initialized to avoid doing it twice for drivers
         # with multiple inheritance that both need to call __init__
-        if getattr(self, '_thread_initialized', False):
-            raise Exception("Thread already initialized. Check multiple inheritance")
+        if getattr(self, '_thread_initialized', False):  # pragma: debug
+            raise Exception("Thread already initialized. " +
+                            "Check multiple inheritance")
         super(Driver, self).__init__()
         self._thread_initialized = True
         self.debug()
@@ -67,7 +68,7 @@ class Driver(Thread):
 
     def __del__(self):
         self.debug('~')
-        if self.isAlive():
+        if self.isAlive():  # pragma: debug
             self.terminate()
 
     def run(self):

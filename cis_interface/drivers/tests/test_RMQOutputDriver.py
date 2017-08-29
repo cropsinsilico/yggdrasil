@@ -11,19 +11,18 @@ class TestRMQOutputDriver(parent.TestRMQConnection):
         super(TestRMQOutputDriver, self).__init__()
         self.driver = 'RMQOutputDriver'
         self.args = 'test'
-        self._in_rmq = None
 
     def setup(self):
         r"""Create a driver instance and start the driver."""
         super(TestRMQOutputDriver, self).setup()
-        self._in_rmq = self.create_in_rmq()
+        self.in_rmq = self.create_in_rmq()
         self.in_rmq.start()
 
     def teardown(self):
         r"""Remove the instance, stoppping it."""
-        if self._in_rmq is not None:
-            self.remove_instance(self._in_rmq)
-            self._in_rmq = None
+        if hasattr(self, 'in_rmq'):
+            self.remove_instance(self.in_rmq)
+            delattr(self, 'in_rmq')
         super(TestRMQOutputDriver, self).teardown()
 
     def create_in_rmq(self):
@@ -32,13 +31,6 @@ class TestRMQOutputDriver(parent.TestRMQConnection):
             'RMQInputDriver', 'TestRMQInputDriver', self.args,
             namespace=self.namespace, workingDir=self.workingDir)
         return inst
-
-    @property
-    def in_rmq(self):
-        r"""object: RMQInputDriver instance."""
-        if self._in_rmq is None:
-            self._in_rmq = self.create_in_rmq()
-        return self._in_rmq
 
     def test_RMQ_send(self):
         r"""Send a short message to the AMQP server."""

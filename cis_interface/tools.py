@@ -17,7 +17,7 @@ def ipcs(options=[]):
     p = Popen(cmd, stdin=PIPE, stdout=PIPE, stderr=PIPE, shell=True)
     output, err = p.communicate()
     exit_code = p.returncode
-    if exit_code != 0:
+    if exit_code != 0:  # pragma: debug
         print(err.decode('utf-8'))
         raise Exception("Error on spawned process. See output.")
     return output.decode('utf-8')

@@ -9,7 +9,7 @@ from datetime import datetime
 import os
 import sys
 import matlab.engine
-from ModelDriver import ModelDriver, preexec
+from ModelDriver import ModelDriver
 from cis_interface.backwards import sio
 
 
@@ -103,7 +103,7 @@ class MatlabModelDriver(ModelDriver):
         if self.started_matlab:
             eng = self.mlengine
             try:
-                if eng is not None:
+                if eng is not None:  # pragma: debug
                     eng.quit()
             except SystemError:  # pragma: debug
                 self.error('.terminate failed to quit matlab engine')
@@ -130,16 +130,21 @@ class MatlabModelDriver(ModelDriver):
         # Construct command
         # Strip the .m off - silly matlab
         name = os.path.splitext(os.path.basename(self.args[0]))[0]
-        command = 'self.mlengine.' + name + '('
+        command = "self.mlengine." + name + "("
         if len(self.args) > 1:
-            command = command + ', '.join(self.args[1:]) +', '
-        command += 'stdout=out, '
-        # command += 'stderr=err, '
-        command += 'nargout=0)'
+            for a in self.args[1:]:
+                if isinstance(a, str):
+                    command += "'%s', " % a
+                else:
+                    command += "%s, " % str(a)
+            # command = command + ", ".join(self.args[1:]) +", "
+        command += "stdout=out, "
+        # command += "stderr=err, "
+        command += "nargout=0)"
         self.debug(": command: %s", command)
         
         # Run
-        if self.mlengine is None:
+        if self.mlengine is None:  # pragma: debug
             return
         eval(command)
 

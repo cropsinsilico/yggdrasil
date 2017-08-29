@@ -63,10 +63,10 @@ class GCCModelDriver(ModelDriver):
                                             stdout=subprocess.PIPE)
             output, err = comp_process.communicate()
             exit_code = comp_process.returncode
-            if exit_code != 0:
+            if exit_code != 0:  # pragma: debug
                 self.error(output)
                 raise RuntimeError("Compilation failed with code %d." % exit_code)
-        except:
+        except:  # pragma: debug
             self.compiled = False
             self.exception(': Exception compiling %s, %s',
                            ' '.join(compile_args), os.getcwd)
@@ -76,5 +76,5 @@ class GCCModelDriver(ModelDriver):
         r"""Run the compiled executable if it exists."""
         if self.compiled:
             super(GCCModelDriver, self).run()
-        else:
+        else:  # pragma: debug
             self.error("Error compiling.")

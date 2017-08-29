@@ -35,20 +35,25 @@ class RMQDriver(Driver):
             connection.
         routing_key (str): Routing key that should be used when the queue is
             bound. If None, the queue name is used.
+        times_connected (int): Number of times the connection has been 
+            established/re-established.
 
     """
     def __init__(self, name, queue='', routing_key=None, **kwargs):
+        kwattr = ['user', 'server', 'passwd', 'exchange']
+        kwargs_attr = {k: kwargs.pop(k, None) for k in kwattr}
         super(RMQDriver, self).__init__(name, **kwargs)
         self.debug()
         self.user = os.environ.get('PSI_MSG_USER', None)
         self.server = os.environ.get('PSI_MSG_SERVER', None)
         self.passwd = os.environ.get('PSI_MSG_PW', None)
         self.exchange = self.namespace
-        for k in ['user', 'server', 'passwd', 'exchange']:
-            if k in kwargs:
-                setattr(self, k, kwargs.pop(k))
-            if getattr(self, k) is None:
-                raise Exception("%s not provided and corresponding environment variable is not set." % k)
+        for k in kwattr:
+            if kwargs_attr[k] is not None:
+                setattr(self, k, kwargs_attr.pop(k))
+            if getattr(self, k) is None:  # pragma: debug
+                raise Exception(("%s not provided and corresponding " +
+                                 "environment variable is not set.") % k)
         self.connection = None
         self.channel = None
         self.queue = queue
@@ -56,6 +61,7 @@ class RMQDriver(Driver):
         self.consumer_tag = ""
         self._opening = False
         self._closing = False
+        self.times_connected = 0
         self.setDaemon(True)
 
     # DRIVER FUNCTIONALITY
@@ -67,7 +73,7 @@ class RMQDriver(Driver):
         while self._opening and tries > 0:
             self.sleep()
             tries -= 1
-        if self._opening:
+        if self._opening:  # pragma: debug
             raise RuntimeError("Connection never finished opening.")
 
     def run(self):
@@ -84,7 +90,7 @@ class RMQDriver(Driver):
             return  # Don't close more than once
         super(RMQDriver, self).terminate()
         self.debug("::terminate")
-        if self._opening:
+        if self._opening:  # pragma: debug
             self.debug('Waiting for connection to open before terminating')
             while self.connection is None:
                 self.sleep()
@@ -115,6 +121,7 @@ class RMQDriver(Driver):
     # CONNECTION
     def connect(self):
         r"""Establish the connection."""
+        self.times_connected += 1
         self.connection = pika.SelectConnection(
             self.connection_parameters,
             on_open_callback=self.on_connection_open,
@@ -128,7 +135,7 @@ class RMQDriver(Driver):
         self.connection.add_on_close_callback(self.on_connection_closed)
         self.open_channel()
 
-    def on_connection_open_error(self, unused_connection):
+    def on_connection_open_error(self, unused_connection):  # pragma: debug
         r"""Actions that must be taken when the connection fails to open."""
         self.debug('::Connection could not be opened')
         self.terminate()
@@ -143,9 +150,9 @@ class RMQDriver(Driver):
         if self._closing or reply_code == 200:
             self.connection.ioloop.stop()
         else:
-            warning('RMQConnection(%s): Connection closed, reopening in 5 seconds: (%s) %s',
-                    self.name, reply_code, reply_text)
-            self.connection.add_timeout(5, self.reconnect)
+            self.warn('Connection closed, reopening in %f seconds: (%s) %s',
+                      self.sleeptime, reply_code, reply_text)
+            self.connection.add_timeout(self.sleeptime, self.reconnect)
 
     def reconnect(self):
         r"""Try to re-establish a connection and resume a new IO loop."""

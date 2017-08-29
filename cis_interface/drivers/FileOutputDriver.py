@@ -49,7 +49,7 @@ class FileOutputDriver(IODriver):
         try:
             with self.lock:
                 self.fd = open(self.args, 'w+')
-        except:
+        except:  # pragma: debug
             self.exception('Could not open file.')
             return
         while self.fd is not None:
@@ -61,7 +61,7 @@ class FileOutputDriver(IODriver):
             if len(data) > 0:
                 with self.lock:
                     if self.fd is None:
-                        break
+                        break  # pragma: debug
                     else:
                         self.fd.write(data)
             else:

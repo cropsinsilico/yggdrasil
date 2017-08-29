@@ -3,14 +3,14 @@ import numpy as np
 from nose.tools import istest, nottest, assert_raises, assert_equal
 from cis_interface.io import AsciiTable
 
+
 input_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), "Input")
 output_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), "Output")
-
 input_file = os.path.join(input_dir, "ascii_table.txt")
 output_file = os.path.join(output_dir, "ascii_table.txt")
 ncols = 3
 nrows = 3
-input_ncomments = 2 # Names & formats
+input_ncomments = 2  # Names & formats
 input_nlines = nrows
 output_ncomments = 2  # Just formats
 output_nlines = nrows
@@ -33,7 +33,8 @@ map_nptype2cformat = [(['float_', 'float16', 'float32', 'float64'], '%g'),
                       ('int8', '%hhd'), ('short', '%hd'), ('intc', '%d'), ('int_', '%ld'),
                       ('uint8', '%hhu'), ('ushort', '%hu'), ('uintc', '%u'), ('uint64', '%lu'), 
                       ('S', '%s')]
-if np.dtype('int_') != np.dtype('longlong'):
+# This is for when default int is 32bit
+if np.dtype('int_') != np.dtype('longlong'):  # pragma: no cover
     map_nptype2cformat.append(('longlong', '%lld'))
     map_nptype2cformat.append(('ulonglong', '%llu'))
 map_cformat2pyscanf = [(['%hhd', '%hd', '%d', '%ld', '%lld'], '%d'),
@@ -78,7 +79,7 @@ def test_cformat2nptype():
     assert_raises(ValueError, AsciiTable.cformat2nptype, 's')
     assert_raises(ValueError, AsciiTable.cformat2nptype, '%')
     for a in unsupported_nptype:
-        assert_raises(ValueError, AsciiTable.cformat2nptype, a)
+        assert_raises(ValueError, AsciiTable.cformat2nptype, '%'+a)
 
 
 def test_cformat2pyscanf():
@@ -104,7 +105,7 @@ def test_AsciiTable():
         assert_raises(RuntimeError, AsciiTable.AsciiTable, output_file, 'w')
         assert_raises(RuntimeError, AsciiTable.AsciiTable, output_file, None)
 
-
+        
 def test_AsciiTable_open_close():
     for use_astropy in [False, True]:
         for mode in mode_list:
@@ -194,7 +195,7 @@ def test_AsciiTable_line():
             eof, line = AF_in.readline()
             if not eof:
                 if line is None:
-                    count_comments+=1
+                    count_comments+=1  # pragma: debug
                 else:
                     AF_out.writeline(*line)
                     count_lines+=1
@@ -213,7 +214,7 @@ def test_AsciiTable_line():
             eof, line = AF_out.readline()
             if not eof:
                 if line is None:
-                    count_comments+=1
+                    count_comments+=1  # pragma: debug
                 else:
                     count_lines+=1
         AF_out.close()
@@ -247,7 +248,7 @@ def test_AsciiTable_io_array():
             eof, line = AF_out.readline_full()
             if not eof:
                 if line is None:
-                    count_comments+=1
+                    count_comments+=1  # pragma: debug
                 else:
                     count_lines+=1
         AF_out.close()
@@ -283,7 +284,7 @@ def test_AsciiTable_io_array_skip_header():
             eof, line = AF_out.readline_full()
             if not eof:
                 if line is None:
-                    count_comments+=1
+                    count_comments+=1  # pragma: debug
                 else:
                     count_lines+=1
         AF_out.close()
@@ -296,9 +297,10 @@ def test_AsciiTable_array_bytes():
     for use_astropy in [False, True]:
         for order in ['C', 'F']:
             AF_in = AsciiTable.AsciiTable(input_file, 'r',
-                                          use_astropy=use_astropy, **mode2kws['r'])
+                                          use_astropy=use_astropy,
+                                          **mode2kws['r'])
             AF_out = AsciiTable.AsciiTable(output_file, 'w',
-                                           use_astropy=use_astropy, #**mode2kws['w'])
+                                           use_astropy=use_astropy,
                                            format_str=AF_in.format_str,
                                            column_names=AF_in.column_names)
             # Read matrix
@@ -320,6 +322,9 @@ def test_AsciiTable_array_bytes():
             out_arr = AF_out.read_array()
             np.testing.assert_equal(out_arr, in_arr)
             os.remove(output_file)
+    mat = np.zeros((4,3), dtype='float')
+    AF0 = AsciiTable.AsciiTable(output_file, 'w', format_str='%f\t%f\t%f')
+    AF0.array_to_bytes(mat)
 
 
 def test_AsciiTable_io_bytes():
@@ -357,3 +362,20 @@ def test_AsciiTable_io_bytes():
         os.remove(output_file)
 
         
+def test_AsciiTable_dtype_vs_format():
+    AF0 = AsciiTable.AsciiTable(mode2file['r'], 'r', **mode2kws['r'])
+    AF1 = AsciiTable.AsciiTable(mode2file['r'], 'r', dtype=AF0.dtype)
+    AF1.update_format_str(AF0.format_str)
+    AF1.update_dtype(AF0.dtype)
+    AF1.update_dtype(AF0.dtype.str)
+
+    
+def test_AsciiTable_writenames():
+    AF0 = AsciiTable.AsciiTable(mode2file['w'], 'w', **mode2kws['w'])
+    AF0.column_names = None
+    AF0.writenames()
+    assert_raises(IndexError, AF0.writenames, names=column_names[1:])
+
+def test_AsciiTable_validate_line():
+    AF0 = AsciiTable.AsciiTable(mode2file['w'], 'w', **mode2kws['w'])
+    assert_raises(AssertionError, AF0.validate_line, 'wrong format')

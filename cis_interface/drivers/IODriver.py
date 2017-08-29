@@ -59,7 +59,7 @@ class IODriver(Driver):
             print '%-15s' % (str(self.numReceived) + ' accepted, '),
             print '%-15s' % (str(self.mq.current_messages) + ' ready'),
             print end_msg
-        except:
+        except:  # pragma: debug
             print ''
 
     def recv_wait(self):
@@ -134,7 +134,7 @@ class IODriver(Driver):
                 ret, leng = data, len(data)
             else:
                 ret, leng = '', 0
-        except:
+        except:  # pragma: debug
             ret, leng = None, -1
         self.debug('.ipc_recv ret %d bytes', leng)
         return ret
@@ -158,7 +158,7 @@ class IODriver(Driver):
                 self.debug('.ipc_send_nolimit(): %d of %d bytes sent',
                            next, len(data))
                 prev = next
-            except:
+            except:  # pragma: debug
                 self.debug('.ipc_send_nolimit(): send interupted at %d of %d bytes.',
                            prev, len(data))
                 error = True
@@ -184,13 +184,13 @@ class IODriver(Driver):
             data = ''
             while len(data) < leng_exp:
                 ret = self.ipc_recv()
-                if ret is None:
+                if ret is None:  # pragma: debug
                     self.debug('.ipc_recv_nolimit: read interupted at %d of %d bytes.',
                                len(data, leng_exp))
                     break
                 data += ret
             ret, leng = data, len(data)
-        except:
+        except:  # pragma: debug
             ret, leng = None, -1
         self.debug('.ipc_recv_nolimit ret %d bytes', leng)
         return ret
@@ -200,7 +200,7 @@ class IODriver(Driver):
         r"""int: The number of messages in the queue."""
         if self.mq:
             return self.mq.current_messages
-        else:
+        else:  # pragma: debug
             return 0
 
     def stop(self, tries=10):
@@ -219,8 +219,8 @@ class IODriver(Driver):
                                self.mq.current_messages)
                 self.sleep()
                 tries = tries-1
-        except:
-            self.debug("::stop: exception") #del self.mq 
+        except:  # pragma: debug
+            self.debug("::stop: exception")
         self.terminate()
         self.debug('.stop(): done')
 
@@ -231,12 +231,11 @@ class IODriver(Driver):
             if self.mq:
                 self.debug('.stop(): remove IPC id %d', self.mq.id)
                 self.mq.remove()
-                #sysv_ipc.remove_message_queue(self.mq.id)
                 self.mq = None
-        except:
+        except:  # pragma: debug
             self.debug(':terminate(): exception')
         self.debug(':terminate(): done')
 
-    def on_delete(self):
+    def on_delete(self):  # pragma: no cover
         r"""Actions to perform when the associated model driver is finished."""
         pass

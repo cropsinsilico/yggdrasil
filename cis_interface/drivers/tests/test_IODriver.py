@@ -116,6 +116,12 @@ class TestIODriver(parent.TestDriver, IOInfo):
         super(TestIODriver, self).teardown()
         nt.assert_equal(len(ipc_queues()), self.nprev_queues)
 
+    def test_early_close(self):
+        r"""Test early deletion of message queue."""
+        if self.instance.mq:
+            self.instance.mq.remove()
+            self.instance.mq = None
+
     def test_send_recv(self):
         r"""Test sending/receiving small message."""
         self.instance.ipc_send(self.msg_short)

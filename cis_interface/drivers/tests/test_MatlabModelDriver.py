@@ -10,13 +10,14 @@ class TestMatlabModelDriver(parent.TestModelDriver):
     def __init__(self):
         super(TestMatlabModelDriver, self).__init__()
         self.driver = "MatlabModelDriver"
-        self.args = "matlab_model.m"
+        self.args = ["matlab_model.m", "test", 1]
         self.attr_list += ['started_matlab', 'mlengine']
 
     def test_a(self):
         r"""Dummy test to start matlab."""
-        if self.instance.screen_session is None:
-            print("Matlab was not started by this test. Close any existing Matlab sessions to test creation/removal.")
+        if self.instance.screen_session is None:  # pragma: debug
+            print("Matlab was not started by this test. Close any " +
+                  "existing Matlab sessions to test creation/removal.")
         else:
             with open(_session_fname, 'w') as f:
                 f.write(self.instance.screen_session)
@@ -31,5 +32,6 @@ class TestMatlabModelDriver(parent.TestModelDriver):
             os.remove(_session_fname)
             self.instance.screen_session = session
             self.instance.started_matlab = True
-        else:
-            print("Skipping removal of Matlab session as the test did not create it.")
+        else:  # pragma: debug
+            print("Skipping removal of Matlab session as the test did " +
+                  "not create it.")

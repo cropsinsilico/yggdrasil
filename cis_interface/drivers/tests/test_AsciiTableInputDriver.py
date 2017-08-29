@@ -25,7 +25,7 @@ class TestAsciiTableInputDriver(parent.TestAsciiFileInputDriver):
                 break
             if len(data) > 0:
                 while self.file_lines[iline].startswith('#'):
-                    iline += 1
+                    iline += 1  # pragma: no cover
                 nt.assert_equal(data, self.file_lines[iline])
                 iline += 1
         nt.assert_equal(len(self.file_lines), iline)

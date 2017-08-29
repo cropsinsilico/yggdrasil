@@ -45,6 +45,7 @@ class RMQClientDriver(RMQDriver, RPCDriver):
         self._acked = 0
         self._nacked = 0
         self._message_number = 0
+        super(RMQClientDriver, self).reconnect()
 
     def on_queue_declareok(self, method_frame):
         r"""Actions to perform once the queue is succesfully declared."""
@@ -66,7 +67,8 @@ class RMQClientDriver(RMQDriver, RPCDriver):
         self.debug('::start_communication')
         self.channel.add_on_cancel_callback(self.on_consumer_cancelled)
         # self.channel.basic_qos(prefetch_count=1)
-        self.publish_to_server(_new_client_msg)
+        if self.times_connected == 1:  # Only do this once
+            self.publish_to_server(_new_client_msg)
         self.consumer_tag = self.channel.basic_consume(self.on_response,
                                                        # no_ack=True,
                                                        queue=self.queue)
@@ -102,7 +104,7 @@ class RMQClientDriver(RMQDriver, RPCDriver):
 
     def schedule_next_message(self):
         r"""Wait for next message."""
-        if self._closing:
+        if self._closing:  # pragma: debug
             return
         self.debug('Checking IPC queue.')
         message = self.oipc.ipc_recv_nolimit()
@@ -121,7 +123,7 @@ class RMQClientDriver(RMQDriver, RPCDriver):
 
     def schedule_next_response(self):
         r"""Wait for next response."""
-        if self._closing:
+        if self._closing:  # pragma: debug
             return
         if self.response is None:
             self.debug('::Checking RMQ response queue again in %0.1f seconds',

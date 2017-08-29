@@ -25,6 +25,7 @@ class TestDriver(object):
         self.namespace = 'TESTING'
         self.attr_list = ['name', 'sleeptime', 'longsleep', 'yml', 'namespace',
                           'rank', 'workingDir']
+        self.inst_kwargs = {}
 
     def setup(self):
         r"""Create a driver instance and start the driver."""
@@ -42,9 +43,6 @@ class TestDriver(object):
         if hasattr(self, '_instance'):
             self.remove_instance(self._instance)
             delattr(self, '_instance')
-
-    def __del__(self):
-        self.teardown()
 
     @property
     def name(self):
@@ -69,7 +67,8 @@ class TestDriver(object):
         os.chdir(self.workingDir)
         inst = PsiRun.create_driver(self.driver, self.name, self.args,
                                     namespace=self.namespace,
-                                    workingDir=self.workingDir)
+                                    workingDir=self.workingDir,
+                                    **self.inst_kwargs)
         os.chdir(curpath)
         # print("created instance")
         return inst
@@ -78,7 +77,7 @@ class TestDriver(object):
         r"""Remove an instance."""
         inst.terminate()
         if inst.is_alive():
-            inst.join()
+            inst.join()  # pragma: debug
         del inst
         # print("removed instance")
 
@@ -130,18 +129,35 @@ class TestDriver(object):
             self.instance.join()
         self.assert_after_terminate()
 
+    def test_info(self):
+        r"""Test print of info statement."""
+        self.instance.info(1)
+
     def test_debug(self):
         r"""Test print of debug statement."""
-        self.instance.debug("Test message %d (int), %s (str)", 1, 'test')
+        self.instance.debug(1)
 
-    def test_error(self):
-        r"""Test print of error statement."""
-        self.instance.error("Test message %d (int), %s (str)", 1, 'test')
+    def test_critical(self):
+        r"""Test print of critical statement."""
+        self.instance.critical(1)
 
     def test_warn(self):
         r"""Test print of warning statement."""
-        self.instance.warn("Test message %d (int), %s (str)", 1, 'test')
+        self.instance.warn(1)
+        
+    def test_error(self):
+        r"""Test print of error statement."""
+        self.instance.error(1)
+
+    def test_exception(self):
+        r"""Test print of exception."""
+        self.instance.exception(1)
         
     def test_printStatus(self):
         r"""Test mechanism to print the status of the driver."""
         self.instance.printStatus()
+
+    def test_wait(self):
+        r"""Test mechanism to wait on driver to finish."""
+        self.instance.wait()
+        assert(not self.instance.isAlive())

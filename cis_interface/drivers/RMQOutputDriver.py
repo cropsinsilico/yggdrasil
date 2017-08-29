@@ -28,12 +28,11 @@ class RMQOutputDriver(RMQConnection):
     def printStatus(self):
         r"""Print the driver status."""
         self.debug('::printStatus():')
-        #print '%-30s' % ('RMQOutputDriver(' + self.name + ')'),
-        #print '%-30s' % (str(self.queue.method.message_count) + ' in server queue')
         try:
             super(RMQOutputDriver, self).printStatus()
             print '%-30s' % ('RMQOutputDriver(' + self.name + ')'),
-            print '%-30s' % (str(self.queue.method.message_count) + ' in server queue')
+            print '%-30s' % (str(self.queue.method.message_count) +
+                             ' in server queue')
         except:
             self.debug("::printStatus(): queue count exception handled")
         self.debug("::printStatus():")
@@ -45,11 +44,6 @@ class RMQOutputDriver(RMQConnection):
         self.connection.add_timeout(self.sleeptime,
                                     self.publish_message)
         self.publish_message()
-        #self.ioloop = Thread(self.connection.ioloop.start()).start()
-        #self._consumer_tag = self.channel.basic_consume(self.on_message, self.args)
-        # one at a time, don't stuff the Qs
-        #self.channel.basic_qos(prefetch_count=1)
-        return
     
     def publish_message(self):
         r"""Continue receiving messages from the local queue and passing them 
@@ -57,39 +51,32 @@ class RMQOutputDriver(RMQConnection):
         while True:
             self.debug(".publish_message(): IPC recv")
             data = self.ipc_recv()
-            if data is None: # closed,
+            if data is None:
                 self.debug(".publish_message(): queue closed!")
                 break
             elif len(data) == 0:
                 self.debug(".publish_message(): no data, reschedule")
-                self.connection.add_timeout(self.sleeptime, \
-                    self.publish_message)
+                self.connection.add_timeout(self.sleeptime,
+                                            self.publish_message)
                 break
             self.debug(".publish_message(): IPC recv got %d bytes", len(data))
             self.debug(".publish_message(): send %d bytes to AMQP", len(data))
-            self.channel.basic_publish(exchange=os.environ['PSI_NAMESPACE'], \
+            self.channel.basic_publish(
+                exchange=os.environ['PSI_NAMESPACE'],
                 routing_key=self.args, body=data, mandatory=True)
             self.debug(".publish_message(): sent to AMQP")
         self.debug(".publish_message returns")
 
-    # def on_consumer_cancelled(self, method_frame):
-    #     r"""Actions to perform when consumption is cancelled."""
-    #     self.debug(": Consumer was cancelled remotely, shutting down: %r",
-    #                method_frame)
-    #     self._closing = False
-    #     #if self.channel:
-    #     #    self.channel.close()
-
-    def on_delete(self):
-        r"""Delete the driver. Deleting the queue and closing the connection."""
-        # self.info(".delete()")
-        self.debug(".delete()")
-        try:
-            pass
-            # self.channel.queue_unbind(exchange=os.environ['PSI_NAMESPACE'], queue=self.args)
-            # self.channel.queue_delete(queue=self.args, if_unused=True)
-            # self.connection.close()
-        except:
-            self.debug(".delete(): exception (IGNORED)")
-        self.debug(".delete() returns")
+    # def on_delete(self):
+    #     r"""Delete the driver. Deleting the queue and closing the connection."""
+    #     # self.info(".delete()")
+    #     self.debug(".delete()")
+    #     try:
+    #         pass
+    #         # self.channel.queue_unbind(exchange=os.environ['PSI_NAMESPACE'], queue=self.args)
+    #         # self.channel.queue_delete(queue=self.args, if_unused=True)
+    #         # self.connection.close()
+    #     except:
+    #         self.debug(".delete(): exception (IGNORED)")
+    #     self.debug(".delete() returns")
 

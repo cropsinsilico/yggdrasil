@@ -47,7 +47,8 @@ def nptype2cformat(nptype):
         cfmt = "%d"
     elif t == np.dtype("int_"):
         cfmt = "%ld"
-    elif t == np.dtype("longlong"): # If it is different than C long
+    elif t == np.dtype("longlong"):  # pragma: no cover
+        # If it is different than C long
         cfmt = "%lld"
     elif t == np.dtype("uint8"):
         cfmt = "%hhu"
@@ -57,7 +58,7 @@ def nptype2cformat(nptype):
         cfmt = "%u"
     elif t == np.dtype("uint64"): # Platform dependent
         cfmt = "%lu"
-    elif t == np.dtype("ulonglong"):
+    elif t == np.dtype("ulonglong"):  # pragma: no cover
         cfmt = "%llu"
     elif np.issubdtype(t, np.dtype("S")):
         # cfmt = '%s'
@@ -229,7 +230,7 @@ class AsciiTable(AsciiFile):
             if hasattr(self, '_dtype'):
                 fmts = [nptype2cformat(self.dtype[i]) for i in range(len(self.dtype))]
                 self._format_str = self.column.join(fmts) + self.newline
-            else:
+            else:  # pragma: debug
                 raise RuntimeError("Format string not set and cannot be determined.")
         return self._format_str
 

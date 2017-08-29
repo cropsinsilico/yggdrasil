@@ -67,7 +67,7 @@ class AsciiTableOutputDriver(AsciiFileOutputDriver):
                 self.file.writeformat()
             while self.file.is_open:
                 data = self.ipc_recv_nolimit()
-                if data is None:
+                if data is None:  # pragma: debug
                     self.debug(':recv: closed')
                     break
                 self.debug(':recvd %s bytes', len(data))
@@ -78,7 +78,7 @@ class AsciiTableOutputDriver(AsciiFileOutputDriver):
                     with self.lock:
                         if self.file.is_open:
                             self.file.writeline_full(data, validate=True)
-                        else:
+                        else:  # pragma: debug
                             break
                 else:
                     self.debug(':recv: no data')
