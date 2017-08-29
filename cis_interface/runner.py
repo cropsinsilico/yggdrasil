@@ -16,6 +16,10 @@ import socket
 from cis_interface.backwards import sio
 
 
+COLOR_TRACE = '\033[30;43;22m'
+COLOR_NORMAL = '\033[0m'
+
+
 def setup_cis_logging(prog, level=None):
     r"""Set the log lovel based on environment variable 'PSI_DEBUG'. If the
     variable is not set, the log level is set to 'NOTSET'.

@@ -1,7 +1,5 @@
 #!/bin/bash
 
-. ../../pycis/interface/setup.sh
-
 python make_input.py
 
 export PSI_DEBUG="INFO"
@@ -36,4 +34,4 @@ case $1 in
 	;;
 esac
 
-PsiRun.py $yaml
+cisrun $yaml

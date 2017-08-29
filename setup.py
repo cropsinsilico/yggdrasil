@@ -27,7 +27,7 @@ setup(
         'tests/scripts/*', 'tests/data/*'],
     },
     include_package_data=True,
-    version="0.0.0",
+    version="0.0.1",
     description=("A framework for combining interdependent models from "
                  "multiple languages."),
     long_description=long_description,
@@ -50,7 +50,7 @@ setup(
         "Development Status :: 3 - Alpha",
     ],
     entry_points = {
-        'console_scripts': ['psirun=cis_interface.command_line:cisrun'],
+        'console_scripts': ['cisrun=cis_interface.command_line:cisrun'],
     },
     license="BSD",
 )

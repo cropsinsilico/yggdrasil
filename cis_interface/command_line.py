@@ -5,6 +5,8 @@ from logging import *
 import signal
 import traceback
 from pprint import pformat
+from cis_interface import runner
+
 
 cisRunner = None
 INTERRUPT_TIME = 0

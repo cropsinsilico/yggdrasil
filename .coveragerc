@@ -6,7 +6,9 @@ omit =
     */site-packages/ordereddict.py
     */site-packages/nose/*
     */unittest2/*
-    cis_interface/drivers/tests/python_model.py
+    cis_interface/tests/scripts/python_model.py
+    cis_interface/command_line.py
+    cis_interface/interface/scanf.py
 
 [report]
 sort = Cover
