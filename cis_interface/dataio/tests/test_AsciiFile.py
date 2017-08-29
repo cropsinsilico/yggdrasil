@@ -1,7 +1,7 @@
 import os
 import numpy as np
 from nose.tools import istest, nottest, assert_raises, assert_equal
-from cis_interface.io import AsciiFile
+from cis_interface.dataio import AsciiFile
 
 input_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), "Input")
 output_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), "Output")

@@ -5,8 +5,8 @@ import time
 from scanf import scanf
 from sysv_ipc import MessageQueue
 from cis_interface.backwards import pickle    
-from cis_interface.io.AsciiFile import AsciiFile
-from cis_interface.io.AsciiTable import AsciiTable
+from cis_interface.dataio.AsciiFile import AsciiFile
+from cis_interface.dataio.AsciiTable import AsciiTable
 
 
 PSI_MSG_MAX = 1024*64

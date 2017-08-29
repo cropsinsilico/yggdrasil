@@ -1,7 +1,7 @@
 import os
 import numpy as np
 from nose.tools import istest, nottest, assert_raises, assert_equal
-from cis_interface.io import AsciiTable
+from cis_interface.dataio import AsciiTable
 
 
 input_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), "Input")
