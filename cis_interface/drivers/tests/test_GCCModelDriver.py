@@ -1,4 +1,5 @@
 import os
+from cis_interface.tests import scripts
 import test_ModelDriver as parent
 
 
@@ -8,7 +9,7 @@ class TestGCCModelDriver(parent.TestModelDriver):
     def __init__(self):
         super(TestGCCModelDriver, self).__init__()
         self.driver = 'GCCModelDriver'
-        self.args = os.path.join(os.path.dirname(__file__), 'gcc_model.c')
+        self.args = scripts['c']
         self.attr_list += ['compiled']
 
     def teardown(self):

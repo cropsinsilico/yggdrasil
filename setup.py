@@ -21,9 +21,9 @@ setup(
     packages=find_packages(),
     package_data={'cis_interface': [
         'defaults.cfg',
-        'dataio/*.h',
+        'dataio/*.h', 'dataio/*.hpp',
         'drivers/matlab_screenrc',
-        'interface/*.h',
+        'interface/*.h', 'interface/*.hpp', 'interface/*.m',
         'tests/scripts/*', 'tests/data/*'],
     include_package_data=True,
     version="0.0.0",

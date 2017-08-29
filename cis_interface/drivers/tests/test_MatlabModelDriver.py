@@ -1,8 +1,10 @@
 import os
+from cis_interface.tests import scripts
 import test_ModelDriver as parent
 
 
 _session_fname = os.path.join(os.getcwd(), 'nt_screen_session.txt')
+
 
 class TestMatlabModelDriver(parent.TestModelDriver):
     r"""Test runner for MatlabModelDriver."""
@@ -10,7 +12,7 @@ class TestMatlabModelDriver(parent.TestModelDriver):
     def __init__(self):
         super(TestMatlabModelDriver, self).__init__()
         self.driver = "MatlabModelDriver"
-        self.args = ["matlab_model.m", "test", 1]
+        self.args = [scripts["matlab"], "test", 1]
         self.attr_list += ['started_matlab', 'mlengine']
 
     def test_a(self):
