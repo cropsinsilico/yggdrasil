@@ -38,7 +38,8 @@ if np.dtype('int_') != np.dtype('longlong'):
     map_nptype2cformat.append(('ulonglong', '%llu'))
 map_cformat2pyscanf = [(['%hhd', '%hd', '%d', '%ld', '%lld'], '%d'),
                        (['%hhu', '%hu', '%u', '%lu', '%llu'], '%u'),
-                       (['%5s', '%s'], '%s')]
+                       (['%5s', '%s'], '%s'),
+                       ('%s', '%s')]
 
 unsupported_cfmt = ['a', 'A', 'p', 'n', '']
 map_cformat2nptype = [(['f', 'F', 'e', 'E', 'g', 'G'], 'float64'),
@@ -52,7 +53,8 @@ map_cformat2nptype = [(['f', 'F', 'e', 'E', 'g', 'G'], 'float64'),
                       (['u', 'o', 'x', 'X'], 'uintc'),
                       (['lu', 'lo', 'lx', 'lX'], 'uint64'),
                       (['llu', 'llo', 'llx', 'llX'], 'ulonglong'),
-                      (['c', 's'], 'str')]
+                      (['c', 's'], 'str'),
+                      ('s', 'str')]
 
 
 def test_nptype2cformat():

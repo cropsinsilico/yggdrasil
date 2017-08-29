@@ -105,7 +105,7 @@ class TestDriver(object):
     def test_attributes(self):
         r"""Assert that the driver has all of the required attributes."""
         for a in self.attr_list:
-            if not hasattr(self.instance, a):
+            if not hasattr(self.instance, a):  # pragma: debug
                 raise AttributeError("Driver does not have attribute %s" % a)
 
     def test_init_del(self):

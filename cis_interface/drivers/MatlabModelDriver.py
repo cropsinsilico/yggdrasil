@@ -102,12 +102,12 @@ class MatlabModelDriver(ModelDriver):
         r"""Terminate the driver, including the matlab engine."""
         if self.started_matlab:
             eng = self.mlengine
-            self.mlengine = None
             try:
                 if eng is not None:
                     eng.quit()
-            except SystemError:
+            except SystemError:  # pragma: debug
                 self.error('.terminate failed to quit matlab engine')
+            self.mlengine = None
             if self.screen_session is not None:
                 stop_matlab(self.screen_session)
             self.screen_session = None
