@@ -215,7 +215,7 @@ class PsiRpc:
 
         """
         outmsg = self._outFmt % args
-        return self._out.send(outmsg)
+        return self._out.send_nolimit(outmsg)
 
     def rpcRecv(self):
         r"""Receive a message and get arguments by parsing the recieved message
@@ -227,7 +227,7 @@ class PsiRpc:
                 the input format string.
         
         """
-        retval, args = self._in.recv()
+        retval, args = self._in.recv_nolimit()
         if retval:
             args = scanf(self._inFmt, args)
         return retval, args

@@ -1,0 +1,20 @@
+---
+
+#
+# Minimal Model Example yaml
+#
+
+model:
+  name: hellopython
+  driver: PythonModelDriver
+  args: hellofiles.py
+
+  inputs:
+    - name: inFile
+      driver: FileInputDriver
+      args: input.txt
+  
+  outputs:
+    - name: outFile
+      driver: FileOutputDriver
+      args: /tmp/output.txt

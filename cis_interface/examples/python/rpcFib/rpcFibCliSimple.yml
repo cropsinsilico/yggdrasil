@@ -1,0 +1,27 @@
+---
+
+model:
+  name: rpcFibCliSimple
+  driver: ModelDriver
+  args:    # basic commands to run, command line:   python rpcFibCli.py ${FIB_ITERATIONS}
+    - python
+    - rpcFibCliSimple.py
+    - "{{ FIB_ITERATIONS }}"   # env_var passed as argument for number of loops
+
+  outputs:
+    - name: cli_output   # Name of channel in model, private to model code 
+      driver: RMQOutputDriver
+      args: fib_call   # connected to this queue, shared by all models
+      onexit: delete    # delete the queue when the model exits
+    - name: output_log
+      driver: FileOutputDriver
+      args: /tmp/fibCli.out
+
+  inputs:
+    - name: cli_input   # Name of channel in model, private to model code      
+      driver: RMQInputDriver
+      args: fib_return     # connected to this queue, shared by all models
+      onexit: delete        # delete the queue when the model exits
+    - name: yaml_in
+      driver: FileInputDriver
+      args: rpcFibCli.yml
