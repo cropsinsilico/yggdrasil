@@ -33,7 +33,7 @@ class MatOutputDriver(FileOutputDriver):
         """
         self.debug(':put: unpickling %s bytes', len(data))
         data_dict = pickle.loads(data)
-        if not isinstance(data_dict, dict):
+        if not isinstance(data_dict, dict):  # pragma: debug
             self.error(':put unpickled object (type %s) is not a dictionary',
                        type(data_dict))
             return
@@ -49,7 +49,7 @@ class MatOutputDriver(FileOutputDriver):
         try:
             with self.lock:
                 self.fd = open(self.args, 'wb')
-        except:
+        except:  # pragma: debug
             self.exception('Could not open file.')
             return
         while self.fd is not None:
@@ -60,7 +60,7 @@ class MatOutputDriver(FileOutputDriver):
             self.debug(':recvd %s bytes', len(data))
             if len(data) > 0:
                 with self.lock:
-                    if self.fd is None:
+                    if self.fd is None:  # pragma: debug
                         self.debug(':recv: file closed')
                         break
                     else:

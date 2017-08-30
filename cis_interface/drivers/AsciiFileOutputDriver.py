@@ -30,6 +30,7 @@ class AsciiFileOutputDriver(FileOutputDriver):
     
     def __init__(self, name, args, skip_AsciiFile=False, **kwargs):
         filepath = None
+        self.args_ignored = []
         if isinstance(args, str):
             filepath = args
             args = {}
@@ -41,17 +42,17 @@ class AsciiFileOutputDriver(FileOutputDriver):
                 if isinstance(a, dict):
                     args_new.update(**a)
                 else:
-                    self.info(": Ignoring argument '%s'", str(a))
+                    self.args_ignored.append(a)
             args = args_new
-        elif isinstance(args, dict):
-            pass
-        else:  # pragma: debug
+        elif not isinstance(args, dict):  # pragma: debug
             raise TypeError("args is incorrect type, check the yaml.")
         if filepath is None:
             filepath = args.pop('filename', None)
             filepath = args.pop('filepath', filepath) 
         super(AsciiFileOutputDriver, self).__init__(name, filepath, **kwargs)
         self.debug('(%s)', filepath)
+        for a in self.args_ignored:
+            self.info(": Ignoring argument '%s'", str(a))
         self.file_kwargs = args
         self.file_kwargs['format_str'] = ''
         if skip_AsciiFile:

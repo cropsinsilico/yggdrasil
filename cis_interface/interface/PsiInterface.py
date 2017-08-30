@@ -429,9 +429,9 @@ class PsiAsciiTableInput(object):
             ret, data = self._psi.recv_nolimit()
             if ret:
                 arr = self._table.bytes_to_array(data, order='F')
-                if arr is None:
+                if arr is None:  # pragma: debug
                     ret = False
-            else:
+            else:  # pragma: debug
                 arr = None
         return ret, arr
 
@@ -562,7 +562,7 @@ class PsiPickleInput(object):
             try:
                 obj = pickle.load(self._file)
                 eof = False
-            except EOFError:
+            except EOFError:  # pragma: debug
                 obj = None
                 eof = True
             ret = (not eof)
@@ -570,7 +570,7 @@ class PsiPickleInput(object):
             ret, obj = self._psi.recv_nolimit()
             try:
                 obj = pickle.loads(obj)
-            except pickle.UnpicklingError:
+            except pickle.UnpicklingError:  # pragma: debug
                 obj = None
                 ret = False
         return ret, obj
@@ -622,13 +622,13 @@ class PsiPickleOutput(object):
             try:
                 pickle.dump(obj, self._file)
                 ret = True
-            except pickle.PicklingError:
+            except pickle.PicklingError:  # pragma: debug
                 ret = False
         else:
             try:
                 msg = pickle.dumps(obj)
                 ret = True
-            except pickle.PicklingError:
+            except pickle.PicklingError:  # pragma: debug
                 ret = False
             if ret:
                 ret = self._psi.send_nolimit(msg)

@@ -12,11 +12,11 @@ class TestRMQClientDriver(parent1.TestRMQDriver, IOInfo):
     def __init__(self):
         super(TestRMQClientDriver, self).__init__()
         self.driver = 'RMQClientDriver'
-        self.args = 'TestServer'
+        self.args = None
         self.attr_list += ['request_queue', 'response', 'corr_id',
                            '_deliveries', '_acked', '_nacked',
                            '_message_number']
-        self._temp_queue = self.args
+        self._temp_queue = 'TestRMQClientDriver_SERVER'
         if self.channel:
             self.channel.queue_purge(queue=self.temp_queue)
 

@@ -108,20 +108,20 @@ class Driver(Thread):
         tobj = Timer(t, func, args=args, kwargs=kwargs)
         tobj.start()
 
-    def copy_env(self, solf=None):
-        r"""Copy environment variables over from another model or the overall
-        environment.
+    # def copy_env(self, solf=None):
+    #     r"""Copy environment variables over from another model or the overall
+    #     environment.
 
-        Args:
-            solf (object, optional): Driver that environment variables should
-                be copied from. Defaults to None and the current environment
-                variables are copied over.
+    #     Args:
+    #         solf (object, optional): Driver that environment variables should
+    #             be copied from. Defaults to None and the current environment
+    #             variables are copied over.
 
-        """
-        if solf is None:
-            self.env.update(os.environ)
-        else:
-            self.env.update(solf.env)
+    #     """
+    #     if solf is None:
+    #         self.env.update(os.environ)
+    #     else:
+    #         self.env.update(solf.env)
 
     # =========================================================================
             

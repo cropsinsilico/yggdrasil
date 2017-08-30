@@ -27,10 +27,10 @@ class RMQClientDriver(RMQDriver, RPCDriver):
     """
 
     def __init__(self, name, args=None, **kwargs):
-        super(RMQClientDriver, self).__init__(name, queue="", **kwargs)
-        self.debug()
         if args is None:
             args = name + '_SERVER'
+        super(RMQClientDriver, self).__init__(name, queue="", **kwargs)
+        self.debug()
         self.request_queue = args
         self.response = None
         self.corr_id = None
@@ -65,7 +65,6 @@ class RMQClientDriver(RMQDriver, RPCDriver):
     def start_communication(self, no_ack=False):
         r"""Start publishing messages to the queue."""
         self.debug('::start_communication')
-        self.channel.add_on_cancel_callback(self.on_consumer_cancelled)
         # self.channel.basic_qos(prefetch_count=1)
         if self.times_connected == 1:  # Only do this once
             self.publish_to_server(_new_client_msg)
@@ -151,13 +150,6 @@ class RMQClientDriver(RMQDriver, RPCDriver):
                                    body=message)
         self._message_number += 1
         self._deliveries.append(self._message_number)
-
-    def on_consumer_cancelled(self, method_frame):
-        r"""Actions to perform when consumption is cancelled."""
-        self.debug('::Consumer was cancelled remotely, shutting down: %r',
-                   method_frame)
-        if self.channel:
-            self.channel.close()
 
     def on_response(self, ch, method, props, body):
         r"""Actions to perform when a reponse is received from the server."""

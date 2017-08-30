@@ -8,6 +8,7 @@ class TestAsciiFileOutputDriver(parent.TestFileOutputDriver):
         super(TestAsciiFileOutputDriver, self).__init__()
         self.driver = 'AsciiFileOutputDriver'
         self.attr_list += ['file_kwargs', 'file']
+        self.args = [self.args, {}, 'ignore']
 
     def setup(self):
         r"""Create a driver instance and start the driver."""

@@ -149,7 +149,7 @@ class TestPsiAsciiFileInput(IOInfo):
         if not os.path.isfile(self.tempfile):
             self.write_table(self.tempfile)
         self.driver = AsciiFileInputDriver.AsciiFileInputDriver(
-            self.name, self.tempfile)
+            self.name, [self.tempfile, {}, 'ignore'])
         self.driver.start()
         self.driver.sleep(0.1)
         os.environ.update(self.driver.env)
@@ -336,7 +336,7 @@ class TestPsiAsciiTableOutput(IOInfo):
         inst = PsiInterface.PsiAsciiTableOutput(self.tempfile,
                                                 self.fmt_str, dst_type=0)
         for rans in self.file_rows:
-            msg_flag = inst.send_row(*rans)
+            msg_flag = inst.send_row(tuple(rans))
             assert(msg_flag)
         inst.send_eof()
         del inst

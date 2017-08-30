@@ -9,6 +9,7 @@ class TestAsciiFileInputDriver(parent.TestFileInputDriver):
         super(TestAsciiFileInputDriver, self).__init__()
         self.driver = 'AsciiFileInputDriver'
         self.attr_list += ['file_kwargs', 'file']
+        self.args = self.args
 
     def assert_before_stop(self):
         r"""Assertions to make before stopping the driver instance."""

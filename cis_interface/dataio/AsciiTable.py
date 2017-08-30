@@ -7,7 +7,7 @@ try:
     from astropy.io import ascii as apy_ascii
     from astropy.table import Table as apy_Table
     _use_astropy = True
-except:
+except:  # pragma: no cover
     apy_ascii, apy_Table = None, None
     print("astropy is not installed, reading/writing as an array will be "+
           "disabled. astropy can be installed using 'pip install astropy'.")

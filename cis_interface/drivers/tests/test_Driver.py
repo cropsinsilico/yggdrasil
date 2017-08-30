@@ -26,7 +26,7 @@ class TestDriver(object):
         self.namespace = 'TESTING'
         self.attr_list = ['name', 'sleeptime', 'longsleep', 'yml', 'namespace',
                           'rank', 'workingDir']
-        self.inst_kwargs = {}
+        self.inst_kwargs = {'yml': {'workingDir': self.workingDir}}
 
     def setup(self):
         r"""Create a driver instance and start the driver."""
