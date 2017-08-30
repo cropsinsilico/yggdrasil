@@ -100,6 +100,18 @@ class IOInfo(object):
         at = AsciiTable(fname, 'w', format_str=self.fmt_str)
         at.write_array(self.file_array)
 
+    def write_pickle(self, fname):
+        r"""Write the pickled table out to a file.
+
+        Args:
+            fname (str): Full path to the file that the pickle should be
+                written to.
+
+        """
+        with open(fname, 'wb') as fd:
+            pickle.dump(self.data_dict, fd)
+
+        
 class TestIODriver(parent.TestDriver, IOInfo):
     r"""Test class for the IODriver class.
 
