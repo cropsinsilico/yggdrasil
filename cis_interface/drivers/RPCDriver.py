@@ -22,8 +22,16 @@ class RPCDriver(Driver):
     def __init__(self, name, args=None, **kwargs):
         super(RPCDriver, self).__init__(name, **kwargs)
         self.debug()
-        self.iipc = IODriver(name+'_ipc_in', '_IN', **kwargs)
-        self.oipc = IODriver(name+'_ipc_out', '_OUT', **kwargs)
+        self.iipc = IODriver(name+'_ipc', '_IN', **kwargs)
+        self.oipc = IODriver(name+'_ipc', '_OUT', **kwargs)
+
+    @property
+    def env(self):
+        r"""dict: Environment variables."""
+        out = {}
+        out.update(self.iipc.env)
+        out.update(self.oipc.env)
+        return out
 
     def run(self):
         r"""Run the input/output queue drivers."""
@@ -51,40 +59,44 @@ class RPCDriver(Driver):
         self.iipc.printStatus(beg_msg='RPC Input Driver:')
         self.oipc.printStatus(beg_msg='RPC Ouput Driver:')
 
-    def recv_wait(self, use_output=False):
+    def recv_wait(self, use_output=False, timeout=0.0):
         r"""Receive a message smaller than maxMsgSize. This method will wait 
         until there is a message in the queue to return or the queue is closed.
 
         Args:
             use_output (bool, optional): If True, the message is received from
                 the output queue instead of the input one.
+            timeout (float, optional): Max time that should be waited. Defaults
+                to 0 and is infinite.
 
         Returns:
             str: The received message.
 
         """
         if use_output:
-            data = self.oipc.recv_wait()
+            data = self.oipc.recv_wait(timeout=timeout)
         else:
-            data = self.iipc.recv_wait()
+            data = self.iipc.recv_wait(timeout=timeout)
         return data
 
-    def recv_wait_nolimit(self, use_output=False):
+    def recv_wait_nolimit(self, use_output=False, timeout=0.0):
         r"""Receive a message larger than maxMsgSize. This method will wait 
         until there is a message in the queue to return or the queue is closed.
 
         Args:
             use_output (bool, optional): If True, the message is received from
                 the output queue instead of the input one.
+            timeout (float, optional): Max time that should be waited. Defaults
+                to 0 and is infinite.
 
         Returns:
             str: The received message.
 
         """
         if use_output:
-            data = self.oipc.recv_wait_nolimit()
+            data = self.oipc.recv_wait_nolimit(timeout=timeout)
         else:
-            data = self.iipc.recv_wait_nolimit()
+            data = self.iipc.recv_wait_nolimit(timeout=timeout)
         return data
 
     def ipc_send(self, data, use_input=False):

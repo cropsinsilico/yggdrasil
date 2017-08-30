@@ -1,4 +1,4 @@
-from threading import Thread
+from threading import Thread, Timer
 from logging import info, debug, error, warn, exception, critical
 import os
 import sys
@@ -52,8 +52,8 @@ class Driver(Thread):
         self.longsleep = self.sleeptime*10
         # Set defaults
         if namespace is None:
-            print("Setting namespace to %s" % os.environ['PSI_NAMESPACE'])
             namespace = os.environ['PSI_NAMESPACE']
+            self.debug("Setting namespace to %s", namespace)
         if workingDir is None:
             if isinstance(yml, dict) and ('workingDir' in yml):
                 workingDir = yml['workingDir']
@@ -90,6 +90,38 @@ class Driver(Thread):
     def printStatus(self):
         r"""Print the driver status."""
         error('%s(%s): state:', self.__module__, self.name)
+
+    def sched_task(self, t, func, args=[], kwargs={}):
+        r"""Schedule a task that will be executed after a certain time has
+        elapsed.
+
+        Args:
+            t (float): Number of seconds that should be waited before task
+                is executed.
+            func (object): Function that should be executed.
+            args (list, optional): Arguments for the provided function.
+                Defaults to [].
+            kwargs (dict, optional): Keyword arguments for the provided
+                function. Defaults to {}.
+
+        """
+        tobj = Timer(t, func, args=args, kwargs=kwargs)
+        tobj.start()
+
+    def copy_env(self, solf=None):
+        r"""Copy environment variables over from another model or the overall
+        environment.
+
+        Args:
+            solf (object, optional): Driver that environment variables should
+                be copied from. Defaults to None and the current environment
+                variables are copied over.
+
+        """
+        if solf is None:
+            self.env.update(os.environ)
+        else:
+            self.env.update(solf.env)
 
     # =========================================================================
             

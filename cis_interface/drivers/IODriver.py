@@ -37,10 +37,10 @@ class IODriver(Driver):
         self.state = 'Started'
         self.numSent = 0
         self.numReceived = 0
-        self.env = {}           # Any addition env that the model needs
+        self.env = {}  # Any addition env that the model needs
         self.mq = MessageQueue(None, flags=sysv_ipc.IPC_CREX, \
                                max_message_size=maxMsgSize)
-        self.env[name+suffix] = str(self.mq.key)
+        self.env[name + suffix] = str(self.mq.key)
         self.debug(".env: %s", self.env)
 
     def printStatus(self, beg_msg='', end_msg=''):
@@ -62,40 +62,52 @@ class IODriver(Driver):
         except:  # pragma: debug
             print ''
 
-    def recv_wait(self):
+    def recv_wait(self, timeout=0):
         r"""Receive a message smaller than maxMsgSize. Unlike ipc_recv, 
         recv_wait will wait until there is a message to receive or the queue is
         closed.
+
+        Args:
+            timeout (float, optional): Max time that should be waited. Defaults
+                to 0 and is infinite.
 
         Returns:
             str: The received message.
 
         """
         ret = ''
-        while True:
+        elapsed = 0.0
+        while True and (not timeout or elapsed < timeout):
             ret = self.ipc_recv()
             if ret is None or len(ret) > 0:
                 break
             self.debug('.recv_wait(): waiting')
             self.sleep()
+            elapsed += self.sleeptime
         return ret
 
-    def recv_wait_nolimit(self):
+    def recv_wait_nolimit(self, timeout=0):
         r"""Receive a message larger than maxMsgSize. Unlike ipc_recv, 
         recv_wait will wait until there is a message to receive or the queue is
         closed.
+
+        Args:
+            timeout (float, optional): Max time that should be waited. Defaults
+                to 0 and is infinite.
 
         Returns:
             str: The received message.
 
         """
         ret = ''
-        while True:
+        elapsed = 0.0
+        while True and (not timeout or elapsed < timeout):
             ret = self.ipc_recv_nolimit()
             if ret is None or len(ret) > 0:
                 break
             self.debug('.recv_wait_nolimit(): waiting')
             self.sleep()
+            elapsed += self.sleeptime
         return ret
 
     def ipc_send(self, data):
@@ -114,7 +126,6 @@ class IODriver(Driver):
             self.debug('.ipc_send(): exception mq closed')
         self.state = 'delivered'
         self.numSent = self.numSent + 1
-        return
 
     def ipc_recv(self):
         r"""Receive a message smaller than maxMsgSize.

@@ -1,6 +1,6 @@
 import nose.tools as nt
 import os
-from cis_interface import PsiRun
+from cis_interface import runner
 import test_RMQConnection as parent
 
 
@@ -27,7 +27,7 @@ class TestRMQOutputDriver(parent.TestRMQConnection):
 
     def create_in_rmq(self):
         r"""Create a new RMQInputDriver instance."""
-        inst = PsiRun.create_driver(
+        inst = runner.create_driver(
             'RMQInputDriver', 'TestRMQInputDriver', self.args,
             namespace=self.namespace, workingDir=self.workingDir)
         return inst

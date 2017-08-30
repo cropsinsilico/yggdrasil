@@ -2,9 +2,9 @@ from logging import debug, info
 import os
 import sys
 import time
-from scanf import scanf
 from sysv_ipc import MessageQueue
 from cis_interface.backwards import pickle    
+from cis_interface.interface.scanf import scanf
 from cis_interface.dataio.AsciiFile import AsciiFile
 from cis_interface.dataio.AsciiTable import AsciiTable
 
@@ -40,17 +40,14 @@ class PsiInput(object):
             raise Exception('PsiInterface cant see %s in env.' % name)
             # print('ERROR:  PsiInterface cant see ' + name + ' in env')
             # exit(-1)
-
         qid = os.environ.get(self.qName, '')
         qid = int(qid)
         debug("PsiInput(%s): qid %s", self.name, qid)
         self.q = MessageQueue(qid, max_message_size=PSI_MSG_MAX)
         clidebug = os.environ.get('PSI_CLIENT_DEBUG', False)
+        self.sleeptime = 0.25
         if clidebug:
             self.sleeptime = 2.0
-        else:
-            self.sleeptime = 0.25
-        return
 
     def recv(self):
         r"""Receive a message smaller than PSI_MSG_MAX. The process will 
@@ -86,7 +83,7 @@ class PsiInput(object):
         """
         debug("PsiInput(%s).recv_nolimit()", self.name)
         payload = self.recv()
-        if not payload[0]:
+        if not payload[0]:  # pragma: debug
             debug("PsiInput(%s).recv_nolimit(): Failed to receive payload size.", self.name)
             return payload
         try:
@@ -96,7 +93,7 @@ class PsiInput(object):
             ret = True
             while len(data) < leng_exp:
                 payload = self.recv()
-                if not payload[0]:
+                if not payload[0]:  # pragma: debug
                     debug("PsiInput(%s).recv_nolimit(): read interupted at %d of %d bytes.",
                           self.name, len(data), leng_exp)
                     ret = False
@@ -104,7 +101,7 @@ class PsiInput(object):
                 data += payload[1]
             payload = (ret, data)
             debug("PsiInput(%s).recv_nolimit(): read %d bytes", self.name, len(data))
-        except Exception as ex:
+        except Exception as ex:  # pragma: debug
             payload = (False, True)
             debug("PsiInput(%s).recv_nolimit(): exception %s, return None", self.name, type(ex))
         return payload
@@ -130,8 +127,9 @@ class PsiOutput:
         self.qName = name + '_OUT'
         debug("PsiOputput(%s)", name)
         if not self.qName in os.environ:
-            print('ERROR:  PsiInterface cant see ' + name + ' in env')
-            exit(-1)
+            raise Exception('PsiInterface cant see %s in env.' % name)
+            # print('ERROR:  PsiInterface cant see ' + name + ' in env')
+            # exit(-1)
         qid = int(os.environ[name + '_OUT'])
         self.q = MessageQueue(qid, max_message_size=PSI_MSG_MAX)
         return
@@ -152,7 +150,7 @@ class PsiOutput:
             self.q.send(payload)
             ret = True
             debug("PsiOutput(%s).sent(%s)", self.name, payload)
-        except Exception as ex:
+        except Exception as ex:  # pragma: debug
             debug("PsiOutput(%s).send(%s): exception: %s", self.name, payload, type(ex))
         debug("PsiOutput(%s).send(%s): returns %d", self.name, payload, ret)
         return ret
@@ -168,14 +166,14 @@ class PsiOutput:
 
         """
         ret = self.send("%ld" % len(payload))
-        if not ret:
+        if not ret:  # pragma: debug
             debug("PsiOutput(%s).send_nolimit: Sending size of payload failed.", self.name)
             return ret
         prev = 0
         while prev < len(payload):
             next = min(prev+PSI_MSG_MAX, len(payload))
             ret = self.send(payload[prev:next])
-            if not ret:
+            if not ret:  # pragma: debug
                 debug("PsiOutput(%s).send_nolimit(): send interupted at %d of %d bytes.",
                       self.name, prev, len(payload))
                 break
@@ -388,7 +386,7 @@ class PsiAsciiTableInput(object):
         else:
             self._psi = PsiInput(name)
             ret, format_str = self._psi.recv()
-            if not ret:
+            if not ret:  # pragma: debug
                 print('ERROR:  PsiAsciiTableInput could not receive format string from input')
                 exit(-1)
             self._table = AsciiTable(name, None, format_str=format_str.decode('string_escape'))

@@ -1,7 +1,8 @@
 import nose.tools as nt
 from cis_interface import runner
 from cis_interface.drivers import Driver, ModelDriver, IODriver
-from cis_interface.tests import data, scripts, yamls
+from cis_interface.tests import scripts
+from cis_interface.examples import yamls
 
 
 def test_import_driver():
@@ -23,7 +24,7 @@ def test_create_driver():
 
 def test_get_runner():
     r"""Use get_runner to start a run."""
-    cr = runner.get_runner([yamls['python']])
+    cr = runner.get_runner([yamls['ascii_io_python']])
     cr.run()
 
 
@@ -32,7 +33,8 @@ class TestCisRunner(object):
     def __init__(self):
         nt.assert_raises(IOError, runner.CisRunner,
                          ['fake_yaml.yml'], 'test_psi_run')
-        self.runner = runner.CisRunner([yamls['python']], 'test_psi_run')
+        self.runner = runner.CisRunner([yamls['ascii_io_python']],
+                                       'test_psi_run')
 
     def test_parseModelYaml(self):
         nt.assert_raises(IOError, self.runner.parseModelYaml, 'fake_yaml.yml')

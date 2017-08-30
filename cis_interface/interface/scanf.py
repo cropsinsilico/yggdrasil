@@ -85,6 +85,10 @@ scanf_translate = [
     ("%[fgeE]", "([-+]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][-+]?\d+)?)", float),
     ("%\*[fgeE]", "(?:[-+]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][-+]?\d+)?)", None),
 
+    # langmm: Added to allows matching of %5s
+    ("%(\d)s", "(.{%s})", lambda x:x.strip()),
+    ("%\*(\d)s", "(?:.{%s})", None),
+
     ("%s", "(\S+)", lambda x:x),
     ("%\*s", "(?:\S+)", None),
 
@@ -127,7 +131,7 @@ def scanf_compile(format, collapseWhitespace=True):
             found = token.match(format, i)
             if found:
             	if cast: # cast != None
-                	cast_list.append(cast)
+                    cast_list.append(cast)
                 groups = found.groupdict() or found.groups()
                 if groups:
                     pattern = pattern % groups

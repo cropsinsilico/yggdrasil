@@ -2,7 +2,7 @@ import os
 import signal
 import nose.tools as nt
 from threading import Timer
-from cis_interface import PsiRun
+from cis_interface import runner
 
 
 # TODO: Test Ctrl-C interruption
@@ -34,8 +34,8 @@ class TestDriver(object):
         os.environ['RMQ_DEBUG'] = 'DEBUG'
         # os.environ['PSI_DEBUG'] = 'INFO'
         os.environ['PSI_NAMESPACE'] = self.namespace
-        PsiRun.setup_psi_logging(self.__module__)
-        PsiRun.setup_rmq_logging()
+        runner.setup_cis_logging(self.__module__)
+        runner.setup_rmq_logging()
         self._instance = self.create_instance()
         self.instance.start()
 
@@ -66,7 +66,7 @@ class TestDriver(object):
         r"""Create a new instance object."""
         curpath = os.getcwd()
         os.chdir(self.workingDir)
-        inst = PsiRun.create_driver(self.driver, self.name, self.args,
+        inst = runner.create_driver(self.driver, self.name, self.args,
                                     namespace=self.namespace,
                                     workingDir=self.workingDir,
                                     **self.inst_kwargs)

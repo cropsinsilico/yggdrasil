@@ -9,7 +9,7 @@ yaml_list = [
     ('ascii_io_all', 'ascii_io', 'ascii_io_all')]
 yamls = {}
 for k, d, f in yaml_list:
-    yamls[k] = os.path.join(d, f + '.yml')
+    yamls[k] = os.path.join(os.path.dirname(__file__), d, f + '.yml')
 
 
 __all__ = ['yamls']

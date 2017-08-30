@@ -4,6 +4,7 @@ from cis_interface.drivers.IODriver import maxMsgSize
 from cis_interface.backwards import pickle
 from cis_interface.drivers.tests import test_Driver as parent
 from cis_interface.tools import ipc_queues
+from cis_interface.dataio.AsciiTable import AsciiTable
 
 
 class IOInfo(object):
@@ -87,6 +88,17 @@ class IOInfo(object):
     def msg_long(self):
         r"""str: Small test message for sending."""
         return 'Test message' + self.maxMsgSize*'0'
+
+    def write_table(self, fname):
+        r"""Write the table out to a file.
+
+        Args:
+            fname (str): Full path to the file that the table should be
+                written to.
+
+        """
+        at = AsciiTable(fname, 'w', format_str=self.fmt_str)
+        at.write_array(self.file_array)
 
 
 class TestIODriver(parent.TestDriver, IOInfo):
