@@ -1,0 +1,26 @@
+---
+
+#
+# Minimal Model Example yaml
+#
+#
+
+model:
+  name: hellomatlab
+  driver: MatlabModelDriver
+  # simple for a long command line instead of '["arg1", "args", "arg3", ...]'
+  args:
+    - helloMatlab.m
+
+  inputs:
+    - name: input
+      driver: FileInputDriver
+      args: ../python/input.txt
+  
+  outputs:
+    - name: output
+      driver: FileOutputDriver
+      args: /tmp/output.txt
+
+
+      

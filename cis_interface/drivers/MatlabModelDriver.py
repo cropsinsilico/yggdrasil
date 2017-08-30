@@ -26,17 +26,20 @@ def start_matlab():
         str: Name of the screen session running matlab.
 
     """
-    screen_session = 'matlab' + datetime.today().strftime("%Y%j%H%M%S")
+    old_matlab = set(matlab.engine.find_matlab())
+    screen_session = str('matlab' + datetime.today().strftime("%Y%j%H%M%S") +
+                         '_%d' % len(old_matlab))
     os.system(('screen ' +
                '-dmS %s ' % screen_session +
                '-c %s ' % os.path.join(os.path.dirname(__file__), 'matlab_screenrc')+
                'matlab -nodisplay -nosplash -nodesktop -nojvm ' +
                '-r "matlab.engine.shareEngine"'))
                # 'matlab -r "matlab.engine.shareEngine"'))
-    while len(matlab.engine.find_matlab()) == 0:
+    while len(set(matlab.engine.find_matlab()) - old_matlab) == 0:
         debug('Waiting for matlab engine to start')
         time.sleep(1) # Usually 3 seconds
-    return screen_session
+    new_matlab = list(set(matlab.engine.find_matlab()) - old_matlab)[0]
+    return screen_session, new_matlab
 
 
 def stop_matlab(screen_session):
@@ -80,13 +83,21 @@ class MatlabModelDriver(ModelDriver):
         self.mlengine = None
         if len(matlab.engine.find_matlab()) == 0:
             self.debug(": starting a matlab shared engine")
-            self.screen_session = start_matlab()
+            self.screen_session, new_engine = start_matlab()
             self.started_matlab = True
+        else:
+            new_engine = matlab.engine.find_matlab()[0]
         try:
-            self.mlengine = matlab.engine.connect_matlab(matlab.engine.find_matlab()[0])
+            self.mlengine = matlab.engine.connect_matlab(new_engine)
         except matlab.engine.EngineError:
-            self.exception("could not connect to matlab engine")
-            return
+            self.debug(": starting a matlab shared engine")
+            self.screen_session, new_engine = start_matlab()
+            self.started_matlab = True
+            try:
+                self.mlengine = matlab.engine.connect_matlab(new_engine)
+            except matlab.engine.EngineError:
+                self.exception("could not connect to matlab engine")
+                return
 
         # Add things to Matlab environment
         fdir = os.path.dirname(os.path.abspath(self.args[0]))
