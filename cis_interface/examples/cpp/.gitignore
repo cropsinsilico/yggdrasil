@@ -1,0 +1,8 @@
+*.so
+*.o
+hello_c
+hello_cpp
+rpcFibCli
+rpcFibSrv
+rpcFibCliPar
+rpcFibSrvPar

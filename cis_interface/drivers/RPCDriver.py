@@ -22,8 +22,8 @@ class RPCDriver(Driver):
     def __init__(self, name, args=None, **kwargs):
         super(RPCDriver, self).__init__(name, **kwargs)
         self.debug()
-        self.iipc = IODriver(name+'_ipc', '_IN', **kwargs)
-        self.oipc = IODriver(name+'_ipc', '_OUT', **kwargs)
+        self.iipc = IODriver(name, '_IN', **kwargs)
+        self.oipc = IODriver(name, '_OUT', **kwargs)
 
     @property
     def env(self):

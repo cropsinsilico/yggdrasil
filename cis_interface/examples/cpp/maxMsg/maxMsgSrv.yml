@@ -1,0 +1,17 @@
+---
+
+model:
+  name: maxMsgSrv
+  driver: ModelDriver
+  args: 
+    - ./maxMsgSrv
+
+  inputs:
+    - name: srv_input
+      driver: RMQInputDriver
+      args: to_srv
+  
+  outputs:
+    - name: srv_output
+      driver: RMQOutputDriver
+      args: from_srv

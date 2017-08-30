@@ -1,0 +1,17 @@
+---
+
+model:
+  name: maxMsgCli
+  driver: ModelDriver
+  args:    # basic commands to run via exec, i.e. no shell, pipes, redirection, etc.
+    - ./maxMsgCli
+
+  inputs:
+    - name: cli_input   # Name of channel in model, private to model code  
+      driver: RMQInputDriver
+      args: from_srv
+  
+  outputs:
+    - name: cli_output   # Name of channel in model, private to model code 
+      driver: RMQOutputDriver
+      args: to_srv

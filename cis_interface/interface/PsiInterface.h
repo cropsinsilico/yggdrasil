@@ -455,13 +455,14 @@ psiRpc_t psiRpc(const char *outName, char *outFormat,
 static inline
 int rpcRecv(psiRpc_t rpc, ...){
   debug("rpcRecv(%s)\n", rpc._input._name);
-  char buf[PSI_MSG_MAX];
+  char *buf = (char*)malloc(PSI_MSG_MAX);
   va_list ap;
   va_start(ap, rpc);
-  int ret = psi_recv(rpc._input, buf, PSI_MSG_MAX);
+  int ret = psi_recv_nolimit(rpc._input, &buf, PSI_MSG_MAX);
   debug("rpcRecv(%s): psi_recv returned %d\n", rpc._input._name, ret);
   if (ret < 0) {
     debug("rpcRecv: receive error: %d\n", ret);
+    free(buf);
     return -1;
   }
   
@@ -469,24 +470,27 @@ int rpcRecv(psiRpc_t rpc, ...){
   ret = vsscanf(buf, rpc._inFmt, ap);
   debug("rpcRecv(%s): vsscanf returned %d\n", rpc._input._name, ret);
   va_end(ap);
+  free(buf);
   return (0);
 };
 
 static inline
 int rpcSend(psiRpc_t rpc, ...){
-  char buf[PSI_MSG_MAX];
+  char *buf = (char*)malloc(PSI_MSG_MAX);
   va_list ap;
   va_start(ap, rpc);
   int ret = vsnprintf(buf, PSI_MSG_MAX, rpc._outFmt, ap);
   debug("rpcSend(%s): vsnprintf returned %d\n", rpc._output._name, ret);
-  ret = psi_send(rpc._output, buf, strlen(buf));
+  ret = psi_send_nolimit(rpc._output, buf, strlen(buf));
   debug("rpcSend(%s): psi_send returned %d\n", rpc._output._name, ret);
   
   if (ret != 0){
     debug("rpcSend(%s): send error %d\n", rpc._output._name, ret);
+    free(buf);
     return -1;
   }
   va_end(ap);
+  free(buf);
   return (0);
 };
 
@@ -494,7 +498,7 @@ int rpcSend(psiRpc_t rpc, ...){
 static inline
 int rpcCall(psiRpc_t rpc,  ...){
   // setup - static variables persist across calls
-  char buf[PSI_MSG_MAX];
+  char *buf = (char*)malloc(PSI_MSG_MAX);
   int ret; // always check return values
   
   // pack the args and call
@@ -503,16 +507,18 @@ int rpcCall(psiRpc_t rpc,  ...){
   va_start(ap, rpc);
   ret = vsnprintf(buf, PSI_MSG_MAX, rpc._outFmt, ap);
   va_copy(op, ap);
-  ret = psi_send(rpc._output, buf, strlen(buf));
+  ret = psi_send_nolimit(rpc._output, buf, strlen(buf));
   if (ret != 0){
     debug("rpcCall: psi_send error: %s\n", strerror(errno));
+    free(buf);
     return -1;
   }
   
   // receive the message
-  ret = psi_recv(rpc._input, buf, PSI_MSG_MAX);
+  ret = psi_recv_nolimit(rpc._input, &buf, PSI_MSG_MAX);
   if (ret < 0) {
     printf("psi_recv error: ret %d: %s\n", ret, strerror(errno));
+    free(buf);
     return -1;
   }
   
@@ -522,6 +528,7 @@ int rpcCall(psiRpc_t rpc,  ...){
   va_end(ap);
   va_end(op);
   
+  free(buf);
   return 0;
 };
 

@@ -283,7 +283,6 @@ class CisRunner(object):
                                       model.get('outputs', dict()))]
         for drv in iodrivers:
             debug('CisRunner::do_exits(): delete %s', drv['name'])
-            drv['instance'].on_delete()
             if 'onexit' in drv:
                 debug('CisRunner::onexit: %s', drv['onexit'])
                 exit_method = getattr(drv['instance'], drv['onexit'])

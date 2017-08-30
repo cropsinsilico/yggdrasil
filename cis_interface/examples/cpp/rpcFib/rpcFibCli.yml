@@ -1,0 +1,24 @@
+---
+
+model:
+  name: rpcFibCli
+  driver: ModelDriver
+  args:    # basic commands to run via exec, i.e. no shell, pipes, redirection, etc.
+    - ./rpcFibCli
+    - "{{ FIB_ITERATIONS }}"   # env_var for number of loops
+
+  inputs:
+    - name: cli_fib
+      driver: RMQClientDriver
+      args: fib_server
+
+  # inputs:
+  #   - name: cli_input   # Name of channel in model, private to model code  
+  #     driver: RMQInputDriver
+  #     args: fib_return     # connected to this queue, shared by all models
+
+  # outputs:
+  #   - name: cli_output   # Name of channel in model, private to model code 
+  #     driver: RMQOutputDriver
+  #     args: fib_call   # connected to this queue, shared by all models
+    

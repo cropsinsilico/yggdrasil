@@ -1,0 +1,23 @@
+---
+
+model:
+  name: rpcFibSrv
+  driver: ModelDriver
+  args:    # basic commands to run via exec, i.e. no shell, pipes, redirection, etc.
+    - ./rpcFibSrv
+    - '{{ FIB_SERVER_SLEEP_SECONDS }}'
+
+  inputs:
+    - name: srv_fib
+      driver: RMQServerDriver
+      args: fib_server
+
+  # inputs:
+  #   - name: srv_input
+  #     driver: RMQInputDriver
+  #     args: fib_call   # connected to this queue, shared by all models
+
+  # outputs:
+  #   - name: srv_output
+  #     driver: RMQOutputDriver
+  #     args: fib_return     # connected to this queue, shared by all models 
