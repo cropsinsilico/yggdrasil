@@ -100,7 +100,6 @@ class IOInfo(object):
         at = AsciiTable(fname, 'w', format_str=self.fmt_str)
         at.write_array(self.file_array)
 
-
 class TestIODriver(parent.TestDriver, IOInfo):
     r"""Test class for the IODriver class.
 
