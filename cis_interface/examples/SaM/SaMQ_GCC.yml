@@ -1,0 +1,24 @@
+---
+
+model:
+  name: SaMQC
+  driver: GCCModelDriver
+  args: ./src/SaMQ.c
+
+  inputs:
+    - name: qin
+      driver: RMQInputDriver
+      args: samq
+    - name: static
+      driver: FileInputDriver
+      args: ./Input/SaM_static.txt
+
+  outputs:
+    - name: output
+      driver: FileOutputDriver
+      args: ./Output/SaM_output.txt
+    - name: qout
+      driver: RMQOutputDriver
+      args: samq
+
+
