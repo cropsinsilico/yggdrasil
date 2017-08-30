@@ -237,7 +237,8 @@ class AsciiTable(AsciiFile):
     @property
     def dtype(self):
         if not hasattr(self, '_dtype'):
-            typs = [(f[-1]+str(i), np.dtype(cformat2nptype(f))) for i,f in enumerate(self.fmts)]
+            # typs = [(f[-1]+str(i), np.dtype(cformat2nptype(f))) for i,f in enumerate(self.fmts)]
+            typs = [('f'+str(i), np.dtype(cformat2nptype(f))) for i,f in enumerate(self.fmts)]
             self._dtype = np.dtype(typs)
         return self._dtype
 

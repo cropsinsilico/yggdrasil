@@ -1,4 +1,5 @@
 import os
+import numpy as np
 import nose.tools as nt
 from threading import Timer
 from cis_interface.interface import PsiInterface
@@ -123,6 +124,17 @@ class TestPsiRpc(IOInfo):
         var_flag, var_recv = self.instance.rpcRecv()
         assert(var_flag)
         nt.assert_equal(var_recv, var_send)
+
+    def test_rpcCall(self):
+        r"""Test rpc call."""
+        var_send = self.file_rows[0]
+        msg_send = self.file_lines[0]
+        self.driver.iipc.ipc_send(msg_send)
+        var_flag, var_recv = self.instance.rpcCall(*var_send)
+        assert(var_flag)
+        nt.assert_equal(var_recv, var_send)
+        msg_recv = self.driver.oipc.recv_wait(timeout=1)
+        nt.assert_equal(msg_recv, msg_send)
 
 
 class TestPsiAsciiFileInput(IOInfo):
@@ -259,6 +271,44 @@ class TestPsiAsciiTableInput(IOInfo):
         msg_flag, rres = inst.recv_row()
         assert(not msg_flag)
 
+        
+class TestPsiAsciiTableInput_AsArray(IOInfo):
+    r"""Test input from an ascii table in array format."""
+    def __init__(self):
+        super(TestPsiAsciiTableInput_AsArray, self).__init__()
+        self.name = 'test'
+        self.tempfile = os.path.join(os.getcwd(), 'temp_ascii.txt')
+
+    def setup(self):
+        r"""Create a test file and start the driver."""
+        if not os.path.isfile(self.tempfile):
+            self.write_table(self.tempfile)
+        self.driver = AsciiTableInputDriver.AsciiTableInputDriver(
+            self.name, dict(filepath=self.tempfile, as_array=True))
+        self.driver.start()
+        self.driver.sleep(0.1)
+        os.environ.update(self.driver.env)
+
+    def teardown(self):
+        r"""Stop the driver."""
+        self.driver.stop()
+        if os.path.isfile(self.tempfile):
+            os.remove(self.tempfile)
+
+    def test_recv_array_loc(self):
+        r"""Test receiving an array from a local table."""
+        inst = PsiInterface.PsiAsciiTableInput(self.tempfile, src_type=0)
+        msg_flag, res = inst.recv_array()
+        assert(msg_flag)
+        np.testing.assert_equal(res, self.file_array)
+
+    def test_recv_array_rem(self):
+        r"""Test receiving an array from a remote table."""
+        inst = PsiInterface.PsiAsciiTableInput(self.name, src_type=1)
+        msg_flag, res = inst.recv_array()
+        assert(msg_flag)
+        np.testing.assert_equal(res, self.file_array)
+        
 
 class TestPsiAsciiTableOutput(IOInfo):
     r"""Test output from an ascii table."""
@@ -307,6 +357,50 @@ class TestPsiAsciiTableOutput(IOInfo):
             assert(msg_flag)
             lres = self.driver.recv_wait_nolimit(timeout=1)
             nt.assert_equal(lres, lans)
+            
+class TestPsiAsciiTableOutput_AsArray(IOInfo):
+    r"""Test output from an ascii table."""
+    def __init__(self):
+        super(TestPsiAsciiTableOutput_AsArray, self).__init__()
+        self.name = 'test'
+        self.tempfile = os.path.join(os.getcwd(), 'temp_ascii.txt')
+
+    def setup(self):
+        r"""Create a test table and start the driver."""
+        if not os.path.isfile(self.tempfile):
+            self.write_table(self.tempfile)
+        self.driver = IODriver.IODriver(self.name, '_OUT')
+        self.driver.start()
+        os.environ.update(self.driver.env)
+
+    def teardown(self):
+        r"""Stop the driver."""
+        self.driver.stop()
+        if os.path.isfile(self.tempfile):
+            os.remove(self.tempfile)
+
+    def test_send_array_loc(self):
+        r"""Test sending an array to a remote file."""
+        inst = PsiInterface.PsiAsciiTableOutput(self.tempfile,
+                                                self.fmt_str, dst_type=0)
+        msg_flag = inst.send_array(self.file_array)
+        assert(msg_flag)
+        del inst
+        # Read temp file
+        assert(os.path.isfile(self.tempfile))
+        with open(self.tempfile, 'r') as fd:
+            res = fd.read()
+            nt.assert_equal(res, self.file_contents)
+        
+    def test_send_array_rem(self):
+        r"""Test sending an array to a remote file."""
+        inst = PsiInterface.PsiAsciiTableOutput(self.name,
+                                                self.fmt_str, dst_type=1)
+        msg_flag = inst.send_array(self.file_array)
+        res = self.driver.recv_wait(timeout=1)
+        nt.assert_equal(res, self.fmt_str)
+        res = self.driver.recv_wait_nolimit(timeout=1)
+        nt.assert_equal(res, self.file_bytes)
 
 
 class TestPsiPickleInput(IOInfo):

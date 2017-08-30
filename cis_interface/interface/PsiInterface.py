@@ -512,7 +512,7 @@ class PsiAsciiTableOutput(object):
 
         """
         if self._type == 0:
-            self._table.write_array(arr, skip_header=True)
+            self._table.write_array(arr, skip_header=False)
             ret = True
         else:
             msg = self._table.array_to_bytes(arr, order='F')
