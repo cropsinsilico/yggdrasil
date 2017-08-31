@@ -171,3 +171,7 @@ class RPCDriver(Driver):
         r"""int: The number of messages in the output queue."""
         return self.oipc.n_msg
 
+    def on_model_exit(self):
+        r"""Actions to perform when the associated model driver is finished."""
+        self.oipc.on_model_exit()
+        self.iipc.on_model_exit()

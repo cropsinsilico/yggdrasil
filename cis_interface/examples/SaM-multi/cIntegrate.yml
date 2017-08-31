@@ -1,0 +1,27 @@
+---
+
+model:
+  name: SaMC
+  driver: GCCModelDriver
+  args: ./src/SaM.c
+
+  inputs:
+    - name: cinput1
+      driver: FileInputDriver
+      args: ./Input/SaM_input.txt
+    - name: cstatic
+      driver: FileInputDriver
+      args: ./Input/SaM_static.txt
+    - name: cfinal
+      driver: RMQInputDriver
+      args: mloutput
+
+
+  outputs:
+    - name: coutput
+      driver: RMQOutputDriver
+      args: coutput
+    - name: finalOut
+      driver: FileOutputDriver
+      args: ./Output/SaM_output.txt
+

@@ -242,7 +242,8 @@ class CisRunner(object):
         r"""Start drivers, starting with the IO drivers."""
         info('Starting I/O drivers and models on system {} in PSI_NAMESPACE {} PSI_RANK {}'.format(
             self.host, self.namespace, self.rank))
-        for driver in [i for i in chain(self.outputdrivers, self.inputdrivers, self.modeldrivers)]:
+        for driver in [i for i in chain(self.outputdrivers, self.inputdrivers,
+                                        self.modeldrivers)]:
             debug("RunModels.startDrivers(): starting driver %s", driver['name'])
             d = driver['instance']
             try:
@@ -262,10 +263,8 @@ class CisRunner(object):
                 d = drv['instance']
                 d.join(1)
                 if not d.is_alive():
-                    d.join()
-                    running.remove(drv)
-                    debug("CisRunner: join finished: (%s)", pformat(drv))
                     self.do_exits(drv)
+                    running.remove(drv)
         #self.closeChannels()
         info('All models completed')
         debug('RunModels.run() returns')
@@ -279,14 +278,22 @@ class CisRunner(object):
 
         """
         debug("CisRunner::do_exits for model %s", model['name'])
+        # Stop the model and join the thread
+        model['instance'].on_exit()
+        model['instance'].join()
+        debug("CisRunner: join finished: (%s)", pformat(model))
+        # Stop associated IO drivers
         iodrivers = [i for i in chain(model.get('inputs', dict()),
                                       model.get('outputs', dict()))]
         for drv in iodrivers:
             debug('CisRunner::do_exits(): delete %s', drv['name'])
             if 'onexit' in drv:
                 debug('CisRunner::onexit: %s', drv['onexit'])
-                exit_method = getattr(drv['instance'], drv['onexit'])
-                exit_method()
+                if drv['onexit'] != 'pass':
+                    exit_method = getattr(drv['instance'], drv['onexit'])
+                    exit_method()
+            else:
+                drv['instance'].on_model_exit()
     
     def terminate(self):
         r"""Immediately stop all drivers, beginning with IO drivers."""

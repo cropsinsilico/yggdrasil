@@ -37,7 +37,7 @@ class PsiInput(object):
         self.q = None
         debug("PsiInput(%s):", name)
         if not self.qName in os.environ:
-            raise Exception('PsiInterface cant see %s in env.' % name)
+            raise Exception('PsiInterface cant see %s in env.' % self.qName)
             # print('ERROR:  PsiInterface cant see ' + name + ' in env')
             # exit(-1)
         qid = os.environ.get(self.qName, '')
@@ -127,7 +127,7 @@ class PsiOutput:
         self.qName = name + '_OUT'
         debug("PsiOputput(%s)", name)
         if not self.qName in os.environ:
-            raise Exception('PsiInterface cant see %s in env.' % name)
+            raise Exception('PsiInterface cant see %s in env.' % self.qName)
             # print('ERROR:  PsiInterface cant see ' + name + ' in env')
             # exit(-1)
         qid = int(os.environ[name + '_OUT'])

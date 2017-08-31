@@ -24,7 +24,6 @@ class FileInputDriver(IODriver):
         self.debug('(%s)', args)
         self.args = os.path.abspath(args)
         self.fd = None
-        self.lock = Lock()
         self.debug('(%s): done with init', args)
 
     def close_file(self):

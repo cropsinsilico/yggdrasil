@@ -1,0 +1,41 @@
+<<<<<<< 9677beea961453b384958ba830fbf7cb60af5ce8
+disp('hello matlab')
+x = onCleanup( @() exit(-1) );
+
+import PsiInterface.*
+
+    in = py.PsiInterface.PsiInput('pyoutput');
+    st = py.PsiInterface.PsiInput('mlstatic');
+    out = py.PsiInterface.PsiOutput('mloutput');
+
+	disp(' created channels');
+
+    Input = in.recv();
+	disp(' in: ');
+	disp(Input);
+    Static = st.recv();
+	disp(' static: ');
+	disp(Static);
+    Output = str2num(char(Input))+str2num(char(Static));
+    sOutput = sprintf('%d',Output);
+    out.send(sOutput);
+disp(['sent: ' sOutput]);
+
+disp(' goodbye from matlab');
+=======
+
+
+import PsiInterface.*
+
+    in = py.PsiInterface.PsiInput('mlinput1');
+    st = py.PsiInterface.PsiInput('mlstatic');
+    out = py.PsiInterface.PsiOutput('mloutput');
+
+    Input = in.recv()
+    Static = st.recv()
+    Output = str2num(char(Input))+str2num(char(Static))
+    sOutput = sprintf('Sum = %d',Output);
+    out.send(sOutput);
+>>>>>>> multimodel messaging test
+
+exit();

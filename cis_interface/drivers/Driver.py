@@ -1,4 +1,4 @@
-from threading import Thread, Timer
+from threading import Thread, Timer, Lock
 from logging import info, debug, error, warn, exception, critical
 import os
 import sys
@@ -65,6 +65,7 @@ class Driver(Thread):
         self.rank = rank
         self.workingDir = workingDir
         self._term_meth = None
+        self.lock = Lock()
 
     def __del__(self):
         self.debug('~')
@@ -74,6 +75,10 @@ class Driver(Thread):
     def run(self):
         r"""Run something in a seperate thread."""
         self.debug(':run()')
+
+    def on_exit(self):
+        r"""Processes that should be run when the driver exits."""
+        self.debug(':on_exit()')
 
     def stop(self):
         r"""Stop the driver."""
@@ -86,6 +91,7 @@ class Driver(Thread):
         self.debug(':terminate()')
         if self._term_meth is None:
             self._term_meth = 'terminate'
+        self.on_exit()
 
     def printStatus(self):
         r"""Print the driver status."""

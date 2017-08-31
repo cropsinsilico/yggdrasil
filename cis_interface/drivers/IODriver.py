@@ -247,6 +247,6 @@ class IODriver(Driver):
             self.debug(':terminate(): exception')
         self.debug(':terminate(): done')
 
-    def on_delete(self):  # pragma: no cover
+    def on_model_exit(self):
         r"""Actions to perform when the associated model driver is finished."""
         pass

@@ -1,0 +1,21 @@
+---
+
+model:
+  name: SaMPython
+  driver: PythonModelDriver
+  args: src/SaM.py
+
+  inputs:
+    - name: pyinput1
+      driver: RMQInputDriver
+      args: coutput
+    - name: pystatic
+      driver: FileInputDriver
+      args: ./Input/SaM_static.txt
+
+  outputs:
+    - name: pyoutput
+      driver: RMQOutputDriver
+      args: pyoutput
+
+

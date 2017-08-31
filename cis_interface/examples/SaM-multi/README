@@ -1,0 +1,9 @@
+
+
+runs SaM style C example, connected to python, connected to matlab, connected back
+to the C code to write the final result.
+
+The integrated example can be run with a single yml specifying all the models and I/Os, 
+and could also be run by specifying multiple per-model ymls on the PsiRun command line.
+
+
