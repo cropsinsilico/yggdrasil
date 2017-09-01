@@ -167,3 +167,8 @@ class RMQClientDriver(RMQDriver, RPCDriver):
         self._closing = True
         if self.channel:
             self.channel.close()
+
+    def on_model_exit(self):
+        r"""Stop when the model exits."""
+        self.debug("::on_model_exit")
+        self.stop()

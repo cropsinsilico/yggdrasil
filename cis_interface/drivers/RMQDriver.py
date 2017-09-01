@@ -274,14 +274,14 @@ class RMQDriver(Driver):
         """
         self.debug("::send %d", len(data))
         assert(len(data) <= maxMsgSize)
-        if not self.channel:
+        if not self.channel:  # pragma: debug
             self.debug("::send %d  NO CHANNEL", len(data))
             return False
         try:
             self.channel.basic_publish(
                 exchange=self.exchange, routing_key=self.queue,
                 body=data, mandatory=True)
-        except Exception as e:
+        except Exception as e:  # pragma: debug
             self.warn("::send %d : exception %s: %s",
                       len(data), type(e), e)
             return False
@@ -298,7 +298,7 @@ class RMQDriver(Driver):
 
         """
         self.debug("::send_nolimit %d", len(data))
-        if not self.channel:
+        if not self.channel:  # pragma: debug
             self.debug("::send_nolimit %d  NO CHANNEL", len(data))
             return False
         prev = 0
@@ -308,6 +308,6 @@ class RMQDriver(Driver):
                 next = min(prev+maxMsgSize, len(data))
                 ret = self.rmq_send(data[prev:next])
                 prev = next
-                if not ret:
+                if not ret:  # pragma: debug
                     break
         return ret

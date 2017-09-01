@@ -31,32 +31,28 @@ class GCCModelDriver(ModelDriver):
 
     def __init__(self, name, args, **kwargs):
         super(GCCModelDriver, self).__init__(name, args, **kwargs)
-        self.debug(str(args))
+        self.debug()
 
-        # Compile
-        if self.args[0].endswith('.c'):
-            execname = os.path.splitext(self.args[0])[0] + '.out'
-            compile_args = ["gcc", "-g", "-Wall"]
-            for x in [_incl_interface, _incl_io]:
-                compile_args += ["-I" + x]
-            run_args = [os.path.join(".", execname)]
-            for arg in self.args[1:]:
-                if arg.startswith("-I"):
-                    compile_args.append(arg)
-                else:
-                    run_args.append(arg)
-            compile_args += ["-o", execname, self.args[0]]
-            # TODO: Option for specifying makefile instead
-            # if (len(self.args) == 2) and ('Makefile' in self.args[0]):
-            #     compile_args = ["make", "-f", self.args[0], "clean", 
-        else:
-            # Assume that it is already an executable
-            self.compiled = True
-            return
+        # Prepare arguments to compile the file
+        # TODO: Allow user to provide a makefile
+        cfile = self.args.pop(0)
+        assert(cfile.endswith('.c'))
+        execname = os.path.splitext(cfile)[0] + '.out'
+        compile_args = ["gcc", "-g", "-Wall"]
+        for x in [_incl_interface, _incl_io]:
+            compile_args += ["-I" + x]
+        run_args = [os.path.join(".", execname)]
+        for arg in self.args:
+            if arg.startswith("-I"):
+                compile_args.append(arg)
+            else:
+                run_args.append(arg)
+        compile_args += ["-o", execname, cfile]
+        # Compile in a new process
         self.args = run_args
         self.compiled = True
         try:
-            self.debug(": compiling")
+            self.debug("::compiling")
             comp_process = subprocess.Popen(['stdbuf', '-o0'] + compile_args,
                                             bufsize=0, stdin=subprocess.PIPE,
                                             stderr=subprocess.STDOUT,
@@ -66,11 +62,11 @@ class GCCModelDriver(ModelDriver):
             if exit_code != 0:  # pragma: debug
                 self.error(output)
                 raise RuntimeError("Compilation failed with code %d." % exit_code)
+            self.debug('::compiled executable with gcc')
         except:  # pragma: debug
             self.compiled = False
-            self.exception(': Exception compiling %s, %s',
+            self.exception('::Exception compiling %s, %s',
                            ' '.join(compile_args), os.getcwd)
-        self.debug(': compiled executable with gcc')
 
     def run(self):
         r"""Run the compiled executable if it exists."""

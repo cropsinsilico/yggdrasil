@@ -1,0 +1,18 @@
+#!/bin/bash
+
+FROM="cpp python matlab"
+TO="cpp python matlab"
+
+#simple
+for f in ${FROM};do
+  for t in ${TO}; do
+    psirun ../${f}/rpcFib/rpcFibSrv.yml ../${t}/rpcFib/rpcFibCli.yml
+    done
+done
+
+#parallel
+for f in ${FROM};do
+  for t in ${TO}; do
+    psirun ../${f}/rpcFib/rpcFibSrv.yml ../${t}/rpcFib/rpcFibCliPar.yml
+    done
+done

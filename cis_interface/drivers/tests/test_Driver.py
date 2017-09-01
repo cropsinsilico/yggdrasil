@@ -69,7 +69,7 @@ class TestDriver(object):
         os.chdir(self.workingDir)
         inst = runner.create_driver(self.driver, self.name, self.args,
                                     namespace=self.namespace,
-                                    workingDir=self.workingDir,
+                                    # workingDir=self.workingDir,
                                     **self.inst_kwargs)
         os.chdir(curpath)
         # print("created instance")

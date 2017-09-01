@@ -65,7 +65,7 @@ def stop_matlab(screen_session, matlab_engine, matlab_session):
         # Either exit the engine or remove its reference
         if matlab_session in matlab.engine.find_matlab():
             matlab_engine.exit()
-        else:
+        else:  # pragma: no cover
             matlab_engine.__dict__.pop('_matlab')
     # Stop the screen session containing the Matlab shared session
     if screen_session is not None:

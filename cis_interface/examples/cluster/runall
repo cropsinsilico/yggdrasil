@@ -1,0 +1,2 @@
+#!/bin/bash
+while true; do ./lang2lang; done

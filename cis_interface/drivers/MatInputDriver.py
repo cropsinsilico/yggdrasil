@@ -49,12 +49,12 @@ class MatInputDriver(FileInputDriver):
         try:
             with self.lock:
                 self.fd = open(self.args, 'rb')
-        except:
+        except:  # pragma: debug
             self.exception('Could not open file.')
             return
         while self.fd is not None:
             with self.lock:
-                if self.fd is None:
+                if self.fd is None:  # pragma: debug
                     self.debug(':run: file closed')
                     return
                 else:

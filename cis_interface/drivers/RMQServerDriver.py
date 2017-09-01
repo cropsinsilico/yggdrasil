@@ -57,6 +57,7 @@ class RMQServerDriver(RMQDriver, RPCDriver):
                 self.debug('::All clients have signed off. Stopping.')
                 self.stop()
         else:
+            self.clients.add(props.reply_to)
             self.debug('::Message received')
             self.iipc.ipc_send_nolimit(body)
             response = self.oipc.recv_wait_nolimit()

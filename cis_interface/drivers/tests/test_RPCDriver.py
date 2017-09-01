@@ -1,6 +1,7 @@
 import nose.tools as nt
 import test_Driver as parent
 from test_IODriver import IOInfo
+from cis_interface.tools import ipc_queues
 
 
 class TestRPCDriver(parent.TestDriver, IOInfo):
@@ -12,6 +13,17 @@ class TestRPCDriver(parent.TestDriver, IOInfo):
         self.driver = 'RPCDriver'
         self.args = '_TEST'
         self.attr_list += ['iipc', 'oipc']
+        self.nprev_queues = 0
+
+    def setup(self):
+        r"""Get a count of existing queues."""
+        self.nprev_queues = len(ipc_queues())
+        super(TestRPCDriver, self).setup()
+
+    def teardown(self):
+        r"""Make sure that all new message queues were deleted."""
+        super(TestRPCDriver, self).teardown()
+        nt.assert_equal(len(ipc_queues()), self.nprev_queues)
         
     def test_send_recv(self):
         r"""Test sending/receiving small message."""
