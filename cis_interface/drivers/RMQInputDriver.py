@@ -1,14 +1,11 @@
-
+"""Module for receiving input from a RabbitMQ server."""
 import json
-from StringIO import *
-from logging import *
 import requests
-from RMQConnection import RMQConnection
-import time
-import os
 from pprint import pformat
+from RMQDriver import RMQDriver
+from IODriver import IODriver
 
-class RMQInputDriver(RMQConnection):
+class RMQInputDriver(RMQDriver, IODriver):
     r"""Driver for receiving input from a RabbitMQ server.
 
     Args:
@@ -25,51 +22,45 @@ class RMQInputDriver(RMQConnection):
     """
 
     def __init__(self, name, args, **kwargs):
-        super(RMQInputDriver, self).__init__(name, "_IN", args, **kwargs)
-        self.debug(':args: %s', args)
-        self._consumer_tag = None
+        super(RMQInputDriver, self).__init__(
+            name, suffix="_IN", queue=args, **kwargs)
+        self.debug()
 
     def printStatus(self):
         r"""Print the driver status."""
         self.debug('::printStatus')
         super(RMQInputDriver, self).printStatus()
-        url = 'http://%s:%s/api/%s/%s/%s' % (self.server, 15672, 'queues', '%2f', self.args)
+        url = 'http://%s:%s/api/%s/%s/%s' % (
+            self.server, 15672, 'queues', '%2f', self.queue)
         res = requests.get(url, auth=(self.user, self.passwd))
         jdata = res.json()
         qdata = jdata.get('message_stats', '')
         self.error(": server info: %s", pformat(qdata))
-        # errors just always print
 
-    def start_consuming(self):
+    def start_communication(self):
         r"""Begin consuming messages and add the callback for cancelling
         consumption."""
-        self.debug(': start_consuming')
-        self.add_on_cancel_callback()
-        self._consumer_tag = self.channel.basic_consume(
-            self.on_message, queue=self.args)
+        self.debug('::start_communication')
         # one at a time, don't stuff the Qs
         self.channel.basic_qos(prefetch_count=1)
+        self._consumer_tag = self.channel.basic_consume(
+            self.on_message, queue=self.queue)
 
-    def on_message(self, unused_channel, basic_deliver, properties, body):
+    def on_message(self, ch, method, props, body):
         r"""Action to perform when a message is received. Send it to the
         local queue and acknowledge the message."""
         self.debug('::on_message: received message # %s from %s',
-                   basic_deliver.delivery_tag, properties.app_id)
+                   method.delivery_tag, props.app_id)
         self.ipc_send(body)
-        self.acknowledge_message(basic_deliver.delivery_tag)
+        ch.basic_ack(delivery_tag=method.delivery_tag)
 
-    def acknowledge_message(self, delivery_tag):
-        r"""Acknowledge that a message was received."""
-        self.debug(':ack message %s', delivery_tag)
-        self.channel.basic_ack(delivery_tag)
-
-    # def on_delete(self):
+    # def on_model_exit(self):
     #     r"""Delete the driver. Unbinding and deleting the queue and closing
     #     the connection."""
     #     self.debug('::delete')
     #     try:
-    #         self.channel.queue_unbind(exchange=os.environ['PSI_NAMESPACE'], queue=self.args)
-    #         # self.channel.queue_delete(queue=self.args, if_unused=True)
+    #         self.channel.queue_unbind(exchange=self.exchange, queue=self.queue)
+    #         # self.channel.queue_delete(queue=self.queue, if_unused=True)
     #         # self.connection.close()
     #     except:
     #         self.debug("::delete(): exception (IGNORED)")

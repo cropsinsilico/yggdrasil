@@ -18,8 +18,8 @@ class IODriver(Driver):
     Args:
         name (str): The name of the message queue that the driver should 
             connect to.
-        suffix (str): Suffix added to name to create the environment variable
-            where the message queue key is stored.
+        suffix (str, optional): Suffix added to name to create the environment
+            variable where the message queue key is stored. Defaults to ''.
         \*\*kwargs: Additional keyword arguments are passed to parent class's
             __init__ method.
 
@@ -31,7 +31,7 @@ class IODriver(Driver):
         mq (:class:`sysv_ipc.MessageQueue`): Message queue.
 
     """
-    def __init__(self, name, suffix, **kwargs):
+    def __init__(self, name, suffix="", **kwargs):
         super(IODriver, self).__init__(name, **kwargs)
         self.debug()
         self.state = 'Started'

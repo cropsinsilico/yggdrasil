@@ -1,10 +1,11 @@
-import nose.tools as nt
 import os
+import nose.tools as nt
 from cis_interface import runner
-import test_RMQConnection as parent
+import test_RMQDriver as parent1
+from test_IODriver import IOInfo
 
 
-class TestRMQOutputDriver(parent.TestRMQConnection):
+class TestRMQOutputDriver(parent1.TestRMQDriver, IOInfo):
     r"""Test runner for RMQOutputDriver."""
 
     def __init__(self):
@@ -35,11 +36,11 @@ class TestRMQOutputDriver(parent.TestRMQConnection):
     def test_RMQ_send(self):
         r"""Send a short message to the AMQP server."""
         self.instance.ipc_send(self.msg_short)
-        msg_recv = self.in_rmq.recv_wait()
+        msg_recv = self.in_rmq.recv_wait(timeout=3)
         nt.assert_equal(msg_recv, self.msg_short)
 
     def test_RMQ_send_nolimit(self):
         r"""Send a long message to the AMQP server."""
         self.instance.ipc_send_nolimit(self.msg_long)
-        msg_recv = self.in_rmq.recv_wait_nolimit()
+        msg_recv = self.in_rmq.recv_wait_nolimit(timeout=3)
         nt.assert_equal(msg_recv, self.msg_long)

@@ -104,8 +104,8 @@ class TestPsiRpc(IOInfo):
         self.driver.start()
         os.environ.update(self.driver.env)
         self.instance = PsiInterface.PsiRpc(
-            self.name + '_ipc', self.fmt_str,
-            self.name + '_ipc', self.fmt_str)
+            self.name, self.fmt_str,
+            self.name, self.fmt_str)
 
     def teardown(self):
         r"""Stop the driver."""
@@ -117,9 +117,9 @@ class TestPsiRpc(IOInfo):
         msg_send = self.file_lines[0]
         var_flag = self.instance.rpcSend(*var_send)
         assert(var_flag)
-        msg_recv = self.driver.oipc.recv_wait(timeout=1)
+        msg_recv = self.driver.oipc.recv_wait_nolimit(timeout=1)
         nt.assert_equal(msg_recv, msg_send)
-        self.driver.iipc.ipc_send(msg_recv)
+        self.driver.iipc.ipc_send_nolimit(msg_recv)
         self.driver.sleep(1)
         var_flag, var_recv = self.instance.rpcRecv()
         assert(var_flag)
@@ -129,11 +129,11 @@ class TestPsiRpc(IOInfo):
         r"""Test rpc call."""
         var_send = self.file_rows[0]
         msg_send = self.file_lines[0]
-        self.driver.iipc.ipc_send(msg_send)
+        self.driver.iipc.ipc_send_nolimit(msg_send)
         var_flag, var_recv = self.instance.rpcCall(*var_send)
         assert(var_flag)
         nt.assert_equal(var_recv, var_send)
-        msg_recv = self.driver.oipc.recv_wait(timeout=1)
+        msg_recv = self.driver.oipc.recv_wait_nolimit(timeout=1)
         nt.assert_equal(msg_recv, msg_send)
 
 

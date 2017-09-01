@@ -1,6 +1,7 @@
 import os
 import pika
 from Driver import Driver
+from IODriver import maxMsgSize
 
 
 class RMQDriver(Driver):
@@ -22,6 +23,9 @@ class RMQDriver(Driver):
         exchange (str, optional): RabbitMQ exchange. Defaults to 'namespace'
             attribute which is set from the environment variable
             'PSI_NAMESPACE'.
+        exclusive (bool, optional): If True, the queue that is created can
+            only be used by this driver. Defaults to False. If a queue
+            name is not provided, it is assumed exclusive.
 
     Attributes (in addition to the parent class's):
         user (str): RabbitMQ server username.
@@ -40,7 +44,7 @@ class RMQDriver(Driver):
 
     """
     def __init__(self, name, queue='', routing_key=None, **kwargs):
-        kwattr = ['user', 'server', 'passwd', 'exchange']
+        kwattr = ['user', 'server', 'passwd', 'exchange', 'exclusive']
         kwargs_attr = {k: kwargs.pop(k, None) for k in kwattr}
         super(RMQDriver, self).__init__(name, **kwargs)
         self.debug()
@@ -48,6 +52,7 @@ class RMQDriver(Driver):
         self.server = os.environ.get('PSI_MSG_SERVER', None)
         self.passwd = os.environ.get('PSI_MSG_PW', None)
         self.exchange = self.namespace
+        self.exclusive = False
         for k in kwattr:
             if kwargs_attr[k] is not None:
                 setattr(self, k, kwargs_attr.pop(k))
@@ -63,6 +68,16 @@ class RMQDriver(Driver):
         self._closing = False
         self.times_connected = 0
         self.setDaemon(True)
+        self._q_obj = None
+
+    # def __del__(self):
+    #     self.debug('~')
+        
+    #         if self.connection is not None:
+    #             self.connection.close()
+    #         self.connection = None
+    #     except:
+    #         self.debug("::__del__(): exception")
 
     # DRIVER FUNCTIONALITY
     def start(self):
@@ -94,7 +109,7 @@ class RMQDriver(Driver):
             self.debug('Waiting for connection to open before terminating')
             while self.connection is None:
                 self.sleep()
-            self.connection.add_timeout(self.terminate(), self.sleeptime)
+            # self.connection.add_timeout(self.terminate(), self.sleeptime)
         self.debug('::terminate: Closing connection')
         self.stop_communication()
         # Only needed if ioloop is stopped prior to closing the connection?
@@ -204,13 +219,13 @@ class RMQDriver(Driver):
         r"""Set up the message queue."""
         self.debug('::Declaring queue %s', queue_name)
         if queue_name:
-            exclusive = False
+            exclusive = self.exclusive
         else:
             exclusive = True
-        self.channel.queue_declare(self.on_queue_declareok,
-                                   queue=queue_name,
-                                   exclusive=exclusive,
-                                   auto_delete=True)
+        self._q_obj = self.channel.queue_declare(self.on_queue_declareok,
+                                                 queue=queue_name,
+                                                 exclusive=exclusive,
+                                                 auto_delete=True)
 
     def on_queue_declareok(self, method_frame):
         r"""Actions to perform once the queue is succesfully declared. Bind
@@ -245,3 +260,54 @@ class RMQDriver(Driver):
         self._closing = True
         if self.channel:
             self.channel.close()
+
+    # UTILITIES
+    def rmq_send(self, data):
+        r"""Send a message smaller than maxMsgSize to the RMQ queue.
+
+        Args:
+            data (str): The message to be sent.
+
+        Returns:
+            bool: True if the message was sent succesfully. False otherwise.
+
+        """
+        self.debug("::send %d", len(data))
+        assert(len(data) <= maxMsgSize)
+        if not self.channel:
+            self.debug("::send %d  NO CHANNEL", len(data))
+            return False
+        try:
+            self.channel.basic_publish(
+                exchange=self.exchange, routing_key=self.queue,
+                body=data, mandatory=True)
+        except Exception as e:
+            self.warn("::send %d : exception %s: %s",
+                      len(data), type(e), e)
+            return False
+        return True
+
+    def rmq_send_nolimit(self, data):
+        r"""Send a message smaller than maxMsgSize to the RMQ queue.
+
+        Args:
+            data (str): The message to be sent.
+
+        Returns:
+            bool: True if the message was sent succesfully. False otherwise.
+
+        """
+        self.debug("::send_nolimit %d", len(data))
+        if not self.channel:
+            self.debug("::send_nolimit %d  NO CHANNEL", len(data))
+            return False
+        prev = 0
+        ret = self.rmq_send("%ld" % len(data))
+        if ret:
+            while prev < len(data):
+                next = min(prev+maxMsgSize, len(data))
+                ret = self.rmq_send(data[prev:next])
+                prev = next
+                if not ret:
+                    break
+        return ret

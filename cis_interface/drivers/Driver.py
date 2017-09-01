@@ -76,10 +76,6 @@ class Driver(Thread):
         r"""Run something in a seperate thread."""
         self.debug(':run()')
 
-    def on_exit(self):
-        r"""Processes that should be run when the driver exits."""
-        self.debug(':on_exit()')
-
     def stop(self):
         r"""Stop the driver."""
         self.debug(':stop()')
@@ -92,6 +88,16 @@ class Driver(Thread):
         if self._term_meth is None:
             self._term_meth = 'terminate'
         self.on_exit()
+
+    def on_exit(self):
+        r"""Processes that should be run when the driver exits."""
+        self.debug(':on_exit()')
+
+    def wait(self):
+        r"""Wait until model finish to return."""
+        while self.isAlive():
+            self.debug('Waiting for model to finish...')
+            self.sleep()
 
     def printStatus(self):
         r"""Print the driver status."""
@@ -135,7 +141,8 @@ class Driver(Thread):
     def logger_prefix(self):
         r"""Prefix to add to logger messages."""
         stack = inspect.stack()
-        the_class = os.path.splitext(os.path.basename(stack[2][0].f_globals["__file__"]))[0]
+        the_class = os.path.splitext(os.path.basename(
+            stack[2][0].f_globals["__file__"]))[0]
         return '%s(%s)' % (the_class, self.name)
 
     def sleep(self, t=None):
@@ -227,10 +234,4 @@ class Driver(Thread):
         if not isinstance(fmt_str, str):
             fmt_str = str(fmt_str)
         exception(self.logger_prefix + fmt_str, *args)
-
-    def wait(self):
-        r"""Wait until model finish to return."""
-        while self.isAlive():
-            self.debug('Waiting for model to finish...')
-            self.sleep()
 

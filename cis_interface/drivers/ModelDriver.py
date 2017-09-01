@@ -43,30 +43,31 @@ class ModelDriver(Driver):
         self.process = None
         self.env = os.environ.copy()    # This gets added to before run with the channel args
 
-    def __del__(self):
-        super(ModelDriver, self).__del__()
-
     def run(self):
         r"""Run the model on a new process, receiving output from."""
         self.debug(':run %s from %s with cwd %s and env %s',
                    self.args, os.getcwd(), self.workingDir, pformat(self.env))
-        try:
-            self.process = subprocess.Popen(['stdbuf', '-o0'] + self.args, bufsize=0, \
-                stdin=subprocess.PIPE, stderr=subprocess.STDOUT, stdout=subprocess.PIPE, \
-                env=self.env, cwd=self.workingDir, preexec_fn=preexec)
-        except:  # pragma: debug
-            self.exception('(%s): Exception starting in %s with wd %s',
-                           self.args, os.getcwd, self.workingDir)
-            return
+        with self.lock:
+            try:
+                self.process = subprocess.Popen(
+                    ['stdbuf', '-o0'] + self.args, bufsize=0,
+                    stdin=subprocess.PIPE, stderr=subprocess.STDOUT,
+                    stdout=subprocess.PIPE,
+                    env=self.env, cwd=self.workingDir, preexec_fn=preexec)
+            except:  # pragma: debug
+                self.exception('(%s): Exception starting in %s with wd %s',
+                               self.args, os.getcwd, self.workingDir)
+                return
         
         # Re-direct output
         while True:
-            # self.debug(':run readline')
             time.sleep(0)
-            line = self.process.stdout.readline()
-            # self.debug(': got line: %d bytes', len(line))
+            with self.lock:
+                if self.process:
+                    line = self.process.stdout.readline()
+                else:
+                    return
             if not line:
-                # self.debug(': got line: NONE')
                 break
             sys.stdout.write(line)
             sys.stdout.flush()
@@ -76,10 +77,8 @@ class ModelDriver(Driver):
     def terminate(self):
         r"""Terminate the process running the model."""
         self.debug(':terminate()')
-        if self.process:
-            self.debug(':terminate(): terminate process')
-            self.process.terminate()
-
-    def delete(self):
-        r"""Perform necessary deletion operations."""
-        pass  # pragma: no cover
+        with self.lock:
+            if self.process:
+                self.debug(':terminate(): terminate process')
+                self.process.terminate()
+                self.process = None
