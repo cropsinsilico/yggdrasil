@@ -1,4 +1,3 @@
-from logging import *
 import os
 
 
@@ -15,7 +14,7 @@ class AsciiFile(object):
                 or written to.
             io_mode (str): Mode that should be used to open the file. Valid
                 values include 'r', 'w', and None. None can be used to
-                indicate an in memory table that will not be read from or 
+                indicate an in memory table that will not be read from or
                 written to a file.
             comment (str, optional): String that should be used to identify
                 comments. Defaults to '#'.
@@ -107,7 +106,6 @@ class AsciiFile(object):
 
         """
         line = None
-        eof = False
         if not self.is_open:
             print("The file is not open. Nothing read.")
             return True, line
@@ -135,4 +133,3 @@ class AsciiFile(object):
         if not isinstance(line, str):
             raise TypeError("Line must be a string.")
         self.fd.write(line)
-    

@@ -1,5 +1,3 @@
-from logging import *
-import os
 import numpy as np
 from scanf import scanf
 from AsciiFile import AsciiFile
@@ -9,7 +7,7 @@ try:
     _use_astropy = True
 except:  # pragma: no cover
     apy_ascii, apy_Table = None, None
-    print("astropy is not installed, reading/writing as an array will be "+
+    print("astropy is not installed, reading/writing as an array will be " +
           "disabled. astropy can be installed using 'pip install astropy'.")
     _use_astropy = False
 
@@ -38,7 +36,7 @@ def nptype2cformat(nptype):
     else:
         raise TypeError("Input must be a string or a numpy.dtype")
     if t in [np.dtype(x) for x in ["float_", "float16", "float32", "float64"]]:
-        cfmt = "%g" # Ensures readability
+        cfmt = "%g"  # Ensures readability
     elif t == np.dtype("int8"):
         cfmt = "%hhd"
     elif t == np.dtype("short"):
@@ -56,7 +54,7 @@ def nptype2cformat(nptype):
         cfmt = "%hu"
     elif t == np.dtype("uintc"):
         cfmt = "%u"
-    elif t == np.dtype("uint64"): # Platform dependent
+    elif t == np.dtype("uint64"):  # Platform dependent
         cfmt = "%lu"
     elif t == np.dtype("ulonglong"):  # pragma: no cover
         cfmt = "%llu"
@@ -94,38 +92,40 @@ def cformat2nptype(cfmt):
     if not isinstance(cfmt, str):
         raise TypeError("Input must be a string.")
     elif not cfmt.startswith('%'):
-        raise ValueError("Provided C format string (%s) does not start with '%%'" % cfmt)
+        raise ValueError("Provided C format string (%s) " % cfmt +
+                         "does not start with '%%'")
     elif len(cfmt) == 1:
-        raise ValueError("Provided C format string (%s) does not contain type info" % cfmt)
+        raise ValueError("Provided C format string (%s) " % cfmt +
+                         "does not contain type info")
     out = None
     if cfmt[-1] in ['f', 'F', 'e', 'E', 'g', 'G']:
         out = 'float64'
     elif cfmt[-1] in ['d', 'i']:
-        if 'hh' in cfmt: # short short, single char
+        if 'hh' in cfmt:  # short short, single char
             out = 'int8'
-        elif cfmt[-2] == 'h': # short
+        elif cfmt[-2] == 'h':  # short
             out = 'short'
         elif 'll' in cfmt:
-            out = 'longlong' # long long
+            out = 'longlong'  # long long
         elif cfmt[-2] == 'l':
-            out = 'int_' # long (broken in python)
+            out = 'int_'  # long (broken in python)
         else:
-            out = 'intc' # int, platform dependent
+            out = 'intc'  # int, platform dependent
     elif cfmt[-1] in ['u', 'o', 'x', 'X']:
-        if 'hh' in cfmt: # short short, single char
+        if 'hh' in cfmt:  # short short, single char
             out = 'uint8'
-        elif cfmt[-2] == 'h': # short
+        elif cfmt[-2] == 'h':  # short
             out = 'ushort'
         elif 'll' in cfmt:
-            out = 'ulonglong' # long long
+            out = 'ulonglong'  # long long
         elif cfmt[-2] == 'l':
-            out = 'uint64' # long (broken in python)
+            out = 'uint64'  # long (broken in python)
         else:
-            out = 'uintc' # int, platform dependent
+            out = 'uintc'  # int, platform dependent
     elif cfmt[-1] in ['c', 's']:
         lstr = cfmt[1:-1]
         if lstr:
-            out = 'S'+lstr
+            out = 'S' + lstr
         else:
             out = 'S'
     else:
@@ -152,9 +152,11 @@ def cformat2pyscanf(cfmt):
     if not isinstance(cfmt, str):
         raise TypeError("Input must be a string.")
     elif not cfmt.startswith('%'):
-        raise ValueError("Provided C format string (%s) does not start with '%%'" % cfmt)
+        raise ValueError("Provided C format string (%s) " % cfmt +
+                         "does not start with '%%'")
     elif len(cfmt) == 1:
-        raise ValueError("Provided C format string (%s) does not contain type info" % cfmt)
+        raise ValueError("Provided C format string (%s) " % cfmt +
+                         "does not contain type info")
     cc = cfmt[-1]
     out = '%' + cc
     # if cc == 's':
@@ -182,7 +184,7 @@ class AsciiTable(AsciiFile):
             format_str (str): Format string that should be used to format
                 output in the case that the io_mode is 'w' (write). It is not
                 required if the io_mode is any other value.
-            dtype (str): Numpy structured data type for each row. If not 
+            dtype (str): Numpy structured data type for each row. If not
                 provided it is set using format_str. Defaults to None.
             column_names (list, optional): List of column names. Defaults to
                 None.
@@ -228,17 +230,21 @@ class AsciiTable(AsciiFile):
     def format_str(self):
         if not hasattr(self, '_format_str'):
             if hasattr(self, '_dtype'):
-                fmts = [nptype2cformat(self.dtype[i]) for i in range(len(self.dtype))]
+                fmts = [nptype2cformat(self.dtype[i])
+                        for i in range(len(self.dtype))]
                 self._format_str = self.column.join(fmts) + self.newline
             else:  # pragma: debug
-                raise RuntimeError("Format string not set and cannot be determined.")
+                raise RuntimeError("Format string not set " +
+                                   "and cannot be determined.")
         return self._format_str
 
     @property
     def dtype(self):
         if not hasattr(self, '_dtype'):
-            # typs = [(f[-1]+str(i), np.dtype(cformat2nptype(f))) for i,f in enumerate(self.fmts)]
-            typs = [('f'+str(i), np.dtype(cformat2nptype(f))) for i,f in enumerate(self.fmts)]
+            # typs = [(f[-1] + str(i), np.dtype(cformat2nptype(f)))
+            #         for i, f in enumerate(self.fmts)]
+            typs = [('f' + str(i), np.dtype(cformat2nptype(f)))
+                    for i, f in enumerate(self.fmts)]
             self._dtype = np.dtype(typs)
         return self._dtype
 
@@ -555,7 +561,8 @@ class AsciiTable(AsciiFile):
             if names is None:
                 names = self.column_names
             if (names is not None) and (len(names) != self.ncols):
-                raise ValueError("The number of names does not match the number of columns")
+                raise ValueError("The number of names does not match " +
+                                 "the number of columns")
         if self.use_astropy:
             table = apy_Table(array)
             if skip_header:
@@ -564,7 +571,7 @@ class AsciiTable(AsciiFile):
                 table_format = 'commented_header'
                 table.meta["comments"] = [fmt]
             apy_ascii.write(table, self.filepath, delimiter=self.column,
-                            comment=self.comment+' ', format=table_format,
+                            comment=self.comment + ' ', format=table_format,
                             names=names)
         else:
             if skip_header:
@@ -574,7 +581,7 @@ class AsciiTable(AsciiFile):
                 if names is not None:
                     head = self.column.join(names) + "\n" + " " + head
             np.savetxt(self.filepath, array, fmt=fmt, delimiter=self.column,
-                       comments=self.comment+' ', newline=self.newline,
+                       comments=self.comment + ' ', newline=self.newline,
                        header=head)
             
     def array_to_bytes(self, arr=None, order='C'):
@@ -630,20 +637,19 @@ class AsciiTable(AsciiFile):
         if (len(data) % self.dtype.itemsize) != 0:
             raise RuntimeError("Data length (%d) must a multiple of the itemsize (%d)."
                                % (len(data), self.dtype.itemsize))
-        nrows = len(data)/self.dtype.itemsize
+        nrows = len(data) / self.dtype.itemsize
         if order == 'F':
             arr = np.empty((nrows,), dtype=self.dtype)
-            arrs = []
             prev = 0
             for i in range(len(self.dtype)):
-                idata = data[prev:(prev+(nrows*self.dtype[i].itemsize))]
+                idata = data[prev:(prev + (nrows * self.dtype[i].itemsize))]
                 arr[self.dtype.names[i]] = np.fromstring(idata, dtype=self.dtype[i])
                 prev += len(idata)
         else:
             arr = np.fromstring(data, dtype=self.dtype)
             if (len(arr) % self.ncols) != 0:
                 raise ValueError("Returned data does not match")
-            nrows = len(arr)/self.ncols
+            nrows = len(arr) / self.ncols
             arr.reshape((nrows, self.ncols), order=order)
         return arr
 
@@ -666,7 +672,7 @@ class AsciiTable(AsciiFile):
         r"""Write a numpy array to the table.
 
         Args:
-            data (bytes): Bytes string to be interpreted as array and 
+            data (bytes): Bytes string to be interpreted as array and
                 written to file.
             order (str, optional): Order of data for reshaping. Defaults to
                 'C'.
