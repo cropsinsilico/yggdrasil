@@ -86,12 +86,14 @@ class RMQDriver(Driver):
         super(RMQDriver, self).start()
         tries = 10
         while True:
-            if not self._opening or tries == 0:
-                break
+            with self.lock:
+                if not self._opening or tries <= 0:
+                    break
             self.sleep()
             tries -= 1
-        if self._opening:  # pragma: debug
-            raise RuntimeError("Connection never finished opening.")
+        with self.lock:
+            if self._opening:  # pragma: debug
+                raise RuntimeError("Connection never finished opening.")
 
     def run(self):
         r"""Run the driver. Connect to the connection and begin the IO loop."""
@@ -107,13 +109,17 @@ class RMQDriver(Driver):
             if self._closing:
                 return  # Don't close more than once
         self.debug("::terminate")
-        if self._opening:  # pragma: debug
+        tries = 10
+        while True:
+            if not self._opening or tries <= 0:
+                break
             self.debug('Waiting for connection to open before terminating')
             # if self.connection is None:
             #     self.connection.add_timeout(self.terminate(), self.sleeptime)
             #     return
-            while self.connection is None:
-                self.sleep()
+            # while self.connection is None:
+            tries -= 1
+            self.sleep()
         self.debug('::terminate: Closing connection')
         self.stop_communication()
         # Only needed if ioloop is stopped prior to closing the connection?
@@ -283,7 +289,11 @@ class RMQDriver(Driver):
                 self.channel.close()
             else:
                 self._closing = False
-        while self._closing:
+        tries = 10
+        while True:
+            if not self._closing or tries <= 0:
+                break
+            tries -= 1
             print 'still closing'
             self.debug('::stop_commmunication: waiting for connection to close')
             self.sleep()
