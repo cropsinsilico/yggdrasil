@@ -2,9 +2,7 @@
 # This should not be used directly by modelers
 #
 import time
-import importlib
-from logging import *
-import subprocess
+from logging import debug
 from datetime import datetime
 import os
 import sys
@@ -20,7 +18,7 @@ _incl_io = os.path.join(_top_dir, 'io')
 
 
 def start_matlab():
-    r"""Start a Matlab shared engine session inside a detached screen 
+    r"""Start a Matlab shared engine session inside a detached screen
     session.
 
     Returns:
@@ -83,8 +81,8 @@ class MatlabModelDriver(ModelDriver):
         name (str): Driver name.
         args (str or list): Argument(s) for running the model in matlab.
             Generally, this should be the full path to a Matlab script.
-        \*\*kwargs: Additional keyword arguments are passed to parent class's 
-            __init__ method. 
+        \*\*kwargs: Additional keyword arguments are passed to parent class's
+            __init__ method.
 
     Attributes (in additon to parent class's):
         started_matlab (bool): True if the driver had to start a new matlab
@@ -195,4 +193,3 @@ class MatlabModelDriver(ModelDriver):
         sys.stdout.flush()
 
         self.debug(".done")
-

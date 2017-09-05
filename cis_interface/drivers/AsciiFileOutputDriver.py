@@ -1,8 +1,4 @@
-import sys
-from logging import *
 import os
-import time
-from scanf import scanf
 from cis_interface.interface.PsiInterface import PSI_MSG_EOF
 from cis_interface.drivers.FileOutputDriver import FileOutputDriver
 from cis_interface.dataio.AsciiFile import AsciiFile
@@ -15,14 +11,14 @@ class AsciiFileOutputDriver(FileOutputDriver):
         name (str): Name of the output queue to receive messages from.
         args (str or dict): Path to the file that messages should be written to
             or dictionary containing the filepath and other keyword arguments
-            to be passed to the created AsciiFile object. 
+            to be passed to the created AsciiFile object.
         skip_AsciiFile (bool, optional): If True, the AsciiFile instance is not
-            created. Defaults to False. 
-        \*\*kwargs: Additional keyword arguments are passed to parent class's 
-            __init__ method. 
+            created. Defaults to False.
+        \*\*kwargs: Additional keyword arguments are passed to parent class's
+            __init__ method.
 
-    Attributes (in addition to parent class's): 
-        file_kwargs (dict): Arguments used to create AsciiFile instance. 
+    Attributes (in addition to parent class's):
+        file_kwargs (dict): Arguments used to create AsciiFile instance.
         file (:class:`AsciiFile.AsciiFile`): Associated special class for ASCII
             file.
 
@@ -48,7 +44,7 @@ class AsciiFileOutputDriver(FileOutputDriver):
             raise TypeError("args is incorrect type, check the yaml.")
         if filepath is None:
             filepath = args.pop('filename', None)
-            filepath = args.pop('filepath', filepath) 
+            filepath = args.pop('filepath', filepath)
         super(AsciiFileOutputDriver, self).__init__(name, filepath, **kwargs)
         self.debug('(%s)', filepath)
         for a in self.args_ignored:
@@ -102,5 +98,3 @@ class AsciiFileOutputDriver(FileOutputDriver):
                 self.debug(':recv: no data')
                 self.sleep()
         self.debug(':run returned')
-
-

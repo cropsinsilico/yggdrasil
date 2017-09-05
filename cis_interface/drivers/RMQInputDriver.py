@@ -1,9 +1,9 @@
 """Module for receiving input from a RabbitMQ server."""
-import json
 import requests
 from pprint import pformat
 from RMQDriver import RMQDriver
 from IODriver import IODriver
+
 
 class RMQInputDriver(RMQDriver, IODriver):
     r"""Driver for receiving input from a RabbitMQ server.
@@ -13,8 +13,8 @@ class RMQInputDriver(RMQDriver, IODriver):
             connect to.
         args (str): The name of the RabbitMQ message queue that the driver
             should connect to.
-        \*\*kwargs: Additional keyword arguments are passed to parent class's 
-            __init__ method. 
+        \*\*kwargs: Additional keyword arguments are passed to parent class's
+            __init__ method.
 
     Attributes (in addition to parent class's):
         -
@@ -82,4 +82,3 @@ class RMQInputDriver(RMQDriver, IODriver):
     #     except:
     #         self.debug("::delete(): exception (IGNORED)")
     #     self.debug('::delete done')
-

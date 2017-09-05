@@ -1,30 +1,28 @@
 #
 # This should not be used directly by modelers
 #
-import time
 from ModelDriver import ModelDriver
-import importlib
-from logging import *
 import subprocess
 import os
 _top_dir = os.path.normpath(os.path.join(os.path.dirname(__file__), '../'))
 _incl_interface = os.path.join(_top_dir, 'interface')
 _incl_io = os.path.join(_top_dir, 'io')
 
+
 class GCCModelDriver(ModelDriver):
     r"""Class from running gcc compiled driveres.
 
     Args:
         name (str): Driver name.
-        args (str or list): Argument(s) for running the model on the command 
+        args (str or list): Argument(s) for running the model on the command
             line. If the first element ends with '.c', the driver attempts to
             compile the code with the necessary interface include directories.
-            Additional arguments that start with '-I' are included in the 
+            Additional arguments that start with '-I' are included in the
             compile command. Others are assumed to be runtime arguments.
         \*\*kwargs: Additional keyword arguments are passed to parent class's
             __init__ method.
 
-    Attributes (in additon to parent class's): 
+    Attributes (in additon to parent class's):
         compiled (bool): True if the compilation was succesful. False otherwise.
 
     """

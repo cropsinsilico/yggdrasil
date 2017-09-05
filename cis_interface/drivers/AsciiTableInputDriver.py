@@ -1,10 +1,5 @@
-import sys
-from logging import *
 import os
-import time
-from scanf import scanf
 from cis_interface.drivers.AsciiFileInputDriver import AsciiFileInputDriver
-from cis_interface.drivers.FileInputDriver import FileInputDriver
 from cis_interface.dataio.AsciiTable import AsciiTable
 
 
@@ -17,7 +12,7 @@ class AsciiTableInputDriver(AsciiFileInputDriver):
             or dictionary containing the filepath and other keyword arguments
             to be passed to the created AsciiTable object.
         \*\*kwargs: Additional keyword arguments are passed to parent class's
-            __init__ method. 
+            __init__ method.
 
     Attributes (in additon to parent class's):
         file (:class:`AsciiTable.AsciiTable`): Associated special class for
@@ -67,5 +62,3 @@ class AsciiTableInputDriver(AsciiFileInputDriver):
             if nread == 0:  # pragma: debug
                 self.debug(':run, no input')
         self.debug(':run returned')
-
-

@@ -1,11 +1,9 @@
 #
 # This should not be used directly by modelers
 #
-
 import os
 import subprocess
 import sys
-from logging import *
 from pprint import pformat
 from Driver import Driver
 import time
@@ -41,7 +39,8 @@ class ModelDriver(Driver):
         else:
             self.args = args
         self.process = None
-        self.env = os.environ.copy()    # This gets added to before run with the channel args
+        # This gets added to before run with the channel args
+        self.env = os.environ.copy()
 
     def run(self):
         r"""Run the model on a new process, receiving output from."""

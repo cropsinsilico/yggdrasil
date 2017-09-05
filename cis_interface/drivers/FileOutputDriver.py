@@ -1,8 +1,6 @@
-from threading import Lock
-from logging import *
-import time
 import os
 from IODriver import IODriver
+
 
 class FileOutputDriver(IODriver):
     r"""Class to handle output of received messages to a file.
@@ -16,7 +14,7 @@ class FileOutputDriver(IODriver):
     Attributes (in addition to parent class's):
         args (str): Path to the file that messages should be written to.
         fd (file-like): File descriptor for the target file if open.
-        lock (:class:`threading.Lock`): Lock to be used when accessing file. 
+        lock (:class:`threading.Lock`): Lock to be used when accessing file.
 
     """
     def __init__(self, name, args, **kwargs):
@@ -67,5 +65,3 @@ class FileOutputDriver(IODriver):
                 self.debug(':recv: no data')
                 self.sleep()
         self.debug(':run returns')
-
-

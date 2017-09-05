@@ -1,8 +1,6 @@
-from threading import Lock
-from logging import *
 import os
-import time
 from IODriver import IODriver
+
 
 class FileInputDriver(IODriver):
     r"""Class that sends messages read from a file.
@@ -11,7 +9,7 @@ class FileInputDriver(IODriver):
         name (str): Name of the queue that messages should be sent to.
         args (str): Path to the file that messages should be read from.
         \*\*kwargs: Additional keyword arguments are passed to parent class's
-            __init__ method. 
+            __init__ method.
 
     Attributes (in additon to parent class's):
         args (str): Path to the file that messages should be read from.
@@ -63,4 +61,3 @@ class FileInputDriver(IODriver):
         else:
             self.ipc_send(data)
         self.debug(':run returned')
-

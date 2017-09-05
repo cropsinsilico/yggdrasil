@@ -1,22 +1,17 @@
-import os
-import time
-from logging import debug, info
 import sysv_ipc
 from sysv_ipc import MessageQueue
 from Driver import Driver
-import traceback
-import os
 
 
-maxMsgSize=1024*64
-DEBUG_SLEEPS=True
+maxMsgSize = 1024 * 64
+DEBUG_SLEEPS = True
 
 
 class IODriver(Driver):
     r"""Base driver for any driver that requires access to a message queue.
 
     Args:
-        name (str): The name of the message queue that the driver should 
+        name (str): The name of the message queue that the driver should
             connect to.
         suffix (str, optional): Suffix added to name to create the environment
             variable where the message queue key is stored. Defaults to ''.
@@ -38,7 +33,7 @@ class IODriver(Driver):
         self.numSent = 0
         self.numReceived = 0
         self.env = {}  # Any addition env that the model needs
-        self.mq = MessageQueue(None, flags=sysv_ipc.IPC_CREX, \
+        self.mq = MessageQueue(None, flags=sysv_ipc.IPC_CREX,
                                max_message_size=maxMsgSize)
         self.env[name + suffix] = str(self.mq.key)
         self.debug(".env: %s", self.env)
@@ -62,7 +57,7 @@ class IODriver(Driver):
         msg += end_msg
 
     def recv_wait(self, timeout=0):
-        r"""Receive a message smaller than maxMsgSize. Unlike ipc_recv, 
+        r"""Receive a message smaller than maxMsgSize. Unlike ipc_recv,
         recv_wait will wait until there is a message to receive or the queue is
         closed.
 
@@ -86,7 +81,7 @@ class IODriver(Driver):
         return ret
 
     def recv_wait_nolimit(self, timeout=0):
-        r"""Receive a message larger than maxMsgSize. Unlike ipc_recv, 
+        r"""Receive a message larger than maxMsgSize. Unlike ipc_recv,
         recv_wait will wait until there is a message to receive or the queue is
         closed.
 
@@ -169,7 +164,7 @@ class IODriver(Driver):
         self.ipc_send("%ld" % len(data))
         while prev < len(data):
             try:
-                next = min(prev+maxMsgSize, len(data))
+                next = min(prev + maxMsgSize, len(data))
                 self.ipc_send(data[prev:next])
                 self.debug('.ipc_send_nolimit(): %d of %d bytes sent',
                            next, len(data))
@@ -224,7 +219,7 @@ class IODriver(Driver):
         r"""Stop the IODriver, first draining the message queue.
 
         Args:
-            tries (int, optional): Number of times driver should sleep while 
+            tries (int, optional): Number of times driver should sleep while
                 waiting for the message queue to drain. Defaults to 10.
             \*\*kwargs: Additional keyword arguments are passed to the parent
                 class's graceful_stop method.
@@ -234,8 +229,8 @@ class IODriver(Driver):
         try:
             while True:
                 with self.lock:
-                    if ((not self.mq) or (self.mq.current_messages == 0) or
-                        (tries == 0)):
+                    if (not self.mq) or ((self.mq.current_messages == 0) or
+                                         (tries == 0)):
                         break
                     if DEBUG_SLEEPS:
                         self.debug('.graceful_stop(): draining %d messages',
@@ -261,7 +256,6 @@ class IODriver(Driver):
                 self.debug(':close_queue(): exception')
         self.debug(':close_queue(): done')
         
-
     def terminate(self):
         r"""Stop the IODriver, removing the queue."""
         self.debug(':terminate()')

@@ -1,4 +1,3 @@
-import os
 import pika
 import uuid
 from RMQDriver import RMQDriver
@@ -156,8 +155,8 @@ class RMQClientDriver(RMQDriver, RPCDriver):
             self.channel.basic_publish(exchange=self.exchange,
                                        routing_key=self.request_queue,
                                        properties=pika.BasicProperties(
-                                           reply_to = self.queue,
-                                           correlation_id = self.corr_id),
+                                           reply_to=self.queue,
+                                           correlation_id=self.corr_id),
                                        body=message)
             self._message_number += 1
             self._deliveries.append(self._message_number)

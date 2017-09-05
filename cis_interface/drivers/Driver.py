@@ -1,7 +1,6 @@
 from threading import Thread, Timer, Lock
 from logging import info, debug, error, warn, exception, critical
 import os
-import sys
 import time
 import inspect
 
@@ -13,18 +12,18 @@ class Driver(Thread):
         name (str): Driver name.
         yml (dict, optional): Dictionary of yaml specification options for this
             driver. Defaults to empty dict.
-        namespace (str, optional): Namespace for set of drivers running 
+        namespace (str, optional): Namespace for set of drivers running
             together. If not provided, the environment variable 'PSI_NAMESPACE'
             is used.
         rank (int, optional): Rank of the integration. Defaults to None.
-        workingDir (str, optional): Working directory. If not provided, the 
+        workingDir (str, optional): Working directory. If not provided, the
             current working directory is used.
 
     Attributes:
         name (str): Driver name.
         sleeptime (float): Time that driver should sleep for when sleep called.
         longsleep (float): Time that the driver will sleep for when waiting for
-            longer tasks to complete (10x longer than sleeptime). 
+            longer tasks to complete (10x longer than sleeptime).
         yml (dict): Dictionary of yaml specification options for this driver.
         namespace (str): Namespace for set of drivers running together.
         rank (int): Rank of the integration.
@@ -49,7 +48,7 @@ class Driver(Thread):
         self.sleeptime = 0.25
         if os.environ['PSI_DEBUG'] == 'DEBUG':
             self.sleeptime = 1.0
-        self.longsleep = self.sleeptime*10
+        self.longsleep = self.sleeptime * 10
         # Set defaults
         if namespace is None:
             namespace = os.environ['PSI_NAMESPACE']
@@ -239,4 +238,3 @@ class Driver(Thread):
         if not isinstance(fmt_str, str):
             fmt_str = str(fmt_str)
         exception(self.logger_prefix + fmt_str, *args)
-

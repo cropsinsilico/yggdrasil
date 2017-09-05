@@ -1,22 +1,18 @@
-import sys
-from logging import *
 import os
-import time
-from scanf import scanf
 from scipy.io import loadmat
 from cis_interface.backwards import pickle
 from FileInputDriver import FileInputDriver
 
 
 class MatInputDriver(FileInputDriver):
-    r"""Class that sends pickled dictionaries of matricies read from a .mat 
+    r"""Class that sends pickled dictionaries of matricies read from a .mat
     file.
 
     Args:
         name (str): Name of the queue that messages should be sent to.
         args (str): Path to the .mat file that messages should be read from.
         \*\*kwargs: Additional keyword arguments are passed to parent class's
-            __init__ method. 
+            __init__ method.
 
     Attributes (in addition to parent class's):
         -
@@ -30,7 +26,7 @@ class MatInputDriver(FileInputDriver):
             data (str): Pickled .mat dictionary of read variables.
 
         """
-        if self.fd.tell() == (os.fstat(self.fd.fileno()).st_size-1):
+        if self.fd.tell() == (os.fstat(self.fd.fileno()).st_size - 1):
             self.debug(':get: eof')
             return ''
         self.debug(':get: reading .mat file')
@@ -41,7 +37,7 @@ class MatInputDriver(FileInputDriver):
         return data
 
     def run(self):
-        r"""Run the driver. The .mat file is opened and contents are read 
+        r"""Run the driver. The .mat file is opened and contents are read
         and then sent to the message queue until EOF is encountered or the file
         is closed.
         """
@@ -66,4 +62,3 @@ class MatInputDriver(FileInputDriver):
             else:
                 self.ipc_send_nolimit(data)
         self.debug(':run returned')
-        

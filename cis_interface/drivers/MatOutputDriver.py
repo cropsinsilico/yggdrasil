@@ -1,8 +1,4 @@
-import sys
-from logging import *
 import os
-import time
-from scanf import scanf
 from scipy.io import savemat
 from cis_interface.backwards import pickle
 from FileOutputDriver import FileOutputDriver
@@ -15,7 +11,7 @@ class MatOutputDriver(FileOutputDriver):
         name (str): Name of the output queue to receive messages from.
         args (str): Path to the file that messages should be written to.
         \*\*kwargs: Additional keyword arguments are passed to parent class's
-            __init__ method. 
+            __init__ method.
 
     Attributes (in addition to parent class's):
         -

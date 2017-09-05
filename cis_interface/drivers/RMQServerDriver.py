@@ -1,4 +1,3 @@
-import os
 import pika
 from RMQDriver import RMQDriver
 from RPCDriver import RPCDriver
@@ -14,12 +13,12 @@ class RMQServerDriver(RMQDriver, RPCDriver):
     Args:
         name (str): The name of the local IPC message queues that the driver
             should use.
-        args (str, optional): The name of the RabbitMQ message queue that the 
+        args (str, optional): The name of the RabbitMQ message queue that the
             driver should connect to. Defaults to name + '_SERVER' if not set.
         \*\*kwargs: Additional keyword arguments are passed to parent class's
-            __init__ method. 
+            __init__ method.
 
-    Attributes (in addition to the parent class's):  
+    Attributes (in addition to the parent class's):
         clients (set): The unique clients subscribed to this server.
     
     """
@@ -76,9 +75,9 @@ class RMQServerDriver(RMQDriver, RPCDriver):
                 ch.basic_publish(exchange=self.exchange,
                                  routing_key=props.reply_to,
                                  properties=pika.BasicProperties(
-                                     correlation_id = props.correlation_id),
+                                     correlation_id=props.correlation_id),
                                  body=str(response))
-        ch.basic_ack(delivery_tag = method.delivery_tag)
+        ch.basic_ack(delivery_tag=method.delivery_tag)
 
     def stop_communication(self):
         r"""Stop consuming messages from the queue."""

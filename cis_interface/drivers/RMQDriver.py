@@ -9,7 +9,7 @@ class RMQDriver(Driver):
 
     Args:
         name (str): The name of the driver.
-        queue (str, optional): Name of the queue that messages will be 
+        queue (str, optional): Name of the queue that messages will be
             received from. If and empty string, the queue is exclusive to this
             connection. Defaults to ''.
         routing_key (str, optional): Routing key that should be used when the
@@ -39,7 +39,7 @@ class RMQDriver(Driver):
             connection.
         routing_key (str): Routing key that should be used when the queue is
             bound. If None, the queue name is used.
-        times_connected (int): Number of times the connection has been 
+        times_connected (int): Number of times the connection has been
             established/re-established.
 
     """
@@ -138,7 +138,7 @@ class RMQDriver(Driver):
 
     @property
     def connection_parameters(self):
-        r""":class:`pika.connection.ConnectionParameters`: Connection 
+        r""":class:`pika.connection.ConnectionParameters`: Connection
         parameters."""
         return pika.ConnectionParameters(host=self.server,
                                          credentials=self.creds,
@@ -342,7 +342,7 @@ class RMQDriver(Driver):
         ret = self.rmq_send("%ld" % len(data))
         if ret:
             while prev < len(data):
-                next = min(prev+maxMsgSize, len(data))
+                next = min(prev + maxMsgSize, len(data))
                 ret = self.rmq_send(data[prev:next])
                 prev = next
                 if not ret:  # pragma: debug

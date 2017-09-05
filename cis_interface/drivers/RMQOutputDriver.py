@@ -9,10 +9,10 @@ class RMQOutputDriver(RMQDriver, IODriver):
     Args:
         name (str): The name of the local message queue that the driver should
             connect to.
-        args (str): The name of the RabbitMQ message queue that the driver 
+        args (str): The name of the RabbitMQ message queue that the driver
             connect to.
-        \*\*kwargs: Additional keyword arguments are passed to parent class's 
-            __init__ method. 
+        \*\*kwargs: Additional keyword arguments are passed to parent class's
+            __init__ method.
 
     Attributes (in addition to parent class's):
         -
@@ -32,7 +32,7 @@ class RMQOutputDriver(RMQDriver, IODriver):
         with self.lock:
             if self._q_obj is not None:
                 msg += '%-30s' % (str(self._q_obj.method.message_count) +
-                                 ' in RMQ server queue')
+                                  ' in RMQ server queue')
             else:
                 msg += '%-30s' % 'queue not found'
         print(msg)
@@ -43,7 +43,7 @@ class RMQOutputDriver(RMQDriver, IODriver):
         self.publish_message()
     
     def publish_message(self):
-        r"""Continue receiving messages from the local queue and passing them 
+        r"""Continue receiving messages from the local queue and passing them
         to the RabbitMQ server until the queue is closed."""
         with self.lock:
             if self._closing:  # pragma: debug
@@ -71,7 +71,7 @@ class RMQOutputDriver(RMQDriver, IODriver):
         self.debug("::publish_message returns")
 
     def stop_communication(self, **kwargs):
-        r"""Stop sending/receiving messages. Only RMQInputDriver should 
+        r"""Stop sending/receiving messages. Only RMQInputDriver should
         explicitly delete the queue."""
         with self.lock:
             self._closing = True
@@ -93,4 +93,3 @@ class RMQOutputDriver(RMQDriver, IODriver):
     #     except:
     #         self.debug(".delete(): exception (IGNORED)")
     #     self.debug(".delete() returns")
-

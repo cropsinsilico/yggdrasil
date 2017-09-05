@@ -1,8 +1,4 @@
-import sys
-from logging import *
 import os
-import time
-from scanf import scanf
 from cis_interface.drivers.FileInputDriver import FileInputDriver
 from cis_interface.dataio.AsciiFile import AsciiFile
 from cis_interface.interface.PsiInterface import PSI_MSG_EOF
@@ -12,13 +8,13 @@ class AsciiFileInputDriver(FileInputDriver):
     r"""Class that sends lines from an ASCII file.
 
     Args:
-        name (str): Name of the queue that messages should be sent to.  
+        name (str): Name of the queue that messages should be sent to.
         args (str or dict): Path to the file that messages should be read from
             or dictionary containing the filepath and other keyword arguments
             to be passed to the created AsciiFile object.
         skip_AsciiFile (bool, optional): If True, the AsciiFile instance is not
             created. Defaults to False.
-        \*\*kwargs: Additional keyword arguments are passed to parent class's 
+        \*\*kwargs: Additional keyword arguments are passed to parent class's
             __init__ method.
 
     Attributes (in additon to parent class's):
@@ -96,5 +92,3 @@ class AsciiFileInputDriver(FileInputDriver):
         if nread == 0:  # pragma: debug
             self.debug(':run, no input')
         self.debug(':run returned')
-
-
