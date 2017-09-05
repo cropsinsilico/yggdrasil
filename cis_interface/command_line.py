@@ -1,10 +1,9 @@
 #!/usr/bin/python
 import sys
 import time
-from logging import *
+from logging import debug
 import signal
 import traceback
-from pprint import pformat
 from cis_interface import runner
 
 
@@ -14,17 +13,17 @@ COLOR_TRACE = '\033[30;43;22m'
 COLOR_NORMAL = '\033[0m'
 
 
-## pretty pprint
+# pretty pprint
 def pprint(*args):
     s = ''.join(str(i) for i in args)
-    print(COLOR_TRACE+'{}'+COLOR_NORMAL.format(s))
+    print(COLOR_TRACE + '{}' + COLOR_NORMAL.format(s))
 
     
 def signal_handler(sigCaught, frame):  # pragma: no cover
     global INTERRUPT_TIME, cisRunner
     debug('CisRunner interrupted with signal %d', sigCaught)
     now = time.time()
-    elapsed = now-INTERRUPT_TIME
+    elapsed = now - INTERRUPT_TIME
     debug('CisRunner.handler: elapsed since last interrupt: %d', elapsed)
     INTERRUPT_TIME = now
     if elapsed < 5:

@@ -1,15 +1,11 @@
 """This module provides tools for running models using cis_interface."""
 import importlib
 import sys
-import time
 import logging
-from logging import *
-import signal
+from logging import debug, info, error
 import os
 import yaml
 import pystache
-import uuid
-import traceback
 from pprint import pformat
 from itertools import chain
 import socket
@@ -65,7 +61,7 @@ def import_driver(driver):
     return class_
 
 
-def create_driver(driver, name, args = None, **kwargs):
+def create_driver(driver, name, args=None, **kwargs):
     r"""Dynamically create a driver based on a string and other driver
     properties.
 
@@ -139,7 +135,8 @@ class CisRunner(object):
         # Parse yamls
         for modelYml in modelYmls:
             self.parseModelYaml(modelYml)
-        # print(pformat(self.inputdrivers), pformat(self.outputdrivers), pformat(self.modeldrivers))
+        # print(pformat(self.inputdrivers), pformat(self.outputdrivers),
+        #       pformat(self.modeldrivers))
 
     def parseModelYaml(self, modelYml):
         r"""Parse supplied yaml, adding yamldir and doing mustache replace.
@@ -221,8 +218,8 @@ class CisRunner(object):
                 driver['instance'] = drv
                 os.chdir(curpath)
             except Exception as e:  # pragma: debug
-                info("ERROR:  Exception %s: Unable to load driver from yaml %s", e, \
-                pformat(driver))
+                info("ERROR:  Exception %s: Unable to load driver from yaml %s",
+                     e, pformat(driver))
                 raise  # Nothing started yet so just raise
         # Add the env's from the IO drivers to the models to ensure that
         # they have access to the necessary queues
@@ -235,16 +232,18 @@ class CisRunner(object):
             for iod in iodrivers:
                 debug("PSrRun::loadDrivers:  Add env: %s", iod['instance'].env)
                 modelenv.update(iod['instance'].env)
-            debug("CisRunner::loadDrivers(): model %s: env: %s", driver['name'], \
-                pformat(driver['instance'].env))
+            debug("CisRunner::loadDrivers(): model %s: env: %s",
+                  driver['name'], pformat(driver['instance'].env))
 
     def startDrivers(self):
         r"""Start drivers, starting with the IO drivers."""
-        info('Starting I/O drivers and models on system {} in PSI_NAMESPACE {} PSI_RANK {}'.format(
-            self.host, self.namespace, self.rank))
+        info('Starting I/O drivers and models on system ' +
+             '{} in PSI_NAMESPACE {} PSI_RANK {}'.format(
+                 self.host, self.namespace, self.rank))
         for driver in [i for i in chain(self.outputdrivers, self.inputdrivers,
                                         self.modeldrivers)]:
-            debug("RunModels.startDrivers(): starting driver %s", driver['name'])
+            debug("RunModels.startDrivers(): starting driver %s",
+                  driver['name'])
             d = driver['instance']
             try:
                 d.start()
@@ -265,7 +264,7 @@ class CisRunner(object):
                 if not d.is_alive():
                     self.do_exits(drv)
                     running.remove(drv)
-        #self.closeChannels()
+        # self.closeChannels()
         info('All models completed')
         debug('RunModels.run() returns')
 
@@ -373,5 +372,3 @@ def get_runner(models, **kwargs):
           os.getcwd(), sys.path, namespace, rank)
     cisRunner = CisRunner(models, namespace, **kwargs)
     return cisRunner
-
-

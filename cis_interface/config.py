@@ -2,7 +2,6 @@
 This module imports the configuration for cis_interface.
 
 """
-import sys
 import os
 from cis_interface.backwards import configparser
 

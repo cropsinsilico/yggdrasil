@@ -9,4 +9,6 @@ else:  # pragma: Python 3
     import pickle
     import configparser
     import sio
+
     
+__all__ = ['pickle', 'configparser', 'sio']

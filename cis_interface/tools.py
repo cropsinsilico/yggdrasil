@@ -63,4 +63,3 @@ def ipcrm(options=[]):
 def ipcrm_queues():
     r"""Delete existing IPC queues."""
     ipcrm(['--all=msg'])
-

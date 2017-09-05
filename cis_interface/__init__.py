@@ -1,6 +1,5 @@
 r"""This package provides a framework for integrating models across languages
 such that they can be run simultaneously, passing input back and forth."""
-
 import os
 import backwards
 import config
@@ -27,6 +26,5 @@ if cis_include not in cpath:
 
 
 __all__ = ['backwards', 'config', 'tools',
-           'interface', 'driver', 'dataio',
+           'interface', 'drivers', 'dataio',
            'tests', 'examples']
-           
