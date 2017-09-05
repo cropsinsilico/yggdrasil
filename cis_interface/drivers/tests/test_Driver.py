@@ -1,7 +1,5 @@
 import os
-import signal
 import nose.tools as nt
-from threading import Timer
 from cis_interface import runner
 from cis_interface.tools import ipc_queues
 
@@ -194,5 +192,3 @@ class TestDriverNoStart(TestParam):
     def test_printStatus(self):
         r"""Test mechanism to print the status of the driver."""
         self.instance.printStatus()
-        
-

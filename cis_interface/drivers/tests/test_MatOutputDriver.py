@@ -1,7 +1,6 @@
 import os
 import numpy as np
 from scipy.io import loadmat
-import nose.tools as nt
 import test_IODriver as parent
 
 

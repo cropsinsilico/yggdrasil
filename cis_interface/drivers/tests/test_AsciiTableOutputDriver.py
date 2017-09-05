@@ -1,4 +1,3 @@
-import nose.tools as nt
 import test_AsciiFileOutputDriver as parent
 import test_FileOutputDriver as super_parent
 

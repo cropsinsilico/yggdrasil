@@ -72,4 +72,3 @@ class TestFileInputDriver(TestFileInputParam, parent.TestIODriver):
         pass
         # data = self.instance.recv_wait_nolimit()
         # super(TestFileInputDriver, self).test_send_recv_nolimit()
-

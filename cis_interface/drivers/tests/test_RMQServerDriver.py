@@ -4,7 +4,7 @@ import nose.tools as nt
 import test_RMQDriver as parent1
 from test_IODriver import IOInfo
 from cis_interface.drivers.RMQServerDriver import (
-        _new_client_msg, _end_client_msg)
+    _new_client_msg, _end_client_msg)
 
 
 class TestRMQServerParam(parent1.TestRMQParam, IOInfo):
@@ -49,7 +49,7 @@ class TestRMQServerDriver(TestRMQServerParam, parent1.TestRMQDriver):
             self.instance.channel.basic_publish(
                 exchange=self.instance.exchange,
                 routing_key=self.instance.queue,
-                properties=pika.BasicProperties(reply_to = self.temp_queue),
+                properties=pika.BasicProperties(reply_to=self.temp_queue),
                 body=_new_client_msg)
         time.sleep(0.1)
         nt.assert_equal(self.instance.n_clients, 1)
@@ -58,7 +58,7 @@ class TestRMQServerDriver(TestRMQServerParam, parent1.TestRMQDriver):
             self.instance.channel.basic_publish(
                 exchange=self.instance.exchange,
                 routing_key=self.instance.queue,
-                properties=pika.BasicProperties(reply_to = self.temp_queue),
+                properties=pika.BasicProperties(reply_to=self.temp_queue),
                 body=_end_client_msg)
         time.sleep(0.1)
         nt.assert_equal(self.instance.n_clients, 0)
@@ -70,7 +70,7 @@ class TestRMQServerDriver(TestRMQServerParam, parent1.TestRMQDriver):
             self.instance.channel.basic_publish(
                 exchange=self.instance.exchange,
                 routing_key=self.instance.queue,
-                properties=pika.BasicProperties(reply_to = self.temp_queue),
+                properties=pika.BasicProperties(reply_to=self.temp_queue),
                 body=self.msg_short)
         ipc_msg = self.instance.iipc.recv_wait_nolimit()
         nt.assert_equal(ipc_msg, self.msg_short)
@@ -78,4 +78,3 @@ class TestRMQServerDriver(TestRMQServerParam, parent1.TestRMQDriver):
         self.instance.oipc.ipc_send_nolimit(ipc_msg)
         method_frame, header_frame, rmq_msg = self.temp_basic_get()
         nt.assert_equal(rmq_msg, self.msg_short)
-        

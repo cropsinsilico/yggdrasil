@@ -62,10 +62,10 @@ class IOInfo(object):
         if not hasattr(self, '_data_dict'):
             self._data_dict = {
                 # 1D arrays are converted to 2D (as row) when saved
-                # 'w': np.zeros((5,), dtype=np.int32),
-                'x': np.zeros((5,1), dtype=np.int32),
-                'y': np.zeros((1,5), dtype=np.int64),
-                'z': np.ones((3,4), dtype=np.float64)}
+                # 'w': np.zeros((5, ), dtype=np.int32),
+                'x': np.zeros((5, 1), dtype=np.int32),
+                'y': np.zeros((1, 5), dtype=np.int64),
+                'z': np.ones((3, 4), dtype=np.float64)}
         return self._data_dict
 
     @property
@@ -86,7 +86,7 @@ class IOInfo(object):
     @property
     def msg_long(self):
         r"""str: Small test message for sending."""
-        return 'Test message' + self.maxMsgSize*'0'
+        return 'Test message' + self.maxMsgSize * '0'
 
     def write_table(self, fname):
         r"""Write the table out to a file.
@@ -174,4 +174,3 @@ class TestIODriver(TestIOParam, parent.TestDriver):
         r"""Assertions to make after terminating the driver instance."""
         super(TestIODriver, self).assert_after_terminate()
         assert(not self.instance.mq)
-

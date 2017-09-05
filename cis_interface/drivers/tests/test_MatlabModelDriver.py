@@ -53,5 +53,3 @@ class TestMatlabModelDriver(parent.TestModelDriver,
         else:  # pragma: debug
             print("Skipping removal of Matlab session as the test did " +
                   "not create it.")
-
-

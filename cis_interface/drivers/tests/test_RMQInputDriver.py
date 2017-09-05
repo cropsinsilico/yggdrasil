@@ -1,4 +1,3 @@
-import os
 import nose.tools as nt
 import test_RMQDriver as parent1
 from test_IODriver import IOInfo
@@ -50,4 +49,3 @@ class TestRMQInputDriver(TestRMQInputParam, parent1.TestRMQDriver):
         self.instance.sleep(0.1)
         msg_recv = self.instance.recv_wait_nolimit(timeout=3)
         nt.assert_equal(msg_recv, self.msg_long)
-

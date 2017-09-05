@@ -1,4 +1,3 @@
-import os
 import nose.tools as nt
 from cis_interface import runner
 import test_RMQDriver as parent1
@@ -28,7 +27,8 @@ class TestRMQOutputDriverNoStart(TestRMQOutputParam,
 
     """
     pass
-    
+
+
 class TestRMQOutputDriver(TestRMQOutputParam,
                           parent1.TestRMQDriver):
     r"""Test runner for RMQOutputDriver.

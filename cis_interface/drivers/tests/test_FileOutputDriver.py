@@ -73,5 +73,3 @@ class TestFileOutputDriver(TestFileOutputParam, parent.TestIODriver):
         pass
         # self.instance.close_file()
         # super(TestFileOutputDriver, self).test_send_recv_nolimit()
-
-

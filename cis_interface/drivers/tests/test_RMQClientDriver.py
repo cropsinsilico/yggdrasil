@@ -62,8 +62,8 @@ class TestRMQClientDriver(TestRMQClientParam, parent1.TestRMQDriver):
         nt.assert_equal(self.instance.request_queue, self.temp_queue)
         # New client message
         method_frame, props, rmq_msg = self.temp_basic_get()
-        self.channel.basic_ack(delivery_tag = method_frame.delivery_tag)
-        # print('received setup', rmq_msg)        
+        self.channel.basic_ack(delivery_tag=method_frame.delivery_tag)
+        # print('received setup', rmq_msg)
         nt.assert_equal(rmq_msg, _new_client_msg)
         
     def teardown(self):
@@ -71,7 +71,7 @@ class TestRMQClientDriver(TestRMQClientParam, parent1.TestRMQDriver):
         self.instance.stop()
         # End client message
         method_frame, props, rmq_msg = self.temp_basic_get()
-        self.channel.basic_ack(delivery_tag = method_frame.delivery_tag)
+        self.channel.basic_ack(delivery_tag=method_frame.delivery_tag)
         # print('received teardown', rmq_msg)
         nt.assert_equal(rmq_msg, _end_client_msg)
         # Parent teardown
@@ -91,4 +91,3 @@ class TestRMQClientDriver(TestRMQClientParam, parent1.TestRMQDriver):
         # self.channel.basic_ack(delivery_tag = method_frame.delivery_tag)
         ipc_msg = self.instance.iipc.recv_wait_nolimit()
         nt.assert_equal(ipc_msg, self.msg_short)
-        

@@ -48,4 +48,3 @@ class TestAsciiFileOutputDriver(TestAsciiFileOutputParam,
         r"""Assertions to make after stopping the driver instance."""
         super(TestAsciiFileOutputDriver, self).assert_after_terminate()
         assert(not self.instance.file.is_open)
-        

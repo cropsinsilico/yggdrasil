@@ -2,7 +2,6 @@ import os
 import numpy as np
 from scipy.io import savemat
 from cis_interface.backwards import pickle
-import nose.tools as nt
 import test_IODriver as parent
 
 

@@ -126,7 +126,7 @@ class TestRMQDriver(TestRMQParam, parent.TestDriver):
     #         self.instance.sleep()
         # import time
         # time.sleep(10)
-        # print self.instance.times_connected, 'times', self.instance._opening, self.instance._closing
+        # print(self.instance.times_connected, 'times', self.instance._opening,
+        #       self.instance._closing)
         # self.instance.sleep()
         # self.instance.sleep()
-
