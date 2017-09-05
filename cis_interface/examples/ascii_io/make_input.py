@@ -1,6 +1,4 @@
 import os
-import sys
-import numpy as np
 import shutil
 
 src_file = 'Input/input1_file.txt'

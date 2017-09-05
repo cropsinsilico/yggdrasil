@@ -1,9 +1,8 @@
-
 import sys
-from cis_interface.interface.PsiInterface import *
+from cis_interface.interface.PsiInterface import PsiInput, PsiOutput
 import os
 import logging
-from logging import *
+from logging import info, debug
 
 
 def runhello():
@@ -25,6 +24,7 @@ def runhello():
     outf.send(buf)
     debug('sent output to outf')
     debug("bye")
+    
 
 if __name__ == '__main__':
     logLevel = logging.NOTSET
@@ -32,7 +32,7 @@ if __name__ == '__main__':
         logLevel = getattr(logging, os.environ['PSI_CLIENT_DEBUG'])
     if 'RMQ_DEBUG' in os.environ:
         rmqLogLevel = getattr(logging, os.environ['RMQ_DEBUG'])
-    logging.basicConfig(level=logLevel, stream=sys.stdout, 
-	format=sys.argv[0].split('/')[-1]+': %(message)s')
+    logging.basicConfig(
+        level=logLevel, stream=sys.stdout,
+        format=sys.argv[0].split('/')[-1] + ': %(message)s')
     runhello()
-    

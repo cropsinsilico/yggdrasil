@@ -1,14 +1,12 @@
 import logging
 import os
 import sys
-import time
-from logging import *
-
-from cis_interface.interface.PsiInterface import *
+from logging import debug
+from cis_interface.interface.PsiInterface import PsiInput, PsiOutput
 
 
 def runhello():
-    debug('hello pythonfiles from %s', os.getcwd() )
+    debug('hello pythonfiles from %s', os.getcwd())
     inf = PsiInput('inFile')
     outf = PsiOutput('outFile')
     flag, fdata = inf.recv()
@@ -19,6 +17,7 @@ def runhello():
 
 
 if __name__ == '__main__':
-    logging.basicConfig(level=logging.DEBUG,
-        format=sys.argv[0].split('/')[-1]+':%(message)s')
+    logging.basicConfig(
+        level=logging.DEBUG,
+        format=sys.argv[0].split('/')[-1] + ':%(message)s')
     runhello()

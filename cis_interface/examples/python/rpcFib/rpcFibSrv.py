@@ -3,8 +3,8 @@ import os
 import sys
 import time
 import logging
-from logging import debug, info
-from cis_interface.interface.PsiInterface import *
+from logging import debug
+from cis_interface.interface.PsiInterface import PsiRpc
 import socket
 
 
@@ -33,7 +33,7 @@ def fibServer(sleeptime):
             result = prev + pprev
             pprev = prev
             prev = result
-            fib_no = fib_no+1
+            fib_no = fib_no + 1
         print(' ::: ->(%2d %2d)' % (arg, result))
 
         time.sleep(float(sleeptime))
@@ -42,13 +42,14 @@ def fibServer(sleeptime):
     debug('fibsrv(P): bye')
     sys.exit(0)
 
+    
 if __name__ == '__main__':
     LOGLEVEL = logging.NOTSET
     if 'PSI_CLIENT_DEBUG' in os.environ:
         LOGLEVEL = getattr(logging, os.environ['PSI_CLIENT_DEBUG'])
     if 'RMQ_DrEBUG' in os.environ:
         RMQLOGLEVEL = getattr(logging, os.environ['RMQ_DEBUG'])
-    logging.basicConfig(level=LOGLEVEL, stream=sys.stdout, \
-	format=sys.argv[0].split('/')[-1]+': %(message)s')
+    logging.basicConfig(level=LOGLEVEL, stream=sys.stdout,
+                        format=sys.argv[0].split('/')[-1] + ': %(message)s')
     print('psirun', sys.argv)
     fibServer(sys.argv[1])

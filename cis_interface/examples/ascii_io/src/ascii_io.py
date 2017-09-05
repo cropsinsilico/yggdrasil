@@ -1,8 +1,8 @@
-import os
 import sys
 import signal
-import numpy as np
-from cis_interface.interface.PsiInterface import *
+from cis_interface.interface.PsiInterface import (
+    PsiAsciiFileInput, PsiAsciiFileOutput,
+    PsiAsciiTableInput, PsiAsciiTableOutput)
 
 
 def signal_handler(signal, frame):

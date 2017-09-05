@@ -1,11 +1,8 @@
-
 import logging
+from logging import debug
 import os
 import sys
-import time
-from logging import *
-
-from PsiInterface import *
+from PsiInterface import PsiInput, PsiOutput
 
 
 def runhello():
@@ -22,5 +19,5 @@ def runhello():
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG,
-        format=sys.argv[0].split('/')[-1]+':%(message)s')
+                        format=sys.argv[0].split('/')[-1] + ':%(message)s')
     runhello()
