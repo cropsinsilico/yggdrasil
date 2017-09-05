@@ -1,7 +1,6 @@
 import os
-import numpy as np
 import tempfile
-from nose.tools import istest, nottest, assert_raises, assert_equal
+from nose.tools import assert_raises, assert_equal
 from cis_interface.dataio import AsciiFile
 from cis_interface.tests import data
 
@@ -61,10 +60,10 @@ def test_AsciiFile_line_full():
         eof, line = AF_in.readline_full()
         if not eof:
             if line is None:
-                count_comments+=1
+                count_comments += 1
             else:
                 AF_out.writeline_full(line)
-                count_lines+=1
+                count_lines += 1
     AF_in.close()
     AF_out.close()
     assert_equal(count_lines, input_nlines)
@@ -79,14 +78,15 @@ def test_AsciiFile_line_full():
         eof, line = AF_out.readline_full()
         if not eof:
             if line is None:
-                count_comments+=1  # pragma: no cover
+                count_comments += 1  # pragma: no cover
             else:
-                count_lines+=1
+                count_lines += 1
     AF_out.close()
     assert_equal(count_lines, output_nlines)
     assert_equal(count_comments, output_ncomments)
     os.remove(output_file)
 
+    
 def test_AsciiFile_line():
     AF_in = AsciiFile.AsciiFile(input_file, 'r')
     AF_out = AsciiFile.AsciiFile(output_file, 'w')
@@ -106,10 +106,10 @@ def test_AsciiFile_line():
         eof, line = AF_in.readline()
         if not eof:
             if line is None:
-                count_comments+=1  # pragma: no cover
+                count_comments += 1  # pragma: no cover
             else:
                 AF_out.writeline(line.rstrip('\n'))
-                count_lines+=1
+                count_lines += 1
     AF_in.close()
     AF_out.close()
     assert_equal(count_lines, input_nlines)
@@ -124,9 +124,9 @@ def test_AsciiFile_line():
         eof, line = AF_out.readline()
         if not eof:
             if line is None:
-                count_comments+=1  # pragma: no cover
+                count_comments += 1  # pragma: no cover
             else:
-                count_lines+=1
+                count_lines += 1
     AF_out.close()
     assert_equal(count_lines, output_nlines)
     assert_equal(count_comments, 0)
