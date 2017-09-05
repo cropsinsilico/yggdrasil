@@ -51,8 +51,25 @@ class RMQInputDriver(RMQDriver, IODriver):
         local queue and acknowledge the message."""
         self.debug('::on_message: received message # %s from %s',
                    method.delivery_tag, props.app_id)
+        with self.lock:
+            if self._closing:
+                return
         self.ipc_send(body)
-        ch.basic_ack(delivery_tag=method.delivery_tag)
+        with self.lock:
+            if self._closing:
+                return
+            ch.basic_ack(delivery_tag=method.delivery_tag)
+
+    def stop_communication(self, **kwargs):
+        r"""Stop sending/receiving messages. Only RMQInputDriver should
+        explicitly delete the queue."""
+        with self.lock:
+            self._closing = True
+            if self.channel:
+                self.channel.queue_unbind(queue=self.queue,
+                                          exchange=self.exchange)
+                self.channel.queue_delete(queue=self.queue)
+                self.channel.close()
 
     # def on_model_exit(self):
     #     r"""Delete the driver. Unbinding and deleting the queue and closing

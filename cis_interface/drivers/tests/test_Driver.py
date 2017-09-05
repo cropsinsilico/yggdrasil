@@ -3,13 +3,14 @@ import signal
 import nose.tools as nt
 from threading import Timer
 from cis_interface import runner
+from cis_interface.tools import ipc_queues
 
 
 # TODO: Test Ctrl-C interruption
 
 
-class TestDriver(object):
-    r"""Test runner for basic Driver class.
+class TestParam(object):
+    r"""Test parameters for basic Driver test class.
 
     Attributes:
         driver (str): The driver class.
@@ -17,6 +18,9 @@ class TestDriver(object):
         namespace (str): PSI namespace to run drivers in.
         attr_list (list): List of attributes that should be checked for after
             initialization.
+        inst_kwargs (dict): Keyword arguments for the driver.
+        nprev_queues (int): The number of IPC queues that exist before the
+            driver instance is created.
 
     """
 
@@ -27,8 +31,14 @@ class TestDriver(object):
         self.attr_list = ['name', 'sleeptime', 'longsleep', 'yml', 'namespace',
                           'rank', 'workingDir']
         self.inst_kwargs = {'yml': {'workingDir': self.workingDir}}
+        self.nprev_queues = 0
 
-    def setup(self):
+    def set_param_attr(self, param_class):
+        r"""Copy all attributes from param_class."""
+        for k, v in param_class.__dict__.items():
+            setattr(self, k, v)
+            
+    def setup(self, skip_start=False):
         r"""Create a driver instance and start the driver."""
         os.environ['PSI_DEBUG'] = 'DEBUG'
         os.environ['RMQ_DEBUG'] = 'DEBUG'
@@ -37,14 +47,17 @@ class TestDriver(object):
         os.environ['PSI_NAMESPACE'] = self.namespace
         runner.setup_cis_logging(self.__module__)
         runner.setup_rmq_logging()
+        self.nprev_queues = len(ipc_queues())
         self._instance = self.create_instance()
-        self.instance.start()
+        if not skip_start:
+            self.instance.start()
 
     def teardown(self):
         r"""Remove the instance, stoppping it."""
         if hasattr(self, '_instance'):
             self.remove_instance(self._instance)
             delattr(self, '_instance')
+        nt.assert_equal(len(ipc_queues()), self.nprev_queues)
 
     @property
     def name(self):
@@ -83,6 +96,15 @@ class TestDriver(object):
         del inst
         # print("removed instance")
 
+
+class TestDriver(TestParam):
+    r"""Test runner for basic Driver class.
+
+    Attributes (in addition to parameter class):
+        -
+
+    """
+
     def assert_before_stop(self):
         r"""Assertions to make before stopping the driver instance."""
         pass
@@ -103,15 +125,9 @@ class TestDriver(object):
         r"""Assertions to make after stopping the driver instance."""
         self.assert_after_terminate()
 
-    def test_attributes(self):
-        r"""Assert that the driver has all of the required attributes."""
-        for a in self.attr_list:
-            if not hasattr(self.instance, a):  # pragma: debug
-                raise AttributeError("Driver does not have attribute %s" % a)
-
     def test_init_del(self):
         r"""Test driver creation and deletion."""
-        pass  # calls creation/destruction
+        self.instance.printStatus()
 
     def test_run_stop(self):
         r"""Start the thread, then stop it."""
@@ -130,6 +146,26 @@ class TestDriver(object):
         if self.instance.is_alive():
             self.instance.join()
         self.assert_after_terminate()
+
+        
+class TestDriverNoStart(TestParam):
+    r"""Test runner for basic Driver class without starting driver.
+
+    Attributes (in addition to parent class):
+        -
+
+    """
+
+    def setup(self):
+        r"""Create a driver instance without starting the driver."""
+        super(TestDriverNoStart, self).setup(skip_start=True)
+        assert(not self.instance.is_alive())
+
+    def test_attributes(self):
+        r"""Assert that the driver has all of the required attributes."""
+        for a in self.attr_list:
+            if not hasattr(self.instance, a):  # pragma: debug
+                raise AttributeError("Driver does not have attribute %s" % a)
 
     def test_info(self):
         r"""Test print of info statement."""
@@ -158,10 +194,5 @@ class TestDriver(object):
     def test_printStatus(self):
         r"""Test mechanism to print the status of the driver."""
         self.instance.printStatus()
+        
 
-    # This only works for some drivers
-    # def test_wait(self):
-    #     r"""Test mechanism to wait on driver to finish."""
-    #     t = Timer(1, self.instance.stop)
-    #     self.instance.wait()
-    #     assert(not self.instance.isAlive())

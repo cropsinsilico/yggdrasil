@@ -28,13 +28,14 @@ class RMQOutputDriver(RMQDriver, IODriver):
         r"""Print the driver status."""
         self.debug('::printStatus():')
         super(RMQOutputDriver, self).printStatus()
-        if self._q_obj is not None:
-            print('%-30s %-30s' % ('RMQOutputDriver(' + self.name + '):', 
-                                   (str(self._q_obj.method.message_count) +
-                                    ' in RMQ server queue')))
-        else:
-            print('%-30s %-30s' % ('RMQOutputDriver(' + self.name + '):',
-                                   'queue not found'))
+        msg = '%-30s' % ('RMQOutputDriver(' + self.name + '):')
+        with self.lock:
+            if self._q_obj is not None:
+                msg += '%-30s' % (str(self._q_obj.method.message_count) +
+                                 ' in RMQ server queue')
+            else:
+                msg += '%-30s' % 'queue not found'
+        print(msg)
 
     def start_communication(self):
         r"""Start publishing messages from the local queue."""
@@ -44,6 +45,9 @@ class RMQOutputDriver(RMQDriver, IODriver):
     def publish_message(self):
         r"""Continue receiving messages from the local queue and passing them 
         to the RabbitMQ server until the queue is closed."""
+        with self.lock:
+            if self._closing:  # pragma: debug
+                return
         while True:
             self.debug("::publish_message(): IPC recv")
             data = self.ipc_recv()
@@ -57,11 +61,25 @@ class RMQOutputDriver(RMQDriver, IODriver):
                 break
             self.debug("::publish_message(): IPC recv got %d bytes", len(data))
             self.debug("::publish_message(): send %d bytes to AMQP", len(data))
-            self.channel.basic_publish(
-                exchange=self.exchange, routing_key=self.queue,
-                body=data, mandatory=True)
+            with self.lock:
+                if self._closing:  # pragma: debug
+                    return
+                self.channel.basic_publish(
+                    exchange=self.exchange, routing_key=self.queue,
+                    body=data, mandatory=True)
             self.debug("::publish_message(): sent to AMQP")
         self.debug("::publish_message returns")
+
+    def stop_communication(self, **kwargs):
+        r"""Stop sending/receiving messages. Only RMQInputDriver should 
+        explicitly delete the queue."""
+        with self.lock:
+            self._closing = True
+            if self.channel and self.channel.is_open:
+                # self.channel.queue_unbind(queue=self.queue,
+                #                           exchange=self.exchange)
+                # self.channel.queue_delete(queue=self.queue)
+                self.channel.close()
 
     # def on_model_exit(self):
     #     r"""Delete the driver. Deleting the queue and closing the connection."""

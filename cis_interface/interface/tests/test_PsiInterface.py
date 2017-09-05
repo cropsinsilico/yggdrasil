@@ -2,7 +2,7 @@ import os
 import numpy as np
 import nose.tools as nt
 from threading import Timer
-from cis_interface.interface import PsiInterface
+from cis_interface.interface import PsiInterface, PSI_MSG_EOF
 from cis_interface.drivers import (IODriver, RPCDriver,
                                    AsciiFileInputDriver,
                                    AsciiFileOutputDriver,
@@ -37,9 +37,9 @@ class TestPsiInput(IOInfo):
 
     def test_recv(self):
         r"""Test receiving small message."""
-        self.driver.ipc_send(self.msg_short)
-        # self.driver.sched_task(0.01, self.driver.ipc_send,
-        #                        args=[self.msg_short])
+        # self.driver.ipc_send(self.msg_short)
+        self.driver.sched_task(0.01, self.driver.ipc_send,
+                               args=[self.msg_short])
         msg_flag, msg_recv = self.instance.recv()
         assert(msg_flag)
         nt.assert_equal(msg_recv, self.msg_short)
@@ -226,6 +226,9 @@ class TestPsiAsciiFileOutput(IOInfo):
             assert(msg_flag)
             lres = self.driver.recv_wait(timeout=1)
             nt.assert_equal(lres, lans)
+        inst.send_eof()
+        eans = self.driver.recv_wait(timeout=1)
+        nt.assert_equal(eans, PSI_MSG_EOF)
 
 
 class TestPsiAsciiTableInput(IOInfo):
@@ -357,6 +360,10 @@ class TestPsiAsciiTableOutput(IOInfo):
             assert(msg_flag)
             lres = self.driver.recv_wait_nolimit(timeout=1)
             nt.assert_equal(lres, lans)
+        inst.send_eof()
+        eres = self.driver.recv_wait_nolimit(timeout=1)
+        nt.assert_equal(eres, PSI_MSG_EOF)
+        
             
 class TestPsiAsciiTableOutput_AsArray(IOInfo):
     r"""Test output from an ascii table."""

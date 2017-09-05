@@ -3,13 +3,39 @@ import test_AsciiFileInputDriver as parent
 import test_FileInputDriver as super_parent
 
 
-class TestAsciiTableInputDriver(parent.TestAsciiFileInputDriver):
-    r"""Test runner for AsciiTableInputDriver."""
+class TestAsciiTableInputParam(parent.TestAsciiFileInputParam):
+    r"""Test parameters for AsciiTableInputDriver.
+
+    Attributes (in addition to parent class's):
+        -
+
+    """
 
     def __init__(self):
-        super(TestAsciiTableInputDriver, self).__init__()
+        super(TestAsciiTableInputParam, self).__init__()
         self.driver = 'AsciiTableInputDriver'
         self.attr_list += ['file', 'as_array']
+
+        
+class TestAsciiTableInputDriverNoStart(TestAsciiTableInputParam,
+                                       parent.TestAsciiFileInputDriverNoStart):
+    r"""Test runner for AsciiTableInputDriver.
+
+    Attributes (in addition to parent class's):
+        -
+
+    """
+    pass
+
+
+class TestAsciiTableInputDriver(TestAsciiTableInputParam,
+                                parent.TestAsciiFileInputDriver):
+    r"""Test runner for AsciiTableInputDriver.
+
+    Attributes (in addition to parent class's):
+        -
+
+    """
 
     def assert_before_stop(self):
         r"""Assertions to make before stopping the driver instance."""
@@ -30,13 +56,18 @@ class TestAsciiTableInputDriver(parent.TestAsciiFileInputDriver):
                 iline += 1
         nt.assert_equal(len(self.file_lines), iline)
 
-class TestAsciiTableInputDriver_Array(parent.TestAsciiFileInputDriver):
-    r"""Test runner for AsciiTableInputDriver with array input."""
+        
+class TestAsciiTableInputDriver_Array(TestAsciiTableInputParam,
+                                      parent.TestAsciiFileInputDriver):
+    r"""Test runner for AsciiTableInputDriver with array input.
+
+    Attributes (in addition to parent class's):
+        -
+
+    """
 
     def __init__(self):
         super(TestAsciiTableInputDriver_Array, self).__init__()
-        self.driver = 'AsciiTableInputDriver'
-        self.attr_list += ['file', 'as_array']
         self.args = {'filepath': self.filepath,
                      'as_array': True}
 

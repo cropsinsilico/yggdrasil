@@ -3,8 +3,8 @@ import nose.tools as nt
 import test_IODriver as parent
 
 
-class TestFileInputDriver(parent.TestIODriver):
-    r"""Test runner for FileInputDriver.
+class TestFileInputParam(parent.TestIOParam):
+    r"""Test parameters for FileInputDriver.
 
     Attributes (in addition to parent class's):
         filepath (str): Full path to test file.
@@ -12,7 +12,7 @@ class TestFileInputDriver(parent.TestIODriver):
     """
 
     def __init__(self):
-        super(TestFileInputDriver, self).__init__()
+        super(TestFileInputParam, self).__init__()
         self.driver = 'FileInputDriver'
         self.filepath = os.path.abspath('ascii_input.txt')
         self.args = self.filepath
@@ -22,13 +22,33 @@ class TestFileInputDriver(parent.TestIODriver):
         r"""Create a driver instance and start the driver."""
         with open(self.filepath, 'wb') as fd:
             fd.write(self.file_contents)
-        super(TestFileInputDriver, self).setup()
+        super(TestFileInputParam, self).setup()
 
     def teardown(self):
         r"""Remove the instance, stoppping it."""
-        super(TestFileInputDriver, self).teardown()
+        super(TestFileInputParam, self).teardown()
         if os.path.isfile(self.filepath):
             os.remove(self.filepath)
+
+
+class TestFileInputDriverNoStart(TestFileInputParam,
+                                 parent.TestIODriverNoStart):
+    r"""Test runner for FileInputDriver without start.
+
+    Attributes (in addition to parent class's):
+        -
+
+    """
+    pass
+
+
+class TestFileInputDriver(TestFileInputParam, parent.TestIODriver):
+    r"""Test runner for FileInputDriver.
+
+    Attributes (in addition to parent class's):
+        -
+
+    """
 
     def assert_before_stop(self):
         r"""Assertions to make before stopping the driver instance."""
@@ -52,3 +72,4 @@ class TestFileInputDriver(parent.TestIODriver):
         pass
         # data = self.instance.recv_wait_nolimit()
         # super(TestFileInputDriver, self).test_send_recv_nolimit()
+

@@ -451,17 +451,16 @@ class AsciiTable(AsciiFile):
             out = None
             with open(self.filepath, 'r') as fd:
                 for line in fd:
-                    if not line.startswith(self.comment):
-                        continue
-                    sline = line.lstrip(self.comment)
-                    sline = sline.lstrip(' ')
-                    fmts = sline.split(self.column)
-                    is_fmt = [f.startswith('%') for f in fmts]
-                    if sum(is_fmt) == len(fmts):
-                        out = sline
-                        break
-                    comment_list.append(sline)
-            if out is None:
+                    if line.startswith(self.comment):
+                        sline = line.lstrip(self.comment)
+                        sline = sline.lstrip(' ')
+                        fmts = sline.split(self.column)
+                        is_fmt = [f.startswith('%') for f in fmts]
+                        if sum(is_fmt) == len(fmts):
+                            out = sline
+                            break
+                        comment_list.append(sline)
+            if out is None:  # pragma: debug
                 raise Exception("Could not locate a line containing format descriptors.")
             self._format_str = out
             # Do column names

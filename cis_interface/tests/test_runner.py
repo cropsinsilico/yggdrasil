@@ -27,6 +27,15 @@ def test_get_runner():
     cr = runner.get_runner([yamls['ascii_io_python']])
     cr.run()
 
+    
+def test_runner_terminate():
+    r"""Start a runner, then stop it early."""
+    cr = runner.get_runner([yamls['ascii_io_python']])
+    cr.loadDrivers()
+    cr.startDrivers()
+    cr.printStatus()
+    cr.terminate()
+
 
 class TestCisRunner(object):
     r"""Tests of the CisRunner class."""

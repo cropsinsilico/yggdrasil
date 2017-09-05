@@ -115,7 +115,7 @@ class MatlabModelDriver(ModelDriver):
             self.started_matlab = True
             try:
                 self.mlengine = matlab.engine.connect_matlab(self.mlsession)
-            except matlab.engine.EngineError:
+            except matlab.engine.EngineError:  # pragma: debug
                 self.exception("could not connect to matlab engine")
                 return
 

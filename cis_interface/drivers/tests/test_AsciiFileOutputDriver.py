@@ -1,14 +1,40 @@
 import test_FileOutputDriver as parent
 
 
-class TestAsciiFileOutputDriver(parent.TestFileOutputDriver):
-    r"""Test runner for AsciiFileOutputDriver."""
+class TestAsciiFileOutputParam(parent.TestFileOutputParam):
+    r"""Test parameters for AsciiFileOutputDriver.
+
+    Attributes (in addition to parent class's):
+        -
+
+    """
 
     def __init__(self):
-        super(TestAsciiFileOutputDriver, self).__init__()
+        super(TestAsciiFileOutputParam, self).__init__()
         self.driver = 'AsciiFileOutputDriver'
         self.attr_list += ['file_kwargs', 'file']
         self.args = [self.args, {}, 'ignore']
+
+
+class TestAsciiFileOutputDriverNoStart(TestAsciiFileOutputParam,
+                                       parent.TestFileOutputDriverNoStart):
+    r"""Test runner for AsciiFileOutputDriver without start.
+
+    Attributes (in addition to parent class's):
+        -
+
+    """
+    pass
+
+
+class TestAsciiFileOutputDriver(TestAsciiFileOutputParam,
+                                parent.TestFileOutputDriver):
+    r"""Test runner for AsciiFileOutputDriver.
+
+    Attributes (in addition to parent class's):
+        -
+
+    """
 
     def setup(self):
         r"""Create a driver instance and start the driver."""

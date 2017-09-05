@@ -80,7 +80,12 @@ class Driver(Thread):
         r"""Stop the driver."""
         self.debug(':stop()')
         self._term_meth = 'stop'
+        self.graceful_stop()
         self.terminate()
+
+    def graceful_stop(self):
+        r"""Gracefully stop the driver."""
+        self.debug(':graceful_stop()')
 
     def terminate(self):
         r"""Stop the driver, without attempting to allow it to finish."""

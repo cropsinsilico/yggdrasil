@@ -41,16 +41,20 @@ class RPCDriver(Driver):
         self.oipc.start()
         self.debug('.run() done')
 
+    def graceful_stop(self):
+        r"""Allow the IPC queues to terminate gracefully."""
+        self.debug('.graceful_stop()')
+        self.iipc.graceful_stop()
+        self.oipc.graceful_stop()
+        super(RPCDriver, self).graceful_stop()
+        self.debug('.graceful_stop() done')
+
     def terminate(self):
         r"""Terminate input/output queue drivers."""
-        super(RPCDriver, self).terminate()
         self.debug('.terminate()')
-        if self._term_meth == 'stop':
-            self.iipc.stop()
-            self.oipc.stop()
-        else:
-            self.iipc.terminate()
-            self.oipc.terminate()
+        self.iipc.terminate()
+        self.oipc.terminate()
+        super(RPCDriver, self).terminate()
         self.debug('.terminate() done')
 
     def printStatus(self):

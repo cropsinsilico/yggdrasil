@@ -3,8 +3,8 @@ import nose.tools as nt
 import test_IODriver as parent
 
 
-class TestFileOutputDriver(parent.TestIODriver):
-    r"""Test runner for FileOutputDriver.
+class TestFileOutputParam(parent.TestIOParam):
+    r"""Test parameters for FileOutputDriver.
 
     Attributes (in addition to parent class's):
         filepath (str): Full path to test file.
@@ -12,11 +12,31 @@ class TestFileOutputDriver(parent.TestIODriver):
     """
 
     def __init__(self):
-        super(TestFileOutputDriver, self).__init__()
+        super(TestFileOutputParam, self).__init__()
         self.driver = 'FileOutputDriver'
         self.filepath = os.path.abspath('ascii_input.txt')
         self.args = self.filepath
         self.attr_list += ['args', 'fd', 'lock']
+        
+
+class TestFileOutputDriverNoStart(TestFileOutputParam,
+                                  parent.TestIODriverNoStart):
+    r"""Test runner for FileOutputDriver without start.
+
+    Attributes (in addition to parent class's):
+        -
+
+    """
+    pass
+
+
+class TestFileOutputDriver(TestFileOutputParam, parent.TestIODriver):
+    r"""Test runner for FileOutputDriver.
+
+    Attributes (in addition to parent class's):
+        -
+
+    """
 
     def setup(self):
         r"""Create a driver instance and start the driver."""
@@ -53,3 +73,5 @@ class TestFileOutputDriver(parent.TestIODriver):
         pass
         # self.instance.close_file()
         # super(TestFileOutputDriver, self).test_send_recv_nolimit()
+
+

@@ -1,14 +1,13 @@
 import os
 import numpy as np
+import tempfile
 from nose.tools import istest, nottest, assert_raises, assert_equal
 from cis_interface.dataio import AsciiFile
 from cis_interface.tests import data
 
 
 input_file = data['txt']
-output_dir = os.path.join(os.getcwd(), 'temp_cis_testing')
-if not os.path.isdir(output_dir):
-    os.mkdir(output_dir)
+output_dir = tempfile.gettempdir()
 output_file = os.path.join(output_dir, os.path.basename(input_file))
 
 input_ncomments = 1

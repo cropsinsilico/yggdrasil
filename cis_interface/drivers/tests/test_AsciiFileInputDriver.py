@@ -2,14 +2,40 @@ import nose.tools as nt
 import test_FileInputDriver as parent
 
 
-class TestAsciiFileInputDriver(parent.TestFileInputDriver):
-    r"""Test runner for AsciiFileInputDriver."""
+class TestAsciiFileInputParam(parent.TestFileInputParam):
+    r"""Test parameters for AsciiFileInputDriver.
+
+    Attributes (in addition to the parent class):
+        -
+
+    """
 
     def __init__(self):
-        super(TestAsciiFileInputDriver, self).__init__()
+        super(TestAsciiFileInputParam, self).__init__()
         self.driver = 'AsciiFileInputDriver'
         self.attr_list += ['file_kwargs', 'file']
         self.args = self.args
+
+
+class TestAsciiFileInputDriverNoStart(TestAsciiFileInputParam,
+                                      parent.TestFileInputDriverNoStart):
+    r"""Test runner for AsciiFileInputDriver without start.
+
+    Attributes (in addition to the parent class):
+        -
+
+    """
+    pass
+
+    
+class TestAsciiFileInputDriver(TestAsciiFileInputParam,
+                               parent.TestFileInputDriver):
+    r"""Test runner for AsciiFileInputDriver.
+
+    Attributes (in addition to the parent class):
+        -
+
+    """
 
     def assert_before_stop(self):
         r"""Assertions to make before stopping the driver instance."""

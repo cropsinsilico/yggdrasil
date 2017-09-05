@@ -1,18 +1,29 @@
 import os
 from cis_interface.tests import scripts
 import test_ModelDriver as parent
+from cis_interface import runner
+from cis_interface.examples import yamls as ex_yamls
 
 
 _session_fname = os.path.join(os.getcwd(), 'nt_screen_session.txt')
 
 
-# def test_multiple():
-#     r"""Test that creates multiple matlab drivers."""
-    
+def test_multiple():
+    r"""Test that creates multiple matlab drivers."""
+    os.environ['FIB_ITERATIONS'] = '3'
+    os.environ['FIB_SERVER_SLEEP_SECONDS'] = '1'
+    cr = runner.get_runner(ex_yamls['rpcfib_matlab'])
+    cr.run()
 
 
-class TestMatlabModelDriver(parent.TestModelDriver):
-    r"""Test runner for MatlabModelDriver."""
+class TestMatlabModelDriver(parent.TestModelDriver,
+                            parent.TestModelDriverNoStart):
+    r"""Test runner for MatlabModelDriver.
+
+    Attributes (in addition to parent class's):
+        -
+
+    """
 
     def __init__(self):
         super(TestMatlabModelDriver, self).__init__()
@@ -42,3 +53,5 @@ class TestMatlabModelDriver(parent.TestModelDriver):
         else:  # pragma: debug
             print("Skipping removal of Matlab session as the test did " +
                   "not create it.")
+
+

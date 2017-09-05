@@ -5,8 +5,8 @@ import nose.tools as nt
 import test_IODriver as parent
 
 
-class TestMatOutputDriver(parent.TestIODriver):
-    r"""Test runner for MatOutputDriver.
+class TestMatOutputParam(parent.TestIOParam):
+    r"""Test parameters for MatOutputDriver.
 
     Attributes (in addition to parent class's):
         filepath (str): Full path to test file.
@@ -14,10 +14,30 @@ class TestMatOutputDriver(parent.TestIODriver):
     """
 
     def __init__(self):
-        super(TestMatOutputDriver, self).__init__()
+        super(TestMatOutputParam, self).__init__()
         self.driver = 'MatOutputDriver'
         self.filepath = os.path.abspath('mat_input.mat')
         self.args = self.filepath
+        
+
+class TestMatOutputDriverNoStart(TestMatOutputParam,
+                                 parent.TestIODriverNoStart):
+    r"""Test runner for MatOutputDriver.
+
+    Attributes (in addition to parent class's):
+        -
+    
+    """
+    pass
+
+
+class TestMatOutputDriver(TestMatOutputParam, parent.TestIODriver):
+    r"""Test runner for MatOutputDriver.
+
+    Attributes (in addition to parent class's):
+        -
+    
+    """
 
     def setup(self):
         r"""Create a driver instance and start the driver."""

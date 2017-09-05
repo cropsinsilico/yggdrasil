@@ -1,14 +1,13 @@
 import os
 import numpy as np
+import tempfile
 from nose.tools import istest, nottest, assert_raises, assert_equal
 from cis_interface.dataio import AsciiTable
 from cis_interface.tests import data
 
 
 input_file = data['table']
-output_dir = os.path.join(os.getcwd(), 'temp_cis_testing')
-if not os.path.isdir(output_dir):
-    os.mkdir(output_dir)
+output_dir = tempfile.gettempdir()
 output_file = os.path.join(output_dir, os.path.basename(input_file))
 
 ncols = 3
@@ -307,17 +306,25 @@ def test_AsciiTable_array_bytes():
                                            format_str=AF_in.format_str,
                                            column_names=AF_in.column_names)
             # Read matrix
+            assert_equal(AF_out.arr, None)
+            assert_raises(ValueError, AF_in.read_array, names=['wrong'])
+            in_arr = AF_in.arr
             in_arr = AF_in.read_array()
             # Errors
             assert_raises(TypeError, AF_in.array_to_bytes, 0)
             assert_raises(ValueError, AF_in.array_to_bytes, np.zeros(nrows))
-            assert_raises(ValueError, AF_in.array_to_bytes, np.zeros((nrows, ncols-1)))
+            assert_raises(ValueError, AF_in.array_to_bytes, np.zeros((nrows,
+                                                                      ncols-1)))
             # Check direct conversion of bytes
             in_bts = AF_in.array_to_bytes(order=order)
             out_arr = AF_in.bytes_to_array(in_bts, order=order)
             np.testing.assert_equal(out_arr, in_arr)
             # Write matrix
+            assert_raises(RuntimeError, AF_out.bytes_to_array, in_bts[:-1],
+                          order=order)
             out_arr = AF_out.bytes_to_array(in_bts, order=order)
+            assert_raises(ValueError, AF_out.write_array, out_arr,
+                          names=['wrong'])
             AF_out.write_array(out_arr)
             # Read output matrix
             AF_out = AsciiTable.AsciiTable(output_file, 'r',
@@ -335,7 +342,7 @@ def test_AsciiTable_io_bytes():
         AF_in = AsciiTable.AsciiTable(input_file, 'r',
                                       use_astropy=use_astropy, **mode2kws['r'])
         AF_out = AsciiTable.AsciiTable(output_file, 'w',
-                                       use_astropy=use_astropy, #**mode2kws['w'])
+                                       use_astropy=use_astropy,
                                        format_str=AF_in.format_str,
                                        column_names=AF_in.column_names)
         # Read matrix
@@ -382,3 +389,4 @@ def test_AsciiTable_writenames():
 def test_AsciiTable_validate_line():
     AF0 = AsciiTable.AsciiTable(mode2file['w'], 'w', **mode2kws['w'])
     assert_raises(AssertionError, AF0.validate_line, 'wrong format')
+    assert_raises(TypeError, AF0.validate_line, 5)

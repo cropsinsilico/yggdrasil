@@ -37,6 +37,12 @@ class RMQServerDriver(RMQDriver, RPCDriver):
         server."""
         return len(self.clients)
 
+    def on_queue_declareok(self, method_frame):
+        r"""Actions to perform once the queue is succesfully declared."""
+        self.debug('::Declaring the server request queue.')
+        self.purge_queue()
+        super(RMQServerDriver, self).on_queue_declareok(method_frame)
+
     def start_communication(self, no_ack=False):
         r"""Start consuming messages from the queue."""
         self.debug('::start_consuming')
@@ -46,6 +52,9 @@ class RMQServerDriver(RMQDriver, RPCDriver):
 
     def on_message(self, ch, method, props, body):
         r"""Actions to perform when a message is received."""
+        with self.lock:
+            if self._closing:
+                return
         # TODO: handle possibility of message larger than AMQP server memory
         if body == _new_client_msg:
             self.debug('::New client (%s)' % props.reply_to)
@@ -61,16 +70,20 @@ class RMQServerDriver(RMQDriver, RPCDriver):
             self.debug('::Message received')
             self.iipc.ipc_send_nolimit(body)
             response = self.oipc.recv_wait_nolimit()
-            ch.basic_publish(exchange=self.exchange,
-                             routing_key=props.reply_to,
-                             properties=pika.BasicProperties(
-                                 correlation_id = props.correlation_id),
-                             body=str(response))
+            with self.lock:
+                if self._closing:
+                    return
+                ch.basic_publish(exchange=self.exchange,
+                                 routing_key=props.reply_to,
+                                 properties=pika.BasicProperties(
+                                     correlation_id = props.correlation_id),
+                                 body=str(response))
         ch.basic_ack(delivery_tag = method.delivery_tag)
 
     def stop_communication(self):
         r"""Stop consuming messages from the queue."""
-        self._closing = True
+        with self.lock:
+            self._closing = True
         if self.channel:
             self.debug("::Cancelling consumption.")
             self.channel.basic_cancel(callback=self.on_cancelok,
@@ -78,5 +91,6 @@ class RMQServerDriver(RMQDriver, RPCDriver):
             
     def on_cancelok(self, unused_frame):
         r"""Actions to perform after succesfully cancelling consumption."""
-        if self.channel:
-            self.channel.close()
+        with self.lock:
+            if self.channel:
+                self.channel.close()

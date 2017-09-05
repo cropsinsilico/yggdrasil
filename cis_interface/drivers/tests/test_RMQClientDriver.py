@@ -1,24 +1,60 @@
+import os
 import pika
 import nose.tools as nt
 import test_RMQDriver as parent1
 from test_IODriver import IOInfo
 from cis_interface.drivers.RMQClientDriver import (
     _new_client_msg, _end_client_msg)
+from cis_interface import runner
+from cis_interface.examples import yamls as ex_yamls
 
 
-class TestRMQClientDriver(parent1.TestRMQDriver, IOInfo):
-    r"""Test class for RMQClientDriver class."""
+def test_yaml():
+    r"""Test Server/Client setup using runner."""
+    os.environ['FIB_ITERATIONS'] = '3'
+    os.environ['FIB_SERVER_SLEEP_SECONDS'] = '1'
+    cr = runner.get_runner(ex_yamls['rpcfib_python'])
+    cr.run()
+
+
+class TestRMQClientParam(parent1.TestRMQParam, IOInfo):
+    r"""Test parameters for RMQClientDriver class.
+
+    Attributes (in addition to parent class's):
+        -
+
+    """
 
     def __init__(self):
-        super(TestRMQClientDriver, self).__init__()
+        super(TestRMQClientParam, self).__init__()
         self.driver = 'RMQClientDriver'
         self.args = None
         self.attr_list += ['request_queue', 'response', 'corr_id',
                            '_deliveries', '_acked', '_nacked',
                            '_message_number']
         self._temp_queue = 'TestRMQClientDriver_SERVER'
-        if self.channel:
+        if getattr(self, 'channel', None):
             self.channel.queue_purge(queue=self.temp_queue)
+            
+
+class TestRMQClientDriverNoStart(TestRMQClientParam,
+                                 parent1.TestRMQDriverNoStart):
+    r"""Test class for RMQClientDriver class without start.
+
+    Attributes (in addition to parent class's):
+        -
+
+    """
+    pass
+
+
+class TestRMQClientDriver(TestRMQClientParam, parent1.TestRMQDriver):
+    r"""Test class for RMQClientDriver class.
+
+    Attributes (in addition to parent class's):
+        -
+
+    """
 
     def setup(self):
         r"""Recover new client message on start-up."""

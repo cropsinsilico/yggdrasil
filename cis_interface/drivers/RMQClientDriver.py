@@ -39,33 +39,35 @@ class RMQClientDriver(RMQDriver, RPCDriver):
         self._nacked = 0
         self._message_number = 0
 
-    def reconnect(self):
-        r"""Reconnect the connection, resetting counts."""
-        self._deliveries = []
-        self._acked = 0
-        self._nacked = 0
-        self._message_number = 0
-        super(RMQClientDriver, self).reconnect()
+    # def reconnect(self):
+    #     r"""Reconnect the connection, resetting counts."""
+    #     self._deliveries = []
+    #     self._acked = 0
+    #     self._nacked = 0
+    #     self._message_number = 0
+    #     super(RMQClientDriver, self).reconnect()
 
-    def on_queue_declareok(self, method_frame):
-        r"""Actions to perform once the queue is succesfully declared."""
-        self.debug('::Declaring the server request queue.')
-        self.channel.queue_declare(
-            self.on_request_queue_declareok,
-            queue=self.request_queue, auto_delete=True)
-        super(RMQClientDriver, self).on_queue_declareok(method_frame)
+    # If we force the RMQServerDriver to start the request queue, it can
+    # purge the queue before starting to ensure a new run
+    # def on_queue_declareok(self, method_frame):
+    #     r"""Actions to perform once the queue is succesfully declared."""
+    #     self.debug('::Declaring the server request queue.')
+    #     self.channel.queue_declare(
+    #         self.on_request_queue_declareok,
+    #         queue=self.request_queue, auto_delete=True)
+    #     super(RMQClientDriver, self).on_queue_declareok(method_frame)
 
-    def on_request_queue_declareok(self, method_frame):
-        r"""Actions to perform once the request queue is succesfully declared.
-        This is needed to ensure that the server queue exists when publishing
-        begins."""
-        self.debug('::Declared the server request queue.')
-        self.request_queue = method_frame.method.queue
+    # def on_request_queue_declareok(self, method_frame):
+    #     r"""Actions to perform once the request queue is succesfully declared.
+    #     This is needed to ensure that the server queue exists when publishing
+    #     begins."""
+    #     self.debug('::Declared the server request queue.')
+    #     self.request_queue = method_frame.method.queue
 
     def start_communication(self, no_ack=False):
         r"""Start publishing messages to the queue."""
         self.debug('::start_communication')
-        # self.channel.basic_qos(prefetch_count=1)
+        self.channel.basic_qos(prefetch_count=1)
         if self.times_connected == 1:  # Only do this once
             self.publish_to_server(_new_client_msg)
         self.consumer_tag = self.channel.basic_consume(self.on_response,
@@ -103,8 +105,9 @@ class RMQClientDriver(RMQDriver, RPCDriver):
 
     def schedule_next_message(self):
         r"""Wait for next message."""
-        if self._closing:  # pragma: debug
-            return
+        with self.lock:
+            if self._closing:  # pragma: debug
+                return
         self.debug('Checking IPC queue.')
         message = self.oipc.ipc_recv_nolimit()
         if message is None:
@@ -113,8 +116,11 @@ class RMQClientDriver(RMQDriver, RPCDriver):
         elif len(message) == 0:
             self.debug('::Checking in IPC queue again in %0.1f seconds',
                        self.sleeptime)
-            self.connection.add_timeout(self.sleeptime,
-                                        self.schedule_next_message)
+            with self.lock:
+                if self._closing:  # pragma: debug
+                    return
+                self.connection.add_timeout(self.sleeptime,
+                                            self.schedule_next_message)
         else:
             self.debug("::IPC recv got %d byte request", len(message))
             self.publish_to_server(message)
@@ -122,13 +128,17 @@ class RMQClientDriver(RMQDriver, RPCDriver):
 
     def schedule_next_response(self):
         r"""Wait for next response."""
-        if self._closing:  # pragma: debug
-            return
+        with self.lock:
+            if self._closing:  # pragma: debug
+                return
         if self.response is None:
             self.debug('::Checking RMQ response queue again in %0.1f seconds',
                        self.sleeptime)
-            self.connection.add_timeout(self.sleeptime,
-                                        self.schedule_next_response)
+            with self.lock:
+                if self._closing:  # pragma: debug
+                    return
+                self.connection.add_timeout(self.sleeptime,
+                                            self.schedule_next_response)
         else:
             self.debug("::Sending %d byte response to IPC", len(self.response))
             self.iipc.ipc_send_nolimit(self.response)
@@ -136,37 +146,39 @@ class RMQClientDriver(RMQDriver, RPCDriver):
 
     def publish_to_server(self, message, properties=None):
         r"""Publish a message to the server queue."""
-        if self._closing:
-            return
-        self.debug(".publish_message(): sending %d bytes to AMQP", len(message))
-        self.response = None
-        self.response_time = 0.0
-        self.corr_id = str(uuid.uuid4())
-        self.channel.basic_publish(exchange=self.exchange,
-                                   routing_key=self.request_queue,
-                                   properties=pika.BasicProperties(
-                                       reply_to = self.queue,
-                                       correlation_id = self.corr_id),
-                                   body=message)
-        self._message_number += 1
-        self._deliveries.append(self._message_number)
+        with self.lock:
+            if self._closing:  # pragma: debug
+                return
+            self.debug(".publish_message(): sending %d bytes to AMQP", len(message))
+            self.response = None
+            self.response_time = 0.0
+            self.corr_id = str(uuid.uuid4())
+            self.channel.basic_publish(exchange=self.exchange,
+                                       routing_key=self.request_queue,
+                                       properties=pika.BasicProperties(
+                                           reply_to = self.queue,
+                                           correlation_id = self.corr_id),
+                                       body=message)
+            self._message_number += 1
+            self._deliveries.append(self._message_number)
 
     def on_response(self, ch, method, props, body):
         r"""Actions to perform when a reponse is received from the server."""
-        if self.corr_id == props.correlation_id:
-            self.debug("::Received %d byte response", len(body))
-            self.response = body
-        ch.basic_ack(delivery_tag = method.delivery_tag)
-        # TODO: put message back in queue if its wrong?
+        with self.lock:
+            if self.corr_id == props.correlation_id:
+                self.debug("::Received %d byte response", len(body))
+                self.response = body
+                ch.basic_ack(delivery_tag=method.delivery_tag)
+            else:
+                ch.basic_reject(method.delivery_tag, requeue=True)
 
     def stop_communication(self):
         r"""Stop consuming messages from the queue."""
         if self.channel:
             self.debug("::Cancelling consumption.")
             self.publish_to_server(_end_client_msg)
-        self._closing = True
-        if self.channel:
-            self.channel.close()
+        print 'stopping communication'
+        super(RMQClientDriver, self).stop_communication()
 
     def on_model_exit(self):
         r"""Stop when the model exits."""

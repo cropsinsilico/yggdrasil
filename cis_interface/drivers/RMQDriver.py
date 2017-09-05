@@ -85,7 +85,9 @@ class RMQDriver(Driver):
         self._opening = True
         super(RMQDriver, self).start()
         tries = 10
-        while self._opening and tries > 0:
+        while True:
+            if not self._opening or tries == 0:
+                break
             self.sleep()
             tries -= 1
         if self._opening:  # pragma: debug
@@ -101,21 +103,25 @@ class RMQDriver(Driver):
 
     def terminate(self):
         r"""Terminate the driver by closing the RabbitMQ connection."""
-        if self._closing:
-            return  # Don't close more than once
-        super(RMQDriver, self).terminate()
+        with self.lock:
+            if self._closing:
+                return  # Don't close more than once
         self.debug("::terminate")
         if self._opening:  # pragma: debug
             self.debug('Waiting for connection to open before terminating')
+            # if self.connection is None:
+            #     self.connection.add_timeout(self.terminate(), self.sleeptime)
+            #     return
             while self.connection is None:
                 self.sleep()
-            # self.connection.add_timeout(self.terminate(), self.sleeptime)
         self.debug('::terminate: Closing connection')
         self.stop_communication()
         # Only needed if ioloop is stopped prior to closing the connection?
         # (e.g. keyboard interupt)
         # if self.connection:
         #     self.connection.ioloop.start()
+        super(RMQDriver, self).terminate()
+        print 'terminated parent'
         self.debug('::terminate returns')
 
     # RMQ PROPERTIES
@@ -160,25 +166,30 @@ class RMQDriver(Driver):
         r"""Actions that must be taken when the connection is closed. Set the
         channel to None. If the connection is meant to be closing, stop the
         IO loop. Otherwise, wait 5 seconds and try to reconnect."""
-        self.debug('::on_connection_closed code %d %s', reply_code, reply_text)
-        self.channel = None
-        if self._closing or reply_code == 200:
-            self.connection.ioloop.stop()
-        else:
-            self.warn('Connection closed, reopening in %f seconds: (%s) %s',
-                      self.sleeptime, reply_code, reply_text)
-            self.connection.add_timeout(self.sleeptime, self.reconnect)
+        with self.lock:
+            self.debug('::on_connection_closed code %d %s', reply_code,
+                       reply_text)
+            self.channel = None
+            if self._closing or reply_code == 200:
+                self.connection.ioloop.stop()
+                self.connection = None
+                self._closing = False
+            else:
+                self.warn('Connection closed, reopening in %f seconds: (%s) %s',
+                          self.sleeptime, reply_code, reply_text)
+                self.connection.add_timeout(self.sleeptime, self.reconnect)
 
     def reconnect(self):
         r"""Try to re-establish a connection and resume a new IO loop."""
         self.debug('::reconnect()')
         # This is the old connection IOLoop instance, stop its ioloop
-        self.connection.ioloop.stop()
-        if not self._closing:
-            # Create a new connection
-            self.connect()
-            # There is now a new connection, needs a new ioloop to run
-            self.connection.ioloop.start()
+        with self.lock:
+            self.connection.ioloop.stop()
+            if not self._closing:
+                # Create a new connection
+                self.connect()
+                # There is now a new connection, needs a new ioloop to run
+                self.connection.ioloop.start()
 
     # CHANNEL
     def open_channel(self):
@@ -197,9 +208,10 @@ class RMQDriver(Driver):
     def on_channel_closed(self, channel, reply_code, reply_text):
         r"""Actions to perform when the channel is closed. Close the
         connection."""
-        self.debug('::channel %i was closed: (%s) %s',
-                   channel, reply_code, reply_text)
-        self.connection.close()
+        with self.lock:
+            self.debug('::channel %i was closed: (%s) %s',
+                       channel, reply_code, reply_text)
+            self.connection.close()
 
     # EXCHANGE
     def setup_exchange(self, exchange_name):
@@ -243,12 +255,17 @@ class RMQDriver(Driver):
         r"""Actions to perform once the queue is succesfully bound. Start
         consuming messages."""
         self.debug('::Queue bound')
-        self._opening = False
+        with self.lock:
+            self._opening = False
         self.start_communication()
 
     def purge_queue(self):
         r"""Remove all messages from the associated queue."""
-        self.channel.queue_purge(queue=self.queue)
+        with self.lock:
+            if self._closing:  # pragma: debug
+                return
+            if self.channel:
+                self.channel.queue_purge(queue=self.queue)
 
     # GENERAL
     def start_communication(self, **kwargs):
@@ -257,9 +274,19 @@ class RMQDriver(Driver):
 
     def stop_communication(self, **kwargs):
         r"""Stop sending/receiving messages."""
-        self._closing = True
-        if self.channel:
-            self.channel.close()
+        with self.lock:
+            self._closing = True
+            if self.channel and self.channel.is_open:
+                self.channel.queue_unbind(queue=self.queue,
+                                          exchange=self.exchange)
+                self.channel.queue_delete(queue=self.queue)
+                self.channel.close()
+            else:
+                self._closing = False
+        while self._closing:
+            print 'still closing'
+            self.debug('::stop_commmunication: waiting for connection to close')
+            self.sleep()
 
     # UTILITIES
     def rmq_send(self, data):
@@ -272,20 +299,23 @@ class RMQDriver(Driver):
             bool: True if the message was sent succesfully. False otherwise.
 
         """
-        self.debug("::send %d", len(data))
-        assert(len(data) <= maxMsgSize)
-        if not self.channel:  # pragma: debug
-            self.debug("::send %d  NO CHANNEL", len(data))
-            return False
-        try:
-            self.channel.basic_publish(
-                exchange=self.exchange, routing_key=self.queue,
-                body=data, mandatory=True)
-        except Exception as e:  # pragma: debug
-            self.warn("::send %d : exception %s: %s",
-                      len(data), type(e), e)
-            return False
-        return True
+        with self.lock:
+            if self._closing:
+                return False
+            self.debug("::send %d", len(data))
+            assert(len(data) <= maxMsgSize)
+            if not self.channel:  # pragma: debug
+                self.debug("::send %d  NO CHANNEL", len(data))
+                return False
+            try:
+                self.channel.basic_publish(
+                    exchange=self.exchange, routing_key=self.queue,
+                    body=data, mandatory=True)
+            except Exception as e:  # pragma: debug
+                self.warn("::send %d : exception %s: %s",
+                          len(data), type(e), e)
+                return False
+            return True
 
     def rmq_send_nolimit(self, data):
         r"""Send a message smaller than maxMsgSize to the RMQ queue.
@@ -298,9 +328,6 @@ class RMQDriver(Driver):
 
         """
         self.debug("::send_nolimit %d", len(data))
-        if not self.channel:  # pragma: debug
-            self.debug("::send_nolimit %d  NO CHANNEL", len(data))
-            return False
         prev = 0
         ret = self.rmq_send("%ld" % len(data))
         if ret:

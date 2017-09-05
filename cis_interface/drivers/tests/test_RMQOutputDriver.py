@@ -5,13 +5,38 @@ import test_RMQDriver as parent1
 from test_IODriver import IOInfo
 
 
-class TestRMQOutputDriver(parent1.TestRMQDriver, IOInfo):
-    r"""Test runner for RMQOutputDriver."""
+class TestRMQOutputParam(parent1.TestRMQParam, IOInfo):
+    r"""Test parameters for RMQOutputDriver.
+
+    Attributes (in addition to parent class's):
+        -
+
+    """
 
     def __init__(self):
-        super(TestRMQOutputDriver, self).__init__()
+        super(TestRMQOutputParam, self).__init__()
         self.driver = 'RMQOutputDriver'
         self.args = 'test'
+        
+
+class TestRMQOutputDriverNoStart(TestRMQOutputParam,
+                                 parent1.TestRMQDriverNoStart):
+    r"""Test runner for RMQOutputDriver without start.
+
+    Attributes (in addition to parent class's):
+        -
+
+    """
+    pass
+    
+class TestRMQOutputDriver(TestRMQOutputParam,
+                          parent1.TestRMQDriver):
+    r"""Test runner for RMQOutputDriver.
+
+    Attributes (in addition to parent class's):
+        -
+
+    """
 
     def setup(self):
         r"""Create a driver instance and start the driver."""

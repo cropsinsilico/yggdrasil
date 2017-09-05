@@ -1,30 +1,42 @@
 import nose.tools as nt
 import test_Driver as parent
 from test_IODriver import IOInfo
-from cis_interface.tools import ipc_queues
 
 
-class TestRPCDriver(parent.TestDriver, IOInfo):
-    r"""Test class for RPCDriver class."""
+class TestRPCParam(parent.TestParam, IOInfo):
+    r"""Test parameters for RPCDriver class.
+
+    Attributes (in addition to parent class's):
+        -
+
+    """
 
     def __init__(self):
-        super(TestRPCDriver, self).__init__()
+        super(TestRPCParam, self).__init__()
         IOInfo.__init__(self)
         self.driver = 'RPCDriver'
         self.args = '_TEST'
         self.attr_list += ['iipc', 'oipc']
-        self.nprev_queues = 0
-
-    def setup(self):
-        r"""Get a count of existing queues."""
-        self.nprev_queues = len(ipc_queues())
-        super(TestRPCDriver, self).setup()
-
-    def teardown(self):
-        r"""Make sure that all new message queues were deleted."""
-        super(TestRPCDriver, self).teardown()
-        nt.assert_equal(len(ipc_queues()), self.nprev_queues)
         
+        
+class TestRPCDriverNoStart(TestRPCParam, parent.TestDriverNoStart, IOInfo):
+    r"""Test class for RPCDriver class without start.
+
+    Attributes (in addition to parent class's):
+        -
+
+    """
+    pass
+
+
+class TestRPCDriver(TestRPCParam, parent.TestDriver, IOInfo):
+    r"""Test class for RPCDriver class.
+
+    Attributes (in addition to parent class's):
+        -
+
+    """
+
     def test_send_recv(self):
         r"""Test sending/receiving small message."""
         # Input

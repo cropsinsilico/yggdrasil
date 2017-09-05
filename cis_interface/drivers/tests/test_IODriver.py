@@ -3,7 +3,6 @@ import nose.tools as nt
 from cis_interface.drivers.IODriver import maxMsgSize
 from cis_interface.backwards import pickle
 from cis_interface.drivers.tests import test_Driver as parent
-from cis_interface.tools import ipc_queues
 from cis_interface.dataio.AsciiTable import AsciiTable
 
 
@@ -111,39 +110,43 @@ class IOInfo(object):
         with open(fname, 'wb') as fd:
             pickle.dump(self.data_dict, fd)
 
-        
-class TestIODriver(parent.TestDriver, IOInfo):
-    r"""Test class for the IODriver class.
+            
+class TestIOParam(parent.TestParam, IOInfo):
+    r"""Test parameters for the IODriver class.
 
     Attributes (in addition to parent class's):
-        fmt_str (str): Format string for lines of a table.
-        file_rows (list): List of mock table rows.
+        -
 
     """
-
     def __init__(self):
-        super(TestIODriver, self).__init__()
+        super(TestIOParam, self).__init__()
         IOInfo.__init__(self)
         self.driver = 'IODriver'
         self.args = '_TEST'
         self.attr_list += ['state', 'numSent', 'numReceived', 'env', 'mq']
-        self.nprev_queues = 0
 
-    def setup(self):
-        r"""Get a count of existing queues."""
-        self.nprev_queues = len(ipc_queues())
-        super(TestIODriver, self).setup()
+    
+class TestIODriverNoStart(TestIOParam, parent.TestDriverNoStart):
+    r"""Test class for the IODriver class without start.
 
-    def teardown(self):
-        r"""Make sure that all new message queues were deleted."""
-        super(TestIODriver, self).teardown()
-        nt.assert_equal(len(ipc_queues()), self.nprev_queues)
+    Attributes (in addition to parent class's):
+        -
+
+    """
+    pass
+
+
+class TestIODriver(TestIOParam, parent.TestDriver):
+    r"""Test class for the IODriver class.
+
+    Attributes (in addition to parent class's):
+        -
+
+    """
 
     def test_early_close(self):
         r"""Test early deletion of message queue."""
-        if self.instance.mq:
-            self.instance.mq.remove()
-            self.instance.mq = None
+        self.instance.close_queue()
 
     def test_send_recv(self):
         r"""Test sending/receiving small message."""
@@ -171,6 +174,4 @@ class TestIODriver(parent.TestDriver, IOInfo):
         r"""Assertions to make after terminating the driver instance."""
         super(TestIODriver, self).assert_after_terminate()
         assert(not self.instance.mq)
-
-
 

@@ -68,7 +68,7 @@ class PsiInput(object):
             data, _ = self.q.receive() # ignore ident
             payload = (True, data)
             debug("PsiInput(%s).recv(): read %d bytes", self.name, len(data))
-        except Exception as ex:
+        except Exception as ex:  # pragma: debug
             debug("PsiInput(%s).recv(): exception %s, return None", self.name, type(ex))
         return payload
 
