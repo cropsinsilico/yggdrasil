@@ -6,7 +6,19 @@ SPHINXOPTS    =
 SPHINXBUILD   = sphinx-build
 SPHINXPROJ    = cis_interface
 SOURCEDIR     = source
-BUILDDIR      = build
+BUILDDIR      = ../../cis_interface_docs
+PDFBUILDDIR   = /tmp
+PDF           = ../manual.pdf
+
+latexpdf:
+    $(SPHINXBUILD) -b latex $(SPHINXOPTS) $(PDFBUILDDIR)/latex
+    #                                          ^^^
+    # @echo "Running LaTeX files through pdflatex..."
+    make -C $(PDFBUILDDIR)/latex all-pdf
+    #         ^^^
+    cp $(PDFBUILDDIR)/latex/*.pdf $(PDF)
+    #^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    # @echo "pdflatex finished; see $(PDF)"
 
 # Put it first so that "make" without argument is like "make help".
 help:
