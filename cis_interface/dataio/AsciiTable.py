@@ -1,5 +1,5 @@
 import numpy as np
-from scanf import scanf
+from cis_interface.interface.scanf import scanf
 from AsciiFile import AsciiFile
 try:
     from astropy.io import ascii as apy_ascii

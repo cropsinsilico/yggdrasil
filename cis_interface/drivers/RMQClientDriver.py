@@ -116,7 +116,7 @@ class RMQClientDriver(RMQDriver, RPCDriver):
             self.debug('::Checking in IPC queue again in %0.1f seconds',
                        self.sleeptime)
             with self.lock:
-                if self._closing:  # pragma: debug
+                if self._closing or not self.connection:  # pragma: debug
                     return
                 self.connection.add_timeout(self.sleeptime,
                                             self.schedule_next_message)
@@ -134,7 +134,7 @@ class RMQClientDriver(RMQDriver, RPCDriver):
             self.debug('::Checking RMQ response queue again in %0.1f seconds',
                        self.sleeptime)
             with self.lock:
-                if self._closing:  # pragma: debug
+                if self._closing or not self.connection:  # pragma: debug
                     return
                 self.connection.add_timeout(self.sleeptime,
                                             self.schedule_next_response)
