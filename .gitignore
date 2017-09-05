@@ -1,8 +1,9 @@
 
 # Copies of test input files
-RMQ-support/examples/ascii_io/Input/inputC_*
-RMQ-support/examples/ascii_io/Input/inputPy_*
-RMQ-support/examples/ascii_io/Input/inputM_*
+cis_interface/tests/scripts/gcc_model.out
+
+# Coverage
+.coverage
 
 # temp for storing notes, whatever, etc.   not managed
 tmp/
@@ -19,6 +20,9 @@ tmp/
 
 **/tags
 
+
+# Packaging things
+cis_interface.egg-info
 
 
 # Windows image file caches
