@@ -1,13 +1,10 @@
 import os
 import numpy as np
 import nose.tools as nt
-from threading import Timer
 from cis_interface.interface import PsiInterface, PSI_MSG_EOF
 from cis_interface.drivers import (IODriver, RPCDriver,
                                    AsciiFileInputDriver,
-                                   AsciiFileOutputDriver,
-                                   AsciiTableInputDriver,
-                                   AsciiTableOutputDriver)
+                                   AsciiTableInputDriver)
 from cis_interface.drivers.tests.test_IODriver import IOInfo
 from cis_interface.backwards import pickle
 
@@ -404,6 +401,7 @@ class TestPsiAsciiTableOutput_AsArray(IOInfo):
         inst = PsiInterface.PsiAsciiTableOutput(self.name,
                                                 self.fmt_str, dst_type=1)
         msg_flag = inst.send_array(self.file_array)
+        assert(msg_flag)
         res = self.driver.recv_wait(timeout=1)
         nt.assert_equal(res, self.fmt_str)
         res = self.driver.recv_wait_nolimit(timeout=1)

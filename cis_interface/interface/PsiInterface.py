@@ -1,15 +1,14 @@
-from logging import debug, info
+from logging import debug
 import os
-import sys
 import time
 from sysv_ipc import MessageQueue
-from cis_interface.backwards import pickle    
+from cis_interface.backwards import pickle
 from cis_interface.interface.scanf import scanf
 from cis_interface.dataio.AsciiFile import AsciiFile
 from cis_interface.dataio.AsciiTable import AsciiTable
 
 
-PSI_MSG_MAX = 1024*64
+PSI_MSG_MAX = 1024 * 64
 PSI_MSG_EOF = "EOF!!!"
 
 
@@ -31,12 +30,13 @@ class PsiInput(object):
     name = None
     qName = None
     q = None
+    
     def __init__(self, name):
         self.name = name
         self.qName = name + '_IN'
         self.q = None
         debug("PsiInput(%s):", name)
-        if not self.qName in os.environ:
+        if self.qName not in os.environ:
             raise Exception('PsiInterface cant see %s in env.' % self.qName)
             # print('ERROR:  PsiInterface cant see ' + name + ' in env')
             # exit(-1)
@@ -50,7 +50,7 @@ class PsiInput(object):
             self.sleeptime = 2.0
 
     def recv(self):
-        r"""Receive a message smaller than PSI_MSG_MAX. The process will 
+        r"""Receive a message smaller than PSI_MSG_MAX. The process will
         sleep until there is a message in the queue to receive.
 
         Returns:
@@ -65,7 +65,7 @@ class PsiInput(object):
                 debug("PsiInput(%s): recv() - no data, sleep", self.name)
                 time.sleep(self.sleeptime)
             debug("PsiInput(%s).recv(): message ready, read it", self.name)
-            data, _ = self.q.receive() # ignore ident
+            data, _ = self.q.receive()  # ignore ident
             payload = (True, data)
             debug("PsiInput(%s).recv(): read %d bytes", self.name, len(data))
         except Exception as ex:  # pragma: debug
@@ -84,7 +84,8 @@ class PsiInput(object):
         debug("PsiInput(%s).recv_nolimit()", self.name)
         payload = self.recv()
         if not payload[0]:  # pragma: debug
-            debug("PsiInput(%s).recv_nolimit(): Failed to receive payload size.", self.name)
+            debug("PsiInput(%s).recv_nolimit(): " +
+                  "Failed to receive payload size.", self.name)
             return payload
         try:
             # (leng_exp,) = scanf('%d', payload[1])
@@ -94,16 +95,19 @@ class PsiInput(object):
             while len(data) < leng_exp:
                 payload = self.recv()
                 if not payload[0]:  # pragma: debug
-                    debug("PsiInput(%s).recv_nolimit(): read interupted at %d of %d bytes.",
+                    debug("PsiInput(%s).recv_nolimit(): " +
+                          "read interupted at %d of %d bytes.",
                           self.name, len(data), leng_exp)
                     ret = False
                     break
                 data += payload[1]
             payload = (ret, data)
-            debug("PsiInput(%s).recv_nolimit(): read %d bytes", self.name, len(data))
+            debug("PsiInput(%s).recv_nolimit(): read %d bytes",
+                  self.name, len(data))
         except Exception as ex:  # pragma: debug
             payload = (False, True)
-            debug("PsiInput(%s).recv_nolimit(): exception %s, return None", self.name, type(ex))
+            debug("PsiInput(%s).recv_nolimit(): " +
+                  "exception %s, return None", self.name, type(ex))
         return payload
         
 
@@ -126,7 +130,7 @@ class PsiOutput:
         self.name = name
         self.qName = name + '_OUT'
         debug("PsiOputput(%s)", name)
-        if not self.qName in os.environ:
+        if self.qName not in os.environ:
             raise Exception('PsiInterface cant see %s in env.' % self.qName)
             # print('ERROR:  PsiInterface cant see ' + name + ' in env')
             # exit(-1)
@@ -167,21 +171,24 @@ class PsiOutput:
         """
         ret = self.send("%ld" % len(payload))
         if not ret:  # pragma: debug
-            debug("PsiOutput(%s).send_nolimit: Sending size of payload failed.", self.name)
+            debug("PsiOutput(%s).send_nolimit: " +
+                  "Sending size of payload failed.", self.name)
             return ret
         prev = 0
         while prev < len(payload):
-            next = min(prev+PSI_MSG_MAX, len(payload))
+            next = min(prev + PSI_MSG_MAX, len(payload))
             ret = self.send(payload[prev:next])
             if not ret:  # pragma: debug
-                debug("PsiOutput(%s).send_nolimit(): send interupted at %d of %d bytes.",
+                debug("PsiOutput(%s).send_nolimit(): " +
+                      "send interupted at %d of %d bytes.",
                       self.name, prev, len(payload))
                 break
             debug("PsiOutput(%s).send_nolimit(): %d of %d bytes sent",
                   self.name, next, len(payload))
             prev = next
         if ret:
-            debug("PsiOutput(%s).send_nolimit %d bytes completed", self.name, len(payload))
+            debug("PsiOutput(%s).send_nolimit %d bytes completed",
+                  self.name, len(payload))
         return ret
         
 
@@ -260,7 +267,7 @@ class PsiAsciiFileInput(object):
         name (str): Path to the local file that input should be read from (if
             src_type == 0) or the name of the input message queue that input
             should be received from.
-        src_type (int, optional): If 0, input is read from a local file. 
+        src_type (int, optional): If 0, input is read from a local file.
             Otherwise input is received from a message queue. Defauts to 1.
 
     """
@@ -303,14 +310,14 @@ class PsiAsciiFileInput(object):
 
 
 class PsiAsciiFileOutput(object):
-    r"""Class for generic ASCII output to either a local file or message 
+    r"""Class for generic ASCII output to either a local file or message
     queue.
 
     Args:
         name (str): Path to the local file where output should be written (if
             dst_type == 0) or the name of the message queue where output should
             be sent.
-        dst_type (int, optional): If 0, output is written to a local file. 
+        dst_type (int, optional): If 0, output is written to a local file.
             Otherwise, output is sent to a message queue. Defaults to 1.
 
     """
@@ -367,7 +374,7 @@ class PsiAsciiTableInput(object):
         name (str): The path to the local file to read input from (if src_type
             == 0) or the name of the message queue input should be received
             from.
-        src_type (int, optional): If 0, input is read from a local file. 
+        src_type (int, optional): If 0, input is read from a local file.
             Otherwise, the input is received from a message queue. Defaults to
             1.
 
@@ -387,9 +394,11 @@ class PsiAsciiTableInput(object):
             self._psi = PsiInput(name)
             ret, format_str = self._psi.recv()
             if not ret:  # pragma: debug
-                print('ERROR:  PsiAsciiTableInput could not receive format string from input')
+                print('ERROR:  PsiAsciiTableInput could not ' +
+                      'receive format string from input')
                 exit(-1)
-            self._table = AsciiTable(name, None, format_str=format_str.decode('string_escape'))
+            self._table = AsciiTable(
+                name, None, format_str=format_str.decode('string_escape'))
 
     def __del__(self):
         if self._type == 0:
@@ -445,7 +454,7 @@ class PsiAsciiTableOutput(object):
             output should be sent.
         fmt (str): A C style format string specifying how each 'row' of output
             should be formated. This should include the newline character.
-        dst_type (int, optional): If 0, output is sent to a local file. 
+        dst_type (int, optional): If 0, output is sent to a local file.
             Otherwise, the output is sent to a message queue. Defaults to 1.
 
     """
@@ -527,7 +536,7 @@ class PsiPickleInput(object):
         name (str): The path to the local file to read input from (if src_type
             == 0) or the name of the message queue input should be received
             from.
-        src_type (int, optional): If 0, input is read from a local file. 
+        src_type (int, optional): If 0, input is read from a local file.
             Otherwise, the input is received from a message queue. Defaults to
             1.
 
@@ -537,7 +546,7 @@ class PsiPickleInput(object):
     _file = None
     _psi = None
 
-    def __init__(self, name, src_type = 1):
+    def __init__(self, name, src_type=1):
         self._name = name
         self._type = src_type
         if self._type == 0:
@@ -585,7 +594,7 @@ class PsiPickleOutput(object):
             output should be sent.
         fmt (str): A C style format string specifying how each 'row' of output
             should be formated. This should include the newline character.
-        dst_type (int, optional): If 0, output is sent to a local file. 
+        dst_type (int, optional): If 0, output is sent to a local file.
             Otherwise, the output is sent to a message queue. Defaults to 1.
 
     """
@@ -594,7 +603,7 @@ class PsiPickleOutput(object):
     _file = None
     _psi = None
 
-    def __init__(self, name, dst_type = 1):
+    def __init__(self, name, dst_type=1):
         self._name = name
         self._type = dst_type
         if self._type == 0:
@@ -633,4 +642,3 @@ class PsiPickleOutput(object):
             if ret:
                 ret = self._psi.send_nolimit(msg)
         return ret
-
