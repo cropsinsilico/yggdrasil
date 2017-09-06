@@ -1,0 +1,183 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>cis_interface.drivers.RMQOutputDriver &#8212; cis_interface 0.0.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for cis_interface.drivers.RMQOutputDriver</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Module for sending output to a RabbitMQ server.&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">RMQDriver</span> <span class="k">import</span> <span class="n">RMQDriver</span>
+<span class="kn">from</span> <span class="nn">IODriver</span> <span class="k">import</span> <span class="n">IODriver</span>
+
+
+<div class="viewcode-block" id="RMQOutputDriver"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.RMQOutputDriver.RMQOutputDriver">[docs]</a><span class="k">class</span> <span class="nc">RMQOutputDriver</span><span class="p">(</span><span class="n">RMQDriver</span><span class="p">,</span> <span class="n">IODriver</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Driver for sending output to a RabbitMQ server.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        name (str): The name of the local message queue that the driver should</span>
+<span class="sd">            connect to.</span>
+<span class="sd">        args (str): The name of the RabbitMQ message queue that the driver</span>
+<span class="sd">            connect to.</span>
+<span class="sd">        \*\*kwargs: Additional keyword arguments are passed to parent class&#39;s</span>
+<span class="sd">            __init__ method.</span>
+
+<span class="sd">    Attributes (in addition to parent class&#39;s):</span>
+<span class="sd">        -</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">RMQOutputDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">name</span><span class="p">,</span> <span class="n">suffix</span><span class="o">=</span><span class="s2">&quot;_OUT&quot;</span><span class="p">,</span> <span class="n">queue</span><span class="o">=</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">()</span>
+
+<div class="viewcode-block" id="RMQOutputDriver.printStatus"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.RMQOutputDriver.RMQOutputDriver.printStatus">[docs]</a>    <span class="k">def</span> <span class="nf">printStatus</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Print the driver status.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;::printStatus():&#39;</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">RMQOutputDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">printStatus</span><span class="p">()</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%-30s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="s1">&#39;RMQOutputDriver(&#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s1">&#39;):&#39;</span><span class="p">)</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_q_obj</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="si">%-30s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_q_obj</span><span class="o">.</span><span class="n">method</span><span class="o">.</span><span class="n">message_count</span><span class="p">)</span> <span class="o">+</span>
+                                  <span class="s1">&#39; in RMQ server queue&#39;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="si">%-30s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="s1">&#39;queue not found&#39;</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="RMQOutputDriver.start_communication"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.RMQOutputDriver.RMQOutputDriver.start_communication">[docs]</a>    <span class="k">def</span> <span class="nf">start_communication</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Start publishing messages from the local queue.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;::start_communication&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">publish_message</span><span class="p">()</span></div>
+    
+<div class="viewcode-block" id="RMQOutputDriver.publish_message"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.RMQOutputDriver.RMQOutputDriver.publish_message">[docs]</a>    <span class="k">def</span> <span class="nf">publish_message</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Continue receiving messages from the local queue and passing them</span>
+<span class="sd">        to the RabbitMQ server until the queue is closed.&quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_closing</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+                <span class="k">return</span>
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;::publish_message(): IPC recv&quot;</span><span class="p">)</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ipc_recv</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">data</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;::publish_message(): queue closed!&quot;</span><span class="p">)</span>
+                <span class="k">break</span>
+            <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;::publish_message(): no data, reschedule&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">add_timeout</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sleeptime</span><span class="p">,</span>
+                                            <span class="bp">self</span><span class="o">.</span><span class="n">publish_message</span><span class="p">)</span>
+                <span class="k">break</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;::publish_message(): IPC recv got </span><span class="si">%d</span><span class="s2"> bytes&quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;::publish_message(): send </span><span class="si">%d</span><span class="s2"> bytes to AMQP&quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">))</span>
+            <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_closing</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+                    <span class="k">return</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">basic_publish</span><span class="p">(</span>
+                    <span class="n">exchange</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">exchange</span><span class="p">,</span> <span class="n">routing_key</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="p">,</span>
+                    <span class="n">body</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="n">mandatory</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;::publish_message(): sent to AMQP&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;::publish_message returns&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="RMQOutputDriver.stop_communication"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.RMQOutputDriver.RMQOutputDriver.stop_communication">[docs]</a>    <span class="k">def</span> <span class="nf">stop_communication</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Stop sending/receiving messages. Only RMQInputDriver should</span>
+<span class="sd">        explicitly delete the queue.&quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_closing</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">channel</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">is_open</span><span class="p">:</span>
+                <span class="c1"># self.channel.queue_unbind(queue=self.queue,</span>
+                <span class="c1">#                           exchange=self.exchange)</span>
+                <span class="c1"># self.channel.queue_delete(queue=self.queue)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div></div>
+
+    <span class="c1"># def on_model_exit(self):</span>
+    <span class="c1">#     r&quot;&quot;&quot;Delete the driver. Deleting the queue and closing the connection.&quot;&quot;&quot;</span>
+    <span class="c1">#     # self.info(&quot;.delete()&quot;)</span>
+    <span class="c1">#     self.debug(&quot;.delete()&quot;)</span>
+    <span class="c1">#     try:</span>
+    <span class="c1">#         pass</span>
+    <span class="c1">#         # self.channel.queue_unbind(exchange=self.exchange, queue=self.queue)</span>
+    <span class="c1">#         # self.channel.queue_delete(queue=self.queue, if_unused=True)</span>
+    <span class="c1">#         # self.connection.close()</span>
+    <span class="c1">#     except:</span>
+    <span class="c1">#         self.debug(&quot;.delete(): exception (IGNORED)&quot;)</span>
+    <span class="c1">#     self.debug(&quot;.delete() returns&quot;)</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Meagan Lang, David Raila.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.6</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>
