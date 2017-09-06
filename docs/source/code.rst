@@ -1,6 +1,2 @@
-####
-Code
-####
-
-.. include:: modules.rst
+.. include:: autodoc/modules.rst
 

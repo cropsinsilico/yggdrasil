@@ -16,17 +16,14 @@ help:
 .PHONY: help Makefile
 
 .PHONY: ghpages
-ghpages: html
+ghpages: autodoc
 
 	cp -a $(BUILDDIR)/html/. $(REPODIR)/html/
-	cd $(REPODIR)/html
-	git add .
-	git commit -m "rebuilt docs"
-	git push origin gh-pages
+	cd $(REPODIR)/html ; git add . ; git commit -m "rebuilt docs" ; git push origin gh-pages
 
 .PHONY: autodoc
 autodoc:
-	sphinx-apidoc -f -o $(SOURCEDIR)/ ../cis_interface
+	sphinx-apidoc -f -o $(SOURCEDIR)/autodoc/ ../cis_interface
 	make html
 
 # Catch-all target: route all unknown targets to Sphinx using the new
