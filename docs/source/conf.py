@@ -84,6 +84,7 @@ release = u'0.0.0'
 # Substitutions
 # .. _Docs: http://cis_interface.readthedocs.io/en/latest/
 rst_epilog = """
+.. _Docs: https://cropsinsilico.github.io/cis_interface/
 .. _Meagan Lang: langmm.astro@gmail.com
 .. |cis_interface| replace:: cis_interface
 """
