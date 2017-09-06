@@ -11,6 +11,7 @@ if not os.path.isfile(usr_config_file):
 
 try:
     import pypandoc
+    pypandoc.convert_file('README.md', 'rst', outputfile='README.rst')
     long_description = pypandoc.convert_file('README.md', 'rst')
 except (ImportError, IOError):
     with open('README.md') as file:
