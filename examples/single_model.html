@@ -1,0 +1,181 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Running a Single Model &#8212; cis_interface 0.0.0 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="running-a-single-model">
+<h1>Running a Single Model<a class="headerlink" href="#running-a-single-model" title="Permalink to this headline">¶</a></h1>
+<p>The model communications interface consists of 2 pairs of very simple
+functions - one pair to create channels and one pair to accomplish data
+tranfer. Each pair represents a read-side and a write-side.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="ow">in</span> <span class="o">=</span> <span class="n">PsiInput</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>          <span class="c1"># create a named input channel</span>
+<span class="n">out</span> <span class="o">=</span> <span class="n">PsiOutput</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>        <span class="c1"># create a named output channel</span>
+
+<span class="ow">in</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>                <span class="c1"># send a message through the managed channel</span>
+<span class="n">flag</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>  <span class="c1"># receive message from channel - block if empty channel</span>
+</pre></div>
+</div>
+<p>Python-style is shown, but as these interfaces are thin wrappers around
+System V IPC message queues, equivalent thin-wrappers are implemented
+easily in almost any language. Models may create and use as many
+channels as necessary, depending on the number of interfaces that they
+require.</p>
+<p>The only other model requirement is to provide a YAML specification file
+that declares the channels that the model uses, and the system command
+required to start the model executing.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">model</span><span class="p">:</span>
+  <span class="n">name</span><span class="p">:</span> <span class="n">hellopython</span>
+  <span class="n">driver</span><span class="p">:</span> <span class="n">PythonModelDriver</span>
+  <span class="n">args</span><span class="p">:</span> <span class="n">hellopython</span><span class="o">.</span><span class="n">py</span>
+
+  <span class="n">inputs</span><span class="p">:</span>
+  <span class="o">-</span> <span class="n">name</span><span class="p">:</span> <span class="n">inFile</span>
+    <span class="n">driver</span><span class="p">:</span> <span class="n">FileInputDriver</span>
+    <span class="n">args</span><span class="p">:</span> <span class="nb">input</span><span class="o">.</span><span class="n">txt</span>
+  <span class="o">-</span> <span class="n">name</span><span class="p">:</span> <span class="n">helloQueueIn</span>
+    <span class="n">driver</span><span class="p">:</span> <span class="n">RMQInputDriver</span>
+    <span class="n">args</span><span class="p">:</span> <span class="n">helloQueue</span>
+
+  <span class="n">outputs</span><span class="p">:</span>
+  <span class="o">-</span> <span class="n">name</span><span class="p">:</span> <span class="n">helloQueueOut</span>
+    <span class="n">driver</span><span class="p">:</span> <span class="n">RMQOutputDriver</span>
+    <span class="n">args</span><span class="p">:</span> <span class="n">helloQueue</span>
+  <span class="o">-</span> <span class="n">name</span><span class="p">:</span> <span class="n">outFile</span>
+    <span class="n">driver</span><span class="p">:</span> <span class="n">FileOutputDriver</span>
+    <span class="n">args</span><span class="p">:</span> <span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="n">output</span><span class="o">.</span><span class="n">txt</span>
+</pre></div>
+</div>
+<p>This example tells the system to run a Python model defined in the script
+&#8220;hellopython.py&#8221; and to connect the file inputdata/input.txt to the
+psi_input named &#8216;inFile&#8217; in your model, so when you recv() on it,
+you&#8217;ll get the file contents. Likewise when you send(data_to_send) to
+the channel you made in your code with psi_output(&#8216;outFile&#8217;) the data
+will go to the associated files.</p>
+<p>In additon to reading/writing to/from files on disk, models can send/recv
+messages to/from generic message queues that other models can connect to.
+In the example above, there is an output queue named &#8216;helloQueueOut&#8217;
+messages sent to the channel psi_output(&#8216;helloQueueOut&#8217;) can be received
+by any model with a corresponding input channel. In this example, the model
+accesses this queue through the channel psi_input(&#8216;helloQueueIn&#8217;). These
+two channels are connected because they share the same argument
+&#8216;helloQueue&#8217; in their YAML blocks.</p>
+<p>The final part is the model runner, cisrun - to which you pass your
+yml file. The model runner reads the specification, arranges for your
+inputs and outputs to come and go as you&#8217;ve specified, and then calls
+your model with the arguments as specified in the model stanza. The
+model runs, using the send and recv calls as needed, and when the model
+exits, the communications get cleaned up by the runner. The examaple
+hellopython.py under examples is run like this (in examples/python):</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">cisrun</span> <span class="n">hellopython</span><span class="o">.</span><span class="n">yml</span>
+</pre></div>
+</div>
+<p>The code in hellopython.py uses the channels to read data from
+the file input.txt, sends the data to the output queue, receives
+it from the input queue, and then sends it to the output file
+/tmp/output.txt:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">inf</span> <span class="o">=</span> <span class="n">PsiInput</span><span class="p">(</span><span class="s1">&#39;inFile&#39;</span><span class="p">)</span>
+<span class="n">outf</span> <span class="o">=</span> <span class="n">PsiOutput</span><span class="p">(</span><span class="s1">&#39;outFile&#39;</span><span class="p">)</span>
+<span class="n">inq</span> <span class="o">=</span> <span class="n">PsiInput</span><span class="p">(</span><span class="s1">&#39;helloQueueIn&#39;</span><span class="p">)</span>
+<span class="n">outq</span> <span class="o">=</span> <span class="n">PsiOutput</span><span class="p">(</span><span class="s1">&#39;helloQueueOut&#39;</span><span class="p">)</span>
+
+<span class="n">buf</span> <span class="o">=</span> <span class="n">inf</span><span class="o">.</span><span class="n">recv</span><span class="p">()</span>
+<span class="n">outq</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">buf</span><span class="p">)</span>
+<span class="n">buf</span> <span class="o">=</span> <span class="n">inq</span><span class="o">.</span><span class="n">recv</span><span class="p">()</span>
+<span class="n">outf</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">buf</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This example is very simple and only shows how to run a single model
+which could be accomplished by just handling input/output within the
+script. The real advantage to using the CiS framework comes when you
+need two models in different languages to communicate.</p>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/examples/single_model.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Meagan Lang, David Raila.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.6</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="../_sources/examples/single_model.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
