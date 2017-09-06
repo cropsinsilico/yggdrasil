@@ -48,7 +48,7 @@
 <span class="kn">from</span> <span class="nn">test_IODriver</span> <span class="k">import</span> <span class="n">IOInfo</span>
 
 
-<div class="viewcode-block" id="TestRMQInputParam"><a class="viewcode-back" href="../../../../cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_RMQInputDriver.TestRMQInputParam">[docs]</a><span class="k">class</span> <span class="nc">TestRMQInputParam</span><span class="p">(</span><span class="n">parent1</span><span class="o">.</span><span class="n">TestRMQParam</span><span class="p">,</span> <span class="n">IOInfo</span><span class="p">):</span>
+<div class="viewcode-block" id="TestRMQInputParam"><a class="viewcode-back" href="../../../../autodoc/cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_RMQInputDriver.TestRMQInputParam">[docs]</a><span class="k">class</span> <span class="nc">TestRMQInputParam</span><span class="p">(</span><span class="n">parent1</span><span class="o">.</span><span class="n">TestRMQParam</span><span class="p">,</span> <span class="n">IOInfo</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test parameters for RMQInputDriver.</span>
 
 <span class="sd">    Attributes (in addition to parent class&#39;s):</span>
@@ -62,7 +62,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">args</span> <span class="o">=</span> <span class="s1">&#39;test&#39;</span></div>
 
         
-<div class="viewcode-block" id="TestRMQInputDriverNoStart"><a class="viewcode-back" href="../../../../cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_RMQInputDriver.TestRMQInputDriverNoStart">[docs]</a><span class="k">class</span> <span class="nc">TestRMQInputDriverNoStart</span><span class="p">(</span><span class="n">TestRMQInputParam</span><span class="p">,</span>
+<div class="viewcode-block" id="TestRMQInputDriverNoStart"><a class="viewcode-back" href="../../../../autodoc/cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_RMQInputDriver.TestRMQInputDriverNoStart">[docs]</a><span class="k">class</span> <span class="nc">TestRMQInputDriverNoStart</span><span class="p">(</span><span class="n">TestRMQInputParam</span><span class="p">,</span>
                                 <span class="n">parent1</span><span class="o">.</span><span class="n">TestRMQDriverNoStart</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test runner for RMQInputDriver without start.</span>
 
@@ -73,7 +73,7 @@
     <span class="k">pass</span></div>
 
 
-<div class="viewcode-block" id="TestRMQInputDriver"><a class="viewcode-back" href="../../../../cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_RMQInputDriver.TestRMQInputDriver">[docs]</a><span class="k">class</span> <span class="nc">TestRMQInputDriver</span><span class="p">(</span><span class="n">TestRMQInputParam</span><span class="p">,</span> <span class="n">parent1</span><span class="o">.</span><span class="n">TestRMQDriver</span><span class="p">):</span>
+<div class="viewcode-block" id="TestRMQInputDriver"><a class="viewcode-back" href="../../../../autodoc/cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_RMQInputDriver.TestRMQInputDriver">[docs]</a><span class="k">class</span> <span class="nc">TestRMQInputDriver</span><span class="p">(</span><span class="n">TestRMQInputParam</span><span class="p">,</span> <span class="n">parent1</span><span class="o">.</span><span class="n">TestRMQDriver</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test runner for RMQInputDriver.</span>
 
 <span class="sd">    Attributes (in addition to parent class&#39;s):</span>
@@ -81,14 +81,14 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="TestRMQInputDriver.test_RMQ_recv"><a class="viewcode-back" href="../../../../cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_RMQInputDriver.TestRMQInputDriver.test_RMQ_recv">[docs]</a>    <span class="k">def</span> <span class="nf">test_RMQ_recv</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="TestRMQInputDriver.test_RMQ_recv"><a class="viewcode-back" href="../../../../autodoc/cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_RMQInputDriver.TestRMQInputDriver.test_RMQ_recv">[docs]</a>    <span class="k">def</span> <span class="nf">test_RMQ_recv</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Receive a small message from AMQP server.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">rmq_send</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">msg_short</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
         <span class="n">msg_recv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">recv_wait</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
         <span class="n">nt</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="n">msg_recv</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">msg_short</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="TestRMQInputDriver.test_RMQ_recv_nolimit"><a class="viewcode-back" href="../../../../cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_RMQInputDriver.TestRMQInputDriver.test_RMQ_recv_nolimit">[docs]</a>    <span class="k">def</span> <span class="nf">test_RMQ_recv_nolimit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="TestRMQInputDriver.test_RMQ_recv_nolimit"><a class="viewcode-back" href="../../../../autodoc/cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_RMQInputDriver.TestRMQInputDriver.test_RMQ_recv_nolimit">[docs]</a>    <span class="k">def</span> <span class="nf">test_RMQ_recv_nolimit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Receive a large message from AMQP server.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">rmq_send_nolimit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">msg_long</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>

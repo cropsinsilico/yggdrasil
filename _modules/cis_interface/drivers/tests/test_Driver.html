@@ -52,7 +52,7 @@
 <span class="c1"># TODO: Test Ctrl-C interruption</span>
 
 
-<div class="viewcode-block" id="TestParam"><a class="viewcode-back" href="../../../../cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_Driver.TestParam">[docs]</a><span class="k">class</span> <span class="nc">TestParam</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="TestParam"><a class="viewcode-back" href="../../../../autodoc/cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_Driver.TestParam">[docs]</a><span class="k">class</span> <span class="nc">TestParam</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test parameters for basic Driver test class.</span>
 
 <span class="sd">    Attributes:</span>
@@ -76,12 +76,12 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">inst_kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;yml&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;workingDir&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">workingDir</span><span class="p">}}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">nprev_queues</span> <span class="o">=</span> <span class="mi">0</span>
 
-<div class="viewcode-block" id="TestParam.set_param_attr"><a class="viewcode-back" href="../../../../cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_Driver.TestParam.set_param_attr">[docs]</a>    <span class="k">def</span> <span class="nf">set_param_attr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">param_class</span><span class="p">):</span>
+<div class="viewcode-block" id="TestParam.set_param_attr"><a class="viewcode-back" href="../../../../autodoc/cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_Driver.TestParam.set_param_attr">[docs]</a>    <span class="k">def</span> <span class="nf">set_param_attr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">param_class</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Copy all attributes from param_class.&quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">param_class</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span></div>
             
-<div class="viewcode-block" id="TestParam.setup"><a class="viewcode-back" href="../../../../cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_Driver.TestParam.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">skip_start</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<div class="viewcode-block" id="TestParam.setup"><a class="viewcode-back" href="../../../../autodoc/cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_Driver.TestParam.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">skip_start</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create a driver instance and start the driver.&quot;&quot;&quot;</span>
         <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;PSI_DEBUG&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;DEBUG&#39;</span>
         <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;RMQ_DEBUG&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;DEBUG&#39;</span>
@@ -95,7 +95,7 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="n">skip_start</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">start</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="TestParam.teardown"><a class="viewcode-back" href="../../../../cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_Driver.TestParam.teardown">[docs]</a>    <span class="k">def</span> <span class="nf">teardown</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="TestParam.teardown"><a class="viewcode-back" href="../../../../autodoc/cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_Driver.TestParam.teardown">[docs]</a>    <span class="k">def</span> <span class="nf">teardown</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Remove the instance, stoppping it.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_instance&#39;</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">remove_instance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_instance</span><span class="p">)</span>
@@ -119,7 +119,7 @@
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;str: Working directory.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span>
 
-<div class="viewcode-block" id="TestParam.create_instance"><a class="viewcode-back" href="../../../../cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_Driver.TestParam.create_instance">[docs]</a>    <span class="k">def</span> <span class="nf">create_instance</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="TestParam.create_instance"><a class="viewcode-back" href="../../../../autodoc/cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_Driver.TestParam.create_instance">[docs]</a>    <span class="k">def</span> <span class="nf">create_instance</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create a new instance object.&quot;&quot;&quot;</span>
         <span class="n">curpath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span>
         <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">workingDir</span><span class="p">)</span>
@@ -131,7 +131,7 @@
         <span class="c1"># print(&quot;created instance&quot;)</span>
         <span class="k">return</span> <span class="n">inst</span></div>
 
-<div class="viewcode-block" id="TestParam.remove_instance"><a class="viewcode-back" href="../../../../cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_Driver.TestParam.remove_instance">[docs]</a>    <span class="k">def</span> <span class="nf">remove_instance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inst</span><span class="p">):</span>
+<div class="viewcode-block" id="TestParam.remove_instance"><a class="viewcode-back" href="../../../../autodoc/cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_Driver.TestParam.remove_instance">[docs]</a>    <span class="k">def</span> <span class="nf">remove_instance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inst</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Remove an instance.&quot;&quot;&quot;</span>
         <span class="n">inst</span><span class="o">.</span><span class="n">terminate</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">inst</span><span class="o">.</span><span class="n">is_alive</span><span class="p">():</span>
@@ -140,7 +140,7 @@
         <span class="c1"># print(&quot;removed instance&quot;)</span>
 
 
-<div class="viewcode-block" id="TestDriver"><a class="viewcode-back" href="../../../../cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_Driver.TestDriver">[docs]</a><span class="k">class</span> <span class="nc">TestDriver</span><span class="p">(</span><span class="n">TestParam</span><span class="p">):</span>
+<div class="viewcode-block" id="TestDriver"><a class="viewcode-back" href="../../../../autodoc/cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_Driver.TestDriver">[docs]</a><span class="k">class</span> <span class="nc">TestDriver</span><span class="p">(</span><span class="n">TestParam</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test runner for basic Driver class.</span>
 
 <span class="sd">    Attributes (in addition to parameter class):</span>
@@ -148,31 +148,31 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="TestDriver.assert_before_stop"><a class="viewcode-back" href="../../../../cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_Driver.TestDriver.assert_before_stop">[docs]</a>    <span class="k">def</span> <span class="nf">assert_before_stop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="TestDriver.assert_before_stop"><a class="viewcode-back" href="../../../../autodoc/cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_Driver.TestDriver.assert_before_stop">[docs]</a>    <span class="k">def</span> <span class="nf">assert_before_stop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Assertions to make before stopping the driver instance.&quot;&quot;&quot;</span>
         <span class="k">pass</span></div>
 
-<div class="viewcode-block" id="TestDriver.run_before_terminate"><a class="viewcode-back" href="../../../../cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_Driver.TestDriver.run_before_terminate">[docs]</a>    <span class="k">def</span> <span class="nf">run_before_terminate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="TestDriver.run_before_terminate"><a class="viewcode-back" href="../../../../autodoc/cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_Driver.TestDriver.run_before_terminate">[docs]</a>    <span class="k">def</span> <span class="nf">run_before_terminate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Commands to run while the instance is running, before terminate.&quot;&quot;&quot;</span>
         <span class="k">pass</span></div>
 
-<div class="viewcode-block" id="TestDriver.run_before_stop"><a class="viewcode-back" href="../../../../cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_Driver.TestDriver.run_before_stop">[docs]</a>    <span class="k">def</span> <span class="nf">run_before_stop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="TestDriver.run_before_stop"><a class="viewcode-back" href="../../../../autodoc/cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_Driver.TestDriver.run_before_stop">[docs]</a>    <span class="k">def</span> <span class="nf">run_before_stop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Commands to run while the instance is running.&quot;&quot;&quot;</span>
         <span class="k">pass</span></div>
 
-<div class="viewcode-block" id="TestDriver.assert_after_terminate"><a class="viewcode-back" href="../../../../cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_Driver.TestDriver.assert_after_terminate">[docs]</a>    <span class="k">def</span> <span class="nf">assert_after_terminate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="TestDriver.assert_after_terminate"><a class="viewcode-back" href="../../../../autodoc/cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_Driver.TestDriver.assert_after_terminate">[docs]</a>    <span class="k">def</span> <span class="nf">assert_after_terminate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Assertions to make after terminating the driver instance.&quot;&quot;&quot;</span>
         <span class="k">assert</span><span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">is_alive</span><span class="p">())</span></div>
 
-<div class="viewcode-block" id="TestDriver.assert_after_stop"><a class="viewcode-back" href="../../../../cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_Driver.TestDriver.assert_after_stop">[docs]</a>    <span class="k">def</span> <span class="nf">assert_after_stop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="TestDriver.assert_after_stop"><a class="viewcode-back" href="../../../../autodoc/cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_Driver.TestDriver.assert_after_stop">[docs]</a>    <span class="k">def</span> <span class="nf">assert_after_stop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Assertions to make after stopping the driver instance.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">assert_after_terminate</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="TestDriver.test_init_del"><a class="viewcode-back" href="../../../../cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_Driver.TestDriver.test_init_del">[docs]</a>    <span class="k">def</span> <span class="nf">test_init_del</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="TestDriver.test_init_del"><a class="viewcode-back" href="../../../../autodoc/cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_Driver.TestDriver.test_init_del">[docs]</a>    <span class="k">def</span> <span class="nf">test_init_del</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test driver creation and deletion.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">printStatus</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="TestDriver.test_run_stop"><a class="viewcode-back" href="../../../../cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_Driver.TestDriver.test_run_stop">[docs]</a>    <span class="k">def</span> <span class="nf">test_run_stop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="TestDriver.test_run_stop"><a class="viewcode-back" href="../../../../autodoc/cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_Driver.TestDriver.test_run_stop">[docs]</a>    <span class="k">def</span> <span class="nf">test_run_stop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Start the thread, then stop it.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">assert_before_stop</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">run_before_stop</span><span class="p">()</span>
@@ -181,7 +181,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">assert_after_stop</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="TestDriver.test_run_terminate"><a class="viewcode-back" href="../../../../cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_Driver.TestDriver.test_run_terminate">[docs]</a>    <span class="k">def</span> <span class="nf">test_run_terminate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="TestDriver.test_run_terminate"><a class="viewcode-back" href="../../../../autodoc/cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_Driver.TestDriver.test_run_terminate">[docs]</a>    <span class="k">def</span> <span class="nf">test_run_terminate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Start the thread, then terminate it.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">assert_before_stop</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">run_before_terminate</span><span class="p">()</span>
@@ -191,7 +191,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">assert_after_terminate</span><span class="p">()</span></div></div>
 
         
-<div class="viewcode-block" id="TestDriverNoStart"><a class="viewcode-back" href="../../../../cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_Driver.TestDriverNoStart">[docs]</a><span class="k">class</span> <span class="nc">TestDriverNoStart</span><span class="p">(</span><span class="n">TestParam</span><span class="p">):</span>
+<div class="viewcode-block" id="TestDriverNoStart"><a class="viewcode-back" href="../../../../autodoc/cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_Driver.TestDriverNoStart">[docs]</a><span class="k">class</span> <span class="nc">TestDriverNoStart</span><span class="p">(</span><span class="n">TestParam</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test runner for basic Driver class without starting driver.</span>
 
 <span class="sd">    Attributes (in addition to parent class):</span>
@@ -199,42 +199,42 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="TestDriverNoStart.setup"><a class="viewcode-back" href="../../../../cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_Driver.TestDriverNoStart.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="TestDriverNoStart.setup"><a class="viewcode-back" href="../../../../autodoc/cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_Driver.TestDriverNoStart.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create a driver instance without starting the driver.&quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">TestDriverNoStart</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span><span class="n">skip_start</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="k">assert</span><span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">is_alive</span><span class="p">())</span></div>
 
-<div class="viewcode-block" id="TestDriverNoStart.test_attributes"><a class="viewcode-back" href="../../../../cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_Driver.TestDriverNoStart.test_attributes">[docs]</a>    <span class="k">def</span> <span class="nf">test_attributes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="TestDriverNoStart.test_attributes"><a class="viewcode-back" href="../../../../autodoc/cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_Driver.TestDriverNoStart.test_attributes">[docs]</a>    <span class="k">def</span> <span class="nf">test_attributes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Assert that the driver has all of the required attributes.&quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">attr_list</span><span class="p">:</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="p">,</span> <span class="n">a</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
                 <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s2">&quot;Driver does not have attribute </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">a</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="TestDriverNoStart.test_info"><a class="viewcode-back" href="../../../../cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_Driver.TestDriverNoStart.test_info">[docs]</a>    <span class="k">def</span> <span class="nf">test_info</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="TestDriverNoStart.test_info"><a class="viewcode-back" href="../../../../autodoc/cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_Driver.TestDriverNoStart.test_info">[docs]</a>    <span class="k">def</span> <span class="nf">test_info</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test print of info statement.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="TestDriverNoStart.test_debug"><a class="viewcode-back" href="../../../../cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_Driver.TestDriverNoStart.test_debug">[docs]</a>    <span class="k">def</span> <span class="nf">test_debug</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="TestDriverNoStart.test_debug"><a class="viewcode-back" href="../../../../autodoc/cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_Driver.TestDriverNoStart.test_debug">[docs]</a>    <span class="k">def</span> <span class="nf">test_debug</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test print of debug statement.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="TestDriverNoStart.test_critical"><a class="viewcode-back" href="../../../../cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_Driver.TestDriverNoStart.test_critical">[docs]</a>    <span class="k">def</span> <span class="nf">test_critical</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="TestDriverNoStart.test_critical"><a class="viewcode-back" href="../../../../autodoc/cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_Driver.TestDriverNoStart.test_critical">[docs]</a>    <span class="k">def</span> <span class="nf">test_critical</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test print of critical statement.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="TestDriverNoStart.test_warn"><a class="viewcode-back" href="../../../../cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_Driver.TestDriverNoStart.test_warn">[docs]</a>    <span class="k">def</span> <span class="nf">test_warn</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="TestDriverNoStart.test_warn"><a class="viewcode-back" href="../../../../autodoc/cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_Driver.TestDriverNoStart.test_warn">[docs]</a>    <span class="k">def</span> <span class="nf">test_warn</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test print of warning statement.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span></div>
         
-<div class="viewcode-block" id="TestDriverNoStart.test_error"><a class="viewcode-back" href="../../../../cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_Driver.TestDriverNoStart.test_error">[docs]</a>    <span class="k">def</span> <span class="nf">test_error</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="TestDriverNoStart.test_error"><a class="viewcode-back" href="../../../../autodoc/cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_Driver.TestDriverNoStart.test_error">[docs]</a>    <span class="k">def</span> <span class="nf">test_error</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test print of error statement.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="TestDriverNoStart.test_exception"><a class="viewcode-back" href="../../../../cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_Driver.TestDriverNoStart.test_exception">[docs]</a>    <span class="k">def</span> <span class="nf">test_exception</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="TestDriverNoStart.test_exception"><a class="viewcode-back" href="../../../../autodoc/cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_Driver.TestDriverNoStart.test_exception">[docs]</a>    <span class="k">def</span> <span class="nf">test_exception</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test print of exception.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span></div>
         
-<div class="viewcode-block" id="TestDriverNoStart.test_printStatus"><a class="viewcode-back" href="../../../../cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_Driver.TestDriverNoStart.test_printStatus">[docs]</a>    <span class="k">def</span> <span class="nf">test_printStatus</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="TestDriverNoStart.test_printStatus"><a class="viewcode-back" href="../../../../autodoc/cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_Driver.TestDriverNoStart.test_printStatus">[docs]</a>    <span class="k">def</span> <span class="nf">test_printStatus</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test mechanism to print the status of the driver.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">printStatus</span><span class="p">()</span></div></div>
 </pre></div>

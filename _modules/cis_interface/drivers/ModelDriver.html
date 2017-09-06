@@ -54,12 +54,12 @@
 <span class="kn">import</span> <span class="nn">time</span>
 
 
-<div class="viewcode-block" id="preexec"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.ModelDriver.preexec">[docs]</a><span class="k">def</span> <span class="nf">preexec</span><span class="p">():</span>  <span class="c1"># pragma: no cover</span>
+<div class="viewcode-block" id="preexec"><a class="viewcode-back" href="../../../autodoc/cis_interface.drivers.html#cis_interface.drivers.ModelDriver.preexec">[docs]</a><span class="k">def</span> <span class="nf">preexec</span><span class="p">():</span>  <span class="c1"># pragma: no cover</span>
     <span class="c1"># Don&#39;t forward signals - used to ignore signals</span>
     <span class="n">os</span><span class="o">.</span><span class="n">setpgrp</span><span class="p">()</span></div>
 
 
-<div class="viewcode-block" id="ModelDriver"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.ModelDriver.ModelDriver">[docs]</a><span class="k">class</span> <span class="nc">ModelDriver</span><span class="p">(</span><span class="n">Driver</span><span class="p">):</span>
+<div class="viewcode-block" id="ModelDriver"><a class="viewcode-back" href="../../../autodoc/cis_interface.drivers.html#cis_interface.drivers.ModelDriver.ModelDriver">[docs]</a><span class="k">class</span> <span class="nc">ModelDriver</span><span class="p">(</span><span class="n">Driver</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Base class form Model drivers.</span>
 
 <span class="sd">    Args:</span>
@@ -87,7 +87,7 @@
         <span class="c1"># This gets added to before run with the channel args</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">env</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 
-<div class="viewcode-block" id="ModelDriver.run"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.ModelDriver.ModelDriver.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="ModelDriver.run"><a class="viewcode-back" href="../../../autodoc/cis_interface.drivers.html#cis_interface.drivers.ModelDriver.ModelDriver.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Run the model on a new process, receiving output from.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;:run </span><span class="si">%s</span><span class="s1"> from </span><span class="si">%s</span><span class="s1"> with cwd </span><span class="si">%s</span><span class="s1"> and env </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span>
                    <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">workingDir</span><span class="p">,</span> <span class="n">pformat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="p">))</span>
@@ -118,7 +118,7 @@
             
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;:run: done&#39;</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="ModelDriver.terminate"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.ModelDriver.ModelDriver.terminate">[docs]</a>    <span class="k">def</span> <span class="nf">terminate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="ModelDriver.terminate"><a class="viewcode-back" href="../../../autodoc/cis_interface.drivers.html#cis_interface.drivers.ModelDriver.ModelDriver.terminate">[docs]</a>    <span class="k">def</span> <span class="nf">terminate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Terminate the process running the model.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;:terminate()&#39;</span><span class="p">)</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>

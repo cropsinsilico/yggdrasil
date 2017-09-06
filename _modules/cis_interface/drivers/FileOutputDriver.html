@@ -47,7 +47,7 @@
 <span class="kn">from</span> <span class="nn">IODriver</span> <span class="k">import</span> <span class="n">IODriver</span>
 
 
-<div class="viewcode-block" id="FileOutputDriver"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.FileOutputDriver.FileOutputDriver">[docs]</a><span class="k">class</span> <span class="nc">FileOutputDriver</span><span class="p">(</span><span class="n">IODriver</span><span class="p">):</span>
+<div class="viewcode-block" id="FileOutputDriver"><a class="viewcode-back" href="../../../autodoc/cis_interface.drivers.html#cis_interface.drivers.FileOutputDriver.FileOutputDriver">[docs]</a><span class="k">class</span> <span class="nc">FileOutputDriver</span><span class="p">(</span><span class="n">IODriver</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Class to handle output of received messages to a file.</span>
 
 <span class="sd">    Args:</span>
@@ -69,7 +69,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">fd</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;(</span><span class="si">%s</span><span class="s1">): done with init&#39;</span><span class="p">,</span> <span class="n">args</span><span class="p">)</span>
 
-<div class="viewcode-block" id="FileOutputDriver.close_file"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.FileOutputDriver.FileOutputDriver.close_file">[docs]</a>    <span class="k">def</span> <span class="nf">close_file</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="FileOutputDriver.close_file"><a class="viewcode-back" href="../../../autodoc/cis_interface.drivers.html#cis_interface.drivers.FileOutputDriver.FileOutputDriver.close_file">[docs]</a>    <span class="k">def</span> <span class="nf">close_file</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Close the file.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;:close_file()&#39;</span><span class="p">)</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
@@ -77,13 +77,13 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">fd</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">fd</span> <span class="o">=</span> <span class="kc">None</span></div>
 
-<div class="viewcode-block" id="FileOutputDriver.terminate"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.FileOutputDriver.FileOutputDriver.terminate">[docs]</a>    <span class="k">def</span> <span class="nf">terminate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="FileOutputDriver.terminate"><a class="viewcode-back" href="../../../autodoc/cis_interface.drivers.html#cis_interface.drivers.FileOutputDriver.FileOutputDriver.terminate">[docs]</a>    <span class="k">def</span> <span class="nf">terminate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Terminate the driver, closeing the file as necessary.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;:terminate()&#39;</span><span class="p">)</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">FileOutputDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">terminate</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">close_file</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="FileOutputDriver.run"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.FileOutputDriver.FileOutputDriver.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="FileOutputDriver.run"><a class="viewcode-back" href="../../../autodoc/cis_interface.drivers.html#cis_interface.drivers.FileOutputDriver.FileOutputDriver.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Run the driver. The driver will open the file and write receieved</span>
 <span class="sd">        messages to the file as they are received until the file is closed.</span>
 <span class="sd">        &quot;&quot;&quot;</span>

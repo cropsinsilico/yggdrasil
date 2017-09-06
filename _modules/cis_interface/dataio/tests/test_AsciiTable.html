@@ -106,7 +106,7 @@
                       <span class="p">(</span><span class="s1">&#39;s&#39;</span><span class="p">,</span> <span class="s1">&#39;str&#39;</span><span class="p">)]</span>
 
 
-<div class="viewcode-block" id="test_nptype2cformat"><a class="viewcode-back" href="../../../../cis_interface.dataio.tests.html#cis_interface.dataio.tests.test_AsciiTable.test_nptype2cformat">[docs]</a><span class="k">def</span> <span class="nf">test_nptype2cformat</span><span class="p">():</span>
+<div class="viewcode-block" id="test_nptype2cformat"><a class="viewcode-back" href="../../../../autodoc/cis_interface.dataio.tests.html#cis_interface.dataio.tests.test_AsciiTable.test_nptype2cformat">[docs]</a><span class="k">def</span> <span class="nf">test_nptype2cformat</span><span class="p">():</span>
     <span class="k">for</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">map_nptype2cformat</span><span class="p">:</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="n">a</span> <span class="o">=</span> <span class="p">[</span><span class="n">a</span><span class="p">]</span>
@@ -117,7 +117,7 @@
         <span class="n">assert_raises</span><span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="n">AsciiTable</span><span class="o">.</span><span class="n">nptype2cformat</span><span class="p">,</span> <span class="n">a</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="test_cformat2nptype"><a class="viewcode-back" href="../../../../cis_interface.dataio.tests.html#cis_interface.dataio.tests.test_AsciiTable.test_cformat2nptype">[docs]</a><span class="k">def</span> <span class="nf">test_cformat2nptype</span><span class="p">():</span>
+<div class="viewcode-block" id="test_cformat2nptype"><a class="viewcode-back" href="../../../../autodoc/cis_interface.dataio.tests.html#cis_interface.dataio.tests.test_AsciiTable.test_cformat2nptype">[docs]</a><span class="k">def</span> <span class="nf">test_cformat2nptype</span><span class="p">():</span>
     <span class="k">for</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">map_cformat2nptype</span><span class="p">:</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="n">a</span> <span class="o">=</span> <span class="p">[</span><span class="n">a</span><span class="p">]</span>
@@ -130,7 +130,7 @@
         <span class="n">assert_raises</span><span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="n">AsciiTable</span><span class="o">.</span><span class="n">cformat2nptype</span><span class="p">,</span> <span class="s1">&#39;%&#39;</span> <span class="o">+</span> <span class="n">a</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="test_cformat2pyscanf"><a class="viewcode-back" href="../../../../cis_interface.dataio.tests.html#cis_interface.dataio.tests.test_AsciiTable.test_cformat2pyscanf">[docs]</a><span class="k">def</span> <span class="nf">test_cformat2pyscanf</span><span class="p">():</span>
+<div class="viewcode-block" id="test_cformat2pyscanf"><a class="viewcode-back" href="../../../../autodoc/cis_interface.dataio.tests.html#cis_interface.dataio.tests.test_AsciiTable.test_cformat2pyscanf">[docs]</a><span class="k">def</span> <span class="nf">test_cformat2pyscanf</span><span class="p">():</span>
     <span class="k">for</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">map_cformat2pyscanf</span><span class="p">:</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="n">a</span> <span class="o">=</span> <span class="p">[</span><span class="n">a</span><span class="p">]</span>
@@ -141,7 +141,7 @@
     <span class="n">assert_raises</span><span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="n">AsciiTable</span><span class="o">.</span><span class="n">cformat2pyscanf</span><span class="p">,</span> <span class="s1">&#39;%&#39;</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="test_AsciiTable"><a class="viewcode-back" href="../../../../cis_interface.dataio.tests.html#cis_interface.dataio.tests.test_AsciiTable.test_AsciiTable">[docs]</a><span class="k">def</span> <span class="nf">test_AsciiTable</span><span class="p">():</span>
+<div class="viewcode-block" id="test_AsciiTable"><a class="viewcode-back" href="../../../../autodoc/cis_interface.dataio.tests.html#cis_interface.dataio.tests.test_AsciiTable.test_AsciiTable">[docs]</a><span class="k">def</span> <span class="nf">test_AsciiTable</span><span class="p">():</span>
     <span class="k">for</span> <span class="n">mode</span> <span class="ow">in</span> <span class="n">mode_list</span><span class="p">:</span>
         <span class="k">for</span> <span class="n">use_astropy</span> <span class="ow">in</span> <span class="p">[</span><span class="kc">False</span><span class="p">,</span> <span class="kc">True</span><span class="p">]:</span>
             <span class="n">AF</span> <span class="o">=</span> <span class="n">AsciiTable</span><span class="o">.</span><span class="n">AsciiTable</span><span class="p">(</span><span class="n">mode2file</span><span class="p">[</span><span class="n">mode</span><span class="p">],</span> <span class="n">mode</span><span class="p">,</span>
@@ -154,7 +154,7 @@
         <span class="n">assert_raises</span><span class="p">(</span><span class="ne">RuntimeError</span><span class="p">,</span> <span class="n">AsciiTable</span><span class="o">.</span><span class="n">AsciiTable</span><span class="p">,</span> <span class="n">output_file</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span></div>
 
         
-<div class="viewcode-block" id="test_AsciiTable_open_close"><a class="viewcode-back" href="../../../../cis_interface.dataio.tests.html#cis_interface.dataio.tests.test_AsciiTable.test_AsciiTable_open_close">[docs]</a><span class="k">def</span> <span class="nf">test_AsciiTable_open_close</span><span class="p">():</span>
+<div class="viewcode-block" id="test_AsciiTable_open_close"><a class="viewcode-back" href="../../../../autodoc/cis_interface.dataio.tests.html#cis_interface.dataio.tests.test_AsciiTable.test_AsciiTable_open_close">[docs]</a><span class="k">def</span> <span class="nf">test_AsciiTable_open_close</span><span class="p">():</span>
     <span class="k">for</span> <span class="n">use_astropy</span> <span class="ow">in</span> <span class="p">[</span><span class="kc">False</span><span class="p">,</span> <span class="kc">True</span><span class="p">]:</span>
         <span class="k">for</span> <span class="n">mode</span> <span class="ow">in</span> <span class="n">mode_list</span><span class="p">:</span>
             <span class="n">AF</span> <span class="o">=</span> <span class="n">AsciiTable</span><span class="o">.</span><span class="n">AsciiTable</span><span class="p">(</span><span class="n">mode2file</span><span class="p">[</span><span class="n">mode</span><span class="p">],</span> <span class="n">mode</span><span class="p">,</span>
@@ -169,7 +169,7 @@
             <span class="k">assert</span><span class="p">(</span><span class="ow">not</span> <span class="n">AF</span><span class="o">.</span><span class="n">is_open</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="test_AsciiTable_line_full"><a class="viewcode-back" href="../../../../cis_interface.dataio.tests.html#cis_interface.dataio.tests.test_AsciiTable.test_AsciiTable_line_full">[docs]</a><span class="k">def</span> <span class="nf">test_AsciiTable_line_full</span><span class="p">():</span>
+<div class="viewcode-block" id="test_AsciiTable_line_full"><a class="viewcode-back" href="../../../../autodoc/cis_interface.dataio.tests.html#cis_interface.dataio.tests.test_AsciiTable.test_AsciiTable_line_full">[docs]</a><span class="k">def</span> <span class="nf">test_AsciiTable_line_full</span><span class="p">():</span>
     <span class="k">for</span> <span class="n">use_astropy</span> <span class="ow">in</span> <span class="p">[</span><span class="kc">False</span><span class="p">,</span> <span class="kc">True</span><span class="p">]:</span>
         <span class="n">AF_in</span> <span class="o">=</span> <span class="n">AsciiTable</span><span class="o">.</span><span class="n">AsciiTable</span><span class="p">(</span><span class="n">input_file</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">,</span>
                                       <span class="n">use_astropy</span><span class="o">=</span><span class="n">use_astropy</span><span class="p">,</span> <span class="o">**</span><span class="n">mode2kws</span><span class="p">[</span><span class="s1">&#39;r&#39;</span><span class="p">])</span>
@@ -220,7 +220,7 @@
         <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">output_file</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="test_AsciiTable_line"><a class="viewcode-back" href="../../../../cis_interface.dataio.tests.html#cis_interface.dataio.tests.test_AsciiTable.test_AsciiTable_line">[docs]</a><span class="k">def</span> <span class="nf">test_AsciiTable_line</span><span class="p">():</span>
+<div class="viewcode-block" id="test_AsciiTable_line"><a class="viewcode-back" href="../../../../autodoc/cis_interface.dataio.tests.html#cis_interface.dataio.tests.test_AsciiTable.test_AsciiTable_line">[docs]</a><span class="k">def</span> <span class="nf">test_AsciiTable_line</span><span class="p">():</span>
     <span class="k">for</span> <span class="n">use_astropy</span> <span class="ow">in</span> <span class="p">[</span><span class="kc">False</span><span class="p">,</span> <span class="kc">True</span><span class="p">]:</span>
         <span class="n">AF_in</span> <span class="o">=</span> <span class="n">AsciiTable</span><span class="o">.</span><span class="n">AsciiTable</span><span class="p">(</span><span class="n">input_file</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">,</span>
                                       <span class="n">use_astropy</span><span class="o">=</span><span class="n">use_astropy</span><span class="p">,</span> <span class="o">**</span><span class="n">mode2kws</span><span class="p">[</span><span class="s1">&#39;r&#39;</span><span class="p">])</span>
@@ -271,7 +271,7 @@
         <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">output_file</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="test_AsciiTable_io_array"><a class="viewcode-back" href="../../../../cis_interface.dataio.tests.html#cis_interface.dataio.tests.test_AsciiTable.test_AsciiTable_io_array">[docs]</a><span class="k">def</span> <span class="nf">test_AsciiTable_io_array</span><span class="p">():</span>
+<div class="viewcode-block" id="test_AsciiTable_io_array"><a class="viewcode-back" href="../../../../autodoc/cis_interface.dataio.tests.html#cis_interface.dataio.tests.test_AsciiTable.test_AsciiTable_io_array">[docs]</a><span class="k">def</span> <span class="nf">test_AsciiTable_io_array</span><span class="p">():</span>
     <span class="k">for</span> <span class="n">use_astropy</span> <span class="ow">in</span> <span class="p">[</span><span class="kc">False</span><span class="p">,</span> <span class="kc">True</span><span class="p">]:</span>
         <span class="n">AF_in</span> <span class="o">=</span> <span class="n">AsciiTable</span><span class="o">.</span><span class="n">AsciiTable</span><span class="p">(</span><span class="n">input_file</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">,</span>
                                       <span class="n">use_astropy</span><span class="o">=</span><span class="n">use_astropy</span><span class="p">,</span> <span class="o">**</span><span class="n">mode2kws</span><span class="p">[</span><span class="s1">&#39;r&#39;</span><span class="p">])</span>
@@ -305,7 +305,7 @@
         <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">output_file</span><span class="p">)</span></div>
 
         
-<div class="viewcode-block" id="test_AsciiTable_io_array_skip_header"><a class="viewcode-back" href="../../../../cis_interface.dataio.tests.html#cis_interface.dataio.tests.test_AsciiTable.test_AsciiTable_io_array_skip_header">[docs]</a><span class="k">def</span> <span class="nf">test_AsciiTable_io_array_skip_header</span><span class="p">():</span>
+<div class="viewcode-block" id="test_AsciiTable_io_array_skip_header"><a class="viewcode-back" href="../../../../autodoc/cis_interface.dataio.tests.html#cis_interface.dataio.tests.test_AsciiTable.test_AsciiTable_io_array_skip_header">[docs]</a><span class="k">def</span> <span class="nf">test_AsciiTable_io_array_skip_header</span><span class="p">():</span>
     <span class="k">for</span> <span class="n">use_astropy</span> <span class="ow">in</span> <span class="p">[</span><span class="kc">False</span><span class="p">,</span> <span class="kc">True</span><span class="p">]:</span>
         <span class="n">AF_in</span> <span class="o">=</span> <span class="n">AsciiTable</span><span class="o">.</span><span class="n">AsciiTable</span><span class="p">(</span><span class="n">input_file</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">,</span>
                                       <span class="n">use_astropy</span><span class="o">=</span><span class="n">use_astropy</span><span class="p">,</span> <span class="o">**</span><span class="n">mode2kws</span><span class="p">[</span><span class="s1">&#39;r&#39;</span><span class="p">])</span>
@@ -341,7 +341,7 @@
         <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">output_file</span><span class="p">)</span></div>
 
         
-<div class="viewcode-block" id="test_AsciiTable_array_bytes"><a class="viewcode-back" href="../../../../cis_interface.dataio.tests.html#cis_interface.dataio.tests.test_AsciiTable.test_AsciiTable_array_bytes">[docs]</a><span class="k">def</span> <span class="nf">test_AsciiTable_array_bytes</span><span class="p">():</span>
+<div class="viewcode-block" id="test_AsciiTable_array_bytes"><a class="viewcode-back" href="../../../../autodoc/cis_interface.dataio.tests.html#cis_interface.dataio.tests.test_AsciiTable.test_AsciiTable_array_bytes">[docs]</a><span class="k">def</span> <span class="nf">test_AsciiTable_array_bytes</span><span class="p">():</span>
     <span class="k">for</span> <span class="n">use_astropy</span> <span class="ow">in</span> <span class="p">[</span><span class="kc">False</span><span class="p">,</span> <span class="kc">True</span><span class="p">]:</span>
         <span class="k">for</span> <span class="n">order</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;C&#39;</span><span class="p">,</span> <span class="s1">&#39;F&#39;</span><span class="p">]:</span>
             <span class="n">AF_in</span> <span class="o">=</span> <span class="n">AsciiTable</span><span class="o">.</span><span class="n">AsciiTable</span><span class="p">(</span><span class="n">input_file</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">,</span>
@@ -383,7 +383,7 @@
     <span class="n">AF0</span><span class="o">.</span><span class="n">array_to_bytes</span><span class="p">(</span><span class="n">mat</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="test_AsciiTable_io_bytes"><a class="viewcode-back" href="../../../../cis_interface.dataio.tests.html#cis_interface.dataio.tests.test_AsciiTable.test_AsciiTable_io_bytes">[docs]</a><span class="k">def</span> <span class="nf">test_AsciiTable_io_bytes</span><span class="p">():</span>
+<div class="viewcode-block" id="test_AsciiTable_io_bytes"><a class="viewcode-back" href="../../../../autodoc/cis_interface.dataio.tests.html#cis_interface.dataio.tests.test_AsciiTable.test_AsciiTable_io_bytes">[docs]</a><span class="k">def</span> <span class="nf">test_AsciiTable_io_bytes</span><span class="p">():</span>
     <span class="k">for</span> <span class="n">use_astropy</span> <span class="ow">in</span> <span class="p">[</span><span class="kc">False</span><span class="p">,</span> <span class="kc">True</span><span class="p">]:</span>
         <span class="n">AF_in</span> <span class="o">=</span> <span class="n">AsciiTable</span><span class="o">.</span><span class="n">AsciiTable</span><span class="p">(</span><span class="n">input_file</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">,</span>
                                       <span class="n">use_astropy</span><span class="o">=</span><span class="n">use_astropy</span><span class="p">,</span> <span class="o">**</span><span class="n">mode2kws</span><span class="p">[</span><span class="s1">&#39;r&#39;</span><span class="p">])</span>
@@ -418,7 +418,7 @@
         <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">output_file</span><span class="p">)</span></div>
 
         
-<div class="viewcode-block" id="test_AsciiTable_dtype_vs_format"><a class="viewcode-back" href="../../../../cis_interface.dataio.tests.html#cis_interface.dataio.tests.test_AsciiTable.test_AsciiTable_dtype_vs_format">[docs]</a><span class="k">def</span> <span class="nf">test_AsciiTable_dtype_vs_format</span><span class="p">():</span>
+<div class="viewcode-block" id="test_AsciiTable_dtype_vs_format"><a class="viewcode-back" href="../../../../autodoc/cis_interface.dataio.tests.html#cis_interface.dataio.tests.test_AsciiTable.test_AsciiTable_dtype_vs_format">[docs]</a><span class="k">def</span> <span class="nf">test_AsciiTable_dtype_vs_format</span><span class="p">():</span>
     <span class="n">AF0</span> <span class="o">=</span> <span class="n">AsciiTable</span><span class="o">.</span><span class="n">AsciiTable</span><span class="p">(</span><span class="n">mode2file</span><span class="p">[</span><span class="s1">&#39;r&#39;</span><span class="p">],</span> <span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">mode2kws</span><span class="p">[</span><span class="s1">&#39;r&#39;</span><span class="p">])</span>
     <span class="n">AF1</span> <span class="o">=</span> <span class="n">AsciiTable</span><span class="o">.</span><span class="n">AsciiTable</span><span class="p">(</span><span class="n">mode2file</span><span class="p">[</span><span class="s1">&#39;r&#39;</span><span class="p">],</span> <span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">AF0</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
     <span class="n">AF1</span><span class="o">.</span><span class="n">update_format_str</span><span class="p">(</span><span class="n">AF0</span><span class="o">.</span><span class="n">format_str</span><span class="p">)</span>
@@ -426,14 +426,14 @@
     <span class="n">AF1</span><span class="o">.</span><span class="n">update_dtype</span><span class="p">(</span><span class="n">AF0</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">str</span><span class="p">)</span></div>
 
     
-<div class="viewcode-block" id="test_AsciiTable_writenames"><a class="viewcode-back" href="../../../../cis_interface.dataio.tests.html#cis_interface.dataio.tests.test_AsciiTable.test_AsciiTable_writenames">[docs]</a><span class="k">def</span> <span class="nf">test_AsciiTable_writenames</span><span class="p">():</span>
+<div class="viewcode-block" id="test_AsciiTable_writenames"><a class="viewcode-back" href="../../../../autodoc/cis_interface.dataio.tests.html#cis_interface.dataio.tests.test_AsciiTable.test_AsciiTable_writenames">[docs]</a><span class="k">def</span> <span class="nf">test_AsciiTable_writenames</span><span class="p">():</span>
     <span class="n">AF0</span> <span class="o">=</span> <span class="n">AsciiTable</span><span class="o">.</span><span class="n">AsciiTable</span><span class="p">(</span><span class="n">mode2file</span><span class="p">[</span><span class="s1">&#39;w&#39;</span><span class="p">],</span> <span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">mode2kws</span><span class="p">[</span><span class="s1">&#39;w&#39;</span><span class="p">])</span>
     <span class="n">AF0</span><span class="o">.</span><span class="n">column_names</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">AF0</span><span class="o">.</span><span class="n">writenames</span><span class="p">()</span>
     <span class="n">assert_raises</span><span class="p">(</span><span class="ne">IndexError</span><span class="p">,</span> <span class="n">AF0</span><span class="o">.</span><span class="n">writenames</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="n">column_names</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span></div>
 
     
-<div class="viewcode-block" id="test_AsciiTable_validate_line"><a class="viewcode-back" href="../../../../cis_interface.dataio.tests.html#cis_interface.dataio.tests.test_AsciiTable.test_AsciiTable_validate_line">[docs]</a><span class="k">def</span> <span class="nf">test_AsciiTable_validate_line</span><span class="p">():</span>
+<div class="viewcode-block" id="test_AsciiTable_validate_line"><a class="viewcode-back" href="../../../../autodoc/cis_interface.dataio.tests.html#cis_interface.dataio.tests.test_AsciiTable.test_AsciiTable_validate_line">[docs]</a><span class="k">def</span> <span class="nf">test_AsciiTable_validate_line</span><span class="p">():</span>
     <span class="n">AF0</span> <span class="o">=</span> <span class="n">AsciiTable</span><span class="o">.</span><span class="n">AsciiTable</span><span class="p">(</span><span class="n">mode2file</span><span class="p">[</span><span class="s1">&#39;w&#39;</span><span class="p">],</span> <span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">mode2kws</span><span class="p">[</span><span class="s1">&#39;w&#39;</span><span class="p">])</span>
     <span class="n">assert_raises</span><span class="p">(</span><span class="ne">AssertionError</span><span class="p">,</span> <span class="n">AF0</span><span class="o">.</span><span class="n">validate_line</span><span class="p">,</span> <span class="s1">&#39;wrong format&#39;</span><span class="p">)</span>
     <span class="n">assert_raises</span><span class="p">(</span><span class="ne">TypeError</span><span class="p">,</span> <span class="n">AF0</span><span class="o">.</span><span class="n">validate_line</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span></div>

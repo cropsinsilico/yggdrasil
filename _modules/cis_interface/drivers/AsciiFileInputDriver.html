@@ -49,7 +49,7 @@
 <span class="kn">from</span> <span class="nn">cis_interface.interface.PsiInterface</span> <span class="k">import</span> <span class="n">PSI_MSG_EOF</span>
 
 
-<div class="viewcode-block" id="AsciiFileInputDriver"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.AsciiFileInputDriver.AsciiFileInputDriver">[docs]</a><span class="k">class</span> <span class="nc">AsciiFileInputDriver</span><span class="p">(</span><span class="n">FileInputDriver</span><span class="p">):</span>
+<div class="viewcode-block" id="AsciiFileInputDriver"><a class="viewcode-back" href="../../../autodoc/cis_interface.drivers.html#cis_interface.drivers.AsciiFileInputDriver.AsciiFileInputDriver">[docs]</a><span class="k">class</span> <span class="nc">AsciiFileInputDriver</span><span class="p">(</span><span class="n">FileInputDriver</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Class that sends lines from an ASCII file.</span>
 
 <span class="sd">    Args:</span>
@@ -104,13 +104,13 @@
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;str: Message indicating end of file.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">PSI_MSG_EOF</span>
 
-<div class="viewcode-block" id="AsciiFileInputDriver.close_file"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.AsciiFileInputDriver.AsciiFileInputDriver.close_file">[docs]</a>    <span class="k">def</span> <span class="nf">close_file</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="AsciiFileInputDriver.close_file"><a class="viewcode-back" href="../../../autodoc/cis_interface.drivers.html#cis_interface.drivers.AsciiFileInputDriver.AsciiFileInputDriver.close_file">[docs]</a>    <span class="k">def</span> <span class="nf">close_file</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Close the file.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;:close_file()&#39;</span><span class="p">)</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">file</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
         
-<div class="viewcode-block" id="AsciiFileInputDriver.run"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.AsciiFileInputDriver.AsciiFileInputDriver.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="AsciiFileInputDriver.run"><a class="viewcode-back" href="../../../autodoc/cis_interface.drivers.html#cis_interface.drivers.AsciiFileInputDriver.AsciiFileInputDriver.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Run the driver. The file is opened and then data is read from the</span>
 <span class="sd">        file and sent to the message queue until eof is encountered or the file</span>
 <span class="sd">        is closed.</span>

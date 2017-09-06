@@ -49,7 +49,7 @@
 <span class="kn">from</span> <span class="nn">FileOutputDriver</span> <span class="k">import</span> <span class="n">FileOutputDriver</span>
 
 
-<div class="viewcode-block" id="MatOutputDriver"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.MatOutputDriver.MatOutputDriver">[docs]</a><span class="k">class</span> <span class="nc">MatOutputDriver</span><span class="p">(</span><span class="n">FileOutputDriver</span><span class="p">):</span>
+<div class="viewcode-block" id="MatOutputDriver"><a class="viewcode-back" href="../../../autodoc/cis_interface.drivers.html#cis_interface.drivers.MatOutputDriver.MatOutputDriver">[docs]</a><span class="k">class</span> <span class="nc">MatOutputDriver</span><span class="p">(</span><span class="n">FileOutputDriver</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Class to handle output to .mat Matlab files.</span>
 
 <span class="sd">    Args:</span>
@@ -63,7 +63,7 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
     
-<div class="viewcode-block" id="MatOutputDriver.put"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.MatOutputDriver.MatOutputDriver.put">[docs]</a>    <span class="k">def</span> <span class="nf">put</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+<div class="viewcode-block" id="MatOutputDriver.put"><a class="viewcode-back" href="../../../autodoc/cis_interface.drivers.html#cis_interface.drivers.MatOutputDriver.MatOutputDriver.put">[docs]</a>    <span class="k">def</span> <span class="nf">put</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Write received data to file. The data is first unpickled and then</span>
 <span class="sd">        written in .mat format.</span>
 
@@ -82,7 +82,7 @@
         <span class="n">savemat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fd</span><span class="p">,</span> <span class="n">data_dict</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;:put: </span><span class="si">%s</span><span class="s1"> complete&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">data_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span></div>
 
-<div class="viewcode-block" id="MatOutputDriver.run"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.MatOutputDriver.MatOutputDriver.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="MatOutputDriver.run"><a class="viewcode-back" href="../../../autodoc/cis_interface.drivers.html#cis_interface.drivers.MatOutputDriver.MatOutputDriver.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Run the driver. The driver will open the file and write receieved</span>
 <span class="sd">        messages to the file as they are received until the file is closed.</span>
 <span class="sd">        &quot;&quot;&quot;</span>

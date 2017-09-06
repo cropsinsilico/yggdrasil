@@ -49,7 +49,7 @@
 <span class="kn">import</span> <span class="nn">test_IODriver</span> <span class="k">as</span> <span class="nn">parent</span>
 
 
-<div class="viewcode-block" id="TestMatOutputParam"><a class="viewcode-back" href="../../../../cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_MatOutputDriver.TestMatOutputParam">[docs]</a><span class="k">class</span> <span class="nc">TestMatOutputParam</span><span class="p">(</span><span class="n">parent</span><span class="o">.</span><span class="n">TestIOParam</span><span class="p">):</span>
+<div class="viewcode-block" id="TestMatOutputParam"><a class="viewcode-back" href="../../../../autodoc/cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_MatOutputDriver.TestMatOutputParam">[docs]</a><span class="k">class</span> <span class="nc">TestMatOutputParam</span><span class="p">(</span><span class="n">parent</span><span class="o">.</span><span class="n">TestIOParam</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test parameters for MatOutputDriver.</span>
 
 <span class="sd">    Attributes (in addition to parent class&#39;s):</span>
@@ -64,7 +64,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">args</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">filepath</span></div>
         
 
-<div class="viewcode-block" id="TestMatOutputDriverNoStart"><a class="viewcode-back" href="../../../../cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_MatOutputDriver.TestMatOutputDriverNoStart">[docs]</a><span class="k">class</span> <span class="nc">TestMatOutputDriverNoStart</span><span class="p">(</span><span class="n">TestMatOutputParam</span><span class="p">,</span>
+<div class="viewcode-block" id="TestMatOutputDriverNoStart"><a class="viewcode-back" href="../../../../autodoc/cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_MatOutputDriver.TestMatOutputDriverNoStart">[docs]</a><span class="k">class</span> <span class="nc">TestMatOutputDriverNoStart</span><span class="p">(</span><span class="n">TestMatOutputParam</span><span class="p">,</span>
                                  <span class="n">parent</span><span class="o">.</span><span class="n">TestIODriverNoStart</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test runner for MatOutputDriver.</span>
 
@@ -75,7 +75,7 @@
     <span class="k">pass</span></div>
 
 
-<div class="viewcode-block" id="TestMatOutputDriver"><a class="viewcode-back" href="../../../../cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_MatOutputDriver.TestMatOutputDriver">[docs]</a><span class="k">class</span> <span class="nc">TestMatOutputDriver</span><span class="p">(</span><span class="n">TestMatOutputParam</span><span class="p">,</span> <span class="n">parent</span><span class="o">.</span><span class="n">TestIODriver</span><span class="p">):</span>
+<div class="viewcode-block" id="TestMatOutputDriver"><a class="viewcode-back" href="../../../../autodoc/cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_MatOutputDriver.TestMatOutputDriver">[docs]</a><span class="k">class</span> <span class="nc">TestMatOutputDriver</span><span class="p">(</span><span class="n">TestMatOutputParam</span><span class="p">,</span> <span class="n">parent</span><span class="o">.</span><span class="n">TestIODriver</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test runner for MatOutputDriver.</span>
 
 <span class="sd">    Attributes (in addition to parent class&#39;s):</span>
@@ -83,18 +83,18 @@
 <span class="sd">    </span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="TestMatOutputDriver.setup"><a class="viewcode-back" href="../../../../cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_MatOutputDriver.TestMatOutputDriver.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="TestMatOutputDriver.setup"><a class="viewcode-back" href="../../../../autodoc/cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_MatOutputDriver.TestMatOutputDriver.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create a driver instance and start the driver.&quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">TestMatOutputDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">setup</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">ipc_send_nolimit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pickled_data</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="TestMatOutputDriver.teardown"><a class="viewcode-back" href="../../../../cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_MatOutputDriver.TestMatOutputDriver.teardown">[docs]</a>    <span class="k">def</span> <span class="nf">teardown</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="TestMatOutputDriver.teardown"><a class="viewcode-back" href="../../../../autodoc/cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_MatOutputDriver.TestMatOutputDriver.teardown">[docs]</a>    <span class="k">def</span> <span class="nf">teardown</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Remove the instance, stoppping it.&quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">TestMatOutputDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">teardown</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filepath</span><span class="p">):</span>
             <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filepath</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="TestMatOutputDriver.assert_after_stop"><a class="viewcode-back" href="../../../../cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_MatOutputDriver.TestMatOutputDriver.assert_after_stop">[docs]</a>    <span class="k">def</span> <span class="nf">assert_after_stop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="TestMatOutputDriver.assert_after_stop"><a class="viewcode-back" href="../../../../autodoc/cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_MatOutputDriver.TestMatOutputDriver.assert_after_stop">[docs]</a>    <span class="k">def</span> <span class="nf">assert_after_stop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Assertions to make after stopping the driver instance.&quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">TestMatOutputDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">assert_after_stop</span><span class="p">()</span>
         <span class="k">assert</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filepath</span><span class="p">))</span>
@@ -103,16 +103,16 @@
         <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
             <span class="n">np</span><span class="o">.</span><span class="n">testing</span><span class="o">.</span><span class="n">assert_array_equal</span><span class="p">(</span><span class="n">dat_recv</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_dict</span><span class="p">[</span><span class="n">k</span><span class="p">])</span></div>
 
-<div class="viewcode-block" id="TestMatOutputDriver.assert_after_terminate"><a class="viewcode-back" href="../../../../cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_MatOutputDriver.TestMatOutputDriver.assert_after_terminate">[docs]</a>    <span class="k">def</span> <span class="nf">assert_after_terminate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="TestMatOutputDriver.assert_after_terminate"><a class="viewcode-back" href="../../../../autodoc/cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_MatOutputDriver.TestMatOutputDriver.assert_after_terminate">[docs]</a>    <span class="k">def</span> <span class="nf">assert_after_terminate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Assertions to make after stopping the driver instance.&quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">TestMatOutputDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">assert_after_terminate</span><span class="p">()</span>
         <span class="k">assert</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">fd</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="TestMatOutputDriver.test_send_recv"><a class="viewcode-back" href="../../../../cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_MatOutputDriver.TestMatOutputDriver.test_send_recv">[docs]</a>    <span class="k">def</span> <span class="nf">test_send_recv</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="TestMatOutputDriver.test_send_recv"><a class="viewcode-back" href="../../../../autodoc/cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_MatOutputDriver.TestMatOutputDriver.test_send_recv">[docs]</a>    <span class="k">def</span> <span class="nf">test_send_recv</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test sending/receiving small message.&quot;&quot;&quot;</span>
         <span class="k">pass</span></div>
 
-<div class="viewcode-block" id="TestMatOutputDriver.test_send_recv_nolimit"><a class="viewcode-back" href="../../../../cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_MatOutputDriver.TestMatOutputDriver.test_send_recv_nolimit">[docs]</a>    <span class="k">def</span> <span class="nf">test_send_recv_nolimit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="TestMatOutputDriver.test_send_recv_nolimit"><a class="viewcode-back" href="../../../../autodoc/cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_MatOutputDriver.TestMatOutputDriver.test_send_recv_nolimit">[docs]</a>    <span class="k">def</span> <span class="nf">test_send_recv_nolimit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test sending/receiving large message.&quot;&quot;&quot;</span>
         <span class="k">pass</span></div></div>
 </pre></div>

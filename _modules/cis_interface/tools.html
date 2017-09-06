@@ -47,7 +47,7 @@
 <span class="kn">from</span> <span class="nn">subprocess</span> <span class="k">import</span> <span class="n">Popen</span><span class="p">,</span> <span class="n">PIPE</span>
 
 
-<div class="viewcode-block" id="ipcs"><a class="viewcode-back" href="../../cis_interface.html#cis_interface.tools.ipcs">[docs]</a><span class="k">def</span> <span class="nf">ipcs</span><span class="p">(</span><span class="n">options</span><span class="o">=</span><span class="p">[]):</span>
+<div class="viewcode-block" id="ipcs"><a class="viewcode-back" href="../../autodoc/cis_interface.html#cis_interface.tools.ipcs">[docs]</a><span class="k">def</span> <span class="nf">ipcs</span><span class="p">(</span><span class="n">options</span><span class="o">=</span><span class="p">[]):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the output from running the ipcs command.</span>
 
 <span class="sd">    Args:</span>
@@ -68,7 +68,7 @@
     <span class="k">return</span> <span class="n">output</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="ipc_queues"><a class="viewcode-back" href="../../cis_interface.html#cis_interface.tools.ipc_queues">[docs]</a><span class="k">def</span> <span class="nf">ipc_queues</span><span class="p">():</span>
+<div class="viewcode-block" id="ipc_queues"><a class="viewcode-back" href="../../autodoc/cis_interface.html#cis_interface.tools.ipc_queues">[docs]</a><span class="k">def</span> <span class="nf">ipc_queues</span><span class="p">():</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get a list of active IPC queues.</span>
 
 <span class="sd">    Returns:</span>
@@ -87,7 +87,7 @@
     <span class="k">return</span> <span class="n">qlist</span></div>
 
 
-<div class="viewcode-block" id="ipcrm"><a class="viewcode-back" href="../../cis_interface.html#cis_interface.tools.ipcrm">[docs]</a><span class="k">def</span> <span class="nf">ipcrm</span><span class="p">(</span><span class="n">options</span><span class="o">=</span><span class="p">[]):</span>
+<div class="viewcode-block" id="ipcrm"><a class="viewcode-back" href="../../autodoc/cis_interface.html#cis_interface.tools.ipcrm">[docs]</a><span class="k">def</span> <span class="nf">ipcrm</span><span class="p">(</span><span class="n">options</span><span class="o">=</span><span class="p">[]):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Remove IPC constructs using the ipcrm command.</span>
 
 <span class="sd">    Args:</span>
@@ -105,7 +105,7 @@
     <span class="nb">print</span><span class="p">(</span><span class="n">output</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">))</span></div>
 
 
-<div class="viewcode-block" id="ipcrm_queues"><a class="viewcode-back" href="../../cis_interface.html#cis_interface.tools.ipcrm_queues">[docs]</a><span class="k">def</span> <span class="nf">ipcrm_queues</span><span class="p">():</span>
+<div class="viewcode-block" id="ipcrm_queues"><a class="viewcode-back" href="../../autodoc/cis_interface.html#cis_interface.tools.ipcrm_queues">[docs]</a><span class="k">def</span> <span class="nf">ipcrm_queues</span><span class="p">():</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Delete existing IPC queues.&quot;&quot;&quot;</span>
     <span class="n">ipcrm</span><span class="p">([</span><span class="s1">&#39;--all=msg&#39;</span><span class="p">])</span></div>
 </pre></div>

@@ -49,7 +49,7 @@
 <span class="kn">from</span> <span class="nn">FileInputDriver</span> <span class="k">import</span> <span class="n">FileInputDriver</span>
 
 
-<div class="viewcode-block" id="MatInputDriver"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.MatInputDriver.MatInputDriver">[docs]</a><span class="k">class</span> <span class="nc">MatInputDriver</span><span class="p">(</span><span class="n">FileInputDriver</span><span class="p">):</span>
+<div class="viewcode-block" id="MatInputDriver"><a class="viewcode-back" href="../../../autodoc/cis_interface.drivers.html#cis_interface.drivers.MatInputDriver.MatInputDriver">[docs]</a><span class="k">class</span> <span class="nc">MatInputDriver</span><span class="p">(</span><span class="n">FileInputDriver</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Class that sends pickled dictionaries of matricies read from a .mat</span>
 <span class="sd">    file.</span>
 
@@ -64,7 +64,7 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="MatInputDriver.get"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.MatInputDriver.MatInputDriver.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="MatInputDriver.get"><a class="viewcode-back" href="../../../autodoc/cis_interface.drivers.html#cis_interface.drivers.MatInputDriver.MatInputDriver.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Returned pickled data read from the .mat file.</span>
 <span class="sd">        </span>
 <span class="sd">        Returns:</span>
@@ -81,7 +81,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;:get: pickled data (len = </span><span class="si">%d</span><span class="s1">)&#39;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">data</span></div>
 
-<div class="viewcode-block" id="MatInputDriver.run"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.MatInputDriver.MatInputDriver.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="MatInputDriver.run"><a class="viewcode-back" href="../../../autodoc/cis_interface.drivers.html#cis_interface.drivers.MatInputDriver.MatInputDriver.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Run the driver. The .mat file is opened and contents are read</span>
 <span class="sd">        and then sent to the message queue until EOF is encountered or the file</span>
 <span class="sd">        is closed.</span>

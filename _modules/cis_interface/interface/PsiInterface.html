@@ -57,7 +57,7 @@
 <span class="n">PSI_MSG_EOF</span> <span class="o">=</span> <span class="s2">&quot;EOF!!!&quot;</span>
 
 
-<div class="viewcode-block" id="PsiInput"><a class="viewcode-back" href="../../../cis_interface.interface.html#cis_interface.interface.PsiInterface.PsiInput">[docs]</a><span class="k">class</span> <span class="nc">PsiInput</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="PsiInput"><a class="viewcode-back" href="../../../autodoc/cis_interface.interface.html#cis_interface.interface.PsiInterface.PsiInput">[docs]</a><span class="k">class</span> <span class="nc">PsiInput</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Class for handling input from a message queue.</span>
 
 <span class="sd">    Args:</span>
@@ -94,7 +94,7 @@
         <span class="k">if</span> <span class="n">clidebug</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">sleeptime</span> <span class="o">=</span> <span class="mf">2.0</span>
 
-<div class="viewcode-block" id="PsiInput.recv"><a class="viewcode-back" href="../../../cis_interface.interface.html#cis_interface.interface.PsiInterface.PsiInput.recv">[docs]</a>    <span class="k">def</span> <span class="nf">recv</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="PsiInput.recv"><a class="viewcode-back" href="../../../autodoc/cis_interface.interface.html#cis_interface.interface.PsiInterface.PsiInput.recv">[docs]</a>    <span class="k">def</span> <span class="nf">recv</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Receive a message smaller than PSI_MSG_MAX. The process will</span>
 <span class="sd">        sleep until there is a message in the queue to receive.</span>
 
@@ -117,7 +117,7 @@
             <span class="n">debug</span><span class="p">(</span><span class="s2">&quot;PsiInput(</span><span class="si">%s</span><span class="s2">).recv(): exception </span><span class="si">%s</span><span class="s2">, return None&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="n">ex</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">payload</span></div>
 
-<div class="viewcode-block" id="PsiInput.recv_nolimit"><a class="viewcode-back" href="../../../cis_interface.interface.html#cis_interface.interface.PsiInterface.PsiInput.recv_nolimit">[docs]</a>    <span class="k">def</span> <span class="nf">recv_nolimit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="PsiInput.recv_nolimit"><a class="viewcode-back" href="../../../autodoc/cis_interface.interface.html#cis_interface.interface.PsiInterface.PsiInput.recv_nolimit">[docs]</a>    <span class="k">def</span> <span class="nf">recv_nolimit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Receive a message larger than PSI_MSG_MAX that is sent in multiple</span>
 <span class="sd">        parts.</span>
 
@@ -156,7 +156,7 @@
         <span class="k">return</span> <span class="n">payload</span></div></div>
         
 
-<div class="viewcode-block" id="PsiOutput"><a class="viewcode-back" href="../../../cis_interface.interface.html#cis_interface.interface.PsiInterface.PsiOutput">[docs]</a><span class="k">class</span> <span class="nc">PsiOutput</span><span class="p">:</span>
+<div class="viewcode-block" id="PsiOutput"><a class="viewcode-back" href="../../../autodoc/cis_interface.interface.html#cis_interface.interface.PsiInterface.PsiOutput">[docs]</a><span class="k">class</span> <span class="nc">PsiOutput</span><span class="p">:</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Class for handling output to a message queue.</span>
 
 <span class="sd">    Args:</span>
@@ -183,7 +183,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">q</span> <span class="o">=</span> <span class="n">MessageQueue</span><span class="p">(</span><span class="n">qid</span><span class="p">,</span> <span class="n">max_message_size</span><span class="o">=</span><span class="n">PSI_MSG_MAX</span><span class="p">)</span>
         <span class="k">return</span>
 
-<div class="viewcode-block" id="PsiOutput.send"><a class="viewcode-back" href="../../../cis_interface.interface.html#cis_interface.interface.PsiInterface.PsiOutput.send">[docs]</a>    <span class="k">def</span> <span class="nf">send</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">payload</span><span class="p">):</span>
+<div class="viewcode-block" id="PsiOutput.send"><a class="viewcode-back" href="../../../autodoc/cis_interface.interface.html#cis_interface.interface.PsiInterface.PsiOutput.send">[docs]</a>    <span class="k">def</span> <span class="nf">send</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">payload</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Send a message smaller than PSI_MSG_MAX.</span>
 
 <span class="sd">        Args:</span>
@@ -204,7 +204,7 @@
         <span class="n">debug</span><span class="p">(</span><span class="s2">&quot;PsiOutput(</span><span class="si">%s</span><span class="s2">).send(</span><span class="si">%s</span><span class="s2">): returns </span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">payload</span><span class="p">,</span> <span class="n">ret</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">ret</span></div>
 
-<div class="viewcode-block" id="PsiOutput.send_nolimit"><a class="viewcode-back" href="../../../cis_interface.interface.html#cis_interface.interface.PsiInterface.PsiOutput.send_nolimit">[docs]</a>    <span class="k">def</span> <span class="nf">send_nolimit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">payload</span><span class="p">):</span>
+<div class="viewcode-block" id="PsiOutput.send_nolimit"><a class="viewcode-back" href="../../../autodoc/cis_interface.interface.html#cis_interface.interface.PsiInterface.PsiOutput.send_nolimit">[docs]</a>    <span class="k">def</span> <span class="nf">send_nolimit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">payload</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Send a message larger than PSI_MSG_MAX in multiple parts.</span>
 
 <span class="sd">        Args:</span>
@@ -237,7 +237,7 @@
         <span class="k">return</span> <span class="n">ret</span></div></div>
         
 
-<div class="viewcode-block" id="PsiRpc"><a class="viewcode-back" href="../../../cis_interface.interface.html#cis_interface.interface.PsiInterface.PsiRpc">[docs]</a><span class="k">class</span> <span class="nc">PsiRpc</span><span class="p">:</span>
+<div class="viewcode-block" id="PsiRpc"><a class="viewcode-back" href="../../../autodoc/cis_interface.interface.html#cis_interface.interface.PsiInterface.PsiRpc">[docs]</a><span class="k">class</span> <span class="nc">PsiRpc</span><span class="p">:</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Class for sending a message and then receiving a response.</span>
 
 <span class="sd">    Args:</span>
@@ -255,7 +255,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_in</span> <span class="o">=</span> <span class="n">PsiInput</span><span class="p">(</span><span class="n">inname</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_out</span> <span class="o">=</span> <span class="n">PsiOutput</span><span class="p">(</span><span class="n">outname</span><span class="p">)</span>
 
-<div class="viewcode-block" id="PsiRpc.rpcSend"><a class="viewcode-back" href="../../../cis_interface.interface.html#cis_interface.interface.PsiInterface.PsiRpc.rpcSend">[docs]</a>    <span class="k">def</span> <span class="nf">rpcSend</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+<div class="viewcode-block" id="PsiRpc.rpcSend"><a class="viewcode-back" href="../../../autodoc/cis_interface.interface.html#cis_interface.interface.PsiInterface.PsiRpc.rpcSend">[docs]</a>    <span class="k">def</span> <span class="nf">rpcSend</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Send arguments as a message created using the output format string.</span>
 
 <span class="sd">        Args:</span>
@@ -269,7 +269,7 @@
         <span class="n">outmsg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_outFmt</span> <span class="o">%</span> <span class="n">args</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_out</span><span class="o">.</span><span class="n">send_nolimit</span><span class="p">(</span><span class="n">outmsg</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="PsiRpc.rpcRecv"><a class="viewcode-back" href="../../../cis_interface.interface.html#cis_interface.interface.PsiInterface.PsiRpc.rpcRecv">[docs]</a>    <span class="k">def</span> <span class="nf">rpcRecv</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="PsiRpc.rpcRecv"><a class="viewcode-back" href="../../../autodoc/cis_interface.interface.html#cis_interface.interface.PsiInterface.PsiRpc.rpcRecv">[docs]</a>    <span class="k">def</span> <span class="nf">rpcRecv</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Receive a message and get arguments by parsing the recieved message</span>
 <span class="sd">        using the input format string.</span>
 
@@ -284,7 +284,7 @@
             <span class="n">args</span> <span class="o">=</span> <span class="n">scanf</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_inFmt</span><span class="p">,</span> <span class="n">args</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">retval</span><span class="p">,</span> <span class="n">args</span></div>
 
-<div class="viewcode-block" id="PsiRpc.rpcCall"><a class="viewcode-back" href="../../../cis_interface.interface.html#cis_interface.interface.PsiInterface.PsiRpc.rpcCall">[docs]</a>    <span class="k">def</span> <span class="nf">rpcCall</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+<div class="viewcode-block" id="PsiRpc.rpcCall"><a class="viewcode-back" href="../../../autodoc/cis_interface.interface.html#cis_interface.interface.PsiInterface.PsiRpc.rpcCall">[docs]</a>    <span class="k">def</span> <span class="nf">rpcCall</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Send arguments using the output format string to format a message</span>
 <span class="sd">        and then receive values back by parsing the response message with the</span>
 <span class="sd">        input format string.</span>
@@ -305,7 +305,7 @@
 
 
 <span class="c1"># Specialized classes for ascii IO</span>
-<div class="viewcode-block" id="PsiAsciiFileInput"><a class="viewcode-back" href="../../../cis_interface.interface.html#cis_interface.interface.PsiInterface.PsiAsciiFileInput">[docs]</a><span class="k">class</span> <span class="nc">PsiAsciiFileInput</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="PsiAsciiFileInput"><a class="viewcode-back" href="../../../autodoc/cis_interface.interface.html#cis_interface.interface.PsiInterface.PsiAsciiFileInput">[docs]</a><span class="k">class</span> <span class="nc">PsiAsciiFileInput</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Class for generic ASCII input from either a file or message queue.</span>
 
 <span class="sd">    Args:</span>
@@ -336,7 +336,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_file</span> <span class="o">=</span> <span class="kc">None</span>
 
-<div class="viewcode-block" id="PsiAsciiFileInput.recv_line"><a class="viewcode-back" href="../../../cis_interface.interface.html#cis_interface.interface.PsiInterface.PsiAsciiFileInput.recv_line">[docs]</a>    <span class="k">def</span> <span class="nf">recv_line</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="PsiAsciiFileInput.recv_line"><a class="viewcode-back" href="../../../autodoc/cis_interface.interface.html#cis_interface.interface.PsiInterface.PsiAsciiFileInput.recv_line">[docs]</a>    <span class="k">def</span> <span class="nf">recv_line</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Receive a single line of ASCII input.</span>
 
 <span class="sd">        Returns:</span>
@@ -354,7 +354,7 @@
         <span class="k">return</span> <span class="n">ret</span><span class="p">,</span> <span class="n">line</span></div></div>
 
 
-<div class="viewcode-block" id="PsiAsciiFileOutput"><a class="viewcode-back" href="../../../cis_interface.interface.html#cis_interface.interface.PsiInterface.PsiAsciiFileOutput">[docs]</a><span class="k">class</span> <span class="nc">PsiAsciiFileOutput</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="PsiAsciiFileOutput"><a class="viewcode-back" href="../../../autodoc/cis_interface.interface.html#cis_interface.interface.PsiInterface.PsiAsciiFileOutput">[docs]</a><span class="k">class</span> <span class="nc">PsiAsciiFileOutput</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Class for generic ASCII output to either a local file or message</span>
 <span class="sd">    queue.</span>
 
@@ -386,14 +386,14 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_file</span> <span class="o">=</span> <span class="kc">None</span>
 
-<div class="viewcode-block" id="PsiAsciiFileOutput.send_eof"><a class="viewcode-back" href="../../../cis_interface.interface.html#cis_interface.interface.PsiInterface.PsiAsciiFileOutput.send_eof">[docs]</a>    <span class="k">def</span> <span class="nf">send_eof</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="PsiAsciiFileOutput.send_eof"><a class="viewcode-back" href="../../../autodoc/cis_interface.interface.html#cis_interface.interface.PsiInterface.PsiAsciiFileOutput.send_eof">[docs]</a>    <span class="k">def</span> <span class="nf">send_eof</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Send an end-of-file message to the message queue.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_type</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">pass</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_psi</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">PSI_MSG_EOF</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="PsiAsciiFileOutput.send_line"><a class="viewcode-back" href="../../../cis_interface.interface.html#cis_interface.interface.PsiInterface.PsiAsciiFileOutput.send_line">[docs]</a>    <span class="k">def</span> <span class="nf">send_line</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">line</span><span class="p">):</span>
+<div class="viewcode-block" id="PsiAsciiFileOutput.send_line"><a class="viewcode-back" href="../../../autodoc/cis_interface.interface.html#cis_interface.interface.PsiInterface.PsiAsciiFileOutput.send_line">[docs]</a>    <span class="k">def</span> <span class="nf">send_line</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">line</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Output a single ASCII line.</span>
 
 <span class="sd">        Args:</span>
@@ -412,7 +412,7 @@
 
 
 <span class="c1"># Specialized classes for ascii table IO</span>
-<div class="viewcode-block" id="PsiAsciiTableInput"><a class="viewcode-back" href="../../../cis_interface.interface.html#cis_interface.interface.PsiInterface.PsiAsciiTableInput">[docs]</a><span class="k">class</span> <span class="nc">PsiAsciiTableInput</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="PsiAsciiTableInput"><a class="viewcode-back" href="../../../autodoc/cis_interface.interface.html#cis_interface.interface.PsiInterface.PsiAsciiTableInput">[docs]</a><span class="k">class</span> <span class="nc">PsiAsciiTableInput</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Class for handling table-like formatted input.</span>
 
 <span class="sd">    Args:</span>
@@ -449,7 +449,7 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_type</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_table</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 
-<div class="viewcode-block" id="PsiAsciiTableInput.recv_row"><a class="viewcode-back" href="../../../cis_interface.interface.html#cis_interface.interface.PsiInterface.PsiAsciiTableInput.recv_row">[docs]</a>    <span class="k">def</span> <span class="nf">recv_row</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="PsiAsciiTableInput.recv_row"><a class="viewcode-back" href="../../../autodoc/cis_interface.interface.html#cis_interface.interface.PsiInterface.PsiAsciiTableInput.recv_row">[docs]</a>    <span class="k">def</span> <span class="nf">recv_row</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Receive a single row of variables from the input.</span>
 
 <span class="sd">        Returns:</span>
@@ -468,7 +468,7 @@
                     <span class="n">ret</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="k">return</span> <span class="n">ret</span><span class="p">,</span> <span class="n">args</span></div>
 
-<div class="viewcode-block" id="PsiAsciiTableInput.recv_array"><a class="viewcode-back" href="../../../cis_interface.interface.html#cis_interface.interface.PsiInterface.PsiAsciiTableInput.recv_array">[docs]</a>    <span class="k">def</span> <span class="nf">recv_array</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="PsiAsciiTableInput.recv_array"><a class="viewcode-back" href="../../../autodoc/cis_interface.interface.html#cis_interface.interface.PsiInterface.PsiAsciiTableInput.recv_array">[docs]</a>    <span class="k">def</span> <span class="nf">recv_array</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Receive an entire array of table data.</span>
 
 <span class="sd">        Returns:</span>
@@ -490,7 +490,7 @@
         <span class="k">return</span> <span class="n">ret</span><span class="p">,</span> <span class="n">arr</span></div></div>
 
 
-<div class="viewcode-block" id="PsiAsciiTableOutput"><a class="viewcode-back" href="../../../cis_interface.interface.html#cis_interface.interface.PsiInterface.PsiAsciiTableOutput">[docs]</a><span class="k">class</span> <span class="nc">PsiAsciiTableOutput</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="PsiAsciiTableOutput"><a class="viewcode-back" href="../../../autodoc/cis_interface.interface.html#cis_interface.interface.PsiInterface.PsiAsciiTableOutput">[docs]</a><span class="k">class</span> <span class="nc">PsiAsciiTableOutput</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Class for handling table-like formatted output.</span>
 
 <span class="sd">    Args:</span>
@@ -524,14 +524,14 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_type</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_table</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 
-<div class="viewcode-block" id="PsiAsciiTableOutput.send_eof"><a class="viewcode-back" href="../../../cis_interface.interface.html#cis_interface.interface.PsiInterface.PsiAsciiTableOutput.send_eof">[docs]</a>    <span class="k">def</span> <span class="nf">send_eof</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="PsiAsciiTableOutput.send_eof"><a class="viewcode-back" href="../../../autodoc/cis_interface.interface.html#cis_interface.interface.PsiInterface.PsiAsciiTableOutput.send_eof">[docs]</a>    <span class="k">def</span> <span class="nf">send_eof</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Send an end-of-file message to the message queue.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_type</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">pass</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_psi</span><span class="o">.</span><span class="n">send_nolimit</span><span class="p">(</span><span class="n">PSI_MSG_EOF</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="PsiAsciiTableOutput.send_row"><a class="viewcode-back" href="../../../cis_interface.interface.html#cis_interface.interface.PsiInterface.PsiAsciiTableOutput.send_row">[docs]</a>    <span class="k">def</span> <span class="nf">send_row</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+<div class="viewcode-block" id="PsiAsciiTableOutput.send_row"><a class="viewcode-back" href="../../../autodoc/cis_interface.interface.html#cis_interface.interface.PsiInterface.PsiAsciiTableOutput.send_row">[docs]</a>    <span class="k">def</span> <span class="nf">send_row</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Output arguments as a formated row to either a local file or</span>
 <span class="sd">        message queue.</span>
 
@@ -552,7 +552,7 @@
             <span class="n">ret</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_psi</span><span class="o">.</span><span class="n">send_nolimit</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">ret</span></div>
 
-<div class="viewcode-block" id="PsiAsciiTableOutput.send_array"><a class="viewcode-back" href="../../../cis_interface.interface.html#cis_interface.interface.PsiInterface.PsiAsciiTableOutput.send_array">[docs]</a>    <span class="k">def</span> <span class="nf">send_array</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arr</span><span class="p">):</span>
+<div class="viewcode-block" id="PsiAsciiTableOutput.send_array"><a class="viewcode-back" href="../../../autodoc/cis_interface.interface.html#cis_interface.interface.PsiInterface.PsiAsciiTableOutput.send_array">[docs]</a>    <span class="k">def</span> <span class="nf">send_array</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arr</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Output an array of table data to either a local file or message</span>
 <span class="sd">        sueue.</span>
 
@@ -574,7 +574,7 @@
         <span class="k">return</span> <span class="n">ret</span></div></div>
 
     
-<div class="viewcode-block" id="PsiPickleInput"><a class="viewcode-back" href="../../../cis_interface.interface.html#cis_interface.interface.PsiInterface.PsiPickleInput">[docs]</a><span class="k">class</span> <span class="nc">PsiPickleInput</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="PsiPickleInput"><a class="viewcode-back" href="../../../autodoc/cis_interface.interface.html#cis_interface.interface.PsiInterface.PsiPickleInput">[docs]</a><span class="k">class</span> <span class="nc">PsiPickleInput</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Class for handling pickled input.</span>
 
 <span class="sd">    Args:</span>
@@ -604,7 +604,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_file</span> <span class="o">=</span> <span class="kc">None</span>
 
-<div class="viewcode-block" id="PsiPickleInput.recv"><a class="viewcode-back" href="../../../cis_interface.interface.html#cis_interface.interface.PsiInterface.PsiPickleInput.recv">[docs]</a>    <span class="k">def</span> <span class="nf">recv</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="PsiPickleInput.recv"><a class="viewcode-back" href="../../../autodoc/cis_interface.interface.html#cis_interface.interface.PsiInterface.PsiPickleInput.recv">[docs]</a>    <span class="k">def</span> <span class="nf">recv</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Receive a single pickled object.</span>
 
 <span class="sd">        Returns:</span>
@@ -630,7 +630,7 @@
         <span class="k">return</span> <span class="n">ret</span><span class="p">,</span> <span class="n">obj</span></div></div>
 
 
-<div class="viewcode-block" id="PsiPickleOutput"><a class="viewcode-back" href="../../../cis_interface.interface.html#cis_interface.interface.PsiInterface.PsiPickleOutput">[docs]</a><span class="k">class</span> <span class="nc">PsiPickleOutput</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="PsiPickleOutput"><a class="viewcode-back" href="../../../autodoc/cis_interface.interface.html#cis_interface.interface.PsiInterface.PsiPickleOutput">[docs]</a><span class="k">class</span> <span class="nc">PsiPickleOutput</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Class for handling pickled output.</span>
 
 <span class="sd">    Args:</span>
@@ -661,7 +661,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_file</span> <span class="o">=</span> <span class="kc">None</span>
 
-<div class="viewcode-block" id="PsiPickleOutput.send"><a class="viewcode-back" href="../../../cis_interface.interface.html#cis_interface.interface.PsiInterface.PsiPickleOutput.send">[docs]</a>    <span class="k">def</span> <span class="nf">send</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+<div class="viewcode-block" id="PsiPickleOutput.send"><a class="viewcode-back" href="../../../autodoc/cis_interface.interface.html#cis_interface.interface.PsiInterface.PsiPickleOutput.send">[docs]</a>    <span class="k">def</span> <span class="nf">send</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Output an object as a pickled string to either a local file or</span>
 <span class="sd">        message queue.</span>
 

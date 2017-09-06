@@ -50,7 +50,7 @@
                  <span class="s1">&#39;newline&#39;</span><span class="p">:</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">}</span>
 
 
-<div class="viewcode-block" id="AsciiFile"><a class="viewcode-back" href="../../../cis_interface.dataio.html#cis_interface.dataio.AsciiFile.AsciiFile">[docs]</a><span class="k">class</span> <span class="nc">AsciiFile</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="AsciiFile"><a class="viewcode-back" href="../../../autodoc/cis_interface.dataio.html#cis_interface.dataio.AsciiFile.AsciiFile">[docs]</a><span class="k">class</span> <span class="nc">AsciiFile</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filepath</span><span class="p">,</span> <span class="n">io_mode</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Class for reading/writing an ASCII file.</span>
 
@@ -92,20 +92,20 @@
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Returns True if the file descriptor is open.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fd</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span>
 
-<div class="viewcode-block" id="AsciiFile.open"><a class="viewcode-back" href="../../../cis_interface.dataio.html#cis_interface.dataio.AsciiFile.AsciiFile.open">[docs]</a>    <span class="k">def</span> <span class="nf">open</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="AsciiFile.open"><a class="viewcode-back" href="../../../autodoc/cis_interface.dataio.html#cis_interface.dataio.AsciiFile.AsciiFile.open">[docs]</a>    <span class="k">def</span> <span class="nf">open</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Open the associated file descriptor if it is not already open.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">io_mode</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Cannot open in memory table.&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_open</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">fd</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filepath</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">io_mode</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="AsciiFile.close"><a class="viewcode-back" href="../../../cis_interface.dataio.html#cis_interface.dataio.AsciiFile.AsciiFile.close">[docs]</a>    <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="AsciiFile.close"><a class="viewcode-back" href="../../../autodoc/cis_interface.dataio.html#cis_interface.dataio.AsciiFile.AsciiFile.close">[docs]</a>    <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Close the associated file descriptor if it is open.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_open</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">fd</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">fd</span> <span class="o">=</span> <span class="kc">None</span></div>
 
-<div class="viewcode-block" id="AsciiFile.readline"><a class="viewcode-back" href="../../../cis_interface.dataio.html#cis_interface.dataio.AsciiFile.AsciiFile.readline">[docs]</a>    <span class="k">def</span> <span class="nf">readline</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="AsciiFile.readline"><a class="viewcode-back" href="../../../autodoc/cis_interface.dataio.html#cis_interface.dataio.AsciiFile.AsciiFile.readline">[docs]</a>    <span class="k">def</span> <span class="nf">readline</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Continue reading lines until a valid line (uncommented) is</span>
 <span class="sd">        encountered</span>
 <span class="sd">        </span>
@@ -121,7 +121,7 @@
             <span class="n">line</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">return</span> <span class="n">eof</span><span class="p">,</span> <span class="n">line</span></div>
 
-<div class="viewcode-block" id="AsciiFile.writeline"><a class="viewcode-back" href="../../../cis_interface.dataio.html#cis_interface.dataio.AsciiFile.AsciiFile.writeline">[docs]</a>    <span class="k">def</span> <span class="nf">writeline</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">line</span><span class="p">):</span>
+<div class="viewcode-block" id="AsciiFile.writeline"><a class="viewcode-back" href="../../../autodoc/cis_interface.dataio.html#cis_interface.dataio.AsciiFile.AsciiFile.writeline">[docs]</a>    <span class="k">def</span> <span class="nf">writeline</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">line</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Write a line to the file, adding a newline character if it is not</span>
 <span class="sd">        present.</span>
 
@@ -141,7 +141,7 @@
             <span class="n">line</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">newline</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">writeline_full</span><span class="p">(</span><span class="n">line</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="AsciiFile.readline_full"><a class="viewcode-back" href="../../../cis_interface.dataio.html#cis_interface.dataio.AsciiFile.AsciiFile.readline_full">[docs]</a>    <span class="k">def</span> <span class="nf">readline_full</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="AsciiFile.readline_full"><a class="viewcode-back" href="../../../autodoc/cis_interface.dataio.html#cis_interface.dataio.AsciiFile.AsciiFile.readline_full">[docs]</a>    <span class="k">def</span> <span class="nf">readline_full</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Read a line and return it if it is not a comment.</span>
 
 <span class="sd">        Returns:</span>
@@ -161,7 +161,7 @@
             <span class="k">return</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">None</span>
         <span class="k">return</span> <span class="kc">False</span><span class="p">,</span> <span class="n">line</span></div>
 
-<div class="viewcode-block" id="AsciiFile.writeline_full"><a class="viewcode-back" href="../../../cis_interface.dataio.html#cis_interface.dataio.AsciiFile.AsciiFile.writeline_full">[docs]</a>    <span class="k">def</span> <span class="nf">writeline_full</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">line</span><span class="p">):</span>
+<div class="viewcode-block" id="AsciiFile.writeline_full"><a class="viewcode-back" href="../../../autodoc/cis_interface.dataio.html#cis_interface.dataio.AsciiFile.AsciiFile.writeline_full">[docs]</a>    <span class="k">def</span> <span class="nf">writeline_full</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">line</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Write a line to the file in its present state. If it is not open,</span>
 <span class="sd">        nothing happens.</span>
 
