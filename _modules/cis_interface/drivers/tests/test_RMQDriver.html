@@ -49,7 +49,7 @@
 <span class="kn">import</span> <span class="nn">test_Driver</span> <span class="k">as</span> <span class="nn">parent</span>
 
 
-<div class="viewcode-block" id="TestRMQParam"><a class="viewcode-back" href="../../../../autodoc/cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_RMQDriver.TestRMQParam">[docs]</a><span class="k">class</span> <span class="nc">TestRMQParam</span><span class="p">(</span><span class="n">parent</span><span class="o">.</span><span class="n">TestParam</span><span class="p">):</span>
+<div class="viewcode-block" id="TestRMQParam"><a class="viewcode-back" href="../../../../cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_RMQDriver.TestRMQParam">[docs]</a><span class="k">class</span> <span class="nc">TestRMQParam</span><span class="p">(</span><span class="n">parent</span><span class="o">.</span><span class="n">TestParam</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test parameters for RMQDriver class.</span>
 
 <span class="sd">    Attributes (in addition to parent class&#39;s):</span>
@@ -71,7 +71,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">inst_kwargs</span><span class="p">[</span><span class="s1">&#39;user&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;PSI_MSG_USER&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span></div>
 
         
-<div class="viewcode-block" id="TestRMQDriverNoStart"><a class="viewcode-back" href="../../../../autodoc/cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_RMQDriver.TestRMQDriverNoStart">[docs]</a><span class="k">class</span> <span class="nc">TestRMQDriverNoStart</span><span class="p">(</span><span class="n">TestRMQParam</span><span class="p">,</span> <span class="n">parent</span><span class="o">.</span><span class="n">TestDriverNoStart</span><span class="p">):</span>
+<div class="viewcode-block" id="TestRMQDriverNoStart"><a class="viewcode-back" href="../../../../cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_RMQDriver.TestRMQDriverNoStart">[docs]</a><span class="k">class</span> <span class="nc">TestRMQDriverNoStart</span><span class="p">(</span><span class="n">TestRMQParam</span><span class="p">,</span> <span class="n">parent</span><span class="o">.</span><span class="n">TestDriverNoStart</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test class for RMQDriver class without start.</span>
 
 <span class="sd">    Attributes (in addition to parent class&#39;s):</span>
@@ -81,7 +81,7 @@
     <span class="k">pass</span></div>
 
 
-<div class="viewcode-block" id="TestRMQDriver"><a class="viewcode-back" href="../../../../autodoc/cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_RMQDriver.TestRMQDriver">[docs]</a><span class="k">class</span> <span class="nc">TestRMQDriver</span><span class="p">(</span><span class="n">TestRMQParam</span><span class="p">,</span> <span class="n">parent</span><span class="o">.</span><span class="n">TestDriver</span><span class="p">):</span>
+<div class="viewcode-block" id="TestRMQDriver"><a class="viewcode-back" href="../../../../cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_RMQDriver.TestRMQDriver">[docs]</a><span class="k">class</span> <span class="nc">TestRMQDriver</span><span class="p">(</span><span class="n">TestRMQParam</span><span class="p">,</span> <span class="n">parent</span><span class="o">.</span><span class="n">TestDriver</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test class for RMQDriver class.</span>
 
 <span class="sd">    Attributes (in addition to parent class&#39;s):</span>
@@ -89,12 +89,12 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="TestRMQDriver.teardown"><a class="viewcode-back" href="../../../../autodoc/cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_RMQDriver.TestRMQDriver.teardown">[docs]</a>    <span class="k">def</span> <span class="nf">teardown</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="TestRMQDriver.teardown"><a class="viewcode-back" href="../../../../cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_RMQDriver.TestRMQDriver.teardown">[docs]</a>    <span class="k">def</span> <span class="nf">teardown</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Make sure the queue is empty before closing the driver.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">purge_queue</span><span class="p">()</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">TestRMQDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">teardown</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="TestRMQDriver.declare_temp_queue"><a class="viewcode-back" href="../../../../autodoc/cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_RMQDriver.TestRMQDriver.declare_temp_queue">[docs]</a>    <span class="k">def</span> <span class="nf">declare_temp_queue</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="TestRMQDriver.declare_temp_queue"><a class="viewcode-back" href="../../../../cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_RMQDriver.TestRMQDriver.declare_temp_queue">[docs]</a>    <span class="k">def</span> <span class="nf">declare_temp_queue</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create a blocking connection, channel, and queue for testing.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_connection</span> <span class="o">=</span> <span class="n">pika</span><span class="o">.</span><span class="n">BlockingConnection</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">connection_parameters</span><span class="p">)</span>
@@ -129,7 +129,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">declare_temp_queue</span><span class="p">()</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_channel</span>
         
-<div class="viewcode-block" id="TestRMQDriver.temp_basic_get"><a class="viewcode-back" href="../../../../autodoc/cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_RMQDriver.TestRMQDriver.temp_basic_get">[docs]</a>    <span class="k">def</span> <span class="nf">temp_basic_get</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="TestRMQDriver.temp_basic_get"><a class="viewcode-back" href="../../../../cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_RMQDriver.TestRMQDriver.temp_basic_get">[docs]</a>    <span class="k">def</span> <span class="nf">temp_basic_get</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Do basic_get from the temporary queue.&quot;&quot;&quot;</span>
         <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">basic_get</span><span class="p">(</span><span class="n">queue</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">temp_queue</span><span class="p">)</span>
         <span class="n">tries</span> <span class="o">=</span> <span class="mi">5</span>
@@ -141,7 +141,7 @@
             <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Msg receive timed out.&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">out</span></div>
 
-<div class="viewcode-block" id="TestRMQDriver.temp_basic_pub"><a class="viewcode-back" href="../../../../autodoc/cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_RMQDriver.TestRMQDriver.temp_basic_pub">[docs]</a>    <span class="k">def</span> <span class="nf">temp_basic_pub</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">routing_key</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">properties</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="TestRMQDriver.temp_basic_pub"><a class="viewcode-back" href="../../../../cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_RMQDriver.TestRMQDriver.temp_basic_pub">[docs]</a>    <span class="k">def</span> <span class="nf">temp_basic_pub</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">routing_key</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">properties</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Do basic_publish tot he temporary queue.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">routing_key</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
             <span class="n">routing_key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">temp_queue</span>
@@ -150,11 +150,11 @@
                                    <span class="n">properties</span><span class="o">=</span><span class="n">properties</span><span class="p">,</span>
                                    <span class="n">body</span><span class="o">=</span><span class="n">msg</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="TestRMQDriver.test_purge"><a class="viewcode-back" href="../../../../autodoc/cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_RMQDriver.TestRMQDriver.test_purge">[docs]</a>    <span class="k">def</span> <span class="nf">test_purge</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="TestRMQDriver.test_purge"><a class="viewcode-back" href="../../../../cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_RMQDriver.TestRMQDriver.test_purge">[docs]</a>    <span class="k">def</span> <span class="nf">test_purge</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test purge of queue.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">purge_queue</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="TestRMQDriver.assert_after_terminate"><a class="viewcode-back" href="../../../../autodoc/cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_RMQDriver.TestRMQDriver.assert_after_terminate">[docs]</a>    <span class="k">def</span> <span class="nf">assert_after_terminate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="TestRMQDriver.assert_after_terminate"><a class="viewcode-back" href="../../../../cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_RMQDriver.TestRMQDriver.assert_after_terminate">[docs]</a>    <span class="k">def</span> <span class="nf">assert_after_terminate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Make sure the connection is closed.&quot;&quot;&quot;</span>
         <span class="n">nt</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">connection</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="n">nt</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">channel</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>

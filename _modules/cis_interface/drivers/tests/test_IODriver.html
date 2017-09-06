@@ -51,7 +51,7 @@
 <span class="kn">from</span> <span class="nn">cis_interface.dataio.AsciiTable</span> <span class="k">import</span> <span class="n">AsciiTable</span>
 
 
-<div class="viewcode-block" id="IOInfo"><a class="viewcode-back" href="../../../../autodoc/cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_IODriver.IOInfo">[docs]</a><span class="k">class</span> <span class="nc">IOInfo</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="IOInfo"><a class="viewcode-back" href="../../../../cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_IODriver.IOInfo">[docs]</a><span class="k">class</span> <span class="nc">IOInfo</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Simple class for useful IO attributes.</span>
 
 <span class="sd">    Attributes:</span>
@@ -133,7 +133,7 @@
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;str: Small test message for sending.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="s1">&#39;Test message&#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">maxMsgSize</span> <span class="o">*</span> <span class="s1">&#39;0&#39;</span>
 
-<div class="viewcode-block" id="IOInfo.write_table"><a class="viewcode-back" href="../../../../autodoc/cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_IODriver.IOInfo.write_table">[docs]</a>    <span class="k">def</span> <span class="nf">write_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="p">):</span>
+<div class="viewcode-block" id="IOInfo.write_table"><a class="viewcode-back" href="../../../../cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_IODriver.IOInfo.write_table">[docs]</a>    <span class="k">def</span> <span class="nf">write_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Write the table out to a file.</span>
 
 <span class="sd">        Args:</span>
@@ -144,7 +144,7 @@
         <span class="n">at</span> <span class="o">=</span> <span class="n">AsciiTable</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="n">format_str</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">fmt_str</span><span class="p">)</span>
         <span class="n">at</span><span class="o">.</span><span class="n">write_array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_array</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="IOInfo.write_pickle"><a class="viewcode-back" href="../../../../autodoc/cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_IODriver.IOInfo.write_pickle">[docs]</a>    <span class="k">def</span> <span class="nf">write_pickle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="p">):</span>
+<div class="viewcode-block" id="IOInfo.write_pickle"><a class="viewcode-back" href="../../../../cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_IODriver.IOInfo.write_pickle">[docs]</a>    <span class="k">def</span> <span class="nf">write_pickle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Write the pickled table out to a file.</span>
 
 <span class="sd">        Args:</span>
@@ -156,7 +156,7 @@
             <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_dict</span><span class="p">,</span> <span class="n">fd</span><span class="p">)</span></div></div>
 
             
-<div class="viewcode-block" id="TestIOParam"><a class="viewcode-back" href="../../../../autodoc/cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_IODriver.TestIOParam">[docs]</a><span class="k">class</span> <span class="nc">TestIOParam</span><span class="p">(</span><span class="n">parent</span><span class="o">.</span><span class="n">TestParam</span><span class="p">,</span> <span class="n">IOInfo</span><span class="p">):</span>
+<div class="viewcode-block" id="TestIOParam"><a class="viewcode-back" href="../../../../cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_IODriver.TestIOParam">[docs]</a><span class="k">class</span> <span class="nc">TestIOParam</span><span class="p">(</span><span class="n">parent</span><span class="o">.</span><span class="n">TestParam</span><span class="p">,</span> <span class="n">IOInfo</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test parameters for the IODriver class.</span>
 
 <span class="sd">    Attributes (in addition to parent class&#39;s):</span>
@@ -171,7 +171,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">attr_list</span> <span class="o">+=</span> <span class="p">[</span><span class="s1">&#39;state&#39;</span><span class="p">,</span> <span class="s1">&#39;numSent&#39;</span><span class="p">,</span> <span class="s1">&#39;numReceived&#39;</span><span class="p">,</span> <span class="s1">&#39;env&#39;</span><span class="p">,</span> <span class="s1">&#39;mq&#39;</span><span class="p">]</span></div>
 
     
-<div class="viewcode-block" id="TestIODriverNoStart"><a class="viewcode-back" href="../../../../autodoc/cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_IODriver.TestIODriverNoStart">[docs]</a><span class="k">class</span> <span class="nc">TestIODriverNoStart</span><span class="p">(</span><span class="n">TestIOParam</span><span class="p">,</span> <span class="n">parent</span><span class="o">.</span><span class="n">TestDriverNoStart</span><span class="p">):</span>
+<div class="viewcode-block" id="TestIODriverNoStart"><a class="viewcode-back" href="../../../../cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_IODriver.TestIODriverNoStart">[docs]</a><span class="k">class</span> <span class="nc">TestIODriverNoStart</span><span class="p">(</span><span class="n">TestIOParam</span><span class="p">,</span> <span class="n">parent</span><span class="o">.</span><span class="n">TestDriverNoStart</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test class for the IODriver class without start.</span>
 
 <span class="sd">    Attributes (in addition to parent class&#39;s):</span>
@@ -181,7 +181,7 @@
     <span class="k">pass</span></div>
 
 
-<div class="viewcode-block" id="TestIODriver"><a class="viewcode-back" href="../../../../autodoc/cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_IODriver.TestIODriver">[docs]</a><span class="k">class</span> <span class="nc">TestIODriver</span><span class="p">(</span><span class="n">TestIOParam</span><span class="p">,</span> <span class="n">parent</span><span class="o">.</span><span class="n">TestDriver</span><span class="p">):</span>
+<div class="viewcode-block" id="TestIODriver"><a class="viewcode-back" href="../../../../cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_IODriver.TestIODriver">[docs]</a><span class="k">class</span> <span class="nc">TestIODriver</span><span class="p">(</span><span class="n">TestIOParam</span><span class="p">,</span> <span class="n">parent</span><span class="o">.</span><span class="n">TestDriver</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test class for the IODriver class.</span>
 
 <span class="sd">    Attributes (in addition to parent class&#39;s):</span>
@@ -189,33 +189,33 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="TestIODriver.test_early_close"><a class="viewcode-back" href="../../../../autodoc/cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_IODriver.TestIODriver.test_early_close">[docs]</a>    <span class="k">def</span> <span class="nf">test_early_close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="TestIODriver.test_early_close"><a class="viewcode-back" href="../../../../cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_IODriver.TestIODriver.test_early_close">[docs]</a>    <span class="k">def</span> <span class="nf">test_early_close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test early deletion of message queue.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">close_queue</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="TestIODriver.test_send_recv"><a class="viewcode-back" href="../../../../autodoc/cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_IODriver.TestIODriver.test_send_recv">[docs]</a>    <span class="k">def</span> <span class="nf">test_send_recv</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="TestIODriver.test_send_recv"><a class="viewcode-back" href="../../../../cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_IODriver.TestIODriver.test_send_recv">[docs]</a>    <span class="k">def</span> <span class="nf">test_send_recv</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test sending/receiving small message.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">ipc_send</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">msg_short</span><span class="p">)</span>
         <span class="n">msg_recv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">ipc_recv</span><span class="p">()</span>
         <span class="n">nt</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="n">msg_recv</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">msg_short</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="TestIODriver.test_send_recv_nolimit"><a class="viewcode-back" href="../../../../autodoc/cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_IODriver.TestIODriver.test_send_recv_nolimit">[docs]</a>    <span class="k">def</span> <span class="nf">test_send_recv_nolimit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="TestIODriver.test_send_recv_nolimit"><a class="viewcode-back" href="../../../../cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_IODriver.TestIODriver.test_send_recv_nolimit">[docs]</a>    <span class="k">def</span> <span class="nf">test_send_recv_nolimit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test sending/receiving large message.&quot;&quot;&quot;</span>
         <span class="k">assert</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">msg_long</span><span class="p">)</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">maxMsgSize</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">ipc_send_nolimit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">msg_long</span><span class="p">)</span>
         <span class="n">msg_recv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">ipc_recv_nolimit</span><span class="p">()</span>
         <span class="n">nt</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="n">msg_recv</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">msg_long</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="TestIODriver.assert_before_stop"><a class="viewcode-back" href="../../../../autodoc/cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_IODriver.TestIODriver.assert_before_stop">[docs]</a>    <span class="k">def</span> <span class="nf">assert_before_stop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="TestIODriver.assert_before_stop"><a class="viewcode-back" href="../../../../cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_IODriver.TestIODriver.assert_before_stop">[docs]</a>    <span class="k">def</span> <span class="nf">assert_before_stop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Assertions to make before stopping the driver instance.&quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">TestIODriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">assert_before_stop</span><span class="p">()</span>
         <span class="k">assert</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">mq</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="TestIODriver.run_before_terminate"><a class="viewcode-back" href="../../../../autodoc/cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_IODriver.TestIODriver.run_before_terminate">[docs]</a>    <span class="k">def</span> <span class="nf">run_before_terminate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="TestIODriver.run_before_terminate"><a class="viewcode-back" href="../../../../cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_IODriver.TestIODriver.run_before_terminate">[docs]</a>    <span class="k">def</span> <span class="nf">run_before_terminate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Commands to run while the instance is running, before terminate.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">ipc_send</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">msg_short</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="TestIODriver.assert_after_terminate"><a class="viewcode-back" href="../../../../autodoc/cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_IODriver.TestIODriver.assert_after_terminate">[docs]</a>    <span class="k">def</span> <span class="nf">assert_after_terminate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="TestIODriver.assert_after_terminate"><a class="viewcode-back" href="../../../../cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_IODriver.TestIODriver.assert_after_terminate">[docs]</a>    <span class="k">def</span> <span class="nf">assert_after_terminate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Assertions to make after terminating the driver instance.&quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">TestIODriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">assert_after_terminate</span><span class="p">()</span>
         <span class="k">assert</span><span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">mq</span><span class="p">)</span></div></div>

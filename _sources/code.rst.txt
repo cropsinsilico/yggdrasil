@@ -1,2 +1,2 @@
-.. include:: autodoc/modules.rst
+.. include:: modules.rst
 

@@ -52,7 +52,7 @@
 <span class="n">DEBUG_SLEEPS</span> <span class="o">=</span> <span class="kc">True</span>
 
 
-<div class="viewcode-block" id="IODriver"><a class="viewcode-back" href="../../../autodoc/cis_interface.drivers.html#cis_interface.drivers.IODriver.IODriver">[docs]</a><span class="k">class</span> <span class="nc">IODriver</span><span class="p">(</span><span class="n">Driver</span><span class="p">):</span>
+<div class="viewcode-block" id="IODriver"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.IODriver.IODriver">[docs]</a><span class="k">class</span> <span class="nc">IODriver</span><span class="p">(</span><span class="n">Driver</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Base driver for any driver that requires access to a message queue.</span>
 
 <span class="sd">    Args:</span>
@@ -83,7 +83,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="p">[</span><span class="n">name</span> <span class="o">+</span> <span class="n">suffix</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mq</span><span class="o">.</span><span class="n">key</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;.env: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="p">)</span>
 
-<div class="viewcode-block" id="IODriver.printStatus"><a class="viewcode-back" href="../../../autodoc/cis_interface.drivers.html#cis_interface.drivers.IODriver.IODriver.printStatus">[docs]</a>    <span class="k">def</span> <span class="nf">printStatus</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">beg_msg</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">end_msg</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
+<div class="viewcode-block" id="IODriver.printStatus"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.IODriver.IODriver.printStatus">[docs]</a>    <span class="k">def</span> <span class="nf">printStatus</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">beg_msg</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">end_msg</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Print information on the status of the IODriver.</span>
 
 <span class="sd">        Arguments:</span>
@@ -101,7 +101,7 @@
                 <span class="n">msg</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="si">%-15s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mq</span><span class="o">.</span><span class="n">current_messages</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39; ready&#39;</span><span class="p">)</span>
         <span class="n">msg</span> <span class="o">+=</span> <span class="n">end_msg</span></div>
 
-<div class="viewcode-block" id="IODriver.recv_wait"><a class="viewcode-back" href="../../../autodoc/cis_interface.drivers.html#cis_interface.drivers.IODriver.IODriver.recv_wait">[docs]</a>    <span class="k">def</span> <span class="nf">recv_wait</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+<div class="viewcode-block" id="IODriver.recv_wait"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.IODriver.IODriver.recv_wait">[docs]</a>    <span class="k">def</span> <span class="nf">recv_wait</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Receive a message smaller than maxMsgSize. Unlike ipc_recv,</span>
 <span class="sd">        recv_wait will wait until there is a message to receive or the queue is</span>
 <span class="sd">        closed.</span>
@@ -125,7 +125,7 @@
             <span class="n">elapsed</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sleeptime</span>
         <span class="k">return</span> <span class="n">ret</span></div>
 
-<div class="viewcode-block" id="IODriver.recv_wait_nolimit"><a class="viewcode-back" href="../../../autodoc/cis_interface.drivers.html#cis_interface.drivers.IODriver.IODriver.recv_wait_nolimit">[docs]</a>    <span class="k">def</span> <span class="nf">recv_wait_nolimit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+<div class="viewcode-block" id="IODriver.recv_wait_nolimit"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.IODriver.IODriver.recv_wait_nolimit">[docs]</a>    <span class="k">def</span> <span class="nf">recv_wait_nolimit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Receive a message larger than maxMsgSize. Unlike ipc_recv,</span>
 <span class="sd">        recv_wait will wait until there is a message to receive or the queue is</span>
 <span class="sd">        closed.</span>
@@ -149,7 +149,7 @@
             <span class="n">elapsed</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sleeptime</span>
         <span class="k">return</span> <span class="n">ret</span></div>
 
-<div class="viewcode-block" id="IODriver.ipc_send"><a class="viewcode-back" href="../../../autodoc/cis_interface.drivers.html#cis_interface.drivers.IODriver.IODriver.ipc_send">[docs]</a>    <span class="k">def</span> <span class="nf">ipc_send</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+<div class="viewcode-block" id="IODriver.ipc_send"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.IODriver.IODriver.ipc_send">[docs]</a>    <span class="k">def</span> <span class="nf">ipc_send</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Send a message smaller than maxMsgSize.</span>
 
 <span class="sd">        Args:</span>
@@ -170,7 +170,7 @@
             <span class="k">except</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;.ipc_send(): exception&#39;</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="IODriver.ipc_recv"><a class="viewcode-back" href="../../../autodoc/cis_interface.drivers.html#cis_interface.drivers.IODriver.IODriver.ipc_recv">[docs]</a>    <span class="k">def</span> <span class="nf">ipc_recv</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="IODriver.ipc_recv"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.IODriver.IODriver.ipc_recv">[docs]</a>    <span class="k">def</span> <span class="nf">ipc_recv</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Receive a message smaller than maxMsgSize.</span>
 
 <span class="sd">        Returns:</span>
@@ -195,7 +195,7 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;.ipc_send(): exception mq&#39;</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">ret</span></div>
 
-<div class="viewcode-block" id="IODriver.ipc_send_nolimit"><a class="viewcode-back" href="../../../autodoc/cis_interface.drivers.html#cis_interface.drivers.IODriver.IODriver.ipc_send_nolimit">[docs]</a>    <span class="k">def</span> <span class="nf">ipc_send_nolimit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+<div class="viewcode-block" id="IODriver.ipc_send_nolimit"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.IODriver.IODriver.ipc_send_nolimit">[docs]</a>    <span class="k">def</span> <span class="nf">ipc_send_nolimit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Send a message larger than maxMsgSize in multiple parts.</span>
 
 <span class="sd">        Args:</span>
@@ -223,7 +223,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;.ipc_send_nolimit </span><span class="si">%d</span><span class="s1"> bytes completed&#39;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">=</span> <span class="s1">&#39;delivered&#39;</span></div>
 
-<div class="viewcode-block" id="IODriver.ipc_recv_nolimit"><a class="viewcode-back" href="../../../autodoc/cis_interface.drivers.html#cis_interface.drivers.IODriver.IODriver.ipc_recv_nolimit">[docs]</a>    <span class="k">def</span> <span class="nf">ipc_recv_nolimit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="IODriver.ipc_recv_nolimit"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.IODriver.IODriver.ipc_recv_nolimit">[docs]</a>    <span class="k">def</span> <span class="nf">ipc_recv_nolimit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Receive a message larger than maxMsgSize in multiple parts.</span>
 
 <span class="sd">        Returns:</span>
@@ -260,7 +260,7 @@
             <span class="k">else</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
                 <span class="k">return</span> <span class="mi">0</span>
 
-<div class="viewcode-block" id="IODriver.graceful_stop"><a class="viewcode-back" href="../../../autodoc/cis_interface.drivers.html#cis_interface.drivers.IODriver.IODriver.graceful_stop">[docs]</a>    <span class="k">def</span> <span class="nf">graceful_stop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tries</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="IODriver.graceful_stop"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.IODriver.IODriver.graceful_stop">[docs]</a>    <span class="k">def</span> <span class="nf">graceful_stop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tries</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Stop the IODriver, first draining the message queue.</span>
 
 <span class="sd">        Args:</span>
@@ -288,7 +288,7 @@
         <span class="nb">super</span><span class="p">(</span><span class="n">IODriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">graceful_stop</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;.graceful_stop(): done&#39;</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="IODriver.close_queue"><a class="viewcode-back" href="../../../autodoc/cis_interface.drivers.html#cis_interface.drivers.IODriver.IODriver.close_queue">[docs]</a>    <span class="k">def</span> <span class="nf">close_queue</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="IODriver.close_queue"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.IODriver.IODriver.close_queue">[docs]</a>    <span class="k">def</span> <span class="nf">close_queue</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Close the queue.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;:close_queue()&#39;</span><span class="p">)</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
@@ -301,14 +301,14 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;:close_queue(): exception&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;:close_queue(): done&#39;</span><span class="p">)</span></div>
         
-<div class="viewcode-block" id="IODriver.terminate"><a class="viewcode-back" href="../../../autodoc/cis_interface.drivers.html#cis_interface.drivers.IODriver.IODriver.terminate">[docs]</a>    <span class="k">def</span> <span class="nf">terminate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="IODriver.terminate"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.IODriver.IODriver.terminate">[docs]</a>    <span class="k">def</span> <span class="nf">terminate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Stop the IODriver, removing the queue.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;:terminate()&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">close_queue</span><span class="p">()</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">IODriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">terminate</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;:terminate(): done&#39;</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="IODriver.on_model_exit"><a class="viewcode-back" href="../../../autodoc/cis_interface.drivers.html#cis_interface.drivers.IODriver.IODriver.on_model_exit">[docs]</a>    <span class="k">def</span> <span class="nf">on_model_exit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="IODriver.on_model_exit"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.IODriver.IODriver.on_model_exit">[docs]</a>    <span class="k">def</span> <span class="nf">on_model_exit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Actions to perform when the associated model driver is finished.&quot;&quot;&quot;</span>
         <span class="k">pass</span></div></div>
 </pre></div>

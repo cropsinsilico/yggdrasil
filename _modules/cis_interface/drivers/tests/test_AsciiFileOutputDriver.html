@@ -46,7 +46,7 @@
 <span></span><span class="kn">import</span> <span class="nn">test_FileOutputDriver</span> <span class="k">as</span> <span class="nn">parent</span>
 
 
-<div class="viewcode-block" id="TestAsciiFileOutputParam"><a class="viewcode-back" href="../../../../autodoc/cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_AsciiFileOutputDriver.TestAsciiFileOutputParam">[docs]</a><span class="k">class</span> <span class="nc">TestAsciiFileOutputParam</span><span class="p">(</span><span class="n">parent</span><span class="o">.</span><span class="n">TestFileOutputParam</span><span class="p">):</span>
+<div class="viewcode-block" id="TestAsciiFileOutputParam"><a class="viewcode-back" href="../../../../cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_AsciiFileOutputDriver.TestAsciiFileOutputParam">[docs]</a><span class="k">class</span> <span class="nc">TestAsciiFileOutputParam</span><span class="p">(</span><span class="n">parent</span><span class="o">.</span><span class="n">TestFileOutputParam</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test parameters for AsciiFileOutputDriver.</span>
 
 <span class="sd">    Attributes (in addition to parent class&#39;s):</span>
@@ -61,7 +61,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">args</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">,</span> <span class="p">{},</span> <span class="s1">&#39;ignore&#39;</span><span class="p">]</span></div>
 
 
-<div class="viewcode-block" id="TestAsciiFileOutputDriverNoStart"><a class="viewcode-back" href="../../../../autodoc/cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_AsciiFileOutputDriver.TestAsciiFileOutputDriverNoStart">[docs]</a><span class="k">class</span> <span class="nc">TestAsciiFileOutputDriverNoStart</span><span class="p">(</span><span class="n">TestAsciiFileOutputParam</span><span class="p">,</span>
+<div class="viewcode-block" id="TestAsciiFileOutputDriverNoStart"><a class="viewcode-back" href="../../../../cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_AsciiFileOutputDriver.TestAsciiFileOutputDriverNoStart">[docs]</a><span class="k">class</span> <span class="nc">TestAsciiFileOutputDriverNoStart</span><span class="p">(</span><span class="n">TestAsciiFileOutputParam</span><span class="p">,</span>
                                        <span class="n">parent</span><span class="o">.</span><span class="n">TestFileOutputDriverNoStart</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test runner for AsciiFileOutputDriver without start.</span>
 
@@ -72,7 +72,7 @@
     <span class="k">pass</span></div>
 
 
-<div class="viewcode-block" id="TestAsciiFileOutputDriver"><a class="viewcode-back" href="../../../../autodoc/cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_AsciiFileOutputDriver.TestAsciiFileOutputDriver">[docs]</a><span class="k">class</span> <span class="nc">TestAsciiFileOutputDriver</span><span class="p">(</span><span class="n">TestAsciiFileOutputParam</span><span class="p">,</span>
+<div class="viewcode-block" id="TestAsciiFileOutputDriver"><a class="viewcode-back" href="../../../../cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_AsciiFileOutputDriver.TestAsciiFileOutputDriver">[docs]</a><span class="k">class</span> <span class="nc">TestAsciiFileOutputDriver</span><span class="p">(</span><span class="n">TestAsciiFileOutputParam</span><span class="p">,</span>
                                 <span class="n">parent</span><span class="o">.</span><span class="n">TestFileOutputDriver</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test runner for AsciiFileOutputDriver.</span>
 
@@ -81,7 +81,7 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="TestAsciiFileOutputDriver.setup"><a class="viewcode-back" href="../../../../autodoc/cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_AsciiFileOutputDriver.TestAsciiFileOutputDriver.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="TestAsciiFileOutputDriver.setup"><a class="viewcode-back" href="../../../../cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_AsciiFileOutputDriver.TestAsciiFileOutputDriver.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create a driver instance and start the driver.&quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">parent</span><span class="o">.</span><span class="n">TestFileOutputDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">setup</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">ipc_send</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fmt_str_line</span><span class="p">)</span>
@@ -89,7 +89,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">ipc_send</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">ipc_send</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">eof_msg</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="TestAsciiFileOutputDriver.assert_after_terminate"><a class="viewcode-back" href="../../../../autodoc/cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_AsciiFileOutputDriver.TestAsciiFileOutputDriver.assert_after_terminate">[docs]</a>    <span class="k">def</span> <span class="nf">assert_after_terminate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="TestAsciiFileOutputDriver.assert_after_terminate"><a class="viewcode-back" href="../../../../cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_AsciiFileOutputDriver.TestAsciiFileOutputDriver.assert_after_terminate">[docs]</a>    <span class="k">def</span> <span class="nf">assert_after_terminate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Assertions to make after stopping the driver instance.&quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">TestAsciiFileOutputDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">assert_after_terminate</span><span class="p">()</span>
         <span class="k">assert</span><span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">file</span><span class="o">.</span><span class="n">is_open</span><span class="p">)</span></div></div>

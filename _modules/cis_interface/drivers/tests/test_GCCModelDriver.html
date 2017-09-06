@@ -49,7 +49,7 @@
 <span class="kn">from</span> <span class="nn">cis_interface.drivers.GCCModelDriver</span> <span class="k">import</span> <span class="n">_incl_interface</span>
 
 
-<div class="viewcode-block" id="TestGCCModelParam"><a class="viewcode-back" href="../../../../autodoc/cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_GCCModelDriver.TestGCCModelParam">[docs]</a><span class="k">class</span> <span class="nc">TestGCCModelParam</span><span class="p">(</span><span class="n">parent</span><span class="o">.</span><span class="n">TestModelParam</span><span class="p">):</span>
+<div class="viewcode-block" id="TestGCCModelParam"><a class="viewcode-back" href="../../../../cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_GCCModelDriver.TestGCCModelParam">[docs]</a><span class="k">class</span> <span class="nc">TestGCCModelParam</span><span class="p">(</span><span class="n">parent</span><span class="o">.</span><span class="n">TestModelParam</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test parameters for GCCModelDriver.</span>
 
 <span class="sd">    Attributes (in addition to parent class&#39;s):</span>
@@ -64,7 +64,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">attr_list</span> <span class="o">+=</span> <span class="p">[</span><span class="s1">&#39;compiled&#39;</span><span class="p">]</span></div>
         
 
-<div class="viewcode-block" id="TestGCCModelDriverNoStart"><a class="viewcode-back" href="../../../../autodoc/cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_GCCModelDriver.TestGCCModelDriverNoStart">[docs]</a><span class="k">class</span> <span class="nc">TestGCCModelDriverNoStart</span><span class="p">(</span><span class="n">TestGCCModelParam</span><span class="p">,</span>
+<div class="viewcode-block" id="TestGCCModelDriverNoStart"><a class="viewcode-back" href="../../../../cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_GCCModelDriver.TestGCCModelDriverNoStart">[docs]</a><span class="k">class</span> <span class="nc">TestGCCModelDriverNoStart</span><span class="p">(</span><span class="n">TestGCCModelParam</span><span class="p">,</span>
                                 <span class="n">parent</span><span class="o">.</span><span class="n">TestModelDriverNoStart</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test runner for GCCModelDriver without start.</span>
 
@@ -75,7 +75,7 @@
     <span class="k">pass</span></div>
 
 
-<div class="viewcode-block" id="TestGCCModelDriver"><a class="viewcode-back" href="../../../../autodoc/cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_GCCModelDriver.TestGCCModelDriver">[docs]</a><span class="k">class</span> <span class="nc">TestGCCModelDriver</span><span class="p">(</span><span class="n">TestGCCModelParam</span><span class="p">,</span> <span class="n">parent</span><span class="o">.</span><span class="n">TestModelDriver</span><span class="p">):</span>
+<div class="viewcode-block" id="TestGCCModelDriver"><a class="viewcode-back" href="../../../../cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_GCCModelDriver.TestGCCModelDriver">[docs]</a><span class="k">class</span> <span class="nc">TestGCCModelDriver</span><span class="p">(</span><span class="n">TestGCCModelParam</span><span class="p">,</span> <span class="n">parent</span><span class="o">.</span><span class="n">TestModelDriver</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test runner for GCCModelDriver.</span>
 
 <span class="sd">    Attributes (in addition to parent class&#39;s):</span>
@@ -83,7 +83,7 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="TestGCCModelDriver.teardown"><a class="viewcode-back" href="../../../../autodoc/cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_GCCModelDriver.TestGCCModelDriver.teardown">[docs]</a>    <span class="k">def</span> <span class="nf">teardown</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="TestGCCModelDriver.teardown"><a class="viewcode-back" href="../../../../cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_GCCModelDriver.TestGCCModelDriver.teardown">[docs]</a>    <span class="k">def</span> <span class="nf">teardown</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Remove the instance, stoppping it.&quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">TestGCCModelDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">teardown</span><span class="p">()</span>
         <span class="n">fexec</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;.out&#39;</span>

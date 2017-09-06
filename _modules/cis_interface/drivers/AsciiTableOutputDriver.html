@@ -48,7 +48,7 @@
 <span class="kn">from</span> <span class="nn">cis_interface.dataio.AsciiTable</span> <span class="k">import</span> <span class="n">AsciiTable</span>
 
 
-<div class="viewcode-block" id="AsciiTableOutputDriver"><a class="viewcode-back" href="../../../autodoc/cis_interface.drivers.html#cis_interface.drivers.AsciiTableOutputDriver.AsciiTableOutputDriver">[docs]</a><span class="k">class</span> <span class="nc">AsciiTableOutputDriver</span><span class="p">(</span><span class="n">AsciiFileOutputDriver</span><span class="p">):</span>
+<div class="viewcode-block" id="AsciiTableOutputDriver"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.AsciiTableOutputDriver.AsciiTableOutputDriver">[docs]</a><span class="k">class</span> <span class="nc">AsciiTableOutputDriver</span><span class="p">(</span><span class="n">AsciiFileOutputDriver</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Class to handle output of received messages to an ASCII table.</span>
 
 <span class="sd">    Args:</span>
@@ -75,7 +75,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">file</span> <span class="o">=</span> <span class="n">AsciiTable</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">file_kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;(</span><span class="si">%s</span><span class="s1">): done with init&#39;</span><span class="p">,</span> <span class="n">args</span><span class="p">)</span>
 
-<div class="viewcode-block" id="AsciiTableOutputDriver.run"><a class="viewcode-back" href="../../../autodoc/cis_interface.drivers.html#cis_interface.drivers.AsciiTableOutputDriver.AsciiTableOutputDriver.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="AsciiTableOutputDriver.run"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.AsciiTableOutputDriver.AsciiTableOutputDriver.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Run the driver. The format string is received then output is written</span>
 <span class="sd">        to the file as it is received from the message queue until eof is</span>
 <span class="sd">        encountered or the file is closed.</span>

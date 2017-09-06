@@ -48,7 +48,7 @@
 <span class="kn">import</span> <span class="nn">test_FileInputDriver</span> <span class="k">as</span> <span class="nn">super_parent</span>
 
 
-<div class="viewcode-block" id="TestAsciiTableInputParam"><a class="viewcode-back" href="../../../../autodoc/cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_AsciiTableInputDriver.TestAsciiTableInputParam">[docs]</a><span class="k">class</span> <span class="nc">TestAsciiTableInputParam</span><span class="p">(</span><span class="n">parent</span><span class="o">.</span><span class="n">TestAsciiFileInputParam</span><span class="p">):</span>
+<div class="viewcode-block" id="TestAsciiTableInputParam"><a class="viewcode-back" href="../../../../cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_AsciiTableInputDriver.TestAsciiTableInputParam">[docs]</a><span class="k">class</span> <span class="nc">TestAsciiTableInputParam</span><span class="p">(</span><span class="n">parent</span><span class="o">.</span><span class="n">TestAsciiFileInputParam</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test parameters for AsciiTableInputDriver.</span>
 
 <span class="sd">    Attributes (in addition to parent class&#39;s):</span>
@@ -62,7 +62,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">attr_list</span> <span class="o">+=</span> <span class="p">[</span><span class="s1">&#39;file&#39;</span><span class="p">,</span> <span class="s1">&#39;as_array&#39;</span><span class="p">]</span></div>
 
         
-<div class="viewcode-block" id="TestAsciiTableInputDriverNoStart"><a class="viewcode-back" href="../../../../autodoc/cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_AsciiTableInputDriver.TestAsciiTableInputDriverNoStart">[docs]</a><span class="k">class</span> <span class="nc">TestAsciiTableInputDriverNoStart</span><span class="p">(</span><span class="n">TestAsciiTableInputParam</span><span class="p">,</span>
+<div class="viewcode-block" id="TestAsciiTableInputDriverNoStart"><a class="viewcode-back" href="../../../../cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_AsciiTableInputDriver.TestAsciiTableInputDriverNoStart">[docs]</a><span class="k">class</span> <span class="nc">TestAsciiTableInputDriverNoStart</span><span class="p">(</span><span class="n">TestAsciiTableInputParam</span><span class="p">,</span>
                                        <span class="n">parent</span><span class="o">.</span><span class="n">TestAsciiFileInputDriverNoStart</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test runner for AsciiTableInputDriver.</span>
 
@@ -73,7 +73,7 @@
     <span class="k">pass</span></div>
 
 
-<div class="viewcode-block" id="TestAsciiTableInputDriver"><a class="viewcode-back" href="../../../../autodoc/cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_AsciiTableInputDriver.TestAsciiTableInputDriver">[docs]</a><span class="k">class</span> <span class="nc">TestAsciiTableInputDriver</span><span class="p">(</span><span class="n">TestAsciiTableInputParam</span><span class="p">,</span>
+<div class="viewcode-block" id="TestAsciiTableInputDriver"><a class="viewcode-back" href="../../../../cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_AsciiTableInputDriver.TestAsciiTableInputDriver">[docs]</a><span class="k">class</span> <span class="nc">TestAsciiTableInputDriver</span><span class="p">(</span><span class="n">TestAsciiTableInputParam</span><span class="p">,</span>
                                 <span class="n">parent</span><span class="o">.</span><span class="n">TestAsciiFileInputDriver</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test runner for AsciiTableInputDriver.</span>
 
@@ -82,7 +82,7 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="TestAsciiTableInputDriver.assert_before_stop"><a class="viewcode-back" href="../../../../autodoc/cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_AsciiTableInputDriver.TestAsciiTableInputDriver.assert_before_stop">[docs]</a>    <span class="k">def</span> <span class="nf">assert_before_stop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="TestAsciiTableInputDriver.assert_before_stop"><a class="viewcode-back" href="../../../../cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_AsciiTableInputDriver.TestAsciiTableInputDriver.assert_before_stop">[docs]</a>    <span class="k">def</span> <span class="nf">assert_before_stop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Assertions to make before stopping the driver instance.&quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">super_parent</span><span class="o">.</span><span class="n">TestFileInputDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">assert_before_stop</span><span class="p">()</span>
         <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">n_msg</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
@@ -102,7 +102,7 @@
         <span class="n">nt</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_lines</span><span class="p">),</span> <span class="n">iline</span><span class="p">)</span></div></div>
 
         
-<div class="viewcode-block" id="TestAsciiTableInputDriver_Array"><a class="viewcode-back" href="../../../../autodoc/cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_AsciiTableInputDriver.TestAsciiTableInputDriver_Array">[docs]</a><span class="k">class</span> <span class="nc">TestAsciiTableInputDriver_Array</span><span class="p">(</span><span class="n">TestAsciiTableInputParam</span><span class="p">,</span>
+<div class="viewcode-block" id="TestAsciiTableInputDriver_Array"><a class="viewcode-back" href="../../../../cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_AsciiTableInputDriver.TestAsciiTableInputDriver_Array">[docs]</a><span class="k">class</span> <span class="nc">TestAsciiTableInputDriver_Array</span><span class="p">(</span><span class="n">TestAsciiTableInputParam</span><span class="p">,</span>
                                       <span class="n">parent</span><span class="o">.</span><span class="n">TestAsciiFileInputDriver</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test runner for AsciiTableInputDriver with array input.</span>
 
@@ -116,7 +116,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">args</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;filepath&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">filepath</span><span class="p">,</span>
                      <span class="s1">&#39;as_array&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
 
-<div class="viewcode-block" id="TestAsciiTableInputDriver_Array.assert_before_stop"><a class="viewcode-back" href="../../../../autodoc/cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_AsciiTableInputDriver.TestAsciiTableInputDriver_Array.assert_before_stop">[docs]</a>    <span class="k">def</span> <span class="nf">assert_before_stop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="TestAsciiTableInputDriver_Array.assert_before_stop"><a class="viewcode-back" href="../../../../cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_AsciiTableInputDriver.TestAsciiTableInputDriver_Array.assert_before_stop">[docs]</a>    <span class="k">def</span> <span class="nf">assert_before_stop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Assertions to make before stopping the driver instance.&quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">super_parent</span><span class="o">.</span><span class="n">TestFileInputDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">assert_before_stop</span><span class="p">()</span>
         <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">n_msg</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>

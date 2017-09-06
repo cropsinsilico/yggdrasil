@@ -52,7 +52,7 @@
     <span class="n">_new_client_msg</span><span class="p">,</span> <span class="n">_end_client_msg</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="TestRMQServerParam"><a class="viewcode-back" href="../../../../autodoc/cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_RMQServerDriver.TestRMQServerParam">[docs]</a><span class="k">class</span> <span class="nc">TestRMQServerParam</span><span class="p">(</span><span class="n">parent1</span><span class="o">.</span><span class="n">TestRMQParam</span><span class="p">,</span> <span class="n">IOInfo</span><span class="p">):</span>
+<div class="viewcode-block" id="TestRMQServerParam"><a class="viewcode-back" href="../../../../cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_RMQServerDriver.TestRMQServerParam">[docs]</a><span class="k">class</span> <span class="nc">TestRMQServerParam</span><span class="p">(</span><span class="n">parent1</span><span class="o">.</span><span class="n">TestRMQParam</span><span class="p">,</span> <span class="n">IOInfo</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test parameters for RMQServerDriver class.</span>
 
 <span class="sd">    Attributes (in addition to parent class&#39;s):</span>
@@ -67,7 +67,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">attr_list</span> <span class="o">+=</span> <span class="p">[</span><span class="s1">&#39;clients&#39;</span><span class="p">]</span></div>
         
 
-<div class="viewcode-block" id="TestRMQServerDriverNoStart"><a class="viewcode-back" href="../../../../autodoc/cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_RMQServerDriver.TestRMQServerDriverNoStart">[docs]</a><span class="k">class</span> <span class="nc">TestRMQServerDriverNoStart</span><span class="p">(</span><span class="n">TestRMQServerParam</span><span class="p">,</span>
+<div class="viewcode-block" id="TestRMQServerDriverNoStart"><a class="viewcode-back" href="../../../../cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_RMQServerDriver.TestRMQServerDriverNoStart">[docs]</a><span class="k">class</span> <span class="nc">TestRMQServerDriverNoStart</span><span class="p">(</span><span class="n">TestRMQServerParam</span><span class="p">,</span>
                                  <span class="n">parent1</span><span class="o">.</span><span class="n">TestRMQDriverNoStart</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test class for RMQServerDriver class without start.</span>
 
@@ -78,7 +78,7 @@
     <span class="k">pass</span></div>
 
 
-<div class="viewcode-block" id="TestRMQServerDriver"><a class="viewcode-back" href="../../../../autodoc/cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_RMQServerDriver.TestRMQServerDriver">[docs]</a><span class="k">class</span> <span class="nc">TestRMQServerDriver</span><span class="p">(</span><span class="n">TestRMQServerParam</span><span class="p">,</span> <span class="n">parent1</span><span class="o">.</span><span class="n">TestRMQDriver</span><span class="p">):</span>
+<div class="viewcode-block" id="TestRMQServerDriver"><a class="viewcode-back" href="../../../../cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_RMQServerDriver.TestRMQServerDriver">[docs]</a><span class="k">class</span> <span class="nc">TestRMQServerDriver</span><span class="p">(</span><span class="n">TestRMQServerParam</span><span class="p">,</span> <span class="n">parent1</span><span class="o">.</span><span class="n">TestRMQDriver</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test class for RMQServerDriver class.</span>
 
 <span class="sd">    Attributes (in addition to parent class&#39;s):</span>
@@ -86,7 +86,7 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="TestRMQServerDriver.test_client_count"><a class="viewcode-back" href="../../../../autodoc/cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_RMQServerDriver.TestRMQServerDriver.test_client_count">[docs]</a>    <span class="k">def</span> <span class="nf">test_client_count</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="TestRMQServerDriver.test_client_count"><a class="viewcode-back" href="../../../../cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_RMQServerDriver.TestRMQServerDriver.test_client_count">[docs]</a>    <span class="k">def</span> <span class="nf">test_client_count</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test to ensure client count is correct.&quot;&quot;&quot;</span>
         <span class="n">nt</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">n_clients</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
         <span class="c1"># Send new client message</span>
@@ -108,7 +108,7 @@
         <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
         <span class="n">nt</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">n_clients</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="TestRMQServerDriver.test_msg"><a class="viewcode-back" href="../../../../autodoc/cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_RMQServerDriver.TestRMQServerDriver.test_msg">[docs]</a>    <span class="k">def</span> <span class="nf">test_msg</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="TestRMQServerDriver.test_msg"><a class="viewcode-back" href="../../../../cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_RMQServerDriver.TestRMQServerDriver.test_msg">[docs]</a>    <span class="k">def</span> <span class="nf">test_msg</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test routing of a message through the IPC &amp; RMQ queues.&quot;&quot;&quot;</span>
         <span class="c1"># Send message to RMQ input &amp; receive from IPC input</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
