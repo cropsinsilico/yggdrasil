@@ -18,8 +18,8 @@ help:
 
 ghpages: html
 
-	cp -a $(BUILDDIR)/. $(REPODIR)/
-	cd $(BUILDDIR)/html
+	cp -a $(BUILDDIR)/html/. $(REPODIR)/html/
+	cd $(REPODIR)/html
 	git add .
 	git commit -m "rebuilt docs"
 	git push origin gh-pages
