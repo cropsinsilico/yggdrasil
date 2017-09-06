@@ -1,6 +1,0 @@
-model:
-  name: gcc_model
-  driver: GCCModelDriver
-  args:
-    - ../scripts/gcc_model.c
-      
