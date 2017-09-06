@@ -23,32 +23,32 @@ skip fields.
 Version: 1.3.3
 
 Releases:
-1.0
+  1.0
     2010-10-11
-    * Initial release
+      * Initial release
 
-1.1
+  1.1
     2010-10-13
-    * Changed regex from 'match' (only matches at beginning of line)
+      * Changed regex from 'match' (only matches at beginning of line)
         to 'search' (matches anywhere in line)
-    * Bugfix - ignore cast for skipped fields
+      * Bugfix - ignore cast for skipped fields
 
-1.2
+  1.2
     2013-05-30
-    * Added 'collapseWhitespace' flag (defaults to True) to take the search
-      string and replace all whitespace with regex string to match repeated
-      whitespace.  This enables better matching in log files where the data
-      has been formatted for easier reading.  These cases have variable
-      amounts of whitespace between the columns, depending on the number
-      of characters in the data itself.
+      * Added 'collapseWhitespace' flag (defaults to True) to take the search
+        string and replace all whitespace with regex string to match repeated
+        whitespace.  This enables better matching in log files where the data
+        has been formatted for easier reading.  These cases have variable
+        amounts of whitespace between the columns, depending on the number
+        of characters in the data itself.
       
-1.3
+  1.3
     2016-01-18
-    * Add 'extractdata' function.
+      * Add 'extractdata' function.
     
-1.3.1
+  1.3.1
     2016-06-23
-    * Release to PyPi, now including README.md
+      * Release to PyPi, now including README.md
 """
 import re
 import sys

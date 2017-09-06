@@ -81,13 +81,15 @@ class MatlabModelDriver(ModelDriver):
         name (str): Driver name.
         args (str or list): Argument(s) for running the model in matlab.
             Generally, this should be the full path to a Matlab script.
-        \*\*kwargs: Additional keyword arguments are passed to parent class's
+        **kwargs: Additional keyword arguments are passed to parent class's
             __init__ method.
 
-    Attributes (in additon to parent class's):
+    Attributes:
         started_matlab (bool): True if the driver had to start a new matlab
             engine. False otherwise.
+        screen_session (str): Screen session that Matlab was started in.
         mlengine (object): Matlab engine used to run script.
+        mlsession (str): Name of the Matlab session that was started.
 
     """
 
@@ -95,8 +97,8 @@ class MatlabModelDriver(ModelDriver):
         super(MatlabModelDriver, self).__init__(name, args, **kwargs)
 
         # Connect to matlab, start if not running
-        self.screen_session = None
         self.started_matlab = False
+        self.screen_session = None
         self.mlengine = None
         self.mlsession = None
         if len(matlab.engine.find_matlab()) == 0:

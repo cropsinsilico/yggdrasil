@@ -27,7 +27,7 @@ class RMQDriver(Driver):
             only be used by this driver. Defaults to False. If a queue
             name is not provided, it is assumed exclusive.
 
-    Attributes (in addition to the parent class's):
+    Attributes:
         user (str): RabbitMQ server username.
         server (str): RabbitMQ server.
         passwd (str): RabbitMQ server password.

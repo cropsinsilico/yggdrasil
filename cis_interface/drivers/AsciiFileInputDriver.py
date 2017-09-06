@@ -14,10 +14,9 @@ class AsciiFileInputDriver(FileInputDriver):
             to be passed to the created AsciiFile object.
         skip_AsciiFile (bool, optional): If True, the AsciiFile instance is not
             created. Defaults to False.
-        \*\*kwargs: Additional keyword arguments are passed to parent class's
-            __init__ method.
+        **kwargs: Additional keyword arguments are passed to parent class.
 
-    Attributes (in additon to parent class's):
+    Attributes:
         file_kwargs (dict): Arguments used to create AsciiFile instance.
         file (:class:`AsciiFile.AsciiFile`): Associated special class for ASCII
             file.
