@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Model Integration and Communications Architecture &#8212; cis_interface 0.0.0 documentation</title>
+    <title>Overview &#8212; cis_interface 0.0.0 documentation</title>
     
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -44,235 +44,28 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="model-integration-and-communications-architecture">
-<h1>Model Integration and Communications Architecture<a class="headerlink" href="#model-integration-and-communications-architecture" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="overview">
-<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
-<p>The CiS model system provides integration and communications support for
-model providers. Modelers add simple communications interfaces within
-their model code, and provide a simple declarative specification that
-informs the system of the names and types of inputs and outputs of the
-model and the commands required to run the model.</p>
-<p>The system uses the specification to configure the communications
-channels and bind them into the model. The complexity of the particular
-communications system is managed by a model driver that performns
-communication setup, binds the communications to a simple interface
-within the model, and manages the model&#8217;s exection. The complexities of
-model registration and discovery, as well as the complexities of setup
-and management of the communications system are handled by the model
-driver under direction of the model specification, freeing the model
-programmer from implementing communications protocols of any particular
-messaging infrastructure. The model programmer is provided with a very
-simple and easy to use abstract send/receive message interface using
-basic IPC mechanisms available in that binds in virtually every language
-and platform.</p>
-<p>The model communications interface consists of 2 pairs of very simple
-functions - one pair to create channels and one pair to accomplish data
-tranfer. Each pair represents a read-side and a write-side.</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">psi_input</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>  <span class="o">-</span> <span class="n">create</span> <span class="n">a</span> <span class="n">named</span> <span class="nb">input</span> <span class="n">channel</span>
-<span class="n">psi_output</span><span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="o">-</span> <span class="n">create</span> <span class="n">a</span> <span class="n">named</span> <span class="n">output</span> <span class="n">channel</span>
-
-<span class="n">psi_send</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>   <span class="o">-</span> <span class="n">send</span> <span class="n">a</span> <span class="n">message</span> <span class="n">through</span> <span class="n">the</span> <span class="n">managed</span> <span class="n">channel</span>
-<span class="n">data</span> <span class="o">=</span> <span class="n">psi_recv</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>  <span class="o">-</span> <span class="n">receive</span> <span class="n">message</span> <span class="kn">from</span> <span class="nn">channel</span> <span class="o">-</span> <span class="n">block</span> <span class="k">if</span> <span class="n">empty</span> <span class="n">channel</span>
-</pre></div>
-</div>
-<p>C-style is shown, but as these interfaces are thin wrappers around
-System V IPC message queues, equivalent thin-wrappers are implemented
-easily in almost any language. Models may create and use as many
-channels as necessary, depending on the number of interfaces that they
-require.</p>
-<p>The only other model requirement is to provide a YAML specification file
-that declares the channels that the model uses, and the system command
-required to start the model executing.</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">model</span><span class="p">:</span>
-  <span class="n">name</span><span class="p">:</span> <span class="n">hellopython</span>
-  <span class="n">driver</span><span class="p">:</span> <span class="n">ModelDriver</span>
-  <span class="n">args</span><span class="p">:</span> <span class="p">[</span> <span class="s2">&quot;python&quot;</span><span class="p">,</span> <span class="s2">&quot;hellopython.py&quot;</span> <span class="p">]</span>
-
-  <span class="n">inputs</span><span class="p">:</span>
-    <span class="o">-</span> <span class="n">name</span><span class="p">:</span> <span class="n">inputFile</span>
-      <span class="n">driver</span><span class="p">:</span> <span class="n">FileInputDriver</span>
-      <span class="n">args</span><span class="p">:</span> <span class="n">inputdata</span><span class="o">/</span><span class="nb">input</span><span class="o">.</span><span class="n">txt</span>
-      <span class="n">onexit</span><span class="p">:</span> <span class="n">delete</span>    <span class="c1"># delete the queue when the model exits</span>
-    <span class="o">-</span> <span class="n">name</span><span class="p">:</span> <span class="n">fooInputChannel</span>
-      <span class="n">driver</span><span class="p">:</span> <span class="n">RMQInputDriver</span>
-      <span class="n">args</span><span class="p">:</span> <span class="n">fooqueue</span>
-      <span class="n">onexit</span><span class="p">:</span> <span class="n">delete</span>    <span class="c1"># delete the queue when the model exits</span>
-
-  <span class="n">outputs</span><span class="p">:</span>
-    <span class="o">-</span> <span class="n">name</span><span class="p">:</span> <span class="n">fooOutput</span>
-      <span class="n">driver</span><span class="p">:</span> <span class="n">RMQOutputDriver</span>
-</pre></div>
-</div>
-<p>This example tells the system to run your model as if you typed &#8220;python
-hellopython.py&#8221; and to connect the file inputdata/input.txt to the
-psi_input named &#8216;inputFile&#8217; in your model, so when you recv() on it,
-you&#8217;ll get the file contents. Likewise when you send(data_to_send) to
-the channel you made in your code with psi_output(&#8216;fooOutput&#8217;) the data
-will go to the message queue names FooOutput.</p>
-<p>You may have multiple inputs and multiple outputs as you need. If you
-send to a RMQOutput named &#8216;fred&#8217; your another model can use fred as a
-RMQInput to read from and get your messages. By keeping multiple yml
-files around with different inputs and outputs but the same model stanza
-you can test with different data inputs and outputs conveniently without
-changing the model code.</p>
-<p>The finel part is the model wrapper, PsiRun.py - to which you pass your
-yml file. The model wrapper reads the specification, arranges for your
-inputs and outputs to come and go as you&#8217;ve specified, and then calls
-your model with the arguments as specified in the model stanza. The
-model runs, using the send and recv calls as needed, and when the model
-exits, the communications get cleaned up bu the wrapper. The exmaple
-hellopython.py under examples is run like this (in examples/python):</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="o">../../</span><span class="n">interface</span><span class="o">/</span><span class="n">PsiRun</span><span class="o">.</span><span class="n">py</span> <span class="n">hellopython</span><span class="o">.</span><span class="n">yml</span>
-</pre></div>
-</div>
-<p>The code in hellopython.py uses the channels:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">inf</span> <span class="o">=</span> <span class="n">PsiInput</span><span class="p">(</span><span class="s1">&#39;infile&#39;</span><span class="p">)</span>
-<span class="n">outf</span> <span class="o">=</span> <span class="n">PsiOutput</span><span class="p">(</span><span class="s1">&#39;outfile&#39;</span><span class="p">)</span>
-<span class="n">inq</span> <span class="o">=</span> <span class="n">PsiInput</span><span class="p">(</span><span class="s1">&#39;helloQueue&#39;</span><span class="p">)</span>
-<span class="n">outq</span> <span class="o">=</span> <span class="n">PsiOutput</span><span class="p">(</span><span class="s1">&#39;helloQueue&#39;</span><span class="p">)</span>
-
-<span class="n">buf</span> <span class="o">=</span> <span class="n">inf</span><span class="o">.</span><span class="n">recv</span><span class="p">()</span>
-<span class="n">outq</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">buf</span><span class="p">)</span>
-<span class="n">buf</span> <span class="o">=</span> <span class="n">inq</span><span class="o">.</span><span class="n">recv</span><span class="p">()</span>
-<span class="n">outf</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">buf</span><span class="p">)</span>
-</pre></div>
-</div>
-<p>The yaml file says to run the model, and connects the inputs and
-outputs:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">model</span><span class="p">:</span>
-  <span class="n">name</span><span class="p">:</span> <span class="n">hellopython</span>
-  <span class="n">driver</span><span class="p">:</span> <span class="n">ModelDriver</span>
-  <span class="n">args</span><span class="p">:</span> <span class="p">[</span> <span class="s2">&quot;python&quot;</span><span class="p">,</span> <span class="s2">&quot;hellopython.py&quot;</span> <span class="p">]</span>
-
-  <span class="n">inputs</span><span class="p">:</span>
-    <span class="o">-</span> <span class="n">name</span><span class="p">:</span> <span class="n">infile</span>
-      <span class="n">driver</span><span class="p">:</span> <span class="n">FileInputDriver</span>
-      <span class="n">filename</span><span class="p">:</span> <span class="nb">input</span><span class="o">.</span><span class="n">txt</span>
-    <span class="o">-</span> <span class="n">name</span><span class="p">:</span> <span class="n">helloQueue</span>
-      <span class="n">driver</span><span class="p">:</span> <span class="n">RMQInputDriver</span>
-
-  <span class="n">outputs</span><span class="p">:</span>
-    <span class="o">-</span> <span class="n">name</span><span class="p">:</span> <span class="n">helloQueue</span>
-      <span class="n">driver</span><span class="p">:</span> <span class="n">RMQOutputDriver</span>
-    <span class="o">-</span> <span class="n">name</span><span class="p">:</span> <span class="n">outFile</span>
-      <span class="n">driver</span><span class="p">:</span> <span class="n">FileOutputDriver</span>
-      <span class="n">filename</span><span class="p">:</span> <span class="n">output</span><span class="o">.</span><span class="n">txt</span>
-</pre></div>
-</div>
-</div>
-<div class="section" id="installation-notes">
-<h2>Installation notes<a class="headerlink" href="#installation-notes" title="Permalink to this headline">¶</a></h2>
-<ul class="simple">
-<li>Matlab</li>
-<li>Matlab uses the python interface directly</li>
-<li>Remove the matlab crypto and ssl libraries and install the python
-engine sudo -s rm -f
-./R2015b/toolbox/compiler_sdk/mps_clients/c/glnxa64/lib/libcrypto.so.1
-rm -f
-./R2015b/toolbox/compiler_sdk/mps_clients/c/glnxa64/lib/libcrypto.so
-rm -f
-./R2015b/toolbox/compiler_sdk/mps_clients/c/glnxa64/lib/libcrypto.so.1.0.0
-rm -f ./R2015b/bin/glnxa64/libcrypto.so.1 rm -f
-./R2015b/bin/glnxa64/libcrypto.so.1.0.0 rm -f
-./R2015b/toolbox/compiler_sdk/mps_clients/c/glnxa64/lib/libssl.so.1
-rm -f
-./R2015b/toolbox/compiler_sdk/mps_clients/c/glnxa64/lib/libssl.so.1.0.0
-rm -f
-./R2015b/toolbox/compiler_sdk/mps_clients/c/glnxa64/lib/libssl.so
-rm -f
-./R2015b/sys/jxbrowser/glnxa64/xulrunner/xulrunner-linux-64/libssl3.so
-rm -f ./R2015b/bin/glnxa64/libssl.so.1 rm -f
-./R2015b/bin/glnxa64/libssl.so.1.0.0 cd
-/usr/local/MATLAB/R2015b/extern/engines/python python setup.py</li>
-</ul>
-</div>
-<div class="section" id="contents">
-<h2>Contents<a class="headerlink" href="#contents" title="Permalink to this headline">¶</a></h2>
-<ul class="simple">
-<li><strong>build</strong> - model build help and container builders</li>
-<li>docker - build containers (in progress)</li>
-<li><strong>edge-example</strong> - full example in python, matlab, C(++)</li>
-<li>models - models and specifications</li>
-<li>app</li>
-<li><strong>lib</strong> - Common services and drivers</li>
-<li>drivers - inputs, outputs, messaging, model-wrapper</li>
-<li>yml - yaml specification support</li>
-<li>controller - cli PSi system setup/run</li>
-</ul>
-</div>
-<div class="section" id="functional-architecture">
-<h2>Functional Architecture<a class="headerlink" href="#functional-architecture" title="Permalink to this headline">¶</a></h2>
-<ul class="simple">
-<li>Models</li>
-<li>Provide callable functions (ml, c, python)<ul>
-<li>Function(s) take an input, returns an output</li>
-<li>A function to set optional parameters</li>
-</ul>
-</li>
-<li>Provide a specification - yaml file<ul>
-<li>Describes the model, inputs, outputs, function names, files to
-use, filenames to store output</li>
-</ul>
-</li>
-<li>Driver</li>
-<li>A driver is a &#8216;wrapper&#8217; or adapter that encapsulates other objects or
-functions, perhaps in other languages or platforms, into a callable
-python object - for example the MatlabCaller encapsulates the Matlab
-runtime and callable function in a clean python object.</li>
-<li>Controller - A python cli program that runs and feeds the models</li>
-<li>Reads the specifications</li>
-<li>Setup and connect the queues</li>
-<li>Setup the models inside model drivers</li>
-<li>Setup the input and output drivers</li>
-<li>Sets all drivers to running<ul>
-<li>Input drivers send data into queues</li>
-<li>Model drivers receive inputs, call model processing functions,
-send outputs to downstream queue drivers and/or output drivers</li>
-</ul>
-</li>
-</ul>
-</div>
-<div class="section" id="advantages">
-<h2>Advantages<a class="headerlink" href="#advantages" title="Permalink to this headline">¶</a></h2>
-<ul class="simple">
-<li>The demands on model providers is greatly simplified</li>
-<li>Model contains only domain-specific model code - focused</li>
-<li>No coding based on unfamilar techniques, languages, etc.<ul>
-<li>System code, protocols, services, and languages outside of a
-modelers area of expertise</li>
-</ul>
-</li>
-<li>The specification is much simpler to create and maintain than code</li>
-<li>Declare what the model wants, take inputs, produce outputs and let
-the system do the rest</li>
-<li>Single system modules and drivers are easier to maintain and evolve</li>
-<li>Messaging, data-handling, and system run-time facilities become
-shared and isolated, bounded in their impact</li>
-<li>Easier to understand, easier to maintain<ul>
-<li>Fixing a shared driver is preferrable to system code embedded in
-multiple models</li>
-</ul>
-</li>
-</ul>
-</div>
-<div class="section" id="development-notes-installation-and-test-code-fragments">
-<h2>Development Notes: Installation and test code fragments<a class="headerlink" href="#development-notes-installation-and-test-code-fragments" title="Permalink to this headline">¶</a></h2>
-<p>Python to matlabs setup: cd
-/usr/local/MATLAB/R2015b/extern/engines/python sudo python setup.py
-install.</p>
-<div class="section" id="python-protocols-matlab">
-<h3>Python protocols Matlab<a class="headerlink" href="#python-protocols-matlab" title="Permalink to this headline">¶</a></h3>
-<p>from psimsg import * import matlab.engine eng =
-matlab.engine.connect_matlab()</p>
-</div>
-<div class="section" id="matlab-to-python">
-<h3>Matlab to Python<a class="headerlink" href="#matlab-to-python" title="Permalink to this headline">¶</a></h3>
-<p>Matlab only seems limited to storing basic data (ints/floats/arrays),
-unable to receive objects from python for storage/calling P =
-py.sys.path; append(P, pwd); import psimsg.*</p>
-</div>
-</div>
+  <div class="section" id="overview">
+<h1>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h1>
+<p>The CiS framework provides support for combining scientific models
+written in different programming languages. To combine two models,
+modelers add simple communications interfaces to the model code and
+provide simple declarative specification files that identfy the models
+that should be run and the inputs and outputs those models expect.</p>
+<p>The system uses the specification file to configure the communications
+channels and expose them to the models. The complexity of the particular
+communications system is managed by the framework which performns
+communication setup, binds the communications to simple interfaces
+within the models, and manages execution of the models. The complexities
+of model registration and discovery, as well as the complexities of
+setup and management of the communications system are handled
+under-the-hood by the framework under direction of the model
+specification, freeing the domain scientist from implementing
+communications protocols or translating models to the same programming
+language.</p>
+<p>Please refer to the package
+<a class="reference external" href="https://cropsinsilico.github.io/cis_interface/">documentation</a> for
+additional information about the package and directions for installing
+it.</p>
 </div>
 
 
@@ -280,24 +73,7 @@ py.sys.path; append(P, pwd); import psimsg.*</p>
         </div>
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-  <h3><a href="index.html">Table Of Contents</a></h3>
-  <ul>
-<li><a class="reference internal" href="#">Model Integration and Communications Architecture</a><ul>
-<li><a class="reference internal" href="#overview">Overview</a></li>
-<li><a class="reference internal" href="#installation-notes">Installation notes</a></li>
-<li><a class="reference internal" href="#contents">Contents</a></li>
-<li><a class="reference internal" href="#functional-architecture">Functional Architecture</a></li>
-<li><a class="reference internal" href="#advantages">Advantages</a></li>
-<li><a class="reference internal" href="#development-notes-installation-and-test-code-fragments">Development Notes: Installation and test code fragments</a><ul>
-<li><a class="reference internal" href="#python-protocols-matlab">Python protocols Matlab</a></li>
-<li><a class="reference internal" href="#matlab-to-python">Matlab to Python</a></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-<div class="relations">
+        <div class="sphinxsidebarwrapper"><div class="relations">
 <h3>Related Topics</h3>
 <ul>
   <li><a href="index.html">Documentation overview</a><ul>
