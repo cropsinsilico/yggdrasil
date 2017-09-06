@@ -1,0 +1,161 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>cis_interface.command_line &#8212; cis_interface 0.0.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for cis_interface.command_line</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/python</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">from</span> <span class="nn">logging</span> <span class="k">import</span> <span class="n">debug</span>
+<span class="kn">import</span> <span class="nn">signal</span>
+<span class="kn">import</span> <span class="nn">traceback</span>
+<span class="kn">from</span> <span class="nn">cis_interface</span> <span class="k">import</span> <span class="n">runner</span>
+
+
+<span class="n">cisRunner</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="n">INTERRUPT_TIME</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">COLOR_TRACE</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\033</span><span class="s1">[30;43;22m&#39;</span>
+<span class="n">COLOR_NORMAL</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\033</span><span class="s1">[0m&#39;</span>
+
+
+<span class="c1"># pretty pprint</span>
+<div class="viewcode-block" id="pprint"><a class="viewcode-back" href="../../cis_interface.html#cis_interface.command_line.pprint">[docs]</a><span class="k">def</span> <span class="nf">pprint</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">):</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">args</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">COLOR_TRACE</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="n">COLOR_NORMAL</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">s</span><span class="p">))</span></div>
+
+    
+<div class="viewcode-block" id="signal_handler"><a class="viewcode-back" href="../../cis_interface.html#cis_interface.command_line.signal_handler">[docs]</a><span class="k">def</span> <span class="nf">signal_handler</span><span class="p">(</span><span class="n">sigCaught</span><span class="p">,</span> <span class="n">frame</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
+    <span class="k">global</span> <span class="n">INTERRUPT_TIME</span><span class="p">,</span> <span class="n">cisRunner</span>
+    <span class="n">debug</span><span class="p">(</span><span class="s1">&#39;CisRunner interrupted with signal </span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">sigCaught</span><span class="p">)</span>
+    <span class="n">now</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+    <span class="n">elapsed</span> <span class="o">=</span> <span class="n">now</span> <span class="o">-</span> <span class="n">INTERRUPT_TIME</span>
+    <span class="n">debug</span><span class="p">(</span><span class="s1">&#39;CisRunner.handler: elapsed since last interrupt: </span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">elapsed</span><span class="p">)</span>
+    <span class="n">INTERRUPT_TIME</span> <span class="o">=</span> <span class="n">now</span>
+    <span class="k">if</span> <span class="n">elapsed</span> <span class="o">&lt;</span> <span class="mi">5</span><span class="p">:</span>
+        <span class="n">pprint</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)</span>
+        <span class="n">pprint</span><span class="p">(</span><span class="s1">&#39;*********************************************************&#39;</span><span class="p">)</span>
+        <span class="n">pprint</span><span class="p">(</span><span class="s1">&#39;*  Interrupted twice within 5 seconds:  shutting down   *&#39;</span><span class="p">)</span>
+        <span class="n">pprint</span><span class="p">(</span><span class="s1">&#39;*********************************************************&#39;</span><span class="p">)</span>
+        <span class="c1"># signal.siginterrupt(signal.SIGTERM, True)</span>
+        <span class="c1"># signal.siginterrupt(signal.SIGINT, True)</span>
+        <span class="n">debug</span><span class="p">(</span><span class="s2">&quot;CisRunner.closing all channels&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">cisRunner</span><span class="p">:</span>
+            <span class="n">cisRunner</span><span class="o">.</span><span class="n">terminate</span><span class="p">()</span>
+        <span class="k">return</span> <span class="mi">1</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">pprint</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="n">pprint</span><span class="p">(</span><span class="s1">&#39;*********************************************************&#39;</span><span class="p">)</span>
+        <span class="n">pprint</span><span class="p">(</span><span class="s1">&#39;*  Interrupted: Displaying channel summary              *&#39;</span><span class="p">)</span>
+        <span class="n">pprint</span><span class="p">(</span><span class="s1">&#39;*  interrupt again (within 5 seconds) to exit           *&#39;</span><span class="p">)</span>
+        <span class="n">pprint</span><span class="p">(</span><span class="s1">&#39;*********************************************************&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">cisRunner</span><span class="p">:</span>
+            <span class="n">cisRunner</span><span class="o">.</span><span class="n">printStatus</span><span class="p">()</span>
+        <span class="n">pprint</span><span class="p">(</span><span class="s1">&#39;*********************************************************&#39;</span><span class="p">)</span>
+    <span class="n">debug</span><span class="p">(</span><span class="s1">&#39;CisRunner handler(</span><span class="si">%d</span><span class="s1">) returns&#39;</span><span class="p">,</span> <span class="n">sigCaught</span><span class="p">)</span>
+    <span class="k">return</span> <span class="mi">0</span></div>
+
+
+<div class="viewcode-block" id="cisrun"><a class="viewcode-back" href="../../cis_interface.html#cis_interface.command_line.cisrun">[docs]</a><span class="k">def</span> <span class="nf">cisrun</span><span class="p">():</span>
+    <span class="k">global</span> <span class="n">cisRunner</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">signal</span><span class="o">.</span><span class="n">signal</span><span class="p">(</span><span class="n">signal</span><span class="o">.</span><span class="n">SIGTERM</span><span class="p">,</span> <span class="n">signal_handler</span><span class="p">)</span>
+        <span class="n">signal</span><span class="o">.</span><span class="n">signal</span><span class="p">(</span><span class="n">signal</span><span class="o">.</span><span class="n">SIGINT</span><span class="p">,</span> <span class="n">signal_handler</span><span class="p">)</span>
+        <span class="n">signal</span><span class="o">.</span><span class="n">siginterrupt</span><span class="p">(</span><span class="n">signal</span><span class="o">.</span><span class="n">SIGTERM</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+        <span class="n">signal</span><span class="o">.</span><span class="n">siginterrupt</span><span class="p">(</span><span class="n">signal</span><span class="o">.</span><span class="n">SIGINT</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+        <span class="n">prog</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">models</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+        <span class="n">cisRunner</span> <span class="o">=</span> <span class="n">runner</span><span class="o">.</span><span class="n">get_runner</span><span class="p">(</span><span class="n">models</span><span class="p">,</span> <span class="n">cis_debug_prefix</span><span class="o">=</span><span class="n">prog</span><span class="p">)</span>
+        <span class="n">cisRunner</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+        <span class="n">debug</span><span class="p">(</span><span class="s2">&quot;cisRunner returns, exiting&quot;</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
+        <span class="n">pprint</span><span class="p">(</span><span class="s2">&quot;cisrun: exception: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="n">ex</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">())</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span></div>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">cisrun</span><span class="p">()</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Meagan Lang, David Raila.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.6</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

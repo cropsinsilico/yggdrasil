@@ -22,7 +22,12 @@ ghpages: html
 	cd $(REPODIR)/html
 	git add .
 	git commit -m "rebuilt docs"
-	# git push origin gh-pages
+	git push origin gh-pages
+
+.PHONY: autodoc
+autodoc:
+	sphinx-apidoc -f -o $(SOURCEDIR)/ ../cis_interface
+	make html
 
 # Catch-all target: route all unknown targets to Sphinx using the new
 # "make mode" option.  $(O) is meant as a shortcut for $(SPHINXOPTS).

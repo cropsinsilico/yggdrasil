@@ -1,0 +1,462 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>cis_interface.runner &#8212; cis_interface 0.0.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for cis_interface.runner</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;This module provides tools for running models using cis_interface.&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">importlib</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">from</span> <span class="nn">logging</span> <span class="k">import</span> <span class="n">debug</span><span class="p">,</span> <span class="n">info</span><span class="p">,</span> <span class="n">error</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">yaml</span>
+<span class="kn">import</span> <span class="nn">pystache</span>
+<span class="kn">from</span> <span class="nn">pprint</span> <span class="k">import</span> <span class="n">pformat</span>
+<span class="kn">from</span> <span class="nn">itertools</span> <span class="k">import</span> <span class="n">chain</span>
+<span class="kn">import</span> <span class="nn">socket</span>
+<span class="kn">from</span> <span class="nn">cis_interface.backwards</span> <span class="k">import</span> <span class="n">sio</span>
+
+
+<span class="n">COLOR_TRACE</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\033</span><span class="s1">[30;43;22m&#39;</span>
+<span class="n">COLOR_NORMAL</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\033</span><span class="s1">[0m&#39;</span>
+
+
+<div class="viewcode-block" id="setup_cis_logging"><a class="viewcode-back" href="../../cis_interface.html#cis_interface.runner.setup_cis_logging">[docs]</a><span class="k">def</span> <span class="nf">setup_cis_logging</span><span class="p">(</span><span class="n">prog</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Set the log lovel based on environment variable &#39;PSI_DEBUG&#39;. If the</span>
+<span class="sd">    variable is not set, the log level is set to &#39;NOTSET&#39;.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        prog (str): Name to prepend log messages with.</span>
+<span class="sd">        level (str, optional): String specifying the logging level. Defaults</span>
+<span class="sd">            to None and the environment variable &#39;PSI_DEBUG&#39; is used.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">level</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">level</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;PSI_DEBUG&#39;</span><span class="p">,</span> <span class="s1">&#39;NOTSET&#39;</span><span class="p">)</span>
+    <span class="n">logLevel</span> <span class="o">=</span> <span class="nb">eval</span><span class="p">(</span><span class="s1">&#39;logging.&#39;</span> <span class="o">+</span> <span class="n">level</span><span class="p">)</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">logLevel</span><span class="p">,</span> <span class="n">stream</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="n">COLOR_TRACE</span> <span class="o">+</span>
+                        <span class="n">prog</span> <span class="o">+</span> <span class="s1">&#39;: </span><span class="si">%(message)s</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="n">COLOR_NORMAL</span><span class="p">)</span></div>
+
+    
+<div class="viewcode-block" id="setup_rmq_logging"><a class="viewcode-back" href="../../cis_interface.html#cis_interface.runner.setup_rmq_logging">[docs]</a><span class="k">def</span> <span class="nf">setup_rmq_logging</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Set the log level for RabbitMQ to value of environment variable</span>
+<span class="sd">    &#39;RMQ_DEBUG&#39;. If the variable is not set, the log level is set to &#39;INFO&#39;.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        level (str, optional): String specifying the logging level. Defaults</span>
+<span class="sd">            to None and the environment variable &#39;RMQ_DEBUG&#39; is used.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">level</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">level</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;RMQ_DEBUG&#39;</span><span class="p">,</span> <span class="s1">&#39;INFO&#39;</span><span class="p">)</span>
+    <span class="n">rmqLogLevel</span> <span class="o">=</span> <span class="nb">eval</span><span class="p">(</span><span class="s1">&#39;logging.&#39;</span> <span class="o">+</span> <span class="n">level</span><span class="p">)</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;pika&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">rmqLogLevel</span><span class="p">)</span></div>
+
+    
+<div class="viewcode-block" id="import_driver"><a class="viewcode-back" href="../../cis_interface.html#cis_interface.runner.import_driver">[docs]</a><span class="k">def</span> <span class="nf">import_driver</span><span class="p">(</span><span class="n">driver</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Dynamically import a driver based on a string.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        driver (str): Name of the driver that should be imported.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">drv</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">import_module</span><span class="p">(</span><span class="s1">&#39;cis_interface.drivers.</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">driver</span><span class="p">)</span>
+    <span class="n">debug</span><span class="p">(</span><span class="s2">&quot;loaded </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">drv</span><span class="p">)</span>
+    <span class="n">class_</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">drv</span><span class="p">,</span> <span class="n">driver</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">class_</span></div>
+
+
+<div class="viewcode-block" id="create_driver"><a class="viewcode-back" href="../../cis_interface.html#cis_interface.runner.create_driver">[docs]</a><span class="k">def</span> <span class="nf">create_driver</span><span class="p">(</span><span class="n">driver</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Dynamically create a driver based on a string and other driver</span>
+<span class="sd">    properties.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        driver (str): Name of the driver that should be created.</span>
+<span class="sd">        name (str): Name to give the driver.</span>
+<span class="sd">        args (object, optional): Second argument for drivers which take a</span>
+<span class="sd">            minimum of two arguments. If None, the driver is assumed to take a</span>
+<span class="sd">            minimum of one argument. Defaults to None.</span>
+<span class="sd">        \*\*kwargs: Additional keyword arguments are passed to the driver</span>
+<span class="sd">            class.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        object: Instance of the requested driver.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">class_</span> <span class="o">=</span> <span class="n">import_driver</span><span class="p">(</span><span class="n">driver</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">args</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">instance</span> <span class="o">=</span> <span class="n">class_</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">instance</span> <span class="o">=</span> <span class="n">class_</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">instance</span></div>
+
+
+<div class="viewcode-block" id="CisRunner"><a class="viewcode-back" href="../../cis_interface.html#cis_interface.runner.CisRunner">[docs]</a><span class="k">class</span> <span class="nc">CisRunner</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;This class handles the orchestration of starting the model and</span>
+<span class="sd">    IO drivers, monitoring their progress, and cleaning up on exit.</span>
+
+<span class="sd">    Arguments:</span>
+<span class="sd">        modelYmls (list): List of paths to yaml files specifying the models</span>
+<span class="sd">            that should be run.</span>
+<span class="sd">        namespace (str): Name that should be used to uniquely identify any RMQ</span>
+<span class="sd">            exchange.</span>
+<span class="sd">        host (str, optional): Name of the host that the models will be launched</span>
+<span class="sd">            from. Defaults to None.</span>
+<span class="sd">        rank (int, optional): Rank of this set of models if run in parallel.</span>
+<span class="sd">            Defaults to 0.</span>
+<span class="sd">        cis_debug_level (str, optional): Level for CiS debug messages. Defaults</span>
+<span class="sd">            to environment variable &#39;PSI_DEBUG&#39;.</span>
+<span class="sd">        rmq_debug_level (str, optional): Level for RabbitMQ debug messages.</span>
+<span class="sd">            Defaults to environment variable &#39;RMQ_DEBUG&#39;.</span>
+<span class="sd">        cis_debug_prefix (str, optional): Prefix for CiS debug messages.</span>
+<span class="sd">            Defaults to namespace.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        namespace (str): Name that should be used to uniquely identify any RMQ</span>
+<span class="sd">            exchange.</span>
+<span class="sd">        host (str): Name of the host that the models will be launched from.</span>
+<span class="sd">        rank (int): Rank of this set of models if run in parallel.</span>
+<span class="sd">        modeldrivers (list): Model drivers associated with this run.</span>
+<span class="sd">        inputdrivers (list): Input drivers associated with this run.</span>
+<span class="sd">        outputdrivers (list): Output drivers associated with this run.</span>
+
+<span class="sd">    ..todo:: namespace, host, and rank do not seem strictly necessary.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">modelYmls</span><span class="p">,</span> <span class="n">namespace</span><span class="p">,</span> <span class="n">host</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">rank</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                 <span class="n">cis_debug_level</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">rmq_debug_level</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">cis_debug_prefix</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">namespace</span> <span class="o">=</span> <span class="n">namespace</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">host</span> <span class="o">=</span> <span class="n">host</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rank</span> <span class="o">=</span> <span class="n">rank</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">modeldrivers</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">inputdrivers</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">outputdrivers</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="c1"># Setup logging</span>
+        <span class="k">if</span> <span class="n">cis_debug_prefix</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">cis_debug_prefix</span> <span class="o">=</span> <span class="n">namespace</span>
+        <span class="n">setup_cis_logging</span><span class="p">(</span><span class="n">cis_debug_prefix</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="n">cis_debug_level</span><span class="p">)</span>
+        <span class="n">setup_rmq_logging</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">rmq_debug_level</span><span class="p">)</span>
+        <span class="c1"># Parse yamls</span>
+        <span class="k">for</span> <span class="n">modelYml</span> <span class="ow">in</span> <span class="n">modelYmls</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">parseModelYaml</span><span class="p">(</span><span class="n">modelYml</span><span class="p">)</span>
+        <span class="c1"># print(pformat(self.inputdrivers), pformat(self.outputdrivers),</span>
+        <span class="c1">#       pformat(self.modeldrivers))</span>
+
+<div class="viewcode-block" id="CisRunner.parseModelYaml"><a class="viewcode-back" href="../../cis_interface.html#cis_interface.runner.CisRunner.parseModelYaml">[docs]</a>    <span class="k">def</span> <span class="nf">parseModelYaml</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">modelYml</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Parse supplied yaml, adding yamldir and doing mustache replace.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            modelYml (str): Path to yaml file containing model info.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            IOError: If the yaml file cannot be located.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">yamlpath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">realpath</span><span class="p">(</span><span class="n">modelYml</span><span class="p">)</span>
+        <span class="n">yamldir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">yamlpath</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">yamlpath</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s2">&quot;Unable locate yaml file </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">yamlpath</span><span class="p">)</span>
+        <span class="c1"># Open file and parse yaml</span>
+        <span class="n">info</span><span class="p">(</span><span class="s2">&quot;CisRunner: Loading yaml </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">yamlpath</span><span class="p">)</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">modelYml</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="c1"># Mustache replace vars</span>
+                <span class="n">yamlparsed</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">safe_load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+                <span class="n">yamlparsed</span> <span class="o">=</span> <span class="n">pystache</span><span class="o">.</span><span class="n">render</span><span class="p">(</span>
+                    <span class="n">sio</span><span class="o">.</span><span class="n">StringIO</span><span class="p">(</span><span class="n">yamlparsed</span><span class="p">)</span><span class="o">.</span><span class="n">getvalue</span><span class="p">(),</span> <span class="nb">dict</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">))</span>
+                <span class="n">yamlparsed</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">safe_load</span><span class="p">(</span><span class="n">yamlparsed</span><span class="p">)</span>
+                <span class="n">debug</span><span class="p">(</span><span class="s2">&quot;CisRunner: yaml after stache: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">pformat</span><span class="p">(</span><span class="n">yamlparsed</span><span class="p">))</span>
+                <span class="c1"># Store parsed models</span>
+                <span class="n">yml_models</span> <span class="o">=</span> <span class="n">yamlparsed</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;models&#39;</span><span class="p">,</span> <span class="p">[])</span>
+                <span class="k">if</span> <span class="s1">&#39;model&#39;</span> <span class="ow">in</span> <span class="n">yamlparsed</span><span class="p">:</span>
+                    <span class="n">yml_models</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">yamlparsed</span><span class="p">[</span><span class="s1">&#39;model&#39;</span><span class="p">])</span>
+                <span class="k">for</span> <span class="n">yml</span> <span class="ow">in</span> <span class="n">yml_models</span><span class="p">:</span>
+                    <span class="n">yml</span><span class="p">[</span><span class="s1">&#39;workingDir&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">yamldir</span>
+                    <span class="k">for</span> <span class="n">inp</span> <span class="ow">in</span> <span class="n">yml</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;inputs&#39;</span><span class="p">,</span> <span class="nb">dict</span><span class="p">()):</span>
+                        <span class="n">inp</span><span class="p">[</span><span class="s1">&#39;workingDir&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">yamldir</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">inputdrivers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">inp</span><span class="p">)</span>
+                    <span class="k">for</span> <span class="n">inp</span> <span class="ow">in</span> <span class="n">yml</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;outputs&#39;</span><span class="p">,</span> <span class="nb">dict</span><span class="p">()):</span>
+                        <span class="n">inp</span><span class="p">[</span><span class="s1">&#39;workingDir&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">yamldir</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">outputdrivers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">inp</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">modeldrivers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">yml</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+                <span class="n">error</span><span class="p">(</span><span class="s2">&quot;CisRunner:  could not load yaml: </span><span class="si">%s</span><span class="s2">: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">modelYml</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+                <span class="k">raise</span>  <span class="c1"># Nothing started yet so just raise</span></div>
+
+<div class="viewcode-block" id="CisRunner.run"><a class="viewcode-back" href="../../cis_interface.html#cis_interface.runner.CisRunner.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Run all of the models and wait for them to exit.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">loadDrivers</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">startDrivers</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">waitModels</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">closeChannels</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="CisRunner.createDriver"><a class="viewcode-back" href="../../cis_interface.html#cis_interface.runner.CisRunner.createDriver">[docs]</a>    <span class="k">def</span> <span class="nf">createDriver</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">yml</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create a driver instance from the yaml information.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            yml (yaml): Yaml object containing driver information.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            object: An instance of the specified driver.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">debug</span><span class="p">(</span><span class="s1">&#39;creating </span><span class="si">%s</span><span class="s1">, a </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">yml</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">],</span> <span class="n">yml</span><span class="p">[</span><span class="s1">&#39;driver&#39;</span><span class="p">])</span>
+        <span class="n">instance</span> <span class="o">=</span> <span class="n">create_driver</span><span class="p">(</span><span class="n">yml</span><span class="p">[</span><span class="s1">&#39;driver&#39;</span><span class="p">],</span> <span class="n">yml</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">],</span> <span class="n">yml</span><span class="p">[</span><span class="s1">&#39;args&#39;</span><span class="p">],</span>
+                                 <span class="n">yml</span><span class="o">=</span><span class="n">yml</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">namespace</span><span class="p">,</span>
+                                 <span class="n">rank</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">rank</span><span class="p">,</span>
+                                 <span class="n">workingDir</span><span class="o">=</span><span class="n">yml</span><span class="p">[</span><span class="s1">&#39;workingDir&#39;</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">instance</span></div>
+
+<div class="viewcode-block" id="CisRunner.loadDrivers"><a class="viewcode-back" href="../../cis_interface.html#cis_interface.runner.CisRunner.loadDrivers">[docs]</a>    <span class="k">def</span> <span class="nf">loadDrivers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Load all of the necessary drivers, doing the IO drivers first</span>
+<span class="sd">        and adding IO driver environmental variables back tot he models.&quot;&quot;&quot;</span>
+        <span class="n">debug</span><span class="p">(</span><span class="s2">&quot;CisRunner.loadDrivers()&quot;</span><span class="p">)</span>
+        <span class="c1"># Create all of the drivers</span>
+        <span class="k">for</span> <span class="n">driver</span> <span class="ow">in</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">chain</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">outputdrivers</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">inputdrivers</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">modeldrivers</span><span class="p">)]:</span>
+            <span class="n">debug</span><span class="p">(</span><span class="s2">&quot;RunModels.loaDrivers(): loading driver </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">pformat</span><span class="p">(</span><span class="n">driver</span><span class="p">))</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">curpath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">driver</span><span class="p">[</span><span class="s1">&#39;workingDir&#39;</span><span class="p">])</span>
+                <span class="n">drv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">createDriver</span><span class="p">(</span><span class="n">driver</span><span class="p">)</span>
+                <span class="n">driver</span><span class="p">[</span><span class="s1">&#39;instance&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">drv</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">curpath</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+                <span class="n">info</span><span class="p">(</span><span class="s2">&quot;ERROR:  Exception </span><span class="si">%s</span><span class="s2">: Unable to load driver from yaml </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span>
+                     <span class="n">e</span><span class="p">,</span> <span class="n">pformat</span><span class="p">(</span><span class="n">driver</span><span class="p">))</span>
+                <span class="k">raise</span>  <span class="c1"># Nothing started yet so just raise</span>
+        <span class="c1"># Add the env&#39;s from the IO drivers to the models to ensure that</span>
+        <span class="c1"># they have access to the necessary queues</span>
+        <span class="k">for</span> <span class="n">driver</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">modeldrivers</span><span class="p">:</span>
+            <span class="n">debug</span><span class="p">(</span><span class="s2">&quot;CisRunner::loadDrivers: driver </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">driver</span><span class="p">)</span>
+            <span class="n">iodrivers</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">chain</span><span class="p">(</span><span class="n">driver</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;inputs&#39;</span><span class="p">,</span> <span class="nb">dict</span><span class="p">()),</span>
+                                          <span class="n">driver</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;outputs&#39;</span><span class="p">,</span> <span class="nb">dict</span><span class="p">()))]</span>
+            <span class="n">modelenv</span> <span class="o">=</span> <span class="n">driver</span><span class="p">[</span><span class="s1">&#39;instance&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">env</span>
+            <span class="n">modelenv</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">iod</span> <span class="ow">in</span> <span class="n">iodrivers</span><span class="p">:</span>
+                <span class="n">debug</span><span class="p">(</span><span class="s2">&quot;PSrRun::loadDrivers:  Add env: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">iod</span><span class="p">[</span><span class="s1">&#39;instance&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">env</span><span class="p">)</span>
+                <span class="n">modelenv</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">iod</span><span class="p">[</span><span class="s1">&#39;instance&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">env</span><span class="p">)</span>
+            <span class="n">debug</span><span class="p">(</span><span class="s2">&quot;CisRunner::loadDrivers(): model </span><span class="si">%s</span><span class="s2">: env: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span>
+                  <span class="n">driver</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">],</span> <span class="n">pformat</span><span class="p">(</span><span class="n">driver</span><span class="p">[</span><span class="s1">&#39;instance&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">env</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="CisRunner.startDrivers"><a class="viewcode-back" href="../../cis_interface.html#cis_interface.runner.CisRunner.startDrivers">[docs]</a>    <span class="k">def</span> <span class="nf">startDrivers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Start drivers, starting with the IO drivers.&quot;&quot;&quot;</span>
+        <span class="n">info</span><span class="p">(</span><span class="s1">&#39;Starting I/O drivers and models on system &#39;</span> <span class="o">+</span>
+             <span class="s1">&#39;</span><span class="si">{}</span><span class="s1"> in PSI_NAMESPACE </span><span class="si">{}</span><span class="s1"> PSI_RANK </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                 <span class="bp">self</span><span class="o">.</span><span class="n">host</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">namespace</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">rank</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">driver</span> <span class="ow">in</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">chain</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outputdrivers</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">inputdrivers</span><span class="p">,</span>
+                                        <span class="bp">self</span><span class="o">.</span><span class="n">modeldrivers</span><span class="p">)]:</span>
+            <span class="n">debug</span><span class="p">(</span><span class="s2">&quot;RunModels.startDrivers(): starting driver </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span>
+                  <span class="n">driver</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">])</span>
+            <span class="n">d</span> <span class="o">=</span> <span class="n">driver</span><span class="p">[</span><span class="s1">&#39;instance&#39;</span><span class="p">]</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">d</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+                <span class="n">error</span><span class="p">(</span><span class="s2">&quot;CisRunner:  ERROR:  </span><span class="si">%s</span><span class="s2"> did not start&quot;</span><span class="p">,</span> <span class="n">d</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="n">e</span>
+        <span class="n">debug</span><span class="p">(</span><span class="s1">&#39;CisRunner(): ALL DRIVERS STARTED&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CisRunner.waitModels"><a class="viewcode-back" href="../../cis_interface.html#cis_interface.runner.CisRunner.waitModels">[docs]</a>    <span class="k">def</span> <span class="nf">waitModels</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Wait for all model drivers to finish. When a model finishes,</span>
+<span class="sd">        join the thread and perform exits for associated IO drivers.&quot;&quot;&quot;</span>
+        <span class="n">debug</span><span class="p">(</span><span class="s1">&#39;CisRunner:waitDrivers(): &#39;</span><span class="p">)</span>
+        <span class="n">running</span> <span class="o">=</span> <span class="p">[</span><span class="n">d</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">modeldrivers</span><span class="p">]</span>
+        <span class="k">while</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">running</span><span class="p">)):</span>
+            <span class="k">for</span> <span class="n">drv</span> <span class="ow">in</span> <span class="n">running</span><span class="p">:</span>
+                <span class="n">d</span> <span class="o">=</span> <span class="n">drv</span><span class="p">[</span><span class="s1">&#39;instance&#39;</span><span class="p">]</span>
+                <span class="n">d</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">d</span><span class="o">.</span><span class="n">is_alive</span><span class="p">():</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">do_exits</span><span class="p">(</span><span class="n">drv</span><span class="p">)</span>
+                    <span class="n">running</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">drv</span><span class="p">)</span>
+        <span class="c1"># self.closeChannels()</span>
+        <span class="n">info</span><span class="p">(</span><span class="s1">&#39;All models completed&#39;</span><span class="p">)</span>
+        <span class="n">debug</span><span class="p">(</span><span class="s1">&#39;RunModels.run() returns&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CisRunner.do_exits"><a class="viewcode-back" href="../../cis_interface.html#cis_interface.runner.CisRunner.do_exits">[docs]</a>    <span class="k">def</span> <span class="nf">do_exits</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Perform exists for IO drivers associated with a model.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            model (dict): Dictionary of model parameters including any</span>
+<span class="sd">                associated IO drivers.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">debug</span><span class="p">(</span><span class="s2">&quot;CisRunner::do_exits for model </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">model</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">])</span>
+        <span class="c1"># Stop the model and join the thread</span>
+        <span class="n">model</span><span class="p">[</span><span class="s1">&#39;instance&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">on_exit</span><span class="p">()</span>
+        <span class="n">model</span><span class="p">[</span><span class="s1">&#39;instance&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
+        <span class="n">debug</span><span class="p">(</span><span class="s2">&quot;CisRunner: join finished: (</span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="n">pformat</span><span class="p">(</span><span class="n">model</span><span class="p">))</span>
+        <span class="c1"># Stop associated IO drivers</span>
+        <span class="n">iodrivers</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">chain</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;inputs&#39;</span><span class="p">,</span> <span class="nb">dict</span><span class="p">()),</span>
+                                      <span class="n">model</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;outputs&#39;</span><span class="p">,</span> <span class="nb">dict</span><span class="p">()))]</span>
+        <span class="k">for</span> <span class="n">drv</span> <span class="ow">in</span> <span class="n">iodrivers</span><span class="p">:</span>
+            <span class="n">debug</span><span class="p">(</span><span class="s1">&#39;CisRunner::do_exits(): delete </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">drv</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">])</span>
+            <span class="k">if</span> <span class="s1">&#39;onexit&#39;</span> <span class="ow">in</span> <span class="n">drv</span><span class="p">:</span>
+                <span class="n">debug</span><span class="p">(</span><span class="s1">&#39;CisRunner::onexit: </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">drv</span><span class="p">[</span><span class="s1">&#39;onexit&#39;</span><span class="p">])</span>
+                <span class="k">if</span> <span class="n">drv</span><span class="p">[</span><span class="s1">&#39;onexit&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;pass&#39;</span><span class="p">:</span>
+                    <span class="n">exit_method</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">drv</span><span class="p">[</span><span class="s1">&#39;instance&#39;</span><span class="p">],</span> <span class="n">drv</span><span class="p">[</span><span class="s1">&#39;onexit&#39;</span><span class="p">])</span>
+                    <span class="n">exit_method</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">drv</span><span class="p">[</span><span class="s1">&#39;instance&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">on_model_exit</span><span class="p">()</span></div>
+    
+<div class="viewcode-block" id="CisRunner.terminate"><a class="viewcode-back" href="../../cis_interface.html#cis_interface.runner.CisRunner.terminate">[docs]</a>    <span class="k">def</span> <span class="nf">terminate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Immediately stop all drivers, beginning with IO drivers.&quot;&quot;&quot;</span>
+        <span class="n">debug</span><span class="p">(</span><span class="s1">&#39;CisRunner::terminate()&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">closeChannels</span><span class="p">(</span><span class="n">force_stop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">debug</span><span class="p">(</span><span class="s1">&#39;CisRunner::terminate(): stop models&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">driver</span> <span class="ow">in</span> <span class="n">chain</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outputdrivers</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">inputdrivers</span><span class="p">,</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">modeldrivers</span><span class="p">):</span>
+            <span class="n">debug</span><span class="p">(</span><span class="s1">&#39;CisRunner::terminate(): stop </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">driver</span><span class="p">)</span>
+            <span class="n">driver</span><span class="p">[</span><span class="s1">&#39;instance&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
+        <span class="n">debug</span><span class="p">(</span><span class="s1">&#39;CisRunner::terminate(): returns&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CisRunner.printStatus"><a class="viewcode-back" href="../../cis_interface.html#cis_interface.runner.CisRunner.printStatus">[docs]</a>    <span class="k">def</span> <span class="nf">printStatus</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Print the status of all drivers, starting with the IO drivers.&quot;&quot;&quot;</span>
+        <span class="n">debug</span><span class="p">(</span><span class="s2">&quot;CisRunner: printStatus()&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">driver</span> <span class="ow">in</span> <span class="n">chain</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">inputdrivers</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">outputdrivers</span><span class="p">,</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">modeldrivers</span><span class="p">):</span>
+            <span class="n">driver</span><span class="p">[</span><span class="s1">&#39;instance&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">printStatus</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="CisRunner.closeChannels"><a class="viewcode-back" href="../../cis_interface.html#cis_interface.runner.CisRunner.closeChannels">[docs]</a>    <span class="k">def</span> <span class="nf">closeChannels</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">force_stop</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Stop IO drivers and join the threads.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            force_stop (bool, optional): If True, the terminate method is</span>
+<span class="sd">                used to stop the drivers. Otherwise, the stop method is used.</span>
+<span class="sd">                The stop method will try to exit gracefully while terminate</span>
+<span class="sd">                will exit as quickly as possible. Defaults to False.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">debug</span><span class="p">(</span><span class="s1">&#39;CisRunner::closeChannels()&#39;</span><span class="p">)</span>
+        <span class="n">drivers</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">chain</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outputdrivers</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">inputdrivers</span><span class="p">)]</span>
+        <span class="k">for</span> <span class="n">driver</span> <span class="ow">in</span> <span class="n">drivers</span><span class="p">:</span>
+            <span class="n">driver</span> <span class="o">=</span> <span class="n">driver</span><span class="p">[</span><span class="s1">&#39;instance&#39;</span><span class="p">]</span>
+            <span class="n">debug</span><span class="p">(</span><span class="s2">&quot;CisRunner:closeChannels(): stopping </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">driver</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">force_stop</span><span class="p">:</span>
+                <span class="n">driver</span><span class="o">.</span><span class="n">terminate</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">driver</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
+            <span class="n">debug</span><span class="p">(</span><span class="s2">&quot;CisRunner:closeChannels(): stop(</span><span class="si">%s</span><span class="s2">) returns&quot;</span><span class="p">,</span> <span class="n">driver</span><span class="p">)</span>
+        <span class="n">debug</span><span class="p">(</span><span class="s1">&#39;closeChannels(): Channel Stops DONE&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">driver</span> <span class="ow">in</span> <span class="n">drivers</span><span class="p">:</span>
+            <span class="n">driver</span> <span class="o">=</span> <span class="n">driver</span><span class="p">[</span><span class="s1">&#39;instance&#39;</span><span class="p">]</span>
+            <span class="n">debug</span><span class="p">(</span><span class="s2">&quot;CisRunner:closeChannels: join </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">driver</span><span class="p">)</span>
+            <span class="n">driver</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
+            <span class="n">debug</span><span class="p">(</span><span class="s2">&quot;CisRunner:closeChannels: join </span><span class="si">%s</span><span class="s2"> done&quot;</span><span class="p">,</span> <span class="n">driver</span><span class="p">)</span>
+        <span class="n">debug</span><span class="p">(</span><span class="s1">&#39;CisRunner::closeChannels(): done&#39;</span><span class="p">)</span></div></div>
+
+        
+<div class="viewcode-block" id="get_runner"><a class="viewcode-back" href="../../cis_interface.html#cis_interface.runner.get_runner">[docs]</a><span class="k">def</span> <span class="nf">get_runner</span><span class="p">(</span><span class="n">models</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get runner for a set of models, getting run information from the</span>
+<span class="sd">    environment.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        models (list): List of yaml files containing information on the models</span>
+<span class="sd">            that should be run.</span>
+<span class="sd">        \*\*kwargs: Additonal keyword arguments are passed to CisRunner.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        CisRunner: Runner for the provided models.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        Exception: If environment variable &#39;PSI_NAMESPACE&#39; is not set.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Get environment variables</span>
+    <span class="n">namespace</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;PSI_NAMESPACE&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">namespace</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;PSI_NAMESPACE not set&#39;</span><span class="p">)</span>
+    <span class="n">rank</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;PARALLEL_SEQ&#39;</span><span class="p">,</span> <span class="s1">&#39;0&#39;</span><span class="p">)</span>
+    <span class="n">host</span> <span class="o">=</span> <span class="n">socket</span><span class="o">.</span><span class="n">gethostname</span><span class="p">()</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;PSI_RANK&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">rank</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;PSI_HOST&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">host</span>
+    <span class="n">rank</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">rank</span><span class="p">)</span>
+    <span class="n">kwargs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">rank</span><span class="o">=</span><span class="n">rank</span><span class="p">,</span> <span class="n">host</span><span class="o">=</span><span class="n">host</span><span class="p">)</span>
+    <span class="c1"># Run</span>
+    <span class="n">debug</span><span class="p">(</span><span class="s2">&quot;run_models in </span><span class="si">%s</span><span class="s2"> with path </span><span class="si">%s</span><span class="s2"> namespace </span><span class="si">%s</span><span class="s2"> rank </span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">,</span>
+          <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(),</span> <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="n">namespace</span><span class="p">,</span> <span class="n">rank</span><span class="p">)</span>
+    <span class="n">cisRunner</span> <span class="o">=</span> <span class="n">CisRunner</span><span class="p">(</span><span class="n">models</span><span class="p">,</span> <span class="n">namespace</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">cisRunner</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Meagan Lang, David Raila.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.6</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>
