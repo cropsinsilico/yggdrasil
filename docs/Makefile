@@ -23,7 +23,7 @@ ghpages: autodoc
 
 .PHONY: autodoc
 autodoc:
-	sphinx-apidoc -f -o $(SOURCEDIR)/autodoc/ ../cis_interface
+	sphinx-apidoc -f -o $(SOURCEDIR)/ ../cis_interface
 	make html
 
 # Catch-all target: route all unknown targets to Sphinx using the new

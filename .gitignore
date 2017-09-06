@@ -5,7 +5,8 @@ cis_interface/tests/scripts/gcc_model.out
 # Intermediate docs
 README.rst
 docs/build
-docs/source/autodoc
+docs/source/cis_interface*.rst
+docs/source/modules.rst
 
 # Coverage
 .coverage
