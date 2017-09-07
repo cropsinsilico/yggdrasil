@@ -12,6 +12,7 @@ Welcome to cis_interface's documentation!
 
    includeme
    install
+   config
    code
 
 Indices and tables

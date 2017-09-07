@@ -27,7 +27,7 @@
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="cis_interface" href="code.html" />
+    <link rel="next" title="Configuration Files" href="config.html" />
     <link rel="prev" title="Overview" href="includeme.html" />
    
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
@@ -53,7 +53,8 @@
 <div class="highlight-default"><div class="highlight"><pre><span></span>$ pip install cis_interface
 </pre></div>
 </div>
-<p>or by cloning the <a class="reference external" href="https://git-scm.com/">Git</a> repository on <a class="reference external" href="https://github.com/cropsinsilico/cis_interface">Github</a>:</p>
+<p>or by cloning the <a class="reference external" href="https://git-scm.com/">Git</a> repository on
+<a class="reference external" href="https://github.com/cropsinsilico/cis_interface">Github</a>:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span>$ git clone https://github.com/cropsinsilico/cis_interface.git
 </pre></div>
 </div>
@@ -62,17 +63,33 @@
 $ python setup.py install
 </pre></div>
 </div>
-<p>If you do not have admin privileges on the target machine, <code class="docutils literal"><span class="pre">--user</span></code> can be added to either the <code class="docutils literal"><span class="pre">pip</span></code> or <code class="docutils literal"><span class="pre">setup.py</span></code> installation commands.</p>
+<p>If you do not have admin privileges on the target machine, <code class="docutils literal"><span class="pre">--user</span></code> can be
+added to either the <code class="docutils literal"><span class="pre">pip</span></code> or <code class="docutils literal"><span class="pre">setup.py</span></code> installation commands.</p>
 </div>
 <div class="section" id="additional-steps-for-matlab-models">
 <h2>Additional Steps for Matlab Models<a class="headerlink" href="#additional-steps-for-matlab-models" title="Permalink to this headline">¶</a></h2>
 <p>To run Matlab models, you will also need to install the Matlab engine for
 Python. This requires that you have an existing Matlab installation and license.</p>
 <p>Instructions for installing the Matlab engine as a python package can be found
-<a class="reference external" href="https://www.mathworks.com/help/matlab/matlab_external/install-the-matlab-engine-for-python.html">&lt;here</a>.</p>
+<a class="reference external" href="https://www.mathworks.com/help/matlab/matlab_external/install-the-matlab-engine-for-python.html">here</a>.</p>
 </div>
 <div class="section" id="additional-steps-for-rabbitmq-message-passing">
 <h2>Additional Steps for RabbitMQ Message Passing<a class="headerlink" href="#additional-steps-for-rabbitmq-message-passing" title="Permalink to this headline">¶</a></h2>
+<p>RabbitMQ connections allow messages to be passed between models when the
+models are not running on the same machine. To use these connections
+(those with the prefix &#8216;RMQ&#8217;), the framework must have access to a
+RabbitMQ server. If you have access to an existing RabbitMQ server,
+the information for that server can either be provided to the
+RabbitMQ connection driver
+(See <a class="reference internal" href="cis_interface.drivers.html#cis_interface.drivers.RMQDriver.RMQDriver" title="cis_interface.drivers.RMQDriver.RMQDriver"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.drivers.RMQDriver.RMQDriver</span></code></a>) or added
+to the cis_interface config file (See
+<a class="reference external" href="config.rst">Configuration Options</a> for information on setting
+config options).</p>
+<p>Starting a local RabbitMQ Server is also relatively easy. Details on
+downloading, installing, and starting a RabbitMQ server can be found
+<a class="reference external" href="https://www.rabbitmq.com/download.html">here</a>. The default values
+for RabbitMQ related properties in the config file are set to the defaults
+for starting a RabbitMQ server.</p>
 </div>
 </div>
 
@@ -96,7 +113,7 @@ Python. This requires that you have an existing Matlab installation and license.
 <ul>
   <li><a href="index.html">Documentation overview</a><ul>
       <li>Previous: <a href="includeme.html" title="previous chapter">Overview</a></li>
-      <li>Next: <a href="code.html" title="next chapter">cis_interface</a></li>
+      <li>Next: <a href="config.html" title="next chapter">Configuration Files</a></li>
   </ul></li>
 </ul>
 </div>

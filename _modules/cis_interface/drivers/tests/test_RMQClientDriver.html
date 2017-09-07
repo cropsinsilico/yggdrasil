@@ -44,12 +44,9 @@
             
   <h1>Source code for cis_interface.drivers.tests.test_RMQClientDriver</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">pika</span>
 <span class="kn">import</span> <span class="nn">nose.tools</span> <span class="k">as</span> <span class="nn">nt</span>
 <span class="kn">import</span> <span class="nn">cis_interface.drivers.tests.test_RMQDriver</span> <span class="k">as</span> <span class="nn">parent1</span>
 <span class="kn">from</span> <span class="nn">cis_interface.drivers.tests.test_IODriver</span> <span class="k">import</span> <span class="n">IOInfo</span>
-<span class="kn">from</span> <span class="nn">cis_interface.drivers.RMQClientDriver</span> <span class="k">import</span> <span class="p">(</span>
-    <span class="n">_new_client_msg</span><span class="p">,</span> <span class="n">_end_client_msg</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">cis_interface</span> <span class="k">import</span> <span class="n">runner</span>
 <span class="kn">from</span> <span class="nn">cis_interface.examples</span> <span class="k">import</span> <span class="n">yamls</span> <span class="k">as</span> <span class="n">ex_yamls</span>
 
@@ -78,7 +75,7 @@
                            <span class="s1">&#39;_deliveries&#39;</span><span class="p">,</span> <span class="s1">&#39;_acked&#39;</span><span class="p">,</span> <span class="s1">&#39;_nacked&#39;</span><span class="p">,</span>
                            <span class="s1">&#39;_message_number&#39;</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_temp_queue</span> <span class="o">=</span> <span class="s1">&#39;TestRMQClientDriver_SERVER&#39;</span>
-        <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;channel&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;channel&#39;</span><span class="p">):</span>  <span class="c1"># , None):</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">queue_purge</span><span class="p">(</span><span class="n">queue</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">temp_queue</span><span class="p">)</span>
             <span class="k">except</span><span class="p">:</span>
@@ -107,37 +104,33 @@
 <div class="viewcode-block" id="TestRMQClientDriver.setup"><a class="viewcode-back" href="../../../../cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_RMQClientDriver.TestRMQClientDriver.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Recover new client message on start-up.&quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">TestRMQClientDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">setup</span><span class="p">()</span>
-        <span class="n">nt</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">request_queue</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">temp_queue</span><span class="p">)</span>
-        <span class="c1"># New client message</span>
-        <span class="n">method_frame</span><span class="p">,</span> <span class="n">props</span><span class="p">,</span> <span class="n">rmq_msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">temp_basic_get</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">basic_ack</span><span class="p">(</span><span class="n">delivery_tag</span><span class="o">=</span><span class="n">method_frame</span><span class="o">.</span><span class="n">delivery_tag</span><span class="p">)</span>
-        <span class="c1"># print(&#39;received setup&#39;, rmq_msg)</span>
-        <span class="n">nt</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="n">rmq_msg</span><span class="p">,</span> <span class="n">_new_client_msg</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">srv_rmq</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_server_rmq</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">srv_rmq</span><span class="o">.</span><span class="n">start</span><span class="p">()</span></div>
         
 <div class="viewcode-block" id="TestRMQClientDriver.teardown"><a class="viewcode-back" href="../../../../cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_RMQClientDriver.TestRMQClientDriver.teardown">[docs]</a>    <span class="k">def</span> <span class="nf">teardown</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Recover end client message on teardown.&quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
-        <span class="c1"># End client message</span>
-        <span class="n">method_frame</span><span class="p">,</span> <span class="n">props</span><span class="p">,</span> <span class="n">rmq_msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">temp_basic_get</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">basic_ack</span><span class="p">(</span><span class="n">delivery_tag</span><span class="o">=</span><span class="n">method_frame</span><span class="o">.</span><span class="n">delivery_tag</span><span class="p">)</span>
-        <span class="c1"># print(&#39;received teardown&#39;, rmq_msg)</span>
-        <span class="n">nt</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="n">rmq_msg</span><span class="p">,</span> <span class="n">_end_client_msg</span><span class="p">)</span>
-        <span class="c1"># Parent teardown</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;srv_rmq&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">remove_instance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">srv_rmq</span><span class="p">)</span>
+            <span class="nb">delattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;srv_rmq&#39;</span><span class="p">)</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">TestRMQClientDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">teardown</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="TestRMQClientDriver.create_server_rmq"><a class="viewcode-back" href="../../../../cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_RMQClientDriver.TestRMQClientDriver.create_server_rmq">[docs]</a>    <span class="k">def</span> <span class="nf">create_server_rmq</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create a new RMQServerDriver instance.&quot;&quot;&quot;</span>
+        <span class="n">inst</span> <span class="o">=</span> <span class="n">runner</span><span class="o">.</span><span class="n">create_driver</span><span class="p">(</span>
+            <span class="s1">&#39;RMQServerDriver&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">namespace</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">namespace</span><span class="p">,</span> <span class="n">workingDir</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">workingDir</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">inst</span></div>
 
 <div class="viewcode-block" id="TestRMQClientDriver.test_msg"><a class="viewcode-back" href="../../../../cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_RMQClientDriver.TestRMQClientDriver.test_msg">[docs]</a>    <span class="k">def</span> <span class="nf">test_msg</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test routing of a message through the IPC &amp; RMQ queues.&quot;&quot;&quot;</span>
         <span class="c1"># Send message to IPC output &amp; receive from RMQ output</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">oipc</span><span class="o">.</span><span class="n">ipc_send_nolimit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">msg_short</span><span class="p">)</span>
-        <span class="n">method_frame</span><span class="p">,</span> <span class="n">props</span><span class="p">,</span> <span class="n">rmq_msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">temp_basic_get</span><span class="p">()</span>
+        <span class="c1"># Receive on server side, then send back</span>
+        <span class="n">rmq_msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">srv_rmq</span><span class="o">.</span><span class="n">iipc</span><span class="o">.</span><span class="n">recv_wait_nolimit</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
         <span class="n">nt</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="n">rmq_msg</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">msg_short</span><span class="p">)</span>
-        <span class="c1"># Send message to RMQ input &amp; receive from IPC input</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">temp_basic_pub</span><span class="p">(</span>
-            <span class="n">rmq_msg</span><span class="p">,</span> <span class="n">routing_key</span><span class="o">=</span><span class="n">props</span><span class="o">.</span><span class="n">reply_to</span><span class="p">,</span>
-            <span class="n">properties</span><span class="o">=</span><span class="n">pika</span><span class="o">.</span><span class="n">BasicProperties</span><span class="p">(</span>
-                <span class="n">correlation_id</span><span class="o">=</span><span class="n">props</span><span class="o">.</span><span class="n">correlation_id</span><span class="p">))</span>
-        <span class="c1"># self.channel.basic_ack(delivery_tag = method_frame.delivery_tag)</span>
-        <span class="n">ipc_msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">iipc</span><span class="o">.</span><span class="n">recv_wait_nolimit</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">srv_rmq</span><span class="o">.</span><span class="n">oipc</span><span class="o">.</span><span class="n">ipc_send_nolimit</span><span class="p">(</span><span class="n">rmq_msg</span><span class="p">)</span>
+        <span class="c1"># Receive response from server</span>
+        <span class="n">ipc_msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">iipc</span><span class="o">.</span><span class="n">recv_wait_nolimit</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
         <span class="n">nt</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="n">ipc_msg</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">msg_short</span><span class="p">)</span></div></div>
 </pre></div>
 

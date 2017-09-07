@@ -1,0 +1,235 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Configuration Files &#8212; cis_interface 0.0.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="cis_interface" href="code.html" />
+    <link rel="prev" title="Installation" href="install.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="configuration-files">
+<h1>Configuration Files<a class="headerlink" href="#configuration-files" title="Permalink to this headline">¶</a></h1>
+<p>Many components of the cis_interface framework&#8217;s behavior can be controlled
+by options in the configuration file. When installed cis_interface creates
+a user config file called &#8216;.cis_interface.cfg&#8217; in your home directory. By
+editting the options in the user config file, you can customize the behavior
+of your framework runs.</p>
+<p>Further customization for specific runs can be
+achieved by creating a local config file called &#8216;.cis_interface.cfg&#8217; in the
+directory where the interface will be run. Any options not found in the local
+will be filled in with values from the user config file. Any options not
+found in the user config file will be filled in with default package values.</p>
+<div class="section" id="debug-options">
+<h2>Debug Options<a class="headerlink" href="#debug-options" title="Permalink to this headline">¶</a></h2>
+<p>Options for controlling the level of information printed during a run can be
+controlled by options in the &#8216;[debug]&#8217; section of the config files. Each one
+can have any of the valid
+<cite>logging levels &lt;https://docs.python.org/2/library/logging.html#levels&gt;</cite>.
+These include:</p>
+<ul class="simple">
+<li><strong>NOTSET:</strong> Do not print any messages.</li>
+<li><strong>CRITICAL:</strong> Print only messages logged as critical.</li>
+<li><strong>ERROR:</strong> Print messages logged as error or critical.</li>
+<li><strong>WARNING:</strong> Print messages logged as warning, error, or critical.</li>
+<li><strong>INFO:</strong> Print messages logged as info, warning, error, or critical.</li>
+<li><strong>DEBUG:</strong> Print messages logged as debug, info, warning, error, or critical.</li>
+</ul>
+<p>The debug options are:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="10%" />
+<col width="11%" />
+<col width="79%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Option</th>
+<th class="head">Default</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>psi</td>
+<td>INFO</td>
+<td>Controls the level of messages printed by the
+cis_interface framework itself.</td>
+</tr>
+<tr class="row-odd"><td>rmq</td>
+<td>WARNING</td>
+<td>Controls the level of messages printed by
+RabbitMQ.</td>
+</tr>
+<tr class="row-even"><td>client</td>
+<td>INFO</td>
+<td>Controls the level of messages printed by
+cis_interface calls from the models themselves.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="rabbitmq-options">
+<h2>RabbitMQ Options<a class="headerlink" href="#rabbitmq-options" title="Permalink to this headline">¶</a></h2>
+<p>Options in the &#8216;[RMQ]&#8217; section control the behavior of RabbitMQ connections.
+If the option is left blank, the default RabbitMQ option is used.
+These include:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="15%" />
+<col width="11%" />
+<col width="74%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Option</th>
+<th class="head">Default</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>namespace</td>
+<td>&#160;</td>
+<td>RabbitMQ exchange.</td>
+</tr>
+<tr class="row-odd"><td>host</td>
+<td>&#160;</td>
+<td>RabbitMQ server host.</td>
+</tr>
+<tr class="row-even"><td>vhost</td>
+<td>&#160;</td>
+<td>RabbitMQ server virtual host.</td>
+</tr>
+<tr class="row-odd"><td>user</td>
+<td>guest</td>
+<td>RabbitMQ server user name.</td>
+</tr>
+<tr class="row-even"><td>password</td>
+<td>guest</td>
+<td>RabbitMQ server password.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="parallel-options">
+<h2>Parallel Options<a class="headerlink" href="#parallel-options" title="Permalink to this headline">¶</a></h2>
+<p>Options in the &#8216;[parallel]&#8217; section control the behavior of parallelization.
+Although, not supported in the current version of cis_interface, these
+include:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="15%" />
+<col width="11%" />
+<col width="74%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Option</th>
+<th class="head">Default</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>cluster</td>
+<td>&#160;</td>
+<td>List of IP address of cluster nodes.</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Configuration Files</a><ul>
+<li><a class="reference internal" href="#debug-options">Debug Options</a></li>
+<li><a class="reference internal" href="#rabbitmq-options">RabbitMQ Options</a></li>
+<li><a class="reference internal" href="#parallel-options">Parallel Options</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="install.html" title="previous chapter">Installation</a></li>
+      <li>Next: <a href="code.html" title="next chapter">cis_interface</a></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/config.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Meagan Lang, David Raila.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.6</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="_sources/config.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
