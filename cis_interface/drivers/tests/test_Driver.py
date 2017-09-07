@@ -28,7 +28,7 @@ class TestParam(unittest.TestCase):
         self.args = None
         self.namespace = 'TESTING'
         self.attr_list = ['name', 'sleeptime', 'longsleep', 'yml', 'namespace',
-                          'rank', 'workingDir']
+                          'rank', 'workingDir', 'lock']
         self.inst_kwargs = {'yml': {'workingDir': self.workingDir}}
         self.nprev_queues = 0
         super(TestParam, self).__init__(*args, **kwargs)

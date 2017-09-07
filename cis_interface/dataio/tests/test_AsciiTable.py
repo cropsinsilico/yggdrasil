@@ -320,7 +320,7 @@ def test_AsciiTable_array_bytes():
             if order == 'C':
                 AF_out_err = AsciiTable.AsciiTable(
                     output_file, 'w', dtype='float',
-                    format_str='\t'.join(5*['%f'])+'\n')
+                    format_str='\t'.join(5 * ['%f']) + '\n')
                 err_byt = np.zeros(12, dtype=AF_out_err.dtype).tobytes(
                     order=order)
                 assert_raises(ValueError, AF_out_err.bytes_to_array, err_byt,

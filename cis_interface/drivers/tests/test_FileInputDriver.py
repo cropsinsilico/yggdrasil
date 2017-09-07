@@ -17,7 +17,7 @@ class TestFileInputParam(parent.TestIOParam):
         self.driver = 'FileInputDriver'
         self.filepath = os.path.join(tempfile.gettempdir(), 'ascii_input.txt')
         self.args = self.filepath
-        self.attr_list += ['args', 'fd', 'lock']
+        self.attr_list += ['args', 'fd']
 
     def setup(self):
         r"""Create a driver instance and start the driver."""
