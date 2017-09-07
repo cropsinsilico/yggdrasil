@@ -8,7 +8,8 @@ from cis_interface.dataio.AsciiFile import AsciiFile
 from cis_interface.dataio.AsciiTable import AsciiTable
 
 
-PSI_MSG_MAX = 1024 * 64
+# OS X limit is 2kb
+PSI_MSG_MAX = 1024 * 2
 PSI_MSG_EOF = "EOF!!!"
 
 

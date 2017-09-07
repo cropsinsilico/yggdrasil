@@ -1,10 +1,11 @@
 import sysv_ipc
 from sysv_ipc import MessageQueue
 from Driver import Driver
+from cis_interface.interface.PsiInterface import PSI_MSG_MAX
 
 
 # OS X limit is 2kb
-maxMsgSize = 1024 * 2
+maxMsgSize = PSI_MSG_MAX
 DEBUG_SLEEPS = True
 
 

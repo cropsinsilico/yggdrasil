@@ -15,7 +15,7 @@
 #include <../dataio/AsciiTable.h>
 
 
-#define PSI_MSG_MAX 1024*64
+#define PSI_MSG_MAX 1024*2
 #define PSI_MSG_EOF "EOF!!!"
 
 typedef struct msgbuf_t {
