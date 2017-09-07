@@ -3,6 +3,7 @@ from cis_interface.tests import scripts
 import test_ModelDriver as parent
 from cis_interface import runner
 from cis_interface.examples import yamls as ex_yamls
+from cis_interface.drivers.MatlabModelDriver import _matlab_installed
 
 
 _session_fname = os.path.join(os.getcwd(), 'nt_screen_session.txt')
@@ -10,10 +11,14 @@ _session_fname = os.path.join(os.getcwd(), 'nt_screen_session.txt')
 
 def test_multiple():
     r"""Test that creates multiple matlab drivers."""
-    os.environ['FIB_ITERATIONS'] = '3'
-    os.environ['FIB_SERVER_SLEEP_SECONDS'] = '1'
-    cr = runner.get_runner(ex_yamls['rpcfib_matlab'])
-    cr.run()
+    if _matlab_installed:  # pragma: matlab
+        os.environ['FIB_ITERATIONS'] = '3'
+        os.environ['FIB_SERVER_SLEEP_SECONDS'] = '1'
+        cr = runner.get_runner(ex_yamls['rpcfib_matlab'])
+        cr.run()
+    else:  # pragma: no matlab
+        print("Matlab not installed. Not running test with " +
+              "multiple Matlab drivers.")
 
 
 class TestMatlabModelDriver(parent.TestModelDriver,
