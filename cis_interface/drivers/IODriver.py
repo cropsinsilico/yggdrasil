@@ -3,7 +3,8 @@ from sysv_ipc import MessageQueue
 from Driver import Driver
 
 
-maxMsgSize = 1024 * 64
+# OS X limit is 2kb
+maxMsgSize = 1024 * 2
 DEBUG_SLEEPS = True
 
 
@@ -165,6 +166,7 @@ class IODriver(Driver):
         while prev < len(data):
             try:
                 next = min(prev + maxMsgSize, len(data))
+                # next = min(prev + self.mq.max_size, len(data))
                 self.ipc_send(data[prev:next])
                 self.debug('.ipc_send_nolimit(): %d of %d bytes sent',
                            next, len(data))
@@ -201,7 +203,7 @@ class IODriver(Driver):
                     break
                 data += ret
                 print('received %d of %d (maxMsgSize = %d)' % (
-                    len(data), leng_exp, maxMsgSize))
+                    len(data), leng_exp, self.mq.max_size))
             ret, leng = data, len(data)
         except:  # pragma: debug
             ret, leng = None, -1
