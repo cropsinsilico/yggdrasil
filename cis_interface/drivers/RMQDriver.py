@@ -1,5 +1,6 @@
 import os
 import pika
+import socket
 from Driver import Driver
 from IODriver import maxMsgSize
 
@@ -17,7 +18,10 @@ class RMQDriver(Driver):
         user (str, optional): RabbitMQ server username. Defaults to environment
             variable 'PSI_MSG_USER' if it exists.
         host (str, optional): RabbitMQ server host. Defaults to environment
-            variable 'PSI_MSG_HOST' if it exists.
+            variable 'PSI_MSG_HOST' if it exists and the output of 
+            socket.gethostname() if it does not.
+        vhost (str, optional): RabbitMQ server virtual host. Defaults to
+            environment variable 'PSI_MSG_VHOST' if it exists.
         passwd (str, optional): RabbitMQ server password. Defaults to
             environment variable 'PSI_MSG_PW' if it exists.
         exchange (str, optional): RabbitMQ exchange. Defaults to 'namespace'
@@ -29,8 +33,9 @@ class RMQDriver(Driver):
 
     Attributes:
         user (str): RabbitMQ server username.
-        host (str): RabbitMQ server host.
         passwd (str): RabbitMQ server password.
+        host (str): RabbitMQ server host.
+        vhost (str): RabbitMQ server virtual host.
         exchange (str): RabbitMQ exchange name.
         connection (:class:`pika.Connection`): RabbitMQ connection.
         channel (:class:`pika.Channel`): RabbitMQ channel.
@@ -44,12 +49,13 @@ class RMQDriver(Driver):
 
     """
     def __init__(self, name, queue='', routing_key=None, **kwargs):
-        kwattr = ['user', 'host', 'passwd', 'exchange', 'exclusive']
+        kwattr = ['user', 'passwd', 'host', 'vhost', 'exchange', 'exclusive']
         kwargs_attr = {k: kwargs.pop(k, None) for k in kwattr}
         super(RMQDriver, self).__init__(name, **kwargs)
         self.debug()
         self.user = os.environ.get('PSI_MSG_USER', None)
-        self.host = os.environ.get('PSI_MSG_HOST', None)
+        self.host = os.environ.get('PSI_MSG_HOST', socket.gethostname())
+        self.vhost = os.environ.get('PSI_MSG_VHOST', None)
         self.passwd = os.environ.get('PSI_MSG_PW', None)
         self.exchange = self.namespace
         self.exclusive = False
