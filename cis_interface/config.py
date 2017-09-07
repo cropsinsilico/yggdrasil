@@ -26,7 +26,7 @@ env_map = [('debug', 'psi', 'PSI_DEBUG'),
            ('RMQ', 'vhost', 'PSI_MSG_VHOST'),
            ('RMQ', 'user', 'PSI_MSG_USER'),
            ('RMQ', 'password', 'PSI_MSG_PW'),
-           ('RMQ', 'cluster', 'PSI_CLUSTER'),
+           ('parallel', 'cluster', 'PSI_CLUSTER'),
            ]
 for s, v, env in env_map:
     val = cis_cfg.get(s, v)
