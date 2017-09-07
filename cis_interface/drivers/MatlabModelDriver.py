@@ -139,20 +139,19 @@ class MatlabModelDriver(ModelDriver):
             self.mlengine.addpath(fdir, nargout=0)
             self.debug(": connected to matlab")
         else:  # pragma: no matlab
-            warn("Matlab not installed. Matlab could not be stopped.")
+            self.screen_session, self.mlsession = start_matlab()
 
     def __del__(self):
         self.terminate()
 
     def cleanup(self):
         r"""Close the Matlab session and engine."""
-        if _matlab_installed:  # pragma: matlab
-            try:
-                stop_matlab(self.screen_session, self.mlengine,
-                            self.mlsession)
-            except SystemError:  # pragma: debug
-                self.error('.terminate failed to exit matlab engine')
-                raise
+        try:
+            stop_matlab(self.screen_session, self.mlengine,
+                        self.mlsession)
+        except SystemError:  # pragma: debug
+            self.error('.terminate failed to exit matlab engine')
+            raise
         self.screen_session = None
         self.mlsession = None
         self.started_matlab = False

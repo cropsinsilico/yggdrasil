@@ -36,7 +36,7 @@ class TestMatlabModelDriver(parent.TestModelDriver,
         self.args = [scripts["matlab"], "test", 1]
         self.attr_list += ['started_matlab', 'mlengine']
 
-    def test_a(self):
+    def test_a(self):  # pragma: matlab
         r"""Dummy test to start matlab."""
         if self.instance.screen_session is None:  # pragma: debug
             print("Matlab was not started by this test. Close any " +
@@ -47,7 +47,7 @@ class TestMatlabModelDriver(parent.TestModelDriver,
             self.instance.screen_session = None
             self.instance.started_matlab = False
 
-    def test_z(self):
+    def test_z(self):  # pragma: matlab
         r"""Dummy test to stop matlab."""
         if os.path.isfile(_session_fname):
             with open(_session_fname, 'r') as f:
