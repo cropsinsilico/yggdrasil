@@ -1,6 +1,6 @@
 import pika
-from RMQDriver import RMQDriver
-from RPCDriver import RPCDriver
+from cis_interface.drivers.RMQDriver import RMQDriver
+from cis_interface.drivers.RPCDriver import RPCDriver
 
 
 _new_client_msg = "PSI_NEW_CLIENT"

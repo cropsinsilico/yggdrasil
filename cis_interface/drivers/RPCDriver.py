@@ -1,5 +1,5 @@
-from Driver import Driver
-from IODriver import IODriver
+from cis_interface.drivers.Driver import Driver
+from cis_interface.drivers.IODriver import IODriver
 
 
 class RPCDriver(Driver):

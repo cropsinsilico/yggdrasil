@@ -8,7 +8,7 @@ if PY2:  # pragma: Python 2
 else:  # pragma: Python 3
     import pickle
     import configparser
-    import sio
+    import io as sio
 
     
 __all__ = ['pickle', 'configparser', 'sio']

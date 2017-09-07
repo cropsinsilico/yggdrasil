@@ -1,7 +1,7 @@
 r"""Routines for standardized I/O."""
 
-import AsciiFile
-import AsciiTable
-import tests
+from cis_interface.dataio import AsciiFile
+from cis_interface.dataio import AsciiTable
+from cis_interface.dataio import tests
 
 __all__ = ['AsciiFile', 'AsciiTable', 'tests']

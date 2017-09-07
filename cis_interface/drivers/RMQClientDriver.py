@@ -1,8 +1,9 @@
 import pika
 import uuid
-from RMQDriver import RMQDriver
-from RPCDriver import RPCDriver
-from RMQServerDriver import _new_client_msg, _end_client_msg
+from cis_interface.drivers.RMQDriver import RMQDriver
+from cis_interface.drivers.RPCDriver import RPCDriver
+from cis_interface.drivers.RMQServerDriver import (
+    _new_client_msg, _end_client_msg)
 
 
 class RMQClientDriver(RMQDriver, RPCDriver):
@@ -176,7 +177,6 @@ class RMQClientDriver(RMQDriver, RPCDriver):
         if self.channel:
             self.debug("::Cancelling consumption.")
             self.publish_to_server(_end_client_msg)
-        print 'stopping communication'
         super(RMQClientDriver, self).stop_communication()
 
     def on_model_exit(self):

@@ -5,8 +5,8 @@ import os
 import subprocess
 import sys
 from pprint import pformat
-from Driver import Driver
 import time
+from cis_interface.drivers.Driver import Driver
 
 
 def preexec():  # pragma: no cover

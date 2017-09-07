@@ -1,6 +1,6 @@
 import numpy as np
 from cis_interface.interface.scanf import scanf
-from AsciiFile import AsciiFile
+from cis_interface.dataio.AsciiFile import AsciiFile
 try:
     from astropy.io import ascii as apy_ascii
     from astropy.table import Table as apy_Table

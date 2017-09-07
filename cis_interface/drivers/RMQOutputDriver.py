@@ -1,6 +1,6 @@
 """Module for sending output to a RabbitMQ server."""
-from RMQDriver import RMQDriver
-from IODriver import IODriver
+from cis_interface.drivers.RMQDriver import RMQDriver
+from cis_interface.drivers.IODriver import IODriver
 
 
 class RMQOutputDriver(RMQDriver, IODriver):

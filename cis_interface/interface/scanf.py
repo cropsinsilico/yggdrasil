@@ -144,7 +144,7 @@ def scanf_compile(format, collapseWhitespace=True):
             format_pat += char
             i += 1
     if DEBUG:
-        print "DEBUG: %r -> %s" % (format, format_pat)
+        print("DEBUG: %r -> %s" % (format, format_pat))
     if collapseWhitespace:
         format_pat = re.sub('\s+', r'\s+', format_pat)
 

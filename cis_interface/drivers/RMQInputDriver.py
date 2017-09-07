@@ -1,8 +1,8 @@
 """Module for receiving input from a RabbitMQ server."""
 import requests
 from pprint import pformat
-from RMQDriver import RMQDriver
-from IODriver import IODriver
+from cis_interface.drivers.RMQDriver import RMQDriver
+from cis_interface.drivers.IODriver import IODriver
 
 
 class RMQInputDriver(RMQDriver, IODriver):

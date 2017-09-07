@@ -1,8 +1,10 @@
 #
 # This should not be used directly by modelers
 #
-from ModelDriver import ModelDriver
 import os
+from cis_interface.drivers.ModelDriver import ModelDriver
+
+
 _top_dir = os.path.normpath(os.path.join(os.path.dirname(__file__), '../'))
 _incl_interface = os.path.join(_top_dir, 'interface')
 _incl_io = os.path.join(_top_dir, 'io')

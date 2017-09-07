@@ -1,14 +1,14 @@
 r"""This package provides a framework for integrating models across languages
 such that they can be run simultaneously, passing input back and forth."""
 import os
-import backwards
-import config
-import tools
-import interface
-import drivers
-import dataio
-import tests
-import examples
+from cis_interface import backwards
+from cis_interface import config
+from cis_interface import tools
+from cis_interface import interface
+from cis_interface import drivers
+from cis_interface import dataio
+from cis_interface import tests
+from cis_interface import examples
 
 
 # Set paths so that c headers are located

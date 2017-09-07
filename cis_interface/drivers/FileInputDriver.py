@@ -1,5 +1,5 @@
 import os
-from IODriver import IODriver
+from cis_interface.drivers.IODriver import IODriver
 
 
 class FileInputDriver(IODriver):

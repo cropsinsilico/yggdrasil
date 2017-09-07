@@ -6,6 +6,7 @@ from logging import debug, warn
 from datetime import datetime
 import os
 import sys
+import weakref
 try:  # pragma: matlab
     import matlab.engine
     _matlab_installed = True
@@ -13,9 +14,8 @@ except ImportError:  # pragma: no matlab
     warn("Could not import matlab.engine. " +
          "Matlab support will be disabled.")
     _matlab_installed = False
-from ModelDriver import ModelDriver
+from cis_interface.drivers.ModelDriver import ModelDriver
 from cis_interface.backwards import sio
-import weakref
 
 
 _top_dir = os.path.normpath(os.path.join(os.path.dirname(__file__), '../'))

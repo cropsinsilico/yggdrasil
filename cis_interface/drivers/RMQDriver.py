@@ -1,8 +1,8 @@
 import os
 import pika
 import socket
-from Driver import Driver
-from IODriver import maxMsgSize
+from cis_interface.drivers.Driver import Driver
+from cis_interface.drivers.IODriver import maxMsgSize
 
 
 class RMQDriver(Driver):
@@ -132,7 +132,6 @@ class RMQDriver(Driver):
         # if self.connection:
         #     self.connection.ioloop.start()
         super(RMQDriver, self).terminate()
-        print 'terminated parent'
         self.debug('::terminate returns')
 
     # RMQ PROPERTIES
@@ -304,7 +303,6 @@ class RMQDriver(Driver):
             if not self._closing or tries <= 0:
                 break
             tries -= 1
-            print 'still closing'
             self.debug('::stop_commmunication: waiting for connection to close')
             self.sleep()
 

@@ -1,6 +1,6 @@
 import nose.tools as nt
-import test_Driver as parent
-from test_IODriver import IOInfo
+import cis_interface.drivers.tests.test_Driver as parent
+from cis_interface.drivers.tests.test_IODriver import IOInfo
 
 
 class TestRPCParam(parent.TestParam, IOInfo):
