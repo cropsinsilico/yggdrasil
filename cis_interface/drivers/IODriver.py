@@ -195,16 +195,22 @@ class IODriver(Driver):
         try:
             leng_exp = long(float(ret))
             data = ''
-            while len(data) < leng_exp:
+            tries_orig = leng_exp / maxMsgSize + 5
+            tries = tries_orig
+            while (len(data) < leng_exp) and (tries > 0):
                 ret = self.ipc_recv()
                 if ret is None:  # pragma: debug
                     self.debug('.ipc_recv_nolimit: read interupted at %d of %d bytes.',
                                len(data, leng_exp))
                     break
                 data += ret
-                print('received %d of %d (maxMsgSize = %d)' % (
-                    len(data), leng_exp, self.mq.max_size))
-            ret, leng = data, len(data)
+                tries -= 1
+            if tries > 0:
+                ret, leng = data, len(data)
+            else:  # pragma: debug
+                self.error('After %d tries, only %d of %d bytes were received.',
+                           tries_orig, len(data), leng_exp)
+                ret, leng = None, -1
         except:  # pragma: debug
             ret, leng = None, -1
         self.debug('.ipc_recv_nolimit ret %d bytes', leng)

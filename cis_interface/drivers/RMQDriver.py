@@ -72,7 +72,6 @@ class RMQDriver(Driver):
 
     # def __del__(self):
     #     self.debug('~')
-        
     #         if self.connection is not None:
     #             self.connection.close()
     #         self.connection = None
