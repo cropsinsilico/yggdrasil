@@ -2,6 +2,7 @@ import sysv_ipc
 from sysv_ipc import MessageQueue
 from cis_interface.drivers.Driver import Driver
 from cis_interface.interface.PsiInterface import PSI_MSG_MAX
+from cis_interface.backwards import decode_str
 
 
 # OS X limit is 2kb
@@ -143,13 +144,13 @@ class IODriver(Driver):
                     self.debug('.ipc_recv(): mq closed')
                 elif self.mq.current_messages > 0:
                     data, _ = self.mq.receive()
-                    ret = str(data)
+                    ret = decode_str(data)
                     self.debug('.ipc_recv ret %d bytes', len(ret))
                 else:
                     ret = ''
                     self.debug('.ipc_recv(): no messages in the queue')
             except:  # pragma: debug
-                self.error('.ipc_send(): exception mq')
+                self.error('.ipc_recv(): exception mq')
             return ret
 
     def ipc_send_nolimit(self, data):
@@ -194,7 +195,7 @@ class IODriver(Driver):
         if ret is None or len(ret) == 0:
             return ret
         try:
-            leng_exp = long(float(ret))
+            leng_exp = int(float(ret))
             data = ''
             tries_orig = leng_exp / maxMsgSize + 5
             tries = tries_orig
@@ -217,6 +218,7 @@ class IODriver(Driver):
                            tries_orig, len(data), leng_exp)
                 ret, leng = None, -1
         except:  # pragma: debug
+            raise
             ret, leng = None, -1
         self.debug('.ipc_recv_nolimit ret %d bytes', leng)
         return ret

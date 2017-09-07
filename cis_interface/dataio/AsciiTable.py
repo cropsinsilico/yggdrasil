@@ -1,6 +1,7 @@
 import numpy as np
 from cis_interface.interface.scanf import scanf
 from cis_interface.dataio.AsciiFile import AsciiFile
+from cis_interface.backwards import decode_str
 try:
     from astropy.io import ascii as apy_ascii
     from astropy.table import Table as apy_Table
@@ -222,7 +223,7 @@ class AsciiTable(AsciiFile):
                 else:
                     raise RuntimeError("'format_str' must be provided for output")
         else:
-            self._format_str = format_str.decode('string_escape')
+            self._format_str = decode_str(format_str)
         if isinstance(column_names, list) and (len(column_names) == self.ncols):
             self.column_names = column_names
 

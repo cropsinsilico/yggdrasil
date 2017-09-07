@@ -81,7 +81,7 @@ class IOInfo(object):
     @property
     def msg_short(self):
         r"""str: Small test message for sending."""
-        return 'Test message'
+        return 'Test\tmessage'
 
     @property
     def msg_long(self):
@@ -159,8 +159,7 @@ class TestIODriver(TestIOParam, parent.TestDriver):
         r"""Test sending/receiving large message."""
         assert(len(self.msg_long) > self.maxMsgSize)
         self.instance.ipc_send_nolimit(self.msg_long)
-        self.instance.sleep(0.1)
-        msg_recv = self.instance.ipc_recv_nolimit()
+        msg_recv = self.instance.recv_wait_nolimit(timeout=10)
         nt.assert_equal(msg_recv, self.msg_long)
 
     def assert_before_stop(self):
