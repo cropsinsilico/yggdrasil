@@ -53,7 +53,8 @@
 <span class="kn">from</span> <span class="nn">cis_interface.dataio.AsciiTable</span> <span class="k">import</span> <span class="n">AsciiTable</span>
 
 
-<span class="n">PSI_MSG_MAX</span> <span class="o">=</span> <span class="mi">1024</span> <span class="o">*</span> <span class="mi">64</span>
+<span class="c1"># OS X limit is 2kb</span>
+<span class="n">PSI_MSG_MAX</span> <span class="o">=</span> <span class="mi">1024</span> <span class="o">*</span> <span class="mi">2</span>
 <span class="n">PSI_MSG_EOF</span> <span class="o">=</span> <span class="s2">&quot;EOF!!!&quot;</span>
 
 

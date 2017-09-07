@@ -189,7 +189,7 @@
             <span class="n">format_pat</span> <span class="o">+=</span> <span class="n">char</span>
             <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
     <span class="k">if</span> <span class="n">DEBUG</span><span class="p">:</span>
-        <span class="nb">print</span> <span class="s2">&quot;DEBUG: </span><span class="si">%r</span><span class="s2"> -&gt; </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">format</span><span class="p">,</span> <span class="n">format_pat</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;DEBUG: </span><span class="si">%r</span><span class="s2"> -&gt; </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">format</span><span class="p">,</span> <span class="n">format_pat</span><span class="p">))</span>
     <span class="k">if</span> <span class="n">collapseWhitespace</span><span class="p">:</span>
         <span class="n">format_pat</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s1">&#39;\s+&#39;</span><span class="p">,</span> <span class="sa">r</span><span class="s1">&#39;\s+&#39;</span><span class="p">,</span> <span class="n">format_pat</span><span class="p">)</span>
 

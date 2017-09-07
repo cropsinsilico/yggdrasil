@@ -1314,8 +1314,11 @@ connection. Defaults to &#8216;&#8217;.</li>
 queue is bound. If None, the queue name is used. Defaults to None.</li>
 <li><strong>user</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a><em>, </em><em>optional</em>) &#8211; RabbitMQ server username. Defaults to environment
 variable &#8216;PSI_MSG_USER&#8217; if it exists.</li>
-<li><strong>server</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a><em>, </em><em>optional</em>) &#8211; RabbitMQ server. Defaults to environment
-variable &#8216;PSI_MSG_SERVER&#8217; if it exists.</li>
+<li><strong>host</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a><em>, </em><em>optional</em>) &#8211; RabbitMQ server host. Defaults to environment
+variable &#8216;PSI_MSG_HOST&#8217; if it exists and the output of
+socket.gethostname() if it does not.</li>
+<li><strong>vhost</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a><em>, </em><em>optional</em>) &#8211; RabbitMQ server virtual host. Defaults to
+environment variable &#8216;PSI_MSG_VHOST&#8217; if it exists.</li>
 <li><strong>passwd</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a><em>, </em><em>optional</em>) &#8211; RabbitMQ server password. Defaults to
 environment variable &#8216;PSI_MSG_PW&#8217; if it exists.</li>
 <li><strong>exchange</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a><em>, </em><em>optional</em>) &#8211; RabbitMQ exchange. Defaults to &#8216;namespace&#8217;
@@ -1336,15 +1339,21 @@ name is not provided, it is assumed exclusive.</li>
 </dd></dl>
 
 <dl class="attribute">
-<dt id="cis_interface.drivers.RMQDriver.RMQDriver.server">
-<code class="descname">server</code><a class="headerlink" href="#cis_interface.drivers.RMQDriver.RMQDriver.server" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>str</em> &#8211; RabbitMQ server.</p>
-</dd></dl>
-
-<dl class="attribute">
 <dt id="cis_interface.drivers.RMQDriver.RMQDriver.passwd">
 <code class="descname">passwd</code><a class="headerlink" href="#cis_interface.drivers.RMQDriver.RMQDriver.passwd" title="Permalink to this definition">¶</a></dt>
 <dd><p><em>str</em> &#8211; RabbitMQ server password.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.drivers.RMQDriver.RMQDriver.host">
+<code class="descname">host</code><a class="headerlink" href="#cis_interface.drivers.RMQDriver.RMQDriver.host" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str</em> &#8211; RabbitMQ server host.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.drivers.RMQDriver.RMQDriver.vhost">
+<code class="descname">vhost</code><a class="headerlink" href="#cis_interface.drivers.RMQDriver.RMQDriver.vhost" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str</em> &#8211; RabbitMQ server virtual host.</p>
 </dd></dl>
 
 <dl class="attribute">

@@ -107,7 +107,9 @@
 
 <div class="viewcode-block" id="ipcrm_queues"><a class="viewcode-back" href="../../cis_interface.html#cis_interface.tools.ipcrm_queues">[docs]</a><span class="k">def</span> <span class="nf">ipcrm_queues</span><span class="p">():</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Delete existing IPC queues.&quot;&quot;&quot;</span>
-    <span class="n">ipcrm</span><span class="p">([</span><span class="s1">&#39;--all=msg&#39;</span><span class="p">])</span></div>
+    <span class="k">for</span> <span class="n">q</span> <span class="ow">in</span> <span class="n">ipc_queues</span><span class="p">():</span>
+        <span class="n">ipcrm</span><span class="p">([</span><span class="s2">&quot;-Q </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">q</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">0</span><span class="p">]])</span></div>
+    <span class="c1"># ipcrm([&#39;--all=msg&#39;])  # This is version specific</span>
 </pre></div>
 
           </div>

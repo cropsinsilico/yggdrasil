@@ -45,10 +45,12 @@
   <h1>Source code for cis_interface.drivers.IODriver</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">sysv_ipc</span>
 <span class="kn">from</span> <span class="nn">sysv_ipc</span> <span class="k">import</span> <span class="n">MessageQueue</span>
-<span class="kn">from</span> <span class="nn">Driver</span> <span class="k">import</span> <span class="n">Driver</span>
+<span class="kn">from</span> <span class="nn">cis_interface.drivers.Driver</span> <span class="k">import</span> <span class="n">Driver</span>
+<span class="kn">from</span> <span class="nn">cis_interface.interface.PsiInterface</span> <span class="k">import</span> <span class="n">PSI_MSG_MAX</span>
 
 
-<span class="n">maxMsgSize</span> <span class="o">=</span> <span class="mi">1024</span> <span class="o">*</span> <span class="mi">64</span>
+<span class="c1"># OS X limit is 2kb</span>
+<span class="n">maxMsgSize</span> <span class="o">=</span> <span class="n">PSI_MSG_MAX</span>
 <span class="n">DEBUG_SLEEPS</span> <span class="o">=</span> <span class="kc">True</span>
 
 
@@ -167,7 +169,7 @@
                     <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;.ipc_send </span><span class="si">%d</span><span class="s1"> bytes completed&#39;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">))</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">=</span> <span class="s1">&#39;delivered&#39;</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">numSent</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">numSent</span> <span class="o">+</span> <span class="mi">1</span>
-            <span class="k">except</span><span class="p">:</span>
+            <span class="k">except</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;.ipc_send(): exception&#39;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="IODriver.ipc_recv"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.IODriver.IODriver.ipc_recv">[docs]</a>    <span class="k">def</span> <span class="nf">ipc_recv</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -210,6 +212,7 @@
         <span class="k">while</span> <span class="n">prev</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="nb">next</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">prev</span> <span class="o">+</span> <span class="n">maxMsgSize</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">))</span>
+                <span class="c1"># next = min(prev + self.mq.max_size, len(data))</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">ipc_send</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">prev</span><span class="p">:</span><span class="nb">next</span><span class="p">])</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;.ipc_send_nolimit(): </span><span class="si">%d</span><span class="s1"> of </span><span class="si">%d</span><span class="s1"> bytes sent&#39;</span><span class="p">,</span>
                            <span class="nb">next</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">))</span>
@@ -238,14 +241,22 @@
         <span class="k">try</span><span class="p">:</span>
             <span class="n">leng_exp</span> <span class="o">=</span> <span class="n">long</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">ret</span><span class="p">))</span>
             <span class="n">data</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
-            <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">leng_exp</span><span class="p">:</span>
+            <span class="n">tries_orig</span> <span class="o">=</span> <span class="n">leng_exp</span> <span class="o">/</span> <span class="n">maxMsgSize</span> <span class="o">+</span> <span class="mi">5</span>
+            <span class="n">tries</span> <span class="o">=</span> <span class="n">tries_orig</span>
+            <span class="k">while</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">leng_exp</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">tries</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">):</span>
                 <span class="n">ret</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ipc_recv</span><span class="p">()</span>
                 <span class="k">if</span> <span class="n">ret</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;.ipc_recv_nolimit: read interupted at </span><span class="si">%d</span><span class="s1"> of </span><span class="si">%d</span><span class="s1"> bytes.&#39;</span><span class="p">,</span>
                                <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">leng_exp</span><span class="p">))</span>
                     <span class="k">break</span>
                 <span class="n">data</span> <span class="o">+=</span> <span class="n">ret</span>
-            <span class="n">ret</span><span class="p">,</span> <span class="n">leng</span> <span class="o">=</span> <span class="n">data</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+                <span class="n">tries</span> <span class="o">-=</span> <span class="mi">1</span>
+            <span class="k">if</span> <span class="n">tries</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">ret</span><span class="p">,</span> <span class="n">leng</span> <span class="o">=</span> <span class="n">data</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;After </span><span class="si">%d</span><span class="s1"> tries, only </span><span class="si">%d</span><span class="s1"> of </span><span class="si">%d</span><span class="s1"> bytes were received.&#39;</span><span class="p">,</span>
+                           <span class="n">tries_orig</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">),</span> <span class="n">leng_exp</span><span class="p">)</span>
+                <span class="n">ret</span><span class="p">,</span> <span class="n">leng</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span>
         <span class="k">except</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
             <span class="n">ret</span><span class="p">,</span> <span class="n">leng</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;.ipc_recv_nolimit ret </span><span class="si">%d</span><span class="s1"> bytes&#39;</span><span class="p">,</span> <span class="n">leng</span><span class="p">)</span>

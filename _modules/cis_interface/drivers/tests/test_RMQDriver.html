@@ -57,11 +57,11 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">TestRMQParam</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">TestRMQParam</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">driver</span> <span class="o">=</span> <span class="s1">&#39;RMQDriver&#39;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">args</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">attr_list</span> <span class="o">+=</span> <span class="p">[</span><span class="s1">&#39;user&#39;</span><span class="p">,</span> <span class="s1">&#39;server&#39;</span><span class="p">,</span> <span class="s1">&#39;passwd&#39;</span><span class="p">,</span> <span class="s1">&#39;exchange&#39;</span><span class="p">,</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">attr_list</span> <span class="o">+=</span> <span class="p">[</span><span class="s1">&#39;user&#39;</span><span class="p">,</span> <span class="s1">&#39;host&#39;</span><span class="p">,</span> <span class="s1">&#39;passwd&#39;</span><span class="p">,</span> <span class="s1">&#39;exchange&#39;</span><span class="p">,</span>
                            <span class="s1">&#39;connection&#39;</span><span class="p">,</span> <span class="s1">&#39;queue&#39;</span><span class="p">,</span> <span class="s1">&#39;channel&#39;</span><span class="p">,</span>
                            <span class="s1">&#39;routing_key&#39;</span><span class="p">,</span> <span class="s1">&#39;consumer_tag&#39;</span><span class="p">,</span>
                            <span class="s1">&#39;_opening&#39;</span><span class="p">,</span> <span class="s1">&#39;_closing&#39;</span><span class="p">,</span> <span class="s1">&#39;times_connected&#39;</span><span class="p">]</span>

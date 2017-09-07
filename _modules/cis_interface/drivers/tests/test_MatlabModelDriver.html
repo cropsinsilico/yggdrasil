@@ -48,6 +48,7 @@
 <span class="kn">import</span> <span class="nn">test_ModelDriver</span> <span class="k">as</span> <span class="nn">parent</span>
 <span class="kn">from</span> <span class="nn">cis_interface</span> <span class="k">import</span> <span class="n">runner</span>
 <span class="kn">from</span> <span class="nn">cis_interface.examples</span> <span class="k">import</span> <span class="n">yamls</span> <span class="k">as</span> <span class="n">ex_yamls</span>
+<span class="kn">from</span> <span class="nn">cis_interface.drivers.MatlabModelDriver</span> <span class="k">import</span> <span class="n">_matlab_installed</span>
 
 
 <span class="n">_session_fname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(),</span> <span class="s1">&#39;nt_screen_session.txt&#39;</span><span class="p">)</span>
@@ -55,10 +56,14 @@
 
 <div class="viewcode-block" id="test_multiple"><a class="viewcode-back" href="../../../../cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_MatlabModelDriver.test_multiple">[docs]</a><span class="k">def</span> <span class="nf">test_multiple</span><span class="p">():</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test that creates multiple matlab drivers.&quot;&quot;&quot;</span>
-    <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;FIB_ITERATIONS&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;3&#39;</span>
-    <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;FIB_SERVER_SLEEP_SECONDS&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;1&#39;</span>
-    <span class="n">cr</span> <span class="o">=</span> <span class="n">runner</span><span class="o">.</span><span class="n">get_runner</span><span class="p">(</span><span class="n">ex_yamls</span><span class="p">[</span><span class="s1">&#39;rpcfib_matlab&#39;</span><span class="p">])</span>
-    <span class="n">cr</span><span class="o">.</span><span class="n">run</span><span class="p">()</span></div>
+    <span class="k">if</span> <span class="n">_matlab_installed</span><span class="p">:</span>  <span class="c1"># pragma: matlab</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;FIB_ITERATIONS&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;3&#39;</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;FIB_SERVER_SLEEP_SECONDS&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;1&#39;</span>
+        <span class="n">cr</span> <span class="o">=</span> <span class="n">runner</span><span class="o">.</span><span class="n">get_runner</span><span class="p">(</span><span class="n">ex_yamls</span><span class="p">[</span><span class="s1">&#39;rpcfib_matlab&#39;</span><span class="p">])</span>
+        <span class="n">cr</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>  <span class="c1"># pragma: no matlab</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Matlab not installed. Not running test with &quot;</span> <span class="o">+</span>
+              <span class="s2">&quot;multiple Matlab drivers.&quot;</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="TestMatlabModelDriver"><a class="viewcode-back" href="../../../../cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_MatlabModelDriver.TestMatlabModelDriver">[docs]</a><span class="k">class</span> <span class="nc">TestMatlabModelDriver</span><span class="p">(</span><span class="n">parent</span><span class="o">.</span><span class="n">TestModelDriver</span><span class="p">,</span>
@@ -70,8 +75,8 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">TestMatlabModelDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">TestMatlabModelDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">driver</span> <span class="o">=</span> <span class="s2">&quot;MatlabModelDriver&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">args</span> <span class="o">=</span> <span class="p">[</span><span class="n">scripts</span><span class="p">[</span><span class="s2">&quot;matlab&quot;</span><span class="p">],</span> <span class="s2">&quot;test&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">attr_list</span> <span class="o">+=</span> <span class="p">[</span><span class="s1">&#39;started_matlab&#39;</span><span class="p">,</span> <span class="s1">&#39;mlengine&#39;</span><span class="p">]</span>

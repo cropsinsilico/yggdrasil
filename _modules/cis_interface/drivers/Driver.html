@@ -112,7 +112,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">lock</span> <span class="o">=</span> <span class="n">Lock</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="nf">__del__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;~&#39;</span><span class="p">)</span>
+        <span class="c1"># self.debug(&#39;~&#39;)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">isAlive</span><span class="p">():</span>  <span class="c1"># pragma: debug</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">terminate</span><span class="p">()</span>
 
