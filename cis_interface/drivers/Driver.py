@@ -3,6 +3,7 @@ from logging import info, debug, error, warn, exception, critical
 import os
 import time
 import inspect
+from cis_interface.config import cis_cfg
 
 
 class Driver(Thread):
@@ -46,12 +47,12 @@ class Driver(Thread):
         self.debug()
         self.name = name
         self.sleeptime = 0.25
-        if os.environ['PSI_DEBUG'] == 'DEBUG':
+        if cis_cfg.get('debug', 'psi') == 'DEBUG':
             self.sleeptime = 1.0
         self.longsleep = self.sleeptime * 10
         # Set defaults
         if namespace is None:
-            namespace = os.environ['PSI_NAMESPACE']
+            namespace = cis_cfg.get('rmq', 'namespace')
             self.debug("Setting namespace to %s", namespace)
         if workingDir is None:
             if isinstance(yml, dict) and ('workingDir' in yml):

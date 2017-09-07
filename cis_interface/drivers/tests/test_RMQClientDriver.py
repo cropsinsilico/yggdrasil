@@ -29,12 +29,6 @@ class TestRMQClientParam(parent1.TestRMQParam, IOInfo):
         self.attr_list += ['request_queue', 'response', 'corr_id',
                            '_deliveries', '_acked', '_nacked',
                            '_message_number']
-        self._temp_queue = 'TestRMQClientDriver_SERVER'
-        if hasattr(self, 'channel'):  # , None):
-            try:
-                self.channel.queue_purge(queue=self.temp_queue)
-            except:
-                self.instance.error("Could not purge test queue.")
             
 
 class TestRMQClientDriverNoStart(TestRMQClientParam,

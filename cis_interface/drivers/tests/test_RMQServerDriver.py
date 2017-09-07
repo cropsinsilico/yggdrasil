@@ -41,6 +41,48 @@ class TestRMQServerDriver(TestRMQServerParam, parent1.TestRMQDriver):
 
     """
 
+    def setup(self):
+        r"""Create a driver instance and start the driver."""
+        super(TestRMQServerDriver, self).setup()
+        self.create_in_rmq()
+
+    def teardown(self):
+        r"""Remove the instance, stoppping it."""
+        self.destroy_in_rmq()
+        super(TestRMQServerDriver, self).teardown()
+
+    def create_in_rmq(self):
+        r"""Create a blocking connection, channel, and queue for testing."""
+        self.connection = pika.BlockingConnection(
+            self.instance.connection_parameters)
+        self.channel = self.connection.channel()
+        out = self.channel.queue_declare(auto_delete=True)
+        self.temp_queue = out.method.queue
+        self.channel.queue_bind(
+            queue=self.temp_queue,
+            exchange=self.instance.exchange,
+            routing_key=self.temp_queue)
+
+    def destroy_in_rmq(self):
+        r"""Remove blocking connection, channel, and queue."""
+        self.channel.queue_unbind(self.temp_queue,
+                                  exchange=self.instance.exchange)
+        self.channel.queue_delete(self.temp_queue)
+        self.channel.close()
+        self.connection.close()
+
+    def temp_basic_get(self):
+        r"""Do basic_get from the temporary queue."""
+        out = self.channel.basic_get(queue=self.temp_queue)
+        tries = 5
+        while out[0] is None and tries > 0:
+            self.connection.sleep(self.instance.sleeptime)
+            out = self.channel.basic_get(queue=self.temp_queue)
+            tries -= 1
+        if out[0] is None:  # pragma: debug
+            raise Exception("Msg receive timed out.")
+        return out
+
     def test_client_count(self):
         r"""Test to ensure client count is correct."""
         nt.assert_equal(self.instance.n_clients, 0)

@@ -1,9 +1,9 @@
 import os
 import nose.tools as nt
+import unittest
 from cis_interface import runner
 from cis_interface.tools import ipc_queues
-import unittest
-
+from cis_interface.config import cis_cfg
 
 # TODO: Test Ctrl-C interruption
 
@@ -51,11 +51,11 @@ class TestParam(unittest.TestCase):
             
     def setup(self, skip_start=False):
         r"""Create a driver instance and start the driver."""
-        # os.environ['PSI_DEBUG'] = 'INFO'
-        os.environ['PSI_DEBUG'] = 'DEBUG'
-        os.environ['RMQ_DEBUG'] = 'INFO'
-        os.environ['PSI_CLIENT_DEBUG'] = 'INFO'
-        os.environ['PSI_NAMESPACE'] = self.namespace
+        # cis_cfg.set('debug', 'psi', 'INFO')
+        cis_cfg.set('debug', 'psi', 'DEBUG')
+        cis_cfg.set('debug', 'rmq', 'INFO')
+        cis_cfg.set('debug', 'client', 'INFO')
+        cis_cfg.set('rmq', 'namespace', self.namespace)
         runner.setup_cis_logging(self.__module__)
         runner.setup_rmq_logging()
         self.nprev_queues = len(ipc_queues())

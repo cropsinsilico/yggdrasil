@@ -1,8 +1,8 @@
-import os
 import pika
 import socket
 from cis_interface.drivers.Driver import Driver
 from cis_interface.drivers.IODriver import maxMsgSize
+from cis_interface.config import cis_cfg
 
 
 class RMQDriver(Driver):
@@ -15,18 +15,18 @@ class RMQDriver(Driver):
             connection. Defaults to ''.
         routing_key (str, optional): Routing key that should be used when the
             queue is bound. If None, the queue name is used. Defaults to None.
-        user (str, optional): RabbitMQ server username. Defaults to environment
-            variable 'PSI_MSG_USER' if it exists.
-        host (str, optional): RabbitMQ server host. Defaults to environment
-            variable 'PSI_MSG_HOST' if it exists and the output of
+        user (str, optional): RabbitMQ server username. Defaults to config
+            option 'user' in section 'rmq'.
+        host (str, optional): RabbitMQ server host. Defaults to config option
+            'host' in section 'rmq' if it exists and the output of
             socket.gethostname() if it does not.
         vhost (str, optional): RabbitMQ server virtual host. Defaults to
-            environment variable 'PSI_MSG_VHOST' if it exists.
+            config option 'vhost' in section 'rmq'.
         passwd (str, optional): RabbitMQ server password. Defaults to
-            environment variable 'PSI_MSG_PW' if it exists.
+            config option 'password' in section 'rmq'.
         exchange (str, optional): RabbitMQ exchange. Defaults to 'namespace'
-            attribute which is set from the environment variable
-            'PSI_NAMESPACE'.
+            attribute which is set from the config option 'namespace' in the
+            section 'rmq'.
         exclusive (bool, optional): If True, the queue that is created can
             only be used by this driver. Defaults to False. If a queue
             name is not provided, it is assumed exclusive.
@@ -53,10 +53,10 @@ class RMQDriver(Driver):
         kwargs_attr = {k: kwargs.pop(k, None) for k in kwattr}
         super(RMQDriver, self).__init__(name, **kwargs)
         self.debug()
-        self.user = os.environ.get('PSI_MSG_USER', None)
-        self.host = os.environ.get('PSI_MSG_HOST', socket.gethostname())
-        self.vhost = os.environ.get('PSI_MSG_VHOST', None)
-        self.passwd = os.environ.get('PSI_MSG_PW', None)
+        self.user = cis_cfg.get('rmq', 'user')
+        self.host = cis_cfg.get('rmq', 'host', socket.gethostname())
+        self.vhost = cis_cfg.get('rmq', 'vhost')
+        self.passwd = cis_cfg.get('rmq', 'password')
         self.exchange = self.namespace
         self.exclusive = False
         for k in kwattr:

@@ -10,6 +10,7 @@ from pprint import pformat
 from itertools import chain
 import socket
 from cis_interface.backwards import sio
+from cis_interface.config import cis_cfg, cfg_environment
 
 
 COLOR_TRACE = '\033[30;43;22m'
@@ -27,7 +28,7 @@ def setup_cis_logging(prog, level=None):
 
     """
     if level is None:
-        level = os.environ.get('PSI_DEBUG', 'NOTSET')
+        level = cis_cfg.get('debug', 'psi', 'NOTSET')
     logLevel = eval('logging.' + level)
     logging.basicConfig(level=logLevel, stream=sys.stdout, format=COLOR_TRACE +
                         prog + ': %(message)s' + COLOR_NORMAL)
@@ -43,7 +44,7 @@ def setup_rmq_logging(level=None):
 
     """
     if level is None:
-        level = os.environ.get('RMQ_DEBUG', 'INFO')
+        level = cis_cfg.get('debug', 'rmq', 'INFO')
     rmqLogLevel = eval('logging.' + level)
     logging.getLogger("pika").setLevel(level=rmqLogLevel)
 
@@ -132,6 +133,8 @@ class CisRunner(object):
             cis_debug_prefix = namespace
         setup_cis_logging(cis_debug_prefix, level=cis_debug_level)
         setup_rmq_logging(level=rmq_debug_level)
+        # Update environment based on config
+        cfg_environment()
         # Parse yamls
         for modelYml in modelYmls:
             self.parseModelYaml(modelYml)
@@ -354,13 +357,13 @@ def get_runner(models, **kwargs):
         CisRunner: Runner for the provided models.
 
     Raises:
-        Exception: If environment variable 'PSI_NAMESPACE' is not set.
+        Exception: If config option 'namespace' in 'rmq' section not set.
 
     """
     # Get environment variables
-    namespace = os.environ.get('PSI_NAMESPACE', False)
+    namespace = cis_cfg.get('rmq', 'namespace', False)
     if not namespace:  # pragma: debug
-        raise Exception('PSI_NAMESPACE not set')
+        raise Exception('rmq:namespace not set in config file')
     rank = os.environ.get('PARALLEL_SEQ', '0')
     host = socket.gethostname()
     os.environ['PSI_RANK'] = rank
