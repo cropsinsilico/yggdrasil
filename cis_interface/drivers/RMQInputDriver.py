@@ -46,15 +46,3 @@ class RMQInputDriver(RMQDriver, IODriver):
             if self._closing:  # pragma: debug
                 return
             ch.basic_ack(delivery_tag=method.delivery_tag)
-
-    # def on_model_exit(self):
-    #     r"""Delete the driver. Unbinding and deleting the queue and closing
-    #     the connection."""
-    #     self.debug('::delete')
-    #     try:
-    #         self.channel.queue_unbind(exchange=self.exchange, queue=self.queue)
-    #         # self.channel.queue_delete(queue=self.queue, if_unused=True)
-    #         # self.connection.close()
-    #     except:
-    #         self.debug("::delete(): exception (IGNORED)")
-    #     self.debug('::delete done')

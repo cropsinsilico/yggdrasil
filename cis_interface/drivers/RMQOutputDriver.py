@@ -62,16 +62,3 @@ class RMQOutputDriver(RMQDriver, IODriver):
         explicitly delete the queue."""
         super(RMQOutputDriver, self).stop_communication(
             remove_queue=False, **kwargs)
-
-    # def on_model_exit(self):
-    #     r"""Delete the driver. Deleting the queue and closing the connection."""
-    #     # self.info(".delete()")
-    #     self.debug(".delete()")
-    #     try:
-    #         pass
-    #         # self.channel.queue_unbind(exchange=self.exchange, queue=self.queue)
-    #         # self.channel.queue_delete(queue=self.queue, if_unused=True)
-    #         # self.connection.close()
-    #     except:
-    #         self.debug(".delete(): exception (IGNORED)")
-    #     self.debug(".delete() returns")
