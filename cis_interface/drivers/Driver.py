@@ -67,7 +67,7 @@ class Driver(Thread):
         self.lock = Lock()
 
     def __del__(self):
-        self.debug('~')
+        # self.debug('~')
         if self.isAlive():  # pragma: debug
             self.terminate()
 
