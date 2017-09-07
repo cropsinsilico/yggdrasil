@@ -34,7 +34,8 @@ class TestRMQClientParam(parent1.TestRMQParam, IOInfo):
                            '_message_number']
         self._temp_queue = 'TestRMQClientDriver_SERVER'
         if getattr(self, 'channel', None):
-            self.channel.queue_purge(queue=self.temp_queue)
+            if self.channel.is_open:
+                self.channel.queue_purge(queue=self.temp_queue)
             
 
 class TestRMQClientDriverNoStart(TestRMQClientParam,

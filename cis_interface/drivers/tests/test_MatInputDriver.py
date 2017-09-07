@@ -35,6 +35,7 @@ class TestMatInputDriver(parent.TestIODriver):
         r"""Assertions to make before stopping the driver instance."""
         super(TestMatInputDriver, self).assert_before_stop()
         msg_recv = self.instance.recv_wait_nolimit()
+        assert(msg_recv)
         dat_recv = pickle.loads(msg_recv)
         for k in self.data_dict.keys():
             np.testing.assert_array_equal(dat_recv[k], self.data_dict[k])
