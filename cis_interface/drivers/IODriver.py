@@ -124,7 +124,7 @@ class IODriver(Driver):
                     self.debug('.ipc_send %d bytes completed', len(data))
                     self.state = 'delivered'
                     self.numSent = self.numSent + 1
-            except:
+            except:  # pragma: debug
                 self.debug('.ipc_send(): exception')
 
     def ipc_recv(self):

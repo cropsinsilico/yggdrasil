@@ -51,10 +51,10 @@ class TestParam(unittest.TestCase):
             
     def setup(self, skip_start=False):
         r"""Create a driver instance and start the driver."""
-        os.environ['PSI_DEBUG'] = 'DEBUG'
-        os.environ['RMQ_DEBUG'] = 'DEBUG'
-        os.environ['PSI_CLIENT_DEBUG'] = 'DEBUG'
         # os.environ['PSI_DEBUG'] = 'INFO'
+        os.environ['PSI_DEBUG'] = 'DEBUG'
+        os.environ['RMQ_DEBUG'] = 'INFO'
+        os.environ['PSI_CLIENT_DEBUG'] = 'INFO'
         os.environ['PSI_NAMESPACE'] = self.namespace
         runner.setup_cis_logging(self.__module__)
         runner.setup_rmq_logging()

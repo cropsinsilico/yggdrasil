@@ -52,7 +52,7 @@ class RMQInputDriver(RMQDriver, IODriver):
         self.debug('::on_message: received message # %s from %s',
                    method.delivery_tag, props.app_id)
         with self.lock:
-            if self._closing:
+            if self._closing:  # pragma: debug
                 return
         self.ipc_send(body)
         with self.lock:

@@ -10,6 +10,7 @@ docs/source/modules.rst
 
 # Coverage
 .coverage
+htmlcov
 
 # temp for storing notes, whatever, etc.   not managed
 tmp/
