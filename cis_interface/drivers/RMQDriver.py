@@ -140,10 +140,15 @@ class RMQDriver(Driver):
     def connection_parameters(self):
         r""":class:`pika.connection.ConnectionParameters`: Connection
         parameters."""
-        return pika.ConnectionParameters(host=self.host,
-                                         credentials=self.creds,
-                                         heartbeat_interval=120,
-                                         connection_attempts=3)
+        kws = dict(credentials=self.creds,
+                   heartbeat_interval=120,
+                   connection_attempts=3)
+        if self.host is not None:
+            kws['host'] = self.host
+        return pika.ConnectionParameters(**kws)  # host=self.host,
+    # credentials=self.creds,
+    # heartbeat_interval=120,
+    # connection_attempts=3)
 
     # CONNECTION
     def connect(self):
