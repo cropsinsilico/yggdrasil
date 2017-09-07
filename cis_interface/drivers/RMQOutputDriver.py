@@ -24,19 +24,6 @@ class RMQOutputDriver(RMQDriver, IODriver):
             name, suffix="_OUT", queue=args, **kwargs)
         self.debug()
 
-    def printStatus(self):
-        r"""Print the driver status."""
-        self.debug('::printStatus():')
-        super(RMQOutputDriver, self).printStatus()
-        msg = '%-30s' % ('RMQOutputDriver(' + self.name + '):')
-        with self.lock:
-            if self._q_obj is not None:
-                msg += '%-30s' % (str(self._q_obj.method.message_count) +
-                                  ' in RMQ server queue')
-            else:
-                msg += '%-30s' % 'queue not found'
-        print(msg)
-
     def start_communication(self):
         r"""Start publishing messages from the local queue."""
         self.debug('::start_communication')

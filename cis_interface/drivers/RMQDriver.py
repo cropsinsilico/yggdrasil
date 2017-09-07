@@ -1,5 +1,7 @@
 import pika
 import socket
+import requests
+from pprint import pformat
 from cis_interface.drivers.Driver import Driver
 from cis_interface.drivers.IODriver import maxMsgSize
 from cis_interface.config import cis_cfg
@@ -134,6 +136,22 @@ class RMQDriver(Driver):
         super(RMQDriver, self).terminate()
         self.debug('::terminate returns')
 
+    def printStatus(self):
+        r"""Print the driver status."""
+        self.debug('::printStatus')
+        super(RMQDriver, self).printStatus()
+        hoststr = self.host
+        if self.host == '/':
+            hoststr = '%2f'
+        url = 'http://%s:%s/api/%s/%s/%s' % (
+            hoststr, 15672, 'queues', '%2f', self.queue)
+        res = requests.get(url, auth=(self.user, self.passwd))
+        jdata = res.json()
+        qdata = jdata.get('message_stats', '')
+        if qdata:
+            qdata = pformat(qdata)
+        self.display(": server info:\n%s", qdata)
+
     # RMQ PROPERTIES
     @property
     def creds(self):
@@ -149,10 +167,7 @@ class RMQDriver(Driver):
                    connection_attempts=3)
         if self.host is not None:
             kws['host'] = self.host
-        return pika.ConnectionParameters(**kws)  # host=self.host,
-    # credentials=self.creds,
-    # heartbeat_interval=120,
-    # connection_attempts=3)
+        return pika.ConnectionParameters(**kws)
 
     # CONNECTION
     def connect(self):
@@ -184,7 +199,6 @@ class RMQDriver(Driver):
         with self.lock:
             self.debug('::on_connection_closed code %d %s', reply_code,
                        reply_text)
-            self.channel = None
             if self._closing or reply_code == 200:
                 self.connection.ioloop.stop()
                 self.connection = None
@@ -226,6 +240,7 @@ class RMQDriver(Driver):
         with self.lock:
             self.debug('::channel %i was closed: (%s) %s',
                        channel, reply_code, reply_text)
+            self.channel = None
             self.connection.close()
 
     # EXCHANGE
@@ -249,15 +264,16 @@ class RMQDriver(Driver):
             exclusive = self.exclusive
         else:
             exclusive = True
-        self._q_obj = self.channel.queue_declare(self.on_queue_declareok,
-                                                 queue=queue_name,
-                                                 exclusive=exclusive,
-                                                 auto_delete=True)
+        self.channel.queue_declare(self.on_queue_declareok,
+                                   queue=queue_name,
+                                   exclusive=exclusive,
+                                   auto_delete=True)
 
     def on_queue_declareok(self, method_frame):
         r"""Actions to perform once the queue is succesfully declared. Bind
         the queue."""
         self.debug('::Binding')
+        self._q_obj = method_frame.method
         self.queue = method_frame.method.queue
         if self.routing_key is None:
             self.routing_key = self.queue
@@ -289,9 +305,11 @@ class RMQDriver(Driver):
 
     def stop_communication(self, **kwargs):
         r"""Stop sending/receiving messages."""
+        self.debug('::stop_communication')
         with self.lock:
             self._closing = True
             if self.channel and self.channel.is_open:
+                self.error('Unbinding queue')
                 self.channel.queue_unbind(queue=self.queue,
                                           exchange=self.exchange)
                 self.channel.queue_delete(queue=self.queue)

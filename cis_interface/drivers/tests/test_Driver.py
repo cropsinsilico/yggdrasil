@@ -54,7 +54,7 @@ class TestParam(unittest.TestCase):
         # cis_cfg.set('debug', 'psi', 'INFO')
         cis_cfg.set('debug', 'psi', 'DEBUG')
         cis_cfg.set('debug', 'rmq', 'INFO')
-        cis_cfg.set('debug', 'client', 'INFO')
+        cis_cfg.set('debug', 'client', 'DEBUG')
         cis_cfg.set('rmq', 'namespace', self.namespace)
         runner.setup_cis_logging(self.__module__)
         runner.setup_rmq_logging()

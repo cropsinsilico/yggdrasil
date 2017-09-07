@@ -162,8 +162,21 @@ class Driver(Thread):
             t = self.sleeptime
         time.sleep(t)
 
+    def display(self, fmt_str='', *args):
+        r"""Log a message at level 1000 that is prepended with the driver class
+        and name. These messages will always be printed.
+
+        Args:
+            fmt_str (str, optional): Format string.
+            \*args: Additional arguments are formated using the format string.
+
+        """
+        if not isinstance(fmt_str, str):
+            fmt_str = str(fmt_str)
+        print(self.logger_prefix + fmt_str % args)
+
     def info(self, fmt_str='', *args):
-        r"""Print a info message that is prepended with the driver class and
+        r"""Log an info message that is prepended with the driver class and
         name.
 
         Args:
@@ -176,7 +189,7 @@ class Driver(Thread):
         info(self.logger_prefix + fmt_str, *args)
 
     def debug(self, fmt_str='', *args):
-        r"""Print a debug message that is prepended with the driver class and
+        r"""Log a debug message that is prepended with the driver class and
         name.
 
         Args:
@@ -189,7 +202,7 @@ class Driver(Thread):
         debug(self.logger_prefix + fmt_str, *args)
 
     def critical(self, fmt_str='', *args):
-        r"""Print a critical message that is prepended with the driver class and
+        r"""Log a critical message that is prepended with the driver class and
         name.
 
         Args:
@@ -202,7 +215,7 @@ class Driver(Thread):
         critical(self.logger_prefix + fmt_str, *args)
 
     def warn(self, fmt_str='', *args):
-        r"""Print a warning message that is prepended with the driver class and
+        r"""Log a warning message that is prepended with the driver class and
         name.
 
         Args:
@@ -215,7 +228,7 @@ class Driver(Thread):
         warn(self.logger_prefix + fmt_str, *args)
 
     def error(self, fmt_str='', *args):
-        r"""Print a error message that is prepended with the driver class and
+        r"""Log an error message that is prepended with the driver class and
         name.
 
         Args:
@@ -228,7 +241,7 @@ class Driver(Thread):
         error(self.logger_prefix + fmt_str, *args)
 
     def exception(self, fmt_str='', *args):
-        r"""Print a exception message that is prepended with the driver class
+        r"""Log an exception message that is prepended with the driver class
         ane name.
 
         Args:

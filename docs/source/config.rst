@@ -50,15 +50,15 @@ Options in the '[RMQ]' section control the behavior of RabbitMQ connections.
 If the option is left blank, the default RabbitMQ option is used.
 These include:
 
-=========    =======    ==============================================
-Option       Default    Description
-=========    =======    ==============================================
-namespace               RabbitMQ exchange.
-host                    RabbitMQ server host.
-vhost                   RabbitMQ server virtual host.
-user         guest      RabbitMQ server user name.
-password     guest      RabbitMQ server password.
-=========    =======    ==============================================
+=========    =========    ==============================================
+Option       Default      Description
+=========    =========    ==============================================
+namespace                 RabbitMQ exchange.
+host         localhost    RabbitMQ server host.
+vhost                     RabbitMQ server virtual host.
+user         guest        RabbitMQ server user name.
+password     guest        RabbitMQ server password.
+=========    =========    ==============================================
 
 
 Parallel Options

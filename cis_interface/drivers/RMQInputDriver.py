@@ -1,6 +1,4 @@
 """Module for receiving input from a RabbitMQ server."""
-import requests
-from pprint import pformat
 from cis_interface.drivers.RMQDriver import RMQDriver
 from cis_interface.drivers.IODriver import IODriver
 
@@ -25,17 +23,6 @@ class RMQInputDriver(RMQDriver, IODriver):
         super(RMQInputDriver, self).__init__(
             name, suffix="_IN", queue=args, **kwargs)
         self.debug()
-
-    def printStatus(self):
-        r"""Print the driver status."""
-        self.debug('::printStatus')
-        super(RMQInputDriver, self).printStatus()
-        url = 'http://%s:%s/api/%s/%s/%s' % (
-            self.host, 15672, 'queues', '%2f', self.queue)
-        res = requests.get(url, auth=(self.user, self.passwd))
-        jdata = res.json()
-        qdata = jdata.get('message_stats', '')
-        self.error(": server info: %s", pformat(qdata))
 
     def start_communication(self):
         r"""Begin consuming messages and add the callback for cancelling

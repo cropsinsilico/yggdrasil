@@ -61,7 +61,6 @@ class TestRMQOutputDriver(TestRMQOutputParam,
     def test_RMQ_send(self):
         r"""Send a short message to the AMQP server."""
         self.instance.ipc_send(self.msg_short)
-        self.instance.printStatus()
         msg_recv = self.in_rmq.recv_wait(timeout=3)
         nt.assert_equal(msg_recv, self.msg_short)
 
