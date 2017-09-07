@@ -165,7 +165,9 @@ class IODriver(Driver):
         while prev < len(data):
             try:
                 next = min(prev + maxMsgSize, len(data))
-                print('sending %d:%d of %d' % (prev, next, len(data)))
+                print('sending %d:%d of %d (maxMsgSize = %d)' % (prev, next,
+                                                                 len(data),
+                                                                 maxMsgSize))
                 self.ipc_send(data[prev:next])
                 self.debug('.ipc_send_nolimit(): %d of %d bytes sent',
                            next, len(data))

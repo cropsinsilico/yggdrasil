@@ -151,6 +151,7 @@ class TestIODriver(TestIOParam, parent.TestDriver):
     def test_send_recv(self):
         r"""Test sending/receiving small message."""
         self.instance.ipc_send(self.msg_short)
+        self.instance.sleep(0.1)
         msg_recv = self.instance.ipc_recv()
         nt.assert_equal(msg_recv, self.msg_short)
 
@@ -158,6 +159,7 @@ class TestIODriver(TestIOParam, parent.TestDriver):
         r"""Test sending/receiving large message."""
         assert(len(self.msg_long) > self.maxMsgSize)
         self.instance.ipc_send_nolimit(self.msg_long)
+        self.instance.sleep(0.1)
         msg_recv = self.instance.ipc_recv_nolimit()
         nt.assert_equal(msg_recv, self.msg_long)
 
