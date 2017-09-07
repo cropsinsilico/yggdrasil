@@ -33,7 +33,7 @@ class TestRMQClientParam(parent1.TestRMQParam, IOInfo):
                            '_deliveries', '_acked', '_nacked',
                            '_message_number']
         self._temp_queue = 'TestRMQClientDriver_SERVER'
-        if getattr(self, 'channel', None):
+        if hasattr(self, 'channel'):  # , None):
             try:
                 self.channel.queue_purge(queue=self.temp_queue)
             except:
