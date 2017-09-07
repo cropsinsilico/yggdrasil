@@ -1,8 +1,8 @@
 import os
 import pika
 import nose.tools as nt
-import test_RMQDriver as parent1
-from test_IODriver import IOInfo
+import cis_interface.drivers.tests.test_RMQDriver as parent1
+from cis_interface.drivers.tests.test_IODriver import IOInfo
 from cis_interface.drivers.RMQClientDriver import (
     _new_client_msg, _end_client_msg)
 from cis_interface import runner
@@ -33,7 +33,7 @@ class TestRMQClientParam(parent1.TestRMQParam, IOInfo):
                            '_deliveries', '_acked', '_nacked',
                            '_message_number']
         self._temp_queue = 'TestRMQClientDriver_SERVER'
-        if getattr(self, 'channel', None):
+        if getattr(self, '_channel', None):
             if self.channel.is_open:
                 self.channel.queue_purge(queue=self.temp_queue)
             
