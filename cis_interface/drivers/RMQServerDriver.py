@@ -60,7 +60,12 @@ class RMQServerDriver(RMQDriver, RPCDriver):
             self.clients.add(props.reply_to)
         elif body == _end_client_msg:
             self.debug('::Client signed off (%s)' % props.reply_to)
-            self.clients.remove(props.reply_to)
+            if props.reply_to in self.clients:
+                self.clients.remove(props.reply_to)
+            else:  # pragma: debug
+                self.debug(('::Client signing off (%s) is not one of ' +
+                            'the recorded clients for this server (%s).'),
+                           props.reply_to, str(self.clients))
             if self.n_clients == 0:
                 self.debug('::All clients have signed off. Stopping.')
                 self.stop()
