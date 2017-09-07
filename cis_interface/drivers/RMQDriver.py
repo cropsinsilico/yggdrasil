@@ -56,9 +56,9 @@ class RMQDriver(Driver):
         for k in kwattr:
             if kwargs_attr[k] is not None:
                 setattr(self, k, kwargs_attr.pop(k))
-            if getattr(self, k) is None:  # pragma: debug
-                raise Exception(("%s not provided and corresponding " +
-                                 "environment variable is not set.") % k)
+            # if getattr(self, k) is None:  # pragma: debug
+            #     raise Exception(("%s not provided and corresponding " +
+            #                      "environment variable is not set.") % k)
         self.connection = None
         self.channel = None
         self.queue = queue

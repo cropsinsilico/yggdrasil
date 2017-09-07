@@ -28,4 +28,7 @@ env_map = [('debug', 'psi', 'PSI_DEBUG'),
            ('RMQ', 'cluster', 'PSI_CLUSTER'),
            ]
 for s, v, env in env_map:
-    os.environ[env] = cis_cfg.get(s, v)
+    val = cis_cfg.get(s, v)
+    if val:
+        os.environ[env] = val
+    # os.environ[env] = cis_cfg.get(s, v)
