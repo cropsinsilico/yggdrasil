@@ -1,3 +1,7 @@
+[![Build Status](https://travis-ci.org/cropsinsilico/cis_interface.svg?branch=master)](https://travis-ci.org/cropsinsilico/cis_interface)
+[![Coverage Status](https://coveralls.io/repos/github/cropsinsilico/cis_interface/badge.svg?branch=master)](https://coveralls.io/github/cropsinsilico/cis_interface?branch=master)
+[![PEP8](https://img.shields.io/badge/code%20style-pep8-orange.svg)](https://www.python.org/dev/peps/pep-0008/)
+
 The CiS framework provides support for combining scientific models
 written in different programming languages. To combine two models,
 modelers add simple communications interfaces to the model code
