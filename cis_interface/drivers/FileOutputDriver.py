@@ -51,7 +51,7 @@ class FileOutputDriver(IODriver):
             return
         while self.fd is not None:
             data = self.ipc_recv()
-            if data is None:
+            if data is None:  # pragma: debug
                 self.debug(':recv: closed')
                 break
             self.debug(':recvd %s bytes', len(data))

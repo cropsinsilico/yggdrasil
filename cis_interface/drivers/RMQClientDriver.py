@@ -110,7 +110,7 @@ class RMQClientDriver(RMQDriver, RPCDriver):
                 return
         self.debug('Checking IPC queue.')
         message = self.oipc.ipc_recv_nolimit()
-        if message is None:
+        if message is None:  # pragma: debug
             self.debug("::IPC queue closed!")
             return
         elif len(message) == 0:

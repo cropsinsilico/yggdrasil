@@ -317,6 +317,14 @@ def test_AsciiTable_array_bytes():
             assert_raises(ValueError, AF_in.array_to_bytes,
                           np.zeros((nrows, ncols - 1)))
             # Check direct conversion of bytes
+            if order == 'C':
+                AF_out_err = AsciiTable.AsciiTable(
+                    output_file, 'w', dtype='float',
+                    format_str='\t'.join(5*['%f'])+'\n')
+                err_byt = np.zeros(12, dtype=AF_out_err.dtype).tobytes(
+                    order=order)
+                assert_raises(ValueError, AF_out_err.bytes_to_array, err_byt,
+                              order=order)
             in_bts = AF_in.array_to_bytes(order=order)
             out_arr = AF_in.bytes_to_array(in_bts, order=order)
             np.testing.assert_equal(out_arr, in_arr)

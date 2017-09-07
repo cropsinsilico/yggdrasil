@@ -113,20 +113,21 @@ class RMQDriver(Driver):
     def terminate(self):
         r"""Terminate the driver by closing the RabbitMQ connection."""
         with self.lock:
-            if self._closing:
+            if self._closing:  # pragma: debug
                 return  # Don't close more than once
         self.debug("::terminate")
         tries = 10
         while True:
             if not self._opening or tries <= 0:
                 break
-            self.debug('Waiting for connection to open before terminating')
-            # if self.connection is None:
-            #     self.connection.add_timeout(self.terminate(), self.sleeptime)
-            #     return
-            # while self.connection is None:
-            tries -= 1
-            self.sleep()
+            else:  # pragma: debug
+                self.debug('Waiting for connection to open before terminating')
+                # if self.connection is None:
+                #     self.connection.add_timeout(self.terminate(), self.sleeptime)
+                #     return
+                # while self.connection is None:
+                tries -= 1
+                self.sleep()
         self.debug('::terminate: Closing connection')
         self.stop_communication()
         # Only needed if ioloop is stopped prior to closing the connection?
@@ -147,7 +148,11 @@ class RMQDriver(Driver):
             hoststr, 15672, 'queues', '%2f', self.queue)
         res = requests.get(url, auth=(self.user, self.passwd))
         jdata = res.json()
-        qdata = jdata.get('message_stats', '')
+        if isinstance(jdata, dict):
+            qdata = jdata.get('message_stats', '')
+        else:
+            qdata = ''
+            # print(len(jdata))
         if qdata:
             qdata = pformat(qdata)
         self.display(": server info:\n%s", qdata)
@@ -303,16 +308,19 @@ class RMQDriver(Driver):
         r"""Start sending/receiving messages."""
         pass
 
-    def stop_communication(self, **kwargs):
+    def stop_communication(self, remove_queue=True, **kwargs):
         r"""Stop sending/receiving messages."""
         self.debug('::stop_communication')
         with self.lock:
             self._closing = True
             if self.channel and self.channel.is_open:
-                self.error('Unbinding queue')
-                self.channel.queue_unbind(queue=self.queue,
-                                          exchange=self.exchange)
-                self.channel.queue_delete(queue=self.queue)
+                if remove_queue:
+                    self.debug('::stop_communication: unbinding queue')
+                    self.display('Unbinding queue')
+                    self.channel.queue_unbind(queue=self.queue,
+                                              exchange=self.exchange)
+                    self.channel.queue_delete(queue=self.queue)
+                self.debug('::stop_communication: closing channel')
                 self.channel.close()
             else:
                 self._closing = False

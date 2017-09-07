@@ -206,7 +206,7 @@ class IODriver(Driver):
                     break
                 data += ret
                 tries -= 1
-            if tries > 0:
+            if len(data) < leng_exp:
                 ret, leng = data, len(data)
             else:  # pragma: debug
                 self.error('After %d tries, only %d of %d bytes were received.',

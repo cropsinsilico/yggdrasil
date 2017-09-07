@@ -52,7 +52,7 @@ class RMQServerDriver(RMQDriver, RPCDriver):
     def on_message(self, ch, method, props, body):
         r"""Actions to perform when a message is received."""
         with self.lock:
-            if self._closing:
+            if self._closing:  # pragma: debug
                 return
         # TODO: handle possibility of message larger than AMQP server memory
         if body == _new_client_msg:
@@ -75,7 +75,7 @@ class RMQServerDriver(RMQDriver, RPCDriver):
             self.iipc.ipc_send_nolimit(body)
             response = self.oipc.recv_wait_nolimit()
             with self.lock:
-                if self._closing:
+                if self._closing:  # pragma: debug
                     return
                 ch.basic_publish(exchange=self.exchange,
                                  routing_key=props.reply_to,

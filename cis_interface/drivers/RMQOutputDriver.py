@@ -60,13 +60,8 @@ class RMQOutputDriver(RMQDriver, IODriver):
     def stop_communication(self, **kwargs):
         r"""Stop sending/receiving messages. Only RMQInputDriver should
         explicitly delete the queue."""
-        with self.lock:
-            self._closing = True
-            if self.channel and self.channel.is_open:
-                # self.channel.queue_unbind(queue=self.queue,
-                #                           exchange=self.exchange)
-                # self.channel.queue_delete(queue=self.queue)
-                self.channel.close()
+        super(RMQOutputDriver, self).stop_communication(
+            remove_queue=False, **kwargs)
 
     # def on_model_exit(self):
     #     r"""Delete the driver. Deleting the queue and closing the connection."""
