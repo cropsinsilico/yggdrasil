@@ -11,6 +11,9 @@ env:
     MATPLOTLIB=matplotlib
     MPLBACKEND=agg
 
+services:
+  - rabbitmq
+
 matrix:
   include:
     - python: 2.7
@@ -57,7 +60,8 @@ install:
     pip install -e .
     
 before_script:
-  - flake8 cis_interface
+  - |
+    flake8 cis_interface
 
 script:
   - |

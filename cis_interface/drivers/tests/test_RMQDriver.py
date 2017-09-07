@@ -16,7 +16,7 @@ class TestRMQParam(parent.TestParam):
         super(TestRMQParam, self).__init__()
         self.driver = 'RMQDriver'
         self.args = None
-        self.attr_list += ['user', 'server', 'passwd', 'exchange',
+        self.attr_list += ['user', 'host', 'passwd', 'exchange',
                            'connection', 'queue', 'channel',
                            'routing_key', 'consumer_tag',
                            '_opening', '_closing', 'times_connected']

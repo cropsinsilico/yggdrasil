@@ -31,7 +31,7 @@ class RMQInputDriver(RMQDriver, IODriver):
         self.debug('::printStatus')
         super(RMQInputDriver, self).printStatus()
         url = 'http://%s:%s/api/%s/%s/%s' % (
-            self.server, 15672, 'queues', '%2f', self.queue)
+            self.host, 15672, 'queues', '%2f', self.queue)
         res = requests.get(url, auth=(self.user, self.passwd))
         jdata = res.json()
         qdata = jdata.get('message_stats', '')
