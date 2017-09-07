@@ -18,7 +18,7 @@ class RMQDriver(Driver):
         user (str, optional): RabbitMQ server username. Defaults to environment
             variable 'PSI_MSG_USER' if it exists.
         host (str, optional): RabbitMQ server host. Defaults to environment
-            variable 'PSI_MSG_HOST' if it exists and the output of 
+            variable 'PSI_MSG_HOST' if it exists and the output of
             socket.gethostname() if it does not.
         vhost (str, optional): RabbitMQ server virtual host. Defaults to
             environment variable 'PSI_MSG_VHOST' if it exists.
