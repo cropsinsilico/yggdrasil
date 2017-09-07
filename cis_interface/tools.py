@@ -62,8 +62,6 @@ def ipcrm(options=[]):
 
 def ipcrm_queues():
     r"""Delete existing IPC queues."""
-    ipcrm(["-V"])
     for q in ipc_queues():
         ipcrm(["-Q %s" % q.split()[0]])
-    # ipcrm(["ipcs -q | grep `whoami` | awk '{ print $2 }' | xargs -n1 ipcrm -q"])
     # ipcrm(['--all=msg'])  # This is version specific
