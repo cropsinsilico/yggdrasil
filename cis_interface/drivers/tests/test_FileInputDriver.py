@@ -1,4 +1,5 @@
 import os
+import tempfile
 import nose.tools as nt
 import test_IODriver as parent
 
@@ -11,10 +12,10 @@ class TestFileInputParam(parent.TestIOParam):
 
     """
 
-    def __init__(self):
-        super(TestFileInputParam, self).__init__()
+    def __init__(self, *args, **kwargs):
+        super(TestFileInputParam, self).__init__(*args, **kwargs)
         self.driver = 'FileInputDriver'
-        self.filepath = os.path.abspath('ascii_input.txt')
+        self.filepath = os.path.join(tempfile.gettempdir(), 'ascii_input.txt')
         self.args = self.filepath
         self.attr_list += ['args', 'fd', 'lock']
 
@@ -53,7 +54,7 @@ class TestFileInputDriver(TestFileInputParam, parent.TestIODriver):
     def assert_before_stop(self):
         r"""Assertions to make before stopping the driver instance."""
         super(TestFileInputDriver, self).assert_before_stop()
-        msg_recv = self.instance.recv_wait()
+        msg_recv = self.instance.recv_wait(timeout=2)
         nt.assert_equal(msg_recv, self.file_contents)
 
     def assert_after_terminate(self):

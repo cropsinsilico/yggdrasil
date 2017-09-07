@@ -12,8 +12,8 @@ class TestRMQParam(parent.TestParam):
 
     """
 
-    def __init__(self):
-        super(TestRMQParam, self).__init__()
+    def __init__(self, *args, **kwargs):
+        super(TestRMQParam, self).__init__(*args, **kwargs)
         self.driver = 'RMQDriver'
         self.args = None
         self.attr_list += ['user', 'host', 'passwd', 'exchange',

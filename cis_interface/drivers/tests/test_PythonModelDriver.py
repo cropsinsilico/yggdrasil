@@ -10,8 +10,8 @@ class TestPythonModelParam(parent.TestModelParam):
 
     """
 
-    def __init__(self):
-        super(TestPythonModelParam, self).__init__()
+    def __init__(self, *args, **kwargs):
+        super(TestPythonModelParam, self).__init__(*args, **kwargs)
         self.driver = "PythonModelDriver"
         self.args = scripts["python"]
 

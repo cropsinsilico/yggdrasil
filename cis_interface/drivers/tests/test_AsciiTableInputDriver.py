@@ -11,8 +11,8 @@ class TestAsciiTableInputParam(parent.TestAsciiFileInputParam):
 
     """
 
-    def __init__(self):
-        super(TestAsciiTableInputParam, self).__init__()
+    def __init__(self, *args, **kwargs):
+        super(TestAsciiTableInputParam, self).__init__(*args, **kwargs)
         self.driver = 'AsciiTableInputDriver'
         self.attr_list += ['file', 'as_array']
 
@@ -66,8 +66,8 @@ class TestAsciiTableInputDriver_Array(TestAsciiTableInputParam,
 
     """
 
-    def __init__(self):
-        super(TestAsciiTableInputDriver_Array, self).__init__()
+    def __init__(self, *args, **kwargs):
+        super(TestAsciiTableInputDriver_Array, self).__init__(*args, **kwargs)
         self.args = {'filepath': self.filepath,
                      'as_array': True}
 

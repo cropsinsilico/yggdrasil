@@ -10,8 +10,8 @@ class TestAsciiFileInputParam(parent.TestFileInputParam):
 
     """
 
-    def __init__(self):
-        super(TestAsciiFileInputParam, self).__init__()
+    def __init__(self, *args, **kwargs):
+        super(TestAsciiFileInputParam, self).__init__(*args, **kwargs)
         self.driver = 'AsciiFileInputDriver'
         self.attr_list += ['file_kwargs', 'file']
         self.args = self.args

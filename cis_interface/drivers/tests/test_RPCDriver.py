@@ -11,8 +11,8 @@ class TestRPCParam(parent.TestParam, IOInfo):
 
     """
 
-    def __init__(self):
-        super(TestRPCParam, self).__init__()
+    def __init__(self, *args, **kwargs):
+        super(TestRPCParam, self).__init__(*args, **kwargs)
         IOInfo.__init__(self)
         self.driver = 'RPCDriver'
         self.args = '_TEST'

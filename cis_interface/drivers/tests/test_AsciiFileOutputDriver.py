@@ -9,8 +9,8 @@ class TestAsciiFileOutputParam(parent.TestFileOutputParam):
 
     """
 
-    def __init__(self):
-        super(TestAsciiFileOutputParam, self).__init__()
+    def __init__(self, *args, **kwargs):
+        super(TestAsciiFileOutputParam, self).__init__(*args, **kwargs)
         self.driver = 'AsciiFileOutputDriver'
         self.attr_list += ['file_kwargs', 'file']
         self.args = [self.args, {}, 'ignore']

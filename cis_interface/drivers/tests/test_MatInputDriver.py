@@ -13,8 +13,8 @@ class TestMatInputDriver(parent.TestIODriver):
     
     """
 
-    def __init__(self):
-        super(TestMatInputDriver, self).__init__()
+    def __init__(self, *args, **kwargs):
+        super(TestMatInputDriver, self).__init__(*args, **kwargs)
         self.driver = 'MatInputDriver'
         self.filepath = os.path.abspath('mat_input.mat')
         self.args = self.filepath

@@ -10,8 +10,8 @@ class TestAsciiTableOutputParam(parent.TestAsciiFileOutputParam):
 
     """
 
-    def __init__(self):
-        super(TestAsciiTableOutputParam, self).__init__()
+    def __init__(self, *args, **kwargs):
+        super(TestAsciiTableOutputParam, self).__init__(*args, **kwargs)
         self.driver = 'AsciiTableOutputDriver'
         self.attr_list = ['file', 'as_array']
         
@@ -50,8 +50,8 @@ class TestAsciiTableOutputDriver_Array(TestAsciiTableOutputParam,
                                        parent.TestAsciiFileOutputDriver):
     r"""Test runner for AsciiTableOutputDriver with array input."""
 
-    def __init__(self):
-        super(TestAsciiTableOutputDriver_Array, self).__init__()
+    def __init__(self, *args, **kwargs):
+        super(TestAsciiTableOutputDriver_Array, self).__init__(*args, **kwargs)
         self.args = {'filepath': self.filepath,
                      'as_array': True}
 

@@ -12,8 +12,8 @@ class TestMatOutputParam(parent.TestIOParam):
     
     """
 
-    def __init__(self):
-        super(TestMatOutputParam, self).__init__()
+    def __init__(self, *args, **kwargs):
+        super(TestMatOutputParam, self).__init__(*args, **kwargs)
         self.driver = 'MatOutputDriver'
         self.filepath = os.path.abspath('mat_input.mat')
         self.args = self.filepath

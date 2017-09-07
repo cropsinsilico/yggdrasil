@@ -12,8 +12,8 @@ class TestRMQOutputParam(parent1.TestRMQParam, IOInfo):
 
     """
 
-    def __init__(self):
-        super(TestRMQOutputParam, self).__init__()
+    def __init__(self, *args, **kwargs):
+        super(TestRMQOutputParam, self).__init__(*args, **kwargs)
         self.driver = 'RMQOutputDriver'
         self.args = 'test'
         

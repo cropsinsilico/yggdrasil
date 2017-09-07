@@ -2,12 +2,13 @@ import os
 import nose.tools as nt
 from cis_interface import runner
 from cis_interface.tools import ipc_queues
+import unittest
 
 
 # TODO: Test Ctrl-C interruption
 
 
-class TestParam(object):
+class TestParam(unittest.TestCase):
     r"""Test parameters for basic Driver test class.
 
     Attributes:
@@ -22,7 +23,7 @@ class TestParam(object):
 
     """
 
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
         self.driver = 'Driver'
         self.args = None
         self.namespace = 'TESTING'
@@ -30,11 +31,23 @@ class TestParam(object):
                           'rank', 'workingDir']
         self.inst_kwargs = {'yml': {'workingDir': self.workingDir}}
         self.nprev_queues = 0
+        super(TestParam, self).__init__(*args, **kwargs)
 
-    def set_param_attr(self, param_class):
-        r"""Copy all attributes from param_class."""
-        for k, v in param_class.__dict__.items():
-            setattr(self, k, v)
+    def shortDescription(self):
+        r"""Prefix first line of doc string with driver."""
+        out = super(TestParam, self).shortDescription()
+        return '%s: %s' % (self.driver, out)
+
+    def setUp(self, *args, **kwargs):
+        self.setup(*args, **kwargs)
+
+    def tearDown(self, *args, **kwargs):
+        self.teardown(*args, **kwargs)
+
+    # def set_param_attr(self, param_class):
+    #     r"""Copy all attributes from param_class."""
+    #     for k, v in param_class.__dict__.items():
+    #         setattr(self, k, v)
             
     def setup(self, skip_start=False):
         r"""Create a driver instance and start the driver."""

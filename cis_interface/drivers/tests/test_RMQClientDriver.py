@@ -25,8 +25,8 @@ class TestRMQClientParam(parent1.TestRMQParam, IOInfo):
 
     """
 
-    def __init__(self):
-        super(TestRMQClientParam, self).__init__()
+    def __init__(self, *args, **kwargs):
+        super(TestRMQClientParam, self).__init__(*args, **kwargs)
         self.driver = 'RMQClientDriver'
         self.args = None
         self.attr_list += ['request_queue', 'response', 'corr_id',

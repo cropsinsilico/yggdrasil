@@ -15,8 +15,8 @@ class TestRMQServerParam(parent1.TestRMQParam, IOInfo):
 
     """
 
-    def __init__(self):
-        super(TestRMQServerParam, self).__init__()
+    def __init__(self, *args, **kwargs):
+        super(TestRMQServerParam, self).__init__(*args, **kwargs)
         self.driver = 'RMQServerDriver'
         self.args = None
         self.attr_list += ['clients']

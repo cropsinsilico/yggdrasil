@@ -25,8 +25,8 @@ class TestMatlabModelDriver(parent.TestModelDriver,
 
     """
 
-    def __init__(self):
-        super(TestMatlabModelDriver, self).__init__()
+    def __init__(self, *args, **kwargs):
+        super(TestMatlabModelDriver, self).__init__(*args, **kwargs)
         self.driver = "MatlabModelDriver"
         self.args = [scripts["matlab"], "test", 1]
         self.attr_list += ['started_matlab', 'mlengine']

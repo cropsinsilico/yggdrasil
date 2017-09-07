@@ -118,8 +118,8 @@ class TestIOParam(parent.TestParam, IOInfo):
         -
 
     """
-    def __init__(self):
-        super(TestIOParam, self).__init__()
+    def __init__(self, *args, **kwargs):
+        super(TestIOParam, self).__init__(*args, **kwargs)
         IOInfo.__init__(self)
         self.driver = 'IODriver'
         self.args = '_TEST'

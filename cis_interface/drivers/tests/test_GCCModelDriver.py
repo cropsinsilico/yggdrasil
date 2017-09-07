@@ -12,8 +12,8 @@ class TestGCCModelParam(parent.TestModelParam):
 
     """
 
-    def __init__(self):
-        super(TestGCCModelParam, self).__init__()
+    def __init__(self, *args, **kwargs):
+        super(TestGCCModelParam, self).__init__(*args, **kwargs)
         self.driver = 'GCCModelDriver'
         self.args = [scripts['c'], '1', '-I' + _incl_interface]
         self.attr_list += ['compiled']
