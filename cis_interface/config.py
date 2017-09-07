@@ -70,7 +70,7 @@ def cfg_environment(env=None, cfg=None):
         env (dict, optional): Dictionary of environment variables that should
             be updated. Defaults to `os.environ`.
         cfg (:class:`cis_interface.config.CisConfigParser`, optional):
-            Config parser with options that should be used to update the 
+            Config parser with options that should be used to update the
             environment. Defaults to :var:`cis_interface.config.cis_cfg`.
 
     """
