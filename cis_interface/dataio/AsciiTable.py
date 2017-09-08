@@ -1,7 +1,8 @@
 import numpy as np
+import copy
 from cis_interface.interface.scanf import scanf
 from cis_interface.dataio.AsciiFile import AsciiFile
-from cis_interface.backwards import decode_str
+from cis_interface import backwards
 try:
     from astropy.io import ascii as apy_ascii
     from astropy.table import Table as apy_Table
@@ -14,6 +15,7 @@ except:  # pragma: no cover
 
 
 _default_args = {'column': '\t'}
+_fmt_char = backwards.unicode2bytes('%')
 
 
 def nptype2cformat(nptype):
@@ -65,6 +67,12 @@ def nptype2cformat(nptype):
             cfmt = '%s'
         else:
             cfmt = "%" + str(t.itemsize) + "s"
+    elif np.issubdtype(t, np.dtype("U")):
+        # cfmt = '%s'
+        if t.itemsize is 0:
+            cfmt = '%s'
+        else:
+            cfmt = "%" + t.str[-1] + "s"
     else:
         raise ValueError("No format specification string for dtype %s" % t)
     # Short and long specifiers not supported by python scanf
@@ -90,45 +98,47 @@ def cformat2nptype(cfmt):
 
     """
     # TODO: this may fail on 32bit systems where C long types are 32 bit
-    if not isinstance(cfmt, str):
-        raise TypeError("Input must be a string.")
-    elif not cfmt.startswith('%'):
+    if not isinstance(cfmt, backwards.bytes_type):
+        raise TypeError("Input must be of type %s, not %s" %
+                        (backwards.bytes_type, type(cfmt)))
+    elif not cfmt.startswith(_fmt_char):
         raise ValueError("Provided C format string (%s) " % cfmt +
                          "does not start with '%%'")
     elif len(cfmt) == 1:
         raise ValueError("Provided C format string (%s) " % cfmt +
                          "does not contain type info")
     out = None
-    if cfmt[-1] in ['f', 'F', 'e', 'E', 'g', 'G']:
+    cfmt_str = backwards.bytes2unicode(cfmt)
+    if cfmt_str[-1] in ['f', 'F', 'e', 'E', 'g', 'G']:
         out = 'float64'
-    elif cfmt[-1] in ['d', 'i']:
-        if 'hh' in cfmt:  # short short, single char
+    elif cfmt_str[-1] in ['d', 'i']:
+        if 'hh' in cfmt_str:  # short short, single char
             out = 'int8'
-        elif cfmt[-2] == 'h':  # short
+        elif cfmt_str[-2] == 'h':  # short
             out = 'short'
-        elif 'll' in cfmt:
+        elif 'll' in cfmt_str:
             out = 'longlong'  # long long
-        elif cfmt[-2] == 'l':
+        elif cfmt_str[-2] == 'l':
             out = 'int_'  # long (broken in python)
         else:
             out = 'intc'  # int, platform dependent
-    elif cfmt[-1] in ['u', 'o', 'x', 'X']:
-        if 'hh' in cfmt:  # short short, single char
+    elif cfmt_str[-1] in ['u', 'o', 'x', 'X']:
+        if 'hh' in cfmt_str:  # short short, single char
             out = 'uint8'
-        elif cfmt[-2] == 'h':  # short
+        elif cfmt_str[-2] == 'h':  # short
             out = 'ushort'
-        elif 'll' in cfmt:
+        elif 'll' in cfmt_str:
             out = 'ulonglong'  # long long
-        elif cfmt[-2] == 'l':
+        elif cfmt_str[-2] == 'l':
             out = 'uint64'  # long (broken in python)
         else:
             out = 'uintc'  # int, platform dependent
-    elif cfmt[-1] in ['c', 's']:
-        lstr = cfmt[1:-1]
+    elif cfmt_str[-1] in ['c', 's']:
+        lstr = cfmt_str[1:-1]
         if lstr:
-            out = 'S' + lstr
+            out = backwards.np_dtype_str + lstr
         else:
-            out = 'S'
+            out = backwards.np_dtype_str
     else:
         raise ValueError("Could not find match for format str %s" % cfmt)
     return np.dtype(out).str
@@ -145,29 +155,26 @@ def cformat2pyscanf(cfmt):
         str: Version of cfmt that can be parsed by scanf.
 
     Raises:
-        TypeError: if cfmt is not a string.
+        TypeError: if cfmt is not a bytes/str.
         ValueError: If the c format does not begin with '%'.
         ValueError: If the c format does not contain type info.
 
     """
-    if not isinstance(cfmt, str):
-        raise TypeError("Input must be a string.")
-    elif not cfmt.startswith('%'):
+    if not isinstance(cfmt, backwards.bytes_type):
+        raise TypeError("Input must be of type %s." % backwards.bytes_type)
+    elif not cfmt.startswith(_fmt_char):
         raise ValueError("Provided C format string (%s) " % cfmt +
                          "does not start with '%%'")
     elif len(cfmt) == 1:
         raise ValueError("Provided C format string (%s) " % cfmt +
                          "does not contain type info")
-    cc = cfmt[-1]
-    out = '%' + cc
-    # if cc == 's':
-    #     out = '%s'  # cfmt[:-1]+'c'
-    # else:
-    #     # out = cfmt
-    #     out = '%'+cc
+    # Hacky, but necessary to handle concatenation of a single byte
+    cfmt_str = backwards.bytes2unicode(cfmt)
+    out = backwards.bytes2unicode(_fmt_char)
+    out += cfmt_str[-1]
     out = out.replace('h', '')
     out = out.replace('l', '')
-    return out
+    return backwards.unicode2bytes(out)
 
 
 class AsciiTable(AsciiFile):
@@ -214,7 +221,10 @@ class AsciiTable(AsciiFile):
         for k, v in _default_args.items():
             if not hasattr(self, k):
                 setattr(self, k, v)
-        if not isinstance(format_str, str):
+        self.column = backwards.unicode2bytes(self.column)
+        try:
+            self._format_str = backwards.unicode2bytes(format_str)
+        except TypeError:
             if isinstance(dtype, (str, np.dtype)):
                 self._dtype = np.dtype(dtype)
             else:
@@ -222,8 +232,6 @@ class AsciiTable(AsciiFile):
                     self.discover_format_str()
                 else:
                     raise RuntimeError("'format_str' must be provided for output")
-        else:
-            self._format_str = decode_str(format_str)
         if isinstance(column_names, list) and (len(column_names) == self.ncols):
             self.column_names = column_names
 
@@ -231,9 +239,10 @@ class AsciiTable(AsciiFile):
     def format_str(self):
         if not hasattr(self, '_format_str'):
             if hasattr(self, '_dtype'):
-                fmts = [nptype2cformat(self.dtype[i])
+                fmts = [backwards.unicode2bytes(nptype2cformat(self.dtype[i]))
                         for i in range(len(self.dtype))]
-                self._format_str = self.column.join(fmts) + self.newline
+                self._format_str = backwards.unicode2bytes(
+                    self.column.join(fmts) + self.newline)
             else:  # pragma: debug
                 raise RuntimeError("Format string not set " +
                                    "and cannot be determined.")
@@ -257,7 +266,7 @@ class AsciiTable(AsciiFile):
     @property
     def ncols(self):
         # return len(self.fmts)
-        return self.format_str.count('%')
+        return self.format_str.count(_fmt_char)
 
     def update_format_str(self, new_format_str):
         r"""Change the format string and update the data type.
@@ -266,7 +275,7 @@ class AsciiTable(AsciiFile):
             new_format_str (str): New format string.
 
         """
-        self._format_str = new_format_str
+        self._format_str = backwards.unicode2bytes(new_format_str)
         if hasattr(self, '_dtype'):
             delattr(self, '_dtype')
 
@@ -315,12 +324,14 @@ class AsciiTable(AsciiFile):
             return
         if len(names) != self.ncols:
             raise IndexError("The number of names must match the number of columns.")
-        line = self.comment + ' ' + self.column.join(names) + '\n'
+        names = [backwards.unicode2bytes(n) for n in names]
+        line = (self.comment + backwards.unicode2bytes(' ') +
+                self.column.join(names) + self.newline)
         self.writeline_full(line)
             
     def writeformat(self):
         r"""Write the format string to the file."""
-        line = self.comment + ' ' + self.format_str
+        line = self.comment + backwards.unicode2bytes(' ') + self.format_str
         self.writeline_full(line)
 
     def readline(self):
@@ -353,7 +364,7 @@ class AsciiTable(AsciiFile):
         if self.is_open:
             line = self.format_line(*args)
         else:
-            line = ''
+            line = backwards.unicode2bytes('')
         self.writeline_full(line, validate=True)
 
     def readline_full(self, validate=False):
@@ -402,7 +413,8 @@ class AsciiTable(AsciiFile):
         """
         if len(args) < self.ncols:
             raise RuntimeError("Incorrect number of arguments.")
-        return self.format_str % args
+        out = backwards.bytes2unicode(self.format_str) % args
+        return backwards.unicode2bytes(out)
 
     def process_line(self, line):
         r"""Extract values from the columns in the line using the table format.
@@ -414,12 +426,11 @@ class AsciiTable(AsciiFile):
             tuple: The arguments extracted from line.
 
         """
-        new_fmt = self.column.join([cformat2pyscanf(f) for f in self.fmts]) + self.newline
-        # print(line, line.count(self.column))
-        # print(new_fmt, new_fmt.count(self.column))
-        # for x, fmt in zip(line.split(self.column), new_fmt.split(self.column)):
-        #     print(fmt, x, scanf(fmt, x))
-        out = scanf(new_fmt, line)
+        new_fmt = (self.column.join(
+            [backwards.unicode2bytes(cformat2pyscanf(f)) for f in self.fmts]) +
+            self.newline)
+        out = scanf(backwards.bytes2unicode(new_fmt),
+                    backwards.bytes2unicode(line))
         return out
         
     def validate_line(self, line):
@@ -427,12 +438,13 @@ class AsciiTable(AsciiFile):
         expected number of values.
 
         Raises:
-            TypeError: If the line is not a string.
+            TypeError: If the line is not a bytes/str.
             AssertionError: If the line does not match the format string.
 
         """
-        if not isinstance(line, str):
-            raise TypeError("Line must be a string")
+        if not isinstance(line, backwards.bytes_type):
+            raise TypeError("Line must be of type %s, not %s."
+                            % (backwards.bytes_type, type(line)))
         args = self.process_line(line)
         if args is None or (len(args) != self.ncols):
             raise AssertionError("The line does not match the format string.")
@@ -452,41 +464,43 @@ class AsciiTable(AsciiFile):
             self._arr = tab.as_array()
             self._dtype = self._arr.dtype
             if getattr(self, 'column_names', None) is None:
-                self.column_names = [str(c) for c in tab.columns]
+                self.column_names = [c for c in tab.columns]
         else:
             comment_list = []
             out = None
-            with open(self.filepath, 'r') as fd:
+            with open(self.filepath, 'rb') as fd:
                 for line in fd:
                     if line.startswith(self.comment):
                         sline = line.lstrip(self.comment)
-                        sline = sline.lstrip(' ')
+                        sline = sline.lstrip(backwards.unicode2bytes(' '))
                         fmts = sline.split(self.column)
-                        is_fmt = [f.startswith('%') for f in fmts]
+                        is_fmt = [f.startswith(_fmt_char) for f in fmts]
                         if sum(is_fmt) == len(fmts):
                             out = sline
                             break
                         comment_list.append(sline)
             if out is None:  # pragma: debug
                 raise Exception("Could not locate a line containing format descriptors.")
-            self._format_str = out
+            self._format_str = backwards.unicode2bytes(out)
             # Do column names
             if getattr(self, 'column_names', None) is None:
                 self.column_names = None
                 for sline in comment_list:
                     names = sline.split(self.newline)[0].split(self.column)
                     if len(names) == self.ncols:
-                        self.column_names = names
+                        self.column_names = [
+                            backwards.bytes2unicode(n) for n in names]
                         break
             # Do string lengths
-            if '%s' in self._format_str:
+            str_fmt = backwards.unicode2bytes('%s')
+            if str_fmt in self._format_str:
                 fmts = self.fmts
                 idx_str = []
                 for i, ifmt in enumerate(fmts):
-                    if ifmt == '%s':
+                    if ifmt == str_fmt:
                         idx_str.append(i)
                 max_len = {i: 0 for i in idx_str}
-                with open(self.filepath, 'r') as fd:
+                with open(self.filepath, 'rb') as fd:
                     for line in fd:
                         if line.startswith(self.comment):
                             continue
@@ -494,7 +508,7 @@ class AsciiTable(AsciiFile):
                         for i in idx_str:
                             max_len[i] = max(max_len[i], len(cols[i]))
                 for i in idx_str:
-                    fmts[i] = '%' + str(max_len[i]) + 's'
+                    fmts[i] = backwards.unicode2bytes('%' + str(max_len[i]) + 's')
                 new_format_str = self.column.join(fmts) + self.newline
                 self.update_format_str(new_format_str)
 
@@ -530,11 +544,13 @@ class AsciiTable(AsciiFile):
         if hasattr(self, '_arr'):
             return self._arr
         if self.use_astropy:
-            return apy_ascii.read(self.filepath, names=names).as_array()
+            arr = apy_ascii.read(self.filepath, names=names).as_array()
         else:
             with open(self.filepath, 'r') as fd:
-                arr = np.genfromtxt(fd, comments=self.comment,
-                                    delimiter=self.column, dtype=self.dtype,
+                arr = np.genfromtxt(fd,
+                                    comments=backwards.bytes2unicode(self.comment),
+                                    delimiter=backwards.bytes2unicode(self.column),
+                                    dtype=self.dtype,
                                     autostrip=True, names=names)
         return arr
 
@@ -555,7 +571,10 @@ class AsciiTable(AsciiFile):
                 there are columns.
 
         """
-        fmt = self.format_str.split(self.newline)[0]
+        fmt = backwards.bytes2unicode(self.format_str.split(self.newline)[0])
+        column = backwards.bytes2unicode(self.column)
+        comment = backwards.bytes2unicode(self.comment)
+        newline = backwards.bytes2unicode(self.newline)
         if skip_header:
             names = None
         else:
@@ -571,20 +590,20 @@ class AsciiTable(AsciiFile):
             else:
                 table_format = 'commented_header'
                 table.meta["comments"] = [fmt]
-            apy_ascii.write(table, self.filepath, delimiter=self.column,
-                            comment=self.comment + ' ', format=table_format,
-                            names=names)
+            apy_ascii.write(table, self.filepath,
+                            delimiter=column, comment=comment + ' ',
+                            format=table_format, names=names)
         else:
             if skip_header:
                 head = ''
             else:
                 head = fmt
                 if names is not None:
-                    head = self.column.join(names) + "\n" + " " + head
-            np.savetxt(self.filepath, array, fmt=fmt, delimiter=self.column,
-                       comments=self.comment + ' ', newline=self.newline,
-                       header=head)
-            
+                    head = column.join(names) + newline + " " + head
+            np.savetxt(self.filepath, array,
+                       fmt=fmt, delimiter=column, comments=comment + ' ',
+                       newline=newline, header=head)
+
     def array_to_bytes(self, arr=None, order='C'):
         r"""Convert arr to bytestring.
 
@@ -615,9 +634,9 @@ class AsciiTable(AsciiFile):
         else:
             arr1 = arr
         if order == 'F':
-            out = ''
+            out = backwards.unicode2bytes('')
             for n in arr1.dtype.names:
-                out += arr1[n].tobytes()
+                out = out + arr1[n].tobytes()
         else:
             out = arr1.tobytes(order='C')
         return out
@@ -638,7 +657,7 @@ class AsciiTable(AsciiFile):
         if (len(data) % self.dtype.itemsize) != 0:
             raise RuntimeError("Data length (%d) must a multiple of the itemsize (%d)."
                                % (len(data), self.dtype.itemsize))
-        nrows = len(data) / self.dtype.itemsize
+        nrows = len(data) // self.dtype.itemsize
         if order == 'F':
             arr = np.empty((nrows,), dtype=self.dtype)
             prev = 0
@@ -650,7 +669,7 @@ class AsciiTable(AsciiFile):
             arr = np.fromstring(data, dtype=self.dtype)
             if (len(arr) % self.ncols) != 0:
                 raise ValueError("Returned data does not match")
-            nrows = len(arr) / self.ncols
+            nrows = len(arr) // self.ncols
             arr.reshape((nrows, self.ncols), order=order)
         return arr
 

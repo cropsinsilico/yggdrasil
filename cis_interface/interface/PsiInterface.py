@@ -90,7 +90,7 @@ class PsiInput(object):
             return payload
         try:
             # (leng_exp,) = scanf('%d', payload[1])
-            leng_exp = long(float(payload[1]))
+            leng_exp = int(float(payload[1]))
             data = ''
             ret = True
             while len(data) < leng_exp:

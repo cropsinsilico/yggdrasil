@@ -5,6 +5,7 @@ from pprint import pformat
 from cis_interface.drivers.Driver import Driver
 from cis_interface.drivers.IODriver import maxMsgSize
 from cis_interface.config import cis_cfg
+from cis_interface import backwards
 
 
 class RMQDriver(Driver):
@@ -343,6 +344,7 @@ class RMQDriver(Driver):
             bool: True if the message was sent succesfully. False otherwise.
 
         """
+        backwards.assert_bytes(data)
         with self.lock:
             if self._closing:
                 return False
@@ -373,7 +375,7 @@ class RMQDriver(Driver):
         """
         self.debug("::send_nolimit %d", len(data))
         prev = 0
-        ret = self.rmq_send("%ld" % len(data))
+        ret = self.rmq_send(backwards.str2bytes("%ld" % len(data)))
         if ret:
             while prev < len(data):
                 next = min(prev + maxMsgSize, len(data))

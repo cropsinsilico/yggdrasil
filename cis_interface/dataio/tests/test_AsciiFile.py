@@ -108,7 +108,7 @@ def test_AsciiFile_line():
             if line is None:
                 count_comments += 1  # pragma: no cover
             else:
-                AF_out.writeline(line.rstrip('\n'))
+                AF_out.writeline(line.rstrip(AF_out.comment))
                 count_lines += 1
     AF_in.close()
     AF_out.close()

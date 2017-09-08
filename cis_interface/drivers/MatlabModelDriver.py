@@ -83,8 +83,8 @@ def stop_matlab(screen_session, matlab_engine, matlab_session):
             while matlab_session in matlab.engine.find_matlab():
                 debug("Waiting for matlab engine to exit")
                 time.sleep(1)
-    else:  # pragma: no matlab
-        warn("Matlab not installed. Matlab could not be stopped.")
+    # else:  # pragma: no matlab
+    #     warn("Matlab not installed. Matlab could not be stopped.")
 
 
 class MatlabModelDriver(ModelDriver):

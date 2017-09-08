@@ -4,6 +4,7 @@ from cis_interface.drivers.IODriver import maxMsgSize
 from cis_interface.backwards import pickle
 from cis_interface.drivers.tests import test_Driver as parent
 from cis_interface.dataio.AsciiTable import AsciiTable
+from cis_interface import backwards
 
 
 class IOInfo(object):
@@ -17,7 +18,7 @@ class IOInfo(object):
 
     def __init__(self):
         self.fmt_str = '%5s\t%d\t%f\n'
-        self.fmt_str_line = '# ' + self.fmt_str
+        self.fmt_str_line = backwards.unicode2bytes('# ' + self.fmt_str)
         self.file_dtype = 'S5, i4, f8'
         self.file_rows = [('one', int(1), 1.0),
                           ('two', int(2), 2.0),
@@ -28,7 +29,7 @@ class IOInfo(object):
         r"""list: Lines in a mock file."""
         out = []
         for r in self.file_rows:
-            out.append(self.fmt_str % r)
+            out.append(backwards.unicode2bytes(self.fmt_str % r))
         return out
 
     @property
@@ -36,7 +37,7 @@ class IOInfo(object):
         r"""str: Complete contents of mock file."""
         out = self.fmt_str_line
         for line in self.file_lines:
-            out += line
+            out = out + line
         return out
 
     @property
@@ -51,9 +52,9 @@ class IOInfo(object):
     def file_bytes(self):
         r"""str: Raw bytes of array of mock file contents."""
         arr = self.file_array
-        out = ''
+        out = backwards.unicode2bytes('')
         for n in arr.dtype.names:
-            out += arr[n].tobytes()
+            out = out + arr[n].tobytes()
         return out
 
     @property
@@ -81,12 +82,12 @@ class IOInfo(object):
     @property
     def msg_short(self):
         r"""str: Small test message for sending."""
-        return 'Test\tmessage'
+        return backwards.unicode2bytes('Test\tmessage')
 
     @property
     def msg_long(self):
         r"""str: Small test message for sending."""
-        return 'Test message' + self.maxMsgSize * '0'
+        return backwards.unicode2bytes('Test message' + self.maxMsgSize * '0')
 
     def write_table(self, fname):
         r"""Write the table out to a file.

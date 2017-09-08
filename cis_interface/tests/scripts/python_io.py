@@ -11,7 +11,7 @@ def runhello():
     outf = PsiOutput('outFile')
     fdata = inf.recv()
     debug('got input %s', fdata)
-    print fdata
+    print(fdata)
     outf.send(fdata)
     debug('sent output')
     debug('bye')

@@ -1,4 +1,5 @@
 import os
+from cis_interface import backwards
 
 
 _default_args = {'comment': '#',
@@ -40,6 +41,8 @@ class AsciiFile(object):
         for k, v in _default_args.items():
             if not hasattr(self, k):
                 setattr(self, k, v)
+        self.comment = backwards.unicode2bytes(self.comment)
+        self.newline = backwards.unicode2bytes(self.newline)
         self.fd = None
 
     @property
@@ -52,7 +55,7 @@ class AsciiFile(object):
         if self.io_mode is None:
             raise Exception("Cannot open in memory table.")
         if not self.is_open:
-            self.fd = open(self.filepath, self.io_mode)
+            self.fd = open(self.filepath, self.io_mode + 'b')
 
     def close(self):
         r"""Close the associated file descriptor if it is open."""
@@ -81,19 +84,20 @@ class AsciiFile(object):
         present.
 
         Args:
-            line (str): Line to be written with/without the newline character.
+            line (str/bytes): Line to be written with/without the newline
+                character.
 
         Raises:
-            TypeError: If line is not a string.
+            TypeError: If line is not the correct bytes type.
 
         """
         if not self.is_open:
             print("The file is not open. Nothing written.")
             return
-        if not isinstance(line, str):
-            raise TypeError("Line must be a string.")
+        if not isinstance(line, backwards.bytes_type):
+            raise TypeError("Line must be of type %s" % backwards.bytes_type)
         if not line.endswith(self.newline):
-            line += self.newline
+            line = line + self.newline
         self.writeline_full(line)
 
     def readline_full(self):
@@ -109,7 +113,7 @@ class AsciiFile(object):
         if not self.is_open:
             print("The file is not open. Nothing read.")
             return True, line
-        line = self.fd.readline()
+        line = backwards.unicode2bytes(self.fd.readline())
         if len(line) == 0:
             return True, line
         if line.startswith(self.comment):
@@ -121,15 +125,15 @@ class AsciiFile(object):
         nothing happens.
 
         Args:
-            line (str): Line to be written.
+            line (str/bytes): Line to be written.
 
         Raises:
-            TypeError: If line is not a string.
+            TypeError: If line is not the correct bytes type.
 
         """
         if not self.is_open:
             print("The file is not open. Nothing written.")
             return
-        if not isinstance(line, str):
-            raise TypeError("Line must be a string.")
+        if not isinstance(line, backwards.bytes_type):
+            raise TypeError("Line must be of type %s" % backwards.bytes_type)
         self.fd.write(line)

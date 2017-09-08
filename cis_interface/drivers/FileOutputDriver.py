@@ -45,7 +45,7 @@ class FileOutputDriver(IODriver):
         self.debug(':run in %s', os.getcwd())
         try:
             with self.lock:
-                self.fd = open(self.args, 'w+')
+                self.fd = open(self.args, 'wb+')
         except:  # pragma: debug
             self.exception('Could not open file.')
             return

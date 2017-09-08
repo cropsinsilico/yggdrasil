@@ -21,7 +21,7 @@ class TestFileInputParam(parent.TestIOParam):
 
     def setup(self):
         r"""Create a driver instance and start the driver."""
-        with open(self.filepath, 'w') as fd:
+        with open(self.filepath, 'wb') as fd:
             fd.write(self.file_contents)
         super(TestFileInputParam, self).setup()
 

@@ -2,7 +2,7 @@ import sysv_ipc
 from sysv_ipc import MessageQueue
 from cis_interface.drivers.Driver import Driver
 from cis_interface.interface.PsiInterface import PSI_MSG_MAX
-from cis_interface.backwards import bytes2str
+from cis_interface import backwards
 
 
 # OS X limit is 2kb
@@ -114,6 +114,7 @@ class IODriver(Driver):
             str: The message to be sent.
 
         """
+        backwards.assert_bytes(data)
         with self.lock:
             self.state = 'deliver'
             self.debug('::ipc_send %d bytes', len(data))
@@ -145,13 +146,15 @@ class IODriver(Driver):
                     self.debug('.ipc_recv(): mq closed')
                 elif self.mq.current_messages > 0:
                     data, _ = self.mq.receive()
-                    ret = bytes2str(data)
+                    ret = data
                     self.debug('.ipc_recv ret %d bytes', len(ret))
                 else:
-                    ret = ''
+                    ret = backwards.unicode2bytes('')
                     self.debug('.ipc_recv(): no messages in the queue')
             except:  # pragma: debug
                 self.error('.ipc_recv(): exception mq')
+            if ret is not None:
+                backwards.assert_bytes(ret)
             return ret
 
     def ipc_send_nolimit(self, data):
@@ -165,7 +168,7 @@ class IODriver(Driver):
         self.debug('::ipc_send_nolimit %d bytes', len(data))
         prev = 0
         error = False
-        self.ipc_send("%ld" % len(data))
+        self.ipc_send(backwards.unicode2bytes("%ld" % len(data)))
         while prev < len(data):
             try:
                 next = min(prev + maxMsgSize, len(data))
@@ -197,7 +200,7 @@ class IODriver(Driver):
             return ret
         try:
             leng_exp = int(float(ret))
-            data = ''
+            data = backwards.unicode2bytes('')
             tries_orig = leng_exp / maxMsgSize + 5
             tries = tries_orig
             while (len(data) < leng_exp) and (tries > 0):
@@ -206,7 +209,7 @@ class IODriver(Driver):
                     self.debug('.ipc_recv_nolimit: read interupted at %d of %d bytes.',
                                len(data, leng_exp))
                     break
-                data += ret
+                data = data + ret
                 tries -= 1
             if len(data) == leng_exp:
                 ret, leng = data, len(data)
