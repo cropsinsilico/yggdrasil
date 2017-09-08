@@ -25,6 +25,7 @@ class Driver(Thread):
         sleeptime (float): Time that driver should sleep for when sleep called.
         longsleep (float): Time that the driver will sleep for when waiting for
             longer tasks to complete (10x longer than sleeptime).
+        timeout (float): Maximum time that should be spent waiting on a process.
         yml (dict): Dictionary of yaml specification options for this driver.
         namespace (str): Namespace for set of drivers running together.
         rank (int): Rank of the integration.
@@ -46,10 +47,11 @@ class Driver(Thread):
         self._thread_initialized = True
         self.debug()
         self.name = name
-        self.sleeptime = 0.25
-        if cis_cfg.get('debug', 'psi') == 'DEBUG':
-            self.sleeptime = 1.0
+        self.sleeptime = 0.001  # 25
+        # if cis_cfg.get('debug', 'psi') == 'DEBUG':
+        #     self.sleeptime = 1.0
         self.longsleep = self.sleeptime * 10
+        self.timeout = 1.0
         # Set defaults
         if namespace is None:
             namespace = cis_cfg.get('rmq', 'namespace')

@@ -1,9 +1,10 @@
 import nose.tools as nt
 import cis_interface.drivers.tests.test_Driver as parent
+from cis_interface.drivers.tests.test_IODriver import IOInfo
 from cis_interface.config import cis_cfg
 
 
-class TestRMQParam(parent.TestParam):
+class TestRMQParam(parent.TestParam, IOInfo):
     r"""Test parameters for RMQDriver class.
 
     Attributes (in addition to parent class's):
@@ -47,7 +48,14 @@ class TestRMQDriver(TestRMQParam, parent.TestDriver):
 
     def test_purge(self):
         r"""Test purge of queue."""
+        self.instance.rmq_send(self.msg_short)
+        elapsed = 0.0
+        while self.instance.n_rmq_msg != 1 and elapsed < self.instance.timeout:
+            self.instance.sleep()
+            elapsed += self.instance.sleeptime
+        nt.assert_equal(self.instance.n_rmq_msg, 1)
         self.instance.purge_queue()
+        nt.assert_equal(self.instance.n_rmq_msg, 0)
 
     def assert_after_terminate(self):
         r"""Make sure the connection is closed."""

@@ -36,16 +36,23 @@ class TestRMQInputDriver(TestRMQInputParam, parent1.TestRMQDriver):
 
     """
 
+    def test_early_close(self):
+        r"""Test early deletion of message queue."""
+        self.instance.close_queue()
+
+    # Disabled so that test message is not read by mistake
+    def test_purge(self):
+        r"""Test purge of queue."""
+        pass
+
     def test_RMQ_recv(self):
         r"""Receive a small message from AMQP server."""
         self.instance.rmq_send(self.msg_short)
-        self.instance.sleep(0.1)
-        msg_recv = self.instance.recv_wait(timeout=3)
+        msg_recv = self.instance.recv_wait()
         nt.assert_equal(msg_recv, self.msg_short)
 
     def test_RMQ_recv_nolimit(self):
         r"""Receive a large message from AMQP server."""
         self.instance.rmq_send_nolimit(self.msg_long)
-        self.instance.sleep(0.1)
-        msg_recv = self.instance.recv_wait_nolimit(timeout=3)
+        msg_recv = self.instance.recv_wait_nolimit()
         nt.assert_equal(msg_recv, self.msg_long)

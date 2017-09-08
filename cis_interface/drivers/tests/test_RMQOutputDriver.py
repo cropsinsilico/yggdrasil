@@ -1,10 +1,9 @@
 import nose.tools as nt
 from cis_interface import runner
 import cis_interface.drivers.tests.test_RMQDriver as parent1
-from cis_interface.drivers.tests.test_IODriver import IOInfo
 
 
-class TestRMQOutputParam(parent1.TestRMQParam, IOInfo):
+class TestRMQOutputParam(parent1.TestRMQParam):
     r"""Test parameters for RMQOutputDriver.
 
     Attributes (in addition to parent class's):
@@ -58,14 +57,31 @@ class TestRMQOutputDriver(TestRMQOutputParam,
             namespace=self.namespace, workingDir=self.workingDir)
         return inst
 
+    # Disabled so that test message is not read by mistake
+    def test_purge(self):
+        r"""Test purge of queue."""
+        pass
+
+    def test_early_close(self):
+        r"""Test early deletion of message queue."""
+        self.instance.close_queue()
+        # self.instance.sleep()
+        # assert(self.instance._closing)
+        # elapsed = 0.0
+        # while self.instance._closing and (elapsed < self.instance.timeout):
+        #     self.instance.sleep()
+        #     elapsed += self.instance.sleeptime
+        # assert(not self.instance._closing)
+
     def test_RMQ_send(self):
         r"""Send a short message to the AMQP server."""
         self.instance.ipc_send(self.msg_short)
-        msg_recv = self.in_rmq.recv_wait(timeout=3)
+        msg_recv = self.in_rmq.recv_wait()
         nt.assert_equal(msg_recv, self.msg_short)
+        nt.assert_equal(self.instance.n_rmq_msg, 0)
 
     def test_RMQ_send_nolimit(self):
         r"""Send a long message to the AMQP server."""
         self.instance.ipc_send_nolimit(self.msg_long)
-        msg_recv = self.in_rmq.recv_wait_nolimit(timeout=3)
+        msg_recv = self.in_rmq.recv_wait_nolimit()
         nt.assert_equal(msg_recv, self.msg_long)

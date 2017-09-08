@@ -168,12 +168,12 @@ class RPCDriver(Driver):
     @property
     def n_msg_in(self):
         r"""int: The number of messages in the input queue."""
-        return self.iipc.n_msg
+        return self.iipc.n_ipc_msg
 
     @property
     def n_msg_out(self):
         r"""int: The number of messages in the output queue."""
-        return self.oipc.n_msg
+        return self.oipc.n_ipc_msg
 
     def on_model_exit(self):
         r"""Actions to perform when the associated model driver is finished."""

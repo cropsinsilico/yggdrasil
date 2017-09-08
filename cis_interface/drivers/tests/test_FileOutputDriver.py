@@ -62,14 +62,15 @@ class TestFileOutputDriver(TestFileOutputParam, parent.TestIODriver):
         super(TestFileOutputDriver, self).assert_after_terminate()
         assert(self.instance.fd is None)
 
+    # These are disabled to prevent writting extraneous data
     def test_send_recv(self):
         r"""Test sending/receiving small message."""
         pass
-        # self.instance.close_file()
-        # super(TestFileOutputDriver, self).test_send_recv()
 
     def test_send_recv_nolimit(self):
         r"""Test sending/receiving large message."""
         pass
-        # self.instance.close_file()
-        # super(TestFileOutputDriver, self).test_send_recv_nolimit()
+
+    def run_before_terminate(self):
+        r"""Commands to run while the instance is running, before terminate."""
+        pass

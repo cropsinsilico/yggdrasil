@@ -1,5 +1,4 @@
 import pika
-import time
 import nose.tools as nt
 import cis_interface.drivers.tests.test_RMQDriver as parent1
 from cis_interface.drivers.tests.test_IODriver import IOInfo
@@ -74,11 +73,11 @@ class TestRMQServerDriver(TestRMQServerParam, parent1.TestRMQDriver):
     def temp_basic_get(self):
         r"""Do basic_get from the temporary queue."""
         out = self.channel.basic_get(queue=self.temp_queue)
-        tries = 5
-        while out[0] is None and tries > 0:
+        elapsed = 0.0
+        while (out[0] is None) and (elapsed <= self.instance.timeout):
             self.connection.sleep(self.instance.sleeptime)
             out = self.channel.basic_get(queue=self.temp_queue)
-            tries -= 1
+            elapsed += self.instance.sleeptime
         if out[0] is None:  # pragma: debug
             raise Exception("Msg receive timed out.")
         return out
@@ -93,7 +92,10 @@ class TestRMQServerDriver(TestRMQServerParam, parent1.TestRMQDriver):
                 routing_key=self.instance.queue,
                 properties=pika.BasicProperties(reply_to=self.temp_queue),
                 body=_new_client_msg)
-        time.sleep(0.1)
+        elapsed = 0.0
+        while self.instance.n_clients == 0 and (elapsed <= self.instance.timeout):
+            self.instance.sleep()
+            elapsed += self.instance.sleeptime
         nt.assert_equal(self.instance.n_clients, 1)
         # Send end client message
         with self.instance.lock:
@@ -102,8 +104,16 @@ class TestRMQServerDriver(TestRMQServerParam, parent1.TestRMQDriver):
                 routing_key=self.instance.queue,
                 properties=pika.BasicProperties(reply_to=self.temp_queue),
                 body=_end_client_msg)
-        time.sleep(0.1)
+        elapsed = 0.0
+        while self.instance.n_clients != 0 and (elapsed <= self.instance.timeout):
+            self.instance.sleep()
+            elapsed += self.instance.sleeptime
         nt.assert_equal(self.instance.n_clients, 0)
+
+    # Disabled so that test message is not read by mistake
+    def test_purge(self):
+        r"""Test purge of queue."""
+        pass
 
     def test_msg(self):
         r"""Test routing of a message through the IPC & RMQ queues."""

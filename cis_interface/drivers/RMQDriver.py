@@ -92,13 +92,13 @@ class RMQDriver(Driver):
         r"""Start the driver. Waiting for connection."""
         self._opening = True
         super(RMQDriver, self).start()
-        tries = 10
+        timeout = self.timeout
         while True:
             with self.lock:
-                if not self._opening or tries <= 0:
+                if not self._opening or timeout <= 0:
                     break
             self.sleep()
-            tries -= 1
+            timeout -= self.sleeptime
         with self.lock:
             if self._opening:  # pragma: debug
                 raise RuntimeError("Connection never finished opening.")
@@ -117,9 +117,9 @@ class RMQDriver(Driver):
             if self._closing:  # pragma: debug
                 return  # Don't close more than once
         self.debug("::terminate")
-        tries = 10
+        timeout = self.timeout
         while True:
-            if not self._opening or tries <= 0:
+            if not self._opening or timeout <= 0:
                 break
             else:  # pragma: debug
                 self.debug('Waiting for connection to open before terminating')
@@ -127,8 +127,8 @@ class RMQDriver(Driver):
                 #     self.connection.add_timeout(self.terminate(), self.sleeptime)
                 #     return
                 # while self.connection is None:
-                tries -= 1
                 self.sleep()
+                timeout -= self.sleeptime
         self.debug('::terminate: Closing connection')
         self.stop_communication()
         # Only needed if ioloop is stopped prior to closing the connection?
@@ -138,10 +138,8 @@ class RMQDriver(Driver):
         super(RMQDriver, self).terminate()
         self.debug('::terminate returns')
 
-    def printStatus(self):
-        r"""Print the driver status."""
-        self.debug('::printStatus')
-        super(RMQDriver, self).printStatus()
+    def get_message_stats(self):
+        r"""Return message stats from the server."""
         hoststr = self.host
         if self.host == '/':
             hoststr = '%2f'
@@ -153,12 +151,49 @@ class RMQDriver(Driver):
             qdata = jdata.get('message_stats', '')
         else:
             qdata = ''
-            # print(len(jdata))
+        return qdata
+        
+    def printStatus(self):
+        r"""Print the driver status."""
+        self.debug('::printStatus')
+        super(RMQDriver, self).printStatus()
+        qdata = self.get_message_stats()
         if qdata:
             qdata = pformat(qdata)
         self.display(": server info:\n%s", qdata)
 
     # RMQ PROPERTIES
+    def on_nmsg_request(self, method_frame):
+        r"""Actions to perform once the queue is declared for message count."""
+        with self.lock:
+            self._n_msg = 0
+            if method_frame:
+                self._n_msg = method_frame.method.message_count
+                
+    @property
+    def n_rmq_msg(self):
+        r"""int: Number of messages in the queue."""
+        timeout = self.timeout
+        self._n_msg = None
+        with self.lock:
+            self.channel.queue_declare(self.on_nmsg_request,
+                                       queue=self.queue,
+                                       exclusive=self.exclusive,
+                                       auto_delete=True,
+                                       passive=True)
+        # Wait for queue to be declared passively
+        while True:
+            with self.lock:
+                if self._n_msg is not None or timeout <= 0:
+                    break
+            self.sleep()
+            timeout -= self.sleeptime
+        # Return result
+        n_msg = 0
+        if self._n_msg is not None:
+            n_msg = self._n_msg
+        return n_msg
+    
     @property
     def creds(self):
         r""":class:`pika.credentials.PlainCredentials`: Server credentials."""
@@ -174,6 +209,24 @@ class RMQDriver(Driver):
         if self.host is not None:
             kws['host'] = self.host
         return pika.ConnectionParameters(**kws)
+
+    @property
+    def is_open(self):
+        r"""bool: True if connection ready for messages, False otherwise."""
+        if self.channel is None or self.connection is None:
+            return False
+        if self.channel.is_open:
+            if not self.channel.is_closing:
+                return True
+        return False
+
+    @property
+    def is_stable(self):
+        r"""bool: True if the connection ready for messages and not about to
+        close. False otherwise."""
+        if self.is_open and not self._closing:
+            return True
+        return False
 
     # CONNECTION
     def connect(self):
@@ -266,13 +319,11 @@ class RMQDriver(Driver):
     def setup_queue(self, queue_name):
         r"""Set up the message queue."""
         self.debug('::Declaring queue %s', queue_name)
-        if queue_name:
-            exclusive = self.exclusive
-        else:
-            exclusive = True
+        if not queue_name:
+            self.exclusive = True
         self.channel.queue_declare(self.on_queue_declareok,
                                    queue=queue_name,
-                                   exclusive=exclusive,
+                                   exclusive=self.exclusive,
                                    auto_delete=True)
 
     def on_queue_declareok(self, method_frame):
@@ -299,7 +350,7 @@ class RMQDriver(Driver):
     def purge_queue(self):
         r"""Remove all messages from the associated queue."""
         with self.lock:
-            if self._closing:  # pragma: debug
+            if self._closing or not self.is_open:  # pragma: debug
                 return
             if self.channel:
                 self.channel.queue_purge(queue=self.queue)
@@ -314,7 +365,7 @@ class RMQDriver(Driver):
         self.debug('::stop_communication')
         with self.lock:
             self._closing = True
-            if self.channel and self.channel.is_open:
+            if self.is_open:
                 if remove_queue:
                     self.debug('::stop_communication: unbinding queue')
                     self.display('Unbinding queue')
@@ -325,13 +376,13 @@ class RMQDriver(Driver):
                 self.channel.close()
             else:
                 self._closing = False
-        tries = 10
+        timeout = self.timeout
         while True:
-            if not self._closing or tries <= 0:
+            if not self._closing or timeout <= 0:
                 break
-            tries -= 1
             self.debug('::stop_commmunication: waiting for connection to close')
             self.sleep()
+            timeout -= self.sleeptime
 
     # UTILITIES
     def rmq_send(self, data):

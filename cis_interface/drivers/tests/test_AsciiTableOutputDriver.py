@@ -40,7 +40,6 @@ class TestAsciiTableOutputDriver(TestAsciiTableOutputParam,
         r"""Create a driver instance and start the driver."""
         super(super_parent.TestFileOutputDriver, self).setup()
         self.instance.ipc_send(self.fmt_str)
-        self.instance.sleep()
         for line in self.file_lines:
             self.instance.ipc_send_nolimit(line)
         self.instance.ipc_send_nolimit(self.instance.eof_msg)

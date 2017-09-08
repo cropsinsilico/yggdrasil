@@ -5,7 +5,6 @@ import os
 import subprocess
 import sys
 from pprint import pformat
-import time
 from cis_interface.drivers.Driver import Driver
 from cis_interface import backwards
 
@@ -61,7 +60,6 @@ class ModelDriver(Driver):
         
         # Re-direct output
         while True:
-            time.sleep(0)
             with self.lock:
                 if self.process:
                     line = self.process.stdout.readline()

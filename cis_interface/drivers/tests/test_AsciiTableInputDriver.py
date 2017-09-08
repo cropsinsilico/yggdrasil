@@ -40,8 +40,10 @@ class TestAsciiTableInputDriver(TestAsciiTableInputParam,
     def assert_before_stop(self):
         r"""Assertions to make before stopping the driver instance."""
         super(super_parent.TestFileInputDriver, self).assert_before_stop()
-        while self.instance.n_msg == 0:
+        elapsed = 0.0
+        while self.instance.n_ipc_msg == 0 and (elapsed <= self.instance.timeout):
             self.instance.sleep()
+            elapsed += self.instance.sleeptime
         data = self.instance.ipc_recv()
         nt.assert_equal(data, self.fmt_str)
         iline = 0
@@ -74,8 +76,10 @@ class TestAsciiTableInputDriver_Array(TestAsciiTableInputParam,
     def assert_before_stop(self):
         r"""Assertions to make before stopping the driver instance."""
         super(super_parent.TestFileInputDriver, self).assert_before_stop()
-        while self.instance.n_msg == 0:
+        elapsed = 0.0
+        while self.instance.n_ipc_msg == 0 and (elapsed <= self.instance.timeout):
             self.instance.sleep()
+            elapsed += self.instance.sleeptime
         data = self.instance.ipc_recv()
         nt.assert_equal(data, self.fmt_str)
 

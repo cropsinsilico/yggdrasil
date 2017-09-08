@@ -66,7 +66,7 @@ class IODriver(Driver):
 
         Args:
             timeout (float, optional): Max time that should be waited. Defaults
-                to 0 and is infinite.
+                to 0 and is set to attribute timeout.
 
         Returns:
             str: The received message.
@@ -74,6 +74,8 @@ class IODriver(Driver):
         """
         ret = ''
         elapsed = 0.0
+        if not timeout:
+            timeout = self.timeout
         while True and (not timeout or elapsed < timeout):
             ret = self.ipc_recv()
             if ret is None or len(ret) > 0:
@@ -81,6 +83,8 @@ class IODriver(Driver):
             self.debug('.recv_wait(): waiting')
             self.sleep()
             elapsed += self.sleeptime
+        if not ret and elapsed >= timeout:
+            self.debug('.recv_wait_nolimit(): timeout at %f s', timeout)
         return ret
 
     def recv_wait_nolimit(self, timeout=0):
@@ -98,6 +102,8 @@ class IODriver(Driver):
         """
         ret = ''
         elapsed = 0.0
+        if not timeout:
+            timeout = self.timeout
         while True and (not timeout or elapsed < timeout):
             ret = self.ipc_recv_nolimit()
             if ret is None or len(ret) > 0:
@@ -105,6 +111,8 @@ class IODriver(Driver):
             self.debug('.recv_wait_nolimit(): waiting')
             self.sleep()
             elapsed += self.sleeptime
+        if not ret and elapsed >= timeout:
+            self.debug('.recv_wait_nolimit(): timeout at %f s', timeout)
         return ret
 
     def ipc_send(self, data):
@@ -211,6 +219,7 @@ class IODriver(Driver):
                     break
                 data = data + ret
                 tries -= 1
+                self.sleep()
             if len(data) == leng_exp:
                 ret, leng = data, len(data)
             elif len(data) > leng_exp:  # pragma: debug
@@ -228,7 +237,7 @@ class IODriver(Driver):
         return ret
 
     @property
-    def n_msg(self):
+    def n_ipc_msg(self):
         r"""int: The number of messages in the queue."""
         with self.lock:
             if self.mq:
@@ -236,28 +245,30 @@ class IODriver(Driver):
             else:  # pragma: debug
                 return 0
 
-    def graceful_stop(self, tries=10, **kwargs):
+    def graceful_stop(self, timeout=0, **kwargs):
         r"""Stop the IODriver, first draining the message queue.
 
         Args:
-            tries (int, optional): Number of times driver should sleep while
-                waiting for the message queue to drain. Defaults to 10.
+            timeout (float, optional): Max time that should be waited. Defaults
+                to 0 and is set to attribute timeout.
             \*\*kwargs: Additional keyword arguments are passed to the parent
                 class's graceful_stop method.
 
         """
         self.debug('.graceful_stop()')
+        if not timeout:
+            timeout = self.timeout
         try:
             while True:
                 with self.lock:
                     if (not self.mq) or ((self.mq.current_messages == 0) or
-                                         (tries == 0)):
+                                         (timeout <= 0)):
                         break
                     if DEBUG_SLEEPS:
                         self.debug('.graceful_stop(): draining %d messages',
                                    self.mq.current_messages)
                 self.sleep()
-                tries -= 1
+                timeout -= self.sleeptime
         except:  # pragma: debug
             self.debug("::graceful_stop: exception")
             # raise

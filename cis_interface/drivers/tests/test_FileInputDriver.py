@@ -54,7 +54,7 @@ class TestFileInputDriver(TestFileInputParam, parent.TestIODriver):
     def assert_before_stop(self):
         r"""Assertions to make before stopping the driver instance."""
         super(TestFileInputDriver, self).assert_before_stop()
-        msg_recv = self.instance.recv_wait(timeout=2)
+        msg_recv = self.instance.recv_wait()
         nt.assert_equal(msg_recv, self.file_contents)
 
     def assert_after_terminate(self):

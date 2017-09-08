@@ -147,6 +147,12 @@ class TestIODriver(TestIOParam, parent.TestDriver):
 
     """
 
+    def setup(self, *args, **kwargs):
+        r"""Ensure that there are not messages in the queue at exit."""
+        super(TestIODriver, self).setup(*args, **kwargs)
+        # This fails for drivers that immediately read input
+        # nt.assert_equal(self.instance.n_ipc_msg, 0)
+
     def test_early_close(self):
         r"""Test early deletion of message queue."""
         self.instance.close_queue()
@@ -154,15 +160,17 @@ class TestIODriver(TestIOParam, parent.TestDriver):
     def test_send_recv(self):
         r"""Test sending/receiving small message."""
         self.instance.ipc_send(self.msg_short)
-        self.instance.sleep(0.1)
+        self.instance.sleep()
+        nt.assert_equal(self.instance.n_ipc_msg, 1)
         msg_recv = self.instance.ipc_recv()
         nt.assert_equal(msg_recv, self.msg_short)
+        nt.assert_equal(self.instance.n_ipc_msg, 0)
 
     def test_send_recv_nolimit(self):
         r"""Test sending/receiving large message."""
         assert(len(self.msg_long) > self.maxMsgSize)
         self.instance.ipc_send_nolimit(self.msg_long)
-        msg_recv = self.instance.recv_wait_nolimit(timeout=10)
+        msg_recv = self.instance.recv_wait_nolimit()
         nt.assert_equal(msg_recv, self.msg_long)
 
     def assert_before_stop(self):

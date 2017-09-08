@@ -9,7 +9,7 @@ from cis_interface.examples import yamls as ex_yamls
 def test_yaml():
     r"""Test Server/Client setup using runner."""
     os.environ['FIB_ITERATIONS'] = '3'
-    os.environ['FIB_SERVER_SLEEP_SECONDS'] = '1'
+    os.environ['FIB_SERVER_SLEEP_SECONDS'] = '0.000001'
     cr = runner.get_runner(ex_yamls['rpcfib_python'])
     cr.run()
 
@@ -70,14 +70,19 @@ class TestRMQClientDriver(TestRMQClientParam, parent1.TestRMQDriver):
             namespace=self.namespace, workingDir=self.workingDir)
         return inst
 
+    # Disabled so that test message is not read by mistake
+    def test_purge(self):
+        r"""Test purge of queue."""
+        pass
+
     def test_msg(self):
         r"""Test routing of a message through the IPC & RMQ queues."""
         # Send message to IPC output & receive from RMQ output
         self.instance.oipc.ipc_send_nolimit(self.msg_short)
         # Receive on server side, then send back
-        rmq_msg = self.srv_rmq.iipc.recv_wait_nolimit(timeout=10)
+        rmq_msg = self.srv_rmq.iipc.recv_wait_nolimit()
         nt.assert_equal(rmq_msg, self.msg_short)
         self.srv_rmq.oipc.ipc_send_nolimit(rmq_msg)
         # Receive response from server
-        ipc_msg = self.instance.iipc.recv_wait_nolimit(timeout=10)
+        ipc_msg = self.instance.iipc.recv_wait_nolimit()
         nt.assert_equal(ipc_msg, self.msg_short)

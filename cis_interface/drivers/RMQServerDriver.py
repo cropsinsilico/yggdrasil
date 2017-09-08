@@ -53,7 +53,7 @@ class RMQServerDriver(RMQDriver, RPCDriver):
     def on_message(self, ch, method, props, body):
         r"""Actions to perform when a message is received."""
         with self.lock:
-            if self._closing:  # pragma: debug
+            if not self.is_stable:  # pragma: debug
                 return
         # TODO: handle possibility of message larger than AMQP server memory
         if body == _new_client_msg:
@@ -70,32 +70,42 @@ class RMQServerDriver(RMQDriver, RPCDriver):
             if self.n_clients == 0:
                 self.debug('::All clients have signed off. Stopping.')
                 self.stop()
+        elif props.reply_to is None:
+            self.debug('::Message received without reply queue.')
+            with self.lock:
+                if not self.is_stable:  # pragma: debug
+                    return
+                self.channel.basic_nack(delivery_tag=method.delivery_tag,
+                                        requeue=True)
         else:
             self.clients.add(props.reply_to)
             self.debug('::Message received')
             self.iipc.ipc_send_nolimit(body)
             response = self.oipc.recv_wait_nolimit()
             with self.lock:
-                if self._closing:  # pragma: debug
+                if not self.is_stable:  # pragma: debug
                     return
                 ch.basic_publish(exchange=self.exchange,
                                  routing_key=props.reply_to,
                                  properties=pika.BasicProperties(
                                      correlation_id=props.correlation_id),
                                  body=response)
-        ch.basic_ack(delivery_tag=method.delivery_tag)
+        with self.lock:
+            if not self.is_stable:  # pragma: debug
+                return
+            ch.basic_ack(delivery_tag=method.delivery_tag)
 
-    def stop_communication(self):
-        r"""Stop consuming messages from the queue."""
-        with self.lock:
-            self._closing = True
-        if self.channel:
-            self.debug("::Cancelling consumption.")
-            self.channel.basic_cancel(callback=self.on_cancelok,
-                                      consumer_tag=self.consumer_tag)
+    # def stop_communication(self):
+    #     r"""Stop consuming messages from the queue."""
+    #     with self.lock:
+    #         self._closing = True
+    #     if self.channel:
+    #         self.debug("::Cancelling consumption.")
+    #         self.channel.basic_cancel(callback=self.on_cancelok,
+    #                                   consumer_tag=self.consumer_tag)
             
-    def on_cancelok(self, unused_frame):
-        r"""Actions to perform after succesfully cancelling consumption."""
-        with self.lock:
-            if self.channel:
-                self.channel.close()
+    # def on_cancelok(self, unused_frame):
+    #     r"""Actions to perform after succesfully cancelling consumption."""
+    #     with self.lock:
+    #         if self.channel:
+    #             self.channel.close()

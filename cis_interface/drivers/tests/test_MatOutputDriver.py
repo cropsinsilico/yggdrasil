@@ -63,10 +63,15 @@ class TestMatOutputDriver(TestMatOutputParam, parent.TestIODriver):
         super(TestMatOutputDriver, self).assert_after_terminate()
         assert(self.instance.fd is None)
 
+    # These are disabled to prevent writting extraneous data
     def test_send_recv(self):
         r"""Test sending/receiving small message."""
         pass
 
     def test_send_recv_nolimit(self):
         r"""Test sending/receiving large message."""
+        pass
+
+    def run_before_terminate(self):
+        r"""Commands to run while the instance is running, before terminate."""
         pass
