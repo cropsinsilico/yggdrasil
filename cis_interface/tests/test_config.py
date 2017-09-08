@@ -12,5 +12,3 @@ def test_CisConfigParser():
     nt.assert_equal(x.get('test_section', 'fake_option', 5), 5)
     nt.assert_equal(x.get('fake_section', 'fake_option'), None)
     nt.assert_equal(x.get('fake_section', 'fake_option', 5), 5)
-
-
