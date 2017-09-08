@@ -17,9 +17,10 @@ class IOInfo(object):
     """
 
     def __init__(self):
-        self.fmt_str = '%5s\t%d\t%f\n'
-        self.fmt_str_line = backwards.unicode2bytes('# ' + self.fmt_str)
-        self.file_dtype = 'S5, i4, f8'
+        self.comment = backwards.unicode2bytes('#')
+        self.fmt_str = backwards.unicode2bytes('%5s\t%d\t%f\n')
+        self.fmt_str_line = backwards.unicode2bytes('# ') + self.fmt_str
+        self.file_dtype = '%s5, i4, f8' % backwards.np_dtype_str
         self.file_rows = [('one', int(1), 1.0),
                           ('two', int(2), 2.0),
                           ('three', int(3), 3.0)]
@@ -29,7 +30,8 @@ class IOInfo(object):
         r"""list: Lines in a mock file."""
         out = []
         for r in self.file_rows:
-            out.append(backwards.unicode2bytes(self.fmt_str % r))
+            out.append(backwards.unicode2bytes(
+                backwards.bytes2unicode(self.fmt_str) % r))
         return out
 
     @property

@@ -375,7 +375,7 @@ class RMQDriver(Driver):
         """
         self.debug("::send_nolimit %d", len(data))
         prev = 0
-        ret = self.rmq_send(backwards.str2bytes("%ld" % len(data)))
+        ret = self.rmq_send(backwards.unicode2bytes("%ld" % len(data)))
         if ret:
             while prev < len(data):
                 next = min(prev + maxMsgSize, len(data))

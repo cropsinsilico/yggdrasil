@@ -6,11 +6,12 @@ from cis_interface.backwards import pickle
 from cis_interface.interface.scanf import scanf
 from cis_interface.dataio.AsciiFile import AsciiFile
 from cis_interface.dataio.AsciiTable import AsciiTable
+from cis_interface import backwards
 
 
 # OS X limit is 2kb
 PSI_MSG_MAX = 1024 * 2
-PSI_MSG_EOF = "EOF!!!"
+PSI_MSG_EOF = backwards.unicode2bytes("EOF!!!")
 
 
 class PsiInput(object):

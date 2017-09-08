@@ -7,6 +7,7 @@ import sys
 from pprint import pformat
 import time
 from cis_interface.drivers.Driver import Driver
+from cis_interface import backwards
 
 
 def preexec():  # pragma: no cover
@@ -68,7 +69,7 @@ class ModelDriver(Driver):
                     return
             if not line:
                 break
-            sys.stdout.write(line)
+            sys.stdout.write(backwards.bytes2unicode(line))
             sys.stdout.flush()
             
         self.debug(':run: done')

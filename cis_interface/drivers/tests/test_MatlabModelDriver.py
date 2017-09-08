@@ -9,6 +9,7 @@ from cis_interface.drivers.MatlabModelDriver import _matlab_installed
 _session_fname = os.path.join(os.getcwd(), 'nt_screen_session.txt')
 
 
+# TODO: Fix this global session error?
 def test_multiple():
     r"""Test that creates multiple matlab drivers."""
     if _matlab_installed:  # pragma: matlab

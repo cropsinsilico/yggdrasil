@@ -50,7 +50,7 @@ class TestAsciiTableInputDriver(TestAsciiTableInputParam,
             if (data is None) or (data == self.instance.eof_msg):
                 break
             if len(data) > 0:
-                while self.file_lines[iline].startswith('#'):
+                while self.file_lines[iline].startswith(self.comment):
                     iline += 1  # pragma: no cover
                 nt.assert_equal(data, self.file_lines[iline])
                 iline += 1

@@ -1,10 +1,11 @@
 import pika
 from cis_interface.drivers.RMQDriver import RMQDriver
 from cis_interface.drivers.RPCDriver import RPCDriver
+from cis_interface import backwards
 
 
-_new_client_msg = "PSI_NEW_CLIENT"
-_end_client_msg = "PSI_END_CLIENT"
+_new_client_msg = backwards.unicode2bytes("PSI_NEW_CLIENT")
+_end_client_msg = backwards.unicode2bytes("PSI_END_CLIENT")
 
 
 class RMQServerDriver(RMQDriver, RPCDriver):

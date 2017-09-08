@@ -40,7 +40,6 @@ class AsciiTableOutputDriver(AsciiFileOutputDriver):
         if fmt is None:
             self.debug(':recv: did not receive format string')
             return
-        fmt = fmt.decode('string_escape')
         self.file.update_format_str(fmt)
         if self.as_array:
             while True:
