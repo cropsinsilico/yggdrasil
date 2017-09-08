@@ -82,7 +82,7 @@ class RMQServerDriver(RMQDriver, RPCDriver):
                                  routing_key=props.reply_to,
                                  properties=pika.BasicProperties(
                                      correlation_id=props.correlation_id),
-                                 body=str(response))
+                                 body=response)
         ch.basic_ack(delivery_tag=method.delivery_tag)
 
     def stop_communication(self):

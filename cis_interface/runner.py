@@ -160,7 +160,7 @@ class CisRunner(object):
         with open(modelYml, 'r') as f:
             try:
                 # Mustache replace vars
-                yamlparsed = yaml.safe_load(f)
+                yamlparsed = f.read()
                 yamlparsed = pystache.render(
                     sio.StringIO(yamlparsed).getvalue(), dict(os.environ))
                 yamlparsed = yaml.safe_load(yamlparsed)

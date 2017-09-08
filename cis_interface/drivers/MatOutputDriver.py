@@ -1,7 +1,7 @@
 import os
 from scipy.io import savemat
 from cis_interface.backwards import pickle
-from FileOutputDriver import FileOutputDriver
+from cis_interface.drivers.FileOutputDriver import FileOutputDriver
 
 
 class MatOutputDriver(FileOutputDriver):

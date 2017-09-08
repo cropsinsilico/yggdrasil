@@ -1,7 +1,7 @@
 import os
 from scipy.io import loadmat
 from cis_interface.backwards import pickle
-from FileInputDriver import FileInputDriver
+from cis_interface.drivers.FileInputDriver import FileInputDriver
 
 
 class MatInputDriver(FileInputDriver):
