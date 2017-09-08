@@ -1,6 +1,6 @@
 import os
 from cis_interface.tests import scripts
-import test_ModelDriver as parent
+import cis_interface.drivers.tests.test_ModelDriver as parent
 from cis_interface import runner
 from cis_interface.examples import yamls as ex_yamls
 from cis_interface.drivers.MatlabModelDriver import _matlab_installed

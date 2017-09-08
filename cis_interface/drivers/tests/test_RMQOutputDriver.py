@@ -1,7 +1,7 @@
 import nose.tools as nt
 from cis_interface import runner
-import test_RMQDriver as parent1
-from test_IODriver import IOInfo
+import cis_interface.drivers.tests.test_RMQDriver as parent1
+from cis_interface.drivers.tests.test_IODriver import IOInfo
 
 
 class TestRMQOutputParam(parent1.TestRMQParam, IOInfo):

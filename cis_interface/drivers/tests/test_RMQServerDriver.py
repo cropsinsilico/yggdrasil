@@ -1,8 +1,8 @@
 import pika
 import time
 import nose.tools as nt
-import test_RMQDriver as parent1
-from test_IODriver import IOInfo
+import cis_interface.drivers.tests.test_RMQDriver as parent1
+from cis_interface.drivers.tests.test_IODriver import IOInfo
 from cis_interface.drivers.RMQServerDriver import (
     _new_client_msg, _end_client_msg)
 

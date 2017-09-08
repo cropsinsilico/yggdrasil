@@ -1,5 +1,5 @@
 from cis_interface.tests import scripts
-import test_ModelDriver as parent
+import cis_interface.drivers.tests.test_ModelDriver as parent
 
 
 class TestPythonModelParam(parent.TestModelParam):

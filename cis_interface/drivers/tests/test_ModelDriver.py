@@ -1,4 +1,4 @@
-import test_Driver as parent
+import cis_interface.drivers.tests.test_Driver as parent
 
 
 class TestModelParam(parent.TestParam):

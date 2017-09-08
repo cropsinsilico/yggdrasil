@@ -12,7 +12,7 @@ from cis_interface.backwards import configparser
 class CisConfigParser(configparser.ConfigParser):
     r"""Config parser that returns None if option not provided on get."""
 
-    def get(self, section, option, default=None):
+    def get(self, section, option, default=None, **kwargs):
         r"""Return None if the section/option does not exist.
 
         Args:
@@ -21,6 +21,8 @@ class CisConfigParser(configparser.ConfigParser):
             default (obj, optional): Value that should be returned if the
                 section and/or option are not found or are an empty string.
                 Defaults to None.
+            **kwargs: Additional keyword arguments are passed to the parent
+                class's get.
 
         Returns:
             obj: String entry if the section & option exist, otherwise default.
@@ -30,7 +32,7 @@ class CisConfigParser(configparser.ConfigParser):
         option = option.lower()
         if self.has_section(section) and self.has_option(section, option):
             # Super does not work for ConfigParser as not inherited from object
-            out = configparser.ConfigParser.get(self, section, option)
+            out = configparser.ConfigParser.get(self, section, option, **kwargs)
             # Count empty strings as not provided
             if not out:
                 return default

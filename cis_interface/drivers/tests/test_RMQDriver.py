@@ -1,5 +1,5 @@
 import nose.tools as nt
-import test_Driver as parent
+import cis_interface.drivers.tests.test_Driver as parent
 from cis_interface.config import cis_cfg
 
 

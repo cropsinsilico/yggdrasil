@@ -1,6 +1,6 @@
 import os
 import nose.tools as nt
-import test_IODriver as parent
+import cis_interface.drivers.tests.test_IODriver as parent
 
 
 class TestFileOutputParam(parent.TestIOParam):

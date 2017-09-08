@@ -1,6 +1,6 @@
 import nose.tools as nt
-import test_AsciiFileInputDriver as parent
-import test_FileInputDriver as super_parent
+import cis_interface.drivers.tests.test_AsciiFileInputDriver as parent
+import cis_interface.drivers.tests.test_FileInputDriver as super_parent
 
 
 class TestAsciiTableInputParam(parent.TestAsciiFileInputParam):

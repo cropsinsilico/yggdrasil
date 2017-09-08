@@ -1,7 +1,7 @@
 import os
 import tempfile
 import nose.tools as nt
-import test_IODriver as parent
+import cis_interface.drivers.tests.test_IODriver as parent
 
 
 class TestFileInputParam(parent.TestIOParam):
@@ -21,7 +21,7 @@ class TestFileInputParam(parent.TestIOParam):
 
     def setup(self):
         r"""Create a driver instance and start the driver."""
-        with open(self.filepath, 'wb') as fd:
+        with open(self.filepath, 'w') as fd:
             fd.write(self.file_contents)
         super(TestFileInputParam, self).setup()
 

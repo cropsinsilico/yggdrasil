@@ -1,5 +1,5 @@
 import nose.tools as nt
-import test_FileInputDriver as parent
+import cis_interface.drivers.tests.test_FileInputDriver as parent
 
 
 class TestAsciiFileInputParam(parent.TestFileInputParam):

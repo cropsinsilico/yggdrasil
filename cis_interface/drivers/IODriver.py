@@ -2,7 +2,7 @@ import sysv_ipc
 from sysv_ipc import MessageQueue
 from cis_interface.drivers.Driver import Driver
 from cis_interface.interface.PsiInterface import PSI_MSG_MAX
-from cis_interface.backwards import decode_str
+from cis_interface.backwards import bytes2str
 
 
 # OS X limit is 2kb
@@ -127,6 +127,7 @@ class IODriver(Driver):
                     self.numSent = self.numSent + 1
             except:  # pragma: debug
                 self.debug('.ipc_send(): exception')
+                raise
 
     def ipc_recv(self):
         r"""Receive a message smaller than maxMsgSize.
@@ -144,7 +145,7 @@ class IODriver(Driver):
                     self.debug('.ipc_recv(): mq closed')
                 elif self.mq.current_messages > 0:
                     data, _ = self.mq.receive()
-                    ret = decode_str(data)
+                    ret = bytes2str(data)
                     self.debug('.ipc_recv ret %d bytes', len(ret))
                 else:
                     ret = ''

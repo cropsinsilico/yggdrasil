@@ -1,4 +1,4 @@
-import test_FileOutputDriver as parent
+import cis_interface.drivers.tests.test_FileOutputDriver as parent
 
 
 class TestAsciiFileOutputParam(parent.TestFileOutputParam):

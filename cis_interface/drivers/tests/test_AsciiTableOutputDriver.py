@@ -1,5 +1,5 @@
-import test_AsciiFileOutputDriver as parent
-import test_FileOutputDriver as super_parent
+import cis_interface.drivers.tests.test_AsciiFileOutputDriver as parent
+import cis_interface.drivers.tests.test_FileOutputDriver as super_parent
 
 
 class TestAsciiTableOutputParam(parent.TestAsciiFileOutputParam):

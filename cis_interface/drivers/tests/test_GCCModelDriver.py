@@ -1,6 +1,6 @@
 import os
 from cis_interface.tests import scripts
-import test_ModelDriver as parent
+import cis_interface.drivers.tests.test_ModelDriver as parent
 from cis_interface.drivers.GCCModelDriver import _incl_interface
 
 

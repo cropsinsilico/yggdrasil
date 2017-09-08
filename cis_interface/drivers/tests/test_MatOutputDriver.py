@@ -1,7 +1,7 @@
 import os
 import numpy as np
 from scipy.io import loadmat
-import test_IODriver as parent
+import cis_interface.drivers.tests.test_IODriver as parent
 
 
 class TestMatOutputParam(parent.TestIOParam):
