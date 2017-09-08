@@ -178,30 +178,13 @@ class TestDriverNoStart(TestParam):
             if not hasattr(self.instance, a):  # pragma: debug
                 raise AttributeError("Driver does not have attribute %s" % a)
 
-    def test_info(self):
-        r"""Test print of info statement."""
+    def test_prints(self):
+        r"""Test logging at various levels."""
+        self.instance.display(1)
         self.instance.info(1)
-
-    def test_debug(self):
-        r"""Test print of debug statement."""
         self.instance.debug(1)
-
-    def test_critical(self):
-        r"""Test print of critical statement."""
         self.instance.critical(1)
-
-    def test_warn(self):
-        r"""Test print of warning statement."""
         self.instance.warn(1)
-        
-    def test_error(self):
-        r"""Test print of error statement."""
         self.instance.error(1)
-
-    def test_exception(self):
-        r"""Test print of exception."""
         self.instance.exception(1)
-        
-    def test_printStatus(self):
-        r"""Test mechanism to print the status of the driver."""
         self.instance.printStatus()

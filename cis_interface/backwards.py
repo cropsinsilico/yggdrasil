@@ -149,4 +149,4 @@ if sys.version_info >= (3,):  # pragma: Python 3
 
     
 __all__ = ['pickle', 'configparser', 'sio',
-           'decode_str', 'bytes2unicode', 'unicode2bytes']
+           'bytes2unicode', 'unicode2bytes']
