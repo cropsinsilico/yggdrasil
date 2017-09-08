@@ -116,74 +116,12 @@ def unicode2bytes(s):
     return b
 
 
-def decode_str(s):
-    r"""Decode string escapes from a stirng.
-
-    Arguments:
-        s (str): String that escape sequences should be decoded from.
-
-    Returns:
-        str: Resulting string with escape sequences decoded.
-
-    """
-    if PY2:  # pragma: Python 2
-        o = s.decode('string_escape')
-    else:  # pragma: Python 3
-        b = unicode2bytes(s)
-        o = b.decode('unicode_escape')
-    return o
-
-
-def array_unicode2bytes(arr):
-    r"""In Python 3, 'S' refers to raw bytes and any bytes written to a file
-    will be prepended with a 'b' that will not be read in correctly with the
-    %s format specifier. To get around this, this function converts parts of
-    an array from 'U' to 'S' format so the array can be read as bytes."""
-    if PY2:  # pragma: Python 2
-        out = arr
-    else:  # pragma: Python 3
-        dtype = arr.dtype
-        if len(dtype) == 0:
-            new_dtype = np.dtype(str(arr.dtype).replace('U', 'S'))
-        else:
-            typs = []
-            for i in range(len(dtype)):
-                n = dtype.names[i]
-                t = str(dtype[i])
-                typs.append((n, np.dtype(t.replace('U', 'S'))))
-            new_dtype = np.dtype(typs)
-        out = arr.astype(new_dtype)
-    return out
-
-
-def array_bytes2unicode(arr):
-    r"""In Python 3, 'S' refers to raw bytes and any bytes written to a file
-    will be prepended with a 'b' that will not be read in correctly with the
-    %s format specifier. To get around this, this function converts parts of
-    an array from 'S' to 'U' format so the array can be written."""
-    if PY2:  # pragma: Python 2
-        out = arr
-    else:  # pragma: Python 3
-        dtype = arr.dtype
-        if len(dtype) == 0:
-            new_dtype = np.dtype(str(arr.dtype).replace('S', 'U'))
-        else:
-            typs = []
-            for i in range(len(dtype)):
-                n = dtype.names[i]
-                t = str(dtype[i])
-                typs.append((n, np.dtype(t.replace('S', 'U'))))
-            new_dtype = np.dtype(typs)
-        out = arr.astype(new_dtype)
-    return out
-
-
 # https://github.com/numpy/numpy/issues/3184
 genfromtxt_old = np.genfromtxt
 
 
 @functools.wraps(genfromtxt_old)
-def genfromtxt_py3_fixed(f, encoding="utf-8", *args, **kwargs):
+def genfromtxt_py3_fixed(f, encoding="utf-8", *args, **kwargs):  # pragma: Python 3
     if isinstance(f, sio.TextIOBase):
         if hasattr(f, "buffer") and hasattr(f.buffer, "raw") and \
            isinstance(f.buffer.raw, sio.FileIO):
@@ -206,7 +144,7 @@ def genfromtxt_py3_fixed(f, encoding="utf-8", *args, **kwargs):
     return result
 
 
-if sys.version_info >= (3,):
+if sys.version_info >= (3,):  # pragma: Python 3
     np.genfromtxt = genfromtxt_py3_fixed
 
     
