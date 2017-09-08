@@ -36,7 +36,7 @@ map_nptype2cformat = [
     # (['uint8', 'ushort', 'uintc', 'uint64', 'ulonglong'], '%u'),
     ('int8', '%hhd'), ('short', '%hd'), ('intc', '%d'), ('int_', '%ld'),
     ('uint8', '%hhu'), ('ushort', '%hu'), ('uintc', '%u'), ('uint64', '%lu'),
-    ('S', '%s'), ('U', '%s')]
+    ('S', '%s'), ('S5', '%5s'), ('U', '%s'), ('U5', '%5s')]
 # This is for when default int is 32bit
 if np.dtype('int_') != np.dtype('longlong'):  # pragma: no cover
     map_nptype2cformat.append(('longlong', '%lld'))
