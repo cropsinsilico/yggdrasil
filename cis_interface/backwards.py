@@ -8,14 +8,14 @@ if PY2:  # pragma: Python 2
     import ConfigParser as configparser
     import StringIO as sio
     from __builtin__ import unicode
-    bytes_type = str  # (str, bytearray)
-    unicode_type = str  # unicode
+    bytes_type = str
+    unicode_type = str
     np_dtype_str = 'S'
 else:  # pragma: Python 3
     import pickle
     import configparser
     import io as sio
-    bytes_type = bytes # bytearray  # (bytes, bytearray)
+    bytes_type = bytes
     unicode_type = str
     unicode = None
     np_dtype_str = 'U'
