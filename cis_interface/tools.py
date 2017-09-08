@@ -60,8 +60,17 @@ def ipcrm(options=[]):
     print(output.decode('utf-8'))
 
 
-def ipcrm_queues():
-    r"""Delete existing IPC queues."""
-    for q in ipc_queues():
-        ipcrm(["-Q %s" % q.split()[0]])
-    # ipcrm(['--all=msg'])  # This is version specific
+def ipcrm_queues(queue_keys=None):
+    r"""Delete existing IPC queues.
+
+    Args:
+        queue_keys (list, str, optional): A list of keys for queues that should
+            be removed. Defaults to all existing queues.
+
+    """
+    if queue_keys is None:
+        queue_keys = [l.split()[0] for l in ipc_queues()]
+    if isinstance(queue_keys, str):
+        queue_keys = [queue_keys]
+    for q in queue_keys:
+        ipcrm(["-Q %s" % q])
