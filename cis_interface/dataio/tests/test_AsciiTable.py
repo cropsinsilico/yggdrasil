@@ -57,8 +57,8 @@ map_cformat2nptype = [(['f', 'F', 'e', 'E', 'g', 'G'], 'float64'),
                       (['u', 'o', 'x', 'X'], 'uintc'),
                       (['lu', 'lo', 'lx', 'lX'], 'uint64'),
                       (['llu', 'llo', 'llx', 'llX'], 'ulonglong'),
-                      (['c', 's'], 'str'),
-                      ('s', 'str')]
+                      (['c', 's'], 'S'),
+                      ('s', 'S')]
 
 
 def test_nptype2cformat():
