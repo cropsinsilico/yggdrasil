@@ -1,5 +1,4 @@
 import os
-# import nose.tools as nt
 import warnings
 import unittest
 from cis_interface import runner

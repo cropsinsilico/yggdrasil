@@ -6,7 +6,7 @@ from logging import info, debug
 
 
 def runhello():
-    debug('hello python from %s', os.getcwd())
+    info('hello python from %s', os.getcwd())
 
     # Ins/outs matching with the the model yaml
     inf = PsiInput('inFile')
@@ -15,15 +15,22 @@ def runhello():
     outq = PsiOutput('helloQueueOut')
     info("created channels")
 
-    buf = inf.recv()
-    debug('got %d bytes on inf', len(buf))
+    # Receive input from a local file
+    flag, buf = inf.recv()
+    info('got %d bytes on inf', len(buf))
+
+    # Send output to the output queue
     outq.send(buf)
-    debug('sent to outq')
-    buf = inq.recv()
-    debug('got %d bytes on inq', len(buf))
+    info('sent to outq')
+
+    # Receive input form the input queue
+    flag, buf = inq.recv()
+    info('got %d bytes on inq', len(buf))
+
+    # Send output to a local file
     outf.send(buf)
-    debug('sent output to outf')
-    debug("bye")
+    info('sent output to outf')
+    info("bye")
     
 
 if __name__ == '__main__':

@@ -1,4 +1,3 @@
-
 #include "PsiInterface.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -28,12 +27,14 @@ int main(int argc, char *argv[]) {
     PsiOutput out = psi_output("output");
     printf("hello_c: created I/Os, %d, %d\n", in, out);
 
+    // Receive input
     int ret;
     ret = psi_recv(in, buf, bufsz);
     if (ret < 0)
         perror("psi_recv");
     printf("hello_c received %d bytes: %s\n", ret, buf );
-    sleep(5);
+
+    // Send output
     ret = psi_send(out, buf, ret);
     if (ret < 0)
         perror("psi_send:");

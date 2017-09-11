@@ -9,12 +9,12 @@
 model:
   name: hellopython
   driver: PythonModelDriver
-  args: hellopython.py
+  args: ./src/hello.py
 
   inputs:
     - name: inFile
       driver: FileInputDriver
-      args: input.txt
+      args: ./Input/input.txt
     - name: helloQueueIn    
       driver: RMQInputDriver
       args: helloQueue

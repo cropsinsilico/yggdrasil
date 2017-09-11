@@ -2,7 +2,8 @@
 import os
 
 
-ex_dict = {'ascii_io': ('python', 'matlab', 'c', 'all')}
+ex_dict = {'hello': ('python', 'matlab', 'c'),
+           'ascii_io': ('python', 'matlab', 'c', 'all')}
 
 
 yamls = {}

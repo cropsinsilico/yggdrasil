@@ -4,12 +4,12 @@ model:
   name: hello_c
   driver: GCCModelDriver
   args:    # compile the C code with necessary libraries
-    - hello_c.c
+    - ./src/hello.c
 
   inputs:
     - name: input
       driver: FileInputDriver
-      args: ../../python/input.txt
+      args: ./Input/input.txt
   
   outputs:
     - name: output

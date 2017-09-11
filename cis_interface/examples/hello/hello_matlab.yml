@@ -10,12 +10,12 @@ model:
   driver: MatlabModelDriver
   # simple for a long command line instead of '["arg1", "args", "arg3", ...]'
   args:
-    - helloMatlab.m
+    - ./src/hello.m
 
   inputs:
     - name: input
       driver: FileInputDriver
-      args: ../python/input.txt
+      args: ./Input/input.txt
   
   outputs:
     - name: output
