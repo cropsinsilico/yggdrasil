@@ -36,9 +36,14 @@ class GCCModelDriver(ModelDriver):
         # Prepare arguments to compile the file
         # TODO: Allow user to provide a makefile
         cfile = self.args.pop(0)
-        assert(cfile.endswith('.c'))
+        if cfile.endswith('.c'):
+            gcc = 'gcc'
+        elif cfile.endswith('.cpp'):
+            gcc = 'g++'
+        else:
+            raise ValueError("Supplied file is not C or C++ code.")
         execname = os.path.splitext(cfile)[0] + '.out'
-        compile_args = ["gcc", "-g", "-Wall"]
+        compile_args = [gcc, "-g", "-Wall"]
         for x in [_incl_interface, _incl_io]:
             compile_args += ["-I" + x]
         run_args = [os.path.join(".", execname)]

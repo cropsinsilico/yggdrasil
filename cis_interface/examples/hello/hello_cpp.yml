@@ -1,0 +1,26 @@
+---
+
+#
+# Minimal Model Example yaml
+#
+
+model:
+  name: hello_cpp
+  driver: GCCModelDriver
+  args: ./src/hello.cpp
+
+  inputs:
+    - name: inFile
+      driver: FileInputDriver
+      args: ./Input/input.txt
+    - name: helloQueueIn    
+      driver: RMQInputDriver
+      args: helloQueue
+
+  outputs:
+    - name: helloQueueOut
+      driver: RMQOutputDriver
+      args: helloQueue
+    - name: outFile
+      driver: FileOutputDriver
+      args: /tmp/output.txt

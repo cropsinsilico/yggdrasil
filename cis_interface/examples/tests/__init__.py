@@ -88,6 +88,12 @@ class TestExample(unittest.TestCase):
         self.run_example()
         self.language = None
 
+    def test_cpp(self):
+        r"""Test the C++ version of the example."""
+        self.language = 'cpp'
+        self.run_example()
+        self.language = None
+
     def test_matlab(self):
         r"""Test the Matlab version of the example."""
         self.language = 'matlab'

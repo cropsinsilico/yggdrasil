@@ -2,7 +2,7 @@
 import os
 
 
-ex_dict = {'hello': ('python', 'matlab', 'c'),
+ex_dict = {'hello': ('python', 'matlab', 'c', 'cpp'),
            'ascii_io': ('python', 'matlab', 'c', 'all')}
 
 
