@@ -3,6 +3,7 @@ import os
 
 
 ex_dict = {'hello': ('python', 'matlab', 'c', 'cpp'),
+           'SaM': ('python', 'matlab', 'c'),
            'ascii_io': ('python', 'matlab', 'c', 'all')}
 
 

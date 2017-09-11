@@ -16,5 +16,5 @@ model:
   outputs:
     - name: output
       driver: FileOutputDriver
-      args: ./Output/SaM_output.txt
+      args: /tmp/SaM_output.txt
 

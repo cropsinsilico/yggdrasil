@@ -16,8 +16,8 @@ if __name__ == '__main__':
     in2 = PsiInput('static')
     out1 = PsiOutput('output')
 
-    adata = in1.recv()
-    bdata = in2.recv()
+    flag, adata = in1.recv()
+    flag, bdata = in2.recv()
 
     a = int(adata[0])
     b = int(bdata[0])
