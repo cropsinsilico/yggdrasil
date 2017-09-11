@@ -14,6 +14,24 @@ PSI_MSG_MAX = 1024 * 2
 PSI_MSG_EOF = backwards.unicode2bytes("EOF!!!")
 
 
+def PsiMatlab(_type, args):
+    r"""Short interface to identify functions called by Matlab.
+
+    Args:
+        _type (str): Name of class that should be returned.
+        args (list): Additional arguments that should be passed to class
+            initializer.
+
+    Returns:
+        obj: An instance of the requested class.
+
+    """
+    cls = eval(_type)
+    kwargs = {'matlab': True}
+    obj = cls(*args, **kwargs)
+    return obj
+
+
 class PsiInput(object):
     r"""Class for handling input from a message queue.
 
@@ -33,7 +51,7 @@ class PsiInput(object):
     qName = None
     q = None
     
-    def __init__(self, name):
+    def __init__(self, name, matlab=False):
         self.name = name
         self.qName = name + '_IN'
         self.q = None
@@ -128,7 +146,7 @@ class PsiOutput:
         q (:class:`sysv_ipc.MessageQueue`): Message queue.
         
     """
-    def __init__(self, name):
+    def __init__(self, name, matlab=False):
         self.name = name
         self.qName = name + '_OUT'
         debug("PsiOputput(%s)", name)
@@ -206,9 +224,13 @@ class PsiRpc:
             messages received from the input message queue.
 
     """
-    def __init__(self, outname, outfmt, inname, infmt):
-        self._inFmt = infmt
-        self._outFmt = outfmt
+    def __init__(self, outname, outfmt, inname, infmt, matlab=False):
+        if matlab:
+            self._inFmt = backwards.decode_escape(infmt)
+            self._outFmt = backwards.decode_escape(outfmt)
+        else:
+            self._inFmt = infmt
+            self._outFmt = outfmt
         self._in = PsiInput(inname)
         self._out = PsiOutput(outname)
 
@@ -278,7 +300,7 @@ class PsiAsciiFileInput(object):
     _file = None
     _psi = None
 
-    def __init__(self, name, src_type=1):
+    def __init__(self, name, src_type=1, matlab=False):
         self._name = name
         self._type = src_type
         if self._type == 0:
@@ -328,7 +350,7 @@ class PsiAsciiFileOutput(object):
     _file = None
     _psi = None
 
-    def __init__(self, name, dst_type=1):
+    def __init__(self, name, dst_type=1, matlab=False):
         self._name = name
         self._type = dst_type
         if self._type == 0:
@@ -386,7 +408,7 @@ class PsiAsciiTableInput(object):
     _table = None
     _psi = None
 
-    def __init__(self, name, src_type=1):
+    def __init__(self, name, src_type=1, matlab=False):
         self._name = name
         self._type = src_type
         if self._type == 0:
@@ -465,9 +487,11 @@ class PsiAsciiTableOutput(object):
     _table = None
     _psi = None
 
-    def __init__(self, name, fmt, dst_type=1):
+    def __init__(self, name, fmt, dst_type=1, matlab=False):
         self._name = name
         self._type = dst_type
+        if matlab:
+            fmt = backwards.decode_escape(fmt)
         if self._type == 0:
             self._table = AsciiTable(name, 'w', format_str=fmt)
             self._table.open()
@@ -548,7 +572,7 @@ class PsiPickleInput(object):
     _file = None
     _psi = None
 
-    def __init__(self, name, src_type=1):
+    def __init__(self, name, src_type=1, matlab=False):
         self._name = name
         self._type = src_type
         if self._type == 0:
@@ -605,7 +629,7 @@ class PsiPickleOutput(object):
     _file = None
     _psi = None
 
-    def __init__(self, name, dst_type=1):
+    def __init__(self, name, dst_type=1, matlab=False):
         self._name = name
         self._type = dst_type
         if self._type == 0:

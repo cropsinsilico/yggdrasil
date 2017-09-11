@@ -1,12 +1,11 @@
-PsiInterface = py.importlib.import_module('cis_interface.interface.PsiInterface');
+% Create IO Objects
+in_file = PsiInterface('PsiAsciiFileInput', 'inputM_file');
+out_file = PsiInterface('PsiAsciiFileOutput', 'outputM_file');
+in_table = PsiInterface('PsiAsciiTableInput', 'inputM_table');
+out_table = PsiInterface('PsiAsciiTableOutput', 'outputM_table', '%5s\t%ld\t%3.1f\n');
+in_array = PsiInterface('PsiAsciiTableInput', 'inputM_array');
+out_array = PsiInterface('PsiAsciiTableOutput', 'outputM_array', '%5s\t%ld\t%3.1f\n');
 
-% IO Objects
-in_file = PsiInterface.PsiAsciiFileInput('inputM_file');
-out_file = PsiInterface.PsiAsciiFileOutput('outputM_file');
-in_table = PsiInterface.PsiAsciiTableInput('inputM_table');
-out_table = PsiInterface.PsiAsciiTableOutput('outputM_table', '%5s\t%ld\t%f\n');
-in_array = PsiInterface.PsiAsciiTableInput('inputM_array');
-out_array = PsiInterface.PsiAsciiTableOutput('outputM_array', '%5s\t%ld\t%f\n');
 	  
 % Generic text file
 res = py.tuple({logical(1), logical(1)});

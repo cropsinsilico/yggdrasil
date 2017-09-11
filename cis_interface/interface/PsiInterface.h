@@ -658,8 +658,6 @@ PsiAsciiTableInput psi_ascii_table_input(const char *name, int src_type) {
     out._psi = psi_input(name);
     out._psi._fmt = (char*)malloc(PSI_MSG_MAX);
     ret = psi_recv(out._psi, out._psi._fmt, PSI_MSG_MAX);
-    /* printf("%s\n", name); */
-    /* printf("%s\n", out._psi._fmt); */
     out._table = ascii_table(name, "0", out._psi._fmt,
 			     NULL, NULL, NULL);
   }
@@ -680,7 +678,6 @@ PsiAsciiTableOutput psi_ascii_table_output(const char *name, int dst_type, char 
   } else {
     out._psi = psi_output(name);
     ret = psi_send(out._psi, format_str, strlen(format_str));
-    /* printf("%s\n", name); */
     out._table = ascii_table(name, "0", format_str,
 			     NULL, NULL, NULL);
     out._psi._fmt = format_str;

@@ -116,6 +116,23 @@ def unicode2bytes(s):
     return b
 
 
+def decode_escape(s):
+    r"""Decode escape sequences.
+
+    Args:
+        s (str): String that should be decoded.
+
+    Returns:
+        str: Result of decoding escape sequences.
+
+    """
+    if PY2:  # pragma: Python 2
+        out = s.decode('string-escape')
+    else:  # pragma: Python 3
+        out = s.decode('unicode_escape').encode('latin1')
+    return out
+
+
 # https://github.com/numpy/numpy/issues/3184
 genfromtxt_old = np.genfromtxt
 

@@ -136,6 +136,8 @@ class CisRunner(object):
         # Update environment based on config
         cfg_environment()
         # Parse yamls
+        if isinstance(modelYmls, str):
+            modelYmls = [modelYmls]
         for modelYml in modelYmls:
             self.parseModelYaml(modelYml)
         # print(pformat(self.inputdrivers), pformat(self.outputdrivers),
@@ -361,7 +363,7 @@ def get_runner(models, **kwargs):
 
     """
     # Get environment variables
-    namespace = cis_cfg.get('rmq', 'namespace', False)
+    namespace = kwargs.pop('namespace', cis_cfg.get('rmq', 'namespace', False))
     if not namespace:  # pragma: debug
         raise Exception('rmq:namespace not set in config file')
     rank = os.environ.get('PARALLEL_SEQ', '0')

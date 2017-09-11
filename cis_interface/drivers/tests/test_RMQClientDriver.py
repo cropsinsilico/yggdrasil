@@ -1,17 +1,17 @@
-import os
+# import os
 import nose.tools as nt
 import cis_interface.drivers.tests.test_RMQDriver as parent1
 from cis_interface.drivers.tests.test_IODriver import IOInfo
 from cis_interface import runner
-from cis_interface.examples import yamls as ex_yamls
+# from cis_interface.examples import yamls as ex_yamls
 
 
-def test_yaml():
-    r"""Test Server/Client setup using runner."""
-    os.environ['FIB_ITERATIONS'] = '3'
-    os.environ['FIB_SERVER_SLEEP_SECONDS'] = '0.000001'
-    cr = runner.get_runner(ex_yamls['rpcfib_python'])
-    cr.run()
+# def test_yaml():
+#     r"""Test Server/Client setup using runner."""
+#     os.environ['FIB_ITERATIONS'] = '3'
+#     os.environ['FIB_SERVER_SLEEP_SECONDS'] = '0.002'
+#     cr = runner.get_runner(ex_yamls['rpcfib_python'])
+#     cr.run()
 
 
 class TestRMQClientParam(parent1.TestRMQParam, IOInfo):

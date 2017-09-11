@@ -8,30 +8,30 @@ model:
   inputs:
     - name: inputPy_file
       driver: AsciiFileInputDriver
-      args: ./Input/input1_file.txt
+      args: ./Input/input_file.txt
       onexit: printStatus
 
     - name: inputPy_table
       driver: AsciiTableInputDriver
-      args: ./Input/input1_table.txt
+      args: ./Input/input_table.txt
 
     - name: inputPy_array
       driver: AsciiTableInputDriver
       args:
-        filepath: ./Input/input1_array.txt
+        filepath: ./Input/input_array.txt
         as_array: True
 
   outputs:
     - name: outputPy_file
       driver: AsciiFileOutputDriver
-      args: /tmp/outputPy_file.txt
+      args: /tmp/output_file.txt
 
     - name: outputPy_table
       driver: AsciiTableOutputDriver
-      args: /tmp/outputPy_table.txt
+      args: /tmp/output_table.txt
 
     - name: outputPy_array
       driver: AsciiTableOutputDriver
       args:
-          filepath: /tmp/outputPy_array.txt
+          filepath: /tmp/output_array.txt
           as_array: True

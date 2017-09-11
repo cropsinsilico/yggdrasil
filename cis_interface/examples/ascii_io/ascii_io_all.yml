@@ -9,16 +9,16 @@ models:
     inputs:
       - name: inputC_file
         driver: AsciiFileInputDriver
-        args: ./Input/inputC_file.txt
+        args: ./Input/input_file.txt
 
       - name: inputC_table
         driver: AsciiTableInputDriver
-        args: ./Input/inputC_table.txt
+        args: ./Input/input_table.txt
 
       - name: inputC_array
         driver: AsciiTableInputDriver
         args:
-          filepath: ./Input/inputC_array.txt
+          filepath: ./Input/input_array.txt
           as_array: True
 
     outputs:
@@ -86,14 +86,14 @@ models:
     outputs:
       - name: outputM_file
         driver: AsciiFileOutputDriver
-        args: ./Output/outputM_file.txt
+        args: /tmp/output_file.txt
 
       - name: outputM_table
         driver: AsciiTableOutputDriver
-        args: ./Output/outputM_table.txt
+        args: /tmp/output_table.txt
 
       - name: outputM_array
         driver: AsciiTableOutputDriver
         args:
-          filepath: ./Output/outputM_array.txt
+          filepath: /tmp/output_array.txt
           as_array: True

@@ -16,9 +16,9 @@ if __name__ == '__main__':
     in_file = PsiAsciiFileInput('inputPy_file')
     out_file = PsiAsciiFileOutput('outputPy_file')
     in_table = PsiAsciiTableInput('inputPy_table')
-    out_table = PsiAsciiTableOutput('outputPy_table', "%5s\t%ld\t%f\n")
+    out_table = PsiAsciiTableOutput('outputPy_table', "%5s\t%ld\t%3.1f\n")
     in_array = PsiAsciiTableInput('inputPy_array')
-    out_array = PsiAsciiTableOutput('outputPy_array', "%5s\t%ld\t%f\n")
+    out_array = PsiAsciiTableOutput('outputPy_array', "%5s\t%ld\t%3.1f\n")
 
     # Generic text file
     ret = True

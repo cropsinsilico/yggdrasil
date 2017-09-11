@@ -18,15 +18,15 @@ case $1 in
 	;;
     -p | --python )
 	echo "Running Python"
-	yaml='ascii_io_Python.yml'
+	yaml='ascii_io_python.yml'
 	;;
     -m | --matlab )
 	echo "Running Matlab"
-	yaml='ascii_io_Matlab.yml'
+	yaml='ascii_io_matlab.yml'
 	;;
     -c | --gcc )
 	echo "Running C"
-	yaml='ascii_io_GCC.yml'
+	yaml='ascii_io_c.yml'
 	;;
     * )
 	echo "Running ", $1
