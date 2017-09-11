@@ -5,7 +5,7 @@ model:
 
   driver: PythonModelDriver
   args:    # basic commands to run via exec, i.e. no shell, pipes, redirection, etc.
-    - rpcFibCliPar.py
+    - ./src/rpcFibCliPar.py
     - "{{ FIB_ITERATIONS }}"   # env_var for number of loops
 
   inputs:

@@ -4,7 +4,7 @@ model:
   name: rpcFibCli
   driver: PythonModelDriver
   args:    # basic commands to run, command line:   python rpcFibCli.py ${FIB_ITERATIONS}
-    - rpcFibCli.py
+    - ./src/rpcFibCli.py
     - "{{ FIB_ITERATIONS }}"   # env_var passed as argument for number of loops
 
   outputs:
@@ -18,4 +18,4 @@ model:
       args: srv_fib     # connected to this queue, shared by all models
     - name: yaml_in
       driver: FileInputDriver
-      args: rpcFibCli.yml
+      args: rpcFibCli_python.yml
