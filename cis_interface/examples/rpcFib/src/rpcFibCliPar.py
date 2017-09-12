@@ -6,25 +6,30 @@ from cis_interface.interface.PsiInterface import PsiRpc
 
 
 def fibClient(args):
+    
     iterations = int(args[0])
-    print('Pfibcli(P): hello  ', args[0], ' iterations')
+    print('Hello from Python rpcFibCliPar: iterations = %d ' % iterations)
+
+    # Create RPC connection with serover
     rpc = PsiRpc("cli_par_fib", "%d", "cli_par_fib", "%d %d")
 
+    # Send all of the requests to the server
     for i in range(1, iterations + 1):
         print('Pfibcli(P): fib(->%-2d) ::: ' % i)
         ret = rpc.rpcSend(i)
         if not ret:
-            print('FAILED')
+            print('SEND FAILED')
             sys.exit(-1)
     print('')
 
+    # Receive responses for all requests that were sent
     for i in range(1, iterations + 1):
         retval, results = rpc.rpcRecv()
         if not retval:
             break
         print('Pfibcli(P):  fib(%2d<-) = %-2d<-' % (results))
 
-    print('Pfibcli(P):  python says goodbye')
+    print('Goodbye from Python rpcFibCliPar')
     sys.exit(0)
 
     

@@ -4,12 +4,11 @@ model:
   name: rpcFibCli
   driver: MatlabModelDriver
   args:
-    - rpcFibCli.m
+    - ./src/rpcFibCliPar.m
     - "{{ FIB_ITERATIONS }}"
 
   inputs:
-    - name: cli_fib   # Name of channel in model, private to model code      
+    - name: cli_par_fib   # Name of channel in model, private to model code      
       driver: RMQClientDriver
       args: srv_fib     # connected to this queue, shared by all models
-
  

@@ -2,15 +2,15 @@
 
 model:
   name: rpcFibCli
-  driver: PythonModelDriver
-  args:    # basic commands to run, command line:   python rpcFibCli.py ${FIB_ITERATIONS}
-    - ./src/rpcFibCli.py
-    - "{{ FIB_ITERATIONS }}"   # env_var passed as argument for number of loops
+  driver: MatlabModelDriver
+  args:
+    - ./src/rpcFibCli.m
+    - "{{ FIB_ITERATIONS }}"
 
   outputs:
     - name: output_log
       driver: FileOutputDriver
-      args: /tmp/fibCli.out
+      args: /tmp/fibCli.txt
 
   inputs:
     - name: cli_fib   # Name of channel in model, private to model code      
@@ -19,3 +19,4 @@ model:
     - name: yaml_in
       driver: FileInputDriver
       args: rpcFibCli_python.yml
+ 

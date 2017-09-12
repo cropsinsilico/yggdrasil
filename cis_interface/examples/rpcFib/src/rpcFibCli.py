@@ -7,31 +7,33 @@ from cis_interface.interface.PsiInterface import (
 
 
 def fibClient(args):
-    host = os.environ.get('PSI_HOST', 'NOT SET')
-    namespace = os.environ.get('PSI_NAMESPACE', 'NOT SET')
-    rank = os.environ.get('PSI_RANK', 'NOT SET')
-
+    
     iterations = int(args[0])
-    print('hello fibcli(P): system {} namespace {} rank {} iterations {}'.format(
-        host, namespace, rank, iterations))
- 
+    print('Hello from Python rpcFibCli: iterations = %d ' % iterations)
+
+    # Set up connections matching yaml
+    ymlfile = PsiInput("yaml_in")
     rpc = PsiRpc("cli_fib", "%d", "cli_fib", "%d %d")
     log = PsiOutput("output_log")
-    ymlfile = PsiInput("yaml_in")
-    ycontent = str(ymlfile.recv())
-    print('input file contents: ')
-    print(ycontent)
+
+    # Read entire contents of yaml
+    flag, ycontent = ymlfile.recv()
+    print('rpcFibCli: yaml has %d lines' % len('\n'.split(ycontent)))
 
     for i in range(1, iterations + 1):
-        print('fibcli(P): fib(->%-2d) ::: ' % i, end='')
+        
+        # Call the server and receive response
+        print('rpcFibCli(P): fib(->%-2d) ::: ' % i, end='')
         idx, fib = rpc.rpcCall(i)
-        if not idx:  # killed = False
+        if not idx:
             break
-        s = 'fib(%2d<-) = %-2d<-' % fib  # (tuple(i,fib(i))
+
+        # Log result by sending it to the log connection
+        s = 'fib(%2d<-) = %-2d<-' % fib
         print(s)
         log.send(s + '\n')
 
-    print('rpcFibCli:  python says goodbye')
+    print('Goodbye from Python rpcFibCli')
     sys.exit(0)
 
     
