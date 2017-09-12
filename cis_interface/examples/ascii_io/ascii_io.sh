@@ -1,12 +1,7 @@
 #!/bin/bash
 
-python make_input.py
-
 export PSI_DEBUG="INFO"
 export PSI_NAMESPACE="AsciiIO"
-
-# make output dir if it's not there
-[ -d Output ] || mkdir Output
 
 yaml= 
 
@@ -35,3 +30,7 @@ case $1 in
 esac
 
 cisrun $yaml
+
+cat /tmp/output_file.txt
+cat /tmp/output_table.txt
+cat /tmp/output_array.txt

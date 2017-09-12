@@ -22,7 +22,7 @@ int main(int argc,char *argv[]){
 
   // Read lines from ASCII text file until end of file is reached.
   // As each line is received, it is then sent to the output ASCII file.
-  printf("Receiving/sending ASCII file.\n");
+  printf("ascii_io(C): Receiving/sending ASCII file.\n");
   char line[LINE_SIZE_MAX];
   ret = 0;
   while (ret >= 0) {
@@ -31,7 +31,11 @@ int main(int argc,char *argv[]){
     if (ret >= 0) {
       // If the receive was succesful, send the line to output
       printf("File: %s", line);
-      send_line(FileOutput, line);
+      ret = send_line(FileOutput, line);
+      if (ret != 0) {
+	printf("ascii_io(C): ERROR SENDING LINE\n");
+	break;
+      }
     } else {
       // If the receive was not succesful, send the end-of-file message to
       // close the output file.
@@ -42,7 +46,7 @@ int main(int argc,char *argv[]){
 
   // Read rows from ASCII table until end of file is reached.
   // As each row is received, it is then sent to the output ASCII table
-  printf("Receiving/sending ASCII table.\n");
+  printf("ascii_io(C): Receiving/sending ASCII table.\n");
   char name[BSIZE];
   int number;
   double value;
@@ -54,7 +58,11 @@ int main(int argc,char *argv[]){
       // If the receive was succesful, send the values to output. Formatting
       // is taken care of on the output driver side.
       printf("Table: %s, %d, %f\n", name, number, value);
-      send_row(TableOutput, name, number, value);
+      ret = send_row(TableOutput, name, number, value);
+      if (ret != 0) {
+	printf("ascii_io(C): ERROR SENDING ROW\n");
+	break;
+      }
     } else {
       // If the receive was not succesful, send the end-of-file message to
       // close the output file.
@@ -71,13 +79,23 @@ int main(int argc,char *argv[]){
   long *number_arr;
   double *value_arr;
   ret = recv_array(ArrayInput, &name_arr, &number_arr, &value_arr);
+  if (ret < 0) {
+    printf("ascii_io(C): ERROR RECVING ARRAY\n");
+    free(name_arr);
+    free(number_arr);
+    free(value_arr);
+    return -1;
+  }
   printf("Array: (%d rows)\n", ret);
   // Print each line in the array
   for (int i = 0; i < ret; i++)
     printf("%5s, %d, %f\n", &name_arr[5*i], number_arr[i], value_arr[i]);
   // Send the columns in the array to output. Formatting is handled on the
   // output driver side.
-  send_array(ArrayOutput, ret, name_arr, number_arr, value_arr);
+  ret = send_array(ArrayOutput, ret, name_arr, number_arr, value_arr);
+  if (ret != 0)
+    printf("ascii_io(C): ERROR SENDING ARRAY\n");
+  
   // Free dynamically allocated columns
   free(name_arr);
   free(number_arr);
