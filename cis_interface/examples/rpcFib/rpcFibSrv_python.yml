@@ -3,9 +3,9 @@
 model:
   name: rpcFibSrv
   driver: PythonModelDriver
-  args:    # basic commands to run via exec, i.e. no shell, pipes, redirection, etc.
+  args:
     - ./src/rpcFibSrv.py
-    - "{{ FIB_SERVER_SLEEP_SECONDS }}"    # env var - time to sleep before returning a 
+    - "{{ FIB_SERVER_SLEEP_SECONDS }}"    # env var - time to sleep before returning
 
   inputs:
     - name: srv_fib

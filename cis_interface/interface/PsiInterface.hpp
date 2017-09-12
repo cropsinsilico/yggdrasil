@@ -7,25 +7,83 @@ extern "C" {
 #include "PsiInterface.h"
 };
 
-class PSi_Input {
-	PsiInput _pi;
-    public:
 
-    PSi_Input(char * name) : _pi(psi_input(name)) {}
+class PsiInput {
+  psiInput_t _pi;
+public:
+  
+  PsiInput(char * name) : _pi(psiInput(name)) {}
 	
-    int recv(char *data, int len){
-	return psi_recv(_pi, data, len);
-  	}
+  int recv(char *data, int len) {
+    return psi_recv(_pi, data, len);
+  }
+
+  int recv_nolimit(cahr *data, int len) {
+    return psi_recv_nolimit(_pi, data, len);
+  }
 };
 
-class PSi_Output {
-	PsiOutput _pi;
-    public:
 
-    PSi_Output(char * name) : _pi(psi_output(name)) {}
+class PsiOutput {
+  psiOutput_t _pi;
+public:
+  
+  PsiOutput(char * name) : _pi(psiOutput(name)) {}
+  
+  int send(char *data, int len) {
+    return psi_send(_pi, data, len);
+  }
 
-    int send(char *data, int len){
-	return psi_send(_pi, data, len);
-  	}
+  int send_nolimit(char *data, int len) {
+    return psi_send_nlimit(_pi, data, len);
+  }
 };
 	
+
+class PsiRpc {
+  psiRpc_t _pi;
+public:
+
+  PsiRpc(const char *outName, char *outFormat,
+	 const char *inName, char *inFormat) :
+    _pi(psiRpc(outName, outFormat, inName, inFormat)) {}
+  
+  int send(int fake_first = 0, ...) {
+    va_list va;
+    va_start(va, fake_first);
+    int ret = vrpcSend(_pi, va);
+    va_end(va);
+    return ret;
+  }
+
+  int recv(int fake_first = 0, ...) {
+    va_list va;
+    va_start(va, fake_first);
+    int ret = vrpcRecv(_pi, va);
+    va_end(va);
+    return ret;
+  }
+};
+
+
+class PsiRpcServer : public PsiRpc {
+
+  PsiRpcServer(cons char *name, char *inFormat, char *outFormat) :
+    _pi(psiRpcServer(name, inFormat, outFormat)) {}
+
+  int call(int fake_first = 0, ...) {
+    va_list va;
+    va_start(va, fake_first);
+    int ret = vrpcCall(_pi, va);
+    va_end(va);
+    return ret;
+  }
+};
+
+
+class PsiRpcClient : public PsiRpc {
+
+  PsiRpcClient(cons char *name, char *outFormat, char *inFormat) :
+    _pi(psiRpcClient(name, outFormat, inFormat)) {}
+  
+};

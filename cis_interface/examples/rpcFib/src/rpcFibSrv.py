@@ -1,20 +1,16 @@
 from __future__ import print_function
-import os
 import sys
 import time
-import logging
-from logging import debug
-from cis_interface.interface.PsiInterface import PsiRpc
-import socket
+from cis_interface.interface.PsiInterface import PsiRpcServer
 
 
 def fibServer(args):
 
-    sleeptime = float(args)
+    sleeptime = float(args[0])
     print('Hello from Python rpcFibSrv: sleeptime = %f' % sleeptime)
 
     # Create server-side rpc conneciton
-    rpc = PsiRpc("srv_fib", "%d %d", "srv_fib", "%d")
+    rpc = PsiRpcServer("srv_fib", "%d", "%d %d")
 
     # Continue receiving requests until error occurs (the connection is closed
     # by all clients that have connected).
@@ -42,17 +38,9 @@ def fibServer(args):
         time.sleep(float(sleeptime))
         rpc.rpcSend(arg, result)
 
-    debug('Goodbye from Python rpcFibSrv')
+    print('Goodbye from Python rpcFibSrv')
     sys.exit(0)
 
     
 if __name__ == '__main__':
-    LOGLEVEL = logging.NOTSET
-    if 'PSI_CLIENT_DEBUG' in os.environ:
-        LOGLEVEL = getattr(logging, os.environ['PSI_CLIENT_DEBUG'])
-    if 'RMQ_DrEBUG' in os.environ:
-        RMQLOGLEVEL = getattr(logging, os.environ['RMQ_DEBUG'])
-    logging.basicConfig(level=LOGLEVEL, stream=sys.stdout,
-                        format=sys.argv[0].split('/')[-1] + ': %(message)s')
-    print('psirun', sys.argv)
-    fibServer(sys.argv[1])
+    fibServer(sys.argv[1:])

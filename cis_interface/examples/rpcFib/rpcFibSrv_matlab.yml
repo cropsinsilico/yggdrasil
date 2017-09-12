@@ -5,7 +5,7 @@ model:
   driver: MatlabModelDriver
   args:
     - ./src/rpcFibSrv.m
-    - "{{ FIB_SERVER_SLEEP_SECONDS }}"
+    - "{{ FIB_SERVER_SLEEP_SECONDS }}"    # env var - time to sleep before returning
 
   inputs:
     - name: srv_fib

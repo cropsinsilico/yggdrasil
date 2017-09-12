@@ -210,9 +210,9 @@ class PsiOutput:
             debug("PsiOutput(%s).send_nolimit %d bytes completed",
                   self.name, len(payload))
         return ret
-        
 
-class PsiRpc:
+    
+class PsiRpc(object):
     r"""Class for sending a message and then receiving a response.
 
     Args:
@@ -282,6 +282,37 @@ class PsiRpc:
         if ret:
             return self.rpcRecv()
 
+
+class PsiRpcServer(PsiRpc):
+    r"""Class for handling requests and response for an RPC Server.
+
+    Args:
+        name (str): The name of the server queues.
+        infmt (str): Format string used to recover variables from
+            messages received from the request queue.
+        outfmt (str): Format string used to format variables in a
+            message sent to the response queue.
+
+    """
+    def __init__(self, name, infmt, outfmt, matlab=False):
+        super(PsiRpcServer, self).__init__(name, outfmt, name, infmt)
+    
+
+class PsiRpcClient(PsiRpc):
+    r"""Class for handling requests and response to an RPC Server from a
+    client.
+
+    Args:
+        name (str): The name of the server queues.
+        outfmt (str): Format string used to format variables in a
+            message sent to the request queue.
+        infmt (str): Format string used to recover variables from
+            messages received from the response queue.
+
+    """
+    def __init__(self, name, outfmt, infmt, matlab=False):
+        super(PsiRpcClient, self).__init__(name, outfmt, name, infmt)
+    
 
 # Specialized classes for ascii IO
 class PsiAsciiFileInput(object):

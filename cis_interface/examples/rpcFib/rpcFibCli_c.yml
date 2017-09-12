@@ -2,9 +2,9 @@
 
 model:
   name: rpcFibCli
-  driver: PythonModelDriver
+  driver: GCCModelDriver
   args:
-    - ./src/rpcFibCli.py
+    - ./src/rpcFibCli.c
     - "{{ FIB_ITERATIONS }}"   # env_var passed as argument for number of loops
 
   outputs:
@@ -13,9 +13,9 @@ model:
       args: /tmp/fibCli.txt
 
   inputs:
-    - name: cli_fib   # Name of channel in model, private to model code      
+    - name: cli_fib   # Name of channel in model, private to model code
       driver: RMQClientDriver
       args: srv_fib   # Connected to this queue, shared by all models
     - name: yaml_in
       driver: FileInputDriver
-      args: rpcFibCli_python.yml
+      args: rpcFibCli_c.yml

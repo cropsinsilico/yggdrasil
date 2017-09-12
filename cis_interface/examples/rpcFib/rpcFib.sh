@@ -42,3 +42,5 @@ case $1 in
 esac
 
 cisrun $yaml1 $yaml2 $yaml3
+
+cat /tmp/fibCli.txt
