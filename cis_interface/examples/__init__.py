@@ -13,12 +13,20 @@ for k, lang in ex_dict.items():
     yamls[k] = {}
     if k is 'rpcFib':
         for l in lang:
-            yamls[k][l] = [os.path.join(os.path.dirname(__file__), k,
-                                        '%sCli_%s.yml' % (k, l)),
-                           os.path.join(os.path.dirname(__file__), k,
-                                        '%sCliPar_%s.yml' % (k, l)),
-                           os.path.join(os.path.dirname(__file__), k,
-                                        '%sSrv_%s.yml' % (k, l))]
+            if l == 'all':
+                yamls[k][l] = [os.path.join(os.path.dirname(__file__), k,
+                                            '%sCli_%s.yml' % (k, 'python')),
+                               os.path.join(os.path.dirname(__file__), k,
+                                            '%sCliPar_%s.yml' % (k, 'matlab')),
+                               os.path.join(os.path.dirname(__file__), k,
+                                            '%sSrv_%s.yml' % (k, 'c'))]
+            else:
+                yamls[k][l] = [os.path.join(os.path.dirname(__file__), k,
+                                            '%sCli_%s.yml' % (k, l)),
+                               os.path.join(os.path.dirname(__file__), k,
+                                            '%sCliPar_%s.yml' % (k, l)),
+                               os.path.join(os.path.dirname(__file__), k,
+                                            '%sSrv_%s.yml' % (k, l))]
     else:
         for l in lang:
             yamls[k][l] = os.path.join(os.path.dirname(__file__), k,

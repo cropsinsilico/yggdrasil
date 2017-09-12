@@ -13,9 +13,9 @@ yaml3=
 case $1 in
     "" | -a | --all )
 	echo "Running Python, Matlab, C integration"
-	yaml1='rpcFibSrv_all.yml'
-	yaml2='rpcFibCli_all.yml'
-	yaml3='rpcFibCliPar_all.yml'
+	yaml1='rpcFibSrv_c.yml'
+	yaml2='rpcFibCli_python.yml'
+	yaml3='rpcFibCliPar_matlab.yml'
 	;;
     -p | --python )
 	echo "Running Python"

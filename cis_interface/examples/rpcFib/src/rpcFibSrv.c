@@ -25,7 +25,7 @@ int main(int argc, char *argv[]) {
     }
 
     // Compute fibonacci number
-    printf("rpcFibSrv(P): <- input %d", input);
+    printf("rpcFibSrv(C): <- input %d", input);
     int result = 1;
     int prevResult = 1;
     int prevPrev = 0;

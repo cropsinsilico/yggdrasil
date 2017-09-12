@@ -19,7 +19,7 @@ function rpcFibCliPar(iterations)
 
   % Receive responses for all requests that were sent
   for i = 1:iterations
-    fprintf('Pfibcli(M):  fib(->%-2d) ::: ', i);
+    fprintf('rpcFibCliPar(M): fib(->%-2d) ::: ', i);
     input = rpc.rpcRecv();
     ret = input{1};
     fib = input{2};
