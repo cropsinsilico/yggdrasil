@@ -127,15 +127,29 @@ public:
     _pi(psiRpc(outName, outFormat, inName, inFormat)) {}
 
   /*!
+    @brief Return the psiRpc_t structure.
+    @return psiRpc_t structure underlying the class.
+  */
+  psiRpc_t pi() {
+    return _pi;
+  };
+
+  /*!
     @brief Format and send a message to an RPC output queue.
     See rpcSend from PsiInterface.h for details.
+    @param[in] nargs int Number of arguments being passed.
     @param[in] ... arguments for formatting.  
     @return integer specifying if the send was succesful. Values >= 0 indicate
     success.
   */
-  int send(int fake_first, ...) {
+  int send(int nargs, ...) {
+    if (nargs != _pi._output._nfmt) {
+      error("PsiRpc(%s).send: %d args provided, but format expects %d.\n",
+	    _pi._output._name, nargs, _pi._output._nfmt);
+      return -1;
+    }
     va_list va;
-    va_start(va, fake_first);
+    va_start(va, nargs);
     int ret = vrpcSend(_pi, va);
     va_end(va);
     return ret;
@@ -144,15 +158,21 @@ public:
   /*!
     @brief Receive and parse a message from an RPC input queue. 
     See rpcRecv from PsiInterface.h for details.
+    @param[in] nargs int Number of arguments being passed.
     @param[out] ... mixed arguments that should be assigned parameters extracted
     using the format string. Since these will be assigned, they should be
     pointers to memory that has already been allocated.
     @return integer specifying if the receive was succesful. Values >= 0
     indicate success.
    */
-  int recv(int fake_first = 0, ...) {
+  int recv(int nargs, ...) {
+    if (nargs != _pi._input._nfmt) {
+      error("PsiRpc(%s).recv: %d args provided, but format expects %d.\n",
+	    _pi._input._name, nargs, _pi._input._nfmt);
+      return -1;
+    }
     va_list va;
-    va_start(va, fake_first);
+    va_start(va, nargs);
     int ret = vrpcRecv(_pi, va);
     va_end(va);
     return ret;
@@ -169,7 +189,6 @@ public:
   operations.
  */
 class PsiRpcServer : public PsiRpc {
-  psiRpc_t _pi;
 public:
 
   /*!
@@ -196,7 +215,6 @@ public:
   operations.
  */
 class PsiRpcClient : public PsiRpc {
-  psiRpc_t _pi;
 public:
 
   /*!
@@ -209,12 +227,14 @@ public:
     parsing input.
    */
   PsiRpcClient(const char *name, char *outFormat, char *inFormat) :
-    PsiRpc(name, outFormat, name, inFormat) {}
+    PsiRpc(name, outFormat, name, inFormat) {
+  }
 
   /*!                                                                                                                                                                               
     @brief Send request to an RPC server from the client and wait for a
     response.
     See rpcCall in PsiInterface.h for details.
+    @param[in] nargs int Number of arguments being passed.
     @param[in,out] ... mixed arguments that include those that should be
     formatted using the output format string, followed by those that should be
     assigned parameters extracted using the input format string. These that will
@@ -222,10 +242,17 @@ public:
     @return integer specifying if the receive was succesful. Values >= 0
     indicate success.
   */
-  int call(int fake_first = 0, ...) {
+  int call(int nargs, ...) {
+    psiRpc_t _cpi = pi();
+    int nfmt_tot = _cpi._output._nfmt + _cpi._input._nfmt;
+    if (nargs != nfmt_tot) {
+      error("PsiRpcClient(%s).call: %d args provided, but format expects %d.\n",
+	    _cpi._output._name, nargs, nfmt_tot);
+      return -1;
+    }
     va_list va;
-    va_start(va, fake_first);
-    int ret = vrpcCall(_pi, va);
+    va_start(va, nargs);
+    int ret = vrpcCall(_cpi, va);
     va_end(va);
     return ret;
   }
@@ -366,13 +393,24 @@ public:
   /*!
     @brief Format and send a row to the table file/queue.
     See at_send_row in PsiInterface.h for details.
+    @param[in] nargs int Number of arguments being passed.
     @param[in] ... Row elements that should be formatted.
     @returns int 0 if send succesfull, -1 if send unsuccessful.
    */
-  int send_row(int fake_first = 0, ...) {
+  int send_row(int nargs, ...) {
+    int nfmt;
+    if (_pi._type == 0)
+      nfmt = count_formats(_pi._table.format_str);
+    else
+      nfmt = _pi._psi._nfmt;
+    if (nargs != nfmt) {
+      error("PsiAsciiTableOutput(%s).send_row: %d args provided, but format expects %d.\n",
+	    _pi._name, nargs, nfmt);
+      return -1;
+    }
     int ret;
     va_list ap;
-    va_start(ap, fake_first);
+    va_start(ap, nargs);
     ret = vsend_row(_pi, ap);
     va_end(ap);
     return ret;
@@ -381,12 +419,23 @@ public:
   /*!
     @brief Format and send table columns to the table file/queue.
     See at_send_array in PsiInterface.h for details. 
+    @param[in] nargs int Number of arguments being passed.
     @param[in] nrows int Number of rows in the columns.
     @param[in] ... Pointers to memory containing table columns that
     should be formatted.
     @returns int 0 if send succesfull, -1 if send unsuccessful.
    */
-  int send_array(int nrows, ...) {
+  int send_array(int nargs, int nrows, ...) {
+    int nfmt;
+    if (_pi._type == 0)
+      nfmt = count_formats(_pi._table.format_str);
+    else
+      nfmt = _pi._psi._nfmt;
+    if (nargs != nfmt) {
+      error("PsiAsciiTableOutput(%s).send_array: %d args provided, but format expects %d.\n",
+	    _pi._name, nargs, nfmt);
+      return -1;
+    }
     int ret;
     va_list ap;
     va_start(ap, nrows);
@@ -449,15 +498,26 @@ public:
   /*!
     @brief Recv and parse a row from the table file/queue.
     See at_recv_row in PsiInterface.h for details.
+    @param[in] nargs int Number of arguments being passed.
     @param[in] ... Pointers to memory where variables from the parsed row
     should be stored.
     @returns int -1 if message could not be received or parsed, otherwise the
     length of the received is returned.
    */
-  int recv_row(int fake_first = 0, ...) {
+  int recv_row(int nargs, ...) {
+    int nfmt;
+    if (_pi._type == 0)
+      nfmt = count_formats(_pi._table.format_str);
+    else
+      nfmt = _pi._psi._nfmt;
+    if (nargs != nfmt) {
+      error("PsiAsciiTableInput(%s).recv_row: %d args provided, but format expects %d.\n",
+	    _pi._name, nargs, nfmt);
+      return -1;
+    }
     int ret;
     va_list ap;
-    va_start(ap, fake_first);
+    va_start(ap, nargs);
     ret = vrecv_row(_pi, ap);
     va_end(ap);
     return ret;
@@ -466,14 +526,25 @@ public:
   /*!
     @brief Recv and parse columns from a table file/queue.
     See at_recv_array in PsiInterface.h for details.
+    @param[in] nargs int Number of arguments being passed.
     @param[in] ... Pointers to pointers to memory where columns from the
     parsed table should be stored. They need not be allocated, only declared.
     @returns int Number of rows received. Negative values indicate errors. 
    */
-  int recv_array(int fake_first = 0, ...) {
+  int recv_array(int nargs, ...) {
+    int nfmt;
+    if (_pi._type == 0)
+      nfmt = count_formats(_pi._table.format_str);
+    else
+      nfmt = _pi._psi._nfmt;
+    if (nargs != nfmt) {
+      error("PsiAsciiTableInput(%s).recv_array: %d args provided, but format expects %d.\n",
+	    _pi._name, nargs, nfmt);
+      return -1;
+    }
     int ret;
     va_list ap;
-    va_start(ap, fake_first);
+    va_start(ap, nargs);
     ret = vrecv_array(_pi, ap);
     va_end(ap);
     return ret;

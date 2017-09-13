@@ -18,7 +18,7 @@ int main(int argc, char *argv[]) {
   // by all clients that have connected).
   int input;
   while (1) {
-    int ret = rpc.recv(0, &input);
+    int ret = rpc.recv(1, &input);
     if (ret < 0) {
       printf("rpcFibSrv(CPP): end of input\n");
       break;
@@ -40,7 +40,7 @@ int main(int argc, char *argv[]) {
     // Sleep and then send response back
     if (timeSleep) 
       sleep(timeSleep);
-    rpc.send(0, input, result);
+    rpc.send(2, input, result);
   }
 
   printf("Goodbye from C++ rpcFibSrv\n");

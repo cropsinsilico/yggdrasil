@@ -44,7 +44,7 @@ int main(int argc, char *argv[]) {
     
     // Call the server and receive response
     printf("rpcFibCli(CPP): fib(->%-2d) ::: ", i);
-    ret = rpc.call(0, i, &fibNo, &fib);
+    ret = rpc.call(3, i, &fibNo, &fib);
     if (ret < 0) {
       printf("rpcFibCli(CPP): RPC CALL ERROR\n");
       free(logmsg);

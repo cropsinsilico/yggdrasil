@@ -51,12 +51,12 @@ int main(int argc,char *argv[]){
   ret = 0;
   while (ret >= 0) {
     // Receive a single row with values stored in scalars declared locally
-    ret = TableInput.recv_row(0, &name, &number, &value);
+    ret = TableInput.recv_row(3, &name, &number, &value);
     if (ret >= 0) {
       // If the receive was succesful, send the values to output. Formatting
       // is taken care of on the output driver side.
       printf("Table: %s, %d, %f\n", name, number, value);
-      ret = TableOutput.send_row(0, name, number, value);
+      ret = TableOutput.send_row(3, name, number, value);
       if (ret != 0) {
 	printf("ascii_io(CPP): ERROR SENDING ROW\n");
 	break;
@@ -76,7 +76,7 @@ int main(int argc,char *argv[]){
   char *name_arr;
   long *number_arr;
   double *value_arr;
-  ret = ArrayInput.recv_array(0, &name_arr, &number_arr, &value_arr);
+  ret = ArrayInput.recv_array(3, &name_arr, &number_arr, &value_arr);
   if (ret < 0) {
     printf("ascii_io(CPP): ERROR RECVING ARRAY\n");
     free(name_arr);
@@ -90,7 +90,7 @@ int main(int argc,char *argv[]){
     printf("%5s, %d, %f\n", &name_arr[5*i], number_arr[i], value_arr[i]);
   // Send the columns in the array to output. Formatting is handled on the
   // output driver side.
-  ret = ArrayOutput.send_array(ret, name_arr, number_arr, value_arr);
+  ret = ArrayOutput.send_array(3, ret, name_arr, number_arr, value_arr);
   if (ret != 0)
     printf("ascii_io(CPP): ERROR SENDING ARRAY\n");
   
