@@ -1,4 +1,10 @@
-.. include:: modules.rst
+Code
+====
 
-.. autodoxygenindex::
-   :project: interface
+.. toctree::
+   :maxdepth: 4
+
+   code_python
+   code_c
+   code_cpp
+   code_matlab

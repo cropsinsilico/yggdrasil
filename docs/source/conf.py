@@ -50,12 +50,16 @@ extensions = [
 breathe_projects = {"cis_interface": doxydir}
 breathe_default_project = "cis_interface"
 breathe_projects_source = {
-    "interface": (
-        os.path.join(srcdir, 'interface'), [
-            'PsiInterface.h', 'PsiInterface.hpp']),
-    "dataio": (
-        os.path.join(srcdir, 'dataio'), [
-            'AsciiTable.h', 'AsciiFile.h'])
+    "interface_m": (os.path.join(srcdir, 'interface'),
+                    ['PsiInterface.m']),
+    "interface_c": (os.path.join(srcdir, 'interface'),
+                    ['PsiInterface.h']),
+    'interface_cpp': (os.path.join(srcdir, 'interface'),
+                      ['PsiInterface.hpp']),
+    "dataio_c": (os.path.join(srcdir, 'dataio'),
+                 ['AsciiFile.h', 'AsciiTable.h'])
+    # "dataio_cpp": (os.path.join(srcdir, 'dataio'),
+    #                ['AsciiFile.hpp', 'AsciiTable.hpp'])
     }
 
 # Napoleon settings
