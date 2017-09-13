@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "PsiInterface.h"
+#include "PsiInterface.hpp"
 
 
 int main(int argc, char *argv[]){
@@ -11,38 +11,38 @@ int main(int argc, char *argv[]){
     char outbuf[BSIZE];
 
     // Get input and output channels matching yaml
-    psiInput_t in1 = psiInput("input1_c");
-    psiInput_t in2 = psiInput("static_c");
-    psiOutput_t out1 = psiOutput("output_c");
-    printf("SaM(C): Set up I/O channels\n");
+    PsiInput in1("input1_cpp");
+    PsiInput in2("static_cpp");
+    PsiOutput out1("output_cpp");
+    printf("SaM(CPP): Set up I/O channels\n");
 
     // Get input from input1 channel
-    ret = psi_recv(in1, adata, BSIZE);
+    ret = in1.recv(adata, BSIZE);
     if (ret < 0) {
-      printf("SaM(C): ERROR RECV from input1\n");
+      printf("SaM(CPP): ERROR RECV from input1\n");
       return -1;
     }
     int a = atoi(adata);
-    printf("SaM(C): Received %d from input1\n", a);
+    printf("SaM(CPP): Received %d from input1\n", a);
 
     // Get input from static channel
-    ret = psi_recv(in2, bdata, BSIZE);
+    ret = in2.recv(bdata, BSIZE);
     if (ret < 0) {
-      printf("SaM(C): ERROR RECV from static\n");
+      printf("SaM(CPP): ERROR RECV from static\n");
       return -1;
     }
     int b = atoi(bdata);
-    printf("SaM(C): Received %d from static\n", b);
+    printf("SaM(CPP): Received %d from static\n", b);
 
     // Compute sum and send message to output channel
     int sum = a + b;
     sprintf(outbuf, "%d", sum);
-    ret = psi_send(out1, outbuf, strlen(outbuf));
+    ret = out1.send(outbuf, strlen(outbuf));
     if (ret != 0) {
-      printf("SaM(C): ERROR SEND to output\n");
+      printf("SaM(CPP): ERROR SEND to output\n");
       return -1;
     }
-    printf("SaM(C): Sent to output\n");
+    printf("SaM(CPP): Sent to output\n");
     
     return 0;
 }

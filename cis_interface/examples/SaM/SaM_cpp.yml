@@ -1,0 +1,20 @@
+---
+
+model:
+  name: SaM_cpp
+  driver: GCCModelDriver
+  args: ./src/SaM.cpp
+
+  inputs:
+    - name: input1_cpp
+      driver: FileInputDriver
+      args: ./Input/SaM_input.txt
+    - name: static_cpp
+      driver: FileInputDriver
+      args: ./Input/SaM_static.txt
+
+  outputs:
+    - name: output_cpp
+      driver: FileOutputDriver
+      args: /tmp/SaM_output.txt
+
