@@ -46,29 +46,302 @@
             
   <div class="section" id="c-interface">
 <h1>C++ Interface<a class="headerlink" href="#c-interface" title="Permalink to this headline">¶</a></h1>
-<dl class="file">
-<dt>
-<span class="target" id="_psi_interface_8m"></span><em>file</em> <code class="descname">PsiInterface.m</code></dt>
+<dl class="class">
+<dt id="_CPPv28PsiInput">
+<span id="PsiInput"></span><span class="target" id="class_psi_input"></span><em class="property">class </em><code class="descname">PsiInput</code><a class="headerlink" href="#_CPPv28PsiInput" title="Permalink to this definition">¶</a><br /></dt>
 <dd><div class="breathe-sectiondef docutils container">
-<p class="breathe-sectiondef-title rubric">Variables</p>
+<p class="breathe-sectiondef-title rubric">Public Functions</p>
+<dl class="function">
+<dt id="_CPPv2N8PsiInput8PsiInputEPKc">
+<span id="PsiInput::PsiInput__cCP"></span><span class="target" id="class_psi_input_1ac796a2dbddfc6b6aa54841d8c762cc6c"></span><code class="descname">PsiInput</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N8PsiInput8PsiInputEPKc" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv2N8PsiInput4recvEPci">
+<span id="PsiInput::recv__cP.i"></span><span class="target" id="class_psi_input_1a480b3f1424806a23c3a1c77d590eb216"></span>int <code class="descname">recv</code><span class="sig-paren">(</span>char *<em>data</em>, int <em>len</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N8PsiInput4recvEPci" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv2N8PsiInput12recv_nolimitEPPci">
+<span id="PsiInput::recv_nolimit__cPP.i"></span><span class="target" id="class_psi_input_1a9410879a8e96915adcad5d6ebb5f224c"></span>int <code class="descname">recv_nolimit</code><span class="sig-paren">(</span>char **<em>data</em>, int <em>len</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N8PsiInput12recv_nolimitEPPci" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Private Members</p>
 <dl class="member">
-<dt>
-<span class="target" id="_psi_interface_8m_1ac20f542425d23d5b71774e61a30c7884"></span><code class="descname">pyobj</code> = PsiInterface(type, varargin)
-  PsiInterface = py.importlib.import_module('cis_interface.interface.PsiInterface')</dt>
+<dt id="_CPPv2N8PsiInput3_piE">
+<span id="PsiInput::_pi__psiInput_t"></span><span class="target" id="class_psi_input_1a7392943147510fd48430b185a30bebbf"></span><a class="reference internal" href="interface_c.html#_CPPv210psiInput_t" title="psiInput_t">psiInput_t</a> <code class="descname">_pi</code><a class="headerlink" href="#_CPPv2N8PsiInput3_piE" title="Permalink to this definition">¶</a><br /></dt>
 <dd></dd></dl>
 
 </div>
 </dd></dl>
 
-<dl class="dir">
-<dt>
-<span class="target" id="dir_a862424b14b5e0bd4b5f46d76b9d9fcd"></span><em>dir</em> <code class="descname">/home/ubuntu/langmm/cis_iterface/cis_interface</code></dt>
+<dl class="class">
+<dt id="_CPPv29PsiOutput">
+<span id="PsiOutput"></span><span class="target" id="class_psi_output"></span><em class="property">class </em><code class="descname">PsiOutput</code><a class="headerlink" href="#_CPPv29PsiOutput" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Functions</p>
+<dl class="function">
+<dt id="_CPPv2N9PsiOutput9PsiOutputEPKc">
+<span id="PsiOutput::PsiOutput__cCP"></span><span class="target" id="class_psi_output_1a40a8752bfc87e83bb9671b737f7506aa"></span><code class="descname">PsiOutput</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N9PsiOutput9PsiOutputEPKc" title="Permalink to this definition">¶</a><br /></dt>
 <dd></dd></dl>
 
-<dl class="dir">
-<dt>
-<span class="target" id="dir_e47a34020f69a6cf0aa9a10e0fa7d928"></span><em>dir</em> <code class="descname">/home/ubuntu/langmm/cis_iterface/cis_interface/interface</code></dt>
+<dl class="function">
+<dt id="_CPPv2N9PsiOutput4sendEPci">
+<span id="PsiOutput::send__cP.i"></span><span class="target" id="class_psi_output_1a5cdad4b95c12f7ac7dcc8c4a7e7c8104"></span>int <code class="descname">send</code><span class="sig-paren">(</span>char *<em>data</em>, int <em>len</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N9PsiOutput4sendEPci" title="Permalink to this definition">¶</a><br /></dt>
 <dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv2N9PsiOutput12send_nolimitEPci">
+<span id="PsiOutput::send_nolimit__cP.i"></span><span class="target" id="class_psi_output_1a8cc6c40e56f1d7570d1f1dca477ade5d"></span>int <code class="descname">send_nolimit</code><span class="sig-paren">(</span>char *<em>data</em>, int <em>len</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N9PsiOutput12send_nolimitEPci" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Members</p>
+<dl class="member">
+<dt id="_CPPv2N9PsiOutput3_piE">
+<span id="PsiOutput::_pi__psiOutput_t"></span><span class="target" id="class_psi_output_1a18e4f13e7bb2525621c3678b29871388"></span><a class="reference internal" href="interface_c.html#_CPPv211psiOutput_t" title="psiOutput_t">psiOutput_t</a> <code class="descname">_pi</code><a class="headerlink" href="#_CPPv2N9PsiOutput3_piE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="class">
+<dt id="_CPPv26PsiRpc">
+<span id="PsiRpc"></span><span class="target" id="class_psi_rpc"></span><em class="property">class </em><code class="descname">PsiRpc</code><a class="headerlink" href="#_CPPv26PsiRpc" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Subclassed by <a class="reference internal" href="#class_psi_rpc_client"><span class="std std-ref">PsiRpcClient</span></a>, <a class="reference internal" href="#class_psi_rpc_server"><span class="std std-ref">PsiRpcServer</span></a></p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Functions</p>
+<dl class="function">
+<dt id="_CPPv2N6PsiRpc6PsiRpcEPKcPcPKcPc">
+<span id="PsiRpc::PsiRpc__cCP.cP.cCP.cP"></span><span class="target" id="class_psi_rpc_1a59e6a3c10d5d3b8b5ddbad8272c21609"></span><code class="descname">PsiRpc</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>outName</em>, char *<em>outFormat</em>, <em class="property">const</em> char *<em>inName</em>, char *<em>inFormat</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N6PsiRpc6PsiRpcEPKcPcPKcPc" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv2N6PsiRpc4sendEiz">
+<span id="PsiRpc::send__i.z"></span><span class="target" id="class_psi_rpc_1acda49b14f82701bfaf0e56b3069fcee3"></span>int <code class="descname">send</code><span class="sig-paren">(</span>int <em>fake_first</em> = 0, ...<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N6PsiRpc4sendEiz" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv2N6PsiRpc4recvEiz">
+<span id="PsiRpc::recv__i.z"></span><span class="target" id="class_psi_rpc_1ab3f5b5be2c8a046828803b9a92b2c5e3"></span>int <code class="descname">recv</code><span class="sig-paren">(</span>int <em>fake_first</em> = 0, ...<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N6PsiRpc4recvEiz" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Members</p>
+<dl class="member">
+<dt id="_CPPv2N6PsiRpc3_piE">
+<span id="PsiRpc::_pi__psiRpc_t"></span><span class="target" id="class_psi_rpc_1a1d955f5b67593d52dc2d058257255865"></span><a class="reference internal" href="interface_c.html#_CPPv28psiRpc_t" title="psiRpc_t">psiRpc_t</a> <code class="descname">_pi</code><a class="headerlink" href="#_CPPv2N6PsiRpc3_piE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="class">
+<dt id="_CPPv212PsiRpcServer">
+<span id="PsiRpcServer"></span><span class="target" id="class_psi_rpc_server"></span><em class="property">class </em><code class="descname">PsiRpcServer</code><a class="headerlink" href="#_CPPv212PsiRpcServer" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Inherits from <a class="reference internal" href="#class_psi_rpc"><span class="std std-ref">PsiRpc</span></a></p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Functions</p>
+<dl class="function">
+<dt id="_CPPv2N12PsiRpcServer12PsiRpcServerEPKcPcPc">
+<span id="PsiRpcServer::PsiRpcServer__cCP.cP.cP"></span><span class="target" id="class_psi_rpc_server_1ab59731cec82271493e4534e43d3756b7"></span><code class="descname">PsiRpcServer</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em>, char *<em>inFormat</em>, char *<em>outFormat</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N12PsiRpcServer12PsiRpcServerEPKcPcPc" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Members</p>
+<dl class="member">
+<dt id="_CPPv2N12PsiRpcServer3_piE">
+<span id="PsiRpcServer::_pi__psiRpc_t"></span><span class="target" id="class_psi_rpc_server_1aa31aadb879cd5b66f04cab1819561641"></span><a class="reference internal" href="interface_c.html#_CPPv28psiRpc_t" title="psiRpc_t">psiRpc_t</a> <code class="descname">_pi</code><a class="headerlink" href="#_CPPv2N12PsiRpcServer3_piE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="class">
+<dt id="_CPPv212PsiRpcClient">
+<span id="PsiRpcClient"></span><span class="target" id="class_psi_rpc_client"></span><em class="property">class </em><code class="descname">PsiRpcClient</code><a class="headerlink" href="#_CPPv212PsiRpcClient" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Inherits from <a class="reference internal" href="#class_psi_rpc"><span class="std std-ref">PsiRpc</span></a></p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Functions</p>
+<dl class="function">
+<dt id="_CPPv2N12PsiRpcClient12PsiRpcClientEPKcPcPc">
+<span id="PsiRpcClient::PsiRpcClient__cCP.cP.cP"></span><span class="target" id="class_psi_rpc_client_1a77a4dd609c4bd82862bea5fc0651ba02"></span><code class="descname">PsiRpcClient</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em>, char *<em>outFormat</em>, char *<em>inFormat</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N12PsiRpcClient12PsiRpcClientEPKcPcPc" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv2N12PsiRpcClient4callEiz">
+<span id="PsiRpcClient::call__i.z"></span><span class="target" id="class_psi_rpc_client_1a309961dea218c53e1b1ccba54c0817c2"></span>int <code class="descname">call</code><span class="sig-paren">(</span>int <em>fake_first</em> = 0, ...<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N12PsiRpcClient4callEiz" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Members</p>
+<dl class="member">
+<dt id="_CPPv2N12PsiRpcClient3_piE">
+<span id="PsiRpcClient::_pi__psiRpc_t"></span><span class="target" id="class_psi_rpc_client_1a0e40bfe85b5d915c27bd5bd07a2886f3"></span><a class="reference internal" href="interface_c.html#_CPPv28psiRpc_t" title="psiRpc_t">psiRpc_t</a> <code class="descname">_pi</code><a class="headerlink" href="#_CPPv2N12PsiRpcClient3_piE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="class">
+<dt id="_CPPv218PsiAsciiFileOutput">
+<span id="PsiAsciiFileOutput"></span><span class="target" id="class_psi_ascii_file_output"></span><em class="property">class </em><code class="descname">PsiAsciiFileOutput</code><a class="headerlink" href="#_CPPv218PsiAsciiFileOutput" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Functions</p>
+<dl class="function">
+<dt id="_CPPv2N18PsiAsciiFileOutput18PsiAsciiFileOutputEPKci">
+<span id="PsiAsciiFileOutput::PsiAsciiFileOutput__cCP.i"></span><span class="target" id="class_psi_ascii_file_output_1a08f5ec347f018509dcdd6b7405e15e36"></span><code class="descname">PsiAsciiFileOutput</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em>, int <em>dst_type</em> = 1<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N18PsiAsciiFileOutput18PsiAsciiFileOutputEPKci" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv2N18PsiAsciiFileOutputD0Ev">
+<span id="PsiAsciiFileOutput::~PsiAsciiFileOutput"></span><span class="target" id="class_psi_ascii_file_output_1a616fa02af7a51f36d62e2aa109035072"></span><code class="descname">~PsiAsciiFileOutput</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N18PsiAsciiFileOutputD0Ev" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv2N18PsiAsciiFileOutput8send_eofEv">
+<span id="PsiAsciiFileOutput::send_eof"></span><span class="target" id="class_psi_ascii_file_output_1a9173658e711537902ea50bf8c3b5b292"></span>int <code class="descname">send_eof</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N18PsiAsciiFileOutput8send_eofEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv2N18PsiAsciiFileOutput9send_lineEPc">
+<span id="PsiAsciiFileOutput::send_line__cP"></span><span class="target" id="class_psi_ascii_file_output_1ad90b9b03bdf05f14be85fe0735df60a9"></span>int <code class="descname">send_line</code><span class="sig-paren">(</span>char *<em>line</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N18PsiAsciiFileOutput9send_lineEPc" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Members</p>
+<dl class="member">
+<dt id="_CPPv2N18PsiAsciiFileOutput3_piE">
+<span id="PsiAsciiFileOutput::_pi__psiAsciiFileOutput_t"></span><span class="target" id="class_psi_ascii_file_output_1a8ed8ca9e591c7db9f42299471ed43978"></span><a class="reference internal" href="interface_c.html#_CPPv220psiAsciiFileOutput_t" title="psiAsciiFileOutput_t">psiAsciiFileOutput_t</a> <code class="descname">_pi</code><a class="headerlink" href="#_CPPv2N18PsiAsciiFileOutput3_piE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="class">
+<dt id="_CPPv217PsiAsciiFileInput">
+<span id="PsiAsciiFileInput"></span><span class="target" id="class_psi_ascii_file_input"></span><em class="property">class </em><code class="descname">PsiAsciiFileInput</code><a class="headerlink" href="#_CPPv217PsiAsciiFileInput" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Functions</p>
+<dl class="function">
+<dt id="_CPPv2N17PsiAsciiFileInput17PsiAsciiFileInputEPKci">
+<span id="PsiAsciiFileInput::PsiAsciiFileInput__cCP.i"></span><span class="target" id="class_psi_ascii_file_input_1aaf0db20856965c11699fc8d3f22562bc"></span><code class="descname">PsiAsciiFileInput</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em>, int <em>src_type</em> = 1<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N17PsiAsciiFileInput17PsiAsciiFileInputEPKci" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv2N17PsiAsciiFileInputD0Ev">
+<span id="PsiAsciiFileInput::~PsiAsciiFileInput"></span><span class="target" id="class_psi_ascii_file_input_1a9e4b866a3986c47ca87309380f8c9c9c"></span><code class="descname">~PsiAsciiFileInput</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N17PsiAsciiFileInputD0Ev" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv2N17PsiAsciiFileInput9recv_lineEPc6size_t">
+<span id="PsiAsciiFileInput::recv_line__cP.s"></span><span class="target" id="class_psi_ascii_file_input_1a75d19d237c5166654bea8360ac4a4056"></span>int <code class="descname">recv_line</code><span class="sig-paren">(</span>char *<em>line</em>, size_t <em>n</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N17PsiAsciiFileInput9recv_lineEPc6size_t" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Members</p>
+<dl class="member">
+<dt id="_CPPv2N17PsiAsciiFileInput3_piE">
+<span id="PsiAsciiFileInput::_pi__psiAsciiFileInput_t"></span><span class="target" id="class_psi_ascii_file_input_1a067c0e3f3b48abafd93e2143442424a7"></span><a class="reference internal" href="interface_c.html#_CPPv219psiAsciiFileInput_t" title="psiAsciiFileInput_t">psiAsciiFileInput_t</a> <code class="descname">_pi</code><a class="headerlink" href="#_CPPv2N17PsiAsciiFileInput3_piE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="class">
+<dt id="_CPPv219PsiAsciiTableOutput">
+<span id="PsiAsciiTableOutput"></span><span class="target" id="class_psi_ascii_table_output"></span><em class="property">class </em><code class="descname">PsiAsciiTableOutput</code><a class="headerlink" href="#_CPPv219PsiAsciiTableOutput" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Functions</p>
+<dl class="function">
+<dt id="_CPPv2N19PsiAsciiTableOutput19PsiAsciiTableOutputEPKcPci">
+<span id="PsiAsciiTableOutput::PsiAsciiTableOutput__cCP.cP.i"></span><span class="target" id="class_psi_ascii_table_output_1a4ed7d46502d5a0212761c9403775237c"></span><code class="descname">PsiAsciiTableOutput</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em>, char *<em>format_str</em>, int <em>dst_type</em> = 1<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N19PsiAsciiTableOutput19PsiAsciiTableOutputEPKcPci" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv2N19PsiAsciiTableOutputD0Ev">
+<span id="PsiAsciiTableOutput::~PsiAsciiTableOutput"></span><span class="target" id="class_psi_ascii_table_output_1a6d407f3f9ad5b585ccb875bddfe2fd40"></span><code class="descname">~PsiAsciiTableOutput</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N19PsiAsciiTableOutputD0Ev" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv2N19PsiAsciiTableOutput4sendEPci">
+<span id="PsiAsciiTableOutput::send__cP.i"></span><span class="target" id="class_psi_ascii_table_output_1a36b070546cacc2522dca60b3eb7c1af1"></span>int <code class="descname">send</code><span class="sig-paren">(</span>char *<em>data</em>, int <em>len</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N19PsiAsciiTableOutput4sendEPci" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv2N19PsiAsciiTableOutput8send_eofEv">
+<span id="PsiAsciiTableOutput::send_eof"></span><span class="target" id="class_psi_ascii_table_output_1a5a4ecadfd80cdb8397eda38a0f178320"></span>int <code class="descname">send_eof</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N19PsiAsciiTableOutput8send_eofEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv2N19PsiAsciiTableOutput8send_rowEiz">
+<span id="PsiAsciiTableOutput::send_row__i.z"></span><span class="target" id="class_psi_ascii_table_output_1a26e38bd9b4816569a6125338455c67d8"></span>int <code class="descname">send_row</code><span class="sig-paren">(</span>int <em>fake_first</em> = 0, ...<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N19PsiAsciiTableOutput8send_rowEiz" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv2N19PsiAsciiTableOutput10send_arrayEiz">
+<span id="PsiAsciiTableOutput::send_array__i.z"></span><span class="target" id="class_psi_ascii_table_output_1a168ace3e3b5fd8da02ae28c429673722"></span>int <code class="descname">send_array</code><span class="sig-paren">(</span>int <em>nrows</em>, ...<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N19PsiAsciiTableOutput10send_arrayEiz" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Members</p>
+<dl class="member">
+<dt id="_CPPv2N19PsiAsciiTableOutput3_piE">
+<span id="PsiAsciiTableOutput::_pi__psiAsciiTableOutput_t"></span><span class="target" id="class_psi_ascii_table_output_1a38c23b4b459107c0e032aaa683d20999"></span><a class="reference internal" href="interface_c.html#_CPPv221psiAsciiTableOutput_t" title="psiAsciiTableOutput_t">psiAsciiTableOutput_t</a> <code class="descname">_pi</code><a class="headerlink" href="#_CPPv2N19PsiAsciiTableOutput3_piE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="class">
+<dt id="_CPPv218PsiAsciiTableInput">
+<span id="PsiAsciiTableInput"></span><span class="target" id="class_psi_ascii_table_input"></span><em class="property">class </em><code class="descname">PsiAsciiTableInput</code><a class="headerlink" href="#_CPPv218PsiAsciiTableInput" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Functions</p>
+<dl class="function">
+<dt id="_CPPv2N18PsiAsciiTableInput18PsiAsciiTableInputEPKci">
+<span id="PsiAsciiTableInput::PsiAsciiTableInput__cCP.i"></span><span class="target" id="class_psi_ascii_table_input_1a75626a21362193ab71e53b0e395f8d4c"></span><code class="descname">PsiAsciiTableInput</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em>, int <em>src_type</em> = 1<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N18PsiAsciiTableInput18PsiAsciiTableInputEPKci" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv2N18PsiAsciiTableInputD0Ev">
+<span id="PsiAsciiTableInput::~PsiAsciiTableInput"></span><span class="target" id="class_psi_ascii_table_input_1abad6b196dddb862f33c760516aa673f0"></span><code class="descname">~PsiAsciiTableInput</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N18PsiAsciiTableInputD0Ev" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv2N18PsiAsciiTableInput4recvEPPci">
+<span id="PsiAsciiTableInput::recv__cPP.i"></span><span class="target" id="class_psi_ascii_table_input_1ade41e5aa0af9200b81fec07c1512e6a2"></span>int <code class="descname">recv</code><span class="sig-paren">(</span>char **<em>data</em>, int <em>len</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N18PsiAsciiTableInput4recvEPPci" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv2N18PsiAsciiTableInput8recv_rowEiz">
+<span id="PsiAsciiTableInput::recv_row__i.z"></span><span class="target" id="class_psi_ascii_table_input_1a7cbbbc6ddf1095e473dbf00653d4520d"></span>int <code class="descname">recv_row</code><span class="sig-paren">(</span>int <em>fake_first</em> = 0, ...<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N18PsiAsciiTableInput8recv_rowEiz" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv2N18PsiAsciiTableInput10recv_arrayEiz">
+<span id="PsiAsciiTableInput::recv_array__i.z"></span><span class="target" id="class_psi_ascii_table_input_1a3e6a42ad44ccd0293f07aacb8509ac2d"></span>int <code class="descname">recv_array</code><span class="sig-paren">(</span>int <em>fake_first</em> = 0, ...<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N18PsiAsciiTableInput10recv_arrayEiz" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Members</p>
+<dl class="member">
+<dt id="_CPPv2N18PsiAsciiTableInput3_piE">
+<span id="PsiAsciiTableInput::_pi__psiAsciiTableInput_t"></span><span class="target" id="class_psi_ascii_table_input_1addffcef0af2986246201c366c4f5942c"></span><a class="reference internal" href="interface_c.html#_CPPv220psiAsciiTableInput_t" title="psiAsciiTableInput_t">psiAsciiTableInput_t</a> <code class="descname">_pi</code><a class="headerlink" href="#_CPPv2N18PsiAsciiTableInput3_piE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
 
 </div>
 

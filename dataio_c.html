@@ -46,91 +46,7 @@
             
   <div class="section" id="c-dataio-api">
 <h1>C DataIO API<a class="headerlink" href="#c-dataio-api" title="Permalink to this headline">¶</a></h1>
-<dl class="class">
-<dt id="_CPPv29AsciiFile">
-<span id="AsciiFile"></span><span class="target" id="struct_ascii_file"></span><em class="property">struct </em><code class="descname">AsciiFile</code><a class="headerlink" href="#_CPPv29AsciiFile" title="Permalink to this definition">¶</a><br /></dt>
-<dd><div class="breathe-sectiondef docutils container">
-<p class="breathe-sectiondef-title rubric">Public Members</p>
-<dl class="member">
-<dt id="_CPPv2N9AsciiFile8filepathE">
-<span id="AsciiFile::filepath__cCP"></span><span class="target" id="struct_ascii_file_1a943bff7edf4fa3310cfc80093f719058"></span><em class="property">const</em> char *<code class="descname">filepath</code><a class="headerlink" href="#_CPPv2N9AsciiFile8filepathE" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
-
-<dl class="member">
-<dt id="_CPPv2N9AsciiFile7io_modeE">
-<span id="AsciiFile::io_mode__cA"></span><span class="target" id="struct_ascii_file_1a28af310876444d92cafbe961dfd7f447"></span>char <code class="descname">io_mode</code>[64]<a class="headerlink" href="#_CPPv2N9AsciiFile7io_modeE" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
-
-<dl class="member">
-<dt id="_CPPv2N9AsciiFile7commentE">
-<span id="AsciiFile::comment__cA"></span><span class="target" id="struct_ascii_file_1ac6ec6edf3c80ec10b3076aaaad2d2543"></span>char <code class="descname">comment</code>[64]<a class="headerlink" href="#_CPPv2N9AsciiFile7commentE" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
-
-<dl class="member">
-<dt id="_CPPv2N9AsciiFile7newlineE">
-<span id="AsciiFile::newline__cA"></span><span class="target" id="struct_ascii_file_1ae4e7b9b8b86b0bee4835f2eb183f048c"></span>char <code class="descname">newline</code>[64]<a class="headerlink" href="#_CPPv2N9AsciiFile7newlineE" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
-
-<dl class="member">
-<dt id="_CPPv2N9AsciiFile2fdE">
-<span id="AsciiFile::fd__FILEP"></span><span class="target" id="struct_ascii_file_1a971e8089527d5d8be168a047ae66c116"></span>FILE *<code class="descname">fd</code><a class="headerlink" href="#_CPPv2N9AsciiFile2fdE" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
-
-</div>
-</dd></dl>
-
-<dl class="class">
-<dt id="_CPPv210AsciiTable">
-<span id="AsciiTable"></span><span class="target" id="struct_ascii_table"></span><em class="property">struct </em><code class="descname">AsciiTable</code><a class="headerlink" href="#_CPPv210AsciiTable" title="Permalink to this definition">¶</a><br /></dt>
-<dd><div class="breathe-sectiondef docutils container">
-<p class="breathe-sectiondef-title rubric">Public Members</p>
-<dl class="member">
-<dt id="_CPPv2N10AsciiTable1fE">
-<span id="AsciiTable::f__AsciiFile"></span><span class="target" id="struct_ascii_table_1a6b71c65c319ebb789ff5a2a912b35d0c"></span><a class="reference internal" href="#_CPPv29AsciiFile" title="AsciiFile">AsciiFile</a> <code class="descname">f</code><a class="headerlink" href="#_CPPv2N10AsciiTable1fE" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
-
-<dl class="member">
-<dt id="_CPPv2N10AsciiTable10format_strE">
-<span id="AsciiTable::format_str__cA"></span><span class="target" id="struct_ascii_table_1a02c0c95bda1032efb7d36ed046a81161"></span>char <code class="descname">format_str</code>[LINE_SIZE_MAX]<a class="headerlink" href="#_CPPv2N10AsciiTable10format_strE" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
-
-<dl class="member">
-<dt id="_CPPv2N10AsciiTable6columnE">
-<span id="AsciiTable::column__cA"></span><span class="target" id="struct_ascii_table_1a9d1eb5cae7de5f8086e13e77ab677cfd"></span>char <code class="descname">column</code>[64]<a class="headerlink" href="#_CPPv2N10AsciiTable6columnE" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
-
-<dl class="member">
-<dt id="_CPPv2N10AsciiTable5ncolsE">
-<span id="AsciiTable::ncols__i"></span><span class="target" id="struct_ascii_table_1a8fb623eb767592c944c925e4fdf39630"></span>int <code class="descname">ncols</code><a class="headerlink" href="#_CPPv2N10AsciiTable5ncolsE" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
-
-<dl class="member">
-<dt id="_CPPv2N10AsciiTable10format_typE">
-<span id="AsciiTable::format_typ__iP"></span><span class="target" id="struct_ascii_table_1a2071d95515e2c0f1d6d3df70d37f1905"></span>int *<code class="descname">format_typ</code><a class="headerlink" href="#_CPPv2N10AsciiTable10format_typE" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
-
-<dl class="member">
-<dt id="_CPPv2N10AsciiTable10format_sizE">
-<span id="AsciiTable::format_siz__iP"></span><span class="target" id="struct_ascii_table_1a697bf776cdb1d3d98197b0c8a574d8af"></span>int *<code class="descname">format_siz</code><a class="headerlink" href="#_CPPv2N10AsciiTable10format_sizE" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
-
-<dl class="member">
-<dt id="_CPPv2N10AsciiTable7row_sizE">
-<span id="AsciiTable::row_siz__i"></span><span class="target" id="struct_ascii_table_1a0182498c6504b0b60b7a803409b330e6"></span>int <code class="descname">row_siz</code><a class="headerlink" href="#_CPPv2N10AsciiTable7row_sizE" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
-
-<dl class="member">
-<dt id="_CPPv2N10AsciiTable6statusE">
-<span id="AsciiTable::status__i"></span><span class="target" id="struct_ascii_table_1a782403a4fbf29b3b6dceabec0282c83d"></span>int <code class="descname">status</code><a class="headerlink" href="#_CPPv2N10AsciiTable6statusE" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
-
-</div>
-</dd></dl>
-
-<dl class="file">
-<dt>
-<span class="target" id="_ascii_file_8h"></span><em>file</em> <code class="descname">AsciiFile.h</code></dt>
-<dd><em>#include &lt;string.h&gt;</em><em>#include &lt;stdio.h&gt;</em><em>#include &lt;stdlib.h&gt;</em><em>#include &lt;stdarg.h&gt;</em><div class="breathe-sectiondef docutils container">
+<div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric">Defines</p>
 <dl class="macro">
 <dt id="c.LINE_SIZE_MAX">
@@ -142,7 +58,7 @@
 <p class="breathe-sectiondef-title rubric">Typedefs</p>
 <dl class="type">
 <dt id="_CPPv29AsciiFile">
-<span class="target" id="_ascii_file_8h_1ad744132f03b4b89bb47911c4ec7a82f1"></span><em class="property">typedef </em><em class="property">struct</em> <a class="reference internal" href="#_CPPv29AsciiFile" title="AsciiFile">AsciiFile</a> <code class="descname">AsciiFile</code><a class="headerlink" href="#_CPPv29AsciiFile" title="Permalink to this definition">¶</a><br /></dt>
+<span id="AsciiFile"></span><span class="target" id="_ascii_file_8h_1ad744132f03b4b89bb47911c4ec7a82f1"></span><em class="property">typedef </em><em class="property">struct</em> <a class="reference internal" href="#_CPPv29AsciiFile" title="AsciiFile">AsciiFile</a> <code class="descname">AsciiFile</code><a class="headerlink" href="#_CPPv29AsciiFile" title="Permalink to this definition">¶</a><br /></dt>
 <dd></dd></dl>
 
 </div>
@@ -184,16 +100,44 @@
 <dd></dd></dl>
 
 </div>
+<dl class="class">
+<dt id="_CPPv29AsciiFile">
+<span class="target" id="struct_ascii_file"></span><em class="property">struct </em><code class="descname">AsciiFile</code><a class="headerlink" href="#_CPPv29AsciiFile" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Members</p>
+<dl class="member">
+<dt id="_CPPv2N9AsciiFile8filepathE">
+<span id="AsciiFile::filepath__cCP"></span><span class="target" id="struct_ascii_file_1a943bff7edf4fa3310cfc80093f719058"></span><em class="property">const</em> char *<code class="descname">filepath</code><a class="headerlink" href="#_CPPv2N9AsciiFile8filepathE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="member">
+<dt id="_CPPv2N9AsciiFile7io_modeE">
+<span id="AsciiFile::io_mode__cA"></span><span class="target" id="struct_ascii_file_1a28af310876444d92cafbe961dfd7f447"></span>char <code class="descname">io_mode</code>[64]<a class="headerlink" href="#_CPPv2N9AsciiFile7io_modeE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="member">
+<dt id="_CPPv2N9AsciiFile7commentE">
+<span id="AsciiFile::comment__cA"></span><span class="target" id="struct_ascii_file_1ac6ec6edf3c80ec10b3076aaaad2d2543"></span>char <code class="descname">comment</code>[64]<a class="headerlink" href="#_CPPv2N9AsciiFile7commentE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="member">
+<dt id="_CPPv2N9AsciiFile7newlineE">
+<span id="AsciiFile::newline__cA"></span><span class="target" id="struct_ascii_file_1ae4e7b9b8b86b0bee4835f2eb183f048c"></span>char <code class="descname">newline</code>[64]<a class="headerlink" href="#_CPPv2N9AsciiFile7newlineE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="member">
+<dt id="_CPPv2N9AsciiFile2fdE">
+<span id="AsciiFile::fd__FILEP"></span><span class="target" id="struct_ascii_file_1a971e8089527d5d8be168a047ae66c116"></span>FILE *<code class="descname">fd</code><a class="headerlink" href="#_CPPv2N9AsciiFile2fdE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
 </dd></dl>
 
-<dl class="file">
-<dt>
-<span class="target" id="_ascii_table_8h"></span><em>file</em> <code class="descname">AsciiTable.h</code></dt>
-<dd><em>#include &lt;string.h&gt;</em><em>#include &lt;stdio.h&gt;</em><em>#include &lt;stdlib.h&gt;</em><em>#include &lt;stdarg.h&gt;</em><div class="breathe-sectiondef docutils container">
+<div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric">Typedefs</p>
 <dl class="type">
 <dt id="_CPPv210AsciiTable">
-<span class="target" id="_ascii_table_8h_1a29f3208e3f7725d88d70d6d962c49a52"></span><em class="property">typedef </em><em class="property">struct</em> <a class="reference internal" href="#_CPPv210AsciiTable" title="AsciiTable">AsciiTable</a> <code class="descname">AsciiTable</code><a class="headerlink" href="#_CPPv210AsciiTable" title="Permalink to this definition">¶</a><br /></dt>
+<span id="AsciiTable"></span><span class="target" id="_ascii_table_8h_1a29f3208e3f7725d88d70d6d962c49a52"></span><em class="property">typedef </em><em class="property">struct</em> <a class="reference internal" href="#_CPPv210AsciiTable" title="AsciiTable">AsciiTable</a> <code class="descname">AsciiTable</code><a class="headerlink" href="#_CPPv210AsciiTable" title="Permalink to this definition">¶</a><br /></dt>
 <dd></dd></dl>
 
 </div>
@@ -354,17 +298,53 @@
 <dd></dd></dl>
 
 </div>
+<dl class="class">
+<dt id="_CPPv210AsciiTable">
+<span class="target" id="struct_ascii_table"></span><em class="property">struct </em><code class="descname">AsciiTable</code><a class="headerlink" href="#_CPPv210AsciiTable" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Members</p>
+<dl class="member">
+<dt id="_CPPv2N10AsciiTable1fE">
+<span id="AsciiTable::f__AsciiFile"></span><span class="target" id="struct_ascii_table_1a6b71c65c319ebb789ff5a2a912b35d0c"></span><a class="reference internal" href="#_CPPv29AsciiFile" title="AsciiFile">AsciiFile</a> <code class="descname">f</code><a class="headerlink" href="#_CPPv2N10AsciiTable1fE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="member">
+<dt id="_CPPv2N10AsciiTable10format_strE">
+<span id="AsciiTable::format_str__cA"></span><span class="target" id="struct_ascii_table_1a02c0c95bda1032efb7d36ed046a81161"></span>char <code class="descname">format_str</code>[LINE_SIZE_MAX]<a class="headerlink" href="#_CPPv2N10AsciiTable10format_strE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="member">
+<dt id="_CPPv2N10AsciiTable6columnE">
+<span id="AsciiTable::column__cA"></span><span class="target" id="struct_ascii_table_1a9d1eb5cae7de5f8086e13e77ab677cfd"></span>char <code class="descname">column</code>[64]<a class="headerlink" href="#_CPPv2N10AsciiTable6columnE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="member">
+<dt id="_CPPv2N10AsciiTable5ncolsE">
+<span id="AsciiTable::ncols__i"></span><span class="target" id="struct_ascii_table_1a8fb623eb767592c944c925e4fdf39630"></span>int <code class="descname">ncols</code><a class="headerlink" href="#_CPPv2N10AsciiTable5ncolsE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="member">
+<dt id="_CPPv2N10AsciiTable10format_typE">
+<span id="AsciiTable::format_typ__iP"></span><span class="target" id="struct_ascii_table_1a2071d95515e2c0f1d6d3df70d37f1905"></span>int *<code class="descname">format_typ</code><a class="headerlink" href="#_CPPv2N10AsciiTable10format_typE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="member">
+<dt id="_CPPv2N10AsciiTable10format_sizE">
+<span id="AsciiTable::format_siz__iP"></span><span class="target" id="struct_ascii_table_1a697bf776cdb1d3d98197b0c8a574d8af"></span>int *<code class="descname">format_siz</code><a class="headerlink" href="#_CPPv2N10AsciiTable10format_sizE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="member">
+<dt id="_CPPv2N10AsciiTable7row_sizE">
+<span id="AsciiTable::row_siz__i"></span><span class="target" id="struct_ascii_table_1a0182498c6504b0b60b7a803409b330e6"></span>int <code class="descname">row_siz</code><a class="headerlink" href="#_CPPv2N10AsciiTable7row_sizE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="member">
+<dt id="_CPPv2N10AsciiTable6statusE">
+<span id="AsciiTable::status__i"></span><span class="target" id="struct_ascii_table_1a782403a4fbf29b3b6dceabec0282c83d"></span>int <code class="descname">status</code><a class="headerlink" href="#_CPPv2N10AsciiTable6statusE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
 </dd></dl>
-
-<dl class="dir">
-<dt>
-<span class="target" id="dir_a862424b14b5e0bd4b5f46d76b9d9fcd"></span><em>dir</em> <code class="descname">/home/ubuntu/langmm/cis_iterface/cis_interface</code></dt>
-<dd></dd></dl>
-
-<dl class="dir">
-<dt>
-<span class="target" id="dir_e2e96a12fc04fec5957fa0cee9f792b8"></span><em>dir</em> <code class="descname">/home/ubuntu/langmm/cis_iterface/cis_interface/dataio</code></dt>
-<dd></dd></dl>
 
 </div>
 
