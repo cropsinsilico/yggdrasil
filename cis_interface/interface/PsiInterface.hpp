@@ -133,8 +133,7 @@ public:
     @return integer specifying if the send was succesful. Values >= 0 indicate
     success.
   */
-  // TODO: fix issue with fake_first, maybe macro
-  int send(int fake_first = 0, ...) {
+  int send(int fake_first, ...) {
     va_list va;
     va_start(va, fake_first);
     int ret = vrpcSend(_pi, va);

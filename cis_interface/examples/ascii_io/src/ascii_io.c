@@ -48,7 +48,7 @@ int main(int argc,char *argv[]){
   // As each row is received, it is then sent to the output ASCII table
   printf("ascii_io(C): Receiving/sending ASCII table.\n");
   char name[BSIZE];
-  int number;
+  long number;
   double value;
   ret = 0;
   while (ret >= 0) {
@@ -57,7 +57,7 @@ int main(int argc,char *argv[]){
     if (ret >= 0) {
       // If the receive was succesful, send the values to output. Formatting
       // is taken care of on the output driver side.
-      printf("Table: %s, %d, %f\n", name, number, value);
+      printf("Table: %s, %ld, %3.1f\n", name, number, value);
       ret = at_send_row(TableOutput, name, number, value);
       if (ret != 0) {
 	printf("ascii_io(C): ERROR SENDING ROW\n");
@@ -89,7 +89,7 @@ int main(int argc,char *argv[]){
   printf("Array: (%d rows)\n", ret);
   // Print each line in the array
   for (int i = 0; i < ret; i++)
-    printf("%5s, %d, %f\n", &name_arr[5*i], number_arr[i], value_arr[i]);
+    printf("%5s, %ld, %f\n", &name_arr[5*i], number_arr[i], value_arr[i]);
   // Send the columns in the array to output. Formatting is handled on the
   // output driver side.
   ret = at_send_array(ArrayOutput, ret, name_arr, number_arr, value_arr);

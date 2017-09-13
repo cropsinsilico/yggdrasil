@@ -10,6 +10,7 @@
 #include <stdarg.h>
 #include <unistd.h>
 #include <errno.h>
+#include <regex.h>
 #include <../dataio/AsciiFile.h>
 #include <../dataio/AsciiTable.h>
 
@@ -23,16 +24,77 @@ static char * _psiChannelNames[_psiTrackChannels];
 static unsigned _psiChannelsUsed = 0;
 
 
+/*!
+  @brief Create a regex from a character array.
+  Adapted from https://www.lemoda.net/c/unix-regex/
+  @param[out] r pointer to regex_t. Resutling regex expression.
+  @param[in] regex_text constant character pointer to text that should be
+  compiled.
+  @return static int Success or failure of compilation.
+ */
+static inline
+int compile_regex (regex_t * r, const char * regex_text)
+{
+  int status = regcomp (r, regex_text, REG_EXTENDED|REG_NEWLINE);
+  if (status != 0) {
+    char error_message[PSI_MSG_MAX];
+    regerror (status, r, error_message, PSI_MSG_MAX);
+    printf ("Regex error compiling '%s': %s\n",
+	    regex_text, error_message);
+    return 1;
+  }
+  return 0;
+}
+
+
+/*!
+  @brief Count the number of times a regular expression is matched in a string.
+  @param[in] regex_text constant character pointer to string that should be
+  compiled into a regex.
+  @param[in] to_match constant character pointer to string that should be
+  checked for matches.
+  @return int Number of matches found. -1 is returned if the regex could not be
+  compiled.
+*/
+static inline
+int count_matches(const char *regex_text, const char *to_match) {
+  int ret;
+  int n_match = 0;
+  regex_t r;
+  // Compile
+  ret = compile_regex(&r, regex_text);
+  if (ret)
+    return -1;
+  // Loop until string done
+  const char * p = to_match;
+  const int n_sub_matches = 10;
+  regmatch_t m[n_sub_matches];
+  while (1) {
+    int nomatch = regexec(&r, p, n_sub_matches, m, 0);
+    if (nomatch)
+      break;
+    n_match++;
+    p += m[0].rm_eo;
+  }
+  return n_match;
+};
+
+
+/*!
+  @brief Count how many % format specifiers there are in format string.
+  Formats are found by counting the number of matches to the regular expression
+      %(?:\d+\$)?[+-]?(?:[ 0]|'.{1})?-?\d*(?:\.\d+)?[bcdeEufFgGosxX]
+  adapted from https://stackoverflow.com/questions/446285/validate-sprintf-format-from-input-field-with-regex
+  @param[in] fmt_str constant character pointer to string that should be
+  searched for format specifiers.
+  @return int Number of format specifiers found.
+*/
 static inline
 int count_formats(const char* fmt_str) {
-  int c = 0;
-  for (char* s = (char*)fmt_str; (s = strstr(s, "%")); s++) {
-    if (strncmp(s, "%%", 2) == 0)
-      s++;
-    else
-      c++;
-  }
-  return c;
+  const char * fmt_regex = "%([[:digit:]]+\\$)?[+-]?([ 0]|\'\.{1})?-?[[:digit:]]*(\\.[[:digit:]]+)?[lhjztL]*[bcdeEufFgGosxX]";
+  int ret = count_matches(fmt_regex, fmt_str);
+  printf("%d, %s\n", ret, fmt_str);
+  return ret;
 };
 
 
@@ -231,6 +293,7 @@ typedef struct psiInput_t {
   int _handle; //!< Queue handle.
   const char *_name; //!< Queue name.
   char *_fmt; //!< Format for interpreting queue messages.
+  int _nfmt; //!< Number of fields expected from format string
 } psiInput_t;
 
 /*!
@@ -241,6 +304,7 @@ typedef struct psiOutput_t {
   int _handle; //!< Queue handle. 
   const char *_name; //!< Queue name.
   char *_fmt; //!< Format for formatting queue messages.
+  int _nfmt; //!< Number of fields expected from format string
 } psiOutput_t;
 
 /*!
@@ -259,6 +323,7 @@ psiOutput_t psiOutput(const char *name){
   psiOutput_t ret;
   ret._name = name;
   ret._fmt = 0;
+  ret._nfmt = 0;
   ret._handle = psi_mq(nm, name);
   return ret;
 };
@@ -280,6 +345,7 @@ psiInput_t psiInput(const char *name){
   ret._handle =  psi_mq(nm, name);
   ret._name = name;
   ret._fmt = 0;
+  ret._nfmt = 0;
   return ret;
 };
 
@@ -309,6 +375,7 @@ static inline
 psiOutput_t psiOutputFmt(const char *name, char *fmtString){
   psiOutput_t ret = psiOutput(name);
   ret._fmt = fmtString;
+  ret._nfmt = count_formats(fmtString);
   return ret;
 };
 
@@ -326,6 +393,7 @@ static inline
 psiInput_t psiInputFmt(const char *name, char *fmtString){
   psiInput_t ret = psiInput(name);
   ret._fmt = fmtString;
+  ret._nfmt = count_formats(fmtString);
   return ret;
 };
 
@@ -627,11 +695,10 @@ int vpsiRecv(psiInput_t psiQ, va_list ap) {
     debug("vpsiRecv(%s): EOF received.\n", psiQ._name);
     return -1;
   }
-  int nexp = count_formats(psiQ._fmt);
   int sret = vsscanf(buf, psiQ._fmt, ap);
-  if (sret != nexp) {
+  if (sret != psiQ._nfmt) {
     error("vpsiRecv(%s): vsscanf filled %d variables, but there are %d formats",
-          psiQ._name, sret, nexp);
+          psiQ._name, sret, psiQ._nfmt);
     return -1;
   }
   debug("vpsiRecv(%s): vsscanf returns %d", psiQ._name, sret);
@@ -650,7 +717,7 @@ int vpsiRecv(psiInput_t psiQ, va_list ap) {
 static inline
 int psiSend(psiOutput_t psiQ, ...){
   va_list ap;
-  va_start(ap, psiQ._fmt);
+  va_start(ap, psiQ);
   int ret = vpsiSend(psiQ, ap);
   va_end(ap);
   return ret;
@@ -670,7 +737,7 @@ int psiSend(psiOutput_t psiQ, ...){
 static inline
 int psiRecv(psiInput_t psiQ, ...){
   va_list ap;
-  va_start(ap, psiQ._fmt);
+  va_start(ap, psiQ);
   int ret = vpsiRecv(psiQ, ap);
   va_end(ap);
   return ret;
@@ -730,11 +797,10 @@ int vpsiRecv_nolimit(psiInput_t psiQ, va_list ap) {
     debug("vpsiRecv(%s): EOF received.\n", psiQ._name);
     return -1;
   }
-  int nexp = count_formats(psiQ._fmt);
   int sret = vsscanf(buf, psiQ._fmt, ap);
-  if (sret != nexp) {
+  if (sret != psiQ._nfmt) {
     error("vpsiRecv_nolimit(%s): vsscanf filled %d variables, but there are %d formats",
-          psiQ._name, sret, nexp);
+          psiQ._name, sret, psiQ._nfmt);
     free(buf);
     return -1;
   }
@@ -1364,6 +1430,7 @@ psiAsciiTableOutput_t psiAsciiTableOutput(const char *name, char *format_str,
       out._table = ascii_table(name, "0", format_str,
                                NULL, NULL, NULL);
       out._psi._fmt = format_str;
+      out._psi._nfmt = count_formats(out._psi._fmt);
     }
   }
   return out;
@@ -1400,6 +1467,7 @@ psiAsciiTableInput_t psiAsciiTableInput(const char *name, int src_type) {
       error("psi_ascii_table_input: Failed to receive format string.");
       out._valid = 0;
     } else {
+      out._psi._nfmt = count_formats(out._psi._fmt);
       out._table = ascii_table(name, "0", out._psi._fmt,
                                NULL, NULL, NULL);
     }
@@ -1585,7 +1653,7 @@ static inline
 int at_send_array(psiAsciiTableOutput_t t, int nrows, ...) {
   int ret;
   va_list ap;
-  va_start(ap, t);
+  va_start(ap, nrows);
   ret = vsend_array(t, nrows, ap);
   va_end(ap);
   return ret;
