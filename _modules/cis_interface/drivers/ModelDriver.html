@@ -50,8 +50,8 @@
 <span class="kn">import</span> <span class="nn">subprocess</span>
 <span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">from</span> <span class="nn">pprint</span> <span class="k">import</span> <span class="n">pformat</span>
-<span class="kn">import</span> <span class="nn">time</span>
 <span class="kn">from</span> <span class="nn">cis_interface.drivers.Driver</span> <span class="k">import</span> <span class="n">Driver</span>
+<span class="kn">from</span> <span class="nn">cis_interface</span> <span class="k">import</span> <span class="n">backwards</span>
 
 
 <div class="viewcode-block" id="preexec"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.ModelDriver.preexec">[docs]</a><span class="k">def</span> <span class="nf">preexec</span><span class="p">():</span>  <span class="c1"># pragma: no cover</span>
@@ -105,7 +105,6 @@
         
         <span class="c1"># Re-direct output</span>
         <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
-            <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
             <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
                 <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">process</span><span class="p">:</span>
                     <span class="n">line</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">process</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
@@ -113,7 +112,7 @@
                     <span class="k">return</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">line</span><span class="p">:</span>
                 <span class="k">break</span>
-            <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">backwards</span><span class="o">.</span><span class="n">bytes2unicode</span><span class="p">(</span><span class="n">line</span><span class="p">))</span>
             <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
             
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;:run: done&#39;</span><span class="p">)</span></div>

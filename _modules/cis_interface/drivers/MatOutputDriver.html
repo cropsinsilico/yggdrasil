@@ -46,7 +46,7 @@
 <span></span><span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">from</span> <span class="nn">scipy.io</span> <span class="k">import</span> <span class="n">savemat</span>
 <span class="kn">from</span> <span class="nn">cis_interface.backwards</span> <span class="k">import</span> <span class="n">pickle</span>
-<span class="kn">from</span> <span class="nn">FileOutputDriver</span> <span class="k">import</span> <span class="n">FileOutputDriver</span>
+<span class="kn">from</span> <span class="nn">cis_interface.drivers.FileOutputDriver</span> <span class="k">import</span> <span class="n">FileOutputDriver</span>
 
 
 <div class="viewcode-block" id="MatOutputDriver"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.MatOutputDriver.MatOutputDriver">[docs]</a><span class="k">class</span> <span class="nc">MatOutputDriver</span><span class="p">(</span><span class="n">FileOutputDriver</span><span class="p">):</span>
@@ -95,7 +95,7 @@
             <span class="k">return</span>
         <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">fd</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ipc_recv_nolimit</span><span class="p">()</span>
-            <span class="k">if</span> <span class="n">data</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">data</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;:recv: closed&#39;</span><span class="p">)</span>
                 <span class="k">break</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;:recvd </span><span class="si">%s</span><span class="s1"> bytes&#39;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">))</span>

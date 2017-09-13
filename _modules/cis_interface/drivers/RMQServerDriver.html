@@ -46,10 +46,11 @@
 <span></span><span class="kn">import</span> <span class="nn">pika</span>
 <span class="kn">from</span> <span class="nn">cis_interface.drivers.RMQDriver</span> <span class="k">import</span> <span class="n">RMQDriver</span>
 <span class="kn">from</span> <span class="nn">cis_interface.drivers.RPCDriver</span> <span class="k">import</span> <span class="n">RPCDriver</span>
+<span class="kn">from</span> <span class="nn">cis_interface</span> <span class="k">import</span> <span class="n">backwards</span>
 
 
-<span class="n">_new_client_msg</span> <span class="o">=</span> <span class="s2">&quot;PSI_NEW_CLIENT&quot;</span>
-<span class="n">_end_client_msg</span> <span class="o">=</span> <span class="s2">&quot;PSI_END_CLIENT&quot;</span>
+<span class="n">_new_client_msg</span> <span class="o">=</span> <span class="n">backwards</span><span class="o">.</span><span class="n">unicode2bytes</span><span class="p">(</span><span class="s2">&quot;PSI_NEW_CLIENT&quot;</span><span class="p">)</span>
+<span class="n">_end_client_msg</span> <span class="o">=</span> <span class="n">backwards</span><span class="o">.</span><span class="n">unicode2bytes</span><span class="p">(</span><span class="s2">&quot;PSI_END_CLIENT&quot;</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="RMQServerDriver"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.RMQServerDriver.RMQServerDriver">[docs]</a><span class="k">class</span> <span class="nc">RMQServerDriver</span><span class="p">(</span><span class="n">RMQDriver</span><span class="p">,</span> <span class="n">RPCDriver</span><span class="p">):</span>
@@ -97,7 +98,7 @@
 <div class="viewcode-block" id="RMQServerDriver.on_message"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.RMQServerDriver.RMQServerDriver.on_message">[docs]</a>    <span class="k">def</span> <span class="nf">on_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ch</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="n">props</span><span class="p">,</span> <span class="n">body</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Actions to perform when a message is received.&quot;&quot;&quot;</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_closing</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_stable</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
                 <span class="k">return</span>
         <span class="c1"># TODO: handle possibility of message larger than AMQP server memory</span>
         <span class="k">if</span> <span class="n">body</span> <span class="o">==</span> <span class="n">_new_client_msg</span><span class="p">:</span>
@@ -114,35 +115,45 @@
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_clients</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;::All clients have signed off. Stopping.&#39;</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="n">props</span><span class="o">.</span><span class="n">reply_to</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;::Message received without reply queue.&#39;</span><span class="p">)</span>
+            <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_stable</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+                    <span class="k">return</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">basic_nack</span><span class="p">(</span><span class="n">delivery_tag</span><span class="o">=</span><span class="n">method</span><span class="o">.</span><span class="n">delivery_tag</span><span class="p">,</span>
+                                        <span class="n">requeue</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">clients</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">props</span><span class="o">.</span><span class="n">reply_to</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;::Message received&#39;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">iipc</span><span class="o">.</span><span class="n">ipc_send_nolimit</span><span class="p">(</span><span class="n">body</span><span class="p">)</span>
             <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">oipc</span><span class="o">.</span><span class="n">recv_wait_nolimit</span><span class="p">()</span>
             <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
-                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_closing</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_stable</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
                     <span class="k">return</span>
                 <span class="n">ch</span><span class="o">.</span><span class="n">basic_publish</span><span class="p">(</span><span class="n">exchange</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">exchange</span><span class="p">,</span>
                                  <span class="n">routing_key</span><span class="o">=</span><span class="n">props</span><span class="o">.</span><span class="n">reply_to</span><span class="p">,</span>
                                  <span class="n">properties</span><span class="o">=</span><span class="n">pika</span><span class="o">.</span><span class="n">BasicProperties</span><span class="p">(</span>
                                      <span class="n">correlation_id</span><span class="o">=</span><span class="n">props</span><span class="o">.</span><span class="n">correlation_id</span><span class="p">),</span>
-                                 <span class="n">body</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">response</span><span class="p">))</span>
-        <span class="n">ch</span><span class="o">.</span><span class="n">basic_ack</span><span class="p">(</span><span class="n">delivery_tag</span><span class="o">=</span><span class="n">method</span><span class="o">.</span><span class="n">delivery_tag</span><span class="p">)</span></div>
+                                 <span class="n">body</span><span class="o">=</span><span class="n">response</span><span class="p">)</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_stable</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+                <span class="k">return</span>
+            <span class="n">ch</span><span class="o">.</span><span class="n">basic_ack</span><span class="p">(</span><span class="n">delivery_tag</span><span class="o">=</span><span class="n">method</span><span class="o">.</span><span class="n">delivery_tag</span><span class="p">)</span></div></div>
 
-<div class="viewcode-block" id="RMQServerDriver.stop_communication"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.RMQServerDriver.RMQServerDriver.stop_communication">[docs]</a>    <span class="k">def</span> <span class="nf">stop_communication</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Stop consuming messages from the queue.&quot;&quot;&quot;</span>
-        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_closing</span> <span class="o">=</span> <span class="kc">True</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;::Cancelling consumption.&quot;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">basic_cancel</span><span class="p">(</span><span class="n">callback</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">on_cancelok</span><span class="p">,</span>
-                                      <span class="n">consumer_tag</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">consumer_tag</span><span class="p">)</span></div>
+    <span class="c1"># def stop_communication(self):</span>
+    <span class="c1">#     r&quot;&quot;&quot;Stop consuming messages from the queue.&quot;&quot;&quot;</span>
+    <span class="c1">#     with self.lock:</span>
+    <span class="c1">#         self._closing = True</span>
+    <span class="c1">#     if self.channel:</span>
+    <span class="c1">#         self.debug(&quot;::Cancelling consumption.&quot;)</span>
+    <span class="c1">#         self.channel.basic_cancel(callback=self.on_cancelok,</span>
+    <span class="c1">#                                   consumer_tag=self.consumer_tag)</span>
             
-<div class="viewcode-block" id="RMQServerDriver.on_cancelok"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.RMQServerDriver.RMQServerDriver.on_cancelok">[docs]</a>    <span class="k">def</span> <span class="nf">on_cancelok</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">unused_frame</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Actions to perform after succesfully cancelling consumption.&quot;&quot;&quot;</span>
-        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div></div>
+    <span class="c1"># def on_cancelok(self, unused_frame):</span>
+    <span class="c1">#     r&quot;&quot;&quot;Actions to perform after succesfully cancelling consumption.&quot;&quot;&quot;</span>
+    <span class="c1">#     with self.lock:</span>
+    <span class="c1">#         if self.channel:</span>
+    <span class="c1">#             self.channel.close()</span>
 </pre></div>
 
           </div>

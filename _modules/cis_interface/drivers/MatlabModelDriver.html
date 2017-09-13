@@ -127,9 +127,9 @@
                 <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">((</span><span class="s1">&#39;screen -X -S </span><span class="si">%s</span><span class="s1"> quit&#39;</span><span class="p">)</span> <span class="o">%</span> <span class="n">screen_session</span><span class="p">)</span>
             <span class="k">while</span> <span class="n">matlab_session</span> <span class="ow">in</span> <span class="n">matlab</span><span class="o">.</span><span class="n">engine</span><span class="o">.</span><span class="n">find_matlab</span><span class="p">():</span>
                 <span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Waiting for matlab engine to exit&quot;</span><span class="p">)</span>
-                <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>  <span class="c1"># pragma: no matlab</span>
-        <span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Matlab not installed. Matlab could not be stopped.&quot;</span><span class="p">)</span></div>
+                <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span></div>
+    <span class="c1"># else:  # pragma: no matlab</span>
+    <span class="c1">#     warn(&quot;Matlab not installed. Matlab could not be stopped.&quot;)</span>
 
 
 <div class="viewcode-block" id="MatlabModelDriver"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.MatlabModelDriver.MatlabModelDriver">[docs]</a><span class="k">class</span> <span class="nc">MatlabModelDriver</span><span class="p">(</span><span class="n">ModelDriver</span><span class="p">):</span>
@@ -184,20 +184,19 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">mlengine</span><span class="o">.</span><span class="n">addpath</span><span class="p">(</span><span class="n">fdir</span><span class="p">,</span> <span class="n">nargout</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;: connected to matlab&quot;</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>  <span class="c1"># pragma: no matlab</span>
-            <span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Matlab not installed. Matlab could not be stopped.&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">screen_session</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mlsession</span> <span class="o">=</span> <span class="n">start_matlab</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="nf">__del__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">terminate</span><span class="p">()</span>
 
 <div class="viewcode-block" id="MatlabModelDriver.cleanup"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.MatlabModelDriver.MatlabModelDriver.cleanup">[docs]</a>    <span class="k">def</span> <span class="nf">cleanup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Close the Matlab session and engine.&quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">_matlab_installed</span><span class="p">:</span>  <span class="c1"># pragma: matlab</span>
-            <span class="k">try</span><span class="p">:</span>
-                <span class="n">stop_matlab</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">screen_session</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mlengine</span><span class="p">,</span>
-                            <span class="bp">self</span><span class="o">.</span><span class="n">mlsession</span><span class="p">)</span>
-            <span class="k">except</span> <span class="ne">SystemError</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;.terminate failed to exit matlab engine&#39;</span><span class="p">)</span>
-                <span class="k">raise</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">stop_matlab</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">screen_session</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mlengine</span><span class="p">,</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">mlsession</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">SystemError</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;.terminate failed to exit matlab engine&#39;</span><span class="p">)</span>
+            <span class="k">raise</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">screen_session</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">mlsession</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">started_matlab</span> <span class="o">=</span> <span class="kc">False</span>

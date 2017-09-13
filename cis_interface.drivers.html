@@ -335,6 +335,12 @@ longer tasks to complete (10x longer than sleeptime).</p>
 </dd></dl>
 
 <dl class="attribute">
+<dt id="cis_interface.drivers.Driver.Driver.timeout">
+<code class="descname">timeout</code><a class="headerlink" href="#cis_interface.drivers.Driver.Driver.timeout" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>float</em> &#8211; Maximum time that should be spent waiting on a process.</p>
+</dd></dl>
+
+<dl class="attribute">
 <dt id="cis_interface.drivers.Driver.Driver.yml">
 <code class="descname">yml</code><a class="headerlink" href="#cis_interface.drivers.Driver.Driver.yml" title="Permalink to this definition">¶</a></dt>
 <dd><p><em>dict</em> &#8211; Dictionary of yaml specification options for this driver.</p>
@@ -361,7 +367,7 @@ longer tasks to complete (10x longer than sleeptime).</p>
 <dl class="method">
 <dt id="cis_interface.drivers.Driver.Driver.critical">
 <code class="descname">critical</code><span class="sig-paren">(</span><em>fmt_str=''</em>, <em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/Driver.html#Driver.critical"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.Driver.Driver.critical" title="Permalink to this definition">¶</a></dt>
-<dd><p>Print a critical message that is prepended with the driver class and
+<dd><p>Log a critical message that is prepended with the driver class and
 name.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -380,8 +386,27 @@ name.</p>
 <dl class="method">
 <dt id="cis_interface.drivers.Driver.Driver.debug">
 <code class="descname">debug</code><span class="sig-paren">(</span><em>fmt_str=''</em>, <em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/Driver.html#Driver.debug"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.Driver.Driver.debug" title="Permalink to this definition">¶</a></dt>
-<dd><p>Print a debug message that is prepended with the driver class and
+<dd><p>Log a debug message that is prepended with the driver class and
 name.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>fmt_str</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a><em>, </em><em>optional</em>) &#8211; Format string.</li>
+<li><strong>*args</strong> &#8211; Additional arguments are formated using the format string.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.drivers.Driver.Driver.display">
+<code class="descname">display</code><span class="sig-paren">(</span><em>fmt_str=''</em>, <em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/Driver.html#Driver.display"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.Driver.Driver.display" title="Permalink to this definition">¶</a></dt>
+<dd><p>Log a message at level 1000 that is prepended with the driver class
+and name. These messages will always be printed.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -399,7 +424,7 @@ name.</p>
 <dl class="method">
 <dt id="cis_interface.drivers.Driver.Driver.error">
 <code class="descname">error</code><span class="sig-paren">(</span><em>fmt_str=''</em>, <em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/Driver.html#Driver.error"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.Driver.Driver.error" title="Permalink to this definition">¶</a></dt>
-<dd><p>Print a error message that is prepended with the driver class and
+<dd><p>Log an error message that is prepended with the driver class and
 name.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -418,7 +443,7 @@ name.</p>
 <dl class="method">
 <dt id="cis_interface.drivers.Driver.Driver.exception">
 <code class="descname">exception</code><span class="sig-paren">(</span><em>fmt_str=''</em>, <em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/Driver.html#Driver.exception"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.Driver.Driver.exception" title="Permalink to this definition">¶</a></dt>
-<dd><p>Print a exception message that is prepended with the driver class
+<dd><p>Log an exception message that is prepended with the driver class
 ane name.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -443,7 +468,7 @@ ane name.</p>
 <dl class="method">
 <dt id="cis_interface.drivers.Driver.Driver.info">
 <code class="descname">info</code><span class="sig-paren">(</span><em>fmt_str=''</em>, <em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/Driver.html#Driver.info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.Driver.Driver.info" title="Permalink to this definition">¶</a></dt>
-<dd><p>Print a info message that is prepended with the driver class and
+<dd><p>Log an info message that is prepended with the driver class and
 name.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -543,7 +568,7 @@ provided, the attribute &#8216;sleeptime&#8217; is used.</td>
 <dl class="method">
 <dt id="cis_interface.drivers.Driver.Driver.warn">
 <code class="descname">warn</code><span class="sig-paren">(</span><em>fmt_str=''</em>, <em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/Driver.html#Driver.warn"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.Driver.Driver.warn" title="Permalink to this definition">¶</a></dt>
-<dd><p>Print a warning message that is prepended with the driver class and
+<dd><p>Log a warning message that is prepended with the driver class and
 name.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -738,15 +763,15 @@ mq (<code class="xref py py-class docutils literal"><span class="pre">sysv_ipc.M
 
 <dl class="method">
 <dt id="cis_interface.drivers.IODriver.IODriver.graceful_stop">
-<code class="descname">graceful_stop</code><span class="sig-paren">(</span><em>tries=10</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/IODriver.html#IODriver.graceful_stop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.IODriver.IODriver.graceful_stop" title="Permalink to this definition">¶</a></dt>
+<code class="descname">graceful_stop</code><span class="sig-paren">(</span><em>timeout=0</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/IODriver.html#IODriver.graceful_stop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.IODriver.IODriver.graceful_stop" title="Permalink to this definition">¶</a></dt>
 <dd><p>Stop the IODriver, first draining the message queue.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>tries</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a><em>, </em><em>optional</em>) &#8211; Number of times driver should sleep while
-waiting for the message queue to drain. Defaults to 10.</li>
+<li><strong>timeout</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a><em>, </em><em>optional</em>) &#8211; Max time that should be waited. Defaults
+to 0 and is set to attribute timeout.</li>
 <li><strong>**kwargs</strong> &#8211; Additional keyword arguments are passed to the parent
 class&#8217;s graceful_stop method.</li>
 </ul>
@@ -817,8 +842,8 @@ class&#8217;s graceful_stop method.</li>
 </dd></dl>
 
 <dl class="attribute">
-<dt id="cis_interface.drivers.IODriver.IODriver.n_msg">
-<code class="descname">n_msg</code><a class="headerlink" href="#cis_interface.drivers.IODriver.IODriver.n_msg" title="Permalink to this definition">¶</a></dt>
+<dt id="cis_interface.drivers.IODriver.IODriver.n_ipc_msg">
+<code class="descname">n_ipc_msg</code><a class="headerlink" href="#cis_interface.drivers.IODriver.IODriver.n_ipc_msg" title="Permalink to this definition">¶</a></dt>
 <dd><p><em>int</em> &#8211; The number of messages in the queue.</p>
 </dd></dl>
 
@@ -857,7 +882,7 @@ closed.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>timeout</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a><em>, </em><em>optional</em>) &#8211; Max time that should be waited. Defaults
-to 0 and is infinite.</td>
+to 0 and is set to attribute timeout.</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The received message.</td>
 </tr>
@@ -1312,18 +1337,18 @@ received from. If and empty string, the queue is exclusive to this
 connection. Defaults to &#8216;&#8217;.</li>
 <li><strong>routing_key</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a><em>, </em><em>optional</em>) &#8211; Routing key that should be used when the
 queue is bound. If None, the queue name is used. Defaults to None.</li>
-<li><strong>user</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a><em>, </em><em>optional</em>) &#8211; RabbitMQ server username. Defaults to environment
-variable &#8216;PSI_MSG_USER&#8217; if it exists.</li>
-<li><strong>host</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a><em>, </em><em>optional</em>) &#8211; RabbitMQ server host. Defaults to environment
-variable &#8216;PSI_MSG_HOST&#8217; if it exists and the output of
+<li><strong>user</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a><em>, </em><em>optional</em>) &#8211; RabbitMQ server username. Defaults to config
+option &#8216;user&#8217; in section &#8216;rmq&#8217;.</li>
+<li><strong>host</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a><em>, </em><em>optional</em>) &#8211; RabbitMQ server host. Defaults to config option
+&#8216;host&#8217; in section &#8216;rmq&#8217; if it exists and the output of
 socket.gethostname() if it does not.</li>
 <li><strong>vhost</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a><em>, </em><em>optional</em>) &#8211; RabbitMQ server virtual host. Defaults to
-environment variable &#8216;PSI_MSG_VHOST&#8217; if it exists.</li>
+config option &#8216;vhost&#8217; in section &#8216;rmq&#8217;.</li>
 <li><strong>passwd</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a><em>, </em><em>optional</em>) &#8211; RabbitMQ server password. Defaults to
-environment variable &#8216;PSI_MSG_PW&#8217; if it exists.</li>
+config option &#8216;password&#8217; in section &#8216;rmq&#8217;.</li>
 <li><strong>exchange</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a><em>, </em><em>optional</em>) &#8211; RabbitMQ exchange. Defaults to &#8216;namespace&#8217;
-attribute which is set from the environment variable
-&#8216;PSI_NAMESPACE&#8217;.</li>
+attribute which is set from the config option &#8216;namespace&#8217; in the
+section &#8216;rmq&#8217;.</li>
 <li><strong>exclusive</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a><em>, </em><em>optional</em>) &#8211; If True, the queue that is created can
 only be used by this driver. Defaults to False. If a queue
 name is not provided, it is assumed exclusive.</li>
@@ -1416,6 +1441,31 @@ parameters.</p>
 </dd></dl>
 
 <dl class="method">
+<dt id="cis_interface.drivers.RMQDriver.RMQDriver.get_message_stats">
+<code class="descname">get_message_stats</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/RMQDriver.html#RMQDriver.get_message_stats"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.RMQDriver.RMQDriver.get_message_stats" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return message stats from the server.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.drivers.RMQDriver.RMQDriver.is_open">
+<code class="descname">is_open</code><a class="headerlink" href="#cis_interface.drivers.RMQDriver.RMQDriver.is_open" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>bool</em> &#8211; True if connection ready for messages, False otherwise.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.drivers.RMQDriver.RMQDriver.is_stable">
+<code class="descname">is_stable</code><a class="headerlink" href="#cis_interface.drivers.RMQDriver.RMQDriver.is_stable" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>bool</em> &#8211; True if the connection ready for messages and not about to
+close. False otherwise.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.drivers.RMQDriver.RMQDriver.n_rmq_msg">
+<code class="descname">n_rmq_msg</code><a class="headerlink" href="#cis_interface.drivers.RMQDriver.RMQDriver.n_rmq_msg" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>int</em> &#8211; Number of messages in the queue.</p>
+</dd></dl>
+
+<dl class="method">
 <dt id="cis_interface.drivers.RMQDriver.RMQDriver.on_bindok">
 <code class="descname">on_bindok</code><span class="sig-paren">(</span><em>unused_frame</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/RMQDriver.html#RMQDriver.on_bindok"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.RMQDriver.RMQDriver.on_bindok" title="Permalink to this definition">¶</a></dt>
 <dd><p>Actions to perform once the queue is succesfully bound. Start
@@ -1465,6 +1515,12 @@ Set up the queue.</p>
 </dd></dl>
 
 <dl class="method">
+<dt id="cis_interface.drivers.RMQDriver.RMQDriver.on_nmsg_request">
+<code class="descname">on_nmsg_request</code><span class="sig-paren">(</span><em>method_frame</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/RMQDriver.html#RMQDriver.on_nmsg_request"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.RMQDriver.RMQDriver.on_nmsg_request" title="Permalink to this definition">¶</a></dt>
+<dd><p>Actions to perform once the queue is declared for message count.</p>
+</dd></dl>
+
+<dl class="method">
 <dt id="cis_interface.drivers.RMQDriver.RMQDriver.on_queue_declareok">
 <code class="descname">on_queue_declareok</code><span class="sig-paren">(</span><em>method_frame</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/RMQDriver.html#RMQDriver.on_queue_declareok"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.RMQDriver.RMQDriver.on_queue_declareok" title="Permalink to this definition">¶</a></dt>
 <dd><p>Actions to perform once the queue is succesfully declared. Bind
@@ -1475,6 +1531,12 @@ the queue.</p>
 <dt id="cis_interface.drivers.RMQDriver.RMQDriver.open_channel">
 <code class="descname">open_channel</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/RMQDriver.html#RMQDriver.open_channel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.RMQDriver.RMQDriver.open_channel" title="Permalink to this definition">¶</a></dt>
 <dd><p>Open a RabbitMQ channel.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.drivers.RMQDriver.RMQDriver.printStatus">
+<code class="descname">printStatus</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/RMQDriver.html#RMQDriver.printStatus"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.RMQDriver.RMQDriver.printStatus" title="Permalink to this definition">¶</a></dt>
+<dd><p>Print the driver status.</p>
 </dd></dl>
 
 <dl class="method">
@@ -1557,7 +1619,7 @@ the queue.</p>
 
 <dl class="method">
 <dt id="cis_interface.drivers.RMQDriver.RMQDriver.stop_communication">
-<code class="descname">stop_communication</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/RMQDriver.html#RMQDriver.stop_communication"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.RMQDriver.RMQDriver.stop_communication" title="Permalink to this definition">¶</a></dt>
+<code class="descname">stop_communication</code><span class="sig-paren">(</span><em>remove_queue=True</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/RMQDriver.html#RMQDriver.stop_communication"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.RMQDriver.RMQDriver.stop_communication" title="Permalink to this definition">¶</a></dt>
 <dd><p>Stop sending/receiving messages.</p>
 </dd></dl>
 
@@ -1609,23 +1671,10 @@ local queue and acknowledge the message.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="cis_interface.drivers.RMQInputDriver.RMQInputDriver.printStatus">
-<code class="descname">printStatus</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/RMQInputDriver.html#RMQInputDriver.printStatus"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.RMQInputDriver.RMQInputDriver.printStatus" title="Permalink to this definition">¶</a></dt>
-<dd><p>Print the driver status.</p>
-</dd></dl>
-
-<dl class="method">
 <dt id="cis_interface.drivers.RMQInputDriver.RMQInputDriver.start_communication">
 <code class="descname">start_communication</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/RMQInputDriver.html#RMQInputDriver.start_communication"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.RMQInputDriver.RMQInputDriver.start_communication" title="Permalink to this definition">¶</a></dt>
 <dd><p>Begin consuming messages and add the callback for cancelling
 consumption.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="cis_interface.drivers.RMQInputDriver.RMQInputDriver.stop_communication">
-<code class="descname">stop_communication</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/RMQInputDriver.html#RMQInputDriver.stop_communication"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.RMQInputDriver.RMQInputDriver.stop_communication" title="Permalink to this definition">¶</a></dt>
-<dd><p>Stop sending/receiving messages. Only RMQInputDriver should
-explicitly delete the queue.</p>
 </dd></dl>
 
 </dd></dl>
@@ -1662,12 +1711,6 @@ __init__ method.</li>
 </ul>
 </dd>
 </dl>
-<dl class="method">
-<dt id="cis_interface.drivers.RMQOutputDriver.RMQOutputDriver.printStatus">
-<code class="descname">printStatus</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/RMQOutputDriver.html#RMQOutputDriver.printStatus"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.RMQOutputDriver.RMQOutputDriver.printStatus" title="Permalink to this definition">¶</a></dt>
-<dd><p>Print the driver status.</p>
-</dd></dl>
-
 <dl class="method">
 <dt id="cis_interface.drivers.RMQOutputDriver.RMQOutputDriver.publish_message">
 <code class="descname">publish_message</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/RMQOutputDriver.html#RMQOutputDriver.publish_message"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.RMQOutputDriver.RMQOutputDriver.publish_message" title="Permalink to this definition">¶</a></dt>
@@ -1726,12 +1769,6 @@ server.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="cis_interface.drivers.RMQServerDriver.RMQServerDriver.on_cancelok">
-<code class="descname">on_cancelok</code><span class="sig-paren">(</span><em>unused_frame</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/RMQServerDriver.html#RMQServerDriver.on_cancelok"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.RMQServerDriver.RMQServerDriver.on_cancelok" title="Permalink to this definition">¶</a></dt>
-<dd><p>Actions to perform after succesfully cancelling consumption.</p>
-</dd></dl>
-
-<dl class="method">
 <dt id="cis_interface.drivers.RMQServerDriver.RMQServerDriver.on_message">
 <code class="descname">on_message</code><span class="sig-paren">(</span><em>ch</em>, <em>method</em>, <em>props</em>, <em>body</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/RMQServerDriver.html#RMQServerDriver.on_message"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.RMQServerDriver.RMQServerDriver.on_message" title="Permalink to this definition">¶</a></dt>
 <dd><p>Actions to perform when a message is received.</p>
@@ -1747,12 +1784,6 @@ server.</p>
 <dt id="cis_interface.drivers.RMQServerDriver.RMQServerDriver.start_communication">
 <code class="descname">start_communication</code><span class="sig-paren">(</span><em>no_ack=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/RMQServerDriver.html#RMQServerDriver.start_communication"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.RMQServerDriver.RMQServerDriver.start_communication" title="Permalink to this definition">¶</a></dt>
 <dd><p>Start consuming messages from the queue.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="cis_interface.drivers.RMQServerDriver.RMQServerDriver.stop_communication">
-<code class="descname">stop_communication</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/RMQServerDriver.html#RMQServerDriver.stop_communication"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.RMQServerDriver.RMQServerDriver.stop_communication" title="Permalink to this definition">¶</a></dt>
-<dd><p>Stop consuming messages from the queue.</p>
 </dd></dl>
 
 </dd></dl>

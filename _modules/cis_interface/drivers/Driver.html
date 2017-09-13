@@ -48,6 +48,7 @@
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">time</span>
 <span class="kn">import</span> <span class="nn">inspect</span>
+<span class="kn">from</span> <span class="nn">cis_interface.config</span> <span class="k">import</span> <span class="n">cis_cfg</span>
 
 
 <div class="viewcode-block" id="Driver"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.Driver.Driver">[docs]</a><span class="k">class</span> <span class="nc">Driver</span><span class="p">(</span><span class="n">Thread</span><span class="p">):</span>
@@ -69,6 +70,7 @@
 <span class="sd">        sleeptime (float): Time that driver should sleep for when sleep called.</span>
 <span class="sd">        longsleep (float): Time that the driver will sleep for when waiting for</span>
 <span class="sd">            longer tasks to complete (10x longer than sleeptime).</span>
+<span class="sd">        timeout (float): Maximum time that should be spent waiting on a process.</span>
 <span class="sd">        yml (dict): Dictionary of yaml specification options for this driver.</span>
 <span class="sd">        namespace (str): Namespace for set of drivers running together.</span>
 <span class="sd">        rank (int): Rank of the integration.</span>
@@ -90,13 +92,14 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_thread_initialized</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">sleeptime</span> <span class="o">=</span> <span class="mf">0.25</span>
-        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;PSI_DEBUG&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;DEBUG&#39;</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">sleeptime</span> <span class="o">=</span> <span class="mf">1.0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sleeptime</span> <span class="o">=</span> <span class="mf">0.001</span>  <span class="c1"># 25</span>
+        <span class="c1"># if cis_cfg.get(&#39;debug&#39;, &#39;psi&#39;) == &#39;DEBUG&#39;:</span>
+        <span class="c1">#     self.sleeptime = 1.0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">longsleep</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sleeptime</span> <span class="o">*</span> <span class="mi">10</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">timeout</span> <span class="o">=</span> <span class="mf">1.0</span>
         <span class="c1"># Set defaults</span>
         <span class="k">if</span> <span class="n">namespace</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">namespace</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;PSI_NAMESPACE&#39;</span><span class="p">]</span>
+            <span class="n">namespace</span> <span class="o">=</span> <span class="n">cis_cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;rmq&#39;</span><span class="p">,</span> <span class="s1">&#39;namespace&#39;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Setting namespace to </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">namespace</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">workingDir</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">yml</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="s1">&#39;workingDir&#39;</span> <span class="ow">in</span> <span class="n">yml</span><span class="p">):</span>
@@ -206,8 +209,21 @@
             <span class="n">t</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sleeptime</span>
         <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">t</span><span class="p">)</span></div>
 
+<div class="viewcode-block" id="Driver.display"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.Driver.Driver.display">[docs]</a>    <span class="k">def</span> <span class="nf">display</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fmt_str</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Log a message at level 1000 that is prepended with the driver class</span>
+<span class="sd">        and name. These messages will always be printed.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            fmt_str (str, optional): Format string.</span>
+<span class="sd">            \*args: Additional arguments are formated using the format string.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">fmt_str</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">fmt_str</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">fmt_str</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logger_prefix</span> <span class="o">+</span> <span class="n">fmt_str</span> <span class="o">%</span> <span class="n">args</span><span class="p">)</span></div>
+
 <div class="viewcode-block" id="Driver.info"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.Driver.Driver.info">[docs]</a>    <span class="k">def</span> <span class="nf">info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fmt_str</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Print a info message that is prepended with the driver class and</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Log an info message that is prepended with the driver class and</span>
 <span class="sd">        name.</span>
 
 <span class="sd">        Args:</span>
@@ -220,7 +236,7 @@
         <span class="n">info</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logger_prefix</span> <span class="o">+</span> <span class="n">fmt_str</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Driver.debug"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.Driver.Driver.debug">[docs]</a>    <span class="k">def</span> <span class="nf">debug</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fmt_str</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Print a debug message that is prepended with the driver class and</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Log a debug message that is prepended with the driver class and</span>
 <span class="sd">        name.</span>
 
 <span class="sd">        Args:</span>
@@ -233,7 +249,7 @@
         <span class="n">debug</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logger_prefix</span> <span class="o">+</span> <span class="n">fmt_str</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Driver.critical"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.Driver.Driver.critical">[docs]</a>    <span class="k">def</span> <span class="nf">critical</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fmt_str</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Print a critical message that is prepended with the driver class and</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Log a critical message that is prepended with the driver class and</span>
 <span class="sd">        name.</span>
 
 <span class="sd">        Args:</span>
@@ -246,7 +262,7 @@
         <span class="n">critical</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logger_prefix</span> <span class="o">+</span> <span class="n">fmt_str</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Driver.warn"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.Driver.Driver.warn">[docs]</a>    <span class="k">def</span> <span class="nf">warn</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fmt_str</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Print a warning message that is prepended with the driver class and</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Log a warning message that is prepended with the driver class and</span>
 <span class="sd">        name.</span>
 
 <span class="sd">        Args:</span>
@@ -259,7 +275,7 @@
         <span class="n">warn</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logger_prefix</span> <span class="o">+</span> <span class="n">fmt_str</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Driver.error"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.Driver.Driver.error">[docs]</a>    <span class="k">def</span> <span class="nf">error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fmt_str</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Print a error message that is prepended with the driver class and</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Log an error message that is prepended with the driver class and</span>
 <span class="sd">        name.</span>
 
 <span class="sd">        Args:</span>
@@ -272,7 +288,7 @@
         <span class="n">error</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logger_prefix</span> <span class="o">+</span> <span class="n">fmt_str</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Driver.exception"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.Driver.Driver.exception">[docs]</a>    <span class="k">def</span> <span class="nf">exception</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fmt_str</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Print a exception message that is prepended with the driver class</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Log an exception message that is prepended with the driver class</span>
 <span class="sd">        ane name.</span>
 
 <span class="sd">        Args:</span>

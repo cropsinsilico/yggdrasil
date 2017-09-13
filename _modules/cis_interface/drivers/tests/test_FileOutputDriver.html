@@ -45,7 +45,7 @@
   <h1>Source code for cis_interface.drivers.tests.test_FileOutputDriver</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">nose.tools</span> <span class="k">as</span> <span class="nn">nt</span>
-<span class="kn">import</span> <span class="nn">test_IODriver</span> <span class="k">as</span> <span class="nn">parent</span>
+<span class="kn">import</span> <span class="nn">cis_interface.drivers.tests.test_IODriver</span> <span class="k">as</span> <span class="nn">parent</span>
 
 
 <div class="viewcode-block" id="TestFileOutputParam"><a class="viewcode-back" href="../../../../cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_FileOutputDriver.TestFileOutputParam">[docs]</a><span class="k">class</span> <span class="nc">TestFileOutputParam</span><span class="p">(</span><span class="n">parent</span><span class="o">.</span><span class="n">TestIOParam</span><span class="p">):</span>
@@ -107,17 +107,18 @@
         <span class="nb">super</span><span class="p">(</span><span class="n">TestFileOutputDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">assert_after_terminate</span><span class="p">()</span>
         <span class="k">assert</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">fd</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span></div>
 
+    <span class="c1"># These are disabled to prevent writting extraneous data</span>
 <div class="viewcode-block" id="TestFileOutputDriver.test_send_recv"><a class="viewcode-back" href="../../../../cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_FileOutputDriver.TestFileOutputDriver.test_send_recv">[docs]</a>    <span class="k">def</span> <span class="nf">test_send_recv</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test sending/receiving small message.&quot;&quot;&quot;</span>
         <span class="k">pass</span></div>
-        <span class="c1"># self.instance.close_file()</span>
-        <span class="c1"># super(TestFileOutputDriver, self).test_send_recv()</span>
 
 <div class="viewcode-block" id="TestFileOutputDriver.test_send_recv_nolimit"><a class="viewcode-back" href="../../../../cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_FileOutputDriver.TestFileOutputDriver.test_send_recv_nolimit">[docs]</a>    <span class="k">def</span> <span class="nf">test_send_recv_nolimit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test sending/receiving large message.&quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="TestFileOutputDriver.run_before_terminate"><a class="viewcode-back" href="../../../../cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_FileOutputDriver.TestFileOutputDriver.run_before_terminate">[docs]</a>    <span class="k">def</span> <span class="nf">run_before_terminate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Commands to run while the instance is running, before terminate.&quot;&quot;&quot;</span>
         <span class="k">pass</span></div></div>
-        <span class="c1"># self.instance.close_file()</span>
-        <span class="c1"># super(TestFileOutputDriver, self).test_send_recv_nolimit()</span>
 </pre></div>
 
           </div>

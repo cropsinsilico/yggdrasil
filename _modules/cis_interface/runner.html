@@ -55,6 +55,7 @@
 <span class="kn">from</span> <span class="nn">itertools</span> <span class="k">import</span> <span class="n">chain</span>
 <span class="kn">import</span> <span class="nn">socket</span>
 <span class="kn">from</span> <span class="nn">cis_interface.backwards</span> <span class="k">import</span> <span class="n">sio</span>
+<span class="kn">from</span> <span class="nn">cis_interface.config</span> <span class="k">import</span> <span class="n">cis_cfg</span><span class="p">,</span> <span class="n">cfg_environment</span>
 
 
 <span class="n">COLOR_TRACE</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\033</span><span class="s1">[30;43;22m&#39;</span>
@@ -72,7 +73,7 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">level</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">level</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;PSI_DEBUG&#39;</span><span class="p">,</span> <span class="s1">&#39;NOTSET&#39;</span><span class="p">)</span>
+        <span class="n">level</span> <span class="o">=</span> <span class="n">cis_cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;debug&#39;</span><span class="p">,</span> <span class="s1">&#39;psi&#39;</span><span class="p">,</span> <span class="s1">&#39;NOTSET&#39;</span><span class="p">)</span>
     <span class="n">logLevel</span> <span class="o">=</span> <span class="nb">eval</span><span class="p">(</span><span class="s1">&#39;logging.&#39;</span> <span class="o">+</span> <span class="n">level</span><span class="p">)</span>
     <span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">logLevel</span><span class="p">,</span> <span class="n">stream</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="n">COLOR_TRACE</span> <span class="o">+</span>
                         <span class="n">prog</span> <span class="o">+</span> <span class="s1">&#39;: </span><span class="si">%(message)s</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="n">COLOR_NORMAL</span><span class="p">)</span></div>
@@ -88,7 +89,7 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">level</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">level</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;RMQ_DEBUG&#39;</span><span class="p">,</span> <span class="s1">&#39;INFO&#39;</span><span class="p">)</span>
+        <span class="n">level</span> <span class="o">=</span> <span class="n">cis_cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;debug&#39;</span><span class="p">,</span> <span class="s1">&#39;rmq&#39;</span><span class="p">,</span> <span class="s1">&#39;INFO&#39;</span><span class="p">)</span>
     <span class="n">rmqLogLevel</span> <span class="o">=</span> <span class="nb">eval</span><span class="p">(</span><span class="s1">&#39;logging.&#39;</span> <span class="o">+</span> <span class="n">level</span><span class="p">)</span>
     <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;pika&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">rmqLogLevel</span><span class="p">)</span></div>
 
@@ -177,7 +178,11 @@
             <span class="n">cis_debug_prefix</span> <span class="o">=</span> <span class="n">namespace</span>
         <span class="n">setup_cis_logging</span><span class="p">(</span><span class="n">cis_debug_prefix</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="n">cis_debug_level</span><span class="p">)</span>
         <span class="n">setup_rmq_logging</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">rmq_debug_level</span><span class="p">)</span>
+        <span class="c1"># Update environment based on config</span>
+        <span class="n">cfg_environment</span><span class="p">()</span>
         <span class="c1"># Parse yamls</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">modelYmls</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">modelYmls</span> <span class="o">=</span> <span class="p">[</span><span class="n">modelYmls</span><span class="p">]</span>
         <span class="k">for</span> <span class="n">modelYml</span> <span class="ow">in</span> <span class="n">modelYmls</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">parseModelYaml</span><span class="p">(</span><span class="n">modelYml</span><span class="p">)</span>
         <span class="c1"># print(pformat(self.inputdrivers), pformat(self.outputdrivers),</span>
@@ -202,7 +207,7 @@
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">modelYml</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="c1"># Mustache replace vars</span>
-                <span class="n">yamlparsed</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">safe_load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+                <span class="n">yamlparsed</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
                 <span class="n">yamlparsed</span> <span class="o">=</span> <span class="n">pystache</span><span class="o">.</span><span class="n">render</span><span class="p">(</span>
                     <span class="n">sio</span><span class="o">.</span><span class="n">StringIO</span><span class="p">(</span><span class="n">yamlparsed</span><span class="p">)</span><span class="o">.</span><span class="n">getvalue</span><span class="p">(),</span> <span class="nb">dict</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">))</span>
                 <span class="n">yamlparsed</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">safe_load</span><span class="p">(</span><span class="n">yamlparsed</span><span class="p">)</span>
@@ -399,13 +404,13 @@
 <span class="sd">        CisRunner: Runner for the provided models.</span>
 
 <span class="sd">    Raises:</span>
-<span class="sd">        Exception: If environment variable &#39;PSI_NAMESPACE&#39; is not set.</span>
+<span class="sd">        Exception: If config option &#39;namespace&#39; in &#39;rmq&#39; section not set.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># Get environment variables</span>
-    <span class="n">namespace</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;PSI_NAMESPACE&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+    <span class="n">namespace</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;namespace&#39;</span><span class="p">,</span> <span class="n">cis_cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;rmq&#39;</span><span class="p">,</span> <span class="s1">&#39;namespace&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">))</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">namespace</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
-        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;PSI_NAMESPACE not set&#39;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;rmq:namespace not set in config file&#39;</span><span class="p">)</span>
     <span class="n">rank</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;PARALLEL_SEQ&#39;</span><span class="p">,</span> <span class="s1">&#39;0&#39;</span><span class="p">)</span>
     <span class="n">host</span> <span class="o">=</span> <span class="n">socket</span><span class="o">.</span><span class="n">gethostname</span><span class="p">()</span>
     <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;PSI_RANK&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">rank</span>

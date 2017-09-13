@@ -43,23 +43,37 @@
           <div class="body" role="main">
             
   <h1>Source code for cis_interface.tests.test_tools</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">cis_interface</span> <span class="k">import</span> <span class="n">tools</span>
+<span></span><span class="kn">import</span> <span class="nn">sysv_ipc</span>
+<span class="kn">from</span> <span class="nn">sysv_ipc</span> <span class="k">import</span> <span class="n">MessageQueue</span>
+<span class="kn">from</span> <span class="nn">cis_interface</span> <span class="k">import</span> <span class="n">tools</span>
+<span class="kn">from</span> <span class="nn">cis_interface.drivers.IODriver</span> <span class="k">import</span> <span class="n">maxMsgSize</span>
 
 
 <div class="viewcode-block" id="test_ipcs"><a class="viewcode-back" href="../../../cis_interface.tests.html#cis_interface.tests.test_tools.test_ipcs">[docs]</a><span class="k">def</span> <span class="nf">test_ipcs</span><span class="p">():</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test list of ipc objects.&quot;&quot;&quot;</span>
     <span class="n">tools</span><span class="o">.</span><span class="n">ipcs</span><span class="p">()</span></div>
 
     
 <div class="viewcode-block" id="test_ipc_queues"><a class="viewcode-back" href="../../../cis_interface.tests.html#cis_interface.tests.test_tools.test_ipc_queues">[docs]</a><span class="k">def</span> <span class="nf">test_ipc_queues</span><span class="p">():</span>
-    <span class="n">tools</span><span class="o">.</span><span class="n">ipc_queues</span><span class="p">()</span></div>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test list of ipc queues.&quot;&quot;&quot;</span>
+    
+    <span class="nb">print</span><span class="p">(</span><span class="n">tools</span><span class="o">.</span><span class="n">ipc_queues</span><span class="p">())</span></div>
 
 
 <div class="viewcode-block" id="test_ipcrm"><a class="viewcode-back" href="../../../cis_interface.tests.html#cis_interface.tests.test_tools.test_ipcrm">[docs]</a><span class="k">def</span> <span class="nf">test_ipcrm</span><span class="p">():</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test removal of ipc objects.&quot;&quot;&quot;</span>
     <span class="n">tools</span><span class="o">.</span><span class="n">ipcrm</span><span class="p">()</span></div>
 
 
 <div class="viewcode-block" id="test_ipcrm_queues"><a class="viewcode-back" href="../../../cis_interface.tests.html#cis_interface.tests.test_tools.test_ipcrm_queues">[docs]</a><span class="k">def</span> <span class="nf">test_ipcrm_queues</span><span class="p">():</span>
-    <span class="n">tools</span><span class="o">.</span><span class="n">ipcrm_queues</span><span class="p">()</span></div>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test removal of ipc queues.&quot;&quot;&quot;</span>
+    <span class="n">tools</span><span class="o">.</span><span class="n">ipcrm_queues</span><span class="p">()</span>
+    <span class="k">assert</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">tools</span><span class="o">.</span><span class="n">ipc_queues</span><span class="p">())</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="n">mq</span> <span class="o">=</span> <span class="n">MessageQueue</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">flags</span><span class="o">=</span><span class="n">sysv_ipc</span><span class="o">.</span><span class="n">IPC_CREX</span><span class="p">,</span>
+                      <span class="n">max_message_size</span><span class="o">=</span><span class="n">maxMsgSize</span><span class="p">)</span>
+    <span class="k">assert</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">tools</span><span class="o">.</span><span class="n">ipc_queues</span><span class="p">())</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">tools</span><span class="o">.</span><span class="n">ipcrm_queues</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">mq</span><span class="o">.</span><span class="n">key</span><span class="p">))</span>
+    <span class="k">assert</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">tools</span><span class="o">.</span><span class="n">ipc_queues</span><span class="p">())</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span></div>
 </pre></div>
 
           </div>

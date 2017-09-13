@@ -43,11 +43,14 @@
           <div class="body" role="main">
             
   <h1>Source code for cis_interface.drivers.RMQDriver</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">pika</span>
+<span></span><span class="kn">import</span> <span class="nn">pika</span>
 <span class="kn">import</span> <span class="nn">socket</span>
+<span class="kn">import</span> <span class="nn">requests</span>
+<span class="kn">from</span> <span class="nn">pprint</span> <span class="k">import</span> <span class="n">pformat</span>
 <span class="kn">from</span> <span class="nn">cis_interface.drivers.Driver</span> <span class="k">import</span> <span class="n">Driver</span>
 <span class="kn">from</span> <span class="nn">cis_interface.drivers.IODriver</span> <span class="k">import</span> <span class="n">maxMsgSize</span>
+<span class="kn">from</span> <span class="nn">cis_interface.config</span> <span class="k">import</span> <span class="n">cis_cfg</span>
+<span class="kn">from</span> <span class="nn">cis_interface</span> <span class="k">import</span> <span class="n">backwards</span>
 
 
 <div class="viewcode-block" id="RMQDriver"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.RMQDriver.RMQDriver">[docs]</a><span class="k">class</span> <span class="nc">RMQDriver</span><span class="p">(</span><span class="n">Driver</span><span class="p">):</span>
@@ -60,18 +63,18 @@
 <span class="sd">            connection. Defaults to &#39;&#39;.</span>
 <span class="sd">        routing_key (str, optional): Routing key that should be used when the</span>
 <span class="sd">            queue is bound. If None, the queue name is used. Defaults to None.</span>
-<span class="sd">        user (str, optional): RabbitMQ server username. Defaults to environment</span>
-<span class="sd">            variable &#39;PSI_MSG_USER&#39; if it exists.</span>
-<span class="sd">        host (str, optional): RabbitMQ server host. Defaults to environment</span>
-<span class="sd">            variable &#39;PSI_MSG_HOST&#39; if it exists and the output of</span>
+<span class="sd">        user (str, optional): RabbitMQ server username. Defaults to config</span>
+<span class="sd">            option &#39;user&#39; in section &#39;rmq&#39;.</span>
+<span class="sd">        host (str, optional): RabbitMQ server host. Defaults to config option</span>
+<span class="sd">            &#39;host&#39; in section &#39;rmq&#39; if it exists and the output of</span>
 <span class="sd">            socket.gethostname() if it does not.</span>
 <span class="sd">        vhost (str, optional): RabbitMQ server virtual host. Defaults to</span>
-<span class="sd">            environment variable &#39;PSI_MSG_VHOST&#39; if it exists.</span>
+<span class="sd">            config option &#39;vhost&#39; in section &#39;rmq&#39;.</span>
 <span class="sd">        passwd (str, optional): RabbitMQ server password. Defaults to</span>
-<span class="sd">            environment variable &#39;PSI_MSG_PW&#39; if it exists.</span>
+<span class="sd">            config option &#39;password&#39; in section &#39;rmq&#39;.</span>
 <span class="sd">        exchange (str, optional): RabbitMQ exchange. Defaults to &#39;namespace&#39;</span>
-<span class="sd">            attribute which is set from the environment variable</span>
-<span class="sd">            &#39;PSI_NAMESPACE&#39;.</span>
+<span class="sd">            attribute which is set from the config option &#39;namespace&#39; in the</span>
+<span class="sd">            section &#39;rmq&#39;.</span>
 <span class="sd">        exclusive (bool, optional): If True, the queue that is created can</span>
 <span class="sd">            only be used by this driver. Defaults to False. If a queue</span>
 <span class="sd">            name is not provided, it is assumed exclusive.</span>
@@ -98,10 +101,10 @@
         <span class="n">kwargs_attr</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">kwattr</span><span class="p">}</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">RMQDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">user</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;PSI_MSG_USER&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">host</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;PSI_MSG_HOST&#39;</span><span class="p">,</span> <span class="n">socket</span><span class="o">.</span><span class="n">gethostname</span><span class="p">())</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">vhost</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;PSI_MSG_VHOST&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">passwd</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;PSI_MSG_PW&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">user</span> <span class="o">=</span> <span class="n">cis_cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;rmq&#39;</span><span class="p">,</span> <span class="s1">&#39;user&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">host</span> <span class="o">=</span> <span class="n">cis_cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;rmq&#39;</span><span class="p">,</span> <span class="s1">&#39;host&#39;</span><span class="p">,</span> <span class="n">socket</span><span class="o">.</span><span class="n">gethostname</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vhost</span> <span class="o">=</span> <span class="n">cis_cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;rmq&#39;</span><span class="p">,</span> <span class="s1">&#39;vhost&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">passwd</span> <span class="o">=</span> <span class="n">cis_cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;rmq&#39;</span><span class="p">,</span> <span class="s1">&#39;password&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">exchange</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">namespace</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">exclusive</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">kwattr</span><span class="p">:</span>
@@ -134,13 +137,13 @@
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Start the driver. Waiting for connection.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_opening</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">RMQDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
-        <span class="n">tries</span> <span class="o">=</span> <span class="mi">10</span>
+        <span class="n">timeout</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">timeout</span>
         <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
             <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
-                <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_opening</span> <span class="ow">or</span> <span class="n">tries</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_opening</span> <span class="ow">or</span> <span class="n">timeout</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
                     <span class="k">break</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">sleep</span><span class="p">()</span>
-            <span class="n">tries</span> <span class="o">-=</span> <span class="mi">1</span>
+            <span class="n">timeout</span> <span class="o">-=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sleeptime</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_opening</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
                 <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Connection never finished opening.&quot;</span><span class="p">)</span></div>
@@ -156,20 +159,21 @@
 <div class="viewcode-block" id="RMQDriver.terminate"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.RMQDriver.RMQDriver.terminate">[docs]</a>    <span class="k">def</span> <span class="nf">terminate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Terminate the driver by closing the RabbitMQ connection.&quot;&quot;&quot;</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_closing</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_closing</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
                 <span class="k">return</span>  <span class="c1"># Don&#39;t close more than once</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;::terminate&quot;</span><span class="p">)</span>
-        <span class="n">tries</span> <span class="o">=</span> <span class="mi">10</span>
+        <span class="n">timeout</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">timeout</span>
         <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_opening</span> <span class="ow">or</span> <span class="n">tries</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_opening</span> <span class="ow">or</span> <span class="n">timeout</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="k">break</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Waiting for connection to open before terminating&#39;</span><span class="p">)</span>
-            <span class="c1"># if self.connection is None:</span>
-            <span class="c1">#     self.connection.add_timeout(self.terminate(), self.sleeptime)</span>
-            <span class="c1">#     return</span>
-            <span class="c1"># while self.connection is None:</span>
-            <span class="n">tries</span> <span class="o">-=</span> <span class="mi">1</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">sleep</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Waiting for connection to open before terminating&#39;</span><span class="p">)</span>
+                <span class="c1"># if self.connection is None:</span>
+                <span class="c1">#     self.connection.add_timeout(self.terminate(), self.sleeptime)</span>
+                <span class="c1">#     return</span>
+                <span class="c1"># while self.connection is None:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">sleep</span><span class="p">()</span>
+                <span class="n">timeout</span> <span class="o">-=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sleeptime</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;::terminate: Closing connection&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">stop_communication</span><span class="p">()</span>
         <span class="c1"># Only needed if ioloop is stopped prior to closing the connection?</span>
@@ -179,7 +183,62 @@
         <span class="nb">super</span><span class="p">(</span><span class="n">RMQDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">terminate</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;::terminate returns&#39;</span><span class="p">)</span></div>
 
+<div class="viewcode-block" id="RMQDriver.get_message_stats"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.RMQDriver.RMQDriver.get_message_stats">[docs]</a>    <span class="k">def</span> <span class="nf">get_message_stats</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Return message stats from the server.&quot;&quot;&quot;</span>
+        <span class="n">hoststr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">host</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">host</span> <span class="o">==</span> <span class="s1">&#39;/&#39;</span><span class="p">:</span>
+            <span class="n">hoststr</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%2f</span><span class="s1">&#39;</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="s1">&#39;http://</span><span class="si">%s</span><span class="s1">:</span><span class="si">%s</span><span class="s1">/api/</span><span class="si">%s</span><span class="s1">/</span><span class="si">%s</span><span class="s1">/</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span>
+            <span class="n">hoststr</span><span class="p">,</span> <span class="mi">15672</span><span class="p">,</span> <span class="s1">&#39;queues&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">%2f</span><span class="s1">&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="p">)</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">auth</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">passwd</span><span class="p">))</span>
+        <span class="n">jdata</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">jdata</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="n">qdata</span> <span class="o">=</span> <span class="n">jdata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;message_stats&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">qdata</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="k">return</span> <span class="n">qdata</span></div>
+        
+<div class="viewcode-block" id="RMQDriver.printStatus"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.RMQDriver.RMQDriver.printStatus">[docs]</a>    <span class="k">def</span> <span class="nf">printStatus</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Print the driver status.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;::printStatus&#39;</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">RMQDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">printStatus</span><span class="p">()</span>
+        <span class="n">qdata</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_message_stats</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">qdata</span><span class="p">:</span>
+            <span class="n">qdata</span> <span class="o">=</span> <span class="n">pformat</span><span class="p">(</span><span class="n">qdata</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="p">(</span><span class="s2">&quot;: server info:</span><span class="se">\n</span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">qdata</span><span class="p">)</span></div>
+
     <span class="c1"># RMQ PROPERTIES</span>
+<div class="viewcode-block" id="RMQDriver.on_nmsg_request"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.RMQDriver.RMQDriver.on_nmsg_request">[docs]</a>    <span class="k">def</span> <span class="nf">on_nmsg_request</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method_frame</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Actions to perform once the queue is declared for message count.&quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_n_msg</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">if</span> <span class="n">method_frame</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_n_msg</span> <span class="o">=</span> <span class="n">method_frame</span><span class="o">.</span><span class="n">method</span><span class="o">.</span><span class="n">message_count</span></div>
+                
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">n_rmq_msg</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: Number of messages in the queue.&quot;&quot;&quot;</span>
+        <span class="n">timeout</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">timeout</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_n_msg</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">queue_declare</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">on_nmsg_request</span><span class="p">,</span>
+                                       <span class="n">queue</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="p">,</span>
+                                       <span class="n">exclusive</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">exclusive</span><span class="p">,</span>
+                                       <span class="n">auto_delete</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                       <span class="n">passive</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="c1"># Wait for queue to be declared passively</span>
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n_msg</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">timeout</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">break</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sleep</span><span class="p">()</span>
+            <span class="n">timeout</span> <span class="o">-=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sleeptime</span>
+        <span class="c1"># Return result</span>
+        <span class="n">n_msg</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n_msg</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">n_msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n_msg</span>
+        <span class="k">return</span> <span class="n">n_msg</span>
+    
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">creds</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;:class:`pika.credentials.PlainCredentials`: Server credentials.&quot;&quot;&quot;</span>
@@ -194,10 +253,25 @@
                    <span class="n">connection_attempts</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">host</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">kws</span><span class="p">[</span><span class="s1">&#39;host&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">host</span>
-        <span class="k">return</span> <span class="n">pika</span><span class="o">.</span><span class="n">ConnectionParameters</span><span class="p">(</span><span class="o">**</span><span class="n">kws</span><span class="p">)</span>  <span class="c1"># host=self.host,</span>
-    <span class="c1"># credentials=self.creds,</span>
-    <span class="c1"># heartbeat_interval=120,</span>
-    <span class="c1"># connection_attempts=3)</span>
+        <span class="k">return</span> <span class="n">pika</span><span class="o">.</span><span class="n">ConnectionParameters</span><span class="p">(</span><span class="o">**</span><span class="n">kws</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">is_open</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;bool: True if connection ready for messages, False otherwise.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">channel</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">connection</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">is_open</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">is_closing</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">is_stable</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;bool: True if the connection ready for messages and not about to</span>
+<span class="sd">        close. False otherwise.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_open</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_closing</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="kc">False</span>
 
     <span class="c1"># CONNECTION</span>
 <div class="viewcode-block" id="RMQDriver.connect"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.RMQDriver.RMQDriver.connect">[docs]</a>    <span class="k">def</span> <span class="nf">connect</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -229,7 +303,6 @@
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;::on_connection_closed code </span><span class="si">%d</span><span class="s1"> </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">reply_code</span><span class="p">,</span>
                        <span class="n">reply_text</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">channel</span> <span class="o">=</span> <span class="kc">None</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_closing</span> <span class="ow">or</span> <span class="n">reply_code</span> <span class="o">==</span> <span class="mi">200</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">ioloop</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">connection</span> <span class="o">=</span> <span class="kc">None</span>
@@ -271,6 +344,7 @@
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;::channel </span><span class="si">%i</span><span class="s1"> was closed: (</span><span class="si">%s</span><span class="s1">) </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span>
                        <span class="n">channel</span><span class="p">,</span> <span class="n">reply_code</span><span class="p">,</span> <span class="n">reply_text</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">channel</span> <span class="o">=</span> <span class="kc">None</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
 
     <span class="c1"># EXCHANGE</span>
@@ -290,19 +364,18 @@
 <div class="viewcode-block" id="RMQDriver.setup_queue"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.RMQDriver.RMQDriver.setup_queue">[docs]</a>    <span class="k">def</span> <span class="nf">setup_queue</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">queue_name</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Set up the message queue.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;::Declaring queue </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">queue_name</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">queue_name</span><span class="p">:</span>
-            <span class="n">exclusive</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">exclusive</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">exclusive</span> <span class="o">=</span> <span class="kc">True</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_q_obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">queue_declare</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">on_queue_declareok</span><span class="p">,</span>
-                                                 <span class="n">queue</span><span class="o">=</span><span class="n">queue_name</span><span class="p">,</span>
-                                                 <span class="n">exclusive</span><span class="o">=</span><span class="n">exclusive</span><span class="p">,</span>
-                                                 <span class="n">auto_delete</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">queue_name</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">exclusive</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">queue_declare</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">on_queue_declareok</span><span class="p">,</span>
+                                   <span class="n">queue</span><span class="o">=</span><span class="n">queue_name</span><span class="p">,</span>
+                                   <span class="n">exclusive</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">exclusive</span><span class="p">,</span>
+                                   <span class="n">auto_delete</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="RMQDriver.on_queue_declareok"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.RMQDriver.RMQDriver.on_queue_declareok">[docs]</a>    <span class="k">def</span> <span class="nf">on_queue_declareok</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method_frame</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Actions to perform once the queue is succesfully declared. Bind</span>
 <span class="sd">        the queue.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;::Binding&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_q_obj</span> <span class="o">=</span> <span class="n">method_frame</span><span class="o">.</span><span class="n">method</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">queue</span> <span class="o">=</span> <span class="n">method_frame</span><span class="o">.</span><span class="n">method</span><span class="o">.</span><span class="n">queue</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">routing_key</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">routing_key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">queue</span>
@@ -322,7 +395,7 @@
 <div class="viewcode-block" id="RMQDriver.purge_queue"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.RMQDriver.RMQDriver.purge_queue">[docs]</a>    <span class="k">def</span> <span class="nf">purge_queue</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Remove all messages from the associated queue.&quot;&quot;&quot;</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_closing</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_closing</span> <span class="ow">or</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_open</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
                 <span class="k">return</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">queue_purge</span><span class="p">(</span><span class="n">queue</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="p">)</span></div>
@@ -332,24 +405,29 @@
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Start sending/receiving messages.&quot;&quot;&quot;</span>
         <span class="k">pass</span></div>
 
-<div class="viewcode-block" id="RMQDriver.stop_communication"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.RMQDriver.RMQDriver.stop_communication">[docs]</a>    <span class="k">def</span> <span class="nf">stop_communication</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="RMQDriver.stop_communication"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.RMQDriver.RMQDriver.stop_communication">[docs]</a>    <span class="k">def</span> <span class="nf">stop_communication</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">remove_queue</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Stop sending/receiving messages.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;::stop_communication&#39;</span><span class="p">)</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_closing</span> <span class="o">=</span> <span class="kc">True</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">channel</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">is_open</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">queue_unbind</span><span class="p">(</span><span class="n">queue</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="p">,</span>
-                                          <span class="n">exchange</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">exchange</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">queue_delete</span><span class="p">(</span><span class="n">queue</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_open</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">remove_queue</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;::stop_communication: unbinding queue&#39;</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">display</span><span class="p">(</span><span class="s1">&#39;Unbinding queue&#39;</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">queue_unbind</span><span class="p">(</span><span class="n">queue</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="p">,</span>
+                                              <span class="n">exchange</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">exchange</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">queue_delete</span><span class="p">(</span><span class="n">queue</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;::stop_communication: closing channel&#39;</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_closing</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="n">tries</span> <span class="o">=</span> <span class="mi">10</span>
+        <span class="n">timeout</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">timeout</span>
         <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_closing</span> <span class="ow">or</span> <span class="n">tries</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_closing</span> <span class="ow">or</span> <span class="n">timeout</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="k">break</span>
-            <span class="n">tries</span> <span class="o">-=</span> <span class="mi">1</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;::stop_commmunication: waiting for connection to close&#39;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">sleep</span><span class="p">()</span></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sleep</span><span class="p">()</span>
+            <span class="n">timeout</span> <span class="o">-=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sleeptime</span></div>
 
     <span class="c1"># UTILITIES</span>
 <div class="viewcode-block" id="RMQDriver.rmq_send"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.RMQDriver.RMQDriver.rmq_send">[docs]</a>    <span class="k">def</span> <span class="nf">rmq_send</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
@@ -362,6 +440,7 @@
 <span class="sd">            bool: True if the message was sent succesfully. False otherwise.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">backwards</span><span class="o">.</span><span class="n">assert_bytes</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_closing</span><span class="p">:</span>
                 <span class="k">return</span> <span class="kc">False</span>
@@ -392,7 +471,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;::send_nolimit </span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">))</span>
         <span class="n">prev</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="n">ret</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rmq_send</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%ld</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">))</span>
+        <span class="n">ret</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rmq_send</span><span class="p">(</span><span class="n">backwards</span><span class="o">.</span><span class="n">unicode2bytes</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%ld</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)))</span>
         <span class="k">if</span> <span class="n">ret</span><span class="p">:</span>
             <span class="k">while</span> <span class="n">prev</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
                 <span class="nb">next</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">prev</span> <span class="o">+</span> <span class="n">maxMsgSize</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">))</span>

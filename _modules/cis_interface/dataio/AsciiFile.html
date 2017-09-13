@@ -44,6 +44,7 @@
             
   <h1>Source code for cis_interface.dataio.AsciiFile</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">cis_interface</span> <span class="k">import</span> <span class="n">backwards</span>
 
 
 <span class="n">_default_args</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;comment&#39;</span><span class="p">:</span> <span class="s1">&#39;#&#39;</span><span class="p">,</span>
@@ -85,6 +86,8 @@
         <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">_default_args</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
                 <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">comment</span> <span class="o">=</span> <span class="n">backwards</span><span class="o">.</span><span class="n">unicode2bytes</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">comment</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">newline</span> <span class="o">=</span> <span class="n">backwards</span><span class="o">.</span><span class="n">unicode2bytes</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">newline</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fd</span> <span class="o">=</span> <span class="kc">None</span>
 
     <span class="nd">@property</span>
@@ -97,7 +100,7 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">io_mode</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Cannot open in memory table.&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_open</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">fd</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filepath</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">io_mode</span><span class="p">)</span></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fd</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filepath</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">io_mode</span> <span class="o">+</span> <span class="s1">&#39;b&#39;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="AsciiFile.close"><a class="viewcode-back" href="../../../cis_interface.dataio.html#cis_interface.dataio.AsciiFile.AsciiFile.close">[docs]</a>    <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Close the associated file descriptor if it is open.&quot;&quot;&quot;</span>
@@ -126,19 +129,20 @@
 <span class="sd">        present.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            line (str): Line to be written with/without the newline character.</span>
+<span class="sd">            line (str/bytes): Line to be written with/without the newline</span>
+<span class="sd">                character.</span>
 
 <span class="sd">        Raises:</span>
-<span class="sd">            TypeError: If line is not a string.</span>
+<span class="sd">            TypeError: If line is not the correct bytes type.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_open</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;The file is not open. Nothing written.&quot;</span><span class="p">)</span>
             <span class="k">return</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Line must be a string.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="n">backwards</span><span class="o">.</span><span class="n">bytes_type</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Line must be of type </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">backwards</span><span class="o">.</span><span class="n">bytes_type</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">line</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">newline</span><span class="p">):</span>
-            <span class="n">line</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">newline</span>
+            <span class="n">line</span> <span class="o">=</span> <span class="n">line</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">newline</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">writeline_full</span><span class="p">(</span><span class="n">line</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="AsciiFile.readline_full"><a class="viewcode-back" href="../../../cis_interface.dataio.html#cis_interface.dataio.AsciiFile.AsciiFile.readline_full">[docs]</a>    <span class="k">def</span> <span class="nf">readline_full</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -154,7 +158,7 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_open</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;The file is not open. Nothing read.&quot;</span><span class="p">)</span>
             <span class="k">return</span> <span class="kc">True</span><span class="p">,</span> <span class="n">line</span>
-        <span class="n">line</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fd</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+        <span class="n">line</span> <span class="o">=</span> <span class="n">backwards</span><span class="o">.</span><span class="n">unicode2bytes</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fd</span><span class="o">.</span><span class="n">readline</span><span class="p">())</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">line</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">True</span><span class="p">,</span> <span class="n">line</span>
         <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">comment</span><span class="p">):</span>
@@ -166,17 +170,17 @@
 <span class="sd">        nothing happens.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            line (str): Line to be written.</span>
+<span class="sd">            line (str/bytes): Line to be written.</span>
 
 <span class="sd">        Raises:</span>
-<span class="sd">            TypeError: If line is not a string.</span>
+<span class="sd">            TypeError: If line is not the correct bytes type.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_open</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;The file is not open. Nothing written.&quot;</span><span class="p">)</span>
             <span class="k">return</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Line must be a string.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="n">backwards</span><span class="o">.</span><span class="n">bytes_type</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Line must be of type </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">backwards</span><span class="o">.</span><span class="n">bytes_type</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fd</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">line</span><span class="p">)</span></div></div>
 </pre></div>
 

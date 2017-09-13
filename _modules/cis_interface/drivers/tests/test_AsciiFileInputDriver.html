@@ -44,7 +44,7 @@
             
   <h1>Source code for cis_interface.drivers.tests.test_AsciiFileInputDriver</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">nose.tools</span> <span class="k">as</span> <span class="nn">nt</span>
-<span class="kn">import</span> <span class="nn">test_FileInputDriver</span> <span class="k">as</span> <span class="nn">parent</span>
+<span class="kn">import</span> <span class="nn">cis_interface.drivers.tests.test_FileInputDriver</span> <span class="k">as</span> <span class="nn">parent</span>
 
 
 <div class="viewcode-block" id="TestAsciiFileInputParam"><a class="viewcode-back" href="../../../../cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_AsciiFileInputDriver.TestAsciiFileInputParam">[docs]</a><span class="k">class</span> <span class="nc">TestAsciiFileInputParam</span><span class="p">(</span><span class="n">parent</span><span class="o">.</span><span class="n">TestFileInputParam</span><span class="p">):</span>
@@ -85,15 +85,17 @@
 <div class="viewcode-block" id="TestAsciiFileInputDriver.assert_before_stop"><a class="viewcode-back" href="../../../../cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_AsciiFileInputDriver.TestAsciiFileInputDriver.assert_before_stop">[docs]</a>    <span class="k">def</span> <span class="nf">assert_before_stop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Assertions to make before stopping the driver instance.&quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">parent</span><span class="o">.</span><span class="n">TestFileInputDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">assert_before_stop</span><span class="p">()</span>
-        <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">n_msg</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">elapsed</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">n_ipc_msg</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="p">(</span><span class="n">elapsed</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">timeout</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">sleep</span><span class="p">()</span>
+            <span class="n">elapsed</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">sleeptime</span>
         <span class="n">iline</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
             <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">ipc_recv</span><span class="p">()</span>
             <span class="k">if</span> <span class="p">(</span><span class="n">data</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">data</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">eof_msg</span><span class="p">):</span>
                 <span class="k">break</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_lines</span><span class="p">[</span><span class="n">iline</span><span class="p">]</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;#&#39;</span><span class="p">):</span>
+                <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_lines</span><span class="p">[</span><span class="n">iline</span><span class="p">]</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">comment</span><span class="p">):</span>
                     <span class="n">iline</span> <span class="o">+=</span> <span class="mi">1</span>  <span class="c1"># pragma: no cover</span>
                 <span class="n">nt</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_lines</span><span class="p">[</span><span class="n">iline</span><span class="p">])</span>
                 <span class="n">iline</span> <span class="o">+=</span> <span class="mi">1</span>

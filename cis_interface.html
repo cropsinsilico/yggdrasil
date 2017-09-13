@@ -121,6 +121,18 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="cis_interface.examples.html">cis_interface.examples package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="cis_interface.examples.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="cis_interface.examples.tests.html">cis_interface.examples.tests package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="cis_interface.examples.tests.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cis_interface.examples.tests.html#module-cis_interface.examples.tests.test_SaM">cis_interface.examples.tests.test_SaM module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cis_interface.examples.tests.html#module-cis_interface.examples.tests.test_ascii_io">cis_interface.examples.tests.test_ascii_io module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cis_interface.examples.tests.html#module-cis_interface.examples.tests.test_hello">cis_interface.examples.tests.test_hello module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cis_interface.examples.tests.html#module-cis_interface.examples.tests.test_rpcFib">cis_interface.examples.tests.test_rpcFib module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cis_interface.examples.tests.html#module-cis_interface.examples.tests">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="cis_interface.examples.html#module-cis_interface.examples">Module contents</a></li>
 </ul>
 </li>
@@ -133,6 +145,8 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="cis_interface.tests.html">cis_interface.tests package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="cis_interface.tests.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cis_interface.tests.html#module-cis_interface.tests.test_backwards">cis_interface.tests.test_backwards module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cis_interface.tests.html#module-cis_interface.tests.test_config">cis_interface.tests.test_config module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cis_interface.tests.html#module-cis_interface.tests.test_runner">cis_interface.tests.test_runner module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cis_interface.tests.html#module-cis_interface.tests.test_tools">cis_interface.tests.test_tools module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cis_interface.tests.html#module-cis_interface.tests">Module contents</a></li>
@@ -147,6 +161,46 @@
 <div class="section" id="module-cis_interface.backwards">
 <span id="cis-interface-backwards-module"></span><h2>cis_interface.backwards module<a class="headerlink" href="#module-cis_interface.backwards" title="Permalink to this headline">¶</a></h2>
 <p>This module allows for backward compatibility.</p>
+<dl class="function">
+<dt id="cis_interface.backwards.bytes2unicode">
+<code class="descclassname">cis_interface.backwards.</code><code class="descname">bytes2unicode</code><span class="sig-paren">(</span><em>b</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/backwards.html#bytes2unicode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.backwards.bytes2unicode" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert from bytes/unicode/str to unicode.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>b</strong> (<em>bytes</em><em>, </em><a class="reference external" href="https://docs.python.org/2/library/functions.html#unicode" title="(in Python v2.7)"><em>unicode</em></a><em>, </em><a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; Bytes to be converted into unicode.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">String version of input.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">unicode/str</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><code class="xref py py-exc docutils literal"><span class="pre">TypeError</span></code> &#8211; If supplied type cannot be converted to unicode.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.backwards.unicode2bytes">
+<code class="descclassname">cis_interface.backwards.</code><code class="descname">unicode2bytes</code><span class="sig-paren">(</span><em>s</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/backwards.html#unicode2bytes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.backwards.unicode2bytes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert from bytes/unicode/str to a bytes object.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>s</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a><em>, </em><em>bytes</em><em>, </em><a class="reference external" href="https://docs.python.org/2/library/functions.html#unicode" title="(in Python v2.7)"><em>unicode</em></a>) &#8211; Object to convert to a bytes version.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Bytes version of input.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">bytes</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><code class="xref py py-exc docutils literal"><span class="pre">TypeError</span></code> &#8211; If supplied type cannot be converted to bytes.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 </div>
 <div class="section" id="module-cis_interface.command_line">
 <span id="cis-interface-command-line-module"></span><h2>cis_interface.command_line module<a class="headerlink" href="#module-cis_interface.command_line" title="Permalink to this headline">¶</a></h2>
@@ -169,6 +223,66 @@
 <div class="section" id="module-cis_interface.config">
 <span id="cis-interface-config-module"></span><h2>cis_interface.config module<a class="headerlink" href="#module-cis_interface.config" title="Permalink to this headline">¶</a></h2>
 <p>This module imports the configuration for cis_interface.</p>
+<div class="admonition-todo admonition" id="index-0">
+<p class="first admonition-title">Todo</p>
+<p class="last">Remove reference to environment variables for accessing config options.</p>
+</div>
+<dl class="class">
+<dt id="cis_interface.config.CisConfigParser">
+<em class="property">class </em><code class="descclassname">cis_interface.config.</code><code class="descname">CisConfigParser</code><span class="sig-paren">(</span><em>defaults=None</em>, <em>dict_type=&lt;class 'collections.OrderedDict'&gt;</em>, <em>allow_no_value=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/config.html#CisConfigParser"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.config.CisConfigParser" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/2/library/configparser.html#ConfigParser.ConfigParser" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">ConfigParser.ConfigParser</span></code></a></p>
+<p>Config parser that returns None if option not provided on get.</p>
+<dl class="method">
+<dt id="cis_interface.config.CisConfigParser.get">
+<code class="descname">get</code><span class="sig-paren">(</span><em>section</em>, <em>option</em>, <em>default=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/config.html#CisConfigParser.get"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.config.CisConfigParser.get" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return None if the section/option does not exist.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>section</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; Name of section.</li>
+<li><strong>option</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; Name of option in section.</li>
+<li><strong>default</strong> (<em>obj</em><em>, </em><em>optional</em>) &#8211; Value that should be returned if the
+section and/or option are not found or are an empty string.
+Defaults to None.</li>
+<li><strong>**kwargs</strong> &#8211; Additional keyword arguments are passed to the parent
+class&#8217;s get.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">String entry if the section &amp; option exist, otherwise default.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">obj</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.config.cfg_environment">
+<code class="descclassname">cis_interface.config.</code><code class="descname">cfg_environment</code><span class="sig-paren">(</span><em>env=None</em>, <em>cfg=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/config.html#cfg_environment"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.config.cfg_environment" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set environment variables based on config options.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>env</strong> (<a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a><em>, </em><em>optional</em>) &#8211; Dictionary of environment variables that should
+be updated. Defaults to <cite>os.environ</cite>.</li>
+<li><strong>cfg</strong> (<a class="reference internal" href="#cis_interface.config.CisConfigParser" title="cis_interface.config.CisConfigParser"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.config.CisConfigParser</span></code></a>, optional) &#8211; Config parser with options that should be used to update the
+environment. Defaults to <code class="xref py py-data docutils literal"><span class="pre">cis_interface.config.cis_cfg</span></code>.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 </div>
 <div class="section" id="module-cis_interface.runner">
 <span id="cis-interface-runner-module"></span><h2>cis_interface.runner module<a class="headerlink" href="#module-cis_interface.runner" title="Permalink to this headline">¶</a></h2>
@@ -266,7 +380,7 @@ will exit as quickly as possible. Defaults to False.</td>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>yml</strong> (<em>yaml</em>) &#8211; Yaml object containing driver information.</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>yml</strong> (<a class="reference internal" href="cis_interface.examples.tests.html#cis_interface.examples.tests.TestExample.yaml" title="cis_interface.examples.tests.TestExample.yaml"><em>yaml</em></a>) &#8211; Yaml object containing driver information.</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">An instance of the specified driver.</td>
 </tr>
@@ -399,7 +513,7 @@ that should be run.</li>
 <tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first"><a class="reference internal" href="#cis_interface.runner.CisRunner" title="cis_interface.runner.CisRunner">CisRunner</a></p>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><code class="xref py py-exc docutils literal"><span class="pre">Exception</span></code> &#8211; If environment variable &#8216;PSI_NAMESPACE&#8217; is not set.</p>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><code class="xref py py-exc docutils literal"><span class="pre">Exception</span></code> &#8211; If config option &#8216;namespace&#8217; in &#8216;rmq&#8217; section not set.</p>
 </td>
 </tr>
 </tbody>
@@ -493,8 +607,17 @@ list.</td>
 
 <dl class="function">
 <dt id="cis_interface.tools.ipcrm_queues">
-<code class="descclassname">cis_interface.tools.</code><code class="descname">ipcrm_queues</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tools.html#ipcrm_queues"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tools.ipcrm_queues" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">cis_interface.tools.</code><code class="descname">ipcrm_queues</code><span class="sig-paren">(</span><em>queue_keys=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tools.html#ipcrm_queues"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tools.ipcrm_queues" title="Permalink to this definition">¶</a></dt>
 <dd><p>Delete existing IPC queues.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>queue_keys</strong> (<em>list</em><em>, </em><a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a><em>, </em><em>optional</em>) &#8211; A list of keys for queues that should
+be removed. Defaults to all existing queues.</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="function">

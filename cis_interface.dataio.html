@@ -138,9 +138,10 @@ present.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>line</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; Line to be written with/without the newline character.</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>line</strong> (<em>str/bytes</em>) &#8211; Line to be written with/without the newline
+character.</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><code class="xref py py-exc docutils literal"><span class="pre">TypeError</span></code> &#8211; If line is not a string.</td>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><code class="xref py py-exc docutils literal"><span class="pre">TypeError</span></code> &#8211; If line is not the correct bytes type.</td>
 </tr>
 </tbody>
 </table>
@@ -155,9 +156,9 @@ nothing happens.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>line</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; Line to be written.</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>line</strong> (<em>str/bytes</em>) &#8211; Line to be written.</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><code class="xref py py-exc docutils literal"><span class="pre">TypeError</span></code> &#8211; If line is not a string.</td>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><code class="xref py py-exc docutils literal"><span class="pre">TypeError</span></code> &#8211; If line is not the correct bytes type.</td>
 </tr>
 </tbody>
 </table>
@@ -437,7 +438,7 @@ expected number of values.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
-<li><code class="xref py py-exc docutils literal"><span class="pre">TypeError</span></code> &#8211; If the line is not a string.</li>
+<li><code class="xref py py-exc docutils literal"><span class="pre">TypeError</span></code> &#8211; If the line is not a bytes/str.</li>
 <li><code class="xref py py-exc docutils literal"><span class="pre">AssertionError</span></code> &#8211; If the line does not match the format string.</li>
 </ul>
 </td>
@@ -623,7 +624,7 @@ python scanf module can use.</p>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
-<li><code class="xref py py-exc docutils literal"><span class="pre">TypeError</span></code> &#8211; if cfmt is not a string.</li>
+<li><code class="xref py py-exc docutils literal"><span class="pre">TypeError</span></code> &#8211; if cfmt is not a bytes/str.</li>
 <li><code class="xref py py-exc docutils literal"><span class="pre">ValueError</span></code> &#8211; If the c format does not begin with &#8216;%&#8217;.</li>
 <li><code class="xref py py-exc docutils literal"><span class="pre">ValueError</span></code> &#8211; If the c format does not contain type info.</li>
 </ul>

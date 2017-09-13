@@ -90,13 +90,13 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;:run in </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">())</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">fd</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">,</span> <span class="s1">&#39;w+&#39;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">fd</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">,</span> <span class="s1">&#39;wb+&#39;</span><span class="p">)</span>
         <span class="k">except</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s1">&#39;Could not open file.&#39;</span><span class="p">)</span>
             <span class="k">return</span>
         <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">fd</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ipc_recv</span><span class="p">()</span>
-            <span class="k">if</span> <span class="n">data</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">data</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;:recv: closed&#39;</span><span class="p">)</span>
                 <span class="k">break</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;:recvd </span><span class="si">%s</span><span class="s1"> bytes&#39;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">))</span>

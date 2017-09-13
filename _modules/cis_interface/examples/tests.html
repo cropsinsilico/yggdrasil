@@ -1,0 +1,189 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>cis_interface.examples.tests &#8212; cis_interface 0.0.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for cis_interface.examples.tests</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">import</span> <span class="nn">unittest</span>
+<span class="kn">from</span> <span class="nn">cis_interface</span> <span class="k">import</span> <span class="n">runner</span>
+<span class="kn">from</span> <span class="nn">cis_interface.examples</span> <span class="k">import</span> <span class="n">yamls</span>
+<span class="kn">from</span> <span class="nn">cis_interface.config</span> <span class="k">import</span> <span class="n">cis_cfg</span>
+
+
+<div class="viewcode-block" id="TestExample"><a class="viewcode-back" href="../../../cis_interface.examples.tests.html#cis_interface.examples.tests.TestExample">[docs]</a><span class="k">class</span> <span class="nc">TestExample</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Base class for running examples.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">language</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">env</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">TestExample</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+<div class="viewcode-block" id="TestExample.setup"><a class="viewcode-back" href="../../../cis_interface.examples.tests.html#cis_interface.examples.tests.TestExample.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Setup to perform before test.&quot;&quot;&quot;</span>
+        <span class="n">cis_cfg</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;debug&#39;</span><span class="p">,</span> <span class="s1">&#39;psi&#39;</span><span class="p">,</span> <span class="s1">&#39;INFO&#39;</span><span class="p">)</span>
+        <span class="n">cis_cfg</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;debug&#39;</span><span class="p">,</span> <span class="s1">&#39;rmq&#39;</span><span class="p">,</span> <span class="s1">&#39;INFO&#39;</span><span class="p">)</span>
+        <span class="n">cis_cfg</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;debug&#39;</span><span class="p">,</span> <span class="s1">&#39;client&#39;</span><span class="p">,</span> <span class="s1">&#39;INFO&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TestExample.teardown"><a class="viewcode-back" href="../../../cis_interface.examples.tests.html#cis_interface.examples.tests.TestExample.teardown">[docs]</a>    <span class="k">def</span> <span class="nf">teardown</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Teardown to perform after test.&quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="TestExample.shortDescription"><a class="viewcode-back" href="../../../cis_interface.examples.tests.html#cis_interface.examples.tests.TestExample.shortDescription">[docs]</a>    <span class="k">def</span> <span class="nf">shortDescription</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Prefix first line of doc string with driver.&quot;&quot;&quot;</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">TestExample</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">shortDescription</span><span class="p">()</span>
+        <span class="k">return</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">out</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TestExample.setUp"><a class="viewcode-back" href="../../../cis_interface.examples.tests.html#cis_interface.examples.tests.TestExample.setUp">[docs]</a>    <span class="k">def</span> <span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Redirect unittest to nose style setup.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+        
+<div class="viewcode-block" id="TestExample.tearDown"><a class="viewcode-back" href="../../../cis_interface.examples.tests.html#cis_interface.examples.tests.TestExample.tearDown">[docs]</a>    <span class="k">def</span> <span class="nf">tearDown</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Redirect unittest to nose style teardown.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">teardown</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">yaml</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;str: The full path to the yaml file for this example.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">yamls</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">language</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">yamls</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">]:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">return</span> <span class="n">yamls</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">language</span><span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">yamldir</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;str: Full path to the directory containing the yaml file.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">yaml</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">yaml</span><span class="p">)</span>
+
+<div class="viewcode-block" id="TestExample.check_result"><a class="viewcode-back" href="../../../cis_interface.examples.tests.html#cis_interface.examples.tests.TestExample.check_result">[docs]</a>    <span class="k">def</span> <span class="nf">check_result</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;This should be overridden with checks for the result.&quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="TestExample.run_example"><a class="viewcode-back" href="../../../cis_interface.examples.tests.html#cis_interface.examples.tests.TestExample.run_example">[docs]</a>    <span class="k">def</span> <span class="nf">run_example</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;This runs an example in the correct language.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">yaml</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Could not locate example </span><span class="si">%s</span><span class="s2"> in language </span><span class="si">%s</span><span class="s2">.&quot;</span> <span class="o">%</span>
+                              <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">language</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="p">)</span>
+            <span class="n">cr</span> <span class="o">=</span> <span class="n">runner</span><span class="o">.</span><span class="n">get_runner</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">yaml</span><span class="p">,</span> <span class="n">namespace</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+            <span class="n">cr</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">check_result</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="TestExample.test_all"><a class="viewcode-back" href="../../../cis_interface.examples.tests.html#cis_interface.examples.tests.TestExample.test_all">[docs]</a>    <span class="k">def</span> <span class="nf">test_all</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test the version of the example that uses all languages.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">language</span> <span class="o">=</span> <span class="s1">&#39;all&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">run_example</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">language</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="TestExample.test_python"><a class="viewcode-back" href="../../../cis_interface.examples.tests.html#cis_interface.examples.tests.TestExample.test_python">[docs]</a>    <span class="k">def</span> <span class="nf">test_python</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test the Python version of the example.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">language</span> <span class="o">=</span> <span class="s1">&#39;python&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">run_example</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">language</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="TestExample.test_c"><a class="viewcode-back" href="../../../cis_interface.examples.tests.html#cis_interface.examples.tests.TestExample.test_c">[docs]</a>    <span class="k">def</span> <span class="nf">test_c</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test the C version of the example.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">language</span> <span class="o">=</span> <span class="s1">&#39;c&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">run_example</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">language</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="TestExample.test_cpp"><a class="viewcode-back" href="../../../cis_interface.examples.tests.html#cis_interface.examples.tests.TestExample.test_cpp">[docs]</a>    <span class="k">def</span> <span class="nf">test_cpp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test the C++ version of the example.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">language</span> <span class="o">=</span> <span class="s1">&#39;cpp&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">run_example</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">language</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="TestExample.test_matlab"><a class="viewcode-back" href="../../../cis_interface.examples.tests.html#cis_interface.examples.tests.TestExample.test_matlab">[docs]</a>    <span class="k">def</span> <span class="nf">test_matlab</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test the Matlab version of the example.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">language</span> <span class="o">=</span> <span class="s1">&#39;matlab&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">run_example</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">language</span> <span class="o">=</span> <span class="kc">None</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Meagan Lang, David Raila.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.6</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

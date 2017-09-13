@@ -47,6 +47,7 @@
 <span class="kn">from</span> <span class="nn">sysv_ipc</span> <span class="k">import</span> <span class="n">MessageQueue</span>
 <span class="kn">from</span> <span class="nn">cis_interface.drivers.Driver</span> <span class="k">import</span> <span class="n">Driver</span>
 <span class="kn">from</span> <span class="nn">cis_interface.interface.PsiInterface</span> <span class="k">import</span> <span class="n">PSI_MSG_MAX</span>
+<span class="kn">from</span> <span class="nn">cis_interface</span> <span class="k">import</span> <span class="n">backwards</span>
 
 
 <span class="c1"># OS X limit is 2kb</span>
@@ -110,7 +111,7 @@
 
 <span class="sd">        Args:</span>
 <span class="sd">            timeout (float, optional): Max time that should be waited. Defaults</span>
-<span class="sd">                to 0 and is infinite.</span>
+<span class="sd">                to 0 and is set to attribute timeout.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            str: The received message.</span>
@@ -118,6 +119,8 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">ret</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
         <span class="n">elapsed</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">timeout</span><span class="p">:</span>
+            <span class="n">timeout</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">timeout</span>
         <span class="k">while</span> <span class="kc">True</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="n">timeout</span> <span class="ow">or</span> <span class="n">elapsed</span> <span class="o">&lt;</span> <span class="n">timeout</span><span class="p">):</span>
             <span class="n">ret</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ipc_recv</span><span class="p">()</span>
             <span class="k">if</span> <span class="n">ret</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">ret</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
@@ -125,6 +128,8 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;.recv_wait(): waiting&#39;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">sleep</span><span class="p">()</span>
             <span class="n">elapsed</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sleeptime</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">ret</span> <span class="ow">and</span> <span class="n">elapsed</span> <span class="o">&gt;=</span> <span class="n">timeout</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;.recv_wait_nolimit(): timeout at </span><span class="si">%f</span><span class="s1"> s&#39;</span><span class="p">,</span> <span class="n">timeout</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">ret</span></div>
 
 <div class="viewcode-block" id="IODriver.recv_wait_nolimit"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.IODriver.IODriver.recv_wait_nolimit">[docs]</a>    <span class="k">def</span> <span class="nf">recv_wait_nolimit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
@@ -142,6 +147,8 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">ret</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
         <span class="n">elapsed</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">timeout</span><span class="p">:</span>
+            <span class="n">timeout</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">timeout</span>
         <span class="k">while</span> <span class="kc">True</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="n">timeout</span> <span class="ow">or</span> <span class="n">elapsed</span> <span class="o">&lt;</span> <span class="n">timeout</span><span class="p">):</span>
             <span class="n">ret</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ipc_recv_nolimit</span><span class="p">()</span>
             <span class="k">if</span> <span class="n">ret</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">ret</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
@@ -149,6 +156,8 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;.recv_wait_nolimit(): waiting&#39;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">sleep</span><span class="p">()</span>
             <span class="n">elapsed</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sleeptime</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">ret</span> <span class="ow">and</span> <span class="n">elapsed</span> <span class="o">&gt;=</span> <span class="n">timeout</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;.recv_wait_nolimit(): timeout at </span><span class="si">%f</span><span class="s1"> s&#39;</span><span class="p">,</span> <span class="n">timeout</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">ret</span></div>
 
 <div class="viewcode-block" id="IODriver.ipc_send"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.IODriver.IODriver.ipc_send">[docs]</a>    <span class="k">def</span> <span class="nf">ipc_send</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
@@ -158,6 +167,7 @@
 <span class="sd">            str: The message to be sent.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">backwards</span><span class="o">.</span><span class="n">assert_bytes</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">=</span> <span class="s1">&#39;deliver&#39;</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;::ipc_send </span><span class="si">%d</span><span class="s1"> bytes&#39;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">))</span>
@@ -170,7 +180,8 @@
                     <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">=</span> <span class="s1">&#39;delivered&#39;</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">numSent</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">numSent</span> <span class="o">+</span> <span class="mi">1</span>
             <span class="k">except</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;.ipc_send(): exception&#39;</span><span class="p">)</span></div>
+                <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;.ipc_send(): exception&#39;</span><span class="p">)</span>
+                <span class="k">raise</span></div>
 
 <div class="viewcode-block" id="IODriver.ipc_recv"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.IODriver.IODriver.ipc_recv">[docs]</a>    <span class="k">def</span> <span class="nf">ipc_recv</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Receive a message smaller than maxMsgSize.</span>
@@ -188,13 +199,15 @@
                     <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;.ipc_recv(): mq closed&#39;</span><span class="p">)</span>
                 <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">mq</span><span class="o">.</span><span class="n">current_messages</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
                     <span class="n">data</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mq</span><span class="o">.</span><span class="n">receive</span><span class="p">()</span>
-                    <span class="n">ret</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+                    <span class="n">ret</span> <span class="o">=</span> <span class="n">data</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;.ipc_recv ret </span><span class="si">%d</span><span class="s1"> bytes&#39;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">ret</span><span class="p">))</span>
                 <span class="k">else</span><span class="p">:</span>
-                    <span class="n">ret</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+                    <span class="n">ret</span> <span class="o">=</span> <span class="n">backwards</span><span class="o">.</span><span class="n">unicode2bytes</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;.ipc_recv(): no messages in the queue&#39;</span><span class="p">)</span>
             <span class="k">except</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;.ipc_send(): exception mq&#39;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;.ipc_recv(): exception mq&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">ret</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">backwards</span><span class="o">.</span><span class="n">assert_bytes</span><span class="p">(</span><span class="n">ret</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">ret</span></div>
 
 <div class="viewcode-block" id="IODriver.ipc_send_nolimit"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.IODriver.IODriver.ipc_send_nolimit">[docs]</a>    <span class="k">def</span> <span class="nf">ipc_send_nolimit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
@@ -208,7 +221,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;::ipc_send_nolimit </span><span class="si">%d</span><span class="s1"> bytes&#39;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">))</span>
         <span class="n">prev</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="n">error</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">ipc_send</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%ld</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ipc_send</span><span class="p">(</span><span class="n">backwards</span><span class="o">.</span><span class="n">unicode2bytes</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%ld</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)))</span>
         <span class="k">while</span> <span class="n">prev</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="nb">next</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">prev</span> <span class="o">+</span> <span class="n">maxMsgSize</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">))</span>
@@ -239,8 +252,8 @@
         <span class="k">if</span> <span class="n">ret</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">ret</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">ret</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">leng_exp</span> <span class="o">=</span> <span class="n">long</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">ret</span><span class="p">))</span>
-            <span class="n">data</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+            <span class="n">leng_exp</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">ret</span><span class="p">))</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">backwards</span><span class="o">.</span><span class="n">unicode2bytes</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
             <span class="n">tries_orig</span> <span class="o">=</span> <span class="n">leng_exp</span> <span class="o">/</span> <span class="n">maxMsgSize</span> <span class="o">+</span> <span class="mi">5</span>
             <span class="n">tries</span> <span class="o">=</span> <span class="n">tries_orig</span>
             <span class="k">while</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">leng_exp</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">tries</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">):</span>
@@ -249,21 +262,27 @@
                     <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;.ipc_recv_nolimit: read interupted at </span><span class="si">%d</span><span class="s1"> of </span><span class="si">%d</span><span class="s1"> bytes.&#39;</span><span class="p">,</span>
                                <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">leng_exp</span><span class="p">))</span>
                     <span class="k">break</span>
-                <span class="n">data</span> <span class="o">+=</span> <span class="n">ret</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="n">data</span> <span class="o">+</span> <span class="n">ret</span>
                 <span class="n">tries</span> <span class="o">-=</span> <span class="mi">1</span>
-            <span class="k">if</span> <span class="n">tries</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">sleep</span><span class="p">()</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">==</span> <span class="n">leng_exp</span><span class="p">:</span>
                 <span class="n">ret</span><span class="p">,</span> <span class="n">leng</span> <span class="o">=</span> <span class="n">data</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">leng_exp</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%d</span><span class="s2"> bytes were recieved, but only </span><span class="si">%d</span><span class="s2"> were expected.&quot;</span><span class="p">,</span>
+                           <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">),</span> <span class="n">leng_exp</span><span class="p">)</span>
+                <span class="n">ret</span><span class="p">,</span> <span class="n">leng</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span>
             <span class="k">else</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;After </span><span class="si">%d</span><span class="s1"> tries, only </span><span class="si">%d</span><span class="s1"> of </span><span class="si">%d</span><span class="s1"> bytes were received.&#39;</span><span class="p">,</span>
                            <span class="n">tries_orig</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">),</span> <span class="n">leng_exp</span><span class="p">)</span>
                 <span class="n">ret</span><span class="p">,</span> <span class="n">leng</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span>
         <span class="k">except</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+            <span class="k">raise</span>
             <span class="n">ret</span><span class="p">,</span> <span class="n">leng</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;.ipc_recv_nolimit ret </span><span class="si">%d</span><span class="s1"> bytes&#39;</span><span class="p">,</span> <span class="n">leng</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">ret</span></div>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">n_msg</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">n_ipc_msg</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: The number of messages in the queue.&quot;&quot;&quot;</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mq</span><span class="p">:</span>
@@ -271,28 +290,30 @@
             <span class="k">else</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
                 <span class="k">return</span> <span class="mi">0</span>
 
-<div class="viewcode-block" id="IODriver.graceful_stop"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.IODriver.IODriver.graceful_stop">[docs]</a>    <span class="k">def</span> <span class="nf">graceful_stop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tries</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="IODriver.graceful_stop"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.IODriver.IODriver.graceful_stop">[docs]</a>    <span class="k">def</span> <span class="nf">graceful_stop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Stop the IODriver, first draining the message queue.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            tries (int, optional): Number of times driver should sleep while</span>
-<span class="sd">                waiting for the message queue to drain. Defaults to 10.</span>
+<span class="sd">            timeout (float, optional): Max time that should be waited. Defaults</span>
+<span class="sd">                to 0 and is set to attribute timeout.</span>
 <span class="sd">            \*\*kwargs: Additional keyword arguments are passed to the parent</span>
 <span class="sd">                class&#39;s graceful_stop method.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;.graceful_stop()&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">timeout</span><span class="p">:</span>
+            <span class="n">timeout</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">timeout</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
                 <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
                     <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">mq</span><span class="p">)</span> <span class="ow">or</span> <span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">mq</span><span class="o">.</span><span class="n">current_messages</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">or</span>
-                                         <span class="p">(</span><span class="n">tries</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)):</span>
+                                         <span class="p">(</span><span class="n">timeout</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">)):</span>
                         <span class="k">break</span>
                     <span class="k">if</span> <span class="n">DEBUG_SLEEPS</span><span class="p">:</span>
                         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;.graceful_stop(): draining </span><span class="si">%d</span><span class="s1"> messages&#39;</span><span class="p">,</span>
                                    <span class="bp">self</span><span class="o">.</span><span class="n">mq</span><span class="o">.</span><span class="n">current_messages</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">sleep</span><span class="p">()</span>
-                <span class="n">tries</span> <span class="o">-=</span> <span class="mi">1</span>
+                <span class="n">timeout</span> <span class="o">-=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sleeptime</span>
         <span class="k">except</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;::graceful_stop: exception&quot;</span><span class="p">)</span>
             <span class="c1"># raise</span>

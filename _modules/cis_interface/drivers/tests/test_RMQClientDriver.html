@@ -43,20 +43,20 @@
           <div class="body" role="main">
             
   <h1>Source code for cis_interface.drivers.tests.test_RMQClientDriver</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">os</span>
+<span></span><span class="c1"># import os</span>
 <span class="kn">import</span> <span class="nn">nose.tools</span> <span class="k">as</span> <span class="nn">nt</span>
 <span class="kn">import</span> <span class="nn">cis_interface.drivers.tests.test_RMQDriver</span> <span class="k">as</span> <span class="nn">parent1</span>
 <span class="kn">from</span> <span class="nn">cis_interface.drivers.tests.test_IODriver</span> <span class="k">import</span> <span class="n">IOInfo</span>
 <span class="kn">from</span> <span class="nn">cis_interface</span> <span class="k">import</span> <span class="n">runner</span>
-<span class="kn">from</span> <span class="nn">cis_interface.examples</span> <span class="k">import</span> <span class="n">yamls</span> <span class="k">as</span> <span class="n">ex_yamls</span>
+<span class="c1"># from cis_interface.examples import yamls as ex_yamls</span>
 
 
-<div class="viewcode-block" id="test_yaml"><a class="viewcode-back" href="../../../../cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_RMQClientDriver.test_yaml">[docs]</a><span class="k">def</span> <span class="nf">test_yaml</span><span class="p">():</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test Server/Client setup using runner.&quot;&quot;&quot;</span>
-    <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;FIB_ITERATIONS&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;3&#39;</span>
-    <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;FIB_SERVER_SLEEP_SECONDS&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;1&#39;</span>
-    <span class="n">cr</span> <span class="o">=</span> <span class="n">runner</span><span class="o">.</span><span class="n">get_runner</span><span class="p">(</span><span class="n">ex_yamls</span><span class="p">[</span><span class="s1">&#39;rpcfib_python&#39;</span><span class="p">])</span>
-    <span class="n">cr</span><span class="o">.</span><span class="n">run</span><span class="p">()</span></div>
+<span class="c1"># def test_yaml():</span>
+<span class="c1">#     r&quot;&quot;&quot;Test Server/Client setup using runner.&quot;&quot;&quot;</span>
+<span class="c1">#     os.environ[&#39;FIB_ITERATIONS&#39;] = &#39;3&#39;</span>
+<span class="c1">#     os.environ[&#39;FIB_SERVER_SLEEP_SECONDS&#39;] = &#39;0.002&#39;</span>
+<span class="c1">#     cr = runner.get_runner(ex_yamls[&#39;rpcfib_python&#39;])</span>
+<span class="c1">#     cr.run()</span>
 
 
 <div class="viewcode-block" id="TestRMQClientParam"><a class="viewcode-back" href="../../../../cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_RMQClientDriver.TestRMQClientParam">[docs]</a><span class="k">class</span> <span class="nc">TestRMQClientParam</span><span class="p">(</span><span class="n">parent1</span><span class="o">.</span><span class="n">TestRMQParam</span><span class="p">,</span> <span class="n">IOInfo</span><span class="p">):</span>
@@ -73,13 +73,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">args</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">attr_list</span> <span class="o">+=</span> <span class="p">[</span><span class="s1">&#39;request_queue&#39;</span><span class="p">,</span> <span class="s1">&#39;response&#39;</span><span class="p">,</span> <span class="s1">&#39;corr_id&#39;</span><span class="p">,</span>
                            <span class="s1">&#39;_deliveries&#39;</span><span class="p">,</span> <span class="s1">&#39;_acked&#39;</span><span class="p">,</span> <span class="s1">&#39;_nacked&#39;</span><span class="p">,</span>
-                           <span class="s1">&#39;_message_number&#39;</span><span class="p">]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_temp_queue</span> <span class="o">=</span> <span class="s1">&#39;TestRMQClientDriver_SERVER&#39;</span>
-        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;channel&#39;</span><span class="p">):</span>  <span class="c1"># , None):</span>
-            <span class="k">try</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">queue_purge</span><span class="p">(</span><span class="n">queue</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">temp_queue</span><span class="p">)</span>
-            <span class="k">except</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Could not purge test queue.&quot;</span><span class="p">)</span></div>
+                           <span class="s1">&#39;_message_number&#39;</span><span class="p">]</span></div>
             
 
 <div class="viewcode-block" id="TestRMQClientDriverNoStart"><a class="viewcode-back" href="../../../../cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_RMQClientDriver.TestRMQClientDriverNoStart">[docs]</a><span class="k">class</span> <span class="nc">TestRMQClientDriverNoStart</span><span class="p">(</span><span class="n">TestRMQClientParam</span><span class="p">,</span>
@@ -121,16 +115,21 @@
             <span class="n">namespace</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">namespace</span><span class="p">,</span> <span class="n">workingDir</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">workingDir</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">inst</span></div>
 
+    <span class="c1"># Disabled so that test message is not read by mistake</span>
+<div class="viewcode-block" id="TestRMQClientDriver.test_purge"><a class="viewcode-back" href="../../../../cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_RMQClientDriver.TestRMQClientDriver.test_purge">[docs]</a>    <span class="k">def</span> <span class="nf">test_purge</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test purge of queue.&quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
 <div class="viewcode-block" id="TestRMQClientDriver.test_msg"><a class="viewcode-back" href="../../../../cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_RMQClientDriver.TestRMQClientDriver.test_msg">[docs]</a>    <span class="k">def</span> <span class="nf">test_msg</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test routing of a message through the IPC &amp; RMQ queues.&quot;&quot;&quot;</span>
         <span class="c1"># Send message to IPC output &amp; receive from RMQ output</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">oipc</span><span class="o">.</span><span class="n">ipc_send_nolimit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">msg_short</span><span class="p">)</span>
         <span class="c1"># Receive on server side, then send back</span>
-        <span class="n">rmq_msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">srv_rmq</span><span class="o">.</span><span class="n">iipc</span><span class="o">.</span><span class="n">recv_wait_nolimit</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+        <span class="n">rmq_msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">srv_rmq</span><span class="o">.</span><span class="n">iipc</span><span class="o">.</span><span class="n">recv_wait_nolimit</span><span class="p">()</span>
         <span class="n">nt</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="n">rmq_msg</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">msg_short</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">srv_rmq</span><span class="o">.</span><span class="n">oipc</span><span class="o">.</span><span class="n">ipc_send_nolimit</span><span class="p">(</span><span class="n">rmq_msg</span><span class="p">)</span>
         <span class="c1"># Receive response from server</span>
-        <span class="n">ipc_msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">iipc</span><span class="o">.</span><span class="n">recv_wait_nolimit</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+        <span class="n">ipc_msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">iipc</span><span class="o">.</span><span class="n">recv_wait_nolimit</span><span class="p">()</span>
         <span class="n">nt</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="n">ipc_msg</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">msg_short</span><span class="p">)</span></div></div>
 </pre></div>
 

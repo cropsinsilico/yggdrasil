@@ -28,7 +28,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="cis_interface.tests package" href="cis_interface.tests.html" />
-    <link rel="prev" title="cis_interface.examples package" href="cis_interface.examples.html" />
+    <link rel="prev" title="cis_interface.examples.tests package" href="cis_interface.examples.tests.html" />
    
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
   
@@ -53,7 +53,7 @@
 <span id="cis-interface-interface-psiinterface-module"></span><h2>cis_interface.interface.PsiInterface module<a class="headerlink" href="#module-cis_interface.interface.PsiInterface" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="cis_interface.interface.PsiInterface.PsiAsciiFileInput">
-<em class="property">class </em><code class="descclassname">cis_interface.interface.PsiInterface.</code><code class="descname">PsiAsciiFileInput</code><span class="sig-paren">(</span><em>name</em>, <em>src_type=1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/PsiInterface.html#PsiAsciiFileInput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.PsiInterface.PsiAsciiFileInput" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">cis_interface.interface.PsiInterface.</code><code class="descname">PsiAsciiFileInput</code><span class="sig-paren">(</span><em>name</em>, <em>src_type=1</em>, <em>matlab=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/PsiInterface.html#PsiAsciiFileInput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.PsiInterface.PsiAsciiFileInput" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/2/library/functions.html#object" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
 <p>Class for generic ASCII input from either a file or message queue.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -95,7 +95,7 @@ Otherwise input is received from a message queue. Defauts to 1.</li>
 
 <dl class="class">
 <dt id="cis_interface.interface.PsiInterface.PsiAsciiFileOutput">
-<em class="property">class </em><code class="descclassname">cis_interface.interface.PsiInterface.</code><code class="descname">PsiAsciiFileOutput</code><span class="sig-paren">(</span><em>name</em>, <em>dst_type=1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/PsiInterface.html#PsiAsciiFileOutput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.PsiInterface.PsiAsciiFileOutput" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">cis_interface.interface.PsiInterface.</code><code class="descname">PsiAsciiFileOutput</code><span class="sig-paren">(</span><em>name</em>, <em>dst_type=1</em>, <em>matlab=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/PsiInterface.html#PsiAsciiFileOutput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.PsiInterface.PsiAsciiFileOutput" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/2/library/functions.html#object" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
 <p>Class for generic ASCII output to either a local file or message
 queue.</p>
@@ -142,7 +142,7 @@ Otherwise, output is sent to a message queue. Defaults to 1.</li>
 
 <dl class="class">
 <dt id="cis_interface.interface.PsiInterface.PsiAsciiTableInput">
-<em class="property">class </em><code class="descclassname">cis_interface.interface.PsiInterface.</code><code class="descname">PsiAsciiTableInput</code><span class="sig-paren">(</span><em>name</em>, <em>src_type=1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/PsiInterface.html#PsiAsciiTableInput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.PsiInterface.PsiAsciiTableInput" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">cis_interface.interface.PsiInterface.</code><code class="descname">PsiAsciiTableInput</code><span class="sig-paren">(</span><em>name</em>, <em>src_type=1</em>, <em>matlab=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/PsiInterface.html#PsiAsciiTableInput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.PsiInterface.PsiAsciiTableInput" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/2/library/functions.html#object" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
 <p>Class for handling table-like formatted input.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -205,7 +205,7 @@ Otherwise, the input is received from a message queue. Defaults to
 
 <dl class="class">
 <dt id="cis_interface.interface.PsiInterface.PsiAsciiTableOutput">
-<em class="property">class </em><code class="descclassname">cis_interface.interface.PsiInterface.</code><code class="descname">PsiAsciiTableOutput</code><span class="sig-paren">(</span><em>name</em>, <em>fmt</em>, <em>dst_type=1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/PsiInterface.html#PsiAsciiTableOutput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.PsiInterface.PsiAsciiTableOutput" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">cis_interface.interface.PsiInterface.</code><code class="descname">PsiAsciiTableOutput</code><span class="sig-paren">(</span><em>name</em>, <em>fmt</em>, <em>dst_type=1</em>, <em>matlab=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/PsiInterface.html#PsiAsciiTableOutput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.PsiInterface.PsiAsciiTableOutput" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/2/library/functions.html#object" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
 <p>Class for handling table-like formatted output.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -275,7 +275,7 @@ message queue.</p>
 
 <dl class="class">
 <dt id="cis_interface.interface.PsiInterface.PsiInput">
-<em class="property">class </em><code class="descclassname">cis_interface.interface.PsiInterface.</code><code class="descname">PsiInput</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/PsiInterface.html#PsiInput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.PsiInterface.PsiInput" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">cis_interface.interface.PsiInterface.</code><code class="descname">PsiInput</code><span class="sig-paren">(</span><em>name</em>, <em>matlab=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/PsiInterface.html#PsiInput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.PsiInterface.PsiInput" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/2/library/functions.html#object" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
 <p>Class for handling input from a message queue.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -366,9 +366,34 @@ parts.</p>
 
 </dd></dl>
 
+<dl class="function">
+<dt id="cis_interface.interface.PsiInterface.PsiMatlab">
+<code class="descclassname">cis_interface.interface.PsiInterface.</code><code class="descname">PsiMatlab</code><span class="sig-paren">(</span><em>_type</em>, <em>args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/PsiInterface.html#PsiMatlab"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.PsiInterface.PsiMatlab" title="Permalink to this definition">¶</a></dt>
+<dd><p>Short interface to identify functions called by Matlab.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>_type</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; Name of class that should be returned.</li>
+<li><strong>args</strong> (<em>list</em>) &#8211; Additional arguments that should be passed to class
+initializer.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">An instance of the requested class.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">obj</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 <dl class="class">
 <dt id="cis_interface.interface.PsiInterface.PsiOutput">
-<em class="property">class </em><code class="descclassname">cis_interface.interface.PsiInterface.</code><code class="descname">PsiOutput</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/PsiInterface.html#PsiOutput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.PsiInterface.PsiOutput" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">cis_interface.interface.PsiInterface.</code><code class="descname">PsiOutput</code><span class="sig-paren">(</span><em>name</em>, <em>matlab=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/PsiInterface.html#PsiOutput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.PsiInterface.PsiOutput" title="Permalink to this definition">¶</a></dt>
 <dd><p>Class for handling output to a message queue.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -439,7 +464,7 @@ a message queue key.</td>
 
 <dl class="class">
 <dt id="cis_interface.interface.PsiInterface.PsiPickleInput">
-<em class="property">class </em><code class="descclassname">cis_interface.interface.PsiInterface.</code><code class="descname">PsiPickleInput</code><span class="sig-paren">(</span><em>name</em>, <em>src_type=1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/PsiInterface.html#PsiPickleInput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.PsiInterface.PsiPickleInput" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">cis_interface.interface.PsiInterface.</code><code class="descname">PsiPickleInput</code><span class="sig-paren">(</span><em>name</em>, <em>src_type=1</em>, <em>matlab=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/PsiInterface.html#PsiPickleInput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.PsiInterface.PsiPickleInput" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/2/library/functions.html#object" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
 <p>Class for handling pickled input.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -482,7 +507,7 @@ Otherwise, the input is received from a message queue. Defaults to
 
 <dl class="class">
 <dt id="cis_interface.interface.PsiInterface.PsiPickleOutput">
-<em class="property">class </em><code class="descclassname">cis_interface.interface.PsiInterface.</code><code class="descname">PsiPickleOutput</code><span class="sig-paren">(</span><em>name</em>, <em>dst_type=1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/PsiInterface.html#PsiPickleOutput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.PsiInterface.PsiPickleOutput" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">cis_interface.interface.PsiInterface.</code><code class="descname">PsiPickleOutput</code><span class="sig-paren">(</span><em>name</em>, <em>dst_type=1</em>, <em>matlab=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/PsiInterface.html#PsiPickleOutput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.PsiInterface.PsiPickleOutput" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/2/library/functions.html#object" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
 <p>Class for handling pickled output.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -525,8 +550,9 @@ message queue.</p>
 
 <dl class="class">
 <dt id="cis_interface.interface.PsiInterface.PsiRpc">
-<em class="property">class </em><code class="descclassname">cis_interface.interface.PsiInterface.</code><code class="descname">PsiRpc</code><span class="sig-paren">(</span><em>outname</em>, <em>outfmt</em>, <em>inname</em>, <em>infmt</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/PsiInterface.html#PsiRpc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.PsiInterface.PsiRpc" title="Permalink to this definition">¶</a></dt>
-<dd><p>Class for sending a message and then receiving a response.</p>
+<em class="property">class </em><code class="descclassname">cis_interface.interface.PsiInterface.</code><code class="descname">PsiRpc</code><span class="sig-paren">(</span><em>outname</em>, <em>outfmt</em>, <em>inname</em>, <em>infmt</em>, <em>matlab=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/PsiInterface.html#PsiRpc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.PsiInterface.PsiRpc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/2/library/functions.html#object" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+<p>Class for sending a message and then receiving a response.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -610,6 +636,51 @@ to create the message.</td>
 </table>
 </dd></dl>
 
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.interface.PsiInterface.PsiRpcClient">
+<em class="property">class </em><code class="descclassname">cis_interface.interface.PsiInterface.</code><code class="descname">PsiRpcClient</code><span class="sig-paren">(</span><em>name</em>, <em>outfmt</em>, <em>infmt</em>, <em>matlab=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/PsiInterface.html#PsiRpcClient"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.PsiInterface.PsiRpcClient" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.interface.PsiInterface.PsiRpc" title="cis_interface.interface.PsiInterface.PsiRpc"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.interface.PsiInterface.PsiRpc</span></code></a></p>
+<p>Class for handling requests and response to an RPC Server from a
+client.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; The name of the server queues.</li>
+<li><strong>outfmt</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; Format string used to format variables in a
+message sent to the request queue.</li>
+<li><strong>infmt</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; Format string used to recover variables from
+messages received from the response queue.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.interface.PsiInterface.PsiRpcServer">
+<em class="property">class </em><code class="descclassname">cis_interface.interface.PsiInterface.</code><code class="descname">PsiRpcServer</code><span class="sig-paren">(</span><em>name</em>, <em>infmt</em>, <em>outfmt</em>, <em>matlab=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/PsiInterface.html#PsiRpcServer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.PsiInterface.PsiRpcServer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.interface.PsiInterface.PsiRpc" title="cis_interface.interface.PsiInterface.PsiRpc"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.interface.PsiInterface.PsiRpc</span></code></a></p>
+<p>Class for handling requests and response for an RPC Server.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; The name of the server queues.</li>
+<li><strong>infmt</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; Format string used to recover variables from
+messages received from the request queue.</li>
+<li><strong>outfmt</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; Format string used to format variables in a
+message sent to the response queue.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </div>
@@ -735,7 +806,7 @@ or None if the format does not match.</p>
 <p>Routines for interfacing with framework from Python/C/C++/Matlab.</p>
 <dl class="class">
 <dt id="cis_interface.interface.PsiInput">
-<em class="property">class </em><code class="descclassname">cis_interface.interface.</code><code class="descname">PsiInput</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/PsiInterface.html#PsiInput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.PsiInput" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">cis_interface.interface.</code><code class="descname">PsiInput</code><span class="sig-paren">(</span><em>name</em>, <em>matlab=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/PsiInterface.html#PsiInput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.PsiInput" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/2/library/functions.html#object" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
 <p>Class for handling input from a message queue.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -828,7 +899,7 @@ parts.</p>
 
 <dl class="class">
 <dt id="cis_interface.interface.PsiOutput">
-<em class="property">class </em><code class="descclassname">cis_interface.interface.</code><code class="descname">PsiOutput</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/PsiInterface.html#PsiOutput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.PsiOutput" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">cis_interface.interface.</code><code class="descname">PsiOutput</code><span class="sig-paren">(</span><em>name</em>, <em>matlab=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/PsiInterface.html#PsiOutput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.PsiOutput" title="Permalink to this definition">¶</a></dt>
 <dd><p>Class for handling output to a message queue.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -899,8 +970,9 @@ a message queue key.</td>
 
 <dl class="class">
 <dt id="cis_interface.interface.PsiRpc">
-<em class="property">class </em><code class="descclassname">cis_interface.interface.</code><code class="descname">PsiRpc</code><span class="sig-paren">(</span><em>outname</em>, <em>outfmt</em>, <em>inname</em>, <em>infmt</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/PsiInterface.html#PsiRpc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.PsiRpc" title="Permalink to this definition">¶</a></dt>
-<dd><p>Class for sending a message and then receiving a response.</p>
+<em class="property">class </em><code class="descclassname">cis_interface.interface.</code><code class="descname">PsiRpc</code><span class="sig-paren">(</span><em>outname</em>, <em>outfmt</em>, <em>inname</em>, <em>infmt</em>, <em>matlab=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/PsiInterface.html#PsiRpc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.PsiRpc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/2/library/functions.html#object" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+<p>Class for sending a message and then receiving a response.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -1011,7 +1083,7 @@ to create the message.</td>
   <li><a href="index.html">Documentation overview</a><ul>
   <li><a href="code.html">cis_interface</a><ul>
   <li><a href="cis_interface.html">cis_interface package</a><ul>
-      <li>Previous: <a href="cis_interface.examples.html" title="previous chapter">cis_interface.examples package</a></li>
+      <li>Previous: <a href="cis_interface.examples.tests.html" title="previous chapter">cis_interface.examples.tests package</a></li>
       <li>Next: <a href="cis_interface.tests.html" title="next chapter">cis_interface.tests package</a></li>
   </ul></li>
   </ul></li>

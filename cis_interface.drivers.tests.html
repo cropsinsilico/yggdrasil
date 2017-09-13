@@ -387,45 +387,9 @@
 </dd></dl>
 
 <dl class="method">
-<dt id="cis_interface.drivers.tests.test_Driver.TestDriverNoStart.test_critical">
-<code class="descname">test_critical</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/tests/test_Driver.html#TestDriverNoStart.test_critical"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.tests.test_Driver.TestDriverNoStart.test_critical" title="Permalink to this definition">¶</a></dt>
-<dd><p>Test print of critical statement.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="cis_interface.drivers.tests.test_Driver.TestDriverNoStart.test_debug">
-<code class="descname">test_debug</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/tests/test_Driver.html#TestDriverNoStart.test_debug"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.tests.test_Driver.TestDriverNoStart.test_debug" title="Permalink to this definition">¶</a></dt>
-<dd><p>Test print of debug statement.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="cis_interface.drivers.tests.test_Driver.TestDriverNoStart.test_error">
-<code class="descname">test_error</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/tests/test_Driver.html#TestDriverNoStart.test_error"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.tests.test_Driver.TestDriverNoStart.test_error" title="Permalink to this definition">¶</a></dt>
-<dd><p>Test print of error statement.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="cis_interface.drivers.tests.test_Driver.TestDriverNoStart.test_exception">
-<code class="descname">test_exception</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/tests/test_Driver.html#TestDriverNoStart.test_exception"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.tests.test_Driver.TestDriverNoStart.test_exception" title="Permalink to this definition">¶</a></dt>
-<dd><p>Test print of exception.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="cis_interface.drivers.tests.test_Driver.TestDriverNoStart.test_info">
-<code class="descname">test_info</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/tests/test_Driver.html#TestDriverNoStart.test_info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.tests.test_Driver.TestDriverNoStart.test_info" title="Permalink to this definition">¶</a></dt>
-<dd><p>Test print of info statement.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="cis_interface.drivers.tests.test_Driver.TestDriverNoStart.test_printStatus">
-<code class="descname">test_printStatus</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/tests/test_Driver.html#TestDriverNoStart.test_printStatus"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.tests.test_Driver.TestDriverNoStart.test_printStatus" title="Permalink to this definition">¶</a></dt>
-<dd><p>Test mechanism to print the status of the driver.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="cis_interface.drivers.tests.test_Driver.TestDriverNoStart.test_warn">
-<code class="descname">test_warn</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/tests/test_Driver.html#TestDriverNoStart.test_warn"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.tests.test_Driver.TestDriverNoStart.test_warn" title="Permalink to this definition">¶</a></dt>
-<dd><p>Test print of warning statement.</p>
+<dt id="cis_interface.drivers.tests.test_Driver.TestDriverNoStart.test_prints">
+<code class="descname">test_prints</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/tests/test_Driver.html#TestDriverNoStart.test_prints"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.tests.test_Driver.TestDriverNoStart.test_prints" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test logging at various levels.</p>
 </dd></dl>
 
 </dd></dl>
@@ -636,6 +600,12 @@ driver instance is created.</p>
 <dt id="cis_interface.drivers.tests.test_FileOutputDriver.TestFileOutputDriver.assert_after_terminate">
 <code class="descname">assert_after_terminate</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/tests/test_FileOutputDriver.html#TestFileOutputDriver.assert_after_terminate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.tests.test_FileOutputDriver.TestFileOutputDriver.assert_after_terminate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Assertions to make after terminating the driver instance.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.drivers.tests.test_FileOutputDriver.TestFileOutputDriver.run_before_terminate">
+<code class="descname">run_before_terminate</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/tests/test_FileOutputDriver.html#TestFileOutputDriver.run_before_terminate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.tests.test_FileOutputDriver.TestFileOutputDriver.run_before_terminate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Commands to run while the instance is running, before terminate.</p>
 </dd></dl>
 
 <dl class="method">
@@ -877,6 +847,12 @@ written to.</td>
 </dd></dl>
 
 <dl class="method">
+<dt id="cis_interface.drivers.tests.test_IODriver.TestIODriver.setup">
+<code class="descname">setup</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/tests/test_IODriver.html#TestIODriver.setup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.tests.test_IODriver.TestIODriver.setup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Ensure that there are not messages in the queue at exit.</p>
+</dd></dl>
+
+<dl class="method">
 <dt id="cis_interface.drivers.tests.test_IODriver.TestIODriver.test_early_close">
 <code class="descname">test_early_close</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/tests/test_IODriver.html#TestIODriver.test_early_close"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.tests.test_IODriver.TestIODriver.test_early_close" title="Permalink to this definition">¶</a></dt>
 <dd><p>Test early deletion of message queue.</p>
@@ -1002,6 +978,12 @@ written to.</td>
 </dd></dl>
 
 <dl class="method">
+<dt id="cis_interface.drivers.tests.test_MatOutputDriver.TestMatOutputDriver.run_before_terminate">
+<code class="descname">run_before_terminate</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/tests/test_MatOutputDriver.html#TestMatOutputDriver.run_before_terminate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.tests.test_MatOutputDriver.TestMatOutputDriver.run_before_terminate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Commands to run while the instance is running, before terminate.</p>
+</dd></dl>
+
+<dl class="method">
 <dt id="cis_interface.drivers.tests.test_MatOutputDriver.TestMatOutputDriver.setup">
 <code class="descname">setup</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/tests/test_MatOutputDriver.html#TestMatOutputDriver.setup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.tests.test_MatOutputDriver.TestMatOutputDriver.setup" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a driver instance and start the driver.</p>
@@ -1079,12 +1061,6 @@ written to.</td>
 <dd><p>Dummy test to stop matlab.</p>
 </dd></dl>
 
-</dd></dl>
-
-<dl class="function">
-<dt id="cis_interface.drivers.tests.test_MatlabModelDriver.test_multiple">
-<code class="descclassname">cis_interface.drivers.tests.test_MatlabModelDriver.</code><code class="descname">test_multiple</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/tests/test_MatlabModelDriver.html#test_multiple"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.tests.test_MatlabModelDriver.test_multiple" title="Permalink to this definition">¶</a></dt>
-<dd><p>Test that creates multiple matlab drivers.</p>
 </dd></dl>
 
 </div>
@@ -1222,6 +1198,12 @@ written to.</td>
 <dd><p>Test routing of a message through the IPC &amp; RMQ queues.</p>
 </dd></dl>
 
+<dl class="method">
+<dt id="cis_interface.drivers.tests.test_RMQClientDriver.TestRMQClientDriver.test_purge">
+<code class="descname">test_purge</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/tests/test_RMQClientDriver.html#TestRMQClientDriver.test_purge"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.tests.test_RMQClientDriver.TestRMQClientDriver.test_purge" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test purge of queue.</p>
+</dd></dl>
+
 </dd></dl>
 
 <dl class="class">
@@ -1252,12 +1234,6 @@ written to.</td>
 </dl>
 </dd></dl>
 
-<dl class="function">
-<dt id="cis_interface.drivers.tests.test_RMQClientDriver.test_yaml">
-<code class="descclassname">cis_interface.drivers.tests.test_RMQClientDriver.</code><code class="descname">test_yaml</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/tests/test_RMQClientDriver.html#test_yaml"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.tests.test_RMQClientDriver.test_yaml" title="Permalink to this definition">¶</a></dt>
-<dd><p>Test Server/Client setup using runner.</p>
-</dd></dl>
-
 </div>
 <div class="section" id="module-cis_interface.drivers.tests.test_RMQDriver">
 <span id="cis-interface-drivers-tests-test-rmqdriver-module"></span><h2>cis_interface.drivers.tests.test_RMQDriver module<a class="headerlink" href="#module-cis_interface.drivers.tests.test_RMQDriver" title="Permalink to this headline">¶</a></h2>
@@ -1279,46 +1255,10 @@ written to.</td>
 <dd><p>Make sure the connection is closed.</p>
 </dd></dl>
 
-<dl class="attribute">
-<dt id="cis_interface.drivers.tests.test_RMQDriver.TestRMQDriver.channel">
-<code class="descname">channel</code><a class="headerlink" href="#cis_interface.drivers.tests.test_RMQDriver.TestRMQDriver.channel" title="Permalink to this definition">¶</a></dt>
-<dd><p>Temporary channel.</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="cis_interface.drivers.tests.test_RMQDriver.TestRMQDriver.connection">
-<code class="descname">connection</code><a class="headerlink" href="#cis_interface.drivers.tests.test_RMQDriver.TestRMQDriver.connection" title="Permalink to this definition">¶</a></dt>
-<dd><p>Temporary connection.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="cis_interface.drivers.tests.test_RMQDriver.TestRMQDriver.declare_temp_queue">
-<code class="descname">declare_temp_queue</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/tests/test_RMQDriver.html#TestRMQDriver.declare_temp_queue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.tests.test_RMQDriver.TestRMQDriver.declare_temp_queue" title="Permalink to this definition">¶</a></dt>
-<dd><p>Create a blocking connection, channel, and queue for testing.</p>
-</dd></dl>
-
 <dl class="method">
 <dt id="cis_interface.drivers.tests.test_RMQDriver.TestRMQDriver.teardown">
 <code class="descname">teardown</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/tests/test_RMQDriver.html#TestRMQDriver.teardown"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.tests.test_RMQDriver.TestRMQDriver.teardown" title="Permalink to this definition">¶</a></dt>
 <dd><p>Make sure the queue is empty before closing the driver.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="cis_interface.drivers.tests.test_RMQDriver.TestRMQDriver.temp_basic_get">
-<code class="descname">temp_basic_get</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/tests/test_RMQDriver.html#TestRMQDriver.temp_basic_get"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.tests.test_RMQDriver.TestRMQDriver.temp_basic_get" title="Permalink to this definition">¶</a></dt>
-<dd><p>Do basic_get from the temporary queue.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="cis_interface.drivers.tests.test_RMQDriver.TestRMQDriver.temp_basic_pub">
-<code class="descname">temp_basic_pub</code><span class="sig-paren">(</span><em>msg</em>, <em>routing_key=None</em>, <em>properties=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/tests/test_RMQDriver.html#TestRMQDriver.temp_basic_pub"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.tests.test_RMQDriver.TestRMQDriver.temp_basic_pub" title="Permalink to this definition">¶</a></dt>
-<dd><p>Do basic_publish tot he temporary queue.</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="cis_interface.drivers.tests.test_RMQDriver.TestRMQDriver.temp_queue">
-<code class="descname">temp_queue</code><a class="headerlink" href="#cis_interface.drivers.tests.test_RMQDriver.TestRMQDriver.temp_queue" title="Permalink to this definition">¶</a></dt>
-<dd><p>Temporary queue for responses etc.</p>
 </dd></dl>
 
 <dl class="method">
@@ -1346,7 +1286,7 @@ written to.</td>
 <dl class="class">
 <dt id="cis_interface.drivers.tests.test_RMQDriver.TestRMQParam">
 <em class="property">class </em><code class="descclassname">cis_interface.drivers.tests.test_RMQDriver.</code><code class="descname">TestRMQParam</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/tests/test_RMQDriver.html#TestRMQParam"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.tests.test_RMQDriver.TestRMQParam" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#cis_interface.drivers.tests.test_Driver.TestParam" title="cis_interface.drivers.tests.test_Driver.TestParam"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.drivers.tests.test_Driver.TestParam</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.drivers.tests.test_Driver.TestParam" title="cis_interface.drivers.tests.test_Driver.TestParam"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.drivers.tests.test_Driver.TestParam</span></code></a>, <a class="reference internal" href="#cis_interface.drivers.tests.test_IODriver.IOInfo" title="cis_interface.drivers.tests.test_IODriver.IOInfo"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.drivers.tests.test_IODriver.IOInfo</span></code></a></p>
 <p>Test parameters for RMQDriver class.</p>
 <dl class="docutils">
 <dt>Attributes (in addition to parent class&#8217;s):</dt>
@@ -1382,6 +1322,18 @@ written to.</td>
 <dt id="cis_interface.drivers.tests.test_RMQInputDriver.TestRMQInputDriver.test_RMQ_recv_nolimit">
 <code class="descname">test_RMQ_recv_nolimit</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/tests/test_RMQInputDriver.html#TestRMQInputDriver.test_RMQ_recv_nolimit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.tests.test_RMQInputDriver.TestRMQInputDriver.test_RMQ_recv_nolimit" title="Permalink to this definition">¶</a></dt>
 <dd><p>Receive a large message from AMQP server.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.drivers.tests.test_RMQInputDriver.TestRMQInputDriver.test_early_close">
+<code class="descname">test_early_close</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/tests/test_RMQInputDriver.html#TestRMQInputDriver.test_early_close"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.tests.test_RMQInputDriver.TestRMQInputDriver.test_early_close" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test early deletion of message queue.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.drivers.tests.test_RMQInputDriver.TestRMQInputDriver.test_purge">
+<code class="descname">test_purge</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/tests/test_RMQInputDriver.html#TestRMQInputDriver.test_purge"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.tests.test_RMQInputDriver.TestRMQInputDriver.test_purge" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test purge of queue.</p>
 </dd></dl>
 
 </dd></dl>
@@ -1459,6 +1411,18 @@ written to.</td>
 <dd><p>Send a long message to the AMQP server.</p>
 </dd></dl>
 
+<dl class="method">
+<dt id="cis_interface.drivers.tests.test_RMQOutputDriver.TestRMQOutputDriver.test_early_close">
+<code class="descname">test_early_close</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/tests/test_RMQOutputDriver.html#TestRMQOutputDriver.test_early_close"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.tests.test_RMQOutputDriver.TestRMQOutputDriver.test_early_close" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test early deletion of message queue.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.drivers.tests.test_RMQOutputDriver.TestRMQOutputDriver.test_purge">
+<code class="descname">test_purge</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/tests/test_RMQOutputDriver.html#TestRMQOutputDriver.test_purge"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.tests.test_RMQOutputDriver.TestRMQOutputDriver.test_purge" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test purge of queue.</p>
+</dd></dl>
+
 </dd></dl>
 
 <dl class="class">
@@ -1478,7 +1442,7 @@ written to.</td>
 <dl class="class">
 <dt id="cis_interface.drivers.tests.test_RMQOutputDriver.TestRMQOutputParam">
 <em class="property">class </em><code class="descclassname">cis_interface.drivers.tests.test_RMQOutputDriver.</code><code class="descname">TestRMQOutputParam</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/tests/test_RMQOutputDriver.html#TestRMQOutputParam"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.tests.test_RMQOutputDriver.TestRMQOutputParam" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#cis_interface.drivers.tests.test_RMQDriver.TestRMQParam" title="cis_interface.drivers.tests.test_RMQDriver.TestRMQParam"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.drivers.tests.test_RMQDriver.TestRMQParam</span></code></a>, <a class="reference internal" href="#cis_interface.drivers.tests.test_IODriver.IOInfo" title="cis_interface.drivers.tests.test_IODriver.IOInfo"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.drivers.tests.test_IODriver.IOInfo</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.drivers.tests.test_RMQDriver.TestRMQParam" title="cis_interface.drivers.tests.test_RMQDriver.TestRMQParam"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.drivers.tests.test_RMQDriver.TestRMQParam</span></code></a></p>
 <p>Test parameters for RMQOutputDriver.</p>
 <dl class="docutils">
 <dt>Attributes (in addition to parent class&#8217;s):</dt>
@@ -1505,6 +1469,36 @@ written to.</td>
 </dd>
 </dl>
 <dl class="method">
+<dt id="cis_interface.drivers.tests.test_RMQServerDriver.TestRMQServerDriver.create_in_rmq">
+<code class="descname">create_in_rmq</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/tests/test_RMQServerDriver.html#TestRMQServerDriver.create_in_rmq"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.tests.test_RMQServerDriver.TestRMQServerDriver.create_in_rmq" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a blocking connection, channel, and queue for testing.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.drivers.tests.test_RMQServerDriver.TestRMQServerDriver.destroy_in_rmq">
+<code class="descname">destroy_in_rmq</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/tests/test_RMQServerDriver.html#TestRMQServerDriver.destroy_in_rmq"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.tests.test_RMQServerDriver.TestRMQServerDriver.destroy_in_rmq" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove blocking connection, channel, and queue.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.drivers.tests.test_RMQServerDriver.TestRMQServerDriver.setup">
+<code class="descname">setup</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/tests/test_RMQServerDriver.html#TestRMQServerDriver.setup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.tests.test_RMQServerDriver.TestRMQServerDriver.setup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a driver instance and start the driver.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.drivers.tests.test_RMQServerDriver.TestRMQServerDriver.teardown">
+<code class="descname">teardown</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/tests/test_RMQServerDriver.html#TestRMQServerDriver.teardown"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.tests.test_RMQServerDriver.TestRMQServerDriver.teardown" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove the instance, stoppping it.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.drivers.tests.test_RMQServerDriver.TestRMQServerDriver.temp_basic_get">
+<code class="descname">temp_basic_get</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/tests/test_RMQServerDriver.html#TestRMQServerDriver.temp_basic_get"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.tests.test_RMQServerDriver.TestRMQServerDriver.temp_basic_get" title="Permalink to this definition">¶</a></dt>
+<dd><p>Do basic_get from the temporary queue.</p>
+</dd></dl>
+
+<dl class="method">
 <dt id="cis_interface.drivers.tests.test_RMQServerDriver.TestRMQServerDriver.test_client_count">
 <code class="descname">test_client_count</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/tests/test_RMQServerDriver.html#TestRMQServerDriver.test_client_count"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.tests.test_RMQServerDriver.TestRMQServerDriver.test_client_count" title="Permalink to this definition">¶</a></dt>
 <dd><p>Test to ensure client count is correct.</p>
@@ -1514,6 +1508,12 @@ written to.</td>
 <dt id="cis_interface.drivers.tests.test_RMQServerDriver.TestRMQServerDriver.test_msg">
 <code class="descname">test_msg</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/tests/test_RMQServerDriver.html#TestRMQServerDriver.test_msg"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.tests.test_RMQServerDriver.TestRMQServerDriver.test_msg" title="Permalink to this definition">¶</a></dt>
 <dd><p>Test routing of a message through the IPC &amp; RMQ queues.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.drivers.tests.test_RMQServerDriver.TestRMQServerDriver.test_purge">
+<code class="descname">test_purge</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/tests/test_RMQServerDriver.html#TestRMQServerDriver.test_purge"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.tests.test_RMQServerDriver.TestRMQServerDriver.test_purge" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test purge of queue.</p>
 </dd></dl>
 
 </dd></dl>

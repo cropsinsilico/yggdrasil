@@ -1,0 +1,178 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>cis_interface.config &#8212; cis_interface 0.0.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for cis_interface.config</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module imports the configuration for cis_interface.</span>
+
+<span class="sd">.. todo::</span>
+<span class="sd">   Remove reference to environment variables for accessing config options.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">cis_interface.backwards</span> <span class="k">import</span> <span class="n">configparser</span>
+
+
+<div class="viewcode-block" id="CisConfigParser"><a class="viewcode-back" href="../../cis_interface.html#cis_interface.config.CisConfigParser">[docs]</a><span class="k">class</span> <span class="nc">CisConfigParser</span><span class="p">(</span><span class="n">configparser</span><span class="o">.</span><span class="n">ConfigParser</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Config parser that returns None if option not provided on get.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="CisConfigParser.get"><a class="viewcode-back" href="../../cis_interface.html#cis_interface.config.CisConfigParser.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">section</span><span class="p">,</span> <span class="n">option</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Return None if the section/option does not exist.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            section (str): Name of section.</span>
+<span class="sd">            option (str): Name of option in section.</span>
+<span class="sd">            default (obj, optional): Value that should be returned if the</span>
+<span class="sd">                section and/or option are not found or are an empty string.</span>
+<span class="sd">                Defaults to None.</span>
+<span class="sd">            **kwargs: Additional keyword arguments are passed to the parent</span>
+<span class="sd">                class&#39;s get.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            obj: String entry if the section &amp; option exist, otherwise default.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">section</span> <span class="o">=</span> <span class="n">section</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+        <span class="n">option</span> <span class="o">=</span> <span class="n">option</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_section</span><span class="p">(</span><span class="n">section</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_option</span><span class="p">(</span><span class="n">section</span><span class="p">,</span> <span class="n">option</span><span class="p">):</span>
+            <span class="c1"># Super does not work for ConfigParser as not inherited from object</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">configparser</span><span class="o">.</span><span class="n">ConfigParser</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">section</span><span class="p">,</span> <span class="n">option</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="c1"># Count empty strings as not provided</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">out</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">default</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">out</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">default</span></div></div>
+        
+        
+<span class="c1"># In order read: defaults, user, local files</span>
+<span class="n">cis_cfg</span> <span class="o">=</span> <span class="n">CisConfigParser</span><span class="p">()</span>
+<span class="n">config_file</span> <span class="o">=</span> <span class="s1">&#39;.cis_interface.cfg&#39;</span>
+<span class="n">def_config_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span> <span class="s1">&#39;defaults.cfg&#39;</span><span class="p">)</span>
+<span class="n">usr_config_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;~&#39;</span><span class="p">,</span> <span class="n">config_file</span><span class="p">))</span>
+<span class="n">loc_config_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(),</span> <span class="n">config_file</span><span class="p">)</span>
+<span class="k">assert</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">def_config_file</span><span class="p">))</span>
+<span class="n">files</span> <span class="o">=</span> <span class="p">[</span><span class="n">def_config_file</span><span class="p">,</span> <span class="n">usr_config_file</span><span class="p">,</span> <span class="n">loc_config_file</span><span class="p">]</span>
+<span class="n">cis_cfg</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">files</span><span class="p">)</span>
+
+<span class="c1"># Set associated environment variables</span>
+<span class="n">env_map</span> <span class="o">=</span> <span class="p">[(</span><span class="s1">&#39;debug&#39;</span><span class="p">,</span> <span class="s1">&#39;psi&#39;</span><span class="p">,</span> <span class="s1">&#39;PSI_DEBUG&#39;</span><span class="p">),</span>
+           <span class="p">(</span><span class="s1">&#39;debug&#39;</span><span class="p">,</span> <span class="s1">&#39;rmq&#39;</span><span class="p">,</span> <span class="s1">&#39;RMQ_DEBUG&#39;</span><span class="p">),</span>
+           <span class="p">(</span><span class="s1">&#39;debug&#39;</span><span class="p">,</span> <span class="s1">&#39;client&#39;</span><span class="p">,</span> <span class="s1">&#39;PSI_CLIENT_DEBUG&#39;</span><span class="p">),</span>
+           <span class="p">(</span><span class="s1">&#39;rmq&#39;</span><span class="p">,</span> <span class="s1">&#39;namespace&#39;</span><span class="p">,</span> <span class="s1">&#39;PSI_NAMESPACE&#39;</span><span class="p">),</span>
+           <span class="p">(</span><span class="s1">&#39;rmq&#39;</span><span class="p">,</span> <span class="s1">&#39;host&#39;</span><span class="p">,</span> <span class="s1">&#39;PSI_MSG_HOST&#39;</span><span class="p">),</span>
+           <span class="p">(</span><span class="s1">&#39;rmq&#39;</span><span class="p">,</span> <span class="s1">&#39;vhost&#39;</span><span class="p">,</span> <span class="s1">&#39;PSI_MSG_VHOST&#39;</span><span class="p">),</span>
+           <span class="p">(</span><span class="s1">&#39;rmq&#39;</span><span class="p">,</span> <span class="s1">&#39;user&#39;</span><span class="p">,</span> <span class="s1">&#39;PSI_MSG_USER&#39;</span><span class="p">),</span>
+           <span class="p">(</span><span class="s1">&#39;rmq&#39;</span><span class="p">,</span> <span class="s1">&#39;password&#39;</span><span class="p">,</span> <span class="s1">&#39;PSI_MSG_PW&#39;</span><span class="p">),</span>
+           <span class="p">(</span><span class="s1">&#39;parallel&#39;</span><span class="p">,</span> <span class="s1">&#39;cluster&#39;</span><span class="p">,</span> <span class="s1">&#39;PSI_CLUSTER&#39;</span><span class="p">),</span>
+           <span class="p">]</span>
+
+
+<div class="viewcode-block" id="cfg_environment"><a class="viewcode-back" href="../../cis_interface.html#cis_interface.config.cfg_environment">[docs]</a><span class="k">def</span> <span class="nf">cfg_environment</span><span class="p">(</span><span class="n">env</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">cfg</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Set environment variables based on config options.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        env (dict, optional): Dictionary of environment variables that should</span>
+<span class="sd">            be updated. Defaults to `os.environ`.</span>
+<span class="sd">        cfg (:class:`cis_interface.config.CisConfigParser`, optional):</span>
+<span class="sd">            Config parser with options that should be used to update the</span>
+<span class="sd">            environment. Defaults to :data:`cis_interface.config.cis_cfg`.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">env</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">env</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span>
+    <span class="k">if</span> <span class="n">cfg</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">cfg</span> <span class="o">=</span> <span class="n">cis_cfg</span>
+    <span class="k">for</span> <span class="n">s</span><span class="p">,</span> <span class="n">o</span><span class="p">,</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">env_map</span><span class="p">:</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="n">cis_cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">o</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">v</span><span class="p">:</span>
+            <span class="n">env</span><span class="p">[</span><span class="n">e</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span></div>
+
+            
+<span class="c1"># Do initial update of environment (legacy)</span>
+<span class="n">cfg_environment</span><span class="p">()</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Meagan Lang, David Raila.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.6</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

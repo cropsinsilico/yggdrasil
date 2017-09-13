@@ -81,9 +81,18 @@
         <span class="c1"># Prepare arguments to compile the file</span>
         <span class="c1"># TODO: Allow user to provide a makefile</span>
         <span class="n">cfile</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-        <span class="k">assert</span><span class="p">(</span><span class="n">cfile</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.c&#39;</span><span class="p">))</span>
-        <span class="n">execname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">cfile</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;.out&#39;</span>
-        <span class="n">compile_args</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;gcc&quot;</span><span class="p">,</span> <span class="s2">&quot;-g&quot;</span><span class="p">,</span> <span class="s2">&quot;-Wall&quot;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">cfile</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.c&#39;</span><span class="p">):</span>
+            <span class="n">gcc</span> <span class="o">=</span> <span class="s1">&#39;gcc&#39;</span>
+            <span class="n">osuffix</span> <span class="o">=</span> <span class="s1">&#39;_c.out&#39;</span>
+            <span class="n">flags</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">elif</span> <span class="n">cfile</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.cpp&#39;</span><span class="p">):</span>
+            <span class="n">gcc</span> <span class="o">=</span> <span class="s1">&#39;g++&#39;</span>
+            <span class="n">osuffix</span> <span class="o">=</span> <span class="s1">&#39;_cpp.out&#39;</span>
+            <span class="n">flags</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;-std=c++11&#39;</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Supplied file is not C or C++ code.&quot;</span><span class="p">)</span>
+        <span class="n">execname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">cfile</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">osuffix</span>
+        <span class="n">compile_args</span> <span class="o">=</span> <span class="p">[</span><span class="n">gcc</span><span class="p">,</span> <span class="s2">&quot;-g&quot;</span><span class="p">,</span> <span class="s2">&quot;-Wall&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="n">flags</span>
         <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">[</span><span class="n">_incl_interface</span><span class="p">,</span> <span class="n">_incl_io</span><span class="p">]:</span>
             <span class="n">compile_args</span> <span class="o">+=</span> <span class="p">[</span><span class="s2">&quot;-I&quot;</span> <span class="o">+</span> <span class="n">x</span><span class="p">]</span>
         <span class="n">run_args</span> <span class="o">=</span> <span class="p">[</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="n">execname</span><span class="p">)]</span>

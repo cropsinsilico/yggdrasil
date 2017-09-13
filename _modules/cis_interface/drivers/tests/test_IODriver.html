@@ -49,6 +49,7 @@
 <span class="kn">from</span> <span class="nn">cis_interface.backwards</span> <span class="k">import</span> <span class="n">pickle</span>
 <span class="kn">from</span> <span class="nn">cis_interface.drivers.tests</span> <span class="k">import</span> <span class="n">test_Driver</span> <span class="k">as</span> <span class="n">parent</span>
 <span class="kn">from</span> <span class="nn">cis_interface.dataio.AsciiTable</span> <span class="k">import</span> <span class="n">AsciiTable</span>
+<span class="kn">from</span> <span class="nn">cis_interface</span> <span class="k">import</span> <span class="n">backwards</span>
 
 
 <div class="viewcode-block" id="IOInfo"><a class="viewcode-back" href="../../../../cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_IODriver.IOInfo">[docs]</a><span class="k">class</span> <span class="nc">IOInfo</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
@@ -61,9 +62,10 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">fmt_str</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%5s</span><span class="se">\t</span><span class="si">%d</span><span class="se">\t</span><span class="si">%f</span><span class="se">\n</span><span class="s1">&#39;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">fmt_str_line</span> <span class="o">=</span> <span class="s1">&#39;# &#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">fmt_str</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">file_dtype</span> <span class="o">=</span> <span class="s1">&#39;S5, i4, f8&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">comment</span> <span class="o">=</span> <span class="n">backwards</span><span class="o">.</span><span class="n">unicode2bytes</span><span class="p">(</span><span class="s1">&#39;#&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fmt_str</span> <span class="o">=</span> <span class="n">backwards</span><span class="o">.</span><span class="n">unicode2bytes</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%5s</span><span class="se">\t</span><span class="si">%d</span><span class="se">\t</span><span class="si">%f</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fmt_str_line</span> <span class="o">=</span> <span class="n">backwards</span><span class="o">.</span><span class="n">unicode2bytes</span><span class="p">(</span><span class="s1">&#39;# &#39;</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">fmt_str</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">file_dtype</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">5, i4, f8&#39;</span> <span class="o">%</span> <span class="n">backwards</span><span class="o">.</span><span class="n">np_dtype_str</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">file_rows</span> <span class="o">=</span> <span class="p">[(</span><span class="s1">&#39;one&#39;</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="mf">1.0</span><span class="p">),</span>
                           <span class="p">(</span><span class="s1">&#39;two&#39;</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span> <span class="mf">2.0</span><span class="p">),</span>
                           <span class="p">(</span><span class="s1">&#39;three&#39;</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="mf">3.0</span><span class="p">)]</span>
@@ -73,7 +75,8 @@
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;list: Lines in a mock file.&quot;&quot;&quot;</span>
         <span class="n">out</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_rows</span><span class="p">:</span>
-            <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fmt_str</span> <span class="o">%</span> <span class="n">r</span><span class="p">)</span>
+            <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">backwards</span><span class="o">.</span><span class="n">unicode2bytes</span><span class="p">(</span>
+                <span class="n">backwards</span><span class="o">.</span><span class="n">bytes2unicode</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fmt_str</span><span class="p">)</span> <span class="o">%</span> <span class="n">r</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">out</span>
 
     <span class="nd">@property</span>
@@ -81,7 +84,7 @@
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;str: Complete contents of mock file.&quot;&quot;&quot;</span>
         <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fmt_str_line</span>
         <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_lines</span><span class="p">:</span>
-            <span class="n">out</span> <span class="o">+=</span> <span class="n">line</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">out</span> <span class="o">+</span> <span class="n">line</span>
         <span class="k">return</span> <span class="n">out</span>
 
     <span class="nd">@property</span>
@@ -96,9 +99,9 @@
     <span class="k">def</span> <span class="nf">file_bytes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;str: Raw bytes of array of mock file contents.&quot;&quot;&quot;</span>
         <span class="n">arr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_array</span>
-        <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">backwards</span><span class="o">.</span><span class="n">unicode2bytes</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">arr</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">names</span><span class="p">:</span>
-            <span class="n">out</span> <span class="o">+=</span> <span class="n">arr</span><span class="p">[</span><span class="n">n</span><span class="p">]</span><span class="o">.</span><span class="n">tobytes</span><span class="p">()</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">out</span> <span class="o">+</span> <span class="n">arr</span><span class="p">[</span><span class="n">n</span><span class="p">]</span><span class="o">.</span><span class="n">tobytes</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">out</span>
 
     <span class="nd">@property</span>
@@ -126,12 +129,12 @@
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">msg_short</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;str: Small test message for sending.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="s1">&#39;Test message&#39;</span>
+        <span class="k">return</span> <span class="n">backwards</span><span class="o">.</span><span class="n">unicode2bytes</span><span class="p">(</span><span class="s1">&#39;Test</span><span class="se">\t</span><span class="s1">message&#39;</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">msg_long</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;str: Small test message for sending.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="s1">&#39;Test message&#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">maxMsgSize</span> <span class="o">*</span> <span class="s1">&#39;0&#39;</span>
+        <span class="k">return</span> <span class="n">backwards</span><span class="o">.</span><span class="n">unicode2bytes</span><span class="p">(</span><span class="s1">&#39;Test message&#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">maxMsgSize</span> <span class="o">*</span> <span class="s1">&#39;0&#39;</span><span class="p">)</span>
 
 <div class="viewcode-block" id="IOInfo.write_table"><a class="viewcode-back" href="../../../../cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_IODriver.IOInfo.write_table">[docs]</a>    <span class="k">def</span> <span class="nf">write_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Write the table out to a file.</span>
@@ -189,6 +192,12 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
+<div class="viewcode-block" id="TestIODriver.setup"><a class="viewcode-back" href="../../../../cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_IODriver.TestIODriver.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Ensure that there are not messages in the queue at exit.&quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">TestIODriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+        <span class="c1"># This fails for drivers that immediately read input</span>
+        <span class="c1"># nt.assert_equal(self.instance.n_ipc_msg, 0)</span>
+
 <div class="viewcode-block" id="TestIODriver.test_early_close"><a class="viewcode-back" href="../../../../cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_IODriver.TestIODriver.test_early_close">[docs]</a>    <span class="k">def</span> <span class="nf">test_early_close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test early deletion of message queue.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">close_queue</span><span class="p">()</span></div>
@@ -196,16 +205,17 @@
 <div class="viewcode-block" id="TestIODriver.test_send_recv"><a class="viewcode-back" href="../../../../cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_IODriver.TestIODriver.test_send_recv">[docs]</a>    <span class="k">def</span> <span class="nf">test_send_recv</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test sending/receiving small message.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">ipc_send</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">msg_short</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">sleep</span><span class="p">()</span>
+        <span class="n">nt</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">n_ipc_msg</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
         <span class="n">msg_recv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">ipc_recv</span><span class="p">()</span>
-        <span class="n">nt</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="n">msg_recv</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">msg_short</span><span class="p">)</span></div>
+        <span class="n">nt</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="n">msg_recv</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">msg_short</span><span class="p">)</span>
+        <span class="n">nt</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">n_ipc_msg</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="TestIODriver.test_send_recv_nolimit"><a class="viewcode-back" href="../../../../cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_IODriver.TestIODriver.test_send_recv_nolimit">[docs]</a>    <span class="k">def</span> <span class="nf">test_send_recv_nolimit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test sending/receiving large message.&quot;&quot;&quot;</span>
         <span class="k">assert</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">msg_long</span><span class="p">)</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">maxMsgSize</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">ipc_send_nolimit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">msg_long</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
-        <span class="n">msg_recv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">ipc_recv_nolimit</span><span class="p">()</span>
+        <span class="n">msg_recv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">recv_wait_nolimit</span><span class="p">()</span>
         <span class="n">nt</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="n">msg_recv</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">msg_long</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="TestIODriver.assert_before_stop"><a class="viewcode-back" href="../../../../cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_IODriver.TestIODriver.assert_before_stop">[docs]</a>    <span class="k">def</span> <span class="nf">assert_before_stop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>

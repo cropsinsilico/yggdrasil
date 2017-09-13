@@ -1,0 +1,46 @@
+cis\_interface\.examples\.tests package
+=======================================
+
+Submodules
+----------
+
+cis\_interface\.examples\.tests\.test\_SaM module
+-------------------------------------------------
+
+.. automodule:: cis_interface.examples.tests.test_SaM
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+cis\_interface\.examples\.tests\.test\_ascii\_io module
+-------------------------------------------------------
+
+.. automodule:: cis_interface.examples.tests.test_ascii_io
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+cis\_interface\.examples\.tests\.test\_hello module
+---------------------------------------------------
+
+.. automodule:: cis_interface.examples.tests.test_hello
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+cis\_interface\.examples\.tests\.test\_rpcFib module
+----------------------------------------------------
+
+.. automodule:: cis_interface.examples.tests.test_rpcFib
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: cis_interface.examples.tests
+    :members:
+    :undoc-members:
+    :show-inheritance:

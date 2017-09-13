@@ -105,11 +105,20 @@
     <span class="nb">print</span><span class="p">(</span><span class="n">output</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">))</span></div>
 
 
-<div class="viewcode-block" id="ipcrm_queues"><a class="viewcode-back" href="../../cis_interface.html#cis_interface.tools.ipcrm_queues">[docs]</a><span class="k">def</span> <span class="nf">ipcrm_queues</span><span class="p">():</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Delete existing IPC queues.&quot;&quot;&quot;</span>
-    <span class="k">for</span> <span class="n">q</span> <span class="ow">in</span> <span class="n">ipc_queues</span><span class="p">():</span>
-        <span class="n">ipcrm</span><span class="p">([</span><span class="s2">&quot;-Q </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">q</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">0</span><span class="p">]])</span></div>
-    <span class="c1"># ipcrm([&#39;--all=msg&#39;])  # This is version specific</span>
+<div class="viewcode-block" id="ipcrm_queues"><a class="viewcode-back" href="../../cis_interface.html#cis_interface.tools.ipcrm_queues">[docs]</a><span class="k">def</span> <span class="nf">ipcrm_queues</span><span class="p">(</span><span class="n">queue_keys</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Delete existing IPC queues.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        queue_keys (list, str, optional): A list of keys for queues that should</span>
+<span class="sd">            be removed. Defaults to all existing queues.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">queue_keys</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">queue_keys</span> <span class="o">=</span> <span class="p">[</span><span class="n">l</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">ipc_queues</span><span class="p">()]</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">queue_keys</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">queue_keys</span> <span class="o">=</span> <span class="p">[</span><span class="n">queue_keys</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">q</span> <span class="ow">in</span> <span class="n">queue_keys</span><span class="p">:</span>
+        <span class="n">ipcrm</span><span class="p">([</span><span class="s2">&quot;-Q </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">q</span><span class="p">])</span></div>
 </pre></div>
 
           </div>

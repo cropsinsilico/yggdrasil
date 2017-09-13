@@ -44,10 +44,9 @@
             
   <h1>Source code for cis_interface.drivers.tests.test_RMQServerDriver</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">pika</span>
-<span class="kn">import</span> <span class="nn">time</span>
 <span class="kn">import</span> <span class="nn">nose.tools</span> <span class="k">as</span> <span class="nn">nt</span>
-<span class="kn">import</span> <span class="nn">test_RMQDriver</span> <span class="k">as</span> <span class="nn">parent1</span>
-<span class="kn">from</span> <span class="nn">test_IODriver</span> <span class="k">import</span> <span class="n">IOInfo</span>
+<span class="kn">import</span> <span class="nn">cis_interface.drivers.tests.test_RMQDriver</span> <span class="k">as</span> <span class="nn">parent1</span>
+<span class="kn">from</span> <span class="nn">cis_interface.drivers.tests.test_IODriver</span> <span class="k">import</span> <span class="n">IOInfo</span>
 <span class="kn">from</span> <span class="nn">cis_interface.drivers.RMQServerDriver</span> <span class="k">import</span> <span class="p">(</span>
     <span class="n">_new_client_msg</span><span class="p">,</span> <span class="n">_end_client_msg</span><span class="p">)</span>
 
@@ -86,6 +85,48 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
+<div class="viewcode-block" id="TestRMQServerDriver.setup"><a class="viewcode-back" href="../../../../cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_RMQServerDriver.TestRMQServerDriver.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create a driver instance and start the driver.&quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">TestRMQServerDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">setup</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">create_in_rmq</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="TestRMQServerDriver.teardown"><a class="viewcode-back" href="../../../../cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_RMQServerDriver.TestRMQServerDriver.teardown">[docs]</a>    <span class="k">def</span> <span class="nf">teardown</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Remove the instance, stoppping it.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">destroy_in_rmq</span><span class="p">()</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">TestRMQServerDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">teardown</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="TestRMQServerDriver.create_in_rmq"><a class="viewcode-back" href="../../../../cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_RMQServerDriver.TestRMQServerDriver.create_in_rmq">[docs]</a>    <span class="k">def</span> <span class="nf">create_in_rmq</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create a blocking connection, channel, and queue for testing.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">connection</span> <span class="o">=</span> <span class="n">pika</span><span class="o">.</span><span class="n">BlockingConnection</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">connection_parameters</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">channel</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">channel</span><span class="p">()</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">queue_declare</span><span class="p">(</span><span class="n">auto_delete</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">temp_queue</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">method</span><span class="o">.</span><span class="n">queue</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">queue_bind</span><span class="p">(</span>
+            <span class="n">queue</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">temp_queue</span><span class="p">,</span>
+            <span class="n">exchange</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">exchange</span><span class="p">,</span>
+            <span class="n">routing_key</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">temp_queue</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TestRMQServerDriver.destroy_in_rmq"><a class="viewcode-back" href="../../../../cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_RMQServerDriver.TestRMQServerDriver.destroy_in_rmq">[docs]</a>    <span class="k">def</span> <span class="nf">destroy_in_rmq</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Remove blocking connection, channel, and queue.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">queue_unbind</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">temp_queue</span><span class="p">,</span>
+                                  <span class="n">exchange</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">exchange</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">queue_delete</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">temp_queue</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="TestRMQServerDriver.temp_basic_get"><a class="viewcode-back" href="../../../../cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_RMQServerDriver.TestRMQServerDriver.temp_basic_get">[docs]</a>    <span class="k">def</span> <span class="nf">temp_basic_get</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Do basic_get from the temporary queue.&quot;&quot;&quot;</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">basic_get</span><span class="p">(</span><span class="n">queue</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">temp_queue</span><span class="p">)</span>
+        <span class="n">elapsed</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="k">while</span> <span class="p">(</span><span class="n">out</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">elapsed</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">timeout</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">sleeptime</span><span class="p">)</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">basic_get</span><span class="p">(</span><span class="n">queue</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">temp_queue</span><span class="p">)</span>
+            <span class="n">elapsed</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">sleeptime</span>
+        <span class="k">if</span> <span class="n">out</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Msg receive timed out.&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">out</span></div>
+
 <div class="viewcode-block" id="TestRMQServerDriver.test_client_count"><a class="viewcode-back" href="../../../../cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_RMQServerDriver.TestRMQServerDriver.test_client_count">[docs]</a>    <span class="k">def</span> <span class="nf">test_client_count</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test to ensure client count is correct.&quot;&quot;&quot;</span>
         <span class="n">nt</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">n_clients</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
@@ -96,7 +137,10 @@
                 <span class="n">routing_key</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">queue</span><span class="p">,</span>
                 <span class="n">properties</span><span class="o">=</span><span class="n">pika</span><span class="o">.</span><span class="n">BasicProperties</span><span class="p">(</span><span class="n">reply_to</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">temp_queue</span><span class="p">),</span>
                 <span class="n">body</span><span class="o">=</span><span class="n">_new_client_msg</span><span class="p">)</span>
-        <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
+        <span class="n">elapsed</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">n_clients</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="p">(</span><span class="n">elapsed</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">timeout</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">sleep</span><span class="p">()</span>
+            <span class="n">elapsed</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">sleeptime</span>
         <span class="n">nt</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">n_clients</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
         <span class="c1"># Send end client message</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
@@ -105,8 +149,16 @@
                 <span class="n">routing_key</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">queue</span><span class="p">,</span>
                 <span class="n">properties</span><span class="o">=</span><span class="n">pika</span><span class="o">.</span><span class="n">BasicProperties</span><span class="p">(</span><span class="n">reply_to</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">temp_queue</span><span class="p">),</span>
                 <span class="n">body</span><span class="o">=</span><span class="n">_end_client_msg</span><span class="p">)</span>
-        <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
+        <span class="n">elapsed</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">n_clients</span> <span class="o">!=</span> <span class="mi">0</span> <span class="ow">and</span> <span class="p">(</span><span class="n">elapsed</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">timeout</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">sleep</span><span class="p">()</span>
+            <span class="n">elapsed</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">sleeptime</span>
         <span class="n">nt</span><span class="o">.</span><span class="n">assert_equal</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">n_clients</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span></div>
+
+    <span class="c1"># Disabled so that test message is not read by mistake</span>
+<div class="viewcode-block" id="TestRMQServerDriver.test_purge"><a class="viewcode-back" href="../../../../cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_RMQServerDriver.TestRMQServerDriver.test_purge">[docs]</a>    <span class="k">def</span> <span class="nf">test_purge</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test purge of queue.&quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
 
 <div class="viewcode-block" id="TestRMQServerDriver.test_msg"><a class="viewcode-back" href="../../../../cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_RMQServerDriver.TestRMQServerDriver.test_msg">[docs]</a>    <span class="k">def</span> <span class="nf">test_msg</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Test routing of a message through the IPC &amp; RMQ queues.&quot;&quot;&quot;</span>

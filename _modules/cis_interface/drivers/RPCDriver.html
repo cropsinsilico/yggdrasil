@@ -213,12 +213,12 @@
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">n_msg_in</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: The number of messages in the input queue.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">iipc</span><span class="o">.</span><span class="n">n_msg</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">iipc</span><span class="o">.</span><span class="n">n_ipc_msg</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">n_msg_out</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: The number of messages in the output queue.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">oipc</span><span class="o">.</span><span class="n">n_msg</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">oipc</span><span class="o">.</span><span class="n">n_ipc_msg</span>
 
 <div class="viewcode-block" id="RPCDriver.on_model_exit"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.RPCDriver.RPCDriver.on_model_exit">[docs]</a>    <span class="k">def</span> <span class="nf">on_model_exit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Actions to perform when the associated model driver is finished.&quot;&quot;&quot;</span>
