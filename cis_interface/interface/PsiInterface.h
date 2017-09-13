@@ -203,6 +203,19 @@ int psi_mq(char *name, const char *yamlName){
 };
 
 /*!
+  @brief Check if a character array matches the internal EOF message.
+  @param[in] buf constant character pointer to string that should be checked.
+  @returns int 1 if buf is the EOF message, 0 otherwise.
+ */
+static inline
+int is_eof(const char *buf) {
+  if (strcmp(buf, PSI_MSG_EOF) == 0)
+    return 1;
+  else
+    return 0;
+};
+
+/*!
   @brief Message buffer structure.
 */
 typedef struct msgbuf_t {
@@ -610,6 +623,10 @@ int vpsiRecv(psiInput_t psiQ, va_list ap) {
     return -1;
   }
   debug("vpsiRecv(%s): psi_recv returns %d: %s", psiQ._name, ret, buf);
+  if (is_eof(buf)) {
+    debug("vpsiRecv(%s): EOF received.\n", psiQ._name);
+    return -1;
+  }
   int nexp = count_formats(psiQ._fmt);
   int sret = vsscanf(buf, psiQ._fmt, ap);
   if (sret != nexp) {
@@ -708,7 +725,11 @@ int vpsiRecv_nolimit(psiInput_t psiQ, va_list ap) {
     free(buf);
     return -1;
   }
-  debug("vpsiRecv_nolimit(%s): psi_recv returns %d: %s", psiQ._name, ret, buf);
+  debug("vpsiRecv_nolimit(%s): psi_recv returns %d", psiQ._name, ret);
+  if (is_eof(buf)) {
+    debug("vpsiRecv(%s): EOF received.\n", psiQ._name);
+    return -1;
+  }
   int nexp = count_formats(psiQ._fmt);
   int sret = vsscanf(buf, psiQ._fmt, ap);
   if (sret != nexp) {
@@ -1125,19 +1146,6 @@ psiAsciiFileInput_t psiAsciiFileInput(const char *name, int src_type) {
 };
 
 /*!
-  @brief Check if a character array matches the internal EOF message.
-  @param[in] buf constant character pointer to string that should be checked.
-  @returns int 1 if buf is the EOF message, 0 otherwise.
- */
-static inline
-int is_eof(const char *buf) {
-  if (strcmp(buf, PSI_MSG_EOF) == 0)
-    return 1;
-  else
-    return 0;
-};
-
-/*!
   @brief Send EOF message to output file, closing it.
   @param[in] t psiAsciiFileOutput_t output structure.
   @returns int 0 if send was succesfull. All other values indicate errors.
@@ -1154,7 +1162,7 @@ int af_send_eof(psiAsciiFileOutput_t t) {
   @param[in] t psiAsciiFileInput_t input structure.
   @param[out] line character pointer to allocate memory where the received
   line should be stored.
-  @param[out] n size_t Size of the allocated memory block in bytes.
+  @param[in] n size_t Size of the allocated memory block in bytes.
   @returns int Number of bytes read/received. Negative values indicate that
   there was either an error or the EOF message was received.
  */
@@ -1414,8 +1422,9 @@ int at_psi_send(psiAsciiTableOutput_t t, char *data, int len){
 /*!
   @brief Recv a nolimit message from a table input queue.
   @param[in] t psiAsciiTableInput_t input structure.
-  @param[in] data character pointer to message that should be sent.
-  @param[in] len int length of message to be sent.
+  @param[in] data character pointer to pointer to memory where received message
+  should be stored. It does not need to be allocated, only defined.
+  @param[in] len int length of allocated buffer.
   @returns int -1 if message could not be received. Length of the received
   message if message was received.
  */
