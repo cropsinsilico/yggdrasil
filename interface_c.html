@@ -199,9 +199,54 @@
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric">Functions</p>
 <dl class="function">
+<dt id="_CPPv213compile_regexP7regex_tPKc">
+<span id="compile_regex__regex_tP.cCP"></span><span class="target" id="_psi_interface_8h_1a2450e4b7c3a254afcfd62c54f4f33bcb"></span><em class="property">static</em> int <code class="descname">compile_regex</code><span class="sig-paren">(</span>regex_t *<em>r</em>, <em class="property">const</em> char *<em>regex_text</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv213compile_regexP7regex_tPKc" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Create a regex from a character array. Adapted from <a class="reference external" href="https://www.lemoda.net/c/unix-regex/">https://www.lemoda.net/c/unix-regex/</a>. </p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>static int Success or failure of compilation. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">r</span></code>: pointer to regex_t. Resutling regex expression. </li>
+<li><code class="docutils literal"><span class="pre">regex_text</span></code>: constant character pointer to text that should be compiled. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv213count_matchesPKcPKc">
+<span id="count_matches__cCP.cCP"></span><span class="target" id="_psi_interface_8h_1acc835d46e359011a0f1fbaba3f28b03b"></span><em class="property">static</em> int <code class="descname">count_matches</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>regex_text</em>, <em class="property">const</em> char *<em>to_match</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv213count_matchesPKcPKc" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Count the number of times a regular expression is matched in a string. </p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>int Number of matches found. -1 is returned if the regex could not be compiled. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">regex_text</span></code>: constant character pointer to string that should be compiled into a regex. </li>
+<li><code class="docutils literal"><span class="pre">to_match</span></code>: constant character pointer to string that should be checked for matches. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
 <dt id="_CPPv213count_formatsPKc">
 <span id="count_formats__cCP"></span><span class="target" id="_psi_interface_8h_1a2059b2fabbacee5e6de895822beb99cd"></span><em class="property">static</em> int <code class="descname">count_formats</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>fmt_str</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv213count_formatsPKc" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dd><p>Count how many % format specifiers there are in format string. Formats are found by counting the number of matches to the regular expression adapted from <a class="reference external" href="https://stackoverflow.com/questions/446285/validate-sprintf-format-from-input-field-with-regex">https://stackoverflow.com/questions/446285/validate-sprintf-format-from-input-field-with-regex</a>. </p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>int Number of format specifiers found. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">fmt_str</span></code>: constant character pointer to string that should be searched for format specifiers. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
 
 <dl class="function">
 <dt id="_CPPv26psiLogPKcPKc7va_list">
@@ -290,6 +335,22 @@
 <dd><ul class="breatheparameterlist first last simple">
 <li><code class="docutils literal"><span class="pre">name</span></code>: character pointer to name of environment variable that the queue key should be shored in. </li>
 <li><code class="docutils literal"><span class="pre">yamlName</span></code>: constant character pointer to the original name of the queue, absent any suffix. This is used to check if there is an existing queue with that name, but a different suffix. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv26is_eofPKc">
+<span id="is_eof__cCP"></span><span class="target" id="_psi_interface_8h_1a781fa4a456e4aaaeb0b11027cb24cea4"></span><em class="property">static</em> int <code class="descname">is_eof</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>buf</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv26is_eofPKc" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Check if a character array matches the internal EOF message. </p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>int 1 if buf is the EOF message, 0 otherwise. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">buf</span></code>: constant character pointer to string that should be checked. </li>
 </ul>
 </dd>
 </dl>
@@ -818,22 +879,6 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv26is_eofPKc">
-<span id="is_eof__cCP"></span><span class="target" id="_psi_interface_8h_1a781fa4a456e4aaaeb0b11027cb24cea4"></span><em class="property">static</em> int <code class="descname">is_eof</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>buf</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv26is_eofPKc" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Check if a character array matches the internal EOF message. </p>
-<p><dl class="docutils">
-<dt><strong>Return</strong></dt>
-<dd>int 1 if buf is the EOF message, 0 otherwise. </dd>
-<dt><strong>Parameters</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal"><span class="pre">buf</span></code>: constant character pointer to string that should be checked. </li>
-</ul>
-</dd>
-</dl>
-</p>
-</dd></dl>
-
-<dl class="function">
 <dt id="_CPPv211af_send_eof20psiAsciiFileOutput_t">
 <span id="af_send_eof__psiAsciiFileOutput_t"></span><span class="target" id="_psi_interface_8h_1abe3312664b4993842c1d3204e7868bc4"></span><em class="property">static</em> int <code class="descname">af_send_eof</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv220psiAsciiFileOutput_t" title="psiAsciiFileOutput_t">psiAsciiFileOutput_t</a> <em>t</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv211af_send_eof20psiAsciiFileOutput_t" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Send EOF message to output file, closing it. </p>
@@ -975,8 +1020,8 @@
 <dt><strong>Parameters</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
 <li><code class="docutils literal"><span class="pre">t</span></code>: <a class="reference internal" href="#structpsi_ascii_table_input__t"><span class="std std-ref">psiAsciiTableInput_t</span></a> input structure. </li>
-<li><code class="docutils literal"><span class="pre">data</span></code>: character pointer to message that should be sent. </li>
-<li><code class="docutils literal"><span class="pre">len</span></code>: int length of message to be sent. </li>
+<li><code class="docutils literal"><span class="pre">data</span></code>: character pointer to pointer to memory where received message should be stored. It does not need to be allocated, only defined. </li>
+<li><code class="docutils literal"><span class="pre">len</span></code>: int length of allocated buffer. </li>
 </ul>
 </dd>
 </dl>
@@ -1224,6 +1269,12 @@
 <dd><p>Format for interpreting queue messages. </p>
 </dd></dl>
 
+<dl class="member">
+<dt id="_CPPv2N10psiInput_t5_nfmtE">
+<span id="psiInput_t::_nfmt__i"></span><span class="target" id="structpsi_input__t_1a9496391ef31330ad5ea299c578f60be1"></span>int <code class="descname">_nfmt</code><a class="headerlink" href="#_CPPv2N10psiInput_t5_nfmtE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Number of fields expected from format string. </p>
+</dd></dl>
+
 </div>
 </dd></dl>
 
@@ -1249,6 +1300,12 @@
 <dt id="_CPPv2N11psiOutput_t4_fmtE">
 <span id="psiOutput_t::_fmt__cP"></span><span class="target" id="structpsi_output__t_1ab0d091406566578aff30e29f8f254dc0"></span>char *<code class="descname">_fmt</code><a class="headerlink" href="#_CPPv2N11psiOutput_t4_fmtE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Format for formatting queue messages. </p>
+</dd></dl>
+
+<dl class="member">
+<dt id="_CPPv2N11psiOutput_t5_nfmtE">
+<span id="psiOutput_t::_nfmt__i"></span><span class="target" id="structpsi_output__t_1a8ce9cd65bd278b405de93b96c595e33b"></span>int <code class="descname">_nfmt</code><a class="headerlink" href="#_CPPv2N11psiOutput_t5_nfmtE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Number of fields expected from format string. </p>
 </dd></dl>
 
 </div>
