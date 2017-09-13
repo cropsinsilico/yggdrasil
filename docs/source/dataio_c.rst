@@ -1,5 +1,8 @@
 C DataIO API
 ============
 
-.. autodoxygenindex::
-   :project: dataio_c
+.. autodoxygenfile:: AsciiFile.h
+   :project: cis_interface
+
+.. autodoxygenfile:: AsciiTable.h
+   :project: cis_interface
