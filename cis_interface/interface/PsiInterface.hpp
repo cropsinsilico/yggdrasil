@@ -49,7 +49,8 @@ public:
   PsiRpc(const char *outName, char *outFormat,
 	 const char *inName, char *inFormat) :
     _pi(psiRpc(outName, outFormat, inName, inFormat)) {}
-  
+
+  // TODO: fix issue with fake_first, maybe macro
   int send(int fake_first = 0, ...) {
     va_list va;
     va_start(va, fake_first);
@@ -75,13 +76,6 @@ public:
   PsiRpcServer(const char *name, char *inFormat, char *outFormat) :
     PsiRpc(name, outFormat, name, inFormat) {}
 
-  int call(int fake_first = 0, ...) {
-    va_list va;
-    va_start(va, fake_first);
-    int ret = vrpcCall(_pi, va);
-    va_end(va);
-    return ret;
-  }
 };
 
 
@@ -91,6 +85,14 @@ public:
 
   PsiRpcClient(const char *name, char *outFormat, char *inFormat) :
     PsiRpc(name, outFormat, name, inFormat) {}
+  
+  int call(int fake_first = 0, ...) {
+    va_list va;
+    va_start(va, fake_first);
+    int ret = vrpcCall(_pi, va);
+    va_end(va);
+    return ret;
+  }
   
 };
 

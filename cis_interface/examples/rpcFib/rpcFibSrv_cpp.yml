@@ -1,0 +1,13 @@
+---
+
+model:
+  name: rpcFibSrv
+  driver: GCCModelDriver
+  args:
+    - ./src/rpcFibSrv.cpp
+    - '{{ FIB_SERVER_SLEEP_SECONDS }}'    # env var - time to sleep before returning
+
+  inputs:
+    - name: srv_fib
+      driver: RMQServerDriver
+      args: srv_fib   # connected to this queue, shared by all models
