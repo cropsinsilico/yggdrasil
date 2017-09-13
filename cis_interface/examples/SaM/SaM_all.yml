@@ -35,6 +35,23 @@ models:
         driver: RMQOutputDriver
         args: output_python
 
+  - name: SaM_cpp
+    driver: GCCModelDriver
+    args: src/SaM.cpp
+
+    inputs:
+      - name: input1_cpp
+        driver: RMQInputDriver
+        args: output_python
+      - name: static_cpp
+        driver: FileInputDriver
+        args: ./Input/SaM_static.txt
+
+    outputs:
+      - name: output_cpp
+        driver: RMQOutputDriver
+        args: output_cpp
+
   - name: SaM_matlab
     driver: MatlabModelDriver
     args: src/SaM.m
@@ -42,7 +59,7 @@ models:
     inputs:
       - name: input1_matlab
         driver: RMQInputDriver
-        args: output_python
+        args: output_cpp
       - name: static_matlab
         driver: FileInputDriver
         args: ./Input/SaM_static.txt

@@ -8,7 +8,7 @@ yaml=
 # ----------------Your Commands------------------- #
 case $1 in
     "" | -a | --all )
-	echo "Running Python, Matlab, C integration"
+	echo "Running C, Python, C++, Matlab integration"
 	yaml='SaM_all.yml'
 	;;
     -p | --python )

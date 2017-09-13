@@ -16,7 +16,7 @@ class TestExampleSaM(TestExample):
     def result(self):
         r"""Result that should be found in output files."""
         if self.language == 'all':
-            s = 7
+            s = 9  # 1 + 2*n_languages
         else:
             s = 3
         return '%d' % s
