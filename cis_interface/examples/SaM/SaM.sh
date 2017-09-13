@@ -3,9 +3,6 @@
 export PSI_DEBUG="INFO"
 export PSI_NAMESPACE="SaM"
 
-# make output dir if it's not there
-[ -d Output ] || mkdir Output
-
 yaml= 
 
 # ----------------Your Commands------------------- #
@@ -32,4 +29,6 @@ case $1 in
 	;;
 esac
 
-cisrun $yaml > ./Output/SaM_log.txt
+cisrun $yaml
+
+cat /tmp/SaM_output.txt
