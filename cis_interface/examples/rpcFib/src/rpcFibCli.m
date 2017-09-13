@@ -13,7 +13,7 @@ function rpcFibCli(iterations)
   input = ymlfile.recv();
   ret = input{1};
   ycontent = char(input{2});
-  if (~ret)
+  if (~ret);
     disp('rpcFibCli(M): RECV ERROR');
     exit(-1);
   end
@@ -27,7 +27,7 @@ function rpcFibCli(iterations)
     input = rpc.rpcCall(i);
     ret = input{1};
     fib = input{2};
-    if (~ret)
+    if (~ret);
       disp('rpcFibCli(M): RPC CALL ERROR');
       exit(-1);
     end
@@ -36,7 +36,7 @@ function rpcFibCli(iterations)
     s = sprintf('fib(%2d<-) = %-2d<-\n', fib{1}, fib{2});
     fprintf(s);
     ret = log.send(s);
-    if (~ret)
+    if (~ret);
       disp('rpcFibCli(M): SEND ERROR');
       exit(-1);
     end

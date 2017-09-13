@@ -7,7 +7,7 @@ disp('SaM(M): Set up I/O channels');
 
 % Get input from input1 channel
 res = in1.recv();
-if (~res{1})
+if (~res{1});
   disp('SaM(M): ERROR RECV from input1');
   exit(-1);
 end
@@ -16,7 +16,7 @@ fprintf('SaM(M): Received %d from input1\n', a);
 
 % Get input from static channel
 res = in2.recv();
-if (~res{1})
+if (~res{1});
   disp('SaM(M): ERROR RECV from static');
   exit(-1);
 end
@@ -27,7 +27,7 @@ fprintf('SaM(M): Received %d from static\n', b);
 sum = a + b;
 outdata = sprintf('%d', sum);
 ret = out1.send(outdata);
-if (~ret)
+if (~ret);
   disp('SaM(M): ERROR SEND to output');
   exit(-1);
 end

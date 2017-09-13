@@ -11,7 +11,7 @@ function rpcFibSrv(sleeptime)
   % by all clients that have connected).
   while 1
     input = rpc.rpcRecv();
-    if (~input{1})
+    if (~input{1});
       fprintf('rpcFibSrv(M): end of input');
       exit(0);
     end

@@ -8,6 +8,7 @@ SPHINXPROJ    = cis_interface
 SOURCEDIR     = source
 BUILDDIR      = build
 REPODIR       = ../../cis_interface_docs
+DOXYDIR       = doxy
 
 # Put it first so that "make" without argument is like "make help".
 help:
@@ -22,9 +23,13 @@ ghpages: autodoc
 	cd $(REPODIR)/html ; git add . ; git commit -m "rebuilt docs" ; git push origin gh-pages
 
 .PHONY: autodoc
-autodoc:
+autodoc: doxy
 	sphinx-apidoc -f -o $(SOURCEDIR)/ ../cis_interface
 	make html
+
+.PHONY: doxy
+doxy:
+	cd $(DOXYDIR) ; doxygen doxy.cfg
 
 # Catch-all target: route all unknown targets to Sphinx using the new
 # "make mode" option.  $(O) is meant as a shortcut for $(SPHINXOPTS).

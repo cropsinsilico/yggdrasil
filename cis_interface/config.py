@@ -73,7 +73,7 @@ def cfg_environment(env=None, cfg=None):
             be updated. Defaults to `os.environ`.
         cfg (:class:`cis_interface.config.CisConfigParser`, optional):
             Config parser with options that should be used to update the
-            environment. Defaults to :var:`cis_interface.config.cis_cfg`.
+            environment. Defaults to :data:`cis_interface.config.cis_cfg`.
 
     """
     if env is None:

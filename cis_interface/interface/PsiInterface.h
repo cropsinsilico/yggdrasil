@@ -206,8 +206,8 @@ int psi_mq(char *name, const char *yamlName){
   @brief Message buffer structure.
 */
 typedef struct msgbuf_t {
-  long mtype; //< Message buffer type
-  char data[PSI_MSG_MAX]; //< Buffer for the message
+  long mtype; //!< Message buffer type
+  char data[PSI_MSG_MAX]; //!< Buffer for the message
 } msgbuf_t;
 
 /*!
@@ -215,9 +215,9 @@ typedef struct msgbuf_t {
   Contains information on an input queue.
  */
 typedef struct psiInput_t {
-  int _handle; //< Queue handle.
-  const char *_name; //< Queue name.
-  char *_fmt; //< Format for interpreting queue messages.
+  int _handle; //!< Queue handle.
+  const char *_name; //!< Queue name.
+  char *_fmt; //!< Format for interpreting queue messages.
 } psiInput_t;
 
 /*!
@@ -225,9 +225,9 @@ typedef struct psiInput_t {
   Contains information on an output queue.
  */
 typedef struct psiOutput_t {
-  int _handle; //< Queue handle. 
-  const char *_name; //< Queue name.
-  char *_fmt; //< Format for formatting queue messages.
+  int _handle; //!< Queue handle. 
+  const char *_name; //!< Queue name.
+  char *_fmt; //!< Format for formatting queue messages.
 } psiOutput_t;
 
 /*!
@@ -808,10 +808,10 @@ int psiRecv_nolimit(psiInput_t psiQ, ...) {
   response/requests from/to an RPC server/client.
  */
 typedef struct psiRpc_t {
-  psiInput_t _input; //< Input queue structure.
-  psiOutput_t _output; //< Output queue structure.
-  char *_inFmt; //< Format string used for input queue.
-  char *_outFmt; //< Format string used for output queue
+  psiInput_t _input; //!< Input queue structure.
+  psiOutput_t _output; //!< Output queue structure.
+  char *_inFmt; //!< Format string used for input queue.
+  char *_outFmt; //!< Format string used for output queue
 } psiRpc_t;
 
 /*!
@@ -950,7 +950,7 @@ int rpcRecv(psiRpc_t rpc, ...){
   output queue, receive a response from the input queue, and assign arguments
   from the message using the input queue format string to parse it.
   @param[in] rpc psiRpc_t structure with RPC information.
-  @param[in/out] ... mixed arguments that include those that should be
+  @param[in,out] ap va_list mixed arguments that include those that should be
   formatted using the output format string, followed by those that should be
   assigned parameters extracted using the input format string. These that will
   be assigned should be pointers to memory that has already been allocated.
@@ -983,7 +983,7 @@ int vrpcCall(psiRpc_t rpc, va_list ap) {
   output queue, receive a response from the input queue, and assign arguments
   from the message using the input queue format string to parse it.
   @param[in] rpc psiRpc_t structure with RPC information.
-  @param[in/out] ... mixed arguments that include those that should be
+  @param[in,out] ... mixed arguments that include those that should be
   formatted using the output format string, followed by those that should be
   assigned parameters extracted using the input format string. These that will
   be assigned should be pointers to memory that has already been allocated.
@@ -1000,27 +1000,79 @@ int rpcCall(psiRpc_t rpc,  ...){
   return ret;
 };
 
-/******************************************************************************/
-/* File IO */
-/******************************************************************************/
-// Specialized methods for passing file rows back and forth
 
+//==============================================================================
+/*!
+  File IO
+
+  Handle I/O from/to a local or remote file line by line.
+
+  Input Usage:
+      1. One-time: Create file interface by providing either a channel name or
+         a path to a local file.
+	    psiAsciiFileInput_t fin = psiAsciiFileInput("file_channel", 1); // channel
+	    psiAsciiFileInput_t fin = psiAsciiFileInput("/local/file.txt", 0); // local file
+      2. Prepare: Allocate space for lines.
+            char line[PSI_MSG_MAX];
+      3. Receive each line, terminating when receive returns -1 (EOF or channel
+         closed).
+	    int ret = 1;
+	    while (ret > 0) {
+	      ret = af_recv_line(fin, line, PSI_MSG_MAX);
+	      // Do something with the line
+	    }
+      4. Cleanup. Call functions to deallocate structures and close files.
+            cleanup_pafi(&fin);
+
+  Output Usage:
+      1. One-time: Create file interface by providing either a channel name or
+         a path to a local file.
+	    psiAsciiFileOutput_t fout = psiAsciiFileOutput("file_channel", 1); // channel
+	    psiAsciiFileOutput_t fout = psiAsciiFileOutput("/local/file.txt", 0); // local file
+      2. Send lines to the file. If return value is not 0, the send was not
+          succesfull.
+            int ret;
+	    ret = af_send_line(fout, "Line 1\n");
+	    ret = af_send_line(fout, "Line 2\n");
+      3. Send EOF message when done to close the file.
+            ret = af_send_eof(fout);
+      4. Cleanup. Call functions to deallocate structures and close files.
+            cleanup_pafo(&fout);
+
+*/
+//==============================================================================
+
+/*!
+  @brief Structure of information for output to a file line by line.
+ */
 typedef struct psiAsciiFileOutput_t {
-  int _valid;
-  const char *_name;
-  int _type;
-  AsciiFile _file;
-  psiOutput_t _psi;
+  int _valid; //!< Indicates if the structure was succesfully initialized.
+  const char *_name; //!< Path to local file or name of output channel.
+  int _type; //!< 0 for local file, 1 for output channel.
+  AsciiFile _file; //!< Associated output handler for local files.
+  psiOutput_t _psi; //!< Associated output handler for output channel.
 } psiAsciiFileOutput_t;
 
+/*!
+  @brief Structure of information for input from a file line by line. 
+ */
 typedef struct psiAsciiFileInput_t {
-  int _valid;
-  const char *_name;
-  int _type;
-  AsciiFile _file;
-  psiInput_t _psi;
+  int _valid; //!< Indicates if the structure was succesfully initialized.
+  const char *_name; //!< Path to local file or name of input channel. 
+  int _type; //!< 0 for local file, 1 for input channel.
+  AsciiFile _file; //!< Associated input handler for local files.
+  psiInput_t _psi; //!< Associated input handler for input channel. 
 } psiAsciiFileInput_t;
 
+/*!
+  @brief Constructor for psiAsciiFileOutput_t.
+  Based on the value of dst_type, either a local file will be opened for output
+  (dst_type == 0), or a psiOutput_t connection will be made.
+  @param[in] name constant character pointer to path of local file or name of
+  an output queue.
+  @param[in] dst_type int 0 if name refers to a local file, 1 if it is a queue.
+  @returns psiAsciiFileOutput_t for line-by-line output to a file or channel.
+ */
 static inline
 psiAsciiFileOutput_t psiAsciiFileOutput(const char *name, int dst_type) {
   psiAsciiFileOutput_t out;
@@ -1042,6 +1094,15 @@ psiAsciiFileOutput_t psiAsciiFileOutput(const char *name, int dst_type) {
   return out;
 };
 
+/*!
+  @brief Constructor for psiAsciiFileInput_t.
+  Based on the value of src_type, either a local file will be opened for input
+  (src_type == 0), or a psiInput_t connection will be made.
+  @param[in] name constant character pointer to path of local file or name of
+  an input queue.
+  @param[in] src_type int 0 if name refers to a local file, 1 if it is a queue.
+  @returns psiAsciiFileInput_t for line-by-line input from a file or channel.
+ */
 static inline
 psiAsciiFileInput_t psiAsciiFileInput(const char *name, int src_type) {
   psiAsciiFileInput_t out;
@@ -1063,6 +1124,11 @@ psiAsciiFileInput_t psiAsciiFileInput(const char *name, int src_type) {
   return out;
 };
 
+/*!
+  @brief Check if a character array matches the internal EOF message.
+  @param[in] buf constant character pointer to string that should be checked.
+  @returns int 1 if buf is the EOF message, 0 otherwise.
+ */
 static inline
 int is_eof(const char *buf) {
   if (strcmp(buf, PSI_MSG_EOF) == 0)
@@ -1070,7 +1136,12 @@ int is_eof(const char *buf) {
   else
     return 0;
 };
-  
+
+/*!
+  @brief Send EOF message to output file, closing it.
+  @param[in] t psiAsciiFileOutput_t output structure.
+  @returns int 0 if send was succesfull. All other values indicate errors.
+ */
 static inline
 int af_send_eof(psiAsciiFileOutput_t t) {
   char buf[PSI_MSG_MAX] = PSI_MSG_EOF;
@@ -1078,6 +1149,15 @@ int af_send_eof(psiAsciiFileOutput_t t) {
   return ret;
 };
 
+/*!
+  @brief Receive a single line from an associated file or queue.
+  @param[in] t psiAsciiFileInput_t input structure.
+  @param[out] line character pointer to allocate memory where the received
+  line should be stored.
+  @param[out] n size_t Size of the allocated memory block in bytes.
+  @returns int Number of bytes read/received. Negative values indicate that
+  there was either an error or the EOF message was received.
+ */
 static inline
 int af_recv_line(psiAsciiFileInput_t t, char *line, size_t n) {
   int ret;
@@ -1085,12 +1165,20 @@ int af_recv_line(psiAsciiFileInput_t t, char *line, size_t n) {
     ret = af_readline_full(t._file, &line, &n);
   } else {
     ret = psi_recv(t._psi, line, n);
-    if (is_eof(line))
-      ret = -1;
+    if (ret > 0) {
+      if (is_eof(line))
+	ret = -1;
+    }
   }
   return ret;
 };
 
+/*!
+  @brief Send a single line to a file or queue.
+  @param[in] t psiAsciiFileOutput_t output structure.
+  @param[in] line character pointer to line that should be sent.
+  @returns int 0 if send was succesfull. Other values indicate errors.
+ */
 static inline
 int af_send_line(psiAsciiFileOutput_t t, char *line) {
   int ret;
@@ -1102,40 +1190,147 @@ int af_send_line(psiAsciiFileOutput_t t, char *line) {
   return ret;
 };
 
+/*!
+  @brief Deallocate and clean up psiAsciiFileInput_t structure.
+  @param[in] t psiAsciiFileInput_t pointer.
+ */
 static inline
 void cleanup_pafi(psiAsciiFileInput_t *t) {
   af_close(&((*t)._file));
 };
 
+/*!
+  @brief Deallocate and clean up psiAsciiFileOutput_t structure.
+  @param[in] t psiAsciiFileOutput_t pointer.
+ */
 static inline
 void cleanup_pafo(psiAsciiFileOutput_t *t) {
   af_close(&((*t)._file));
 };
 
 
-/******************************************************************************/
-/* Table IO */
-/******************************************************************************/
-// Specialized functions for passing table rows back and forth
+//==============================================================================
+/*!
+  Table IO
 
+  Handle I/O from/to a local or remote ASCII table either line-by-line or as
+  an array.
+
+  Row-by-Row
+  ==========
+
+  Input by Row Usage:
+      1. One-time: Create file interface by providing either a channel name or
+         a path to a local file.
+	    psiAsciiTableInput_t fin = psiAsciiTableInput("file_channel", 1);    // channel
+	    psiAsciiTableInput_t fin = psiAsciiTableInput("/local/file.txt", 0); // local table
+      2. Prepare: Allocate space for variables in row (the format in this
+         example is "%5s %d %f\n" like the output example below).
+	    char a[5];
+	    int b;
+	    double c;
+      3. Receive each row, terminating when receive returns -1 (EOF or channel
+         closed).
+	    int ret = 1;
+	    while (ret > 0) {
+	      ret = at_recv_row(fin, &a, &b, &c);
+	      // Do something with the row
+	    }
+      4. Cleanup. Call functions to deallocate structures and close files.
+            cleanup_pati(&fin);
+
+  Output by Row Usage:
+      1. One-time: Create file interface by providing either a channel name or
+         a path to a local file and a format string for rows.
+	    psiAsciiTableOutput_t fout = psiAsciiTableOutput("file_channel",    // channel
+                                                             "%5s %d %f\n", 1);
+	    psiAsciiTableOutput_t fout = psiAsciiTableOutput("/local/file.txt", // local table
+	                                                     "%5s %d %f\n", 0);
+      2. Send rows to the file by providing entries. Formatting is handled by
+         the interface. If return value is not 0, the send was not succesful.
+            int ret;
+	    ret = at_send_row(fout, "one", 1, 1.0);
+	    ret = at_send_row(fout, "two", 2, 2.0);
+      3. Send EOF message when done to close the file.
+            ret = at_send_eof(fout);
+      4. Cleanup. Call functions to deallocate structures and close files.
+            cleanup_pato(&fout);
+
+  Array
+  =====
+
+  Input by Array Usage:
+      1. One-time: Create file interface by providing either a channel name or
+         a path to a local file.
+	    psiAsciiTableInput_t fin = psiAsciiTableInput("file_channel", 1);    // channel
+	    psiAsciiTableInput_t fin = psiAsciiTableInput("/local/file.txt", 0); // local table
+      2. Prepare: Declare pointers for table columns (they will be allocated by
+         the interface once the number of rows is known).
+	    char *aCol;
+	    int *bCol;
+	    double *cCol;
+      3. Receive entire table as columns. Return value will be the number of
+         elements in each column (the number of table rows). Negative values
+	 indicate errors.
+            int ret = at_recv_array(fin, &a, &b, &c);
+      4. Cleanup. Call functions to deallocate structures and close files.
+            cleanup_pati(&fin);
+
+  Output by Array Usage:
+      1. One-time: Create file interface by providing either a channel name or
+         a path to a local file and a format string for rows.
+	    psiAsciiTableOutput_t fout = psiAsciiTableOutput("file_channel",    // channel
+                                                             "%5s %d %f\n", 1);
+	    psiAsciiTableOutput_t fout = psiAsciiTableOutput("/local/file.txt", // local table
+	                                                     "%5s %d %f\n", 0);
+      2. Send columns to the file by providing pointers (or arrays). Formatting
+         is handled by the interface. If return value is not 0, the send was not
+	 succesful.
+	    char aCol[] = {"one  ", "two  ", "three"}; \\ Each str is of len 5
+	    int bCol[3] = {1, 2, 3};
+	    float cCol[3] = {1.0, 2.0, 3.0};
+            int ret = at_send_array(fout, a, b, c);
+      3. Cleanup. Call functions to deallocate structures and close files.
+            cleanup_pato(&fout);
+
+*/
+//==============================================================================
+
+/*!
+  @brief Structure for handling output to an ASCII table.
+ */
 typedef struct psiAsciiTableOutput_t {
-  int _valid;
-  const char *_name;
-  int _type;
-  AsciiTable _table;
-  psiOutput_t _psi;
+  int _valid; //!< Success or failure of initializing the structure
+  const char *_name; //!< Path to local table or name of message queue
+  int _type; //!< 0 if #_name is a local table, 1 if it is a message queue.
+  AsciiTable _table; //!< Associated output handler for local tables.
+  psiOutput_t _psi; //!< Associated output handler for queues.
 } psiAsciiTableOutput_t;
 
+/*!
+  @brief Structure for handling input from an ASCII table.
+ */
 typedef struct psiAsciiTableInput_t {
-  int _valid;
-  const char *_name;
-  int _type;
-  AsciiTable _table;
-  psiInput_t _psi;
+  int _valid; //!< Success or failure of initializing the structure
+  const char *_name; //!< Path to local table or name of message queue
+  int _type; //!< 0 if #_name is a local table, 1 if it is a message queue.
+  AsciiTable _table; //!< Associated input handler for local tables. 
+  psiInput_t _psi; //!< Associated input handler for queues.
 } psiAsciiTableInput_t;
 
+/*!
+  @brief Constructor for psiAsciiTableOutput_t.
+  @param[in] name constant character pointer to local file path or message
+  queue name.
+  @param[in] format_str character pointer to format string that should be used
+  to format rows into table lines.
+  @param[in] dst_type int 0 if name is a local file path, 1 if it is the name
+  of a message queue.
+  @returns psiAsciiTableOutput_t output structure.
+ */
 static inline
-psiAsciiTableOutput_t psiAsciiTableOutput(const char *name, char *format_str, int dst_type) {
+psiAsciiTableOutput_t psiAsciiTableOutput(const char *name, char *format_str,
+					  int dst_type) {
   psiAsciiTableOutput_t out;
   int ret;
   out._valid = 1;
@@ -1166,6 +1361,14 @@ psiAsciiTableOutput_t psiAsciiTableOutput(const char *name, char *format_str, in
   return out;
 };
 
+/*!
+  @brief Constructor for psiAsciiTableInput_t.
+  @param[in] name constant character pointer to local file path or message
+  queue name.
+  @param[in] src_type int 0 if name is a local file path, 1 if it is the name
+  of a message queue.
+  @returns psiAsciiTableInput_t input structure.
+ */
 static inline
 psiAsciiTableInput_t psiAsciiTableInput(const char *name, int src_type) {
   psiAsciiTableInput_t out;
@@ -1196,16 +1399,36 @@ psiAsciiTableInput_t psiAsciiTableInput(const char *name, int src_type) {
   return out;
 };
 
+/*!
+  @brief Send a nolimit message to a table output queue.
+  @param[in] t psiAsciiTableOutput_t output structure.
+  @param[in] data character pointer to message that should be sent.
+  @param[in] len int length of message to be sent.
+  @returns int 0 if send succesfull, -1 if send unsuccessful.
+ */
 static inline
 int at_psi_send(psiAsciiTableOutput_t t, char *data, int len){
   return psi_send_nolimit(t._psi, data, len);
 };
   
+/*!
+  @brief Recv a nolimit message from a table input queue.
+  @param[in] t psiAsciiTableInput_t input structure.
+  @param[in] data character pointer to message that should be sent.
+  @param[in] len int length of message to be sent.
+  @returns int -1 if message could not be received. Length of the received
+  message if message was received.
+ */
 static inline
 int at_psi_recv(psiAsciiTableInput_t t, char **data, int len){
   return psi_recv_nolimit(t._psi, data, len);
 };
 
+/*!
+  @brief Send a nolimit EOF message to a table output queue.
+  @param[in] t psiAsciiTableOutput_t output structure.
+  @returns int 0 if send succesfull, -1 if send unsuccessful.
+ */
 static inline
 int at_send_eof(psiAsciiTableOutput_t t) {
   char buf[PSI_MSG_MAX] = PSI_MSG_EOF;
@@ -1213,6 +1436,12 @@ int at_send_eof(psiAsciiTableOutput_t t) {
   return ret;
 };
 
+/*!
+  @brief Format and send a row to the table file/queue.
+  @param[in] t psiAsciiTableOutput_t output structure.
+  @param[in] ap va_list Row elements that should be formatted.
+  @returns int 0 if send succesfull, -1 if send unsuccessful.
+ */
 static inline
 int vsend_row(psiAsciiTableOutput_t t, va_list ap) {
   int ret;
@@ -1224,30 +1453,31 @@ int vsend_row(psiAsciiTableOutput_t t, va_list ap) {
   return ret;
 };
 
+/*!
+  @brief Recv and parse a row from the table file/queue.
+  @param[in] t psiAsciiTableInput_t input structure.
+  @param[in] ap va_list Pointers to memory where variables from the parsed
+  should be stored.
+  @returns int -1 if message could not be received or parsed, otherwise the 
+  length of the received is returned.
+ */
 static inline
 int vrecv_row(psiAsciiTableInput_t t, va_list ap) {
   int ret;
   if (t._type == 0) {
     ret = at_vreadline(t._table, ap);
   } else {
-    char *buf = (char*)malloc(PSI_MSG_MAX);
-    ret = psi_recv_nolimit(t._psi, &buf, PSI_MSG_MAX);
-    if (ret > 0) {
-      debug("recv_row(%s): psi_recv returns %d: %s", t._psi._name, ret, buf);
-      if (is_eof(buf)) {
-	ret = -1;
-      } else {
-	ret = vsscanf(buf, t._psi._fmt, ap);
-	debug("vpsiRecv_nolimit(%s): vsscanf returns %d", t._psi._name, ret);
-      }
-    } else {
-      ret = -1;
-    }
-    free(buf);
+    ret = vpsiRecv_nolimit(t._psi, ap);
   }
   return ret;
 };
 
+/*!
+  @brief Format and send a row to the table file/queue.
+  @param[in] t psiAsciiTableOutput_t output structure.
+  @param[in] ... Row elements that should be formatted.
+  @returns int 0 if send succesfull, -1 if send unsuccessful.
+ */
 static inline
 int at_send_row(psiAsciiTableOutput_t t, ...) {
   int ret;
@@ -1258,6 +1488,14 @@ int at_send_row(psiAsciiTableOutput_t t, ...) {
   return ret;
 };
 
+/*!
+  @brief Recv and parse a row from the table file/queue.
+  @param[in] t psiAsciiTableInput_t input structure.
+  @param[in] ... Pointers to memory where variables from the parsed row
+  should be stored.
+  @returns int -1 if message could not be received or parsed, otherwise the 
+  length of the received is returned.
+ */
 static inline
 int at_recv_row(psiAsciiTableInput_t t, ...) {
   int ret;
@@ -1268,6 +1506,14 @@ int at_recv_row(psiAsciiTableInput_t t, ...) {
   return ret;
 };
  
+/*!
+  @brief Format and send table columns to the table file/queue.
+  @param[in] t psiAsciiTableOutput_t output structure.
+  @param[in] nrows int Number of rows in the columns.
+  @param[in] ap va_list Pointers to memory containing table columns that
+  should be formatted.
+  @returns int 0 if send succesfull, -1 if send unsuccessful.
+ */
 static inline
 int vsend_array(psiAsciiTableOutput_t t, int nrows, va_list ap) {
   int ret;
@@ -1291,6 +1537,13 @@ int vsend_array(psiAsciiTableOutput_t t, int nrows, va_list ap) {
   return ret;
 };
 
+/*!
+  @brief Recv and parse columns from a table file/queue.
+  @param[in] t psiAsciiTableInput_t input structure.
+  @param[in] ap va_list Pointers to pointers to memory where columns from the
+  parsed table should be stored. They need not be allocated, only declared.
+  @returns int Number of rows received. Negative values indicate errors.
+ */
 static inline
 int vrecv_array(psiAsciiTableInput_t t, va_list ap) {
   int ret;
@@ -1311,6 +1564,14 @@ int vrecv_array(psiAsciiTableInput_t t, va_list ap) {
   return ret;
 };
 
+/*!
+  @brief Format and send table columns to the table file/queue.
+  @param[in] t psiAsciiTableOutput_t output structure.
+  @param[in] nrows int Number of rows in the columns.
+  @param[in] ... Pointers to memory containing table columns that
+  should be formatted.
+  @returns int 0 if send succesfull, -1 if send unsuccessful.
+ */
 static inline
 int at_send_array(psiAsciiTableOutput_t t, int nrows, ...) {
   int ret;
@@ -1321,6 +1582,13 @@ int at_send_array(psiAsciiTableOutput_t t, int nrows, ...) {
   return ret;
 };
 
+/*!
+  @brief Recv and parse columns from a table file/queue.
+  @param[in] t psiAsciiTableInput_t input structure.
+  @param[in] ... Pointers to pointers to memory where columns from the
+  parsed table should be stored. They need not be allocated, only declared.
+  @returns int Number of rows received. Negative values indicate errors.
+ */
 static inline
 int at_recv_array(psiAsciiTableInput_t t, ...) {
   int ret;
@@ -1331,6 +1599,10 @@ int at_recv_array(psiAsciiTableInput_t t, ...) {
   return ret;
 };
  
+/*!
+  @brief Deallocate and clean up psiAsciiTableInput_t structure.
+  @param[in] t psiAsciiTableInput_t pointer.
+ */
 static inline
 void cleanup_pati(psiAsciiTableInput_t *t) {
   if ((*t)._type != 0)
@@ -1339,6 +1611,10 @@ void cleanup_pati(psiAsciiTableInput_t *t) {
   at_cleanup(&((*t)._table));
 };
 
+/*!
+  @brief Deallocate and clean up psiAsciiTableOutput_t structure.
+  @param[in] t psiAsciiTableOutput_t pointer.
+ */
 static inline
 void cleanup_pato(psiAsciiTableOutput_t *t) {
   at_close(&((*t)._table));

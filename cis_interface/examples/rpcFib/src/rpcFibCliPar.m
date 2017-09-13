@@ -11,7 +11,7 @@ function rpcFibCliPar(iterations)
   for i = 1:iterations
     fprintf('rpcFibCliPar(M): fib(->%-2d) ::: \n', i);
     ret = rpc.rpcSend(i);
-    if (~ret)
+    if (~ret);
       disp('rpcFibCliPar(M): SEND FAILED');
       exit(-1);
     end
@@ -23,7 +23,7 @@ function rpcFibCliPar(iterations)
     input = rpc.rpcRecv();
     ret = input{1};
     fib = input{2};
-    if (~ret)
+    if (~ret);
       disp('rpcFibCliPar(M): RECV FAILED')
       exit(-1);
       break;

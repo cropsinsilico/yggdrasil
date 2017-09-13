@@ -16,9 +16,12 @@
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
-# import os
-# import sys
+import os
+import sys
 # sys.path.insert(0, os.path.abspath('.'))
+doxydir = os.path.join(os.path.abspath('../'), "doxy", "xml")
+srcdir = os.path.join(os.path.abspath('../../'), "cis_interface")
+sys.path.append(doxydir)
 
 
 # -- General configuration ------------------------------------------------
@@ -30,7 +33,8 @@
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
-extensions = ['sphinx.ext.autodoc',
+extensions = [
+    'sphinx.ext.autodoc',
     'sphinx.ext.doctest',
     'sphinx.ext.intersphinx',
     'sphinx.ext.todo',
@@ -40,7 +44,19 @@ extensions = ['sphinx.ext.autodoc',
     'sphinx.ext.viewcode',
     'sphinx.ext.githubpages',
     'sphinx.ext.napoleon',
+    'breathe',
 ]
+
+breathe_projects = {"cis_interface": doxydir}
+breathe_default_project = "cis_interface"
+breathe_projects_source = {
+    "interface": (
+        os.path.join(srcdir, 'interface'), [
+            'PsiInterface.h', 'PsiInterface.hpp']),
+    "dataio": (
+        os.path.join(srcdir, 'dataio'), [
+            'AsciiTable.h', 'AsciiFile.h'])
+    }
 
 # Napoleon settings
 napoleon_google_docstring = True

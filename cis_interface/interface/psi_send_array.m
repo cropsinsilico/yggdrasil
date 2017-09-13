@@ -1,4 +1,4 @@
-function psi_send_array(psi_output, mat)
+function psi_send_array(psi_output, mat);
 
   % TODO: Handle mixed types
   % Single array of single type
@@ -8,4 +8,4 @@ function psi_send_array(psi_output, mat)
 
   psi_output.send_array(pyarr);
 
-end
+end;

@@ -21,7 +21,7 @@ while res{1}
     % If the receive was succesful, send the line to output
     fprintf('File: %s', char(res{2}));
     ret = out_file.send_line(res{2});
-    if (~ret)
+    if (~ret);
       disp('ascii_io(M): ERROR SENDING LINE');
       break;
     end;
@@ -45,7 +45,7 @@ while res{1}
     line = res{2};
     fprintf('Table: %s, %d, %f\n', char(line{1}), line{2}, line{3});
     ret = out_table.send_row(res{2});
-    if (~ret)
+    if (~ret);
       disp('ascii_io(M): ERROR SENDING ROW');
       break;
     end;
@@ -59,7 +59,7 @@ end;
 
 % Read entire array from ASCII table into an array
 res = in_array.recv_array();
-if (~res{1})
+if (~res{1});
   disp('ascii_io(M): ERROR RECVING ARRAY');
   exit(-1);
 end;
@@ -72,7 +72,7 @@ for i = 1:arr.size
 end;
 % Send the array to output. Formatting is handled on the output driver side.
 ret = out_array.send_array(arr);
-if (~ret)
+if (~ret);
   disp('ascii_io(M): ERROR SENDING ARRAY');
 end;
 
