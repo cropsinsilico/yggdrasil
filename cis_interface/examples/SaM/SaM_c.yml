@@ -6,15 +6,15 @@ model:
   args: ./src/SaM.c
 
   inputs:
-    - name: input1
+    - name: input1_c
       driver: FileInputDriver
       args: ./Input/SaM_input.txt
-    - name: static
+    - name: static_c
       driver: FileInputDriver
       args: ./Input/SaM_static.txt
 
   outputs:
-    - name: output
+    - name: output_c
       driver: FileOutputDriver
       args: /tmp/SaM_output.txt
 

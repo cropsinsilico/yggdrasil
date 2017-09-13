@@ -11,9 +11,9 @@ int main(int argc, char *argv[]){
     char outbuf[BSIZE];
 
     // Get input and output channels matching yaml
-    psiInput_t Input = psiInput("input1");
-    psiInput_t Static = psiInput("static");
-    psiOutput_t Output = psiOutput("output");
+    psiInput_t Input = psiInput("input1_c");
+    psiInput_t Static = psiInput("static_c");
+    psiOutput_t Output = psiOutput("output_c");
     printf("SaM(C): Set up I/O channels\n");
 
     // Get input from input1 channel
@@ -36,7 +36,7 @@ int main(int argc, char *argv[]){
 
     // Compute sum and send message to output channel
     int sum = a + b;
-    sprintf(outbuf,"Sum = %d\n", sum);
+    sprintf(outbuf, "%d", sum);
     ret = psi_send(Output, outbuf, strlen(outbuf));
     if (ret != 0) {
       printf("SaM(C): ERROR SEND to output\n");

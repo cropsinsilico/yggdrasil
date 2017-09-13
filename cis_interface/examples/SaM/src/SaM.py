@@ -6,9 +6,9 @@ from cis_interface.interface.PsiInterface import PsiInput, PsiOutput
 if __name__ == '__main__':
 
     # Get input and output channels matching yaml
-    in1 = PsiInput('input1')
-    in2 = PsiInput('static')
-    out1 = PsiOutput('output')
+    in1 = PsiInput('input1_python')
+    in2 = PsiInput('static_python')
+    out1 = PsiOutput('output_python')
     print('SaM(P): Set up I/O channels')
 
     # Get input from input1 channel
@@ -29,7 +29,7 @@ if __name__ == '__main__':
 
     # Compute sum and send message to output channel
     sum = a + b
-    outdata = 'Sum = %d\n' % sum
+    outdata = '%d' % sum
     ret = out1.send(outdata)
     if not ret:
         print('SaM(P): ERROR SEND to output')

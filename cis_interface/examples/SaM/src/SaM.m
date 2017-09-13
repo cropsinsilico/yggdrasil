@@ -1,8 +1,8 @@
 
 % Get input and output channels matching yaml
-in1 = PsiInterface('PsiInput', 'input1');
-in2 = PsiInterface('PsiInput', 'static');
-out1 = PsiInterface('PsiOutput', 'output');
+in1 = PsiInterface('PsiInput', 'input1_matlab');
+in2 = PsiInterface('PsiInput', 'static_matlab');
+out1 = PsiInterface('PsiOutput', 'output_matlab');
 disp('SaM(M): Set up I/O channels');
 
 % Get input from input1 channel
@@ -25,7 +25,7 @@ fprintf('SaM(M): Received %d from static\n', b);
 
 % Compute sum and send message to output channel
 sum = a + b;
-outdata = sprintf('Sum = %d\n', sum);
+outdata = sprintf('%d', sum);
 ret = out1.send(outdata);
 if (~ret)
   disp('SaM(M): ERROR SEND to output');

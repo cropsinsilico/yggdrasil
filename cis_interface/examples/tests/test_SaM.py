@@ -15,7 +15,11 @@ class TestExampleSaM(TestExample):
     @property
     def result(self):
         r"""Result that should be found in output files."""
-        return 'Sum = %d' % 3
+        if self.language == 'all':
+            s = 7
+        else:
+            s = 3
+        return '%d' % s
 
     @property
     def output_file(self):
