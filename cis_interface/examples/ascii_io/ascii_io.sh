@@ -23,6 +23,10 @@ case $1 in
 	echo "Running C"
 	yaml='ascii_io_c.yml'
 	;;
+    --cpp | --g++ )
+	echo "Running C++"
+	yaml='ascii_io_cpp.yml'
+	;;
     * )
 	echo "Running ", $1
 	yaml=$1

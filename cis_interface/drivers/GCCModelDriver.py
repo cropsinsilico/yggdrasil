@@ -38,12 +38,16 @@ class GCCModelDriver(ModelDriver):
         cfile = self.args.pop(0)
         if cfile.endswith('.c'):
             gcc = 'gcc'
+            osuffix = '_c.out'
+            flags = []
         elif cfile.endswith('.cpp'):
             gcc = 'g++'
+            osuffix = '_cpp.out'
+            flags = ['-std=c++11']
         else:
             raise ValueError("Supplied file is not C or C++ code.")
-        execname = os.path.splitext(cfile)[0] + '.out'
-        compile_args = [gcc, "-g", "-Wall"]
+        execname = os.path.splitext(cfile)[0] + osuffix
+        compile_args = [gcc, "-g", "-Wall"] + flags
         for x in [_incl_interface, _incl_io]:
             compile_args += ["-I" + x]
         run_args = [os.path.join(".", execname)]

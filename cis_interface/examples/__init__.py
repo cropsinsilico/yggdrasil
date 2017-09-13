@@ -4,7 +4,7 @@ import os
 
 ex_dict = {'hello': ('python', 'matlab', 'c', 'cpp'),
            'SaM': ('python', 'matlab', 'c', 'cpp', 'all'),
-           'ascii_io': ('python', 'matlab', 'c', 'all'),
+           'ascii_io': ('python', 'matlab', 'c', 'cpp', 'all'),
            'rpcFib': ('python', 'matlab', 'c', 'all')}
 
 

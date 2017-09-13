@@ -1,0 +1,36 @@
+---
+
+model:
+  name: ascii_io_cpp
+  driver: GCCModelDriver
+  args: src/ascii_io.cpp
+
+  inputs:
+    - name: inputCPP_file
+      driver: AsciiFileInputDriver
+      args: ./Input/input_file.txt
+
+    - name: inputCPP_table
+      driver: AsciiTableInputDriver
+      args: ./Input/input_table.txt
+
+    - name: inputCPP_array
+      driver: AsciiTableInputDriver
+      args:
+        filepath: ./Input/input_array.txt
+        as_array: True
+
+  outputs:
+    - name: outputCPP_file
+      driver: AsciiFileOutputDriver
+      args: /tmp/output_file.txt
+
+    - name: outputCPP_table
+      driver: AsciiTableOutputDriver
+      args: /tmp/output_table.txt
+
+    - name: outputCPP_array
+      driver: AsciiTableOutputDriver
+      args:
+        filepath: /tmp/output_array.txt
+        as_array: True

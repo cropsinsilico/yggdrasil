@@ -66,6 +66,37 @@ models:
         args: outputPy_array
 
   -
+    name: ascii_io_CPP
+    driver: GCCModelDriver
+    args: src/ascii_io.cpp
+
+    inputs:
+      - name: inputCPP_file
+        driver: RMQInputDriver
+        args: outputPy_file
+
+      - name: inputCPP_table
+        driver: RMQInputDriver
+        args: outputPy_table
+
+      - name: inputCPP_array
+        driver: RMQInputDriver
+        args: outputPy_array
+
+    outputs:
+      - name: outputCPP_file
+        driver: RMQOutputDriver
+        args: outputCPP_file
+
+      - name: outputCPP_table
+        driver: RMQOutputDriver
+        args: outputCPP_table
+
+      - name: outputCPP_array
+        driver: RMQOutputDriver
+        args: outputCPP_array
+
+  -
     name: ascii_io_Matlab
     driver: MatlabModelDriver
     args: src/ascii_io.m
@@ -73,15 +104,15 @@ models:
     inputs:
       - name: inputM_file
         driver: RMQInputDriver
-        args: outputPy_file
+        args: outputCPP_file
 
       - name: inputM_table
         driver: RMQInputDriver
-        args: outputPy_table
+        args: outputCPP_table
 
       - name: inputM_array
         driver: RMQInputDriver
-        args: outputPy_array
+        args: outputCPP_array
 
     outputs:
       - name: outputM_file

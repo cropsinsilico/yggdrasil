@@ -244,9 +244,9 @@ psiOutput_t psiOutput(const char *name){
   strcpy(nm, name);
   strcat(nm, "_OUT");
   psiOutput_t ret;
-  ret._handle = psi_mq(nm, name);
   ret._name = name;
   ret._fmt = 0;
+  ret._handle = psi_mq(nm, name);
   return ret;
 };
 
@@ -918,18 +918,6 @@ int rpcSend(psiRpc_t rpc, ...){
   va_list ap;
   va_start(ap, rpc);
   int ret = vrpcSend(rpc, ap);
-  /* char *buf = (char*)malloc(PSI_MSG_MAX); */
-  /* int ret = vsnprintf(buf, PSI_MSG_MAX, rpc._outFmt, ap); */
-  /* debug("rpcSend(%s): vsnprintf returned %d\n", rpc._output._name, ret); */
-  /* ret = psi_send_nolimit(rpc._output, buf, strlen(buf)); */
-  /* debug("rpcSend(%s): psi_send returned %d\n", rpc._output._name, ret); */
-  
-  /* if (ret != 0){ */
-  /*   debug("rpcSend(%s): send error %d\n", rpc._output._name, ret); */
-  /*   free(buf); */
-  /*   return -1; */
-  /* } */
-  /* free(buf); */
   va_end(ap);
   return ret;
 };
@@ -952,20 +940,6 @@ int rpcRecv(psiRpc_t rpc, ...){
   va_list ap;
   va_start(ap, rpc);
   int ret = vrpcRecv(rpc, ap);
-  /* debug("rpcRecv(%s)\n", rpc._input._name); */
-  /* char *buf = (char*)malloc(PSI_MSG_MAX); */
-  /* int ret = psi_recv_nolimit(rpc._input, &buf, PSI_MSG_MAX); */
-  /* debug("rpcRecv(%s): psi_recv returned %d\n", rpc._input._name, ret); */
-  /* if (ret < 0) { */
-  /*   debug("rpcRecv: receive error: %d\n", ret); */
-  /*   free(buf); */
-  /*   return -1; */
-  /* } */
-  
-  /* // unpack the message */
-  /* ret = vsscanf(buf, rpc._inFmt, ap); */
-  /* debug("rpcRecv(%s): vsscanf returned %d\n", rpc._input._name, ret); */
-  /* free(buf); */
   va_end(ap);
   return ret;
 };
@@ -1032,39 +1006,11 @@ int vrpcCall(psiRpc_t rpc, va_list ap) {
  */
 static inline
 int rpcCall(psiRpc_t rpc,  ...){
-  // setup - static variables persist across calls
-  /* char *buf = (char*)malloc(PSI_MSG_MAX); */
-  int ret; // always check return values
-  
-  // pack the args and call
+  int ret;
   va_list ap;
-  /* va_list op; */
   va_start(ap, rpc);
   ret = vrpcCall(rpc, ap);
-  /* ret = vsnprintf(buf, PSI_MSG_MAX, rpc._outFmt, ap); */
-  /* va_copy(op, ap); */
-  /* ret = psi_send_nolimit(rpc._output, buf, strlen(buf)); */
-  /* if (ret != 0){ */
-  /*   debug("rpcCall: psi_send error: %s\n", strerror(errno)); */
-  /*   free(buf); */
-  /*   return -1; */
-  /* } */
-  
-  /* // receive the message */
-  /* ret = psi_recv_nolimit(rpc._input, &buf, PSI_MSG_MAX); */
-  /* if (ret < 0) { */
-  /*   printf("psi_recv error: ret %d: %s\n", ret, strerror(errno)); */
-  /*   free(buf); */
-  /*   return -1; */
-  /* } */
-  
-  /* // unpack the messages */
-  /* ret = vsscanf(buf, rpc._inFmt, op); */
-  /* debug("rpcCall: return_temporary_buffer %d\n", ret); */
   va_end(ap);
-  /* va_end(op); */
-  
-  /* free(buf); */
   return ret;
 };
 
@@ -1073,46 +1019,25 @@ int rpcCall(psiRpc_t rpc,  ...){
 /******************************************************************************/
 // Specialized methods for passing file rows back and forth
 
-typedef struct PsiAsciiFileOutput {
+typedef struct psiAsciiFileOutput_t {
   int _valid;
   const char *_name;
   int _type;
   AsciiFile _file;
   psiOutput_t _psi;
-} PsiAsciiFileOutput;
+} psiAsciiFileOutput_t;
 
-typedef struct PsiAsciiFileInput {
+typedef struct psiAsciiFileInput_t {
   int _valid;
   const char *_name;
   int _type;
   AsciiFile _file;
   psiInput_t _psi;
-} PsiAsciiFileInput;
+} psiAsciiFileInput_t;
 
 static inline
-PsiAsciiFileInput psi_ascii_file_input(const char *name, int src_type) {
-  PsiAsciiFileInput out;
-  int ret;
-  out._name = name;
-  out._type = src_type;
-  out._valid = 1;
-  if (src_type == 0) { // Direct file interface
-    out._file = ascii_file(name, "r", NULL, NULL);
-    ret = af_open(&(out._file));
-    if (ret != 0) {
-      error("psi_ascii_file_input: Could not open %s", name);
-      out._valid = 0;
-    }
-  } else {
-    out._psi = psiInput(name);
-    out._file = ascii_file(name, "0", NULL, NULL);
-  }
-  return out;
-};
-
-static inline
-PsiAsciiFileOutput psi_ascii_file_output(const char *name, int dst_type) {
-  PsiAsciiFileOutput out;
+psiAsciiFileOutput_t psiAsciiFileOutput(const char *name, int dst_type) {
+  psiAsciiFileOutput_t out;
   int ret;
   out._name = name;
   out._type = dst_type;
@@ -1132,6 +1057,27 @@ PsiAsciiFileOutput psi_ascii_file_output(const char *name, int dst_type) {
 };
 
 static inline
+psiAsciiFileInput_t psiAsciiFileInput(const char *name, int src_type) {
+  psiAsciiFileInput_t out;
+  int ret;
+  out._name = name;
+  out._type = src_type;
+  out._valid = 1;
+  if (src_type == 0) { // Direct file interface
+    out._file = ascii_file(name, "r", NULL, NULL);
+    ret = af_open(&(out._file));
+    if (ret != 0) {
+      error("psi_ascii_file_input: Could not open %s", name);
+      out._valid = 0;
+    }
+  } else {
+    out._psi = psiInput(name);
+    out._file = ascii_file(name, "0", NULL, NULL);
+  }
+  return out;
+};
+
+static inline
 int is_eof(const char *buf) {
   if (strcmp(buf, PSI_MSG_EOF) == 0)
     return 1;
@@ -1140,14 +1086,14 @@ int is_eof(const char *buf) {
 };
   
 static inline
-int af_send_eof(PsiAsciiFileOutput t) {
+int af_send_eof(psiAsciiFileOutput_t t) {
   char buf[PSI_MSG_MAX] = PSI_MSG_EOF;
   int ret = psi_send(t._psi, buf, strlen(buf));
   return ret;
 };
 
 static inline
-int recv_line(PsiAsciiFileInput t, char *line, size_t n) {
+int af_recv_line(psiAsciiFileInput_t t, char *line, size_t n) {
   int ret;
   if (t._type == 0) {
     ret = af_readline_full(t._file, &line, &n);
@@ -1160,7 +1106,7 @@ int recv_line(PsiAsciiFileInput t, char *line, size_t n) {
 };
 
 static inline
-int send_line(PsiAsciiFileOutput t, char *line) {
+int af_send_line(psiAsciiFileOutput_t t, char *line) {
   int ret;
   if (t._type == 0) {
     ret = af_writeline_full(t._file, line);
@@ -1171,12 +1117,12 @@ int send_line(PsiAsciiFileOutput t, char *line) {
 };
 
 static inline
-void cleanup_pafi(PsiAsciiFileInput *t) {
+void cleanup_pafi(psiAsciiFileInput_t *t) {
   af_close(&((*t)._file));
 };
 
 static inline
-void cleanup_pafo(PsiAsciiFileOutput *t) {
+void cleanup_pafo(psiAsciiFileOutput_t *t) {
   af_close(&((*t)._file));
 };
 
@@ -1186,55 +1132,25 @@ void cleanup_pafo(PsiAsciiFileOutput *t) {
 /******************************************************************************/
 // Specialized functions for passing table rows back and forth
 
-typedef struct PsiAsciiTableOutput {
+typedef struct psiAsciiTableOutput_t {
   int _valid;
   const char *_name;
   int _type;
   AsciiTable _table;
   psiOutput_t _psi;
-} PsiAsciiTableOutput;
+} psiAsciiTableOutput_t;
 
-typedef struct PsiAsciiTableInput {
+typedef struct psiAsciiTableInput_t {
   int _valid;
   const char *_name;
   int _type;
   AsciiTable _table;
   psiInput_t _psi;
-} PsiAsciiTableInput;
+} psiAsciiTableInput_t;
 
 static inline
-PsiAsciiTableInput psi_ascii_table_input(const char *name, int src_type) {
-  PsiAsciiTableInput out;
-  int ret;
-  out._valid = 1;
-  out._name = name;
-  out._type = src_type;
-  if (src_type == 0) { // Direct file interface
-    out._table = ascii_table(name, "r", NULL,
-			     NULL, NULL, NULL);
-    ret = at_open(&(out._table));
-    if (ret != 0) {
-      error("psi_ascii_table_input: Could not open %s", name);
-      out._valid = 0;
-    }
-  } else {
-    out._psi = psiInput(name);
-    out._psi._fmt = (char*)malloc(PSI_MSG_MAX);
-    ret = psi_recv(out._psi, out._psi._fmt, PSI_MSG_MAX);
-    if (ret < 0) {
-      error("psi_ascii_table_input: Failed to receive format string.");
-      out._valid = 0;
-    } else {
-      out._table = ascii_table(name, "0", out._psi._fmt,
-                               NULL, NULL, NULL);
-    }
-  }
-  return out;
-};
-
-static inline
-PsiAsciiTableOutput psi_ascii_table_output(const char *name, int dst_type, char *format_str) {
-  PsiAsciiTableOutput out;
+psiAsciiTableOutput_t psiAsciiTableOutput(const char *name, char *format_str, int dst_type) {
+  psiAsciiTableOutput_t out;
   int ret;
   out._valid = 1;
   out._name = name;
@@ -1265,30 +1181,68 @@ PsiAsciiTableOutput psi_ascii_table_output(const char *name, int dst_type, char 
 };
 
 static inline
-int at_psi_send(PsiAsciiTableOutput t, char *data, int len){
+psiAsciiTableInput_t psiAsciiTableInput(const char *name, int src_type) {
+  psiAsciiTableInput_t out;
+  int ret;
+  out._valid = 1;
+  out._name = name;
+  out._type = src_type;
+  if (src_type == 0) { // Direct file interface
+    out._table = ascii_table(name, "r", NULL,
+			     NULL, NULL, NULL);
+    ret = at_open(&(out._table));
+    if (ret != 0) {
+      error("psi_ascii_table_input: Could not open %s", name);
+      out._valid = 0;
+    }
+  } else {
+    out._psi = psiInput(name);
+    out._psi._fmt = (char*)malloc(PSI_MSG_MAX);
+    ret = psi_recv(out._psi, out._psi._fmt, PSI_MSG_MAX);
+    if (ret < 0) {
+      error("psi_ascii_table_input: Failed to receive format string.");
+      out._valid = 0;
+    } else {
+      out._table = ascii_table(name, "0", out._psi._fmt,
+                               NULL, NULL, NULL);
+    }
+  }
+  return out;
+};
+
+static inline
+int at_psi_send(psiAsciiTableOutput_t t, char *data, int len){
   return psi_send_nolimit(t._psi, data, len);
 };
   
 static inline
-int at_psi_recv(PsiAsciiTableInput t, char **data, int len){
+int at_psi_recv(psiAsciiTableInput_t t, char **data, int len){
   return psi_recv_nolimit(t._psi, data, len);
 };
 
 static inline
-int at_send_eof(PsiAsciiTableOutput t) {
+int at_send_eof(psiAsciiTableOutput_t t) {
   char buf[PSI_MSG_MAX] = PSI_MSG_EOF;
   int ret = psi_send_nolimit(t._psi, buf, strlen(buf));
   return ret;
 };
 
 static inline
-int recv_row(PsiAsciiTableInput t, ...) {
+int vsend_row(psiAsciiTableOutput_t t, va_list ap) {
   int ret;
-  va_list ap;
-  va_start(ap, t);
+  if (t._type == 0) {
+    ret = at_vwriteline(t._table, ap);
+  } else {
+    ret = vpsiSend_nolimit(t._psi, ap);
+  }
+  return ret;
+};
+
+static inline
+int vrecv_row(psiAsciiTableInput_t t, va_list ap) {
+  int ret;
   if (t._type == 0) {
     ret = at_vreadline(t._table, ap);
-    va_end(ap);
   } else {
     char *buf = (char*)malloc(PSI_MSG_MAX);
     ret = psi_recv_nolimit(t._psi, &buf, PSI_MSG_MAX);
@@ -1309,48 +1263,28 @@ int recv_row(PsiAsciiTableInput t, ...) {
 };
 
 static inline
-int send_row(PsiAsciiTableOutput t, ...) {
+int at_send_row(psiAsciiTableOutput_t t, ...) {
   int ret;
   va_list ap;
   va_start(ap, t);
-  if (t._type == 0) {
-    ret = at_vwriteline(t._table, ap);
-    va_end(ap);
-  } else {
-    ret = vpsiSend_nolimit(t._psi, ap);
-    va_end(ap);
-  }
-  return ret;
-};
-
-static inline
-int recv_array(PsiAsciiTableInput t, ...) {
-  int ret;
-  va_list ap;
-  va_start(ap, t);
-  if (t._type == 0) {
-    printf("Not currently implemented.\n");
-    ret = -1;
-  } else {
-    int data_siz = 10*t._table.row_siz;
-    char *data = (char*)malloc(data_siz);
-    ret = psi_recv_nolimit(t._psi, &data, data_siz);
-    /* printf("Received: "); */
-    /* fwrite(data, ret, 1, stdout); */
-    /* printf("\n"); */
-    if (ret >= 0) {
-      ret = at_vbytes_to_array(t._table, data, ret, ap);
-    }
-  }
+  ret = vsend_row(t, ap);
   va_end(ap);
   return ret;
 };
 
 static inline
-int send_array(PsiAsciiTableOutput t, int nrows, ...) {
+int at_recv_row(psiAsciiTableInput_t t, ...) {
   int ret;
   va_list ap;
-  va_start(ap, nrows);
+  va_start(ap, t);
+  ret = vrecv_row(t, ap);
+  va_end(ap);
+  return ret;
+};
+ 
+static inline
+int vsend_array(psiAsciiTableOutput_t t, int nrows, va_list ap) {
+  int ret;
   if (t._type == 0) {
     printf("Not currently implemented.\n");
     ret = -1;
@@ -1368,12 +1302,51 @@ int send_array(PsiAsciiTableOutput t, int nrows, ...) {
     }
     free(data);
   }
+  return ret;
+};
+
+static inline
+int vrecv_array(psiAsciiTableInput_t t, va_list ap) {
+  int ret;
+  if (t._type == 0) {
+    printf("Not currently implemented.\n");
+    ret = -1;
+  } else {
+    int data_siz = 10*t._table.row_siz;
+    char *data = (char*)malloc(data_siz);
+    ret = psi_recv_nolimit(t._psi, &data, data_siz);
+    /* printf("Received: "); */
+    /* fwrite(data, ret, 1, stdout); */
+    /* printf("\n"); */
+    if (ret >= 0) {
+      ret = at_vbytes_to_array(t._table, data, ret, ap);
+    }
+  }
+  return ret;
+};
+
+static inline
+int at_send_array(psiAsciiTableOutput_t t, int nrows, ...) {
+  int ret;
+  va_list ap;
+  va_start(ap, t);
+  ret = vsend_array(t, nrows, ap);
   va_end(ap);
   return ret;
 };
 
 static inline
-void cleanup_pati(PsiAsciiTableInput *t) {
+int at_recv_array(psiAsciiTableInput_t t, ...) {
+  int ret;
+  va_list ap;
+  va_start(ap, t);
+  ret = vrecv_array(t, ap);
+  va_end(ap);
+  return ret;
+};
+ 
+static inline
+void cleanup_pati(psiAsciiTableInput_t *t) {
   if ((*t)._type != 0)
     free((*t)._psi._fmt);
   at_close(&((*t)._table));
@@ -1381,7 +1354,7 @@ void cleanup_pati(PsiAsciiTableInput *t) {
 };
 
 static inline
-void cleanup_pato(PsiAsciiTableOutput *t) {
+void cleanup_pato(psiAsciiTableOutput_t *t) {
   at_close(&((*t)._table));
   at_cleanup(&((*t)._table));
 };
