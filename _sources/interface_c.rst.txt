@@ -2,4 +2,4 @@ C Interface
 ===========
 
 .. autodoxygenindex::
-   :project: interface_c
+   :project: c_interface

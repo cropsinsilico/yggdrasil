@@ -1,4 +1,4 @@
-PYTHON CODE
+Python Code
 ===========
 
 Subpackages
