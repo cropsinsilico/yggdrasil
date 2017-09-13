@@ -1,45 +1,47 @@
+from __future__ import print_function
 import sys
 from cis_interface.interface.PsiInterface import PsiInput, PsiOutput
-import os
-import logging
-from logging import info, debug
 
 
 def runhello():
-    info('hello python from %s', os.getcwd())
+    print('Hello from Python')
 
     # Ins/outs matching with the the model yaml
     inf = PsiInput('inFile')
     outf = PsiOutput('outFile')
     inq = PsiInput('helloQueueIn')
     outq = PsiOutput('helloQueueOut')
-    info("created channels")
+    print("hello(P): Created I/O channels")
 
     # Receive input from a local file
-    flag, buf = inf.recv()
-    info('got %d bytes on inf', len(buf))
+    ret, buf = inf.recv()
+    if not ret:
+        print('hello(P): ERROR FILE RECV')
+        sys.exit(-1)
+    print('hello(P): Received %d bytes from file: %s' % (len(buf), buf))
 
     # Send output to the output queue
-    outq.send(buf)
-    info('sent to outq')
+    ret = outq.send(buf)
+    if not ret:
+        print('hello(P): ERROR QUEUE SEND')
+        sys.exit(-1)
+    print('hello(P): Sent to outq')
 
     # Receive input form the input queue
-    flag, buf = inq.recv()
-    info('got %d bytes on inq', len(buf))
+    ret, buf = inq.recv()
+    if not ret:
+        print('hello(P): ERROR QUEUE RECV')
+        sys.exit(-1)
+    print('hello(P): Received %d bytes from queue: %s' % (len(buf), buf))
 
     # Send output to a local file
-    outf.send(buf)
-    info('sent output to outf')
-    info("bye")
-    
+    ret = outf.send(buf)
+    if not ret:
+        print('hello(P): ERROR FILE SEND')
+        sys.exit(-1)
+    print('hello(P): Sent to outf')
+
+    print('Goodbye from Python');
 
 if __name__ == '__main__':
-    logLevel = logging.NOTSET
-    if 'PSI_CLIENT_DEBUG' in os.environ:
-        logLevel = getattr(logging, os.environ['PSI_CLIENT_DEBUG'])
-    if 'RMQ_DEBUG' in os.environ:
-        rmqLogLevel = getattr(logging, os.environ['RMQ_DEBUG'])
-    logging.basicConfig(
-        level=logLevel, stream=sys.stdout,
-        format=sys.argv[0].split('/')[-1] + ': %(message)s')
     runhello()

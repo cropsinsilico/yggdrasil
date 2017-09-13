@@ -1,26 +1,22 @@
 ---
 
-#
-# Minimal Model Example yaml
-#
-#
-
 model:
-  name: hellomatlab
+  name: hello_matlab
   driver: MatlabModelDriver
-  # simple for a long command line instead of '["arg1", "args", "arg3", ...]'
-  args:
-    - ./src/hello.m
+  args: ./src/hello.m  # Runs the matlab script using Matlab engine
 
   inputs:
-    - name: input
+    - name: inFile
       driver: FileInputDriver
       args: ./Input/input.txt
-  
+    - name: helloQueueIn    
+      driver: RMQInputDriver
+      args: helloQueue
+
   outputs:
-    - name: output
+    - name: helloQueueOut    
+      driver: RMQOutputDriver
+      args: helloQueue
+    - name: outFile
       driver: FileOutputDriver
-      args: /tmp/output.txt
-
-
-      
+      args: /tmp/output_hello.txt

@@ -12,37 +12,37 @@ class PsiInput {
   psiInput_t _pi;
 public:
   
-  PsiInput(char * name) : _pi(psiInput(name)) {}
+  PsiInput(const char *name) : _pi(psiInput(name)) {}
 	
   int recv(char *data, int len) {
     return psi_recv(_pi, data, len);
   }
 
-  int recv_nolimit(cahr *data, int len) {
+  int recv_nolimit(char **data, int len) {
     return psi_recv_nolimit(_pi, data, len);
   }
 };
 
 
 class PsiOutput {
-  psiOutput_t _pi;
 public:
+  psiOutput_t _pi;
   
-  PsiOutput(char * name) : _pi(psiOutput(name)) {}
+  PsiOutput(const char *name) : _pi(psiOutput(name)) {}
   
   int send(char *data, int len) {
     return psi_send(_pi, data, len);
   }
 
   int send_nolimit(char *data, int len) {
-    return psi_send_nlimit(_pi, data, len);
+    return psi_send_nolimit(_pi, data, len);
   }
 };
 	
 
 class PsiRpc {
-  psiRpc_t _pi;
 public:
+  psiRpc_t _pi;
 
   PsiRpc(const char *outName, char *outFormat,
 	 const char *inName, char *inFormat) :
@@ -67,9 +67,11 @@ public:
 
 
 class PsiRpcServer : public PsiRpc {
+public:
+  psiRpc_t _pi;
 
-  PsiRpcServer(cons char *name, char *inFormat, char *outFormat) :
-    _pi(psiRpcServer(name, inFormat, outFormat)) {}
+  PsiRpcServer(const char *name, char *inFormat, char *outFormat) :
+    PsiRpc(name, outFormat, name, inFormat) {}
 
   int call(int fake_first = 0, ...) {
     va_list va;
@@ -82,8 +84,10 @@ class PsiRpcServer : public PsiRpc {
 
 
 class PsiRpcClient : public PsiRpc {
+public:
+  psiRpc_t _pi;
 
-  PsiRpcClient(cons char *name, char *outFormat, char *inFormat) :
-    _pi(psiRpcClient(name, outFormat, inFormat)) {}
+  PsiRpcClient(const char *name, char *outFormat, char *inFormat) :
+    PsiRpc(name, outFormat, name, inFormat) {}
   
 };

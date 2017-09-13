@@ -1,15 +1,9 @@
 ---
 
-#
-# Minimal Model Example yaml
-#
-# The python function name is modelFunction, see PythonModelExample.python
-#
-
 model:
-  name: hellopython
+  name: hello_python
   driver: PythonModelDriver
-  args: ./src/hello.py
+  args: ./src/hello.py  # Runs the python script using default python
 
   inputs:
     - name: inFile
@@ -25,4 +19,4 @@ model:
       args: helloQueue
     - name: outFile
       driver: FileOutputDriver
-      args: /tmp/output.txt
+      args: /tmp/output_hello.txt

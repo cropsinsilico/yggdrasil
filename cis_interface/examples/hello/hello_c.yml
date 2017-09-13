@@ -3,15 +3,20 @@
 model:
   name: hello_c
   driver: GCCModelDriver
-  args:    # compile the C code with necessary libraries
-    - ./src/hello.c
+  args: ./src/hello.c  # compile the C code with necessary libraries
 
   inputs:
-    - name: input
+    - name: inFile
       driver: FileInputDriver
       args: ./Input/input.txt
+    - name: helloQueueIn
+      driver: RMQInputDriver
+      args: helloQueue
   
   outputs:
-    - name: output
+    - name: helloQueueOut
+      driver: RMQOutputDriver
+      args: helloQueue
+    - name: outFile
       driver: FileOutputDriver
-      args: /tmp/output.txt
+      args: /tmp/output_hello.txt
