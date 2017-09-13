@@ -1,0 +1,426 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>C DataIO API &#8212; cis_interface 0.0.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="C++ Code" href="code_cpp.html" />
+    <link rel="prev" title="C Interface" href="interface_c.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="c-dataio-api">
+<h1>C DataIO API<a class="headerlink" href="#c-dataio-api" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="_CPPv29AsciiFile">
+<span id="AsciiFile"></span><span class="target" id="struct_ascii_file"></span><em class="property">struct </em><code class="descname">AsciiFile</code><a class="headerlink" href="#_CPPv29AsciiFile" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Members</p>
+<dl class="member">
+<dt id="_CPPv2N9AsciiFile8filepathE">
+<span id="AsciiFile::filepath__cCP"></span><span class="target" id="struct_ascii_file_1a943bff7edf4fa3310cfc80093f719058"></span><em class="property">const</em> char *<code class="descname">filepath</code><a class="headerlink" href="#_CPPv2N9AsciiFile8filepathE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="member">
+<dt id="_CPPv2N9AsciiFile7io_modeE">
+<span id="AsciiFile::io_mode__cA"></span><span class="target" id="struct_ascii_file_1a28af310876444d92cafbe961dfd7f447"></span>char <code class="descname">io_mode</code>[64]<a class="headerlink" href="#_CPPv2N9AsciiFile7io_modeE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="member">
+<dt id="_CPPv2N9AsciiFile7commentE">
+<span id="AsciiFile::comment__cA"></span><span class="target" id="struct_ascii_file_1ac6ec6edf3c80ec10b3076aaaad2d2543"></span>char <code class="descname">comment</code>[64]<a class="headerlink" href="#_CPPv2N9AsciiFile7commentE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="member">
+<dt id="_CPPv2N9AsciiFile7newlineE">
+<span id="AsciiFile::newline__cA"></span><span class="target" id="struct_ascii_file_1ae4e7b9b8b86b0bee4835f2eb183f048c"></span>char <code class="descname">newline</code>[64]<a class="headerlink" href="#_CPPv2N9AsciiFile7newlineE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="member">
+<dt id="_CPPv2N9AsciiFile2fdE">
+<span id="AsciiFile::fd__FILEP"></span><span class="target" id="struct_ascii_file_1a971e8089527d5d8be168a047ae66c116"></span>FILE *<code class="descname">fd</code><a class="headerlink" href="#_CPPv2N9AsciiFile2fdE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="class">
+<dt id="_CPPv210AsciiTable">
+<span id="AsciiTable"></span><span class="target" id="struct_ascii_table"></span><em class="property">struct </em><code class="descname">AsciiTable</code><a class="headerlink" href="#_CPPv210AsciiTable" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Members</p>
+<dl class="member">
+<dt id="_CPPv2N10AsciiTable1fE">
+<span id="AsciiTable::f__AsciiFile"></span><span class="target" id="struct_ascii_table_1a6b71c65c319ebb789ff5a2a912b35d0c"></span><a class="reference internal" href="#_CPPv29AsciiFile" title="AsciiFile">AsciiFile</a> <code class="descname">f</code><a class="headerlink" href="#_CPPv2N10AsciiTable1fE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="member">
+<dt id="_CPPv2N10AsciiTable10format_strE">
+<span id="AsciiTable::format_str__cA"></span><span class="target" id="struct_ascii_table_1a02c0c95bda1032efb7d36ed046a81161"></span>char <code class="descname">format_str</code>[LINE_SIZE_MAX]<a class="headerlink" href="#_CPPv2N10AsciiTable10format_strE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="member">
+<dt id="_CPPv2N10AsciiTable6columnE">
+<span id="AsciiTable::column__cA"></span><span class="target" id="struct_ascii_table_1a9d1eb5cae7de5f8086e13e77ab677cfd"></span>char <code class="descname">column</code>[64]<a class="headerlink" href="#_CPPv2N10AsciiTable6columnE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="member">
+<dt id="_CPPv2N10AsciiTable5ncolsE">
+<span id="AsciiTable::ncols__i"></span><span class="target" id="struct_ascii_table_1a8fb623eb767592c944c925e4fdf39630"></span>int <code class="descname">ncols</code><a class="headerlink" href="#_CPPv2N10AsciiTable5ncolsE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="member">
+<dt id="_CPPv2N10AsciiTable10format_typE">
+<span id="AsciiTable::format_typ__iP"></span><span class="target" id="struct_ascii_table_1a2071d95515e2c0f1d6d3df70d37f1905"></span>int *<code class="descname">format_typ</code><a class="headerlink" href="#_CPPv2N10AsciiTable10format_typE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="member">
+<dt id="_CPPv2N10AsciiTable10format_sizE">
+<span id="AsciiTable::format_siz__iP"></span><span class="target" id="struct_ascii_table_1a697bf776cdb1d3d98197b0c8a574d8af"></span>int *<code class="descname">format_siz</code><a class="headerlink" href="#_CPPv2N10AsciiTable10format_sizE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="member">
+<dt id="_CPPv2N10AsciiTable7row_sizE">
+<span id="AsciiTable::row_siz__i"></span><span class="target" id="struct_ascii_table_1a0182498c6504b0b60b7a803409b330e6"></span>int <code class="descname">row_siz</code><a class="headerlink" href="#_CPPv2N10AsciiTable7row_sizE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="member">
+<dt id="_CPPv2N10AsciiTable6statusE">
+<span id="AsciiTable::status__i"></span><span class="target" id="struct_ascii_table_1a782403a4fbf29b3b6dceabec0282c83d"></span>int <code class="descname">status</code><a class="headerlink" href="#_CPPv2N10AsciiTable6statusE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="file">
+<dt>
+<span class="target" id="_ascii_file_8h"></span><em>file</em> <code class="descname">AsciiFile.h</code></dt>
+<dd><em>#include &lt;string.h&gt;</em><em>#include &lt;stdio.h&gt;</em><em>#include &lt;stdlib.h&gt;</em><em>#include &lt;stdarg.h&gt;</em><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Defines</p>
+<dl class="macro">
+<dt id="c.LINE_SIZE_MAX">
+<span class="target" id="_ascii_file_8h_1ac68bae2984ae6cc400d0e6ca823dd28b"></span><code class="descname">LINE_SIZE_MAX</code><a class="headerlink" href="#c.LINE_SIZE_MAX" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Typedefs</p>
+<dl class="type">
+<dt id="_CPPv29AsciiFile">
+<span class="target" id="_ascii_file_8h_1ad744132f03b4b89bb47911c4ec7a82f1"></span><em class="property">typedef </em><em class="property">struct</em> <a class="reference internal" href="#_CPPv29AsciiFile" title="AsciiFile">AsciiFile</a> <code class="descname">AsciiFile</code><a class="headerlink" href="#_CPPv29AsciiFile" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Functions</p>
+<dl class="function">
+<dt id="_CPPv210af_is_openK9AsciiFile">
+<span id="af_is_open__AsciiFileC"></span><span class="target" id="_ascii_file_8h_1a3190a61794d85fda62485cea7650320e"></span><em class="property">static</em> int <code class="descname">af_is_open</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv29AsciiFile" title="AsciiFile">AsciiFile</a> <em>t</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv210af_is_openK9AsciiFile" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv27af_openP9AsciiFile">
+<span id="af_open__AsciiFileP"></span><span class="target" id="_ascii_file_8h_1ae34d5f34cfaac1ecb64c0d98b8098a7b"></span><em class="property">static</em> int <code class="descname">af_open</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv29AsciiFile" title="AsciiFile">AsciiFile</a> *<em>t</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv27af_openP9AsciiFile" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv28af_closeP9AsciiFile">
+<span id="af_close__AsciiFileP"></span><span class="target" id="_ascii_file_8h_1ad2594d6d1e3a868fde31070089a9f5f7"></span><em class="property">static</em> void <code class="descname">af_close</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv29AsciiFile" title="AsciiFile">AsciiFile</a> *<em>t</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv28af_closeP9AsciiFile" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv213af_is_comment9AsciiFilePc">
+<span id="af_is_comment__AsciiFile.cP"></span><span class="target" id="_ascii_file_8h_1aa715a34cb66225c368f6ecc2d9490275"></span><em class="property">static</em> int <code class="descname">af_is_comment</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv29AsciiFile" title="AsciiFile">AsciiFile</a> <em>t</em>, char *<em>line</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv213af_is_comment9AsciiFilePc" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv216af_readline_fullK9AsciiFilePPcP6size_t">
+<span id="af_readline_full__AsciiFileC.cPP.sP"></span><span class="target" id="_ascii_file_8h_1aab169ebcefeef51fbdfd869ab95c1b91"></span><em class="property">static</em> int <code class="descname">af_readline_full</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv29AsciiFile" title="AsciiFile">AsciiFile</a> <em>t</em>, char **<em>line</em>, size_t *<em>n</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv216af_readline_fullK9AsciiFilePPcP6size_t" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv217af_writeline_fullK9AsciiFilePKc">
+<span id="af_writeline_full__AsciiFileC.cCP"></span><span class="target" id="_ascii_file_8h_1a6735b69ee05db53b9fdabe358bb4fb26"></span><em class="property">static</em> int <code class="descname">af_writeline_full</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv29AsciiFile" title="AsciiFile">AsciiFile</a> <em>t</em>, <em class="property">const</em> char *<em>line</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv217af_writeline_fullK9AsciiFilePKc" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv210ascii_filePKcPKcPcPc">
+<span id="ascii_file__cCP.cCP.cP.cP"></span><span class="target" id="_ascii_file_8h_1a8412b025390313d73923a4b16a6e90d4"></span><em class="property">static</em> <a class="reference internal" href="#_CPPv29AsciiFile" title="AsciiFile">AsciiFile</a> <code class="descname">ascii_file</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>filepath</em>, <em class="property">const</em> char *<em>io_mode</em>, char *<em>comment</em>, char *<em>newline</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv210ascii_filePKcPKcPcPc" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="file">
+<dt>
+<span class="target" id="_ascii_table_8h"></span><em>file</em> <code class="descname">AsciiTable.h</code></dt>
+<dd><em>#include &lt;string.h&gt;</em><em>#include &lt;stdio.h&gt;</em><em>#include &lt;stdlib.h&gt;</em><em>#include &lt;stdarg.h&gt;</em><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Typedefs</p>
+<dl class="type">
+<dt id="_CPPv210AsciiTable">
+<span class="target" id="_ascii_table_8h_1a29f3208e3f7725d88d70d6d962c49a52"></span><em class="property">typedef </em><em class="property">struct</em> <a class="reference internal" href="#_CPPv210AsciiTable" title="AsciiTable">AsciiTable</a> <code class="descname">AsciiTable</code><a class="headerlink" href="#_CPPv210AsciiTable" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Enums</p>
+<dl class="type">
+<dt id="_CPPv27mytypes">
+<span id="mytypes"></span><span class="target" id="_ascii_table_8h_1a14d2a55c4a978c4cfb618c491001daca"></span><em class="property">enum </em><code class="descname">mytypes</code><a class="headerlink" href="#_CPPv27mytypes" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p><em>Values:</em></p>
+<dl class="member">
+<dt id="_CPPv26STRING">
+<span id="STRING"></span><span class="target" id="_ascii_table_8h_1a14d2a55c4a978c4cfb618c491001dacaaee847e634a4297b274316de8a8ca9921"></span><code class="descname">STRING</code><a class="headerlink" href="#_CPPv26STRING" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="member">
+<dt id="_CPPv25FLOAT">
+<span id="FLOAT"></span><span class="target" id="_ascii_table_8h_1a14d2a55c4a978c4cfb618c491001dacaa9cf4a0866224b0bb4a7a895da27c9c4c"></span><code class="descname">FLOAT</code><a class="headerlink" href="#_CPPv25FLOAT" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="member">
+<dt id="_CPPv26DOUBLE">
+<span id="DOUBLE"></span><span class="target" id="_ascii_table_8h_1a14d2a55c4a978c4cfb618c491001dacaa33465d1d419b1074fb259ef444609e92"></span><code class="descname">DOUBLE</code><a class="headerlink" href="#_CPPv26DOUBLE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="member">
+<dt id="_CPPv210SHORTSHORT">
+<span id="SHORTSHORT"></span><span class="target" id="_ascii_table_8h_1a14d2a55c4a978c4cfb618c491001dacaa9d7fa6997de0b485952dd28167ed2e56"></span><code class="descname">SHORTSHORT</code><a class="headerlink" href="#_CPPv210SHORTSHORT" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="member">
+<dt id="_CPPv25SHORT">
+<span id="SHORT"></span><span class="target" id="_ascii_table_8h_1a14d2a55c4a978c4cfb618c491001dacaa7a1fe3ba88f0c16cb494922948a9597d"></span><code class="descname">SHORT</code><a class="headerlink" href="#_CPPv25SHORT" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="member">
+<dt id="_CPPv23INT">
+<span id="INT"></span><span class="target" id="_ascii_table_8h_1a14d2a55c4a978c4cfb618c491001dacaafd5a5f51ce25953f3db2c7e93eb7864a"></span><code class="descname">INT</code><a class="headerlink" href="#_CPPv23INT" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="member">
+<dt id="_CPPv24LONG">
+<span id="LONG"></span><span class="target" id="_ascii_table_8h_1a14d2a55c4a978c4cfb618c491001dacaaaee055c4a5aba7d55774e4f1c01dacea"></span><code class="descname">LONG</code><a class="headerlink" href="#_CPPv24LONG" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="member">
+<dt id="_CPPv28LONGLONG">
+<span id="LONGLONG"></span><span class="target" id="_ascii_table_8h_1a14d2a55c4a978c4cfb618c491001dacaa6f20a0296b153acb8046f73b274794df"></span><code class="descname">LONGLONG</code><a class="headerlink" href="#_CPPv28LONGLONG" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="member">
+<dt id="_CPPv211USHORTSHORT">
+<span id="USHORTSHORT"></span><span class="target" id="_ascii_table_8h_1a14d2a55c4a978c4cfb618c491001dacaa46aa94ef4fd7b28578064b5e37420448"></span><code class="descname">USHORTSHORT</code><a class="headerlink" href="#_CPPv211USHORTSHORT" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="member">
+<dt id="_CPPv26USHORT">
+<span id="USHORT"></span><span class="target" id="_ascii_table_8h_1a14d2a55c4a978c4cfb618c491001dacaa9ae509995ac75484348487a7477900ca"></span><code class="descname">USHORT</code><a class="headerlink" href="#_CPPv26USHORT" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="member">
+<dt id="_CPPv24UINT">
+<span id="UINT"></span><span class="target" id="_ascii_table_8h_1a14d2a55c4a978c4cfb618c491001dacaa4756f5bbd9f28d6b8905f32024b57398"></span><code class="descname">UINT</code><a class="headerlink" href="#_CPPv24UINT" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="member">
+<dt id="_CPPv25ULONG">
+<span id="ULONG"></span><span class="target" id="_ascii_table_8h_1a14d2a55c4a978c4cfb618c491001dacaa574bf5ec73e28138b997d24464adb70c"></span><code class="descname">ULONG</code><a class="headerlink" href="#_CPPv25ULONG" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="member">
+<dt id="_CPPv29ULONGLONG">
+<span id="ULONGLONG"></span><span class="target" id="_ascii_table_8h_1a14d2a55c4a978c4cfb618c491001dacaa9e339c35c454aba9d8ec635e45ef078e"></span><code class="descname">ULONGLONG</code><a class="headerlink" href="#_CPPv29ULONGLONG" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Functions</p>
+<dl class="function">
+<dt id="_CPPv27at_openP10AsciiTable">
+<span id="at_open__AsciiTableP"></span><span class="target" id="_ascii_table_8h_1aca9d2fd0c6970b310599be6a8464a744"></span><em class="property">static</em> int <code class="descname">at_open</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv210AsciiTable" title="AsciiTable">AsciiTable</a> *<em>t</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv27at_openP10AsciiTable" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv28at_closeP10AsciiTable">
+<span id="at_close__AsciiTableP"></span><span class="target" id="_ascii_table_8h_1abe750d8ac30055a764f36e3ad1bad940"></span><em class="property">static</em> void <code class="descname">at_close</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv210AsciiTable" title="AsciiTable">AsciiTable</a> *<em>t</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv28at_closeP10AsciiTable" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv212at_vreadlineK10AsciiTable7va_list">
+<span id="at_vreadline__AsciiTableC.va_list"></span><span class="target" id="_ascii_table_8h_1a1f6ada43a43017875b96e6a6ae10b763"></span><em class="property">static</em> int <code class="descname">at_vreadline</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv210AsciiTable" title="AsciiTable">AsciiTable</a> <em>t</em>, va_list <em>ap</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv212at_vreadlineK10AsciiTable7va_list" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv213at_vwritelineK10AsciiTable7va_list">
+<span id="at_vwriteline__AsciiTableC.va_list"></span><span class="target" id="_ascii_table_8h_1a37759590f8a514acb13cee60f428de09"></span><em class="property">static</em> int <code class="descname">at_vwriteline</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv210AsciiTable" title="AsciiTable">AsciiTable</a> <em>t</em>, va_list <em>ap</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv213at_vwritelineK10AsciiTable7va_list" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv211at_readlineK10AsciiTablez">
+<span id="at_readline__AsciiTableC.z"></span><span class="target" id="_ascii_table_8h_1a7e2dc969d714274abae74fac7a6a2f2f"></span><em class="property">static</em> int <code class="descname">at_readline</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv210AsciiTable" title="AsciiTable">AsciiTable</a> <em>t</em>, ...<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv211at_readlineK10AsciiTablez" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv212at_writelineK10AsciiTablez">
+<span id="at_writeline__AsciiTableC.z"></span><span class="target" id="_ascii_table_8h_1afb5566c5a9f296880db98f5ba15231a2"></span><em class="property">static</em> int <code class="descname">at_writeline</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv210AsciiTable" title="AsciiTable">AsciiTable</a> <em>t</em>, ...<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv212at_writelineK10AsciiTablez" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv214at_writeformatK10AsciiTable">
+<span id="at_writeformat__AsciiTableC"></span><span class="target" id="_ascii_table_8h_1a4a221d51656ea3ec0e3d59d6c3e70c91"></span><em class="property">static</em> int <code class="descname">at_writeformat</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv210AsciiTable" title="AsciiTable">AsciiTable</a> <em>t</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv214at_writeformatK10AsciiTable" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv222at_discover_format_strP10AsciiTable">
+<span id="at_discover_format_str__AsciiTableP"></span><span class="target" id="_ascii_table_8h_1ade6b829a9a7413b998ad9911f2828a69"></span><em class="property">static</em> int <code class="descname">at_discover_format_str</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv210AsciiTable" title="AsciiTable">AsciiTable</a> *<em>t</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv222at_discover_format_strP10AsciiTable" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv212at_set_ncolsP10AsciiTable">
+<span id="at_set_ncols__AsciiTableP"></span><span class="target" id="_ascii_table_8h_1a1091254a720936f5a21f1c553a7679a4"></span><em class="property">static</em> int <code class="descname">at_set_ncols</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv210AsciiTable" title="AsciiTable">AsciiTable</a> *<em>t</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv212at_set_ncolsP10AsciiTable" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv217at_set_format_typP10AsciiTable">
+<span id="at_set_format_typ__AsciiTableP"></span><span class="target" id="_ascii_table_8h_1a2725477103ea9884c974570b650af761"></span><em class="property">static</em> int <code class="descname">at_set_format_typ</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv210AsciiTable" title="AsciiTable">AsciiTable</a> *<em>t</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv217at_set_format_typP10AsciiTable" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv218at_vbytes_to_arrayK10AsciiTablePci7va_list">
+<span id="at_vbytes_to_array__AsciiTableC.cP.i.va_list"></span><span class="target" id="_ascii_table_8h_1a0c944aa280eec8a1fd95f91419a6cd14"></span><em class="property">static</em> int <code class="descname">at_vbytes_to_array</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv210AsciiTable" title="AsciiTable">AsciiTable</a> <em>t</em>, char *<em>data</em>, int <em>data_siz</em>, va_list <em>ap</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv218at_vbytes_to_arrayK10AsciiTablePci7va_list" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv218at_varray_to_bytesK10AsciiTablePPci7va_list">
+<span id="at_varray_to_bytes__AsciiTableC.cPP.i.va_list"></span><span class="target" id="_ascii_table_8h_1a985d327ec4713da33c9e114ca95a260e"></span><em class="property">static</em> int <code class="descname">at_varray_to_bytes</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv210AsciiTable" title="AsciiTable">AsciiTable</a> <em>t</em>, char **<em>data</em>, int <em>nrows</em>, va_list <em>ap</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv218at_varray_to_bytesK10AsciiTablePPci7va_list" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv217at_array_to_bytesK10AsciiTablePPciz">
+<span id="at_array_to_bytes__AsciiTableC.cPP.i.z"></span><span class="target" id="_ascii_table_8h_1a1f632de97f4a37847b535dd0ff8402d8"></span><em class="property">static</em> int <code class="descname">at_array_to_bytes</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv210AsciiTable" title="AsciiTable">AsciiTable</a> <em>t</em>, char **<em>data</em>, int <em>nrows</em>, ...<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv217at_array_to_bytesK10AsciiTablePPciz" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv217at_bytes_to_arrayK10AsciiTablePciz">
+<span id="at_bytes_to_array__AsciiTableC.cP.i.z"></span><span class="target" id="_ascii_table_8h_1a1245e6ef651ca627c9e867e70f708743"></span><em class="property">static</em> int <code class="descname">at_bytes_to_array</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv210AsciiTable" title="AsciiTable">AsciiTable</a> <em>t</em>, char *<em>data</em>, int <em>data_siz</em>, ...<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv217at_bytes_to_arrayK10AsciiTablePciz" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv210at_cleanupP10AsciiTable">
+<span id="at_cleanup__AsciiTableP"></span><span class="target" id="_ascii_table_8h_1a44ebc18807492d34c4209e768b050c68"></span><em class="property">static</em> void <code class="descname">at_cleanup</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv210AsciiTable" title="AsciiTable">AsciiTable</a> *<em>t</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv210at_cleanupP10AsciiTable" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="_CPPv211ascii_tablePKcPKcPcPcPcPc">
+<span id="ascii_table__cCP.cCP.cP.cP.cP.cP"></span><span class="target" id="_ascii_table_8h_1a59b6e48fdb36589d3cb257f182ff225f"></span><em class="property">static</em> <a class="reference internal" href="#_CPPv210AsciiTable" title="AsciiTable">AsciiTable</a> <code class="descname">ascii_table</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>filepath</em>, <em class="property">const</em> char *<em>io_mode</em>, char *<em>format_str</em>, char *<em>comment</em>, char *<em>column</em>, char *<em>newline</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv211ascii_tablePKcPKcPcPcPcPc" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="dir">
+<dt>
+<span class="target" id="dir_a862424b14b5e0bd4b5f46d76b9d9fcd"></span><em>dir</em> <code class="descname">/home/ubuntu/langmm/cis_iterface/cis_interface</code></dt>
+<dd></dd></dl>
+
+<dl class="dir">
+<dt>
+<span class="target" id="dir_e2e96a12fc04fec5957fa0cee9f792b8"></span><em>dir</em> <code class="descname">/home/ubuntu/langmm/cis_iterface/cis_interface/dataio</code></dt>
+<dd></dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  <li><a href="code.html">Code</a><ul>
+  <li><a href="code_c.html">C Code</a><ul>
+      <li>Previous: <a href="interface_c.html" title="previous chapter">C Interface</a></li>
+      <li>Next: <a href="code_cpp.html" title="next chapter">C++ Code</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/dataio_c.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Meagan Lang, David Raila.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.6</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="_sources/dataio_c.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

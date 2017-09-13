@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>cis_interface package &#8212; cis_interface 0.0.0 documentation</title>
+    <title>PYTHON CODE &#8212; cis_interface 0.0.0 documentation</title>
     
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -27,6 +27,8 @@
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="cis_interface.interface package" href="cis_interface.interface.html" />
+    <link rel="prev" title="Code" href="code.html" />
    
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
   
@@ -42,12 +44,19 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="cis-interface-package">
-<h1>cis_interface package<a class="headerlink" href="#cis-interface-package" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="python-code">
+<h1>PYTHON CODE<a class="headerlink" href="#python-code" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="subpackages">
 <h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
 <div class="toctree-wrapper compound">
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="cis_interface.interface.html">cis_interface.interface package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="cis_interface.interface.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cis_interface.interface.html#module-cis_interface.interface.PsiInterface">cis_interface.interface.PsiInterface module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cis_interface.interface.html#module-cis_interface.interface.scanf">cis_interface.interface.scanf module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cis_interface.interface.html#module-cis_interface.interface">Module contents</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="cis_interface.dataio.html">cis_interface.dataio package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="cis_interface.dataio.html#subpackages">Subpackages</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="cis_interface.dataio.tests.html">cis_interface.dataio.tests package</a><ul>
@@ -132,13 +141,6 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="cis_interface.examples.html#module-cis_interface.examples">Module contents</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="cis_interface.interface.html">cis_interface.interface package</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="cis_interface.interface.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cis_interface.interface.html#module-cis_interface.interface.PsiInterface">cis_interface.interface.PsiInterface module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cis_interface.interface.html#module-cis_interface.interface.scanf">cis_interface.interface.scanf module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cis_interface.interface.html#module-cis_interface.interface">Module contents</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="cis_interface.tests.html">cis_interface.tests package</a><ul>
@@ -272,7 +274,7 @@ class&#8217;s get.</li>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
 <li><strong>env</strong> (<a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a><em>, </em><em>optional</em>) &#8211; Dictionary of environment variables that should
 be updated. Defaults to <cite>os.environ</cite>.</li>
-<li><strong>cfg</strong> (<a class="reference internal" href="code_python.html#cis_interface.config.CisConfigParser" title="cis_interface.config.CisConfigParser"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.config.CisConfigParser</span></code></a>, optional) &#8211; Config parser with options that should be used to update the
+<li><strong>cfg</strong> (<a class="reference internal" href="#cis_interface.config.CisConfigParser" title="cis_interface.config.CisConfigParser"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.config.CisConfigParser</span></code></a>, optional) &#8211; Config parser with options that should be used to update the
 environment. Defaults to <code class="xref py py-data docutils literal"><span class="pre">cis_interface.config.cis_cfg</span></code>.</li>
 </ul>
 </td>
@@ -508,7 +510,7 @@ that should be run.</li>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Runner for the provided models.</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first"><a class="reference internal" href="code_python.html#cis_interface.runner.CisRunner" title="cis_interface.runner.CisRunner">CisRunner</a></p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first"><a class="reference internal" href="#cis_interface.runner.CisRunner" title="cis_interface.runner.CisRunner">CisRunner</a></p>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><code class="xref py py-exc docutils literal"><span class="pre">Exception</span></code> &#8211; If config option &#8216;namespace&#8217; in &#8216;rmq&#8217; section not set.</p>
@@ -653,7 +655,7 @@ such that they can be run simultaneously, passing input back and forth.</p>
         <div class="sphinxsidebarwrapper">
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
-<li><a class="reference internal" href="#">cis_interface package</a><ul>
+<li><a class="reference internal" href="#">PYTHON CODE</a><ul>
 <li><a class="reference internal" href="#subpackages">Subpackages</a></li>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
 <li><a class="reference internal" href="#module-cis_interface.backwards">cis_interface.backwards module</a></li>
@@ -669,13 +671,17 @@ such that they can be run simultaneously, passing input back and forth.</p>
 <h3>Related Topics</h3>
 <ul>
   <li><a href="index.html">Documentation overview</a><ul>
+  <li><a href="code.html">Code</a><ul>
+      <li>Previous: <a href="code.html" title="previous chapter">Code</a></li>
+      <li>Next: <a href="cis_interface.interface.html" title="next chapter">cis_interface.interface package</a></li>
+  </ul></li>
   </ul></li>
 </ul>
 </div>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
-      <li><a href="_sources/cis_interface.rst.txt"
+      <li><a href="_sources/code_python.rst.txt"
             rel="nofollow">Show Source</a></li>
     </ul>
    </div>
@@ -701,7 +707,7 @@ such that they can be run simultaneously, passing input back and forth.</p>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
       
       |
-      <a href="_sources/cis_interface.rst.txt"
+      <a href="_sources/code_python.rst.txt"
           rel="nofollow">Page source</a>
     </div>
 
