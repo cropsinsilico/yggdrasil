@@ -23,7 +23,7 @@ if __name__ == '__main__':
     print('ascii_io(P): Receiving/sending ASCII file.')
     ret = True
     while ret:
-        # Receive a single line 
+        # Receive a single line
         (ret, line) = in_file.recv_line()
         if ret:
             # If the receive was succesful, send the line to output

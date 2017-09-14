@@ -42,7 +42,8 @@ def runhello():
         sys.exit(-1)
     print('hello(P): Sent to outf')
 
-    print('Goodbye from Python');
+    print('Goodbye from Python')
 
+    
 if __name__ == '__main__':
     runhello()
