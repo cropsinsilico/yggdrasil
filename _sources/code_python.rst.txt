@@ -5,8 +5,8 @@ Subpackages
 -----------
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 3
 
-    .. include:: cis_interface.rst
-		 :start-line: 8
+.. include:: cis_interface.rst
+   :start-line: 8
 	     
