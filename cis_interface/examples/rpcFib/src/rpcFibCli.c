@@ -10,7 +10,8 @@ int count_lines(const char* str, const char* substr) {
   int c = 0;
   int inc = strlen(substr);
   if (strlen(substr) == 0) return -1;
-  for (char* s = (char*)str; (s = strstr(s, substr)); s += inc)
+  char *s;
+  for (s = (char*)str; (s = strstr(s, substr)); s += inc)
     c++;
   return c;
 }
@@ -40,7 +41,8 @@ int main(int argc, char *argv[]) {
   int fib = -1;
   int fibNo = -1;
   char *logmsg = (char*)malloc(PSI_MSG_MAX*sizeof(char));
-  for (int i = 1; i <= iterations; i++) {
+  int i;
+  for (i = 1; i <= iterations; i++) {
     
     // Call the server and receive response
     printf("rpcFibCli(C): fib(->%-2d) ::: ", i);
@@ -53,7 +55,7 @@ int main(int argc, char *argv[]) {
 
     // Log result by sending it to the log connection
     sprintf(logmsg, "fib(%2d<-) = %-2d<-\n", fibNo, fib);
-    printf(logmsg);
+    printf("%s", logmsg);
     ret = psi_send(log, logmsg, strlen(logmsg));
     if (ret != 0) {
       printf("rpcFibCli(C): SEND ERROR\n");
