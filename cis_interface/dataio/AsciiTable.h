@@ -102,8 +102,8 @@ int regex_replace_nosub(char *buf, const int len_buf,
   int creplace = 0;
   while (1) {
     if ((nreplace > 0) && (creplace >= nreplace)) {
-      /* printf("regex_replace_nosub: Maximum of %d replacements reached\n", */
-      /* 	     creplace); */
+      printf("regex_replace_nosub: Maximum of %d replacements reached\n",
+      	     creplace);
       break;
     }
     int nomatch = regexec(&r, p, ngroups, m, 0);
@@ -232,13 +232,16 @@ int get_subrefs(const char *buf, int **refs) {
   @param[in] len_buf const int length of buf.
   @param[in] re Constant character pointer to regex string.
   @param[in] rp Constant character pointer to the replacement text.
+  @param[in] nreplace Constant int number of replacements to make. If 0, all
+  matches are replaced.
   @return int -1 on failure if the regex could not be compiled or the buffer 
   is not big enough to contain the result. If succesful, the new length of buf
   is returned.
  */
 static inline
 int regex_replace_sub(char *buf, const int len_buf,
-		      const char *re, const char *rp) {
+		      const char *re, const char *rp,
+		      const int nreplace) {
   // Compile
   regex_t r;
   int ret = compile_regex(&r, re);
@@ -257,6 +260,11 @@ int regex_replace_sub(char *buf, const int len_buf,
   int creplace = 0;
   int i, j;
   while (1) {
+    if ((nreplace > 0) && (creplace >= nreplace)) {
+      printf("regex_replace_nosub: Maximum of %d replacements reached\n",
+	     creplace);
+      break;
+    }
     int nomatch = regexec(&r, p, ngroups, m, 0);
     if (nomatch) {
       /* printf("regex_replace_sub: nomatch for %s in %s\n", re, p); */

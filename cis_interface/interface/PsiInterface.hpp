@@ -474,7 +474,8 @@ public:
     // For input, remove precision from floats to avoid confusing vsscanf
     // C version
     char *re = "%([[:digit:]]+\\$)?[+-]?([ 0]|'.{1})?-?[[:digit:]]*(\\.[[:digit:]]+)?([lhjztL])*([eEfFgG])";
-    int ret = regex_replace_sub(_pi._psi._fmt, strlen(_pi._psi._fmt), re, "%$5");
+    int ret = regex_replace_sub(_pi._psi._fmt, strlen(_pi._psi._fmt),
+				re, "%$5", 0);
     if (ret < 0)
       printf("PsiAsciiTableInput(%s): could not fix format\n", name);
 
