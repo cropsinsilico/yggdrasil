@@ -45,6 +45,10 @@ class TestRMQOutputDriver(TestRMQOutputParam,
 
     def teardown(self):
         r"""Remove the instance, stoppping it."""
+        # Must remove this instance first to prevent remote channel close error
+        if hasattr(self, '_instance'):
+            self.remove_instance(self._instance)
+            delattr(self, '_instance');
         if hasattr(self, 'in_rmq'):
             self.remove_instance(self.in_rmq)
             delattr(self, 'in_rmq')
