@@ -92,7 +92,7 @@ class RMQDriver(Driver):
         r"""Start the driver. Waiting for connection."""
         self._opening = True
         super(RMQDriver, self).start()
-        timeout = self.timeout
+        timeout = 5 * self.timeout
         interval = timeout / 5
         while timeout > 0:
             with self.lock:
