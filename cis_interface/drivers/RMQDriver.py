@@ -93,12 +93,14 @@ class RMQDriver(Driver):
         self._opening = True
         super(RMQDriver, self).start()
         timeout = self.timeout
-        while True:
+        interval = timeout / 5
+        while timeout > 0:
             with self.lock:
-                if self.is_open or timeout <= 0:
+                if self.is_open:
                     break
-            self.sleep()
-            timeout -= self.sleeptime
+            # import time; time.sleep(self.sleeptime)
+            self.sleep(interval)
+            timeout -= interval
         with self.lock:
             if self._opening:  # pragma: debug
                 raise RuntimeError("Connection never finished opening.")
@@ -368,7 +370,7 @@ class RMQDriver(Driver):
             if self.is_open:
                 if remove_queue:
                     self.debug('::stop_communication: unbinding queue')
-                    self.display('Unbinding queue')
+                    # self.display('Unbinding queue')
                     self.channel.queue_unbind(queue=self.queue,
                                               exchange=self.exchange)
                     self.channel.queue_delete(queue=self.queue)
