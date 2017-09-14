@@ -95,7 +95,7 @@ class RMQDriver(Driver):
         timeout = self.timeout
         while True:
             with self.lock:
-                if not self._opening or timeout <= 0:
+                if self.is_open or timeout <= 0:
                     break
             self.sleep()
             timeout -= self.sleeptime
