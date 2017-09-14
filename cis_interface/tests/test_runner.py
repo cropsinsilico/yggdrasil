@@ -24,13 +24,13 @@ def test_create_driver():
 
 def test_get_runner():
     r"""Use get_runner to start a run."""
-    cr = runner.get_runner([yamls['ascii_io_python']])
+    cr = runner.get_runner([yamls['ascii_io']['python']])
     cr.run()
 
     
 def test_runner_terminate():
     r"""Start a runner, then stop it early."""
-    cr = runner.get_runner([yamls['ascii_io_python']])
+    cr = runner.get_runner([yamls['ascii_io']['python']])
     cr.loadDrivers()
     cr.startDrivers()
     cr.printStatus()
@@ -42,7 +42,7 @@ class TestCisRunner(object):
     def __init__(self):
         nt.assert_raises(IOError, runner.CisRunner,
                          ['fake_yaml.yml'], 'test_psi_run')
-        self.runner = runner.CisRunner([yamls['ascii_io_python']],
+        self.runner = runner.CisRunner([yamls['ascii_io']['python']],
                                        'test_psi_run')
 
     def test_parseModelYaml(self):

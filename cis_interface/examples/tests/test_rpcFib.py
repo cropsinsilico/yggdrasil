@@ -29,6 +29,6 @@ class TestExampleRpcFib(TestExample):
     def check_result(self):
         r"""Assert that contents of input/output files are identical."""
         assert(os.path.isfile(self.client1_output_file))
-        with open(self.output_file, 'r') as fd:
+        with open(self.client1_output_file, 'r') as fd:
             ocont = fd.read()
         nt.assert_equal(ocont, self.result)
