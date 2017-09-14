@@ -610,20 +610,21 @@ int vpsiSend(psiOutput_t psiQ, va_list ap) {
   received message using sscanf. As these are being assigned, they should be
   pointers to memory that has already been allocated.
   @returns int -1 if message could not be received or could not be parsed.
-  Length of the received message if message was received and parsed.
+  Length of the received message if message was received and parsed. -2 is
+  returned if EOF is received.
  */
 static inline
 int vpsiRecv(psiInput_t psiQ, va_list ap) {
   char buf[PSI_MSG_MAX];
   int ret = psi_recv(psiQ, buf, PSI_MSG_MAX);
   if (ret < 0) {
-    error("vpsiRecv(%s): Error receiving.", psiQ._name);
-    return -1;
+    /* error("vpsiRecv(%s): Error receiving.", psiQ._name); */
+    return ret;
   }
   debug("vpsiRecv(%s): psi_recv returns %d: %s", psiQ._name, ret, buf);
   if (is_eof(buf)) {
     debug("vpsiRecv(%s): EOF received.\n", psiQ._name);
-    return -1;
+    return -2;
   }
   int sret = vsscanf(buf, psiQ._fmt, ap);
   if (sret != psiQ._nfmt) {
@@ -711,21 +712,22 @@ int vpsiSend_nolimit(psiOutput_t psiQ, va_list ap) {
   received message using sscanf. As these are being assigned, they should be
   pointers to memory that has already been allocated.
   @returns int -1 if message could not be received or could not be parsed.
-  Length of the received message if message was received and parsed.
+  Length of the received message if message was received and parsed. -2 is
+  returned if EOF is received.
  */
 static inline
 int vpsiRecv_nolimit(psiInput_t psiQ, va_list ap) {
   char *buf = (char*)malloc(PSI_MSG_MAX);
   int ret = psi_recv_nolimit(psiQ, &buf, PSI_MSG_MAX);
   if (ret < 0) {
-    error("vpsiRecv_nolimit(%s): Error receiving.", psiQ._name);
+    /* error("vpsiRecv_nolimit(%s): Error receiving.", psiQ._name); */
     free(buf);
-    return -1;
+    return ret;
   }
   debug("vpsiRecv_nolimit(%s): psi_recv returns %d", psiQ._name, ret);
   if (is_eof(buf)) {
     debug("vpsiRecv(%s): EOF received.\n", psiQ._name);
-    return -1;
+    return -2;
   }
   int sret = vsscanf(buf, psiQ._fmt, ap);
   if (sret != psiQ._nfmt) {
