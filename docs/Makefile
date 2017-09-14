@@ -24,7 +24,7 @@ ghpages: autodoc
 
 .PHONY: autodoc
 autodoc: doxy
-	sphinx-apidoc -fT -o $(SOURCEDIR)/ ../cis_interface
+	sphinx-apidoc -fT -o $(SOURCEDIR)/ ../cis_interface ../cis_interface/tests/* ../cis_interface/*/tests/*
 	make html
 
 .PHONY: doxy
