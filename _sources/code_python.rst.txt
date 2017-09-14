@@ -1,6 +1,12 @@
 Python Code
 ===========
 
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 1
+   
 .. include:: cis_interface.rst
-   :start-line: 3
+   :start-line: 7
 	     
