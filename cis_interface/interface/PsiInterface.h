@@ -176,7 +176,8 @@ int psi_mq(char *name, const char *yamlName){
     return -1;
   }
   // Fail if trying to re-use the same channel twice
-  for (unsigned i =0; i < _psiChannelsUsed; i++ ){
+  unsigned i;
+  for (i =0; i < _psiChannelsUsed; i++ ){
     if (0 == strcmp(_psiChannelNames[i], name)){
       error("Attempt to re-use channel %s", name);
       return -1;

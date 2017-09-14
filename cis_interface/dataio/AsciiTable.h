@@ -380,7 +380,8 @@ int at_vbytes_to_array(const asciiTable_t t, const char *data,
   // Loop through
   int nrows = data_siz / t.row_siz;
   int cur_pos = 0, col_siz;
-  for (int i = 0; i < t.ncols; i++) {
+  int i;
+  for (i = 0; i < t.ncols; i++) {
     char **temp;
     col_siz = nrows*t.format_siz[i];
     temp = va_arg(ap, char**);
@@ -415,7 +416,8 @@ int at_varray_to_bytes(const asciiTable_t t, char **data, int nrows, va_list ap)
   // Loop through
   int cur_pos = 0, col_siz;
   char *temp;
-  for (int i = 0; i < t.ncols; i++) {
+  int i;
+  for (i = 0; i < t.ncols; i++) {
     col_siz = nrows*t.format_siz[i];
     temp = va_arg(ap, char*);
     memcpy(*data+cur_pos, temp, col_siz);
