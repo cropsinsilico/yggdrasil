@@ -44,7 +44,7 @@ class AsciiTableOutputDriver(AsciiFileOutputDriver):
         if self.as_array:
             while True:
                 data = self.ipc_recv_nolimit()
-                if data is None:
+                if data is None:  # pragma: debug
                     self.debug(':recv: closed')
                     break
                 self.debug(':recvd %s bytes', len(data))

@@ -77,7 +77,7 @@ class TestParam(unittest.TestCase):
     @property
     def instance(self):
         r"""object: Instance of the test driver."""
-        if not hasattr(self, '_instance'):
+        if not hasattr(self, '_instance'):  # pragma: debug
             self._instance = self.create_instance()
         return self._instance
 
@@ -144,8 +144,9 @@ class TestDriver(TestParam):
         self.assert_before_stop()
         self.run_before_stop()
         self.instance.stop()
-        if self.instance.is_alive():
-            self.instance.join()
+        # This is asserted to not happen
+        # if self.instance.is_alive():
+        #     self.instance.join()
         self.assert_after_stop()
 
     def test_run_terminate(self):

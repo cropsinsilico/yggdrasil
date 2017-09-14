@@ -83,7 +83,7 @@ class IODriver(Driver):
             self.debug('.recv_wait(): waiting')
             self.sleep()
             elapsed += self.sleeptime
-        if not ret and elapsed >= timeout:
+        if not ret and elapsed >= timeout:  # pragma: debug
             self.debug('.recv_wait_nolimit(): timeout at %f s', timeout)
         return ret
 
@@ -111,7 +111,7 @@ class IODriver(Driver):
             self.debug('.recv_wait_nolimit(): waiting')
             self.sleep()
             elapsed += self.sleeptime
-        if not ret and elapsed >= timeout:
+        if not ret and elapsed >= timeout:  # pragma: debug
             self.debug('.recv_wait_nolimit(): timeout at %f s', timeout)
         return ret
 

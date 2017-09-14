@@ -50,7 +50,8 @@ class TestRMQDriver(TestRMQParam, parent.TestDriver):
         r"""Test purge of queue."""
         self.instance.rmq_send(self.msg_short)
         elapsed = 0.0
-        while self.instance.n_rmq_msg != 1 and elapsed < self.instance.timeout:
+        while ((self.instance.n_rmq_msg != 1) and
+               (elapsed < self.instance.timeout)):  # pragma: debug
             self.instance.sleep()
             elapsed += self.instance.sleeptime
         nt.assert_equal(self.instance.n_rmq_msg, 1)
