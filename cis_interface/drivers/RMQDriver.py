@@ -352,7 +352,7 @@ class RMQDriver(Driver):
     def purge_queue(self):
         r"""Remove all messages from the associated queue."""
         with self.lock:
-            if self._closing or not self.is_open:  # pragma: debug
+            if not self.is_stable:  # pragma: debug
                 return
             if self.channel:
                 self.channel.queue_purge(queue=self.queue)
@@ -399,7 +399,7 @@ class RMQDriver(Driver):
         """
         backwards.assert_bytes(data)
         with self.lock:
-            if self._closing:
+            if not self.is_stable:  # pragma: debug
                 return False
             self.debug("::send %d", len(data))
             assert(len(data) <= maxMsgSize)

@@ -112,8 +112,12 @@ class TestRMQServerDriver(TestRMQServerParam, parent1.TestRMQDriver):
 
     # Disabled so that test message is not read by mistake
     def test_purge(self):
-        r"""Test purge of queue."""
-        pass
+        r"""Test receipt of messages with no reply to."""
+        with self.instance.lock:
+            self.instance.channel.basic_publish(
+                exchange=self.instance.exchange,
+                routing_key=self.instance.queue,
+                body=self.msg_short)
 
     def test_msg(self):
         r"""Test routing of a message through the IPC & RMQ queues."""
