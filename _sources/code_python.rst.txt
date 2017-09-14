@@ -6,6 +6,13 @@ Subpackages
 
 .. toctree::
    :maxdepth: 3
+	   
+   cis_interface.dataio
+   cis_interface.drivers
+   cis_interface.examples
+   cis_interface.interface
+   cis_interface.tests
+	      
 .. include:: cis_interface.rst
-   :start-line: 7
+   :start-line: 14
 	     
