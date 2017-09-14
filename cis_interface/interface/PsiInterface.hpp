@@ -475,7 +475,7 @@ public:
     std::regex e("%(?:\\d+\\$)?[+-]?(?:[ 0]|'.{1})?-?\\d*(?:\\.\\d+)?(?:[lhjztL])*([eEfFgG])");
     std::string s(_pi._psi._fmt, strlen(_pi._psi._fmt));
     std::string result;
-    std::regex_replace(std::back_inserter(result), s.begin(), s.end(), e, "%$1");
+    result = std::regex_replace(s, e, "%$1");
     strcpy(_pi._psi._fmt, result.c_str());
   }
   /*!
