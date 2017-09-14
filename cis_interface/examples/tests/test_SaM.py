@@ -2,6 +2,7 @@ import os
 import nose.tools as nt
 import tempfile
 from cis_interface.examples.tests import TestExample
+from cis_interface.drivers.MatlabModelDriver import _matlab_installed
 
 
 class TestExampleSaM(TestExample):
@@ -14,8 +15,12 @@ class TestExampleSaM(TestExample):
     @property
     def result(self):
         r"""Result that should be found in output files."""
+        # 1 + 2*n_languages
         if self.language == 'all':
-            s = 9  # 1 + 2*n_languages
+            if _matlab_installed:  # pragma: matlab
+                s = 9
+            else:
+                s = 7  # pragma: no matlab
         else:
             s = 3
         return '%d' % s

@@ -1,0 +1,54 @@
+---
+
+models:
+  - name: SaM_c
+    driver: GCCModelDriver
+    args: src/SaM.c
+
+    inputs:
+      - name: input1_c
+        driver: FileInputDriver
+        args: ./Input/SaM_input.txt
+      - name: static_c
+        driver: FileInputDriver
+        args: ./Input/SaM_static.txt
+
+    outputs:
+      - name: output_c
+        driver: RMQOutputDriver
+        args: output_c
+    
+  - name: SaM_python
+    driver: PythonModelDriver
+    args: src/SaM.py
+
+    inputs:
+      - name: input1_python
+        driver: RMQInputDriver
+        args: output_c
+      - name: static_python
+        driver: FileInputDriver
+        args: ./Input/SaM_static.txt
+
+    outputs:
+      - name: output_python
+        driver: RMQOutputDriver
+        args: output_python
+
+  - name: SaM_cpp
+    driver: GCCModelDriver
+    args: src/SaM.cpp
+
+    inputs:
+      - name: input1_cpp
+        driver: RMQInputDriver
+        args: output_python
+      - name: static_cpp
+        driver: FileInputDriver
+        args: ./Input/SaM_static.txt
+
+    outputs:
+      - name: output_cpp
+        driver: FileOutputDriver
+        args: /tmp/SaM_output.txt
+    
