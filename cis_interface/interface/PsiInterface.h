@@ -15,87 +15,16 @@
 #include <../dataio/AsciiTable.h>
 
 
-#define PSI_MSG_MAX 1024*2
+/*! @brief Maximum message size. */
+#define PSI_MSG_MAX LINE_SIZE_MAX
+/*! @brief End of file message. */
 #define PSI_MSG_EOF "EOF!!!"
-// track 256 channels in use- fail if re-using
-// max # channels 
+/*! @brief Maximum number of channels. */
 #define _psiTrackChannels 256
-static char * _psiChannelNames[_psiTrackChannels]; 
+/*! @brief Names of channels in use. */
+static char * _psiChannelNames[_psiTrackChannels];
+/*! @brief Number of channels in use. */
 static unsigned _psiChannelsUsed = 0;
-
-
-/*!
-  @brief Create a regex from a character array.
-  Adapted from https://www.lemoda.net/c/unix-regex/
-  @param[out] r pointer to regex_t. Resutling regex expression.
-  @param[in] regex_text constant character pointer to text that should be
-  compiled.
-  @return static int Success or failure of compilation.
- */
-static inline
-int compile_regex (regex_t * r, const char * regex_text)
-{
-  int status = regcomp (r, regex_text, REG_EXTENDED|REG_NEWLINE);
-  if (status != 0) {
-    char error_message[PSI_MSG_MAX];
-    regerror (status, r, error_message, PSI_MSG_MAX);
-    printf ("Regex error compiling '%s': %s\n",
-	    regex_text, error_message);
-    return 1;
-  }
-  return 0;
-}
-
-
-/*!
-  @brief Count the number of times a regular expression is matched in a string.
-  @param[in] regex_text constant character pointer to string that should be
-  compiled into a regex.
-  @param[in] to_match constant character pointer to string that should be
-  checked for matches.
-  @return int Number of matches found. -1 is returned if the regex could not be
-  compiled.
-*/
-static inline
-int count_matches(const char *regex_text, const char *to_match) {
-  int ret;
-  int n_match = 0;
-  regex_t r;
-  // Compile
-  ret = compile_regex(&r, regex_text);
-  if (ret)
-    return -1;
-  // Loop until string done
-  const char * p = to_match;
-  const int n_sub_matches = 10;
-  regmatch_t m[n_sub_matches];
-  while (1) {
-    int nomatch = regexec(&r, p, n_sub_matches, m, 0);
-    if (nomatch)
-      break;
-    n_match++;
-    p += m[0].rm_eo;
-  }
-  return n_match;
-};
-
-
-/*!
-  @brief Count how many % format specifiers there are in format string.
-  Formats are found by counting the number of matches to the regular expression
-      %(?:\d+\$)?[+-]?(?:[ 0]|'.{1})?-?\d*(?:\.\d+)?[bcdeEufFgGosxX]
-  adapted from https://stackoverflow.com/questions/446285/validate-sprintf-format-from-input-field-with-regex
-  @param[in] fmt_str constant character pointer to string that should be
-  searched for format specifiers.
-  @return int Number of format specifiers found.
-*/
-static inline
-int count_formats(const char* fmt_str) {
-  const char * fmt_regex = "%([[:digit:]]+\\$)?[+-]?([ 0]|\'\.{1})?-?[[:digit:]]*(\\.[[:digit:]]+)?[lhjztL]*[bcdeEufFgGosxX]";
-  int ret = count_matches(fmt_regex, fmt_str);
-  /* printf("%d, %s\n", ret, fmt_str); */
-  return ret;
-};
 
 
 //==============================================================================
@@ -1136,7 +1065,7 @@ typedef struct psiAsciiFileOutput_t {
   int _valid; //!< Indicates if the structure was succesfully initialized.
   const char *_name; //!< Path to local file or name of output channel.
   int _type; //!< 0 for local file, 1 for output channel.
-  AsciiFile _file; //!< Associated output handler for local files.
+  asciiFile_t _file; //!< Associated output handler for local files.
   psiOutput_t _psi; //!< Associated output handler for output channel.
 } psiAsciiFileOutput_t;
 
@@ -1147,7 +1076,7 @@ typedef struct psiAsciiFileInput_t {
   int _valid; //!< Indicates if the structure was succesfully initialized.
   const char *_name; //!< Path to local file or name of input channel. 
   int _type; //!< 0 for local file, 1 for input channel.
-  AsciiFile _file; //!< Associated input handler for local files.
+  asciiFile_t _file; //!< Associated input handler for local files.
   psiInput_t _psi; //!< Associated input handler for input channel. 
 } psiAsciiFileInput_t;
 
@@ -1168,15 +1097,15 @@ psiAsciiFileOutput_t psiAsciiFileOutput(const char *name, int dst_type) {
   out._type = dst_type;
   out._valid = 1;
   if (dst_type == 0) {
-    out._file = ascii_file(name, "w", NULL, NULL);
+    out._file = asciiFile(name, "w", NULL, NULL);
     ret = af_open(&(out._file));
     if (ret != 0) {
-      error("psi_ascii_file_output: Could not open %s", name);
+      error("psiAsciiFileOutput: Could not open %s", name);
       out._valid = 0;
     }
   } else {
     out._psi = psiOutput(name);
-    out._file = ascii_file(name, "0", NULL, NULL);
+    out._file = asciiFile(name, "0", NULL, NULL);
   }
   return out;
 };
@@ -1198,15 +1127,15 @@ psiAsciiFileInput_t psiAsciiFileInput(const char *name, int src_type) {
   out._type = src_type;
   out._valid = 1;
   if (src_type == 0) { // Direct file interface
-    out._file = ascii_file(name, "r", NULL, NULL);
+    out._file = asciiFile(name, "r", NULL, NULL);
     ret = af_open(&(out._file));
     if (ret != 0) {
-      error("psi_ascii_file_input: Could not open %s", name);
+      error("psiAsciiFileInput: Could not open %s", name);
       out._valid = 0;
     }
   } else {
     out._psi = psiInput(name);
-    out._file = ascii_file(name, "0", NULL, NULL);
+    out._file = asciiFile(name, "0", NULL, NULL);
   }
   return out;
 };
@@ -1377,7 +1306,7 @@ typedef struct psiAsciiTableOutput_t {
   int _valid; //!< Success or failure of initializing the structure
   const char *_name; //!< Path to local table or name of message queue
   int _type; //!< 0 if #_name is a local table, 1 if it is a message queue.
-  AsciiTable _table; //!< Associated output handler for local tables.
+  asciiTable_t _table; //!< Associated output handler for local tables.
   psiOutput_t _psi; //!< Associated output handler for queues.
 } psiAsciiTableOutput_t;
 
@@ -1388,7 +1317,7 @@ typedef struct psiAsciiTableInput_t {
   int _valid; //!< Success or failure of initializing the structure
   const char *_name; //!< Path to local table or name of message queue
   int _type; //!< 0 if #_name is a local table, 1 if it is a message queue.
-  AsciiTable _table; //!< Associated input handler for local tables. 
+  asciiTable_t _table; //!< Associated input handler for local tables. 
   psiInput_t _psi; //!< Associated input handler for queues.
 } psiAsciiTableInput_t;
 
@@ -1411,11 +1340,11 @@ psiAsciiTableOutput_t psiAsciiTableOutput(const char *name, char *format_str,
   out._name = name;
   out._type = dst_type;
   if (dst_type == 0) {
-    out._table = ascii_table(name, "w", format_str,
-			     NULL, NULL, NULL);
+    out._table = asciiTable(name, "w", format_str,
+			    NULL, NULL, NULL);
     ret = at_open(&(out._table));
     if (ret != 0) {
-      error("psi_ascii_table_output: Could not open %s", name);
+      error("psiAsciiTableOutput: Could not open %s", name);
       out._valid = 0;
     } else {
       at_writeformat(out._table);
@@ -1424,11 +1353,11 @@ psiAsciiTableOutput_t psiAsciiTableOutput(const char *name, char *format_str,
     out._psi = psiOutput(name);
     ret = psi_send(out._psi, format_str, strlen(format_str));
     if (ret != 0) {
-      error("psi_ascii_table_input: Failed to receive format string.");
+      error("psiAsciiTableOutput: Failed to receive format string.");
       out._valid = 0;
     } else {
-      out._table = ascii_table(name, "0", format_str,
-                               NULL, NULL, NULL);
+      out._table = asciiTable(name, "0", format_str,
+			      NULL, NULL, NULL);
       out._psi._fmt = format_str;
       out._psi._nfmt = count_formats(out._psi._fmt);
     }
@@ -1452,11 +1381,11 @@ psiAsciiTableInput_t psiAsciiTableInput(const char *name, int src_type) {
   out._name = name;
   out._type = src_type;
   if (src_type == 0) { // Direct file interface
-    out._table = ascii_table(name, "r", NULL,
-			     NULL, NULL, NULL);
+    out._table = asciiTable(name, "r", NULL,
+			    NULL, NULL, NULL);
     ret = at_open(&(out._table));
     if (ret != 0) {
-      error("psi_ascii_table_input: Could not open %s", name);
+      error("psiAsciiTableInput: Could not open %s", name);
       out._valid = 0;
     }
   } else {
@@ -1464,12 +1393,12 @@ psiAsciiTableInput_t psiAsciiTableInput(const char *name, int src_type) {
     out._psi._fmt = (char*)malloc(PSI_MSG_MAX);
     ret = psi_recv(out._psi, out._psi._fmt, PSI_MSG_MAX);
     if (ret < 0) {
-      error("psi_ascii_table_input: Failed to receive format string.");
+      error("psiAsciiTableInput: Failed to receive format string.");
       out._valid = 0;
     } else {
       out._psi._nfmt = count_formats(out._psi._fmt);
-      out._table = ascii_table(name, "0", out._psi._fmt,
-                               NULL, NULL, NULL);
+      out._table = asciiTable(name, "0", out._psi._fmt,
+			      NULL, NULL, NULL);
     }
   }
   return out;
@@ -1524,6 +1453,10 @@ int vsend_row(psiAsciiTableOutput_t t, va_list ap) {
   int ret;
   if (t._type == 0) {
     ret = at_vwriteline(t._table, ap);
+    if (ret > 0)
+      ret = 0;
+    else
+      ret = -1;
   } else {
     ret = vpsiSend_nolimit(t._psi, ap);
   }
