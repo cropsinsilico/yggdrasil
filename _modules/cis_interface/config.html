@@ -54,10 +54,10 @@
 <span class="kn">from</span> <span class="nn">cis_interface.backwards</span> <span class="k">import</span> <span class="n">configparser</span>
 
 
-<div class="viewcode-block" id="CisConfigParser"><a class="viewcode-back" href="../../code_python.html#cis_interface.config.CisConfigParser">[docs]</a><span class="k">class</span> <span class="nc">CisConfigParser</span><span class="p">(</span><span class="n">configparser</span><span class="o">.</span><span class="n">ConfigParser</span><span class="p">):</span>
+<div class="viewcode-block" id="CisConfigParser"><a class="viewcode-back" href="../../cis_interface.html#cis_interface.config.CisConfigParser">[docs]</a><span class="k">class</span> <span class="nc">CisConfigParser</span><span class="p">(</span><span class="n">configparser</span><span class="o">.</span><span class="n">ConfigParser</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Config parser that returns None if option not provided on get.&quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="CisConfigParser.get"><a class="viewcode-back" href="../../code_python.html#cis_interface.config.CisConfigParser.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">section</span><span class="p">,</span> <span class="n">option</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="CisConfigParser.get"><a class="viewcode-back" href="../../cis_interface.html#cis_interface.config.CisConfigParser.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">section</span><span class="p">,</span> <span class="n">option</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Return None if the section/option does not exist.</span>
 
 <span class="sd">        Args:</span>
@@ -110,7 +110,7 @@
            <span class="p">]</span>
 
 
-<div class="viewcode-block" id="cfg_environment"><a class="viewcode-back" href="../../code_python.html#cis_interface.config.cfg_environment">[docs]</a><span class="k">def</span> <span class="nf">cfg_environment</span><span class="p">(</span><span class="n">env</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">cfg</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="cfg_environment"><a class="viewcode-back" href="../../cis_interface.html#cis_interface.config.cfg_environment">[docs]</a><span class="k">def</span> <span class="nf">cfg_environment</span><span class="p">(</span><span class="n">env</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">cfg</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Set environment variables based on config options.</span>
 
 <span class="sd">    Args:</span>
