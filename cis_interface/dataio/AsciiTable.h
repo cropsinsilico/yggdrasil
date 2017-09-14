@@ -77,7 +77,7 @@ int count_matches(const char *regex_text, const char *to_match) {
 */
 static inline
 int count_formats(const char* fmt_str) {
-  const char * fmt_regex = "%([[:digit:]]+\\$)?[+-]?([ 0]|\'\.{1})?-?[[:digit:]]*(\\.[[:digit:]]+)?[lhjztL]*[bcdeEufFgGosxX]";
+  const char * fmt_regex = "%([[:digit:]]+\\$)?[+-]?([ 0]|\'.{1})?-?[[:digit:]]*(\\.[[:digit:]]+)?[lhjztL]*[bcdeEufFgGosxX]";
   int ret = count_matches(fmt_regex, fmt_str);
   /* printf("%d, %s\n", ret, fmt_str); */
   return ret;
