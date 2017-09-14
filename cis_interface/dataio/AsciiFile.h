@@ -4,7 +4,7 @@
 #include <stdarg.h>
 
 /*! @brief Flag for checking if AsciiFile.h has already been included.*/
-#define ASCIIFILE_INCLUDED;
+#define ASCIIFILE_INCLUDED
 
 /*! @brief Maximum line size. */
 #define LINE_SIZE_MAX 1024*2
