@@ -49,86 +49,184 @@
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric">Defines</p>
 <dl class="macro">
+<dt id="c.ASCIIFILE_INCLUDED">
+<span class="target" id="_ascii_file_8h_1a26d9d29d1d43b31cc617396448c13c0b"></span><code class="descname">ASCIIFILE_INCLUDED</code><a class="headerlink" href="#c.ASCIIFILE_INCLUDED" title="Permalink to this definition">¶</a></dt>
+<dd><p>Flag for checking if AsciiFile.h has already been included. </p>
+</dd></dl>
+
+<dl class="macro">
 <dt id="c.LINE_SIZE_MAX">
 <span class="target" id="_ascii_file_8h_1ac68bae2984ae6cc400d0e6ca823dd28b"></span><code class="descname">LINE_SIZE_MAX</code><a class="headerlink" href="#c.LINE_SIZE_MAX" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Maximum line size. </p>
+</dd></dl>
 
 </div>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric">Typedefs</p>
 <dl class="type">
-<dt id="_CPPv29AsciiFile">
-<span id="AsciiFile"></span><span class="target" id="_ascii_file_8h_1ad744132f03b4b89bb47911c4ec7a82f1"></span><em class="property">typedef </em><em class="property">struct</em> <a class="reference internal" href="#_CPPv29AsciiFile" title="AsciiFile">AsciiFile</a> <code class="descname">AsciiFile</code><a class="headerlink" href="#_CPPv29AsciiFile" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dt id="_CPPv211asciiFile_t">
+<span id="asciiFile_t"></span><span class="target" id="_ascii_file_8h_1a731c3c1bfd9021ff410ee8398db8c8a4"></span><em class="property">typedef </em><em class="property">struct</em> <a class="reference internal" href="#_CPPv211asciiFile_t" title="asciiFile_t">asciiFile_t</a> <code class="descname">asciiFile_t</code><a class="headerlink" href="#_CPPv211asciiFile_t" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Structure containing information about an ASCII text file. </p>
+</dd></dl>
 
 </div>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric">Functions</p>
 <dl class="function">
-<dt id="_CPPv210af_is_openK9AsciiFile">
-<span id="af_is_open__AsciiFileC"></span><span class="target" id="_ascii_file_8h_1a3190a61794d85fda62485cea7650320e"></span><em class="property">static</em> int <code class="descname">af_is_open</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv29AsciiFile" title="AsciiFile">AsciiFile</a> <em>t</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv210af_is_openK9AsciiFile" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dt id="_CPPv210af_is_openK11asciiFile_t">
+<span id="af_is_open__asciiFile_tC"></span><span class="target" id="_ascii_file_8h_1a47a6fed432d1842f8da133abcc44a88c"></span><em class="property">static</em> int <code class="descname">af_is_open</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv211asciiFile_t" title="asciiFile_t">asciiFile_t</a> <em>t</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv210af_is_openK11asciiFile_t" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Determine if the file is open. </p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>int 1 if open, 0 if closed. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">t</span></code>: constant <a class="reference internal" href="#structascii_file__t"><span class="std std-ref">asciiFile_t</span></a> file structure. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
 
 <dl class="function">
-<dt id="_CPPv27af_openP9AsciiFile">
-<span id="af_open__AsciiFileP"></span><span class="target" id="_ascii_file_8h_1ae34d5f34cfaac1ecb64c0d98b8098a7b"></span><em class="property">static</em> int <code class="descname">af_open</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv29AsciiFile" title="AsciiFile">AsciiFile</a> *<em>t</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv27af_openP9AsciiFile" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dt id="_CPPv27af_openP11asciiFile_t">
+<span id="af_open__asciiFile_tP"></span><span class="target" id="_ascii_file_8h_1a4c6f40e8e6773279180c65e89cede010"></span><em class="property">static</em> int <code class="descname">af_open</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv211asciiFile_t" title="asciiFile_t">asciiFile_t</a> *<em>t</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv27af_openP11asciiFile_t" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Open the file. </p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>int 0 if opened successfully, -1 otherwise. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">t</span></code>: constant <a class="reference internal" href="#structascii_file__t"><span class="std std-ref">asciiFile_t</span></a> file structure. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
 
 <dl class="function">
-<dt id="_CPPv28af_closeP9AsciiFile">
-<span id="af_close__AsciiFileP"></span><span class="target" id="_ascii_file_8h_1ad2594d6d1e3a868fde31070089a9f5f7"></span><em class="property">static</em> void <code class="descname">af_close</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv29AsciiFile" title="AsciiFile">AsciiFile</a> *<em>t</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv28af_closeP9AsciiFile" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dt id="_CPPv28af_closeP11asciiFile_t">
+<span id="af_close__asciiFile_tP"></span><span class="target" id="_ascii_file_8h_1a0527ea4a37b370f03fe6da956ff82051"></span><em class="property">static</em> int <code class="descname">af_close</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv211asciiFile_t" title="asciiFile_t">asciiFile_t</a> *<em>t</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv28af_closeP11asciiFile_t" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Close the file. </p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>int 0 if closed successfully, -1 otherwise. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">t</span></code>: constant <a class="reference internal" href="#structascii_file__t"><span class="std std-ref">asciiFile_t</span></a> file structure. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
 
 <dl class="function">
-<dt id="_CPPv213af_is_comment9AsciiFilePc">
-<span id="af_is_comment__AsciiFile.cP"></span><span class="target" id="_ascii_file_8h_1aa715a34cb66225c368f6ecc2d9490275"></span><em class="property">static</em> int <code class="descname">af_is_comment</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv29AsciiFile" title="AsciiFile">AsciiFile</a> <em>t</em>, char *<em>line</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv213af_is_comment9AsciiFilePc" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dt id="_CPPv213af_is_commentK11asciiFile_tPKc">
+<span id="af_is_comment__asciiFile_tC.cCP"></span><span class="target" id="_ascii_file_8h_1a2563193ae51f894e0c1c66c465b001c7"></span><em class="property">static</em> int <code class="descname">af_is_comment</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv211asciiFile_t" title="asciiFile_t">asciiFile_t</a> <em>t</em>, <em class="property">const</em> char *<em>line</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv213af_is_commentK11asciiFile_tPKc" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Check if string starts with a comment. </p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>int 1 if line starts with a comment, 0 otherwise. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">t</span></code>: constant <a class="reference internal" href="#structascii_file__t"><span class="std std-ref">asciiFile_t</span></a> file structure. </li>
+<li><code class="docutils literal"><span class="pre">line</span></code>: constant character pointer to string that should be checked. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
 
 <dl class="function">
-<dt id="_CPPv216af_readline_fullK9AsciiFilePPcP6size_t">
-<span id="af_readline_full__AsciiFileC.cPP.sP"></span><span class="target" id="_ascii_file_8h_1aab169ebcefeef51fbdfd869ab95c1b91"></span><em class="property">static</em> int <code class="descname">af_readline_full</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv29AsciiFile" title="AsciiFile">AsciiFile</a> <em>t</em>, char **<em>line</em>, size_t *<em>n</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv216af_readline_fullK9AsciiFilePPcP6size_t" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dt id="_CPPv216af_readline_fullK11asciiFile_tPPcP6size_t">
+<span id="af_readline_full__asciiFile_tC.cPP.sP"></span><span class="target" id="_ascii_file_8h_1abe2de982da7e4bc735994b9b8c1925b1"></span><em class="property">static</em> int <code class="descname">af_readline_full</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv211asciiFile_t" title="asciiFile_t">asciiFile_t</a> <em>t</em>, char **<em>line</em>, size_t *<em>n</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv216af_readline_fullK11asciiFile_tPPcP6size_t" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Read a single line from the file. </p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>int On success, the number of characters read, -1 on failure. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">t</span></code>: constant <a class="reference internal" href="#structascii_file__t"><span class="std std-ref">asciiFile_t</span></a> file structure. </li>
+<li><code class="docutils literal"><span class="pre">line</span></code>: constant character pointer to pointer to buffer where the read line should be stored. If line is not large enough to hold the read line, it will be reallocated. </li>
+<li><code class="docutils literal"><span class="pre">n</span></code>: Pointer to size of allocated buffer. If line is not large enough to hold the read line and is reallocated, n will be changed to the new size. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
 
 <dl class="function">
-<dt id="_CPPv217af_writeline_fullK9AsciiFilePKc">
-<span id="af_writeline_full__AsciiFileC.cCP"></span><span class="target" id="_ascii_file_8h_1a6735b69ee05db53b9fdabe358bb4fb26"></span><em class="property">static</em> int <code class="descname">af_writeline_full</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv29AsciiFile" title="AsciiFile">AsciiFile</a> <em>t</em>, <em class="property">const</em> char *<em>line</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv217af_writeline_fullK9AsciiFilePKc" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dt id="_CPPv217af_writeline_fullK11asciiFile_tPKc">
+<span id="af_writeline_full__asciiFile_tC.cCP"></span><span class="target" id="_ascii_file_8h_1ae1b11621aad35b3a39ebb6f36385cf94"></span><em class="property">static</em> int <code class="descname">af_writeline_full</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv211asciiFile_t" title="asciiFile_t">asciiFile_t</a> <em>t</em>, <em class="property">const</em> char *<em>line</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv217af_writeline_fullK11asciiFile_tPKc" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Write a single line to the file. </p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>int On success, the number of characters written, -1 on failure. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">t</span></code>: constant <a class="reference internal" href="#structascii_file__t"><span class="std std-ref">asciiFile_t</span></a> file structure. </li>
+<li><code class="docutils literal"><span class="pre">line</span></code>: constant character pointer to string that should be written. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
 
 <dl class="function">
-<dt id="_CPPv210ascii_filePKcPKcPcPc">
-<span id="ascii_file__cCP.cCP.cP.cP"></span><span class="target" id="_ascii_file_8h_1a8412b025390313d73923a4b16a6e90d4"></span><em class="property">static</em> <a class="reference internal" href="#_CPPv29AsciiFile" title="AsciiFile">AsciiFile</a> <code class="descname">ascii_file</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>filepath</em>, <em class="property">const</em> char *<em>io_mode</em>, char *<em>comment</em>, char *<em>newline</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv210ascii_filePKcPKcPcPc" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dt id="_CPPv29asciiFilePKcPKcPKcPKc">
+<span id="asciiFile__cCP.cCP.cCP.cCP"></span><span class="target" id="_ascii_file_8h_1a90670937615370b08cd7dfafad8fbbba"></span><em class="property">static</em> <a class="reference internal" href="#_CPPv211asciiFile_t" title="asciiFile_t">asciiFile_t</a> <code class="descname">asciiFile</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>filepath</em>, <em class="property">const</em> char *<em>io_mode</em>, <em class="property">const</em> char *<em>comment</em>, <em class="property">const</em> char *<em>newline</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv29asciiFilePKcPKcPKcPKc" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor for <a class="reference internal" href="#structascii_file__t"><span class="std std-ref">asciiFile_t</span></a> structure. </p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd><a class="reference internal" href="#structascii_file__t"><span class="std std-ref">asciiFile_t</span></a> File structure. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">filepath</span></code>: constant character pointer to file path. </li>
+<li><code class="docutils literal"><span class="pre">io_mode</span></code>: const character pointer to I/O mode. &#8220;r&#8221; for read, &#8220;w&#8221; for write. </li>
+<li><code class="docutils literal"><span class="pre">comment</span></code>: const character pointer to character(s) that should indicate a comment. If NULL, comment is set to &#8220;# &#8221;. </li>
+<li><code class="docutils literal"><span class="pre">newline</span></code>: const character pointer to character(s) that should indicate a newline. If NULL, newline is set to &#8220;\n&#8221;. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
 
 </div>
 <dl class="class">
-<dt id="_CPPv29AsciiFile">
-<span class="target" id="struct_ascii_file"></span><em class="property">struct </em><code class="descname">AsciiFile</code><a class="headerlink" href="#_CPPv29AsciiFile" title="Permalink to this definition">¶</a><br /></dt>
-<dd><div class="breathe-sectiondef docutils container">
+<dt id="_CPPv211asciiFile_t">
+<span class="target" id="structascii_file__t"></span><em class="property">struct </em><code class="descname">asciiFile_t</code><a class="headerlink" href="#_CPPv211asciiFile_t" title="Permalink to this definition">¶</a><br /></dt>
+<dd><em>#include &lt;AsciiFile.h&gt;</em><p>Structure containing information about an ASCII text file. </p>
+<div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric">Public Members</p>
 <dl class="member">
-<dt id="_CPPv2N9AsciiFile8filepathE">
-<span id="AsciiFile::filepath__cCP"></span><span class="target" id="struct_ascii_file_1a943bff7edf4fa3310cfc80093f719058"></span><em class="property">const</em> char *<code class="descname">filepath</code><a class="headerlink" href="#_CPPv2N9AsciiFile8filepathE" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dt id="_CPPv2N11asciiFile_t8filepathE">
+<span id="asciiFile_t::filepath__cCP"></span><span class="target" id="structascii_file__t_1a9141b66096494327a32fa51c6b8281cc"></span><em class="property">const</em> char *<code class="descname">filepath</code><a class="headerlink" href="#_CPPv2N11asciiFile_t8filepathE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Full path to file. </p>
+</dd></dl>
 
 <dl class="member">
-<dt id="_CPPv2N9AsciiFile7io_modeE">
-<span id="AsciiFile::io_mode__cA"></span><span class="target" id="struct_ascii_file_1a28af310876444d92cafbe961dfd7f447"></span>char <code class="descname">io_mode</code>[64]<a class="headerlink" href="#_CPPv2N9AsciiFile7io_modeE" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dt id="_CPPv2N11asciiFile_t7io_modeE">
+<span id="asciiFile_t::io_mode__cA"></span><span class="target" id="structascii_file__t_1a89b8b86d814353fea003c9c54204d8af"></span>char <code class="descname">io_mode</code>[64]<a class="headerlink" href="#_CPPv2N11asciiFile_t7io_modeE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>I/O mode. &#8216;r&#8217; for read, &#8216;w&#8217; for write. </p>
+</dd></dl>
 
 <dl class="member">
-<dt id="_CPPv2N9AsciiFile7commentE">
-<span id="AsciiFile::comment__cA"></span><span class="target" id="struct_ascii_file_1ac6ec6edf3c80ec10b3076aaaad2d2543"></span>char <code class="descname">comment</code>[64]<a class="headerlink" href="#_CPPv2N9AsciiFile7commentE" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dt id="_CPPv2N11asciiFile_t7commentE">
+<span id="asciiFile_t::comment__cA"></span><span class="target" id="structascii_file__t_1aa6b01ebf820bd2c7bc7003e7b0669092"></span>char <code class="descname">comment</code>[64]<a class="headerlink" href="#_CPPv2N11asciiFile_t7commentE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Character(s) indicating a comment. </p>
+</dd></dl>
 
 <dl class="member">
-<dt id="_CPPv2N9AsciiFile7newlineE">
-<span id="AsciiFile::newline__cA"></span><span class="target" id="struct_ascii_file_1ae4e7b9b8b86b0bee4835f2eb183f048c"></span>char <code class="descname">newline</code>[64]<a class="headerlink" href="#_CPPv2N9AsciiFile7newlineE" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dt id="_CPPv2N11asciiFile_t7newlineE">
+<span id="asciiFile_t::newline__cA"></span><span class="target" id="structascii_file__t_1aa98795a5f431ada3d3548bc9b29c936f"></span>char <code class="descname">newline</code>[64]<a class="headerlink" href="#_CPPv2N11asciiFile_t7newlineE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Character(s) indicating a newline. </p>
+</dd></dl>
 
 <dl class="member">
-<dt id="_CPPv2N9AsciiFile2fdE">
-<span id="AsciiFile::fd__FILEP"></span><span class="target" id="struct_ascii_file_1a971e8089527d5d8be168a047ae66c116"></span>FILE *<code class="descname">fd</code><a class="headerlink" href="#_CPPv2N9AsciiFile2fdE" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dt id="_CPPv2N11asciiFile_t2fdE">
+<span id="asciiFile_t::fd__FILEP"></span><span class="target" id="structascii_file__t_1a799e768ea6b00c3cdf49303950b015b6"></span>FILE *<code class="descname">fd</code><a class="headerlink" href="#_CPPv2N11asciiFile_t2fdE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>File identifier for ASCII file when open. </p>
+</dd></dl>
 
 </div>
 </dd></dl>
@@ -136,9 +234,10 @@
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric">Typedefs</p>
 <dl class="type">
-<dt id="_CPPv210AsciiTable">
-<span id="AsciiTable"></span><span class="target" id="_ascii_table_8h_1a29f3208e3f7725d88d70d6d962c49a52"></span><em class="property">typedef </em><em class="property">struct</em> <a class="reference internal" href="#_CPPv210AsciiTable" title="AsciiTable">AsciiTable</a> <code class="descname">AsciiTable</code><a class="headerlink" href="#_CPPv210AsciiTable" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dt id="_CPPv212asciiTable_t">
+<span id="asciiTable_t"></span><span class="target" id="_ascii_table_8h_1ac239c9dc53457dcb09bffb7dd0f1474e"></span><em class="property">typedef </em><em class="property">struct</em> <a class="reference internal" href="#_CPPv212asciiTable_t" title="asciiTable_t">asciiTable_t</a> <code class="descname">asciiTable_t</code><a class="headerlink" href="#_CPPv212asciiTable_t" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Structure containing information about an ASCII table. </p>
+</dd></dl>
 
 </div>
 <div class="breathe-sectiondef docutils container">
@@ -146,7 +245,8 @@
 <dl class="type">
 <dt id="_CPPv27mytypes">
 <span id="mytypes"></span><span class="target" id="_ascii_table_8h_1a14d2a55c4a978c4cfb618c491001daca"></span><em class="property">enum </em><code class="descname">mytypes</code><a class="headerlink" href="#_CPPv27mytypes" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p><em>Values:</em></p>
+<dd><p>Enumerated types to be used for interpreting formats. </p>
+<p><em>Values:</em></p>
 <dl class="member">
 <dt id="_CPPv26STRING">
 <span id="STRING"></span><span class="target" id="_ascii_table_8h_1a14d2a55c4a978c4cfb618c491001dacaaee847e634a4297b274316de8a8ca9921"></span><code class="descname">STRING</code><a class="headerlink" href="#_CPPv26STRING" title="Permalink to this definition">¶</a><br /></dt>
@@ -218,130 +318,380 @@
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric">Functions</p>
 <dl class="function">
-<dt id="_CPPv27at_openP10AsciiTable">
-<span id="at_open__AsciiTableP"></span><span class="target" id="_ascii_table_8h_1aca9d2fd0c6970b310599be6a8464a744"></span><em class="property">static</em> int <code class="descname">at_open</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv210AsciiTable" title="AsciiTable">AsciiTable</a> *<em>t</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv27at_openP10AsciiTable" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dt id="_CPPv213compile_regexP7regex_tPKc">
+<span id="compile_regex__regex_tP.cCP"></span><span class="target" id="_ascii_table_8h_1a2450e4b7c3a254afcfd62c54f4f33bcb"></span><em class="property">static</em> int <code class="descname">compile_regex</code><span class="sig-paren">(</span>regex_t *<em>r</em>, <em class="property">const</em> char *<em>regex_text</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv213compile_regexP7regex_tPKc" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Create a regex from a character array. Adapted from <a class="reference external" href="https://www.lemoda.net/c/unix-regex/">https://www.lemoda.net/c/unix-regex/</a>. </p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>static int Success or failure of compilation. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">r</span></code>: pointer to regex_t. Resutling regex expression. </li>
+<li><code class="docutils literal"><span class="pre">regex_text</span></code>: constant character pointer to text that should be compiled. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
 
 <dl class="function">
-<dt id="_CPPv28at_closeP10AsciiTable">
-<span id="at_close__AsciiTableP"></span><span class="target" id="_ascii_table_8h_1abe750d8ac30055a764f36e3ad1bad940"></span><em class="property">static</em> void <code class="descname">at_close</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv210AsciiTable" title="AsciiTable">AsciiTable</a> *<em>t</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv28at_closeP10AsciiTable" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dt id="_CPPv213count_matchesPKcPKc">
+<span id="count_matches__cCP.cCP"></span><span class="target" id="_ascii_table_8h_1acc835d46e359011a0f1fbaba3f28b03b"></span><em class="property">static</em> int <code class="descname">count_matches</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>regex_text</em>, <em class="property">const</em> char *<em>to_match</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv213count_matchesPKcPKc" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Count the number of times a regular expression is matched in a string. </p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>int Number of matches found. -1 is returned if the regex could not be compiled. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">regex_text</span></code>: constant character pointer to string that should be compiled into a regex. </li>
+<li><code class="docutils literal"><span class="pre">to_match</span></code>: constant character pointer to string that should be checked for matches. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
 
 <dl class="function">
-<dt id="_CPPv212at_vreadlineK10AsciiTable7va_list">
-<span id="at_vreadline__AsciiTableC.va_list"></span><span class="target" id="_ascii_table_8h_1a1f6ada43a43017875b96e6a6ae10b763"></span><em class="property">static</em> int <code class="descname">at_vreadline</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv210AsciiTable" title="AsciiTable">AsciiTable</a> <em>t</em>, va_list <em>ap</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv212at_vreadlineK10AsciiTable7va_list" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dt id="_CPPv213count_formatsPKc">
+<span id="count_formats__cCP"></span><span class="target" id="_ascii_table_8h_1a2059b2fabbacee5e6de895822beb99cd"></span><em class="property">static</em> int <code class="descname">count_formats</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>fmt_str</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv213count_formatsPKc" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Count how many % format specifiers there are in format string. Formats are found by counting the number of matches to the regular expression adapted from <a class="reference external" href="https://stackoverflow.com/questions/446285/validate-sprintf-format-from-input-field-with-regex">https://stackoverflow.com/questions/446285/validate-sprintf-format-from-input-field-with-regex</a>. </p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>int Number of format specifiers found. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">fmt_str</span></code>: constant character pointer to string that should be searched for format specifiers. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
 
 <dl class="function">
-<dt id="_CPPv213at_vwritelineK10AsciiTable7va_list">
-<span id="at_vwriteline__AsciiTableC.va_list"></span><span class="target" id="_ascii_table_8h_1a37759590f8a514acb13cee60f428de09"></span><em class="property">static</em> int <code class="descname">at_vwriteline</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv210AsciiTable" title="AsciiTable">AsciiTable</a> <em>t</em>, va_list <em>ap</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv213at_vwritelineK10AsciiTable7va_list" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dt id="_CPPv27at_openP12asciiTable_t">
+<span id="at_open__asciiTable_tP"></span><span class="target" id="_ascii_table_8h_1aa392a2b640022f5fc7f928660f3d4859"></span><em class="property">static</em> int <code class="descname">at_open</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv212asciiTable_t" title="asciiTable_t">asciiTable_t</a> *<em>t</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv27at_openP12asciiTable_t" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Open the file. </p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>int 0 if opened successfully, -1 otherwise. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">t</span></code>: <a class="reference internal" href="#structascii_table__t"><span class="std std-ref">asciiTable_t</span></a> table structure. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
 
 <dl class="function">
-<dt id="_CPPv211at_readlineK10AsciiTablez">
-<span id="at_readline__AsciiTableC.z"></span><span class="target" id="_ascii_table_8h_1a7e2dc969d714274abae74fac7a6a2f2f"></span><em class="property">static</em> int <code class="descname">at_readline</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv210AsciiTable" title="AsciiTable">AsciiTable</a> <em>t</em>, ...<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv211at_readlineK10AsciiTablez" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dt id="_CPPv28at_closeP12asciiTable_t">
+<span id="at_close__asciiTable_tP"></span><span class="target" id="_ascii_table_8h_1aafdce9672f7a9645a1a7b9af886727ea"></span><em class="property">static</em> void <code class="descname">at_close</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv212asciiTable_t" title="asciiTable_t">asciiTable_t</a> *<em>t</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv28at_closeP12asciiTable_t" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Close the file. </p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>int 0 if ocloseded successfully, -1 otherwise. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">t</span></code>: <a class="reference internal" href="#structascii_table__t"><span class="std std-ref">asciiTable_t</span></a> table structure. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
 
 <dl class="function">
-<dt id="_CPPv212at_writelineK10AsciiTablez">
-<span id="at_writeline__AsciiTableC.z"></span><span class="target" id="_ascii_table_8h_1afb5566c5a9f296880db98f5ba15231a2"></span><em class="property">static</em> int <code class="descname">at_writeline</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv210AsciiTable" title="AsciiTable">AsciiTable</a> <em>t</em>, ...<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv212at_writelineK10AsciiTablez" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dt id="_CPPv212at_vreadlineK12asciiTable_t7va_list">
+<span id="at_vreadline__asciiTable_tC.va_list"></span><span class="target" id="_ascii_table_8h_1a5d3bdde3a0beb050a8699e7d7907d4e6"></span><em class="property">static</em> int <code class="descname">at_vreadline</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv212asciiTable_t" title="asciiTable_t">asciiTable_t</a> <em>t</em>, va_list <em>ap</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv212at_vreadlineK12asciiTable_t7va_list" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Read a line from the file and parse it. </p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>int On success, the number of characters read. -1 on failure. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">t</span></code>: constant <a class="reference internal" href="#structascii_table__t"><span class="std std-ref">asciiTable_t</span></a> table structure. </li>
+<li><code class="docutils literal"><span class="pre">ap</span></code>: va_list Pointers to variables where parsed arguments should be stored. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
 
 <dl class="function">
-<dt id="_CPPv214at_writeformatK10AsciiTable">
-<span id="at_writeformat__AsciiTableC"></span><span class="target" id="_ascii_table_8h_1a4a221d51656ea3ec0e3d59d6c3e70c91"></span><em class="property">static</em> int <code class="descname">at_writeformat</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv210AsciiTable" title="AsciiTable">AsciiTable</a> <em>t</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv214at_writeformatK10AsciiTable" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dt id="_CPPv213at_vwritelineK12asciiTable_t7va_list">
+<span id="at_vwriteline__asciiTable_tC.va_list"></span><span class="target" id="_ascii_table_8h_1a2ad380bc74295b4f561d5d496c558843"></span><em class="property">static</em> int <code class="descname">at_vwriteline</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv212asciiTable_t" title="asciiTable_t">asciiTable_t</a> <em>t</em>, va_list <em>ap</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv213at_vwritelineK12asciiTable_t7va_list" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Format arguments to form a line and write it to the file. </p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>int On success, the number of characters written. -1 on failure. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">t</span></code>: constant <a class="reference internal" href="#structascii_table__t"><span class="std std-ref">asciiTable_t</span></a> table structure. </li>
+<li><code class="docutils literal"><span class="pre">ap</span></code>: va_list Variables that should be formatted using the format string to create a line in the table. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
 
 <dl class="function">
-<dt id="_CPPv222at_discover_format_strP10AsciiTable">
-<span id="at_discover_format_str__AsciiTableP"></span><span class="target" id="_ascii_table_8h_1ade6b829a9a7413b998ad9911f2828a69"></span><em class="property">static</em> int <code class="descname">at_discover_format_str</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv210AsciiTable" title="AsciiTable">AsciiTable</a> *<em>t</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv222at_discover_format_strP10AsciiTable" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dt id="_CPPv211at_readlineK12asciiTable_tz">
+<span id="at_readline__asciiTable_tC.z"></span><span class="target" id="_ascii_table_8h_1ae69d8028086c1dfbc9d1f3c47d2b58cd"></span><em class="property">static</em> int <code class="descname">at_readline</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv212asciiTable_t" title="asciiTable_t">asciiTable_t</a> <em>t</em>, ...<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv211at_readlineK12asciiTable_tz" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Read a line from the file and parse it. </p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>int On success, the number of characters read. -1 on failure. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">t</span></code>: constant <a class="reference internal" href="#structascii_table__t"><span class="std std-ref">asciiTable_t</span></a> table structure. </li>
+<li><code class="docutils literal"><span class="pre">...</span></code>: Pointers to variables where parsed arguments should be stored. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
 
 <dl class="function">
-<dt id="_CPPv212at_set_ncolsP10AsciiTable">
-<span id="at_set_ncols__AsciiTableP"></span><span class="target" id="_ascii_table_8h_1a1091254a720936f5a21f1c553a7679a4"></span><em class="property">static</em> int <code class="descname">at_set_ncols</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv210AsciiTable" title="AsciiTable">AsciiTable</a> *<em>t</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv212at_set_ncolsP10AsciiTable" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dt id="_CPPv212at_writelineK12asciiTable_tz">
+<span id="at_writeline__asciiTable_tC.z"></span><span class="target" id="_ascii_table_8h_1a3537e4479c4c6146115a606c4be89fb0"></span><em class="property">static</em> int <code class="descname">at_writeline</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv212asciiTable_t" title="asciiTable_t">asciiTable_t</a> <em>t</em>, ...<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv212at_writelineK12asciiTable_tz" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Format arguments to form a line and write it to the file. </p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>int On success, the number of characters written. -1 on failure. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">t</span></code>: constant <a class="reference internal" href="#structascii_table__t"><span class="std std-ref">asciiTable_t</span></a> table structure. </li>
+<li><code class="docutils literal"><span class="pre">...</span></code>: Variables that should be formatted using the format string to create a line in the table. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
 
 <dl class="function">
-<dt id="_CPPv217at_set_format_typP10AsciiTable">
-<span id="at_set_format_typ__AsciiTableP"></span><span class="target" id="_ascii_table_8h_1a2725477103ea9884c974570b650af761"></span><em class="property">static</em> int <code class="descname">at_set_format_typ</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv210AsciiTable" title="AsciiTable">AsciiTable</a> *<em>t</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv217at_set_format_typP10AsciiTable" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dt id="_CPPv214at_writeformatK12asciiTable_t">
+<span id="at_writeformat__asciiTable_tC"></span><span class="target" id="_ascii_table_8h_1a99cf4e10276fa57632a44489ce1883ce"></span><em class="property">static</em> int <code class="descname">at_writeformat</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv212asciiTable_t" title="asciiTable_t">asciiTable_t</a> <em>t</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv214at_writeformatK12asciiTable_t" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Write the format string the the file, prepending it with a comment. </p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>int On success, the number of characters written. -1 on failure. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">t</span></code>: constant <a class="reference internal" href="#structascii_table__t"><span class="std std-ref">asciiTable_t</span></a> table structure. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
 
 <dl class="function">
-<dt id="_CPPv218at_vbytes_to_arrayK10AsciiTablePci7va_list">
-<span id="at_vbytes_to_array__AsciiTableC.cP.i.va_list"></span><span class="target" id="_ascii_table_8h_1a0c944aa280eec8a1fd95f91419a6cd14"></span><em class="property">static</em> int <code class="descname">at_vbytes_to_array</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv210AsciiTable" title="AsciiTable">AsciiTable</a> <em>t</em>, char *<em>data</em>, int <em>data_siz</em>, va_list <em>ap</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv218at_vbytes_to_arrayK10AsciiTablePci7va_list" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dt id="_CPPv222at_discover_format_strP12asciiTable_t">
+<span id="at_discover_format_str__asciiTable_tP"></span><span class="target" id="_ascii_table_8h_1a065c972ea3d12c9c0b3b18f60ae2fb67"></span><em class="property">static</em> int <code class="descname">at_discover_format_str</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv212asciiTable_t" title="asciiTable_t">asciiTable_t</a> *<em>t</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv222at_discover_format_strP12asciiTable_t" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Try to find the format string in the file. The format string is assumed to start with a comment. </p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>0 on success, -1 on failure. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">t</span></code>: constant <a class="reference internal" href="#structascii_table__t"><span class="std std-ref">asciiTable_t</span></a> table structure. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
 
 <dl class="function">
-<dt id="_CPPv218at_varray_to_bytesK10AsciiTablePPci7va_list">
-<span id="at_varray_to_bytes__AsciiTableC.cPP.i.va_list"></span><span class="target" id="_ascii_table_8h_1a985d327ec4713da33c9e114ca95a260e"></span><em class="property">static</em> int <code class="descname">at_varray_to_bytes</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv210AsciiTable" title="AsciiTable">AsciiTable</a> <em>t</em>, char **<em>data</em>, int <em>nrows</em>, va_list <em>ap</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv218at_varray_to_bytesK10AsciiTablePPci7va_list" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dt id="_CPPv212at_set_ncolsP12asciiTable_t">
+<span id="at_set_ncols__asciiTable_tP"></span><span class="target" id="_ascii_table_8h_1a0603f9b3c88d350047d07d7ae1be7885"></span><em class="property">static</em> int <code class="descname">at_set_ncols</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv212asciiTable_t" title="asciiTable_t">asciiTable_t</a> *<em>t</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv212at_set_ncolsP12asciiTable_t" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Set the number of columns by counting the format specifiers. </p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>int The number of columns counted. Negative values indicate errors. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">t</span></code>: constant <a class="reference internal" href="#structascii_table__t"><span class="std std-ref">asciiTable_t</span></a> table structure. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
 
 <dl class="function">
-<dt id="_CPPv217at_array_to_bytesK10AsciiTablePPciz">
-<span id="at_array_to_bytes__AsciiTableC.cPP.i.z"></span><span class="target" id="_ascii_table_8h_1a1f632de97f4a37847b535dd0ff8402d8"></span><em class="property">static</em> int <code class="descname">at_array_to_bytes</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv210AsciiTable" title="AsciiTable">AsciiTable</a> <em>t</em>, char **<em>data</em>, int <em>nrows</em>, ...<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv217at_array_to_bytesK10AsciiTablePPciz" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dt id="_CPPv217at_set_format_typP12asciiTable_t">
+<span id="at_set_format_typ__asciiTable_tP"></span><span class="target" id="_ascii_table_8h_1ab0a82f6cbb7d372d6ea2fbab1da2d4af"></span><em class="property">static</em> int <code class="descname">at_set_format_typ</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv212asciiTable_t" title="asciiTable_t">asciiTable_t</a> *<em>t</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv217at_set_format_typP12asciiTable_t" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Determine the column types by parsing the format string. </p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>int 0 on success, -1 on failure. TODO: switch to regex </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">t</span></code>: constant <a class="reference internal" href="#structascii_table__t"><span class="std std-ref">asciiTable_t</span></a> table structure. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
 
 <dl class="function">
-<dt id="_CPPv217at_bytes_to_arrayK10AsciiTablePciz">
-<span id="at_bytes_to_array__AsciiTableC.cP.i.z"></span><span class="target" id="_ascii_table_8h_1a1245e6ef651ca627c9e867e70f708743"></span><em class="property">static</em> int <code class="descname">at_bytes_to_array</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv210AsciiTable" title="AsciiTable">AsciiTable</a> <em>t</em>, char *<em>data</em>, int <em>data_siz</em>, ...<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv217at_bytes_to_arrayK10AsciiTablePciz" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dt id="_CPPv218at_vbytes_to_arrayK12asciiTable_tPKcKi7va_list">
+<span id="at_vbytes_to_array__asciiTable_tC.cCP.iC.va_list"></span><span class="target" id="_ascii_table_8h_1aaffcc61102c5cdd0048523c1b8a3fd8b"></span><em class="property">static</em> int <code class="descname">at_vbytes_to_array</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv212asciiTable_t" title="asciiTable_t">asciiTable_t</a> <em>t</em>, <em class="property">const</em> char *<em>data</em>, <em class="property">const</em> int <em>data_siz</em>, va_list <em>ap</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv218at_vbytes_to_arrayK12asciiTable_tPKcKi7va_list" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Convert data into arrays for columns. </p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>int Number of rows read on success, -1 on failure. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">t</span></code>: constant <a class="reference internal" href="#structascii_table__t"><span class="std std-ref">asciiTable_t</span></a> table structure. </li>
+<li><code class="docutils literal"><span class="pre">data</span></code>: constant character pointer to memory containing data that should be parsed. </li>
+<li><code class="docutils literal"><span class="pre">data_siz</span></code>: constant int Size of data in bytes. </li>
+<li><code class="docutils literal"><span class="pre">ap</span></code>: va_list Pointers to pointers to memory where columns should be stored. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
 
 <dl class="function">
-<dt id="_CPPv210at_cleanupP10AsciiTable">
-<span id="at_cleanup__AsciiTableP"></span><span class="target" id="_ascii_table_8h_1a44ebc18807492d34c4209e768b050c68"></span><em class="property">static</em> void <code class="descname">at_cleanup</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv210AsciiTable" title="AsciiTable">AsciiTable</a> *<em>t</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv210at_cleanupP10AsciiTable" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dt id="_CPPv218at_varray_to_bytesK12asciiTable_tPPci7va_list">
+<span id="at_varray_to_bytes__asciiTable_tC.cPP.i.va_list"></span><span class="target" id="_ascii_table_8h_1ad5d3936998aef99536a4373fff968ff5"></span><em class="property">static</em> int <code class="descname">at_varray_to_bytes</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv212asciiTable_t" title="asciiTable_t">asciiTable_t</a> <em>t</em>, char **<em>data</em>, int <em>nrows</em>, va_list <em>ap</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv218at_varray_to_bytesK12asciiTable_tPPci7va_list" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Encode a set of arrays as bytes. </p>
+<p><dl class="docutils">
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">t</span></code>: constant <a class="reference internal" href="#structascii_table__t"><span class="std std-ref">asciiTable_t</span></a> table structure. </li>
+<li><code class="docutils literal"><span class="pre">data</span></code>: Pointer to pointer to memory where encoded arrays should be stored. It does not need to be allocate, only declared. </li>
+<li><code class="docutils literal"><span class="pre">nrows</span></code>: int Number of rows in each column array. </li>
+<li><code class="docutils literal"><span class="pre">ap</span></code>: va_list Pointers to memory where column data is stored. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
 
 <dl class="function">
-<dt id="_CPPv211ascii_tablePKcPKcPcPcPcPc">
-<span id="ascii_table__cCP.cCP.cP.cP.cP.cP"></span><span class="target" id="_ascii_table_8h_1a59b6e48fdb36589d3cb257f182ff225f"></span><em class="property">static</em> <a class="reference internal" href="#_CPPv210AsciiTable" title="AsciiTable">AsciiTable</a> <code class="descname">ascii_table</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>filepath</em>, <em class="property">const</em> char *<em>io_mode</em>, char *<em>format_str</em>, char *<em>comment</em>, char *<em>column</em>, char *<em>newline</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv211ascii_tablePKcPKcPcPcPcPc" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dt id="_CPPv217at_bytes_to_arrayK12asciiTable_tPciz">
+<span id="at_bytes_to_array__asciiTable_tC.cP.i.z"></span><span class="target" id="_ascii_table_8h_1a1d4ab07625e12ae9d6782ed0d3f014f8"></span><em class="property">static</em> int <code class="descname">at_bytes_to_array</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv212asciiTable_t" title="asciiTable_t">asciiTable_t</a> <em>t</em>, char *<em>data</em>, int <em>data_siz</em>, ...<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv217at_bytes_to_arrayK12asciiTable_tPciz" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Convert data into arrays for columns. </p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>int Number of rows read on success, -1 on failure. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">t</span></code>: constant <a class="reference internal" href="#structascii_table__t"><span class="std std-ref">asciiTable_t</span></a> table structure. </li>
+<li><code class="docutils literal"><span class="pre">data</span></code>: constant character pointer to memory containing data that should be parsed. </li>
+<li><code class="docutils literal"><span class="pre">data_siz</span></code>: constant int Size of data in bytes. </li>
+<li><code class="docutils literal"><span class="pre">...</span></code>: Pointers to pointers to memory where columns should be stored. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv217at_array_to_bytesK12asciiTable_tPPciz">
+<span id="at_array_to_bytes__asciiTable_tC.cPP.i.z"></span><span class="target" id="_ascii_table_8h_1af2c77919a811f2deb7e7579465bf4049"></span><em class="property">static</em> int <code class="descname">at_array_to_bytes</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv212asciiTable_t" title="asciiTable_t">asciiTable_t</a> <em>t</em>, char **<em>data</em>, int <em>nrows</em>, ...<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv217at_array_to_bytesK12asciiTable_tPPciz" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Encode a set of arrays as bytes. </p>
+<p><dl class="docutils">
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">t</span></code>: constant <a class="reference internal" href="#structascii_table__t"><span class="std std-ref">asciiTable_t</span></a> table structure. </li>
+<li><code class="docutils literal"><span class="pre">data</span></code>: Pointer to pointer to memory where encoded arrays should be stored. It does not need to be allocate, only declared. </li>
+<li><code class="docutils literal"><span class="pre">nrows</span></code>: int Number of rows in each column array. </li>
+<li><code class="docutils literal"><span class="pre">...</span></code>: Pointers to memory where column data is stored. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv210at_cleanupP12asciiTable_t">
+<span id="at_cleanup__asciiTable_tP"></span><span class="target" id="_ascii_table_8h_1a4334fe77589dbea1626482da3fa54abb"></span><em class="property">static</em> void <code class="descname">at_cleanup</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv212asciiTable_t" title="asciiTable_t">asciiTable_t</a> *<em>t</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv210at_cleanupP12asciiTable_t" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Deallocate and clean up <a class="reference internal" href="#structascii_table__t"><span class="std std-ref">asciiTable_t</span></a> structure. </p>
+<p><dl class="docutils">
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">t</span></code>: <a class="reference internal" href="#structascii_table__t"><span class="std std-ref">asciiTable_t</span></a> table structure. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv210asciiTablePKcPKcPKcPKcPKcPKc">
+<span id="asciiTable__cCP.cCP.cCP.cCP.cCP.cCP"></span><span class="target" id="_ascii_table_8h_1a2cc033a42c5436c373793d378b806e9c"></span><em class="property">static</em> <a class="reference internal" href="#_CPPv212asciiTable_t" title="asciiTable_t">asciiTable_t</a> <code class="descname">asciiTable</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>filepath</em>, <em class="property">const</em> char *<em>io_mode</em>, <em class="property">const</em> char *<em>format_str</em>, <em class="property">const</em> char *<em>comment</em>, <em class="property">const</em> char *<em>column</em>, <em class="property">const</em> char *<em>newline</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv210asciiTablePKcPKcPKcPKcPKcPKc" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor for <a class="reference internal" href="#structascii_table__t"><span class="std std-ref">asciiTable_t</span></a> structure. </p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd><a class="reference internal" href="#structascii_table__t"><span class="std std-ref">asciiTable_t</span></a> table structure. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">filepath</span></code>: constant character pointer to file path. </li>
+<li><code class="docutils literal"><span class="pre">io_mode</span></code>: constant character pointer to I/O mode. &#8220;r&#8221; for read, &#8220;w&#8221; for write. </li>
+<li><code class="docutils literal"><span class="pre">format_str</span></code>: constant character pointer to string describing the format of the table roads. Required for io_mode == &#8220;w&#8221;, but if set to NULL for io_mode == &#8220;r&#8221;, it will attempt to be read from the table. </li>
+<li><code class="docutils literal"><span class="pre">comment</span></code>: const character pointer to character(s) that should indicate a comment. If NULL, comment is set to &#8220;# &#8221;. </li>
+<li><code class="docutils literal"><span class="pre">column</span></code>: const character pointer to character(s) that should separate columns in the table. If NULL, column is set to &#8220;\t&#8221;. </li>
+<li><code class="docutils literal"><span class="pre">newline</span></code>: const character pointer to character(s) that should indicate a newline. If NULL, newline is set to &#8220;\n&#8221;. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
 
 </div>
 <dl class="class">
-<dt id="_CPPv210AsciiTable">
-<span class="target" id="struct_ascii_table"></span><em class="property">struct </em><code class="descname">AsciiTable</code><a class="headerlink" href="#_CPPv210AsciiTable" title="Permalink to this definition">¶</a><br /></dt>
-<dd><div class="breathe-sectiondef docutils container">
+<dt id="_CPPv212asciiTable_t">
+<span class="target" id="structascii_table__t"></span><em class="property">struct </em><code class="descname">asciiTable_t</code><a class="headerlink" href="#_CPPv212asciiTable_t" title="Permalink to this definition">¶</a><br /></dt>
+<dd><em>#include &lt;AsciiTable.h&gt;</em><p>Structure containing information about an ASCII table. </p>
+<div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric">Public Members</p>
 <dl class="member">
-<dt id="_CPPv2N10AsciiTable1fE">
-<span id="AsciiTable::f__AsciiFile"></span><span class="target" id="struct_ascii_table_1a6b71c65c319ebb789ff5a2a912b35d0c"></span><a class="reference internal" href="#_CPPv29AsciiFile" title="AsciiFile">AsciiFile</a> <code class="descname">f</code><a class="headerlink" href="#_CPPv2N10AsciiTable1fE" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dt id="_CPPv2N12asciiTable_t1fE">
+<span id="asciiTable_t::f__asciiFile_t"></span><span class="target" id="structascii_table__t_1a1e211c26164429dca7a616e6a8af64a6"></span><a class="reference internal" href="#_CPPv211asciiFile_t" title="asciiFile_t">asciiFile_t</a> <code class="descname">f</code><a class="headerlink" href="#_CPPv2N12asciiTable_t1fE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>ASCII file structure. </p>
+</dd></dl>
 
 <dl class="member">
-<dt id="_CPPv2N10AsciiTable10format_strE">
-<span id="AsciiTable::format_str__cA"></span><span class="target" id="struct_ascii_table_1a02c0c95bda1032efb7d36ed046a81161"></span>char <code class="descname">format_str</code>[LINE_SIZE_MAX]<a class="headerlink" href="#_CPPv2N10AsciiTable10format_strE" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dt id="_CPPv2N12asciiTable_t10format_strE">
+<span id="asciiTable_t::format_str__cA"></span><span class="target" id="structascii_table__t_1a030a09e49d0cb900ae0e3f6103229d14"></span>char <code class="descname">format_str</code>[LINE_SIZE_MAX]<a class="headerlink" href="#_CPPv2N12asciiTable_t10format_strE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Format string for rows. </p>
+</dd></dl>
 
 <dl class="member">
-<dt id="_CPPv2N10AsciiTable6columnE">
-<span id="AsciiTable::column__cA"></span><span class="target" id="struct_ascii_table_1a9d1eb5cae7de5f8086e13e77ab677cfd"></span>char <code class="descname">column</code>[64]<a class="headerlink" href="#_CPPv2N10AsciiTable6columnE" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dt id="_CPPv2N12asciiTable_t6columnE">
+<span id="asciiTable_t::column__cA"></span><span class="target" id="structascii_table__t_1a4c09956acb7a76e0431d9deb6f27be7e"></span>char <code class="descname">column</code>[64]<a class="headerlink" href="#_CPPv2N12asciiTable_t6columnE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Character(s) used to seperate columns. </p>
+</dd></dl>
 
 <dl class="member">
-<dt id="_CPPv2N10AsciiTable5ncolsE">
-<span id="AsciiTable::ncols__i"></span><span class="target" id="struct_ascii_table_1a8fb623eb767592c944c925e4fdf39630"></span>int <code class="descname">ncols</code><a class="headerlink" href="#_CPPv2N10AsciiTable5ncolsE" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dt id="_CPPv2N12asciiTable_t5ncolsE">
+<span id="asciiTable_t::ncols__i"></span><span class="target" id="structascii_table__t_1a837095bd2a245987e98f2bdd1fccaa94"></span>int <code class="descname">ncols</code><a class="headerlink" href="#_CPPv2N12asciiTable_t5ncolsE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Number of columns in the table. </p>
+</dd></dl>
 
 <dl class="member">
-<dt id="_CPPv2N10AsciiTable10format_typE">
-<span id="AsciiTable::format_typ__iP"></span><span class="target" id="struct_ascii_table_1a2071d95515e2c0f1d6d3df70d37f1905"></span>int *<code class="descname">format_typ</code><a class="headerlink" href="#_CPPv2N10AsciiTable10format_typE" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dt id="_CPPv2N12asciiTable_t10format_typE">
+<span id="asciiTable_t::format_typ__iP"></span><span class="target" id="structascii_table__t_1aaa59065a52a15e3dd33c6e043941ed8b"></span>int *<code class="descname">format_typ</code><a class="headerlink" href="#_CPPv2N12asciiTable_t10format_typE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Array of ncols integers specifying column types. </p>
+</dd></dl>
 
 <dl class="member">
-<dt id="_CPPv2N10AsciiTable10format_sizE">
-<span id="AsciiTable::format_siz__iP"></span><span class="target" id="struct_ascii_table_1a697bf776cdb1d3d98197b0c8a574d8af"></span>int *<code class="descname">format_siz</code><a class="headerlink" href="#_CPPv2N10AsciiTable10format_sizE" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dt id="_CPPv2N12asciiTable_t10format_sizE">
+<span id="asciiTable_t::format_siz__iP"></span><span class="target" id="structascii_table__t_1a807c3654eee6e0cedc1d8ce1d3e73b17"></span>int *<code class="descname">format_siz</code><a class="headerlink" href="#_CPPv2N12asciiTable_t10format_sizE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Array of ncols sizes for elements in each column. </p>
+</dd></dl>
 
 <dl class="member">
-<dt id="_CPPv2N10AsciiTable7row_sizE">
-<span id="AsciiTable::row_siz__i"></span><span class="target" id="struct_ascii_table_1a0182498c6504b0b60b7a803409b330e6"></span>int <code class="descname">row_siz</code><a class="headerlink" href="#_CPPv2N10AsciiTable7row_sizE" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dt id="_CPPv2N12asciiTable_t7row_sizE">
+<span id="asciiTable_t::row_siz__i"></span><span class="target" id="structascii_table__t_1aaa2f0c09c59e6b4cdad4e3845552da35"></span>int <code class="descname">row_siz</code><a class="headerlink" href="#_CPPv2N12asciiTable_t7row_sizE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Size of an entire row in bytes. </p>
+</dd></dl>
 
 <dl class="member">
-<dt id="_CPPv2N10AsciiTable6statusE">
-<span id="AsciiTable::status__i"></span><span class="target" id="struct_ascii_table_1a782403a4fbf29b3b6dceabec0282c83d"></span>int <code class="descname">status</code><a class="headerlink" href="#_CPPv2N10AsciiTable6statusE" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dt id="_CPPv2N12asciiTable_t6statusE">
+<span id="asciiTable_t::status__i"></span><span class="target" id="structascii_table__t_1a3a1b4f901f6cad135a0600a22942c43b"></span>int <code class="descname">status</code><a class="headerlink" href="#_CPPv2N12asciiTable_t6statusE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Negative if format_str has not been set yet. </p>
+</dd></dl>
 
 </div>
 </dd></dl>

@@ -51,17 +51,20 @@
 <dl class="macro">
 <dt id="c.PSI_MSG_MAX">
 <span class="target" id="_psi_interface_8h_1ab4898bbe6eb1c1d8b2ef19ada4dee530"></span><code class="descname">PSI_MSG_MAX</code><a class="headerlink" href="#c.PSI_MSG_MAX" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Maximum message size. </p>
+</dd></dl>
 
 <dl class="macro">
 <dt id="c.PSI_MSG_EOF">
 <span class="target" id="_psi_interface_8h_1a51f9d450ac9270c1f2ac6abd50085825"></span><code class="descname">PSI_MSG_EOF</code><a class="headerlink" href="#c.PSI_MSG_EOF" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>End of file message. </p>
+</dd></dl>
 
 <dl class="macro">
 <dt id="c._psiTrackChannels">
 <span class="target" id="_psi_interface_8h_1ac13baa41dad6c8dcf3dfc1c9fe70346e"></span><code class="descname">_psiTrackChannels</code><a class="headerlink" href="#c._psiTrackChannels" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Maximum number of channels. </p>
+</dd></dl>
 
 <dl class="macro">
 <dt id="c.error">
@@ -198,56 +201,6 @@
 </div>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric">Functions</p>
-<dl class="function">
-<dt id="_CPPv213compile_regexP7regex_tPKc">
-<span id="compile_regex__regex_tP.cCP"></span><span class="target" id="_psi_interface_8h_1a2450e4b7c3a254afcfd62c54f4f33bcb"></span><em class="property">static</em> int <code class="descname">compile_regex</code><span class="sig-paren">(</span>regex_t *<em>r</em>, <em class="property">const</em> char *<em>regex_text</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv213compile_regexP7regex_tPKc" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Create a regex from a character array. Adapted from <a class="reference external" href="https://www.lemoda.net/c/unix-regex/">https://www.lemoda.net/c/unix-regex/</a>. </p>
-<p><dl class="docutils">
-<dt><strong>Return</strong></dt>
-<dd>static int Success or failure of compilation. </dd>
-<dt><strong>Parameters</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal"><span class="pre">r</span></code>: pointer to regex_t. Resutling regex expression. </li>
-<li><code class="docutils literal"><span class="pre">regex_text</span></code>: constant character pointer to text that should be compiled. </li>
-</ul>
-</dd>
-</dl>
-</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="_CPPv213count_matchesPKcPKc">
-<span id="count_matches__cCP.cCP"></span><span class="target" id="_psi_interface_8h_1acc835d46e359011a0f1fbaba3f28b03b"></span><em class="property">static</em> int <code class="descname">count_matches</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>regex_text</em>, <em class="property">const</em> char *<em>to_match</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv213count_matchesPKcPKc" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Count the number of times a regular expression is matched in a string. </p>
-<p><dl class="docutils">
-<dt><strong>Return</strong></dt>
-<dd>int Number of matches found. -1 is returned if the regex could not be compiled. </dd>
-<dt><strong>Parameters</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal"><span class="pre">regex_text</span></code>: constant character pointer to string that should be compiled into a regex. </li>
-<li><code class="docutils literal"><span class="pre">to_match</span></code>: constant character pointer to string that should be checked for matches. </li>
-</ul>
-</dd>
-</dl>
-</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="_CPPv213count_formatsPKc">
-<span id="count_formats__cCP"></span><span class="target" id="_psi_interface_8h_1a2059b2fabbacee5e6de895822beb99cd"></span><em class="property">static</em> int <code class="descname">count_formats</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>fmt_str</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv213count_formatsPKc" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Count how many % format specifiers there are in format string. Formats are found by counting the number of matches to the regular expression adapted from <a class="reference external" href="https://stackoverflow.com/questions/446285/validate-sprintf-format-from-input-field-with-regex">https://stackoverflow.com/questions/446285/validate-sprintf-format-from-input-field-with-regex</a>. </p>
-<p><dl class="docutils">
-<dt><strong>Return</strong></dt>
-<dd>int Number of format specifiers found. </dd>
-<dt><strong>Parameters</strong></dt>
-<dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal"><span class="pre">fmt_str</span></code>: constant character pointer to string that should be searched for format specifiers. </li>
-</ul>
-</dd>
-</dl>
-</p>
-</dd></dl>
-
 <dl class="function">
 <dt id="_CPPv26psiLogPKcPKc7va_list">
 <span id="psiLog__cCP.cCP.va_list"></span><span class="target" id="_psi_interface_8h_1aec18e891e7c91b1367b4f06593e1ec79"></span><em class="property">static</em> void <code class="descname">psiLog</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>prefix</em>, <em class="property">const</em> char *<em>fmt</em>, va_list <em>ap</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv26psiLogPKcPKc7va_list" title="Permalink to this definition">¶</a><br /></dt>
@@ -1216,12 +1169,14 @@
 <dl class="member">
 <dt id="_CPPv216_psiChannelNames">
 <span id="_psiChannelNames__cPA"></span><span class="target" id="_psi_interface_8h_1a2997772bcc4be69ae75af9c8bf656519"></span>char *<code class="descname">_psiChannelNames</code>[_psiTrackChannels]<a class="headerlink" href="#_CPPv216_psiChannelNames" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dd><p>Names of channels in use. </p>
+</dd></dl>
 
 <dl class="member">
 <dt id="_CPPv216_psiChannelsUsed">
 <span id="_psiChannelsUsed__unsigned"></span><span class="target" id="_psi_interface_8h_1a48658cb4b55eba05559ffed852ccb19d"></span>unsigned <code class="descname">_psiChannelsUsed</code> = 0<a class="headerlink" href="#_CPPv216_psiChannelsUsed" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
+<dd><p>Number of channels in use. </p>
+</dd></dl>
 
 </div>
 <dl class="class">
@@ -1405,7 +1360,7 @@
 
 <dl class="member">
 <dt id="_CPPv2N20psiAsciiFileOutput_t5_fileE">
-<span id="psiAsciiFileOutput_t::_file__AsciiFile"></span><span class="target" id="structpsi_ascii_file_output__t_1a6e33955b27878e6bb3d959b995258c92"></span><a class="reference internal" href="dataio_c.html#_CPPv29AsciiFile" title="AsciiFile">AsciiFile</a> <code class="descname">_file</code><a class="headerlink" href="#_CPPv2N20psiAsciiFileOutput_t5_fileE" title="Permalink to this definition">¶</a><br /></dt>
+<span id="psiAsciiFileOutput_t::_file__asciiFile_t"></span><span class="target" id="structpsi_ascii_file_output__t_1aa3182952200aa71ebab66d18e2c7a32a"></span><a class="reference internal" href="dataio_c.html#_CPPv211asciiFile_t" title="asciiFile_t">asciiFile_t</a> <code class="descname">_file</code><a class="headerlink" href="#_CPPv2N20psiAsciiFileOutput_t5_fileE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Associated output handler for local files. </p>
 </dd></dl>
 
@@ -1444,7 +1399,7 @@
 
 <dl class="member">
 <dt id="_CPPv2N19psiAsciiFileInput_t5_fileE">
-<span id="psiAsciiFileInput_t::_file__AsciiFile"></span><span class="target" id="structpsi_ascii_file_input__t_1a67d8b1356fd726bf4ea10d023b60b8cc"></span><a class="reference internal" href="dataio_c.html#_CPPv29AsciiFile" title="AsciiFile">AsciiFile</a> <code class="descname">_file</code><a class="headerlink" href="#_CPPv2N19psiAsciiFileInput_t5_fileE" title="Permalink to this definition">¶</a><br /></dt>
+<span id="psiAsciiFileInput_t::_file__asciiFile_t"></span><span class="target" id="structpsi_ascii_file_input__t_1a520047f592ec4fe3b51430c9166c4cc2"></span><a class="reference internal" href="dataio_c.html#_CPPv211asciiFile_t" title="asciiFile_t">asciiFile_t</a> <code class="descname">_file</code><a class="headerlink" href="#_CPPv2N19psiAsciiFileInput_t5_fileE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Associated input handler for local files. </p>
 </dd></dl>
 
@@ -1514,7 +1469,7 @@
 
 <dl class="member">
 <dt id="_CPPv2N21psiAsciiTableOutput_t6_tableE">
-<span id="psiAsciiTableOutput_t::_table__AsciiTable"></span><span class="target" id="structpsi_ascii_table_output__t_1a48b160ca303b3a7a850d6b093e1d55f8"></span><a class="reference internal" href="dataio_c.html#_CPPv210AsciiTable" title="AsciiTable">AsciiTable</a> <code class="descname">_table</code><a class="headerlink" href="#_CPPv2N21psiAsciiTableOutput_t6_tableE" title="Permalink to this definition">¶</a><br /></dt>
+<span id="psiAsciiTableOutput_t::_table__asciiTable_t"></span><span class="target" id="structpsi_ascii_table_output__t_1aa2c3f77a38c5907c9a4bf37d9483e12f"></span><a class="reference internal" href="dataio_c.html#_CPPv212asciiTable_t" title="asciiTable_t">asciiTable_t</a> <code class="descname">_table</code><a class="headerlink" href="#_CPPv2N21psiAsciiTableOutput_t6_tableE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Associated output handler for local tables. </p>
 </dd></dl>
 
@@ -1553,7 +1508,7 @@
 
 <dl class="member">
 <dt id="_CPPv2N20psiAsciiTableInput_t6_tableE">
-<span id="psiAsciiTableInput_t::_table__AsciiTable"></span><span class="target" id="structpsi_ascii_table_input__t_1afa2330c9db3b106b0fc4ad1c0f7c8408"></span><a class="reference internal" href="dataio_c.html#_CPPv210AsciiTable" title="AsciiTable">AsciiTable</a> <code class="descname">_table</code><a class="headerlink" href="#_CPPv2N20psiAsciiTableInput_t6_tableE" title="Permalink to this definition">¶</a><br /></dt>
+<span id="psiAsciiTableInput_t::_table__asciiTable_t"></span><span class="target" id="structpsi_ascii_table_input__t_1ab3f77107765211a9ea744eb178ff9b87"></span><a class="reference internal" href="dataio_c.html#_CPPv212asciiTable_t" title="asciiTable_t">asciiTable_t</a> <code class="descname">_table</code><a class="headerlink" href="#_CPPv2N20psiAsciiTableInput_t6_tableE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Associated input handler for local tables. </p>
 </dd></dl>
 
