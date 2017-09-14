@@ -29,9 +29,10 @@ class RMQInputDriver(RMQDriver, IODriver):
         consumption."""
         self.debug('::start_communication')
         # one at a time, don't stuff the Qs
-        self.channel.basic_qos(prefetch_count=1)
-        self._consumer_tag = self.channel.basic_consume(
-            self.on_message, queue=self.queue)
+        if self.is_stable:
+            self.channel.basic_qos(prefetch_count=1)
+            self._consumer_tag = self.channel.basic_consume(
+                self.on_message, queue=self.queue)
 
     def on_message(self, ch, method, props, body):
         r"""Action to perform when a message is received. Send it to the
