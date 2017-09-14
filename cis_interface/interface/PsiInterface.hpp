@@ -472,14 +472,20 @@ public:
   PsiAsciiTableInput(const char *name, int src_type = 1) :
     _pi(psiAsciiTableInput(name, src_type)) {
     // For input, remove precision from floats to avoid confusing vsscanf
-    std::regex e("%(?:\\d+\\$)?[+-]?(?:[ 0]|'.{1})?-?\\d*(?:\\.\\d+)?(?:[lhjztL])*([eEfFgG])");
-    std::string s(_pi._psi._fmt, strlen(_pi._psi._fmt));
-    std::string result;
-    std::string replace("%$1");
-    std::regex_replace(std::back_inserter(result), s.begin(), s.end(), e,
-		       replace);
-    // result = std::regex_replace(s, e, "%$1");
-    strcpy(_pi._psi._fmt, result.c_str());
+    // C version
+    char *re = "%([[:digit:]]+\\$)?[+-]?([ 0]|'.{1})?-?[[:digit:]]*(\\.[[:digit:]]+)?([lhjztL])*([eEfFgG])";
+    int ret = regex_replace_sub(_pi._psi._fmt, strlen(_pi._psi._fmt), re, "%$5");
+    if (ret < 0)
+      printf("PsiAsciiTableInput(%s): could not fix format\n", name);
+
+    // // C++ version, not consitent between libraries
+    // std::regex e("%(?:\\d+\\$)?[+-]?(?:[ 0]|'.{1})?-?\\d*(?:\\.\\d+)?(?:[lhjztL])*([eEfFgG])");
+    // std::string s(_pi._psi._fmt, strlen(_pi._psi._fmt));
+    // std::string result;
+    // std::string replace("%$1");
+    // std::regex_replace(std::back_inserter(result), s.begin(), s.end(), e,
+    // 		       replace);
+    // strcpy(_pi._psi._fmt, result.c_str());
   }
   /*!
     @brief Destructor for PsiAsciiTableInput.
