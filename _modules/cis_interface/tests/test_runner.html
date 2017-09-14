@@ -69,13 +69,13 @@
 
 <div class="viewcode-block" id="test_get_runner"><a class="viewcode-back" href="../../../cis_interface.tests.html#cis_interface.tests.test_runner.test_get_runner">[docs]</a><span class="k">def</span> <span class="nf">test_get_runner</span><span class="p">():</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Use get_runner to start a run.&quot;&quot;&quot;</span>
-    <span class="n">cr</span> <span class="o">=</span> <span class="n">runner</span><span class="o">.</span><span class="n">get_runner</span><span class="p">([</span><span class="n">yamls</span><span class="p">[</span><span class="s1">&#39;ascii_io_python&#39;</span><span class="p">]])</span>
+    <span class="n">cr</span> <span class="o">=</span> <span class="n">runner</span><span class="o">.</span><span class="n">get_runner</span><span class="p">([</span><span class="n">yamls</span><span class="p">[</span><span class="s1">&#39;ascii_io&#39;</span><span class="p">][</span><span class="s1">&#39;python&#39;</span><span class="p">]])</span>
     <span class="n">cr</span><span class="o">.</span><span class="n">run</span><span class="p">()</span></div>
 
     
 <div class="viewcode-block" id="test_runner_terminate"><a class="viewcode-back" href="../../../cis_interface.tests.html#cis_interface.tests.test_runner.test_runner_terminate">[docs]</a><span class="k">def</span> <span class="nf">test_runner_terminate</span><span class="p">():</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Start a runner, then stop it early.&quot;&quot;&quot;</span>
-    <span class="n">cr</span> <span class="o">=</span> <span class="n">runner</span><span class="o">.</span><span class="n">get_runner</span><span class="p">([</span><span class="n">yamls</span><span class="p">[</span><span class="s1">&#39;ascii_io_python&#39;</span><span class="p">]])</span>
+    <span class="n">cr</span> <span class="o">=</span> <span class="n">runner</span><span class="o">.</span><span class="n">get_runner</span><span class="p">([</span><span class="n">yamls</span><span class="p">[</span><span class="s1">&#39;ascii_io&#39;</span><span class="p">][</span><span class="s1">&#39;python&#39;</span><span class="p">]])</span>
     <span class="n">cr</span><span class="o">.</span><span class="n">loadDrivers</span><span class="p">()</span>
     <span class="n">cr</span><span class="o">.</span><span class="n">startDrivers</span><span class="p">()</span>
     <span class="n">cr</span><span class="o">.</span><span class="n">printStatus</span><span class="p">()</span>
@@ -87,7 +87,7 @@
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">nt</span><span class="o">.</span><span class="n">assert_raises</span><span class="p">(</span><span class="ne">IOError</span><span class="p">,</span> <span class="n">runner</span><span class="o">.</span><span class="n">CisRunner</span><span class="p">,</span>
                          <span class="p">[</span><span class="s1">&#39;fake_yaml.yml&#39;</span><span class="p">],</span> <span class="s1">&#39;test_psi_run&#39;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">runner</span> <span class="o">=</span> <span class="n">runner</span><span class="o">.</span><span class="n">CisRunner</span><span class="p">([</span><span class="n">yamls</span><span class="p">[</span><span class="s1">&#39;ascii_io_python&#39;</span><span class="p">]],</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">runner</span> <span class="o">=</span> <span class="n">runner</span><span class="o">.</span><span class="n">CisRunner</span><span class="p">([</span><span class="n">yamls</span><span class="p">[</span><span class="s1">&#39;ascii_io&#39;</span><span class="p">][</span><span class="s1">&#39;python&#39;</span><span class="p">]],</span>
                                        <span class="s1">&#39;test_psi_run&#39;</span><span class="p">)</span>
 
 <div class="viewcode-block" id="TestCisRunner.test_parseModelYaml"><a class="viewcode-back" href="../../../cis_interface.tests.html#cis_interface.tests.test_runner.TestCisRunner.test_parseModelYaml">[docs]</a>    <span class="k">def</span> <span class="nf">test_parseModelYaml</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
