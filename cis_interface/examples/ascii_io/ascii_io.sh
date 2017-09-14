@@ -11,6 +11,10 @@ case $1 in
 	echo "Running C, Python, C++, Matlab integration"
 	yaml='ascii_io_all.yml'
 	;;
+    --all-nomatlab )
+	echo "Running C, Python, C++ integration"
+	yaml='ascii_io_all_nomatlab.yml'
+	;;
     -p | --python )
 	echo "Running Python"
 	yaml='ascii_io_python.yml'

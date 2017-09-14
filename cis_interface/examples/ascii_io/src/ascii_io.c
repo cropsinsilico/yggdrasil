@@ -88,7 +88,8 @@ int main(int argc,char *argv[]){
   }
   printf("Array: (%d rows)\n", ret);
   // Print each line in the array
-  for (int i = 0; i < ret; i++)
+  int i;
+  for (i = 0; i < ret; i++)
     printf("%5s, %ld, %f\n", &name_arr[5*i], number_arr[i], value_arr[i]);
   // Send the columns in the array to output. Formatting is handled on the
   // output driver side.

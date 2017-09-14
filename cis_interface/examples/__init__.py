@@ -4,7 +4,7 @@ import os
 
 ex_dict = {'hello': ('python', 'matlab', 'c', 'cpp'),
            'SaM': ('python', 'matlab', 'c', 'cpp', 'all'),
-           'ascii_io': ('python', 'matlab', 'c', 'cpp', 'all'),
+           'ascii_io': ('python', 'matlab', 'c', 'cpp', 'all', 'all_nomatlab'),
            'rpcFib': ('python', 'matlab', 'c', 'all')}
 
 
@@ -17,7 +17,7 @@ for k, lang in ex_dict.items():
                 yamls[k][l] = [os.path.join(os.path.dirname(__file__), k,
                                             '%sCli_%s.yml' % (k, 'python')),
                                os.path.join(os.path.dirname(__file__), k,
-                                            '%sCliPar_%s.yml' % (k, 'matlab')),
+                                            '%sCliPar_%s.yml' % (k, 'cpp')),
                                os.path.join(os.path.dirname(__file__), k,
                                             '%sSrv_%s.yml' % (k, 'c'))]
             else:

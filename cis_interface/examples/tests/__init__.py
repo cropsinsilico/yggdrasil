@@ -4,6 +4,7 @@ import unittest
 from cis_interface import runner
 from cis_interface.examples import yamls
 from cis_interface.config import cis_cfg
+from cis_interface.drivers.MatlabModelDriver import _matlab_installed
 
 
 class TestExample(unittest.TestCase):
@@ -45,6 +46,9 @@ class TestExample(unittest.TestCase):
             return None
         if self.language not in yamls[self.name]:
             return None
+        if not _matlab_installed:  # pragma: no matlab
+            if self.language is 'all':
+                return yamls[self.name].get('all_nomatlab', None)
         return yamls[self.name][self.language]
 
     @property
@@ -96,6 +100,7 @@ class TestExample(unittest.TestCase):
 
     def test_matlab(self):
         r"""Test the Matlab version of the example."""
-        self.language = 'matlab'
-        self.run_example()
-        self.language = None
+        if _matlab_installed:  # pragma: matlab
+            self.language = 'matlab'
+            self.run_example()
+            self.language = None
