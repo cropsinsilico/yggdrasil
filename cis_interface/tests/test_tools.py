@@ -1,8 +1,18 @@
 import sysv_ipc
 from sysv_ipc import MessageQueue
+import nose.tools as nt
 from cis_interface import tools
 from cis_interface.drivers.IODriver import maxMsgSize
 
+
+def test_eval_kwarg():
+    r"""Ensure strings & objects properly evaluated."""
+    vals = [None, True, False, ['one', 'two'], 'one']
+    for v in vals:
+        nt.assert_equal(tools.eval_kwarg(v), v)
+        nt.assert_equal(tools.eval_kwarg(str(v)), v)
+    nt.assert_equal(tools.eval_kwarg("'one'"), 'one')
+    nt.assert_equal(tools.eval_kwarg('"one"'), 'one')
 
 def test_ipcs():
     r"""Test list of ipc objects."""
@@ -11,8 +21,7 @@ def test_ipcs():
     
 def test_ipc_queues():
     r"""Test list of ipc queues."""
-    
-    print(tools.ipc_queues())
+    tools.ipc_queues()
 
 
 def test_ipcrm():

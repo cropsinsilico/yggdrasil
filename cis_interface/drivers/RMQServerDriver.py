@@ -22,6 +22,8 @@ class RMQServerDriver(RMQDriver, RPCDriver):
     Attributes (in addition to the parent class's):
         clients (set): The unique clients subscribed to this server.
     
+    .. todo Handle possibility of message larger than AMQP server memory.
+
     """
 
     def __init__(self, name, args=None, **kwargs):
@@ -55,7 +57,6 @@ class RMQServerDriver(RMQDriver, RPCDriver):
         with self.lock:
             if not self.is_stable:  # pragma: debug
                 return
-        # TODO: handle possibility of message larger than AMQP server memory
         if body == _new_client_msg:
             self.debug('::New client (%s)' % props.reply_to)
             self.clients.add(props.reply_to)
@@ -69,7 +70,8 @@ class RMQServerDriver(RMQDriver, RPCDriver):
                            props.reply_to, str(self.clients))
             if self.n_clients == 0:
                 self.debug('::All clients have signed off. Stopping.')
-                self.stop()
+                # Moved to runner level control to prevent mis-communication
+                # self.stop()
         elif props.reply_to is None:
             self.debug('::Message received without reply queue.')
             with self.lock:

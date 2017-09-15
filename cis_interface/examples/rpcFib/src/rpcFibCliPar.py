@@ -9,7 +9,8 @@ def fibClient(args):
     print('Hello from Python rpcFibCliPar: iterations = %d' % iterations)
 
     # Create RPC connection with server
-    rpc = PsiRpcClient("cli_par_fib", "%d", "%d %d")
+    # RPC client-side connection will be $(server_name)_$(client_name)
+    rpc = PsiRpcClient("rpcFibSrv_rpcFibCliPar", "%d", "%d %d")
 
     # Send all of the requests to the server
     for i in range(1, iterations + 1):

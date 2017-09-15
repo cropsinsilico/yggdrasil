@@ -126,7 +126,7 @@ class TestIOParam(parent.TestParam, IOInfo):
         IOInfo.__init__(self)
         self.driver = 'IODriver'
         self.args = '_TEST'
-        self.attr_list += ['state', 'numSent', 'numReceived', 'env', 'mq']
+        self.attr_list += ['state', 'numSent', 'numReceived', 'mq']
 
     
 class TestIODriverNoStart(TestIOParam, parent.TestDriverNoStart):

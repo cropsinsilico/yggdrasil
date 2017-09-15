@@ -111,6 +111,7 @@ class TestRMQServerDriver(TestRMQServerParam, parent1.TestRMQDriver):
         nt.assert_equal(self.instance.n_clients, 0)
 
     # Disabled so that test message is not read by mistake
+    # Replaced with another test
     def test_purge(self):
         r"""Test receipt of messages with no reply to."""
         with self.instance.lock:

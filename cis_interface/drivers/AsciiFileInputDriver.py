@@ -14,6 +14,10 @@ class AsciiFileInputDriver(FileInputDriver):
             to be passed to the created AsciiFile object.
         skip_AsciiFile (bool, optional): If True, the AsciiFile instance is not
             created. Defaults to False.
+        comment (str, optional): String that should be used to identify
+                comments. Default set by :class:`AsciiFile`.
+        newline (str, optional): String that should be used to identify
+                the end of a line. Default set by :class:`AsciiFile`.
         **kwargs: Additional keyword arguments are passed to parent class.
 
     Attributes:
@@ -23,35 +27,18 @@ class AsciiFileInputDriver(FileInputDriver):
 
     """
     def __init__(self, name, args, skip_AsciiFile=False, **kwargs):
-        filepath = None
-        args_ignored = []
-        if isinstance(args, str):
-            filepath = args
-            args = {}
-        elif isinstance(args, list):
-            if isinstance(args[0], str):
-                filepath = args.pop(0)
-            args_new = {}
-            for a in args:
-                if isinstance(a, dict):
-                    args_new.update(**a)
-                else:
-                    args_ignored.append(a)
-            args = args_new
-        elif not isinstance(args, dict):  # pragma: debug
-            raise TypeError("args is incorrect type, check the yaml.")
-        if filepath is None:
-            filepath = args.pop('filename', None)
-            filepath = args.pop('filepath', filepath)
-        super(AsciiFileInputDriver, self).__init__(name, filepath, **kwargs)
-        self.debug('(%s)', filepath)
-        for a in args_ignored:
-            self.info(": Ignoring argument '%s'", str(a))
-        self.file_kwargs = args
+        file_keys = ['comment', 'newline']
+        file_kwargs = {}
+        for k in file_keys:
+            if k in kwargs:
+                file_kwargs[k] = kwargs.pop(k)
+        self.file_kwargs = file_kwargs
+        super(AsciiFileInputDriver, self).__init__(name, args, **kwargs)
+        self.debug('(%s)', args)
         if skip_AsciiFile:
             self.file = None
         else:
-            self.file = AsciiFile(self.args, 'r', **args)
+            self.file = AsciiFile(self.args, 'r', **self.file_kwargs)
         self.debug('(%s): done with init', args)
 
     @property

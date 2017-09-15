@@ -11,8 +11,8 @@ int main(int argc, char *argv[]) {
   float timeSleep = atof(argv[1]);
   printf("Hello from C rpcFibSrv: sleeptime = %f\n", timeSleep);
   
-  // Create server-side rpc conneciton
-  psiRpc_t rpc = psiRpcServer("srv_fib", "%d", "%d %d");
+  // Create server-side rpc conneciton using model name
+  psiRpc_t rpc = psiRpcServer("rpcFibSrv", "%d", "%d %d");
 
   // Continue receiving requests until error occurs (the connection is closed
   // by all clients that have connected).

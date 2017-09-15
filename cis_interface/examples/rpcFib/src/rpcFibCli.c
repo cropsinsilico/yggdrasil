@@ -23,8 +23,9 @@ int main(int argc, char *argv[]) {
   printf("Hello from C rpcFibCli: iterations %d\n", iterations);
   
   // Set up connections matching yaml
+  // RPC client-side connection will be $(server_name)_$(client_name)
   psiInput_t ymlfile = psiInput("yaml_in");
-  psiRpc_t rpc = psiRpcClient("cli_fib", "%d", "%d %d");
+  psiRpc_t rpc = psiRpcClient("rpcFibSrv_rpcFibCli", "%d", "%d %d");
   psiOutput_t log = psiOutput("output_log");
   
   // Read entire contents of yaml

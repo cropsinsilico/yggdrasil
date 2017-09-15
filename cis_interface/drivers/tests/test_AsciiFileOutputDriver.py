@@ -13,7 +13,7 @@ class TestAsciiFileOutputParam(parent.TestFileOutputParam):
         super(TestAsciiFileOutputParam, self).__init__(*args, **kwargs)
         self.driver = 'AsciiFileOutputDriver'
         self.attr_list += ['file_kwargs', 'file']
-        self.args = [self.args, {}, 'ignore']
+        self.inst_kwargs['newline'] = "\n"
 
 
 class TestAsciiFileOutputDriverNoStart(TestAsciiFileOutputParam,

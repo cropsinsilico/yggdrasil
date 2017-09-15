@@ -178,8 +178,3 @@ class RMQClientDriver(RMQDriver, RPCDriver):
             self.debug("::Cancelling consumption.")
             self.publish_to_server(_end_client_msg)
         super(RMQClientDriver, self).stop_communication()
-
-    def on_model_exit(self):
-        r"""Stop when the model exits."""
-        self.debug("::on_model_exit")
-        self.stop()

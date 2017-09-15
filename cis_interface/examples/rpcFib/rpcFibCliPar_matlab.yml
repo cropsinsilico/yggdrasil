@@ -6,9 +6,5 @@ model:
   args:
     - ./src/rpcFibCliPar.m
     - "{{ FIB_ITERATIONS }}"
-
-  inputs:
-    - name: cli_par_fib   # Name of channel in model, private to model code      
-      driver: RMQClientDriver
-      args: srv_fib     # connected to this queue, shared by all models
+  client_of: rpcFibSrv  # Creates an RPC client queue $(client_of)_$(name)
  

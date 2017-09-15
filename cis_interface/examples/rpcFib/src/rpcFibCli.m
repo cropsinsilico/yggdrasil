@@ -5,8 +5,9 @@ function rpcFibCli(iterations)
   fprintf('Hello from Matlab rpcFibCli: iterations = %d\n', iterations);
 
   % Set up connections matching yaml
+  % RPC client-side connection will be $(server_name)_$(client_name)
   ymlfile = PsiInterface('PsiInput', 'yaml_in');
-  rpc = PsiInterface('PsiRpcClient', 'cli_fib', '%d', '%d %d');
+  rpc = PsiInterface('PsiRpcClient', 'rpcFibSrv_rpcFibCli', '%d', '%d %d');
   log = PsiInterface('PsiOutput', 'output_log');
 
   % Read entire contents of yaml

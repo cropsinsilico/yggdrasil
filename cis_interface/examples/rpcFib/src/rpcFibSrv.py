@@ -9,8 +9,8 @@ def fibServer(args):
     sleeptime = float(args[0])
     print('Hello from Python rpcFibSrv: sleeptime = %f' % sleeptime)
 
-    # Create server-side rpc conneciton
-    rpc = PsiRpcServer("srv_fib", "%d", "%d %d")
+    # Create server-side rpc conneciton using model name
+    rpc = PsiRpcServer("rpcFibSrv", "%d", "%d %d")
 
     # Continue receiving requests until error occurs (the connection is closed
     # by all clients that have connected).

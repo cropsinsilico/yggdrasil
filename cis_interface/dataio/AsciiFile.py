@@ -7,7 +7,8 @@ _default_args = {'comment': '#',
 
 
 class AsciiFile(object):
-    def __init__(self, filepath, io_mode, **kwargs):
+    def __init__(self, filepath, io_mode, comment=_default_args['comment'],
+                 newline=_default_args['newline']):
         r"""Class for reading/writing an ASCII file.
 
         Args:
@@ -36,13 +37,8 @@ class AsciiFile(object):
         self.io_mode = io_mode
         if self.io_mode == 'r' and not os.path.isfile(filepath):
             raise ValueError("File does not exist.")
-        for k, v in kwargs.items():
-            setattr(self, k, v)
-        for k, v in _default_args.items():
-            if not hasattr(self, k):
-                setattr(self, k, v)
-        self.comment = backwards.unicode2bytes(self.comment)
-        self.newline = backwards.unicode2bytes(self.newline)
+        self.comment = backwards.unicode2bytes(comment)
+        self.newline = backwards.unicode2bytes(newline)
         self.fd = None
 
     @property

@@ -6,6 +6,7 @@ model:
   args:
     - ./src/rpcFibCli.py
     - "{{ FIB_ITERATIONS }}"   # env_var passed as argument for number of loops
+  client_of: rpcFibSrv  # Creates an RPC client queue $(client_of)_$(name)
 
   outputs:
     - name: output_log
@@ -13,9 +14,6 @@ model:
       args: /tmp/fibCli.txt
 
   inputs:
-    - name: cli_fib   # Name of channel in model, private to model code      
-      driver: RMQClientDriver
-      args: srv_fib   # Connected to this queue, shared by all models
     - name: yaml_in
       driver: FileInputDriver
       args: rpcFibCli_python.yml

@@ -25,7 +25,6 @@ class IODriver(Driver):
         state (str): Description of the last operation performed by the driver.
         numSent (int): The number of messages sent to the queue.
         numReceived (int): The number of messages received from the queue.
-        env (dict): Environment variables.
         mq (:class:`sysv_ipc.MessageQueue`): Message queue.
 
     """
@@ -35,7 +34,6 @@ class IODriver(Driver):
         self.state = 'Started'
         self.numSent = 0
         self.numReceived = 0
-        self.env = {}  # Any addition env that the model needs
         self.mq = MessageQueue(None, flags=sysv_ipc.IPC_CREX,
                                max_message_size=maxMsgSize)
         self.env[name + suffix] = str(self.mq.key)
@@ -294,6 +292,12 @@ class IODriver(Driver):
         self.close_queue()
         super(IODriver, self).terminate()
         self.debug(':terminate(): done')
+
+    def cleanup(self):
+        r"""Ensure that the queues are removed."""
+        self.debug(':cleanup()')
+        self.close_queue()
+        super(IODriver, self).cleanup()
 
     def on_model_exit(self):
         r"""Actions to perform when the associated model driver is finished."""

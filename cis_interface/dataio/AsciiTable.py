@@ -178,7 +178,8 @@ def cformat2pyscanf(cfmt):
 
 class AsciiTable(AsciiFile):
     def __init__(self, filepath, io_mode, format_str=None, dtype=None,
-                 column_names=None, use_astropy=False, **kwargs):
+                 column_names=None, use_astropy=False,
+                 column=_default_args['column'], **kwargs):
         r"""Class for reading/writing an ASCII table.
 
         Args:
@@ -198,12 +199,12 @@ class AsciiTable(AsciiFile):
             use_astropy (bool, optional): If True, astropy is used to determine
                 a table's format if it is installed. If False, a format string
                 must be contained in the table. Defaults to False.
-            comment (str, optional): String that should be used to identify
-                comments. Defaults to '#'.
-            newline (str, optional): String that should be used to identify
-                the end of a line. Defaults to '\n'.
             column (str, optional): String that should be used to separate
-                columns. Defaults to '\t'.
+                columns. Defaults to "\t" (tab-delimited).
+            comment (str, optional): String that should be used to identify
+                comments. Default set by :class:`AsciiFile`.
+            newline (str, optional): String that should be used to identify
+                the end of a line. Default set by :class:`AsciiFile`.
 
         Raises:
             RuntimeError: If format_str is not provided and the io_mode is 'w'
@@ -217,10 +218,7 @@ class AsciiTable(AsciiFile):
         super(AsciiTable, self).__init__(filepath, io_mode, **kwargs)
         self.column_names = None
         # Add default args specific to ascii table
-        for k, v in _default_args.items():
-            if not hasattr(self, k):
-                setattr(self, k, v)
-        self.column = backwards.unicode2bytes(self.column)
+        self.column = backwards.unicode2bytes(column)
         try:
             self._format_str = backwards.unicode2bytes(format_str)
         except TypeError:

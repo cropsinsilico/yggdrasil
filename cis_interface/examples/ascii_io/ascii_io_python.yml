@@ -17,9 +17,8 @@ model:
 
     - name: inputPy_array
       driver: AsciiTableInputDriver
-      args:
-        filepath: ./Input/input_array.txt
-        as_array: True
+      args: ./Input/input_array.txt
+      as_array: True
 
   outputs:
     - name: outputPy_file
@@ -32,6 +31,5 @@ model:
 
     - name: outputPy_array
       driver: AsciiTableOutputDriver
-      args:
-          filepath: /tmp/output_array.txt
-          as_array: True
+      args: /tmp/output_array.txt
+      as_array: True

@@ -14,7 +14,7 @@ class TestAsciiFileInputParam(parent.TestFileInputParam):
         super(TestAsciiFileInputParam, self).__init__(*args, **kwargs)
         self.driver = 'AsciiFileInputDriver'
         self.attr_list += ['file_kwargs', 'file']
-        self.args = self.args
+        self.inst_kwargs['newline'] = "\n"
 
 
 class TestAsciiFileInputDriverNoStart(TestAsciiFileInputParam,

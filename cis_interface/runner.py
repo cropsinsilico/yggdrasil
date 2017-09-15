@@ -11,6 +11,7 @@ from itertools import chain
 import socket
 from cis_interface.backwards import sio
 from cis_interface.config import cis_cfg, cfg_environment
+import drivers
 
 
 COLOR_TRACE = '\033[30;43;22m'
@@ -112,9 +113,9 @@ class CisRunner(object):
             exchange.
         host (str): Name of the host that the models will be launched from.
         rank (int): Rank of this set of models if run in parallel.
-        modeldrivers (list): Model drivers associated with this run.
-        inputdrivers (list): Input drivers associated with this run.
-        outputdrivers (list): Output drivers associated with this run.
+        modeldrivers (dict): Model drivers associated with this run.
+        inputdrivers (dict): Input drivers associated with this run.
+        outputdrivers (dict): Output drivers associated with this run.
 
     ..todo:: namespace, host, and rank do not seem strictly necessary.
 
@@ -125,9 +126,11 @@ class CisRunner(object):
         self.namespace = namespace
         self.host = host
         self.rank = rank
-        self.modeldrivers = []
-        self.inputdrivers = []
-        self.outputdrivers = []
+        self.modeldrivers = {}
+        self.inputdrivers = {}
+        self.outputdrivers = {}
+        self._inputchannels = []
+        self._outputchannels = []
         # Setup logging
         if cis_debug_prefix is None:
             cis_debug_prefix = namespace
@@ -172,17 +175,76 @@ class CisRunner(object):
                 if 'model' in yamlparsed:
                     yml_models.append(yamlparsed['model'])
                 for yml in yml_models:
-                    yml['workingDir'] = yamldir
-                    for inp in yml.get('inputs', dict()):
-                        inp['workingDir'] = yamldir
-                        self.inputdrivers.append(inp)
-                    for inp in yml.get('outputs', dict()):
-                        inp['workingDir'] = yamldir
-                        self.outputdrivers.append(inp)
-                    self.modeldrivers.append(yml)
+                    self.add_driver('model', yml, yamldir)
             except Exception as e:  # pragma: debug
                 error("CisRunner:  could not load yaml: %s: %s", modelYml, e)
                 raise  # Nothing started yet so just raise
+
+    def add_driver(self, dtype, yaml, yamldir):
+        r"""Add a driver to the appropriate driver dictionary with yamldir.
+
+        Args:
+            dtype (str): Driver type. Should be 'input', 'output',or 'model'.
+            yaml (dict): YAML dictionary for the driver.
+            yamldir (str): Full path to directory where the yaml is stored.
+
+        Raises:
+            ValueError: If dtype is not 'input', 'output',or 'model'.
+            ValueError: If the driver name already exists.
+
+        """
+        if dtype == 'input':
+            dd = self.inputdrivers
+            self._inputchannels.append(yaml['args'])
+        elif dtype == 'output':
+            dd = self.outputdrivers
+            self._outputchannels.append(yaml['args'])
+        elif dtype == 'model':
+            yaml.setdefault('inputs', [])
+            yaml.setdefault('outputs', [])
+            # Add server driver
+            if yaml.get('is_server', False):
+                srv = {'name': yaml['name'],
+                       'driver': 'RMQServerDriver',
+                       'args': yaml['name']}
+                yaml['inputs'].append(srv)
+                yaml['clients'] = []
+            # Add client driver
+            if yaml.get('client_of', []):
+                srv_names = yaml['client_of']
+                if isinstance(srv_names, str):
+                    srv_names = [srv_names]
+                yaml['client_of'] = srv_names
+                for srv in srv_names:
+                    cli = {'name': '%s_%s' % (srv, yaml['name']),
+                           'driver': 'RMQClientDriver',
+                           'args': srv}
+                    yaml['outputs'].append(cli)
+            # Add I/O drivers for this model
+            for inp in yaml['inputs']:
+                self.add_driver('input', inp, yamldir)
+            for inp in yaml['outputs']:
+                self.add_driver('output', inp, yamldir)
+            dd = self.modeldrivers
+        else:
+            raise ValueError("%s is not a recognized driver type." % dtype)
+        # Check to make sure there arn't two drivers with the same name
+        if yaml['name'] in dd:
+            raise ValueError("%s is already a registered %d driver." % (
+                yaml['name'], dtype))
+        # Copy keywords
+        if 'kwargs' in yaml:
+            raise RuntimeError(("The yaml specs for driver %s includes the " +
+                                "keyword 'kwargs' which is reserved. " +
+                                "Please remove it.") % yaml['name'])
+        yaml['kwargs'] = {}
+        kws_ignore = ['name', 'driver', 'args', 'kwargs', 'onexit',
+                      'input', 'inputs', 'output', 'outputs', 'clients']
+        for k in yaml:
+            if k not in kws_ignore:
+                yaml['kwargs'][k] = yaml[k]
+        yaml['workingDir'] = yamldir
+        dd[yaml['name']] = yaml
 
     def run(self):
         r"""Run all of the models and wait for them to exit."""
@@ -190,6 +252,31 @@ class CisRunner(object):
         self.startDrivers()
         self.waitModels()
         self.closeChannels()
+
+    @property
+    def all_drivers(self):
+        r"""iterator: For all drivers."""
+        return chain(self.inputdrivers.values(), self.outputdrivers.values(),
+                     self.modeldrivers.values())
+
+    def io_drivers(self, model=None):
+        r"""Return the input and output drivers for one or all models.
+
+        Args:
+            model (str, optional): Name of a model that I/O drivers should be
+                returned for. Defaults to None and all I/O drivers are returned.
+
+        Returns:
+            iterator: Access to list of I/O drivers.
+
+        """
+        if model is None:
+            out = chain(self.inputdrivers.values(), self.outputdrivers.values())
+        else:
+            driver = self.modeldrivers[model]
+            out = chain(driver.get('inputs', dict()),
+                        driver.get('outputs', dict()))
+        return out
 
     def createDriver(self, yml):
         r"""Create a driver instance from the yaml information.
@@ -201,67 +288,127 @@ class CisRunner(object):
             object: An instance of the specified driver.
 
         """
-        debug('creating %s, a %s', yml['name'], yml['driver'])
-        instance = create_driver(yml['driver'], yml['name'], yml['args'],
-                                 yml=yml, namespace=self.namespace,
-                                 rank=self.rank,
-                                 workingDir=yml['workingDir'])
+        try:
+            debug('creating %s, a %s', yml['name'], yml['driver'])
+            curpath = os.getcwd()
+            os.chdir(yml['workingDir'])
+            instance = create_driver(yml['driver'], yml['name'], yml['args'],
+                                     yml=yml, env=yml.get('env', {}),
+                                     namespace=self.namespace, rank=self.rank,
+                                     workingDir=yml['workingDir'],
+                                     **yml['kwargs'])
+            yml['instance'] = instance
+            os.chdir(curpath)
+        except Exception as e:  # pragma: debug
+            info("ERROR:  Exception %s: Unable to load driver from yaml %s",
+                 e, pformat(yml))
+            raise  # Nothing started yet so just raise
         return instance
 
+    def createModelDriver(self, yml):
+        r"""Create a model driver instance from the yaml information.
+
+        Args:
+            yml (yaml): Yaml object containing driver information.
+
+        Returns:
+            object: An instance of the specified driver.
+
+        """
+        yml['env'] = {}
+        for iod in self.io_drivers(yml['name']):
+            debug("CisRunner::loadDrivers: Add env: %s", iod['instance'].env)
+            yml['env'].update(iod['instance'].env)
+        drv = self.createDriver(yml)
+        if 'client_of' in yml:
+            for srv in yml['client_of']:
+                self.modeldrivers[srv]['clients'].append(yml['name'])
+        debug("CisRunner::loadDrivers(): model %s: env: %s",
+              yml['name'], pformat(yml['instance'].env))
+        return drv
+
+    def createInputDriver(self, yml):
+        r"""Create an input driver instance from the yaml information.
+
+        Args:
+            yml (yaml): Yaml object containing driver information.
+
+        Returns:
+            object: An instance of the specified driver.
+
+        """
+        if yml['args'] not in self._outputchannels:
+            try:
+                norm_path = os.path.normpath(os.path.join(
+                    yml['workingDir'], yml['args']))
+                assert(os.path.isfile(norm_path))
+            except AssertionError:
+                raise Exception(("Input driver %s could not locate a " +
+                                 "corresponding file or output channel %s") % (
+                                     yml["name"], yml["args"]))
+        drv = self.createDriver(yml)
+        return drv
+
+    def createOutputDriver(self, yml):
+        r"""Create an output driver instance from the yaml information.
+
+        Args:
+            yml (yaml): Yaml object containing driver information.
+
+        Returns:
+            object: An instance of the specified driver.
+
+        """
+        drv = self.createDriver(yml)
+        if yml['args'] not in self._inputchannels:
+            try:
+                assert(issubclass(drv.__class__,
+                                  drivers.FileOutputDriver.FileOutputDriver))
+            except AssertionError:
+                raise Exception(("Output driver %s is not a subclass of " +
+                                 "FileOutputDriver and there is not a " +
+                                 "corresponding input channel %s.") % (
+                                     yml["name"], yml["args"]))
+        return drv
+        
     def loadDrivers(self):
         r"""Load all of the necessary drivers, doing the IO drivers first
         and adding IO driver environmental variables back tot he models."""
         debug("CisRunner.loadDrivers()")
-        # Create all of the drivers
-        for driver in [i for i in chain(
-                self.outputdrivers, self.inputdrivers, self.modeldrivers)]:
-            debug("RunModels.loaDrivers(): loading driver %s", pformat(driver))
-            try:
-                curpath = os.getcwd()
-                os.chdir(driver['workingDir'])
-                drv = self.createDriver(driver)
-                driver['instance'] = drv
-                os.chdir(curpath)
-            except Exception as e:  # pragma: debug
-                info("ERROR:  Exception %s: Unable to load driver from yaml %s",
-                     e, pformat(driver))
-                raise  # Nothing started yet so just raise
-        # Add the env's from the IO drivers to the models to ensure that
-        # they have access to the necessary queues
-        for driver in self.modeldrivers:
-            debug("CisRunner::loadDrivers: driver %s", driver)
-            iodrivers = [i for i in chain(driver.get('inputs', dict()),
-                                          driver.get('outputs', dict()))]
-            modelenv = driver['instance'].env
-            modelenv.update(os.environ)
-            for iod in iodrivers:
-                debug("PSrRun::loadDrivers:  Add env: %s", iod['instance'].env)
-                modelenv.update(iod['instance'].env)
-            debug("CisRunner::loadDrivers(): model %s: env: %s",
-                  driver['name'], pformat(driver['instance'].env))
+        # Create input drivers
+        debug("CisRunner::loadDrivers(): loading input drivers")
+        for driver in self.inputdrivers.itervalues():
+            self.createInputDriver(driver)
+        # Create output drivers
+        debug("CisRunner::loadDrivers(): loading output drivers")
+        for driver in self.outputdrivers.itervalues():
+            self.createOutputDriver(driver)
+        # Create model drivers
+        debug("CisRunner::loadDrivers(): loading model drivers")
+        for driver in self.modeldrivers.itervalues():
+            self.createModelDriver(driver)
 
     def startDrivers(self):
         r"""Start drivers, starting with the IO drivers."""
         info('Starting I/O drivers and models on system ' +
              '{} in PSI_NAMESPACE {} PSI_RANK {}'.format(
                  self.host, self.namespace, self.rank))
-        for driver in [i for i in chain(self.outputdrivers, self.inputdrivers,
-                                        self.modeldrivers)]:
-            debug("RunModels.startDrivers(): starting driver %s",
+        for driver in self.all_drivers:
+            debug("CisRunner.startDrivers(): starting driver %s",
                   driver['name'])
             d = driver['instance']
             try:
                 d.start()
             except Exception as e:  # pragma: debug
-                error("CisRunner:  ERROR:  %s did not start", d.name)
+                error("CisRunner: ERROR:  %s did not start", d.name)
                 raise e
-        debug('CisRunner(): ALL DRIVERS STARTED')
+        debug('CisRunner.startDrivers(): ALL DRIVERS STARTED')
 
     def waitModels(self):
         r"""Wait for all model drivers to finish. When a model finishes,
         join the thread and perform exits for associated IO drivers."""
         debug('CisRunner:waitDrivers(): ')
-        running = [d for d in self.modeldrivers]
+        running = [d for d in self.modeldrivers.values()]
         while(len(running)):
             for drv in running:
                 d = drv['instance']
@@ -286,10 +433,19 @@ class CisRunner(object):
         model['instance'].on_exit()
         model['instance'].join()
         debug("CisRunner: join finished: (%s)", pformat(model))
+        # Stop associated server if not more clients
+        if 'client_of' in model:
+            for srv_name in model['client_of']:
+                srv = self.modeldrivers[srv_name]
+                srv['clients'].remove(model['name'])
+                if len(srv['clients']) == 0:
+                    iod = self.inputdrivers[srv_name]
+                    iod['instance'].stop()
+                    self.do_exits(iod)
+                    srv['instance'].stop()
+                    self.do_exits(srv)
         # Stop associated IO drivers
-        iodrivers = [i for i in chain(model.get('inputs', dict()),
-                                      model.get('outputs', dict()))]
-        for drv in iodrivers:
+        for drv in self.io_drivers(model['name']):
             debug('CisRunner::do_exits(): delete %s', drv['name'])
             if 'onexit' in drv:
                 debug('CisRunner::onexit: %s', drv['onexit'])
@@ -304,8 +460,7 @@ class CisRunner(object):
         debug('CisRunner::terminate()')
         self.closeChannels(force_stop=True)
         debug('CisRunner::terminate(): stop models')
-        for driver in chain(self.outputdrivers, self.inputdrivers,
-                            self.modeldrivers):
+        for driver in self.all_drivers:
             debug('CisRunner::terminate(): stop %s', driver)
             driver['instance'].stop()
         debug('CisRunner::terminate(): returns')
@@ -313,8 +468,7 @@ class CisRunner(object):
     def printStatus(self):
         r"""Print the status of all drivers, starting with the IO drivers."""
         debug("CisRunner: printStatus()")
-        for driver in chain(self.inputdrivers, self.outputdrivers,
-                            self.modeldrivers):
+        for driver in self.all_drivers:
             driver['instance'].printStatus()
 
     def closeChannels(self, force_stop=False):
@@ -328,7 +482,7 @@ class CisRunner(object):
 
         """
         debug('CisRunner::closeChannels()')
-        drivers = [i for i in chain(self.outputdrivers, self.inputdrivers)]
+        drivers = [i for i in self.io_drivers()]
         for driver in drivers:
             driver = driver['instance']
             debug("CisRunner:closeChannels(): stopping %s", driver)

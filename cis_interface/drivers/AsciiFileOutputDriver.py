@@ -14,8 +14,11 @@ class AsciiFileOutputDriver(FileOutputDriver):
             to be passed to the created AsciiFile object.
         skip_AsciiFile (bool, optional): If True, the AsciiFile instance is not
             created. Defaults to False.
-        **kwargs: Additional keyword arguments are passed to parent class's
-            __init__ method.
+        comment (str, optional): String that should be used to identify
+                comments. Default set by :class:`AsciiFile`.
+        newline (str, optional): String that should be used to identify
+                the end of a line. Default set by :class:`AsciiFile`.
+        **kwargs: Additional keyword arguments are passed to parent class.
 
     Attributes:
         file_kwargs (dict): Arguments used to create AsciiFile instance.
@@ -25,37 +28,20 @@ class AsciiFileOutputDriver(FileOutputDriver):
     """
     
     def __init__(self, name, args, skip_AsciiFile=False, **kwargs):
-        filepath = None
-        self.args_ignored = []
-        if isinstance(args, str):
-            filepath = args
-            args = {}
-        elif isinstance(args, list):
-            if isinstance(args[0], str):
-                filepath = args.pop(0)
-            args_new = {}
-            for a in args:
-                if isinstance(a, dict):
-                    args_new.update(**a)
-                else:
-                    self.args_ignored.append(a)
-            args = args_new
-        elif not isinstance(args, dict):  # pragma: debug
-            raise TypeError("args is incorrect type, check the yaml.")
-        if filepath is None:
-            filepath = args.pop('filename', None)
-            filepath = args.pop('filepath', filepath)
-        super(AsciiFileOutputDriver, self).__init__(name, filepath, **kwargs)
-        self.debug('(%s)', filepath)
-        for a in self.args_ignored:
-            self.info(": Ignoring argument '%s'", str(a))
-        self.file_kwargs = args
-        self.file_kwargs['format_str'] = ''
+        file_keys = ['comment', 'newline']
+        file_kwargs = {}
+        for k in file_keys:
+            if k in kwargs:
+                file_kwargs[k] = kwargs.pop(k)
+        self.file_kwargs = file_kwargs
+        super(AsciiFileOutputDriver, self).__init__(name, args, **kwargs)
+        self.debug('(%s)', args)
+        # self.file_kwargs['format_str'] = ''
         if skip_AsciiFile:
             self.file = None
         else:
-            self.file = AsciiFile(filepath, 'w', **self.file_kwargs)
-        self.debug('(%s): done with init', args)
+            self.file = AsciiFile(self.args, 'w', **self.file_kwargs)
+        self.debug('(%s): done with init', self.args)
 
     @property
     def eof_msg(self):

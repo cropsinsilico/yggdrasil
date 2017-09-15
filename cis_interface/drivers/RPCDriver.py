@@ -24,14 +24,10 @@ class RPCDriver(Driver):
         self.debug()
         self.iipc = IODriver(name, '_IN', **kwargs)
         self.oipc = IODriver(name, '_OUT', **kwargs)
-
-    @property
-    def env(self):
-        r"""dict: Environment variables."""
         out = {}
         out.update(self.iipc.env)
         out.update(self.oipc.env)
-        return out
+        self.env = out
 
     def run(self):
         r"""Run the input/output queue drivers."""

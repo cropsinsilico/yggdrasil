@@ -13,12 +13,16 @@ class Driver(Thread):
         name (str): Driver name.
         yml (dict, optional): Dictionary of yaml specification options for this
             driver. Defaults to empty dict.
+        env (dict, optional): Dictionary of environment variables that should
+            be set when the driver starts. Defaults to {}.
         namespace (str, optional): Namespace for set of drivers running
             together. If not provided, the environment variable 'PSI_NAMESPACE'
             is used.
         rank (int, optional): Rank of the integration. Defaults to None.
         workingDir (str, optional): Working directory. If not provided, the
             current working directory is used.
+        timeout (float, optional): Maximum time (in seconds) that should be
+            spent waiting on a process. Defaults to 60.
 
     Attributes:
         name (str): Driver name.
@@ -26,6 +30,7 @@ class Driver(Thread):
         longsleep (float): Time that the driver will sleep for when waiting for
             longer tasks to complete (10x longer than sleeptime).
         timeout (float): Maximum time that should be spent waiting on a process.
+        env (dict): Dictionary of environment variables.
         yml (dict): Dictionary of yaml specification options for this driver.
         namespace (str): Namespace for set of drivers running together.
         rank (int): Rank of the integration.
@@ -36,8 +41,8 @@ class Driver(Thread):
     # METHODS THAT MUST HAVE SUPER AT BEGINNING AND CAN BE OVERRIDEN BY CHILD
     # CLASSES TO ADD DRIVER FUNCTIONALITY. ALL OF THE CHILD CLASSES MUST HAVE
     # COMPATIBLE FORMATS (THE SAME NAMED ARGUMENTS).
-    def __init__(self, name, yml={}, namespace=None, rank=None,
-                 workingDir=None):
+    def __init__(self, name, yml={}, env={}, namespace=None, rank=None,
+                 workingDir=None, timeout=60.0):
         # Check if thread initialized to avoid doing it twice for drivers
         # with multiple inheritance that both need to call __init__
         if getattr(self, '_thread_initialized', False):  # pragma: debug
@@ -51,7 +56,7 @@ class Driver(Thread):
         # if cis_cfg.get('debug', 'psi') == 'DEBUG':
         #     self.sleeptime = 1.0
         self.longsleep = self.sleeptime * 10
-        self.timeout = 1.0
+        self.timeout = timeout
         # Set defaults
         if namespace is None:
             namespace = cis_cfg.get('rmq', 'namespace')
@@ -63,16 +68,18 @@ class Driver(Thread):
                 workingDir = os.getcwd()
         # Assign things
         self.yml = yml
+        self.env = env
         self.namespace = namespace
         self.rank = rank
         self.workingDir = workingDir
-        self._term_meth = None
+        self._term_meth = "terminate"
         self.lock = Lock()
 
     def __del__(self):
         # self.debug('~')
         if self.isAlive():  # pragma: debug
             self.terminate()
+        self.cleanup()
 
     def run(self):
         r"""Run something in a seperate thread."""
@@ -92,13 +99,16 @@ class Driver(Thread):
     def terminate(self):
         r"""Stop the driver, without attempting to allow it to finish."""
         self.debug(':terminate()')
-        if self._term_meth is None:
-            self._term_meth = 'terminate'
         self.on_exit()
 
     def on_exit(self):
         r"""Processes that should be run when the driver exits."""
         self.debug(':on_exit()')
+
+    def cleanup(self):
+        r"""Processes that should be run to clean up a driver that is not
+        running."""
+        self.debug(':cleanup()')
 
     def wait(self):
         r"""Wait until model finish to return."""

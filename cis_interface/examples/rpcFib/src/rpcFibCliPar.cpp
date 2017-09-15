@@ -12,7 +12,8 @@ int main(int argc, char *argv[]) {
   printf("Hello from C++ rpcFibCliPar: iterations = %d\n", iterations);
   
   // Create RPC connection with server
-  PsiRpcClient rpc("cli_par_fib", "%d", "%d %d");
+  // RPC client-side connection will be $(server_name)_$(client_name)
+  PsiRpcClient rpc("rpcFibSrv_rpcFibCliPar", "%d", "%d %d");
   
   // Send all of the requests to the server
   int ret;

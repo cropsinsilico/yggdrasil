@@ -13,7 +13,7 @@ class TestModelParam(parent.TestParam):
         super(TestModelParam, self).__init__(*args, **kwargs)
         self.driver = 'ModelDriver'
         self.args = ['sleep', '0.1']
-        self.attr_list += ['args', 'process', 'env']
+        self.attr_list += ['args', 'process', 'is_server', 'client_of']
         
 
 class TestModelDriverNoStart(TestModelParam, parent.TestDriverNoStart):

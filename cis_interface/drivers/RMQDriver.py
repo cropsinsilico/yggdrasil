@@ -79,21 +79,13 @@ class RMQDriver(Driver):
         self.setDaemon(True)
         self._q_obj = None
 
-    # def __del__(self):
-    #     self.debug('~')
-    #         if self.connection is not None:
-    #             self.connection.close()
-    #         self.connection = None
-    #     except:
-    #         self.debug("::__del__(): exception")
-
     # DRIVER FUNCTIONALITY
     def start(self):
         r"""Start the driver. Waiting for connection."""
         self._opening = True
         super(RMQDriver, self).start()
-        timeout = 5 * self.timeout
-        interval = timeout / 5
+        timeout = self.timeout
+        interval = 0.5  # timeout / 5
         while timeout > 0:
             with self.lock:
                 if self.is_open:
@@ -139,6 +131,12 @@ class RMQDriver(Driver):
         #     self.connection.ioloop.start()
         super(RMQDriver, self).terminate()
         self.debug('::terminate returns')
+
+    def on_model_exit(self):
+        r"""Stop this driver if the model exits."""
+        self.debug('::on_model_exit()')
+        self.stop()
+        super(RMQDriver, self).on_model_exit()
 
     def get_message_stats(self):
         r"""Return message stats from the server."""
@@ -358,6 +356,15 @@ class RMQDriver(Driver):
                 self.channel.queue_purge(queue=self.queue)
 
     # GENERAL
+    def remove_queue(self):
+        r"""Unbind the queue from the exchange and delete the queue."""
+        self.debug('::stop_communication: unbinding queue')
+        if self.channel:
+            # self.display('Unbinding queue')
+            self.channel.queue_unbind(queue=self.queue,
+                                      exchange=self.exchange)
+            self.channel.queue_delete(queue=self.queue)
+        
     def start_communication(self, **kwargs):
         r"""Start sending/receiving messages."""
         pass
@@ -369,11 +376,7 @@ class RMQDriver(Driver):
             self._closing = True
             if self.is_open:
                 if remove_queue:
-                    self.debug('::stop_communication: unbinding queue')
-                    # self.display('Unbinding queue')
-                    self.channel.queue_unbind(queue=self.queue,
-                                              exchange=self.exchange)
-                    self.channel.queue_delete(queue=self.queue)
+                    self.remove_queue()
                 self.debug('::stop_communication: closing channel')
                 self.channel.close()
             else:

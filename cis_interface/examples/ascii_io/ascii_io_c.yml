@@ -16,9 +16,8 @@ model:
 
     - name: inputC_array
       driver: AsciiTableInputDriver
-      args:
-        filepath: ./Input/input_array.txt
-        as_array: True
+      args: ./Input/input_array.txt
+      as_array: True
 
   outputs:
     - name: outputC_file
@@ -31,6 +30,5 @@ model:
 
     - name: outputC_array
       driver: AsciiTableOutputDriver
-      args:
-        filepath: /tmp/output_array.txt
-        as_array: True
+      args: /tmp/output_array.txt
+      as_array: True

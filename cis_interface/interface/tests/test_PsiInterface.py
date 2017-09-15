@@ -146,14 +146,14 @@ class TestPsiAsciiFileInput(IOInfo):
         if not os.path.isfile(self.tempfile):
             self.write_table(self.tempfile)
         self.driver = AsciiFileInputDriver.AsciiFileInputDriver(
-            self.name, [self.tempfile, {}, 'ignore'])
+            self.name, self.tempfile)
         self.driver.start()
         self.driver.sleep(0.1)
         os.environ.update(self.driver.env)
 
     def teardown(self):
         r"""Stop the driver."""
-        self.driver.stop()
+        self.driver.terminate()
         if os.path.isfile(self.tempfile):
             os.remove(self.tempfile)
 
@@ -247,7 +247,7 @@ class TestPsiAsciiTableInput(IOInfo):
 
     def teardown(self):
         r"""Stop the driver."""
-        self.driver.stop()
+        self.driver.terminate()
         if os.path.isfile(self.tempfile):
             os.remove(self.tempfile)
 
@@ -284,14 +284,14 @@ class TestPsiAsciiTableInput_AsArray(IOInfo):
         if not os.path.isfile(self.tempfile):
             self.write_table(self.tempfile)
         self.driver = AsciiTableInputDriver.AsciiTableInputDriver(
-            self.name, dict(filepath=self.tempfile, as_array=True))
+            self.name, self.tempfile, as_array=True)
         self.driver.start()
         self.driver.sleep(0.1)
         os.environ.update(self.driver.env)
 
     def teardown(self):
         r"""Stop the driver."""
-        self.driver.stop()
+        self.driver.terminate()
         if os.path.isfile(self.tempfile):
             os.remove(self.tempfile)
 

@@ -21,17 +21,27 @@ class ModelDriver(Driver):
         name (str): Driver name.
         args (str or list): Argument(s) for running the model on the command
             line.
+        is_server (bool, optional): If True, the model is assumed to be a server
+            and an instance of :class:`cis_interface.drivers.RMQServerDriver`
+            is started. Defaults to False.
+        client_of (str, list, optional): THe names of ne or more servers that
+            this model is a client of. Defaults to empty list.
         \*\*kwargs: Additional keyword arguments are passed to parent class's
             __init__ method.
 
     Attributes (in additon to parent class's):
         args (list): Argument(s) for running the model on the command line.
         process (:class:`subprocess.Popen`): Process used to run the model.
-        env (dict): Dictionary of environment variables.
+        is_server (bool): If True, the model is assumed to be a server and an
+            instance of :class:`cis_interface.drivers.RMQServerDriver` is
+            started.
+        client_of (list): The names of server models that this model is a
+            client of.
 
     """
 
-    def __init__(self, name, args, **kwargs):
+    def __init__(self, name, args, is_server=False, client_of=[],
+                 **kwargs):
         super(ModelDriver, self).__init__(name, **kwargs)
         self.debug(str(args))
         if isinstance(args, str):
@@ -39,8 +49,11 @@ class ModelDriver(Driver):
         else:
             self.args = args
         self.process = None
-        # This gets added to before run with the channel args
-        self.env = os.environ.copy()
+        self.is_server = is_server
+        if isinstance(client_of, str):
+            client_of = [client_of]
+        self.client_of = client_of
+        self.env.update(os.environ)
 
     def run(self):
         r"""Run the model on a new process, receiving output from."""
@@ -75,6 +88,7 @@ class ModelDriver(Driver):
     def terminate(self):
         r"""Terminate the process running the model."""
         self.debug(':terminate()')
+        super(ModelDriver, self).terminate()
         with self.lock:
             if self.process:
                 self.debug(':terminate(): terminate process')

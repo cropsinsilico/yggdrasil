@@ -2,6 +2,24 @@
 from subprocess import Popen, PIPE
 
 
+def eval_kwarg(x):
+    r"""If x is a string, eval it. Otherwise just return it.
+
+    Args:
+        x (str, obj): String to be evaluated as an object or an object.
+
+    Returns:
+        obj: Evaluation result of x for strings if x is a string. x otherwise.
+
+    """
+    if isinstance(x, str):
+        try:
+            return eval(x)
+        except NameError:
+            return x
+    return x
+
+
 def ipcs(options=[]):
     r"""Get the output from running the ipcs command.
 

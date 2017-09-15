@@ -10,8 +10,9 @@ def fibClient(args):
     print('Hello from Python rpcFibCli: iterations = %d ' % iterations)
 
     # Set up connections matching yaml
+    # RPC client-side connection will be $(server_name)_$(client_name)
     ymlfile = PsiInput("yaml_in")
-    rpc = PsiRpcClient("cli_fib", "%d", "%d %d")
+    rpc = PsiRpcClient("rpcFibSrv_rpcFibCli", "%d", "%d %d")
     log = PsiOutput("output_log")
 
     # Read entire contents of yaml

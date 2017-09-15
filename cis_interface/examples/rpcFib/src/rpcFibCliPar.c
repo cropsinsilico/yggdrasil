@@ -11,8 +11,9 @@ int main(int argc, char *argv[]) {
   int iterations = atoi(argv[1]);
   printf("Hello from C rpcFibCliPar: iterations = %d\n", iterations);
   
-  // Create RPC connection with server 
-  psiRpc_t rpc = psiRpcClient("cli_par_fib", "%d", "%d %d");
+  // Create RPC connection with server
+  // RPC client-side connection will be $(server_name)_$(client_name)
+  psiRpc_t rpc = psiRpcClient("rpcFibSrv_rpcFibCliPar", "%d", "%d %d");
   
   // Send all of the requests to the server
   int i;

@@ -4,8 +4,8 @@ function rpcFibSrv(sleeptime)
   sleeptime = str2num(sleeptime);
   fprintf('Hello from Matlab rpcFibSrv: sleeptime = %f\n', sleeptime);
 
-  % Create server-side rpc conneciton 
-  rpc = PsiInterface('PsiRpcServer', 'srv_fib', '%d', '%d %d');
+  % Create server-side rpc conneciton using model name
+  rpc = PsiInterface('PsiRpcServer', 'rpcFibSrv', '%d', '%d %d');
 
   % Continue receiving requests until error occurs (the connection is closed
   % by all clients that have connected).
