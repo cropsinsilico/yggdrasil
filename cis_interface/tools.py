@@ -124,5 +124,3 @@ class TimeOut(object):
         if not self.max_time:
             return False
         return (self.elapsed > self.max_time)
-
-        

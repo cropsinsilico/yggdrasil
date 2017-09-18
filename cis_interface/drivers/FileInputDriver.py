@@ -44,5 +44,6 @@ class FileInputDriver(FileDriver):
             self.debug(':run, no input')
         else:
             ret = self.ipc_send(data)
-            self.debug(":run send failed")
+            if not ret:
+                self.debug(":run send failed")
         self.debug(':run returned')
