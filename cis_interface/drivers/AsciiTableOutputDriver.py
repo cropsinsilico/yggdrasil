@@ -69,40 +69,31 @@ class AsciiTableOutputDriver(AsciiFileOutputDriver):
             self.debug(':recv: did not receive format string')
             return
         self.file.update_format_str(fmt)
-        if self.as_array:
-            while True:
-                data = self.ipc_recv_nolimit()
-                if data is None:  # pragma: debug
-                    self.debug(':recv: closed')
-                    break
-                self.debug(':recvd %s bytes', len(data))
-                if len(data) > 0:
-                    with self.lock:
-                        self.file.write_bytes(data, order='F')
-                    break
-                else:
-                    self.debug(':recv: no data')
-                    self.sleep()
-        else:
+        with self.lock:
+            self.file.open()
+            self.file.writeformat()
+        while True:
             with self.lock:
-                self.file.open()
-                self.file.writeformat()
-            while self.file.is_open:
-                data = self.ipc_recv_nolimit()
-                if data is None:  # pragma: debug
-                    self.debug(':recv: closed')
+                if not self.file.is_open:  # pragma: debug
                     break
-                self.debug(':recvd %s bytes', len(data))
-                if data == self.eof_msg:
-                    self.debug(':recv: end of file')
-                    break
-                elif len(data) > 0:
-                    with self.lock:
-                        if self.file.is_open:
+            data = self.ipc_recv_nolimit()
+            if data is None:  # pragma: debug
+                self.debug(':recv: closed')
+                break
+            self.debug(':recvd %s bytes', len(data))
+            if data == self.eof_msg:
+                self.debug(':recv: end of file')
+                break
+            elif len(data) > 0:
+                with self.lock:
+                    if self.file.is_open:
+                        if self.as_array:
+                            self.file.write_bytes(data, order='F', append=True)
+                        else:
                             self.file.writeline_full(data, validate=True)
-                        else:  # pragma: debug
-                            break
-                else:
-                    self.debug(':recv: no data')
-                    self.sleep()
+                    else:  # pragma: debug
+                        break
+            else:
+                self.debug(':recv: no data')
+                self.sleep()
         self.debug(':run returned')

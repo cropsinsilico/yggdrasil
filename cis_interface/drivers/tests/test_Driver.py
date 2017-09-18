@@ -67,7 +67,9 @@ class TestParam(unittest.TestCase):
     def teardown(self):
         r"""Remove the instance, stoppping it."""
         if hasattr(self, '_instance'):
-            self.remove_instance(self._instance)
+            inst = self._instance
+            self._instance = None
+            self.remove_instance(inst)
             delattr(self, '_instance')
         nt.assert_equal(len(ipc_queues()), self.nprev_queues)
 
@@ -103,10 +105,13 @@ class TestParam(unittest.TestCase):
 
     def remove_instance(self, inst):
         r"""Remove an instance."""
-        inst.terminate()
+        if not inst._terminated:
+            inst.terminate()
         if inst.is_alive():
             inst.join()  # pragma: debug
-        del inst
+        # inst.__del__()
+        # del inst
+        assert(not inst.is_alive())
         # print("removed instance")
 
 

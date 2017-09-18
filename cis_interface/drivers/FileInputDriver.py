@@ -1,8 +1,8 @@
 import os
-from cis_interface.drivers.IODriver import IODriver
+from cis_interface.drivers.FileDriver import FileDriver
 
 
-class FileInputDriver(IODriver):
+class FileInputDriver(FileDriver):
     r"""Class that sends messages read from a file.
 
     Args:
@@ -18,25 +18,9 @@ class FileInputDriver(IODriver):
 
     """
     def __init__(self, name, args, **kwargs):
-        super(FileInputDriver, self).__init__(name, "_IN", **kwargs)
+        super(FileInputDriver, self).__init__(name, args, suffix="_IN",
+                                              **kwargs)
         self.debug('(%s)', args)
-        self.args = os.path.abspath(args)
-        self.fd = None
-        self.debug('(%s): done with init', args)
-
-    def close_file(self):
-        r"""Close the file."""
-        self.debug(':close_file()')
-        with self.lock:
-            if self.fd:
-                self.fd.close()
-            self.fd = None
-
-    def terminate(self):
-        r"""Terminate the driver. The file is closed as necessary."""
-        self.debug(':terminate()')
-        super(FileInputDriver, self).terminate()
-        self.close_file()
 
     def run(self):
         r"""Run the driver. The file is opened and then data is read from the
@@ -59,5 +43,6 @@ class FileInputDriver(IODriver):
         if len(data) == 0:  # pragma: debug
             self.debug(':run, no input')
         else:
-            self.ipc_send(data)
+            ret = self.ipc_send(data)
+            self.debug(":run send failed")
         self.debug(':run returned')

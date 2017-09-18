@@ -57,60 +57,54 @@ class IODriver(Driver):
                 msg += '%-15s' % (str(self.mq.current_messages) + ' ready')
         msg += end_msg
 
-    def recv_wait(self, timeout=0):
+    def recv_wait(self, timeout=None):
         r"""Receive a message smaller than maxMsgSize. Unlike ipc_recv,
         recv_wait will wait until there is a message to receive or the queue is
         closed.
 
         Args:
             timeout (float, optional): Max time that should be waited. Defaults
-                to 0 and is set to attribute timeout.
+                to None and is set to attribute timeout. If set to 0, it will
+                never timeout.
 
         Returns:
             str: The received message.
 
         """
         ret = ''
-        elapsed = 0.0
-        if not timeout:
-            timeout = self.timeout
-        while True and (not timeout or elapsed < timeout):
+        T = self.start_timeout(timeout)
+        while True and (not T.is_out):
             ret = self.ipc_recv()
             if ret is None or len(ret) > 0:
                 break
             self.debug('.recv_wait(): waiting')
             self.sleep()
-            elapsed += self.sleeptime
-        if not ret and elapsed >= timeout:  # pragma: debug
-            self.debug('.recv_wait_nolimit(): timeout at %f s', timeout)
+        self.stop_timeout()
         return ret
 
-    def recv_wait_nolimit(self, timeout=0):
+    def recv_wait_nolimit(self, timeout=None):
         r"""Receive a message larger than maxMsgSize. Unlike ipc_recv,
         recv_wait will wait until there is a message to receive or the queue is
         closed.
 
         Args:
             timeout (float, optional): Max time that should be waited. Defaults
-                to 0 and is infinite.
+                to None and is set to self.timeout. If set to 0, it will never
+                timeout.
 
         Returns:
             str: The received message.
 
         """
         ret = ''
-        elapsed = 0.0
-        if not timeout:
-            timeout = self.timeout
-        while True and (not timeout or elapsed < timeout):
+        T = self.start_timeout(timeout)
+        while True and (not T.is_out):
             ret = self.ipc_recv_nolimit()
             if ret is None or len(ret) > 0:
                 break
             self.debug('.recv_wait_nolimit(): waiting')
             self.sleep()
-            elapsed += self.sleeptime
-        if not ret and elapsed >= timeout:  # pragma: debug
-            self.debug('.recv_wait_nolimit(): timeout at %f s', timeout)
+        self.stop_timeout()
         return ret
 
     def ipc_send(self, data):
@@ -118,6 +112,9 @@ class IODriver(Driver):
 
         Args:
             str: The message to be sent.
+
+        Returns:
+            bool: Success or failure of send.
 
         """
         backwards.assert_bytes(data)
@@ -127,6 +124,7 @@ class IODriver(Driver):
             try:
                 if self.mq is None:
                     self.debug('.ipc_send(): mq closed')
+                    return False
                 else:
                     self.mq.send(data)
                     self.debug('.ipc_send %d bytes completed', len(data))
@@ -135,6 +133,7 @@ class IODriver(Driver):
             except:  # pragma: debug
                 self.debug('.ipc_send(): exception')
                 raise
+        return True
 
     def ipc_recv(self):
         r"""Receive a message smaller than maxMsgSize.
@@ -169,17 +168,24 @@ class IODriver(Driver):
         Args:
             str: The message to be sent.
 
+        Returns:
+            bool: Success or failure of send.
+
         """
         self.state = 'deliver'
         self.debug('::ipc_send_nolimit %d bytes', len(data))
         prev = 0
         error = False
-        self.ipc_send(backwards.unicode2bytes("%ld" % len(data)))
+        out = self.ipc_send(backwards.unicode2bytes("%ld" % len(data)))
+        if not out:  # pragma: debug
+            return out
         while prev < len(data):
             try:
                 next = min(prev + maxMsgSize, len(data))
                 # next = min(prev + self.mq.max_size, len(data))
-                self.ipc_send(data[prev:next])
+                out = self.ipc_send(data[prev:next])
+                if not out:  # pragma: debug
+                    return out
                 self.debug('.ipc_send_nolimit(): %d of %d bytes sent',
                            next, len(data))
                 prev = next
@@ -191,6 +197,9 @@ class IODriver(Driver):
         if not error:
             self.debug('.ipc_send_nolimit %d bytes completed', len(data))
         self.state = 'delivered'
+        if error:  # pragma: debug
+            return False
+        return True
 
     def ipc_recv_nolimit(self):
         r"""Receive a message larger than maxMsgSize in multiple parts.
@@ -243,33 +252,31 @@ class IODriver(Driver):
             else:  # pragma: debug
                 return 0
 
-    def graceful_stop(self, timeout=0, **kwargs):
+    def graceful_stop(self, timeout=None, **kwargs):
         r"""Stop the IODriver, first draining the message queue.
 
         Args:
             timeout (float, optional): Max time that should be waited. Defaults
-                to 0 and is set to attribute timeout.
+                to None and is set to attribute timeout. If 0, it will never
+                timeout.
             \*\*kwargs: Additional keyword arguments are passed to the parent
                 class's graceful_stop method.
 
         """
         self.debug('.graceful_stop()')
-        if not timeout:
-            timeout = self.timeout
+        T = self.start_timeout(timeout)
         try:
             while True:
-                with self.lock:
-                    if (not self.mq) or ((self.mq.current_messages == 0) or
-                                         (timeout <= 0)):
-                        break
-                    if DEBUG_SLEEPS:
-                        self.debug('.graceful_stop(): draining %d messages',
-                                   self.mq.current_messages)
+                n_msg = self.n_ipc_msg
+                if (n_msg == 0) or T.is_out:
+                    break
+                if DEBUG_SLEEPS:
+                    self.debug('.graceful_stop(): draining %d messages', n_msg)
                 self.sleep()
-                timeout -= self.sleeptime
         except:  # pragma: debug
             self.debug("::graceful_stop: exception")
             # raise
+        self.stop_timeout()
         super(IODriver, self).graceful_stop()
         self.debug('.graceful_stop(): done')
 

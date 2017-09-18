@@ -65,7 +65,10 @@ class AsciiFileOutputDriver(FileOutputDriver):
         except:  # pragma: debug
             self.exception('Could not open file.')
             return
-        while self.file.is_open:
+        while True:
+            with self.lock:
+                if not self.file.is_open:  # pragma: debug
+                    break
             data = self.ipc_recv()
             if data is None:
                 self.debug(':recv: closed')

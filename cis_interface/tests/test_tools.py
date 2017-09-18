@@ -14,6 +14,7 @@ def test_eval_kwarg():
     nt.assert_equal(tools.eval_kwarg("'one'"), 'one')
     nt.assert_equal(tools.eval_kwarg('"one"'), 'one')
 
+
 def test_ipcs():
     r"""Test list of ipc objects."""
     tools.ipcs()

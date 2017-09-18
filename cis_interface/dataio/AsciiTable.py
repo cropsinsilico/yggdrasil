@@ -551,7 +551,7 @@ class AsciiTable(AsciiFile):
                                     autostrip=True, names=names)
         return arr
 
-    def write_array(self, array, names=None, skip_header=False):
+    def write_array(self, array, names=None, skip_header=False, append=False):
         r"""Write a numpy array to the table.
 
         Args:
@@ -562,6 +562,8 @@ class AsciiTable(AsciiFile):
             skip_header (bool, optional): If True, no header information is
                 written (it is assumed it was already written. Defaults to
                 False.
+            append (bool, optional): If True, array is appended to existing
+                table. This sets skip_header to True. Defaults to False.
 
         Raises:
             ValueError: If names are provided, but not the same number as
@@ -572,6 +574,15 @@ class AsciiTable(AsciiFile):
         column = backwards.bytes2unicode(self.column)
         comment = backwards.bytes2unicode(self.comment)
         newline = backwards.bytes2unicode(self.newline)
+        if append:
+            skip_header = True
+            open_mode = 'ab'
+        else:
+            open_mode = 'wb'
+        if self.is_open:
+            fd = self.fd
+        else:
+            fd = open(self.filepath, open_mode)
         if skip_header:
             names = None
         else:
@@ -587,7 +598,7 @@ class AsciiTable(AsciiFile):
             else:
                 table_format = 'commented_header'
                 table.meta["comments"] = [fmt]
-            apy_ascii.write(table, self.filepath,
+            apy_ascii.write(table, fd,
                             delimiter=column, comment=comment + ' ',
                             format=table_format, names=names)
         else:
@@ -597,7 +608,7 @@ class AsciiTable(AsciiFile):
                 head = fmt
                 if names is not None:
                     head = column.join(names) + newline + " " + head
-            np.savetxt(self.filepath, array,
+            np.savetxt(fd, array,
                        fmt=fmt, delimiter=column, comments=comment + ' ',
                        newline=newline, header=head)
 
@@ -685,7 +696,7 @@ class AsciiTable(AsciiFile):
         out = self.array_to_bytes(arr, order=order)
         return out
 
-    def write_bytes(self, data, order='C', names=None):
+    def write_bytes(self, data, order='C', **kwargs):
         r"""Write a numpy array to the table.
 
         Args:
@@ -693,14 +704,8 @@ class AsciiTable(AsciiFile):
                 written to file.
             order (str, optional): Order of data for reshaping. Defaults to
                 'C'.
-            names (list, optional): List of column names to write out. If
-                not provided, existing names are used if they exist. Defaults
-                to None.
-
-        Raises:
-            ValueError: If names are provided, but not the same number as
-                there are columns.
+            **kwargs: Additional keyword arguments are passed to write_array.
 
         """
         arr = self.bytes_to_array(data, order=order)
-        self.write_array(arr, names=names)
+        self.write_array(arr, **kwargs)

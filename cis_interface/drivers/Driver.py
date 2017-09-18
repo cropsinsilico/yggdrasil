@@ -4,6 +4,7 @@ import os
 import time
 import inspect
 from cis_interface.config import cis_cfg
+from cis_interface.tools import TimeOut
 
 
 class Driver(Thread):
@@ -52,11 +53,12 @@ class Driver(Thread):
         self._thread_initialized = True
         self.debug()
         self.name = name
-        self.sleeptime = 0.001  # 25
+        self.sleeptime = 0.01  # 25
         # if cis_cfg.get('debug', 'psi') == 'DEBUG':
         #     self.sleeptime = 1.0
         self.longsleep = self.sleeptime * 10
         self.timeout = timeout
+        self._timeouts = {}
         # Set defaults
         if namespace is None:
             namespace = cis_cfg.get('rmq', 'namespace')
@@ -73,13 +75,16 @@ class Driver(Thread):
         self.rank = rank
         self.workingDir = workingDir
         self._term_meth = "terminate"
+        self._terminated = False
         self.lock = Lock()
 
-    def __del__(self):
-        # self.debug('~')
-        if self.isAlive():  # pragma: debug
-            self.terminate()
-        self.cleanup()
+    # def __del__(self):
+    #     # self.debug('~')
+    #     if self.isAlive():  # pragma: debug
+    #         self.terminate()
+    #         self.join()
+    #     assert(not self.isAlive())
+    #     self.cleanup()
 
     def run(self):
         r"""Run something in a seperate thread."""
@@ -87,6 +92,9 @@ class Driver(Thread):
 
     def stop(self):
         r"""Stop the driver."""
+        if self._terminated:
+            self.debug(':stop() Driver already terminated.')
+            return
         self.debug(':stop()')
         self._term_meth = 'stop'
         self.graceful_stop()
@@ -98,8 +106,16 @@ class Driver(Thread):
 
     def terminate(self):
         r"""Stop the driver, without attempting to allow it to finish."""
+        if self._terminated:
+            self.debug(':terminated() Driver already terminated.')
+            return
         self.debug(':terminate()')
+        T = self.start_timeout()
+        while self.is_alive() and (not T.is_out):
+            self.sleep()
+        self.stop_timeout()
         self.on_exit()
+        self._terminated = True
 
     def on_exit(self):
         r"""Processes that should be run when the driver exits."""
@@ -173,6 +189,51 @@ class Driver(Thread):
         if t is None:
             t = self.sleeptime
         time.sleep(t)
+
+    @property
+    def timeout_key(self):
+        r"""str: Key identifying calling object and method."""
+        stack = inspect.stack()
+        fcn = stack[2][3]
+        cls = os.path.splitext(os.path.basename(stack[2][1]))[0]
+        key = '%s(%s).%s' % (cls, self.name, fcn)
+        return key
+
+    def start_timeout(self, t=None):
+        r"""Start a timeout for the calling function/method.
+
+        Args:
+            t (float, optional): Maximum time that the calling function should
+                wait before timeing out. If not provided, the attribute
+                'timeout' is used.
+
+        """
+        if t is None:
+            t = self.timeout
+        key = self.timeout_key
+        if key in self._timeouts:
+            raise Exception("Timeout already registered for %s" % key)
+        self._timeouts[key] = TimeOut(t)
+        return self._timeouts[key]
+
+    def check_timeout(self):
+        r"""Check timeout for the calling function/method."""
+        key = self.timeout_key
+        if key not in self._timeouts:
+            raise Exception("No timeout registered for %s" % key)
+        t = self._timeouts[key]
+        return t.is_out
+        
+    def stop_timeout(self):
+        r"""Stop a timeout for the calling function method."""
+        key = self.timeout_key
+        if key not in self._timeouts:
+            raise Exception("No timeout registered for %s" % key)
+        t = self._timeouts[key]
+        if t.is_out:
+            self.error("Timeout for %s at %5.2f s" % (key, t.elapsed))
+        print("Stopped %s at %f/%f" % (key, t.elapsed, t.max_time))
+        del self._timeouts[key]
 
     def display(self, fmt_str='', *args):
         r"""Log a message at level 1000 that is prepended with the driver class

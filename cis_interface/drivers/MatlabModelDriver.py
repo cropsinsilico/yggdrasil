@@ -16,6 +16,7 @@ except ImportError:  # pragma: no matlab
     _matlab_installed = False
 from cis_interface.drivers.ModelDriver import ModelDriver
 from cis_interface.backwards import sio
+from cis_interface.tools import TimeOut
 
 
 _top_dir = os.path.normpath(os.path.join(os.path.dirname(__file__), '../'))
@@ -41,9 +42,13 @@ def start_matlab():
                                            'matlab_screenrc') +
                    'matlab -nodisplay -nosplash -nodesktop -nojvm ' +
                    '-r "matlab.engine.shareEngine"'))
-        while len(set(matlab.engine.find_matlab()) - old_matlab) == 0:
+        T = TimeOut(10)
+        while ((len(set(matlab.engine.find_matlab()) - old_matlab) == 0) and
+               not T.is_out):
             debug('Waiting for matlab engine to start')
             time.sleep(1)  # Usually 3 seconds
+        if (len(set(matlab.engine.find_matlab()) - old_matlab) == 0):
+            raise Exception("start_matlab timed out at %f s" % T.elapsed)
         new_matlab = list(set(matlab.engine.find_matlab()) - old_matlab)[0]
     else:  # pragma: no matlab
         warn("Matlab not installed. Matlab could not be started.")
@@ -80,9 +85,13 @@ def stop_matlab(screen_session, matlab_engine, matlab_session):
         if screen_session is not None:
             if matlab_session in matlab.engine.find_matlab():
                 os.system(('screen -X -S %s quit') % screen_session)
-            while matlab_session in matlab.engine.find_matlab():
+            T = TimeOut(5)
+            while ((matlab_session in matlab.engine.find_matlab()) and
+                   not T.is_out):
                 debug("Waiting for matlab engine to exit")
                 time.sleep(1)
+            if (matlab_session in matlab.engine.find_matlab()):
+                raise Exception("stp[_matlab timed out at %f s" % T.elapsed)
     # else:  # pragma: no matlab
     #     warn("Matlab not installed. Matlab could not be stopped.")
 
@@ -156,6 +165,7 @@ class MatlabModelDriver(ModelDriver):
         self.mlsession = None
         self.started_matlab = False
         self.mlengine = None
+        super(MatlabModelDriver, self).cleanup()
 
     def on_exit(self):
         r"""Cleanup Matlab session and engine on exit."""

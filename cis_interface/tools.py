@@ -1,5 +1,6 @@
 """This modules offers various tools."""
 from subprocess import Popen, PIPE
+import time
 
 
 def eval_kwarg(x):
@@ -92,3 +93,36 @@ def ipcrm_queues(queue_keys=None):
         queue_keys = [queue_keys]
     for q in queue_keys:
         ipcrm(["-Q %s" % q])
+
+
+class TimeOut(object):
+    r"""Class for checking if a period of time has been elapsed.
+
+    Args:
+        max_time (float): Maximum period of time that should elapsed before
+            'is_out' returns True.
+
+    Attributes:
+        max_time (float): Maximum period of time that should elapsed before
+            'is_out' returns True.
+        start_time (float): Result of time.time() at start.
+
+    """
+
+    def __init__(self, max_time):
+        self.max_time = max_time
+        self.start_time = time.clock()
+
+    @property
+    def elapsed(self):
+        r"""float: Total time that has elapsed since the start."""
+        return time.clock() - self.start_time
+    
+    @property
+    def is_out(self):
+        r"""bool: True if there is not any time remaining. False otherwise."""
+        if not self.max_time:
+            return False
+        return (self.elapsed > self.max_time)
+
+        

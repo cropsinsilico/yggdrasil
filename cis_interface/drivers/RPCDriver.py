@@ -53,6 +53,20 @@ class RPCDriver(Driver):
         super(RPCDriver, self).terminate()
         self.debug('.terminate() done')
 
+    def on_exit(self):
+        self.debug('.on_exit()')
+        self.iipc.on_exit()
+        self.oipc.on_exit()
+        super(RPCDriver, self).on_exit()
+        self.debug('.on_exit() done')
+
+    def cleanup(self):
+        self.debug('.cleanup()')
+        self.iipc.cleanup()
+        self.oipc.cleanup()
+        super(RPCDriver, self).cleanup()
+        self.debug('.cleanup() done')
+
     def printStatus(self):
         r"""Print information on the status of the driver."""
         super(RPCDriver, self).printStatus()

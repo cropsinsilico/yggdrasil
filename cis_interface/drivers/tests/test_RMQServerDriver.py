@@ -73,11 +73,11 @@ class TestRMQServerDriver(TestRMQServerParam, parent1.TestRMQDriver):
     def temp_basic_get(self):
         r"""Do basic_get from the temporary queue."""
         out = self.channel.basic_get(queue=self.temp_queue)
-        elapsed = 0.0
-        while (out[0] is None) and (elapsed <= self.instance.timeout):
+        T = self.instance.start_timeout()
+        while (out[0] is None) and (not T.is_out):
             self.connection.sleep(self.instance.sleeptime)
             out = self.channel.basic_get(queue=self.temp_queue)
-            elapsed += self.instance.sleeptime
+        self.instance.stop_timeout()
         if out[0] is None:  # pragma: debug
             raise Exception("Msg receive timed out.")
         return out
@@ -92,10 +92,10 @@ class TestRMQServerDriver(TestRMQServerParam, parent1.TestRMQDriver):
                 routing_key=self.instance.queue,
                 properties=pika.BasicProperties(reply_to=self.temp_queue),
                 body=_new_client_msg)
-        elapsed = 0.0
-        while self.instance.n_clients == 0 and (elapsed <= self.instance.timeout):
+        T = self.instance.start_timeout()
+        while self.instance.n_clients == 0 and (not T.is_out):
             self.instance.sleep()
-            elapsed += self.instance.sleeptime
+        self.instance.stop_timeout()
         nt.assert_equal(self.instance.n_clients, 1)
         # Send end client message
         with self.instance.lock:
@@ -104,10 +104,10 @@ class TestRMQServerDriver(TestRMQServerParam, parent1.TestRMQDriver):
                 routing_key=self.instance.queue,
                 properties=pika.BasicProperties(reply_to=self.temp_queue),
                 body=_end_client_msg)
-        elapsed = 0.0
-        while self.instance.n_clients != 0 and (elapsed <= self.instance.timeout):
+        T = self.instance.start_timeout()
+        while self.instance.n_clients != 0 and (not T.is_out):
             self.instance.sleep()
-            elapsed += self.instance.sleeptime
+        self.instance.stop_timeout()
         nt.assert_equal(self.instance.n_clients, 0)
 
     # Disabled so that test message is not read by mistake

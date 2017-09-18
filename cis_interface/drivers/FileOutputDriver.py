@@ -1,8 +1,8 @@
 import os
-from cis_interface.drivers.IODriver import IODriver
+from cis_interface.drivers.FileDriver import FileDriver
 
 
-class FileOutputDriver(IODriver):
+class FileOutputDriver(FileDriver):
     r"""Class to handle output of received messages to a file.
 
     Args:
@@ -18,25 +18,9 @@ class FileOutputDriver(IODriver):
 
     """
     def __init__(self, name, args, **kwargs):
-        super(FileOutputDriver, self).__init__(name, "_OUT", **kwargs)
+        super(FileOutputDriver, self).__init__(name, args, suffix="_OUT",
+                                               **kwargs)
         self.debug('(%s)', args)
-        self.args = os.path.abspath(args)
-        self.fd = None
-        self.debug('(%s): done with init', args)
-
-    def close_file(self):
-        r"""Close the file."""
-        self.debug(':close_file()')
-        with self.lock:
-            if self.fd:
-                self.fd.close()
-            self.fd = None
-
-    def terminate(self):
-        r"""Terminate the driver, closeing the file as necessary."""
-        self.debug(':terminate()')
-        super(FileOutputDriver, self).terminate()
-        self.close_file()
 
     def run(self):
         r"""Run the driver. The driver will open the file and write receieved

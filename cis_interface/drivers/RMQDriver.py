@@ -84,18 +84,19 @@ class RMQDriver(Driver):
         r"""Start the driver. Waiting for connection."""
         self._opening = True
         super(RMQDriver, self).start()
-        timeout = self.timeout
-        interval = 0.5  # timeout / 5
-        while timeout > 0:
+        T = self.start_timeout()
+        interval = 1  # timeout / 5
+        while not T.is_out:
             with self.lock:
                 if self.is_open:
                     break
             # import time; time.sleep(self.sleeptime)
             self.sleep(interval)
-            timeout -= interval
         with self.lock:
             if self._opening:  # pragma: debug
-                raise RuntimeError("Connection never finished opening.")
+                raise RuntimeError("Connection never finished opening " +
+                                   "(%f/%f timeout)." % (T.elapsed, T.max_time))
+        self.stop_timeout()
 
     def run(self):
         r"""Run the driver. Connect to the connection and begin the IO loop."""
@@ -111,9 +112,9 @@ class RMQDriver(Driver):
             if self._closing:  # pragma: debug
                 return  # Don't close more than once
         self.debug("::terminate")
-        timeout = self.timeout
+        T = self.start_timeout()
         while True:
-            if not self._opening or timeout <= 0:
+            if not self._opening or T.is_out:
                 break
             else:  # pragma: debug
                 self.debug('Waiting for connection to open before terminating')
@@ -122,7 +123,7 @@ class RMQDriver(Driver):
                 #     return
                 # while self.connection is None:
                 self.sleep()
-                timeout -= self.sleeptime
+        self.stop_timeout()
         self.debug('::terminate: Closing connection')
         self.stop_communication()
         # Only needed if ioloop is stopped prior to closing the connection?
@@ -173,7 +174,7 @@ class RMQDriver(Driver):
     @property
     def n_rmq_msg(self):
         r"""int: Number of messages in the queue."""
-        timeout = self.timeout
+        T = self.start_timeout()
         self._n_msg = None
         with self.lock:
             self.channel.queue_declare(self.on_nmsg_request,
@@ -184,11 +185,11 @@ class RMQDriver(Driver):
         # Wait for queue to be declared passively
         while True:
             with self.lock:
-                if self._n_msg is not None or timeout <= 0:
+                if self._n_msg is not None or T.is_out:
                     break
             self.sleep()
-            timeout -= self.sleeptime
         # Return result
+        self.stop_timeout()
         n_msg = 0
         if self._n_msg is not None:
             n_msg = self._n_msg
@@ -381,13 +382,13 @@ class RMQDriver(Driver):
                 self.channel.close()
             else:
                 self._closing = False
-        timeout = self.timeout
+        T = self.start_timeout()
         while True:
-            if not self._closing or timeout <= 0:
+            if not self._closing or T.is_out:
                 break
             self.debug('::stop_commmunication: waiting for connection to close')
             self.sleep()
-            timeout -= self.sleeptime
+        self.stop_timeout()
 
     # UTILITIES
     def rmq_send(self, data):

@@ -88,9 +88,9 @@ class ModelDriver(Driver):
     def terminate(self):
         r"""Terminate the process running the model."""
         self.debug(':terminate()')
-        super(ModelDriver, self).terminate()
         with self.lock:
             if self.process:
                 self.debug(':terminate(): terminate process')
                 self.process.terminate()
                 self.process = None
+        super(ModelDriver, self).terminate()
