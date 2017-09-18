@@ -389,7 +389,8 @@ class TestPsiAsciiTableOutput_AsArray(IOInfo):
                                                 self.fmt_str, dst_type=0)
         msg_flag = inst.send_array(self.file_array)
         assert(msg_flag)
-        del inst
+        inst.send_eof()
+        # del inst
         # Read temp file
         assert(os.path.isfile(self.tempfile))
         with open(self.tempfile, 'r') as fd:

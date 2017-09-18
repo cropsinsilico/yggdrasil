@@ -539,7 +539,7 @@ class PsiAsciiTableOutput(object):
     def send_eof(self):
         r"""Send an end-of-file message to the message queue."""
         if self._type == 0:
-            pass
+            self._table.close()
         else:
             self._psi.send_nolimit(PSI_MSG_EOF)
 
