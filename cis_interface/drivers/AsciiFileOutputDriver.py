@@ -1,5 +1,4 @@
 import os
-from cis_interface.interface.PsiInterface import PSI_MSG_EOF
 from cis_interface.drivers.FileOutputDriver import FileOutputDriver
 from cis_interface.dataio.AsciiFile import AsciiFile
 
@@ -42,11 +41,6 @@ class AsciiFileOutputDriver(FileOutputDriver):
         else:
             self.file = AsciiFile(self.args, 'w', **self.file_kwargs)
         self.debug('(%s): done with init', self.args)
-
-    @property
-    def eof_msg(self):
-        r"""str: Message indicating end of file."""
-        return PSI_MSG_EOF
 
     def close_file(self):
         r"""Close the file."""

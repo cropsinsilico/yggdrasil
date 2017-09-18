@@ -1,5 +1,6 @@
 import os
 from cis_interface.drivers.IODriver import IODriver
+from cis_interface.interface.PsiInterface import PSI_MSG_EOF
 
 
 class FileDriver(IODriver):
@@ -25,6 +26,11 @@ class FileDriver(IODriver):
         self.debug('(%s)', args)
         self.args = os.path.abspath(args)
         self.fd = None
+
+    @property
+    def eof_msg(self):
+        r"""str: Message indicating end of file."""
+        return PSI_MSG_EOF
 
     def close_file(self):
         r"""Close the file."""
