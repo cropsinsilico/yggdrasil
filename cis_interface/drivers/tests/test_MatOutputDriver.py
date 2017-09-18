@@ -42,6 +42,7 @@ class TestMatOutputDriver(TestMatOutputParam, parent.TestIODriver):
         r"""Create a driver instance and start the driver."""
         super(TestMatOutputDriver, self).setup()
         self.instance.ipc_send_nolimit(self.pickled_data)
+        self.instance.ipc_send_nolimit(self.instance.eof_msg)
         self.timeout = 10.0
 
     def teardown(self):

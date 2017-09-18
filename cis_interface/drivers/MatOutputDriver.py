@@ -48,16 +48,21 @@ class MatOutputDriver(FileOutputDriver):
         except:  # pragma: debug
             self.exception('Could not open file.')
             return
-        while self.fd is not None:
+        while True:
+            with lock:
+                if self.fd is None:  # pragma: debug
+                    break
             data = self.ipc_recv_nolimit()
             if data is None:  # pragma: debug
                 self.debug(':recv: closed')
                 break
             self.debug(':recvd %s bytes', len(data))
-            if len(data) > 0:
+            if data == self.eof_msg:
+                self.debug(':recv: end of file')
+                break
+            elif len(data) > 0:
                 with self.lock:
                     if self.fd is None:  # pragma: debug
-                        self.debug(':recv: file closed')
                         break
                     else:
                         self.put(data)
