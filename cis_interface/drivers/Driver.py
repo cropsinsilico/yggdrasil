@@ -103,6 +103,10 @@ class Driver(Thread):
     def graceful_stop(self):
         r"""Gracefully stop the driver."""
         self.debug(':graceful_stop()')
+        T = self.start_timeout()
+        while (self.is_alive() and not T.is_out):
+            self.sleep()
+        self.stop_timeout()
 
     def terminate(self):
         r"""Stop the driver, without attempting to allow it to finish."""
