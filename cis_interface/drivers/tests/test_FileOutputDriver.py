@@ -43,6 +43,7 @@ class TestFileOutputDriver(TestFileOutputParam, parent.TestIODriver):
         r"""Create a driver instance and start the driver."""
         super(TestFileOutputDriver, self).setup()
         self.instance.ipc_send(self.file_contents)
+        self.instance.ipc_send(self.instance.eof_msg)
 
     def teardown(self):
         r"""Remove the instance, stoppping it."""

@@ -39,7 +39,10 @@ class FileOutputDriver(FileDriver):
                 self.debug(':recv: closed')
                 break
             self.debug(':recvd %s bytes', len(data))
-            if len(data) > 0:
+            if data == self.eof_msg:
+                self.debug(':recv: end of file')
+                break
+            elif len(data) > 0:
                 with self.lock:
                     if self.fd is None:
                         break  # pragma: debug
