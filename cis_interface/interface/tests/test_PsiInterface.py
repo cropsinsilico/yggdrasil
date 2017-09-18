@@ -384,7 +384,7 @@ class TestPsiAsciiTableOutput_AsArray(IOInfo):
             os.remove(self.tempfile)
 
     def test_send_array_loc(self):
-        r"""Test sending an array to a remote file."""
+        r"""Test sending an array to a local file."""
         inst = PsiInterface.PsiAsciiTableOutput(self.tempfile,
                                                 self.fmt_str, dst_type=0)
         msg_flag = inst.send_array(self.file_array)
