@@ -49,7 +49,7 @@ class MatOutputDriver(FileOutputDriver):
             self.exception('Could not open file.')
             return
         while True:
-            with lock:
+            with self.lock:
                 if self.fd is None:  # pragma: debug
                     break
             data = self.ipc_recv_nolimit()
