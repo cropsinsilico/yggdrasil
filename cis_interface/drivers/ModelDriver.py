@@ -64,39 +64,18 @@ class ModelDriver(Driver):
             try:
                 self.process = subprocess.Popen(
                     ['stdbuf', '-o0'] + self.args, bufsize=0,
-                    stdin=subprocess.PIPE, stderr=subprocess.PIPE,  # STDOUT,
-                    stdout=subprocess.PIPE,
+                    # stdin=subprocess.PIPE, stderr=subprocess.PIPE,
+                    # stdout=subprocess.PIPE,
                     env=self.env, cwd=self.workingDir, preexec_fn=preexec)
             except:  # pragma: debug
                 self.exception('(%s): Exception starting in %s with wd %s',
                                self.args, os.getcwd, self.workingDir)
                 return
-        
-        # while True:
-        #     with self.lock:
-        #         if self.process:
-        #             self.process.poll()
-        #             if self.process.returncode is None:
-        #                 while True:
-        #                     line = self.process.stdout.readline()
-        #                     if line:
-        #                         print(line, end="")
-        #                     else:
-        #                         break
-        #                 while True:
-        #                     line = self.process.stderr.readline()
-        #                     if line:
-        #                         print(line, end="")
-        #                     else:
-        #                         break
-        #         else:
-        #             break
-        #     self.sleep()
-        
         # Re-direct output
-        (outdata, errdata) = self.process.communicate()
-        print(outdata, end="")
-        print(errdata, end="")
+        self.process.wait()
+        # (outdata, errdata) = self.process.communicate()
+        # print(outdata, end="")
+        # print(errdata, end="")
         # while True:
         #     with self.lock:
         #         if self.process:
@@ -117,6 +96,6 @@ class ModelDriver(Driver):
             self.process.poll()
             if self.process.returncode is None:
                 self.debug(':terminate(): terminate process')
-                self.process.terminate()
+                self.process.kill()  # terminate()
                 self.process = None
         super(ModelDriver, self).terminate()
