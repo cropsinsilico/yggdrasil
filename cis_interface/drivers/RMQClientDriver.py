@@ -178,4 +178,4 @@ class RMQClientDriver(RMQDriver, RPCDriver):
                 self.debug("::Cancelling consumption.")
                 print 'publish end client'
                 self.publish_to_server(_end_client_msg)
-        super(RMQClientDriver, self).stop_communication()
+        super(RMQClientDriver, self).stop_communication(cancel_consumer=True)

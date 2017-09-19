@@ -97,6 +97,10 @@ class RMQServerDriver(RMQDriver, RPCDriver):
                 return
             ch.basic_ack(delivery_tag=method.delivery_tag)
 
+    def stop_communication(self):
+        r"""Stop sending/receiving messages."""
+        super(RMQServerDriver, self).stop_communication(cancel_consumer=True)
+            
     # def stop_communication(self):
     #     r"""Stop sending/receiving messages."""
     #     self.debug('::stop_communication()')

@@ -376,20 +376,23 @@ class RMQDriver(Driver):
         r"""Start sending/receiving messages."""
         pass
 
-    def stop_communication(self, remove_queue=True, **kwargs):
+    def stop_communication(self, remove_queue=True, cancel_consumer=False,
+                           **kwargs):
         r"""Stop sending/receiving messages."""
         print 'stop_communication'
         self.debug('::stop_communication')
         with self.lock:
             self._closing = True
             if self.channel_open:
-                self.debug('::stop_communication: cancelling consumption')
-                self.channel.basic_cancel(callback=self.on_cancelok,
-                                          consumer_tag=self.consumer_tag)
-                # if remove_queue:
-                #     self.remove_queue()
-                # self.debug('::stop_communication: closing channel')
-                # self.channel.close()
+                if cancel_consumer:
+                    self.debug('::stop_communication: cancelling consumption')
+                    self.channel.basic_cancel(callback=self.on_cancelok,
+                                              consumer_tag=self.consumer_tag)
+                else:
+                    if remove_queue:
+                        self.remove_queue()
+                    self.debug('::stop_communication: closing channel')
+                    self.channel.close()
             else:
                 self._closing = False
         T = self.start_timeout()
