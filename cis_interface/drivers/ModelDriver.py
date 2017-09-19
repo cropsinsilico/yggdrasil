@@ -4,10 +4,8 @@
 from __future__ import print_function
 import os
 import subprocess
-# import sys
 from pprint import pformat
 from cis_interface.drivers.Driver import Driver
-# from cis_interface import backwards
 
 
 def preexec():  # pragma: no cover
@@ -64,6 +62,7 @@ class ModelDriver(Driver):
             try:
                 self.process = subprocess.Popen(
                     ['stdbuf', '-o0'] + self.args, bufsize=0,
+                    # If PIPEs are used, communicate must be used below
                     # stdin=subprocess.PIPE, stderr=subprocess.PIPE,
                     # stdout=subprocess.PIPE,
                     env=self.env, cwd=self.workingDir, preexec_fn=preexec)
@@ -71,22 +70,12 @@ class ModelDriver(Driver):
                 self.exception('(%s): Exception starting in %s with wd %s',
                                self.args, os.getcwd, self.workingDir)
                 return
-        # Re-direct output
+        # Wait for process to stop w/o PIPE redirect
         self.process.wait()
+        # Wait for process to stop w/ PIPE redirect
         # (outdata, errdata) = self.process.communicate()
         # print(outdata, end="")
         # print(errdata, end="")
-        # while True:
-        #     with self.lock:
-        #         if self.process:
-        #             line = self.process.stdout.readline()
-        #         else:
-        #             return
-        #     if not line:
-        #         break
-        #     sys.stdout.write(backwards.bytes2unicode(line))
-        #     sys.stdout.flush()
-            
         self.debug(':run: done')
 
     def terminate(self):
