@@ -416,6 +416,8 @@ class CisRunner(object):
                 if not d.is_alive():
                     self.do_model_exits(drv)
                     running.remove(drv)
+                else:
+                    print drv['name'], ' still alive'
         # self.closeChannels()
         info('All models completed')
         debug('RunModels.run() returns')
