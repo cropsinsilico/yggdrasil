@@ -82,9 +82,10 @@ class ModelDriver(Driver):
         r"""Terminate the process running the model."""
         self.debug(':terminate()')
         with self.lock:
-            self.process.poll()
-            if self.process.returncode is None:
-                self.debug(':terminate(): terminate process')
-                self.process.kill()  # terminate()
-                self.process = None
+            if self.process:
+                self.process.poll()
+                if self.process.returncode is None:
+                    self.debug(':terminate(): terminate process')
+                    self.process.kill()  # terminate()
+                    self.process = None
         super(ModelDriver, self).terminate()
