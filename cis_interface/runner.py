@@ -416,8 +416,6 @@ class CisRunner(object):
                 if not d.is_alive():
                     self.do_model_exits(drv)
                     running.remove(drv)
-                else:
-                    print drv['name'], ' still alive'
         # self.closeChannels()
         info('All models completed')
         debug('RunModels.run() returns')
@@ -431,10 +429,8 @@ class CisRunner(object):
         """
         debug("CisRunner::do_exits for driver %s", driver['name'])
         # Stop the driver and join the thread
-        print('driver %s exited' % driver['name'])
         driver['instance'].on_exit()
         driver['instance'].join()
-        print('driver %s joined' % driver['name'])
         debug("CisRunner: join finished: (%s)", pformat(driver))
 
     def do_model_exits(self, model):
@@ -450,7 +446,6 @@ class CisRunner(object):
         for srv_name in model.get('client_of', []):
             # Stop client IO driver
             iod = self.outputdrivers["%s_%s" % (srv_name, model['name'])]
-            print 'stopping client IO', iod['name']
             iod['instance'].stop()
             self.do_exits(iod)
             # Remove this client from list for server
@@ -459,7 +454,6 @@ class CisRunner(object):
             # Stop server if there are not any more clients
             if len(srv['clients']) == 0:
                 iod = self.inputdrivers[srv_name]
-                print 'stopping server IO', iod['name']
                 iod['instance'].stop()
                 self.do_exits(iod)
                 srv['instance'].stop()

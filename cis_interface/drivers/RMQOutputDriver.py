@@ -39,7 +39,8 @@ class RMQOutputDriver(RMQDriver, IODriver):
             data = self.ipc_recv()
             if data is None:
                 self.debug("::publish_message(): queue closed!")
-                self.terminate()
+                # print 'terminate'
+                # self.terminate()
                 break
             elif len(data) == 0:
                 self.debug("::publish_message(): no data, reschedule")

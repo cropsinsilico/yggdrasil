@@ -80,6 +80,9 @@ class ModelDriver(Driver):
 
     def terminate(self):
         r"""Terminate the process running the model."""
+        if self._terminated:
+            self.debug(':terminated() Driver already terminated.')
+            return
         self.debug(':terminate()')
         with self.lock:
             if self.process:

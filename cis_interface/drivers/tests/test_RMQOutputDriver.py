@@ -72,7 +72,7 @@ class TestRMQOutputDriver(TestRMQOutputParam,
         # self.instance.sleep()
         # assert(self.instance._closing)
         # T = self.instance.start_timeout()
-        # while self.instance._closing and (not T.is_out):
+        # while (not self.instance._terminated) and (not T.is_out):
         #     self.instance.sleep()
         # self.instance.stop_timeout()
         # assert(not self.instance._closing)

@@ -132,8 +132,10 @@ class RMQDriver(Driver):
 
     def terminate(self):
         r"""Terminate the driver by closing the RabbitMQ connection."""
+        if self._terminated:
+            self.debug(':terminated() Driver already terminated.')
+            return
         with self.lock:
-            print 'terminate', self._closing
             if self._closing:  # pragma: debug
                 return  # Don't close more than once
         self.debug("::terminate")
@@ -153,12 +155,10 @@ class RMQDriver(Driver):
         # if self.connection:
         #     self.connection.ioloop.start()
         super(RMQDriver, self).terminate()
-        print 'terminate finished'
         self.debug('::terminate returns')
 
     def on_model_exit(self):
         r"""Stop this driver if the model exits."""
-        print 'on_model_exit'
         self.debug('::on_model_exit()')
         self.stop()
         super(RMQDriver, self).on_model_exit()
@@ -259,7 +259,6 @@ class RMQDriver(Driver):
         r"""Actions that must be taken when the connection is closed. Set the
         channel to None. If the connection is meant to be closing, stop the
         IO loop. Otherwise, wait 5 seconds and try to reconnect."""
-        print 'on_connection_closed'
         with self.lock:
             self.debug('::on_connection_closed code %d %s', reply_code,
                        reply_text)
@@ -301,7 +300,6 @@ class RMQDriver(Driver):
     def on_channel_closed(self, channel, reply_code, reply_text):
         r"""Actions to perform when the channel is closed. Close the
         connection."""
-        print 'on_channel_closed'
         with self.lock:
             self.debug('::channel %i was closed: (%s) %s',
                        channel, reply_code, reply_text)
@@ -364,7 +362,6 @@ class RMQDriver(Driver):
     # GENERAL
     def remove_queue(self):
         r"""Unbind the queue from the exchange and delete the queue."""
-        print 'remove_queue'
         self.debug('::stop_communication: unbinding queue')
         if self.channel:
             # self.display('Unbinding queue')
@@ -379,7 +376,6 @@ class RMQDriver(Driver):
     def stop_communication(self, remove_queue=True, cancel_consumer=False,
                            **kwargs):
         r"""Stop sending/receiving messages."""
-        print 'stop_communication'
         self.debug('::stop_communication')
         with self.lock:
             self._closing = True
@@ -409,7 +405,6 @@ class RMQDriver(Driver):
     def on_consumer_cancelled(self, unused_frame):
         r"""Actions to perform after consumption is cancelled. Closes the
         channel."""
-        print 'on_consumer_cancelled'
         self.debug('::on_consumer_cancelled()')
         with self.lock:
             if self.channel_open:
@@ -419,7 +414,6 @@ class RMQDriver(Driver):
     def on_cancelok(self, unused_frame):
         r"""Actions to perform after succesfully cancelling consumption. Closes
         the channel."""
-        print 'on_cancelok'
         self.debug('::on_cancelok()')
         with self.lock:
             if self.channel_open:

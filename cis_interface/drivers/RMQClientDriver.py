@@ -176,6 +176,5 @@ class RMQClientDriver(RMQDriver, RPCDriver):
         with self.lock:
             if self.channel_stable:
                 self.debug("::Cancelling consumption.")
-                print 'publish end client'
                 self.publish_to_server(_end_client_msg)
         super(RMQClientDriver, self).stop_communication(cancel_consumer=True)

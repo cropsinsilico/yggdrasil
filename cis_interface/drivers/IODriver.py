@@ -102,6 +102,9 @@ class IODriver(Driver):
         
     def terminate(self):
         r"""Stop the IODriver, removing the queue."""
+        if self._terminated:
+            self.debug(':terminated() Driver already terminated.')
+            return
         self.debug(':terminate()')
         self.close_queue()
         super(IODriver, self).terminate()

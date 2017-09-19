@@ -36,6 +36,7 @@ class Driver(Thread):
         namespace (str): Namespace for set of drivers running together.
         rank (int): Rank of the integration.
         workingDir (str): Working directory.
+        errors (list): List of errors.
 
     """
     # =========================================================================
@@ -77,6 +78,7 @@ class Driver(Thread):
         self._term_meth = "terminate"
         self._terminated = False
         self.lock = RLock()
+        self.errors = []
 
     # def __del__(self):
     #     # self.debug('~')
@@ -329,6 +331,7 @@ class Driver(Thread):
         if not isinstance(fmt_str, str):
             fmt_str = str(fmt_str)
         error(self.logger_prefix + fmt_str, *args)
+        self.errors.append((self.logger_prefix + fmt_str) % args)
 
     def exception(self, fmt_str='', *args):
         r"""Log an exception message that is prepended with the driver class
@@ -342,3 +345,9 @@ class Driver(Thread):
         if not isinstance(fmt_str, str):
             fmt_str = str(fmt_str)
         exception(self.logger_prefix + fmt_str, *args)
+        self.errors.append((self.logger_prefix + fmt_str) % args)
+
+    def raise_error(self, error_class, msg):
+        r"""Raise an exception, logging it first."""
+        self.errors.append(msg)
+        raise error_class(msg)

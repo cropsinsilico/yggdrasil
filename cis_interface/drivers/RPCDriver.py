@@ -74,6 +74,9 @@ class RPCDriver(Driver):
 
     def terminate(self):
         r"""Terminate input/output queue drivers."""
+        if self._terminated:
+            self.debug(':terminated() Driver already terminated.')
+            return
         self.debug('.terminate()')
         self.iipc.terminate()
         self.oipc.terminate()

@@ -55,6 +55,9 @@ class FileDriver(IODriver):
 
     def terminate(self):
         r"""Terminate the driver, closeing the file as necessary."""
+        if self._terminated:
+            self.debug(':terminated() Driver already terminated.')
+            return
         self.debug(':terminate()')
         self.close_file()
         super(FileDriver, self).terminate()
