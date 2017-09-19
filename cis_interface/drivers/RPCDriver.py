@@ -29,6 +29,28 @@ class RPCDriver(Driver):
         out.update(self.oipc.env)
         self.env = out
 
+    @property
+    def queues_open(self):
+        r"""bool: True if both input and output queues open."""
+        with self.lock:
+            return (self.iipc.queue_open and self.oipc.queue_open)
+
+    @property
+    def is_valid(self):
+        r"""bool: True if both queues are open and parent class is valid."""
+        with self.lock:
+            return (super(IODriver, self).is_valid and self.queues_open)
+        
+    @property
+    def n_msg_in(self):
+        r"""int: The number of messages in the input queue."""
+        return self.iipc.n_ipc_msg
+
+    @property
+    def n_msg_out(self):
+        r"""int: The number of messages in the output queue."""
+        return self.oipc.n_ipc_msg
+
     def run(self):
         r"""Run the input/output queue drivers."""
         super(RPCDriver, self).run()
@@ -43,7 +65,12 @@ class RPCDriver(Driver):
         self.iipc.graceful_stop()
         self.oipc.graceful_stop()
         super(RPCDriver, self).graceful_stop()
-        self.debug('.graceful_stop() done')
+
+    def close_queues(self):
+        r"""Close the IPC queues."""
+        self.debug('.close_queues()')
+        self.iipc.close_queue()
+        self.oipc.close_queue()
 
     def terminate(self):
         r"""Terminate input/output queue drivers."""
@@ -51,67 +78,33 @@ class RPCDriver(Driver):
         self.iipc.terminate()
         self.oipc.terminate()
         super(RPCDriver, self).terminate()
-        self.debug('.terminate() done')
 
     def on_exit(self):
+        r"""Actions to perform when the driver is finished."""
         self.debug('.on_exit()')
         self.iipc.on_exit()
         self.oipc.on_exit()
         super(RPCDriver, self).on_exit()
-        self.debug('.on_exit() done')
 
+    def on_model_exit(self):
+        r"""Actions to perform when the associated model driver is finished."""
+        self.debug('.on_model_exit()')
+        self.oipc.on_model_exit()
+        self.iipc.on_model_exit()
+        super(RPCDriver, self).on_model_exit()
+        
     def cleanup(self):
+        r"""Perform cleanup for IPC drivers."""
         self.debug('.cleanup()')
         self.iipc.cleanup()
         self.oipc.cleanup()
         super(RPCDriver, self).cleanup()
-        self.debug('.cleanup() done')
 
     def printStatus(self):
         r"""Print information on the status of the driver."""
         super(RPCDriver, self).printStatus()
         self.iipc.printStatus(beg_msg='RPC Input Driver:')
         self.oipc.printStatus(beg_msg='RPC Ouput Driver:')
-
-    def recv_wait(self, use_output=False, timeout=0.0):
-        r"""Receive a message smaller than maxMsgSize. This method will wait
-        until there is a message in the queue to return or the queue is closed.
-
-        Args:
-            use_output (bool, optional): If True, the message is received from
-                the output queue instead of the input one.
-            timeout (float, optional): Max time that should be waited. Defaults
-                to 0 and is infinite.
-
-        Returns:
-            str: The received message.
-
-        """
-        if use_output:
-            data = self.oipc.recv_wait(timeout=timeout)
-        else:
-            data = self.iipc.recv_wait(timeout=timeout)
-        return data
-
-    def recv_wait_nolimit(self, use_output=False, timeout=0.0):
-        r"""Receive a message larger than maxMsgSize. This method will wait
-        until there is a message in the queue to return or the queue is closed.
-
-        Args:
-            use_output (bool, optional): If True, the message is received from
-                the output queue instead of the input one.
-            timeout (float, optional): Max time that should be waited. Defaults
-                to 0 and is infinite.
-
-        Returns:
-            str: The received message.
-
-        """
-        if use_output:
-            data = self.oipc.recv_wait_nolimit(timeout=timeout)
-        else:
-            data = self.iipc.recv_wait_nolimit(timeout=timeout)
-        return data
 
     def ipc_send(self, data, use_input=False):
         r"""Send message smaller than maxMsgSize to the output queue.
@@ -175,17 +168,42 @@ class RPCDriver(Driver):
             data = self.iipc.ipc_recv_nolimit()
         return data
 
-    @property
-    def n_msg_in(self):
-        r"""int: The number of messages in the input queue."""
-        return self.iipc.n_ipc_msg
+    def recv_wait(self, use_output=False, timeout=0.0):
+        r"""Receive a message smaller than maxMsgSize. This method will wait
+        until there is a message in the queue to return or the queue is closed.
 
-    @property
-    def n_msg_out(self):
-        r"""int: The number of messages in the output queue."""
-        return self.oipc.n_ipc_msg
+        Args:
+            use_output (bool, optional): If True, the message is received from
+                the output queue instead of the input one.
+            timeout (float, optional): Max time that should be waited. Defaults
+                to 0 and is infinite.
 
-    def on_model_exit(self):
-        r"""Actions to perform when the associated model driver is finished."""
-        self.oipc.on_model_exit()
-        self.iipc.on_model_exit()
+        Returns:
+            str: The received message.
+
+        """
+        if use_output:
+            data = self.oipc.recv_wait(timeout=timeout)
+        else:
+            data = self.iipc.recv_wait(timeout=timeout)
+        return data
+
+    def recv_wait_nolimit(self, use_output=False, timeout=0.0):
+        r"""Receive a message larger than maxMsgSize. This method will wait
+        until there is a message in the queue to return or the queue is closed.
+
+        Args:
+            use_output (bool, optional): If True, the message is received from
+                the output queue instead of the input one.
+            timeout (float, optional): Max time that should be waited. Defaults
+                to 0 and is infinite.
+
+        Returns:
+            str: The received message.
+
+        """
+        if use_output:
+            data = self.oipc.recv_wait_nolimit(timeout=timeout)
+        else:
+            data = self.iipc.recv_wait_nolimit(timeout=timeout)
+        return data
