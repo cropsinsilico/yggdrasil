@@ -97,38 +97,19 @@ class RMQServerDriver(RMQDriver, RPCDriver):
                 return
             ch.basic_ack(delivery_tag=method.delivery_tag)
 
-    def stop_communication(self):
-        r"""Stop sending/receiving messages."""
-        self.debug('::stop_communication()')
-        with self.lock:
-            self._closing = True
-            if self.channel_open:
-                self.debug('::stop_communication: cancelling consumption')
-                self.channel.basic_cancel(callback=self.on_cancelok,
-                                          consumer_tag=self.consumer_tag)
-            else:
-                self._closing = False
-        T = self.start_timeout()
-        while self._closing and (not T.is_out):
-            self.debug('::stop_commmunication: waiting for connection to close')
-            self.sleep()
-        self.stop_timeout()
-
-    def on_consumer_cancelled(self, unused_frame):
-        r"""Actions to perform after consumption is cancelled. Closes the
-        channel."""
-        print 'on_consumer'
-        self.debug('::on_consumer_cancelled()')
-        with self.lock:
-            if self.channel_open:
-                self.channel.close()
-    
-    def on_cancelok(self, unused_frame):
-        r"""Actions to perform after succesfully cancelling consumption. Closes
-        the channel."""
-        print 'on_cancelok'
-        self.debug('::on_cancelok()')
-        with self.lock:
-            if self.channel_open:
-                self.remove_queue()
-                self.channel.close()
+    # def stop_communication(self):
+    #     r"""Stop sending/receiving messages."""
+    #     self.debug('::stop_communication()')
+    #     with self.lock:
+    #         self._closing = True
+    #         if self.channel_open:
+    #             self.debug('::stop_communication: cancelling consumption')
+    #             self.channel.basic_cancel(callback=self.on_cancelok,
+    #                                       consumer_tag=self.consumer_tag)
+    #         else:
+    #             self._closing = False
+    #     T = self.start_timeout()
+    #     while self._closing and (not T.is_out):
+    #         self.debug('::stop_commmunication: waiting for connection to close')
+    #         self.sleep()
+    #     self.stop_timeout()

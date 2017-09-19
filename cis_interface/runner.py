@@ -429,8 +429,10 @@ class CisRunner(object):
         """
         debug("CisRunner::do_exits for driver %s", driver['name'])
         # Stop the driver and join the thread
+        print('driver %s exited' % driver['name'])
         driver['instance'].on_exit()
         driver['instance'].join()
+        print('driver %s joined' % driver['name'])
         debug("CisRunner: join finished: (%s)", pformat(driver))
 
     def do_model_exits(self, model):
@@ -441,9 +443,7 @@ class CisRunner(object):
                 associated IO drivers.
 
         """
-        print('model %s exited' % model['name'])
         self.do_exits(model)
-        print('model %s joined' % model['name'])
         # Stop associated server if not more clients
         for srv_name in model.get('client_of', []):
             # Stop client IO driver
