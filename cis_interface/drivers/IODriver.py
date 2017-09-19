@@ -40,17 +40,17 @@ class IODriver(Driver):
         self.debug(".env: %s", self.env)
 
     @property
-    def queue_open(self):
-        r"""bool: Returns True if the queue is open."""
-        with self.lock:
-            return (self.mq is not None)
-
-    @property
     def is_valid(self):
         r"""bool: Returns True if the queue is open and the parent class is
         valid."""
         with self.lock:
             return (super(IODriver, self).is_valid and self.queue_open)
+
+    @property
+    def queue_open(self):
+        r"""bool: Returns True if the queue is open."""
+        with self.lock:
+            return (self.mq is not None)
 
     @property
     def n_ipc_msg(self):

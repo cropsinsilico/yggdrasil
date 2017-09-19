@@ -32,9 +32,8 @@ class RMQOutputDriver(RMQDriver, IODriver):
     def publish_message(self):
         r"""Continue receiving messages from the local queue and passing them
         to the RabbitMQ server until the queue is closed."""
-        with self.lock:
-            if not self.is_stable:  # pragma: debug
-                return
+        if not self.channel_stable:  # pragma: debug
+            return
         while True:
             self.debug("::publish_message(): IPC recv")
             data = self.ipc_recv()
@@ -45,7 +44,7 @@ class RMQOutputDriver(RMQDriver, IODriver):
             elif len(data) == 0:
                 self.debug("::publish_message(): no data, reschedule")
                 with self.lock:
-                    if not self.is_stable:  # pragma: debug
+                    if not self.channel_stable:  # pragma: debug
                         return
                     self.connection.add_timeout(self.sleeptime,
                                                 self.publish_message)
@@ -53,7 +52,7 @@ class RMQOutputDriver(RMQDriver, IODriver):
             self.debug("::publish_message(): IPC recv got %d bytes", len(data))
             self.debug("::publish_message(): send %d bytes to AMQP", len(data))
             with self.lock:
-                if not self.is_stable:  # pragma: debug
+                if not self.channel_stable:  # pragma: debug
                     return
                 self.channel.basic_publish(
                     exchange=self.exchange, routing_key=self.queue,

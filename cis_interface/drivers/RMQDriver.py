@@ -79,6 +79,31 @@ class RMQDriver(Driver):
         self.setDaemon(True)
         self._q_obj = None
 
+    @property
+    def is_valid(self):
+        r"""bool: True if the channel is stable and the parent class is
+        valid."""
+        with self.lock:
+            return (super(RMQDriver, self).is_valid and self.channel_stable)
+
+    @property
+    def channel_open(self):
+        r"""bool: True if connection ready for messages, False otherwise."""
+        with self.lock:
+            if self.channel is None or self.connection is None:
+                return False
+            if self.channel.is_open:
+                if not self.channel.is_closing:
+                    return True
+            return False
+
+    @property
+    def channel_stable(self):
+        r"""bool: True if the connection ready for messages and not about to
+        close. False otherwise."""
+        with self.lock:
+            return (self.channel_open and not self._closing)
+
     # DRIVER FUNCTIONALITY
     def start(self):
         r"""Start the driver. Waiting for connection."""
@@ -87,9 +112,8 @@ class RMQDriver(Driver):
         T = self.start_timeout()
         interval = 1  # timeout / 5
         while not T.is_out:
-            with self.lock:
-                if self.is_open:
-                    break
+            if self.channel_open:
+                break
             # import time; time.sleep(self.sleeptime)
             self.sleep(interval)
         with self.lock:
@@ -139,6 +163,16 @@ class RMQDriver(Driver):
         self.stop()
         super(RMQDriver, self).on_model_exit()
 
+    def printStatus(self):
+        r"""Print the driver status."""
+        self.debug('::printStatus')
+        super(RMQDriver, self).printStatus()
+        qdata = self.get_message_stats()
+        if qdata:
+            qdata = pformat(qdata)
+        self.display(": server info:\n%s", qdata)
+
+    # RMQ PROPERTIES
     def get_message_stats(self):
         r"""Return message stats from the server."""
         hoststr = self.host
@@ -154,16 +188,6 @@ class RMQDriver(Driver):
             qdata = ''
         return qdata
         
-    def printStatus(self):
-        r"""Print the driver status."""
-        self.debug('::printStatus')
-        super(RMQDriver, self).printStatus()
-        qdata = self.get_message_stats()
-        if qdata:
-            qdata = pformat(qdata)
-        self.display(": server info:\n%s", qdata)
-
-    # RMQ PROPERTIES
     def on_nmsg_request(self, method_frame):
         r"""Actions to perform once the queue is declared for message count."""
         with self.lock:
@@ -210,24 +234,6 @@ class RMQDriver(Driver):
         if self.host is not None:
             kws['host'] = self.host
         return pika.ConnectionParameters(**kws)
-
-    @property
-    def is_open(self):
-        r"""bool: True if connection ready for messages, False otherwise."""
-        if self.channel is None or self.connection is None:
-            return False
-        if self.channel.is_open:
-            if not self.channel.is_closing:
-                return True
-        return False
-
-    @property
-    def is_stable(self):
-        r"""bool: True if the connection ready for messages and not about to
-        close. False otherwise."""
-        if self.is_open and not self._closing:
-            return True
-        return False
 
     # CONNECTION
     def connect(self):
@@ -351,7 +357,7 @@ class RMQDriver(Driver):
     def purge_queue(self):
         r"""Remove all messages from the associated queue."""
         with self.lock:
-            if not self.is_stable:  # pragma: debug
+            if not self.channel_stable:  # pragma: debug
                 return
             if self.channel:
                 self.channel.queue_purge(queue=self.queue)
@@ -375,7 +381,7 @@ class RMQDriver(Driver):
         self.debug('::stop_communication')
         with self.lock:
             self._closing = True
-            if self.is_open:
+            if self.channel_open:
                 if remove_queue:
                     self.remove_queue()
                 self.debug('::stop_communication: closing channel')
@@ -403,7 +409,7 @@ class RMQDriver(Driver):
         """
         backwards.assert_bytes(data)
         with self.lock:
-            if not self.is_stable:  # pragma: debug
+            if not self.channel_stable:  # pragma: debug
                 return False
             self.debug("::send %d", len(data))
             assert(len(data) <= maxMsgSize)

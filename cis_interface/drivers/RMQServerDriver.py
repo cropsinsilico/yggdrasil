@@ -54,9 +54,8 @@ class RMQServerDriver(RMQDriver, RPCDriver):
 
     def on_message(self, ch, method, props, body):
         r"""Actions to perform when a message is received."""
-        with self.lock:
-            if not self.is_stable:  # pragma: debug
-                return
+        if not self.channel_stable:  # pragma: debug
+            return
         if body == _new_client_msg:
             self.debug('::New client (%s)' % props.reply_to)
             self.clients.add(props.reply_to)
@@ -75,7 +74,7 @@ class RMQServerDriver(RMQDriver, RPCDriver):
         elif props.reply_to is None:
             self.debug('::Message received without reply queue.')
             with self.lock:
-                if not self.is_stable:  # pragma: debug
+                if not self.channel_stable:  # pragma: debug
                     return
                 self.channel.basic_nack(delivery_tag=method.delivery_tag,
                                         requeue=True)
@@ -85,7 +84,7 @@ class RMQServerDriver(RMQDriver, RPCDriver):
             self.iipc.ipc_send_nolimit(body)
             response = self.oipc.recv_wait_nolimit()
             with self.lock:
-                if not self.is_stable:  # pragma: debug
+                if not self.channel_stable:  # pragma: debug
                     return
                 ch.basic_publish(exchange=self.exchange,
                                  routing_key=props.reply_to,
@@ -93,7 +92,7 @@ class RMQServerDriver(RMQDriver, RPCDriver):
                                      correlation_id=props.correlation_id),
                                  body=response)
         with self.lock:
-            if not self.is_stable:  # pragma: debug
+            if not self.channel_stable:  # pragma: debug
                 return
             ch.basic_ack(delivery_tag=method.delivery_tag)
 

@@ -29,7 +29,7 @@ class RMQInputDriver(RMQDriver, IODriver):
         consumption."""
         self.debug('::start_communication')
         # one at a time, don't stuff the Qs
-        if self.is_stable:
+        if self.channel_stable:
             self.channel.basic_qos(prefetch_count=1)
             self._consumer_tag = self.channel.basic_consume(
                 self.on_message, queue=self.queue)
@@ -39,11 +39,10 @@ class RMQInputDriver(RMQDriver, IODriver):
         local queue and acknowledge the message."""
         self.debug('::on_message: received message # %s from %s',
                    method.delivery_tag, props.app_id)
-        with self.lock:
-            if not self.is_stable:  # pragma: debug
-                return
+        if not self.channel_stable:  # pragma: debug
+            return
         self.ipc_send(body)
         with self.lock:
-            if not self.is_stable:  # pragma: debug
+            if not self.channel_stable:  # pragma: debug
                 return
             ch.basic_ack(delivery_tag=method.delivery_tag)

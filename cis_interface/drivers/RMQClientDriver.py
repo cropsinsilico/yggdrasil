@@ -105,9 +105,8 @@ class RMQClientDriver(RMQDriver, RPCDriver):
 
     def schedule_next_message(self):
         r"""Wait for next message."""
-        with self.lock:
-            if not self.is_stable:  # pragma: debug
-                return
+        if not self.channel_stable:  # pragma: debug
+            return
         self.debug('Checking IPC queue.')
         message = self.oipc.ipc_recv_nolimit()
         if message is None:  # pragma: debug
@@ -117,7 +116,7 @@ class RMQClientDriver(RMQDriver, RPCDriver):
             self.debug('::Checking in IPC queue again in %0.1f seconds',
                        self.sleeptime)
             with self.lock:
-                if not self.is_stable:  # pragma: debug
+                if not self.channel_stable:  # pragma: debug
                     return
                 self.connection.add_timeout(self.sleeptime,
                                             self.schedule_next_message)
@@ -128,14 +127,13 @@ class RMQClientDriver(RMQDriver, RPCDriver):
 
     def schedule_next_response(self):
         r"""Wait for next response."""
-        with self.lock:
-            if not self.is_stable:  # pragma: debug
-                return
+        if not self.channel_stable:  # pragma: debug
+            return
         if self.response is None:
             self.debug('::Checking RMQ response queue again in %0.1f seconds',
                        self.sleeptime)
             with self.lock:
-                if not self.is_stable:  # pragma: debug
+                if not self.channel_stable:  # pragma: debug
                     return
                 self.connection.add_timeout(self.sleeptime,
                                             self.schedule_next_response)
@@ -147,7 +145,7 @@ class RMQClientDriver(RMQDriver, RPCDriver):
     def publish_to_server(self, message, properties=None):
         r"""Publish a message to the server queue."""
         with self.lock:
-            if not self.is_stable:  # pragma: debug
+            if not self.channel_stable:  # pragma: debug
                 return
             self.debug(".publish_message(): sending %d bytes to AMQP", len(message))
             self.response = None
