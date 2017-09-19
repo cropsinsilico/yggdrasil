@@ -49,12 +49,13 @@ class RMQServerDriver(RMQDriver, RPCDriver):
         r"""Start consuming messages from the queue."""
         self.debug('::start_consuming')
         self.channel.basic_qos(prefetch_count=1)
+        self.channel.add_on_cancel_callback(self.on_consumer_cancelled)
         self.consumer_tag = self.channel.basic_consume(self.on_message,
                                                        queue=self.queue)
 
     def on_message(self, ch, method, props, body):
         r"""Actions to perform when a message is received."""
-        if not self.channel_stable:  # pragma: debug
+        if not self.is_valid:  # pragma: debug
             return
         if body == _new_client_msg:
             self.debug('::New client (%s)' % props.reply_to)
@@ -96,17 +97,38 @@ class RMQServerDriver(RMQDriver, RPCDriver):
                 return
             ch.basic_ack(delivery_tag=method.delivery_tag)
 
-    # def stop_communication(self):
-    #     r"""Stop consuming messages from the queue."""
-    #     with self.lock:
-    #         self._closing = True
-    #     if self.channel:
-    #         self.debug("::Cancelling consumption.")
-    #         self.channel.basic_cancel(callback=self.on_cancelok,
-    #                                   consumer_tag=self.consumer_tag)
-            
-    # def on_cancelok(self, unused_frame):
-    #     r"""Actions to perform after succesfully cancelling consumption."""
-    #     with self.lock:
-    #         if self.channel:
-    #             self.channel.close()
+    def stop_communication(self):
+        r"""Stop sending/receiving messages."""
+        self.debug('::stop_communication()')
+        with self.lock:
+            self._closing = True
+            if self.channel_open:
+                self.debug('::stop_communication: cancelling consumption')
+                self.channel.basic_cancel(callback=self.on_cancelok,
+                                          consumer_tag=self.consumer_tag)
+            else:
+                self._closing = False
+        T = self.start_timeout()
+        while self._closing and (not T.is_out):
+            self.debug('::stop_commmunication: waiting for connection to close')
+            self.sleep()
+        self.stop_timeout()
+
+    def on_consumer_cancelled(self, unused_frame):
+        r"""Actions to perform after consumption is cancelled. Closes the
+        channel."""
+        print 'on_consumer'
+        self.debug('::on_consumer_cancelled()')
+        with self.lock:
+            if self.channel_open:
+                self.channel.close()
+    
+    def on_cancelok(self, unused_frame):
+        r"""Actions to perform after succesfully cancelling consumption. Closes
+        the channel."""
+        print 'on_cancelok'
+        self.debug('::on_cancelok()')
+        with self.lock:
+            if self.channel_open:
+                self.remove_queue()
+                self.channel.close()

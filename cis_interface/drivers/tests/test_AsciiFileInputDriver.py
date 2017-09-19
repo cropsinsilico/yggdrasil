@@ -44,17 +44,14 @@ class TestAsciiFileInputDriver(TestAsciiFileInputParam,
         while self.instance.n_ipc_msg == 0 and not T.is_out:
             self.instance.sleep()
         self.instance.stop_timeout()
-        iline = 0
-        while True:
-            data = self.instance.ipc_recv()
-            if (data is None) or (data == self.instance.eof_msg):
-                break
-            if len(data) > 0:
-                while self.file_lines[iline].startswith(self.comment):
-                    iline += 1  # pragma: no cover
-                nt.assert_equal(data, self.file_lines[iline])
-                iline += 1
-        nt.assert_equal(len(self.file_lines), iline)
+        # Check file lines
+        for iline, ans in enumerate(self.file_lines):
+            if not ans.startswith(self.comment):
+                data = self.instance.recv_wait()
+                nt.assert_equal(data, ans)
+        # End of file
+        data = self.instance.recv_wait()
+        nt.assert_equal(data, self.instance.eof_msg)
         
     def assert_after_terminate(self):
         r"""Assertions to make after stopping the driver instance."""

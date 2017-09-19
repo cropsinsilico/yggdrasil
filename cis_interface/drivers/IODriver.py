@@ -75,12 +75,10 @@ class IODriver(Driver):
         self.debug('.graceful_stop()')
         T = self.start_timeout(timeout)
         try:
-            while True:
-                n_msg = self.n_ipc_msg
-                if (n_msg == 0) or T.is_out:
-                    break
+            while (self.n_ipc_msg > 0) and (not T.is_out):
                 if DEBUG_SLEEPS:
-                    self.debug('.graceful_stop(): draining %d messages', n_msg)
+                    self.debug('.graceful_stop(): draining %d messages',
+                               self.n_ipc_msg)
                 self.sleep()
         except:  # pragma: debug
             self.debug("::graceful_stop: exception")
@@ -289,7 +287,7 @@ class IODriver(Driver):
         """
         ret = ''
         T = self.start_timeout(timeout)
-        while True and (not T.is_out):
+        while (not T.is_out):
             ret = self.ipc_recv()
             if ret is None or len(ret) > 0:
                 break
@@ -314,7 +312,7 @@ class IODriver(Driver):
         """
         ret = ''
         T = self.start_timeout(timeout)
-        while True and (not T.is_out):
+        while (not T.is_out):
             ret = self.ipc_recv_nolimit()
             if ret is None or len(ret) > 0:
                 break

@@ -133,20 +133,18 @@ class RMQDriver(Driver):
     def terminate(self):
         r"""Terminate the driver by closing the RabbitMQ connection."""
         with self.lock:
+            print 'terminate', self._closing
             if self._closing:  # pragma: debug
                 return  # Don't close more than once
         self.debug("::terminate")
         T = self.start_timeout()
-        while True:
-            if not self._opening or T.is_out:
-                break
-            else:  # pragma: debug
-                self.debug('Waiting for connection to open before terminating')
-                # if self.connection is None:
-                #     self.connection.add_timeout(self.terminate(), self.sleeptime)
-                #     return
-                # while self.connection is None:
-                self.sleep()
+        while self._opening and (not T.is_out):  # pragma: debug
+            self.debug('Waiting for connection to open before terminating')
+            # if self.connection is None:
+            #     self.connection.add_timeout(self.terminate(), self.sleeptime)
+            #     return
+            # while self.connection is None:
+            self.sleep()
         self.stop_timeout()
         self.debug('::terminate: Closing connection')
         self.stop_communication()
@@ -159,6 +157,7 @@ class RMQDriver(Driver):
 
     def on_model_exit(self):
         r"""Stop this driver if the model exits."""
+        print 'on_model_exit'
         self.debug('::on_model_exit()')
         self.stop()
         super(RMQDriver, self).on_model_exit()
@@ -207,10 +206,7 @@ class RMQDriver(Driver):
                                        auto_delete=True,
                                        passive=True)
         # Wait for queue to be declared passively
-        while True:
-            with self.lock:
-                if self._n_msg is not None or T.is_out:
-                    break
+        while (self._n_msg is None) and (not T.is_out):
             self.sleep()
         # Return result
         self.stop_timeout()
@@ -262,6 +258,7 @@ class RMQDriver(Driver):
         r"""Actions that must be taken when the connection is closed. Set the
         channel to None. If the connection is meant to be closing, stop the
         IO loop. Otherwise, wait 5 seconds and try to reconnect."""
+        print 'on_connection_closed'
         with self.lock:
             self.debug('::on_connection_closed code %d %s', reply_code,
                        reply_text)
@@ -303,6 +300,7 @@ class RMQDriver(Driver):
     def on_channel_closed(self, channel, reply_code, reply_text):
         r"""Actions to perform when the channel is closed. Close the
         connection."""
+        print 'on_channel_closed'
         with self.lock:
             self.debug('::channel %i was closed: (%s) %s',
                        channel, reply_code, reply_text)
@@ -365,6 +363,7 @@ class RMQDriver(Driver):
     # GENERAL
     def remove_queue(self):
         r"""Unbind the queue from the exchange and delete the queue."""
+        print 'remove_queue'
         self.debug('::stop_communication: unbinding queue')
         if self.channel:
             # self.display('Unbinding queue')
@@ -378,6 +377,7 @@ class RMQDriver(Driver):
 
     def stop_communication(self, remove_queue=True, **kwargs):
         r"""Stop sending/receiving messages."""
+        print 'stop_communication'
         self.debug('::stop_communication')
         with self.lock:
             self._closing = True
@@ -389,9 +389,7 @@ class RMQDriver(Driver):
             else:
                 self._closing = False
         T = self.start_timeout()
-        while True:
-            if not self._closing or T.is_out:
-                break
+        while self._closing and (not T.is_out):
             self.debug('::stop_commmunication: waiting for connection to close')
             self.sleep()
         self.stop_timeout()

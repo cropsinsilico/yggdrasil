@@ -39,7 +39,7 @@ class RPCDriver(Driver):
     def is_valid(self):
         r"""bool: True if both queues are open and parent class is valid."""
         with self.lock:
-            return (super(IODriver, self).is_valid and self.queues_open)
+            return (super(RPCDriver, self).is_valid and self.queues_open)
         
     @property
     def n_msg_in(self):

@@ -135,11 +135,19 @@ class Driver(Thread):
         running."""
         self.debug(':cleanup()')
 
-    def wait(self):
-        r"""Wait until model finish to return."""
-        while self.isAlive():
-            self.debug('Waiting for model to finish...')
+    def wait(self, timeout=0.0):
+        r"""Wait until model finish to return.
+
+        Args:
+            timeout (float, optional): Maximum time that should be waited for
+                the driver to finish. Defaults to 0 and is infinite.
+
+        """
+        T = self.start_timeout(timeout)
+        while self.is_alive() and not T.is_out:
+            self.debug('Waiting for driver to finish...')
             self.sleep()
+        self.stop_timeout()
 
     def printStatus(self):
         r"""Print the driver status."""

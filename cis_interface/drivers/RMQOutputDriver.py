@@ -34,7 +34,7 @@ class RMQOutputDriver(RMQDriver, IODriver):
         to the RabbitMQ server until the queue is closed."""
         if not self.channel_stable:  # pragma: debug
             return
-        while True:
+        while self.is_valid:
             self.debug("::publish_message(): IPC recv")
             data = self.ipc_recv()
             if data is None:

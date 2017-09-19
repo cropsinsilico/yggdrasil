@@ -172,7 +172,9 @@ class RMQClientDriver(RMQDriver, RPCDriver):
 
     def stop_communication(self):
         r"""Stop consuming messages from the queue."""
-        if self.channel:
-            self.debug("::Cancelling consumption.")
-            self.publish_to_server(_end_client_msg)
+        with self.lock:
+            if self.channel_stable:
+                self.debug("::Cancelling consumption.")
+                print 'publish end client'
+                self.publish_to_server(_end_client_msg)
         super(RMQClientDriver, self).stop_communication()

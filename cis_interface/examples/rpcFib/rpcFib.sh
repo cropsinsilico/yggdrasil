@@ -36,7 +36,7 @@ case $1 in
 	yaml3='rpcFibCliPar_c.yml'
 	;;
     --cpp | --g++ )
-	echo "Running C"
+	echo "Running C++"
 	yaml1='rpcFibSrv_cpp.yml'
 	yaml2='rpcFibCli_cpp.yml'
 	yaml3='rpcFibCliPar_cpp.yml'

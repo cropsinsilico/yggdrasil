@@ -414,13 +414,26 @@ class CisRunner(object):
                 d = drv['instance']
                 d.join(1)
                 if not d.is_alive():
-                    self.do_exits(drv)
+                    self.do_model_exits(drv)
                     running.remove(drv)
         # self.closeChannels()
         info('All models completed')
         debug('RunModels.run() returns')
 
-    def do_exits(self, model):
+    def do_exits(self, driver):
+        r"""Perform basic exits for a driver.
+
+        Args:
+            model (dict): Dictionary of driver parameters.
+
+        """
+        debug("CisRunner::do_exits for driver %s", driver['name'])
+        # Stop the driver and join the thread
+        driver['instance'].on_exit()
+        driver['instance'].join()
+        debug("CisRunner: join finished: (%s)", pformat(driver))
+
+    def do_model_exits(self, model):
         r"""Perform exists for IO drivers associated with a model.
 
         Args:
@@ -428,25 +441,28 @@ class CisRunner(object):
                 associated IO drivers.
 
         """
-        debug("CisRunner::do_exits for model %s", model['name'])
-        # Stop the model and join the thread
-        model['instance'].on_exit()
-        model['instance'].join()
-        debug("CisRunner: join finished: (%s)", pformat(model))
+        self.do_exits(model)
         # Stop associated server if not more clients
-        if 'client_of' in model:
-            for srv_name in model['client_of']:
-                srv = self.modeldrivers[srv_name]
-                srv['clients'].remove(model['name'])
-                if len(srv['clients']) == 0:
-                    iod = self.inputdrivers[srv_name]
-                    iod['instance'].stop()
-                    self.do_exits(iod)
-                    srv['instance'].stop()
-                    self.do_exits(srv)
+        for srv_name in model.get('client_of', []):
+            # Stop client IO driver
+            iod = self.outputdrivers["%s_%s" % (srv_name, model['name'])]
+            iod['instance'].stop()
+            self.do_exits(iod)
+            # Remove this client from list for server
+            srv = self.modeldrivers[srv_name]
+            srv['clients'].remove(model['name'])
+            # Stop server if there are not any more clients
+            if len(srv['clients']) == 0:
+                iod = self.inputdrivers[srv_name]
+                iod['instance'].stop()
+                self.do_exits(iod)
+                srv['instance'].stop()
+                self.do_model_exits(srv)
         # Stop associated IO drivers
         for drv in self.io_drivers(model['name']):
-            debug('CisRunner::do_exits(): delete %s', drv['name'])
+            if not drv['instance'].is_alive():
+                continue
+            debug('CisRunner::do_model_exits(): on_model_exit %s', drv['name'])
             if 'onexit' in drv:
                 debug('CisRunner::onexit: %s', drv['onexit'])
                 if drv['onexit'] != 'pass':
