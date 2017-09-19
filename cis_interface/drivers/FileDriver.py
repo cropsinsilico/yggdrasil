@@ -32,11 +32,24 @@ class FileDriver(IODriver):
         r"""str: Message indicating end of file."""
         return PSI_MSG_EOF
 
+    @property
+    def is_open(self):
+        r"""bool: True if file is open, false otherwise."""
+        with self.lock:
+            out = (self.fd is not None)
+        return out
+
+    @property
+    def is_valid(self):
+        r"""bool: True if the file is open and parent is valid."""
+        out = super(FileDriver, self).is_valid
+        return (out and (self.is_open))
+
     def close_file(self):
         r"""Close the file."""
         self.debug(':close_file()')
         with self.lock:
-            if self.fd:
+            if self.is_open:
                 self.fd.close()
             self.fd = None
 
@@ -44,5 +57,15 @@ class FileDriver(IODriver):
         r"""Terminate the driver, closeing the file as necessary."""
         self.debug(':terminate()')
         self.close_file()
-        print 'closed_file'
         super(FileDriver, self).terminate()
+
+    def graceful_stop(self):
+        r"""Gracefully stop the driver by closing the queues then waiting for
+        files to close."""
+        self.debug(':graceful_stop()')
+        super(FileDriver, self).graceful_stop()
+        self.close_queue()
+        T = self.start_timeout()
+        while (self.is_open and not T.is_out):
+            self.sleep()
+        self.stop_timeout()

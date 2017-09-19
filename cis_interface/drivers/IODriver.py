@@ -39,6 +39,18 @@ class IODriver(Driver):
         self.env[name + suffix] = str(self.mq.key)
         self.debug(".env: %s", self.env)
 
+    @property
+    def queue_open(self):
+        r"""bool: Returns True if the queue is open."""
+        return (self.mq is not None)
+
+    @property
+    def is_valid(self):
+        r"""bool: Returns True if the queue is open and the parent class is
+        valid."""
+        out = super(IODriver, self).is_valid
+        return (out and self.queue_open)
+
     def printStatus(self, beg_msg='', end_msg=''):
         r"""Print information on the status of the IODriver.
 
@@ -53,7 +65,7 @@ class IODriver(Driver):
         msg += '%-15s' % (str(self.numSent) + ' delivered, ')
         msg += '%-15s' % (str(self.numReceived) + ' accepted, ')
         with self.lock:
-            if self.mq:
+            if self.queue_open:
                 msg += '%-15s' % (str(self.mq.current_messages) + ' ready')
         msg += end_msg
 
@@ -122,7 +134,7 @@ class IODriver(Driver):
             self.state = 'deliver'
             self.debug('::ipc_send %d bytes', len(data))
             try:
-                if self.mq is None:
+                if not self.queue_open:
                     self.debug('.ipc_send(): mq closed')
                     return False
                 else:
@@ -147,7 +159,7 @@ class IODriver(Driver):
             self.debug('.ipc_recv(): reading IPC msg')
             ret = None
             try:
-                if self.mq is None:
+                if not self.queue_open:
                     self.debug('.ipc_recv(): mq closed')
                 elif self.mq.current_messages > 0:
                     data, _ = self.mq.receive()
@@ -247,7 +259,7 @@ class IODriver(Driver):
     def n_ipc_msg(self):
         r"""int: The number of messages in the queue."""
         with self.lock:
-            if self.mq:
+            if self.queue_open:
                 return self.mq.current_messages
             else:  # pragma: debug
                 return 0
@@ -285,7 +297,7 @@ class IODriver(Driver):
         self.debug(':close_queue()')
         with self.lock:
             try:
-                if self.mq:
+                if self.queue_open:
                     self.debug('.close_queue(): remove IPC id %d', self.mq.id)
                     self.mq.remove()
                     self.mq = None

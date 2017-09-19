@@ -1,4 +1,3 @@
-import os
 from cis_interface.drivers.AsciiFileInputDriver import AsciiFileInputDriver
 from cis_interface.dataio.AsciiTable import AsciiTable
 from cis_interface.tools import eval_kwarg
@@ -57,36 +56,34 @@ class AsciiTableInputDriver(AsciiFileInputDriver):
         self.file = AsciiTable(self.args, 'r', **self.file_kwargs)
         self.debug('(%s): done with init', args)
 
-    def run(self):
-        r"""Run the driver. The file is opened and then data is read from the
-        file and sent to the message queue until eof is encountered or the file
-        is closed.
+    def open_file(self):
+        r"""Open the file and send the format string."""
+        with self.lock:
+            self.ipc_send(self.file.format_str)
+            self.file.open()
+
+    def file_read(self):
+        r"""Read either the entire table or just a single row.
+
+        Returns:
+            str: Read data.
+
         """
-        self.debug(':run in %s', os.getcwd())
-        self.ipc_send(self.file.format_str)
         if self.as_array:
             with self.lock:
                 data = self.file.read_bytes(order='F')
-            self.debug(':run: read: %d bytes', len(data))
-            self.ipc_send_nolimit(data)
+                # Only read the table array once
+                self.close_file()
         else:
-            with self.lock:
-                self.file.open()
-            nread = 0
-            while self.file.is_open:
-                with self.lock:
-                    if self.file.is_open:
-                        eof, data = self.file.readline_full()
-                    else:  # pragma: debug
-                        break
-                if eof:
-                    self.debug(':run, End of file encountered')
-                    self.ipc_send_nolimit(self.eof_msg)
-                    break
-                elif (data is not None):
-                    self.debug(':run: read: %d bytes', len(data))
-                    self.ipc_send_nolimit(data)
-                    nread += 1
-            if nread == 0:  # pragma: debug
-                self.debug(':run, no input')
-        self.debug(':run returned')
+            data = super(AsciiTableInputDriver, self).file_read(dont_parse=True)
+        return data
+
+    def file_send(self, data):
+        r"""Send table data as a long message.
+
+        Args:
+            data (str): Message.
+
+        """
+        with self.lock:
+            return self.ipc_send_nolimit(data)

@@ -19,46 +19,30 @@ class MatInputDriver(FileInputDriver):
 
     """
 
-    def get(self):
+    def file_read(self):
         r"""Returned pickled data read from the .mat file.
         
         Returns:
-            data (str): Pickled .mat dictionary of read variables.
+            str: Pickled .mat dictionary of read variables.
 
         """
-        if self.fd.tell() == (os.fstat(self.fd.fileno()).st_size - 1):
-            self.debug(':get: eof')
-            return ''
-        self.debug(':get: reading .mat file')
-        data_dict = loadmat(self.fd, squeeze_me=False)
-        self.debug(':get: read %s from .mat file', str(data_dict.keys()))
+        with self.lock:
+            if self.fd.tell() == (os.fstat(self.fd.fileno()).st_size - 1):
+                self.debug(':file_read: eof')
+                return self.eof_msg
+            self.debug(':file_read: reading .mat file')
+            data_dict = loadmat(self.fd, squeeze_me=False)
+        self.debug(':file_read: read %s from .mat file', str(data_dict.keys()))
         data = pickle.dumps(data_dict)
-        self.debug(':get: pickled data (len = %d)', len(data))
+        self.debug(':file_read: pickled data (len = %d)', len(data))
         return data
 
-    def run(self):
-        r"""Run the driver. The .mat file is opened and contents are read
-        and then sent to the message queue until EOF is encountered or the file
-        is closed.
+    def file_send(self, data):
+        r"""Send pickled data as a large message.
+
+        Args:
+            data (str): Message.
+
         """
-        self.debug(':run in %s', os.getcwd())
-        try:
-            with self.lock:
-                self.fd = open(self.args, 'rb')
-        except:  # pragma: debug
-            self.exception('Could not open file.')
-            return
-        while self.fd is not None:
-            with self.lock:
-                if self.fd is None:  # pragma: debug
-                    self.debug(':run: file closed')
-                    return
-                else:
-                    data = self.get()
-            self.debug(':run: read: %d bytes', len(data))
-            if len(data) == 0:
-                self.debug(':run: end of file')
-                break
-            else:
-                self.ipc_send_nolimit(data)
-        self.debug(':run returned')
+        with self.lock:
+            self.ipc_send_nolimit(data)

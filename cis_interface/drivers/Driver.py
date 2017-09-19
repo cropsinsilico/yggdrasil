@@ -1,4 +1,4 @@
-from threading import Thread, Timer, Lock
+from threading import Thread, Timer, RLock
 from logging import info, debug, error, warn, exception, critical
 import os
 import time
@@ -76,7 +76,7 @@ class Driver(Thread):
         self.workingDir = workingDir
         self._term_meth = "terminate"
         self._terminated = False
-        self.lock = Lock()
+        self.lock = RLock()
 
     # def __del__(self):
     #     # self.debug('~')
@@ -89,6 +89,11 @@ class Driver(Thread):
     def run(self):
         r"""Run something in a seperate thread."""
         self.debug(':run()')
+
+    @property
+    def is_valid(self):
+        r"""bool: True if the driver is functional."""
+        return True
 
     def stop(self):
         r"""Stop the driver."""
@@ -103,10 +108,6 @@ class Driver(Thread):
     def graceful_stop(self):
         r"""Gracefully stop the driver."""
         self.debug(':graceful_stop()')
-        T = self.start_timeout()
-        while (self.is_alive() and not T.is_out):
-            self.sleep()
-        self.stop_timeout()
 
     def terminate(self):
         r"""Stop the driver, without attempting to allow it to finish."""
@@ -236,7 +237,7 @@ class Driver(Thread):
         t = self._timeouts[key]
         if t.is_out:
             self.error("Timeout for %s at %5.2f s" % (key, t.elapsed))
-        print("Stopped %s at %f/%f" % (key, t.elapsed, t.max_time))
+            print("Stopped %s at %f/%f" % (key, t.elapsed, t.max_time))
         del self._timeouts[key]
 
     def display(self, fmt_str='', *args):

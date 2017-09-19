@@ -1,4 +1,3 @@
-import os
 from cis_interface.drivers.FileInputDriver import FileInputDriver
 from cis_interface.dataio.AsciiFile import AsciiFile
 
@@ -40,35 +39,39 @@ class AsciiFileInputDriver(FileInputDriver):
             self.file = AsciiFile(self.args, 'r', **self.file_kwargs)
         self.debug('(%s): done with init', args)
 
+    @property
+    def is_open(self):
+        r"""bool: True if file is open, False otherwise."""
+        with self.lock:
+            return self.file.is_open
+
+    def open_file(self):
+        r"""Open the file."""
+        with self.lock:
+            self.file.open()
+
     def close_file(self):
         r"""Close the file."""
         self.debug(':close_file()')
         with self.lock:
             self.file.close()
-        
-    def run(self):
-        r"""Run the driver. The file is opened and then data is read from the
-        file and sent to the message queue until eof is encountered or the file
-        is closed.
+
+    def file_read(self, **kwargs):
+        r"""Read a full line from the file.
+
+        Args:
+            **kwargs: Keyword arguments are passed to AsciiTable.readline.
+
+        Returns:
+            str: Message.
+
         """
-        self.debug(':run in %s', os.getcwd())
         with self.lock:
-            self.file.open()
-        nread = 0
-        while self.file.is_open:
-            with self.lock:
-                if self.file.is_open:
-                    eof, data = self.file.readline_full()
-                else:  # pragma: debug
-                    break
+            eof, data = self.file.readline(**kwargs)
             if eof:
-                self.debug(':run, End of file encountered')
-                self.ipc_send(self.eof_msg)
-                break
-            if data is not None:
-                self.debug(':run: read: %d bytes', len(data))
-                self.ipc_send(data)
-                nread += 1
-        if nread == 0:  # pragma: debug
-            self.debug(':run, no input')
-        self.debug(':run returned')
+                data = self.eof_msg
+        return data
+
+    def on_eof(self):
+        r"""On end-of-file, send end of file message."""
+        self.file_send(self.eof_msg)

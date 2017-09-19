@@ -331,9 +331,13 @@ class AsciiTable(AsciiFile):
         line = self.comment + backwards.unicode2bytes(' ') + self.format_str
         self.writeline_full(line)
 
-    def readline(self):
+    def readline(self, dont_parse=False):
         r"""Continue reading lines until a valid line (uncommented) is
         encountered and return the arguments found there.
+
+        Args:
+            dont_parse (bool, optional): If True, the raw line is returned.
+                Defaults to False.
 
         Returns:
             tuple (bool, tuple): End of file flag and the arguments that
@@ -345,6 +349,8 @@ class AsciiTable(AsciiFile):
         eof, line = False, None
         while (not eof) and (line is None):
             eof, line = self.readline_full(validate=True)
+        if dont_parse:
+            return eof, line
         if (not line) or eof:
             args = None
         else:
@@ -540,15 +546,20 @@ class AsciiTable(AsciiFile):
             raise ValueError("The number of names does not match the number of columns")
         if hasattr(self, '_arr'):
             return self._arr
+        openned = False
+        fd = self.fd
+        if not self.is_open:
+            fd = open(self.filepath, 'rb')
         if self.use_astropy:
-            arr = apy_ascii.read(self.filepath, names=names).as_array()
+            arr = apy_ascii.read(fd, names=names).as_array()
         else:
-            with open(self.filepath, 'r') as fd:
-                arr = np.genfromtxt(fd,
-                                    comments=backwards.bytes2unicode(self.comment),
-                                    delimiter=backwards.bytes2unicode(self.column),
-                                    dtype=self.dtype,
-                                    autostrip=True, names=names)
+            arr = np.genfromtxt(fd,
+                                comments=backwards.bytes2unicode(self.comment),
+                                delimiter=backwards.bytes2unicode(self.column),
+                                dtype=self.dtype,
+                                autostrip=True, names=names)
+        if openned:
+            fd.close()
         return arr
 
     def write_array(self, array, names=None, skip_header=False, append=False):
@@ -574,14 +585,13 @@ class AsciiTable(AsciiFile):
         column = backwards.bytes2unicode(self.column)
         comment = backwards.bytes2unicode(self.comment)
         newline = backwards.bytes2unicode(self.newline)
+        open_mode = 'wb'
+        openned = False
+        fd = self.fd
         if append:
             skip_header = True
             open_mode = 'ab'
-        else:
-            open_mode = 'wb'
-        if self.is_open:
-            fd = self.fd
-        else:
+        if not self.is_open:
             fd = open(self.filepath, open_mode)
         if skip_header:
             names = None
@@ -611,6 +621,8 @@ class AsciiTable(AsciiFile):
             np.savetxt(fd, array,
                        fmt=fmt, delimiter=column, comments=comment + ' ',
                        newline=newline, header=head)
+        if openned:
+            fd.close()
 
     def array_to_bytes(self, arr=None, order='C'):
         r"""Convert arr to bytestring.
@@ -681,18 +693,19 @@ class AsciiTable(AsciiFile):
             arr.reshape((nrows, self.ncols), order=order)
         return arr
 
-    def read_bytes(self, order='C'):
+    def read_bytes(self, order='C', **kwargs):
         r"""Read the table in as array and encode as bytes.
 
         Args:
             order (str, optional): Order that array should be written to the
                 bytestring. Defaults to 'C'.
+            **kwargs: Additional keyword arguments are passed to read_array.
 
         Returns:
             bytes: Array as bytes.
 
         """
-        arr = self.read_array()
+        arr = self.read_array(**kwargs)
         out = self.array_to_bytes(arr, order=order)
         return out
 

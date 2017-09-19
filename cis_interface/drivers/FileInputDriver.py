@@ -22,6 +22,42 @@ class FileInputDriver(FileDriver):
                                               **kwargs)
         self.debug('(%s)', args)
 
+    def open_file(self):
+        r"""Open the file."""
+        self.debug(':open_file()')
+        with self.lock:
+            self.fd = open(self.args, 'rb')
+
+    def file_read(self):
+        r"""Read a message from the file.
+
+        Returns:
+            str: Message.
+
+        """
+        with self.lock:
+            data = self.fd.read()
+            if len(data) == 0:
+                data = self.eof_msg
+        return data
+
+    def file_send(self, data):
+        r"""Send a message to the IPC queue.
+
+        Args:
+            data (str): Message.
+
+        Returns:
+            bool: Success or failure of send.
+
+        """
+        with self.lock:
+            return self.ipc_send(data)
+
+    def on_eof(self):
+        r"""Actions to perform when the end of file is reached."""
+        pass
+
     def run(self):
         r"""Run the driver. The file is opened and then data is read from the
         file and sent to the message queue until eof is encountered or the file
@@ -29,21 +65,43 @@ class FileInputDriver(FileDriver):
         """
         self.debug(':run in %s', os.getcwd())
         try:
-            with self.lock:
-                self.fd = open(self.args, 'rb')
+            self.open_file()
         except:  # pragma: debug
             self.exception('Could not open file.')
             return
-        with self.lock:
-            if self.fd is None:  # pragma: debug
-                data = ''
+        nread = 0
+        nsent = 0
+        while self.is_valid:
+            # Ensure file not closed between check and read
+            with self.lock:
+                if self.is_open:
+                    data = self.file_read()
+                else:  # pragma: debug
+                    # Break on file closed
+                    self.debug(':run: File closed.')
+                    break
+            # if data is None:  # pragma: debug
+            #     # Break on None for closed file
+            #     self.debug(':run: File closed.')
+            #     break
+            if data == self.eof_msg:
+                # Break on end of file
+                self.debug(':run: End of file')
+                self.on_eof()
+                break
             else:
-                data = self.fd.read()
-        self.debug(':run: read: %d bytes', len(data))
-        if len(data) == 0:  # pragma: debug
-            self.debug(':run, no input')
-        else:
-            ret = self.ipc_send(data)
-            if not ret:
-                self.debug(":run send failed")
-        self.debug(':run returned')
+                nread += 1
+                self.debug(':run: Read %d bytes.', len(data))
+                # Ensure queue not closed between check and message
+                with self.lock:
+                    if self.queue_open:
+                        ret = self.file_send(data)
+                        if ret:
+                            nsent += 1
+                    else:  # pragma: debug
+                        # Break on queue closed
+                        self.debug(':run: Queue closed')
+                        break
+        self.close_file()
+        self.debug(':run: Read %d messages, sent %d.' % (nread, nsent))
+        self.debug(':run returns')

@@ -1,4 +1,3 @@
-import os
 from cis_interface.drivers.FileOutputDriver import FileOutputDriver
 from cis_interface.dataio.AsciiFile import AsciiFile
 
@@ -42,42 +41,30 @@ class AsciiFileOutputDriver(FileOutputDriver):
             self.file = AsciiFile(self.args, 'w', **self.file_kwargs)
         self.debug('(%s): done with init', self.args)
 
+    @property
+    def is_open(self):
+        r"""bool: True if file is open, False otherwise."""
+        with self.lock:
+            return self.file.is_open
+
+    def open_file(self):
+        r"""Open the file."""
+        self.debug(':open_file()')
+        with self.lock:
+            self.file.open()
+
     def close_file(self):
         r"""Close the file."""
         self.debug(':close_file()')
         with self.lock:
             self.file.close()
 
-    def run(self):
-        r"""Run the driver. The driver will open the file and write receieved
-        messages to the file as they are received until the file is closed.
+    def file_write(self, data):
+        r"""When a message is received, write it as a full line to the file.
+
+        Args:
+            data (str): Message.
+
         """
-        self.debug(':run in %s', os.getcwd())
-        try:
-            with self.lock:
-                self.file.open()
-        except:  # pragma: debug
-            self.exception('Could not open file.')
-            return
-        while True:
-            with self.lock:
-                if not self.file.is_open:  # pragma: debug
-                    break
-            data = self.ipc_recv()
-            if data is None:
-                self.debug(':recv: closed')
-                break
-            self.debug(':recvd %s bytes', len(data))
-            if data == self.eof_msg:
-                self.debug(':recv: end of file')
-                break
-            elif len(data) > 0:
-                with self.lock:
-                    if self.file.is_open:
-                        self.file.writeline_full(data)
-                    else:  # pragma: debug
-                        break
-            else:
-                self.debug(':recv: no data')
-                self.sleep()
-        self.debug(':run returned')
+        with self.lock:
+            self.file.writeline_full(data)

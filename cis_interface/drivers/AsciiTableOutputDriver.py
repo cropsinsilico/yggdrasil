@@ -1,4 +1,3 @@
-import os
 from cis_interface.drivers.AsciiFileOutputDriver import AsciiFileOutputDriver
 from cis_interface.dataio.AsciiTable import AsciiTable
 from cis_interface.tools import eval_kwarg
@@ -58,42 +57,40 @@ class AsciiTableOutputDriver(AsciiFileOutputDriver):
         self.file = AsciiTable(self.args, 'w', **self.file_kwargs)
         self.debug('(%s): done with init', args)
 
-    def run(self):
-        r"""Run the driver. The format string is received then output is written
-        to the file as it is received from the message queue until eof is
-        encountered or the file is closed.
+    def open_file(self):
+        r"""Open the file and write the format string.
+
+        Raises:
+            RuntimeError: If the format string cannot be received.
+
         """
-        self.debug(':run in %s', os.getcwd())
         fmt = self.recv_wait()
         if fmt is None:
-            self.debug(':recv: did not receive format string')
-            return
-        self.file.update_format_str(fmt)
+            raise RuntimeError('Did not receive format string')
         with self.lock:
+            self.file.update_format_str(fmt)
             self.file.open()
             self.file.writeformat()
-        while True:
-            with self.lock:
-                if not self.file.is_open:  # pragma: debug
-                    break
-            data = self.ipc_recv_nolimit()
-            if data is None:  # pragma: debug
-                self.debug(':recv: closed')
-                break
-            self.debug(':recvd %s bytes', len(data))
-            if data == self.eof_msg:
-                self.debug(':recv: end of file')
-                break
-            elif len(data) > 0:
-                with self.lock:
-                    if self.file.is_open:
-                        if self.as_array:
-                            self.file.write_bytes(data, order='F', append=True)
-                        else:
-                            self.file.writeline_full(data, validate=True)
-                    else:  # pragma: debug
-                        break
+
+    def file_recv(self):
+        r"""Receive a long message.
+
+        Returns:
+            str: Received message.
+
+        """
+        with self.lock:
+            return self.ipc_recv_nolimit()
+
+    def file_write(self, data):
+        r"""Write a table row or array to the file.
+
+        Args:
+            data (str): Message.
+
+        """
+        with self.lock:
+            if self.as_array:
+                self.file.write_bytes(data, order='F', append=True)
             else:
-                self.debug(':recv: no data')
-                self.sleep()
-        self.debug(':run returned')
+                self.file.writeline_full(data, validate=True)

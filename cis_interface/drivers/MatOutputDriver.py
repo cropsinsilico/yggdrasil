@@ -1,4 +1,3 @@
-import os
 from scipy.io import savemat
 from cis_interface.backwards import pickle
 from cis_interface.drivers.FileOutputDriver import FileOutputDriver
@@ -18,7 +17,17 @@ class MatOutputDriver(FileOutputDriver):
 
     """
     
-    def put(self, data):
+    def file_recv(self):
+        r"""Receive a long message.
+
+        Returns:
+            str: Received message.
+
+        """
+        with self.lock:
+            return self.ipc_recv_nolimit()
+
+    def file_write(self, data):
         r"""Write received data to file. The data is first unpickled and then
         written in .mat format.
 
@@ -26,47 +35,16 @@ class MatOutputDriver(FileOutputDriver):
             data (str): Pickled dictionary of objects to write to the .mat
                 file.
 
-        """
-        self.debug(':put: unpickling %s bytes', len(data))
-        data_dict = pickle.loads(data)
-        if not isinstance(data_dict, dict):  # pragma: debug
-            self.error(':put unpickled object (type %s) is not a dictionary',
-                       type(data_dict))
-            return
-        self.debug(':put: saving %s', str(data_dict.keys()))
-        savemat(self.fd, data_dict)
-        self.debug(':put: %s complete', str(data_dict.keys()))
+        Raises:
+            TypeError: If the unpickled object is not a dictionary.
 
-    def run(self):
-        r"""Run the driver. The driver will open the file and write receieved
-        messages to the file as they are received until the file is closed.
         """
-        self.debug(':run in %s', os.getcwd())
-        try:
-            with self.lock:
-                self.fd = open(self.args, 'wb')
-        except:  # pragma: debug
-            self.exception('Could not open file.')
-            return
-        while True:
-            with self.lock:
-                if self.fd is None:  # pragma: debug
-                    break
-            data = self.ipc_recv_nolimit()
-            if data is None:  # pragma: debug
-                self.debug(':recv: closed')
-                break
-            self.debug(':recvd %s bytes', len(data))
-            if data == self.eof_msg:
-                self.debug(':recv: end of file')
-                break
-            elif len(data) > 0:
-                with self.lock:
-                    if self.fd is None:  # pragma: debug
-                        break
-                    else:
-                        self.put(data)
-            else:
-                self.debug(':recv: no data')
-                self.sleep()
-        self.debug(':run returns')
+        with self.lock:
+            self.debug(':put: unpickling %s bytes', len(data))
+            data_dict = pickle.loads(data)
+            if not isinstance(data_dict, dict):  # pragma: debug
+                raise TypeError('Unpickled object (type %s) is not a dictionary' %
+                                type(data_dict))
+            self.debug(':put: saving %s', str(data_dict.keys()))
+            savemat(self.fd, data_dict)
+            self.debug(':put: %s complete', str(data_dict.keys()))
