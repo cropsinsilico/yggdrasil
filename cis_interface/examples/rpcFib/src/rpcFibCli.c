@@ -39,34 +39,34 @@ int main(int argc, char *argv[]) {
   printf("rpcFibCli: yaml has %d lines\n", count_lines(ycontent, "\n") + 1);
   free(ycontent);
   
-  int fib = -1;
-  int fibNo = -1;
-  char *logmsg = (char*)malloc(PSI_MSG_MAX*sizeof(char));
-  int i;
-  for (i = 1; i <= iterations; i++) {
+  /* int fib = -1; */
+  /* int fibNo = -1; */
+  /* char *logmsg = (char*)malloc(PSI_MSG_MAX*sizeof(char)); */
+  /* int i; */
+  /* for (i = 1; i <= iterations; i++) { */
     
-    // Call the server and receive response
-    printf("rpcFibCli(C): fib(->%-2d) ::: ", i);
-    ret = rpcCall(rpc, i, &fibNo, &fib);
-    if (ret < 0) {
-      printf("rpcFibCli(C): RPC CALL ERROR\n");
-      free(logmsg);
-      exit(-1);
-    }
+  /*   // Call the server and receive response */
+  /*   printf("rpcFibCli(C): fib(->%-2d) ::: ", i); */
+  /*   ret = rpcCall(rpc, i, &fibNo, &fib); */
+  /*   if (ret < 0) { */
+  /*     printf("rpcFibCli(C): RPC CALL ERROR\n"); */
+  /*     free(logmsg); */
+  /*     exit(-1); */
+  /*   } */
 
-    // Log result by sending it to the log connection
-    sprintf(logmsg, "fib(%2d<-) = %-2d<-\n", fibNo, fib);
-    printf("%s", logmsg);
-    ret = psi_send(log, logmsg, strlen(logmsg));
-    if (ret != 0) {
-      printf("rpcFibCli(C): SEND ERROR\n");
-      free(logmsg);
-      exit(-1);
-    }
-  }
+  /*   // Log result by sending it to the log connection */
+  /*   sprintf(logmsg, "fib(%2d<-) = %-2d<-\n", fibNo, fib); */
+  /*   printf("%s", logmsg); */
+  /*   ret = psi_send(log, logmsg, strlen(logmsg)); */
+  /*   if (ret != 0) { */
+  /*     printf("rpcFibCli(C): SEND ERROR\n"); */
+  /*     free(logmsg); */
+  /*     exit(-1); */
+  /*   } */
+  /* } */
 
+  /* free(logmsg); */
   printf("Goodbye from C rpcFibCli\n");
-  free(logmsg);
   exit(0);
     
 }
