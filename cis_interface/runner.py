@@ -441,11 +441,14 @@ class CisRunner(object):
                 associated IO drivers.
 
         """
+        print('model %s exited' % model['name'])
         self.do_exits(model)
+        print('model %s joined' % model['name'])
         # Stop associated server if not more clients
         for srv_name in model.get('client_of', []):
             # Stop client IO driver
             iod = self.outputdrivers["%s_%s" % (srv_name, model['name'])]
+            print 'stopping client IO', iod['name']
             iod['instance'].stop()
             self.do_exits(iod)
             # Remove this client from list for server
@@ -454,10 +457,11 @@ class CisRunner(object):
             # Stop server if there are not any more clients
             if len(srv['clients']) == 0:
                 iod = self.inputdrivers[srv_name]
+                print 'stopping server IO', iod['name']
                 iod['instance'].stop()
                 self.do_exits(iod)
                 srv['instance'].stop()
-                self.do_model_exits(srv)
+                # self.do_model_exits(srv)
         # Stop associated IO drivers
         for drv in self.io_drivers(model['name']):
             if not drv['instance'].is_alive():
