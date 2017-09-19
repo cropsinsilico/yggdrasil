@@ -126,6 +126,10 @@ class Driver(Thread):
         r"""Processes that should be run when the driver exits."""
         self.debug(':on_exit()')
 
+    def on_model_exit(self):
+        r"""Processes that should be run when an associated model exits."""
+        self.debug(':on_model_exit()')
+
     def cleanup(self):
         r"""Processes that should be run to clean up a driver that is not
         running."""
