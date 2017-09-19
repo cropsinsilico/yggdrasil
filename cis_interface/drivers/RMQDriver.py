@@ -386,8 +386,13 @@ class RMQDriver(Driver):
             if self.channel_open:
                 if cancel_consumer:
                     self.debug('::stop_communication: cancelling consumption')
-                    self.channel.basic_cancel(callback=self.on_cancelok,
-                                              consumer_tag=self.consumer_tag)
+                    self.remove_queue()
+                    self.connection.ioloop.stop()
+                    self.channel = None
+                    self.connection = None
+                    self._closing = False
+                    # self.channel.basic_cancel(callback=self.on_cancelok,
+                    #                           consumer_tag=self.consumer_tag)
                 else:
                     if remove_queue:
                         self.remove_queue()
@@ -404,10 +409,11 @@ class RMQDriver(Driver):
     def on_consumer_cancelled(self, unused_frame):
         r"""Actions to perform after consumption is cancelled. Closes the
         channel."""
-        print 'on_consumer'
+        print 'on_consumer_cancelled'
         self.debug('::on_consumer_cancelled()')
         with self.lock:
             if self.channel_open:
+                self.remove_queue()
                 self.channel.close()
     
     def on_cancelok(self, unused_frame):
