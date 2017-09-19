@@ -1,12 +1,13 @@
 #
 # This should not be used directly by modelers
 #
+from __future__ import print_function
 import os
 import subprocess
-import sys
+# import sys
 from pprint import pformat
 from cis_interface.drivers.Driver import Driver
-from cis_interface import backwards
+# from cis_interface import backwards
 
 
 def preexec():  # pragma: no cover
@@ -63,7 +64,7 @@ class ModelDriver(Driver):
             try:
                 self.process = subprocess.Popen(
                     ['stdbuf', '-o0'] + self.args, bufsize=0,
-                    stdin=subprocess.PIPE, stderr=subprocess.STDOUT,
+                    stdin=subprocess.PIPE, stderr=subprocess.PIPE,  # STDOUT,
                     stdout=subprocess.PIPE,
                     env=self.env, cwd=self.workingDir, preexec_fn=preexec)
             except:  # pragma: debug
@@ -71,17 +72,41 @@ class ModelDriver(Driver):
                                self.args, os.getcwd, self.workingDir)
                 return
         
+        # while True:
+        #     with self.lock:
+        #         if self.process:
+        #             self.process.poll()
+        #             if self.process.returncode is None:
+        #                 while True:
+        #                     line = self.process.stdout.readline()
+        #                     if line:
+        #                         print(line, end="")
+        #                     else:
+        #                         break
+        #                 while True:
+        #                     line = self.process.stderr.readline()
+        #                     if line:
+        #                         print(line, end="")
+        #                     else:
+        #                         break
+        #         else:
+        #             break
+        #     self.sleep()
+        
         # Re-direct output
-        while True:
-            with self.lock:
-                if self.process:
-                    line = self.process.stdout.readline()
-                else:
-                    return
-            if not line:
-                break
-            sys.stdout.write(backwards.bytes2unicode(line))
-            sys.stdout.flush()
+        (outdata, errdata) = self.process.communicate()
+        print(outdata, end="")
+        print(errdata, end="")
+        # while True:
+        #     with self.lock:
+        #         if self.process:
+        #             line = self.process.stdout.readline()
+        #         else:
+        #             return
+        #     if not line:
+        #         break
+        #     sys.stdout.write(backwards.bytes2unicode(line))
+        #     sys.stdout.flush()
             
         self.debug(':run: done')
 
@@ -89,7 +114,8 @@ class ModelDriver(Driver):
         r"""Terminate the process running the model."""
         self.debug(':terminate()')
         with self.lock:
-            if self.process:
+            self.process.poll()
+            if self.process.returncode is None:
                 self.debug(':terminate(): terminate process')
                 self.process.terminate()
                 self.process = None
