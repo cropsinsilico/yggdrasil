@@ -153,6 +153,7 @@ class RMQDriver(Driver):
         # if self.connection:
         #     self.connection.ioloop.start()
         super(RMQDriver, self).terminate()
+        print 'terminate finished'
         self.debug('::terminate returns')
 
     def on_model_exit(self):
