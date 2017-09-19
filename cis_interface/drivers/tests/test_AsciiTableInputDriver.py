@@ -52,10 +52,10 @@ class TestAsciiTableInputDriver(TestAsciiTableInputParam,
         # File lines
         for iline, ans in enumerate(self.file_lines):
             if not ans.startswith(self.comment):
-                data = self.instance.recv_wait()
+                data = self.instance.recv_wait_nolimit()
                 nt.assert_equal(data, ans)
         # End of file
-        data = self.instance.recv_wait()
+        data = self.instance.recv_wait_nolimit()
         nt.assert_equal(data, self.instance.eof_msg)
 
         
