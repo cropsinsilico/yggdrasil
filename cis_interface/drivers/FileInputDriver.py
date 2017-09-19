@@ -80,11 +80,11 @@ class FileInputDriver(FileDriver):
                     # Break on file closed
                     self.debug(':run: File closed.')
                     break
-            # if data is None:  # pragma: debug
-            #     # Break on None for closed file
-            #     self.debug(':run: File closed.')
-            #     break
-            if data == self.eof_msg:
+            if data is None:  # pragma: debug
+                # Break on None for closed file
+                self.debug(':run: File closed.')
+                break
+            elif data == self.eof_msg:
                 # Break on end of file
                 self.debug(':run: End of file')
                 self.on_eof()

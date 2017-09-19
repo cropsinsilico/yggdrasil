@@ -67,11 +67,11 @@ class FileOutputDriver(FileDriver):
                 else:  # pragma: debug
                     self.debug(':run: Queue closed')
                     break
-            # if data is None:  # pragma: debug
-            #     # Break on None for closed queue
-            #     self.debug(':run: Queue closed')
-            #     break
-            if data == self.eof_msg:
+            if data is None:  # pragma: debug
+                # Break on None for closed queue
+                self.debug(':run: Queue closed')
+                break
+            elif data == self.eof_msg:
                 # Break on end of file
                 self.debug(':run: End of file')
                 break
