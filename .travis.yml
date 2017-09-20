@@ -65,7 +65,7 @@ before_script:
 
 script:
   - |
-    nosetests --nologcapture --with-coverage --cover-package=cis_interface -sv
+    nosetests --nologcapture --with-coverage --cover-package=cis_interface -sv cis_interface/examples/tests/test_rpcFib.py
 
 after_success:
   - coveralls
