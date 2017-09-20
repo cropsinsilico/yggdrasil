@@ -77,7 +77,11 @@ class TestRMQClientDriver(TestRMQClientParam, parent1.TestRMQDriver):
 
     def test_msg(self):
         r"""Test routing of a message through the IPC & RMQ queues."""
-        print self.instance.is_valid, self.srv_rmq.is_valid
+        T = self.instance.start_timeout()
+        while ((not T.is_out) and ((not self.instance.is_valid) or
+                                   (not self.srv_rmq.is_valid))):
+            self.instance.sleep()
+        self.instance.stop_timeout()
         # Send message to IPC output & receive from RMQ output
         self.instance.oipc.ipc_send_nolimit(self.msg_short)
         # Receive on server side, then send back

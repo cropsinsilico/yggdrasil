@@ -256,6 +256,7 @@ class CisRunner(object):
         self.startDrivers()
         self.waitModels()
         self.closeChannels()
+        self.cleanup()
 
     @property
     def all_drivers(self):
@@ -405,6 +406,7 @@ class CisRunner(object):
                 d.start()
             except Exception as e:  # pragma: debug
                 error("CisRunner: %s did not start", d.name)
+                self.terminate()
                 raise e
         debug('CisRunner.startDrivers(): ALL DRIVERS STARTED')
 
@@ -487,14 +489,20 @@ class CisRunner(object):
     def terminate(self):
         r"""Immediately stop all drivers, beginning with IO drivers."""
         debug('CisRunner::terminate()')
-        self.closeChannels(force_stop=True)
-        debug('CisRunner::terminate(): stop models')
+        # self.closeChannels(force_stop=True)
+        # debug('CisRunner::terminate(): stop models')
         for driver in self.all_drivers:
             print 'stopping', driver['name']
             debug('CisRunner::terminate(): stop %s', driver)
             driver['instance'].terminate()
             driver['instance'].join()
         debug('CisRunner::terminate(): returns')
+
+    def cleanup(self):
+        r"""Perform cleanup operations for all drivers."""
+        debug('CisRunner::cleanup()')
+        for driver in self.all_drivers:
+            driver['instance'].cleanup()
 
     def printStatus(self):
         r"""Print the status of all drivers, starting with the IO drivers."""

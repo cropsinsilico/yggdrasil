@@ -131,7 +131,7 @@ class RMQClientDriver(RMQDriver, RPCDriver):
         if not self.channel_stable:  # pragma: debug
             return
         if self.response is None:
-            self.debug('::Checking RMQ response queue again in %0.1f seconds',
+            self.debug('::Checking RMQ response queue again in %5.2f seconds',
                        self.sleeptime)
             with self.lock:
                 if not self.channel_stable:  # pragma: debug

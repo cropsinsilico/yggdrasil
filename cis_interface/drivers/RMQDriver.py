@@ -102,7 +102,8 @@ class RMQDriver(Driver):
         r"""bool: True if the connection ready for messages and not about to
         close. False otherwise."""
         with self.lock:
-            return (self.channel_open and not self._closing and not self._opening)
+            return (self.channel_open and (not self._closing) and
+                    (not self._opening))
 
     # DRIVER FUNCTIONALITY
     def start(self):
