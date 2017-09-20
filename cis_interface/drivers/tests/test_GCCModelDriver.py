@@ -1,7 +1,14 @@
 import os
+import nose.tools as nt
 from cis_interface.tests import scripts
 import cis_interface.drivers.tests.test_ModelDriver as parent
-from cis_interface.drivers.GCCModelDriver import _incl_interface
+from cis_interface.drivers.GCCModelDriver import (
+    _incl_interface, GCCModelDriver)
+
+
+def test_GCCModelDriver_errors():
+    r"""Test GCCModelDriver errors."""
+    nt.assert_raises(ValueError, GCCModelDriver, 'test', 'test.py')
 
 
 class TestGCCModelParam(parent.TestModelParam):
@@ -18,6 +25,13 @@ class TestGCCModelParam(parent.TestModelParam):
         self.args = [scripts['c'], '1', '-I' + _incl_interface]
         self.attr_list += ['compiled']
         
+    def teardown(self):
+        r"""Remove the instance, stoppping it."""
+        fexec = self.instance.efile
+        super(TestGCCModelParam, self).teardown()
+        if os.path.isfile(fexec):
+            os.remove(fexec)
+            
 
 class TestGCCModelDriverNoStart(TestGCCModelParam,
                                 parent.TestModelDriverNoStart):
@@ -38,9 +52,4 @@ class TestGCCModelDriver(TestGCCModelParam, parent.TestModelDriver):
 
     """
 
-    def teardown(self):
-        r"""Remove the instance, stoppping it."""
-        super(TestGCCModelDriver, self).teardown()
-        fexec = os.path.splitext(self.args[0])[0] + '.out'
-        if os.path.isfile(fexec):
-            os.remove(fexec)
+    pass

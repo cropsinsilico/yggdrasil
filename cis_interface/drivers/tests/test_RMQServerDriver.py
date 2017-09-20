@@ -19,6 +19,7 @@ class TestRMQServerParam(parent1.TestRMQParam, IOInfo):
         self.driver = 'RMQServerDriver'
         self.args = None
         self.attr_list += ['clients']
+        self.sleeptime = 0.5
         
 
 class TestRMQServerDriverNoStart(TestRMQServerParam,

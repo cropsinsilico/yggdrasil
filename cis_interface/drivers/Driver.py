@@ -24,6 +24,8 @@ class Driver(Thread):
             current working directory is used.
         timeout (float, optional): Maximum time (in seconds) that should be
             spent waiting on a process. Defaults to 60.
+        sleeptime (float, optional): Time that driver should sleep for when
+            sleep is called. Defaults to 0.01.
 
     Attributes:
         name (str): Driver name.
@@ -44,7 +46,7 @@ class Driver(Thread):
     # CLASSES TO ADD DRIVER FUNCTIONALITY. ALL OF THE CHILD CLASSES MUST HAVE
     # COMPATIBLE FORMATS (THE SAME NAMED ARGUMENTS).
     def __init__(self, name, yml={}, env={}, namespace=None, rank=None,
-                 workingDir=None, timeout=60.0):
+                 workingDir=None, timeout=60.0, sleeptime=0.01):
         # Check if thread initialized to avoid doing it twice for drivers
         # with multiple inheritance that both need to call __init__
         if getattr(self, '_thread_initialized', False):  # pragma: debug
@@ -54,7 +56,7 @@ class Driver(Thread):
         self._thread_initialized = True
         self.debug()
         self.name = name
-        self.sleeptime = 0.01  # 25
+        self.sleeptime = sleeptime
         # if cis_cfg.get('debug', 'psi') == 'DEBUG':
         #     self.sleeptime = 1.0
         self.longsleep = self.sleeptime * 10

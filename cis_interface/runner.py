@@ -233,7 +233,7 @@ class CisRunner(object):
             raise ValueError("%s is not a recognized driver type." % dtype)
         # Check to make sure there arn't two drivers with the same name
         if yaml['name'] in dd:
-            raise ValueError("%s is already a registered %d driver." % (
+            raise ValueError("%s is already a registered %s driver." % (
                 yaml['name'], dtype))
         # Copy keywords
         if 'kwargs' in yaml:

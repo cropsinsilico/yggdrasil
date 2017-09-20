@@ -1,9 +1,5 @@
 ---
 
-#
-# Minimal Model Example yaml
-#
-
 model:
   name: hello_cpp
   driver: GCCModelDriver
@@ -13,6 +9,7 @@ model:
     - name: inFile
       driver: FileInputDriver
       args: ./Input/input.txt
+      onexit: on_model_exit
     - name: helloQueueIn    
       driver: RMQInputDriver
       args: helloQueue

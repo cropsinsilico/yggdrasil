@@ -103,3 +103,9 @@ class TestRPCDriver(TestRPCParam, parent.TestDriver, IOInfo):
         super(TestRPCDriver, self).assert_after_terminate()
         assert(not self.instance.iipc.mq)
         assert(not self.instance.oipc.mq)
+
+    def test_close_queues(self):
+        r"""Test closing queues."""
+        self.instance.close_queues()
+        assert(not self.instance.iipc.queue_open)
+        assert(not self.instance.oipc.queue_open)

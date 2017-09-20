@@ -1,0 +1,6 @@
+model:
+  name: error_model
+  driver: PythonModelDriver
+  args:
+    - ../scripts/error_model.py
+      

@@ -49,8 +49,6 @@ class ModelDriver(Driver):
             self.args = args
         self.process = None
         self.is_server = is_server
-        if isinstance(client_of, str):
-            client_of = [client_of]
         self.client_of = client_of
         self.env.update(os.environ)
 

@@ -33,6 +33,7 @@ class TestParam(unittest.TestCase):
         self.inst_kwargs = {'yml': {'workingDir': self.workingDir}}
         self.nprev_queues = 0
         self.timeout = 1.0
+        self.sleeptime = 0.01
         super(TestParam, self).__init__(*args, **kwargs)
 
     def shortDescription(self):
@@ -98,6 +99,7 @@ class TestParam(unittest.TestCase):
                                     namespace=self.namespace,
                                     # workingDir=self.workingDir,
                                     timeout=self.timeout,
+                                    sleeptime=self.sleeptime,
                                     **self.inst_kwargs)
         os.chdir(curpath)
         # print("created instance")
@@ -198,7 +200,6 @@ class TestDriverNoStart(TestParam):
         self.instance.exception(1)
         self.instance.printStatus()
 
-
     def test_timeout(self):
         r"""Test functionality of timeout."""
         # Test w/o timeout
@@ -214,3 +215,7 @@ class TestDriverNoStart(TestParam):
         self.instance.sleep()
         assert(self.instance.check_timeout)
         self.instance.stop_timeout()
+
+    def test_raise_error(self):
+        r"""Test error raise with log."""
+        nt.assert_raises(KeyError, self.instance.raise_error, KeyError("fake"))

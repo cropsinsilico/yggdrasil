@@ -29,6 +29,7 @@ class TestRMQClientParam(parent1.TestRMQParam, IOInfo):
         self.attr_list += ['request_queue', 'response', 'corr_id',
                            '_deliveries', '_acked', '_nacked',
                            '_message_number']
+        self.sleeptime = 0.5
             
 
 class TestRMQClientDriverNoStart(TestRMQClientParam,
@@ -86,8 +87,14 @@ class TestRMQClientDriver(TestRMQClientParam, parent1.TestRMQDriver):
         self.instance.stop_timeout()
         # Send message to IPC output
         self.instance.oipc.ipc_send_nolimit(self.msg_short)
+        # Wait for message to be routed
+        T = self.instance.start_timeout()
+        while ((not T.is_out) and (self.srv_rmq.iipc.n_ipc_msg == 0)):
+            self.instance.sleep()
+        self.instance.stop_timeout()
         # Receive on server side, then send back
-        rmq_msg = self.srv_rmq.iipc.recv_wait_nolimit()
+        # rmq_msg = self.srv_rmq.iipc.recv_wait_nolimit()
+        rmq_msg = self.srv_rmq.iipc.ipc_recv_nolimit()
         nt.assert_equal(rmq_msg, self.msg_short)
         self.srv_rmq.oipc.ipc_send_nolimit(rmq_msg)
         # Receive response from server

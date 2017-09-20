@@ -153,7 +153,7 @@ class IODriver(Driver):
             self.state = 'deliver'
             self.debug('::ipc_send %d bytes', len(data))
             try:
-                if not self.queue_open:
+                if not self.queue_open:  # pragma: debug
                     self.debug('.ipc_send(): mq closed')
                     return False
                 else:

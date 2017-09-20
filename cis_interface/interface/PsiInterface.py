@@ -225,7 +225,7 @@ class PsiRpc(object):
 
     """
     def __init__(self, outname, outfmt, inname, infmt, matlab=False):
-        if matlab:
+        if matlab:  # pragma: matlab
             self._inFmt = backwards.decode_escape(infmt)
             self._outFmt = backwards.decode_escape(outfmt)
         else:
@@ -521,7 +521,7 @@ class PsiAsciiTableOutput(object):
     def __init__(self, name, fmt, dst_type=1, matlab=False):
         self._name = name
         self._type = dst_type
-        if matlab:
+        if matlab:  # pragma: matlab
             fmt = backwards.decode_escape(fmt)
         if self._type == 0:
             self._table = AsciiTable(name, 'w', format_str=fmt)

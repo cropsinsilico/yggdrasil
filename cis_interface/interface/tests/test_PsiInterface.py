@@ -9,6 +9,18 @@ from cis_interface.drivers.tests.test_IODriver import IOInfo
 from cis_interface.backwards import pickle
 
 
+def test_PsiMatlab():
+    r"""Test Matlab interface."""
+    name = 'test'
+    drv = IODriver.IODriver(name, '_IN')
+    drv.start()
+    os.environ.update(drv.env)
+    # ans = PsiInterface.PsiInput(name)
+    res = PsiInterface.PsiMatlab('PsiInput', (name,))
+    # nt.assert_equal(res, ans)
+    drv.terminate()
+
+
 class TestPsiInput(IOInfo):
     r"""Test basic input to python."""
     def __init__(self):
@@ -134,6 +146,30 @@ class TestPsiRpc(IOInfo):
         nt.assert_equal(msg_recv, msg_send)
 
 
+class TestPsiRpcClient(TestPsiRpc):
+    r"""Test client-side RPC communication with Python."""
+
+    def setup(self):
+        r"""Start driver and instance."""
+        self.driver = RPCDriver.RPCDriver(self.name)
+        self.driver.start()
+        os.environ.update(self.driver.env)
+        self.instance = PsiInterface.PsiRpcClient(
+            self.name, self.fmt_str, self.fmt_str)
+
+        
+class TestPsiRpcServer(TestPsiRpc):
+    r"""Test server-side RPC communication with Python."""
+
+    def setup(self):
+        r"""Start driver and instance."""
+        self.driver = RPCDriver.RPCDriver(self.name)
+        self.driver.start()
+        os.environ.update(self.driver.env)
+        self.instance = PsiInterface.PsiRpcServer(
+            self.name, self.fmt_str, self.fmt_str)
+
+        
 class TestPsiAsciiFileInput(IOInfo):
     r"""Test input from an unformatted text file."""
     def __init__(self):

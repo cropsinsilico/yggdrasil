@@ -9,6 +9,7 @@ model:
     - name: inFile
       driver: FileInputDriver
       args: ./Input/input.txt
+      onexit: on_model_exit
     - name: helloQueueIn
       driver: RMQInputDriver
       args: helloQueue

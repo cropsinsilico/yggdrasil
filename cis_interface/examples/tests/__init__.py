@@ -24,7 +24,7 @@ class TestExample(unittest.TestCase):
 
     def teardown(self, *args, **kwargs):
         r"""Teardown to perform after test."""
-        pass
+        pass  # pragma: no cover
 
     def shortDescription(self):
         r"""Prefix first line of doc string with driver."""
@@ -54,7 +54,7 @@ class TestExample(unittest.TestCase):
     @property
     def yamldir(self):
         r"""str: Full path to the directory containing the yaml file."""
-        if self.yaml is None:
+        if self.yaml is None:  # pragma: no cover
             return None
         return os.path.dirname(self.yaml)
 

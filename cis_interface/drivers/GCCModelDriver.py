@@ -26,37 +26,29 @@ class GCCModelDriver(ModelDriver):
 
     Attributes (in additon to parent class's):
         compiled (bool): True if the compilation was succesful. False otherwise.
+        cfile (str): Source file.
+        gcc (str): Compiler that should be used.
+        flags (list): List of compiler flags.
+        efile (str): Compiled executable file.
 
     """
 
     def __init__(self, name, args, **kwargs):
         super(GCCModelDriver, self).__init__(name, args, **kwargs)
         self.debug()
-
         # Prepare arguments to compile the file
         # TODO: Allow user to provide a makefile
-        cfile = self.args.pop(0)
-        if cfile.endswith('.c'):
-            gcc = 'gcc'
-            osuffix = '_c.out'
-            flags = []
-        elif cfile.endswith('.cpp'):
-            gcc = 'g++'
-            osuffix = '_cpp.out'
-            flags = ['-std=c++11']
-        else:
-            raise ValueError("Supplied file is not C or C++ code.")
-        execname = os.path.splitext(cfile)[0] + osuffix
-        compile_args = [gcc, "-g", "-Wall"] + flags
+        self.compile_setup(self.args.pop(0))
+        compile_args = [self.gcc, "-g", "-Wall"] + self.flags
         for x in [_incl_interface, _incl_io]:
             compile_args += ["-I" + x]
-        run_args = [os.path.join(".", execname)]
+        run_args = [os.path.join(".", self.efile)]
         for arg in self.args:
             if arg.startswith("-I"):
                 compile_args.append(arg)
             else:
                 run_args.append(arg)
-        compile_args += ["-o", execname, cfile]
+        compile_args += ["-o", self.efile, self.cfile]
         # Compile in a new process
         self.args = run_args
         self.compiled = True
@@ -76,6 +68,31 @@ class GCCModelDriver(ModelDriver):
             self.compiled = False
             self.exception('::Exception compiling %s, %s',
                            ' '.join(compile_args), os.getcwd)
+
+    def compile_setup(self, cfile):
+        r"""Perform setup based on source file.
+
+        Args:
+            cfile (str): Full path to source file.
+
+        Raises:
+            ValueError: If the source file suffix is not .c or .cpp.
+
+        """
+        self.cfile = cfile
+        if cfile.endswith('.c'):
+            gcc = 'gcc'
+            osuffix = '_c.out'
+            flags = []
+        elif cfile.endswith('.cpp'):
+            gcc = 'g++'
+            osuffix = '_cpp.out'
+            flags = ['-std=c++11']
+        else:
+            raise ValueError("Supplied file is not C or C++ code.")
+        self.gcc = gcc
+        self.flags = flags
+        self.efile = os.path.splitext(cfile)[0] + osuffix
 
     def run(self):
         r"""Run the compiled executable if it exists."""
