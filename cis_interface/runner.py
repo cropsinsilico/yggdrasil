@@ -419,12 +419,15 @@ class CisRunner(object):
             for drv in running:
                 d = drv['instance']
                 if d.errors:
+                    print 'Error in ', drv['name']
                     self.error_flag = True
                     break
                 d.join(1)
                 if not d.is_alive():
                     self.do_model_exits(drv)
                     running.remove(drv)
+                else:
+                    print drv['name'], ' still running'
         if not self.error_flag:
             info('All models completed')
         else:
@@ -439,6 +442,7 @@ class CisRunner(object):
             model (dict): Dictionary of driver parameters.
 
         """
+        print 'exits', driver['name']
         debug("CisRunner::do_exits for driver %s", driver['name'])
         # Stop the driver and join the thread
         driver['instance'].on_exit()
@@ -453,11 +457,13 @@ class CisRunner(object):
                 associated IO drivers.
 
         """
+        print 'model_exits', model['name']
         self.do_exits(model)
         # Stop associated server if not more clients
         for srv_name in model.get('client_of', []):
             # Stop client IO driver
             iod = self.outputdrivers["%s_%s" % (srv_name, model['name'])]
+            print 'stopping client', iod['name']
             iod['instance'].stop()
             self.do_exits(iod)
             # Remove this client from list for server
@@ -466,8 +472,10 @@ class CisRunner(object):
             # Stop server if there are not any more clients
             if len(srv['clients']) == 0:
                 iod = self.inputdrivers[srv_name]
+                print 'stopping server', iod['name']
                 iod['instance'].stop()
                 self.do_exits(iod)
+                print 'stopping server model', srv['name']
                 srv['instance'].stop()
                 # self.do_model_exits(srv)
         # Stop associated IO drivers
@@ -481,6 +489,7 @@ class CisRunner(object):
                     exit_method = getattr(drv['instance'], drv['onexit'])
                     exit_method()
             else:
+                print 'on_model_exit', drv['name']
                 drv['instance'].on_model_exit()
     
     def terminate(self):
@@ -499,6 +508,7 @@ class CisRunner(object):
         r"""Perform cleanup operations for all drivers."""
         debug('CisRunner::cleanup()')
         for driver in self.all_drivers:
+            print 'cleanup', driver['name']
             driver['instance'].cleanup()
 
     def printStatus(self):
@@ -519,20 +529,22 @@ class CisRunner(object):
         """
         debug('CisRunner::closeChannels()')
         drivers = [i for i in self.io_drivers()]
-        for driver in drivers:
-            driver = driver['instance']
-            debug("CisRunner:closeChannels(): stopping %s", driver)
+        for drv in drivers:
+            driver = drv['instance']
+            debug("CisRunner:closeChannels(): stopping %s", drv)
+            print 'stopping', force_stop, self.error_flag, drv['name']
             if force_stop or self.error_flag:
                 driver.terminate()
             else:
                 driver.stop()
-            debug("CisRunner:closeChannels(): stop(%s) returns", driver)
+            debug("CisRunner:closeChannels(): stop(%s) returns", drv)
         debug('closeChannels(): Channel Stops DONE')
-        for driver in drivers:
-            driver = driver['instance']
-            debug("CisRunner:closeChannels: join %s", driver)
+        for drv in drivers:
+            driver = drv['instance']
+            debug("CisRunner:closeChannels: join %s", drv)
+            print 'join', drv['name']
             driver.join()
-            debug("CisRunner:closeChannels: join %s done", driver)
+            debug("CisRunner:closeChannels: join %s done", drv)
         debug('CisRunner::closeChannels(): done')
 
         
