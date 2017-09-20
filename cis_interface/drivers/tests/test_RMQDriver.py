@@ -66,16 +66,13 @@ class TestRMQDriver(TestRMQParam, parent.TestDriver):
         assert(not self.instance._closing)
         super(TestRMQDriver, self).assert_after_terminate()
 
-    # def test_reconnect(self):
-    #     r"""Close the connection to simulation failure and force reconnect."""
-    #     if self.driver == 'RMQDriver':
-    #         with self.instance.lock:
-    #             self.instance.connection.close(reply_code=100,
-    #                                            reply_text="Test shutdown")
-    #         self.instance.sleep()
-        # import time
-        # time.sleep(10)
-        # print(self.instance.times_connected, 'times', self.instance._opening,
-        #       self.instance._closing)
-        # self.instance.sleep()
-        # self.instance.sleep()
+    def test_reconnect(self):
+        r"""Close the connection to simulation failure and force reconnect."""
+        if self.driver == 'RMQDriver':
+            with self.instance.lock:
+                self.instance.connection.close(reply_code=100,
+                                               reply_text="Test shutdown")
+            T = self.instance.start_timeout(5.0)
+            while (not T.is_out) and (self.instance.times_connected == 1):
+                self.instance.sleep()
+            self.instance.stop_timeout()

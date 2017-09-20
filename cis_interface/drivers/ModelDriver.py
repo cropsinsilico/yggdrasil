@@ -72,8 +72,8 @@ class ModelDriver(Driver):
         self.process.wait()
         if self.process is not None:
             if self.process.returncode != 0:
-                self.error("return code of %d indicates model error.",
-                           self.process.returncode)
+                self.info("return code of %d indicates model error.",
+                          self.process.returncode)
                 # self.raise_error(
                 #     RuntimeError("return code of %d indicates model error."
                 #                  % self.process.returncode))
