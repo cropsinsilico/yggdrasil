@@ -65,7 +65,7 @@ class AsciiTableOutputDriver(AsciiFileOutputDriver):
 
         """
         fmt = self.recv_wait()
-        if fmt is None:
+        if fmt is None:  # pragma: debug
             raise RuntimeError('Did not receive format string')
         with self.lock:
             self.file.update_format_str(fmt)

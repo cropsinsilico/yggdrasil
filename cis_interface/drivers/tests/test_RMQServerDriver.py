@@ -107,7 +107,7 @@ class TestRMQServerDriver(TestRMQServerParam, parent1.TestRMQDriver):
                 body=_end_client_msg)
         T = self.instance.start_timeout()
         while self.instance.n_clients != 0 and (not T.is_out):
-            self.instance.sleep()
+            self.instance.sleep()  # pragma: debug
         self.instance.stop_timeout()
         nt.assert_equal(self.instance.n_clients, 0)
 
