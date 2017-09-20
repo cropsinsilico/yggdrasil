@@ -116,6 +116,23 @@ def unicode2bytes(s):
     return b
 
 
+def encode_escape(s):
+    r"""Encode escape sequences.
+
+    Args:
+        s (str): String that should be encoded.
+
+    Returns:
+        str: Result of encoding escape sequences.
+
+    """
+    if PY2:  # pragma: Python 2
+        out = s.encode('string-escape')
+    else:  # pragma: Python 3
+        out = s.encode('unicode_escape')
+    return out
+
+
 def decode_escape(s):
     r"""Decode escape sequences.
 

@@ -109,7 +109,7 @@ class TestParam(unittest.TestCase):
         r"""Remove an instance."""
         if not inst._terminated:
             inst.terminate()
-        inst.join()
+        # inst.join()
         inst.cleanup()
         assert(not inst.is_alive())
         # print("removed instance")

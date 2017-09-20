@@ -59,10 +59,26 @@ def test_unicode2bytes():
         backwards.assert_bytes(res)
         nt.assert_equal(backwards.unicode2bytes('hello'), res)
         nt.assert_equal(backwards.unicode2bytes(unicode('hello')), res)
+        nt.assert_equal(backwards.unicode2bytes(bytearray('hello')), res)
         nt.assert_raises(TypeError, backwards.unicode2bytes, 1)
     else:  # pragma: Python 3
         res = backwards.bytes_type('hello', 'utf-8')
         backwards.assert_bytes(res)
         nt.assert_equal(backwards.unicode2bytes('hello'), res)
         nt.assert_equal(backwards.unicode2bytes(b'hello'), res)
+        nt.assert_equal(backwards.unicode2bytes(bytearray('hello')), res)
         nt.assert_raises(TypeError, backwards.unicode2bytes, 1)
+
+
+def test_encode_escape():
+    r"""Test escape encoding."""
+    s = 'hello\nhello'
+    ans = 'hello\\nhello'
+    nt.assert_equal(backwards.encode_escape(s), ans)
+
+    
+def test_decode_escape():
+    r"""Test esscape decoding."""
+    s = 'hello\\nhello'
+    ans = 'hello\nhello'
+    nt.assert_equal(backwards.decode_escape(s), ans)
