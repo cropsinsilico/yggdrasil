@@ -109,8 +109,7 @@ class TestParam(unittest.TestCase):
             inst.terminate()
         if inst.is_alive():
             inst.join()  # pragma: debug
-        # inst.__del__()
-        # del inst
+        inst.cleanup()
         assert(not inst.is_alive())
         # print("removed instance")
 
