@@ -46,6 +46,3 @@ disp('hello(M): Sent to outf');
 disp('Goodbye from Matlab');
 
 exit(0);
-
-
-

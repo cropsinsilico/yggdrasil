@@ -78,4 +78,4 @@ class TestCisRunner(object):
                'kwargs': {}}
         nt.assert_raises(Exception, self.runner.createInputDriver, yml)
         yml['driver'] = 'RMQOutputDriver'
-        nt.assert_raises(Exception, self.runner.createInputDriver, yml)
+        nt.assert_raises(Exception, self.runner.createOutputDriver, yml)

@@ -213,12 +213,20 @@ class MatlabModelDriver(ModelDriver):
             with self.lock:
                 if self.mlengine is None:  # pragma: debug
                     return
-                eval(command)
+                try:
+                    eval(command)
+                except Exception as e:
+                    self.raise_error(e)
 
-            # Get otuput
+            # Get output
             line = out.getvalue()
             sys.stdout.write(line)
             sys.stdout.flush()
+
+            # Get errors
+            # err = err.getvalue()
+            # sys.stdout.write(err)
+            # sys.stdout.flush()
 
             self.debug(".done")
         else:  # pragma: no matlab
