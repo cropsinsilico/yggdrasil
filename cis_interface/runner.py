@@ -131,6 +131,7 @@ class CisRunner(object):
         self.outputdrivers = {}
         self._inputchannels = []
         self._outputchannels = []
+        self.error_flag = False
         # Setup logging
         if cis_debug_prefix is None:
             cis_debug_prefix = namespace
@@ -222,8 +223,10 @@ class CisRunner(object):
                     yaml['outputs'].append(cli)
             # Add I/O drivers for this model
             for inp in yaml['inputs']:
+                inp['model_driver'] = yaml['name']
                 self.add_driver('input', inp, yamldir)
             for inp in yaml['outputs']:
+                inp['model_driver'] = yaml['name']
                 self.add_driver('output', inp, yamldir)
             dd = self.modeldrivers
         else:
@@ -239,7 +242,8 @@ class CisRunner(object):
                                 "Please remove it.") % yaml['name'])
         yaml['kwargs'] = {}
         kws_ignore = ['name', 'driver', 'args', 'kwargs', 'onexit',
-                      'input', 'inputs', 'output', 'outputs', 'clients']
+                      'input', 'inputs', 'output', 'outputs', 'clients',
+                      'model_driver']
         for k in yaml:
             if k not in kws_ignore:
                 yaml['kwargs'][k] = yaml[k]
@@ -409,20 +413,21 @@ class CisRunner(object):
         join the thread and perform exits for associated IO drivers."""
         debug('CisRunner:waitDrivers(): ')
         running = [d for d in self.modeldrivers.values()]
-        error_flag = False
         while(len(running)):
             for drv in running:
                 d = drv['instance']
                 if d.errors:
                     self.terminate()
-                    error_flag = True
                     break
                 d.join(1)
                 if not d.is_alive():
                     self.do_model_exits(drv)
                     running.remove(drv)
-        # self.closeChannels()
-        if not error_flag:
+        for drv in self.modeldrivers.values():
+            if drv['instance'].errors:  # pragma: debug
+                self.error_flag = True
+                break
+        if not self.error_flag:
             info('All models completed')
         else:
             error('One or more models generated errors.')
@@ -511,8 +516,9 @@ class CisRunner(object):
         drivers = [i for i in self.io_drivers()]
         for driver in drivers:
             driver = driver['instance']
+            model = self.modeldrivers[driver['model_driver']]
             debug("CisRunner:closeChannels(): stopping %s", driver)
-            if force_stop:
+            if force_stop or self.error_flag:
                 driver.terminate()
             else:
                 driver.stop()
