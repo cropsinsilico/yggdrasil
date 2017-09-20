@@ -138,9 +138,9 @@ class MatlabModelDriver(ModelDriver):
                 self.started_matlab = True
                 try:
                     self.mlengine = matlab.engine.connect_matlab(self.mlsession)
-                except matlab.engine.EngineError:  # pragma: debug
-                    self.exception("could not connect to matlab engine")
-                    return
+                except matlab.engine.EngineError as e:  # pragma: debug
+                    self.error("could not connect to matlab engine")
+                    self.raise_error(e)
             # Add things to Matlab environment
             fdir = os.path.dirname(os.path.abspath(self.args[0]))
             self.mlengine.addpath(_top_dir, nargout=0)
@@ -177,6 +177,12 @@ class MatlabModelDriver(ModelDriver):
         with self.lock:
             self.cleanup()
         super(MatlabModelDriver, self).terminate()
+
+    def start(self):
+        r"""Prevent Popen from standard model driver."""
+        print("start", self.name)
+        super(MatlabModelDriver, self).start(no_popen=True)
+        print("start finished", self.name)
 
     def run(self):
         r"""Run the matlab script in the matlab engine."""

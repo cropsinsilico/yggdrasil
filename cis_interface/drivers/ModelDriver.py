@@ -52,26 +52,43 @@ class ModelDriver(Driver):
         self.client_of = client_of
         self.env.update(os.environ)
 
+    def start(self, no_popen=False):
+        r"""Start subprocess before monitoring."""
+        if not no_popen:
+            self.debug(':run %s from %s with cwd %s and env %s',
+                       self.args, os.getcwd(), self.workingDir, pformat(self.env))
+            print('popen', self.name)
+            self.process = subprocess.Popen(
+                ['stdbuf', '-o0', '-e0'] + self.args, bufsize=0,
+                # If PIPEs are used, communicate must be used below
+                # stdin=subprocess.PIPE, stderr=subprocess.PIPE,
+                stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+                env=self.env, cwd=self.workingDir, preexec_fn=preexec)
+            print('popen finished', self.name)
+        super(ModelDriver, self).start()
+
     def run(self):
         r"""Run the model on a new process, receiving output from."""
         self.debug(':run %s from %s with cwd %s and env %s',
                    self.args, os.getcwd(), self.workingDir, pformat(self.env))
-        with self.lock:
-            try:
-                self.process = subprocess.Popen(
-                    ['stdbuf', '-o0', '-e0'] + self.args, bufsize=0,
-                    # If PIPEs are used, communicate must be used below
-                    # stdin=subprocess.PIPE, stderr=subprocess.PIPE,
-                    stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
-                    env=self.env, cwd=self.workingDir, preexec_fn=preexec)
-            except Exception as e:  # pragma: debug
-                self.raise_exception(e)
-                # self.exception('(%s): Exception starting in %s with wd %s',
-                #                self.args, os.getcwd, self.workingDir)
-                # return
+        # with self.lock:
+        #     try:
+        #         self.process = subprocess.Popen(
+        #             ['stdbuf', '-o0', '-e0'] + self.args, bufsize=0,
+        #             # If PIPEs are used, communicate must be used below
+        #             # stdin=subprocess.PIPE, stderr=subprocess.PIPE,
+        #             stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+        #             env=self.env, cwd=self.workingDir, preexec_fn=preexec)
+        #     except Exception as e:  # pragma: debug
+        #         self.raise_exception(e)
+        #         # self.exception('(%s): Exception starting in %s with wd %s',
+        #         #                self.args, os.getcwd, self.workingDir)
+        #         # return
         # Continue reading until PIPE
         print(self.name, 'reading output')
         while True:
+            if self.process is None:
+                break
             line = self.process.stdout.readline()
             if len(line) == 0:
                 break
@@ -89,8 +106,8 @@ class ModelDriver(Driver):
         if self.process is not None:
             if self.process.returncode != 0:
                 print(self.name, 'process error')
-                self.info("return code of %d indicates model error.",
-                          self.process.returncode)
+                self.info("return code of %s indicates model error.",
+                          str(self.process.returncode))
                 # self.raise_error(
                 #     RuntimeError("return code of %d indicates model error."
                 #                  % self.process.returncode))

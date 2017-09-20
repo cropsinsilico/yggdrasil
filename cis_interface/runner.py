@@ -498,24 +498,28 @@ class CisRunner(object):
         # self.closeChannels(force_stop=True)
         # debug('CisRunner::terminate(): stop models')
         for driver in self.all_drivers:
-            print 'stopping', driver['name']
-            debug('CisRunner::terminate(): stop %s', driver)
-            driver['instance'].terminate()
-            driver['instance'].join()
+            if 'instance' in driver:
+                print 'stopping', driver['name']
+                debug('CisRunner::terminate(): stop %s', driver)
+                driver['instance'].terminate()
+                if driver['instance'].is_alive():
+                    driver['instance'].join()
         debug('CisRunner::terminate(): returns')
 
     def cleanup(self):
         r"""Perform cleanup operations for all drivers."""
         debug('CisRunner::cleanup()')
         for driver in self.all_drivers:
-            print 'cleanup', driver['name']
-            driver['instance'].cleanup()
+            if 'instance' in driver:
+                print 'cleanup', driver['name']
+                driver['instance'].cleanup()
 
     def printStatus(self):
         r"""Print the status of all drivers, starting with the IO drivers."""
         debug("CisRunner: printStatus()")
         for driver in self.all_drivers:
-            driver['instance'].printStatus()
+            if 'instance' in driver:
+                driver['instance'].printStatus()
 
     def closeChannels(self, force_stop=False):
         r"""Stop IO drivers and join the threads.
