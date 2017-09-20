@@ -492,10 +492,11 @@ class CisRunner(object):
         # self.closeChannels(force_stop=True)
         # debug('CisRunner::terminate(): stop models')
         for driver in self.all_drivers:
-            print 'stopping', driver['name']
-            debug('CisRunner::terminate(): stop %s', driver)
-            driver['instance'].terminate()
-            driver['instance'].join()
+            if driver['instance'].is_alive():
+                print 'stopping', driver['name']
+                debug('CisRunner::terminate(): stop %s', driver)
+                driver['instance'].terminate()
+                driver['instance'].join()
         debug('CisRunner::terminate(): returns')
 
     def cleanup(self):
