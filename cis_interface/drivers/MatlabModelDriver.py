@@ -150,16 +150,13 @@ class MatlabModelDriver(ModelDriver):
         else:  # pragma: no matlab
             self.screen_session, self.mlsession = start_matlab()
 
-    def __del__(self):
-        self.terminate()
-
     def cleanup(self):
         r"""Close the Matlab session and engine."""
         try:
             stop_matlab(self.screen_session, self.mlengine,
                         self.mlsession)
         except SystemError as e:  # pragma: debug
-            self.error('.terminate failed to exit matlab engine')
+            self.error('.cleanup() failed to exit matlab engine')
             self.raise_error(e)
         self.screen_session = None
         self.mlsession = None
@@ -175,7 +172,7 @@ class MatlabModelDriver(ModelDriver):
     def terminate(self):
         r"""Terminate the driver, including the matlab engine."""
         if self._terminated:
-            self.debug(':terminated() Driver already terminated.')
+            self.debug(':terminate() Driver already terminated.')
             return
         with self.lock:
             self.cleanup()

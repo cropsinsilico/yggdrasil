@@ -417,7 +417,6 @@ class CisRunner(object):
             for drv in running:
                 d = drv['instance']
                 if d.errors:
-                    self.terminate()
                     break
                 d.join(1)
                 if not d.is_alive():
@@ -431,6 +430,7 @@ class CisRunner(object):
             info('All models completed')
         else:
             error('One or more models generated errors.')
+            self.terminate()
         debug('RunModels.run() returns')
 
     def do_exits(self, driver):
