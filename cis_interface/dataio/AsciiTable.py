@@ -550,6 +550,7 @@ class AsciiTable(AsciiFile):
         fd = self.fd
         if not self.is_open:
             fd = open(self.filepath, 'rb')
+            openned = True
         if self.use_astropy:
             arr = apy_ascii.read(fd, names=names).as_array()
         else:
@@ -593,6 +594,7 @@ class AsciiTable(AsciiFile):
             open_mode = 'ab'
         if not self.is_open:
             fd = open(self.filepath, open_mode)
+            openned = True
         if skip_header:
             names = None
         else:

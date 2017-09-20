@@ -44,7 +44,7 @@ class TestAsciiTableInputDriver(TestAsciiTableInputParam,
         super(super_parent.TestFileInputDriver, self).assert_before_stop()
         T = self.instance.start_timeout()
         while self.instance.n_ipc_msg == 0 and (not T.is_out):
-            self.instance.sleep()
+            self.instance.sleep()  # pragma: debug
         self.instance.stop_timeout()
         # Format string
         data = self.instance.recv_wait()
@@ -79,7 +79,7 @@ class TestAsciiTableInputDriver_Array(TestAsciiTableInputParam,
         super(super_parent.TestFileInputDriver, self).assert_before_stop()
         T = self.instance.start_timeout()
         while self.instance.n_ipc_msg == 0 and (not T.is_out):
-            self.instance.sleep()
+            self.instance.sleep()  # pragma: debug
         self.instance.stop_timeout()
         data = self.instance.ipc_recv()
         nt.assert_equal(data, self.fmt_str)

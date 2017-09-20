@@ -42,7 +42,7 @@ class TestAsciiFileInputDriver(TestAsciiFileInputParam,
         super(parent.TestFileInputDriver, self).assert_before_stop()
         T = self.instance.start_timeout()
         while self.instance.n_ipc_msg == 0 and not T.is_out:
-            self.instance.sleep()
+            self.instance.sleep()  # pragma: debug
         self.instance.stop_timeout()
         # Check file lines
         for iline, ans in enumerate(self.file_lines):

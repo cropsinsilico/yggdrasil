@@ -83,7 +83,7 @@ class TestRMQClientDriver(TestRMQClientParam, parent1.TestRMQDriver):
         T = self.instance.start_timeout()
         while ((not T.is_out) and ((not self.instance.is_valid) or
                                    (not self.srv_rmq.is_valid))):
-            self.instance.sleep()
+            self.instance.sleep()  # pragma: debug
         self.instance.stop_timeout()
         # Send message to IPC output
         self.instance.oipc.ipc_send_nolimit(self.msg_short)

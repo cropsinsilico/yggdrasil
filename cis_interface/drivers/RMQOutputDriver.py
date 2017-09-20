@@ -37,7 +37,7 @@ class RMQOutputDriver(RMQDriver, IODriver):
         while self.is_valid:
             self.debug("::publish_message(): IPC recv")
             data = self.ipc_recv()
-            if data is None:
+            if data is None:  # pragma: debug
                 self.debug("::publish_message(): queue closed!")
                 # print 'terminate'
                 # self.terminate()

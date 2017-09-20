@@ -109,8 +109,7 @@ class TestParam(unittest.TestCase):
         r"""Remove an instance."""
         if not inst._terminated:
             inst.terminate()
-        if inst.is_alive():
-            inst.join()  # pragma: debug
+        inst.join()
         inst.cleanup()
         assert(not inst.is_alive())
         # print("removed instance")
@@ -153,9 +152,6 @@ class TestDriver(TestParam):
         self.assert_before_stop()
         self.run_before_stop()
         self.instance.stop()
-        # This is asserted to not happen
-        # if self.instance.is_alive():
-        #     self.instance.join()
         self.assert_after_stop()
 
     def test_run_terminate(self):
@@ -165,8 +161,7 @@ class TestDriver(TestParam):
         self.instance.terminate()
         # Second time to ensure it is escaped
         self.instance.terminate()
-        if self.instance.is_alive():
-            self.instance.join()
+        # self.instance.join()
         self.assert_after_terminate()
 
         
