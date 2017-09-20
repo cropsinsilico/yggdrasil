@@ -216,7 +216,8 @@ class MatlabModelDriver(ModelDriver):
                 try:
                     eval(command)
                 except Exception as e:
-                    self.raise_error(e)
+                    # self.raise_error(e)
+                    self.error(e)
 
             # Get output
             line = out.getvalue()

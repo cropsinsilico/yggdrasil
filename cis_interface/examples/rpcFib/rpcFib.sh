@@ -17,6 +17,12 @@ case $1 in
 	yaml2='rpcFibCli_python.yml'
 	yaml3='rpcFibCliPar_matlab.yml'
 	;;
+    --all-nomatlab )
+	echo "Running Python, C++, C integration"
+	yaml1='rpcFibSrv_c.yml'
+	yaml2='rpcFibCli_python.yml'
+	yaml3='rpcFibCliPar_cpp.yml'
+	;;
     -p | --python )
 	echo "Running Python"
 	yaml1='rpcFibSrv_python.yml'
