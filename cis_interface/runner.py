@@ -419,15 +419,12 @@ class CisRunner(object):
             for drv in running:
                 d = drv['instance']
                 if d.errors:
+                    self.error_flag = True
                     break
                 d.join(1)
                 if not d.is_alive():
                     self.do_model_exits(drv)
                     running.remove(drv)
-        for drv in self.modeldrivers.values():
-            if drv['instance'].errors:
-                self.error_flag = True
-                break
         if not self.error_flag:
             info('All models completed')
         else:
