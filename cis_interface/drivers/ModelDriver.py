@@ -65,9 +65,12 @@ class ModelDriver(Driver):
                     stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
                     env=self.env, cwd=self.workingDir, preexec_fn=preexec)
             except:  # pragma: debug
-                self.exception('(%s): Exception starting in %s with wd %s',
-                               self.args, os.getcwd, self.workingDir)
-                return
+                self.raise_exception(Exception(
+                    '(%s): Exception starting in %s with wd %s' % (
+                                     self.args, os.getcwd, self.workingDir)))
+                # self.exception('(%s): Exception starting in %s with wd %s',
+                #                self.args, os.getcwd, self.workingDir)
+                # return
         # Continue reading until PIPE
         print(self.name, 'reading output')
         while True:
