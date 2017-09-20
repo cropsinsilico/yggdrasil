@@ -203,13 +203,14 @@ class TestDriverNoStart(TestParam):
         self.instance.start_timeout(10, key='fake_key')
         assert(not self.instance.check_timeout(key='fake_key'))
         # Test errors
-        nt.assert_raises(KeyError, self.instance.start_timeout, key='fake_key')
+        nt.assert_raises(KeyError, self.instance.start_timeout,
+                         0.1, key='fake_key')
         self.instance.stop_timeout(key='fake_key')
         nt.assert_raises(KeyError, self.instance.check_timeout)
         nt.assert_raises(KeyError, self.instance.check_timeout, key='fake_key')
         nt.assert_raises(KeyError, self.instance.stop_timeout, key='fake_key')
         # Test w/ timeout
-        T = self.instance.start_timeout(self.instance.sleeptime)
+        T = self.instance.start_timeout(0.001)  # self.instance.sleeptime)
         while not T.is_out:
             self.instance.sleep()
         assert(self.instance.check_timeout())

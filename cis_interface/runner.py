@@ -475,8 +475,8 @@ class CisRunner(object):
                 # self.do_model_exits(srv)
         # Stop associated IO drivers
         for drv in self.io_drivers(model['name']):
-            # if not drv['instance'].is_alive():
-            #     continue
+            if not drv['instance'].is_alive():
+                continue
             debug('CisRunner::do_model_exits(): on_model_exit %s', drv['name'])
             if 'onexit' in drv:
                 debug('CisRunner::onexit: %s', drv['onexit'])
