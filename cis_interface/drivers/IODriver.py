@@ -153,7 +153,7 @@ class IODriver(Driver):
             self.state = 'deliver'
             self.debug('::ipc_send %d bytes', len(data))
             try:
-                if not self.queue_open:  # pragma: debug
+                if not self.queue_open:
                     self.debug('.ipc_send(): mq closed')
                     return False
                 else:
@@ -207,7 +207,7 @@ class IODriver(Driver):
         prev = 0
         ret = True
         out = self.ipc_send(backwards.unicode2bytes("%ld" % len(data)))
-        if not out:  # pragma: debug
+        if not out:
             return out
         while prev < len(data):
             try:

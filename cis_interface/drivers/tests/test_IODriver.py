@@ -137,7 +137,21 @@ class TestIODriverNoStart(TestIOParam, parent.TestDriverNoStart):
         -
 
     """
-    pass
+
+    def test_send_recv(self):
+        r"""Test sending/receiving with queues closed."""
+        self.instance.close_queue()
+        assert(not self.instance.queue_open)
+        # Short
+        ret = self.instance.ipc_send(self.msg_short)
+        assert(not ret)
+        ret = self.instance.ipc_recv()
+        nt.assert_equal(ret, None)
+        # Long
+        ret = self.instance.ipc_send_nolimit(self.msg_short)
+        assert(not ret)
+        ret = self.instance.ipc_recv_nolimit()
+        nt.assert_equal(ret, None)
 
 
 class TestIODriver(TestIOParam, parent.TestDriver):
