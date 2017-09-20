@@ -59,19 +59,32 @@ class ModelDriver(Driver):
         with self.lock:
             try:
                 self.process = subprocess.Popen(
-                    ['stdbuf', '-o0'] + self.args, bufsize=0,
+                    ['stdbuf', '-o0', '-e0'] + self.args, bufsize=0,
                     # If PIPEs are used, communicate must be used below
                     # stdin=subprocess.PIPE, stderr=subprocess.PIPE,
-                    # stdout=subprocess.PIPE,
+                    stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
                     env=self.env, cwd=self.workingDir, preexec_fn=preexec)
             except:  # pragma: debug
                 self.exception('(%s): Exception starting in %s with wd %s',
                                self.args, os.getcwd, self.workingDir)
                 return
+        # Continue reading until PIPE
+        print(self.name, 'reading output')
+        while True:
+            line = self.process.readline()
+            if len(line) == 0:
+                break
+            print(line, end="")
+        print(self.name, 'process done')
         # Wait for process to stop w/o PIPE redirect
         print(self.name, 'waiting for process')
         self.process.wait()
         print(self.name, 'process done')
+        # Wait for process to stop w/ PIPE redirect
+        # (outdata, errdata) = self.process.communicate()
+        # print(outdata, end="")
+        # print(errdata, end="")
+        # Handle error
         if self.process is not None:
             if self.process.returncode != 0:
                 print(self.name, 'process error')
@@ -80,10 +93,6 @@ class ModelDriver(Driver):
                 # self.raise_error(
                 #     RuntimeError("return code of %d indicates model error."
                 #                  % self.process.returncode))
-        # Wait for process to stop w/ PIPE redirect
-        # (outdata, errdata) = self.process.communicate()
-        # print(outdata, end="")
-        # print(errdata, end="")
         self.debug(':run: done')
 
     def terminate(self):
