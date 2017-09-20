@@ -226,4 +226,3 @@ class MatlabModelDriver(ModelDriver):
             self.debug(".done")
         else:  # pragma: no matlab
             self.error("Matlab not installed. Could not run model.")
-            

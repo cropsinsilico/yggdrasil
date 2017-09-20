@@ -301,7 +301,7 @@ class CisRunner(object):
             os.chdir(curpath)
         except Exception as e:  # pragma: debug
             error("Exception %s: Unable to load driver from yaml %s",
-                 e, pformat(yml))
+                  e, pformat(yml))
             raise  # Nothing started yet so just raise
         return instance
 
@@ -409,20 +409,20 @@ class CisRunner(object):
         join the thread and perform exits for associated IO drivers."""
         debug('CisRunner:waitDrivers(): ')
         running = [d for d in self.modeldrivers.values()]
-        error = False
+        error_flag = False
         while(len(running)):
             for drv in running:
                 d = drv['instance']
                 if d.errors:
                     self.terminate()
-                    error = True
+                    error_flag = True
                     break
                 d.join(1)
                 if not d.is_alive():
                     self.do_model_exits(drv)
                     running.remove(drv)
         # self.closeChannels()
-        if not error:
+        if not error_flag:
             info('All models completed')
         else:
             error('One or more models generated errors.')

@@ -80,7 +80,7 @@ class IODriver(Driver):
                     self.debug('.graceful_stop(): draining %d messages',
                                self.n_ipc_msg)
                 self.sleep()
-        except as e:  # pragma: debug
+        except Exception as e:  # pragma: debug
             self.raise_error(e)
         self.stop_timeout()
         super(IODriver, self).graceful_stop()
@@ -95,8 +95,9 @@ class IODriver(Driver):
                     self.debug('.close_queue(): remove IPC id %d', self.mq.id)
                     self.mq.remove()
                     self.mq = None
-            except:  # pragma: debug
-                self.debug(':close_queue(): exception')
+            except Exception as e:  # pragma: debug
+                self.error(':close_queue(): exception')
+                self.raise_error(e)
         self.debug(':close_queue(): done')
         
     def terminate(self):
@@ -160,7 +161,7 @@ class IODriver(Driver):
                     self.debug('.ipc_send %d bytes completed', len(data))
                     self.state = 'delivered'
                     self.numSent = self.numSent + 1
-            except as e:  # pragma: debug
+            except Exception as e:  # pragma: debug
                 self.raise_error(e)
         return True
 
@@ -185,7 +186,7 @@ class IODriver(Driver):
                 else:
                     ret = backwards.unicode2bytes('')
                     self.debug('.ipc_recv(): no messages in the queue')
-            except as e:  # pragma: debug
+            except Exception as e:  # pragma: debug
                 self.raise_error(e)
             if ret is not None:
                 backwards.assert_bytes(ret)
@@ -204,7 +205,7 @@ class IODriver(Driver):
         self.state = 'deliver'
         self.debug('::ipc_send_nolimit %d bytes', len(data))
         prev = 0
-        error = False
+        ret = True
         out = self.ipc_send(backwards.unicode2bytes("%ld" % len(data)))
         if not out:  # pragma: debug
             return out
@@ -218,17 +219,16 @@ class IODriver(Driver):
                 self.debug('.ipc_send_nolimit(): %d of %d bytes sent',
                            next, len(data))
                 prev = next
-            except:  # pragma: debug
-                self.debug('.ipc_send_nolimit(): send interupted at %d of %d bytes.',
+            except Exception as e:  # pragma: debug
+                ret = False
+                self.error('.ipc_send_nolimit(): send interupted at %d of %d bytes.',
                            prev, len(data))
-                error = True
-                break
-        if not error:
+                self.raise_error(e)
+                # break
+        if ret:
             self.debug('.ipc_send_nolimit %d bytes completed', len(data))
         self.state = 'delivered'
-        if error:  # pragma: debug
-            return False
-        return True
+        return ret
 
     def ipc_recv_nolimit(self):
         r"""Receive a message larger than maxMsgSize in multiple parts.
@@ -264,9 +264,9 @@ class IODriver(Driver):
                           % (len(data), leng_exp))
             else:  # pragma: debug
                 ret, leng = None, -1
-                Exception('After %d tries, only %d of %d bytes were received.',
+                Exception('After %d tries, only %d of %d bytes were received.'
                           % (tries_orig, len(data), leng_exp))
-        except as e:  # pragma: debug
+        except Exception as e:  # pragma: debug
             ret, leng = None, -1
             self.raise_error(e)
         self.debug('.ipc_recv_nolimit ret %d bytes', leng)
