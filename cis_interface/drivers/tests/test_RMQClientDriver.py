@@ -66,9 +66,8 @@ class TestRMQClientDriver(TestRMQClientParam, parent1.TestRMQDriver):
     def create_server_rmq(self):
         r"""Create a new RMQServerDriver instance."""
         inst = runner.create_driver(
-            'RMQServerDriver', self.instance.request_queue,
-            self.instance.request_queue,
-            # 'RMQServerDriver', self.name, None,
+            'RMQServerDriver',
+            self.instance.request_queue, self.instance.request_queue,
             namespace=self.namespace, workingDir=self.workingDir,
             timeout=self.timeout)
         return inst

@@ -161,6 +161,8 @@ class TestDriver(TestParam):
         self.assert_before_stop()
         self.run_before_terminate()
         self.instance.terminate()
+        # Second time to ensure it is escaped
+        self.instance.terminate()
         if self.instance.is_alive():
             self.instance.join()
         self.assert_after_terminate()
@@ -195,3 +197,20 @@ class TestDriverNoStart(TestParam):
         self.instance.error(1)
         self.instance.exception(1)
         self.instance.printStatus()
+
+
+    def test_timeout(self):
+        r"""Test functionality of timeout."""
+        # Test w/o timeout
+        self.instance.start_timeout(10, key='fake_key')
+        assert(not self.instance.check_timeout(key='fake_key'))
+        # Test errors
+        nt.assert_raises(KeyError, self.instance.start_timeout, key='fake_key')
+        self.instance.stop_timeout(key='fake_key')
+        nt.assert_raises(KeyError, self.instance.check_timeout, key='fake_key')
+        nt.assert_raises(KeyError, self.instance.stop_timeout, key='fake_key')
+        # Test w/ timeout
+        self.instance.start_timeout(self.instance.sleeptime)
+        self.instance.sleep()
+        assert(self.instance.check_timeout)
+        self.instance.stop_timeout()

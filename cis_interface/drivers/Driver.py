@@ -218,36 +218,67 @@ class Driver(Thread):
         key = '%s(%s).%s' % (cls, self.name, fcn)
         return key
 
-    def start_timeout(self, t=None):
+    def start_timeout(self, t=None, key=None):
         r"""Start a timeout for the calling function/method.
 
         Args:
             t (float, optional): Maximum time that the calling function should
                 wait before timeing out. If not provided, the attribute
                 'timeout' is used.
+            key (str, optional): Key that should be associated with the timeout
+                that is created. Defaults to None and is set by the calling
+                driver and function/method (See `timeout_key`).
+
+        Raises:
+            KeyError: If the key already exists.
 
         """
         if t is None:
             t = self.timeout
-        key = self.timeout_key
+        if key is None:
+            key = self.timeout_key
         if key in self._timeouts:
-            raise Exception("Timeout already registered for %s" % key)
+            raise KeyError("Timeout already registered for %s" % key)
         self._timeouts[key] = TimeOut(t)
         return self._timeouts[key]
 
-    def check_timeout(self):
-        r"""Check timeout for the calling function/method."""
-        key = self.timeout_key
+    def check_timeout(self, key=None):
+        r"""Check timeout for the calling function/method.
+
+        Args:
+            key (str, optional): Key for timeout that should be checked.
+                Defaults to None and is set by the calling driver and
+                function/method (See `timeout_key`).
+
+        Raises:
+            KeyError: If there is not a timeout registered for the specified
+                key.
+
+        """
+        if key is None:
+            key = self.timeout_key
         if key not in self._timeouts:
-            raise Exception("No timeout registered for %s" % key)
+            raise KeyError("No timeout registered for %s" % key)
         t = self._timeouts[key]
         return t.is_out
         
-    def stop_timeout(self):
-        r"""Stop a timeout for the calling function method."""
-        key = self.timeout_key
+    def stop_timeout(self, key=None):
+        r"""Stop a timeout for the calling function method.
+
+        Args:
+            key (str, optional): Key for timeout that should be stopped.
+                Defaults to None and is set by the calling driver and
+                function/method (See `timeout_key`).
+
+        Raises:
+            KeyError: If there is not a timeout registered for the specified
+                key.
+
+        """
+        if key is None:
+            key = self.timeout_key
         if key not in self._timeouts:
-            raise Exception("No timeout registered for %s" % key)
+            raise KeyError("No timeout registered for %s" % key)
         t = self._timeouts[key]
         if t.is_out:
             self.error("Timeout for %s at %5.2f s" % (key, t.elapsed))

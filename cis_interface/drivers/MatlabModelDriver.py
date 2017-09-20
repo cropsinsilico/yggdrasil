@@ -152,8 +152,6 @@ class MatlabModelDriver(ModelDriver):
 
     def cleanup(self):
         r"""Close the Matlab session and engine."""
-        if self.mlsession is None:
-            return
         try:
             stop_matlab(self.screen_session, self.mlengine,
                         self.mlsession)
