@@ -177,7 +177,7 @@ class CisRunner(object):
                 for yml in yml_models:
                     self.add_driver('model', yml, yamldir)
             except Exception as e:  # pragma: debug
-                error("CisRunner:  could not load yaml: %s: %s", modelYml, e)
+                error("CisRunner: could not load yaml: %s: %s", modelYml, e)
                 raise  # Nothing started yet so just raise
 
     def add_driver(self, dtype, yaml, yamldir):
@@ -300,7 +300,7 @@ class CisRunner(object):
             yml['instance'] = instance
             os.chdir(curpath)
         except Exception as e:  # pragma: debug
-            info("ERROR:  Exception %s: Unable to load driver from yaml %s",
+            error("Exception %s: Unable to load driver from yaml %s",
                  e, pformat(yml))
             raise  # Nothing started yet so just raise
         return instance
@@ -400,7 +400,7 @@ class CisRunner(object):
             try:
                 d.start()
             except Exception as e:  # pragma: debug
-                error("CisRunner: ERROR:  %s did not start", d.name)
+                error("CisRunner: %s did not start", d.name)
                 raise e
         debug('CisRunner.startDrivers(): ALL DRIVERS STARTED')
 
@@ -409,15 +409,23 @@ class CisRunner(object):
         join the thread and perform exits for associated IO drivers."""
         debug('CisRunner:waitDrivers(): ')
         running = [d for d in self.modeldrivers.values()]
+        error = False
         while(len(running)):
             for drv in running:
                 d = drv['instance']
+                if d.errors:
+                    self.terminate()
+                    error = True
+                    break
                 d.join(1)
                 if not d.is_alive():
                     self.do_model_exits(drv)
                     running.remove(drv)
         # self.closeChannels()
-        info('All models completed')
+        if not error:
+            info('All models completed')
+        else:
+            error('One or more models generated errors.')
         debug('RunModels.run() returns')
 
     def do_exits(self, driver):
@@ -478,7 +486,7 @@ class CisRunner(object):
         debug('CisRunner::terminate(): stop models')
         for driver in self.all_drivers:
             debug('CisRunner::terminate(): stop %s', driver)
-            driver['instance'].stop()
+            driver['instance'].terminate()
         debug('CisRunner::terminate(): returns')
 
     def printStatus(self):

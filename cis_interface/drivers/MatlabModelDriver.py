@@ -158,9 +158,9 @@ class MatlabModelDriver(ModelDriver):
         try:
             stop_matlab(self.screen_session, self.mlengine,
                         self.mlsession)
-        except SystemError:  # pragma: debug
+        except SystemError as e:  # pragma: debug
             self.error('.terminate failed to exit matlab engine')
-            raise
+            self.raise_error(e)
         self.screen_session = None
         self.mlsession = None
         self.started_matlab = False
@@ -225,4 +225,5 @@ class MatlabModelDriver(ModelDriver):
 
             self.debug(".done")
         else:  # pragma: no matlab
-            warn("Matlab not installed. Could not run model.")
+            self.error("Matlab not installed. Could not run model.")
+            

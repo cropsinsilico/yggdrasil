@@ -80,9 +80,8 @@ class IODriver(Driver):
                     self.debug('.graceful_stop(): draining %d messages',
                                self.n_ipc_msg)
                 self.sleep()
-        except:  # pragma: debug
-            self.debug("::graceful_stop: exception")
-            # raise
+        except as e:  # pragma: debug
+            self.raise_error(e)
         self.stop_timeout()
         super(IODriver, self).graceful_stop()
         self.debug('.graceful_stop(): done')
@@ -161,9 +160,8 @@ class IODriver(Driver):
                     self.debug('.ipc_send %d bytes completed', len(data))
                     self.state = 'delivered'
                     self.numSent = self.numSent + 1
-            except:  # pragma: debug
-                self.debug('.ipc_send(): exception')
-                raise
+            except as e:  # pragma: debug
+                self.raise_error(e)
         return True
 
     def ipc_recv(self):
@@ -187,8 +185,8 @@ class IODriver(Driver):
                 else:
                     ret = backwards.unicode2bytes('')
                     self.debug('.ipc_recv(): no messages in the queue')
-            except:  # pragma: debug
-                self.error('.ipc_recv(): exception mq')
+            except as e:  # pragma: debug
+                self.raise_error(e)
             if ret is not None:
                 backwards.assert_bytes(ret)
             return ret
@@ -261,16 +259,16 @@ class IODriver(Driver):
             if len(data) == leng_exp:
                 ret, leng = data, len(data)
             elif len(data) > leng_exp:  # pragma: debug
-                self.error("%d bytes were recieved, but only %d were expected.",
-                           len(data), leng_exp)
                 ret, leng = None, -1
+                Exception("%d bytes were recieved, but only %d were expected."
+                          % (len(data), leng_exp))
             else:  # pragma: debug
-                self.error('After %d tries, only %d of %d bytes were received.',
-                           tries_orig, len(data), leng_exp)
                 ret, leng = None, -1
-        except:  # pragma: debug
-            raise
+                Exception('After %d tries, only %d of %d bytes were received.',
+                          % (tries_orig, len(data), leng_exp))
+        except as e:  # pragma: debug
             ret, leng = None, -1
+            self.raise_error(e)
         self.debug('.ipc_recv_nolimit ret %d bytes', leng)
         return ret
     
