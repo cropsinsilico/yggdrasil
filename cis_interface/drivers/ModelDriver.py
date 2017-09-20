@@ -71,25 +71,13 @@ class ModelDriver(Driver):
         r"""Run the model on a new process, receiving output from."""
         self.debug(':run %s from %s with cwd %s and env %s',
                    self.args, os.getcwd(), self.workingDir, pformat(self.env))
-        # with self.lock:
-        #     try:
-        #         self.process = subprocess.Popen(
-        #             ['stdbuf', '-o0', '-e0'] + self.args, bufsize=0,
-        #             # If PIPEs are used, communicate must be used below
-        #             # stdin=subprocess.PIPE, stderr=subprocess.PIPE,
-        #             stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
-        #             env=self.env, cwd=self.workingDir, preexec_fn=preexec)
-        #     except Exception as e:  # pragma: debug
-        #         self.raise_exception(e)
-        #         # self.exception('(%s): Exception starting in %s with wd %s',
-        #         #                self.args, os.getcwd, self.workingDir)
-        #         # return
-        # Continue reading until PIPE
+        # Continue reading until there is not any output
         print(self.name, 'reading output')
         while True:
-            if self.process is None:
-                break
-            line = self.process.stdout.readline()
+            with self.lock:
+                if self.process is None:
+                    break
+                line = self.process.stdout.readline()
             if len(line) == 0:
                 break
             print(line, end="")
