@@ -116,10 +116,6 @@ class IODriver(Driver):
         self.close_queue()
         super(IODriver, self).cleanup()
 
-    def on_model_exit(self):
-        r"""Actions to perform when the associated model driver is finished."""
-        pass
-    
     def printStatus(self, beg_msg='', end_msg=''):
         r"""Print information on the status of the IODriver.
 
