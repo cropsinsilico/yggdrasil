@@ -180,9 +180,7 @@ class MatlabModelDriver(ModelDriver):
 
     def start(self):
         r"""Prevent Popen from standard model driver."""
-        print("start", self.name)
         super(MatlabModelDriver, self).start(no_popen=True)
-        print("start finished", self.name)
 
     def run(self):
         r"""Run the matlab script in the matlab engine."""
@@ -220,6 +218,7 @@ class MatlabModelDriver(ModelDriver):
                 if self.mlengine is None:  # pragma: debug
                     return
                 try:
+                    # TODO: eval in thread to allow termination
                     eval(command)
                 except Exception as e:
                     # self.raise_error(e)
