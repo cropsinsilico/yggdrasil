@@ -15,9 +15,7 @@ def test_PsiMatlab():
     drv = IODriver.IODriver(name, '_IN')
     drv.start()
     os.environ.update(drv.env)
-    # ans = PsiInterface.PsiInput(name)
-    res = PsiInterface.PsiMatlab('PsiInput', (name,))
-    # nt.assert_equal(res, ans)
+    PsiInterface.PsiMatlab('PsiInput', (name,))
     drv.terminate()
 
 
