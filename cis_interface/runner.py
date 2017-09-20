@@ -516,7 +516,6 @@ class CisRunner(object):
         drivers = [i for i in self.io_drivers()]
         for driver in drivers:
             driver = driver['instance']
-            model = self.modeldrivers[driver['model_driver']]
             debug("CisRunner:closeChannels(): stopping %s", driver)
             if force_stop or self.error_flag:
                 driver.terminate()
