@@ -69,12 +69,12 @@ class ModelDriver(Driver):
                                self.args, os.getcwd, self.workingDir)
                 return
         # Wait for process to stop w/o PIPE redirect
-        print self.name, 'waiting for process'
+        print(self.name, 'waiting for process')
         self.process.wait()
-        print self.name, 'process done'
+        print(self.name, 'process done')
         if self.process is not None:
             if self.process.returncode != 0:
-                print self.name, 'process error'
+                print(self.name, 'process error')
                 self.info("return code of %d indicates model error.",
                           self.process.returncode)
                 # self.raise_error(
