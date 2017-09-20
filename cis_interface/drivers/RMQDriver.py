@@ -102,7 +102,7 @@ class RMQDriver(Driver):
         r"""bool: True if the connection ready for messages and not about to
         close. False otherwise."""
         with self.lock:
-            return (self.channel_open and not self._closing)
+            return (self.channel_open and not self._closing and not self._opening)
 
     # DRIVER FUNCTIONALITY
     def start(self):
@@ -111,15 +111,11 @@ class RMQDriver(Driver):
         super(RMQDriver, self).start()
         T = self.start_timeout()
         interval = 1  # timeout / 5
-        while not T.is_out:
-            if self.channel_open:
-                break
-            # import time; time.sleep(self.sleeptime)
+        while (not T.is_out) and (not self.channel_stable):
             self.sleep(interval)
-        with self.lock:
-            if self._opening:  # pragma: debug
-                raise RuntimeError("Connection never finished opening " +
-                                   "(%f/%f timeout)." % (T.elapsed, T.max_time))
+        if not self.channel_stable:  # pragma: debug
+            raise RuntimeError("Connection never finished opening " +
+                               "(%f/%f timeout)." % (T.elapsed, T.max_time))
         self.stop_timeout()
 
     def run(self):
