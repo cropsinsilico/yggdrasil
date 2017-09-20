@@ -17,7 +17,6 @@ class TestFileOutputParam(parent.TestIOParam):
         self.filepath = os.path.abspath('ascii_input.txt')
         self.args = self.filepath
         self.attr_list += ['args', 'fd', 'lock']
-        self.timeout = 5.0
         
 
 class TestFileOutputDriverNoStart(TestFileOutputParam,

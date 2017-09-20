@@ -66,8 +66,11 @@ class TestRMQClientDriver(TestRMQClientParam, parent1.TestRMQDriver):
     def create_server_rmq(self):
         r"""Create a new RMQServerDriver instance."""
         inst = runner.create_driver(
-            'RMQServerDriver', self.name, None,
-            namespace=self.namespace, workingDir=self.workingDir)
+            'RMQServerDriver', self.instance.request_queue,
+            self.instance.request_queue,
+            # 'RMQServerDriver', self.name, None,
+            namespace=self.namespace, workingDir=self.workingDir,
+            timeout=self.timeout)
         return inst
 
     # Disabled so that test message is not read by mistake
@@ -82,7 +85,7 @@ class TestRMQClientDriver(TestRMQClientParam, parent1.TestRMQDriver):
                                    (not self.srv_rmq.is_valid))):
             self.instance.sleep()
         self.instance.stop_timeout()
-        # Send message to IPC output & receive from RMQ output
+        # Send message to IPC output
         self.instance.oipc.ipc_send_nolimit(self.msg_short)
         # Receive on server side, then send back
         rmq_msg = self.srv_rmq.iipc.recv_wait_nolimit()

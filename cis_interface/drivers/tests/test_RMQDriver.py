@@ -20,7 +20,6 @@ class TestRMQParam(parent.TestParam, IOInfo):
                            'connection', 'queue', 'channel',
                            'routing_key', 'consumer_tag',
                            '_opening', '_closing', 'times_connected']
-        self.timeout = 60.0
         self.inst_kwargs['user'] = cis_cfg.get('RMQ', 'user')
 
         

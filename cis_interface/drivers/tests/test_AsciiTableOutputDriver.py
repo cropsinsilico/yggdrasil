@@ -53,7 +53,6 @@ class TestAsciiTableOutputDriver_Array(TestAsciiTableOutputParam,
         super(TestAsciiTableOutputDriver_Array, self).__init__(*args, **kwargs)
         self.inst_kwargs['as_array'] = True
         self.inst_kwargs['use_astropy'] = False
-        self.timeout = 5.0
 
     def setup(self):
         r"""Create a driver instance and start the driver."""

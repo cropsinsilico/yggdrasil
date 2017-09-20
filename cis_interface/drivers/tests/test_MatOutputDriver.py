@@ -43,7 +43,7 @@ class TestMatOutputDriver(TestMatOutputParam, parent.TestIODriver):
         super(TestMatOutputDriver, self).setup()
         self.instance.ipc_send_nolimit(self.pickled_data)
         self.instance.ipc_send_nolimit(self.instance.eof_msg)
-        self.timeout = 10.0
+        # self.timeout = 10.0
 
     def teardown(self):
         r"""Remove the instance, stoppping it."""

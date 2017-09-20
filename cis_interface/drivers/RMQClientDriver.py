@@ -114,7 +114,7 @@ class RMQClientDriver(RMQDriver, RPCDriver):
             self.debug("::IPC queue closed!")
             return
         elif len(message) == 0:
-            self.debug('::Checking in IPC queue again in %0.1f seconds',
+            self.debug('::Checking in IPC queue again in %5.2f seconds',
                        self.sleeptime)
             with self.lock:
                 if not self.channel_stable:  # pragma: debug

@@ -73,7 +73,6 @@ class TestAsciiTableInputDriver_Array(TestAsciiTableInputParam,
         self.inst_kwargs['as_array'] = 'True'
         self.inst_kwargs['column_names'] = 'None'
         self.inst_kwargs['use_astropy'] = 'False'
-        self.timeout = 5.0
 
     def assert_before_stop(self):
         r"""Assertions to make before stopping the driver instance."""
