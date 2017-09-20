@@ -71,15 +71,15 @@ class ModelDriver(Driver):
         # Continue reading until PIPE
         print(self.name, 'reading output')
         while True:
-            line = self.process.readline()
+            line = self.process.stdout.readline()
             if len(line) == 0:
                 break
             print(line, end="")
         print(self.name, 'process done')
         # Wait for process to stop w/o PIPE redirect
-        print(self.name, 'waiting for process')
-        self.process.wait()
-        print(self.name, 'process done')
+        # print(self.name, 'waiting for process')
+        # self.process.wait()
+        # print(self.name, 'process done')
         # Wait for process to stop w/ PIPE redirect
         # (outdata, errdata) = self.process.communicate()
         # print(outdata, end="")
