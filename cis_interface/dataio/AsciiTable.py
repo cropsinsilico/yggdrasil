@@ -561,6 +561,7 @@ class AsciiTable(AsciiFile):
                                 autostrip=True, names=names)
         if openned:
             fd.close()
+            fd = None
         return arr
 
     def write_array(self, array, names=None, skip_header=False, append=False):
@@ -625,6 +626,7 @@ class AsciiTable(AsciiFile):
                        newline=newline, header=head)
         if openned:
             fd.close()
+            fd = None
 
     def array_to_bytes(self, arr=None, order='C'):
         r"""Convert arr to bytestring.
