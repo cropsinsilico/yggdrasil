@@ -1,6 +1,3 @@
-import os
-import nose.tools as nt
-import tempfile
 from cis_interface.examples.tests import TestExample
 
 

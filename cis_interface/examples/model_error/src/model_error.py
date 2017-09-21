@@ -1,3 +1,6 @@
+import sys
+
+
 def runerror():
     # Raise exception or return non-zero value to indicate an error
     raise Exception("Test error")
