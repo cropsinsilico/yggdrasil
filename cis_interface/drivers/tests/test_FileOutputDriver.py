@@ -14,7 +14,7 @@ class TestFileOutputParam(parent.TestIOParam):
     def __init__(self, *args, **kwargs):
         super(TestFileOutputParam, self).__init__(*args, **kwargs)
         self.driver = 'FileOutputDriver'
-        self.filepath = os.path.abspath('ascii_input.txt')
+        self.filepath = os.path.abspath('%s_input.txt' % self.name)
         self.args = self.filepath
         self.attr_list += ['args', 'fd', 'lock']
         

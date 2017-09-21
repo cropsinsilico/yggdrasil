@@ -77,8 +77,9 @@ class RMQServerDriver(RMQDriver, RPCDriver):
             with self.lock:
                 if not self.channel_stable:  # pragma: debug
                     return
-                self.channel.basic_nack(delivery_tag=method.delivery_tag,
-                                        requeue=True)
+                # TODO: Requeue?
+                self.channel.basic_reject(delivery_tag=method.delivery_tag,
+                                          requeue=False)
         else:
             self.clients.add(props.reply_to)
             self.debug('::Message received')

@@ -15,7 +15,8 @@ class TestFileInputParam(parent.TestIOParam):
     def __init__(self, *args, **kwargs):
         super(TestFileInputParam, self).__init__(*args, **kwargs)
         self.driver = 'FileInputDriver'
-        self.filepath = os.path.join(tempfile.gettempdir(), 'ascii_input.txt')
+        self.filepath = os.path.join(tempfile.gettempdir(),
+                                     '%s_input.txt' % self.name)
         self.args = self.filepath
         self.attr_list += ['args', 'fd']
 
