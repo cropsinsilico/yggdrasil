@@ -187,42 +187,29 @@ class MatlabModelDriver(ModelDriver):
         if _matlab_installed:  # pragma: matlab
             self.debug('.run %s from %s', self.args[0], os.getcwd())
 
+            # Set up IO
             out = sio.StringIO()
             # err = sio.StringIO()
+            kwargs = dict(nargout=0, stdout=out)  # , stderr=err)
+            name = os.path.splitext(os.path.basename(self.args[0]))[0]
 
             # Add environment variables
             for k, v in self.env.items():
                 with self.lock:
-                    if self.mlengine is None:
+                    if self.mlengine is None:  # pragma: debug
                         return
                     self.mlengine.setenv(k, v, nargout=0)
-
-            # Construct command
-            # Strip the .m off - silly matlab
-            name = os.path.splitext(os.path.basename(self.args[0]))[0]
-            command = "self.mlengine." + name + "("
-            if len(self.args) > 1:
-                for a in self.args[1:]:
-                    if isinstance(a, str):
-                        command += "'%s', " % a
-                    else:
-                        command += "%s, " % str(a)
-                # command = command + ", ".join(self.args[1:]) +", "
-            command += "stdout=out, "
-            # command += "stderr=err, "
-            command += "nargout=0)"
-            self.debug(": command: %s", command)
 
             # Run
             with self.lock:
                 if self.mlengine is None:  # pragma: debug
                     return
                 try:
-                    # TODO: eval in thread to allow termination
-                    eval(command)
+                    # TODO: run in separate process to allow termination?
+                    func = getattr(self.mlengine, name)
+                    func(*self.args[1:], **kwargs)
                 except Exception as e:
-                    # self.raise_error(e)
-                    self.info(e)
+                    self.error(e)
 
             # Get output
             line = out.getvalue()

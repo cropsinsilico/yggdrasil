@@ -1,0 +1,23 @@
+---
+
+model:
+  name: model_error_cpp
+  driver: GCCModelDriver
+  args: ./src/model_error.cpp
+
+  inputs:
+    - name: inFile
+      driver: FileInputDriver
+      args: ./Input/input.txt
+    - name: model_errorQueueIn    
+      driver: RMQInputDriver
+      args: model_errorQueue
+      onexit: on_model_exit
+
+  outputs:
+    - name: model_errorQueueOut
+      driver: RMQOutputDriver
+      args: model_errorQueue
+    - name: outFile
+      driver: FileOutputDriver
+      args: /tmp/output_model_error.txt

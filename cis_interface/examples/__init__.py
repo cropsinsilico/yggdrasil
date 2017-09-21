@@ -3,6 +3,7 @@ import os
 
 
 ex_dict = {'hello': ('python', 'matlab', 'c', 'cpp'),
+           'model_error': ('python', 'matlab', 'c', 'cpp'),
            'SaM': ('python', 'matlab', 'c', 'cpp', 'all', 'all_nomatlab'),
            'ascii_io': ('python', 'matlab', 'c', 'cpp', 'all', 'all_nomatlab'),
            'rpcFib': ('python', 'matlab', 'c', 'cpp', 'all', 'all_nomatlab')}

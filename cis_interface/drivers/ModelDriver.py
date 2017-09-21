@@ -86,9 +86,19 @@ class ModelDriver(Driver):
         # print(errdata, end="")
         # Handle error
         if self.process is not None:
+            T = self.start_timeout()
+            self.process.poll()
+            while ((not T.is_out) and
+                   (self.process.returncode is None)):  # pragma: debug
+                self.sleep()
+                self.process.poll()
+            self.stop_timeout()
+            if self.process.returncode is None:
+                self.process.kill()
+                self.error("Return code is None, killing process")
             if self.process.returncode != 0:
-                self.info("return code of %s indicates model error.",
-                          str(self.process.returncode))
+                self.error("return code of %s indicates model error.",
+                           str(self.process.returncode))
                 # self.raise_error(
                 #     RuntimeError("return code of %d indicates model error."
                 #                  % self.process.returncode))

@@ -52,22 +52,17 @@ class GCCModelDriver(ModelDriver):
         # Compile in a new process
         self.args = run_args
         self.compiled = True
-        try:
-            self.debug("::compiling")
-            comp_process = subprocess.Popen(['stdbuf', '-o0'] + compile_args,
-                                            bufsize=0, stdin=subprocess.PIPE,
-                                            stderr=subprocess.STDOUT,
-                                            stdout=subprocess.PIPE)
-            output, err = comp_process.communicate()
-            exit_code = comp_process.returncode
-            if exit_code != 0:  # pragma: debug
-                self.error(output)
-                raise RuntimeError("Compilation failed with code %d." % exit_code)
-            self.debug('::compiled executable with gcc')
-        except:  # pragma: debug
-            self.compiled = False
-            self.exception('::Exception compiling %s, %s',
-                           ' '.join(compile_args), os.getcwd)
+        self.debug("::compiling")
+        comp_process = subprocess.Popen(['stdbuf', '-o0'] + compile_args,
+                                        bufsize=0, stdin=subprocess.PIPE,
+                                        stderr=subprocess.STDOUT,
+                                        stdout=subprocess.PIPE)
+        output, err = comp_process.communicate()
+        exit_code = comp_process.returncode
+        if exit_code != 0:  # pragma: debug
+            self.error(output)
+            raise RuntimeError("Compilation failed with code %d." % exit_code)
+        self.debug('::compiled executable with gcc')
 
     def compile_setup(self, cfile):
         r"""Perform setup based on source file.
@@ -100,3 +95,9 @@ class GCCModelDriver(ModelDriver):
             super(GCCModelDriver, self).run()
         else:  # pragma: debug
             self.error("Error compiling.")
+
+    def cleanup(self):
+        r"""Remove compile executable."""
+        if os.path.isfile(self.efile):
+            os.remove(self.efile)
+        super(GCCModelDriver, self).cleanup()
