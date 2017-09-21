@@ -1,4 +1,5 @@
 import os
+import uuid
 import warnings
 import unittest
 from cis_interface import runner
@@ -13,6 +14,7 @@ class TestExample(unittest.TestCase):
     def __init__(self, *args, **kwargs):
         self.name = None
         self.language = None
+        self.uuid = str(uuid.uuid4())
         self.env = {}
         super(TestExample, self).__init__(*args, **kwargs)
 
@@ -38,6 +40,11 @@ class TestExample(unittest.TestCase):
     def tearDown(self, *args, **kwargs):
         r"""Redirect unittest to nose style teardown."""
         self.teardown(*args, **kwargs)
+
+    @property
+    def namespace(self):
+        r"""str: Namespace for the example."""
+        return "%s_%s" % (self.name, self.uuid)
 
     @property
     def yaml(self):
@@ -70,7 +77,7 @@ class TestExample(unittest.TestCase):
                               (self.name, self.language))
         else:
             os.environ.update(self.env)
-            cr = runner.get_runner(self.yaml, namespace=self.name)
+            cr = runner.get_runner(self.yaml, namespace=self.namespace)
             cr.run()
             self.check_result()
 

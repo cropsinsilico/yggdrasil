@@ -93,15 +93,12 @@ class ModelDriver(Driver):
                 self.sleep()
                 self.process.poll()
             self.stop_timeout()
-            if self.process.returncode is None:
+            if self.process.returncode is None:  # pragma: debug
                 self.process.kill()
                 self.error("Return code is None, killing process")
             if self.process.returncode != 0:
                 self.error("return code of %s indicates model error.",
                            str(self.process.returncode))
-                # self.raise_error(
-                #     RuntimeError("return code of %d indicates model error."
-                #                  % self.process.returncode))
 
     def terminate(self):
         r"""Terminate the process running the model."""

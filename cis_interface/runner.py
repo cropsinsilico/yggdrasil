@@ -396,7 +396,7 @@ class CisRunner(object):
     def startDrivers(self):
         r"""Start drivers, starting with the IO drivers."""
         info('Starting I/O drivers and models on system ' +
-             '{} in PSI_NAMESPACE {} PSI_RANK {}'.format(
+             '{} in namespace {} with rank {}'.format(
                  self.host, self.namespace, self.rank))
         for driver in self.all_drivers:
             debug("CisRunner.startDrivers(): starting driver %s",
@@ -498,8 +498,10 @@ class CisRunner(object):
             if 'instance' in driver:
                 debug('CisRunner::terminate(): stop %s', driver)
                 driver['instance'].terminate()
-                if driver['instance'].is_alive():
-                    driver['instance'].join()
+                # Terminate should ensure instance not alive
+                assert(not driver['instance'].is_alive())
+                # if driver['instance'].is_alive():
+                #     driver['instance'].join()
         debug('CisRunner::terminate(): returns')
 
     def cleanup(self):
@@ -529,23 +531,22 @@ class CisRunner(object):
         debug('CisRunner::closeChannels()')
         drivers = [i for i in self.io_drivers()]
         for drv in drivers:
-            if 'instance' not in drv:
-                continue
-            driver = drv['instance']
-            debug("CisRunner:closeChannels(): stopping %s", drv)
-            if force_stop or self.error_flag:
-                driver.terminate()
-            else:
-                driver.stop()
-            debug("CisRunner:closeChannels(): stop(%s) returns", drv)
+            if 'instance' in drv:
+                driver = drv['instance']
+                debug("CisRunner:closeChannels(): stopping %s", drv)
+                if force_stop or self.error_flag:
+                    driver.terminate()
+                else:
+                    driver.stop()
+                debug("CisRunner:closeChannels(): stop(%s) returns", drv)
         debug('closeChannels(): Channel Stops DONE')
         for drv in drivers:
-            if 'instance' not in drv:
-                continue
-            driver = drv['instance']
-            debug("CisRunner:closeChannels: join %s", drv)
-            driver.join()
-            debug("CisRunner:closeChannels: join %s done", drv)
+            if 'instance' in drv:
+                driver = drv['instance']
+                debug("CisRunner:closeChannels: join %s", drv)
+                if driver.is_alive():
+                    driver.join()
+                debug("CisRunner:closeChannels: join %s done", drv)
         debug('CisRunner::closeChannels(): done')
 
         

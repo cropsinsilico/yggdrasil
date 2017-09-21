@@ -17,7 +17,7 @@ class Driver(Thread):
         env (dict, optional): Dictionary of environment variables that should
             be set when the driver starts. Defaults to {}.
         namespace (str, optional): Namespace for set of drivers running
-            together. If not provided, the environment variable 'PSI_NAMESPACE'
+            together. If not provided, the config option ('rmq', 'namespace')
             is used.
         rank (int, optional): Rank of the integration. Defaults to None.
         workingDir (str, optional): Working directory. If not provided, the

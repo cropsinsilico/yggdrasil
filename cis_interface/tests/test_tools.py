@@ -1,8 +1,5 @@
-import sysv_ipc
-from sysv_ipc import MessageQueue
 import nose.tools as nt
 from cis_interface import tools
-from cis_interface.drivers.IODriver import maxMsgSize
 
 
 def test_eval_kwarg():
@@ -13,6 +10,18 @@ def test_eval_kwarg():
         nt.assert_equal(tools.eval_kwarg(str(v)), v)
     nt.assert_equal(tools.eval_kwarg("'one'"), 'one')
     nt.assert_equal(tools.eval_kwarg('"one"'), 'one')
+
+
+def test_queue():
+    r"""Test creation/removal of queue."""
+    mq = tools.get_queue()
+    key = str(mq.key)
+    assert(key in tools._registered_queues)
+    tools._registered_queues.pop(key)
+    nt.assert_raises(KeyError, tools.remove_queue, mq)
+    tools._registered_queues[key] = mq
+    tools.remove_queue(mq)
+    assert(key not in tools._registered_queues)
 
 
 def test_ipcs():
@@ -34,8 +43,7 @@ def test_ipcrm_queues():
     r"""Test removal of ipc queues."""
     tools.ipcrm_queues()
     assert(len(tools.ipc_queues()) == 0)
-    mq = MessageQueue(None, flags=sysv_ipc.IPC_CREX,
-                      max_message_size=maxMsgSize)
+    mq = tools.get_queue()
     assert(len(tools.ipc_queues()) == 1)
     tools.ipcrm_queues(str(mq.key))
     assert(len(tools.ipc_queues()) == 0)

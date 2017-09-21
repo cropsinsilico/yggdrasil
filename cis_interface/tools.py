@@ -1,6 +1,14 @@
 """This modules offers various tools."""
 from subprocess import Popen, PIPE
+import sysv_ipc
 import time
+from cis_interface import backwards
+
+
+# OS X limit is 2kb
+PSI_MSG_MAX = 1024 * 2
+PSI_MSG_EOF = backwards.unicode2bytes("EOF!!!")
+_registered_queues = {}
 
 
 def eval_kwarg(x):
@@ -20,6 +28,44 @@ def eval_kwarg(x):
             return x
     return x
 
+
+def get_queue(qid=None):
+    r"""Create or return a sysv_ipc.MessageQueue and register it.
+
+    Args:
+        qid (int, optional): If provided, ID for existing queue that should be
+           returned. Defaults to None and a new queue is returned.
+
+    Returns:
+        :class:`sysv_ipc.MessageQueue`: Message queue.
+
+    """
+    kwargs = dict(max_message_size=PSI_MSG_MAX)
+    if qid is None:
+        kwargs['flags'] = sysv_ipc.IPC_CREX
+    mq = sysv_ipc.MessageQueue(qid, **kwargs)
+    key = str(mq.key)
+    if key not in _registered_queues:
+        _registered_queues[key] = mq
+    return mq
+
+
+def remove_queue(mq):
+    r"""Remove a sysv_ipc.MessageQueue and unregister it.
+
+    Args:
+        mq (:class:`sysv_ipc.MessageQueue`) Message queue.
+    
+    Raises:
+        KeyError: If the provided queue is not registered.
+
+    """
+    key = str(mq.key)
+    if key not in _registered_queues:
+        raise KeyError("Queue not registered.")
+    _registered_queues.pop(key)
+    mq.remove()
+    
 
 def ipcs(options=[]):
     r"""Get the output from running the ipcs command.

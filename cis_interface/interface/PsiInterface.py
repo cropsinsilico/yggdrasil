@@ -1,17 +1,12 @@
 from logging import debug
 import os
 import time
-from sysv_ipc import MessageQueue
 from cis_interface.backwards import pickle
 from cis_interface.interface.scanf import scanf
 from cis_interface.dataio.AsciiFile import AsciiFile
 from cis_interface.dataio.AsciiTable import AsciiTable
-from cis_interface import backwards
-
-
-# OS X limit is 2kb
-PSI_MSG_MAX = 1024 * 2
-PSI_MSG_EOF = backwards.unicode2bytes("EOF!!!")
+from cis_interface import backwards, tools
+from cis_interface.tools import PSI_MSG_MAX, PSI_MSG_EOF
 
 
 def PsiMatlab(_type, args):
@@ -63,7 +58,7 @@ class PsiInput(object):
         qid = os.environ.get(self.qName, '')
         qid = int(qid)
         debug("PsiInput(%s): qid %s", self.name, qid)
-        self.q = MessageQueue(qid, max_message_size=PSI_MSG_MAX)
+        self.q = tools.get_queue(qid)
         clidebug = os.environ.get('PSI_CLIENT_DEBUG', False)
         self.sleeptime = 0.25
         if clidebug:
@@ -155,7 +150,7 @@ class PsiOutput:
             # print('ERROR:  PsiInterface cant see ' + name + ' in env')
             # exit(-1)
         qid = int(os.environ[name + '_OUT'])
-        self.q = MessageQueue(qid, max_message_size=PSI_MSG_MAX)
+        self.q = tools.get_queue(qid)
         return
 
     def send(self, payload):

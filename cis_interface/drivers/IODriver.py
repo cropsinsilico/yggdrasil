@@ -1,8 +1,6 @@
-import sysv_ipc
-from sysv_ipc import MessageQueue
 from cis_interface.drivers.Driver import Driver
-from cis_interface.interface.PsiInterface import PSI_MSG_MAX
-from cis_interface import backwards
+from cis_interface import backwards, tools
+from cis_interface.tools import PSI_MSG_MAX
 
 
 # OS X limit is 2kb
@@ -34,8 +32,7 @@ class IODriver(Driver):
         self.state = 'Started'
         self.numSent = 0
         self.numReceived = 0
-        self.mq = MessageQueue(None, flags=sysv_ipc.IPC_CREX,
-                               max_message_size=maxMsgSize)
+        self.mq = tools.get_queue()
         self.env[name + suffix] = str(self.mq.key)
         self.debug(".env: %s", self.env)
 
@@ -93,7 +90,7 @@ class IODriver(Driver):
             try:
                 if self.queue_open:
                     self.debug('.close_queue(): remove IPC id %d', self.mq.id)
-                    self.mq.remove()
+                    tools.remove_queue(self.mq)
                     self.mq = None
             except Exception as e:  # pragma: debug
                 self.error(':close_queue(): exception')

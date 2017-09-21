@@ -1,4 +1,3 @@
-import os
 import nose.tools as nt
 from cis_interface.tests import scripts
 import cis_interface.drivers.tests.test_ModelDriver as parent
@@ -24,13 +23,14 @@ class TestGCCModelParam(parent.TestModelParam):
         self.driver = 'GCCModelDriver'
         self.args = [scripts['c'], '1', '-I' + _incl_interface]
         self.attr_list += ['compiled']
-        
-    def teardown(self):
-        r"""Remove the instance, stoppping it."""
-        fexec = self.instance.efile
-        super(TestGCCModelParam, self).teardown()
-        if os.path.isfile(fexec):
-            os.remove(fexec)
+
+    # Done in driver
+    # def teardown(self):
+    #     r"""Remove the instance, stoppping it."""
+    #     fexec = self.instance.efile
+    #     super(TestGCCModelParam, self).teardown()
+    #     if os.path.isfile(fexec):
+    #         os.remove(fexec)
             
 
 class TestGCCModelDriverNoStart(TestGCCModelParam,
