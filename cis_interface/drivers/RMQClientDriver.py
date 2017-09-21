@@ -169,7 +169,8 @@ class RMQClientDriver(RMQDriver, RPCDriver):
                 self.response = body
                 ch.basic_ack(delivery_tag=method.delivery_tag)
             else:
-                ch.basic_reject(method.delivery_tag, requeue=True)
+                # TODO: requeue rejected message
+                ch.basic_reject(method.delivery_tag, requeue=False)
 
     def stop_communication(self):
         r"""Stop consuming messages from the queue."""

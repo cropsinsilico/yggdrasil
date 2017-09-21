@@ -1,17 +1,7 @@
-# import os
 import nose.tools as nt
 import cis_interface.drivers.tests.test_RMQDriver as parent1
 from cis_interface.drivers.tests.test_IODriver import IOInfo
 from cis_interface import runner
-# from cis_interface.examples import yamls as ex_yamls
-
-
-# def test_yaml():
-#     r"""Test Server/Client setup using runner."""
-#     os.environ['FIB_ITERATIONS'] = '3'
-#     os.environ['FIB_SERVER_SLEEP_SECONDS'] = '0.002'
-#     cr = runner.get_runner(ex_yamls['rpcfib_python'])
-#     cr.run()
 
 
 class TestRMQClientParam(parent1.TestRMQParam, IOInfo):
@@ -87,6 +77,8 @@ class TestRMQClientDriver(TestRMQClientParam, parent1.TestRMQDriver):
         self.instance.stop_timeout()
         # Send message to IPC output
         self.instance.oipc.ipc_send_nolimit(self.msg_short)
+        # Send incorrect response to client
+        self.instance.rmq_send("Incorrect message")
         # Wait for message to be routed
         T = self.instance.start_timeout()
         while ((not T.is_out) and (self.srv_rmq.iipc.n_ipc_msg == 0)):

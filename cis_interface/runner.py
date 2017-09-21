@@ -543,10 +543,11 @@ class CisRunner(object):
         for drv in drivers:
             if 'instance' in drv:
                 driver = drv['instance']
-                debug("CisRunner:closeChannels: join %s", drv)
-                if driver.is_alive():
-                    driver.join()
-                debug("CisRunner:closeChannels: join %s done", drv)
+                assert(not driver.is_alive())
+                # debug("CisRunner:closeChannels: join %s", drv)
+                # if driver.is_alive():
+                #     driver.join()
+                # debug("CisRunner:closeChannels: join %s done", drv)
         debug('CisRunner::closeChannels(): done')
 
         
