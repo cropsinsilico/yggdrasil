@@ -2,8 +2,7 @@ import os
 import uuid
 import nose.tools as nt
 import unittest
-from cis_interface import runner
-from cis_interface.tools import ipc_queues
+from cis_interface import runner, tools
 from cis_interface.config import cis_cfg
 
 # TODO: Test Ctrl-C interruption
@@ -63,7 +62,7 @@ class TestParam(unittest.TestCase):
         cis_cfg.set('rmq', 'namespace', self.namespace)
         runner.setup_cis_logging(self.__module__)
         runner.setup_rmq_logging()
-        self.nprev_queues = len(ipc_queues())
+        self.nprev_queues = len(tools._registered_queues.keys())
         self._instance = self.create_instance()
         if not skip_start:
             self.instance.start()
@@ -75,7 +74,7 @@ class TestParam(unittest.TestCase):
             self._instance = None
             self.remove_instance(inst)
             delattr(self, '_instance')
-        nt.assert_equal(len(ipc_queues()), self.nprev_queues)
+        nt.assert_equal(len(tools._registered_queues.keys()), self.nprev_queues)
 
     @property
     def name(self):
