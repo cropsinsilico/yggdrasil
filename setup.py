@@ -88,6 +88,8 @@ setup(
         'drivers/matlab_screenrc',
         'interface/*.h', 'interface/*.hpp', 'interface/*.m',
         'tests/scripts/*', 'tests/data/*',
+        'examples/hello/*.yml', 'examples/hello/Input/*.txt',
+        'examples/model_error/*.yml', 'examples/model_error/Input/*.txt',
         'examples/ascii_io/*.yml', 'examples/ascii_io/Input/*.txt'],
     },
     include_package_data=True,
