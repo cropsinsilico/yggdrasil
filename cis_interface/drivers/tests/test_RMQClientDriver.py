@@ -1,7 +1,7 @@
 import nose.tools as nt
 import cis_interface.drivers.tests.test_RMQDriver as parent1
 from cis_interface.drivers.tests.test_IODriver import IOInfo
-from cis_interface import runner
+from cis_interface import runner, backwards
 
 
 class TestRMQClientParam(parent1.TestRMQParam, IOInfo):
@@ -78,7 +78,7 @@ class TestRMQClientDriver(TestRMQClientParam, parent1.TestRMQDriver):
         # Send message to IPC output
         self.instance.oipc.ipc_send_nolimit(self.msg_short)
         # Send incorrect response to client
-        self.instance.rmq_send("Incorrect message")
+        self.instance.rmq_send(backwards.unicode2bytes("Incorrect message"))
         # Wait for message to be routed
         T = self.instance.start_timeout()
         while ((not T.is_out) and (self.srv_rmq.iipc.n_ipc_msg == 0)):

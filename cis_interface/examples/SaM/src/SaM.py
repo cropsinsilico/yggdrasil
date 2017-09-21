@@ -16,7 +16,7 @@ if __name__ == '__main__':
     if not ret:
         print('SaM(P): ERROR RECV from input1')
         sys.exit(-1)
-    a = int(adata[0])
+    a = int(adata)
     print('SaM(P): Received %d from input1' % a)
 
     # Get input from static channel
@@ -24,7 +24,7 @@ if __name__ == '__main__':
     if not ret:
         print('SaM(P): ERROR RECV from static')
         sys.exit(-1)
-    b = int(bdata[0])
+    b = int(bdata)
     print('SaM(P): Received %d from static' % b)
 
     # Compute sum and send message to output channel
