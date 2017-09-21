@@ -8,7 +8,7 @@ _default_args = {'comment': '#',
 
 class AsciiFile(object):
     def __init__(self, filepath, io_mode, comment=_default_args['comment'],
-                 newline=_default_args['newline']):
+                 newline=_default_args['newline'], open_as_binary=True):
         r"""Class for reading/writing an ASCII file.
 
         Args:
@@ -22,6 +22,18 @@ class AsciiFile(object):
                 comments. Defaults to '#'.
             newline (str, optional): String that should be used to identify
                 the end of a line. Defaults to '\n'.
+            open_as_binary (bool, optional): If True, the file is opened in
+                binary mode. Defaults to True.
+
+        Attributes:
+            filepath (str): Full path to the file that should be read from
+                or written to.
+            io_mode (str): Mode that should be used to open the file.
+            comment (str): String that should be used to identify comments.
+            newline (str): String that should be used to identify the end of a
+                line.
+            open_as_binary (bool): If True, the file is opened in binary mode.
+            fd (file): File descriptor.
 
         Raises:
             TypeError: If filepath is not a string.
@@ -39,19 +51,28 @@ class AsciiFile(object):
             raise ValueError("File does not exist.")
         self.comment = backwards.unicode2bytes(comment)
         self.newline = backwards.unicode2bytes(newline)
+        self.open_as_binary = open_as_binary
         self.fd = None
 
     @property
     def is_open(self):
-        r"""Returns True if the file descriptor is open."""
+        r"""bool: Returns True if the file descriptor is open."""
         return (self.fd is not None)
+
+    @property
+    def open_mode(self):
+        r"""str: Mode that should be used to open the file."""
+        if self.open_as_binary:
+            return self.io_mode + 'b'
+        else:
+            return self.io_mode
 
     def open(self):
         r"""Open the associated file descriptor if it is not already open."""
         if self.io_mode is None:
             raise Exception("Cannot open in memory table.")
         if not self.is_open:
-            self.fd = open(self.filepath, self.io_mode + 'b')
+            self.fd = open(self.filepath, self.open_mode)
 
     def close(self):
         r"""Close the associated file descriptor if it is open."""
@@ -130,6 +151,10 @@ class AsciiFile(object):
         if not self.is_open:
             print("The file is not open. Nothing written.")
             return
-        if not isinstance(line, backwards.bytes_type):
-            raise TypeError("Line must be of type %s" % backwards.bytes_type)
+        if self.open_as_binary:
+            line = backwards.unicode2bytes(line)
+        else:
+            line = backwards.bytes2unicode(line)
+        # if not isinstance(line, backwards.bytes_type):
+        #     raise TypeError("Line must be of type %s" % backwards.bytes_type)
         self.fd.write(line)

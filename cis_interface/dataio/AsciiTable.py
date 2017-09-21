@@ -6,6 +6,8 @@ try:
     from astropy.io import ascii as apy_ascii
     from astropy.table import Table as apy_Table
     _use_astropy = True
+    if not backwards.PY2:  # pragma: Python 3
+        _use_astropy = False
 except:  # pragma: no cover
     apy_ascii, apy_Table = None, None
     print("astropy is not installed, reading/writing as an array will be " +
@@ -201,10 +203,7 @@ class AsciiTable(AsciiFile):
                 must be contained in the table. Defaults to False.
             column (str, optional): String that should be used to separate
                 columns. Defaults to "\t" (tab-delimited).
-            comment (str, optional): String that should be used to identify
-                comments. Default set by :class:`AsciiFile`.
-            newline (str, optional): String that should be used to identify
-                the end of a line. Default set by :class:`AsciiFile`.
+            **kwargs: Additonal keyword arguments are passed to AsciiFile.
 
         Raises:
             RuntimeError: If format_str is not provided and the io_mode is 'w'
@@ -215,6 +214,8 @@ class AsciiTable(AsciiFile):
             self.use_astropy = _use_astropy
         else:
             self.use_astropy = False
+        if self.use_astropy:
+            kwargs['open_as_binary'] = False
         super(AsciiTable, self).__init__(filepath, io_mode, **kwargs)
         self.column_names = None
         # Add default args specific to ascii table
@@ -471,8 +472,9 @@ class AsciiTable(AsciiFile):
         else:
             comment_list = []
             out = None
-            with open(self.filepath, 'rb') as fd:
+            with open(self.filepath, self.open_mode) as fd:
                 for line in fd:
+                    line = backwards.unicode2bytes(line)
                     if line.startswith(self.comment):
                         sline = line.lstrip(self.comment)
                         sline = sline.lstrip(backwards.unicode2bytes(' '))
@@ -503,8 +505,9 @@ class AsciiTable(AsciiFile):
                     if ifmt == str_fmt:
                         idx_str.append(i)
                 max_len = {i: 0 for i in idx_str}
-                with open(self.filepath, 'rb') as fd:
+                with open(self.filepath, self.open_mode) as fd:
                     for line in fd:
+                        line = backwards.unicode2bytes(line)
                         if line.startswith(self.comment):
                             continue
                         cols = line.split(self.newline)[0].split(self.column)
@@ -549,7 +552,7 @@ class AsciiTable(AsciiFile):
         openned = False
         fd = self.fd
         if not self.is_open:
-            fd = open(self.filepath, 'rb')
+            fd = open(self.filepath, self.open_mode)
             openned = True
         if self.use_astropy:
             arr = apy_ascii.read(fd, names=names).as_array()
@@ -585,14 +588,16 @@ class AsciiTable(AsciiFile):
         """
         fmt = backwards.bytes2unicode(self.format_str.split(self.newline)[0])
         column = backwards.bytes2unicode(self.column)
-        comment = backwards.bytes2unicode(self.comment)
+        comment = backwards.bytes2unicode(self.comment) + ' '
         newline = backwards.bytes2unicode(self.newline)
-        open_mode = 'wb'
+        open_mode = self.open_mode
         openned = False
         fd = self.fd
         if append:
             skip_header = True
-            open_mode = 'ab'
+            open_mode = 'a'
+            if self.open_as_binary:
+                open_mode += 'b'
         if not self.is_open:
             fd = open(self.filepath, open_mode)
             openned = True
@@ -612,7 +617,7 @@ class AsciiTable(AsciiFile):
                 table_format = 'commented_header'
                 table.meta["comments"] = [fmt]
             apy_ascii.write(table, fd,
-                            delimiter=column, comment=comment + ' ',
+                            delimiter=column, comment=comment,
                             format=table_format, names=names)
         else:
             if skip_header:
@@ -622,7 +627,7 @@ class AsciiTable(AsciiFile):
                 if names is not None:
                     head = column.join(names) + newline + " " + head
             np.savetxt(fd, array,
-                       fmt=fmt, delimiter=column, comments=comment + ' ',
+                       fmt=fmt, delimiter=column, comments=comment,
                        newline=newline, header=head)
         if openned:
             fd.close()

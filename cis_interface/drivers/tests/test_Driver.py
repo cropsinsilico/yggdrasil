@@ -1,4 +1,5 @@
 import os
+import uuid
 import nose.tools as nt
 import unittest
 from cis_interface import runner
@@ -14,6 +15,7 @@ class TestParam(unittest.TestCase):
     Attributes:
         driver (str): The driver class.
         args (object): Driver arguments.
+        uuid (str): Random unique identifier.
         namespace (str): PSI namespace to run drivers in.
         attr_list (list): List of attributes that should be checked for after
             initialization.
@@ -26,7 +28,8 @@ class TestParam(unittest.TestCase):
     def __init__(self, *args, **kwargs):
         self.driver = 'Driver'
         self.args = None
-        self.namespace = 'TESTING'
+        self.uuid = str(uuid.uuid4())
+        self.namespace = 'TESTING_%s' % self.uuid
         self.attr_list = ['name', 'sleeptime', 'longsleep', 'timeout',
                           'yml', 'env', 'namespace', 'rank', 'workingDir',
                           'lock']
@@ -77,7 +80,7 @@ class TestParam(unittest.TestCase):
     @property
     def name(self):
         r"""str: Name of the test driver."""
-        return 'Test' + self.driver
+        return 'Test%s_%s' % (self.driver, self.uuid)
 
     @property
     def instance(self):

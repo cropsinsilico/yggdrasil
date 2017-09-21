@@ -11,7 +11,7 @@ from itertools import chain
 import socket
 from cis_interface.backwards import sio
 from cis_interface.config import cis_cfg, cfg_environment
-import drivers
+from cis_interface import drivers
 
 
 COLOR_TRACE = '\033[30;43;22m'
@@ -382,15 +382,15 @@ class CisRunner(object):
         debug("CisRunner.loadDrivers()")
         # Create input drivers
         debug("CisRunner::loadDrivers(): loading input drivers")
-        for driver in self.inputdrivers.itervalues():
+        for driver in self.inputdrivers.values():
             self.createInputDriver(driver)
         # Create output drivers
         debug("CisRunner::loadDrivers(): loading output drivers")
-        for driver in self.outputdrivers.itervalues():
+        for driver in self.outputdrivers.values():
             self.createOutputDriver(driver)
         # Create model drivers
         debug("CisRunner::loadDrivers(): loading model drivers")
-        for driver in self.modeldrivers.itervalues():
+        for driver in self.modeldrivers.values():
             self.createModelDriver(driver)
 
     def startDrivers(self):
