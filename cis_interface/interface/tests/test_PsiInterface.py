@@ -245,7 +245,7 @@ class TestPsiAsciiFileOutput(IOInfo):
         del inst
         # Read temp file
         assert(os.path.isfile(self.tempfile))
-        with open(self.tempfile, 'r') as fd:
+        with open(self.tempfile, 'rb') as fd:
             res = fd.read()
             nt.assert_equal(res, self.file_contents)
 
@@ -376,7 +376,7 @@ class TestPsiAsciiTableOutput(IOInfo):
         del inst
         # Read temp file
         assert(os.path.isfile(self.tempfile))
-        with open(self.tempfile, 'r') as fd:
+        with open(self.tempfile, 'rb') as fd:
             res = fd.read()
             nt.assert_equal(res, self.file_contents)
 
@@ -427,7 +427,7 @@ class TestPsiAsciiTableOutput_AsArray(IOInfo):
         # del inst
         # Read temp file
         assert(os.path.isfile(self.tempfile))
-        with open(self.tempfile, 'r') as fd:
+        with open(self.tempfile, 'rb') as fd:
             res = fd.read()
             nt.assert_equal(res, self.file_contents)
         

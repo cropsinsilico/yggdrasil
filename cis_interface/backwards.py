@@ -18,7 +18,7 @@ else:  # pragma: Python 3
     bytes_type = bytes
     unicode_type = str
     unicode = None
-    np_dtype_str = 'U'
+    np_dtype_str = 'S'
 
 
 def assert_bytes(s):
@@ -116,6 +116,43 @@ def unicode2bytes(s):
     return b
 
 
+def match_stype(s1, s2):
+    r"""Encodes one string to match the type of the second.
+
+    Args:
+        s1 (str, bytes, bytearray, unicode): Object that type should be taken
+            from.
+        s2 (str, bytes, bytearray, unicode): Object that should be returned
+            in the type from s1.
+
+    Returns:
+        str, bytes, bytearray, unicode: Type matched version of s2.
+
+    Raises:
+        TypeError: If s1 is not str, bytes, bytearray or unicode.
+
+    """
+    if PY2:  # pragma: Python 2
+        if isinstance(s1, str):
+            out = unicode2bytes(s2)
+        elif isinstance(s1, unicode):
+            out = unicode(s2)
+        elif isinstance(s1, bytearray):
+            out = bytearray(bytes2unicode(s2), 'utf-8')
+        else:
+            raise TypeError("s1 must be str, bytes, bytearray or unicode.")
+    else:  # pragma: Python 3
+        if isinstance(s1, str):
+            out = bytes2unicode(s2)
+        elif isinstance(s1, bytes):
+            out = unicode2bytes(s2)
+        elif isinstance(s1, bytearray):
+            out = bytearray(bytes2unicode(s2), 'utf-8')
+        else:
+            raise TypeError("s1 must be str, bytes, bytearray or unicode.")
+    return out
+
+
 def encode_escape(s):
     r"""Encode escape sequences.
 
@@ -127,9 +164,9 @@ def encode_escape(s):
 
     """
     if PY2:  # pragma: Python 2
-        out = s.encode('string-escape')
+        out = match_stype(s, bytes2unicode(s).encode('string-escape'))
     else:  # pragma: Python 3
-        out = s.encode('unicode_escape')
+        out = match_stype(s, bytes2unicode(s).encode('unicode-escape'))
     return out
 
 
@@ -144,9 +181,10 @@ def decode_escape(s):
 
     """
     if PY2:  # pragma: Python 2
-        out = s.decode('string-escape')
+        out = match_stype(s, unicode2bytes(s).decode('string-escape'))
     else:  # pragma: Python 3
-        out = s.decode('unicode_escape').encode('latin1')
+        out = match_stype(s, unicode2bytes(s).decode('unicode-escape'))
+        # out = unicode2bytes(s).decode('unicode-escape').encode('latin1')
     return out
 
 

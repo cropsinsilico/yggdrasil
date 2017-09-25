@@ -1,0 +1,7 @@
+---
+
+model:
+  name: maxMsgSrv
+  driver: MatlabModelDriver
+  args: ./src/maxMsgSrv.m
+  is_server: True

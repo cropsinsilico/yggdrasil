@@ -2,6 +2,7 @@ import numpy as np
 from cis_interface.interface.scanf import scanf
 from cis_interface.dataio.AsciiFile import AsciiFile
 from cis_interface import backwards
+from numpy.compat import asbytes
 try:
     from astropy.io import ascii as apy_ascii
     from astropy.table import Table as apy_Table
@@ -63,17 +64,15 @@ def nptype2cformat(nptype):
     elif t == np.dtype("ulonglong"):  # pragma: no cover
         cfmt = "%llu"
     elif np.issubdtype(t, np.dtype("S")):
-        # cfmt = '%s'
         if t.itemsize is 0:
             cfmt = '%s'
         else:
             cfmt = "%" + str(t.itemsize) + "s"
     elif np.issubdtype(t, np.dtype("U")):
-        # cfmt = '%s'
         if t.itemsize is 0:
             cfmt = '%s'
         else:
-            cfmt = "%" + t.str[-1] + "s"
+            cfmt = "%" + str(t.itemsize) + "s"
     else:
         raise ValueError("No format specification string for dtype %s" % t)
     # Short and long specifiers not supported by python scanf
@@ -137,9 +136,11 @@ def cformat2nptype(cfmt):
     elif cfmt_str[-1] in ['c', 's']:
         lstr = cfmt_str[1:-1]
         if lstr:
-            out = backwards.np_dtype_str + lstr
+            lint = int(lstr)
         else:
-            out = backwards.np_dtype_str
+            lint = 0
+        lsiz = lint * np.dtype(backwards.np_dtype_str + '1').itemsize
+        out = '%s%d' % (backwards.np_dtype_str, lsiz)
     else:
         raise ValueError("Could not find match for format str %s" % cfmt)
     return np.dtype(out).str
@@ -550,21 +551,19 @@ class AsciiTable(AsciiFile):
         if hasattr(self, '_arr'):
             return self._arr
         openned = False
-        fd = self.fd
         if not self.is_open:
-            fd = open(self.filepath, self.open_mode)
+            self.open()
             openned = True
         if self.use_astropy:
-            arr = apy_ascii.read(fd, names=names).as_array()
+            arr = apy_ascii.read(self.fd, names=names).as_array()
         else:
-            arr = np.genfromtxt(fd,
+            arr = np.genfromtxt(self.fd,
                                 comments=backwards.bytes2unicode(self.comment),
                                 delimiter=backwards.bytes2unicode(self.column),
                                 dtype=self.dtype,
                                 autostrip=True, names=names)
         if openned:
-            fd.close()
-            fd = None
+            self.close()
         return arr
 
     def write_array(self, array, names=None, skip_header=False, append=False):
@@ -626,9 +625,25 @@ class AsciiTable(AsciiFile):
                 head = fmt
                 if names is not None:
                     head = column.join(names) + newline + " " + head
-            np.savetxt(fd, array,
-                       fmt=fmt, delimiter=column, comments=comment,
-                       newline=newline, header=head)
+            # Write directly to file, savetxt writes bytes as "b'body'"
+            if len(head) > 0:
+                head = head.replace(newline, newline + comment)
+                fd.write(asbytes(comment + head + newline))
+            iscomplex_X = np.iscomplexobj(array)
+            for row in array:
+                row2 = row
+                if iscomplex_X:
+                    row2 = []
+                    for x in row:
+                        if np.iscomplexobj(x):
+                            row2.append(x.real)
+                            row2.append(x.imag)
+                        else:
+                            row2.append(x)
+                fd.write(asbytes(fmt) % tuple(row2) + asbytes(newline))
+            # np.savetxt(fd, array,
+            #            fmt=fmt, delimiter=column, comments=comment,
+            #            newline=newline, header=head)
         if openned:
             fd.close()
             fd = None

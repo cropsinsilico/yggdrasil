@@ -1,0 +1,7 @@
+---
+
+model:
+  name: maxMsgCli
+  driver: PythonModelDriver
+  args: ./src/maxMsgCli.py
+  client_of: maxMsgSrv

@@ -22,8 +22,11 @@ def PsiMatlab(_type, args):
 
     """
     cls = eval(_type)
-    kwargs = {'matlab': True}
-    obj = cls(*args, **kwargs)
+    if isinstance(cls, (int, str)):
+        obj = cls
+    else:
+        kwargs = {'matlab': True}
+        obj = cls(*args, **kwargs)
     return obj
 
 
@@ -53,8 +56,6 @@ class PsiInput(object):
         debug("PsiInput(%s):", name)
         if self.qName not in os.environ:
             raise Exception('PsiInterface cant see %s in env.' % self.qName)
-            # print('ERROR:  PsiInterface cant see ' + name + ' in env')
-            # exit(-1)
         qid = os.environ.get(self.qName, '')
         qid = int(qid)
         debug("PsiInput(%s): qid %s", self.name, qid)
@@ -85,6 +86,7 @@ class PsiInput(object):
             debug("PsiInput(%s).recv(): read %d bytes", self.name, len(data))
         except Exception as ex:  # pragma: debug
             debug("PsiInput(%s).recv(): exception %s, return None", self.name, type(ex))
+            raise ex
         return payload
 
     def recv_nolimit(self):
@@ -105,7 +107,7 @@ class PsiInput(object):
         try:
             # (leng_exp,) = scanf('%d', payload[1])
             leng_exp = int(float(payload[1]))
-            data = ''
+            data = backwards.unicode2bytes('')
             ret = True
             while len(data) < leng_exp:
                 payload = self.recv()
@@ -115,14 +117,13 @@ class PsiInput(object):
                           self.name, len(data), leng_exp)
                     ret = False
                     break
-                data += payload[1]
+                data = data + payload[1]
             payload = (ret, data)
             debug("PsiInput(%s).recv_nolimit(): read %d bytes",
                   self.name, len(data))
         except Exception as ex:  # pragma: debug
             payload = (False, True)
-            debug("PsiInput(%s).recv_nolimit(): " +
-                  "exception %s, return None", self.name, type(ex))
+            raise ex
         return payload
         
 
@@ -147,8 +148,6 @@ class PsiOutput:
         debug("PsiOputput(%s)", name)
         if self.qName not in os.environ:
             raise Exception('PsiInterface cant see %s in env.' % self.qName)
-            # print('ERROR:  PsiInterface cant see ' + name + ' in env')
-            # exit(-1)
         qid = int(os.environ[name + '_OUT'])
         self.q = tools.get_queue(qid)
         return
@@ -171,6 +170,7 @@ class PsiOutput:
             debug("PsiOutput(%s).sent(%s)", self.name, payload)
         except Exception as ex:  # pragma: debug
             debug("PsiOutput(%s).send(%s): exception: %s", self.name, payload, type(ex))
+            raise ex
         debug("PsiOutput(%s).send(%s): returns %d", self.name, payload, ret)
         return ret
 
@@ -240,8 +240,8 @@ class PsiRpc(object):
             bool: Success or failure of sending the message.
 
         """
-        outmsg = self._outFmt % args
-        return self._out.send_nolimit(outmsg)
+        outmsg = backwards.bytes2unicode(self._outFmt) % args
+        return self._out.send_nolimit(backwards.unicode2bytes(outmsg))
 
     def rpcRecv(self):
         r"""Receive a message and get arguments by parsing the recieved message
@@ -255,7 +255,8 @@ class PsiRpc(object):
         """
         retval, args = self._in.recv_nolimit()
         if retval:
-            args = scanf(self._inFmt, args)
+            args = scanf(backwards.bytes2unicode(self._inFmt),
+                         backwards.bytes2unicode(args))
         return retval, args
 
     def rpcCall(self, *args):
@@ -444,11 +445,10 @@ class PsiAsciiTableInput(object):
             self._psi = PsiInput(name)
             ret, format_str = self._psi.recv()
             if not ret:  # pragma: debug
-                print('ERROR:  PsiAsciiTableInput could not ' +
-                      'receive format string from input')
-                exit(-1)
+                raise Exception('PsiAsciiTableInput could not receive format' +
+                                'string from input.')
             self._table = AsciiTable(
-                name, None, format_str=format_str.decode('string_escape'))
+                name, None, format_str=backwards.decode_escape(format_str))
 
     def __del__(self):
         if self._type == 0:
@@ -525,7 +525,7 @@ class PsiAsciiTableOutput(object):
         else:
             self._psi = PsiOutput(name)
             self._table = AsciiTable(name, None, format_str=fmt)
-            self._psi.send(fmt.decode('string_escape'))
+            self._psi.send(backwards.decode_escape(fmt))
 
     def __del__(self):
         if self._type == 0:

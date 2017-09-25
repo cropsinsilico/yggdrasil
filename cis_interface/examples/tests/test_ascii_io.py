@@ -47,9 +47,9 @@ class TestExampleAsciiIO(TestExample):
         r"""Assert that contents of input/output ascii files are identical."""
         assert(os.path.isfile(self.input_file))
         assert(os.path.isfile(self.output_file))
-        with open(self.input_file, 'r') as fd:
+        with open(self.input_file, 'rb') as fd:
             icont = fd.read()
-        with open(self.output_file, 'r') as fd:
+        with open(self.output_file, 'rb') as fd:
             ocont = fd.read()
         nt.assert_equal(icont, ocont)
         
@@ -71,7 +71,6 @@ class TestExampleAsciiIO(TestExample):
         
     def check_result(self):
         r"""Ensure output files are identical to input files."""
-        print(os.path.isfile(self.input_file))
         self.check_file()
         self.check_table()
         self.check_array()

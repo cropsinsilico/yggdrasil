@@ -1,11 +1,11 @@
 #
 # This should not be used directly by modelers
 #
+from __future__ import print_function
 import time
 from logging import debug, warn
 from datetime import datetime
 import os
-import sys
 import weakref
 try:  # pragma: matlab
     import matlab.engine
@@ -15,7 +15,7 @@ except ImportError:  # pragma: no matlab
          "Matlab support will be disabled.")
     _matlab_installed = False
 from cis_interface.drivers.ModelDriver import ModelDriver
-from cis_interface.backwards import sio
+from cis_interface import backwards
 from cis_interface.tools import TimeOut
 
 
@@ -188,8 +188,8 @@ class MatlabModelDriver(ModelDriver):
             self.debug('.run %s from %s', self.args[0], os.getcwd())
 
             # Set up IO
-            out = sio.StringIO()
-            # err = sio.StringIO()
+            out = backwards.sio.StringIO()
+            # err = backwards.sio.StringIO()
             kwargs = dict(nargout=0, stdout=out)  # , stderr=err)
             name = os.path.splitext(os.path.basename(self.args[0]))[0]
 
@@ -213,13 +213,11 @@ class MatlabModelDriver(ModelDriver):
 
             # Get output
             line = out.getvalue()
-            sys.stdout.write(line)
-            sys.stdout.flush()
+            print(line, end="")
 
             # Get errors
-            # err = err.getvalue()
-            # sys.stdout.write(err)
-            # sys.stdout.flush()
+            # line = err.getvalue()
+            # print(line, end="")
 
             self.debug(".done")
         else:  # pragma: no matlab

@@ -59,16 +59,27 @@ def test_unicode2bytes():
         backwards.assert_bytes(res)
         nt.assert_equal(backwards.unicode2bytes('hello'), res)
         nt.assert_equal(backwards.unicode2bytes(unicode('hello')), res)
-        nt.assert_equal(backwards.unicode2bytes(bytearray('hello')), res)
+        nt.assert_equal(backwards.unicode2bytes(bytearray('hello', 'utf-8')), res)
         nt.assert_raises(TypeError, backwards.unicode2bytes, 1)
     else:  # pragma: Python 3
         res = backwards.bytes_type('hello', 'utf-8')
         backwards.assert_bytes(res)
         nt.assert_equal(backwards.unicode2bytes('hello'), res)
         nt.assert_equal(backwards.unicode2bytes(b'hello'), res)
-        nt.assert_equal(backwards.unicode2bytes(bytearray('hello')), res)
+        nt.assert_equal(backwards.unicode2bytes(bytearray('hello', 'utf-8')), res)
         nt.assert_raises(TypeError, backwards.unicode2bytes, 1)
 
+
+def test_match_stype():
+    r"""Test string type matching."""
+    if backwards.PY2:  # pragma: Python 2
+        slist = ['hello', bytearray('hello'), unicode('hello')]
+    else:  # pragma: Python 3
+        slist = ['hello', b'hello', bytearray('hello', 'utf-8')]
+    for s1 in slist:
+        for s2 in slist:
+            nt.assert_equal(backwards.match_stype(s1, s2), s1)
+            
 
 def test_encode_escape():
     r"""Test escape encoding."""

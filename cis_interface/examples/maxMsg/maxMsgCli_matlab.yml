@@ -1,0 +1,7 @@
+---
+
+model:
+  name: maxMsgCli
+  driver: MatlabModelDriver
+  args: ./src/maxMsgCli.m
+  client_of: maxMsgSrv

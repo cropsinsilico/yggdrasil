@@ -1,6 +1,7 @@
 from __future__ import print_function
 import sys
 # Import necessary connection interfaces
+from cis_interface import backwards
 from cis_interface.interface.PsiInterface import (
     PsiAsciiFileInput, PsiAsciiFileOutput,
     PsiAsciiTableInput, PsiAsciiTableOutput)
@@ -13,10 +14,10 @@ if __name__ == '__main__':
     out_file = PsiAsciiFileOutput('outputPy_file')
     # Input & output from a table row by row
     in_table = PsiAsciiTableInput('inputPy_table')
-    out_table = PsiAsciiTableOutput('outputPy_table', "%5s\t%ld\t%3.1f\n")
+    out_table = PsiAsciiTableOutput('outputPy_table', '%5s\t%ld\t%3.1f\n')
     # Input & output from a table as an array
     in_array = PsiAsciiTableInput('inputPy_array')
-    out_array = PsiAsciiTableOutput('outputPy_array', "%5s\t%ld\t%3.1f\n")
+    out_array = PsiAsciiTableOutput('outputPy_array', '%5s\t%ld\t%3.1f\n')
 
     # Read lines from ASCII text file until end of file is reached.
     # As each line is received, it is then sent to the output ASCII file.
@@ -27,7 +28,7 @@ if __name__ == '__main__':
         (ret, line) = in_file.recv_line()
         if ret:
             # If the receive was succesful, send the line to output
-            print("File: %s", line, end='')
+            print("File: %s" % backwards.bytes2unicode(line), end='')
             ret = out_file.send_line(line)
             if not ret:
                 print("ascii_io(P): ERROR SENDING LINE")

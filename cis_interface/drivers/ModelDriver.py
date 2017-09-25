@@ -5,6 +5,7 @@ from __future__ import print_function
 import os
 import subprocess
 from pprint import pformat
+from cis_interface import backwards
 from cis_interface.drivers.Driver import Driver
 
 
@@ -77,7 +78,7 @@ class ModelDriver(Driver):
                 line = self.process.stdout.readline()
             if len(line) == 0:
                 break
-            print(line, end="")
+            print(backwards.bytes2unicode(line), end="")
         # Wait for process to stop w/o PIPE redirect
         # self.process.wait()
         # Wait for process to stop w/ PIPE redirect

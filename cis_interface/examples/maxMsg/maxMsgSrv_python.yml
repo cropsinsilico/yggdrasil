@@ -1,0 +1,7 @@
+---
+
+model:
+  name: maxMsgSrv
+  driver: PythonModelDriver
+  args: ./src/maxMsgSrv.py
+  is_server: True
