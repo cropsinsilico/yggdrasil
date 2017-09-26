@@ -29,9 +29,10 @@ mode2kws = {'r': {},
             'w': {'format_str': format_str, 'column_names': column_names},
             None: {'format_str': format_str, 'column_names': column_names}}
 
-unsupported_nptype = ['complex_', 'complex64', 'complex128', 'bool_']
+unsupported_nptype = ['bool_']
 map_nptype2cformat = [
     (['float_', 'float16', 'float32', 'float64'], '%g'),
+    (['complex_', 'complex64', 'complex128'], '%g%+gj'),
     # (['int8', 'short', 'intc', 'int_', 'longlong'], '%d'),
     # (['uint8', 'ushort', 'uintc', 'uint64', 'ulonglong'], '%u'),
     ('int8', '%hhd'), ('short', '%hd'), ('intc', '%d'), ('int_', '%ld'),
@@ -60,9 +61,13 @@ map_cformat2nptype = [(['f', 'F', 'e', 'E', 'g', 'G'], 'float64'),
                       (['llu', 'llo', 'llx', 'llX'], 'ulonglong'),
                       (['c', 's'], backwards.np_dtype_str),
                       ('s', backwards.np_dtype_str)]
+map_cformat2nptype.append(
+    (['%{}%+{}j'.format(_, _) for _ in ['f', 'F', 'e', 'E', 'g', 'G']],
+     'complex128'))
 
 
 def test_nptype2cformat():
+    r"""Test conversion from numpy dtype to C format string."""
     for a, b in map_nptype2cformat:
         if isinstance(a, str):
             a = [a]
@@ -74,11 +79,15 @@ def test_nptype2cformat():
 
 
 def test_cformat2nptype():
+    r"""Test conversion from C format string to numpy dtype."""
     for a, b in map_cformat2nptype:
         if isinstance(a, str):
             a = [a]
         for _ia in a:
-            ia = AsciiTable._fmt_char + backwards.unicode2bytes(_ia)
+            if _ia.startswith(AsciiTable._fmt_char):
+                ia = backwards.unicode2bytes(_ia)
+            else:
+                ia = AsciiTable._fmt_char + backwards.unicode2bytes(_ia)
             assert_equal(AsciiTable.cformat2nptype(ia), np.dtype(b).str)
     assert_raises(TypeError, AsciiTable.cformat2nptype, 0)
     assert_raises(ValueError, AsciiTable.cformat2nptype,
@@ -91,6 +100,7 @@ def test_cformat2nptype():
 
 
 def test_cformat2pyscanf():
+    r"""Test conversion of C format string to version for python scanf."""
     for a, b in map_cformat2pyscanf:
         if isinstance(a, str):
             a = [a]
@@ -106,6 +116,7 @@ def test_cformat2pyscanf():
 
 
 def test_AsciiTable():
+    r"""Test creation of an AsciiTable."""
     for mode in mode_list:
         for use_astropy in [False, True]:
             AF = AsciiTable.AsciiTable(mode2file[mode], mode,
@@ -119,6 +130,7 @@ def test_AsciiTable():
 
         
 def test_AsciiTable_open_close():
+    r"""Test opening/closing and AsciiTable file."""
     for use_astropy in [False, True]:
         for mode in mode_list:
             AF = AsciiTable.AsciiTable(mode2file[mode], mode,
@@ -134,6 +146,7 @@ def test_AsciiTable_open_close():
 
 
 def test_AsciiTable_line_full():
+    r"""Test writing/reading a full line to/from an AsciiTable file."""
     for use_astropy in [False, True]:
         AF_in = AsciiTable.AsciiTable(input_file, 'r',
                                       use_astropy=use_astropy, **mode2kws['r'])
@@ -185,6 +198,7 @@ def test_AsciiTable_line_full():
 
 
 def test_AsciiTable_line():
+    r"""Test reading/writing a row from/to an AsciiTable file."""
     for use_astropy in [False, True]:
         AF_in = AsciiTable.AsciiTable(input_file, 'r',
                                       use_astropy=use_astropy, **mode2kws['r'])
@@ -236,6 +250,7 @@ def test_AsciiTable_line():
 
 
 def test_AsciiTable_io_array():
+    r"""Test writing/reading an array to/from an AsciiTable file."""
     for use_astropy in [False, True]:
         AF_in = AsciiTable.AsciiTable(input_file, 'r',
                                       use_astropy=use_astropy, **mode2kws['r'])
@@ -270,6 +285,7 @@ def test_AsciiTable_io_array():
 
         
 def test_AsciiTable_io_array_skip_header():
+    r"""Test writing/reading an array to/from an AsciiTable file w/o a header."""
     for use_astropy in [False, True]:
         AF_in = AsciiTable.AsciiTable(input_file, 'r',
                                       use_astropy=use_astropy, **mode2kws['r'])
@@ -306,6 +322,7 @@ def test_AsciiTable_io_array_skip_header():
 
         
 def test_AsciiTable_array_bytes():
+    r"""Test converting an array from/to bytes using AsciiTable."""
     for use_astropy in [False, True]:
         for order in ['C', 'F']:
             AF_in = AsciiTable.AsciiTable(input_file, 'r',
@@ -355,6 +372,7 @@ def test_AsciiTable_array_bytes():
 
 
 def test_AsciiTable_io_bytes():
+    r"""Test writing/reading an array to/from an AsciiTable file as bytes."""
     for use_astropy in [False, True]:
         AF_in = AsciiTable.AsciiTable(input_file, 'r',
                                       use_astropy=use_astropy, **mode2kws['r'])
@@ -389,7 +407,22 @@ def test_AsciiTable_io_bytes():
         os.remove(output_file)
 
         
+def test_AsciiTable_complex():
+    r"""Test write/read of a table with a complex entry."""
+    dtype = np.dtype([('f0', 'float'), ('f1', 'complex')])
+    fmt = '%f\t%f%+fj\n'
+    out_arr = np.ones(3, dtype)
+    AF_out = AsciiTable.AsciiTable(output_file, 'w', dtype=dtype)
+    AF_out.write_array(out_arr)
+    AF_out.close()
+    AF_in = AsciiTable.AsciiTable(output_file, 'r', format_str=fmt)
+    in_arr = AF_in.read_array()
+    AF_in.close()
+    np.testing.assert_equal(in_arr, out_arr)
+
+    
 def test_AsciiTable_dtype_vs_format():
+    r"""Test updating the format string/numpy dtype for an AsciiTable."""
     AF0 = AsciiTable.AsciiTable(mode2file['r'], 'r', **mode2kws['r'])
     AF1 = AsciiTable.AsciiTable(mode2file['r'], 'r', dtype=AF0.dtype)
     AF1.update_format_str(AF0.format_str)
@@ -398,6 +431,7 @@ def test_AsciiTable_dtype_vs_format():
 
     
 def test_AsciiTable_writenames():
+    r"""Test writing column names to an AsciiTable file."""
     AF0 = AsciiTable.AsciiTable(mode2file['w'], 'w', **mode2kws['w'])
     AF0.column_names = None
     AF0.writenames()
@@ -405,6 +439,7 @@ def test_AsciiTable_writenames():
 
     
 def test_AsciiTable_validate_line():
+    r"""Test errors raised in line validation."""
     AF0 = AsciiTable.AsciiTable(mode2file['w'], 'w', **mode2kws['w'])
     assert_raises(AssertionError, AF0.validate_line,
                   backwards.unicode2bytes('wrong format'))

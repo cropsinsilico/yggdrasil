@@ -42,6 +42,8 @@ def nptype2cformat(nptype):
         raise TypeError("Input must be a string or a numpy.dtype")
     if t in [np.dtype(x) for x in ["float_", "float16", "float32", "float64"]]:
         cfmt = "%g"  # Ensures readability
+    elif t in [np.dtype(x) for x in ["complex_", "complex64", "complex128"]]:
+        cfmt = "%g%+gj"
     elif t == np.dtype("int8"):
         cfmt = "%hhd"
     elif t == np.dtype("short"):
@@ -109,7 +111,10 @@ def cformat2nptype(cfmt):
                          "does not contain type info")
     out = None
     cfmt_str = backwards.bytes2unicode(cfmt)
-    if cfmt_str[-1] in ['f', 'F', 'e', 'E', 'g', 'G']:
+    if cfmt_str in ['%{}%+{}j'.format(x, x) for x in
+                    ['f', 'F', 'e', 'E', 'g', 'G']]:
+        out = 'complex128'
+    elif cfmt_str[-1] in ['f', 'F', 'e', 'E', 'g', 'G']:
         out = 'float64'
     elif cfmt_str[-1] in ['d', 'i']:
         if 'hh' in cfmt_str:  # short short, single char
@@ -629,17 +634,14 @@ class AsciiTable(AsciiFile):
             if len(head) > 0:
                 head = head.replace(newline, newline + comment)
                 fd.write(asbytes(comment + head + newline))
-            iscomplex_X = np.iscomplexobj(array)
             for row in array:
-                row2 = row
-                if iscomplex_X:
-                    row2 = []
-                    for x in row:
-                        if np.iscomplexobj(x):
-                            row2.append(x.real)
-                            row2.append(x.imag)
-                        else:
-                            row2.append(x)
+                row2 = []
+                for x in row:
+                    if np.iscomplexobj(x):
+                        row2.append(x.real)
+                        row2.append(x.imag)
+                    else:
+                        row2.append(x)
                 fd.write(asbytes(fmt) % tuple(row2) + asbytes(newline))
             # np.savetxt(fd, array,
             #            fmt=fmt, delimiter=column, comments=comment,
