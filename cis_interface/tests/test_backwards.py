@@ -79,6 +79,7 @@ def test_match_stype():
     for s1 in slist:
         for s2 in slist:
             nt.assert_equal(backwards.match_stype(s1, s2), s1)
+    nt.assert_raises(TypeError, backwards.match_stype, 1, 'hello')
             
 
 def test_encode_escape():
