@@ -4,7 +4,8 @@
 #include <stdarg.h>
 
 /*! @brief Flag for checking if AsciiFile.h has already been included.*/
-#define ASCIIFILE_INCLUDED
+#ifndef ASCIIFILE_H_
+#define ASCIIFILE_H_
 
 /*! @brief Maximum line size. */
 #define LINE_SIZE_MAX 1024*2
@@ -142,3 +143,4 @@ asciiFile_t asciiFile(const char *filepath, const char *io_mode,
   return t;
 };
 
+#endif /*ASCIIFILE_H_*/

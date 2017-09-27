@@ -22,7 +22,7 @@ def PsiMatlab(_type, args=[]):
 
     """
     cls = eval(_type)
-    if isinstance(cls, (int, str)):
+    if isinstance(cls, (int, backwards.bytes_type, backwards.unicode_type)):
         obj = cls
     else:
         kwargs = {'matlab': True}

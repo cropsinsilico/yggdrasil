@@ -9,6 +9,9 @@ extern "C" {
 #include <string>
 #include <regex>
 
+/*! @brief Flag for checking if PsiInterface.hpp has already been included.*/
+#ifndef PSIINTERFACE_HPP_
+#define PSIINTERFACE_HPP_
 
 /*!
   @brief C++ interface to psiInput_t functionality.
@@ -144,8 +147,8 @@ public:
   */
   int send(int nargs, ...) {
     if (nargs != _pi._output._nfmt) {
-      error("PsiRpc(%s).send: %d args provided, but format expects %d.\n",
-	    _pi._output._name, nargs, _pi._output._nfmt);
+      psilog_error("PsiRpc(%s).send: %d args provided, but format expects %d.\n",
+		   _pi._output._name, nargs, _pi._output._nfmt);
       return -1;
     }
     va_list va;
@@ -167,8 +170,8 @@ public:
    */
   int recv(int nargs, ...) {
     if (nargs != _pi._input._nfmt) {
-      error("PsiRpc(%s).recv: %d args provided, but format expects %d.\n",
-	    _pi._input._name, nargs, _pi._input._nfmt);
+      psilog_error("PsiRpc(%s).recv: %d args provided, but format expects %d.\n",
+		   _pi._input._name, nargs, _pi._input._nfmt);
       return -1;
     }
     va_list va;
@@ -246,8 +249,8 @@ public:
     psiRpc_t _cpi = pi();
     int nfmt_tot = _cpi._output._nfmt + _cpi._input._nfmt;
     if (nargs != nfmt_tot) {
-      error("PsiRpcClient(%s).call: %d args provided, but format expects %d.\n",
-	    _cpi._output._name, nargs, nfmt_tot);
+      psilog_error("PsiRpcClient(%s).call: %d args provided, but format expects %d.\n",
+		   _cpi._output._name, nargs, nfmt_tot);
       return -1;
     }
     va_list va;
@@ -404,8 +407,8 @@ public:
     else
       nfmt = _pi._psi._nfmt;
     if (nargs != nfmt) {
-      error("PsiAsciiTableOutput(%s).send_row: %d args provided, but format expects %d.\n",
-	    _pi._name, nargs, nfmt);
+      psilog_error("PsiAsciiTableOutput(%s).send_row: %d args provided, but format expects %d.\n",
+		   _pi._name, nargs, nfmt);
       return -1;
     }
     int ret;
@@ -432,8 +435,8 @@ public:
     else
       nfmt = _pi._psi._nfmt;
     if (nargs != nfmt) {
-      error("PsiAsciiTableOutput(%s).send_array: %d args provided, but format expects %d.\n",
-	    _pi._name, nargs, nfmt);
+      psilog_error("PsiAsciiTableOutput(%s).send_array: %d args provided, but format expects %d.\n",
+		   _pi._name, nargs, nfmt);
       return -1;
     }
     int ret;
@@ -474,7 +477,7 @@ public:
     // For input, remove precision from floats to avoid confusing vsscanf
     // C version
     // int ret = simplify_formats(_pi._psi._fmt, PSI_MSG_MAX);
-    char *re = "%([[:digit:]]+\\$)?[+-]?([ 0]|'.{1})?-?[[:digit:]]*(\\.[[:digit:]]+)?([lhjztL])*([eEfFgG])";
+    const char re[PSI_MSG_MAX] = "%([[:digit:]]+\\$)?[+-]?([ 0]|'.{1})?-?[[:digit:]]*(\\.[[:digit:]]+)?([lhjztL])*([eEfFgG])";
     int ret = regex_replace_sub(_pi._psi._fmt, PSI_MSG_MAX,
     				re, "%$4$5", 0);
     if (ret < 0)
@@ -522,8 +525,8 @@ public:
     else
       nfmt = _pi._psi._nfmt;
     if (nargs != nfmt) {
-      error("PsiAsciiTableInput(%s).recv_row: %d args provided, but format expects %d.\n",
-	    _pi._name, nargs, nfmt);
+      psilog_error("PsiAsciiTableInput(%s).recv_row: %d args provided, but format expects %d.\n",
+		   _pi._name, nargs, nfmt);
       return -1;
     }
     int ret;
@@ -549,8 +552,8 @@ public:
     else
       nfmt = _pi._psi._nfmt;
     if (nargs != nfmt) {
-      error("PsiAsciiTableInput(%s).recv_array: %d args provided, but format expects %d.\n",
-	    _pi._name, nargs, nfmt);
+      psilog_error("PsiAsciiTableInput(%s).recv_array: %d args provided, but format expects %d.\n",
+		   _pi._name, nargs, nfmt);
       return -1;
     }
     int ret;
@@ -562,3 +565,5 @@ public:
   }
   
 };
+
+#endif /*PSIINTERFACE_HPP_*/

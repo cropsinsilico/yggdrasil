@@ -4,10 +4,11 @@
 #include <stdarg.h>
 #include <stdint.h>
 #include <regex.h>
-// Only include if not already included
-#if !defined (ASCIIFILE_INCLUDED)
 #include "AsciiFile.h"
-#endif
+
+/*! @brief Flag for checking if AsciiTable.h has already been included.*/
+#ifndef ASCIITABLE_H_
+#define ASCIITABLE_H_
 
 /*! @brief Enumerated types to be used for interpreting formats. */
 enum fmt_types { STRING, FLOAT, DOUBLE, COMPLEX,
@@ -876,3 +877,4 @@ asciiTable_t asciiTable(const char *filepath, const char *io_mode,
   return t;
 };
 
+#endif /*ASCIITABLE_H_*/

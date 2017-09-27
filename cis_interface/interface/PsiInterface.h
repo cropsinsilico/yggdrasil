@@ -14,6 +14,9 @@
 #include <../dataio/AsciiFile.h>
 #include <../dataio/AsciiTable.h>
 
+/*! @brief Flag for checking if PsiInterface.h has already been included.*/
+#ifndef PSIINTERFACE_H_
+#define PSIINTERFACE_H_
 
 /*! @brief Maximum message size. */
 #define PSI_MSG_MAX LINE_SIZE_MAX
@@ -102,7 +105,7 @@ void psiError(const char* fmt, ...) {
   va_end(ap);
 };
   
-#define error psiError
+#define psilog_error psiError
 #ifdef PSI_DEBUG
   #if PSI_DEBUG == INFO
     #define info psiInfo
@@ -159,8 +162,8 @@ int psi_mq(char *name, const char *yamlName){
   char *qid = getenv(name);
   // Fail if the driver did not declare the channel
   if (qid == NULL) {
-    error("psi_mq: Channel %s not registered, model/YAML mismatch (yaml=%s)\n",
-	  name, yamlName);
+    psilog_error("psi_mq: Channel %s not registered, model/YAML mismatch (yaml=%s)\n",
+		 name, yamlName);
     // Check if opposite channel exists
     char nm_opp[512];
     strcpy(nm_opp, yamlName);
@@ -170,8 +173,8 @@ int psi_mq(char *name, const char *yamlName){
       strcat(nm_opp, "_IN");
     qid = getenv(nm_opp);
     if (qid != NULL) {
-      error("psi_mq: Directed channel %s exists, but requested channel %s does not\n",
-	    nm_opp, name);
+      psilog_error("psi_mq: Directed channel %s exists, but requested channel %s does not\n",
+		   nm_opp, name);
     }
     return -1;
   }
@@ -179,13 +182,13 @@ int psi_mq(char *name, const char *yamlName){
   unsigned i;
   for (i =0; i < _psiChannelsUsed; i++ ){
     if (0 == strcmp(_psiChannelNames[i], name)){
-      error("Attempt to re-use channel %s", name);
+      psilog_error("Attempt to re-use channel %s", name);
       return -1;
     }
   }
   // Fail if > _psiTrackChannels channels used
   if (_psiChannelsUsed >= _psiTrackChannels) {
-    error("Too many channels in use, max: %d\n", _psiTrackChannels);
+    psilog_error("Too many channels in use, max: %d\n", _psiTrackChannels);
     return -1;
   }
   _psiChannelNames[_psiChannelsUsed++] = qid;
@@ -342,7 +345,7 @@ int psi_output_nmsg(psiOutput_t psiQ) {
   int num_messages;
   rc = msgctl(psiQ._handle, IPC_STAT, &buf);
   if (rc != 0) {
-    error("psi_output_nmsg: Could not access queue.");
+    psilog_error("psi_output_nmsg: Could not access queue.");
     return -1;
   }
   num_messages = buf.msg_qnum;
@@ -364,7 +367,7 @@ int psi_input_nmsg(psiInput_t psiQ) {
   int num_messages;
   rc = msgctl(psiQ._handle, IPC_STAT, &buf);
   if (rc != 0) {
-    error("psi_input_nmsg: Could not access queue.");
+    psilog_error("psi_input_nmsg: Could not access queue.");
     return -1;
   }
   num_messages = buf.msg_qnum;
@@ -384,8 +387,8 @@ static inline
 int psi_send(psiOutput_t psiQ, char *data, int len){
   debug("psi_send(%s): %d bytes", psiQ._name, len);
   if (len > PSI_MSG_MAX) {
-    error("psi_send(%s): message too large for single packet (PSI_MSG_MAX=%d, len=%d)",
-	  psiQ._name, PSI_MSG_MAX, len);
+    psilog_error("psi_send(%s): message too large for single packet (PSI_MSG_MAX=%d, len=%d)",
+		 psiQ._name, PSI_MSG_MAX, len);
     return -1;
   }
   msgbuf_t t;
@@ -400,8 +403,8 @@ int psi_send(psiOutput_t psiQ, char *data, int len){
       debug("psi_send(%s): msgsnd, sleep", psiQ._name);
       usleep(250*1000);
     } else {
-      error("psi_send:  msgsend(%d, %p, %d, IPC_NOWAIT) ret(%d), errno(%d): %s",
-	    psiQ._handle, &t, len, ret, errno, strerror(errno));
+      psilog_error("psi_send:  msgsend(%d, %p, %d, IPC_NOWAIT) ret(%d), errno(%d): %s",
+		   psiQ._handle, &t, len, ret, errno, strerror(errno));
       ret = -1;
       break;
     }
@@ -589,11 +592,11 @@ int vpsiSend(psiOutput_t psiQ, va_list ap) {
   int ret = vsnprintf(buf, PSI_MSG_MAX, psiQ._fmt, ap);
   debug("vpsiSend(%s): vsnprintf returns %d", psiQ._name, ret);
   if (ret < 0) {
-    error("vpsiSend(%s): vsnprintf encoding error", psiQ._name);
+    psilog_error("vpsiSend(%s): vsnprintf encoding error", psiQ._name);
     return -1;
   } else if (ret > PSI_MSG_MAX) {
-    error("vpsiSend(%s): encoded message too large. (PSI_MSG_MAX=%d, len=%d)",
-	  psiQ._name, PSI_MSG_MAX, ret);
+    psilog_error("vpsiSend(%s): encoded message too large. (PSI_MSG_MAX=%d, len=%d)",
+		 psiQ._name, PSI_MSG_MAX, ret);
     return -1;
   }
   ret = psi_send(psiQ, buf, ret);
@@ -619,7 +622,7 @@ int vpsiRecv(psiInput_t psiQ, va_list ap) {
   char buf[PSI_MSG_MAX];
   int ret = psi_recv(psiQ, buf, PSI_MSG_MAX);
   if (ret < 0) {
-    /* error("vpsiRecv(%s): Error receiving.", psiQ._name); */
+    /* psilog_error("vpsiRecv(%s): Error receiving.", psiQ._name); */
     return ret;
   }
   debug("vpsiRecv(%s): psi_recv returns %d: %s", psiQ._name, ret, buf);
@@ -632,16 +635,16 @@ int vpsiRecv(psiInput_t psiQ, va_list ap) {
   strcpy(fmt, psiQ._fmt);
   int sret = simplify_formats(fmt, PSI_MSG_MAX);
   if (sret < 0) {
-    error("vpsiRecv(%s): simplify_formats returned %d",
-	  psiQ._name, sret);
+    psilog_error("vpsiRecv(%s): simplify_formats returned %d",
+		 psiQ._name, sret);
     return -1;
   }
   debug("vpsiRecv(%s): simplify_formats returns %d", psiQ._name, sret);
   // Interpret message
   sret = vsscanf(buf, fmt, ap);
   if (sret != psiQ._nfmt) {
-    error("vpsiRecv(%s): vsscanf filled %d variables, but there are %d formats",
-          psiQ._name, sret, psiQ._nfmt);
+    psilog_error("vpsiRecv(%s): vsscanf filled %d variables, but there are %d formats",
+		 psiQ._name, sret, psiQ._nfmt);
     return -1;
   }
   debug("vpsiRecv(%s): vsscanf returns %d", psiQ._name, sret);
@@ -701,7 +704,7 @@ int vpsiSend_nolimit(psiOutput_t psiQ, va_list ap) {
   char *buf = (char*)malloc(PSI_MSG_MAX);
   int ret = vsnprintf(buf, PSI_MSG_MAX, psiQ._fmt, ap);
   if (ret < 0) {
-    error("vpsiSend_nolimit(%s): vsnprintf encoding error", psiQ._name);
+    psilog_error("vpsiSend_nolimit(%s): vsnprintf encoding error", psiQ._name);
     free(buf);
     return -1;
   } else if (ret > PSI_MSG_MAX) {
@@ -733,7 +736,7 @@ int vpsiRecv_nolimit(psiInput_t psiQ, va_list ap) {
   char *buf = (char*)malloc(PSI_MSG_MAX);
   int ret = psi_recv_nolimit(psiQ, &buf, PSI_MSG_MAX);
   if (ret < 0) {
-    /* error("vpsiRecv_nolimit(%s): Error receiving.", psiQ._name); */
+    /* psilog_error("vpsiRecv_nolimit(%s): Error receiving.", psiQ._name); */
     free(buf);
     return ret;
   }
@@ -748,8 +751,8 @@ int vpsiRecv_nolimit(psiInput_t psiQ, va_list ap) {
   strcpy(fmt, psiQ._fmt);
   int sret = simplify_formats(fmt, PSI_MSG_MAX);
   if (sret < 0) {
-    error("vpsiRecv_nolimit(%s): simplify_formats returned %d",
-	  psiQ._name, sret);
+    psilog_error("vpsiRecv_nolimit(%s): simplify_formats returned %d",
+		 psiQ._name, sret);
     free(buf);
     return -1;
   }
@@ -757,8 +760,8 @@ int vpsiRecv_nolimit(psiInput_t psiQ, va_list ap) {
   // Interpret message
   sret = vsscanf(buf, fmt, ap);
   if (sret != psiQ._nfmt) {
-    error("vpsiRecv_nolimit(%s): vsscanf filled %d variables, but there are %d formats",
-          psiQ._name, sret, psiQ._nfmt);
+    psilog_error("vpsiRecv_nolimit(%s): vsscanf filled %d variables, but there are %d formats",
+		 psiQ._name, sret, psiQ._nfmt);
     free(buf);
     return -1;
   }
@@ -1129,7 +1132,7 @@ psiAsciiFileOutput_t psiAsciiFileOutput(const char *name, int dst_type) {
     out._file = asciiFile(name, "w", NULL, NULL);
     ret = af_open(&(out._file));
     if (ret != 0) {
-      error("psiAsciiFileOutput: Could not open %s", name);
+      psilog_error("psiAsciiFileOutput: Could not open %s", name);
       out._valid = 0;
     }
   } else {
@@ -1159,7 +1162,7 @@ psiAsciiFileInput_t psiAsciiFileInput(const char *name, int src_type) {
     out._file = asciiFile(name, "r", NULL, NULL);
     ret = af_open(&(out._file));
     if (ret != 0) {
-      error("psiAsciiFileInput: Could not open %s", name);
+      psilog_error("psiAsciiFileInput: Could not open %s", name);
       out._valid = 0;
     }
   } else {
@@ -1373,7 +1376,7 @@ psiAsciiTableOutput_t psiAsciiTableOutput(const char *name, char *format_str,
 			    NULL, NULL, NULL);
     ret = at_open(&(out._table));
     if (ret != 0) {
-      error("psiAsciiTableOutput: Could not open %s", name);
+      psilog_error("psiAsciiTableOutput: Could not open %s", name);
       out._valid = 0;
     } else {
       at_writeformat(out._table);
@@ -1382,7 +1385,7 @@ psiAsciiTableOutput_t psiAsciiTableOutput(const char *name, char *format_str,
     out._psi = psiOutput(name);
     ret = psi_send(out._psi, format_str, strlen(format_str));
     if (ret != 0) {
-      error("psiAsciiTableOutput: Failed to receive format string.");
+      psilog_error("psiAsciiTableOutput: Failed to receive format string.");
       out._valid = 0;
     } else {
       out._table = asciiTable(name, "0", format_str,
@@ -1414,7 +1417,7 @@ psiAsciiTableInput_t psiAsciiTableInput(const char *name, int src_type) {
 			    NULL, NULL, NULL);
     ret = at_open(&(out._table));
     if (ret != 0) {
-      error("psiAsciiTableInput: Could not open %s", name);
+      psilog_error("psiAsciiTableInput: Could not open %s", name);
       out._valid = 0;
     }
   } else {
@@ -1422,7 +1425,7 @@ psiAsciiTableInput_t psiAsciiTableInput(const char *name, int src_type) {
     out._psi._fmt = (char*)malloc(PSI_MSG_MAX);
     ret = psi_recv(out._psi, out._psi._fmt, PSI_MSG_MAX);
     if (ret < 0) {
-      error("psiAsciiTableInput: Failed to receive format string.");
+      psilog_error("psiAsciiTableInput: Failed to receive format string.");
       out._valid = 0;
     } else {
       out._psi._nfmt = count_formats(out._psi._fmt);
@@ -1660,3 +1663,4 @@ void cleanup_pato(psiAsciiTableOutput_t *t) {
   at_cleanup(&((*t)._table));
 };
 
+#endif /*PSIINTERFACE_H_*/
