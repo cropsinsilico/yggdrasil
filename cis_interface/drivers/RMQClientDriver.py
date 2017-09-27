@@ -70,7 +70,7 @@ class RMQClientDriver(RMQDriver, RPCDriver):
         self.channel.basic_qos(prefetch_count=1)
         if self.times_connected == 1:  # Only do this once
             self.publish_to_server(_new_client_msg)
-        self.channel.add_on_cancel_callback(self.on_consumer_cancelled)
+        self.channel.add_on_cancel_callback(self.on_cancelok)
         self.consumer_tag = self.channel.basic_consume(self.on_response,
                                                        # no_ack=True,
                                                        queue=self.queue)

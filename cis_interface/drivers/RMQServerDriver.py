@@ -49,7 +49,7 @@ class RMQServerDriver(RMQDriver, RPCDriver):
         r"""Start consuming messages from the queue."""
         self.debug('::start_consuming')
         self.channel.basic_qos(prefetch_count=1)
-        self.channel.add_on_cancel_callback(self.on_consumer_cancelled)
+        self.channel.add_on_cancel_callback(self.on_cancelok)
         self.consumer_tag = self.channel.basic_consume(self.on_message,
                                                        queue=self.queue)
 

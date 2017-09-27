@@ -75,7 +75,7 @@ class TestRMQServerDriver(TestRMQServerParam, parent1.TestRMQDriver):
         r"""Do basic_get from the temporary queue."""
         out = self.channel.basic_get(queue=self.temp_queue)
         T = self.instance.start_timeout()
-        while (out[0] is None) and (not T.is_out):
+        while (out[0] is None) and (not T.is_out):  # pragma: debug
             self.connection.sleep(self.instance.sleeptime)
             out = self.channel.basic_get(queue=self.temp_queue)
         self.instance.stop_timeout()
@@ -94,7 +94,7 @@ class TestRMQServerDriver(TestRMQServerParam, parent1.TestRMQDriver):
                 properties=pika.BasicProperties(reply_to=self.temp_queue),
                 body=_new_client_msg)
         T = self.instance.start_timeout()
-        while self.instance.n_clients == 0 and (not T.is_out):
+        while self.instance.n_clients == 0 and (not T.is_out):  # pragma: debug
             self.instance.sleep()
         self.instance.stop_timeout()
         nt.assert_equal(self.instance.n_clients, 1)
