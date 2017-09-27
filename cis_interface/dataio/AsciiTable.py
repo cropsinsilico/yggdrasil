@@ -1,6 +1,5 @@
 import numpy as np
 import copy
-import textwrap
 from cis_interface.interface.scanf import scanf
 from cis_interface.dataio.AsciiFile import AsciiFile
 from cis_interface import backwards

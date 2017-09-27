@@ -87,7 +87,7 @@ def test_cformat2nptype():
         if isinstance(a, str):
             a = [a]
         for _ia in a:
-            if _ia.startswith(AsciiTable._fmt_char):
+            if _ia.startswith(backwards.bytes2unicode(AsciiTable._fmt_char)):
                 ia = backwards.unicode2bytes(_ia)
             else:
                 ia = AsciiTable._fmt_char + backwards.unicode2bytes(_ia)
