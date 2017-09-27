@@ -9,7 +9,7 @@ from cis_interface import backwards, tools
 from cis_interface.tools import PSI_MSG_MAX, PSI_MSG_EOF
 
 
-def PsiMatlab(_type, args):
+def PsiMatlab(_type, args=[]):
     r"""Short interface to identify functions called by Matlab.
 
     Args:

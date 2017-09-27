@@ -1,7 +1,8 @@
 import os
 import numpy as np
 import nose.tools as nt
-from cis_interface.interface import PsiInterface, PSI_MSG_EOF
+from cis_interface.interface import PsiInterface
+from cis_interface.interface.PsiInterface import PSI_MSG_EOF, PSI_MSG_MAX
 from cis_interface.drivers import (IODriver, RPCDriver,
                                    AsciiFileInputDriver,
                                    AsciiTableInputDriver)
@@ -9,8 +10,8 @@ from cis_interface.drivers.tests.test_IODriver import IOInfo
 from cis_interface.backwards import pickle
 
 
-def test_PsiMatlab():
-    r"""Test Matlab interface."""
+def test_PsiMatlab_class():
+    r"""Test Matlab interface for classes."""
     name = 'test'
     drv = IODriver.IODriver(name, '_IN')
     drv.start()
@@ -19,6 +20,12 @@ def test_PsiMatlab():
     drv.terminate()
 
 
+def test_PsiMatlab_variables():
+    r"""Test Matlab interface for variables."""
+    nt.assert_equal(PsiInterface.PsiMatlab('PSI_MSG_MAX'), PSI_MSG_MAX)
+    nt.assert_equal(PsiInterface.PsiMatlab('PSI_MSG_EOF'), PSI_MSG_EOF)
+    
+    
 class TestPsiInput(IOInfo):
     r"""Test basic input to python."""
     def __init__(self):
