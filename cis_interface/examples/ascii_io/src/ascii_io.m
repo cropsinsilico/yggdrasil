@@ -4,11 +4,11 @@ out_file = PsiInterface('PsiAsciiFileOutput', 'outputM_file');
 % Input & output from a table row by row
 in_table = PsiInterface('PsiAsciiTableInput', 'inputM_table');
 out_table = PsiInterface('PsiAsciiTableOutput', 'outputM_table', ...
-			 '%5s\t%ld\t%3.1f\n');
+			 '%5s\t%ld\t%3.1f\t%3.1lf%+3.1lfj\n');
 % Input & output from a table as an array
 in_array = PsiInterface('PsiAsciiTableInput', 'inputM_array');
 out_array = PsiInterface('PsiAsciiTableOutput', 'outputM_array', ...
-			 '%5s\t%ld\t%3.1f\n');
+			 '%5s\t%ld\t%3.1f\t%3.1lf%+3.1lfj\n');
 
 % Read lines from ASCII text file until end of file is reached.
 % As each line is received, it is then sent to the output ASCII file.
@@ -43,7 +43,8 @@ while res{1}
     % If the receive was succesful, send the values to output.
     % Formatting is taken care of on the output driver side.
     line = res{2};
-    fprintf('Table: %s, %d, %f\n', char(line{1}), line{2}, line{3});
+    fprintf('Table: %s, %d, %3.1f, %3.1f%+3.1f\n', char(line{1}), ...
+	    line{2}, line{3}, real(line{4}), imag(line{4}));
     ret = out_table.send_row(res{2});
     if (~ret);
       disp('ascii_io(M): ERROR SENDING ROW');
@@ -68,7 +69,8 @@ fprintf('Array: (%d rows)\n', arr.size);
 % Print each line in the array
 for i = 1:arr.size
   line = arr.item(i-1);
-  fprintf('%5s, %d, %f\n', char(line{1}), line{2}, line{3});
+  fprintf('%5s, %d, %3.1f, %3.1f%+3.1f\n', char(line{1}), line{2}, line{3}, ...
+	  real(line{4}), imag(line{4}));
 end;
 % Send the array to output. Formatting is handled on the output driver side.
 ret = out_array.send_array(arr);

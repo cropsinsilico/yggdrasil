@@ -11,14 +11,14 @@ input_file = data['table']
 output_dir = tempfile.gettempdir()
 output_file = os.path.join(output_dir, os.path.basename(input_file))
 
-ncols = 3
-nrows = 3
+ncols = 4
+nrows = 4
 input_ncomments = 2  # Names & formats
 input_nlines = nrows
 output_ncomments = 2  # Just formats
 output_nlines = nrows
-format_str = "%5s\t%d\t%f\n"
-column_names = ["name", "number", "value"]
+format_str = "%5s\t%ld\t%lf\t%g%+gj\n"
+column_names = ["name", "number", "value", "complex"]
 
 
 mode_list = ['r', 'w', None]
@@ -45,10 +45,13 @@ if np.dtype('int_') != np.dtype('longlong'):  # pragma: no cover
 map_cformat2pyscanf = [(['%hhd', '%hd', '%d', '%ld', '%lld'], '%d'),
                        (['%hhu', '%hu', '%u', '%lu', '%llu'], '%u'),
                        (['%5s', '%s'], '%s'),
-                       ('%s', '%s')]
+                       ('%s', '%s'),
+                       ('%g%+gj', '%g%+gj')]
 
 unsupported_cfmt = ['a', 'A', 'p', 'n', '']
 map_cformat2nptype = [(['f', 'F', 'e', 'E', 'g', 'G'], 'float64'),
+                      # (['f', 'F', 'e', 'E', 'g', 'G'], 'float32'),
+                      # (['lf', 'lF', 'le', 'lE', 'lg', 'lG'], 'float64'),
                       (['hhd', 'hhi'], 'int8'),
                       (['hd', 'hi'], 'short'),
                       (['d', 'i'], 'intc'),

@@ -1,5 +1,6 @@
-# name	number	value
-# %s	%d	%f
-one	1	1.0
-two	2	2.0
-three	3	3.0
+# name	number	value	complex
+# %s	%ld	%lf	%f%+fj
+one	1	1.0	1.0+2.0j
+two	2	2.0	2.0+3.0j
+three	3	3.0	3.0+4.0j
+ф	4	4.0	4.0+5.0j

@@ -1,4 +1,6 @@
 import numpy as np
+import copy
+import textwrap
 from cis_interface.interface.scanf import scanf
 from cis_interface.dataio.AsciiFile import AsciiFile
 from cis_interface import backwards
@@ -7,6 +9,12 @@ try:
     from astropy.io import ascii as apy_ascii
     from astropy.table import Table as apy_Table
     _use_astropy = True
+    from astropy.io.ascii import TableOutputter, convert_numpy
+    apy_tableout = TableOutputter()
+    apy_tableout.default_converters = [convert_numpy(np.int),
+                                       convert_numpy(np.float),
+                                       convert_numpy(np.str),
+                                       convert_numpy(np.complex)]
     if not backwards.PY2:  # pragma: Python 3
         _use_astropy = False
 except:  # pragma: no cover
@@ -111,10 +119,19 @@ def cformat2nptype(cfmt):
                          "does not contain type info")
     out = None
     cfmt_str = backwards.bytes2unicode(cfmt)
-    if cfmt_str in ['%{}%+{}j'.format(x, x) for x in
-                    ['f', 'F', 'e', 'E', 'g', 'G']]:
+    if cfmt_str[-1] in ['j']:
         out = 'complex128'
     elif cfmt_str[-1] in ['f', 'F', 'e', 'E', 'g', 'G']:
+        # if 'hh' in cfmt_str:
+        #     out = 'float8'
+        # elif cfmt_str[-2] == 'h':
+        #     out = 'float16'
+        # elif 'll' in cfmt_str:
+        #     out = 'longfloat'
+        # elif cfmt_str[-2] == 'l':
+        #     out = 'double'
+        # else:
+        #     out = 'single'
         out = 'float64'
     elif cfmt_str[-1] in ['d', 'i']:
         if 'hh' in cfmt_str:  # short short, single char
@@ -177,10 +194,14 @@ def cformat2pyscanf(cfmt):
                          "does not contain type info")
     # Hacky, but necessary to handle concatenation of a single byte
     cfmt_str = backwards.bytes2unicode(cfmt)
-    out = backwards.bytes2unicode(_fmt_char)
-    out += cfmt_str[-1]
-    out = out.replace('h', '')
-    out = out.replace('l', '')
+    if cfmt_str[-1] == 'j':
+        # Handle complex format specifier
+        out = '%g%+gj'
+    else:
+        out = backwards.bytes2unicode(_fmt_char)
+        out += cfmt_str[-1]
+        out = out.replace('h', '')
+        out = out.replace('l', '')
     return backwards.unicode2bytes(out)
 
 
@@ -269,8 +290,8 @@ class AsciiTable(AsciiFile):
 
     @property
     def ncols(self):
-        # return len(self.fmts)
-        return self.format_str.count(_fmt_char)
+        return len(self.fmts)
+        # return self.format_str.count(_fmt_char)
 
     def update_format_str(self, new_format_str):
         r"""Change the format string and update the data type.
@@ -423,7 +444,14 @@ class AsciiTable(AsciiFile):
         """
         if len(args) < self.ncols:
             raise RuntimeError("Incorrect number of arguments.")
-        out = backwards.bytes2unicode(self.format_str) % args
+        # Handle complex
+        args_ = []
+        for a in args:
+            if np.iscomplexobj(a):
+                args_ += [a.real, a.imag]
+            else:
+                args_.append(a)
+        out = backwards.bytes2unicode(self.format_str) % tuple(args_)
         return backwards.unicode2bytes(out)
 
     def process_line(self, line):
@@ -469,12 +497,11 @@ class AsciiTable(AsciiFile):
 
         """
         if self.use_astropy:
-            tab = apy_ascii.read(self.filepath,
-                                 **getattr(self, 'astropy_kwargs', {}))
-            self._arr = tab.as_array()
+            arr = self.read_array()
+            self._arr = arr
             self._dtype = self._arr.dtype
             if getattr(self, 'column_names', None) is None:
-                self.column_names = [c for c in tab.columns]
+                self.column_names = [c for c in arr.dtype.names]
         else:
             comment_list = []
             out = None
@@ -560,7 +587,20 @@ class AsciiTable(AsciiFile):
             self.open()
             openned = True
         if self.use_astropy:
-            arr = apy_ascii.read(self.fd, names=names).as_array()
+            tab = apy_ascii.read(self.fd, names=names,
+                                 **getattr(self, 'astropy_kwargs', {}))
+            arr = tab.as_array()
+            typs = [arr.dtype[i].str for i in range(len(arr.dtype))]
+            cols = tab.columns
+            for i in range(len(arr.dtype)):
+                if np.issubdtype(arr.dtype[i], np.dtype('S')):
+                    new_typs = copy.copy(typs)
+                    new_typs[i] = 'complex'
+                    new_dtyp = np.dtype([(c, t) for c, t in zip(cols, new_typs)])
+                    try:
+                        arr = arr.astype(new_dtyp)
+                    except ValueError:
+                        pass
         else:
             arr = np.genfromtxt(self.fd,
                                 comments=backwards.bytes2unicode(self.comment),
@@ -681,8 +721,13 @@ class AsciiTable(AsciiFile):
             arr1 = arr
         if order == 'F':
             out = backwards.unicode2bytes('')
-            for n in arr1.dtype.names:
-                out = out + arr1[n].tobytes()
+            for i in range(len(arr1.dtype)):
+                n = arr1.dtype.names[i]
+                if np.issubdtype(arr1.dtype[i], np.dtype('complex')):
+                    out = out + arr1[n].real.tobytes()
+                    out = out + arr1[n].imag.tobytes()
+                else:
+                    out = out + arr1[n].tobytes()
         else:
             out = arr1.tobytes(order='C')
         return out
@@ -707,10 +752,21 @@ class AsciiTable(AsciiFile):
         if order == 'F':
             arr = np.empty((nrows,), dtype=self.dtype)
             prev = 0
+            j = 0
             for i in range(len(self.dtype)):
                 idata = data[prev:(prev + (nrows * self.dtype[i].itemsize))]
-                arr[self.dtype.names[i]] = np.fromstring(idata, dtype=self.dtype[i])
+                if np.issubdtype(self.dtype[i], np.dtype('complex')):
+                    idata_real = idata[:(nrows * self.dtype[i].itemsize // 2)]
+                    idata_imag = idata[(nrows * self.dtype[i].itemsize // 2):]
+                    arr_real = np.fromstring(idata_real, dtype='float64')
+                    arr_imag = np.fromstring(idata_imag, dtype='float64')
+                    arr[self.dtype.names[i]] = np.zeros(nrows, dtype=self.dtype[i])
+                    arr[self.dtype.names[i]] += arr_real
+                    arr[self.dtype.names[i]] += arr_imag * 1j
+                else:
+                    arr[self.dtype.names[i]] = np.fromstring(idata, dtype=self.dtype[i])
                 prev += len(idata)
+                j += 1
         else:
             arr = np.fromstring(data, dtype=self.dtype)
             if (len(arr) % self.ncols) != 0:

@@ -10,9 +10,9 @@
 #endif
 
 /*! @brief Enumerated types to be used for interpreting formats. */
-enum mytypes { STRING, FLOAT, DOUBLE,
-	       SHORTSHORT, SHORT, INT, LONG, LONGLONG,
-	       USHORTSHORT, USHORT, UINT, ULONG, ULONGLONG };
+enum fmt_types { STRING, FLOAT, DOUBLE, COMPLEX,
+		 SHORTSHORT, SHORT, INT, LONG, LONGLONG,
+		 USHORTSHORT, USHORT, UINT, ULONG, ULONGLONG };
 
 /*!
   @brief Create a regex from a character array.
@@ -64,6 +64,40 @@ int count_matches(const char *regex_text, const char *to_match) {
       break;
     n_match++;
     p += m[0].rm_eo;
+  }
+  return n_match;
+};
+
+/*!
+  @brief Find first match to regex.
+  @param[in] regex_text constant character pointer to string that should be
+  compiled into a regex.
+  @param[in] to_match constant character pointer to string that should be
+  checked for matches.
+  @param[out] sind int index where match begins.
+  @param[out] eind int index where match ends.
+  @return int Number of matches found. -1 is returned if the regex could not be
+  compiled.
+*/
+static inline
+int find_match(const char *regex_text, const char *to_match,
+	       int *sind, int *eind) {
+  int ret;
+  int n_match = 0;
+  regex_t r;
+  // Compile
+  ret = compile_regex(&r, regex_text);
+  if (ret)
+    return -1;
+  // Loop until string done
+  const char * p = to_match;
+  const int n_sub_matches = 10;
+  regmatch_t m[n_sub_matches];
+  int nomatch = regexec(&r, p, n_sub_matches, m, 0);
+  if (!(nomatch)) {
+    *sind = m[0].rm_so;
+    *eind = m[0].rm_eo;
+    n_match++;
   }
   return n_match;
 };
@@ -124,7 +158,7 @@ int regex_replace_nosub(char *buf, const int len_buf,
     rem_s = m[0].rm_so + len_rp;
     memmove(p + rem_s, p + m[0].rm_eo, rem_l + 1);
     // Copy replacement
-    strcpy(p + m[0].rm_so, rp);
+    strncpy(p + m[0].rm_so, rp, len_rp);
     // Advance
     p += rem_s;
     cur_pos += rem_s;
@@ -304,7 +338,7 @@ int regex_replace_sub(char *buf, const int len_buf,
     // Move trailing
     rem_l = cur_siz - (cur_pos + m[0].rm_eo);
     rem_s = m[0].rm_so + len_rp;
-    memmove(p + rem_s, p + m[0].rm_eo, rem_l);
+    memmove(p + rem_s, p + m[0].rm_eo, rem_l + 1);
     // Copy replacement
     strncpy(p + m[0].rm_so, rp_sub, len_rp);
     // Advance
@@ -315,6 +349,21 @@ int regex_replace_sub(char *buf, const int len_buf,
   }
   free(m);
   return cur_siz;
+};
+
+/*!
+  @brief Count format specifiers for complex numbers.
+  @param[in] fmt_str constant character pointer to string that should be
+  searched for format specifiers.
+  @return int Number of complex format specifiers found.
+ */
+static inline
+int count_complex_formats(const char* fmt_str) {
+  const char * fmt_regex = "%([[:digit:]]+\\$)?[+-]?([ 0]|\'.{1})?-?[[:digit:]]*(\\.[[:digit:]]+)?[lhjztL]*[eEfFgG]"
+    "%([[:digit:]]+\\$)?[+-]([ 0]|\'.{1})?-?[[:digit:]]*(\\.[[:digit:]]+)?[lhjztL]*[eEfFgG]j";
+  int ret = count_matches(fmt_regex, fmt_str);
+  /* printf("%d, %s\n", ret, fmt_str); */
+  return ret;
 };
 
 /*!
@@ -330,6 +379,27 @@ int count_formats(const char* fmt_str) {
   const char * fmt_regex = "%([[:digit:]]+\\$)?[+-]?([ 0]|\'.{1})?-?[[:digit:]]*(\\.[[:digit:]]+)?[lhjztL]*[bcdeEufFgGosxX]";
   int ret = count_matches(fmt_regex, fmt_str);
   /* printf("%d, %s\n", ret, fmt_str); */
+  return ret;
+};
+
+/*!
+  @brief Remove extra format characters that confusing sscanf.
+  @param[in] fmt_str character pointer to string that should be modified.
+  @param[in] fmt_len constant int, length of the fmt_str buffer.
+  @return int -1 on failure if the regex could not be compiled or the buffer 
+  is not big enough to contain the result. If succesful, the new length of buf
+  is returned.
+ */
+static inline
+int simplify_formats(char *fmt_str, const int fmt_len) {
+  const char * fmt_regex1 = "%([[:digit:]]+\\$)?[+-]?([ 0]|\'.{1})?-?[[:digit:]]*(\\.[[:digit:]]+)?([lhjztL]*)([eEfFgG])";
+  int ret = regex_replace_sub(fmt_str, fmt_len, fmt_regex1,
+			      "%$4$5", 0);
+  if (ret > 0) {
+    const char * fmt_regex2 = "%[lhjztL]*([fF])";
+    ret = regex_replace_sub(fmt_str, fmt_len, fmt_regex2,
+			    "%l$1", 0);
+  }
   return ret;
 };
 
@@ -374,16 +444,29 @@ void at_close(asciiTable_t *t) {
  */
 static inline
 int at_vreadline(const asciiTable_t t, va_list ap) {
+  // Read lines until there's one that's not a comment
   int ret = 0, com = 1;
   size_t nread = LINE_SIZE_MAX;
   char *line = (char*)malloc(nread);
   while ((ret >= 0) && (com == 1)) {
     ret = af_readline_full(t.f, &line, &nread);
-    if (ret < 0)
+    if (ret < 0) {
+      free(line);
       return ret;
+    }
     com = af_is_comment(t.f, line);
   }
-  int sret = vsscanf(line, t.format_str, ap);
+  // Simplify format for vsscanf
+  char fmt[LINE_SIZE_MAX];
+  strcpy(fmt, t.format_str);
+  int sret = simplify_formats(fmt, LINE_SIZE_MAX);
+  if (sret < 0) {
+    printf("at_vreadline: simplify_formats returned %d\n", sret);
+    free(line);
+    return -1;
+  }
+  // Interpret line
+  sret = vsscanf(line, fmt, ap);
   if (sret != t.ncols) {
     printf("at_vreadline: %d arguments filled, but %d were expected\n",
 	   sret, t.ncols);
@@ -497,9 +580,48 @@ int at_set_ncols(asciiTable_t *t) {
   return count;
 };
 
+
+/*!
+  @brief Determine the column sizes based on the types.
+  @param[in] t asciiTable_t table structure that sizes will be added to.
+  @return int 0 on success, -1 on failure.
+ */
+static inline
+int at_set_format_siz(asciiTable_t *t) {
+  /* (*t).format_siz = (int*)malloc((*t).ncols*sizeof(int)); */
+  int i, typ, siz;
+  (*t).row_siz = 0;
+  for (i = 0; i < (*t).ncols; i++) {
+    typ = (*t).format_typ[i];
+    siz = (*t).format_siz[i];
+    if (typ == STRING) siz = (*t).format_siz[i]; // TODO
+    else if (typ == FLOAT) siz = sizeof(float);
+    else if (typ == DOUBLE) siz = sizeof(double);
+    else if (typ == COMPLEX) siz = 2*sizeof(double);
+    else if (typ == SHORTSHORT) siz = sizeof(char);
+    else if (typ == SHORT) siz = sizeof(short);
+    else if (typ == LONGLONG) siz = sizeof(long long);
+    else if (typ == LONG) siz = sizeof(long);
+    else if (typ == INT) siz = sizeof(int);
+    else if (typ == USHORTSHORT) siz = sizeof(unsigned char);
+    else if (typ == USHORT) siz = sizeof(unsigned short);
+    else if (typ == ULONGLONG) siz = sizeof(unsigned long long);
+    else if (typ == ULONG) siz = sizeof(unsigned long);
+    else if (typ == UINT) siz = sizeof(unsigned int);
+    else siz = -1;
+    if (siz < 0) {
+      printf("ERROR setting size for column %d with type %d\n", i, typ);
+      return -1;
+    }
+    (*t).format_siz[i] = siz;
+    (*t).row_siz += siz;
+  }
+  return 0;
+}
+
 /*!
   @brief Determine the column types by parsing the format string.
-  @param[in] t constant asciiTable_t table structure.
+  @param[in] t asciiTable_t table structure that types will be added to.
   @return int 0 on success, -1 on failure.
   TODO: switch to regex
  */
@@ -509,102 +631,76 @@ int at_set_format_typ(asciiTable_t *t) {
   (*t).format_siz = (int*)malloc((*t).ncols*sizeof(int));
   size_t beg = 0, end;
   int icol = 0;
-  char ifmt[100];
-  (*t).row_siz = 0;
-  while (beg < strlen((*t).format_str)) {
-    if ((*t).format_str[beg] == '%') {
-      end = beg;
-      while (end < strlen((*t).format_str)) {
-	// Advance end to next column separator or new line
-	if ((strncmp((*t).format_str + end, (*t).column, strlen((*t).column)) == 0) ||
-	    (strncmp((*t).format_str + end, (*t).f.newline, strlen((*t).f.newline)) == 0)) {
-	  strncpy(ifmt, &((*t).format_str)[beg], end-beg);
-	  ifmt[end-beg] = '\0';
-	  if ((*t).format_str[end-1] == 's') {
-	    // String (variable length)
-	    (*t).format_typ[icol] = STRING;
-	    char len_fmt[100];
-	    strncpy(len_fmt, &((*t).format_str)[beg+1], end-beg-2);
-	    sscanf(len_fmt, "%d", &((*t).format_siz[icol]));
-	  } else if (((*t).format_str[end-1] == 'f') ||
-		     ((*t).format_str[end-1] == 'e') ||
-		     ((*t).format_str[end-1] == 'E') ||
-		     ((*t).format_str[end-1] == 'g') ||
-		     ((*t).format_str[end-1] == 'G')) {
-	    (*t).format_typ[icol] = DOUBLE;
-	    (*t).format_siz[icol] = sizeof(double);
-	    // Hack to allow double to be specified
-	    /* if ((*t).format_str[end-2] == 'l') { */
-	    /*   (*t).format_typ[icol] = DOUBLE; */
-	    /*   (*t).format_siz[icol] = sizeof(double); */
-	    /* } else { */
-	    /*   (*t).format_typ[icol] = FLOAT; */
-	    /*   (*t).format_siz[icol] = sizeof(float); */
-	    /* } */
-	  } else if (((*t).format_str[end-1] == 'd') ||
-		     ((*t).format_str[end-1] == 'i')) {
-	    // Integers
-	    if ((*t).format_str[end-2] == 'h') {
-	      if ((*t).format_str[end-3] == 'h') {
-		(*t).format_typ[icol] = SHORTSHORT;
-		(*t).format_siz[icol] = sizeof(char);
-	      } else {
-		(*t).format_typ[icol] = SHORT;
-		(*t).format_siz[icol] = sizeof(short);
-	      }
-	    } else if ((*t).format_str[end-2] == 'l') {
-	      if ((*t).format_str[end-3] == 'l') {
-		(*t).format_typ[icol] = LONGLONG;
-		(*t).format_siz[icol] = sizeof(long long);
-	      } else {
-		(*t).format_typ[icol] = LONG;
-		(*t).format_siz[icol] = sizeof(long);
-	      }
-	    } else {
-	      (*t).format_typ[icol] = INT;
-	      (*t).format_siz[icol] = sizeof(int);
-	    }
-	  } else if (((*t).format_str[end-1] == 'u') ||
-		     ((*t).format_str[end-1] == 'o') ||
-		     ((*t).format_str[end-1] == 'x') ||
-		     ((*t).format_str[end-1] == 'X')) {
-	    // Unsigned integers
-	    if ((*t).format_str[end-2] == 'h') {
-	      if ((*t).format_str[end-3] == 'h') {
-		(*t).format_typ[icol] = USHORTSHORT;
-		(*t).format_siz[icol] = sizeof(unsigned char);
-	      } else {
-		(*t).format_typ[icol] = USHORT;
-		(*t).format_siz[icol] = sizeof(unsigned short);
-	      }
-	    } else if ((*t).format_str[end-2] == 'l') {
-	      if ((*t).format_str[end-3] == 'l') {
-		(*t).format_typ[icol] = ULONGLONG;
-		(*t).format_siz[icol] = sizeof(unsigned long long);
-	      } else {
-		(*t).format_typ[icol] = ULONG;
-		(*t).format_siz[icol] = sizeof(unsigned long);
-	      }
-	    } else {
-	      (*t).format_typ[icol] = UINT;
-	      (*t).format_siz[icol] = sizeof(unsigned int);
-	    }
-	  } else {
-	    printf("Could not parse format string: %s\n", ifmt);
-	    return -1;
-	  }
-	  /* printf("%d: %s, typ = %d, siz = %d\n", icol, ifmt, */
-	  /* 	 (*t).format_typ[icol], (*t).format_siz[icol]); */
-	  (*t).row_siz += (*t).format_siz[icol];
-	  icol++;
-	  break;
-	}
-	end++;
-      }
-    }
-    beg++;
+  const char fmt_len = 100;
+  char ifmt[fmt_len];
+  // Initialize
+  for (icol = 0; icol < (*t).ncols; icol++) {
+    (*t).format_typ[icol] = -1;
+    (*t).format_siz[icol] = -1;
   }
-  return 0;
+  // Loop over string
+  icol = 0;
+  int mres, sind, eind;
+  char re_fmt[fmt_len];
+  sprintf(re_fmt, "%%[^%s%s]+[%s%s]",
+	  (*t).column, (*t).f.newline, (*t).column, (*t).f.newline);
+  while (beg < strlen((*t).format_str)) {
+    mres = find_match(re_fmt, (*t).format_str + beg, &sind, &eind);
+    if (mres < 0) {
+      printf("ERROR: find_match returned %d\n", mres);
+      return -1;
+    } else if (mres == 0) {
+      beg++;
+      continue;
+    }
+    beg += sind;
+    end = beg + (eind - sind);
+    strncpy(ifmt, &((*t).format_str)[beg], end-beg);
+    ifmt[end-beg] = '\0';
+    if (find_match("%.*s", ifmt, &sind, &eind)) {
+      (*t).format_typ[icol] = STRING;
+      mres = regex_replace_sub(ifmt, fmt_len,
+			       "%(\\.)?([[:digit:]]*)s(.*)", "$2", 0);
+      (*t).format_siz[icol] = atoi(ifmt);
+    } else if (find_match("(\%.*[fFeEgG]){2}j", ifmt, &sind, &eind)) {
+      /* (*t).format_typ[icol] = COMPLEX; */
+      (*t).format_typ[icol] = DOUBLE;
+      icol++;
+      (*t).format_typ[icol] = DOUBLE;
+    } else if (find_match("%.*[fFeEgG]", ifmt, &sind, &eind)) {
+      (*t).format_typ[icol] = DOUBLE;
+    /* } else if (find_match("%.*l[fFeEgG]", ifmt, &sind, &eind)) { */
+    /*   (*t).format_typ[icol] = DOUBLE; */
+    /* } else if (find_match("%.*[fFeEgG]", ifmt, &sind, &eind)) { */
+    /*   (*t).format_typ[icol] = FLOAT; */
+    } else if (find_match("%.*hh[id]", ifmt, &sind, &eind)) {
+      (*t).format_typ[icol] = SHORTSHORT;
+    } else if (find_match("%.*h[id]", ifmt, &sind, &eind)) {
+      (*t).format_typ[icol] = SHORT;
+    } else if (find_match("%.*ll[id]", ifmt, &sind, &eind)) {
+      (*t).format_typ[icol] = LONGLONG;
+    } else if (find_match("%.*l[id]", ifmt, &sind, &eind)) {
+      (*t).format_typ[icol] = LONG;
+    } else if (find_match("%.*[id]", ifmt, &sind, &eind)) {
+      (*t).format_typ[icol] = INT;
+    } else if (find_match("%.*hh[uoxX]", ifmt, &sind, &eind)) {
+      (*t).format_typ[icol] = USHORTSHORT;
+    } else if (find_match("%.*h[uoxX]", ifmt, &sind, &eind)) {
+      (*t).format_typ[icol] = USHORT;
+    } else if (find_match("%.*ll[uoxX]", ifmt, &sind, &eind)) {
+      (*t).format_typ[icol] = ULONGLONG;
+    } else if (find_match("%.*l[uoxX]", ifmt, &sind, &eind)) {
+      (*t).format_typ[icol] = ULONG;
+    } else if (find_match("%.*[uoxX]", ifmt, &sind, &eind)) {
+      (*t).format_typ[icol] = UINT;
+    } else {
+      printf("ERROR: Could not parse format string: %s\n", ifmt);
+      return -1;
+    }
+    beg = end;
+    icol++;
+  }
+  return at_set_format_siz(t);
 };
 
 /*!
@@ -633,8 +729,8 @@ int at_vbytes_to_array(const asciiTable_t t, const char *data,
   int i;
   for (i = 0; i < t.ncols; i++) {
     char **temp;
-    col_siz = nrows*t.format_siz[i];
     temp = va_arg(ap, char**);
+    col_siz = nrows*t.format_siz[i];
     *temp = (char*)malloc(col_siz);
     // C order memory
     /* for (int j = 0; j < nrows; j++) { */

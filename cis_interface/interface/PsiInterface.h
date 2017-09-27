@@ -615,6 +615,7 @@ int vpsiSend(psiOutput_t psiQ, va_list ap) {
  */
 static inline
 int vpsiRecv(psiInput_t psiQ, va_list ap) {
+  // Receive message
   char buf[PSI_MSG_MAX];
   int ret = psi_recv(psiQ, buf, PSI_MSG_MAX);
   if (ret < 0) {
@@ -626,7 +627,18 @@ int vpsiRecv(psiInput_t psiQ, va_list ap) {
     debug("vpsiRecv(%s): EOF received.\n", psiQ._name);
     return -2;
   }
-  int sret = vsscanf(buf, psiQ._fmt, ap);
+  // Simplify format
+  char fmt[PSI_MSG_MAX];
+  strcpy(fmt, psiQ._fmt);
+  int sret = simplify_formats(fmt, PSI_MSG_MAX);
+  if (sret < 0) {
+    error("vpsiRecv(%s): simplify_formats returned %d",
+	  psiQ._name, sret);
+    return -1;
+  }
+  debug("vpsiRecv(%s): simplify_formats returns %d", psiQ._name, sret);
+  // Interpret message
+  sret = vsscanf(buf, fmt, ap);
   if (sret != psiQ._nfmt) {
     error("vpsiRecv(%s): vsscanf filled %d variables, but there are %d formats",
           psiQ._name, sret, psiQ._nfmt);
@@ -717,6 +729,7 @@ int vpsiSend_nolimit(psiOutput_t psiQ, va_list ap) {
  */
 static inline
 int vpsiRecv_nolimit(psiInput_t psiQ, va_list ap) {
+  // Receive message
   char *buf = (char*)malloc(PSI_MSG_MAX);
   int ret = psi_recv_nolimit(psiQ, &buf, PSI_MSG_MAX);
   if (ret < 0) {
@@ -727,16 +740,29 @@ int vpsiRecv_nolimit(psiInput_t psiQ, va_list ap) {
   debug("vpsiRecv_nolimit(%s): psi_recv returns %d", psiQ._name, ret);
   if (is_eof(buf)) {
     debug("vpsiRecv(%s): EOF received.\n", psiQ._name);
+    free(buf);
     return -2;
   }
-  int sret = vsscanf(buf, psiQ._fmt, ap);
+  // Simplify format
+  char fmt[PSI_MSG_MAX];
+  strcpy(fmt, psiQ._fmt);
+  int sret = simplify_formats(fmt, PSI_MSG_MAX);
+  if (sret < 0) {
+    error("vpsiRecv_nolimit(%s): simplify_formats returned %d",
+	  psiQ._name, sret);
+    free(buf);
+    return -1;
+  }
+  debug("vpsiRecv_nolimit(%s): simplify_formats returns %d", psiQ._name, sret);
+  // Interpret message
+  sret = vsscanf(buf, fmt, ap);
   if (sret != psiQ._nfmt) {
     error("vpsiRecv_nolimit(%s): vsscanf filled %d variables, but there are %d formats",
           psiQ._name, sret, psiQ._nfmt);
     free(buf);
     return -1;
   }
-  debug("vpsiRecv_nolimit(%s): vsscanf returns %d", psiQ._name, ret);
+  debug("vpsiRecv_nolimit(%s): vsscanf returns %d", psiQ._name, sret);
   free(buf);
   return ret;
 };

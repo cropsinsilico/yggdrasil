@@ -13,10 +13,12 @@ int main(int argc,char *argv[]){
   PsiAsciiFileOutput FileOutput("outputCPP_file");
   // Input & output from a table row by row
   PsiAsciiTableInput TableInput("inputCPP_table");
-  PsiAsciiTableOutput TableOutput("outputCPP_table", "%5s\t%ld\t%3.1f\n");
+  PsiAsciiTableOutput TableOutput("outputCPP_table",
+				  "%5s\t%ld\t%3.1f\t%3.1lf%+3.1lfj\n");
   // Input & output from a table as an array
   PsiAsciiTableInput ArrayInput("inputCPP_array");
-  PsiAsciiTableOutput ArrayOutput("outputCPP_array", "%5s\t%ld\t%3.1f\n");
+  PsiAsciiTableOutput ArrayOutput("outputCPP_array",
+				  "%5s\t%ld\t%3.1f\t%3.1lf%+3.1lfj\n");
 
   // Read lines from ASCII text file until end of file is reached.
   // As each line is received, it is then sent to the output ASCII file.
@@ -47,16 +49,18 @@ int main(int argc,char *argv[]){
   printf("ascii_io(CPP): Receiving/sending ASCII table.\n");
   char name[BSIZE];
   int number;
-  float value;
+  double value;
+  double comp_real, comp_imag;
   ret = 0;
   while (ret >= 0) {
     // Receive a single row with values stored in scalars declared locally
-    ret = TableInput.recv_row(3, &name, &number, &value);
+    ret = TableInput.recv_row(5, &name, &number, &value, &comp_real, &comp_imag);
     if (ret >= 0) {
       // If the receive was succesful, send the values to output. Formatting
       // is taken care of on the output driver side.
-      printf("Table: %s, %d, %f\n", name, number, value);
-      ret = TableOutput.send_row(3, name, number, value);
+      printf("Table: %.5s, %d, %3.1f, %3.1lf%+3.1lfj\n", name, number, value,
+	     comp_real, comp_imag);
+      ret = TableOutput.send_row(5, name, number, value, comp_real, comp_imag);
       if (ret != 0) {
 	printf("ascii_io(CPP): ERROR SENDING ROW\n");
 	break;
@@ -73,31 +77,35 @@ int main(int argc,char *argv[]){
   // allocated. The returned values tells us the number of elements in the
   // columns.
   printf("Receiving/sending ASCII table as array.\n");
-  char *name_arr;
-  long *number_arr;
-  double *value_arr;
-  ret = ArrayInput.recv_array(3, &name_arr, &number_arr, &value_arr);
+  char *name_arr = NULL;
+  long *number_arr = NULL;
+  double *value_arr = NULL;
+  double *comp_real_arr = NULL;
+  double *comp_imag_arr = NULL;
+  ret = ArrayInput.recv_array(5, &name_arr, &number_arr, &value_arr,
+			      &comp_real_arr, &comp_imag_arr);
   if (ret < 0) {
     printf("ascii_io(CPP): ERROR RECVING ARRAY\n");
-    free(name_arr);
-    free(number_arr);
-    free(value_arr);
-    return -1;
+  } else {
+    printf("Array: (%d rows)\n", ret);
+    // Print each line in the array
+    for (int i = 0; i < ret; i++)
+      printf("%.5s, %d, %3.1f, %3.1lf%+3.1lfj\n", &name_arr[5*i], number_arr[i],
+	     value_arr[i], comp_real_arr[i], comp_imag_arr[i]);
+    // Send the columns in the array to output. Formatting is handled on the
+    // output driver side.
+    ret = ArrayOutput.send_array(5, ret, name_arr, number_arr, value_arr,
+				 comp_real_arr, comp_imag_arr);
+    if (ret != 0)
+      printf("ascii_io(CPP): ERROR SENDING ARRAY\n");
   }
-  printf("Array: (%d rows)\n", ret);
-  // Print each line in the array
-  for (int i = 0; i < ret; i++)
-    printf("%5s, %d, %f\n", &name_arr[5*i], number_arr[i], value_arr[i]);
-  // Send the columns in the array to output. Formatting is handled on the
-  // output driver side.
-  ret = ArrayOutput.send_array(3, ret, name_arr, number_arr, value_arr);
-  if (ret != 0)
-    printf("ascii_io(CPP): ERROR SENDING ARRAY\n");
   
   // Free dynamically allocated columns
-  free(name_arr);
-  free(number_arr);
-  free(value_arr);
+  if (name_arr) free(name_arr);
+  if (number_arr) free(number_arr);
+  if (value_arr) free(value_arr);
+  if (comp_real_arr) free(comp_real_arr);
+  if (comp_imag_arr) free(comp_imag_arr);
 
   return 0;
 }

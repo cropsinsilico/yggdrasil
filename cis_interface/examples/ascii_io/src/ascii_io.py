@@ -14,10 +14,12 @@ if __name__ == '__main__':
     out_file = PsiAsciiFileOutput('outputPy_file')
     # Input & output from a table row by row
     in_table = PsiAsciiTableInput('inputPy_table')
-    out_table = PsiAsciiTableOutput('outputPy_table', '%5s\t%ld\t%3.1f\n')
+    out_table = PsiAsciiTableOutput('outputPy_table',
+                                    '%5s\t%ld\t%3.1f\t%3.1lf%+3.1lfj\n')
     # Input & output from a table as an array
     in_array = PsiAsciiTableInput('inputPy_array')
-    out_array = PsiAsciiTableOutput('outputPy_array', '%5s\t%ld\t%3.1f\n')
+    out_array = PsiAsciiTableOutput('outputPy_array',
+                                    '%5s\t%ld\t%3.1f\t%3.1lf%+3.1lfj\n')
 
     # Read lines from ASCII text file until end of file is reached.
     # As each line is received, it is then sent to the output ASCII file.
@@ -49,7 +51,7 @@ if __name__ == '__main__':
         if ret:
             # If the receive was succesful, send the values to output.
             # Formatting is taken care of on the output driver side.
-            print("Table: %s, %d, %f" % line)
+            print("Table: %s, %d, %3.1f, %s" % line)
             ret = out_table.send_row(*line)
             if not ret:
                 print("ascii_io(P): ERROR SENDING ROW")
@@ -68,7 +70,7 @@ if __name__ == '__main__':
     print("Array: (%d rows)" % len(arr))
     # Print each line in the array
     for i in range(len(arr)):
-        print("%5s, %d, %f" % tuple(arr[i]))
+        print("%5s, %d, %3.1f, %s" % tuple(arr[i]))
     # Send the array to output. Formatting is handled on the output driver side.
     ret = out_array.send_array(arr)
     if not ret:

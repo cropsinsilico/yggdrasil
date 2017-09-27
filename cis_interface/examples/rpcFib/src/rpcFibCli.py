@@ -2,6 +2,7 @@ from __future__ import print_function
 import sys
 from cis_interface.interface.PsiInterface import (
     PsiRpcClient, PsiInput, PsiOutput)
+from cis_interface import backwards
 
 
 def fibClient(args):
@@ -20,7 +21,8 @@ def fibClient(args):
     if not ret:
         print('rpcFibCli(P): RECV ERROR')
         sys.exit(-1)
-    print('rpcFibCli: yaml has %d lines' % len(ycontent.split('\n')))
+    print('rpcFibCli: yaml has %d lines' % len(ycontent.split(
+        backwards.unicode2bytes('\n'))))
 
     for i in range(1, iterations + 1):
         
