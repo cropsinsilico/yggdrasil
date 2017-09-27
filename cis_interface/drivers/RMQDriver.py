@@ -173,8 +173,8 @@ class RMQDriver(Driver):
     def get_message_stats(self):
         r"""Return message stats from the server."""
         hoststr = self.host
-        if self.host == '/':
-            hoststr = '%2f'
+        # if self.host == '/':
+        #     hoststr = '%2f'
         url = 'http://%s:%s/api/%s/%s/%s' % (
             hoststr, 15672, 'queues', '%2f', self.queue)
         res = requests.get(url, auth=(self.user, self.passwd))
