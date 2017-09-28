@@ -85,7 +85,7 @@ class PsiInput(object):
             data, _ = self.q.receive()  # ignore ident
             payload = (True, data)
             debug("PsiInput(%s).recv(): read %d bytes", self.name, len(data))
-        except sysv_ipc.ExistentialError:
+        except sysv_ipc.ExistentialError:  # pragma: debug
             debug("PsiInput(%s).recv(): queue closed, returning (False, '')",
                   self.name)
         except Exception as ex:  # pragma: debug
