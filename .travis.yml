@@ -74,7 +74,6 @@ before_script:
     flake8 cis_interface
 
 script:
-  - sudo rabbitmqctl status
   - nosetests --nologcapture --with-coverage --cover-package=cis_interface -sv
 
 after_success:
