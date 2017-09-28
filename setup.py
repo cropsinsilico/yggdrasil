@@ -6,7 +6,7 @@ from setuptools import setup, find_packages
 PY_MAJOR_VERSION = sys.version_info[0]
 PY2 = (PY_MAJOR_VERSION == 2)
 
-cis_ver = "0.1.1"
+cis_ver = "0.1.2"
     
 try:
     import matlab.engine
@@ -91,7 +91,6 @@ setup(
     name="cis_interface",
     packages=find_packages(),
     include_package_data=True,
-    # Update this for PyPI/release
     version=cis_ver,
     description=("A framework for combining interdependent models from "
                  "multiple languages."),
@@ -99,9 +98,9 @@ setup(
     author="Meagan Lang",
     author_email="langmm.astro@gmail.com",
     url="https://github.com/cropsinsilico/cis_interface",
-    # Update this for release
     download_url = "https://github.com/cropsinsilico/cis_interface/archive/%s.tar.gz" % cis_ver,
     keywords=["plants", "simulation", "models", "framework"],
+    install_requires=["sysv_ipc", "pika", "pyyaml", "pystache", "scipy"],
     classifiers=[
         "Programming Language :: Python",
         "Programming Language :: C",
