@@ -1,6 +1,7 @@
 from threading import Thread, Timer, RLock
 from logging import info, debug, error, warn, exception, critical
 import os
+import sys
 import time
 import inspect
 from cis_interface.config import cis_cfg
@@ -377,7 +378,11 @@ class Driver(Thread):
         """
         if not isinstance(fmt_str, str):
             fmt_str = str(fmt_str)
-        exception(self.logger_prefix + fmt_str, *args)
+        exc_info = sys.exc_info()
+        if exc_info is not None and exc_info != (None, None, None):
+            exception(self.logger_prefix + fmt_str, *args)
+        else:
+            error(self.logger_prefix + fmt_str, *args)
         self.errors.append((self.logger_prefix + fmt_str) % args)
 
     def raise_error(self, e):

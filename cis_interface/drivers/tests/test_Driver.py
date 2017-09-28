@@ -196,6 +196,10 @@ class TestDriverNoStart(TestParam):
         self.instance.critical(1)
         self.instance.warn(1)
         self.instance.error(1)
+        try:
+            raise Exception("Test exception")
+        except:
+            self.instance.exception(1)
         self.instance.exception(1)
         self.instance.printStatus()
 
