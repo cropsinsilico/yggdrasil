@@ -1,6 +1,7 @@
 from logging import debug
 import os
 import time
+import sysv_ipc
 from cis_interface.backwards import pickle
 from cis_interface.interface.scanf import scanf
 from cis_interface.dataio.AsciiFile import AsciiFile
@@ -84,8 +85,11 @@ class PsiInput(object):
             data, _ = self.q.receive()  # ignore ident
             payload = (True, data)
             debug("PsiInput(%s).recv(): read %d bytes", self.name, len(data))
+        except sysv_ipc.ExistentialError:
+            debug("PsiInput(%s).recv(): queue closed, returning (False, '')",
+                  self.name)
         except Exception as ex:  # pragma: debug
-            debug("PsiInput(%s).recv(): exception %s, return None", self.name, type(ex))
+            # debug("PsiInput(%s).recv(): exception %s, return None", self.name, type(ex))
             raise ex
         return payload
 
@@ -104,26 +108,22 @@ class PsiInput(object):
             debug("PsiInput(%s).recv_nolimit(): " +
                   "Failed to receive payload size.", self.name)
             return payload
-        try:
-            # (leng_exp,) = scanf('%d', payload[1])
-            leng_exp = int(float(payload[1]))
-            data = backwards.unicode2bytes('')
-            ret = True
-            while len(data) < leng_exp:
-                payload = self.recv()
-                if not payload[0]:  # pragma: debug
-                    debug("PsiInput(%s).recv_nolimit(): " +
-                          "read interupted at %d of %d bytes.",
-                          self.name, len(data), leng_exp)
-                    ret = False
-                    break
-                data = data + payload[1]
-            payload = (ret, data)
-            debug("PsiInput(%s).recv_nolimit(): read %d bytes",
-                  self.name, len(data))
-        except Exception as ex:  # pragma: debug
-            payload = (False, True)
-            raise ex
+        # (leng_exp,) = scanf('%d', payload[1])
+        leng_exp = int(float(payload[1]))
+        data = backwards.unicode2bytes('')
+        ret = True
+        while len(data) < leng_exp:
+            payload = self.recv()
+            if not payload[0]:  # pragma: debug
+                debug("PsiInput(%s).recv_nolimit(): " +
+                      "read interupted at %d of %d bytes.",
+                      self.name, len(data), leng_exp)
+                ret = False
+                break
+            data = data + payload[1]
+        payload = (ret, data)
+        debug("PsiInput(%s).recv_nolimit(): read %d bytes",
+              self.name, len(data))
         return payload
         
 
