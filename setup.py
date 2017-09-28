@@ -93,14 +93,16 @@ setup(
         'examples/ascii_io/*.yml', 'examples/ascii_io/Input/*.txt'],
     },
     include_package_data=True,
-    version="0.0.1",
+    # Update this for PyPI/release
+    version="0.1",
     description=("A framework for combining interdependent models from "
                  "multiple languages."),
     long_description=long_description,
     author="Meagan Lang",
     author_email="langmm.astro@gmail.com",
     url="https://github.com/cropsinsilico/cis_interface",
-    # download_url =  # TODO: tag
+    # Update this for release
+    download_url = "https://github.com/cropsinsilico/cis_interface/archive/0.1.tar.gz",
     keywords=["plants", "simulation", "models", "framework"],
     classifiers=[
         "Programming Language :: Python",
