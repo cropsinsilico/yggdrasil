@@ -99,8 +99,8 @@ setup(
     long_description=long_description,
     author="Meagan Lang",
     author_email="langmm.astro@gmail.com",
-    # TODO: Update url
-    # url="https://github.com/cropsinsilico/cis_interface",
+    url="https://github.com/cropsinsilico/cis_interface",
+    # download_url =  # TODO: tag
     keywords=["plants", "simulation", "models", "framework"],
     classifiers=[
         "Programming Language :: Python",
