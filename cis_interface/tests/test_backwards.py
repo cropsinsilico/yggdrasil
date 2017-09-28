@@ -80,6 +80,17 @@ def test_match_stype():
         for s2 in slist:
             nt.assert_equal(backwards.match_stype(s1, s2), s1)
     nt.assert_raises(TypeError, backwards.match_stype, 1, 'hello')
+
+
+def test_format_bytes():
+    r"""Test formating of bytes string."""
+    s0 = "%s, %s"
+    ans = "one, one"
+    arg0 = "one"
+    args = (backwards.unicode2bytes(arg0), backwards.bytes2unicode(arg0))
+    for cvt in [backwards.unicode2bytes, backwards.bytes2unicode]:
+        res = backwards.format_bytes(cvt(s0), args)
+        nt.assert_equal(res, cvt(ans))
             
 
 def test_encode_escape():
