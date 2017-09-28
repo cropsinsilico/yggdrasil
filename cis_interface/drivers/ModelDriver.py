@@ -112,6 +112,9 @@ class ModelDriver(Driver):
                 self.process.poll()
                 if self.process.returncode is None:
                     self.debug(':terminate(): terminate process')
-                    self.process.kill()  # terminate()
+                    try:
+                        self.process.kill()  # terminate()
+                    except OSError:  # pragma: debug
+                        pass
                     self.process = None
         super(ModelDriver, self).terminate()
