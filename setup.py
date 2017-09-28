@@ -6,6 +6,8 @@ from setuptools import setup, find_packages
 PY_MAJOR_VERSION = sys.version_info[0]
 PY2 = (PY_MAJOR_VERSION == 2)
 
+cis_ver = "0.1.1"
+    
 try:
     import matlab.engine
     matlab_installed = True
@@ -76,25 +78,21 @@ try:
     pypandoc.convert_file('README.md', 'rst', outputfile='README.rst')
     long_description = pypandoc.convert_file('README.md', 'rst')
 except (ImportError, IOError):
-    with open('README.md') as file:
-        long_description = file.read()
-
+    if os.path.isfile('README.rst'):
+        with open('README.rst', 'r') as file:
+            long_description = file.read()
+    elif os.path.isfile('README.md'):
+        with open('README.md', 'r') as file:
+            long_description = file.read()
+    else:
+        raise IOError("Could not find README.rst or README.md")
+    
 setup(
     name="cis_interface",
     packages=find_packages(),
-    package_data={'cis_interface': [
-        'defaults.cfg',
-        'dataio/*.h', 'dataio/*.hpp',
-        'drivers/matlab_screenrc',
-        'interface/*.h', 'interface/*.hpp', 'interface/*.m',
-        'tests/scripts/*', 'tests/data/*',
-        'examples/hello/*.yml', 'examples/hello/Input/*.txt',
-        'examples/model_error/*.yml', 'examples/model_error/Input/*.txt',
-        'examples/ascii_io/*.yml', 'examples/ascii_io/Input/*.txt'],
-    },
     include_package_data=True,
     # Update this for PyPI/release
-    version="0.1",
+    version=cis_ver,
     description=("A framework for combining interdependent models from "
                  "multiple languages."),
     long_description=long_description,
@@ -102,7 +100,7 @@ setup(
     author_email="langmm.astro@gmail.com",
     url="https://github.com/cropsinsilico/cis_interface",
     # Update this for release
-    download_url = "https://github.com/cropsinsilico/cis_interface/archive/0.1.tar.gz",
+    download_url = "https://github.com/cropsinsilico/cis_interface/archive/%s.tar.gz" % cis_ver,
     keywords=["plants", "simulation", "models", "framework"],
     classifiers=[
         "Programming Language :: Python",
