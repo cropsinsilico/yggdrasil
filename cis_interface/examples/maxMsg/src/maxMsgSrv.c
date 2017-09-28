@@ -11,9 +11,13 @@ int main(int argc, char *argv[]) {
     psiRpc_t rpc = psiRpcServer("maxMsgSrv", "%s", "%s");
     char input[PSI_MSG_MAX];
 
-    int ret = rpcRecv(rpc, &input);
-    printf("maxMsgSrv(C): rpcRecv returned %d, input %s\n", ret, input);
-    rpcSend(rpc, input);
+    while (1) {
+      int ret = rpcRecv(rpc, &input);
+      if (ret < 0)
+	break;
+      printf("maxMsgSrv(C): rpcRecv returned %d, input %s\n", ret, input);
+      rpcSend(rpc, input);
+    }
 
     printf("maxMsgSrv(C): Goodbye!\n");
     
