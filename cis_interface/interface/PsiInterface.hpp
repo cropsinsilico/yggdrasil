@@ -33,6 +33,14 @@ public:
   PsiInput(const char *name) : _pi(psiInput(name)) {}
 
   /*!
+    @brief Constructor for PsiInput with format.
+    @param[in] name constant character pointer to name of input queue. This
+    should be the argument to an input driver in the yaml specification file.
+    @param[in] fmt character pointer to format string for parsing messages.
+   */
+  PsiInput(const char *name, const char *fmt) : _pi(psiInputFmt(name, fmt)) {}
+
+  /*!
     @brief Receive a message shorter than PSI_MSG_MAX from the input queue.
     See psi_recv in PsiInterface.h for additional details.
     @param[out] data character pointer to allocated buffer where the message
@@ -41,10 +49,33 @@ public:
     @returns int -1 if message could not be received. Length of the received
     message if message was received.
    */
-  int recv(char *data, int len) {
+  int recv(char *data, const int len) {
     return psi_recv(_pi, data, len);
   }
 
+  /*!
+    @brief Receive and parse a message shorter than PSI_MSG_MAX from the input
+    queue. See psiRecv from PsiInterface.h for details.
+    @param[in] nargs int Number of arguments being passed.
+    @param[out] ... mixed arguments that should be assigned parameters extracted
+    using the format string. Since these will be assigned, they should be
+    pointers to memory that has already been allocated.
+    @return integer specifying if the receive was succesful. Values >= 0
+    indicate success.
+   */
+  int recv(const int nargs, ...) {
+    if (nargs != _pi._nfmt) {
+      psilog_error("PsiInput(%s).recv: %d args provided, but format expects %d.\n",
+		   _pi._name, nargs, _pi._nfmt);
+      return -1;
+    }
+    va_list va;
+    va_start(va, nargs);
+    int ret = vpsiRecv(_pi, va);
+    va_end(va);
+    return ret;
+  }
+  
   /*!
     @brief Receive a message larger than PSI_MSG_MAX from the input queue.
     See psi_recv_nolimit in PsiInterface.h for additional details.
@@ -54,9 +85,33 @@ public:
     @returns int -1 if message could not be received. Length of the received
     message if message was received.
    */
-  int recv_nolimit(char **data, int len) {
+  int recv_nolimit(char **data, const int len) {
     return psi_recv_nolimit(_pi, data, len);
   }
+  
+  /*!
+    @brief Receive and parse a message larger than PSI_MSG_MAX from the input
+    queue. See psiRecv_nolimit from PsiInterface.h for details.
+    @param[in] nargs int Number of arguments being passed.
+    @param[out] ... mixed arguments that should be assigned parameters extracted
+    using the format string. Since these will be assigned, they should be
+    pointers to memory that has already been allocated.
+    @return integer specifying if the receive was succesful. Values >= 0
+    indicate success.
+   */
+  int recv_nolimit(const int nargs, ...) {
+    if (nargs != _pi._nfmt) {
+      psilog_error("PsiInput(%s).recv: %d args provided, but format expects %d.\n",
+		   _pi._name, nargs, _pi._nfmt);
+      return -1;
+    }
+    va_list va;
+    va_start(va, nargs);
+    int ret = vpsiRecv_nolimit(_pi, va);
+    va_end(va);
+    return ret;
+  }
+  
 };
 
 
@@ -78,6 +133,14 @@ public:
     should be the argument to an output driver in the yaml specification file.
    */
   PsiOutput(const char *name) : _pi(psiOutput(name)) {}
+  
+  /*!
+    @brief Constructor for PsiOutput with format.
+    @param[in] name constant character pointer to name of output queue. This
+    should be the argument to an output driver in the yaml specification file.
+    @param[in] fmt character pointer to format string for formatting variables.
+   */
+  PsiOutput(const char *name, const char *fmt) : _pi(psiOutputFmt(name, fmt)) {}
 
   /*!
     @brief Send a message smaller than PSI_MSG_MAX to the output queue.
@@ -87,8 +150,29 @@ public:
     @param[in] len int length of message to be sent.
     @returns int 0 if send succesfull, -1 if send unsuccessful.
   */
-  int send(char *data, int len) {
+  int send(const char *data, const int len) {
     return psi_send(_pi, data, len);
+  }
+
+  /*!
+    @brief Format and send a message smaller than PSI_MSG_MAX to the output
+    queue. See psiSend from PsiInterface.h for details.
+    @param[in] nargs int Number of arguments being passed.
+    @param[in] ... arguments for formatting.  
+    @return integer specifying if the send was succesful. Values >= 0 indicate
+    success.
+  */
+  int send(const int nargs, ...) {
+    if (nargs != _pi._nfmt) {
+      psilog_error("PsiOutput(%s).send: %d args provided, but format expects %d.\n",
+		   _pi._name, nargs, _pi._nfmt);
+      return -1;
+    }
+    va_list va;
+    va_start(va, nargs);
+    int ret = vpsiSend(_pi, va);
+    va_end(va);
+    return ret;
   }
 
   /*!
@@ -98,9 +182,31 @@ public:
     @param[in] len int length of message to be sent.
     @returns int 0 if send succesfull, -1 if send unsuccessful.
   */
-  int send_nolimit(char *data, int len) {
+  int send_nolimit(const char *data, const int len) {
     return psi_send_nolimit(_pi, data, len);
   }
+  
+  /*!
+    @brief Format and send a message larger than PSI_MSG_MAX to the output
+    queue. See psiSend from PsiInterface.h for details.
+    @param[in] nargs int Number of arguments being passed.
+    @param[in] ... arguments for formatting.  
+    @return integer specifying if the send was succesful. Values >= 0 indicate
+    success.
+  */
+  int send_nolimit(const int nargs, ...) {
+    if (nargs != _pi._nfmt) {
+      psilog_error("PsiOutput(%s).send: %d args provided, but format expects %d.\n",
+		   _pi._name, nargs, _pi._nfmt);
+      return -1;
+    }
+    va_list va;
+    va_start(va, nargs);
+    int ret = vpsiSend_nolimit(_pi, va);
+    va_end(va);
+    return ret;
+  }
+
 };
 	
 
@@ -125,8 +231,8 @@ public:
     @param[in] inFormat character pointer to format that should be used for
     parsing input.
    */
-  PsiRpc(const char *outName, char *outFormat,
-	 const char *inName, char *inFormat) :
+  PsiRpc(const char *outName, const char *outFormat,
+	 const char *inName, const char *inFormat) :
     _pi(psiRpc(outName, outFormat, inName, inFormat)) {}
 
   /*!
@@ -145,7 +251,7 @@ public:
     @return integer specifying if the send was succesful. Values >= 0 indicate
     success.
   */
-  int send(int nargs, ...) {
+  int send(const int nargs, ...) {
     if (nargs != _pi._output._nfmt) {
       psilog_error("PsiRpc(%s).send: %d args provided, but format expects %d.\n",
 		   _pi._output._name, nargs, _pi._output._nfmt);
@@ -168,7 +274,7 @@ public:
     @return integer specifying if the receive was succesful. Values >= 0
     indicate success.
    */
-  int recv(int nargs, ...) {
+  int recv(const int nargs, ...) {
     if (nargs != _pi._input._nfmt) {
       psilog_error("PsiRpc(%s).recv: %d args provided, but format expects %d.\n",
 		   _pi._input._name, nargs, _pi._input._nfmt);
@@ -203,7 +309,7 @@ public:
     @param[in] outFormat character pointer to format that should be used for
     formatting output.
    */
-  PsiRpcServer(const char *name, char *inFormat, char *outFormat) :
+  PsiRpcServer(const char *name, const char *inFormat, const char *outFormat) :
     PsiRpc(name, outFormat, name, inFormat) {}
 
 };
@@ -229,7 +335,7 @@ public:
     @param[in] inFormat character pointer to format that should be used for
     parsing input.
    */
-  PsiRpcClient(const char *name, char *outFormat, char *inFormat) :
+  PsiRpcClient(const char *name, const char *outFormat, const char *inFormat) :
     PsiRpc(name, outFormat, name, inFormat) {
   }
 
@@ -245,7 +351,7 @@ public:
     @return integer specifying if the receive was succesful. Values >= 0
     indicate success.
   */
-  int call(int nargs, ...) {
+  int call(const int nargs, ...) {
     psiRpc_t _cpi = pi();
     int nfmt_tot = _cpi._output._nfmt + _cpi._input._nfmt;
     if (nargs != nfmt_tot) {
@@ -282,7 +388,7 @@ public:
     @param[in] dst_type int 0 if name refers to a local file, 1 if it is a
     queue.
    */
-  PsiAsciiFileOutput(const char *name, int dst_type = 1) :
+  PsiAsciiFileOutput(const char *name, const int dst_type = 1) :
     _pi(psiAsciiFileOutput(name, dst_type)) {}
   /*!
     @brief Destructor for PsiAsciiFileOutput.
@@ -302,7 +408,7 @@ public:
     @param[in] line character pointer to line that should be sent.
     @returns int 0 if send was succesfull. All other values indicate errors.
    */
-  int send_line(char *line) { return af_send_line(_pi, line); }
+  int send_line(const char *line) { return af_send_line(_pi, line); }
 
 };
 
@@ -326,7 +432,7 @@ public:
     @param[in] src_type int 0 if name refers to a local file, 1 if it is a
     queue.
    */
-  PsiAsciiFileInput(const char *name, int src_type = 1) :
+  PsiAsciiFileInput(const char *name, const int src_type = 1) :
     _pi(psiAsciiFileInput(name, src_type)) {}
   /*!
     @brief Destructor for PsiAsciiFileInput.
@@ -369,7 +475,7 @@ public:
     @param[in] dst_type int 0 if name refers to a local table, 1 if it is a
     queue.
    */
-  PsiAsciiTableOutput(const char *name, char *format_str, int dst_type = 1) :
+  PsiAsciiTableOutput(const char *name, const char *format_str, const int dst_type = 1) :
     _pi(psiAsciiTableOutput(name, format_str, dst_type)) {}
   /*!
     @brief Destructor for PsiAsciiTableOutput.
@@ -384,7 +490,7 @@ public:
     @param[in] len int length of message to be sent.
     @returns int 0 if send succesfull, -1 if send unsuccessful.
    */
-  int send(char *data, int len) { return at_psi_send(_pi, data, len); }
+  int send(const char *data, const int len) { return at_psi_send(_pi, data, len); }
 
   /*!
     @brief Send a nolimit EOF message to a table output queue.
@@ -400,7 +506,7 @@ public:
     @param[in] ... Row elements that should be formatted.
     @returns int 0 if send succesfull, -1 if send unsuccessful.
    */
-  int send_row(int nargs, ...) {
+  int send_row(const int nargs, ...) {
     int nfmt;
     if (_pi._type == 0)
       nfmt = count_formats(_pi._table.format_str);
@@ -428,7 +534,7 @@ public:
     should be formatted.
     @returns int 0 if send succesfull, -1 if send unsuccessful.
    */
-  int send_array(int nargs, int nrows, ...) {
+  int send_array(const int nargs, const int nrows, ...) {
     int nfmt;
     if (_pi._type == 0)
       nfmt = count_formats(_pi._table.format_str);
@@ -472,7 +578,7 @@ public:
     @param[in] src_type int 0 if name refers to a local table, 1 if it is a
     queue.
    */
-  PsiAsciiTableInput(const char *name, int src_type = 1) :
+  PsiAsciiTableInput(const char *name, const int src_type = 1) :
     _pi(psiAsciiTableInput(name, src_type)) {
     // For input, remove precision from floats to avoid confusing vsscanf
     // C version
@@ -507,7 +613,7 @@ public:
     @returns int -1 if message could not be received. Length of the received
     message if message was received.
    */
-  int recv(char **data, int len) { return at_psi_recv(_pi, data, len); }
+  int recv(char **data, const int len) { return at_psi_recv(_pi, data, len); }
 
   /*!
     @brief Recv and parse a row from the table file/queue.
@@ -518,7 +624,7 @@ public:
     @returns int -1 if message could not be received or parsed, otherwise the
     length of the received is returned.
    */
-  int recv_row(int nargs, ...) {
+  int recv_row(const int nargs, ...) {
     int nfmt;
     if (_pi._type == 0)
       nfmt = count_formats(_pi._table.format_str);
@@ -545,7 +651,7 @@ public:
     parsed table should be stored. They need not be allocated, only declared.
     @returns int Number of rows received. Negative values indicate errors. 
    */
-  int recv_array(int nargs, ...) {
+  int recv_array(const int nargs, ...) {
     int nfmt;
     if (_pi._type == 0)
       nfmt = count_formats(_pi._table.format_str);

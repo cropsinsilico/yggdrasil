@@ -157,7 +157,7 @@ void psiError(const char* fmt, ...) {
   @returns int queue identifier.
  */
 static inline
-int psi_mq(char *name, const char *yamlName){
+int psi_mq(const char *name, const char *yamlName){
   // Look up registered name
   char *qid = getenv(name);
   // Fail if the driver did not declare the channel
@@ -225,7 +225,7 @@ typedef struct msgbuf_t {
 typedef struct psiInput_t {
   int _handle; //!< Queue handle.
   const char *_name; //!< Queue name.
-  char *_fmt; //!< Format for interpreting queue messages.
+  char _fmt[PSI_MSG_MAX]; //!< Format for interpreting queue messages.
   int _nfmt; //!< Number of fields expected from format string
 } psiInput_t;
 
@@ -236,7 +236,7 @@ typedef struct psiInput_t {
 typedef struct psiOutput_t {
   int _handle; //!< Queue handle. 
   const char *_name; //!< Queue name.
-  char *_fmt; //!< Format for formatting queue messages.
+  char _fmt[PSI_MSG_MAX]; //!< Format for formatting queue messages.
   int _nfmt; //!< Number of fields expected from format string
 } psiOutput_t;
 
@@ -255,7 +255,7 @@ psiOutput_t psiOutput(const char *name){
   strcat(nm, "_OUT");
   psiOutput_t ret;
   ret._name = name;
-  ret._fmt = 0;
+  strcpy(ret._fmt, "\0");
   ret._nfmt = 0;
   ret._handle = psi_mq(nm, name);
   return ret;
@@ -277,7 +277,7 @@ psiInput_t psiInput(const char *name){
   psiInput_t ret;
   ret._handle =  psi_mq(nm, name);
   ret._name = name;
-  ret._fmt = 0;
+  strcpy(ret._fmt, "\0");
   ret._nfmt = 0;
   return ret;
 };
@@ -305,9 +305,9 @@ psiInput_t psi_input(const char *name){
   @returns psiOutput_t output queue structure.
  */
 static inline
-psiOutput_t psiOutputFmt(const char *name, char *fmtString){
+psiOutput_t psiOutputFmt(const char *name, const char *fmtString){
   psiOutput_t ret = psiOutput(name);
-  ret._fmt = fmtString;
+  strcpy(ret._fmt, fmtString);
   ret._nfmt = count_formats(fmtString);
   return ret;
 };
@@ -323,9 +323,9 @@ psiOutput_t psiOutputFmt(const char *name, char *fmtString){
   @returns psiInput_t input queue structure.
  */
 static inline
-psiInput_t psiInputFmt(const char *name, char *fmtString){
+psiInput_t psiInputFmt(const char *name, const char *fmtString){
   psiInput_t ret = psiInput(name);
-  ret._fmt = fmtString;
+  strcpy(ret._fmt, fmtString);
   ret._nfmt = count_formats(fmtString);
   return ret;
 };
@@ -339,7 +339,7 @@ psiInput_t psiInputFmt(const char *name, char *fmtString){
   accessed.
 */
 static inline
-int psi_output_nmsg(psiOutput_t psiQ) {
+int psi_output_nmsg(const psiOutput_t psiQ) {
   int rc;
   struct msqid_ds buf;
   int num_messages;
@@ -361,7 +361,7 @@ int psi_output_nmsg(psiOutput_t psiQ) {
   accessed.
 */
 static inline
-int psi_input_nmsg(psiInput_t psiQ) {
+int psi_input_nmsg(const psiInput_t psiQ) {
   int rc;
   struct msqid_ds buf;
   int num_messages;
@@ -384,7 +384,7 @@ int psi_input_nmsg(psiInput_t psiQ) {
   @returns int 0 if send succesfull, -1 if send unsuccessful.
  */
 static inline
-int psi_send(psiOutput_t psiQ, char *data, int len){
+int psi_send(const psiOutput_t psiQ, const char *data, const int len){
   debug("psi_send(%s): %d bytes", psiQ._name, len);
   if (len > PSI_MSG_MAX) {
     psilog_error("psi_send(%s): message too large for single packet (PSI_MSG_MAX=%d, len=%d)",
@@ -419,12 +419,12 @@ int psi_send(psiOutput_t psiQ, char *data, int len){
   @param[in] psiQ psiOutput_t structure that message should be sent to.
   @param[out] data character pointer to allocated buffer where the message
   should be saved.
-  @param[in] len int length of the allocated message buffer in bytes.
+  @param[in] len const int length of the allocated message buffer in bytes.
   @returns int -1 if message could not be received. Length of the received
   message if message was received.
  */
 static inline
-int psi_recv(psiInput_t psiQ, char *data, int len){
+int psi_recv(const psiInput_t psiQ, char *data, const int len){
   debug("psi_recv(%s)", psiQ._name);
   msgbuf_t t;
   t.mtype=1;
@@ -464,7 +464,7 @@ int psi_recv(psiInput_t psiQ, char *data, int len){
   @returns int 0 if send succesfull, -1 if send unsuccessful.
  */
 static inline
-int psi_send_nolimit(psiOutput_t psiQ, char *data, int len){
+int psi_send_nolimit(const psiOutput_t psiQ, const char *data, const int len){
   debug("psi_send_nolimit(%s): %d bytes", psiQ._name, len);
   int ret = -1;
   int msgsiz = 0;
@@ -510,7 +510,7 @@ int psi_send_nolimit(psiOutput_t psiQ, char *data, int len){
   message if message was received.
  */
 static inline
-int psi_recv_nolimit(psiInput_t psiQ, char **data, int len0){
+int psi_recv_nolimit(const psiInput_t psiQ, char **data, const int len0){
   debug("psi_recv_nolimit(%s)", psiQ._name);
   long len = 0;
   int ret = -1;
@@ -587,7 +587,7 @@ int psi_recv_nolimit(psiInput_t psiQ, char **data, int len0){
   @returns int 0 if send succesfull, -1 if send unsuccessful.
  */
 static inline
-int vpsiSend(psiOutput_t psiQ, va_list ap) {
+int vpsiSend(const psiOutput_t psiQ, va_list ap) {
   char buf[PSI_MSG_MAX];
   int ret = vsnprintf(buf, PSI_MSG_MAX, psiQ._fmt, ap);
   debug("vpsiSend(%s): vsnprintf returns %d", psiQ._name, ret);
@@ -617,7 +617,7 @@ int vpsiSend(psiOutput_t psiQ, va_list ap) {
   returned if EOF is received.
  */
 static inline
-int vpsiRecv(psiInput_t psiQ, va_list ap) {
+int vpsiRecv(const psiInput_t psiQ, va_list ap) {
   // Receive message
   char buf[PSI_MSG_MAX];
   int ret = psi_recv(psiQ, buf, PSI_MSG_MAX);
@@ -661,7 +661,7 @@ int vpsiRecv(psiInput_t psiQ, va_list ap) {
   @returns int 0 if send succesfull, -1 if send unsuccessful.
  */
 static inline
-int psiSend(psiOutput_t psiQ, ...){
+int psiSend(const psiOutput_t psiQ, ...){
   va_list ap;
   va_start(ap, psiQ);
   int ret = vpsiSend(psiQ, ap);
@@ -681,7 +681,7 @@ int psiSend(psiOutput_t psiQ, ...){
   Length of the received message if message was received and parsed.
  */
 static inline
-int psiRecv(psiInput_t psiQ, ...){
+int psiRecv(const psiInput_t psiQ, ...){
   va_list ap;
   va_start(ap, psiQ);
   int ret = vpsiRecv(psiQ, ap);
@@ -700,7 +700,7 @@ int psiRecv(psiInput_t psiQ, ...){
   unsuccessful.
  */
 static inline
-int vpsiSend_nolimit(psiOutput_t psiQ, va_list ap) {
+int vpsiSend_nolimit(const psiOutput_t psiQ, va_list ap) {
   char *buf = (char*)malloc(PSI_MSG_MAX);
   int ret = vsnprintf(buf, PSI_MSG_MAX, psiQ._fmt, ap);
   if (ret < 0) {
@@ -731,7 +731,7 @@ int vpsiSend_nolimit(psiOutput_t psiQ, va_list ap) {
   returned if EOF is received.
  */
 static inline
-int vpsiRecv_nolimit(psiInput_t psiQ, va_list ap) {
+int vpsiRecv_nolimit(const psiInput_t psiQ, va_list ap) {
   // Receive message
   char *buf = (char*)malloc(PSI_MSG_MAX);
   int ret = psi_recv_nolimit(psiQ, &buf, PSI_MSG_MAX);
@@ -781,7 +781,7 @@ int vpsiRecv_nolimit(psiInput_t psiQ, va_list ap) {
   unsuccessful.
  */
 static inline
-int psiSend_nolimit(psiOutput_t psiQ, ...) {
+int psiSend_nolimit(const psiOutput_t psiQ, ...) {
   va_list ap;
   va_start(ap, psiQ);
   int ret = vpsiSend_nolimit(psiQ, ap);
@@ -801,7 +801,7 @@ int psiSend_nolimit(psiOutput_t psiQ, ...) {
   Length of the received message if message was received and parsed.
  */
 static inline
-int psiRecv_nolimit(psiInput_t psiQ, ...) {
+int psiRecv_nolimit(const psiInput_t psiQ, ...) {
   va_list ap;
   va_start(ap, psiQ);
   int ret = vpsiRecv_nolimit(psiQ, ap);
@@ -858,8 +858,6 @@ int psiRecv_nolimit(psiInput_t psiQ, ...) {
 typedef struct psiRpc_t {
   psiInput_t _input; //!< Input queue structure.
   psiOutput_t _output; //!< Output queue structure.
-  char *_inFmt; //!< Format string used for input queue.
-  char *_outFmt; //!< Format string used for output queue
 } psiRpc_t;
 
 /*!
@@ -874,11 +872,9 @@ typedef struct psiRpc_t {
   @return psiRpc_t structure with provided info.
  */
 static inline 
-psiRpc_t psiRpc(const char *outName, char *outFormat,
-		const char *inName, char *inFormat){
+psiRpc_t psiRpc(const char *outName, const char *outFormat,
+		const char *inName, const char *inFormat){
   psiRpc_t rpc;
-  rpc._inFmt = inFormat;
-  rpc._outFmt = outFormat;
   rpc._input = psiInputFmt(inName, inFormat);
   rpc._output = psiOutputFmt(outName, outFormat);
   return rpc;
@@ -895,7 +891,7 @@ psiRpc_t psiRpc(const char *outName, char *outFormat,
   @return psiRpc_t structure with provided info.
  */
 static inline 
-psiRpc_t psiRpcClient(const char *name, char *outFormat, char *inFormat){
+psiRpc_t psiRpcClient(const char *name, const char *outFormat, const char *inFormat){
   psiRpc_t rpc = psiRpc(name, outFormat, name, inFormat);
   return rpc;
 };
@@ -911,7 +907,7 @@ psiRpc_t psiRpcClient(const char *name, char *outFormat, char *inFormat){
   @return psiRpc_t structure with provided info.
  */
 static inline 
-psiRpc_t psiRpcServer(const char *name, char *inFormat, char *outFormat){
+psiRpc_t psiRpcServer(const char *name, const char *inFormat, const char *outFormat){
   psiRpc_t rpc = psiRpc(name, outFormat, name, inFormat);
   return rpc;
 };
@@ -927,7 +923,7 @@ psiRpc_t psiRpcServer(const char *name, char *inFormat, char *outFormat){
   success.
  */
 static inline
-int vrpcSend(psiRpc_t rpc, va_list ap) {
+int vrpcSend(const psiRpc_t rpc, va_list ap) {
   int ret = vpsiSend_nolimit(rpc._output, ap);
   return ret;
 };
@@ -946,7 +942,7 @@ int vrpcSend(psiRpc_t rpc, va_list ap) {
   success.
 */
 static inline
-int vrpcRecv(psiRpc_t rpc, va_list ap) {
+int vrpcRecv(const psiRpc_t rpc, va_list ap) {
   int ret = vpsiRecv_nolimit(rpc._input, ap);
   return ret;
 };
@@ -962,7 +958,7 @@ int vrpcRecv(psiRpc_t rpc, va_list ap) {
   success.
  */
 static inline
-int rpcSend(psiRpc_t rpc, ...){
+int rpcSend(const psiRpc_t rpc, ...){
   va_list ap;
   va_start(ap, rpc);
   int ret = vrpcSend(rpc, ap);
@@ -984,7 +980,7 @@ int rpcSend(psiRpc_t rpc, ...){
   success.
 */
 static inline
-int rpcRecv(psiRpc_t rpc, ...){
+int rpcRecv(const psiRpc_t rpc, ...){
   va_list ap;
   va_start(ap, rpc);
   int ret = vrpcRecv(rpc, ap);
@@ -1006,7 +1002,7 @@ int rpcRecv(psiRpc_t rpc, ...){
   success.
  */
 static inline
-int vrpcCall(psiRpc_t rpc, va_list ap) {
+int vrpcCall(const psiRpc_t rpc, va_list ap) {
   int ret;
   
   // pack the args and call
@@ -1039,7 +1035,7 @@ int vrpcCall(psiRpc_t rpc, va_list ap) {
   success.
  */
 static inline
-int rpcCall(psiRpc_t rpc,  ...){
+int rpcCall(const psiRpc_t rpc,  ...){
   int ret;
   va_list ap;
   va_start(ap, rpc);
@@ -1122,7 +1118,7 @@ typedef struct psiAsciiFileInput_t {
   @returns psiAsciiFileOutput_t for line-by-line output to a file or channel.
  */
 static inline
-psiAsciiFileOutput_t psiAsciiFileOutput(const char *name, int dst_type) {
+psiAsciiFileOutput_t psiAsciiFileOutput(const char *name, const int dst_type) {
   psiAsciiFileOutput_t out;
   int ret;
   out._name = name;
@@ -1152,7 +1148,7 @@ psiAsciiFileOutput_t psiAsciiFileOutput(const char *name, int dst_type) {
   @returns psiAsciiFileInput_t for line-by-line input from a file or channel.
  */
 static inline
-psiAsciiFileInput_t psiAsciiFileInput(const char *name, int src_type) {
+psiAsciiFileInput_t psiAsciiFileInput(const char *name, const int src_type) {
   psiAsciiFileInput_t out;
   int ret;
   out._name = name;
@@ -1178,7 +1174,7 @@ psiAsciiFileInput_t psiAsciiFileInput(const char *name, int src_type) {
   @returns int 0 if send was succesfull. All other values indicate errors.
  */
 static inline
-int af_send_eof(psiAsciiFileOutput_t t) {
+int af_send_eof(const psiAsciiFileOutput_t t) {
   char buf[PSI_MSG_MAX] = PSI_MSG_EOF;
   int ret = psi_send(t._psi, buf, strlen(buf));
   return ret;
@@ -1194,7 +1190,7 @@ int af_send_eof(psiAsciiFileOutput_t t) {
   there was either an error or the EOF message was received.
  */
 static inline
-int af_recv_line(psiAsciiFileInput_t t, char *line, size_t n) {
+int af_recv_line(const psiAsciiFileInput_t t, char *line, size_t n) {
   int ret;
   if (t._type == 0) {
     ret = af_readline_full(t._file, &line, &n);
@@ -1215,7 +1211,7 @@ int af_recv_line(psiAsciiFileInput_t t, char *line, size_t n) {
   @returns int 0 if send was succesfull. Other values indicate errors.
  */
 static inline
-int af_send_line(psiAsciiFileOutput_t t, char *line) {
+int af_send_line(const psiAsciiFileOutput_t t, const char *line) {
   int ret;
   if (t._type == 0) {
     ret = af_writeline_full(t._file, line);
@@ -1364,8 +1360,8 @@ typedef struct psiAsciiTableInput_t {
   @returns psiAsciiTableOutput_t output structure.
  */
 static inline
-psiAsciiTableOutput_t psiAsciiTableOutput(const char *name, char *format_str,
-					  int dst_type) {
+psiAsciiTableOutput_t psiAsciiTableOutput(const char *name, const char *format_str,
+					  const int dst_type) {
   psiAsciiTableOutput_t out;
   int ret;
   out._valid = 1;
@@ -1390,7 +1386,7 @@ psiAsciiTableOutput_t psiAsciiTableOutput(const char *name, char *format_str,
     } else {
       out._table = asciiTable(name, "0", format_str,
 			      NULL, NULL, NULL);
-      out._psi._fmt = format_str;
+      strcpy(out._psi._fmt, format_str);
       out._psi._nfmt = count_formats(out._psi._fmt);
     }
   }
@@ -1406,7 +1402,7 @@ psiAsciiTableOutput_t psiAsciiTableOutput(const char *name, char *format_str,
   @returns psiAsciiTableInput_t input structure.
  */
 static inline
-psiAsciiTableInput_t psiAsciiTableInput(const char *name, int src_type) {
+psiAsciiTableInput_t psiAsciiTableInput(const char *name, const int src_type) {
   psiAsciiTableInput_t out;
   int ret;
   out._valid = 1;
@@ -1422,7 +1418,6 @@ psiAsciiTableInput_t psiAsciiTableInput(const char *name, int src_type) {
     }
   } else {
     out._psi = psiInput(name);
-    out._psi._fmt = (char*)malloc(PSI_MSG_MAX);
     ret = psi_recv(out._psi, out._psi._fmt, PSI_MSG_MAX);
     if (ret < 0) {
       psilog_error("psiAsciiTableInput: Failed to receive format string.");
@@ -1444,7 +1439,7 @@ psiAsciiTableInput_t psiAsciiTableInput(const char *name, int src_type) {
   @returns int 0 if send succesfull, -1 if send unsuccessful.
  */
 static inline
-int at_psi_send(psiAsciiTableOutput_t t, char *data, int len){
+int at_psi_send(const psiAsciiTableOutput_t t, const char *data, const int len){
   return psi_send_nolimit(t._psi, data, len);
 };
   
@@ -1458,7 +1453,7 @@ int at_psi_send(psiAsciiTableOutput_t t, char *data, int len){
   message if message was received.
  */
 static inline
-int at_psi_recv(psiAsciiTableInput_t t, char **data, int len){
+int at_psi_recv(const psiAsciiTableInput_t t, char **data, const int len){
   return psi_recv_nolimit(t._psi, data, len);
 };
 
@@ -1468,7 +1463,7 @@ int at_psi_recv(psiAsciiTableInput_t t, char **data, int len){
   @returns int 0 if send succesfull, -1 if send unsuccessful.
  */
 static inline
-int at_send_eof(psiAsciiTableOutput_t t) {
+int at_send_eof(const psiAsciiTableOutput_t t) {
   char buf[PSI_MSG_MAX] = PSI_MSG_EOF;
   int ret = psi_send_nolimit(t._psi, buf, strlen(buf));
   return ret;
@@ -1481,7 +1476,7 @@ int at_send_eof(psiAsciiTableOutput_t t) {
   @returns int 0 if send succesfull, -1 if send unsuccessful.
  */
 static inline
-int vsend_row(psiAsciiTableOutput_t t, va_list ap) {
+int vsend_row(const psiAsciiTableOutput_t t, va_list ap) {
   int ret;
   if (t._type == 0) {
     ret = at_vwriteline(t._table, ap);
@@ -1504,7 +1499,7 @@ int vsend_row(psiAsciiTableOutput_t t, va_list ap) {
   length of the received is returned.
  */
 static inline
-int vrecv_row(psiAsciiTableInput_t t, va_list ap) {
+int vrecv_row(const psiAsciiTableInput_t t, va_list ap) {
   int ret;
   if (t._type == 0) {
     ret = at_vreadline(t._table, ap);
@@ -1521,7 +1516,7 @@ int vrecv_row(psiAsciiTableInput_t t, va_list ap) {
   @returns int 0 if send succesfull, -1 if send unsuccessful.
  */
 static inline
-int at_send_row(psiAsciiTableOutput_t t, ...) {
+int at_send_row(const psiAsciiTableOutput_t t, ...) {
   int ret;
   va_list ap;
   va_start(ap, t);
@@ -1539,7 +1534,7 @@ int at_send_row(psiAsciiTableOutput_t t, ...) {
   length of the received is returned.
  */
 static inline
-int at_recv_row(psiAsciiTableInput_t t, ...) {
+int at_recv_row(const psiAsciiTableInput_t t, ...) {
   int ret;
   va_list ap;
   va_start(ap, t);
@@ -1557,7 +1552,7 @@ int at_recv_row(psiAsciiTableInput_t t, ...) {
   @returns int 0 if send succesfull, -1 if send unsuccessful.
  */
 static inline
-int vsend_array(psiAsciiTableOutput_t t, int nrows, va_list ap) {
+int vsend_array(const psiAsciiTableOutput_t t, const int nrows, va_list ap) {
   int ret;
   if (t._type == 0) {
     printf("Not currently implemented.\n");
@@ -1587,7 +1582,7 @@ int vsend_array(psiAsciiTableOutput_t t, int nrows, va_list ap) {
   @returns int Number of rows received. Negative values indicate errors.
  */
 static inline
-int vrecv_array(psiAsciiTableInput_t t, va_list ap) {
+int vrecv_array(const psiAsciiTableInput_t t, va_list ap) {
   int ret;
   if (t._type == 0) {
     printf("Not currently implemented.\n");
@@ -1615,7 +1610,7 @@ int vrecv_array(psiAsciiTableInput_t t, va_list ap) {
   @returns int 0 if send succesfull, -1 if send unsuccessful.
  */
 static inline
-int at_send_array(psiAsciiTableOutput_t t, int nrows, ...) {
+int at_send_array(const psiAsciiTableOutput_t t, const int nrows, ...) {
   int ret;
   va_list ap;
   va_start(ap, nrows);
@@ -1632,7 +1627,7 @@ int at_send_array(psiAsciiTableOutput_t t, int nrows, ...) {
   @returns int Number of rows received. Negative values indicate errors.
  */
 static inline
-int at_recv_array(psiAsciiTableInput_t t, ...) {
+int at_recv_array(const psiAsciiTableInput_t t, ...) {
   int ret;
   va_list ap;
   va_start(ap, t);
@@ -1647,8 +1642,6 @@ int at_recv_array(psiAsciiTableInput_t t, ...) {
  */
 static inline
 void cleanup_pati(psiAsciiTableInput_t *t) {
-  if ((*t)._type != 0)
-    free((*t)._psi._fmt);
   at_close(&((*t)._table));
   at_cleanup(&((*t)._table));
 };
