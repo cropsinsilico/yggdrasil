@@ -127,7 +127,7 @@ class TestIOParam(parent.TestParam, IOInfo):
         self.driver = 'IODriver'
         self.args = '_TEST'
         self.attr_list += ['state', 'numSent', 'numReceived', 'mq']
-        self.timeout = 10.0
+        self.timeout = 20.0
 
     
 class TestIODriverNoStart(TestIOParam, parent.TestDriverNoStart):

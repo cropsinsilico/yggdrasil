@@ -30,6 +30,7 @@ tmp/
 
 # Packaging things
 cis_interface.egg-info
+dist/
 
 
 # Windows image file caches
