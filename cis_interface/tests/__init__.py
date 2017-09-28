@@ -1,5 +1,6 @@
 """Testing things."""
 import os
+import unittest
 
 # Test data
 data_dir = os.path.join(os.path.dirname(__file__), 'data')
@@ -26,4 +27,40 @@ yaml_list = [
     ('error', 'error_model.yml')]
 yamls = {k: os.path.join(yaml_dir, v) for k, v in yaml_list}
 
-__all__ = ['data', 'scripts', 'yamls']
+
+class CisTest(unittest.TestCase):
+    r"""Wrapper for unittest.TestCase that allows use of nose setup and
+    teardown methods along with description prefix.
+
+    Args:
+        description_prefix (str, optional): String to prepend docstring
+            test message with. Default to empty string.
+
+    """
+
+    def __init__(self, *args, **kwargs):
+        self.description_prefix = kwargs.pop('description_prefix', '')
+        super(CisTest, self).__init__(*args, **kwargs)
+
+    def shortDescription(self):
+        r"""Prefix first line of doc string."""
+        out = super(CisTest, self).shortDescription()
+        if self.description_prefix:
+            return '%s: %s' % (self.description_prefix, out)
+        else:
+            return out
+
+    def setUp(self, *args, **kwargs):
+        self.setup(*args, **kwargs)
+
+    def tearDown(self, *args, **kwargs):
+        self.teardown(*args, **kwargs)
+
+    def setup(self, *args, **kwargs):
+        pass
+
+    def teardown(self, *args, **kwargs):
+        pass
+
+
+__all__ = ['data', 'scripts', 'yamls', 'cisTest']

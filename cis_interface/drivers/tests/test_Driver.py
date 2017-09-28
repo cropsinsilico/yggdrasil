@@ -4,11 +4,12 @@ import nose.tools as nt
 import unittest
 from cis_interface import runner, tools
 from cis_interface.config import cis_cfg
+from cis_interface.tests import CisTest
 
 # TODO: Test Ctrl-C interruption
 
 
-class TestParam(unittest.TestCase):
+class TestParam(CisTest):
     r"""Test parameters for basic Driver test class.
 
     Attributes:
@@ -36,24 +37,9 @@ class TestParam(unittest.TestCase):
         self.nprev_queues = 0
         self.timeout = 1.0
         self.sleeptime = 0.01
+        kwargs.setdefault('description_prefix', self.driver)
         super(TestParam, self).__init__(*args, **kwargs)
 
-    def shortDescription(self):
-        r"""Prefix first line of doc string with driver."""
-        out = super(TestParam, self).shortDescription()
-        return '%s: %s' % (self.driver, out)
-
-    def setUp(self, *args, **kwargs):
-        self.setup(*args, **kwargs)
-
-    def tearDown(self, *args, **kwargs):
-        self.teardown(*args, **kwargs)
-
-    # def set_param_attr(self, param_class):
-    #     r"""Copy all attributes from param_class."""
-    #     for k, v in param_class.__dict__.items():
-    #         setattr(self, k, v)
-            
     def setup(self, skip_start=False):
         r"""Create a driver instance and start the driver."""
         cis_cfg.set('debug', 'psi', 'INFO')
