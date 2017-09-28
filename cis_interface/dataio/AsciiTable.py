@@ -450,7 +450,7 @@ class AsciiTable(AsciiFile):
                 args_ += [a.real, a.imag]
             else:
                 args_.append(a)
-        out = backwards.bytes2unicode(self.format_str) % tuple(args_)
+        out = backwards.format_bytes(self.format_str, tuple(args_))
         return backwards.unicode2bytes(out)
 
     def process_line(self, line):
@@ -681,7 +681,8 @@ class AsciiTable(AsciiFile):
                         row2.append(x.imag)
                     else:
                         row2.append(x)
-                fd.write(asbytes(fmt) % tuple(row2) + asbytes(newline))
+                line = backwards.format_bytes(asbytes(fmt), tuple(row2))
+                fd.write(line + asbytes(newline))
             # np.savetxt(fd, array,
             #            fmt=fmt, delimiter=column, comments=comment,
             #            newline=newline, header=head)

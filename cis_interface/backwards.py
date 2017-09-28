@@ -3,6 +3,7 @@ import sys
 import functools
 import numpy as np
 PY2 = (sys.version_info[0] == 2)
+PY34 = ((sys.version_info[0] == 3) and (sys.version_info[1] == 4))
 if PY2:  # pragma: Python 2
     import cPickle as pickle
     import ConfigParser as configparser
@@ -150,6 +151,40 @@ def match_stype(s1, s2):
             out = bytearray(bytes2unicode(s2), 'utf-8')
         else:
             raise TypeError("s1 must be str, bytes, bytearray or unicode.")
+    return out
+
+
+def format_bytes(s, args):
+    r"""Perform format on bytes/str, converting arguments to type of format
+    string to ensure there is no prefix. For Python 3.4, if the format string
+    is bytes, the formats and arguments will be changed to str type before
+    format and then the resulting string will be changed back to bytes.
+
+    Args:
+        s (str, bytes): Format string.
+        args (tuple): Arguments to be formated using the format string.
+
+    Returns:
+        str, bytes: Formatted argument string.
+
+    """
+    if PY2:  # pragma: Python 2
+        out = s % args
+    else:  # pragma: Python 3
+        is_bytes = isinstance(s, bytes)
+        new_args = []
+        if PY34 or not is_bytes:
+            converter = bytes2unicode
+        else:
+            converter = unicode2bytes
+        for a in args:
+            if isinstance(a, (bytes, str)):
+                new_args.append(converter(a))
+            else:
+                new_args.append(a)
+        out = converter(s) % tuple(new_args)
+        if PY34 and is_bytes:
+            out = unicode2bytes(out)
     return out
 
 
