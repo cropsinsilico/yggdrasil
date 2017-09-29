@@ -139,8 +139,8 @@ class MatlabModelDriver(ModelDriver):
                 try:
                     self.mlengine = matlab.engine.connect_matlab(self.mlsession)
                 except matlab.engine.EngineError as e:  # pragma: debug
-                    self.error("could not connect to matlab engine")
-                    self.raise_error(e)
+                    self.exception("could not connect to matlab engine")
+                    raise e
             # Add things to Matlab environment
             fdir = os.path.dirname(os.path.abspath(self.args[0]))
             self.mlengine.addpath(_top_dir, nargout=0)
@@ -156,8 +156,8 @@ class MatlabModelDriver(ModelDriver):
             stop_matlab(self.screen_session, self.mlengine,
                         self.mlsession)
         except SystemError as e:  # pragma: debug
-            self.error('.cleanup() failed to exit matlab engine')
-            self.raise_error(e)
+            self.exception('.cleanup() failed to exit matlab engine')
+            raise e
         self.screen_session = None
         self.mlsession = None
         self.started_matlab = False

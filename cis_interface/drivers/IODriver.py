@@ -1,6 +1,7 @@
 from cis_interface.drivers.Driver import Driver
 from cis_interface import backwards, tools
 from cis_interface.tools import PSI_MSG_MAX
+import sysv_ipc
 
 
 # OS X limit is 2kb
@@ -16,6 +17,9 @@ class IODriver(Driver):
             connect to.
         suffix (str, optional): Suffix added to name to create the environment
             variable where the message queue key is stored. Defaults to ''.
+        receiving (bool, optional): If True, the driver will continue receiving
+            messages from the queue and placing them in backlog_recv until it is
+            stopped.
         \*\*kwargs: Additional keyword arguments are passed to parent class's
             __init__ method.
 
@@ -24,9 +28,14 @@ class IODriver(Driver):
         numSent (int): The number of messages sent to the queue.
         numReceived (int): The number of messages received from the queue.
         mq (:class:`sysv_ipc.MessageQueue`): Message queue.
+        receiving (bool): If True, the driver will continue receiving messages
+            from the queue and placing them in buffered_messages until it is
+            stopped.
+        backlog_recv (list): A list of messages that have been received.
+        backlog_send (list): A list of messages that should be sent.
 
     """
-    def __init__(self, name, suffix="", **kwargs):
+    def __init__(self, name, suffix="", receiving=False, **kwargs):
         super(IODriver, self).__init__(name, **kwargs)
         self.debug()
         self.state = 'Started'
@@ -35,6 +44,9 @@ class IODriver(Driver):
         self.mq = tools.get_queue()
         self.env[name + suffix] = str(self.mq.key)
         self.debug(".env: %s", self.env)
+        self.receiving = False
+        self.backlog_recv = []
+        self.backlog_send = []
 
     @property
     def is_valid(self):
@@ -58,6 +70,15 @@ class IODriver(Driver):
             else:  # pragma: debug
                 return 0
 
+    def run(self):
+        r"""Continue checking for buffered messages to be sent/recveived."""
+        while self.queue_open:
+            if self.receiving:
+                self.recv_backlog()
+            else:
+                self.send_backlog()
+            self.sleep()
+
     def graceful_stop(self, timeout=None, **kwargs):
         r"""Stop the IODriver, first draining the message queue.
 
@@ -78,7 +99,8 @@ class IODriver(Driver):
                                self.n_ipc_msg)
                 self.sleep()
         except Exception as e:  # pragma: debug
-            self.raise_error(e)
+            self.exception(e)
+            raise e
         self.stop_timeout()
         super(IODriver, self).graceful_stop()
         self.debug('.graceful_stop(): done')
@@ -93,8 +115,8 @@ class IODriver(Driver):
                     tools.remove_queue(self.mq)
                     self.mq = None
             except Exception as e:  # pragma: debug
-                self.error(':close_queue(): exception')
-                self.raise_error(e)
+                self.exception(':close_queue(): exception')
+                raise e
         self.debug(':close_queue(): done')
         
     def terminate(self):
@@ -131,11 +153,34 @@ class IODriver(Driver):
                 msg += '%-15s' % (str(self.mq.current_messages) + ' ready')
         msg += end_msg
 
-    def ipc_send(self, data):
+    def send_backlog(self):
+        r"""Send a message from the send backlog to the queue."""
+        if len(self.backlog_send) == 0:
+            return
+        try:
+            ret = self.ipc_send(self.backlog_send[0], no_backlog=True)
+            if ret:
+                self.backlog_send.pop(0)
+        except sysv_ipc.BusyError:
+            pass
+
+    def recv_backlog(self):
+        r"""Check for any messages in the queue and add them to the recv
+        backlog."""
+        data = self.ipc_recv(no_backlog=True)
+        if data is not None:
+            self.backlog_recv.append(data)
+
+    def ipc_send(self, data, no_backlog=False):
         r"""Send a message smaller than maxMsgSize.
 
         Args:
-            str: The message to be sent.
+            data (str): The message to be sent.
+            no_backlog (bool, optional): If False, any messages that can't be
+                sent because the queue is full will be added to a list of
+                messages to be sent once the queue is no longer full. If True,
+                messages are not backlogged and an error will be raised if the
+                queue is full.
 
         Returns:
             bool: Success or failure of send.
@@ -150,21 +195,43 @@ class IODriver(Driver):
                     self.debug('.ipc_send(): mq closed')
                     return False
                 else:
-                    self.mq.send(data)
-                    self.debug('.ipc_send %d bytes completed', len(data))
-                    self.state = 'delivered'
-                    self.numSent = self.numSent + 1
+                    try:
+                        if no_backlog or len(self.backlog_send) == 0:
+                            self.mq.send(data, block=False)
+                            self.debug('.ipc_send %d bytes completed', len(data))
+                            self.numSent = self.numSent + 1
+                            self.state = 'delivered'
+                        else:
+                            raise sysv_ipc.BusyError(
+                                'Backlogged messages must be received first')
+                    except sysv_ipc.BusyError as e:
+                        if no_backlog:
+                            raise e
+                        else:
+                            self.backlog_send.append(data)
+                            self.debug('.ipc_send %d bytes backlogged',
+                                       len(data))
+                            self.state = 'backlog'
             except Exception as e:  # pragma: debug
-                self.raise_error(e)
+                self.exception(e)
+                raise e
         return True
 
-    def ipc_recv(self):
+    def ipc_recv(self, no_backlog=False):
         r"""Receive a message smaller than maxMsgSize.
+
+        Args:
+            no_backlog (bool, optional): If False and there are messages in the
+                receive backlog, they will be returned first. Otherwise the
+                queue is checked for a message.
 
         Returns:
             str: The received message.
 
         """
+        if (not no_backlog) and (len(self.backlog_recv) > 0):
+            self.debug('.ipc_recv(): returning backlogged message')
+            return self.backlog_recv.pop(0)
         with self.lock:
             self.state = 'accept'
             self.debug('.ipc_recv(): reading IPC msg')
@@ -180,7 +247,8 @@ class IODriver(Driver):
                     ret = backwards.unicode2bytes('')
                     self.debug('.ipc_recv(): no messages in the queue')
             except Exception as e:  # pragma: debug
-                self.raise_error(e)
+                self.exception(e)
+                raise e
             if ret is not None:
                 backwards.assert_bytes(ret)
             return ret
@@ -214,13 +282,12 @@ class IODriver(Driver):
                 prev = next
             except Exception as e:  # pragma: debug
                 ret = False
-                self.error('.ipc_send_nolimit(): send interupted at %d of %d bytes.',
-                           prev, len(data))
-                self.raise_error(e)
+                self.exception('.ipc_send_nolimit(): send interupted at %d of %d bytes.',
+                               prev, len(data))
+                raise e
                 # break
         if ret:
             self.debug('.ipc_send_nolimit %d bytes completed', len(data))
-        self.state = 'delivered'
         return ret
 
     def ipc_recv_nolimit(self):
@@ -261,7 +328,8 @@ class IODriver(Driver):
                           % (tries_orig, len(data), leng_exp))
         except Exception as e:  # pragma: debug
             ret, leng = None, -1
-            self.raise_error(e)
+            self.exception(e)
+            raise e
         self.debug('.ipc_recv_nolimit ret %d bytes', leng)
         return ret
     
