@@ -65,7 +65,7 @@ before_script:
 
 script:
   - |
-    nosetests --nologcapture --with-coverage --cover-package=cis_interface -sv cis_interface/drivers/tests/test_GCCModelDriver.py
+    nosetests --nologcapture --with-coverage --cover-package=cis_interface -sv
 
 after_success:
   - coveralls
