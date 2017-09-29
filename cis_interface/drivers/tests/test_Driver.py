@@ -1,7 +1,6 @@
 import os
 import uuid
 import nose.tools as nt
-import unittest
 from cis_interface import runner, tools
 from cis_interface.config import cis_cfg
 from cis_interface.tests import CisTest
