@@ -17,6 +17,8 @@ htmlcov
 tmp/
 
 # Temporary file copies
+.#*
+\#*\#
 *~
 
 # Compiled things - not managed
