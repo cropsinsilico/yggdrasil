@@ -36,8 +36,12 @@ class TestParam(CisTest):
         self.nprev_queues = 0
         self.timeout = 1.0
         self.sleeptime = 0.01
-        kwargs.setdefault('description_prefix', self.driver)
         super(TestParam, self).__init__(*args, **kwargs)
+
+    @property
+    def description_prefix(self):
+        r"""Set description prefix to driver name."""
+        return self.driver
 
     def setup(self, skip_start=False):
         r"""Create a driver instance and start the driver."""

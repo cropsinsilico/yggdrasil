@@ -39,8 +39,13 @@ class CisTest(unittest.TestCase):
     """
 
     def __init__(self, *args, **kwargs):
-        self.description_prefix = kwargs.pop('description_prefix', '')
+        self._description_prefix = kwargs.pop('description_prefix', '')
         super(CisTest, self).__init__(*args, **kwargs)
+
+    @property
+    def description_prefix(self):
+        r"""String prefix to prepend docstr test message with."""
+        return self._description_prefix
 
     def shortDescription(self):
         r"""Prefix first line of doc string."""
