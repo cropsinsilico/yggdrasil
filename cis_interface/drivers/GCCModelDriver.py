@@ -1,8 +1,8 @@
 #
 # This should not be used directly by modelers
 #
-import subprocess
 import os
+from cis_interface import tools
 from cis_interface.drivers.ModelDriver import ModelDriver
 
 
@@ -57,10 +57,7 @@ class GCCModelDriver(ModelDriver):
         self.args = run_args
         self.compiled = True
         self.debug("::compiling")
-        comp_process = subprocess.Popen(['stdbuf', '-o0'] + compile_args,
-                                        bufsize=0, stdin=subprocess.PIPE,
-                                        stderr=subprocess.STDOUT,
-                                        stdout=subprocess.PIPE)
+        comp_process = tools.popen_nobuffer(compile_args)
         output, err = comp_process.communicate()
         exit_code = comp_process.returncode
         if exit_code != 0:  # pragma: debug
