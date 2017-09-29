@@ -17,6 +17,7 @@ htmlcov
 tmp/
 
 # Temporary file copies
+*.dSYM/
 .#*
 \#*\#
 *~
