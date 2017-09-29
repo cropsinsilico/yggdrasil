@@ -1,0 +1,185 @@
+cis_interface.dataio.tests.test_AsciiFile.test_AsciiFile ... ok
+cis_interface.dataio.tests.test_AsciiFile.test_AsciiFile_open_close ... ok
+cis_interface.dataio.tests.test_AsciiFile.test_AsciiFile_line_full ... ok
+cis_interface.dataio.tests.test_AsciiFile.test_AsciiFile_line ... ok
+Test conversion from numpy dtype to C format string. ... ok
+Test conversion from C format string to numpy dtype. ... ok
+Test conversion of C format string to version for python scanf. ... ok
+Test creation of an AsciiTable. ... ok
+Test opening/closing and AsciiTable file. ... ok
+Test writing/reading a full line to/from an AsciiTable file. ... ok
+Test reading/writing a row from/to an AsciiTable file. ... ok
+Test writing/reading an array to/from an AsciiTable file. ... ok
+Test writing/reading an array to/from an AsciiTable file w/o a header. ... ok
+Test converting an array from/to bytes using AsciiTable. ... ok
+Test writing/reading an array to/from an AsciiTable file as bytes. ... ok
+Test write/read of a table with a complex entry. ... ok
+Test updating the format string/numpy dtype for an AsciiTable. ... ok
+Test writing column names to an AsciiTable file. ... ok
+Test errors raised in line validation. ... ok
+AsciiFileInputDriver: Test early deletion of message queue. ... ok
+AsciiFileInputDriver: Test driver creation and deletion. ... ok
+AsciiFileInputDriver: Start the thread, then stop it. ... ok
+AsciiFileInputDriver: Start the thread, then terminate it. ... ok
+AsciiFileInputDriver: Test sending/receiving small message. ... ok
+AsciiFileInputDriver: Test sending/receiving large message. ... ok
+AsciiFileInputDriver: Assert that the driver has all of the required attributes. ... ok
+AsciiFileInputDriver: Test logging at various levels. ... ok
+AsciiFileInputDriver: Test error raise with log. ... ok
+AsciiFileInputDriver: Test sending/receiving with queues closed. ... ok
+AsciiFileInputDriver: Test functionality of timeout. ... ok
+AsciiFileOutputDriver: Test early deletion of message queue. ... ok
+AsciiFileOutputDriver: Test driver creation and deletion. ... ok
+AsciiFileOutputDriver: Start the thread, then stop it. ... ok
+AsciiFileOutputDriver: Start the thread, then terminate it. ... ok
+AsciiFileOutputDriver: Test sending/receiving small message. ... ok
+AsciiFileOutputDriver: Test sending/receiving large message. ... ok
+AsciiFileOutputDriver: Assert that the driver has all of the required attributes. ... ok
+AsciiFileOutputDriver: Test logging at various levels. ... ok
+AsciiFileOutputDriver: Test error raise with log. ... ok
+AsciiFileOutputDriver: Test sending/receiving with queues closed. ... ok
+AsciiFileOutputDriver: Test functionality of timeout. ... ok
+AsciiTableInputDriver: Test early deletion of message queue. ... ok
+AsciiTableInputDriver: Test driver creation and deletion. ... ok
+AsciiTableInputDriver: Start the thread, then stop it. ... ok
+AsciiTableInputDriver: Start the thread, then terminate it. ... ok
+AsciiTableInputDriver: Test sending/receiving small message. ... ok
+AsciiTableInputDriver: Test sending/receiving large message. ... ok
+AsciiTableInputDriver: Assert that the driver has all of the required attributes. ... ok
+AsciiTableInputDriver: Test logging at various levels. ... ok
+AsciiTableInputDriver: Test error raise with log. ... ok
+AsciiTableInputDriver: Test sending/receiving with queues closed. ... ok
+AsciiTableInputDriver: Test functionality of timeout. ... ok
+AsciiTableInputDriver: Test early deletion of message queue. ... ok
+AsciiTableInputDriver: Test driver creation and deletion. ... ok
+AsciiTableInputDriver: Start the thread, then stop it. ... ok
+AsciiTableInputDriver: Start the thread, then terminate it. ... ok
+AsciiTableInputDriver: Test sending/receiving small message. ... ok
+AsciiTableInputDriver: Test sending/receiving large message. ... ok
+AsciiTableOutputDriver: Test early deletion of message queue. ... ok
+AsciiTableOutputDriver: Test driver creation and deletion. ... ok
+AsciiTableOutputDriver: Start the thread, then stop it. ... ok
+AsciiTableOutputDriver: Start the thread, then terminate it. ... ok
+AsciiTableOutputDriver: Test sending/receiving small message. ... ok
+AsciiTableOutputDriver: Test sending/receiving large message. ... ok
+AsciiTableOutputDriver: Assert that the driver has all of the required attributes. ... ok
+AsciiTableOutputDriver: Test logging at various levels. ... ok
+AsciiTableOutputDriver: Test error raise with log. ... ok
+AsciiTableOutputDriver: Test sending/receiving with queues closed. ... ok
+AsciiTableOutputDriver: Test functionality of timeout. ... ok
+AsciiTableOutputDriver: Test early deletion of message queue. ... ok
+AsciiTableOutputDriver: Test driver creation and deletion. ... ok
+AsciiTableOutputDriver: Start the thread, then stop it. ... ok
+AsciiTableOutputDriver: Start the thread, then terminate it. ... ok
+AsciiTableOutputDriver: Test sending/receiving small message. ... ok
+AsciiTableOutputDriver: Test sending/receiving large message. ... ok
+Driver: Test driver creation and deletion. ... ok
+Driver: Start the thread, then stop it. ... ok
+Driver: Start the thread, then terminate it. ... ok
+Driver: Assert that the driver has all of the required attributes. ... ok
+Driver: Test logging at various levels. ... ok
+Driver: Test error raise with log. ... ok
+Driver: Test functionality of timeout. ... ok
+FileInputDriver: Test early deletion of message queue. ... ok
+FileInputDriver: Test driver creation and deletion. ... ok
+FileInputDriver: Start the thread, then stop it. ... ok
+FileInputDriver: Start the thread, then terminate it. ... ok
+FileInputDriver: Test sending/receiving small message. ... ok
+FileInputDriver: Test sending/receiving large message. ... ok
+FileInputDriver: Assert that the driver has all of the required attributes. ... ok
+FileInputDriver: Test logging at various levels. ... ok
+FileInputDriver: Test error raise with log. ... ok
+FileInputDriver: Test sending/receiving with queues closed. ... ok
+FileInputDriver: Test functionality of timeout. ... ok
+FileOutputDriver: Test early deletion of message queue. ... ok
+FileOutputDriver: Test driver creation and deletion. ... ok
+FileOutputDriver: Start the thread, then stop it. ... ok
+FileOutputDriver: Start the thread, then terminate it. ... ok
+FileOutputDriver: Test sending/receiving small message. ... ok
+FileOutputDriver: Test sending/receiving large message. ... ok
+FileOutputDriver: Assert that the driver has all of the required attributes. ... ok
+FileOutputDriver: Test logging at various levels. ... ok
+FileOutputDriver: Test error raise with log. ... ok
+FileOutputDriver: Test sending/receiving with queues closed. ... ok
+FileOutputDriver: Test functionality of timeout. ... ok
+GCCModelDriver: Test driver creation and deletion. ... ok
+GCCModelDriver: Start the thread, then stop it. ... ok
+GCCModelDriver: Start the thread, then terminate it. ... ok
+GCCModelDriver: Assert that the driver has all of the required attributes. ... ok
+GCCModelDriver: Test logging at various levels. ... ok
+GCCModelDriver: Test error raise with log. ... ok
+GCCModelDriver: Test functionality of timeout. ... ok
+Test GCCModelDriver errors. ... ok
+IODriver: Test early deletion of message queue. ... ok
+IODriver: Test driver creation and deletion. ... ok
+IODriver: Start the thread, then stop it. ... ok
+IODriver: Start the thread, then terminate it. ... ok
+IODriver: Test sending/receiving small message. ... ok
+IODriver: Test sending/receiving large message. ... 
+Name                                              Stmts   Miss  Cover
+---------------------------------------------------------------------
+cis_interface/drivers/RMQDriver.py                  229    187    18%
+cis_interface/drivers/MatlabModelDriver.py          117     91    22%
+cis_interface/drivers/RPCDriver.py                   92     70    24%
+cis_interface/drivers/RMQServerDriver.py             48     35    27%
+cis_interface/interface/PsiInterface.py             295    212    28%
+cis_interface/runner.py                             281    165    41%
+cis_interface/backwards.py                           55     19    65%
+cis_interface/tools.py                               89      4    96%
+cis_interface/drivers/Driver.py                     148      6    96%
+cis_interface/config.py                              31      1    97%
+cis_interface/drivers/IODriver.py                   158      5    97%
+cis_interface/drivers/FileDriver.py                  39      1    97%
+cis_interface/__init__.py                            15      0   100%
+cis_interface/dataio/AsciiFile.py                    67      0   100%
+cis_interface/dataio/AsciiTable.py                  403      0   100%
+cis_interface/dataio/__init__.py                      4      0   100%
+cis_interface/drivers/AsciiFileInputDriver.py        34      0   100%
+cis_interface/drivers/AsciiFileOutputDriver.py       30      0   100%
+cis_interface/drivers/AsciiTableInputDriver.py       32      0   100%
+cis_interface/drivers/AsciiTableOutputDriver.py      33      0   100%
+cis_interface/drivers/FileInputDriver.py             45      0   100%
+cis_interface/drivers/FileOutputDriver.py            37      0   100%
+cis_interface/drivers/GCCModelDriver.py              48      0   100%
+cis_interface/drivers/ModelDriver.py                 51      0   100%
+cis_interface/drivers/__init__.py                     1      0   100%
+cis_interface/examples/__init__.py                   22      0   100%
+cis_interface/interface/__init__.py                   3      0   100%
+cis_interface/platform.py                             4      0   100%
+---------------------------------------------------------------------
+TOTAL                                              2411    796    67%
+----------------------------------------------------------------------
+Ran 118 tests in 184.506s
+
+OK
+The file is not open. Nothing read.
+The file is not open. Nothing written.
+The file is not open. Nothing read.
+The file is not open. Nothing written.
+The file is not open. Nothing read.
+The file is not open. Nothing written.
+The file is not open. Nothing read.
+The file is not open. Nothing written.
+The file is not open. Nothing read.
+The file is not open. Nothing written.
+The file is not open. Nothing read.
+The file is not open. Nothing written.
+test_Driver(TestAsciiFileInputDriver_44e0d18f-7925-4171-ae70-654f80adbc9d)1
+Stopped test_Driver(TestAsciiFileInputDriver_2b73c135-6193-444a-b821-7590f800ed20).test_timeout at 0.009470/0.001000
+test_Driver(TestAsciiFileOutputDriver_a903560d-a2f3-46c5-a12b-beb5919a0a9d)1
+Stopped test_Driver(TestAsciiFileOutputDriver_cae4cd16-e00d-477f-a9e7-9c77f44728b8).test_timeout at 0.009644/0.001000
+test_Driver(TestAsciiTableInputDriver_ab4aae92-6d21-42e4-8e3b-23ba6095bb81)1
+Stopped test_Driver(TestAsciiTableInputDriver_c8e8ae48-2f51-4cd2-a31b-21b3bda446f8).test_timeout at 0.009412/0.001000
+test_Driver(TestAsciiTableOutputDriver_b4f9b5fa-7d8e-42a7-8b80-9ca78a3e2284)1
+Stopped test_Driver(TestAsciiTableOutputDriver_3cd6cf09-7f9f-4600-8494-729fa3c091dd).test_timeout at 0.019216/0.001000
+test_Driver(TestDriver_f8142256-17bf-4f58-9f5f-f4233ad5211a)1
+Stopped test_Driver(TestDriver_07bda9fa-b35d-4092-82bc-2c037d5c77b9).test_timeout at 0.009726/0.001000
+test_Driver(TestFileInputDriver_cd5862ab-1776-4784-8b6b-fe0b767c850a)1
+Stopped test_Driver(TestFileInputDriver_5428b4ac-d634-4439-ae9e-5ae45d1d958e).test_timeout at 0.012105/0.001000
+test_Driver(TestFileOutputDriver_a90d51c8-d8f4-4327-9ca1-12b674f44e94)1
+Stopped test_Driver(TestFileOutputDriver_2498d2c6-8e82-4d09-ac82-a4692bb91e8c).test_timeout at 0.009824/0.001000
+GCC Model
+GCC Model
+GCC Model
+test_Driver(TestGCCModelDriver_b1f5bfac-2522-4fa5-a441-3bc84e55401f)1
+Stopped test_Driver(TestGCCModelDriver_5ab38e33-21f8-4b5b-86ba-45f7d0b24efe).test_timeout at 0.010331/0.001000

@@ -217,7 +217,3 @@ class TestDriverNoStart(TestParam):
             self.instance.sleep()
         assert(self.instance.check_timeout())
         self.instance.stop_timeout()
-
-    def test_raise_error(self):
-        r"""Test error raise with log."""
-        nt.assert_raises(KeyError, self.instance.raise_error, KeyError("fake"))
