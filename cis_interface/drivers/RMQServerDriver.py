@@ -101,3 +101,8 @@ class RMQServerDriver(RMQDriver, RPCDriver):
     def stop_communication(self):
         r"""Stop sending/receiving messages."""
         super(RMQServerDriver, self).stop_communication(cancel_consumer=True)
+
+    def on_model_exit(self):
+        r"""Explicitly call both RMQDriver and RPCDriver versions."""
+        super(RMQDriver, self).on_model_exit()
+        RPCDriver.on_model_exit(self)

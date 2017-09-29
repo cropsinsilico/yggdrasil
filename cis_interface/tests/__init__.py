@@ -56,10 +56,10 @@ class CisTest(unittest.TestCase):
     def tearDown(self, *args, **kwargs):
         self.teardown(*args, **kwargs)
 
-    def setup(self, *args, **kwargs):
+    def setup(self, *args, **kwargs):  # pragma: no cover
         pass
 
-    def teardown(self, *args, **kwargs):
+    def teardown(self, *args, **kwargs):  # pragma: no cover
         pass
 
 
