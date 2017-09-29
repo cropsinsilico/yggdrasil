@@ -3,9 +3,8 @@
 #
 from __future__ import print_function
 import os
-import subprocess
 from pprint import pformat
-from cis_interface import backwards
+from cis_interface import backwards, tools
 from cis_interface.drivers.Driver import Driver
 
 
@@ -58,12 +57,8 @@ class ModelDriver(Driver):
         if not no_popen:
             self.debug(':run %s from %s with cwd %s and env %s',
                        self.args, os.getcwd(), self.workingDir, pformat(self.env))
-            self.process = subprocess.Popen(
-                ['stdbuf', '-o0', '-e0'] + self.args, bufsize=0,
-                # If PIPEs are used, communicate must be used below
-                # stdin=subprocess.PIPE, stderr=subprocess.PIPE,
-                stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
-                env=self.env, cwd=self.workingDir, preexec_fn=preexec)
+            self.process = tools.popen_nobuffer(self.args, env=self.env,
+                                                cwd=self.workingDir, preexec_fn=preexec)
         super(ModelDriver, self).start()
 
     def run(self):
