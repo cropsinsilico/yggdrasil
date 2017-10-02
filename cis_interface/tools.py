@@ -173,7 +173,8 @@ def ipcrm(options=[]):
     if exit_code != 0:  # pragma: debug
         print(err.decode('utf-8'))
         raise Exception("Error on spawned process. See output.")
-    print(output.decode('utf-8'))
+    if output:
+        print(output.decode('utf-8'))
 
 
 def ipcrm_queues(queue_keys=None):
