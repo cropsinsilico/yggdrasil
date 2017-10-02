@@ -365,6 +365,16 @@ class RMQDriver(Driver):
             self.channel.queue_unbind(queue=self.queue,
                                       exchange=self.exchange)
             self.channel.queue_delete(queue=self.queue)
+
+    def force_close(self):
+        r"""Force stop by removing the queue and stopping the IO loop."""
+        if self.channel_open:
+            self.remove_queue()
+        if self.connection:
+            self.connection.ioloop.stop()
+        self.channel = None
+        self.connection = None
+        self._closing = False
         
     def start_communication(self, **kwargs):
         r"""Start sending/receiving messages."""
@@ -380,11 +390,7 @@ class RMQDriver(Driver):
                 if cancel_consumer:
                     self.debug('::stop_communication: cancelling consumption')
                     # This cancels when basic_cancel dosn't work
-                    # self.remove_queue()
-                    # self.connection.ioloop.stop()
-                    # self.channel = None
-                    # self.connection = None
-                    # self._closing = False
+                    # self.force_close()
                     try:
                         self.channel.basic_cancel(callback=self.on_cancelok,
                                                   consumer_tag=self.consumer_tag)
@@ -402,6 +408,9 @@ class RMQDriver(Driver):
             self.debug('::stop_commmunication: waiting for connection to close')
             self.sleep()
         self.stop_timeout()
+        # Force close
+        if self._closing:
+            self.force_close()
 
     def on_cancelok(self, unused_frame):
         r"""Actions to perform after succesfully cancelling consumption. Closes
