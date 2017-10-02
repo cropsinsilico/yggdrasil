@@ -45,13 +45,13 @@ before_install:
        export PATH=/usr/local/opt/ccache/libexec:$PATH
 
        # Install & start RabbitMQ
-       echo Installing RabbitMQ...;
-       echo "find / -name rabbitmq-server" `find / -name rabbitmq-server 2>/dev/null`;
-       brew install rabbitmq;
+       # echo Installing RabbitMQ...;
+       # echo "find / -name rabbitmq-server" `find / -name rabbitmq-server 2>/dev/null`;
+       # brew install rabbitmq;
        
-       echo Starting RabbitMQ...;
-       export PATH="${PATH}:/usr/local/sbin";
-       sudo rabbitmq-server -detached;
+       # echo Starting RabbitMQ...;
+       # export PATH="${PATH}:/usr/local/sbin";
+       # sudo rabbitmq-server -detached;
     fi
 
 install:
@@ -74,7 +74,7 @@ before_script:
 
 script:
   - sudo rabbitmqctl status
-  - nosetests --nologcapture --with-coverage --cover-package=cis_interface -sv cis_interface/drivers/tests/test_RMQInputDriver.py
+  - nosetests --nologcapture --with-coverage --cover-package=cis_interface -sv
 
 after_success:
   - coveralls
