@@ -80,6 +80,7 @@ class RMQServerDriver(RMQDriver, RPCDriver):
                 # TODO: Requeue?
                 self.channel.basic_reject(delivery_tag=method.delivery_tag,
                                           requeue=False)
+                return
         else:
             self.clients.add(props.reply_to)
             self.debug('::Message received')

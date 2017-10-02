@@ -359,7 +359,7 @@ class RMQDriver(Driver):
     # GENERAL
     def remove_queue(self):
         r"""Unbind the queue from the exchange and delete the queue."""
-        self.debug('::stop_communication: unbinding queue')
+        self.debug('::remove_queue: unbinding queue')
         if self.channel:
             # self.display('Unbinding queue')
             self.channel.queue_unbind(queue=self.queue,
@@ -385,8 +385,11 @@ class RMQDriver(Driver):
                     # self.channel = None
                     # self.connection = None
                     # self._closing = False
-                    self.channel.basic_cancel(callback=self.on_cancelok,
-                                              consumer_tag=self.consumer_tag)
+                    try:
+                        self.channel.basic_cancel(callback=self.on_cancelok,
+                                                  consumer_tag=self.consumer_tag)
+                    except pika.exceptions.ChannelClosed:
+                        self._closing = False
                 else:
                     if remove_queue:
                         self.remove_queue()
