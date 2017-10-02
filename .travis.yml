@@ -41,8 +41,6 @@ before_install:
        export PATH=/usr/lib/ccache:$PATH
     else
        brew update
-       brew install ccache
-       export PATH=/usr/local/opt/ccache/libexec:$PATH
 
        # Install & start RabbitMQ
        echo Installing RabbitMQ...;
@@ -53,6 +51,8 @@ before_install:
        export PATH="${PATH}:/usr/local/sbin";
        sudo rabbitmq-server -detached;
 
+       brew install ccache
+       export PATH=/usr/local/opt/ccache/libexec:$PATH
     fi
 
 install:
