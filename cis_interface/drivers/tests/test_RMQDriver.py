@@ -2,6 +2,14 @@ import nose.tools as nt
 import cis_interface.drivers.tests.test_Driver as parent
 from cis_interface.drivers.tests.test_IODriver import IOInfo
 from cis_interface.config import cis_cfg
+from cis_interface.drivers import RMQDriver
+
+
+def test_errors():
+    r"""Test error incurred when opening the connection."""
+    drv = RMQDriver.RMQDriver('test', 'test', host='garbage')
+    nt.assert_raises(RuntimeError, drv.start)
+    assert(not drv.is_alive())
 
 
 class TestRMQParam(parent.TestParam, IOInfo):
@@ -19,7 +27,8 @@ class TestRMQParam(parent.TestParam, IOInfo):
         self.attr_list += ['user', 'host', 'passwd', 'exchange',
                            'connection', 'queue', 'channel',
                            'routing_key', 'consumer_tag',
-                           '_opening', '_closing', 'times_connected']
+                           '_opening', '_closing', '_error_opening',
+                           'times_connected']
         self.timeout = 5.0
         self.inst_kwargs['user'] = cis_cfg.get('RMQ', 'user')
 

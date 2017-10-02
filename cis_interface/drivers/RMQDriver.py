@@ -75,6 +75,7 @@ class RMQDriver(Driver):
         self.consumer_tag = ""
         self._opening = False
         self._closing = False
+        self._error_opening = False
         self.times_connected = 0
         self.setDaemon(True)
         self._q_obj = None
@@ -110,23 +111,27 @@ class RMQDriver(Driver):
         r"""Start the driver. Waiting for connection."""
         self._opening = True
         super(RMQDriver, self).start()
+        # Wait to see if connection opened
         T = self.start_timeout()
         interval = 1  # timeout / 5
         while (not T.is_out) and (not self.channel_stable):
-            print(self.channel_open, self._closing, self._opening)
-            print('sleeping')
+            if self._error_opening:
+                break
             self.sleep(interval)
-        if not self.channel_stable:  # pragma: debug
-            raise RuntimeError("Connection never finished opening " +
-                               "(%f/%f timeout)." % (T.elapsed, T.max_time))
         self.stop_timeout()
+        # If connection failed to open, terminate and raise error
+        if not self.channel_stable:  # pragma: debug
+            self._opening = False
+            self.terminate()
+            raise RuntimeError("Connection could not be opened.")
 
     def run(self):
         r"""Run the driver. Connect to the connection and begin the IO loop."""
-        super(RMQDriver, self).run()
         self.debug("::run")
         self.connect()
         self.connection.ioloop.start()
+        # Start after since this run is non-blocking
+        super(RMQDriver, self).run()
         self.debug("::run returns")
 
     def terminate(self):
@@ -175,8 +180,7 @@ class RMQDriver(Driver):
     def get_message_stats(self):
         r"""Return message stats from the server."""
         hoststr = self.host
-        # if self.host == '/':
-        #     hoststr = '%2f'
+        # TODO: Use vhost and replace with '%2f' if vhost is '/'
         url = 'http://%s:%s/api/%s/%s/%s' % (
             hoststr, 15672, 'queues', '%2f', self.queue)
         res = requests.get(url, auth=(self.user, self.passwd))
@@ -229,6 +233,7 @@ class RMQDriver(Driver):
                    connection_attempts=3)
         if self.host is not None:
             kws['host'] = self.host
+            # kws['host'] = "127.0.0.1"
         return pika.ConnectionParameters(**kws)
 
     # CONNECTION
@@ -245,15 +250,13 @@ class RMQDriver(Driver):
         r"""Actions that must be taken when the connection is opened.
         Add the close connection callback and open the RabbitMQ channel."""
         self.debug('::Connection opened')
-        print('connection open')
         self.connection.add_on_close_callback(self.on_connection_closed)
         self.open_channel()
 
-    def on_connection_open_error(self, unused_connection):  # pragma: debug
+    def on_connection_open_error(self, unused_connection, msg):
         r"""Actions that must be taken when the connection fails to open."""
         self.debug('::Connection could not be opened')
-        print('connection error')
-        self.terminate()
+        self._error_opening = True
         raise Exception('Could not connect.')
 
     def on_connection_closed(self, connection, reply_code, reply_text):
