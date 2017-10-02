@@ -388,7 +388,7 @@ class RMQDriver(Driver):
                     try:
                         self.channel.basic_cancel(callback=self.on_cancelok,
                                                   consumer_tag=self.consumer_tag)
-                    except pika.exceptions.ChannelClosed:
+                    except pika.exceptions.ChannelClosed:  # pragma: debug
                         self._closing = False
                 else:
                     if remove_queue:
