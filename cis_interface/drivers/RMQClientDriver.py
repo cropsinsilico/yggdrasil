@@ -182,5 +182,5 @@ class RMQClientDriver(RMQDriver, RPCDriver):
 
     def on_model_exit(self):
         r"""Explicitly call both RMQDriver and RPCDriver versions."""
-        super(RMQDriver, self).on_model_exit()
+        super(RMQClientDriver, self).on_model_exit()
         RPCDriver.on_model_exit(self)
