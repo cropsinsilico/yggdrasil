@@ -366,7 +366,7 @@ class RMQDriver(Driver):
                                       exchange=self.exchange)
             self.channel.queue_delete(queue=self.queue)
 
-    def force_close(self):
+    def force_close(self):  # pragma: debug
         r"""Force stop by removing the queue and stopping the IO loop."""
         if self.channel_open:
             self.remove_queue()
@@ -409,7 +409,7 @@ class RMQDriver(Driver):
             self.sleep()
         self.stop_timeout()
         # Force close
-        if self._closing:
+        if self._closing:  # pragma: debug
             self.force_close()
 
     def on_cancelok(self, unused_frame):
