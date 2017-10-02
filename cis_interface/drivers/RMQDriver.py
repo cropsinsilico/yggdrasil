@@ -113,6 +113,8 @@ class RMQDriver(Driver):
         T = self.start_timeout()
         interval = 1  # timeout / 5
         while (not T.is_out) and (not self.channel_stable):
+            print(self.channel_open, self._closing, self._opening)
+            print('sleeping')
             self.sleep(interval)
         if not self.channel_stable:  # pragma: debug
             raise RuntimeError("Connection never finished opening " +
@@ -243,12 +245,14 @@ class RMQDriver(Driver):
         r"""Actions that must be taken when the connection is opened.
         Add the close connection callback and open the RabbitMQ channel."""
         self.debug('::Connection opened')
+        print('connection open')
         self.connection.add_on_close_callback(self.on_connection_closed)
         self.open_channel()
 
     def on_connection_open_error(self, unused_connection):  # pragma: debug
         r"""Actions that must be taken when the connection fails to open."""
         self.debug('::Connection could not be opened')
+        print('connection error')
         self.terminate()
         raise Exception('Could not connect.')
 
