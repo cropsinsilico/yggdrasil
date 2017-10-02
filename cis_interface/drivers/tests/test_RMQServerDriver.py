@@ -120,6 +120,8 @@ class TestRMQServerDriver(TestRMQServerParam, parent1.TestRMQDriver):
                 exchange=self.instance.exchange,
                 routing_key=self.instance.queue,
                 body=self.msg_short)
+        self.instance.sleep()
+        nt.assert_equal(self.instance.n_rmq_msg, 0)
 
     def test_msg(self):
         r"""Test routing of a message through the IPC & RMQ queues."""

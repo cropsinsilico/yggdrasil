@@ -1,14 +1,14 @@
 import os
 import uuid
 import nose.tools as nt
-import unittest
 from cis_interface import runner, tools
 from cis_interface.config import cis_cfg
+from cis_interface.tests import CisTest
 
 # TODO: Test Ctrl-C interruption
 
 
-class TestParam(unittest.TestCase):
+class TestParam(CisTest):
     r"""Test parameters for basic Driver test class.
 
     Attributes:
@@ -38,22 +38,11 @@ class TestParam(unittest.TestCase):
         self.sleeptime = 0.01
         super(TestParam, self).__init__(*args, **kwargs)
 
-    def shortDescription(self):
-        r"""Prefix first line of doc string with driver."""
-        out = super(TestParam, self).shortDescription()
-        return '%s: %s' % (self.driver, out)
+    @property
+    def description_prefix(self):
+        r"""Set description prefix to driver name."""
+        return self.driver
 
-    def setUp(self, *args, **kwargs):
-        self.setup(*args, **kwargs)
-
-    def tearDown(self, *args, **kwargs):
-        self.teardown(*args, **kwargs)
-
-    # def set_param_attr(self, param_class):
-    #     r"""Copy all attributes from param_class."""
-    #     for k, v in param_class.__dict__.items():
-    #         setattr(self, k, v)
-            
     def setup(self, skip_start=False):
         r"""Create a driver instance and start the driver."""
         cis_cfg.set('debug', 'psi', 'INFO')
@@ -197,6 +186,10 @@ class TestDriverNoStart(TestParam):
         self.instance.warn(1)
         self.instance.error(1)
         self.instance.exception(1)
+        try:
+            raise Exception("Test exception")
+        except:
+            self.instance.exception(1)
         self.instance.printStatus()
 
     def test_timeout(self):

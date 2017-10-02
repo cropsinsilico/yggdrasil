@@ -1,8 +1,7 @@
 r"""This module allows for backward compatibility."""
 import sys
-import functools
-import numpy as np
 PY2 = (sys.version_info[0] == 2)
+PY34 = ((sys.version_info[0] == 3) and (sys.version_info[1] == 4))
 if PY2:  # pragma: Python 2
     import cPickle as pickle
     import ConfigParser as configparser
@@ -153,6 +152,40 @@ def match_stype(s1, s2):
     return out
 
 
+def format_bytes(s, args):
+    r"""Perform format on bytes/str, converting arguments to type of format
+    string to ensure there is no prefix. For Python 3.4, if the format string
+    is bytes, the formats and arguments will be changed to str type before
+    format and then the resulting string will be changed back to bytes.
+
+    Args:
+        s (str, bytes): Format string.
+        args (tuple): Arguments to be formated using the format string.
+
+    Returns:
+        str, bytes: Formatted argument string.
+
+    """
+    if PY2:  # pragma: Python 2
+        out = s % args
+    else:  # pragma: Python 3
+        is_bytes = isinstance(s, bytes)
+        new_args = []
+        if PY34 or not is_bytes:
+            converter = bytes2unicode
+        else:
+            converter = unicode2bytes
+        for a in args:
+            if isinstance(a, (bytes, str)):
+                new_args.append(converter(a))
+            else:
+                new_args.append(a)
+        out = converter(s) % tuple(new_args)
+        if PY34 and is_bytes:
+            out = unicode2bytes(out)
+    return out
+
+
 def encode_escape(s):
     r"""Encode escape sequences.
 
@@ -188,36 +221,8 @@ def decode_escape(s):
     return out
 
 
+# Python 3 version of np.genfromtxt
 # https://github.com/numpy/numpy/issues/3184
-genfromtxt_old = np.genfromtxt
-
-
-@functools.wraps(genfromtxt_old)
-def genfromtxt_py3_fixed(f, encoding="utf-8", *args, **kwargs):  # pragma: Python 3
-    if isinstance(f, sio.TextIOBase):
-        if hasattr(f, "buffer") and hasattr(f.buffer, "raw") and \
-           isinstance(f.buffer.raw, sio.FileIO):
-            # Best case: get underlying FileIO stream (binary!) and use that
-            fb = f.buffer.raw
-            # Reset cursor on the underlying object to match that on wrapper
-            fb.seek(f.tell())
-            result = genfromtxt_old(fb, *args, **kwargs)
-            # Reset cursor on wrapper to match that of the underlying object
-            f.seek(fb.tell())
-        else:
-            # Not very good but works: Put entire contents into BytesIO object,
-            # otherwise same ideas as above
-            old_cursor_pos = f.tell()
-            fb = sio.BytesIO(bytes(f.read(), encoding=encoding))
-            result = genfromtxt_old(fb, *args, **kwargs)
-            f.seek(old_cursor_pos + fb.tell())
-    else:
-        result = genfromtxt_old(f, *args, **kwargs)
-    return result
-
-
-if sys.version_info >= (3,):  # pragma: Python 3
-    np.genfromtxt = genfromtxt_py3_fixed
 
     
 __all__ = ['pickle', 'configparser', 'sio',

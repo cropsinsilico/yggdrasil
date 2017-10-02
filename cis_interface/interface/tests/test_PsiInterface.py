@@ -6,6 +6,7 @@ from cis_interface.interface.PsiInterface import PSI_MSG_EOF, PSI_MSG_MAX
 from cis_interface.drivers import (IODriver, RPCDriver,
                                    AsciiFileInputDriver,
                                    AsciiTableInputDriver)
+from cis_interface.tests import CisTest
 from cis_interface.drivers.tests.test_IODriver import IOInfo
 from cis_interface.backwards import pickle
 
@@ -26,10 +27,11 @@ def test_PsiMatlab_variables():
     nt.assert_equal(PsiInterface.PsiMatlab('PSI_MSG_EOF'), PSI_MSG_EOF)
     
     
-class TestPsiInput(IOInfo):
+class TestPsiInput(CisTest, IOInfo):
     r"""Test basic input to python."""
-    def __init__(self):
-        super(TestPsiInput, self).__init__()
+    def __init__(self, *args, **kwargs):
+        super(TestPsiInput, self).__init__(*args, **kwargs)
+        IOInfo.__init__(self)
         self.name = 'test'
         self.driver = None
         self.instance = None
@@ -66,10 +68,11 @@ class TestPsiInput(IOInfo):
         nt.assert_equal(msg_recv, self.msg_long)
 
 
-class TestPsiOutput(IOInfo):
+class TestPsiOutput(CisTest, IOInfo):
     r"""Test basic output to python."""
-    def __init__(self):
-        super(TestPsiOutput, self).__init__()
+    def __init__(self, *args, **kwargs):
+        super(TestPsiOutput, self).__init__(*args, **kwargs)
+        IOInfo.__init__(self)
         self.name = 'test'
         self.driver = None
         self.instance = None
@@ -104,10 +107,11 @@ class TestPsiOutput(IOInfo):
         nt.assert_equal(msg_recv, self.msg_long)
 
 
-class TestPsiRpc(IOInfo):
+class TestPsiRpc(CisTest, IOInfo):
     r"""Test basic RPC communication with Python."""
-    def __init__(self):
-        super(TestPsiRpc, self).__init__()
+    def __init__(self, *args, **kwargs):
+        super(TestPsiRpc, self).__init__(*args, **kwargs)
+        IOInfo.__init__(self)
         self.name = 'test'
         self.driver = None
         self.instance = None
@@ -175,10 +179,11 @@ class TestPsiRpcServer(TestPsiRpc):
             self.name, self.fmt_str, self.fmt_str)
 
         
-class TestPsiAsciiFileInput(IOInfo):
+class TestPsiAsciiFileInput(CisTest, IOInfo):
     r"""Test input from an unformatted text file."""
-    def __init__(self):
-        super(TestPsiAsciiFileInput, self).__init__()
+    def __init__(self, *args, **kwargs):
+        super(TestPsiAsciiFileInput, self).__init__(*args, **kwargs)
+        IOInfo.__init__(self)
         self.name = 'test'
         self.tempfile = os.path.join(os.getcwd(), 'temp_ascii.txt')
 
@@ -219,10 +224,11 @@ class TestPsiAsciiFileInput(IOInfo):
         assert(not msg_flag)
 
 
-class TestPsiAsciiFileOutput(IOInfo):
+class TestPsiAsciiFileOutput(CisTest, IOInfo):
     r"""Test output from an unformatted text file."""
-    def __init__(self):
-        super(TestPsiAsciiFileOutput, self).__init__()
+    def __init__(self, *args, **kwargs):
+        super(TestPsiAsciiFileOutput, self).__init__(*args, **kwargs)
+        IOInfo.__init__(self)
         self.name = 'test'
         self.tempfile = os.path.join(os.getcwd(), 'temp_ascii.txt')
 
@@ -269,10 +275,11 @@ class TestPsiAsciiFileOutput(IOInfo):
         nt.assert_equal(eans, PSI_MSG_EOF)
 
 
-class TestPsiAsciiTableInput(IOInfo):
+class TestPsiAsciiTableInput(CisTest, IOInfo):
     r"""Test input from an ascii table."""
-    def __init__(self):
-        super(TestPsiAsciiTableInput, self).__init__()
+    def __init__(self, *args, **kwargs):
+        super(TestPsiAsciiTableInput, self).__init__(*args, **kwargs)
+        IOInfo.__init__(self)
         self.name = 'test'
         self.tempfile = os.path.join(os.getcwd(), 'temp_ascii.txt')
 
@@ -313,10 +320,11 @@ class TestPsiAsciiTableInput(IOInfo):
         assert(not msg_flag)
 
         
-class TestPsiAsciiTableInput_AsArray(IOInfo):
+class TestPsiAsciiTableInput_AsArray(CisTest, IOInfo):
     r"""Test input from an ascii table in array format."""
-    def __init__(self):
-        super(TestPsiAsciiTableInput_AsArray, self).__init__()
+    def __init__(self, *args, **kwargs):
+        super(TestPsiAsciiTableInput_AsArray, self).__init__(*args, **kwargs)
+        IOInfo.__init__(self)
         self.name = 'test'
         self.tempfile = os.path.join(os.getcwd(), 'temp_ascii.txt')
 
@@ -351,10 +359,11 @@ class TestPsiAsciiTableInput_AsArray(IOInfo):
         np.testing.assert_equal(res, self.file_array)
         
 
-class TestPsiAsciiTableOutput(IOInfo):
+class TestPsiAsciiTableOutput(CisTest, IOInfo):
     r"""Test output from an ascii table."""
-    def __init__(self):
-        super(TestPsiAsciiTableOutput, self).__init__()
+    def __init__(self, *args, **kwargs):
+        super(TestPsiAsciiTableOutput, self).__init__(*args, **kwargs)
+        IOInfo.__init__(self)
         self.name = 'test'
         self.tempfile = os.path.join(os.getcwd(), 'temp_ascii.txt')
 
@@ -403,10 +412,11 @@ class TestPsiAsciiTableOutput(IOInfo):
         nt.assert_equal(eres, PSI_MSG_EOF)
         
             
-class TestPsiAsciiTableOutput_AsArray(IOInfo):
+class TestPsiAsciiTableOutput_AsArray(CisTest, IOInfo):
     r"""Test output from an ascii table."""
-    def __init__(self):
-        super(TestPsiAsciiTableOutput_AsArray, self).__init__()
+    def __init__(self, *args, **kwargs):
+        super(TestPsiAsciiTableOutput_AsArray, self).__init__(*args, **kwargs)
+        IOInfo.__init__(self)
         self.name = 'test'
         self.tempfile = os.path.join(os.getcwd(), 'temp_ascii.txt')
 
@@ -450,10 +460,11 @@ class TestPsiAsciiTableOutput_AsArray(IOInfo):
         nt.assert_equal(res, self.file_bytes)
 
 
-class TestPsiPickleInput(IOInfo):
+class TestPsiPickleInput(CisTest, IOInfo):
     r"""Test input from a pickle file."""
-    def __init__(self):
-        super(TestPsiPickleInput, self).__init__()
+    def __init__(self, *args, **kwargs):
+        super(TestPsiPickleInput, self).__init__(*args, **kwargs)
+        IOInfo.__init__(self)
         self.name = 'test'
         self.tempfile = os.path.join(os.getcwd(), 'temp_ascii.dat')
 
@@ -476,8 +487,9 @@ class TestPsiPickleInput(IOInfo):
         inst = PsiInterface.PsiPickleInput(self.tempfile, src_type=0)
         msg_flag, res = inst.recv()
         assert(msg_flag)
-        res_pickle = pickle.dumps(res)
-        nt.assert_equal(res_pickle, self.pickled_data)
+        self.assert_equal_data_dict(res)
+        # res_pickle = pickle.dumps(res)
+        # nt.assert_equal(res_pickle, self.pickled_data)
 
     def test_recv_rem(self):
         r"""Test receiving a pickle from a remote file."""
@@ -485,14 +497,16 @@ class TestPsiPickleInput(IOInfo):
         self.driver.ipc_send_nolimit(self.pickled_data)
         msg_flag, res = inst.recv()
         assert(msg_flag)
-        res_pickle = pickle.dumps(res)
-        nt.assert_equal(res_pickle, self.pickled_data)
+        self.assert_equal_data_dict(res)
+        # res_pickle = pickle.dumps(res)
+        # nt.assert_equal(res_pickle, self.pickled_data)
 
 
-class TestPsiPickleOutput(IOInfo):
+class TestPsiPickleOutput(CisTest, IOInfo):
     r"""Test output from a pickle."""
-    def __init__(self):
-        super(TestPsiPickleOutput, self).__init__()
+    def __init__(self, *args, **kwargs):
+        super(TestPsiPickleOutput, self).__init__(*args, **kwargs)
+        IOInfo.__init__(self)
         self.name = 'test'
         self.tempfile = os.path.join(os.getcwd(), 'temp_ascii.dat')
 
@@ -520,8 +534,9 @@ class TestPsiPickleOutput(IOInfo):
         assert(os.path.isfile(self.tempfile))
         with open(self.tempfile, 'rb') as fd:
             res = pickle.load(fd)
-            res_pickle = pickle.dumps(res)
-            nt.assert_equal(res_pickle, self.pickled_data)
+            self.assert_equal_data_dict(res)
+            # res_pickle = pickle.dumps(res)
+            # nt.assert_equal(res_pickle, self.pickled_data)
 
     def test_send_rem(self):
         r"""Test sending a pickle to a remote file."""
@@ -529,4 +544,6 @@ class TestPsiPickleOutput(IOInfo):
         msg_flag = inst.send(self.data_dict)
         assert(msg_flag)
         res = self.driver.recv_wait_nolimit(timeout=1)
-        nt.assert_equal(res, self.pickled_data)
+        res = pickle.loads(res)
+        self.assert_equal_data_dict(res)
+        # nt.assert_equal(res, self.pickled_data)

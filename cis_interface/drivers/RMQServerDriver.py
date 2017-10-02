@@ -80,6 +80,7 @@ class RMQServerDriver(RMQDriver, RPCDriver):
                 # TODO: Requeue?
                 self.channel.basic_reject(delivery_tag=method.delivery_tag,
                                           requeue=False)
+                return
         else:
             self.clients.add(props.reply_to)
             self.debug('::Message received')
@@ -101,3 +102,8 @@ class RMQServerDriver(RMQDriver, RPCDriver):
     def stop_communication(self):
         r"""Stop sending/receiving messages."""
         super(RMQServerDriver, self).stop_communication(cancel_consumer=True)
+
+    def on_model_exit(self):
+        r"""Explicitly call both RMQDriver and RPCDriver versions."""
+        super(RMQServerDriver, self).on_model_exit()
+        RPCDriver.on_model_exit(self)

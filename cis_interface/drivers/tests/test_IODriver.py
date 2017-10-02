@@ -71,6 +71,25 @@ class IOInfo(object):
                 'z': np.ones((3, 4), dtype=np.float64)}
         return self._data_dict
 
+    def assert_equal_data_dict(self, x):
+        r"""Assert that the provided object is equivalent to data_dict.
+
+        Args:
+            x (obj): Object to check.
+
+        Raises:
+            AssertionError: If the two are not equal.
+
+        """
+        nt.assert_equal(type(x), type(self.data_dict))
+        for k in self.data_dict:
+            if k not in x:  # pragma: debug
+                raise AssertionError("Key %s expected, but not in result." % k)
+            np.testing.assert_array_equal(x[k], self.data_dict[k])
+        for k in x:
+            if k not in self.data_dict:  # pragma: debug
+                raise AssertionError("Key %s in result not expected." % k)
+
     @property
     def pickled_data(self):
         r"""str: Pickled mock data dictionary."""

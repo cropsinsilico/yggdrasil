@@ -464,7 +464,7 @@ class CisRunner(object):
         for srv_name in model.get('client_of', []):
             # Stop client IO driver
             iod = self.outputdrivers["%s_%s" % (srv_name, model['name'])]
-            iod['instance'].stop()
+            iod['instance'].on_model_exit()
             self.do_exits(iod)
             # Remove this client from list for server
             srv = self.modeldrivers[srv_name]
@@ -472,7 +472,7 @@ class CisRunner(object):
             # Stop server if there are not any more clients
             if len(srv['clients']) == 0:
                 iod = self.inputdrivers[srv_name]
-                iod['instance'].stop()
+                iod['instance'].on_model_exit()
                 self.do_exits(iod)
                 srv['instance'].stop()
                 # self.do_model_exits(srv)
