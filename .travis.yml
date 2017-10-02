@@ -43,6 +43,15 @@ before_install:
        brew update
        brew install ccache
        export PATH=/usr/local/opt/ccache/libexec:$PATH
+
+       # Install & start RabbitMQ
+       echo Installing RabbitMQ...;
+       echo "find / -name rabbitmq-server" `find / -name rabbitmq-server 2>/dev/null`;
+       brew install rabbitmq;
+       
+       echo Starting RabbitMQ...;
+       export PATH="${PATH}:/usr/local/sbin";
+       sudo rabbitmq-server -detached;
     fi
 
 install:
@@ -64,8 +73,8 @@ before_script:
     flake8 cis_interface
 
 script:
-  - |
-    nosetests --nologcapture --with-coverage --cover-package=cis_interface -sv cis_interface/drivers/tests/test_RMQInputDriver.py
+  - sudo rabbitmqctl status
+  - nosetests --nologcapture --with-coverage --cover-package=cis_interface -sv cis_interface/drivers/tests/test_RMQInputDriver.py
 
 after_success:
   - coveralls
