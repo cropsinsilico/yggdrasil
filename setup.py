@@ -6,7 +6,7 @@ from setuptools import setup, find_packages
 PY_MAJOR_VERSION = sys.version_info[0]
 PY2 = (PY_MAJOR_VERSION == 2)
 
-cis_ver = "0.1.2"
+cis_ver = "0.1.3"
     
 try:
     import matlab.engine
