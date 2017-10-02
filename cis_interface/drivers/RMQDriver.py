@@ -250,7 +250,6 @@ class RMQDriver(Driver):
         r"""Actions that must be taken when the connection is opened.
         Add the close connection callback and open the RabbitMQ channel."""
         self.debug('::Connection opened')
-        print('connection open')
         self.connection.add_on_close_callback(self.on_connection_closed)
         self.open_channel()
 
