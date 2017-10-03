@@ -19,7 +19,7 @@ Debug Options
 Options for controlling the level of information printed during a run can be
 controlled by options in the '[debug]' section of the config files. Each one
 can have any of the valid
-`logging levels <https://docs.python.org/2/library/logging.html#levels>`.
+`logging levels <https://docs.python.org/2/library/logging.html#levels>`_.
 These include:
 
 * **NOTSET:** Do not print any messages.
@@ -39,7 +39,7 @@ psi       INFO       Controls the level of messages printed by the
 rmq       WARNING    Controls the level of messages printed by
 		     RabbitMQ.
 client    INFO       Controls the level of messages printed by
-                     |cis_interface| calls from the models themselves.
+                     |cis_interface| calls from the models.
 ======    =======    =================================================
 
 
