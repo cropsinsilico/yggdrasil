@@ -1,46 +1,162 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
 
-<html xmlns="http://www.w3.org/1999/xhtml">
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>cis_interface.drivers.RPCDriver &mdash; cis_interface 0.0.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
     
-    <title>cis_interface.drivers.RPCDriver &#8212; cis_interface 0.0.0 documentation</title>
-    
-    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
-    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-    
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../../../',
-        VERSION:     '0.0.0',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
-    <script type="text/javascript" src="../../../_static/jquery.js"></script>
-    <script type="text/javascript" src="../../../_static/underscore.js"></script>
-    <script type="text/javascript" src="../../../_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <link rel="index" title="Index" href="../../../genindex.html" />
-    <link rel="search" title="Search" href="../../../search.html" />
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="../../../genindex.html"/>
+        <link rel="search" title="Search" href="../../../search.html"/>
+    <link rel="top" title="cis_interface 0.0.0 documentation" href="../../../index.html"/>
+        <link rel="up" title="Module code" href="../../index.html"/> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
    
-  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
-  
-  
-  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+  <div class="wy-grid-for-nav">
 
-  </head>
-  <body role="document">
-  
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          <div class="body" role="main">
+          
+            <a href="../../../index.html" class="icon icon-home"> cis_interface
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.0.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../includeme.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../config.html">Configuration Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../code.html">Code</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">cis_interface</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>cis_interface.drivers.RPCDriver</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
             
   <h1>Source code for cis_interface.drivers.RPCDriver</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">cis_interface.drivers.Driver</span> <span class="k">import</span> <span class="n">Driver</span>
@@ -69,14 +185,32 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">iipc</span> <span class="o">=</span> <span class="n">IODriver</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="s1">&#39;_IN&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">oipc</span> <span class="o">=</span> <span class="n">IODriver</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="s1">&#39;_OUT&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">env</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;dict: Environment variables.&quot;&quot;&quot;</span>
         <span class="n">out</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="n">out</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">iipc</span><span class="o">.</span><span class="n">env</span><span class="p">)</span>
         <span class="n">out</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">oipc</span><span class="o">.</span><span class="n">env</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">out</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">env</span> <span class="o">=</span> <span class="n">out</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">queues_open</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;bool: True if both input and output queues open.&quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">iipc</span><span class="o">.</span><span class="n">queue_open</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">oipc</span><span class="o">.</span><span class="n">queue_open</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">is_valid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;bool: True if both queues are open and parent class is valid.&quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">(</span><span class="nb">super</span><span class="p">(</span><span class="n">RPCDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">is_valid</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">queues_open</span><span class="p">)</span>
+        
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">n_msg_in</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: The number of messages in the input queue.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">iipc</span><span class="o">.</span><span class="n">n_ipc_msg</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">n_msg_out</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: The number of messages in the output queue.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">oipc</span><span class="o">.</span><span class="n">n_ipc_msg</span>
 
 <div class="viewcode-block" id="RPCDriver.run"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.RPCDriver.RPCDriver.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Run the input/output queue drivers.&quot;&quot;&quot;</span>
@@ -91,62 +225,50 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;.graceful_stop()&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">iipc</span><span class="o">.</span><span class="n">graceful_stop</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">oipc</span><span class="o">.</span><span class="n">graceful_stop</span><span class="p">()</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">RPCDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">graceful_stop</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;.graceful_stop() done&#39;</span><span class="p">)</span></div>
+        <span class="nb">super</span><span class="p">(</span><span class="n">RPCDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">graceful_stop</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="RPCDriver.close_queues"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.RPCDriver.RPCDriver.close_queues">[docs]</a>    <span class="k">def</span> <span class="nf">close_queues</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Close the IPC queues.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;.close_queues()&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">iipc</span><span class="o">.</span><span class="n">close_queue</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">oipc</span><span class="o">.</span><span class="n">close_queue</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="RPCDriver.terminate"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.RPCDriver.RPCDriver.terminate">[docs]</a>    <span class="k">def</span> <span class="nf">terminate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Terminate input/output queue drivers.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_terminated</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;:terminated() Driver already terminated.&#39;</span><span class="p">)</span>
+            <span class="k">return</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;.terminate()&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">iipc</span><span class="o">.</span><span class="n">terminate</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">oipc</span><span class="o">.</span><span class="n">terminate</span><span class="p">()</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">RPCDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">terminate</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;.terminate() done&#39;</span><span class="p">)</span></div>
+        <span class="nb">super</span><span class="p">(</span><span class="n">RPCDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">terminate</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="RPCDriver.on_exit"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.RPCDriver.RPCDriver.on_exit">[docs]</a>    <span class="k">def</span> <span class="nf">on_exit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Actions to perform when the driver is finished.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;.on_exit()&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">iipc</span><span class="o">.</span><span class="n">on_exit</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">oipc</span><span class="o">.</span><span class="n">on_exit</span><span class="p">()</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">RPCDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">on_exit</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="RPCDriver.on_model_exit"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.RPCDriver.RPCDriver.on_model_exit">[docs]</a>    <span class="k">def</span> <span class="nf">on_model_exit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Actions to perform when the associated model driver is finished.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;.on_model_exit()&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">oipc</span><span class="o">.</span><span class="n">on_model_exit</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">iipc</span><span class="o">.</span><span class="n">on_model_exit</span><span class="p">()</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">RPCDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">on_model_exit</span><span class="p">()</span></div>
+        
+<div class="viewcode-block" id="RPCDriver.cleanup"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.RPCDriver.RPCDriver.cleanup">[docs]</a>    <span class="k">def</span> <span class="nf">cleanup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Perform cleanup for IPC drivers.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;.cleanup()&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">iipc</span><span class="o">.</span><span class="n">cleanup</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">oipc</span><span class="o">.</span><span class="n">cleanup</span><span class="p">()</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">RPCDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">cleanup</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="RPCDriver.printStatus"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.RPCDriver.RPCDriver.printStatus">[docs]</a>    <span class="k">def</span> <span class="nf">printStatus</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Print information on the status of the driver.&quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">RPCDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">printStatus</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">iipc</span><span class="o">.</span><span class="n">printStatus</span><span class="p">(</span><span class="n">beg_msg</span><span class="o">=</span><span class="s1">&#39;RPC Input Driver:&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">oipc</span><span class="o">.</span><span class="n">printStatus</span><span class="p">(</span><span class="n">beg_msg</span><span class="o">=</span><span class="s1">&#39;RPC Ouput Driver:&#39;</span><span class="p">)</span></div>
-
-<div class="viewcode-block" id="RPCDriver.recv_wait"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.RPCDriver.RPCDriver.recv_wait">[docs]</a>    <span class="k">def</span> <span class="nf">recv_wait</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">use_output</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Receive a message smaller than maxMsgSize. This method will wait</span>
-<span class="sd">        until there is a message in the queue to return or the queue is closed.</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            use_output (bool, optional): If True, the message is received from</span>
-<span class="sd">                the output queue instead of the input one.</span>
-<span class="sd">            timeout (float, optional): Max time that should be waited. Defaults</span>
-<span class="sd">                to 0 and is infinite.</span>
-
-<span class="sd">        Returns:</span>
-<span class="sd">            str: The received message.</span>
-
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">use_output</span><span class="p">:</span>
-            <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">oipc</span><span class="o">.</span><span class="n">recv_wait</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">iipc</span><span class="o">.</span><span class="n">recv_wait</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">data</span></div>
-
-<div class="viewcode-block" id="RPCDriver.recv_wait_nolimit"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.RPCDriver.RPCDriver.recv_wait_nolimit">[docs]</a>    <span class="k">def</span> <span class="nf">recv_wait_nolimit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">use_output</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Receive a message larger than maxMsgSize. This method will wait</span>
-<span class="sd">        until there is a message in the queue to return or the queue is closed.</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            use_output (bool, optional): If True, the message is received from</span>
-<span class="sd">                the output queue instead of the input one.</span>
-<span class="sd">            timeout (float, optional): Max time that should be waited. Defaults</span>
-<span class="sd">                to 0 and is infinite.</span>
-
-<span class="sd">        Returns:</span>
-<span class="sd">            str: The received message.</span>
-
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">use_output</span><span class="p">:</span>
-            <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">oipc</span><span class="o">.</span><span class="n">recv_wait_nolimit</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">iipc</span><span class="o">.</span><span class="n">recv_wait_nolimit</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">data</span></div>
 
 <div class="viewcode-block" id="RPCDriver.ipc_send"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.RPCDriver.RPCDriver.ipc_send">[docs]</a>    <span class="k">def</span> <span class="nf">ipc_send</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">use_input</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Send message smaller than maxMsgSize to the output queue.</span>
@@ -210,60 +332,108 @@
             <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">iipc</span><span class="o">.</span><span class="n">ipc_recv_nolimit</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">data</span></div>
 
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">n_msg_in</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: The number of messages in the input queue.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">iipc</span><span class="o">.</span><span class="n">n_ipc_msg</span>
+<div class="viewcode-block" id="RPCDriver.recv_wait"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.RPCDriver.RPCDriver.recv_wait">[docs]</a>    <span class="k">def</span> <span class="nf">recv_wait</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">use_output</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Receive a message smaller than maxMsgSize. This method will wait</span>
+<span class="sd">        until there is a message in the queue to return or the queue is closed.</span>
 
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">n_msg_out</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: The number of messages in the output queue.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">oipc</span><span class="o">.</span><span class="n">n_ipc_msg</span>
+<span class="sd">        Args:</span>
+<span class="sd">            use_output (bool, optional): If True, the message is received from</span>
+<span class="sd">                the output queue instead of the input one.</span>
+<span class="sd">            timeout (float, optional): Max time that should be waited. Defaults</span>
+<span class="sd">                to 0 and is infinite.</span>
 
-<div class="viewcode-block" id="RPCDriver.on_model_exit"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.RPCDriver.RPCDriver.on_model_exit">[docs]</a>    <span class="k">def</span> <span class="nf">on_model_exit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Actions to perform when the associated model driver is finished.&quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">oipc</span><span class="o">.</span><span class="n">on_model_exit</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">iipc</span><span class="o">.</span><span class="n">on_model_exit</span><span class="p">()</span></div></div>
+<span class="sd">        Returns:</span>
+<span class="sd">            str: The received message.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">use_output</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">oipc</span><span class="o">.</span><span class="n">recv_wait</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">iipc</span><span class="o">.</span><span class="n">recv_wait</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">data</span></div>
+
+<div class="viewcode-block" id="RPCDriver.recv_wait_nolimit"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.RPCDriver.RPCDriver.recv_wait_nolimit">[docs]</a>    <span class="k">def</span> <span class="nf">recv_wait_nolimit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">use_output</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Receive a message larger than maxMsgSize. This method will wait</span>
+<span class="sd">        until there is a message in the queue to return or the queue is closed.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            use_output (bool, optional): If True, the message is received from</span>
+<span class="sd">                the output queue instead of the input one.</span>
+<span class="sd">            timeout (float, optional): Max time that should be waited. Defaults</span>
+<span class="sd">                to 0 and is infinite.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: The received message.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">use_output</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">oipc</span><span class="o">.</span><span class="n">recv_wait_nolimit</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">iipc</span><span class="o">.</span><span class="n">recv_wait_nolimit</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">data</span></div></div>
 </pre></div>
 
+           </div>
+           <div class="articleComments">
+            
+           </div>
           </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Meagan Lang, David Raila.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper"><div class="relations">
-<h3>Related Topics</h3>
-<ul>
-  <li><a href="../../../index.html">Documentation overview</a><ul>
-  <li><a href="../../index.html">Module code</a><ul>
-  </ul></li>
-  </ul></li>
-</ul>
-</div>
-<div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
-    <form class="search" action="../../../search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
-    </form>
-</div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
-        </div>
-      </div>
-      <div class="clearer"></div>
-    </div>
-    <div class="footer">
-      &copy;2017, Meagan Lang, David Raila.
-      
-      |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.6</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
-      
-    </div>
 
-    
+    </section>
 
-    
-  </body>
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../',
+            VERSION:'0.0.0',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
 </html>

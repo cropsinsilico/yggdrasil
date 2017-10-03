@@ -1,53 +1,169 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
 
-<html xmlns="http://www.w3.org/1999/xhtml">
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>cis_interface.drivers.FileInputDriver &mdash; cis_interface 0.0.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
     
-    <title>cis_interface.drivers.FileInputDriver &#8212; cis_interface 0.0.0 documentation</title>
-    
-    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
-    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-    
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../../../',
-        VERSION:     '0.0.0',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
-    <script type="text/javascript" src="../../../_static/jquery.js"></script>
-    <script type="text/javascript" src="../../../_static/underscore.js"></script>
-    <script type="text/javascript" src="../../../_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <link rel="index" title="Index" href="../../../genindex.html" />
-    <link rel="search" title="Search" href="../../../search.html" />
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="../../../genindex.html"/>
+        <link rel="search" title="Search" href="../../../search.html"/>
+    <link rel="top" title="cis_interface 0.0.0 documentation" href="../../../index.html"/>
+        <link rel="up" title="Module code" href="../../index.html"/> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
    
-  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
-  
-  
-  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+  <div class="wy-grid-for-nav">
 
-  </head>
-  <body role="document">
-  
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          <div class="body" role="main">
+          
+            <a href="../../../index.html" class="icon icon-home"> cis_interface
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.0.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../includeme.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../config.html">Configuration Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../code.html">Code</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">cis_interface</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>cis_interface.drivers.FileInputDriver</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
             
   <h1>Source code for cis_interface.drivers.FileInputDriver</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">from</span> <span class="nn">cis_interface.drivers.IODriver</span> <span class="k">import</span> <span class="n">IODriver</span>
+<span class="kn">from</span> <span class="nn">cis_interface.drivers.FileDriver</span> <span class="k">import</span> <span class="n">FileDriver</span>
 
 
-<div class="viewcode-block" id="FileInputDriver"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.FileInputDriver.FileInputDriver">[docs]</a><span class="k">class</span> <span class="nc">FileInputDriver</span><span class="p">(</span><span class="n">IODriver</span><span class="p">):</span>
+<div class="viewcode-block" id="FileInputDriver"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.FileInputDriver.FileInputDriver">[docs]</a><span class="k">class</span> <span class="nc">FileInputDriver</span><span class="p">(</span><span class="n">FileDriver</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Class that sends messages read from a file.</span>
 
 <span class="sd">    Args:</span>
@@ -63,25 +179,45 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">FileInputDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;_IN&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">FileInputDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">suffix</span><span class="o">=</span><span class="s2">&quot;_IN&quot;</span><span class="p">,</span>
+                                              <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;(</span><span class="si">%s</span><span class="s1">)&#39;</span><span class="p">,</span> <span class="n">args</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">args</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">fd</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;(</span><span class="si">%s</span><span class="s1">): done with init&#39;</span><span class="p">,</span> <span class="n">args</span><span class="p">)</span>
 
-<div class="viewcode-block" id="FileInputDriver.close_file"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.FileInputDriver.FileInputDriver.close_file">[docs]</a>    <span class="k">def</span> <span class="nf">close_file</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Close the file.&quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;:close_file()&#39;</span><span class="p">)</span>
+<div class="viewcode-block" id="FileInputDriver.open_file"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.FileInputDriver.FileInputDriver.open_file">[docs]</a>    <span class="k">def</span> <span class="nf">open_file</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Open the file.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;:open_file()&#39;</span><span class="p">)</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">fd</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">fd</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">fd</span> <span class="o">=</span> <span class="kc">None</span></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fd</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="FileInputDriver.terminate"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.FileInputDriver.FileInputDriver.terminate">[docs]</a>    <span class="k">def</span> <span class="nf">terminate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Terminate the driver. The file is closed as necessary.&quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;:terminate()&#39;</span><span class="p">)</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">FileInputDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">terminate</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">close_file</span><span class="p">()</span></div>
+<div class="viewcode-block" id="FileInputDriver.file_read"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.FileInputDriver.FileInputDriver.file_read">[docs]</a>    <span class="k">def</span> <span class="nf">file_read</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Read a message from the file.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: Message.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fd</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">eof_msg</span>
+        <span class="k">return</span> <span class="n">data</span></div>
+
+<div class="viewcode-block" id="FileInputDriver.file_send"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.FileInputDriver.FileInputDriver.file_send">[docs]</a>    <span class="k">def</span> <span class="nf">file_send</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Send a message to the IPC queue.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            data (str): Message.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: Success or failure of send.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">ipc_send</span><span class="p">(</span><span class="n">data</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="FileInputDriver.on_eof"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.FileInputDriver.FileInputDriver.on_eof">[docs]</a>    <span class="k">def</span> <span class="nf">on_eof</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Actions to perform when the end of file is reached.&quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
 
 <div class="viewcode-block" id="FileInputDriver.run"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.FileInputDriver.FileInputDriver.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Run the driver. The file is opened and then data is read from the</span>
@@ -90,62 +226,109 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;:run in </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">())</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">fd</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">open_file</span><span class="p">()</span>
         <span class="k">except</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s1">&#39;Could not open file.&#39;</span><span class="p">)</span>
             <span class="k">return</span>
-        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">fd</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
-                <span class="n">data</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="n">nread</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">nsent</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_valid</span><span class="p">:</span>
+            <span class="c1"># Ensure file not closed between check and read</span>
+            <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_open</span><span class="p">:</span>
+                    <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_read</span><span class="p">()</span>
+                <span class="k">else</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+                    <span class="c1"># Break on file closed</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;:run: File closed.&#39;</span><span class="p">)</span>
+                    <span class="k">break</span>
+            <span class="k">if</span> <span class="n">data</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+                <span class="c1"># Break on None for closed file</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;:run: File closed.&#39;</span><span class="p">)</span>
+                <span class="k">break</span>
+            <span class="k">elif</span> <span class="n">data</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">eof_msg</span><span class="p">:</span>
+                <span class="c1"># Break on end of file</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;:run: End of file&#39;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">on_eof</span><span class="p">()</span>
+                <span class="k">break</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fd</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;:run: read: </span><span class="si">%d</span><span class="s1"> bytes&#39;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">))</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;:run, no input&#39;</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">ipc_send</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;:run returned&#39;</span><span class="p">)</span></div></div>
+                <span class="n">nread</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;:run: Read </span><span class="si">%d</span><span class="s1"> bytes.&#39;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">))</span>
+                <span class="c1"># Ensure queue not closed between check and message</span>
+                <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">queue_open</span><span class="p">:</span>
+                        <span class="n">ret</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_send</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="n">ret</span><span class="p">:</span>
+                            <span class="n">nsent</span> <span class="o">+=</span> <span class="mi">1</span>
+                    <span class="k">else</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+                        <span class="c1"># Break on queue closed</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;:run: Queue closed&#39;</span><span class="p">)</span>
+                        <span class="k">break</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">close_file</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;:run: Read </span><span class="si">%d</span><span class="s1"> messages, sent </span><span class="si">%d</span><span class="s1">.&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">nread</span><span class="p">,</span> <span class="n">nsent</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;:run returns&#39;</span><span class="p">)</span></div></div>
 </pre></div>
 
+           </div>
+           <div class="articleComments">
+            
+           </div>
           </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Meagan Lang, David Raila.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper"><div class="relations">
-<h3>Related Topics</h3>
-<ul>
-  <li><a href="../../../index.html">Documentation overview</a><ul>
-  <li><a href="../../index.html">Module code</a><ul>
-  </ul></li>
-  </ul></li>
-</ul>
-</div>
-<div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
-    <form class="search" action="../../../search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
-    </form>
-</div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
-        </div>
-      </div>
-      <div class="clearer"></div>
-    </div>
-    <div class="footer">
-      &copy;2017, Meagan Lang, David Raila.
-      
-      |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.6</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
-      
-    </div>
 
-    
+    </section>
 
-    
-  </body>
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../',
+            VERSION:'0.0.0',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
 </html>

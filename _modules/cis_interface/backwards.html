@@ -1,53 +1,168 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
 
-<html xmlns="http://www.w3.org/1999/xhtml">
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>cis_interface.backwards &mdash; cis_interface 0.0.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
     
-    <title>cis_interface.backwards &#8212; cis_interface 0.0.0 documentation</title>
-    
-    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
-    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-    
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../../',
-        VERSION:     '0.0.0',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
-    <script type="text/javascript" src="../../_static/jquery.js"></script>
-    <script type="text/javascript" src="../../_static/underscore.js"></script>
-    <script type="text/javascript" src="../../_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <link rel="index" title="Index" href="../../genindex.html" />
-    <link rel="search" title="Search" href="../../search.html" />
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="../../genindex.html"/>
+        <link rel="search" title="Search" href="../../search.html"/>
+    <link rel="top" title="cis_interface 0.0.0 documentation" href="../../index.html"/>
+        <link rel="up" title="Module code" href="../index.html"/> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
    
-  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
-  
-  
-  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+  <div class="wy-grid-for-nav">
 
-  </head>
-  <body role="document">
-  
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          <div class="body" role="main">
+          
+            <a href="../../index.html" class="icon icon-home"> cis_interface
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.0.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../includeme.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../config.html">Configuration Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../code.html">Code</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">cis_interface</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>cis_interface.backwards</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
             
   <h1>Source code for cis_interface.backwards</h1><div class="highlight"><pre>
 <span></span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;This module allows for backward compatibility.&quot;&quot;&quot;</span>
 <span class="kn">import</span> <span class="nn">sys</span>
-<span class="kn">import</span> <span class="nn">functools</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="n">PY2</span> <span class="o">=</span> <span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">version_info</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">2</span><span class="p">)</span>
+<span class="n">PY34</span> <span class="o">=</span> <span class="p">((</span><span class="n">sys</span><span class="o">.</span><span class="n">version_info</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">3</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">version_info</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">4</span><span class="p">))</span>
 <span class="k">if</span> <span class="n">PY2</span><span class="p">:</span>  <span class="c1"># pragma: Python 2</span>
     <span class="kn">import</span> <span class="nn">cPickle</span> <span class="k">as</span> <span class="nn">pickle</span>
     <span class="kn">import</span> <span class="nn">ConfigParser</span> <span class="k">as</span> <span class="nn">configparser</span>
@@ -63,7 +178,7 @@
     <span class="n">bytes_type</span> <span class="o">=</span> <span class="nb">bytes</span>
     <span class="n">unicode_type</span> <span class="o">=</span> <span class="nb">str</span>
     <span class="n">unicode</span> <span class="o">=</span> <span class="kc">None</span>
-    <span class="n">np_dtype_str</span> <span class="o">=</span> <span class="s1">&#39;U&#39;</span>
+    <span class="n">np_dtype_str</span> <span class="o">=</span> <span class="s1">&#39;S&#39;</span>
 
 
 <span class="k">def</span> <span class="nf">assert_bytes</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
@@ -94,7 +209,7 @@
     <span class="k">assert</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">unicode_type</span><span class="p">))</span>
 
 
-<div class="viewcode-block" id="bytes2unicode"><a class="viewcode-back" href="../../code_python.html#cis_interface.backwards.bytes2unicode">[docs]</a><span class="k">def</span> <span class="nf">bytes2unicode</span><span class="p">(</span><span class="n">b</span><span class="p">):</span>
+<div class="viewcode-block" id="bytes2unicode"><a class="viewcode-back" href="../../cis_interface.html#cis_interface.backwards.bytes2unicode">[docs]</a><span class="k">def</span> <span class="nf">bytes2unicode</span><span class="p">(</span><span class="n">b</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Convert from bytes/unicode/str to unicode.</span>
 
 <span class="sd">    Arguments:</span>
@@ -126,7 +241,7 @@
     <span class="k">return</span> <span class="n">s</span></div>
 
 
-<div class="viewcode-block" id="unicode2bytes"><a class="viewcode-back" href="../../code_python.html#cis_interface.backwards.unicode2bytes">[docs]</a><span class="k">def</span> <span class="nf">unicode2bytes</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+<div class="viewcode-block" id="unicode2bytes"><a class="viewcode-back" href="../../cis_interface.html#cis_interface.backwards.unicode2bytes">[docs]</a><span class="k">def</span> <span class="nf">unicode2bytes</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Convert from bytes/unicode/str to a bytes object.</span>
 
 <span class="sd">    Arguments:</span>
@@ -161,6 +276,94 @@
     <span class="k">return</span> <span class="n">b</span></div>
 
 
+<span class="k">def</span> <span class="nf">match_stype</span><span class="p">(</span><span class="n">s1</span><span class="p">,</span> <span class="n">s2</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Encodes one string to match the type of the second.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        s1 (str, bytes, bytearray, unicode): Object that type should be taken</span>
+<span class="sd">            from.</span>
+<span class="sd">        s2 (str, bytes, bytearray, unicode): Object that should be returned</span>
+<span class="sd">            in the type from s1.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str, bytes, bytearray, unicode: Type matched version of s2.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        TypeError: If s1 is not str, bytes, bytearray or unicode.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">PY2</span><span class="p">:</span>  <span class="c1"># pragma: Python 2</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">s1</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">unicode2bytes</span><span class="p">(</span><span class="n">s2</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">s1</span><span class="p">,</span> <span class="n">unicode</span><span class="p">):</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">unicode</span><span class="p">(</span><span class="n">s2</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">s1</span><span class="p">,</span> <span class="nb">bytearray</span><span class="p">):</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="nb">bytearray</span><span class="p">(</span><span class="n">bytes2unicode</span><span class="p">(</span><span class="n">s2</span><span class="p">),</span> <span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;s1 must be str, bytes, bytearray or unicode.&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>  <span class="c1"># pragma: Python 3</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">s1</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">bytes2unicode</span><span class="p">(</span><span class="n">s2</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">s1</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">):</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">unicode2bytes</span><span class="p">(</span><span class="n">s2</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">s1</span><span class="p">,</span> <span class="nb">bytearray</span><span class="p">):</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="nb">bytearray</span><span class="p">(</span><span class="n">bytes2unicode</span><span class="p">(</span><span class="n">s2</span><span class="p">),</span> <span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;s1 must be str, bytes, bytearray or unicode.&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">out</span>
+
+
+<span class="k">def</span> <span class="nf">format_bytes</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Perform format on bytes/str, converting arguments to type of format</span>
+<span class="sd">    string to ensure there is no prefix. For Python 3.4, if the format string</span>
+<span class="sd">    is bytes, the formats and arguments will be changed to str type before</span>
+<span class="sd">    format and then the resulting string will be changed back to bytes.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        s (str, bytes): Format string.</span>
+<span class="sd">        args (tuple): Arguments to be formated using the format string.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str, bytes: Formatted argument string.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">PY2</span><span class="p">:</span>  <span class="c1"># pragma: Python 2</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">s</span> <span class="o">%</span> <span class="n">args</span>
+    <span class="k">else</span><span class="p">:</span>  <span class="c1"># pragma: Python 3</span>
+        <span class="n">is_bytes</span> <span class="o">=</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">)</span>
+        <span class="n">new_args</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="n">PY34</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">is_bytes</span><span class="p">:</span>
+            <span class="n">converter</span> <span class="o">=</span> <span class="n">bytes2unicode</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">converter</span> <span class="o">=</span> <span class="n">unicode2bytes</span>
+        <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">args</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="p">(</span><span class="nb">bytes</span><span class="p">,</span> <span class="nb">str</span><span class="p">)):</span>
+                <span class="n">new_args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">converter</span><span class="p">(</span><span class="n">a</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">new_args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">converter</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="o">%</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">new_args</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">PY34</span> <span class="ow">and</span> <span class="n">is_bytes</span><span class="p">:</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">unicode2bytes</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">out</span>
+
+
+<span class="k">def</span> <span class="nf">encode_escape</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Encode escape sequences.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        s (str): String that should be encoded.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str: Result of encoding escape sequences.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">PY2</span><span class="p">:</span>  <span class="c1"># pragma: Python 2</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">match_stype</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">bytes2unicode</span><span class="p">(</span><span class="n">s</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;string-escape&#39;</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>  <span class="c1"># pragma: Python 3</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">match_stype</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">bytes2unicode</span><span class="p">(</span><span class="n">s</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;unicode-escape&#39;</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">out</span>
+
+
 <span class="k">def</span> <span class="nf">decode_escape</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Decode escape sequences.</span>
 
@@ -172,86 +375,82 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">PY2</span><span class="p">:</span>  <span class="c1"># pragma: Python 2</span>
-        <span class="n">out</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;string-escape&#39;</span><span class="p">)</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">match_stype</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">unicode2bytes</span><span class="p">(</span><span class="n">s</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;string-escape&#39;</span><span class="p">))</span>
     <span class="k">else</span><span class="p">:</span>  <span class="c1"># pragma: Python 3</span>
-        <span class="n">out</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;unicode_escape&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;latin1&#39;</span><span class="p">)</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">match_stype</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">unicode2bytes</span><span class="p">(</span><span class="n">s</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;unicode-escape&#39;</span><span class="p">))</span>
+        <span class="c1"># out = unicode2bytes(s).decode(&#39;unicode-escape&#39;).encode(&#39;latin1&#39;)</span>
     <span class="k">return</span> <span class="n">out</span>
 
 
+<span class="c1"># Python 3 version of np.genfromtxt</span>
 <span class="c1"># https://github.com/numpy/numpy/issues/3184</span>
-<span class="n">genfromtxt_old</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">genfromtxt</span>
-
-
-<span class="nd">@functools</span><span class="o">.</span><span class="n">wraps</span><span class="p">(</span><span class="n">genfromtxt_old</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">genfromtxt_py3_fixed</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>  <span class="c1"># pragma: Python 3</span>
-    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">sio</span><span class="o">.</span><span class="n">TextIOBase</span><span class="p">):</span>
-        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s2">&quot;buffer&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">buffer</span><span class="p">,</span> <span class="s2">&quot;raw&quot;</span><span class="p">)</span> <span class="ow">and</span> \
-           <span class="nb">isinstance</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">buffer</span><span class="o">.</span><span class="n">raw</span><span class="p">,</span> <span class="n">sio</span><span class="o">.</span><span class="n">FileIO</span><span class="p">):</span>
-            <span class="c1"># Best case: get underlying FileIO stream (binary!) and use that</span>
-            <span class="n">fb</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">buffer</span><span class="o">.</span><span class="n">raw</span>
-            <span class="c1"># Reset cursor on the underlying object to match that on wrapper</span>
-            <span class="n">fb</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">tell</span><span class="p">())</span>
-            <span class="n">result</span> <span class="o">=</span> <span class="n">genfromtxt_old</span><span class="p">(</span><span class="n">fb</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-            <span class="c1"># Reset cursor on wrapper to match that of the underlying object</span>
-            <span class="n">f</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">fb</span><span class="o">.</span><span class="n">tell</span><span class="p">())</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="c1"># Not very good but works: Put entire contents into BytesIO object,</span>
-            <span class="c1"># otherwise same ideas as above</span>
-            <span class="n">old_cursor_pos</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">tell</span><span class="p">()</span>
-            <span class="n">fb</span> <span class="o">=</span> <span class="n">sio</span><span class="o">.</span><span class="n">BytesIO</span><span class="p">(</span><span class="nb">bytes</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">(),</span> <span class="n">encoding</span><span class="o">=</span><span class="n">encoding</span><span class="p">))</span>
-            <span class="n">result</span> <span class="o">=</span> <span class="n">genfromtxt_old</span><span class="p">(</span><span class="n">fb</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-            <span class="n">f</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">old_cursor_pos</span> <span class="o">+</span> <span class="n">fb</span><span class="o">.</span><span class="n">tell</span><span class="p">())</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">result</span> <span class="o">=</span> <span class="n">genfromtxt_old</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">result</span>
-
-
-<span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">version_info</span> <span class="o">&gt;=</span> <span class="p">(</span><span class="mi">3</span><span class="p">,):</span>  <span class="c1"># pragma: Python 3</span>
-    <span class="n">np</span><span class="o">.</span><span class="n">genfromtxt</span> <span class="o">=</span> <span class="n">genfromtxt_py3_fixed</span>
 
     
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;pickle&#39;</span><span class="p">,</span> <span class="s1">&#39;configparser&#39;</span><span class="p">,</span> <span class="s1">&#39;sio&#39;</span><span class="p">,</span>
            <span class="s1">&#39;bytes2unicode&#39;</span><span class="p">,</span> <span class="s1">&#39;unicode2bytes&#39;</span><span class="p">]</span>
 </pre></div>
 
+           </div>
+           <div class="articleComments">
+            
+           </div>
           </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Meagan Lang, David Raila.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper"><div class="relations">
-<h3>Related Topics</h3>
-<ul>
-  <li><a href="../../index.html">Documentation overview</a><ul>
-  <li><a href="../index.html">Module code</a><ul>
-  </ul></li>
-  </ul></li>
-</ul>
-</div>
-<div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
-    <form class="search" action="../../search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
-    </form>
-</div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
-        </div>
-      </div>
-      <div class="clearer"></div>
-    </div>
-    <div class="footer">
-      &copy;2017, Meagan Lang, David Raila.
-      
-      |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.6</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
-      
-    </div>
 
-    
+    </section>
 
-    
-  </body>
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'0.0.0',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
 </html>

@@ -51,6 +51,14 @@ cis\_interface\.drivers\.Driver module
     :undoc-members:
     :show-inheritance:
 
+cis\_interface\.drivers\.FileDriver module
+------------------------------------------
+
+.. automodule:: cis_interface.drivers.FileDriver
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 cis\_interface\.drivers\.FileInputDriver module
 -----------------------------------------------
 

@@ -1,51 +1,193 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
 
-<html xmlns="http://www.w3.org/1999/xhtml">
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>C++ Interface &mdash; cis_interface 0.0.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
     
-    <title>C++ Interface &#8212; cis_interface 0.0.0 documentation</title>
-    
-    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    './',
-        VERSION:     '0.0.0',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
-    <script type="text/javascript" src="_static/jquery.js"></script>
-    <script type="text/javascript" src="_static/underscore.js"></script>
-    <script type="text/javascript" src="_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="C++ DataIO API" href="dataio_cpp.html" />
-    <link rel="prev" title="C++ Code" href="code_cpp.html" />
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="cis_interface 0.0.0 documentation" href="index.html"/>
+        <link rel="up" title="C++ Code" href="code_cpp.html"/>
+        <link rel="next" title="C++ DataIO API" href="dataio_cpp.html"/>
+        <link rel="prev" title="C++ Code" href="code_cpp.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
    
-  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
-  
-  
-  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+  <div class="wy-grid-for-nav">
 
-  </head>
-  <body role="document">
-  
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          <div class="body" role="main">
+          
+            <a href="index.html" class="icon icon-home"> cis_interface
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.0.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="includeme.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="config.html">Configuration Files</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="code.html">Code</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="code_python.html">Python Code</a></li>
+<li class="toctree-l2"><a class="reference internal" href="code_c.html">C Code</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="code_cpp.html">C++ Code</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="code_cpp.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4 current"><a class="current reference internal" href="#">C++ Interface</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dataio_cpp.html">C++ DataIO API</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="code_matlab.html">Matlab Code</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">cis_interface</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="code.html">Code</a> &raquo;</li>
+        
+          <li><a href="code_cpp.html">C++ Code</a> &raquo;</li>
+        
+      <li>C++ Interface</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/interface_cpp.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
             
   <div class="section" id="c-interface">
 <h1>C++ Interface<a class="headerlink" href="#c-interface" title="Permalink to this headline">¶</a></h1>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Defines</p>
+<dl class="macro">
+<dt id="c.PSIINTERFACE_HPP_">
+<span class="target" id="_psi_interface_8hpp_1a94878add670c8b6c28ad79f910fef493"></span><code class="descname">PSIINTERFACE_HPP_</code><a class="headerlink" href="#c.PSIINTERFACE_HPP_" title="Permalink to this definition">¶</a></dt>
+<dd><p>Flag for checking if PsiInterface.hpp has already been included. </p>
+</dd></dl>
+
+</div>
 <dl class="class">
 <dt id="_CPPv28PsiInput">
 <span id="PsiInput"></span><span class="target" id="class_psi_input"></span><em class="property">class </em><code class="descname">PsiInput</code><a class="headerlink" href="#_CPPv28PsiInput" title="Permalink to this definition">¶</a><br /></dt>
@@ -68,8 +210,23 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv2N8PsiInput4recvEPci">
-<span id="PsiInput::recv__cP.i"></span><span class="target" id="class_psi_input_1a480b3f1424806a23c3a1c77d590eb216"></span>int <code class="descname">recv</code><span class="sig-paren">(</span>char *<em>data</em>, int <em>len</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N8PsiInput4recvEPci" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv2N8PsiInput8PsiInputEPKcPKc">
+<span id="PsiInput::PsiInput__cCP.cCP"></span><span class="target" id="class_psi_input_1a09513c3aae3e26592b69e8a436e7229a"></span><code class="descname">PsiInput</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em>, <em class="property">const</em> char *<em>fmt</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N8PsiInput8PsiInputEPKcPKc" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor for <a class="reference internal" href="#class_psi_input"><span class="std std-ref">PsiInput</span></a> with format. </p>
+<p><dl class="docutils">
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">name</span></code>: constant character pointer to name of input queue. This should be the argument to an input driver in the yaml specification file. </li>
+<li><code class="docutils literal"><span class="pre">fmt</span></code>: character pointer to format string for parsing messages. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv2N8PsiInput4recvEPcKi">
+<span id="PsiInput::recv__cP.iC"></span><span class="target" id="class_psi_input_1a1c292458de494ca0f91d97c9225036de"></span>int <code class="descname">recv</code><span class="sig-paren">(</span>char *<em>data</em>, <em class="property">const</em> int <em>len</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N8PsiInput4recvEPcKi" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Receive a message shorter than PSI_MSG_MAX from the input queue. See psi_recv in PsiInterface.h for additional details. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -85,8 +242,25 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv2N8PsiInput12recv_nolimitEPPci">
-<span id="PsiInput::recv_nolimit__cPP.i"></span><span class="target" id="class_psi_input_1a9410879a8e96915adcad5d6ebb5f224c"></span>int <code class="descname">recv_nolimit</code><span class="sig-paren">(</span>char **<em>data</em>, int <em>len</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N8PsiInput12recv_nolimitEPPci" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv2N8PsiInput4recvEKiz">
+<span id="PsiInput::recv__iC.z"></span><span class="target" id="class_psi_input_1a4b266f3fdc8359d71c0f9c4d5b0d7d7d"></span>int <code class="descname">recv</code><span class="sig-paren">(</span><em class="property">const</em> int <em>nargs</em>, ...<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N8PsiInput4recvEKiz" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Receive and parse a message shorter than PSI_MSG_MAX from the input queue. See psiRecv from PsiInterface.h for details. </p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>integer specifying if the receive was succesful. Values &gt;= 0 indicate success. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">nargs</span></code>: int Number of arguments being passed. </li>
+<li><code class="docutils literal"><span class="pre">...</span></code>: mixed arguments that should be assigned parameters extracted using the format string. Since these will be assigned, they should be pointers to memory that has already been allocated. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv2N8PsiInput12recv_nolimitEPPcKi">
+<span id="PsiInput::recv_nolimit__cPP.iC"></span><span class="target" id="class_psi_input_1a7c8715d4779f33bd9332accc9ce619a5"></span>int <code class="descname">recv_nolimit</code><span class="sig-paren">(</span>char **<em>data</em>, <em class="property">const</em> int <em>len</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N8PsiInput12recv_nolimitEPPcKi" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Receive a message larger than PSI_MSG_MAX from the input queue. See psi_recv_nolimit in PsiInterface.h for additional details. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -95,6 +269,23 @@
 <dd><ul class="breatheparameterlist first last simple">
 <li><code class="docutils literal"><span class="pre">data</span></code>: character pointer to allocated buffer where the message should be saved. </li>
 <li><code class="docutils literal"><span class="pre">len</span></code>: int length of the allocated message buffer in bytes. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv2N8PsiInput12recv_nolimitEKiz">
+<span id="PsiInput::recv_nolimit__iC.z"></span><span class="target" id="class_psi_input_1a34b17df0567d24347ddddb82e94488da"></span>int <code class="descname">recv_nolimit</code><span class="sig-paren">(</span><em class="property">const</em> int <em>nargs</em>, ...<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N8PsiInput12recv_nolimitEKiz" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Receive and parse a message larger than PSI_MSG_MAX from the input queue. See psiRecv_nolimit from PsiInterface.h for details. </p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>integer specifying if the receive was succesful. Values &gt;= 0 indicate success. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">nargs</span></code>: int Number of arguments being passed. </li>
+<li><code class="docutils literal"><span class="pre">...</span></code>: mixed arguments that should be assigned parameters extracted using the format string. Since these will be assigned, they should be pointers to memory that has already been allocated. </li>
 </ul>
 </dd>
 </dl>
@@ -134,8 +325,23 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv2N9PsiOutput4sendEPci">
-<span id="PsiOutput::send__cP.i"></span><span class="target" id="class_psi_output_1a5cdad4b95c12f7ac7dcc8c4a7e7c8104"></span>int <code class="descname">send</code><span class="sig-paren">(</span>char *<em>data</em>, int <em>len</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N9PsiOutput4sendEPci" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv2N9PsiOutput9PsiOutputEPKcPKc">
+<span id="PsiOutput::PsiOutput__cCP.cCP"></span><span class="target" id="class_psi_output_1a44ca5828c93c9b4b50ea2137aaa1f24f"></span><code class="descname">PsiOutput</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em>, <em class="property">const</em> char *<em>fmt</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N9PsiOutput9PsiOutputEPKcPKc" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor for <a class="reference internal" href="#class_psi_output"><span class="std std-ref">PsiOutput</span></a> with format. </p>
+<p><dl class="docutils">
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">name</span></code>: constant character pointer to name of output queue. This should be the argument to an output driver in the yaml specification file. </li>
+<li><code class="docutils literal"><span class="pre">fmt</span></code>: character pointer to format string for formatting variables. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv2N9PsiOutput4sendEPKcKi">
+<span id="PsiOutput::send__cCP.iC"></span><span class="target" id="class_psi_output_1a16d67d3e9f1ce655b4d59190ca969ef2"></span>int <code class="descname">send</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>data</em>, <em class="property">const</em> int <em>len</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N9PsiOutput4sendEPKcKi" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Send a message smaller than PSI_MSG_MAX to the output queue. If the message is larger than PSI_MSG_MAX an error code will be returned. See psi_send in PsiInterface.h for details. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -151,8 +357,25 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv2N9PsiOutput12send_nolimitEPci">
-<span id="PsiOutput::send_nolimit__cP.i"></span><span class="target" id="class_psi_output_1a8cc6c40e56f1d7570d1f1dca477ade5d"></span>int <code class="descname">send_nolimit</code><span class="sig-paren">(</span>char *<em>data</em>, int <em>len</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N9PsiOutput12send_nolimitEPci" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv2N9PsiOutput4sendEKiz">
+<span id="PsiOutput::send__iC.z"></span><span class="target" id="class_psi_output_1aca55241a3e428c700160f76099320039"></span>int <code class="descname">send</code><span class="sig-paren">(</span><em class="property">const</em> int <em>nargs</em>, ...<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N9PsiOutput4sendEKiz" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Format and send a message smaller than PSI_MSG_MAX to the output queue. See psiSend from PsiInterface.h for details. </p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>integer specifying if the send was succesful. Values &gt;= 0 indicate success. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">nargs</span></code>: int Number of arguments being passed. </li>
+<li><code class="docutils literal"><span class="pre">...</span></code>: arguments for formatting. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv2N9PsiOutput12send_nolimitEPKcKi">
+<span id="PsiOutput::send_nolimit__cCP.iC"></span><span class="target" id="class_psi_output_1acd30bbe2f5608666c3961e97ddebeb6f"></span>int <code class="descname">send_nolimit</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>data</em>, <em class="property">const</em> int <em>len</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N9PsiOutput12send_nolimitEPKcKi" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Send a message larger than PSI_MSG_MAX to the output queue. See psi_send_nolimit in PsiInterface.h for details. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -161,6 +384,23 @@
 <dd><ul class="breatheparameterlist first last simple">
 <li><code class="docutils literal"><span class="pre">data</span></code>: character pointer to message that should be sent. </li>
 <li><code class="docutils literal"><span class="pre">len</span></code>: int length of message to be sent. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv2N9PsiOutput12send_nolimitEKiz">
+<span id="PsiOutput::send_nolimit__iC.z"></span><span class="target" id="class_psi_output_1adae6e04a6681bc88db8c9944b05576aa"></span>int <code class="descname">send_nolimit</code><span class="sig-paren">(</span><em class="property">const</em> int <em>nargs</em>, ...<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N9PsiOutput12send_nolimitEKiz" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Format and send a message larger than PSI_MSG_MAX to the output queue. See psiSend from PsiInterface.h for details. </p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>integer specifying if the send was succesful. Values &gt;= 0 indicate success. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">nargs</span></code>: int Number of arguments being passed. </li>
+<li><code class="docutils literal"><span class="pre">...</span></code>: arguments for formatting. </li>
 </ul>
 </dd>
 </dl>
@@ -187,8 +427,8 @@
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric">Public Functions</p>
 <dl class="function">
-<dt id="_CPPv2N6PsiRpc6PsiRpcEPKcPcPKcPc">
-<span id="PsiRpc::PsiRpc__cCP.cP.cCP.cP"></span><span class="target" id="class_psi_rpc_1a59e6a3c10d5d3b8b5ddbad8272c21609"></span><code class="descname">PsiRpc</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>outName</em>, char *<em>outFormat</em>, <em class="property">const</em> char *<em>inName</em>, char *<em>inFormat</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N6PsiRpc6PsiRpcEPKcPcPKcPc" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv2N6PsiRpc6PsiRpcEPKcPKcPKcPKc">
+<span id="PsiRpc::PsiRpc__cCP.cCP.cCP.cCP"></span><span class="target" id="class_psi_rpc_1a73c75c55491217fbe180dc230f740c9f"></span><code class="descname">PsiRpc</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>outName</em>, <em class="property">const</em> char *<em>outFormat</em>, <em class="property">const</em> char *<em>inName</em>, <em class="property">const</em> char *<em>inFormat</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N6PsiRpc6PsiRpcEPKcPKcPKcPKc" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor for <a class="reference internal" href="#class_psi_rpc"><span class="std std-ref">PsiRpc</span></a>. </p>
 <p><dl class="docutils">
 <dt><strong>Parameters</strong></dt>
@@ -215,8 +455,8 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv2N6PsiRpc4sendEiz">
-<span id="PsiRpc::send__i.z"></span><span class="target" id="class_psi_rpc_1a9a24ea2c10ec433ce2571714659e8156"></span>int <code class="descname">send</code><span class="sig-paren">(</span>int <em>nargs</em>, ...<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N6PsiRpc4sendEiz" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv2N6PsiRpc4sendEKiz">
+<span id="PsiRpc::send__iC.z"></span><span class="target" id="class_psi_rpc_1a8493aa1f98eb4aca396d1cde0274e850"></span>int <code class="descname">send</code><span class="sig-paren">(</span><em class="property">const</em> int <em>nargs</em>, ...<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N6PsiRpc4sendEKiz" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Format and send a message to an RPC output queue. See rpcSend from PsiInterface.h for details. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -232,8 +472,8 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv2N6PsiRpc4recvEiz">
-<span id="PsiRpc::recv__i.z"></span><span class="target" id="class_psi_rpc_1a4f66919b86a358644d73c686b9a6b409"></span>int <code class="descname">recv</code><span class="sig-paren">(</span>int <em>nargs</em>, ...<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N6PsiRpc4recvEiz" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv2N6PsiRpc4recvEKiz">
+<span id="PsiRpc::recv__iC.z"></span><span class="target" id="class_psi_rpc_1a4e4b1f7cc468e0623e1b1b2c62fa1470"></span>int <code class="descname">recv</code><span class="sig-paren">(</span><em class="property">const</em> int <em>nargs</em>, ...<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N6PsiRpc4recvEKiz" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Receive and parse a message from an RPC input queue. See rpcRecv from PsiInterface.h for details. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -268,8 +508,8 @@
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric">Public Functions</p>
 <dl class="function">
-<dt id="_CPPv2N12PsiRpcServer12PsiRpcServerEPKcPcPc">
-<span id="PsiRpcServer::PsiRpcServer__cCP.cP.cP"></span><span class="target" id="class_psi_rpc_server_1ab59731cec82271493e4534e43d3756b7"></span><code class="descname">PsiRpcServer</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em>, char *<em>inFormat</em>, char *<em>outFormat</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N12PsiRpcServer12PsiRpcServerEPKcPcPc" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv2N12PsiRpcServer12PsiRpcServerEPKcPKcPKc">
+<span id="PsiRpcServer::PsiRpcServer__cCP.cCP.cCP"></span><span class="target" id="class_psi_rpc_server_1ae32473a341694d34b65e665dfb3ee6c6"></span><code class="descname">PsiRpcServer</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em>, <em class="property">const</em> char *<em>inFormat</em>, <em class="property">const</em> char *<em>outFormat</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N12PsiRpcServer12PsiRpcServerEPKcPKcPKc" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor for <a class="reference internal" href="#class_psi_rpc_server"><span class="std std-ref">PsiRpcServer</span></a>. </p>
 <p><dl class="docutils">
 <dt><strong>Parameters</strong></dt>
@@ -295,8 +535,8 @@
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric">Public Functions</p>
 <dl class="function">
-<dt id="_CPPv2N12PsiRpcClient12PsiRpcClientEPKcPcPc">
-<span id="PsiRpcClient::PsiRpcClient__cCP.cP.cP"></span><span class="target" id="class_psi_rpc_client_1a77a4dd609c4bd82862bea5fc0651ba02"></span><code class="descname">PsiRpcClient</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em>, char *<em>outFormat</em>, char *<em>inFormat</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N12PsiRpcClient12PsiRpcClientEPKcPcPc" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv2N12PsiRpcClient12PsiRpcClientEPKcPKcPKc">
+<span id="PsiRpcClient::PsiRpcClient__cCP.cCP.cCP"></span><span class="target" id="class_psi_rpc_client_1af01e9b45e44618423b9faf32f4166e88"></span><code class="descname">PsiRpcClient</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em>, <em class="property">const</em> char *<em>outFormat</em>, <em class="property">const</em> char *<em>inFormat</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N12PsiRpcClient12PsiRpcClientEPKcPKcPKc" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor for <a class="reference internal" href="#class_psi_rpc_client"><span class="std std-ref">PsiRpcClient</span></a>. </p>
 <p><dl class="docutils">
 <dt><strong>Parameters</strong></dt>
@@ -311,8 +551,8 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv2N12PsiRpcClient4callEiz">
-<span id="PsiRpcClient::call__i.z"></span><span class="target" id="class_psi_rpc_client_1a214010682c81e31783a62773f7b9f788"></span>int <code class="descname">call</code><span class="sig-paren">(</span>int <em>nargs</em>, ...<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N12PsiRpcClient4callEiz" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv2N12PsiRpcClient4callEKiz">
+<span id="PsiRpcClient::call__iC.z"></span><span class="target" id="class_psi_rpc_client_1a0f79de8aaa8685abf640906777c9c575"></span>int <code class="descname">call</code><span class="sig-paren">(</span><em class="property">const</em> int <em>nargs</em>, ...<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N12PsiRpcClient4callEKiz" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Send request to an RPC server from the client and wait for a response. See rpcCall in PsiInterface.h for details. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -338,8 +578,8 @@
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric">Public Functions</p>
 <dl class="function">
-<dt id="_CPPv2N18PsiAsciiFileOutput18PsiAsciiFileOutputEPKci">
-<span id="PsiAsciiFileOutput::PsiAsciiFileOutput__cCP.i"></span><span class="target" id="class_psi_ascii_file_output_1a08f5ec347f018509dcdd6b7405e15e36"></span><code class="descname">PsiAsciiFileOutput</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em>, int <em>dst_type</em> = 1<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N18PsiAsciiFileOutput18PsiAsciiFileOutputEPKci" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv2N18PsiAsciiFileOutput18PsiAsciiFileOutputEPKcKi">
+<span id="PsiAsciiFileOutput::PsiAsciiFileOutput__cCP.iC"></span><span class="target" id="class_psi_ascii_file_output_1a09ff715688d7f7860344596ee63a5b41"></span><code class="descname">PsiAsciiFileOutput</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em>, <em class="property">const</em> int <em>dst_type</em> = 1<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N18PsiAsciiFileOutput18PsiAsciiFileOutputEPKcKi" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor for <a class="reference internal" href="#class_psi_ascii_file_output"><span class="std std-ref">PsiAsciiFileOutput</span></a>. </p>
 <p><dl class="docutils">
 <dt><strong>Parameters</strong></dt>
@@ -370,8 +610,8 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv2N18PsiAsciiFileOutput9send_lineEPc">
-<span id="PsiAsciiFileOutput::send_line__cP"></span><span class="target" id="class_psi_ascii_file_output_1ad90b9b03bdf05f14be85fe0735df60a9"></span>int <code class="descname">send_line</code><span class="sig-paren">(</span>char *<em>line</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N18PsiAsciiFileOutput9send_lineEPc" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv2N18PsiAsciiFileOutput9send_lineEPKc">
+<span id="PsiAsciiFileOutput::send_line__cCP"></span><span class="target" id="class_psi_ascii_file_output_1a017102fa6a815a047e38c7f6b383d5de"></span>int <code class="descname">send_line</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>line</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N18PsiAsciiFileOutput9send_lineEPKc" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Send a single line to a file or queue. See af_send_line in PsiInterface.h for details. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -404,8 +644,8 @@
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric">Public Functions</p>
 <dl class="function">
-<dt id="_CPPv2N17PsiAsciiFileInput17PsiAsciiFileInputEPKci">
-<span id="PsiAsciiFileInput::PsiAsciiFileInput__cCP.i"></span><span class="target" id="class_psi_ascii_file_input_1aaf0db20856965c11699fc8d3f22562bc"></span><code class="descname">PsiAsciiFileInput</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em>, int <em>src_type</em> = 1<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N17PsiAsciiFileInput17PsiAsciiFileInputEPKci" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv2N17PsiAsciiFileInput17PsiAsciiFileInputEPKcKi">
+<span id="PsiAsciiFileInput::PsiAsciiFileInput__cCP.iC"></span><span class="target" id="class_psi_ascii_file_input_1a5ad5691a0bb9691707ee866c29ea9314"></span><code class="descname">PsiAsciiFileInput</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em>, <em class="property">const</em> int <em>src_type</em> = 1<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N17PsiAsciiFileInput17PsiAsciiFileInputEPKcKi" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor for <a class="reference internal" href="#class_psi_ascii_file_input"><span class="std std-ref">PsiAsciiFileInput</span></a>. </p>
 <p><dl class="docutils">
 <dt><strong>Parameters</strong></dt>
@@ -460,8 +700,8 @@
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric">Public Functions</p>
 <dl class="function">
-<dt id="_CPPv2N19PsiAsciiTableOutput19PsiAsciiTableOutputEPKcPci">
-<span id="PsiAsciiTableOutput::PsiAsciiTableOutput__cCP.cP.i"></span><span class="target" id="class_psi_ascii_table_output_1a4ed7d46502d5a0212761c9403775237c"></span><code class="descname">PsiAsciiTableOutput</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em>, char *<em>format_str</em>, int <em>dst_type</em> = 1<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N19PsiAsciiTableOutput19PsiAsciiTableOutputEPKcPci" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv2N19PsiAsciiTableOutput19PsiAsciiTableOutputEPKcPKcKi">
+<span id="PsiAsciiTableOutput::PsiAsciiTableOutput__cCP.cCP.iC"></span><span class="target" id="class_psi_ascii_table_output_1ab6fe186ccd891a96448f794a61f87341"></span><code class="descname">PsiAsciiTableOutput</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em>, <em class="property">const</em> char *<em>format_str</em>, <em class="property">const</em> int <em>dst_type</em> = 1<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N19PsiAsciiTableOutput19PsiAsciiTableOutputEPKcPKcKi" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor for <a class="reference internal" href="#class_psi_ascii_table_output"><span class="std std-ref">PsiAsciiTableOutput</span></a>. </p>
 <p><dl class="docutils">
 <dt><strong>Parameters</strong></dt>
@@ -482,8 +722,8 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv2N19PsiAsciiTableOutput4sendEPci">
-<span id="PsiAsciiTableOutput::send__cP.i"></span><span class="target" id="class_psi_ascii_table_output_1a36b070546cacc2522dca60b3eb7c1af1"></span>int <code class="descname">send</code><span class="sig-paren">(</span>char *<em>data</em>, int <em>len</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N19PsiAsciiTableOutput4sendEPci" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv2N19PsiAsciiTableOutput4sendEPKcKi">
+<span id="PsiAsciiTableOutput::send__cCP.iC"></span><span class="target" id="class_psi_ascii_table_output_1a11c83d593b92129236b077486f42b773"></span>int <code class="descname">send</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>data</em>, <em class="property">const</em> int <em>len</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N19PsiAsciiTableOutput4sendEPKcKi" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Send a nolimit message to a table output queue. See at_psi_send in PsiInterface.h for details. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -510,8 +750,8 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv2N19PsiAsciiTableOutput8send_rowEiz">
-<span id="PsiAsciiTableOutput::send_row__i.z"></span><span class="target" id="class_psi_ascii_table_output_1af558c3508abf8c61122286166f8b09a1"></span>int <code class="descname">send_row</code><span class="sig-paren">(</span>int <em>nargs</em>, ...<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N19PsiAsciiTableOutput8send_rowEiz" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv2N19PsiAsciiTableOutput8send_rowEKiz">
+<span id="PsiAsciiTableOutput::send_row__iC.z"></span><span class="target" id="class_psi_ascii_table_output_1aa6b479f7b8c4a149a68a63d3dfda8818"></span>int <code class="descname">send_row</code><span class="sig-paren">(</span><em class="property">const</em> int <em>nargs</em>, ...<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N19PsiAsciiTableOutput8send_rowEKiz" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Format and send a row to the table file/queue. See at_send_row in PsiInterface.h for details. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -527,8 +767,8 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv2N19PsiAsciiTableOutput10send_arrayEiiz">
-<span id="PsiAsciiTableOutput::send_array__i.i.z"></span><span class="target" id="class_psi_ascii_table_output_1a9e72e278e8955142969c53e68a7b36e5"></span>int <code class="descname">send_array</code><span class="sig-paren">(</span>int <em>nargs</em>, int <em>nrows</em>, ...<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N19PsiAsciiTableOutput10send_arrayEiiz" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv2N19PsiAsciiTableOutput10send_arrayEKiKiz">
+<span id="PsiAsciiTableOutput::send_array__iC.iC.z"></span><span class="target" id="class_psi_ascii_table_output_1a1858b7885784506d43d1030431b5e70a"></span>int <code class="descname">send_array</code><span class="sig-paren">(</span><em class="property">const</em> int <em>nargs</em>, <em class="property">const</em> int <em>nrows</em>, ...<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N19PsiAsciiTableOutput10send_arrayEKiKiz" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Format and send table columns to the table file/queue. See at_send_array in PsiInterface.h for details. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -563,8 +803,8 @@
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric">Public Functions</p>
 <dl class="function">
-<dt id="_CPPv2N18PsiAsciiTableInput18PsiAsciiTableInputEPKci">
-<span id="PsiAsciiTableInput::PsiAsciiTableInput__cCP.i"></span><span class="target" id="class_psi_ascii_table_input_1a75626a21362193ab71e53b0e395f8d4c"></span><code class="descname">PsiAsciiTableInput</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em>, int <em>src_type</em> = 1<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N18PsiAsciiTableInput18PsiAsciiTableInputEPKci" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv2N18PsiAsciiTableInput18PsiAsciiTableInputEPKcKi">
+<span id="PsiAsciiTableInput::PsiAsciiTableInput__cCP.iC"></span><span class="target" id="class_psi_ascii_table_input_1afb6e42f40411d13912e3d2963dd97896"></span><code class="descname">PsiAsciiTableInput</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em>, <em class="property">const</em> int <em>src_type</em> = 1<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N18PsiAsciiTableInput18PsiAsciiTableInputEPKcKi" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor for <a class="reference internal" href="#class_psi_ascii_table_input"><span class="std std-ref">PsiAsciiTableInput</span></a>. Due to issues with the C++ version of vsscanf, flags and precision indicators for floating point format specifiers (e.g. e, f), must be removed so that table input can be properly parsed. </p>
 <p><dl class="docutils">
 <dt><strong>Parameters</strong></dt>
@@ -584,8 +824,8 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv2N18PsiAsciiTableInput4recvEPPci">
-<span id="PsiAsciiTableInput::recv__cPP.i"></span><span class="target" id="class_psi_ascii_table_input_1ade41e5aa0af9200b81fec07c1512e6a2"></span>int <code class="descname">recv</code><span class="sig-paren">(</span>char **<em>data</em>, int <em>len</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N18PsiAsciiTableInput4recvEPPci" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv2N18PsiAsciiTableInput4recvEPPcKi">
+<span id="PsiAsciiTableInput::recv__cPP.iC"></span><span class="target" id="class_psi_ascii_table_input_1a5fb8a7a0916c6ead4f292b13e0c9220b"></span>int <code class="descname">recv</code><span class="sig-paren">(</span>char **<em>data</em>, <em class="property">const</em> int <em>len</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N18PsiAsciiTableInput4recvEPPcKi" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Recv a nolimit message from a table input queue. See at_psi_recv in PsiInterface.h for details. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -601,8 +841,8 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv2N18PsiAsciiTableInput8recv_rowEiz">
-<span id="PsiAsciiTableInput::recv_row__i.z"></span><span class="target" id="class_psi_ascii_table_input_1a36ba3bb0a5fe6c98493bcc2bb8cc981d"></span>int <code class="descname">recv_row</code><span class="sig-paren">(</span>int <em>nargs</em>, ...<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N18PsiAsciiTableInput8recv_rowEiz" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv2N18PsiAsciiTableInput8recv_rowEKiz">
+<span id="PsiAsciiTableInput::recv_row__iC.z"></span><span class="target" id="class_psi_ascii_table_input_1af5c2d48cc1fc1162133b78f92b8d08c7"></span>int <code class="descname">recv_row</code><span class="sig-paren">(</span><em class="property">const</em> int <em>nargs</em>, ...<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N18PsiAsciiTableInput8recv_rowEKiz" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Recv and parse a row from the table file/queue. See at_recv_row in PsiInterface.h for details. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -618,8 +858,8 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv2N18PsiAsciiTableInput10recv_arrayEiz">
-<span id="PsiAsciiTableInput::recv_array__i.z"></span><span class="target" id="class_psi_ascii_table_input_1a6485b575238765c26434319307e27f6c"></span>int <code class="descname">recv_array</code><span class="sig-paren">(</span>int <em>nargs</em>, ...<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N18PsiAsciiTableInput10recv_arrayEiz" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv2N18PsiAsciiTableInput10recv_arrayEKiz">
+<span id="PsiAsciiTableInput::recv_array__iC.z"></span><span class="target" id="class_psi_ascii_table_input_1a46f735fa07913bfcce96bbc1041c24ee"></span>int <code class="descname">recv_array</code><span class="sig-paren">(</span><em class="property">const</em> int <em>nargs</em>, ...<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N18PsiAsciiTableInput10recv_arrayEKiz" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Recv and parse columns from a table file/queue. See at_recv_array in PsiInterface.h for details. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -648,58 +888,76 @@
 </div>
 
 
+           </div>
+           <div class="articleComments">
+            
+           </div>
           </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="dataio_cpp.html" class="btn btn-neutral float-right" title="C++ DataIO API" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="code_cpp.html" class="btn btn-neutral" title="C++ Code" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Meagan Lang, David Raila.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper"><div class="relations">
-<h3>Related Topics</h3>
-<ul>
-  <li><a href="index.html">Documentation overview</a><ul>
-  <li><a href="code.html">Code</a><ul>
-  <li><a href="code_cpp.html">C++ Code</a><ul>
-      <li>Previous: <a href="code_cpp.html" title="previous chapter">C++ Code</a></li>
-      <li>Next: <a href="dataio_cpp.html" title="next chapter">C++ DataIO API</a></li>
-  </ul></li>
-  </ul></li>
-  </ul></li>
-</ul>
-</div>
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="_sources/interface_cpp.rst.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div>
-<div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
-    <form class="search" action="search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
-    </form>
-</div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
-        </div>
-      </div>
-      <div class="clearer"></div>
-    </div>
-    <div class="footer">
-      &copy;2017, Meagan Lang, David Raila.
-      
-      |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.6</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
-      
-      |
-      <a href="_sources/interface_cpp.rst.txt"
-          rel="nofollow">Page source</a>
-    </div>
 
-    
+    </section>
 
-    
-  </body>
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.0.0',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
 </html>

@@ -1,53 +1,192 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
 
-<html xmlns="http://www.w3.org/1999/xhtml">
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>C Interface &mdash; cis_interface 0.0.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
     
-    <title>C Interface &#8212; cis_interface 0.0.0 documentation</title>
-    
-    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    './',
-        VERSION:     '0.0.0',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
-    <script type="text/javascript" src="_static/jquery.js"></script>
-    <script type="text/javascript" src="_static/underscore.js"></script>
-    <script type="text/javascript" src="_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="C DataIO API" href="dataio_c.html" />
-    <link rel="prev" title="C Code" href="code_c.html" />
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="cis_interface 0.0.0 documentation" href="index.html"/>
+        <link rel="up" title="C Code" href="code_c.html"/>
+        <link rel="next" title="C DataIO API" href="dataio_c.html"/>
+        <link rel="prev" title="C Code" href="code_c.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
    
-  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
-  
-  
-  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+  <div class="wy-grid-for-nav">
 
-  </head>
-  <body role="document">
-  
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          <div class="body" role="main">
+          
+            <a href="index.html" class="icon icon-home"> cis_interface
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.0.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="includeme.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="config.html">Configuration Files</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="code.html">Code</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="code_python.html">Python Code</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="code_c.html">C Code</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="code_c.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4 current"><a class="current reference internal" href="#">C Interface</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dataio_c.html">C DataIO API</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="code_cpp.html">C++ Code</a></li>
+<li class="toctree-l2"><a class="reference internal" href="code_matlab.html">Matlab Code</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">cis_interface</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="code.html">Code</a> &raquo;</li>
+        
+          <li><a href="code_c.html">C Code</a> &raquo;</li>
+        
+      <li>C Interface</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/interface_c.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
             
   <div class="section" id="c-interface">
 <h1>C Interface<a class="headerlink" href="#c-interface" title="Permalink to this headline">¶</a></h1>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric">Defines</p>
+<dl class="macro">
+<dt id="c.PSIINTERFACE_H_">
+<span class="target" id="_psi_interface_8h_1ab18e0ea87f9105a2e461ef00545f0f1f"></span><code class="descname">PSIINTERFACE_H_</code><a class="headerlink" href="#c.PSIINTERFACE_H_" title="Permalink to this definition">¶</a></dt>
+<dd><p>Flag for checking if PsiInterface.h has already been included. </p>
+</dd></dl>
+
 <dl class="macro">
 <dt id="c.PSI_MSG_MAX">
 <span class="target" id="_psi_interface_8h_1ab4898bbe6eb1c1d8b2ef19ada4dee530"></span><code class="descname">PSI_MSG_MAX</code><a class="headerlink" href="#c.PSI_MSG_MAX" title="Permalink to this definition">¶</a></dt>
@@ -67,8 +206,8 @@
 </dd></dl>
 
 <dl class="macro">
-<dt id="c.error">
-<span class="target" id="_psi_interface_8h_1a0c5e59a7caaa02f887d077eaa467f209"></span><code class="descname">error</code><a class="headerlink" href="#c.error" title="Permalink to this definition">¶</a></dt>
+<dt id="c.psilog_error">
+<span class="target" id="_psi_interface_8h_1aea1d888212c5d3cf2cea8ccf063d6210"></span><code class="descname">psilog_error</code><a class="headerlink" href="#c.psilog_error" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="macro">
@@ -265,8 +404,8 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv26psi_mqPcPKc">
-<span id="psi_mq__cP.cCP"></span><span class="target" id="_psi_interface_8h_1a3fed45ae6b99750bbbbf766e87e7c3a2"></span><em class="property">static</em> int <code class="descname">psi_mq</code><span class="sig-paren">(</span>char *<em>name</em>, <em class="property">const</em> char *<em>yamlName</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv26psi_mqPcPKc" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv26psi_mqPKcPKc">
+<span id="psi_mq__cCP.cCP"></span><span class="target" id="_psi_interface_8h_1a7061974630af5b208878fd2bba474247"></span><em class="property">static</em> int <code class="descname">psi_mq</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em>, <em class="property">const</em> char *<em>yamlName</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv26psi_mqPKcPKc" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Get a sysv_ipc queue identifier based on its name. The queue name is used to locate the queue key stored in the associated environment variable. That key is then used to get the queue ID. </p>
 <p>Basic IO</p>
 <p>Output Usage:<ol class="arabic simple">
@@ -355,8 +494,8 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv212psiOutputFmtPKcPc">
-<span id="psiOutputFmt__cCP.cP"></span><span class="target" id="_psi_interface_8h_1a001ce1e3095f022326691cf36d3704f1"></span><em class="property">static</em> <a class="reference internal" href="#_CPPv211psiOutput_t" title="psiOutput_t">psiOutput_t</a> <code class="descname">psiOutputFmt</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em>, char *<em>fmtString</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv212psiOutputFmtPKcPc" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv212psiOutputFmtPKcPKc">
+<span id="psiOutputFmt__cCP.cCP"></span><span class="target" id="_psi_interface_8h_1a14c7ab981adeb1af6c90a49517ffe10f"></span><em class="property">static</em> <a class="reference internal" href="#_CPPv211psiOutput_t" title="psiOutput_t">psiOutput_t</a> <code class="descname">psiOutputFmt</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em>, <em class="property">const</em> char *<em>fmtString</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv212psiOutputFmtPKcPKc" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor for <a class="reference internal" href="#structpsi_output__t"><span class="std std-ref">psiOutput_t</span></a> structure with format. Create a <a class="reference internal" href="#structpsi_output__t"><span class="std std-ref">psiOutput_t</span></a> structure based on a provided name that is used to locate a particular sysv_ipc queue key stored in the environment variable name + &#8220;_OUT&#8221; and a format string that can be used to format arguments into outgoing messages for the queue. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -372,8 +511,8 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv211psiInputFmtPKcPc">
-<span id="psiInputFmt__cCP.cP"></span><span class="target" id="_psi_interface_8h_1aaa3509adf84c86e8e3d40798f32a3d91"></span><em class="property">static</em> <a class="reference internal" href="#_CPPv210psiInput_t" title="psiInput_t">psiInput_t</a> <code class="descname">psiInputFmt</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em>, char *<em>fmtString</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv211psiInputFmtPKcPc" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv211psiInputFmtPKcPKc">
+<span id="psiInputFmt__cCP.cCP"></span><span class="target" id="_psi_interface_8h_1ad623b1ddf7512d8b094335c5051b2072"></span><em class="property">static</em> <a class="reference internal" href="#_CPPv210psiInput_t" title="psiInput_t">psiInput_t</a> <code class="descname">psiInputFmt</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em>, <em class="property">const</em> char *<em>fmtString</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv211psiInputFmtPKcPKc" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor for <a class="reference internal" href="#structpsi_input__t"><span class="std std-ref">psiInput_t</span></a> structure with format. Create a <a class="reference internal" href="#structpsi_input__t"><span class="std std-ref">psiInput_t</span></a> structure based on a provided name that is used to locate a particular sysv_ipc queue key stored in the environment variable name + &#8220;_IN&#8221; and a format stirng that can be used to extract arguments from messages received from the queue. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -389,8 +528,8 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv215psi_output_nmsg11psiOutput_t">
-<span id="psi_output_nmsg__psiOutput_t"></span><span class="target" id="_psi_interface_8h_1afdc43e0a5a525c76d5738a8ebcf63df7"></span><em class="property">static</em> int <code class="descname">psi_output_nmsg</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv211psiOutput_t" title="psiOutput_t">psiOutput_t</a> <em>psiQ</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv215psi_output_nmsg11psiOutput_t" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv215psi_output_nmsgK11psiOutput_t">
+<span id="psi_output_nmsg__psiOutput_tC"></span><span class="target" id="_psi_interface_8h_1acda2e3713e5dcb015088688a3ae19130"></span><em class="property">static</em> int <code class="descname">psi_output_nmsg</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv211psiOutput_t" title="psiOutput_t">psiOutput_t</a> <em>psiQ</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv215psi_output_nmsgK11psiOutput_t" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Get the number of messages in an output queue. Check how many messages are waiting in the associated queue for an output queue structure. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -405,8 +544,8 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv214psi_input_nmsg10psiInput_t">
-<span id="psi_input_nmsg__psiInput_t"></span><span class="target" id="_psi_interface_8h_1a5dc48a06675e64d6db31f67a49491d07"></span><em class="property">static</em> int <code class="descname">psi_input_nmsg</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv210psiInput_t" title="psiInput_t">psiInput_t</a> <em>psiQ</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv214psi_input_nmsg10psiInput_t" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv214psi_input_nmsgK10psiInput_t">
+<span id="psi_input_nmsg__psiInput_tC"></span><span class="target" id="_psi_interface_8h_1adddb89c6519d99621e62764e01ac67ea"></span><em class="property">static</em> int <code class="descname">psi_input_nmsg</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv210psiInput_t" title="psiInput_t">psiInput_t</a> <em>psiQ</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv214psi_input_nmsgK10psiInput_t" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Get the number of messages in an input queue. Check how many messages are waiting in the associated queue for an input queue structure. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -421,8 +560,8 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv28psi_send11psiOutput_tPci">
-<span id="psi_send__psiOutput_t.cP.i"></span><span class="target" id="_psi_interface_8h_1adc0a2735efdc76e88586bc667b1adedc"></span><em class="property">static</em> int <code class="descname">psi_send</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv211psiOutput_t" title="psiOutput_t">psiOutput_t</a> <em>psiQ</em>, char *<em>data</em>, int <em>len</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv28psi_send11psiOutput_tPci" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv28psi_sendK11psiOutput_tPKcKi">
+<span id="psi_send__psiOutput_tC.cCP.iC"></span><span class="target" id="_psi_interface_8h_1a5f59344fa0b2516472da5c54cf0178af"></span><em class="property">static</em> int <code class="descname">psi_send</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv211psiOutput_t" title="psiOutput_t">psiOutput_t</a> <em>psiQ</em>, <em class="property">const</em> char *<em>data</em>, <em class="property">const</em> int <em>len</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv28psi_sendK11psiOutput_tPKcKi" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Send a message to an output queue. Send a message smaller than PSI_MSG_MAX bytes to an output queue. If the message is larger, it will not be sent. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -439,8 +578,8 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv28psi_recv10psiInput_tPci">
-<span id="psi_recv__psiInput_t.cP.i"></span><span class="target" id="_psi_interface_8h_1a972c93543c79f484dbe74c0acdd874f2"></span><em class="property">static</em> int <code class="descname">psi_recv</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv210psiInput_t" title="psiInput_t">psiInput_t</a> <em>psiQ</em>, char *<em>data</em>, int <em>len</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv28psi_recv10psiInput_tPci" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv28psi_recvK10psiInput_tPcKi">
+<span id="psi_recv__psiInput_tC.cP.iC"></span><span class="target" id="_psi_interface_8h_1a836944a7258a039116177a07657c5abd"></span><em class="property">static</em> int <code class="descname">psi_recv</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv210psiInput_t" title="psiInput_t">psiInput_t</a> <em>psiQ</em>, char *<em>data</em>, <em class="property">const</em> int <em>len</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv28psi_recvK10psiInput_tPcKi" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Receive a message from an input queue. Receive a message smaller than PSI_MSG_MAX bytes from an input queue. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -449,7 +588,7 @@
 <dd><ul class="breatheparameterlist first last simple">
 <li><code class="docutils literal"><span class="pre">psiQ</span></code>: <a class="reference internal" href="#structpsi_output__t"><span class="std std-ref">psiOutput_t</span></a> structure that message should be sent to. </li>
 <li><code class="docutils literal"><span class="pre">data</span></code>: character pointer to allocated buffer where the message should be saved. </li>
-<li><code class="docutils literal"><span class="pre">len</span></code>: int length of the allocated message buffer in bytes. </li>
+<li><code class="docutils literal"><span class="pre">len</span></code>: const int length of the allocated message buffer in bytes. </li>
 </ul>
 </dd>
 </dl>
@@ -457,8 +596,8 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv216psi_send_nolimit11psiOutput_tPci">
-<span id="psi_send_nolimit__psiOutput_t.cP.i"></span><span class="target" id="_psi_interface_8h_1aac9241b696c3d615ddeee95f0a5e74e9"></span><em class="property">static</em> int <code class="descname">psi_send_nolimit</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv211psiOutput_t" title="psiOutput_t">psiOutput_t</a> <em>psiQ</em>, char *<em>data</em>, int <em>len</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv216psi_send_nolimit11psiOutput_tPci" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv216psi_send_nolimitK11psiOutput_tPKcKi">
+<span id="psi_send_nolimit__psiOutput_tC.cCP.iC"></span><span class="target" id="_psi_interface_8h_1ac1fb44c90b4615f18027455027c0ec01"></span><em class="property">static</em> int <code class="descname">psi_send_nolimit</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv211psiOutput_t" title="psiOutput_t">psiOutput_t</a> <em>psiQ</em>, <em class="property">const</em> char *<em>data</em>, <em class="property">const</em> int <em>len</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv216psi_send_nolimitK11psiOutput_tPKcKi" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Send a large message to an output queue. Send a message larger than PSI_MSG_MAX bytes to an output queue by breaking it up between several smaller messages and sending initial message with the size of the message that should be expected. Must be partnered with psi_recv_nolimit for communication to make sense. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -475,8 +614,8 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv216psi_recv_nolimit10psiInput_tPPci">
-<span id="psi_recv_nolimit__psiInput_t.cPP.i"></span><span class="target" id="_psi_interface_8h_1afa235566d3df6db412b52caa9b548ba5"></span><em class="property">static</em> int <code class="descname">psi_recv_nolimit</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv210psiInput_t" title="psiInput_t">psiInput_t</a> <em>psiQ</em>, char **<em>data</em>, int <em>len0</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv216psi_recv_nolimit10psiInput_tPPci" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv216psi_recv_nolimitK10psiInput_tPPcKi">
+<span id="psi_recv_nolimit__psiInput_tC.cPP.iC"></span><span class="target" id="_psi_interface_8h_1aa345fae700150898d4a1abc104007ae4"></span><em class="property">static</em> int <code class="descname">psi_recv_nolimit</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv210psiInput_t" title="psiInput_t">psiInput_t</a> <em>psiQ</em>, char **<em>data</em>, <em class="property">const</em> int <em>len0</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv216psi_recv_nolimitK10psiInput_tPPcKi" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Receive a large message from an input queue. Receive a message larger than PSI_MSG_MAX bytes from an input queue by receiving it in parts. This expects the first message to be the size of the total message. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -493,8 +632,8 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv28vpsiSend11psiOutput_t7va_list">
-<span id="vpsiSend__psiOutput_t.va_list"></span><span class="target" id="_psi_interface_8h_1ad079888e1b56ee70b8a22e401ea8c3fa"></span><em class="property">static</em> int <code class="descname">vpsiSend</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv211psiOutput_t" title="psiOutput_t">psiOutput_t</a> <em>psiQ</em>, va_list <em>ap</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv28vpsiSend11psiOutput_t7va_list" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv28vpsiSendK11psiOutput_t7va_list">
+<span id="vpsiSend__psiOutput_tC.va_list"></span><span class="target" id="_psi_interface_8h_1a7d765f67b90ced939a5a99061ed1d374"></span><em class="property">static</em> int <code class="descname">vpsiSend</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv211psiOutput_t" title="psiOutput_t">psiOutput_t</a> <em>psiQ</em>, va_list <em>ap</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv28vpsiSendK11psiOutput_t7va_list" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Send arguments as a small formatted message to an output queue. Use the format string to create a message from the input arguments that is then sent to the specified output queue. If the message is larger than PSI_MSG_MAX or cannot be encoded, it will not be sent. </p>
 <p>Formatted IO</p>
 <p>Output Usage:<ol class="arabic simple">
@@ -522,12 +661,12 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv28vpsiRecv10psiInput_t7va_list">
-<span id="vpsiRecv__psiInput_t.va_list"></span><span class="target" id="_psi_interface_8h_1ab260126f1b7bb6040e18a1100dcb7876"></span><em class="property">static</em> int <code class="descname">vpsiRecv</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv210psiInput_t" title="psiInput_t">psiInput_t</a> <em>psiQ</em>, va_list <em>ap</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv28vpsiRecv10psiInput_t7va_list" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv28vpsiRecvK10psiInput_t7va_list">
+<span id="vpsiRecv__psiInput_tC.va_list"></span><span class="target" id="_psi_interface_8h_1a06d02ec178fcec9a1120a2895d63c585"></span><em class="property">static</em> int <code class="descname">vpsiRecv</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv210psiInput_t" title="psiInput_t">psiInput_t</a> <em>psiQ</em>, va_list <em>ap</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv28vpsiRecvK10psiInput_t7va_list" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Assign arguments by receiving and parsing a message from an input queue. Receive a message smaller than PSI_MSG_MAX bytes from an input queue and parse it using the associated format string. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
-<dd>int -1 if message could not be received or could not be parsed. Length of the received message if message was received and parsed. </dd>
+<dd>int -1 if message could not be received or could not be parsed. Length of the received message if message was received and parsed. -2 is returned if EOF is received. </dd>
 <dt><strong>Parameters</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
 <li><code class="docutils literal"><span class="pre">psiQ</span></code>: <a class="reference internal" href="#structpsi_output__t"><span class="std std-ref">psiOutput_t</span></a> structure that message should be sent to. </li>
@@ -539,8 +678,8 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv27psiSend11psiOutput_tz">
-<span id="psiSend__psiOutput_t.z"></span><span class="target" id="_psi_interface_8h_1a4293da6e3c87ca72525ecae4b0818fbe"></span><em class="property">static</em> int <code class="descname">psiSend</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv211psiOutput_t" title="psiOutput_t">psiOutput_t</a> <em>psiQ</em>, ...<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv27psiSend11psiOutput_tz" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv27psiSendK11psiOutput_tz">
+<span id="psiSend__psiOutput_tC.z"></span><span class="target" id="_psi_interface_8h_1a29375f472c3c000815af489099b54390"></span><em class="property">static</em> int <code class="descname">psiSend</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv211psiOutput_t" title="psiOutput_t">psiOutput_t</a> <em>psiQ</em>, ...<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv27psiSendK11psiOutput_tz" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Send arguments as a small formatted message to an output queue. Use the format string to create a message from the input arguments that is then sent to the specified output queue. If the message is larger than PSI_MSG_MAX or cannot be encoded, it will not be sent. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -556,8 +695,8 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv27psiRecv10psiInput_tz">
-<span id="psiRecv__psiInput_t.z"></span><span class="target" id="_psi_interface_8h_1a0fcfba570d59bbedd7a35026eee0b521"></span><em class="property">static</em> int <code class="descname">psiRecv</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv210psiInput_t" title="psiInput_t">psiInput_t</a> <em>psiQ</em>, ...<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv27psiRecv10psiInput_tz" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv27psiRecvK10psiInput_tz">
+<span id="psiRecv__psiInput_tC.z"></span><span class="target" id="_psi_interface_8h_1a511d75e5e255c3d777577737cb07702d"></span><em class="property">static</em> int <code class="descname">psiRecv</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv210psiInput_t" title="psiInput_t">psiInput_t</a> <em>psiQ</em>, ...<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv27psiRecvK10psiInput_tz" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Assign arguments by receiving and parsing a message from an input queue. Receive a message smaller than PSI_MSG_MAX bytes from an input queue and parse it using the associated format string. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -573,8 +712,8 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv216vpsiSend_nolimit11psiOutput_t7va_list">
-<span id="vpsiSend_nolimit__psiOutput_t.va_list"></span><span class="target" id="_psi_interface_8h_1a881d7f9b4da8f055291ccb9177b3cb7d"></span><em class="property">static</em> int <code class="descname">vpsiSend_nolimit</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv211psiOutput_t" title="psiOutput_t">psiOutput_t</a> <em>psiQ</em>, va_list <em>ap</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv216vpsiSend_nolimit11psiOutput_t7va_list" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv216vpsiSend_nolimitK11psiOutput_t7va_list">
+<span id="vpsiSend_nolimit__psiOutput_tC.va_list"></span><span class="target" id="_psi_interface_8h_1a000203cb9672b111395dfd4d385a5589"></span><em class="property">static</em> int <code class="descname">vpsiSend_nolimit</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv211psiOutput_t" title="psiOutput_t">psiOutput_t</a> <em>psiQ</em>, va_list <em>ap</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv216vpsiSend_nolimitK11psiOutput_t7va_list" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Send arguments as a large formatted message to an output queue. Use the format string to create a message from the input arguments that is then sent to the specified output queue. The message can be larger than PSI_MSG_MAX. If it cannot be encoded, it will not be sent. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -590,12 +729,12 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv216vpsiRecv_nolimit10psiInput_t7va_list">
-<span id="vpsiRecv_nolimit__psiInput_t.va_list"></span><span class="target" id="_psi_interface_8h_1adc5d75245a867935c5c9a28346de48b5"></span><em class="property">static</em> int <code class="descname">vpsiRecv_nolimit</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv210psiInput_t" title="psiInput_t">psiInput_t</a> <em>psiQ</em>, va_list <em>ap</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv216vpsiRecv_nolimit10psiInput_t7va_list" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv216vpsiRecv_nolimitK10psiInput_t7va_list">
+<span id="vpsiRecv_nolimit__psiInput_tC.va_list"></span><span class="target" id="_psi_interface_8h_1ae35ed7a9d6c27bc124fa80c6a4189b08"></span><em class="property">static</em> int <code class="descname">vpsiRecv_nolimit</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv210psiInput_t" title="psiInput_t">psiInput_t</a> <em>psiQ</em>, va_list <em>ap</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv216vpsiRecv_nolimitK10psiInput_t7va_list" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Assign arguments by receiving and parsing a message from an input queue. Receive a message larger than PSI_MSG_MAX bytes in chunks from an input queue and parse it using the associated format string. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
-<dd>int -1 if message could not be received or could not be parsed. Length of the received message if message was received and parsed. </dd>
+<dd>int -1 if message could not be received or could not be parsed. Length of the received message if message was received and parsed. -2 is returned if EOF is received. </dd>
 <dt><strong>Parameters</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
 <li><code class="docutils literal"><span class="pre">psiQ</span></code>: <a class="reference internal" href="#structpsi_output__t"><span class="std std-ref">psiOutput_t</span></a> structure that message should be sent to. </li>
@@ -607,8 +746,8 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv215psiSend_nolimit11psiOutput_tz">
-<span id="psiSend_nolimit__psiOutput_t.z"></span><span class="target" id="_psi_interface_8h_1a05c4cd155a51148cbf2f349268e22b80"></span><em class="property">static</em> int <code class="descname">psiSend_nolimit</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv211psiOutput_t" title="psiOutput_t">psiOutput_t</a> <em>psiQ</em>, ...<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv215psiSend_nolimit11psiOutput_tz" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv215psiSend_nolimitK11psiOutput_tz">
+<span id="psiSend_nolimit__psiOutput_tC.z"></span><span class="target" id="_psi_interface_8h_1ab06b54fef79be264e3526cd85707c3a0"></span><em class="property">static</em> int <code class="descname">psiSend_nolimit</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv211psiOutput_t" title="psiOutput_t">psiOutput_t</a> <em>psiQ</em>, ...<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv215psiSend_nolimitK11psiOutput_tz" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Send arguments as a large formatted message to an output queue. Use the format string to create a message from the input arguments that is then sent to the specified output queue. The message can be larger than PSI_MSG_MAX. If it cannot be encoded, it will not be sent. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -624,8 +763,8 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv215psiRecv_nolimit10psiInput_tz">
-<span id="psiRecv_nolimit__psiInput_t.z"></span><span class="target" id="_psi_interface_8h_1af7de5118391ad402559647b460b957ef"></span><em class="property">static</em> int <code class="descname">psiRecv_nolimit</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv210psiInput_t" title="psiInput_t">psiInput_t</a> <em>psiQ</em>, ...<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv215psiRecv_nolimit10psiInput_tz" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv215psiRecv_nolimitK10psiInput_tz">
+<span id="psiRecv_nolimit__psiInput_tC.z"></span><span class="target" id="_psi_interface_8h_1a20d3a841d6793908c2577fb2543ec31a"></span><em class="property">static</em> int <code class="descname">psiRecv_nolimit</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv210psiInput_t" title="psiInput_t">psiInput_t</a> <em>psiQ</em>, ...<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv215psiRecv_nolimitK10psiInput_tz" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Assign arguments by receiving and parsing a message from an input queue. Receive a message larger than PSI_MSG_MAX bytes in chunks from an input queue and parse it using the associated format string. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -641,8 +780,8 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv26psiRpcPKcPcPKcPc">
-<span id="psiRpc__cCP.cP.cCP.cP"></span><span class="target" id="_psi_interface_8h_1a7c5f439f1492b8acfd01b0a0334997dc"></span><em class="property">static</em> <a class="reference internal" href="#_CPPv28psiRpc_t" title="psiRpc_t">psiRpc_t</a> <code class="descname">psiRpc</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>outName</em>, char *<em>outFormat</em>, <em class="property">const</em> char *<em>inName</em>, char *<em>inFormat</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv26psiRpcPKcPcPKcPc" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv26psiRpcPKcPKcPKcPKc">
+<span id="psiRpc__cCP.cCP.cCP.cCP"></span><span class="target" id="_psi_interface_8h_1ac06595e60bd2e6c1d8a7ba942cd6d1fb"></span><em class="property">static</em> <a class="reference internal" href="#_CPPv28psiRpc_t" title="psiRpc_t">psiRpc_t</a> <code class="descname">psiRpc</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>outName</em>, <em class="property">const</em> char *<em>outFormat</em>, <em class="property">const</em> char *<em>inName</em>, <em class="property">const</em> char *<em>inFormat</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv26psiRpcPKcPKcPKcPKc" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor for RPC structure. Creates an instance of <a class="reference internal" href="#structpsi_rpc__t"><span class="std std-ref">psiRpc_t</span></a> with provided information. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -660,8 +799,8 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv212psiRpcClientPKcPcPc">
-<span id="psiRpcClient__cCP.cP.cP"></span><span class="target" id="_psi_interface_8h_1a7a11c6766ef06754d96279849be8865a"></span><em class="property">static</em> <a class="reference internal" href="#_CPPv28psiRpc_t" title="psiRpc_t">psiRpc_t</a> <code class="descname">psiRpcClient</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em>, char *<em>outFormat</em>, char *<em>inFormat</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv212psiRpcClientPKcPcPc" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv212psiRpcClientPKcPKcPKc">
+<span id="psiRpcClient__cCP.cCP.cCP"></span><span class="target" id="_psi_interface_8h_1aa9249b34cd5ecb948d96a8ee710ff252"></span><em class="property">static</em> <a class="reference internal" href="#_CPPv28psiRpc_t" title="psiRpc_t">psiRpc_t</a> <code class="descname">psiRpcClient</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em>, <em class="property">const</em> char *<em>outFormat</em>, <em class="property">const</em> char *<em>inFormat</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv212psiRpcClientPKcPKcPKc" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor for client side RPC structure. Creates an instance of <a class="reference internal" href="#structpsi_rpc__t"><span class="std std-ref">psiRpc_t</span></a> with provided information. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -678,8 +817,8 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv212psiRpcServerPKcPcPc">
-<span id="psiRpcServer__cCP.cP.cP"></span><span class="target" id="_psi_interface_8h_1a26ee676a478da87e12bf9c9bac2a6b1d"></span><em class="property">static</em> <a class="reference internal" href="#_CPPv28psiRpc_t" title="psiRpc_t">psiRpc_t</a> <code class="descname">psiRpcServer</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em>, char *<em>inFormat</em>, char *<em>outFormat</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv212psiRpcServerPKcPcPc" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv212psiRpcServerPKcPKcPKc">
+<span id="psiRpcServer__cCP.cCP.cCP"></span><span class="target" id="_psi_interface_8h_1ac51ea99cb68840f9ffecc5ff4694b3d2"></span><em class="property">static</em> <a class="reference internal" href="#_CPPv28psiRpc_t" title="psiRpc_t">psiRpc_t</a> <code class="descname">psiRpcServer</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em>, <em class="property">const</em> char *<em>inFormat</em>, <em class="property">const</em> char *<em>outFormat</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv212psiRpcServerPKcPKcPKc" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor for server side RPC structure. Creates an instance of <a class="reference internal" href="#structpsi_rpc__t"><span class="std std-ref">psiRpc_t</span></a> with provided information. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -696,8 +835,8 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv28vrpcSend8psiRpc_t7va_list">
-<span id="vrpcSend__psiRpc_t.va_list"></span><span class="target" id="_psi_interface_8h_1ad5d6f8a3980b08347ac3b9ad19fd197b"></span><em class="property">static</em> int <code class="descname">vrpcSend</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv28psiRpc_t" title="psiRpc_t">psiRpc_t</a> <em>rpc</em>, va_list <em>ap</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv28vrpcSend8psiRpc_t7va_list" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv28vrpcSendK8psiRpc_t7va_list">
+<span id="vrpcSend__psiRpc_tC.va_list"></span><span class="target" id="_psi_interface_8h_1afdc04c37500fdb7222efbe046c1aac4a"></span><em class="property">static</em> int <code class="descname">vrpcSend</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv28psiRpc_t" title="psiRpc_t">psiRpc_t</a> <em>rpc</em>, va_list <em>ap</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv28vrpcSendK8psiRpc_t7va_list" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Format and send a message to an RPC output queue. Format provided arguments list using the output queue format string and then sends it to the output queue under the assumption that it is larger than the maximum message size. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -713,8 +852,8 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv28vrpcRecv8psiRpc_t7va_list">
-<span id="vrpcRecv__psiRpc_t.va_list"></span><span class="target" id="_psi_interface_8h_1ad1105eb4982adb37e11845d06041f8fc"></span><em class="property">static</em> int <code class="descname">vrpcRecv</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv28psiRpc_t" title="psiRpc_t">psiRpc_t</a> <em>rpc</em>, va_list <em>ap</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv28vrpcRecv8psiRpc_t7va_list" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv28vrpcRecvK8psiRpc_t7va_list">
+<span id="vrpcRecv__psiRpc_tC.va_list"></span><span class="target" id="_psi_interface_8h_1a0974957634f55330aeac8b56572cb719"></span><em class="property">static</em> int <code class="descname">vrpcRecv</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv28psiRpc_t" title="psiRpc_t">psiRpc_t</a> <em>rpc</em>, va_list <em>ap</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv28vrpcRecvK8psiRpc_t7va_list" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Receive and parse a message from an RPC input queue. Receive a message from the input queue under the assumption that it is larger than the maximum message size. Then parse the message using the input queue format string to extract parameters and assign them to the arguments. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -730,8 +869,8 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv27rpcSend8psiRpc_tz">
-<span id="rpcSend__psiRpc_t.z"></span><span class="target" id="_psi_interface_8h_1acfcbce1dbf8b4ffb62877d5ea759685b"></span><em class="property">static</em> int <code class="descname">rpcSend</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv28psiRpc_t" title="psiRpc_t">psiRpc_t</a> <em>rpc</em>, ...<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv27rpcSend8psiRpc_tz" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv27rpcSendK8psiRpc_tz">
+<span id="rpcSend__psiRpc_tC.z"></span><span class="target" id="_psi_interface_8h_1ac65ba040038b475e401f44eefce51612"></span><em class="property">static</em> int <code class="descname">rpcSend</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv28psiRpc_t" title="psiRpc_t">psiRpc_t</a> <em>rpc</em>, ...<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv27rpcSendK8psiRpc_tz" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Format and send a message to an RPC output queue. Format provided arguments using the output queue format string and then sends it to the output queue under the assumption that it is larger than the maximum message size. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -747,8 +886,8 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv27rpcRecv8psiRpc_tz">
-<span id="rpcRecv__psiRpc_t.z"></span><span class="target" id="_psi_interface_8h_1ad093c184b82e34b84b6d4cb5aaf333e2"></span><em class="property">static</em> int <code class="descname">rpcRecv</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv28psiRpc_t" title="psiRpc_t">psiRpc_t</a> <em>rpc</em>, ...<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv27rpcRecv8psiRpc_tz" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv27rpcRecvK8psiRpc_tz">
+<span id="rpcRecv__psiRpc_tC.z"></span><span class="target" id="_psi_interface_8h_1aabd15d99ef14b216109049cbcb7fea33"></span><em class="property">static</em> int <code class="descname">rpcRecv</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv28psiRpc_t" title="psiRpc_t">psiRpc_t</a> <em>rpc</em>, ...<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv27rpcRecvK8psiRpc_tz" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Receive and parse a message from an RPC input queue. Receive a message from the input queue under the assumption that it is larger than the maximum message size. Then parse the message using the input queue format string to extract parameters and assign them to the arguments. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -764,8 +903,8 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv28vrpcCall8psiRpc_t7va_list">
-<span id="vrpcCall__psiRpc_t.va_list"></span><span class="target" id="_psi_interface_8h_1a2255bb46149b2f3c591b0f083d409c71"></span><em class="property">static</em> int <code class="descname">vrpcCall</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv28psiRpc_t" title="psiRpc_t">psiRpc_t</a> <em>rpc</em>, va_list <em>ap</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv28vrpcCall8psiRpc_t7va_list" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv28vrpcCallK8psiRpc_t7va_list">
+<span id="vrpcCall__psiRpc_tC.va_list"></span><span class="target" id="_psi_interface_8h_1ad1dd0c228a64cb58b532cf02fec08557"></span><em class="property">static</em> int <code class="descname">vrpcCall</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv28psiRpc_t" title="psiRpc_t">psiRpc_t</a> <em>rpc</em>, va_list <em>ap</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv28vrpcCallK8psiRpc_t7va_list" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Send request to an RPC server from the client and wait for a response. Format arguments using the output queue format string, send the message to the output queue, receive a response from the input queue, and assign arguments from the message using the input queue format string to parse it. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -781,8 +920,8 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv27rpcCall8psiRpc_tz">
-<span id="rpcCall__psiRpc_t.z"></span><span class="target" id="_psi_interface_8h_1a04c802f77523e4eaa3fee628cca25c9a"></span><em class="property">static</em> int <code class="descname">rpcCall</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv28psiRpc_t" title="psiRpc_t">psiRpc_t</a> <em>rpc</em>, ...<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv27rpcCall8psiRpc_tz" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv27rpcCallK8psiRpc_tz">
+<span id="rpcCall__psiRpc_tC.z"></span><span class="target" id="_psi_interface_8h_1a950ec850232483e40e47f791c10dd530"></span><em class="property">static</em> int <code class="descname">rpcCall</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv28psiRpc_t" title="psiRpc_t">psiRpc_t</a> <em>rpc</em>, ...<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv27rpcCallK8psiRpc_tz" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Send request to an RPC server from the client and wait for a response. Format arguments using the output queue format string, send the message to the output queue, receive a response from the input queue, and assign arguments from the message using the input queue format string to parse it. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -798,8 +937,8 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv218psiAsciiFileOutputPKci">
-<span id="psiAsciiFileOutput__cCP.i"></span><span class="target" id="_psi_interface_8h_1a917731ab30c9dd7c0a9591ba196dcc79"></span><em class="property">static</em> <a class="reference internal" href="#_CPPv220psiAsciiFileOutput_t" title="psiAsciiFileOutput_t">psiAsciiFileOutput_t</a> <code class="descname">psiAsciiFileOutput</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em>, int <em>dst_type</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv218psiAsciiFileOutputPKci" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv218psiAsciiFileOutputPKcKi">
+<span id="psiAsciiFileOutput__cCP.iC"></span><span class="target" id="_psi_interface_8h_1ab2401d9357fa6ac0b6ebc03e9be2a8e8"></span><em class="property">static</em> <a class="reference internal" href="#_CPPv220psiAsciiFileOutput_t" title="psiAsciiFileOutput_t">psiAsciiFileOutput_t</a> <code class="descname">psiAsciiFileOutput</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em>, <em class="property">const</em> int <em>dst_type</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv218psiAsciiFileOutputPKcKi" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor for <a class="reference internal" href="#structpsi_ascii_file_output__t"><span class="std std-ref">psiAsciiFileOutput_t</span></a>. Based on the value of dst_type, either a local file will be opened for output (dst_type == 0), or a <a class="reference internal" href="#structpsi_output__t"><span class="std std-ref">psiOutput_t</span></a> connection will be made. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -815,8 +954,8 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv217psiAsciiFileInputPKci">
-<span id="psiAsciiFileInput__cCP.i"></span><span class="target" id="_psi_interface_8h_1ac54c1ff2d66273861b8e02a7dacb1302"></span><em class="property">static</em> <a class="reference internal" href="#_CPPv219psiAsciiFileInput_t" title="psiAsciiFileInput_t">psiAsciiFileInput_t</a> <code class="descname">psiAsciiFileInput</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em>, int <em>src_type</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv217psiAsciiFileInputPKci" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv217psiAsciiFileInputPKcKi">
+<span id="psiAsciiFileInput__cCP.iC"></span><span class="target" id="_psi_interface_8h_1aebc194123abf1466369196e9c6923052"></span><em class="property">static</em> <a class="reference internal" href="#_CPPv219psiAsciiFileInput_t" title="psiAsciiFileInput_t">psiAsciiFileInput_t</a> <code class="descname">psiAsciiFileInput</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em>, <em class="property">const</em> int <em>src_type</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv217psiAsciiFileInputPKcKi" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor for <a class="reference internal" href="#structpsi_ascii_file_input__t"><span class="std std-ref">psiAsciiFileInput_t</span></a>. Based on the value of src_type, either a local file will be opened for input (src_type == 0), or a <a class="reference internal" href="#structpsi_input__t"><span class="std std-ref">psiInput_t</span></a> connection will be made. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -832,8 +971,8 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv211af_send_eof20psiAsciiFileOutput_t">
-<span id="af_send_eof__psiAsciiFileOutput_t"></span><span class="target" id="_psi_interface_8h_1abe3312664b4993842c1d3204e7868bc4"></span><em class="property">static</em> int <code class="descname">af_send_eof</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv220psiAsciiFileOutput_t" title="psiAsciiFileOutput_t">psiAsciiFileOutput_t</a> <em>t</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv211af_send_eof20psiAsciiFileOutput_t" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv211af_send_eofK20psiAsciiFileOutput_t">
+<span id="af_send_eof__psiAsciiFileOutput_tC"></span><span class="target" id="_psi_interface_8h_1ab26776be9eafbae4a7803a88ee764169"></span><em class="property">static</em> int <code class="descname">af_send_eof</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv220psiAsciiFileOutput_t" title="psiAsciiFileOutput_t">psiAsciiFileOutput_t</a> <em>t</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv211af_send_eofK20psiAsciiFileOutput_t" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Send EOF message to output file, closing it. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -848,8 +987,8 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv212af_recv_line19psiAsciiFileInput_tPc6size_t">
-<span id="af_recv_line__psiAsciiFileInput_t.cP.s"></span><span class="target" id="_psi_interface_8h_1a1215a6e22752ab11faf4d6c2ebdd0866"></span><em class="property">static</em> int <code class="descname">af_recv_line</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv219psiAsciiFileInput_t" title="psiAsciiFileInput_t">psiAsciiFileInput_t</a> <em>t</em>, char *<em>line</em>, size_t <em>n</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv212af_recv_line19psiAsciiFileInput_tPc6size_t" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv212af_recv_lineK19psiAsciiFileInput_tPc6size_t">
+<span id="af_recv_line__psiAsciiFileInput_tC.cP.s"></span><span class="target" id="_psi_interface_8h_1a367d81fefe8b06a0cfaf5d14ea8fe1bf"></span><em class="property">static</em> int <code class="descname">af_recv_line</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv219psiAsciiFileInput_t" title="psiAsciiFileInput_t">psiAsciiFileInput_t</a> <em>t</em>, char *<em>line</em>, size_t <em>n</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv212af_recv_lineK19psiAsciiFileInput_tPc6size_t" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Receive a single line from an associated file or queue. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -866,8 +1005,8 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv212af_send_line20psiAsciiFileOutput_tPc">
-<span id="af_send_line__psiAsciiFileOutput_t.cP"></span><span class="target" id="_psi_interface_8h_1a28d01084311f996391fee723c864d061"></span><em class="property">static</em> int <code class="descname">af_send_line</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv220psiAsciiFileOutput_t" title="psiAsciiFileOutput_t">psiAsciiFileOutput_t</a> <em>t</em>, char *<em>line</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv212af_send_line20psiAsciiFileOutput_tPc" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv212af_send_lineK20psiAsciiFileOutput_tPKc">
+<span id="af_send_line__psiAsciiFileOutput_tC.cCP"></span><span class="target" id="_psi_interface_8h_1a78364b6dd89ab3a7d4397344c10a05be"></span><em class="property">static</em> int <code class="descname">af_send_line</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv220psiAsciiFileOutput_t" title="psiAsciiFileOutput_t">psiAsciiFileOutput_t</a> <em>t</em>, <em class="property">const</em> char *<em>line</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv212af_send_lineK20psiAsciiFileOutput_tPKc" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Send a single line to a file or queue. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -911,8 +1050,8 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv219psiAsciiTableOutputPKcPci">
-<span id="psiAsciiTableOutput__cCP.cP.i"></span><span class="target" id="_psi_interface_8h_1aec97c695c821f56969ce3c2e9fe9650a"></span><em class="property">static</em> <a class="reference internal" href="#_CPPv221psiAsciiTableOutput_t" title="psiAsciiTableOutput_t">psiAsciiTableOutput_t</a> <code class="descname">psiAsciiTableOutput</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em>, char *<em>format_str</em>, int <em>dst_type</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv219psiAsciiTableOutputPKcPci" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv219psiAsciiTableOutputPKcPKcKi">
+<span id="psiAsciiTableOutput__cCP.cCP.iC"></span><span class="target" id="_psi_interface_8h_1a1bdc926929fff1f25697bb31232b606c"></span><em class="property">static</em> <a class="reference internal" href="#_CPPv221psiAsciiTableOutput_t" title="psiAsciiTableOutput_t">psiAsciiTableOutput_t</a> <code class="descname">psiAsciiTableOutput</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em>, <em class="property">const</em> char *<em>format_str</em>, <em class="property">const</em> int <em>dst_type</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv219psiAsciiTableOutputPKcPKcKi" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor for <a class="reference internal" href="#structpsi_ascii_table_output__t"><span class="std std-ref">psiAsciiTableOutput_t</span></a>. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -929,8 +1068,8 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv218psiAsciiTableInputPKci">
-<span id="psiAsciiTableInput__cCP.i"></span><span class="target" id="_psi_interface_8h_1a49661a7659925bf5993f706cb56dbdd1"></span><em class="property">static</em> <a class="reference internal" href="#_CPPv220psiAsciiTableInput_t" title="psiAsciiTableInput_t">psiAsciiTableInput_t</a> <code class="descname">psiAsciiTableInput</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em>, int <em>src_type</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv218psiAsciiTableInputPKci" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv218psiAsciiTableInputPKcKi">
+<span id="psiAsciiTableInput__cCP.iC"></span><span class="target" id="_psi_interface_8h_1ad033e7faef3591fe9b90cfa0c0fec143"></span><em class="property">static</em> <a class="reference internal" href="#_CPPv220psiAsciiTableInput_t" title="psiAsciiTableInput_t">psiAsciiTableInput_t</a> <code class="descname">psiAsciiTableInput</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em>, <em class="property">const</em> int <em>src_type</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv218psiAsciiTableInputPKcKi" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Constructor for <a class="reference internal" href="#structpsi_ascii_table_input__t"><span class="std std-ref">psiAsciiTableInput_t</span></a>. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -946,8 +1085,8 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv211at_psi_send21psiAsciiTableOutput_tPci">
-<span id="at_psi_send__psiAsciiTableOutput_t.cP.i"></span><span class="target" id="_psi_interface_8h_1a9566c8f7b1fccf0af7e33a1293f80081"></span><em class="property">static</em> int <code class="descname">at_psi_send</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv221psiAsciiTableOutput_t" title="psiAsciiTableOutput_t">psiAsciiTableOutput_t</a> <em>t</em>, char *<em>data</em>, int <em>len</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv211at_psi_send21psiAsciiTableOutput_tPci" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv211at_psi_sendK21psiAsciiTableOutput_tPKcKi">
+<span id="at_psi_send__psiAsciiTableOutput_tC.cCP.iC"></span><span class="target" id="_psi_interface_8h_1abb18304f27a70666c55de7aa492958d0"></span><em class="property">static</em> int <code class="descname">at_psi_send</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv221psiAsciiTableOutput_t" title="psiAsciiTableOutput_t">psiAsciiTableOutput_t</a> <em>t</em>, <em class="property">const</em> char *<em>data</em>, <em class="property">const</em> int <em>len</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv211at_psi_sendK21psiAsciiTableOutput_tPKcKi" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Send a nolimit message to a table output queue. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -964,8 +1103,8 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv211at_psi_recv20psiAsciiTableInput_tPPci">
-<span id="at_psi_recv__psiAsciiTableInput_t.cPP.i"></span><span class="target" id="_psi_interface_8h_1aea1f30cb5ff40e675ce50331d9652668"></span><em class="property">static</em> int <code class="descname">at_psi_recv</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv220psiAsciiTableInput_t" title="psiAsciiTableInput_t">psiAsciiTableInput_t</a> <em>t</em>, char **<em>data</em>, int <em>len</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv211at_psi_recv20psiAsciiTableInput_tPPci" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv211at_psi_recvK20psiAsciiTableInput_tPPcKi">
+<span id="at_psi_recv__psiAsciiTableInput_tC.cPP.iC"></span><span class="target" id="_psi_interface_8h_1a162de4097415b56520e34b667a0c464f"></span><em class="property">static</em> int <code class="descname">at_psi_recv</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv220psiAsciiTableInput_t" title="psiAsciiTableInput_t">psiAsciiTableInput_t</a> <em>t</em>, char **<em>data</em>, <em class="property">const</em> int <em>len</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv211at_psi_recvK20psiAsciiTableInput_tPPcKi" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Recv a nolimit message from a table input queue. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -982,8 +1121,8 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv211at_send_eof21psiAsciiTableOutput_t">
-<span id="at_send_eof__psiAsciiTableOutput_t"></span><span class="target" id="_psi_interface_8h_1af937091e584302eb59449038d82ada18"></span><em class="property">static</em> int <code class="descname">at_send_eof</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv221psiAsciiTableOutput_t" title="psiAsciiTableOutput_t">psiAsciiTableOutput_t</a> <em>t</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv211at_send_eof21psiAsciiTableOutput_t" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv211at_send_eofK21psiAsciiTableOutput_t">
+<span id="at_send_eof__psiAsciiTableOutput_tC"></span><span class="target" id="_psi_interface_8h_1a5b00316eae296f04951dc3eb96b61b80"></span><em class="property">static</em> int <code class="descname">at_send_eof</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv221psiAsciiTableOutput_t" title="psiAsciiTableOutput_t">psiAsciiTableOutput_t</a> <em>t</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv211at_send_eofK21psiAsciiTableOutput_t" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Send a nolimit EOF message to a table output queue. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -998,8 +1137,8 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv29vsend_row21psiAsciiTableOutput_t7va_list">
-<span id="vsend_row__psiAsciiTableOutput_t.va_list"></span><span class="target" id="_psi_interface_8h_1a5b207253f4895dc56e2058e8a3b7086e"></span><em class="property">static</em> int <code class="descname">vsend_row</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv221psiAsciiTableOutput_t" title="psiAsciiTableOutput_t">psiAsciiTableOutput_t</a> <em>t</em>, va_list <em>ap</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv29vsend_row21psiAsciiTableOutput_t7va_list" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv29vsend_rowK21psiAsciiTableOutput_t7va_list">
+<span id="vsend_row__psiAsciiTableOutput_tC.va_list"></span><span class="target" id="_psi_interface_8h_1ae746ae07841960e80b8a1fe141b6b51a"></span><em class="property">static</em> int <code class="descname">vsend_row</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv221psiAsciiTableOutput_t" title="psiAsciiTableOutput_t">psiAsciiTableOutput_t</a> <em>t</em>, va_list <em>ap</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv29vsend_rowK21psiAsciiTableOutput_t7va_list" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Format and send a row to the table file/queue. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -1015,8 +1154,8 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv29vrecv_row20psiAsciiTableInput_t7va_list">
-<span id="vrecv_row__psiAsciiTableInput_t.va_list"></span><span class="target" id="_psi_interface_8h_1aeb20cd14e063bab6fb2f928277edd1e8"></span><em class="property">static</em> int <code class="descname">vrecv_row</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv220psiAsciiTableInput_t" title="psiAsciiTableInput_t">psiAsciiTableInput_t</a> <em>t</em>, va_list <em>ap</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv29vrecv_row20psiAsciiTableInput_t7va_list" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv29vrecv_rowK20psiAsciiTableInput_t7va_list">
+<span id="vrecv_row__psiAsciiTableInput_tC.va_list"></span><span class="target" id="_psi_interface_8h_1aa7d072e76404ce6042feaefc1240d977"></span><em class="property">static</em> int <code class="descname">vrecv_row</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv220psiAsciiTableInput_t" title="psiAsciiTableInput_t">psiAsciiTableInput_t</a> <em>t</em>, va_list <em>ap</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv29vrecv_rowK20psiAsciiTableInput_t7va_list" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Recv and parse a row from the table file/queue. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -1032,8 +1171,8 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv211at_send_row21psiAsciiTableOutput_tz">
-<span id="at_send_row__psiAsciiTableOutput_t.z"></span><span class="target" id="_psi_interface_8h_1a5a95696e516874a295708bf542aa6b6e"></span><em class="property">static</em> int <code class="descname">at_send_row</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv221psiAsciiTableOutput_t" title="psiAsciiTableOutput_t">psiAsciiTableOutput_t</a> <em>t</em>, ...<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv211at_send_row21psiAsciiTableOutput_tz" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv211at_send_rowK21psiAsciiTableOutput_tz">
+<span id="at_send_row__psiAsciiTableOutput_tC.z"></span><span class="target" id="_psi_interface_8h_1a39c71d4c829ca285d306431fd79d14f2"></span><em class="property">static</em> int <code class="descname">at_send_row</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv221psiAsciiTableOutput_t" title="psiAsciiTableOutput_t">psiAsciiTableOutput_t</a> <em>t</em>, ...<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv211at_send_rowK21psiAsciiTableOutput_tz" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Format and send a row to the table file/queue. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -1049,8 +1188,8 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv211at_recv_row20psiAsciiTableInput_tz">
-<span id="at_recv_row__psiAsciiTableInput_t.z"></span><span class="target" id="_psi_interface_8h_1a484947b9a14a2b389a06017ca3de8780"></span><em class="property">static</em> int <code class="descname">at_recv_row</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv220psiAsciiTableInput_t" title="psiAsciiTableInput_t">psiAsciiTableInput_t</a> <em>t</em>, ...<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv211at_recv_row20psiAsciiTableInput_tz" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv211at_recv_rowK20psiAsciiTableInput_tz">
+<span id="at_recv_row__psiAsciiTableInput_tC.z"></span><span class="target" id="_psi_interface_8h_1aa765f15fbb302a200944f1e2903b9eb7"></span><em class="property">static</em> int <code class="descname">at_recv_row</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv220psiAsciiTableInput_t" title="psiAsciiTableInput_t">psiAsciiTableInput_t</a> <em>t</em>, ...<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv211at_recv_rowK20psiAsciiTableInput_tz" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Recv and parse a row from the table file/queue. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -1066,8 +1205,8 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv211vsend_array21psiAsciiTableOutput_ti7va_list">
-<span id="vsend_array__psiAsciiTableOutput_t.i.va_list"></span><span class="target" id="_psi_interface_8h_1adf0b479a6802e9bbb5af57a2719531a6"></span><em class="property">static</em> int <code class="descname">vsend_array</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv221psiAsciiTableOutput_t" title="psiAsciiTableOutput_t">psiAsciiTableOutput_t</a> <em>t</em>, int <em>nrows</em>, va_list <em>ap</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv211vsend_array21psiAsciiTableOutput_ti7va_list" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv211vsend_arrayK21psiAsciiTableOutput_tKi7va_list">
+<span id="vsend_array__psiAsciiTableOutput_tC.iC.va_list"></span><span class="target" id="_psi_interface_8h_1ae3727bc88964d98c2c988402914e326b"></span><em class="property">static</em> int <code class="descname">vsend_array</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv221psiAsciiTableOutput_t" title="psiAsciiTableOutput_t">psiAsciiTableOutput_t</a> <em>t</em>, <em class="property">const</em> int <em>nrows</em>, va_list <em>ap</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv211vsend_arrayK21psiAsciiTableOutput_tKi7va_list" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Format and send table columns to the table file/queue. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -1084,8 +1223,8 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv211vrecv_array20psiAsciiTableInput_t7va_list">
-<span id="vrecv_array__psiAsciiTableInput_t.va_list"></span><span class="target" id="_psi_interface_8h_1a668a05184bc722e4457d8bb6f6ae4f90"></span><em class="property">static</em> int <code class="descname">vrecv_array</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv220psiAsciiTableInput_t" title="psiAsciiTableInput_t">psiAsciiTableInput_t</a> <em>t</em>, va_list <em>ap</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv211vrecv_array20psiAsciiTableInput_t7va_list" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv211vrecv_arrayK20psiAsciiTableInput_t7va_list">
+<span id="vrecv_array__psiAsciiTableInput_tC.va_list"></span><span class="target" id="_psi_interface_8h_1a6b6b0117e5a6859fc453f795ca09e1ac"></span><em class="property">static</em> int <code class="descname">vrecv_array</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv220psiAsciiTableInput_t" title="psiAsciiTableInput_t">psiAsciiTableInput_t</a> <em>t</em>, va_list <em>ap</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv211vrecv_arrayK20psiAsciiTableInput_t7va_list" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Recv and parse columns from a table file/queue. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -1101,8 +1240,8 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv213at_send_array21psiAsciiTableOutput_tiz">
-<span id="at_send_array__psiAsciiTableOutput_t.i.z"></span><span class="target" id="_psi_interface_8h_1a5e2748762090b002b2e97d4897d00cf7"></span><em class="property">static</em> int <code class="descname">at_send_array</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv221psiAsciiTableOutput_t" title="psiAsciiTableOutput_t">psiAsciiTableOutput_t</a> <em>t</em>, int <em>nrows</em>, ...<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv213at_send_array21psiAsciiTableOutput_tiz" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv213at_send_arrayK21psiAsciiTableOutput_tKiz">
+<span id="at_send_array__psiAsciiTableOutput_tC.iC.z"></span><span class="target" id="_psi_interface_8h_1abc262f541ff4369bcd1dec1273ce925f"></span><em class="property">static</em> int <code class="descname">at_send_array</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv221psiAsciiTableOutput_t" title="psiAsciiTableOutput_t">psiAsciiTableOutput_t</a> <em>t</em>, <em class="property">const</em> int <em>nrows</em>, ...<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv213at_send_arrayK21psiAsciiTableOutput_tKiz" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Format and send table columns to the table file/queue. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -1119,8 +1258,8 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="_CPPv213at_recv_array20psiAsciiTableInput_tz">
-<span id="at_recv_array__psiAsciiTableInput_t.z"></span><span class="target" id="_psi_interface_8h_1ad090f4eeaa1e713d5f9ca8e981c59795"></span><em class="property">static</em> int <code class="descname">at_recv_array</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv220psiAsciiTableInput_t" title="psiAsciiTableInput_t">psiAsciiTableInput_t</a> <em>t</em>, ...<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv213at_recv_array20psiAsciiTableInput_tz" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv213at_recv_arrayK20psiAsciiTableInput_tz">
+<span id="at_recv_array__psiAsciiTableInput_tC.z"></span><span class="target" id="_psi_interface_8h_1a181ecb5de4db1a109d412370910680f1"></span><em class="property">static</em> int <code class="descname">at_recv_array</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv220psiAsciiTableInput_t" title="psiAsciiTableInput_t">psiAsciiTableInput_t</a> <em>t</em>, ...<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv213at_recv_arrayK20psiAsciiTableInput_tz" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Recv and parse columns from a table file/queue. </p>
 <p><dl class="docutils">
 <dt><strong>Return</strong></dt>
@@ -1220,7 +1359,7 @@
 
 <dl class="member">
 <dt id="_CPPv2N10psiInput_t4_fmtE">
-<span id="psiInput_t::_fmt__cP"></span><span class="target" id="structpsi_input__t_1a4b30391a07118d0fc50315750a04f3fc"></span>char *<code class="descname">_fmt</code><a class="headerlink" href="#_CPPv2N10psiInput_t4_fmtE" title="Permalink to this definition">¶</a><br /></dt>
+<span id="psiInput_t::_fmt__cA"></span><span class="target" id="structpsi_input__t_1ae4951655300d41f8e2c2525872db14bc"></span>char <code class="descname">_fmt</code>[PSI_MSG_MAX]<a class="headerlink" href="#_CPPv2N10psiInput_t4_fmtE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Format for interpreting queue messages. </p>
 </dd></dl>
 
@@ -1253,7 +1392,7 @@
 
 <dl class="member">
 <dt id="_CPPv2N11psiOutput_t4_fmtE">
-<span id="psiOutput_t::_fmt__cP"></span><span class="target" id="structpsi_output__t_1ab0d091406566578aff30e29f8f254dc0"></span>char *<code class="descname">_fmt</code><a class="headerlink" href="#_CPPv2N11psiOutput_t4_fmtE" title="Permalink to this definition">¶</a><br /></dt>
+<span id="psiOutput_t::_fmt__cA"></span><span class="target" id="structpsi_output__t_1aef7399820b5bcc83044ad131528c8b8d"></span>char <code class="descname">_fmt</code>[PSI_MSG_MAX]<a class="headerlink" href="#_CPPv2N11psiOutput_t4_fmtE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Format for formatting queue messages. </p>
 </dd></dl>
 
@@ -1301,18 +1440,6 @@
 <dt id="_CPPv2N8psiRpc_t7_outputE">
 <span id="psiRpc_t::_output__psiOutput_t"></span><span class="target" id="structpsi_rpc__t_1a17f0094559da23188f3782d9cca1157a"></span><a class="reference internal" href="#_CPPv211psiOutput_t" title="psiOutput_t">psiOutput_t</a> <code class="descname">_output</code><a class="headerlink" href="#_CPPv2N8psiRpc_t7_outputE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Output queue structure. </p>
-</dd></dl>
-
-<dl class="member">
-<dt id="_CPPv2N8psiRpc_t6_inFmtE">
-<span id="psiRpc_t::_inFmt__cP"></span><span class="target" id="structpsi_rpc__t_1a31c6a55cda7c12d643fbe358e429c207"></span>char *<code class="descname">_inFmt</code><a class="headerlink" href="#_CPPv2N8psiRpc_t6_inFmtE" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Format string used for input queue. </p>
-</dd></dl>
-
-<dl class="member">
-<dt id="_CPPv2N8psiRpc_t7_outFmtE">
-<span id="psiRpc_t::_outFmt__cP"></span><span class="target" id="structpsi_rpc__t_1a5f04717309ffe83b639b459d5052ea19"></span>char *<code class="descname">_outFmt</code><a class="headerlink" href="#_CPPv2N8psiRpc_t7_outFmtE" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Format string used for output queue. </p>
 </dd></dl>
 
 </div>
@@ -1524,58 +1651,76 @@
 </div>
 
 
+           </div>
+           <div class="articleComments">
+            
+           </div>
           </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="dataio_c.html" class="btn btn-neutral float-right" title="C DataIO API" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="code_c.html" class="btn btn-neutral" title="C Code" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Meagan Lang, David Raila.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper"><div class="relations">
-<h3>Related Topics</h3>
-<ul>
-  <li><a href="index.html">Documentation overview</a><ul>
-  <li><a href="code.html">Code</a><ul>
-  <li><a href="code_c.html">C Code</a><ul>
-      <li>Previous: <a href="code_c.html" title="previous chapter">C Code</a></li>
-      <li>Next: <a href="dataio_c.html" title="next chapter">C DataIO API</a></li>
-  </ul></li>
-  </ul></li>
-  </ul></li>
-</ul>
-</div>
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="_sources/interface_c.rst.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div>
-<div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
-    <form class="search" action="search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
-    </form>
-</div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
-        </div>
-      </div>
-      <div class="clearer"></div>
-    </div>
-    <div class="footer">
-      &copy;2017, Meagan Lang, David Raila.
-      
-      |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.6</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
-      
-      |
-      <a href="_sources/interface_c.rst.txt"
-          rel="nofollow">Page source</a>
-    </div>
 
-    
+    </section>
 
-    
-  </body>
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.0.0',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
 </html>

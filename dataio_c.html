@@ -1,63 +1,191 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
 
-<html xmlns="http://www.w3.org/1999/xhtml">
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>C DataIO API &mdash; cis_interface 0.0.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
     
-    <title>C DataIO API &#8212; cis_interface 0.0.0 documentation</title>
-    
-    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    './',
-        VERSION:     '0.0.0',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
-    <script type="text/javascript" src="_static/jquery.js"></script>
-    <script type="text/javascript" src="_static/underscore.js"></script>
-    <script type="text/javascript" src="_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="C++ Code" href="code_cpp.html" />
-    <link rel="prev" title="C Interface" href="interface_c.html" />
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="cis_interface 0.0.0 documentation" href="index.html"/>
+        <link rel="up" title="C Code" href="code_c.html"/>
+        <link rel="next" title="C++ Code" href="code_cpp.html"/>
+        <link rel="prev" title="C Interface" href="interface_c.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
    
-  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
-  
-  
-  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+  <div class="wy-grid-for-nav">
 
-  </head>
-  <body role="document">
-  
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          <div class="body" role="main">
+          
+            <a href="index.html" class="icon icon-home"> cis_interface
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.0.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="includeme.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="config.html">Configuration Files</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="code.html">Code</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="code_python.html">Python Code</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="code_c.html">C Code</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="code_c.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="interface_c.html">C Interface</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">C DataIO API</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="code_cpp.html">C++ Code</a></li>
+<li class="toctree-l2"><a class="reference internal" href="code_matlab.html">Matlab Code</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">cis_interface</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="code.html">Code</a> &raquo;</li>
+        
+          <li><a href="code_c.html">C Code</a> &raquo;</li>
+        
+      <li>C DataIO API</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/dataio_c.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
             
   <div class="section" id="c-dataio-api">
 <h1>C DataIO API<a class="headerlink" href="#c-dataio-api" title="Permalink to this headline">¶</a></h1>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric">Defines</p>
 <dl class="macro">
-<dt id="c.ASCIIFILE_INCLUDED">
-<span class="target" id="_ascii_file_8h_1a26d9d29d1d43b31cc617396448c13c0b"></span><code class="descname">ASCIIFILE_INCLUDED</code><a class="headerlink" href="#c.ASCIIFILE_INCLUDED" title="Permalink to this definition">¶</a></dt>
-<dd><p>Flag for checking if AsciiFile.h has already been included. </p>
-</dd></dl>
-
-<dl class="macro">
 <dt id="c.LINE_SIZE_MAX">
 <span class="target" id="_ascii_file_8h_1ac68bae2984ae6cc400d0e6ca823dd28b"></span><code class="descname">LINE_SIZE_MAX</code><a class="headerlink" href="#c.LINE_SIZE_MAX" title="Permalink to this definition">¶</a></dt>
-<dd><p>Maximum line size. </p>
+<dd><p>Flag for checking if AsciiFile.h has already been included. </p>
+<p>Maximum line size. </p>
 </dd></dl>
 
 </div>
@@ -232,6 +360,15 @@
 </dd></dl>
 
 <div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Defines</p>
+<dl class="macro">
+<dt id="c.ASCIITABLE_H_">
+<span class="target" id="_ascii_table_8h_1aaf70dfebdb02d991884a3c5020ec9ea4"></span><code class="descname">ASCIITABLE_H_</code><a class="headerlink" href="#c.ASCIITABLE_H_" title="Permalink to this definition">¶</a></dt>
+<dd><p>Flag for checking if AsciiTable.h has already been included. </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric">Typedefs</p>
 <dl class="type">
 <dt id="_CPPv212asciiTable_t">
@@ -243,73 +380,78 @@
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric">Enums</p>
 <dl class="type">
-<dt id="_CPPv27mytypes">
-<span id="mytypes"></span><span class="target" id="_ascii_table_8h_1a14d2a55c4a978c4cfb618c491001daca"></span><em class="property">enum </em><code class="descname">mytypes</code><a class="headerlink" href="#_CPPv27mytypes" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv29fmt_types">
+<span id="fmt_types"></span><span class="target" id="_ascii_table_8h_1ae0bb117f17ab81d1efd74b0e4ff790fa"></span><em class="property">enum </em><code class="descname">fmt_types</code><a class="headerlink" href="#_CPPv29fmt_types" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Enumerated types to be used for interpreting formats. </p>
 <p><em>Values:</em></p>
 <dl class="member">
 <dt id="_CPPv26STRING">
-<span id="STRING"></span><span class="target" id="_ascii_table_8h_1a14d2a55c4a978c4cfb618c491001dacaaee847e634a4297b274316de8a8ca9921"></span><code class="descname">STRING</code><a class="headerlink" href="#_CPPv26STRING" title="Permalink to this definition">¶</a><br /></dt>
+<span id="STRING"></span><span class="target" id="_ascii_table_8h_1ae0bb117f17ab81d1efd74b0e4ff790faaee847e634a4297b274316de8a8ca9921"></span><code class="descname">STRING</code><a class="headerlink" href="#_CPPv26STRING" title="Permalink to this definition">¶</a><br /></dt>
 <dd></dd></dl>
 
 <dl class="member">
 <dt id="_CPPv25FLOAT">
-<span id="FLOAT"></span><span class="target" id="_ascii_table_8h_1a14d2a55c4a978c4cfb618c491001dacaa9cf4a0866224b0bb4a7a895da27c9c4c"></span><code class="descname">FLOAT</code><a class="headerlink" href="#_CPPv25FLOAT" title="Permalink to this definition">¶</a><br /></dt>
+<span id="FLOAT"></span><span class="target" id="_ascii_table_8h_1ae0bb117f17ab81d1efd74b0e4ff790faa9cf4a0866224b0bb4a7a895da27c9c4c"></span><code class="descname">FLOAT</code><a class="headerlink" href="#_CPPv25FLOAT" title="Permalink to this definition">¶</a><br /></dt>
 <dd></dd></dl>
 
 <dl class="member">
 <dt id="_CPPv26DOUBLE">
-<span id="DOUBLE"></span><span class="target" id="_ascii_table_8h_1a14d2a55c4a978c4cfb618c491001dacaa33465d1d419b1074fb259ef444609e92"></span><code class="descname">DOUBLE</code><a class="headerlink" href="#_CPPv26DOUBLE" title="Permalink to this definition">¶</a><br /></dt>
+<span id="DOUBLE"></span><span class="target" id="_ascii_table_8h_1ae0bb117f17ab81d1efd74b0e4ff790faa33465d1d419b1074fb259ef444609e92"></span><code class="descname">DOUBLE</code><a class="headerlink" href="#_CPPv26DOUBLE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="member">
+<dt id="_CPPv27COMPLEX">
+<span id="COMPLEX"></span><span class="target" id="_ascii_table_8h_1ae0bb117f17ab81d1efd74b0e4ff790faa5374e1234e4d55af346d6ae6263ad573"></span><code class="descname">COMPLEX</code><a class="headerlink" href="#_CPPv27COMPLEX" title="Permalink to this definition">¶</a><br /></dt>
 <dd></dd></dl>
 
 <dl class="member">
 <dt id="_CPPv210SHORTSHORT">
-<span id="SHORTSHORT"></span><span class="target" id="_ascii_table_8h_1a14d2a55c4a978c4cfb618c491001dacaa9d7fa6997de0b485952dd28167ed2e56"></span><code class="descname">SHORTSHORT</code><a class="headerlink" href="#_CPPv210SHORTSHORT" title="Permalink to this definition">¶</a><br /></dt>
+<span id="SHORTSHORT"></span><span class="target" id="_ascii_table_8h_1ae0bb117f17ab81d1efd74b0e4ff790faa9d7fa6997de0b485952dd28167ed2e56"></span><code class="descname">SHORTSHORT</code><a class="headerlink" href="#_CPPv210SHORTSHORT" title="Permalink to this definition">¶</a><br /></dt>
 <dd></dd></dl>
 
 <dl class="member">
 <dt id="_CPPv25SHORT">
-<span id="SHORT"></span><span class="target" id="_ascii_table_8h_1a14d2a55c4a978c4cfb618c491001dacaa7a1fe3ba88f0c16cb494922948a9597d"></span><code class="descname">SHORT</code><a class="headerlink" href="#_CPPv25SHORT" title="Permalink to this definition">¶</a><br /></dt>
+<span id="SHORT"></span><span class="target" id="_ascii_table_8h_1ae0bb117f17ab81d1efd74b0e4ff790faa7a1fe3ba88f0c16cb494922948a9597d"></span><code class="descname">SHORT</code><a class="headerlink" href="#_CPPv25SHORT" title="Permalink to this definition">¶</a><br /></dt>
 <dd></dd></dl>
 
 <dl class="member">
 <dt id="_CPPv23INT">
-<span id="INT"></span><span class="target" id="_ascii_table_8h_1a14d2a55c4a978c4cfb618c491001dacaafd5a5f51ce25953f3db2c7e93eb7864a"></span><code class="descname">INT</code><a class="headerlink" href="#_CPPv23INT" title="Permalink to this definition">¶</a><br /></dt>
+<span id="INT"></span><span class="target" id="_ascii_table_8h_1ae0bb117f17ab81d1efd74b0e4ff790faafd5a5f51ce25953f3db2c7e93eb7864a"></span><code class="descname">INT</code><a class="headerlink" href="#_CPPv23INT" title="Permalink to this definition">¶</a><br /></dt>
 <dd></dd></dl>
 
 <dl class="member">
 <dt id="_CPPv24LONG">
-<span id="LONG"></span><span class="target" id="_ascii_table_8h_1a14d2a55c4a978c4cfb618c491001dacaaaee055c4a5aba7d55774e4f1c01dacea"></span><code class="descname">LONG</code><a class="headerlink" href="#_CPPv24LONG" title="Permalink to this definition">¶</a><br /></dt>
+<span id="LONG"></span><span class="target" id="_ascii_table_8h_1ae0bb117f17ab81d1efd74b0e4ff790faaaee055c4a5aba7d55774e4f1c01dacea"></span><code class="descname">LONG</code><a class="headerlink" href="#_CPPv24LONG" title="Permalink to this definition">¶</a><br /></dt>
 <dd></dd></dl>
 
 <dl class="member">
 <dt id="_CPPv28LONGLONG">
-<span id="LONGLONG"></span><span class="target" id="_ascii_table_8h_1a14d2a55c4a978c4cfb618c491001dacaa6f20a0296b153acb8046f73b274794df"></span><code class="descname">LONGLONG</code><a class="headerlink" href="#_CPPv28LONGLONG" title="Permalink to this definition">¶</a><br /></dt>
+<span id="LONGLONG"></span><span class="target" id="_ascii_table_8h_1ae0bb117f17ab81d1efd74b0e4ff790faa6f20a0296b153acb8046f73b274794df"></span><code class="descname">LONGLONG</code><a class="headerlink" href="#_CPPv28LONGLONG" title="Permalink to this definition">¶</a><br /></dt>
 <dd></dd></dl>
 
 <dl class="member">
 <dt id="_CPPv211USHORTSHORT">
-<span id="USHORTSHORT"></span><span class="target" id="_ascii_table_8h_1a14d2a55c4a978c4cfb618c491001dacaa46aa94ef4fd7b28578064b5e37420448"></span><code class="descname">USHORTSHORT</code><a class="headerlink" href="#_CPPv211USHORTSHORT" title="Permalink to this definition">¶</a><br /></dt>
+<span id="USHORTSHORT"></span><span class="target" id="_ascii_table_8h_1ae0bb117f17ab81d1efd74b0e4ff790faa46aa94ef4fd7b28578064b5e37420448"></span><code class="descname">USHORTSHORT</code><a class="headerlink" href="#_CPPv211USHORTSHORT" title="Permalink to this definition">¶</a><br /></dt>
 <dd></dd></dl>
 
 <dl class="member">
 <dt id="_CPPv26USHORT">
-<span id="USHORT"></span><span class="target" id="_ascii_table_8h_1a14d2a55c4a978c4cfb618c491001dacaa9ae509995ac75484348487a7477900ca"></span><code class="descname">USHORT</code><a class="headerlink" href="#_CPPv26USHORT" title="Permalink to this definition">¶</a><br /></dt>
+<span id="USHORT"></span><span class="target" id="_ascii_table_8h_1ae0bb117f17ab81d1efd74b0e4ff790faa9ae509995ac75484348487a7477900ca"></span><code class="descname">USHORT</code><a class="headerlink" href="#_CPPv26USHORT" title="Permalink to this definition">¶</a><br /></dt>
 <dd></dd></dl>
 
 <dl class="member">
 <dt id="_CPPv24UINT">
-<span id="UINT"></span><span class="target" id="_ascii_table_8h_1a14d2a55c4a978c4cfb618c491001dacaa4756f5bbd9f28d6b8905f32024b57398"></span><code class="descname">UINT</code><a class="headerlink" href="#_CPPv24UINT" title="Permalink to this definition">¶</a><br /></dt>
+<span id="UINT"></span><span class="target" id="_ascii_table_8h_1ae0bb117f17ab81d1efd74b0e4ff790faa4756f5bbd9f28d6b8905f32024b57398"></span><code class="descname">UINT</code><a class="headerlink" href="#_CPPv24UINT" title="Permalink to this definition">¶</a><br /></dt>
 <dd></dd></dl>
 
 <dl class="member">
 <dt id="_CPPv25ULONG">
-<span id="ULONG"></span><span class="target" id="_ascii_table_8h_1a14d2a55c4a978c4cfb618c491001dacaa574bf5ec73e28138b997d24464adb70c"></span><code class="descname">ULONG</code><a class="headerlink" href="#_CPPv25ULONG" title="Permalink to this definition">¶</a><br /></dt>
+<span id="ULONG"></span><span class="target" id="_ascii_table_8h_1ae0bb117f17ab81d1efd74b0e4ff790faa574bf5ec73e28138b997d24464adb70c"></span><code class="descname">ULONG</code><a class="headerlink" href="#_CPPv25ULONG" title="Permalink to this definition">¶</a><br /></dt>
 <dd></dd></dl>
 
 <dl class="member">
 <dt id="_CPPv29ULONGLONG">
-<span id="ULONGLONG"></span><span class="target" id="_ascii_table_8h_1a14d2a55c4a978c4cfb618c491001dacaa9e339c35c454aba9d8ec635e45ef078e"></span><code class="descname">ULONGLONG</code><a class="headerlink" href="#_CPPv29ULONGLONG" title="Permalink to this definition">¶</a><br /></dt>
+<span id="ULONGLONG"></span><span class="target" id="_ascii_table_8h_1ae0bb117f17ab81d1efd74b0e4ff790faa9e339c35c454aba9d8ec635e45ef078e"></span><code class="descname">ULONGLONG</code><a class="headerlink" href="#_CPPv29ULONGLONG" title="Permalink to this definition">¶</a><br /></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -352,6 +494,98 @@
 </dd></dl>
 
 <dl class="function">
+<dt id="_CPPv210find_matchPKcPKcPiPi">
+<span id="find_match__cCP.cCP.iP.iP"></span><span class="target" id="_ascii_table_8h_1a407a184007e7c65fd824103142b4698f"></span><em class="property">static</em> int <code class="descname">find_match</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>regex_text</em>, <em class="property">const</em> char *<em>to_match</em>, int *<em>sind</em>, int *<em>eind</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv210find_matchPKcPKcPiPi" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Find first match to regex. </p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>int Number of matches found. -1 is returned if the regex could not be compiled. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">regex_text</span></code>: constant character pointer to string that should be compiled into a regex. </li>
+<li><code class="docutils literal"><span class="pre">to_match</span></code>: constant character pointer to string that should be checked for matches. </li>
+<li><code class="docutils literal"><span class="pre">sind</span></code>: int index where match begins. </li>
+<li><code class="docutils literal"><span class="pre">eind</span></code>: int index where match ends. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv219regex_replace_nosubPcKiPKcPKcKi">
+<span id="regex_replace_nosub__cP.iC.cCP.cCP.iC"></span><span class="target" id="_ascii_table_8h_1a1061bcf6aff11dc1a552b09574ee7925"></span><em class="property">static</em> int <code class="descname">regex_replace_nosub</code><span class="sig-paren">(</span>char *<em>buf</em>, <em class="property">const</em> int <em>len_buf</em>, <em class="property">const</em> char *<em>re</em>, <em class="property">const</em> char *<em>rp</em>, <em class="property">const</em> int <em>nreplace</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv219regex_replace_nosubPcKiPKcPKcKi" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Make a replacement of regex matches, ignoring captured substrings. </p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>int -1 on failure if the regex could not be compiled or the buffer is not big enough to contain the result. If succesful, the new length of buf is returned. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">buf</span></code>: Characer pointer to buffer that replacements should be made to. </li>
+<li><code class="docutils literal"><span class="pre">len_buf</span></code>: const int length of buf. </li>
+<li><code class="docutils literal"><span class="pre">re</span></code>: Constant character pointer to regex string. </li>
+<li><code class="docutils literal"><span class="pre">rp</span></code>: Constant character pointer to the replacement text. </li>
+<li><code class="docutils literal"><span class="pre">nreplace</span></code>: Constant int number of replacements to make. If 0, all matches are replaced. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv211get_subrefsPKcPPi">
+<span id="get_subrefs__cCP.iPP"></span><span class="target" id="_ascii_table_8h_1aa23e248c1415cb7e5d7b5fa52130ed44"></span><em class="property">static</em> int <code class="descname">get_subrefs</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>buf</em>, int **<em>refs</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv211get_subrefsPKcPPi" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Extract substring references from a string. </p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>int Number of refs found. -1 indicates an error. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">buf</span></code>: Constant character pointer to buffer that references should be extracted from. </li>
+<li><code class="docutils literal"><span class="pre">refs</span></code>: Pointer to pointer to memory where reference numbers should be stored. This function will reallocate it to fit the number of references returned. (Should be freed by calling program.) </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv217regex_replace_subPcKiPKcPKcKi">
+<span id="regex_replace_sub__cP.iC.cCP.cCP.iC"></span><span class="target" id="_ascii_table_8h_1a8bbf94ececc8b14c7ed12ddd0e51dbfd"></span><em class="property">static</em> int <code class="descname">regex_replace_sub</code><span class="sig-paren">(</span>char *<em>buf</em>, <em class="property">const</em> int <em>len_buf</em>, <em class="property">const</em> char *<em>re</em>, <em class="property">const</em> char *<em>rp</em>, <em class="property">const</em> int <em>nreplace</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv217regex_replace_subPcKiPKcPKcKi" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Make a replacement of regex matches, allowing for captured substrings. </p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>int -1 on failure if the regex could not be compiled or the buffer is not big enough to contain the result. If succesful, the new length of buf is returned. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">buf</span></code>: Characer pointer to buffer that replacements should be made to. </li>
+<li><code class="docutils literal"><span class="pre">len_buf</span></code>: const int length of buf. </li>
+<li><code class="docutils literal"><span class="pre">re</span></code>: Constant character pointer to regex string. </li>
+<li><code class="docutils literal"><span class="pre">rp</span></code>: Constant character pointer to the replacement text. </li>
+<li><code class="docutils literal"><span class="pre">nreplace</span></code>: Constant int number of replacements to make. If 0, all matches are replaced. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv221count_complex_formatsPKc">
+<span id="count_complex_formats__cCP"></span><span class="target" id="_ascii_table_8h_1aaec1ba2d1988e74fe162386f0677fcf2"></span><em class="property">static</em> int <code class="descname">count_complex_formats</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>fmt_str</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv221count_complex_formatsPKc" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Count format specifiers for complex numbers. </p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>int Number of complex format specifiers found. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">fmt_str</span></code>: constant character pointer to string that should be searched for format specifiers. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
 <dt id="_CPPv213count_formatsPKc">
 <span id="count_formats__cCP"></span><span class="target" id="_ascii_table_8h_1a2059b2fabbacee5e6de895822beb99cd"></span><em class="property">static</em> int <code class="descname">count_formats</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>fmt_str</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv213count_formatsPKc" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Count how many % format specifiers there are in format string. Formats are found by counting the number of matches to the regular expression adapted from <a class="reference external" href="https://stackoverflow.com/questions/446285/validate-sprintf-format-from-input-field-with-regex">https://stackoverflow.com/questions/446285/validate-sprintf-format-from-input-field-with-regex</a>. </p>
@@ -361,6 +595,23 @@
 <dt><strong>Parameters</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
 <li><code class="docutils literal"><span class="pre">fmt_str</span></code>: constant character pointer to string that should be searched for format specifiers. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv216simplify_formatsPcKi">
+<span id="simplify_formats__cP.iC"></span><span class="target" id="_ascii_table_8h_1ab2c99ee73e26cf3f8d567de043d3e470"></span><em class="property">static</em> int <code class="descname">simplify_formats</code><span class="sig-paren">(</span>char *<em>fmt_str</em>, <em class="property">const</em> int <em>fmt_len</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv216simplify_formatsPcKi" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Remove extra format characters that confusing sscanf. </p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>int -1 on failure if the regex could not be compiled or the buffer is not big enough to contain the result. If succesful, the new length of buf is returned. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">fmt_str</span></code>: character pointer to string that should be modified. </li>
+<li><code class="docutils literal"><span class="pre">fmt_len</span></code>: constant int, length of the fmt_str buffer. </li>
 </ul>
 </dd>
 </dl>
@@ -516,6 +767,22 @@
 </dd></dl>
 
 <dl class="function">
+<dt id="_CPPv217at_set_format_sizP12asciiTable_t">
+<span id="at_set_format_siz__asciiTable_tP"></span><span class="target" id="_ascii_table_8h_1aaf2ff73c9e5029825d7da00efc5d37c4"></span><em class="property">static</em> int <code class="descname">at_set_format_siz</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv212asciiTable_t" title="asciiTable_t">asciiTable_t</a> *<em>t</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv217at_set_format_sizP12asciiTable_t" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Determine the column sizes based on the types. </p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>int 0 on success, -1 on failure. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">t</span></code>: <a class="reference internal" href="#structascii_table__t"><span class="std std-ref">asciiTable_t</span></a> table structure that sizes will be added to. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
 <dt id="_CPPv217at_set_format_typP12asciiTable_t">
 <span id="at_set_format_typ__asciiTable_tP"></span><span class="target" id="_ascii_table_8h_1ab0a82f6cbb7d372d6ea2fbab1da2d4af"></span><em class="property">static</em> int <code class="descname">at_set_format_typ</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv212asciiTable_t" title="asciiTable_t">asciiTable_t</a> *<em>t</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv217at_set_format_typP12asciiTable_t" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Determine the column types by parsing the format string. </p>
@@ -524,7 +791,7 @@
 <dd>int 0 on success, -1 on failure. TODO: switch to regex </dd>
 <dt><strong>Parameters</strong></dt>
 <dd><ul class="breatheparameterlist first last simple">
-<li><code class="docutils literal"><span class="pre">t</span></code>: constant <a class="reference internal" href="#structascii_table__t"><span class="std std-ref">asciiTable_t</span></a> table structure. </li>
+<li><code class="docutils literal"><span class="pre">t</span></code>: <a class="reference internal" href="#structascii_table__t"><span class="std std-ref">asciiTable_t</span></a> table structure that types will be added to. </li>
 </ul>
 </dd>
 </dl>
@@ -699,58 +966,76 @@
 </div>
 
 
+           </div>
+           <div class="articleComments">
+            
+           </div>
           </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="code_cpp.html" class="btn btn-neutral float-right" title="C++ Code" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="interface_c.html" class="btn btn-neutral" title="C Interface" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Meagan Lang, David Raila.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper"><div class="relations">
-<h3>Related Topics</h3>
-<ul>
-  <li><a href="index.html">Documentation overview</a><ul>
-  <li><a href="code.html">Code</a><ul>
-  <li><a href="code_c.html">C Code</a><ul>
-      <li>Previous: <a href="interface_c.html" title="previous chapter">C Interface</a></li>
-      <li>Next: <a href="code_cpp.html" title="next chapter">C++ Code</a></li>
-  </ul></li>
-  </ul></li>
-  </ul></li>
-</ul>
-</div>
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="_sources/dataio_c.rst.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div>
-<div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
-    <form class="search" action="search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
-    </form>
-</div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
-        </div>
-      </div>
-      <div class="clearer"></div>
-    </div>
-    <div class="footer">
-      &copy;2017, Meagan Lang, David Raila.
-      
-      |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.6</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
-      
-      |
-      <a href="_sources/dataio_c.rst.txt"
-          rel="nofollow">Page source</a>
-    </div>
 
-    
+    </section>
 
-    
-  </body>
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.0.0',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
 </html>

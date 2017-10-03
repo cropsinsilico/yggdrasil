@@ -1,48 +1,188 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
 
-<html xmlns="http://www.w3.org/1999/xhtml">
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Python Code &mdash; cis_interface 0.0.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
     
-    <title>Python Code &#8212; cis_interface 0.0.0 documentation</title>
-    
-    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    './',
-        VERSION:     '0.0.0',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
-    <script type="text/javascript" src="_static/jquery.js"></script>
-    <script type="text/javascript" src="_static/underscore.js"></script>
-    <script type="text/javascript" src="_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="cis_interface.interface package" href="cis_interface.interface.html" />
-    <link rel="prev" title="Code" href="code.html" />
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="cis_interface 0.0.0 documentation" href="index.html"/>
+        <link rel="up" title="Code" href="code.html"/>
+        <link rel="next" title="cis_interface.interface package" href="cis_interface.interface.html"/>
+        <link rel="prev" title="Code" href="code.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
    
-  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
-  
-  
-  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+  <div class="wy-grid-for-nav">
 
-  </head>
-  <body role="document">
-  
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          <div class="body" role="main">
+          
+            <a href="index.html" class="icon icon-home"> cis_interface
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.0.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="includeme.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="config.html">Configuration Files</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="code.html">Code</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Python Code</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#subpackages">Subpackages</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="cis_interface.interface.html">cis_interface.interface package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cis_interface.dataio.html">cis_interface.dataio package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cis_interface.drivers.html">cis_interface.drivers package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cis_interface.examples.html">cis_interface.examples package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-cis_interface.backwards">cis_interface.backwards module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-cis_interface.command_line">cis_interface.command_line module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-cis_interface.config">cis_interface.config module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-cis_interface.runner">cis_interface.runner module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-cis_interface.tools">cis_interface.tools module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-cis_interface">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="code_c.html">C Code</a></li>
+<li class="toctree-l2"><a class="reference internal" href="code_cpp.html">C++ Code</a></li>
+<li class="toctree-l2"><a class="reference internal" href="code_matlab.html">Matlab Code</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">cis_interface</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="code.html">Code</a> &raquo;</li>
+        
+      <li>Python Code</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/code_python.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
             
   <div class="section" id="python-code">
 <h1>Python Code<a class="headerlink" href="#python-code" title="Permalink to this headline">¶</a></h1>
@@ -176,7 +316,7 @@ class&#8217;s get.</li>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
 <li><strong>env</strong> (<a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a><em>, </em><em>optional</em>) &#8211; Dictionary of environment variables that should
 be updated. Defaults to <cite>os.environ</cite>.</li>
-<li><strong>cfg</strong> (<a class="reference internal" href="#cis_interface.config.CisConfigParser" title="cis_interface.config.CisConfigParser"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.config.CisConfigParser</span></code></a>, optional) &#8211; Config parser with options that should be used to update the
+<li><strong>cfg</strong> (<a class="reference internal" href="cis_interface.html#cis_interface.config.CisConfigParser" title="cis_interface.config.CisConfigParser"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.config.CisConfigParser</span></code></a>, optional) &#8211; Config parser with options that should be used to update the
 environment. Defaults to <code class="xref py py-data docutils literal"><span class="pre">cis_interface.config.cis_cfg</span></code>.</li>
 </ul>
 </td>
@@ -241,22 +381,59 @@ exchange.</p>
 <dl class="attribute">
 <dt id="cis_interface.runner.CisRunner.modeldrivers">
 <code class="descname">modeldrivers</code><a class="headerlink" href="#cis_interface.runner.CisRunner.modeldrivers" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>list</em> &#8211; Model drivers associated with this run.</p>
+<dd><p><em>dict</em> &#8211; Model drivers associated with this run.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="cis_interface.runner.CisRunner.inputdrivers">
 <code class="descname">inputdrivers</code><a class="headerlink" href="#cis_interface.runner.CisRunner.inputdrivers" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>list</em> &#8211; Input drivers associated with this run.</p>
+<dd><p><em>dict</em> &#8211; Input drivers associated with this run.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="cis_interface.runner.CisRunner.outputdrivers">
 <code class="descname">outputdrivers</code><a class="headerlink" href="#cis_interface.runner.CisRunner.outputdrivers" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>list</em> &#8211; Output drivers associated with this run.</p>
+<dd><p><em>dict</em> &#8211; Output drivers associated with this run.</p>
 </dd></dl>
 
 <p>..todo:: namespace, host, and rank do not seem strictly necessary.</p>
+<dl class="method">
+<dt id="cis_interface.runner.CisRunner.add_driver">
+<code class="descname">add_driver</code><span class="sig-paren">(</span><em>dtype</em>, <em>yaml</em>, <em>yamldir</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/runner.html#CisRunner.add_driver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.runner.CisRunner.add_driver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a driver to the appropriate driver dictionary with yamldir.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>dtype</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; Driver type. Should be &#8216;input&#8217;, &#8216;output&#8217;,or &#8216;model&#8217;.</li>
+<li><strong>yaml</strong> (<a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) &#8211; YAML dictionary for the driver.</li>
+<li><strong>yamldir</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; Full path to directory where the yaml is stored.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
+<li><code class="xref py py-exc docutils literal"><span class="pre">ValueError</span></code> &#8211; If dtype is not &#8216;input&#8217;, &#8216;output&#8217;,or &#8216;model&#8217;.</li>
+<li><code class="xref py py-exc docutils literal"><span class="pre">ValueError</span></code> &#8211; If the driver name already exists.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.runner.CisRunner.all_drivers">
+<code class="descname">all_drivers</code><a class="headerlink" href="#cis_interface.runner.CisRunner.all_drivers" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>iterator</em> &#8211; For all drivers.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.runner.CisRunner.cleanup">
+<code class="descname">cleanup</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/runner.html#CisRunner.cleanup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.runner.CisRunner.cleanup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Perform cleanup operations for all drivers.</p>
+</dd></dl>
+
 <dl class="method">
 <dt id="cis_interface.runner.CisRunner.closeChannels">
 <code class="descname">closeChannels</code><span class="sig-paren">(</span><em>force_stop=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/runner.html#CisRunner.closeChannels"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.runner.CisRunner.closeChannels" title="Permalink to this definition">¶</a></dt>
@@ -293,8 +470,76 @@ will exit as quickly as possible. Defaults to False.</td>
 </dd></dl>
 
 <dl class="method">
+<dt id="cis_interface.runner.CisRunner.createInputDriver">
+<code class="descname">createInputDriver</code><span class="sig-paren">(</span><em>yml</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/runner.html#CisRunner.createInputDriver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.runner.CisRunner.createInputDriver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create an input driver instance from the yaml information.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>yml</strong> (<em>yaml</em>) &#8211; Yaml object containing driver information.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">An instance of the specified driver.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/functions.html#object" title="(in Python v2.7)">object</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.runner.CisRunner.createModelDriver">
+<code class="descname">createModelDriver</code><span class="sig-paren">(</span><em>yml</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/runner.html#CisRunner.createModelDriver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.runner.CisRunner.createModelDriver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a model driver instance from the yaml information.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>yml</strong> (<em>yaml</em>) &#8211; Yaml object containing driver information.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">An instance of the specified driver.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/functions.html#object" title="(in Python v2.7)">object</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.runner.CisRunner.createOutputDriver">
+<code class="descname">createOutputDriver</code><span class="sig-paren">(</span><em>yml</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/runner.html#CisRunner.createOutputDriver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.runner.CisRunner.createOutputDriver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create an output driver instance from the yaml information.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>yml</strong> (<em>yaml</em>) &#8211; Yaml object containing driver information.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">An instance of the specified driver.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/functions.html#object" title="(in Python v2.7)">object</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
 <dt id="cis_interface.runner.CisRunner.do_exits">
-<code class="descname">do_exits</code><span class="sig-paren">(</span><em>model</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/runner.html#CisRunner.do_exits"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.runner.CisRunner.do_exits" title="Permalink to this definition">¶</a></dt>
+<code class="descname">do_exits</code><span class="sig-paren">(</span><em>driver</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/runner.html#CisRunner.do_exits"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.runner.CisRunner.do_exits" title="Permalink to this definition">¶</a></dt>
+<dd><p>Perform basic exits for a driver.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>model</strong> (<a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) &#8211; Dictionary of driver parameters.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.runner.CisRunner.do_model_exits">
+<code class="descname">do_model_exits</code><span class="sig-paren">(</span><em>model</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/runner.html#CisRunner.do_model_exits"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.runner.CisRunner.do_model_exits" title="Permalink to this definition">¶</a></dt>
 <dd><p>Perform exists for IO drivers associated with a model.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -302,6 +547,25 @@ will exit as quickly as possible. Defaults to False.</td>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>model</strong> (<a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) &#8211; Dictionary of model parameters including any
 associated IO drivers.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.runner.CisRunner.io_drivers">
+<code class="descname">io_drivers</code><span class="sig-paren">(</span><em>model=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/runner.html#CisRunner.io_drivers"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.runner.CisRunner.io_drivers" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the input and output drivers for one or all models.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>model</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a><em>, </em><em>optional</em>) &#8211; Name of a model that I/O drivers should be
+returned for. Defaults to None and all I/O drivers are returned.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Access to list of I/O drivers.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">iterator</td>
 </tr>
 </tbody>
 </table>
@@ -412,7 +676,7 @@ that should be run.</li>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Runner for the provided models.</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first"><a class="reference internal" href="#cis_interface.runner.CisRunner" title="cis_interface.runner.CisRunner">CisRunner</a></p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first"><a class="reference internal" href="cis_interface.html#cis_interface.runner.CisRunner" title="cis_interface.runner.CisRunner">CisRunner</a></p>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><code class="xref py py-exc docutils literal"><span class="pre">Exception</span></code> &#8211; If config option &#8216;namespace&#8217; in &#8216;rmq&#8217; section not set.</p>
@@ -476,6 +740,84 @@ to None and the environment variable &#8216;RMQ_DEBUG&#8217; is used.</td>
 <div class="section" id="module-cis_interface.tools">
 <span id="cis-interface-tools-module"></span><h2>cis_interface.tools module<a class="headerlink" href="#module-cis_interface.tools" title="Permalink to this headline">¶</a></h2>
 <p>This modules offers various tools.</p>
+<dl class="class">
+<dt id="cis_interface.tools.TimeOut">
+<em class="property">class </em><code class="descclassname">cis_interface.tools.</code><code class="descname">TimeOut</code><span class="sig-paren">(</span><em>max_time</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tools.html#TimeOut"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tools.TimeOut" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/2/library/functions.html#object" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+<p>Class for checking if a period of time has been elapsed.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>max_time</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; Maximum period of time that should elapsed before
+&#8216;is_out&#8217; returns True.</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="cis_interface.tools.TimeOut.max_time">
+<code class="descname">max_time</code><a class="headerlink" href="#cis_interface.tools.TimeOut.max_time" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>float</em> &#8211; Maximum period of time that should elapsed before
+&#8216;is_out&#8217; returns True.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.tools.TimeOut.start_time">
+<code class="descname">start_time</code><a class="headerlink" href="#cis_interface.tools.TimeOut.start_time" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>float</em> &#8211; Result of time.time() at start.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.tools.TimeOut.elapsed">
+<code class="descname">elapsed</code><a class="headerlink" href="#cis_interface.tools.TimeOut.elapsed" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>float</em> &#8211; Total time that has elapsed since the start.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.tools.TimeOut.is_out">
+<code class="descname">is_out</code><a class="headerlink" href="#cis_interface.tools.TimeOut.is_out" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>bool</em> &#8211; True if there is not any time remaining. False otherwise.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.tools.eval_kwarg">
+<code class="descclassname">cis_interface.tools.</code><code class="descname">eval_kwarg</code><span class="sig-paren">(</span><em>x</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tools.html#eval_kwarg"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tools.eval_kwarg" title="Permalink to this definition">¶</a></dt>
+<dd><p>If x is a string, eval it. Otherwise just return it.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>x</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a><em>, </em><em>obj</em>) &#8211; String to be evaluated as an object or an object.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Evaluation result of x for strings if x is a string. x otherwise.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">obj</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.tools.get_queue">
+<code class="descclassname">cis_interface.tools.</code><code class="descname">get_queue</code><span class="sig-paren">(</span><em>qid=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tools.html#get_queue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tools.get_queue" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create or return a sysv_ipc.MessageQueue and register it.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>qid</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a><em>, </em><em>optional</em>) &#8211; If provided, ID for existing queue that should be
+returned. Defaults to None and a new queue is returned.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Message queue.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal"><span class="pre">sysv_ipc.MessageQueue</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 <dl class="function">
 <dt id="cis_interface.tools.ipc_queues">
 <code class="descclassname">cis_interface.tools.</code><code class="descname">ipc_queues</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tools.html#ipc_queues"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tools.ipc_queues" title="Permalink to this definition">¶</a></dt>
@@ -541,6 +883,22 @@ list.</td>
 </table>
 </dd></dl>
 
+<dl class="function">
+<dt id="cis_interface.tools.remove_queue">
+<code class="descclassname">cis_interface.tools.</code><code class="descname">remove_queue</code><span class="sig-paren">(</span><em>mq</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tools.html#remove_queue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tools.remove_queue" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove a sysv_ipc.MessageQueue and unregister it.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>mq</strong> (<code class="xref py py-class docutils literal"><span class="pre">sysv_ipc.MessageQueue</span></code>) &#8211; </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><code class="xref py py-exc docutils literal"><span class="pre">KeyError</span></code> &#8211; If the provided queue is not registered.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 </div>
 <div class="section" id="module-cis_interface">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-cis_interface" title="Permalink to this headline">¶</a></h2>
@@ -550,71 +908,76 @@ such that they can be run simultaneously, passing input back and forth.</p>
 </div>
 
 
+           </div>
+           <div class="articleComments">
+            
+           </div>
           </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="cis_interface.interface.html" class="btn btn-neutral float-right" title="cis_interface.interface package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="code.html" class="btn btn-neutral" title="Code" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Meagan Lang, David Raila.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-  <h3><a href="index.html">Table Of Contents</a></h3>
-  <ul>
-<li><a class="reference internal" href="#">Python Code</a><ul>
-<li><a class="reference internal" href="#subpackages">Subpackages</a></li>
-<li><a class="reference internal" href="#submodules">Submodules</a></li>
-<li><a class="reference internal" href="#module-cis_interface.backwards">cis_interface.backwards module</a></li>
-<li><a class="reference internal" href="#module-cis_interface.command_line">cis_interface.command_line module</a></li>
-<li><a class="reference internal" href="#module-cis_interface.config">cis_interface.config module</a></li>
-<li><a class="reference internal" href="#module-cis_interface.runner">cis_interface.runner module</a></li>
-<li><a class="reference internal" href="#module-cis_interface.tools">cis_interface.tools module</a></li>
-<li><a class="reference internal" href="#module-cis_interface">Module contents</a></li>
-</ul>
-</li>
-</ul>
-<div class="relations">
-<h3>Related Topics</h3>
-<ul>
-  <li><a href="index.html">Documentation overview</a><ul>
-  <li><a href="code.html">Code</a><ul>
-      <li>Previous: <a href="code.html" title="previous chapter">Code</a></li>
-      <li>Next: <a href="cis_interface.interface.html" title="next chapter">cis_interface.interface package</a></li>
-  </ul></li>
-  </ul></li>
-</ul>
-</div>
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="_sources/code_python.rst.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div>
-<div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
-    <form class="search" action="search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
-    </form>
-</div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
-        </div>
-      </div>
-      <div class="clearer"></div>
-    </div>
-    <div class="footer">
-      &copy;2017, Meagan Lang, David Raila.
-      
-      |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.6</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
-      
-      |
-      <a href="_sources/code_python.rst.txt"
-          rel="nofollow">Page source</a>
-    </div>
 
-    
+    </section>
 
-    
-  </body>
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.0.0',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
 </html>
