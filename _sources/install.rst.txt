@@ -5,9 +5,8 @@ Installation
 Basic Installation
 ------------------
 
-..todo:: Links to PyPI release
-
-|cis_interface| can be installed from either PyPI using ``pip``::
+|cis_interface| can be installed from either `PyPI <https://pypi.org/project/cis_interface/>`_ 
+using ``pip``::
 
   $ pip install cis_interface
 
