@@ -18,6 +18,7 @@
 #
 import os
 import sys
+import sphinx_rtd_theme
 # sys.path.insert(0, os.path.abspath('.'))
 doxydir = os.path.join(os.path.abspath('../'), "doxy", "xml")
 srcdir = os.path.join(os.path.abspath('../../'), "cis_interface")
@@ -95,9 +96,9 @@ author = u'Meagan Lang, David Raila'
 # built documents.
 #
 # The short X.Y version.
-version = u'0.0.0'
+version = u'0.1'
 # The full version, including alpha/beta/rc tags.
-release = u'0.0.0'
+release = u'0.1.3'
 
 # Substitutions
 # .. _Docs: http://cis_interface.readthedocs.io/en/latest/
@@ -131,7 +132,9 @@ todo_include_todos = True
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = 'alabaster'
+#html_theme = 'alabaster'
+html_theme = "sphinx_rtd_theme"
+html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
