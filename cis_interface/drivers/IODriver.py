@@ -206,7 +206,7 @@ class IODriver(Driver):
                                 'Backlogged messages must be received first')
                     except sysv_ipc.BusyError as e:
                         if no_backlog:
-                            raise e
+                            return False
                         else:
                             self.backlog_send.append(data)
                             self.debug('.ipc_send %d bytes backlogged',

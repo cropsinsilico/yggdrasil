@@ -1,7 +1,6 @@
 import os
 import numpy as np
 import nose.tools as nt
-import tempfile
 from cis_interface.examples.tests import TestExample
 from cis_interface.dataio.AsciiTable import AsciiTable
 
@@ -15,33 +14,44 @@ class TestExampleAsciiIO(TestExample):
 
     @property
     def input_file(self):
-        r"""Input file."""
+        r"""str: Input file."""
         return os.path.join(self.yamldir, 'Input', 'input_file.txt')
 
     @property
     def input_table(self):
-        r"""Input table."""
+        r"""str: Input table file."""
         return os.path.join(self.yamldir, 'Input', 'input_table.txt')
         
     @property
     def input_array(self):
-        r"""Input array."""
+        r"""str: Input array file."""
         return os.path.join(self.yamldir, 'Input', 'input_array.txt')
 
     @property
     def output_file(self):
-        r"""Output file."""
-        return os.path.join(tempfile.gettempdir(), 'output_file.txt')
-    
+        r"""str: Output file for the run."""
+        for o, yml in self.runner.outputdrivers.items():
+            if yml['driver'] == 'AsciiFileOutputDriver':
+                return yml['args']
+        raise Exception('Could not locate output file in yaml.')
+
     @property
     def output_table(self):
-        r"""Output table."""
-        return os.path.join(tempfile.gettempdir(), 'output_table.txt')
-    
+        r"""str: Output table for the run."""
+        for o, yml in self.runner.outputdrivers.items():
+            if (((yml['driver'] == 'AsciiTableOutputDriver') and
+                 (not yml.get('as_array', False)))):
+                return yml['args']
+        raise Exception('Could not locate output table in yaml.')
+
     @property
     def output_array(self):
-        r"""Output array."""
-        return os.path.join(tempfile.gettempdir(), 'output_array.txt')
+        r"""str: Output array for the run."""
+        for o, yml in self.runner.outputdrivers.items():
+            if (((yml['driver'] == 'AsciiTableOutputDriver') and
+                 (yml.get('as_array', False)))):
+                return yml['args']
+        raise Exception('Could not locate output array in yaml.')
 
     def check_file(self):
         r"""Assert that contents of input/output ascii files are identical."""

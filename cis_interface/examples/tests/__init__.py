@@ -16,6 +16,7 @@ class TestExample(unittest.TestCase):
         self.language = None
         self.uuid = str(uuid.uuid4())
         self.env = {}
+        self.runner = None
         super(TestExample, self).__init__(*args, **kwargs)
 
     def setup(self, *args, **kwargs):
@@ -65,6 +66,14 @@ class TestExample(unittest.TestCase):
             return None
         return os.path.dirname(self.yaml)
 
+    @property
+    def output_file(self):
+        r"""str: Output file for the run."""
+        for o, yml in self.runner.outputdrivers.items():
+            if yml['driver'] == 'FileOutputDriver':
+                return yml['args']
+        raise Exception('Could not locate output file in yaml.')
+
     def check_result(self):
         r"""This should be overridden with checks for the result."""
         pass
@@ -77,8 +86,8 @@ class TestExample(unittest.TestCase):
                               (self.name, self.language))
         else:
             os.environ.update(self.env)
-            cr = runner.get_runner(self.yaml, namespace=self.namespace)
-            cr.run()
+            self.runner = runner.get_runner(self.yaml, namespace=self.namespace)
+            self.runner.run()
             self.check_result()
 
     def test_all(self):
