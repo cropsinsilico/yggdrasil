@@ -1,5 +1,4 @@
 import os
-import uuid
 import nose.tools as nt
 from cis_interface import runner, tools
 from cis_interface.config import cis_cfg
@@ -12,36 +11,46 @@ class TestParam(CisTest):
     r"""Test parameters for basic Driver test class.
 
     Attributes:
-        driver (str): The driver class.
+        driver (str): Name of driver class.
         args (object): Driver arguments.
-        uuid (str): Random unique identifier.
         namespace (str): PSI namespace to run drivers in.
-        attr_list (list): List of attributes that should be checked for after
-            initialization.
-        inst_kwargs (dict): Keyword arguments for the driver.
         nprev_queues (int): The number of IPC queues that exist before the
             driver instance is created.
 
     """
 
     def __init__(self, *args, **kwargs):
+        super(TestParam, self).__init__(*args, **kwargs)
         self.driver = 'Driver'
         self.args = None
-        self.uuid = str(uuid.uuid4())
         self.namespace = 'TESTING_%s' % self.uuid
-        self.attr_list = ['name', 'sleeptime', 'longsleep', 'timeout',
-                          'yml', 'env', 'namespace', 'rank', 'workingDir',
-                          'lock']
-        self.inst_kwargs = {'yml': {'workingDir': self.workingDir}}
+        self.attr_list += ['name', 'sleeptime', 'longsleep', 'timeout',
+                           'yml', 'env', 'namespace', 'rank', 'workingDir',
+                           'lock']
+        self._inst_kwargs = {'yml': {'workingDir': self.workingDir},
+                             'timeout': self.timeout,
+                             'sleeptime': self.sleeptime,
+                             # 'workingDir': self.workingDir,
+                             'namespace': self.namespace}
         self.nprev_queues = 0
-        self.timeout = 1.0
-        self.sleeptime = 0.01
-        super(TestParam, self).__init__(*args, **kwargs)
 
     @property
-    def description_prefix(self):
-        r"""Set description prefix to driver name."""
+    def cls(self):
+        r"""str: Driver class."""
         return self.driver
+
+    @property
+    def mod(self):
+        r"""str: Absolute path to module containing driver."""
+        return 'cis_interface.drivers.%s' % self.cls
+
+    @property
+    def inst_args(self):
+        r"""tuple: Driver arguments."""
+        out = [self.name]
+        if self.args is not None:
+            out.append(self.args)
+        return out
 
     def setup(self, skip_start=False):
         r"""Create a driver instance and start the driver."""
@@ -52,48 +61,26 @@ class TestParam(CisTest):
         runner.setup_cis_logging(self.__module__)
         runner.setup_rmq_logging()
         self.nprev_queues = len(tools._registered_queues.keys())
-        self._instance = self.create_instance()
+        super(TestParam, self).setup()
         if not skip_start:
             self.instance.start()
 
     def teardown(self):
         r"""Remove the instance, stoppping it."""
-        if hasattr(self, '_instance'):
-            inst = self._instance
-            self._instance = None
-            self.remove_instance(inst)
-            delattr(self, '_instance')
+        super(TestParam, self).teardown()
         nt.assert_equal(len(tools._registered_queues.keys()), self.nprev_queues)
 
     @property
     def name(self):
         r"""str: Name of the test driver."""
-        return 'Test%s_%s' % (self.driver, self.uuid)
-
-    @property
-    def instance(self):
-        r"""object: Instance of the test driver."""
-        if not hasattr(self, '_instance'):  # pragma: debug
-            self._instance = self.create_instance()
-        return self._instance
-
-    @property
-    def workingDir(self):
-        r"""str: Working directory."""
-        return os.path.dirname(__file__)
+        return 'Test%s_%s' % (self.cls, self.uuid)
 
     def create_instance(self):
         r"""Create a new instance object."""
         curpath = os.getcwd()
         os.chdir(self.workingDir)
-        inst = runner.create_driver(self.driver, self.name, self.args,
-                                    namespace=self.namespace,
-                                    # workingDir=self.workingDir,
-                                    timeout=self.timeout,
-                                    sleeptime=self.sleeptime,
-                                    **self.inst_kwargs)
+        inst = super(TestParam, self).create_instance()
         os.chdir(curpath)
-        # print("created instance")
         return inst
 
     def remove_instance(self, inst):
@@ -104,7 +91,7 @@ class TestParam(CisTest):
             inst.join()
         inst.cleanup()
         assert(not inst.is_alive())
-        # print("removed instance")
+        super(TestParam, self).remove_instance(inst)
 
 
 class TestDriver(TestParam):

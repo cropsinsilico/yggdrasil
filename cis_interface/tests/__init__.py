@@ -1,5 +1,7 @@
 """Testing things."""
 import os
+import uuid
+import importlib
 import unittest
 
 # Test data
@@ -36,16 +38,52 @@ class CisTest(unittest.TestCase):
         description_prefix (str, optional): String to prepend docstring
             test message with. Default to empty string.
 
+    Attributes:
+        uuid (str): Random unique identifier.
+        attr_list (list): List of attributes that should be checked for after
+            initialization.
+        timeout (float): Maximum time in seconds for timeouts.
+        sleeptime (float): Time in seconds that should be waited for sleeps.
+
     """
 
     def __init__(self, *args, **kwargs):
         self._description_prefix = kwargs.pop('description_prefix', '')
+        self._mod = None
+        self._cls = None
+        self.uuid = str(uuid.uuid4())
+        self.attr_list = list()
+        self._inst_args = list()
+        self._inst_kwargs = dict()
+        self.timeout = 1.0
+        self.sleeptime = 0.01
         super(CisTest, self).__init__(*args, **kwargs)
+
+    def setUp(self, *args, **kwargs):
+        self.setup(*args, **kwargs)
+
+    def tearDown(self, *args, **kwargs):
+        self.teardown(*args, **kwargs)
+
+    def setup(self, *args, **kwargs):
+        r"""Create an instance of the class."""
+        self._instance = self.create_instance()
+
+    def teardown(self, *args, **kwargs):
+        r"""Remove the instance."""
+        if hasattr(self, '_instance'):
+            inst = self._instance
+            self._instance = None
+            self.remove_instance(inst)
+            delattr(self, '_instance')
 
     @property
     def description_prefix(self):
         r"""String prefix to prepend docstr test message with."""
-        return self._description_prefix
+        if self.cls is None:
+            return self._description_prefix
+        else:
+            return self.cls
 
     def shortDescription(self):
         r"""Prefix first line of doc string."""
@@ -55,17 +93,59 @@ class CisTest(unittest.TestCase):
         else:
             return out
 
-    def setUp(self, *args, **kwargs):
-        self.setup(*args, **kwargs)
+    @property
+    def cls(self):
+        r"""str: Class to be tested."""
+        return self._cls
 
-    def tearDown(self, *args, **kwargs):
-        self.teardown(*args, **kwargs)
+    @property
+    def mod(self):
+        r"""str: Absolute name of module containing class to be tested."""
+        return self._mod
 
-    def setup(self, *args, **kwargs):  # pragma: no cover
+    @property
+    def inst_args(self):
+        r"""list: Arguments for creating a class instance."""
+        return self._inst_args
+
+    @property
+    def inst_kwargs(self):
+        r"""dict: Keyword arguments for creating a class instance."""
+        return self._inst_kwargs
+
+    @property
+    def workingDir(self):
+        r"""str: Working directory."""
+        return os.path.dirname(__file__)
+
+    @property
+    def import_cls(self):
+        r"""Import the tested class from its module"""
+        if self.mod is None:
+            raise Exception("No module registered.")
+        if self.cls is None:
+            raise Exception("No class registered.")
+        mod = importlib.import_module(self.mod)
+        cls = getattr(mod, self.cls)
+        return cls
+
+    @property
+    def instance(self):
+        r"""object: Instance of the test driver."""
+        if not hasattr(self, '_instance'):  # pragma: debug
+            self._instance = self.create_instance()
+        return self._instance
+
+    def create_instance(self):
+        r"""Create a new instance of the class."""
+        inst = self.import_cls(*self.inst_args, **self.inst_kwargs)
+        # print("created instance")
+        return inst
+
+    def remove_instance(self, inst):
+        r"""Remove an instance of the class."""
+        # print("removed instance")
         pass
 
-    def teardown(self, *args, **kwargs):  # pragma: no cover
-        pass
 
-
-__all__ = ['data', 'scripts', 'yamls', 'cisTest']
+__all__ = ['data', 'scripts', 'yamls', 'CisTest']

@@ -25,27 +25,40 @@ def test_PsiMatlab_variables():
     r"""Test Matlab interface for variables."""
     nt.assert_equal(PsiInterface.PsiMatlab('PSI_MSG_MAX'), PSI_MSG_MAX)
     nt.assert_equal(PsiInterface.PsiMatlab('PSI_MSG_EOF'), PSI_MSG_EOF)
-    
-    
-class TestPsiInput(CisTest, IOInfo):
-    r"""Test basic input to python."""
+
+
+@nt.nottest
+class TestBase(CisTest, IOInfo):
+    r"""Test class for interface classes."""
     def __init__(self, *args, **kwargs):
-        super(TestPsiInput, self).__init__(*args, **kwargs)
+        super(TestBase, self).__init__(*args, **kwargs)
         IOInfo.__init__(self)
+        self._mod = 'cis_interface.interface.PsiInterface'
         self.name = 'test'
         self.driver = None
-        self.instance = None
-
+        self.driver_class = IODriver.IODriver
+        self.driver_args = []
+        self._inst_args = [self.name]
+        
     def setup(self):
         r"""Start driver and instance."""
-        self.driver = IODriver.IODriver(self.name, '_IN')
+        self.driver = self.driver_class(*self.driver_args)
         self.driver.start()
         os.environ.update(self.driver.env)
-        self.instance = PsiInterface.PsiInput(self.name)
+        super(TestBase, self).setup()
 
     def teardown(self):
         r"""Stop the driver."""
         self.driver.stop()
+        super(TestBase, self).teardown()
+
+    
+class TestPsiInput(TestBase):
+    r"""Test basic input to python."""
+    def __init__(self, *args, **kwargs):
+        super(TestPsiInput, self).__init__(*args, **kwargs)
+        self._cls = 'PsiInput'
+        self.driver_args = [self.name, '_IN']
 
     def test_init(self):
         r"""Test error on init."""
@@ -68,25 +81,12 @@ class TestPsiInput(CisTest, IOInfo):
         nt.assert_equal(msg_recv, self.msg_long)
 
 
-class TestPsiOutput(CisTest, IOInfo):
+class TestPsiOutput(TestBase):
     r"""Test basic output to python."""
     def __init__(self, *args, **kwargs):
         super(TestPsiOutput, self).__init__(*args, **kwargs)
-        IOInfo.__init__(self)
-        self.name = 'test'
-        self.driver = None
-        self.instance = None
-
-    def setup(self):
-        r"""Start driver and instance."""
-        self.driver = IODriver.IODriver(self.name, '_OUT')
-        self.driver.start()
-        os.environ.update(self.driver.env)
-        self.instance = PsiInterface.PsiOutput(self.name)
-
-    def teardown(self):
-        r"""Stop the driver."""
-        self.driver.stop()
+        self._cls = 'PsiOutput'
+        self.driver_args = [self.name, '_OUT']
 
     def test_init(self):
         r"""Test error on init."""
@@ -107,27 +107,15 @@ class TestPsiOutput(CisTest, IOInfo):
         nt.assert_equal(msg_recv, self.msg_long)
 
 
-class TestPsiRpc(CisTest, IOInfo):
+class TestPsiRpc(TestBase):
     r"""Test basic RPC communication with Python."""
     def __init__(self, *args, **kwargs):
         super(TestPsiRpc, self).__init__(*args, **kwargs)
-        IOInfo.__init__(self)
-        self.name = 'test'
-        self.driver = None
-        self.instance = None
-
-    def setup(self):
-        r"""Start driver and instance."""
-        self.driver = RPCDriver.RPCDriver(self.name)
-        self.driver.start()
-        os.environ.update(self.driver.env)
-        self.instance = PsiInterface.PsiRpc(
-            self.name, self.fmt_str,
-            self.name, self.fmt_str)
-
-    def teardown(self):
-        r"""Stop the driver."""
-        self.driver.stop()
+        self._cls = 'PsiRpc'
+        self._inst_args = [self.name, self.fmt_str,
+                           self.name, self.fmt_str]
+        self.driver_class = RPCDriver.RPCDriver
+        self.driver_args = [self.name]
 
     def test_rpcSend_rpcRecv(self):
         r"""Test sending/receiving formated output."""
@@ -157,26 +145,18 @@ class TestPsiRpc(CisTest, IOInfo):
 
 class TestPsiRpcClient(TestPsiRpc):
     r"""Test client-side RPC communication with Python."""
-
-    def setup(self):
-        r"""Start driver and instance."""
-        self.driver = RPCDriver.RPCDriver(self.name)
-        self.driver.start()
-        os.environ.update(self.driver.env)
-        self.instance = PsiInterface.PsiRpcClient(
-            self.name, self.fmt_str, self.fmt_str)
+    def __init__(self, *args, **kwargs):
+        super(TestPsiRpcClient, self).__init__(*args, **kwargs)
+        self._cls = 'PsiRpcClient'
+        self._inst_args = [self.name, self.fmt_str, self.fmt_str]
 
         
 class TestPsiRpcServer(TestPsiRpc):
     r"""Test server-side RPC communication with Python."""
-
-    def setup(self):
-        r"""Start driver and instance."""
-        self.driver = RPCDriver.RPCDriver(self.name)
-        self.driver.start()
-        os.environ.update(self.driver.env)
-        self.instance = PsiInterface.PsiRpcServer(
-            self.name, self.fmt_str, self.fmt_str)
+    def __init__(self, *args, **kwargs):
+        super(TestPsiRpcServer, self).__init__(*args, **kwargs)
+        self._cls = 'PsiRpcServer'
+        self._inst_args = [self.name, self.fmt_str, self.fmt_str]
 
         
 class TestPsiAsciiFileInput(CisTest, IOInfo):
