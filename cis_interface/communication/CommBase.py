@@ -5,7 +5,7 @@ from cis_interface.tools import PSI_MSG_MAX  # , PSI_MSG_EOF
 
 
 def default_serialize(x):
-    return x
+    return backwards.unicode2bytes(x)
 
 
 def default_deserialize(x):
