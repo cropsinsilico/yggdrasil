@@ -52,23 +52,42 @@ class TestParam(CisTest):
             out.append(self.args)
         return out
 
-    def setup(self, skip_start=False):
-        r"""Create a driver instance and start the driver."""
+    def setup(self, skip_start=False, nprev_queues=None):
+        r"""Create a driver instance and start the driver.
+
+        Args:
+            skip_start (bool, optional): If True, the driver will not be
+                started. Defaults to False.
+            nprev_queues (int, optional): Number of previous IPC queues.
+                If not provided, it is determined to be the present number of
+                queues.
+
+        """
         cis_cfg.set('debug', 'psi', 'INFO')
         cis_cfg.set('debug', 'rmq', 'INFO')
         cis_cfg.set('debug', 'client', 'INFO')
         cis_cfg.set('rmq', 'namespace', self.namespace)
         runner.setup_cis_logging(self.__module__)
         runner.setup_rmq_logging()
-        self.nprev_queues = len(tools._registered_queues.keys())
+        if nprev_queues is None:
+            nprev_queues = len(tools._registered_queues.keys())
+        self.nprev_queues = nprev_queues
         super(TestParam, self).setup()
         if not skip_start:
             self.instance.start()
 
-    def teardown(self):
-        r"""Remove the instance, stoppping it."""
+    def teardown(self, ncurr_queues=None):
+        r"""Remove the instance, stoppping it.
+
+        Args:
+            ncurr_queues (int, optional): Number of current queues. If not
+                provided, it is determined to be the present number of queues.
+
+        """
         super(TestParam, self).teardown()
-        nt.assert_equal(len(tools._registered_queues.keys()), self.nprev_queues)
+        if ncurr_queues is None:
+            ncurr_queues = len(tools._registered_queues.keys())
+        nt.assert_equal(ncurr_queues, self.nprev_queues)
 
     @property
     def name(self):
@@ -153,9 +172,10 @@ class TestDriverNoStart(TestParam):
 
     """
 
-    def setup(self):
+    def setup(self, *args, **kwargs):
         r"""Create a driver instance without starting the driver."""
-        super(TestDriverNoStart, self).setup(skip_start=True)
+        kwargs['skip_start'] = True
+        super(TestDriverNoStart, self).setup(*args, **kwargs)
         assert(not self.instance.is_alive())
 
     def test_attributes(self):

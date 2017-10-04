@@ -51,16 +51,42 @@ class CommDriver(Driver):
             return self.comm.is_open
 
     @property
+    def is_closed(self):
+        r"""bool: Returns True if the connection is closed."""
+        with self.lock:
+            return self.comm.is_closed
+
+    @property
     def n_msg(self):
         r"""int: The number of messages in the queue."""
         with self.lock:
             return self.comm.n_msg
 
-    @property
-    def run(self):
-        r"""Open the connection."""
-        self.comm.open()
+    def open(self):
+        r"""Open the queue."""
+        self.debug(':open()')
+        with self.lock:
+            self.comm.open()
+        self.debug(':open(): done')
+        
+    def close(self):
+        r"""Close the queue."""
+        self.debug(':close()')
+        with self.lock:
+            self.comm.close()
+        self.debug(':close(): done')
 
+    def start(self):
+        r"""Open connection before running."""
+        self.open()
+        Tout = self.start_timeout()
+        while (not self.is_open) and (not Tout.is_out):
+            self.sleep()
+        self.stop_timeout()
+        if not self.is_open:
+            raise Exception("Connection never finished opening.")
+        super(CommDriver, self).start()
+        
     def graceful_stop(self, timeout=None, **kwargs):
         r"""Stop the CommDriver, first draining the message queue.
 
@@ -86,13 +112,6 @@ class CommDriver(Driver):
         super(CommDriver, self).graceful_stop()
         self.debug('.graceful_stop(): done')
 
-    def close(self):
-        r"""Close the queue."""
-        self.debug(':close_queue()')
-        with self.lock:
-            self.comm.close()
-        self.debug(':close_queue(): done')
-        
     def terminate(self):
         r"""Stop the CommDriver, removing the queue."""
         if self._terminated:
@@ -124,6 +143,7 @@ class CommDriver(Driver):
         msg += '%-15s' % (str(self.numReceived) + ' accepted, ')
         msg += '%-15s' % (str(self.n_msg) + ' ready')
         msg += end_msg
+        print(msg)
 
     def send(self, data):
         r"""Send a message smaller than maxMsgSize.
