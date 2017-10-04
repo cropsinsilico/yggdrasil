@@ -1,7 +1,9 @@
-from logging import error, exception
 import zmq
 from cis_interface import backwards
 from cis_interface.communication import CommBase
+
+
+_N_SOCKETS = 0
 
 
 _socket_type_pairs = [('PUSH', 'PULL'),
@@ -75,6 +77,11 @@ class ZMQComm(CommBase.CommBase):
             self.open()
 
     @property
+    def comm_count(self):
+        r"""int: Number of sockets that have been opened on this process."""
+        return _N_SOCKETS
+
+    @property
     def port(self):
         r"""str: Port that socket is connected to."""
         res = self.address.split(':')
@@ -105,15 +112,17 @@ class ZMQComm(CommBase.CommBase):
             ZMQComm: Instance with new socket.
 
         """
-        if host == 'localhost':
-            host = '127.0.0.1'
-        if protocol == 'inproc':
-            address = "inproc://%s" % name
-        else:
-            address = "%s://%s" % (protocol, host)
-        if port is not None:
-            address += ":%d" % port
-        out = cls(name, address=address, **kwargs)
+        if 'address' not in kwargs:
+            if host == 'localhost':
+                host = '127.0.0.1'
+            if protocol == 'inproc':
+                address = "inproc://%s" % name
+            else:
+                address = "%s://%s" % (protocol, host)
+            if port is not None:
+                address += ":%d" % port
+            kwargs['address'] = address
+        out = cls(name, **kwargs)
         return out
 
     def opp_comm_kwargs(self):
@@ -130,6 +139,7 @@ class ZMQComm(CommBase.CommBase):
 
     def open(self):
         r"""Open connection by binding/connect to the specified socket."""
+        global _N_SOCKETS
         if not self.is_open:
             if self.direction == 'send':
                 if self.port is None:
@@ -146,6 +156,7 @@ class ZMQComm(CommBase.CommBase):
             else:
                 raise ValueError("Direction must be 'send' or 'recv'")
             self._openned = True
+            _N_SOCKETS += 1
 
     def close(self):
         r"""Close connection."""
@@ -182,13 +193,13 @@ class ZMQComm(CommBase.CommBase):
 
         """
         if self.socket.closed:
-            error("ZMQComm(%s): Socket closed", self.name)
+            self.error(".send(): Socket closed")
             return False
         try:
             msg_chunks = [_ for _ in self.chunk_message(msg)]
             self.socket.send_multipart(msg_chunks, flags=zmq.NOBLOCK)
         except zmq.ZMQError:
-            exception("ZMQComm(%s): Error during send" % self.name)
+            self.exception(".send(): Error")
             return False
         return True
 
@@ -201,12 +212,12 @@ class ZMQComm(CommBase.CommBase):
 
         """
         if self.socket.closed:
-            error("ZMQComm(%s): Socket closed", self.name)
+            self.error(".recv(): Socket closed")
             return (False, None)
         try:
             msg_chunks = self.socket.recv_multipart()
         except zmq.ZMQError:
-            exception("ZMQComm(%s): Error during recv", self.name)
+            self.exception(".recv(): Error")
             return (False, None)
         return (True, backwards.unicode2bytes('').join(msg_chunks))
 

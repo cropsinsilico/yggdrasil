@@ -130,6 +130,7 @@ class IODriver(Driver):
             if self.queue_open:
                 msg += '%-15s' % (str(self.mq.current_messages) + ' ready')
         msg += end_msg
+        print(msg)
 
     def ipc_send(self, data):
         r"""Send a message smaller than maxMsgSize.

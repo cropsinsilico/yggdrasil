@@ -1,7 +1,7 @@
 # from logging import debug, error, exception
 import os
 from cis_interface import backwards
-from cis_interface.tools import PSI_MSG_MAX  # , PSI_MSG_EOF
+from cis_interface.tools import CisClass, PSI_MSG_MAX  # , PSI_MSG_EOF
 
 
 def default_serialize(x):
@@ -12,7 +12,7 @@ def default_deserialize(x):
     return x
 
 
-class CommBase(object):
+class CommBase(CisClass):
     r"""Class for handling I/O.
 
     Args:
@@ -47,6 +47,7 @@ class CommBase(object):
         meth_serialize (obj): Callable object that takes any object as
             input and returns a serialized set of bytes. This will be used
             to encode sent messages.
+        **kwargs: Additional keywords arguments are passed to parent class.
 
     Raises:
         Exception: If there is not an environment variable with the specified
@@ -54,7 +55,8 @@ class CommBase(object):
 
     """
     def __init__(self, name, address=None, direction='send',
-                 deserialize=None, serialize=None, dont_open=False):
+                 deserialize=None, serialize=None, dont_open=False, **kwargs):
+        super(CommBase, self).__init__(name, **kwargs)
         self.name = name
         if address is None:
             if self.name not in os.environ:
@@ -72,10 +74,15 @@ class CommBase(object):
         if not dont_open:
             self.open()
 
+    @property
+    def comm_count(self):
+        r"""int: Number of communication connections."""
+        return 0
+
     @classmethod
     def new_comm(cls, *args, **kwargs):
         r"""Initialize communication with new queue."""
-        kwargs['address'] = 'address'
+        kwargs.setdefault('address', 'address')
         return cls(*args, **kwargs)
 
     def opp_comm_kwargs(self):

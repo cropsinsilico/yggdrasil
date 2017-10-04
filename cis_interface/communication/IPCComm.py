@@ -1,8 +1,9 @@
-from logging import debug  # , error, exception
-import time
 import sysv_ipc
 from cis_interface import backwards, tools
 from cis_interface.communication import CommBase
+
+
+_N_QUEUES = 0
 
 
 class IPCComm(CommBase.CommBase):
@@ -24,8 +25,14 @@ class IPCComm(CommBase.CommBase):
         if not dont_open:
             self.open()
 
+    @property
+    @staticmethod
+    def comm_count(cls):
+        r"""int: Total number of IPC queues started on this process."""
+        return _N_QUEUES
+
     @classmethod
-    def new_comm(cls, name):
+    def new_comm(cls, name, **kwargs):
         r"""Initialize communication with new queue.
 
         Args:
@@ -35,16 +42,22 @@ class IPCComm(CommBase.CommBase):
             IPCComm: Instance with new queue.
 
         """
-        q = tools.get_queue()
-        out = cls(name, address=str(q.key))
+        kwargs.setdefault('address', 'generate')
+        out = cls(name, **kwargs)
         return out
 
     def open(self):
         r"""Open the connection by connecting to the queue."""
+        global _N_QUEUES
         if not self.is_open:
-            qid = int(self.address)
-            debug("IPCComm(%s): qid %s", self.name, qid)
-            self.q = tools.get_queue(qid)
+            if self.address == 'generate':
+                self.q = tools.get_queue()
+                self.address = str(self.q.key)
+                _N_QUEUES += 1
+            else:
+                qid = int(self.address)
+                self.q = tools.get_queue(qid)
+            self.debug(": qid %s", self.q.key)
 
     def close(self):
         r"""Close the connection."""
@@ -68,7 +81,7 @@ class IPCComm(CommBase.CommBase):
         else:
             return 0
 
-    def _recv(self):
+    def _recv(self, timeout=None):
         r"""Receive a message smaller than PSI_MSG_MAX. The process will
         sleep until there is a message in the queue to receive.
 
@@ -78,20 +91,21 @@ class IPCComm(CommBase.CommBase):
 
         """
         payload = (False, '')
-        debug("IPCComm(%s).recv()", self.name)
+        self.debug('.recv()')
         try:
-            while self.n_msg == 0 and self.is_open:
-                debug("IPCComm(%s): recv() - no data, sleep", self.name)
-                time.sleep(self.sleeptime)
-            debug("IPCComm(%s).recv(): message ready, read it", self.name)
+            Tout = self.start_timeout(timeout)
+            while self.n_msg == 0 and self.is_open and (not Tout.is_out):
+                self.debug("recv(): no data, sleep")
+                self.sleep()
+            self.stop_timeout()
+            self.debug(".recv(): message ready, read it")
             data, _ = self.q.receive()  # ignore ident
             payload = (True, data)
-            debug("IPCComm(%s).recv(): read %d bytes", self.name, len(data))
+            self.debug(".recv(): read %d bytes", len(data))
         except sysv_ipc.ExistentialError:  # pragma: debug
-            debug("IPCComm(%s).recv(): queue closed, returning (False, '')",
-                  self.name)
+            self.debug(".recv(): queue closed, returning (False, '')")
         except Exception as ex:  # pragma: debug
-            # debug("IPCComm(%s).recv(): exception %s, return None", self.name, type(ex))
+            # self.exception(".recv(): exception %s, return None", type(ex))
             raise ex
         return payload
 
@@ -104,11 +118,10 @@ class IPCComm(CommBase.CommBase):
                 and the complete message received.
 
         """
-        debug("IPCComm(%s).recv_nolimit()", self.name)
+        self.debug(".recv_nolimit()")
         payload = self.recv()
         if not payload[0]:  # pragma: debug
-            debug("IPCComm(%s).recv_nolimit(): " +
-                  "Failed to receive payload size.", self.name)
+            self.debug(".recv_nolimit(): Failed to receive payload size.")
             return payload
         leng_exp = int(float(payload[1]))
         data = backwards.unicode2bytes('')
@@ -116,15 +129,14 @@ class IPCComm(CommBase.CommBase):
         while len(data) < leng_exp:
             payload = self.recv()
             if not payload[0]:  # pragma: debug
-                debug("IPCComm(%s).recv_nolimit(): " +
-                      "read interupted at %d of %d bytes.",
-                      self.name, len(data), leng_exp)
+                self.debug(
+                    ".recv_nolimit(): read interupted at %d of %d bytes.",
+                    len(data), leng_exp)
                 ret = False
                 break
             data = data + payload[1]
         payload = (ret, data)
-        debug("IPCComm(%s).recv_nolimit(): read %d bytes",
-              self.name, len(data))
+        self.debug(".recv_nolimit(): read %d bytes", len(data))
         return payload
 
     def _send(self, payload):
@@ -144,14 +156,13 @@ class IPCComm(CommBase.CommBase):
             payload_msg = payload
         ret = False
         try:
-            debug("IPCComm(%s).send(%s)", self.name, payload_msg)
+            self.debug(".send(%s)", payload_msg)
             self.q.send(payload)
             ret = True
-            debug("IPCComm(%s).sent(%s)", self.name, payload_msg)
+            self.debug(".sent(%s)", payload_msg)
         except Exception as ex:  # pragma: debug
-            debug("IPCComm(%s).send(%s): exception: %s", self.name, payload_msg, type(ex))
+            self.exception(".send(%s): exception: %s", payload_msg, type(ex))
             raise ex
-        debug("IPCComm(%s).send(%s): returns %d", self.name, payload_msg, ret)
         return ret
 
     def _send_nolimit(self, payload):
@@ -166,23 +177,21 @@ class IPCComm(CommBase.CommBase):
         """
         ret = self.send("%ld" % len(payload))
         if not ret:  # pragma: debug
-            debug("IPCComm(%s).send_nolimit: " +
-                  "Sending size of payload failed.", self.name)
+            self.debug(".send_nolimit: Sending size of payload faile.")
             return ret
         nsent = 0
         for imsg in self.chunk_message(payload):
             ret = self.send(imsg)
             if not ret:  # pragma: debug
-                debug("IPCComm(%s).send_nolimit(): " +
-                      "send interupted at %d of %d bytes.",
-                      self.name, nsent, len(payload))
+                self.debug(
+                    ".send_nolimit(): send interupted at %d of %d bytes.",
+                    nsent, len(payload))
                 break
             nsent += len(imsg)
-            debug("IPCComm(%s).send_nolimit(): %d of %d bytes sent",
-                  self.name, nsent, len(payload))
+            self.debug(".send_nolimit(): %d of %d bytes sent",
+                       nsent, len(payload))
         if ret:
-            debug("IPCComm(%s).send_nolimit %d bytes completed",
-                  self.name, len(payload))
+            self.debug(".send_nolimit %d bytes completed", len(payload))
         return ret
 
 
