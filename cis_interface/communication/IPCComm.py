@@ -139,7 +139,7 @@ class IPCComm(CommBase.CommBase):
         """
         max_msg = 10
         if len(payload) > max_msg:
-            payload_msg = payload[:max_msg] + ' ...'
+            payload_msg = payload[:max_msg] + backwards.unicode2bytes(' ...')
         else:
             payload_msg = payload
         ret = False

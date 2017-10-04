@@ -1,5 +1,6 @@
 from logging import error, exception
 import zmq
+from cis_interface import backwards
 from cis_interface.communication import CommBase
 
 
@@ -115,6 +116,18 @@ class ZMQComm(CommBase.CommBase):
         out = cls(name, address=address, **kwargs)
         return out
 
+    def opp_comm_kwargs(self):
+        r"""Get keyword arguments to initialize communication with opposite
+        comm object.
+
+        Returns:
+            dict: Keyword arguments for opposite comm object.
+
+        """
+        kwargs = super(ZMQComm, self).opp_comm_kwargs()
+        kwargs['socket_type'] = get_socket_type_mate(self.socket_type_name)
+        return kwargs
+
     def open(self):
         r"""Open connection by binding/connect to the specified socket."""
         if not self.is_open:
@@ -195,7 +208,7 @@ class ZMQComm(CommBase.CommBase):
         except zmq.ZMQError:
             exception("ZMQComm(%s): Error during recv", self.name)
             return (False, None)
-        return (True, ''.join(msg_chunks))
+        return (True, backwards.unicode2bytes('').join(msg_chunks))
 
 
 class ZMQInput(ZMQComm):
