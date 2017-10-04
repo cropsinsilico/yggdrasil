@@ -55,7 +55,7 @@ install:
     pip install --upgrade setuptools
     # Install dependencies
     pip install $NUMPY $MATPLOTLIB
-    pip install nose coverage coveralls flake8 sysv_ipc pystache pika pyyaml astropy scipy
+    pip install nose coverage coveralls flake8 pystache pika pyyaml astropy scipy zmq sysv_ipc
     # install cis_interface
     pip install -e .
     
