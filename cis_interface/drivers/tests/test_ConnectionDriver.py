@@ -19,6 +19,8 @@ class TestConnectionParam(parent.TestParam, IOInfo):
         self.attr_list += ['icomm_kws', 'ocomm_kws', 'icomm', 'ocomm',
                            'nrecv', 'nproc', 'nsent', 'state']
         self.timeout = 1.0
+        self.icomm_name = self.comm_name
+        self.ocomm_name = self.comm_name
     
     @property
     def send_comm_kwargs(self):
@@ -29,13 +31,13 @@ class TestConnectionParam(parent.TestParam, IOInfo):
     def recv_comm_kwargs(self):
         r"""dict: Keyword arguments for recv comm."""
         return self.instance.ocomm.opp_comm_kwargs()
-    
+
     @property
     def inst_kwargs(self):
         r"""dict: Keyword arguments for tested class."""
         out = super(TestConnectionParam, self).inst_kwargs
-        out['icomm_kws'] = {'comm': self.comm_name}
-        out['ocomm_kws'] = {'comm': self.comm_name}
+        out['icomm_kws'] = {'comm': self.icomm_name}
+        out['ocomm_kws'] = {'comm': self.ocomm_name}
         return out
 
     @property

@@ -12,8 +12,8 @@ class TestAsciiFileOutputParam(parent.TestFileOutputParam):
     def __init__(self, *args, **kwargs):
         super(TestAsciiFileOutputParam, self).__init__(*args, **kwargs)
         self.driver = 'AsciiFileOutputDriver'
-        self.attr_list += ['file_kwargs', 'file']
         self.inst_kwargs['newline'] = "\n"
+        self.ocomm_name = 'AsciiFileComm'
 
 
 class TestAsciiFileOutputDriverNoStart(TestAsciiFileOutputParam,
@@ -39,12 +39,7 @@ class TestAsciiFileOutputDriver(TestAsciiFileOutputParam,
     def setup(self):
         r"""Create a driver instance and start the driver."""
         super(parent.TestFileOutputDriver, self).setup()
-        self.instance.ipc_send(self.fmt_str_line)
+        self.send_comm.send(self.fmt_str_line)
         for line in self.file_lines:
-            self.instance.ipc_send(line)
-        self.instance.ipc_send(self.instance.eof_msg)
-
-    def assert_after_terminate(self):
-        r"""Assertions to make after stopping the driver instance."""
-        super(TestAsciiFileOutputDriver, self).assert_after_terminate()
-        assert(not self.instance.file.is_open)
+            self.send_comm.send(line)
+        self.send_comm.send(self.instance.eof_msg)
