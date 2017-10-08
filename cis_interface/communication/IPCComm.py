@@ -81,7 +81,7 @@ class IPCComm(CommBase.CommBase):
         else:
             return 0
 
-    def _recv(self, timeout=None):
+    def _recv(self, timeout=0):
         r"""Receive a message smaller than PSI_MSG_MAX. The process will
         sleep until there is a message in the queue to receive.
 
@@ -90,28 +90,28 @@ class IPCComm(CommBase.CommBase):
                 and the message received.
 
         """
-        payload = (False, '')
-        self.debug('.recv()')
-        try:
-            Tout = self.start_timeout(timeout)
-            while self.n_msg == 0 and self.is_open and (not Tout.is_out):
-                self.debug("recv(): no data, sleep")
-                self.sleep()
-            self.stop_timeout()
-            self.debug(".recv(): message ready, read it")
-            data, _ = self.q.receive()  # ignore ident
-            payload = (True, data)
-            self.debug(".recv(): read %d bytes", len(data))
-        except sysv_ipc.ExistentialError:  # pragma: debug
-            self.debug(".recv(): queue closed, returning (False, '')")
-        except Exception as ex:  # pragma: debug
-            # self.exception(".recv(): exception %s, return None", type(ex))
-            raise ex
-        return payload
+        # Sleep until there is a message
+        Tout = self.start_timeout(timeout)
+        while self.n_msg == 0 and self.is_open and (not Tout.is_out):
+            self.debug("recv(): no data, sleep")
+            self.sleep()
+        self.stop_timeout()
+        # Return True, '' if there are no messages
+        if self.n_msg == 0:
+            self.debug("recv(): no data, returning (True, '')")
+            return (True, '')
+        # Receive message
+        self.debug(".recv(): message ready, read it")
+        data, _ = self.q.receive()  # ignore ident
+        return (True, data)
 
-    def _recv_nolimit(self):
+    def _recv_nolimit(self, *args, **kwargs):
         r"""Receive a message larger than PSI_MSG_MAX that is sent in multiple
         parts.
+
+        Args:
+            *args: All arguments are passed to _recv.
+            **kwargs: All keyword arguments are passed to _recv.
 
         Returns:
             tuple (bool, str): The success or failure of receiving a message
@@ -119,15 +119,15 @@ class IPCComm(CommBase.CommBase):
 
         """
         self.debug(".recv_nolimit()")
-        payload = self.recv()
-        if not payload[0]:  # pragma: debug
+        payload = self._recv(*args, **kwargs)
+        if not payload[0] or (len(payload[1]) == 0):  # pragma: debug
             self.debug(".recv_nolimit(): Failed to receive payload size.")
             return payload
         leng_exp = int(float(payload[1]))
         data = backwards.unicode2bytes('')
         ret = True
         while len(data) < leng_exp:
-            payload = self.recv()
+            payload = self._recv(*args, **kwargs)
             if not payload[0]:  # pragma: debug
                 self.debug(
                     ".recv_nolimit(): read interupted at %d of %d bytes.",
@@ -149,21 +149,8 @@ class IPCComm(CommBase.CommBase):
             bool: Success or failure of sending the message.
 
         """
-        max_msg = 10
-        if len(payload) > max_msg:
-            payload_msg = payload[:max_msg] + backwards.unicode2bytes(' ...')
-        else:
-            payload_msg = payload
-        ret = False
-        try:
-            self.debug(".send(%s)", payload_msg)
-            self.q.send(payload)
-            ret = True
-            self.debug(".sent(%s)", payload_msg)
-        except Exception as ex:  # pragma: debug
-            self.exception(".send(%s): exception: %s", payload_msg, type(ex))
-            raise ex
-        return ret
+        self.q.send(payload)
+        return True
 
     def _send_nolimit(self, payload):
         r"""Send a message larger than PSI_MSG_MAX in multiple parts.
@@ -175,13 +162,13 @@ class IPCComm(CommBase.CommBase):
             bool: Success or failure of sending the message.
 
         """
-        ret = self.send("%ld" % len(payload))
+        ret = self._send("%ld" % len(payload))
         if not ret:  # pragma: debug
-            self.debug(".send_nolimit: Sending size of payload faile.")
+            self.debug(".send_nolimit: Sending size of payload failed.")
             return ret
         nsent = 0
         for imsg in self.chunk_message(payload):
-            ret = self.send(imsg)
+            ret = self._send(imsg)
             if not ret:  # pragma: debug
                 self.debug(
                     ".send_nolimit(): send interupted at %d of %d bytes.",
