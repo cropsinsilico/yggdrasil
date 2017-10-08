@@ -73,8 +73,12 @@ class ZMQComm(CommBase.CommBase):
         elif socket_type in ['PUSH', 'PUB', 'REP', 'DEALER']:
             self.direction = 'send'
         self._openned = False
+        self._bound = False
+        # Reserve port by binding
         if not dont_open:
             self.open()
+        else:
+            self.bind()
 
     @property
     def comm_count(self):
@@ -137,22 +141,28 @@ class ZMQComm(CommBase.CommBase):
         kwargs['socket_type'] = get_socket_type_mate(self.socket_type_name)
         return kwargs
 
-    def open(self):
+    def bind(self):
+        r"""Bind to address, getting random port as necessary."""
+        if self.port is None:
+            port = self.socket.bind_to_random_port(self.address)
+            self.address += ":%d" % port
+        else:
+            self.socket.bind(self.address)
+        self._bound = True
+
+    def open(self, reserve=False):
         r"""Open connection by binding/connect to the specified socket."""
         global _N_SOCKETS
         if not self.is_open:
             if self.direction == 'send':
-                if self.port is None:
-                    self.port = self.socket.bind_to_random_port(self.address)
-                    self.address += ":%d" % self.port
-                else:
-                    self.socket.bind(self.address)
+                if not self._bound:
+                    self.bind()
             elif self.direction == 'recv':
                 if self.port is None:
-                    # TODO: Handle no port
-                    raise NotImplementedError('Port None for receive.')
-                else:
-                    self.socket.connect(self.address)
+                    self.bind()
+                if self._bound:
+                    self.socket.unbind(self.address)
+                self.socket.connect(self.address)
             else:
                 raise ValueError("Direction must be 'send' or 'recv'")
             self._openned = True
