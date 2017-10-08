@@ -13,8 +13,8 @@ class TestAsciiFileInputParam(parent.TestFileInputParam):
     def __init__(self, *args, **kwargs):
         super(TestAsciiFileInputParam, self).__init__(*args, **kwargs)
         self.driver = 'AsciiFileInputDriver'
-        self.attr_list += ['file_kwargs', 'file']
         self.inst_kwargs['newline'] = "\n"
+        self.icomm_name = 'AsciiFileComm'
 
 
 class TestAsciiFileInputDriverNoStart(TestAsciiFileInputParam,
@@ -39,21 +39,17 @@ class TestAsciiFileInputDriver(TestAsciiFileInputParam,
 
     def assert_before_stop(self):
         r"""Assertions to make before stopping the driver instance."""
-        super(parent.TestFileInputDriver, self).assert_before_stop()
         T = self.instance.start_timeout()
-        while self.instance.n_ipc_msg == 0 and not T.is_out:
+        while self.instance.n_msg == 0 and not T.is_out:
             self.instance.sleep()  # pragma: debug
         self.instance.stop_timeout()
         # Check file lines
         for iline, ans in enumerate(self.file_lines):
             if not ans.startswith(self.comment):
-                data = self.instance.recv_wait()
+                flag, data = self.recv_comm.recv(timeout=False)
+                assert(flag)
                 nt.assert_equal(data, ans)
         # End of file
-        data = self.instance.recv_wait()
+        flag, data = self.recv_comm.recv(timeout=False)
+        assert(flag)
         nt.assert_equal(data, self.instance.eof_msg)
-        
-    def assert_after_terminate(self):
-        r"""Assertions to make after stopping the driver instance."""
-        super(TestAsciiFileInputDriver, self).assert_after_terminate()
-        assert(not self.instance.file.is_open)

@@ -14,7 +14,7 @@ class FileInputDriver(ConnectionDriver):
     def __init__(self, name, args, **kwargs):
         icomm_kws = kwargs.get('icomm_kws', {})
         # ocomm_kws = kwargs.get('ocomm_kws', {})
-        icomm_kws['comm'] = 'FileComm'
+        icomm_kws.setdefault('comm', 'FileComm')
         icomm_kws['address'] = args
         kwargs['icomm_kws'] = icomm_kws
         super(FileInputDriver, self).__init__(name, **kwargs)
