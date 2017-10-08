@@ -68,7 +68,8 @@ class FileComm(CommBase.CommBase):
     def remove_file(self):
         r"""Remove the file."""
         assert(self.is_closed)
-        os.remove(self.address)
+        if os.path.isfile(self.address):
+            os.remove(self.address)
 
     @property
     def is_open(self):
