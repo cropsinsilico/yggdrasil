@@ -22,7 +22,6 @@ class TestFileInputParam(parent.TestConnectionParam):
     @property
     def send_comm_kwargs(self):
         r"""dict: Keyword arguments for send comm."""
-        # Dont open file
         out = super(TestFileInputParam, self).send_comm_kwargs
         out['append'] = True
         return out

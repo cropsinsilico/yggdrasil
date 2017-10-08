@@ -1,4 +1,5 @@
 import os
+from cis_interface.interface.PsiInterface import PSI_MSG_EOF
 from cis_interface.drivers.ConnectionDriver import ConnectionDriver
 
 
@@ -19,6 +20,11 @@ class FileInputDriver(ConnectionDriver):
         kwargs['icomm_kws'] = icomm_kws
         super(FileInputDriver, self).__init__(name, **kwargs)
         self.debug('(%s)', args)
+
+    @property
+    def eof_msg(self):
+        r"""str: Message indicating end of file."""
+        return PSI_MSG_EOF
 
     def recv_message(self):
         r"""Read a message from the file.

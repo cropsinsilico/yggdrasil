@@ -1,9 +1,9 @@
 import os
 import nose.tools as nt
-import cis_interface.drivers.tests.test_IODriver as parent
+import cis_interface.drivers.tests.test_ConnectionDriver as parent
 
 
-class TestFileOutputParam(parent.TestIOParam):
+class TestFileOutputParam(parent.TestConnectionParam):
     r"""Test parameters for FileOutputDriver.
 
     Attributes (in addition to parent class's):
@@ -16,11 +16,11 @@ class TestFileOutputParam(parent.TestIOParam):
         self.driver = 'FileOutputDriver'
         self.filepath = os.path.abspath('%s_input.txt' % self.name)
         self.args = self.filepath
-        self.attr_list += ['args', 'fd', 'lock']
+        self.attr_list += []
         
 
 class TestFileOutputDriverNoStart(TestFileOutputParam,
-                                  parent.TestIODriverNoStart):
+                                  parent.TestConnectionDriverNoStart):
     r"""Test runner for FileOutputDriver without start.
 
     Attributes (in addition to parent class's):
@@ -30,7 +30,7 @@ class TestFileOutputDriverNoStart(TestFileOutputParam,
     pass
 
 
-class TestFileOutputDriver(TestFileOutputParam, parent.TestIODriver):
+class TestFileOutputDriver(TestFileOutputParam, parent.TestConnectionDriver):
     r"""Test runner for FileOutputDriver.
 
     Attributes (in addition to parent class's):
@@ -41,14 +41,13 @@ class TestFileOutputDriver(TestFileOutputParam, parent.TestIODriver):
     def setup(self):
         r"""Create a driver instance and start the driver."""
         super(TestFileOutputDriver, self).setup()
-        self.instance.ipc_send(self.file_contents)
-        self.instance.ipc_send(self.instance.eof_msg)
+        self.send_comm.send(self.file_contents)
+        self.send_comm.send(self.instance.eof_msg)
 
     def teardown(self):
         r"""Remove the instance, stoppping it."""
         super(TestFileOutputDriver, self).teardown()
-        if os.path.isfile(self.filepath):
-            os.remove(self.filepath)
+        self.recv_comm.remove_file()
 
     def assert_after_stop(self):
         r"""Assertions to make after stopping the driver instance."""
@@ -61,7 +60,7 @@ class TestFileOutputDriver(TestFileOutputParam, parent.TestIODriver):
     def assert_after_terminate(self):
         r"""Assertions to make after terminating the driver instance."""
         super(TestFileOutputDriver, self).assert_after_terminate()
-        assert(self.instance.fd is None)
+        assert(self.instance.is_comm_closed)
 
     # These are disabled to prevent writting extraneous data
     def test_send_recv(self):
@@ -73,5 +72,5 @@ class TestFileOutputDriver(TestFileOutputParam, parent.TestIODriver):
         pass
 
     def run_before_terminate(self):
-        r"""Commands to run while the instance is running, before terminate."""
+        r"""Comands to run while the instance is running, before terminate."""
         pass
