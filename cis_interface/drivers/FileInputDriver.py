@@ -1,4 +1,3 @@
-import os
 from cis_interface.interface.PsiInterface import PSI_MSG_EOF
 from cis_interface.drivers.ConnectionDriver import ConnectionDriver
 
