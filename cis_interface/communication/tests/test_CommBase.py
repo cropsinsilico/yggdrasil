@@ -18,7 +18,6 @@ class TestCommBase(CisTest, IOInfo):
         self.comm = 'CommBase'
         self.attr_list += ['name', 'address', 'direction',
                            'meth_deserialize', 'meth_serialize']
-        self.send_inst_kwargs = {}
 
     @property
     def name(self):
@@ -34,6 +33,11 @@ class TestCommBase(CisTest, IOInfo):
     def mod(self):
         r"""str: Absolute module import."""
         return 'cis_interface.communication.%s' % self.cls
+
+    @property
+    def send_inst_kwargs(self):
+        r"""dict: Keyword arguments for send instance."""
+        return {'comm': self.comm}
 
     @property
     def inst_args(self):
@@ -52,7 +56,7 @@ class TestCommBase(CisTest, IOInfo):
 
     def setup(self, *args, **kwargs):
         r"""Initialize comm object pair."""
-        self.send_instance = new_comm(self.name, **self.send_isnt_kwargs)
+        self.send_instance = new_comm(self.name, **self.send_inst_kwargs)
         super(TestCommBase, self).setup(*args, **kwargs)
         # CommBase is dummy class that never opens
         if self.comm != 'CommBase':
