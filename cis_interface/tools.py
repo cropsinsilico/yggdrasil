@@ -150,8 +150,9 @@ class TimeOut(object):
     r"""Class for checking if a period of time has been elapsed.
 
     Args:
-        max_time (float): Maximum period of time that should elapsed before
-            'is_out' returns True.
+        max_time (float, bbol): Maximum period of time that should elapse before
+            'is_out' returns True. If False, 'is_out' will never return True.
+            Providing 0 indicates that 'is_out' should immediately return True.
 
     Attributes:
         max_time (float): Maximum period of time that should elapsed before
@@ -172,7 +173,7 @@ class TimeOut(object):
     @property
     def is_out(self):
         r"""bool: True if there is not any time remaining. False otherwise."""
-        if not self.max_time:
+        if self.max_time is False:
             return False
         return (self.elapsed > self.max_time)
 
@@ -188,6 +189,8 @@ class CisClass(object):
             spent waiting on a process. Defaults to 60.
         sleeptime (float, optional): Time that class should sleep for when
             sleep is called. Defaults to 0.01.
+        **kwargs: Additional keyword arguments are assigned to the extra_kwargs
+            dictionary.
 
     Attributes:
         name (str): Class name.
@@ -197,9 +200,11 @@ class CisClass(object):
         timeout (float): Maximum time that should be spent waiting on a process.
         workingDir (str): Working directory.
         errors (list): List of errors.
+        extra_kwargs (dict): Keyword arguments that were not parsed.
 
     """
-    def __init__(self, name, workingDir=None, timeout=60.0, sleeptime=0.01):
+    def __init__(self, name, workingDir=None, timeout=60.0, sleeptime=0.01,
+                 **kwargs):
         self.name = name
         self.sleeptime = sleeptime
         self.longsleep = self.sleeptime * 10
@@ -211,6 +216,7 @@ class CisClass(object):
         # Assign things
         self.workingDir = workingDir
         self.errors = []
+        self.extra_kwargs = kwargs
 
     def printStatus(self):
         r"""Print the class status."""

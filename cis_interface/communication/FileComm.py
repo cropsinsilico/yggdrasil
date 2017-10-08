@@ -1,0 +1,113 @@
+# from logging import debug, error, exception
+import os
+from cis_interface import backwards
+from cis_interface.communication import CommBase
+
+
+_N_FILES = 0
+
+
+class FileComm(CommBase.CommBase):
+    r"""Class for handling I/O from/to a file on disk.
+
+    Args:
+        name (str): The environment variable where communication address is
+            stored.
+        read_meth (str, optional): Method that should be used to read data
+            from the file. Defaults to 'read'. Ignored if direction is 'send'.
+        **kwargs: Additional keywords arguments are passed to parent class.
+
+    Attributes:
+        fd (file): File that should be read/written.
+        read_meth (str): Method that should be used to read data from the file.
+
+    Raises:
+        ValueError: If the read_meth is not one of the supported values.
+
+    """
+    def __init__(self, name, read_meth='read', **kwargs):
+        self.fd = None
+        super(FileComm, self).__init__(name, **kwargs)
+        if read_meth not in ['read', 'readline']:
+            raise ValueError("read_meth '%s' not supported." % read_meth)
+        self.read_meth = read_meth
+
+    @property
+    @staticmethod
+    def comm_count(cls):
+        r"""int: Number of communication connections."""
+        return _N_FILES
+
+    @classmethod
+    def new_comm(cls, *args, **kwargs):
+        r"""Initialize communication with new queue."""
+        kwargs.setdefault('address', 'file.txt')
+        return cls(*args, **kwargs)
+
+    def open(self):
+        r"""Open the file."""
+        global _N_FILES
+        if self.direction == 'recv':
+            self.fd = open(self.address, 'rb')
+        else:
+            self.fd = open(self.address, 'wb')
+        _N_FILES += 1
+
+    def close(self):
+        r"""Close the file."""
+        if self.is_open:
+            self.fd.close()
+        self.fd = None
+
+    def remove_file(self):
+        r"""Remove the file."""
+        assert(self.is_closed)
+        os.remove(self.address)
+
+    @property
+    def is_open(self):
+        r"""bool: True if the connection is open."""
+        return (self.fd is not None)
+
+    @property
+    def n_msg(self):
+        r"""int: The number of messages in the file."""
+        # TODO: How to count messages
+        if self.direction == 'send':
+            out = 0
+        else:
+            curpos = self.fd.tell()
+            out = 0
+            flag, msg = self._recv()
+            while len(msg) != 0:
+                out += 1
+                flag, msg = self._recv()
+            self.fd.seek(curpos)
+        return out
+
+    def _send(self, msg):
+        r"""Write message to a file.
+
+        Args:
+            msg (bytes, str): Data to write to the file.
+
+        Returns:
+            bool: Success or failure of writing to the file.
+
+        """
+        self.fd.write(msg)
+        self.fd.flush()
+        return True
+
+    def _recv(self):
+        r"""Reads message from a file.
+
+        Returns:
+            bool: Success or failure of reading from the file.
+
+        """
+        if self.read_meth == 'read':
+            out = self.fd.read()
+        elif self.read_meth == 'readline':
+            out = self.fd.readline()
+        return (True, out)

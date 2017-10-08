@@ -15,9 +15,11 @@ class CommDriver(Driver):
             connect to.
         comm (str, optional): The name of a communication class from the
             cis_interface.communication subpackage. Defaults to 'IPCComm'.
-        \*\*kwargs: Additional keyword arguments are passed to the comm class.
+        **kwargs: Additional keyword arguments are passed to the parent and comm
+            classes.
 
     Attributes:
+        comm_name (str): Name of communication class.
         comm_cls (class): Communication class.
         comm (CommBase): Instance of communication class.
         state (str): Description of the last operation performed by the driver.
@@ -26,12 +28,13 @@ class CommDriver(Driver):
 
     """
     def __init__(self, name, comm='IPCComm', **kwargs):
-        super(CommDriver, self).__init__(name)
+        super(CommDriver, self).__init__(name, **kwargs)
         self.debug()
         self.state = 'Started'
         self.numSent = 0
         self.numReceived = 0
         mod = importlib.import_module('cis_interface.communication.%s' % comm)
+        self.comm_name = comm
         self.comm_cls = getattr(mod, comm)
         self.comm = self.comm_cls.new_comm(name, dont_open=True, **kwargs)
         self.env[name] = self.comm.address
@@ -42,16 +45,16 @@ class CommDriver(Driver):
         r"""bool: Returns True if the connection is open and the parent class
         is valid."""
         with self.lock:
-            return (super(CommDriver, self).is_valid and self.is_open)
+            return (super(CommDriver, self).is_valid and self.is_comm_open)
 
     @property
-    def is_open(self):
+    def is_comm_open(self):
         r"""bool: Returns True if the connection is open."""
         with self.lock:
             return self.comm.is_open
 
     @property
-    def is_closed(self):
+    def is_comm_closed(self):
         r"""bool: Returns True if the connection is closed."""
         with self.lock:
             return self.comm.is_closed
@@ -62,14 +65,14 @@ class CommDriver(Driver):
         with self.lock:
             return self.comm.n_msg
 
-    def open(self):
+    def open_comm(self):
         r"""Open the queue."""
         self.debug(':open()')
         with self.lock:
             self.comm.open()
         self.debug(':open(): done')
         
-    def close(self):
+    def close_comm(self):
         r"""Close the queue."""
         self.debug(':close()')
         with self.lock:
@@ -78,13 +81,14 @@ class CommDriver(Driver):
 
     def start(self):
         r"""Open connection before running."""
-        self.open()
-        Tout = self.start_timeout()
-        while (not self.is_open) and (not Tout.is_out):
-            self.sleep()
-        self.stop_timeout()
-        if not self.is_open:
-            raise Exception("Connection never finished opening.")
+        if self.comm_name != 'CommBase':
+            self.open_comm()
+            Tout = self.start_timeout()
+            while (not self.is_comm_open) and (not Tout.is_out):
+                self.sleep()
+            self.stop_timeout()
+            if not self.is_comm_open:
+                raise Exception("Connection never finished opening.")
         super(CommDriver, self).start()
         
     def graceful_stop(self, timeout=None, **kwargs):
@@ -118,14 +122,14 @@ class CommDriver(Driver):
             self.debug(':terminated() Driver already terminated.')
             return
         self.debug(':terminate()')
-        self.close()
+        self.close_comm()
         super(CommDriver, self).terminate()
         self.debug(':terminate(): done')
 
     def cleanup(self):
         r"""Ensure that the queues are removed."""
         self.debug(':cleanup()')
-        self.close()
+        self.close_comm()
         super(CommDriver, self).cleanup()
 
     def printStatus(self, beg_msg='', end_msg=''):
@@ -145,11 +149,13 @@ class CommDriver(Driver):
         msg += end_msg
         print(msg)
 
-    def send(self, data):
+    def send(self, data, *args, **kwargs):
         r"""Send a message smaller than maxMsgSize.
 
         Args:
             str: The message to be sent.
+            *args: All arguments are passed to comm send method.
+            **kwargs: All keywords arguments are passed to comm send method.
 
         Returns:
             bool: Success or failure of send.
@@ -157,7 +163,7 @@ class CommDriver(Driver):
         """
         with self.lock:
             self.state = 'deliver'
-            ret = self.comm.send(data)
+            ret = self.comm.send(data, *args, **kwargs)
             if ret:
                 self.state = 'delivered'
                 self.numSent = self.numSent + 1
@@ -165,8 +171,12 @@ class CommDriver(Driver):
                 self.state = 'delivery failed'
         return ret
 
-    def recv(self):
+    def recv(self, *args, **kwargs):
         r"""Receive a message smaller than maxMsgSize.
+
+        Args:
+            *args: All arguments are passed to comm recv method.
+            **kwargs: All keywords arguments are passed to comm recv method.
 
         Returns:
             tuple (bool, str): The success or failure of receiving and the
@@ -175,7 +185,7 @@ class CommDriver(Driver):
         """
         with self.lock:
             self.state = 'receiving'
-            ret = self.comm.recv()
+            ret = self.comm.recv(*args, **kwargs)
             if ret[0]:
                 self.state = 'received'
                 self.numReceived += 1
@@ -183,26 +193,34 @@ class CommDriver(Driver):
                 self.state = 'received failed'
         return ret
 
-    def send_nolimit(self, data):
+    def send_nolimit(self, data, *args, **kwargs):
         r"""Send a message larger than maxMsgSize in multiple parts.
 
         Args:
             str: The message to be sent.
+            *args: All arguments are passed to comm send_nolimit method.
+            **kwargs: All keywords arguments are passed to comm send_nolimit
+                method.
 
         Returns:
             bool: Success or failure of send.
 
         """
-        ret = self.comm.send_nolimit(data)
+        ret = self.comm.send_nolimit(data, *args, **kwargs)
         return ret
 
-    def recv_nolimit(self):
+    def recv_nolimit(self, *args, **kwargs):
         r"""Receive a message larger than maxMsgSize in multiple parts.
+
+        Args:
+            *args: All arguments are passed to comm recv_nolimit method.
+            **kwargs: All keywords arguments are passed to comm recv_nolimit
+                method.
 
         Returns:
             tuple (bool, str): The success or failure of receiving and the
                 received message.
 
         """
-        ret = self.comm.recv_nolimit()
+        ret = self.comm.recv_nolimit(*args, **kwargs)
         return ret

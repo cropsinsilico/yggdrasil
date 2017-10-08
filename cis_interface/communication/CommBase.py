@@ -16,7 +16,7 @@ class CommBase(CisClass):
     r"""Class for handling I/O.
 
     Args:
-        name (str): The environment variable where communication addres is
+        name (str): The environment variable where communication address is
             stored.
         address (str, optional): Communication info. Default to None and
             address is taken from the environment variable.
@@ -34,6 +34,7 @@ class CommBase(CisClass):
             that all messages are raw bytes.
         dont_open (bool, optional): If True, the connection will not be opened.
             Defaults to False.
+        **kwargs: Additional keywords arguments are passed to parent class.
 
     Attributes:
         name (str): The environment variable where communication address is
@@ -47,7 +48,6 @@ class CommBase(CisClass):
         meth_serialize (obj): Callable object that takes any object as
             input and returns a serialized set of bytes. This will be used
             to encode sent messages.
-        **kwargs: Additional keywords arguments are passed to parent class.
 
     Raises:
         Exception: If there is not an environment variable with the specified
@@ -179,79 +179,125 @@ class CommBase(CisClass):
         return self.meth_deserialize(msg)
 
     # SEND METHODS
-    def _send(self, msg):
+    def _send(self, msg, *args, **kwargs):
         r"""Raw send. Should be overridden by inheriting class."""
         return False
 
-    def _send_nolimit(self, msg):
+    def _send_nolimit(self, msg, *args, **kwargs):
         r"""Raw send_nolimit. Should be overridden by inheriting class."""
-        return self._send(msg)
+        return self._send(msg, *args, **kwargs)
 
-    def send(self, msg):
+    def send(self, msg, *args, **kwargs):
         r"""Send a message shorter than PSI_MSG_MAX.
 
         Args:
             msg (obj): Message to be sent that can be parsed by meth_serialize.
+            *args: All arguments are passed to comm _send method.
+            **kwargs: All keywords arguments are passed to comm _send method.
 
         Returns:
             bool: Success or failure of send.
 
         """
         if self.is_closed:
+            self.debug('.send(): comm closed.')
             return False
         msg_s = self.serialize(msg)
-        return self._send(msg_s)
+        try:
+            self.debug('.send(): %d bytes', len(msg))
+            ret = self._send(msg_s, *args, **kwargs)
+            self.debug('.send(): %d bytes sent', len(msg))
+        except:
+            self.exception('.send(): Failed to send.')
+            return False
+        return ret
 
-    def send_nolimit(self, msg):
+    def send_nolimit(self, msg, *args, **kwargs):
         r"""Send a message larger than PSI_MSG_MAX.
 
         Args:
             msg (obj): Message to be sent that can be parsed by meth_serialize.
+            *args: All arguments are passed to comm _send_nolimit method.
+            **kwargs: All keywords arguments are passed to comm _send_nolimit
+                method.
 
         Returns:
             bool: Success or failure of send.
 
         """
         if self.is_closed:
+            self.debug('.send_nolimit(): comm closed.')
             return False
         msg_s = self.serialize(msg)
-        return self._send_nolimit(msg_s)
+        try:
+            self.debug('.send_nolimit(): %d bytes', len(msg))
+            ret = self._send_nolimit(msg_s, *args, **kwargs)
+            self.debug('.send_nolimit(): %d bytes sent', len(msg))
+        except:
+            self.exception('.send_nolimit(): Failed to send.')
+            return False
+        return ret
 
     # RECV METHODS
-    def _recv(self):
+    def _recv(self, *args, **kwargs):
         r"""Raw recv. Should be overridden by inheriting class."""
         return (False, None)
 
-    def _recv_nolimit(self):
+    def _recv_nolimit(self, *args, **kwargs):
         r"""Raw send_nolimit. Should be overridden by inheriting class."""
-        return self._recv()
+        return self._recv(*args, **kwargs)
         
-    def recv(self):
+    def recv(self, *args, **kwargs):
         r"""Receive a message shorter than PSI_MSG_MAX.
 
+        Args:
+            *args: All arguments are passed to comm _recv method.
+            **kwargs: All keywords arguments are passed to comm _recv method.
+
         Returns:
             tuple (bool, obj): Success or failure of receive and received
                 message.
 
         """
         if self.is_closed:
+            self.debug('.recv(): comm closed.')
             return (False, None)
-        flag, s_msg = self._recv()
-        if not flag:
+        try:
+            flag, s_msg = self._recv(*args, **kwargs)
+            self.debug('.recv(): %d bytes received', len(s_msg))
+        except:
+            self.exception('.recv(): Failed to recv.')
             return (False, None)
-        return (True, self.deserialize(s_msg))
+        if flag:
+            msg = self.deserialize(s_msg)
+        else:
+            msg = None
+        return (flag, msg)
 
-    def recv_nolimit(self):
+    def recv_nolimit(self, *args, **kwargs):
         r"""Receive a message larger than PSI_MSG_MAX.
 
+        Args:
+            *args: All arguments are passed to comm _recv_nolimit method.
+            **kwargs: All keywords arguments are passed to comm _recv_nolimit
+                method.
+
         Returns:
             tuple (bool, obj): Success or failure of receive and received
                 message.
 
         """
         if self.is_closed:
+            self.debug('.recv_nolimit(): comm closed.')
             return (False, None)
-        flag, s_msg = self._recv_nolimit()
-        if not flag:
+        try:
+            flag, s_msg = self._recv_nolimit(*args, **kwargs)
+            self.debug('.recv_nolimit(): %d bytes received', len(s_msg))
+        except:
+            self.exception('.recv_nolimit(): Failed to recv.')
             return (False, None)
-        return (True, self.deserialize(s_msg))
+        if flag:
+            msg = self.deserialize(s_msg)
+        else:
+            msg = None
+        return (flag, msg)
