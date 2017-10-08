@@ -6,7 +6,7 @@ class TestFileComm(parent.TestCommBase):
     def __init__(self, *args, **kwargs):
         super(TestFileComm, self).__init__(*args, **kwargs)
         self.comm = 'FileComm'
-        self.attr_list += ['fd', 'read_meth']
+        self.attr_list += ['fd', 'read_meth', 'append']
 
     def teardown(self):
         r"""Remove the file."""

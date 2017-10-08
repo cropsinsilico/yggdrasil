@@ -1,6 +1,21 @@
 import importlib
 
 
+def get_comm_class(comm):
+    r"""Return a communication class given it's name.
+
+    Args:
+        comm (str): Name of communicator class.
+
+    Returns:
+        class: Communicator class.
+
+    """
+    mod = importlib.import_module('cis_interface.communication.%s' % comm)
+    comm_cls = getattr(mod, comm)
+    return comm_cls
+
+
 def new_comm(name, comm='IPCComm', **kwargs):
     r"""Return a new communicator.
 
@@ -13,8 +28,7 @@ def new_comm(name, comm='IPCComm', **kwargs):
         Comm: Communicator of given class.
 
     """
-    mod = importlib.import_module('cis_interface.communication.%s' % comm)
-    comm_cls = getattr(mod, comm)
+    comm_cls = get_comm_class(comm)
     return comm_cls.new_comm(name, **kwargs)
 
 
