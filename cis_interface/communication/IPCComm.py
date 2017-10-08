@@ -42,7 +42,12 @@ class IPCComm(CommBase.CommBase):
             IPCComm: Instance with new queue.
 
         """
-        kwargs.setdefault('address', 'generate')
+        global _N_QUEUES
+        if 'address' not in kwargs:
+            q = tools.get_queue()
+            kwargs['address'] = str(q.key)
+            _N_QUEUES += 1
+        # kwargs.setdefault('address', 'generate')
         out = cls(name, **kwargs)
         return out
 
@@ -93,9 +98,13 @@ class IPCComm(CommBase.CommBase):
         # Sleep until there is a message
         Tout = self.start_timeout(timeout)
         while self.n_msg == 0 and self.is_open and (not Tout.is_out):
-            self.debug("recv(): no data, sleep")
+            # self.debug("recv(): no data, sleep")
             self.sleep()
         self.stop_timeout()
+        # Return False if the queue is closed
+        if self.is_closed:
+            self.debug("recv(): queue closed, returning (False, '')")
+            return (False, '')
         # Return True, '' if there are no messages
         if self.n_msg == 0:
             self.debug("recv(): no data, returning (True, '')")
@@ -149,8 +158,11 @@ class IPCComm(CommBase.CommBase):
             bool: Success or failure of sending the message.
 
         """
-        self.q.send(payload)
-        return True
+        if not self.is_open:
+            return False
+        else:
+            self.q.send(payload)
+            return True
 
     def _send_nolimit(self, payload):
         r"""Send a message larger than PSI_MSG_MAX in multiple parts.
