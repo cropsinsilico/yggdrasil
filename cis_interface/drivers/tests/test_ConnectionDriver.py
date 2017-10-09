@@ -1,7 +1,7 @@
 import nose.tools as nt
 from cis_interface.drivers.tests.test_IODriver import IOInfo
 from cis_interface.drivers.tests import test_Driver as parent
-from cis_interface.communication import get_comm_class, new_comm
+from cis_interface.communication import get_comm_class, new_comm, CommBase
 
             
 class TestConnectionParam(parent.TestParam, IOInfo):
@@ -113,8 +113,9 @@ class TestConnectionDriver(TestConnectionParam, parent.TestDriver):
         r"""Initialize comm object pair."""
         super(TestConnectionDriver, self).setup(*args, **kwargs)
         # CommBase is dummy class that never opens
-        if self.comm_name != 'CommBase':
+        if not isinstance(self.send_comm, CommBase.CommBase):
             assert(self.send_comm.is_open)
+        if not isinstance(self.recv_comm, CommBase.CommBase):
             assert(self.recv_comm.is_open)
 
     def test_early_close(self):

@@ -14,9 +14,9 @@ class TestAsciiTableInputParam(parent.TestAsciiFileInputParam):
     def __init__(self, *args, **kwargs):
         super(TestAsciiTableInputParam, self).__init__(*args, **kwargs)
         self.driver = 'AsciiTableInputDriver'
-        self.attr_list += ['file', 'as_array']
         self.inst_kwargs['column_names'] = None
         self.inst_kwargs['use_astropy'] = False
+        self.icomm_name = 'AsciiTableComm'
 
         
 class TestAsciiTableInputDriverNoStart(TestAsciiTableInputParam,
@@ -43,20 +43,23 @@ class TestAsciiTableInputDriver(TestAsciiTableInputParam,
         r"""Assertions to make before stopping the driver instance."""
         super(super_parent.TestFileInputDriver, self).assert_before_stop()
         T = self.instance.start_timeout()
-        while self.instance.n_ipc_msg == 0 and (not T.is_out):
+        while self.recv_comm.n_msg == 0 and (not T.is_out):
             self.instance.sleep()  # pragma: debug
         self.instance.stop_timeout()
         # Format string
-        data = self.instance.recv_wait()
+        flag, data = self.recv_comm.recv_nolimit(timeout=False)
+        assert(flag)
         nt.assert_equal(data, self.fmt_str)
         # File lines
         for iline, ans in enumerate(self.file_lines):
             if not ans.startswith(self.comment):
-                data = self.instance.recv_wait_nolimit()
+                flag, data = self.recv_comm.recv_nolimit(timeout=False)
+                assert(flag)
                 nt.assert_equal(data, ans)
         # End of file
-        data = self.instance.recv_wait_nolimit()
-        nt.assert_equal(data, self.instance.eof_msg)
+        flag, data = self.recv_comm.recv_nolimit(timeout=False)
+        assert(not flag)
+        nt.assert_equal(data, self.recv_comm.eof_msg)
 
         
 class TestAsciiTableInputDriver_Array(TestAsciiTableInputParam,
@@ -78,11 +81,20 @@ class TestAsciiTableInputDriver_Array(TestAsciiTableInputParam,
         r"""Assertions to make before stopping the driver instance."""
         super(super_parent.TestFileInputDriver, self).assert_before_stop()
         T = self.instance.start_timeout()
-        while self.instance.n_ipc_msg == 0 and (not T.is_out):
+        while self.recv_comm.n_msg == 0 and (not T.is_out):
             self.instance.sleep()  # pragma: debug
         self.instance.stop_timeout()
-        data = self.instance.ipc_recv()
+        # Format string
+        flag, data = self.recv_comm.recv_nolimit(self.timeout)
+        assert(flag)
         nt.assert_equal(data, self.fmt_str)
-
-        data = self.instance.recv_wait_nolimit()
+        # Array
+        flag, data = self.recv_comm.recv_nolimit(self.timeout)
+        assert(flag)
         nt.assert_equal(data, self.file_bytes)
+        # End of file
+        flag, data = self.recv_comm.recv_nolimit(self.timeout)
+        assert(not flag)
+        nt.assert_equal(data, self.recv_comm.eof_msg)
+        assert(self.instance.icomm.is_closed)
+        assert(self.recv_comm.is_closed)

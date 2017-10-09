@@ -17,6 +17,11 @@ class TestFileOutputParam(parent.TestConnectionParam):
         self.filepath = os.path.abspath('%s_input.txt' % self.name)
         self.args = self.filepath
         self.ocomm_name = 'FileComm'
+
+    @property
+    def recv_comm_kwargs(self):
+        r"""Keyword arguments for receive comm."""
+        return {'comm': 'CommBase'}
         
 
 class TestFileOutputDriverNoStart(TestFileOutputParam,
@@ -42,12 +47,17 @@ class TestFileOutputDriver(TestFileOutputParam, parent.TestConnectionDriver):
         r"""Create a driver instance and start the driver."""
         super(TestFileOutputDriver, self).setup()
         self.send_comm.send(self.file_contents)
-        self.send_comm.send(self.instance.eof_msg)
+        self.send_comm.send_eof()
 
     def teardown(self):
         r"""Remove the instance, stoppping it."""
         super(TestFileOutputDriver, self).teardown()
-        self.recv_comm.remove_file()
+        self.instance.ocomm.remove_file()
+
+    def assert_before_stop(self):
+        r"""Assertions to make before stopping the driver instance."""
+        # super(TestFileOutputDriver, self).assert_before_stop()
+        # assert(self.instance.ocomm.is_closed)
 
     def assert_after_stop(self):
         r"""Assertions to make after stopping the driver instance."""

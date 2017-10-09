@@ -69,21 +69,12 @@ class AsciiFileComm(FileComm):
         return self.file.is_open
 
     @property
-    def n_msg(self):
-        r"""int: The number of messages in the file."""
-        if self.is_closed:
-            return 0
-        if self.direction == 'send':
-            out = 0
+    def fd(self):
+        r"""Associated file identifier."""
+        if self.file is None:
+            return None
         else:
-            curpos = self.file.fd.tell()
-            out = 0
-            flag, msg = self._recv()
-            while len(msg) != 0:
-                out += 1
-                flag, msg = self._recv()
-            self.file.fd.seek(curpos)
-        return out
+            return self.file.fd
 
     def _send(self, msg):
         r"""Write message to a file.
@@ -108,5 +99,5 @@ class AsciiFileComm(FileComm):
         """
         eof, data = self.file.readline(**kwargs)
         if eof:
-            data = ''
+            data = self.eof_msg
         return (True, data)

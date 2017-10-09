@@ -40,7 +40,7 @@ class TestAsciiFileInputDriver(TestAsciiFileInputParam,
     def assert_before_stop(self):
         r"""Assertions to make before stopping the driver instance."""
         T = self.instance.start_timeout()
-        while self.instance.n_msg == 0 and not T.is_out:
+        while self.recv_comm.n_msg == 0 and not T.is_out:
             self.instance.sleep()  # pragma: debug
         self.instance.stop_timeout()
         # Check file lines
@@ -51,5 +51,6 @@ class TestAsciiFileInputDriver(TestAsciiFileInputParam,
                 nt.assert_equal(data, ans)
         # End of file
         flag, data = self.recv_comm.recv(timeout=False)
-        assert(flag)
-        nt.assert_equal(data, self.instance.eof_msg)
+        assert(not flag)
+        nt.assert_equal(data, self.recv_comm.eof_msg)
+        assert(self.recv_comm.is_closed)

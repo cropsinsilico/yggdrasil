@@ -64,7 +64,8 @@ class ConnectionDriver(Driver):
     @property
     def n_msg(self):
         r"""int: Number of messages waiting in input communicator."""
-        return self.icomm.n_msg
+        with self.lock:
+            return self.icomm.n_msg
 
     def open_comm(self):
         r"""Open the communicators."""
@@ -155,18 +156,33 @@ class ConnectionDriver(Driver):
         r"""Actions to perform after sending messages."""
         pass
 
-    def recv_message(self):
+    def recv_message(self, nolimit=False):
         r"""Get a new message to send.
+
+        Args:
+            nolimit (bool, optional): If True, recv_nolimit should be used.
+                Otherwise, recv is used. Defaults to False.
 
         Returns:
             str, bool: False if no more messages, message otherwise.
 
         """
-        flag, msg = self.icomm.recv(timeout=False)
+        with self.lock:
+            if nolimit:
+                flag, msg = self.icomm.recv_nolimit(timeout=0)
+            else:
+                flag, msg = self.icomm.recv(timeout=0)
+        if msg == self.icomm.eof_msg:
+            self.on_eof()
         if flag:
             return msg
         else:
             return flag
+
+    def on_eof(self):
+        r"""Actions to take when EOF received."""
+        self.debug(': EOF received')
+        self.send_message(self.ocomm.eof_msg)
 
     def on_message(self, msg):
         r"""Process a message.
@@ -180,17 +196,23 @@ class ConnectionDriver(Driver):
         """
         return msg
 
-    def send_message(self, msg):
+    def send_message(self, msg, nolimit=False):
         r"""Send a single message.
 
         Args:
             msg (str): Message to be sent.
+            nolimit (bool, optional): If True, send_nolimit should be used.
+                Otherwise, send is used. Defaults to False.
 
         Returns:
             bool: Success or failure of send.
 
         """
-        return self.ocomm.send(msg)
+        with self.lock:
+            if nolimit:
+                return self.ocomm.send_nolimit(msg)
+            else:
+                return self.ocomm.send(msg)
 
     def run(self):
         r"""Run the driver. Continue looping over messages until there are not

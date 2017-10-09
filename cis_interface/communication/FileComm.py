@@ -28,7 +28,8 @@ class FileComm(CommBase.CommBase):
 
     """
     def __init__(self, name, read_meth='read', append=False, **kwargs):
-        self.fd = None
+        if not hasattr(self, 'fd'):
+            self.fd = None
         if read_meth not in ['read', 'readline']:
             raise ValueError("read_meth '%s' not supported." % read_meth)
         self.read_meth = read_meth
@@ -77,21 +78,39 @@ class FileComm(CommBase.CommBase):
         return (self.fd is not None)
 
     @property
+    def remaining_bytes(self):
+        r"""int: Remaining bytes in the file."""
+        if self.is_closed or self.direction == 'send':
+            return 0
+        curpos = self.fd.tell()
+        self.fd.seek(0, os.SEEK_END)
+        endpos = self.fd.tell()
+        self.fd.seek(curpos)
+        return endpos - curpos
+
+    @property
     def n_msg(self):
         r"""int: The number of messages in the file."""
-        if self.is_closed:
+        if self.is_closed or self.direction == 'send':
             return 0
-        if self.direction == 'send':
-            out = 0
-        else:
-            curpos = self.fd.tell()
-            out = 0
+        curpos = self.fd.tell()
+        out = 0
+        flag, msg = self._recv()
+        while len(msg) != 0 and msg != self.eof_msg:
+            out += 1
             flag, msg = self._recv()
-            while len(msg) != 0:
-                out += 1
-                flag, msg = self._recv()
-            self.fd.seek(curpos)
+        self.fd.seek(curpos)
         return out
+
+    def on_send_eof(self):
+        r"""Close file when EOF to be sent.
+
+        Returns:
+            bool: False so that message not sent.
+
+        """
+        self.close()
+        return False
 
     def _send(self, msg):
         r"""Write message to a file.
@@ -118,4 +137,6 @@ class FileComm(CommBase.CommBase):
             out = self.fd.read()
         elif self.read_meth == 'readline':
             out = self.fd.readline()
+        if len(out) == 0:
+            out = self.eof_msg
         return (True, out)
