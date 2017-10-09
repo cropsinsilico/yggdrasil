@@ -17,7 +17,7 @@ class AsciiFileComm(FileComm):
         file (AsciiFile): Instance for read/writing to/from file.
 
     """
-    def __init__(self, name, dont_open=False, **kwargs):
+    def __init__(self, name, dont_open=False, skip_AsciiFile=False, **kwargs):
         file_keys = ['comment', 'newline']
         file_kwargs = {}
         for k in file_keys:
@@ -26,15 +26,32 @@ class AsciiFileComm(FileComm):
         self.file_kwargs = file_kwargs
         self.file = None
         super(AsciiFileComm, self).__init__(name, dont_open=True, **kwargs)
-        if self.direction == 'recv':
-            self.file = AsciiFile(self.address, 'r', **self.file_kwargs)
-        else:
-            if self.append:
-                self.file = AsciiFile(self.address, 'a', **self.file_kwargs)
+        if not skip_AsciiFile:
+            if self.direction == 'recv':
+                self.file = AsciiFile(self.address, 'r', **self.file_kwargs)
             else:
-                self.file = AsciiFile(self.address, 'w', **self.file_kwargs)
-        if not dont_open:
-            self.open()
+                if self.append:
+                    self.file = AsciiFile(self.address, 'a', **self.file_kwargs)
+                else:
+                    self.file = AsciiFile(self.address, 'w', **self.file_kwargs)
+            if not dont_open:
+                self.open()
+        else:
+            self.file = None
+
+    def opp_comm_kwargs(self):
+        r"""Get keyword arguments to initialize communication with opposite
+        comm object.
+
+        Returns:
+            dict: Keyword arguments for opposite comm object.
+
+        """
+        kwargs = super(AsciiFileComm, self).opp_comm_kwargs()
+        kwargs['comment'] = self.file.comment
+        kwargs['newline'] = self.file.newline
+        kwargs['open_as_binary'] = self.file.open_as_binary
+        return kwargs
 
     def open(self):
         r"""Open the file."""
