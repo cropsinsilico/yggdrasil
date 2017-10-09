@@ -1,6 +1,6 @@
 import os
 from cis_interface import backwards
-from cis_interface.tools import CisClass, PSI_MSG_MAX  # , PSI_MSG_EOF
+from cis_interface.tools import CisClass, PSI_MSG_MAX, PSI_MSG_EOF
 
 
 def default_serialize(x):
@@ -124,7 +124,12 @@ class CommBase(CisClass):
     def n_msg(self):
         r"""int: The number of messages in the connection."""
         return 0
-    
+
+    @property
+    def eof_msg(self):
+        r"""str: Message indicating EOF."""
+        return PSI_MSG_EOF
+
     def chunk_message(self, msg):
         r"""Yield chunks of message of size PSI_MSG_MAX.
 
@@ -186,6 +191,64 @@ class CommBase(CisClass):
         r"""Raw send_nolimit. Should be overridden by inheriting class."""
         return self._send(msg, *args, **kwargs)
 
+    def on_send_eof(self):
+        r"""Actions to perform when EOF being sent.
+
+        Returns:
+            bool: True if EOF message should be sent, False otherwise.
+
+        """
+        return True
+    
+    def on_send(self, msg, *args, **kwargs):
+        r"""Process message to be sent including handling serializing
+        message and handling EOF.
+
+        Args:
+            msg (obj): Message to be sent
+
+        Returns:
+            tuple (bool, str): Truth of if message should be sent and raw bytes
+                message to send.
+
+        """
+        if self.is_closed:
+            self.debug('.on_send(): comm closed.')
+            return False, ''
+        if msg == self.eof_msg:
+            flag = self.on_send_eof()
+            msg_s = backwards.unicode2bytes(msg)
+        else:
+            flag = True
+            msg_s = self.serialize(msg)
+        return flag, msg
+
+    def send_eof(self, *args, **kwargs):
+        r"""Send the EOF message as a short message.
+        
+        Args:
+            *args: All arguments are passed to comm send.
+            **kwargs: All keywords arguments are passed to comm send.
+
+        Returns:
+            bool: Success or failure of send.
+
+        """
+        return self.send(self.eof_msg, *args, **kwargs)
+        
+    def send_nolimit_eof(self, *args, **kwargs):
+        r"""Send the EOF message as a large message.
+        
+        Args:
+            *args: All arguments are passed to comm send_nolimit.
+            **kwargs: All keywords arguments are passed to comm send_nolimit.
+
+        Returns:
+            bool: Success or failure of send.
+
+        """
+        return self.send_nolimit(self.eof_msg, *args, **kwargs)
+        
     def send(self, msg, *args, **kwargs):
         r"""Send a message shorter than PSI_MSG_MAX.
 
@@ -198,10 +261,9 @@ class CommBase(CisClass):
             bool: Success or failure of send.
 
         """
-        if self.is_closed:
-            self.debug('.send(): comm closed.')
+        flag, msg_s = self.on_send(msg)
+        if not flag:
             return False
-        msg_s = self.serialize(msg)
         try:
             self.debug('.send(): %d bytes', len(msg))
             ret = self._send(msg_s, *args, **kwargs)
@@ -224,10 +286,9 @@ class CommBase(CisClass):
             bool: Success or failure of send.
 
         """
-        if self.is_closed:
-            self.debug('.send_nolimit(): comm closed.')
+        flag, msg_s = self.on_send(msg)
+        if not flag:
             return False
-        msg_s = self.serialize(msg)
         try:
             self.debug('.send_nolimit(): %d bytes', len(msg))
             ret = self._send_nolimit(msg_s, *args, **kwargs)
@@ -245,6 +306,35 @@ class CommBase(CisClass):
     def _recv_nolimit(self, *args, **kwargs):
         r"""Raw send_nolimit. Should be overridden by inheriting class."""
         return self._recv(*args, **kwargs)
+
+    def on_recv_eof(self):
+        r"""Actions to perform when EOF received.
+
+        Returns:
+            bool: Flag that should be returned for EOF.
+
+        """
+        self.close()
+        return False
+    
+    def on_recv(self, s_msg, *args, **kwargs):
+        r"""Process raw received message including handling deserializing
+        message and handling EOF.
+
+        Args:
+            s_msg (bytes, str): Raw bytes message.
+
+        Returns:
+            tuple (bool, str): Success or failure and processed message.
+
+        """
+        if s_msg == self.eof_msg:
+            flag = self.on_recv_eof()
+            msg = s_msg
+        else:
+            flag = True
+            msg = self.deserialize(s_msg)
+        return flag, msg
         
     def recv(self, *args, **kwargs):
         r"""Receive a message shorter than PSI_MSG_MAX.
@@ -268,7 +358,7 @@ class CommBase(CisClass):
             self.exception('.recv(): Failed to recv.')
             return (False, None)
         if flag:
-            msg = self.deserialize(s_msg)
+            flag, msg = self.on_recv(s_msg)
         else:
             msg = None
         return (flag, msg)
@@ -296,7 +386,7 @@ class CommBase(CisClass):
             self.exception('.recv_nolimit(): Failed to recv.')
             return (False, None)
         if flag:
-            msg = self.deserialize(s_msg)
+            flag, msg = self.on_recv(s_msg)
         else:
             msg = None
         return (flag, msg)

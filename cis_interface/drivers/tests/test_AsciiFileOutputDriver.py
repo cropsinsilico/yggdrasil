@@ -42,4 +42,4 @@ class TestAsciiFileOutputDriver(TestAsciiFileOutputParam,
         self.send_comm.send(self.fmt_str_line)
         for line in self.file_lines:
             self.send_comm.send(line)
-        self.send_comm.send(self.instance.eof_msg)
+        self.send_comm.send_eof()

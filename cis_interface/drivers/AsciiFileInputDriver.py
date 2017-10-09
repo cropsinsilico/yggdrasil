@@ -28,8 +28,3 @@ class AsciiFileInputDriver(FileInputDriver):
         kwargs['icomm_kws'] = icomm_kws
         super(AsciiFileInputDriver, self).__init__(name, args, **kwargs)
         self.debug('(%s)', args)
-
-    def on_eof(self):
-        r"""On end-of-file, send end of file message."""
-        self.send_message(self.eof_msg)
-        super(AsciiFileInputDriver, self).on_eof()

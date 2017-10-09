@@ -36,7 +36,7 @@ class TestFileInputParam(parent.TestConnectionParam):
     def teardown(self):
         r"""Remove the instance, stoppping it."""
         super(TestFileInputParam, self).teardown()
-        self.send_comm.remove_file()
+        self.instance.icomm.remove_file()
         # if os.path.isfile(self.filepath):
         #     os.remove(self.filepath)
 
@@ -64,9 +64,14 @@ class TestFileInputDriver(TestFileInputParam, parent.TestConnectionDriver):
         r"""Assertions to make before stopping the driver instance."""
         super(TestFileInputDriver, self).assert_before_stop()
         self.instance.sleep()
+        # File contents
         flag, msg_recv = self.recv_comm.recv(self.timeout)
         assert(flag)
         nt.assert_equal(msg_recv, self.file_contents)
+        # EOF
+        flag, msg_recv = self.recv_comm.recv(self.timeout)
+        assert(not flag)
+        nt.assert_equal(msg_recv, self.recv_comm.eof_msg)
 
     def assert_after_terminate(self):
         r"""Assertions to make after stopping the driver instance."""

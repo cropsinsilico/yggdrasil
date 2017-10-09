@@ -80,6 +80,26 @@ class TestCommBase(CisTest, IOInfo):
             if not hasattr(self.instance, a):  # pragma: debug
                 raise AttributeError("Driver does not have attribute %s" % a)
 
+    def test_eof(self):
+        r"""Test send/recv of EOF message."""
+        if self.comm != 'CommBase':
+            flag = self.send_instance.send(self.send_instance.eof_msg)
+            assert(flag)
+            flag, msg_recv = self.recv_instance.recv()
+            assert(not flag)
+            nt.assert_equal(msg_recv, self.send_instance.eof_msg)
+            assert(self.recv_instance.is_closed)
+
+    def test_eof_nolimit(self):
+        r"""Test send/recv of EOF message through nolimit."""
+        if self.comm != 'CommBase':
+            flag = self.send_instance.send_nolimit(self.send_instance.eof_msg)
+            assert(flag)
+            flag, msg_recv = self.recv_instance.recv_nolimit()
+            assert(not flag)
+            nt.assert_equal(msg_recv, self.send_instance.eof_msg)
+            assert(self.recv_instance.is_closed)
+
     def test_send_recv(self):
         r"""Test send/recv of a small message."""
         nt.assert_equal(self.send_instance.n_msg, 0)
