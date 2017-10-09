@@ -221,7 +221,7 @@ class CommBase(CisClass):
         else:
             flag = True
             msg_s = self.serialize(msg)
-        return flag, msg
+        return flag, msg_s
 
     def send_eof(self, *args, **kwargs):
         r"""Send the EOF message as a short message.

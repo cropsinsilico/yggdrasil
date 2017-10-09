@@ -48,9 +48,7 @@ class FileComm(CommBase.CommBase):
         kwargs.setdefault('address', 'file.txt')
         return cls(*args, **kwargs)
 
-    def open(self):
-        r"""Open the file."""
-        global _N_FILES
+    def _open(self):
         if self.direction == 'recv':
             self.fd = open(self.address, 'rb')
         else:
@@ -58,6 +56,11 @@ class FileComm(CommBase.CommBase):
                 self.fd = open(self.address, 'ab')
             else:
                 self.fd = open(self.address, 'wb')
+
+    def open(self):
+        r"""Open the file."""
+        global _N_FILES
+        self._open()
         _N_FILES += 1
 
     def close(self):
