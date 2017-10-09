@@ -1,5 +1,4 @@
 # from logging import debug, error, exception
-import os
 from cis_interface.communication.AsciiFileComm import AsciiFileComm
 from cis_interface.dataio.AsciiTable import AsciiTable
 

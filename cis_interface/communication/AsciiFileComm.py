@@ -1,6 +1,4 @@
-# from logging import debug, error, exception
-import os
-from cis_interface.communication.FileComm import _N_FILES, FileComm
+from cis_interface.communication.FileComm import FileComm
 from cis_interface.dataio.AsciiFile import AsciiFile
 
 
@@ -53,11 +51,9 @@ class AsciiFileComm(FileComm):
         kwargs['open_as_binary'] = self.file.open_as_binary
         return kwargs
 
-    def open(self):
+    def _open(self):
         r"""Open the file."""
-        global _N_FILES
         self.file.open()
-        _N_FILES += 1
 
     def close(self):
         r"""Close the file."""
