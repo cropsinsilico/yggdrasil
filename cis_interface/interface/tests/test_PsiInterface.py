@@ -271,22 +271,6 @@ class TestPsiAsciiFileOutput(TestBase):
         self.file_comm.remove_file()
         super(TestPsiAsciiFileOutput, self).teardown()
             
-    # def test_send_line_loc(self):
-    #     r"""Test sending a line to a local file."""
-    #     inst = PsiInterface.PsiAsciiFileOutput(self.tempfile, dst_type=0)
-    #     msg_flag = inst.send_line(self.fmt_str_line)
-    #     assert(msg_flag)
-    #     for lans in self.file_lines:
-    #         msg_flag = inst.send_line(lans)
-    #         assert(msg_flag)
-    #     inst.send_eof()
-    #     del inst
-    #     # Read temp file
-    #     assert(os.path.isfile(self.tempfile))
-    #     with open(self.tempfile, 'rb') as fd:
-    #         res = fd.read()
-    #         nt.assert_equal(res, self.file_contents)
-
     def test_send_line(self):
         r"""Test sending a line to a remote file."""
         msg_flag = self.instance.send(self.fmt_str_line)
@@ -319,49 +303,43 @@ class TestPsiAsciiFileOutput_local(TestPsiAsciiFileOutput):
         super(TestPsiAsciiFileOutput_local, self).test_send_line()
         
 
-# class TestPsiAsciiTableInput(CisTest, IOInfo):
-#     r"""Test input from an ascii table."""
-#     def __init__(self, *args, **kwargs):
-#         super(TestPsiAsciiTableInput, self).__init__(*args, **kwargs)
-#         IOInfo.__init__(self)
-#         self.name = 'test'
-#         self.tempfile = os.path.join(os.getcwd(), 'temp_ascii.txt')
+class TestPsiAsciiTableInput(TestPsiAsciiFileInput):
+    r"""Test input from an ascii table."""
+    def __init__(self, *args, **kwargs):
+        super(TestPsiAsciiTableInput, self).__init__(*args, **kwargs)
+        self._cls = 'PsiAsciiTableInput'
+        self.driver_name = 'AsciiTableInputDriver'
 
-#     def setup(self):
-#         r"""Create a test file and start the driver."""
-#         if not os.path.isfile(self.tempfile):
-#             self.write_table(self.tempfile)
-#         self.driver = AsciiTableInputDriver.AsciiTableInputDriver(
-#             self.name, self.tempfile)
-#         self.driver.start()
-#         self.driver.sleep(0.1)
-#         os.environ.update(self.driver.env)
+    # def test_recv_row_loc(self):
+    #     r"""Test receiving a row from a local table."""
+    #     inst = PsiInterface.PsiAsciiTableInput(self.tempfile, src_type=0)
+    #     for rans in self.file_rows:
+    #         msg_flag, rres = inst.recv_row()
+    #         assert(msg_flag)
+    #         nt.assert_equal(rres, rans)
+    #     msg_flag, rres = inst.recv_row()
+    #     assert(not msg_flag)
 
-#     def teardown(self):
-#         r"""Stop the driver."""
-#         self.driver.terminate()
-#         if os.path.isfile(self.tempfile):
-#             os.remove(self.tempfile)
+    def test_recv_line(self):
+        r"""Test receiving a row from a remote table."""
+        for rans in self.file_rows:
+            msg_flag, rres = self.instance.recv()
+            assert(msg_flag)
+            nt.assert_equal(rres, rans)
+        msg_flag, rres = self.instance.recv()
+        assert(not msg_flag)
 
-#     def test_recv_row_loc(self):
-#         r"""Test receiving a row from a local table."""
-#         inst = PsiInterface.PsiAsciiTableInput(self.tempfile, src_type=0)
-#         for rans in self.file_rows:
-#             msg_flag, rres = inst.recv_row()
-#             assert(msg_flag)
-#             nt.assert_equal(rres, rans)
-#         msg_flag, rres = inst.recv_row()
-#         assert(not msg_flag)
+        
+class TestPsiAsciiTableInput_local(TestPsiAsciiTableInput):
+    r"""Test input from an ASCII table."""
+    def __init__(self, *args, **kwargs):
+        super(TestPsiAsciiTableInput_local, self).__init__(*args, **kwargs)
+        self._inst_args = [self.tempfile]
+        self._inst_kwargs = {'src_type': 0}  # local
 
-#     def test_recv_row_rem(self):
-#         r"""Test receiving a row from a remote table."""
-#         inst = PsiInterface.PsiAsciiTableInput(self.name, src_type=1)
-#         for rans in self.file_rows:
-#             msg_flag, rres = inst.recv_row()
-#             assert(msg_flag)
-#             nt.assert_equal(rres, rans)
-#         msg_flag, rres = inst.recv_row()
-#         assert(not msg_flag)
+    def test_recv_line(self):
+        r"""Test receiving a row from a local table."""
+        super(TestPsiAsciiTableInput_local, self).test_recv_line()
 
         
 # class TestPsiAsciiTableInput_AsArray(CisTest, IOInfo):
