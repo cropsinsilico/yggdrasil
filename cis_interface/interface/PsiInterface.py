@@ -183,62 +183,42 @@ def PsiAsciiFileInput(name, src_type=1, **kwargs):
     return PsiAsciiFileInput(name, **kwargs)
 
 
-class PsiAsciiFileOutput(object):
-    r"""Class for generic ASCII output to either a local file or message
-    queue.
+def PsiAsciiFileOutput(name, dst_type=1, **kwargs):
+    r"""Wrapper to create interface with the correct base comm.
 
     Args:
         name (str): Path to the local file where output should be written (if
-            dst_type == 0) or the name of the message queue where output should
-            be sent.
+            dst_type == 0) or the name of the message queue where output
+            should be sent.
         dst_type (int, optional): If 0, output is written to a local file.
             Otherwise, output is sent to a message queue. Defaults to 1.
+        **kwargs: Additional keyword arguments are passed to the base comm.
 
     """
-    _name = None
-    _type = 0
-    _file = None
-    _psi = None
-
-    def __init__(self, name, dst_type=1, matlab=False):
-        self._name = name
-        self._type = dst_type
-        if self._type == 0:
-            self._file = AsciiFile(name, 'w')
-            self._file.open()
-        else:
-            self._psi = PsiOutput(name)
-            self._file = AsciiFile(name, None)
-
-    def __del__(self):
-        if self._type == 0 and (self._file is not None):
-            self._file.close()
-            self._file = None
-
-    def send_eof(self):
-        r"""Send an end-of-file message to the message queue."""
-        if self._type == 0:
-            pass
-        else:
-            self._psi.send(PSI_MSG_EOF)
-
-    def send_line(self, line):
-        r"""Output a single ASCII line.
+    
+    if dst_type == 0:
+        base = AsciiFileComm.AsciiFileComm
+        kwargs.setdefault('address', name)
+    else:
+        base = DefaultComm
+        
+    class PsiAsciiFileOutput(base):
+        r"""Class for generic ASCII output to either a local file or message
+        queue.
 
         Args:
-            line (str): Line to output (including newline character).
-
-        Returns:
-            bool: Success or failure of sending the line.
+            name (str): Path to the local file where output should be written (if
+                dst_type == 0) or the name of the message queue where output
+                should be sent.
+            **kwargs: Additional keyword arguments are passed to the base comm.
 
         """
-        if self._type == 0:
-            self._file.writeline(line)
-            ret = True
-        else:
-            ret = self._psi.send(line)
-        return ret
+        def __init__(self, name, matlab=False, **kwargs):
+            kwargs.setdefault('direction', 'send')
+            super(PsiAsciiFileOutput, self).__init__(name, **kwargs)
 
+    return PsiAsciiFileOutput(name, **kwargs)
+            
 
 # Specialized classes for ascii table IO
 class PsiAsciiTableInput(object):

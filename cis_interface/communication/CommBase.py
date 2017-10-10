@@ -225,6 +225,8 @@ class CommBase(CisClass):
         if self.is_closed:
             self.debug('.on_send(): comm closed.')
             return False, ''
+        if len(msg) == 1:
+            msg = msg[0]
         if msg == self.eof_msg:
             flag = self.on_send_eof()
             msg_s = backwards.unicode2bytes(msg)
