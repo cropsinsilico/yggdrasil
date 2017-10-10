@@ -32,7 +32,7 @@ class DefaultSerialize(object):
 
         """
         if self.format_str is None:
-            if isinstance(args, list):
+            if isinstance(args, (list, tuple)):
                 if len(args) != 1:
                     raise Exception("No format string and more than one " +
                                     "argument provided.")

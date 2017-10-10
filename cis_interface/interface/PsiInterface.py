@@ -8,6 +8,7 @@ from cis_interface.dataio.AsciiFile import AsciiFile
 from cis_interface.dataio.AsciiTable import AsciiTable
 from cis_interface import backwards, tools
 from cis_interface.tools import PSI_MSG_MAX, PSI_MSG_EOF
+from cis_interface.communication import DefaultComm, RPCComm
 
 
 def PsiMatlab(_type, args=[]):
@@ -31,183 +32,46 @@ def PsiMatlab(_type, args=[]):
     return obj
 
 
-class PsiInput(object):
+class PsiInput(DefaultComm):
     r"""Class for handling input from a message queue.
 
     Args:
         name (str): The name of the message queue. Combined with the
             suffix '_INT', it should match an environment variable containing
             a message queue key.
-        
-    Attributes:
-        name (str): The name of the message queue.
-        qname (str): The name of the message queue combined with the suffix
-            '_IN'.
-        q (:class:`sysv_ipc.MessageQueue`): Message queue.
+        format_str (str, optional): C style format string that should be used
+            to deserialize messages that are receieved into a list of python
+            objects. Defaults to None and raw string messages are returned.
         
     """
-    name = None
-    qName = None
-    q = None
     
-    def __init__(self, name, matlab=False):
-        self.name = name
-        self.qName = name + '_IN'
-        self.q = None
-        debug("PsiInput(%s):", name)
-        if self.qName not in os.environ:
-            raise Exception('PsiInterface cant see %s in env.' % self.qName)
-        qid = os.environ.get(self.qName, '')
-        qid = int(qid)
-        debug("PsiInput(%s): qid %s", self.name, qid)
-        self.q = tools.get_queue(qid)
-        clidebug = os.environ.get('PSI_CLIENT_DEBUG', False)
-        self.sleeptime = 0.25
-        if clidebug:
-            self.sleeptime = 2.0
-
-    def recv(self):
-        r"""Receive a message smaller than PSI_MSG_MAX. The process will
-        sleep until there is a message in the queue to receive.
-
-        Returns:
-            tuple (bool, str): The success or failure of receiving a message
-                and the message received.
-
-        """
-        payload = (False, '')
-        debug("PsiInput(%s).recv()", self.name)
-        try:
-            while self.q.current_messages == 0:
-                debug("PsiInput(%s): recv() - no data, sleep", self.name)
-                time.sleep(self.sleeptime)
-            debug("PsiInput(%s).recv(): message ready, read it", self.name)
-            data, _ = self.q.receive()  # ignore ident
-            payload = (True, data)
-            debug("PsiInput(%s).recv(): read %d bytes", self.name, len(data))
-        except sysv_ipc.ExistentialError:  # pragma: debug
-            debug("PsiInput(%s).recv(): queue closed, returning (False, '')",
-                  self.name)
-        except Exception as ex:  # pragma: debug
-            # debug("PsiInput(%s).recv(): exception %s, return None", self.name, type(ex))
-            raise ex
-        return payload
-
-    def recv_nolimit(self):
-        r"""Receive a message larger than PSI_MSG_MAX that is sent in multiple
-        parts.
-
-        Returns:
-            tuple (bool, str): The success or failure of receiving a message
-                and the complete message received.
-
-        """
-        debug("PsiInput(%s).recv_nolimit()", self.name)
-        payload = self.recv()
-        if not payload[0]:  # pragma: debug
-            debug("PsiInput(%s).recv_nolimit(): " +
-                  "Failed to receive payload size.", self.name)
-            return payload
-        # (leng_exp,) = scanf('%d', payload[1])
-        leng_exp = int(float(payload[1]))
-        data = backwards.unicode2bytes('')
-        ret = True
-        while len(data) < leng_exp:
-            payload = self.recv()
-            if not payload[0]:  # pragma: debug
-                debug("PsiInput(%s).recv_nolimit(): " +
-                      "read interupted at %d of %d bytes.",
-                      self.name, len(data), leng_exp)
-                ret = False
-                break
-            data = data + payload[1]
-        payload = (ret, data)
-        debug("PsiInput(%s).recv_nolimit(): read %d bytes",
-              self.name, len(data))
-        return payload
+    def __init__(self, name, format_str=None, matlab=False):
+        if matlab and format_str is not None:  # pragma: matlab
+            format_str = backwards.decode_escape(format_str)
+        super(PsiInput, self).__init__(name, direction='recv',
+                                       format_str=format_str)
         
 
-class PsiOutput:
+class PsiOutput(DefaultComm):
     r"""Class for handling output to a message queue.
 
     Args:
         name (str): The name of the message queue. Combined with the
             suffix '_OUT', it should match an environment variable containing
             a message queue key.
-        
-    Attributes:
-        name (str): The name of the message queue.
-        qname (str): The name of the message queue combined with the suffix
-            '_OUT'.
-        q (:class:`sysv_ipc.MessageQueue`): Message queue.
+        format_str (str, optional): C style format string that should be used
+            to create a message from a list of python ojbects. Defaults to None
+            and raw string messages are sent.
         
     """
-    def __init__(self, name, matlab=False):
-        self.name = name
-        self.qName = name + '_OUT'
-        debug("PsiOputput(%s)", name)
-        if self.qName not in os.environ:
-            raise Exception('PsiInterface cant see %s in env.' % self.qName)
-        qid = int(os.environ[name + '_OUT'])
-        self.q = tools.get_queue(qid)
-        return
-
-    def send(self, payload):
-        r"""Send a message smaller than PSI_MSG_MAX.
-
-        Args:
-            payload (str): Message to send.
-
-        Returns:
-            bool: Success or failure of sending the message.
-
-        """
-        ret = False
-        try:
-            debug("PsiOutput(%s).send(%s)", self.name, payload)
-            self.q.send(payload)
-            ret = True
-            debug("PsiOutput(%s).sent(%s)", self.name, payload)
-        except Exception as ex:  # pragma: debug
-            debug("PsiOutput(%s).send(%s): exception: %s", self.name, payload, type(ex))
-            raise ex
-        debug("PsiOutput(%s).send(%s): returns %d", self.name, payload, ret)
-        return ret
-
-    def send_nolimit(self, payload):
-        r"""Send a message larger than PSI_MSG_MAX in multiple parts.
-
-        Args:
-            payload (str): Message to send.
-
-        Returns:
-            bool: Success or failure of sending the message.
-
-        """
-        ret = self.send("%ld" % len(payload))
-        if not ret:  # pragma: debug
-            debug("PsiOutput(%s).send_nolimit: " +
-                  "Sending size of payload failed.", self.name)
-            return ret
-        prev = 0
-        while prev < len(payload):
-            next = min(prev + PSI_MSG_MAX, len(payload))
-            ret = self.send(payload[prev:next])
-            if not ret:  # pragma: debug
-                debug("PsiOutput(%s).send_nolimit(): " +
-                      "send interupted at %d of %d bytes.",
-                      self.name, prev, len(payload))
-                break
-            debug("PsiOutput(%s).send_nolimit(): %d of %d bytes sent",
-                  self.name, next, len(payload))
-            prev = next
-        if ret:
-            debug("PsiOutput(%s).send_nolimit %d bytes completed",
-                  self.name, len(payload))
-        return ret
+    def __init__(self, name, format_str=None, matlab=False):
+        if matlab and format_str is not None:  # pragma: matlab
+            format_str = backwards.decode_escape(format_str)
+        super(PsiOutput, self).__init__(name, direction='send',
+                                        format_str=format_str)
 
     
-class PsiRpc(object):
+class PsiRpc(RPCComm.RPCComm):
     r"""Class for sending a message and then receiving a response.
 
     Args:
@@ -221,51 +85,51 @@ class PsiRpc(object):
     """
     def __init__(self, outname, outfmt, inname, infmt, matlab=False):
         if matlab:  # pragma: matlab
-            self._inFmt = backwards.decode_escape(infmt)
-            self._outFmt = backwards.decode_escape(outfmt)
-        else:
-            self._inFmt = infmt
-            self._outFmt = outfmt
-        self._in = PsiInput(inname)
-        self._out = PsiOutput(outname)
+            infmt = backwards.decode_escape(infmt)
+            outfmt = backwards.decode_escape(outfmt)
+        icomm_kwargs = dict(name=inname, format_str=infmt)
+        ocomm_kwargs = dict(name=outname, format_str=outfmt)
+        super(PsiRpc, self).__init__('%s_%s' % (inname, outname),
+                                     icomm_kwargs=icomm_kwargs,
+                                     ocomm_kwargs=ocomm_kwargs)
 
-    def rpcSend(self, *args):
-        r"""Send arguments as a message created using the output format string.
+    # def rpcSend(self, *args):
+    #     r"""Send arguments as a message created using the output format string.
 
-        Args:
-            \*args: All arguments are formatted using the output format string
-                to create the message.
+    #     Args:
+    #         \*args: All arguments are formatted using the output format string
+    #             to create the message.
 
-        Returns:
-            bool: Success or failure of sending the message.
+    #     Returns:
+    #         bool: Success or failure of sending the message.
 
-        """
-        outmsg = backwards.bytes2unicode(self._outFmt) % args
-        return self._out.send_nolimit(backwards.unicode2bytes(outmsg))
+    #     """
+    #     outmsg = backwards.bytes2unicode(self._outFmt) % args
+    #     return self._out.send_nolimit(backwards.unicode2bytes(outmsg))
 
-    def rpcRecv(self):
-        r"""Receive a message and get arguments by parsing the recieved message
-        using the input format string.
+    # def rpcRecv(self):
+    #     r"""Receive a message and get arguments by parsing the recieved message
+    #     using the input format string.
 
-        Returns:
-            tuple (bool, tuple): Success or failure of receiving a message and
-                the tuple of arguments retreived by parsing the message using
-                the input format string.
+    #     Returns:
+    #         tuple (bool, tuple): Success or failure of receiving a message and
+    #             the tuple of arguments retreived by parsing the message using
+    #             the input format string.
         
-        """
-        retval, args = self._in.recv_nolimit()
-        if retval:
-            args = scanf(backwards.bytes2unicode(self._inFmt),
-                         backwards.bytes2unicode(args))
-        return retval, args
+    #     """
+    #     retval, args = self._in.recv_nolimit()
+    #     if retval:
+    #         args = scanf(backwards.bytes2unicode(self._inFmt),
+    #                      backwards.bytes2unicode(args))
+    #     return retval, args
 
-    def rpcCall(self, *args):
+    def call(self, *args):
         r"""Send arguments using the output format string to format a message
         and then receive values back by parsing the response message with the
         input format string.
 
         Args:
-            \*args: All arguments are formatted using the output format string
+            *args: All arguments are formatted using the output format string
                 to create the message.
 
         Returns:
@@ -274,9 +138,9 @@ class PsiRpc(object):
                 the input format string.
         
         """
-        ret = self.rpcSend(*args)
+        ret = self.send_nolimit(*args)
         if ret:
-            return self.rpcRecv()
+            return self.recv_nolimit(timeout=False)
 
 
 class PsiRpcServer(PsiRpc):
