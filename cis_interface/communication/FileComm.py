@@ -43,10 +43,10 @@ class FileComm(CommBase.CommBase):
         return _N_FILES
 
     @classmethod
-    def new_comm(cls, *args, **kwargs):
+    def new_comm_kwargs(cls, *args, **kwargs):
         r"""Initialize communication with new queue."""
         kwargs.setdefault('address', 'file.txt')
-        return cls(*args, **kwargs)
+        return args, kwargs
 
     def _open(self):
         if self.direction == 'recv':
