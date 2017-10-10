@@ -1,16 +1,10 @@
 import os
 from cis_interface import backwards
 from cis_interface.tools import CisClass, PSI_MSG_MAX, PSI_MSG_EOF
+from cis_interface.serialize.DefaultSerialize import DefaultSerialize
+from cis_interface.serialize.DefaultDeserialize import DefaultDeserialize
 
-
-def default_serialize(x):
-    return backwards.unicode2bytes(x)
-
-
-def default_deserialize(x):
-    return x
-
-
+    
 class CommBase(CisClass):
     r"""Class for handling I/O.
 
@@ -31,6 +25,9 @@ class CommBase(CisClass):
             input and returns a serialized set of bytes. This will be used
             to encode sent messages. Defaults to None and send will assume
             that all messages are raw bytes.
+        format_str (str, optional): If provided and deserialize and/or serialize
+            are not provided, this string will be used to format/parse messages
+            that are sent/received. Defaults to None.
         dont_open (bool, optional): If True, the connection will not be opened.
             Defaults to False.
         **kwargs: Additional keywords arguments are passed to parent class.
@@ -54,7 +51,8 @@ class CommBase(CisClass):
 
     """
     def __init__(self, name, address=None, direction='send',
-                 deserialize=None, serialize=None, dont_open=False, **kwargs):
+                 deserialize=None, serialize=None, format_str=None,
+                 dont_open=False, **kwargs):
         super(CommBase, self).__init__(name, **kwargs)
         self.name = name
         if address is None:
@@ -64,10 +62,11 @@ class CommBase(CisClass):
         else:
             self.address = address
         self.direction = direction
+        self.format_str = format_str
         if deserialize is None:
-            deserialize = default_deserialize
+            deserialize = DefaultDeserialize(format_str=self.format_str)
         if serialize is None:
-            serialize = default_serialize
+            serialize = DefaultSerialize(format_str=self.format_str)
         self.meth_deserialize = deserialize
         self.meth_serialize = serialize
         if not dont_open:
