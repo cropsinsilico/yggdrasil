@@ -10,6 +10,8 @@ from cis_interface import backwards, tools
 from cis_interface.tools import PSI_MSG_MAX, PSI_MSG_EOF
 from cis_interface.communication import (
     DefaultComm, RPCComm, AsciiFileComm, AsciiTableComm)
+from cis_interface.serialize import (
+    AsciiTableDeserialize)
 
 
 def PsiMatlab(_type, args=[]):
@@ -221,81 +223,95 @@ def PsiAsciiFileOutput(name, dst_type=1, **kwargs):
             
 
 # Specialized classes for ascii table IO
-class PsiAsciiTableInput(object):
-    r"""Class for handling table-like formatted input.
+def PsiAsciiTableInput(name, src_type=1, **kwargs):
 
-    Args:
-        name (str): The path to the local file to read input from (if src_type
-            == 0) or the name of the message queue input should be received
-            from.
-        src_type (int, optional): If 0, input is read from a local file.
-            Otherwise, the input is received from a message queue. Defaults to
-            1.
+    if src_type == 0:
+        base = AsciiTableComm.AsciiTableComm
+        kwargs.setdefault('address', name)
+    else:
+        base = DefaultComm
+    kwargs['src_type'] = src_type
+    
+    class PsiAsciiTableInput(base):
+        r"""Class for handling table-like formatted input.
 
-    """
-    _name = None
-    _type = 0
-    _table = None
-    _psi = None
-
-    def __init__(self, name, src_type=1, matlab=False):
-        self._name = name
-        self._type = src_type
-        if self._type == 0:
-            self._table = AsciiTable(name, 'r')
-            self._table.open()
-        else:
-            self._psi = PsiInput(name)
-            ret, format_str = self._psi.recv()
-            if not ret:  # pragma: debug
-                raise Exception('PsiAsciiTableInput could not receive format' +
-                                'string from input.')
-            self._table = AsciiTable(
-                name, None, format_str=backwards.decode_escape(format_str))
-
-    def __del__(self):
-        if self._type == 0:
-            self._table.close()
-
-    def recv_row(self):
-        r"""Receive a single row of variables from the input.
-
-        Returns:
-            tuple(bool, tuple): Success or failure of receiving the row and
-                the variables recovered from the row.
+        Args:
+            name (str): The path to the local file to read input from (if src_type
+                == 0) or the name of the message queue input should be received
+                from.
+            src_type (int, optional): If 0, input is read from a local file.
+                Otherwise, the input is received from a message queue. Defaults to
+                1.
+            as_array (bool, optional): If True, recv returns the entire table
+                array and can only be called once. If False, recv returns row
+                entries. Default to False.
 
         """
-        if self._type == 0:
-            eof, args = self._table.readline()
-            ret = (not eof)
-        else:
-            ret, args = self._psi.recv_nolimit()
-            if ret:
-                args = self._table.process_line(args)
-                if args is None:
-                    ret = False
-        return ret, args
 
-    def recv_array(self):
-        r"""Receive an entire array of table data.
+        def __init__(self, name, matlab=False, src_type=1, as_array=False,
+                     **kwargs):
+            kwargs.setdefault('direction', 'recv')
+            if src_type == 0:
+                kwargs['as_array'] = as_array
+            super(PsiAsciiTableInput, self).__init__(name, **kwargs)
+            if src_type == 1:
+                ret, format_str = self.recv(timeout=self.timeout)
+                if not ret:  # pragma: debug
+                    raise Exception('PsiAsciiTableInput could not receive format' +
+                                    'string from input.')
+            else:
+                format_str = self.file.format_str
+            # TODO: Have serialize, deserialize for Ascii comms
+            self.meth_deserialize = AsciiTableDeserialize.AsciiTableDeserialize(
+                format_str=backwards.decode_escape(format_str),
+                as_array=as_array)
 
-        Returns:
-            tuple(bool, np.ndarray): Success or failure of receiving the row
-                and the array of table data.
+        def recv(self, *args, **kwargs):
+            r"""Alias so recv defaults to recv_nolimit."""
+            return self.recv_nolimit(*args, **kwargs)
 
-        """
-        if self._type == 0:
-            arr = self._table.read_array()
-            ret = True
-        else:
-            ret, data = self._psi.recv_nolimit()
-            if ret:
-                arr = self._table.bytes_to_array(data, order='F')
-                if arr is None:  # pragma: debug
-                    ret = False
-            else:  # pragma: debug
-                arr = None
-        return ret, arr
+    return PsiAsciiTableInput(name, **kwargs)
+
+
+        # def recv_row(self):
+        #     r"""Receive a single row of variables from the input.
+
+        #     Returns:
+        #         tuple(bool, tuple): Success or failure of receiving the row and
+        #             the variables recovered from the row.
+
+        #     """
+        #     if self._type == 0:
+        #         eof, args = self._table.readline()
+        #         ret = (not eof)
+        #     else:
+        #         ret, args = self._psi.recv_nolimit()
+        #         if ret:
+        #             args = self._table.process_line(args)
+        #             if args is None:
+        #                 ret = False
+        #     return ret, args
+
+        # def recv_array(self):
+        #     r"""Receive an entire array of table data.
+
+        #     Returns:
+        #         tuple(bool, np.ndarray): Success or failure of receiving the row
+        #             and the array of table data.
+
+        #     """
+        #     if self._type == 0:
+        #         arr = self._table.read_array()
+        #         ret = True
+        #     else:
+        #         ret, data = self._psi.recv_nolimit()
+        #         if ret:
+        #             arr = self._table.bytes_to_array(data, order='F')
+        #             if arr is None:  # pragma: debug
+        #                 ret = False
+        #         else:  # pragma: debug
+        #             arr = None
+        #     return ret, arr
 
 
 class PsiAsciiTableOutput(object):
