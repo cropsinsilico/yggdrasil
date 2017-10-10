@@ -1,3 +1,4 @@
+import os
 from cis_interface.communication import DefaultComm, CommBase
 
 
@@ -10,6 +11,10 @@ class RPCComm(CommBase.CommBase):
     Args:
         name (str): The environment variable where communication address is
             stored.
+        icomm_kwargs (dict, optional): Keyword arguments for the input comm.
+            Defaults to empty dict.
+        ocomm_kwargs (dict, optional): Keyword arguments for the output comm.
+            Defaults to empty dict.
         **kwargs: Additional keywords arguments are passed to parent class.
 
     Attributes:
@@ -17,36 +22,34 @@ class RPCComm(CommBase.CommBase):
         ocomm (DefaultComm): Output comm.
 
     """
-    def __init__(self, name, dont_open=False, **kwargs):
-        super(RPCComm, self).__init__(name, dont_open=True, **kwargs)
-        self.icomm = DefaultComm(self.icomm_name, **self.icomm_kwargs)
-        self.ocomm = DefaultComm(self.ocomm_name, **self.ocomm_kwargs)
+    def __init__(self, name, icomm_kwargs=None, ocomm_kwargs=None,
+                 dont_open=False, **kwargs):
+        if icomm_kwargs is None:
+            icomm_kwargs = dict()
+        if ocomm_kwargs is None:
+            ocomm_kwargs = dict()
+        icomm_name = icomm_kwargs.pop('name', name + '_IN')
+        ocomm_name = ocomm_kwargs.pop('name', name + '_OUT')
+        icomm_kwargs['direction'] = 'recv'
+        ocomm_kwargs['direction'] = 'send'
+        icomm_kwargs['dont_open'] = True
+        ocomm_kwargs['dont_open'] = True
+        if name in os.environ or 'address' in kwargs:
+            super(RPCComm, self).__init__(name, dont_open=True, **kwargs)
+            icomm_kwargs.setdefault(
+                'address', self.address.split(_rpc_address_split)[0])
+            ocomm_kwargs.setdefault(
+                'address', self.address.split(_rpc_address_split)[1])
+            self.icomm = DefaultComm(icomm_name, **icomm_kwargs)
+            self.ocomm = DefaultComm(ocomm_name, **ocomm_kwargs)
+        else:
+            self.icomm = DefaultComm(icomm_name, **icomm_kwargs)
+            self.ocomm = DefaultComm(ocomm_name, **ocomm_kwargs)
+            kwargs.setdefault('address', _rpc_address_split.join(
+                [self.icomm.address, self.ocomm.address]))
+            super(RPCComm, self).__init__(name, dont_open=True, **kwargs)
         if not dont_open:
             self.open()
-
-    @property
-    def icomm_name(self):
-        r"""str: Name of input comm."""
-        return self.name + '_IN'
-
-    @property
-    def ocomm_name(self):
-        r"""str: Name of output comm."""
-        return self.name + '_OUT'
-
-    @property
-    def icomm_kwargs(self):
-        r"""dict: Keyword arguments for input comm."""
-        out = dict(address=self.address.split(_rpc_address_split)[0],
-                   direction='recv')
-        return out
-
-    @property
-    def ocomm_kwargs(self):
-        r"""dict: Keyword arguments for output comm."""
-        out = dict(address=self.address.split(_rpc_address_split)[1],
-                   direction='send')
-        return out
 
     @property
     def comm_count(self):

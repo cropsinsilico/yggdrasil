@@ -215,7 +215,7 @@ class CisClass(object):
         if key not in self._timeouts:
             raise KeyError("No timeout registered for %s" % key)
         t = self._timeouts[key]
-        if t.is_out:
+        if t.is_out and t.max_time > 0:
             self.error("Timeout for %s at %5.2f s" % (key, t.elapsed))
             print("Stopped %s at %f/%f" % (key, t.elapsed, t.max_time))
         del self._timeouts[key]
