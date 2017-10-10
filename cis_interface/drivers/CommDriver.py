@@ -1,6 +1,7 @@
 import importlib
 from cis_interface.drivers.Driver import Driver
 from cis_interface.tools import PSI_MSG_MAX
+from cis_interface.communication import new_comm
 
 
 maxMsgSize = PSI_MSG_MAX
@@ -13,30 +14,25 @@ class CommDriver(Driver):
     Args:
         name (str): The name of the message queue that the driver should
             connect to.
-        comm (str, optional): The name of a communication class from the
-            cis_interface.communication subpackage. Defaults to 'IPCComm'.
         **kwargs: Additional keyword arguments are passed to the parent and comm
             classes.
 
     Attributes:
         comm_name (str): Name of communication class.
-        comm_cls (class): Communication class.
         comm (CommBase): Instance of communication class.
         state (str): Description of the last operation performed by the driver.
         numSent (int): The number of messages sent to the queue.
         numReceived (int): The number of messages received from the queue.
 
     """
-    def __init__(self, name, comm='IPCComm', **kwargs):
+    def __init__(self, name, **kwargs):
         super(CommDriver, self).__init__(name, **kwargs)
         self.debug()
         self.state = 'Started'
         self.numSent = 0
         self.numReceived = 0
-        mod = importlib.import_module('cis_interface.communication.%s' % comm)
-        self.comm_name = comm
-        self.comm_cls = getattr(mod, comm)
-        self.comm = self.comm_cls.new_comm(name, dont_open=True, **kwargs)
+        self.comm = new_comm(name, dont_open=True, **kwargs)
+        self.comm_name = self.comm.comm_class
         self.env[name] = self.comm.address
         self.debug(".env: %s", self.env)
 

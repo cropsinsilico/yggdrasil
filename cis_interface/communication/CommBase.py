@@ -78,6 +78,11 @@ class CommBase(CisClass):
         r"""int: Number of communication connections."""
         return 0
 
+    @property
+    def comm_class(self):
+        r"""str: Name of communication class."""
+        return str(self.__class__).split("'")[1].split(".")[-1]
+
     @classmethod
     def new_comm(cls, *args, **kwargs):
         r"""Initialize communication with new queue."""
@@ -92,7 +97,7 @@ class CommBase(CisClass):
             dict: Keyword arguments for opposite comm object.
 
         """
-        kwargs = {'comm': str(self.__class__).split("'")[1].split(".")[-1]}
+        kwargs = {'comm': self.comm_class}
         kwargs['address'] = self.address
         kwargs['serialize'] = self.meth_serialize
         kwargs['deserialize'] = self.meth_deserialize

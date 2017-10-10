@@ -1,5 +1,5 @@
 from cis_interface.drivers.Driver import Driver
-from cis_interface.drivers.IODriver import IODriver
+from cis_interface.drivers.CommDriver import CommDriver
 
 
 class RPCDriver(Driver):
@@ -9,204 +9,159 @@ class RPCDriver(Driver):
     Args:
         name (str): The name of the message queue set that the driver should
             connect to. (name + "_IN" and name + "_OUT")
-        \*\*kwargs: Additional keyword arguments are passed to parent class's
-            __init__ method.
+        **kwargs: Additional keyword arguments are passed to parent class.
 
-    Attributes (in addition to parent class's):
-        iipc (:class:`cis_interface.drivers.IODriver`): Driver for the input
+    Attributes:
+        icomm (:class:`cis_interface.drivers.CommDriver`): Driver for the input
             message queue.
-        oipc (:class:`cis_interface.drivers.IODriver`): Driver for the output
+        ocomm (:class:`cis_interface.drivers.CommDriver`): Driver for the output
             message ueue.
 
     """
     def __init__(self, name, args=None, **kwargs):
         super(RPCDriver, self).__init__(name, **kwargs)
         self.debug()
-        self.iipc = IODriver(name, '_IN', **kwargs)
-        self.oipc = IODriver(name, '_OUT', **kwargs)
+        self.icomm = CommDriver(name + '_IN', direction='recv', **kwargs)
+        self.ocomm = CommDriver(name + '_OUT', direction='send', **kwargs)
         out = {}
-        out.update(self.iipc.env)
-        out.update(self.oipc.env)
+        out.update(self.icomm.env)
+        out.update(self.ocomm.env)
         self.env = out
 
     @property
-    def queues_open(self):
-        r"""bool: True if both input and output queues open."""
+    def comms_open(self):
+        r"""bool: True if both input and output comms open."""
         with self.lock:
-            return (self.iipc.queue_open and self.oipc.queue_open)
+            return (self.icomm.comm_open and self.ocomm.comm_open)
 
     @property
     def is_valid(self):
-        r"""bool: True if both queues are open and parent class is valid."""
+        r"""bool: True if both comms are open and parent class is valid."""
         with self.lock:
-            return (super(RPCDriver, self).is_valid and self.queues_open)
+            return (super(RPCDriver, self).is_valid and self.comms_open)
         
     @property
     def n_msg_in(self):
-        r"""int: The number of messages in the input queue."""
-        return self.iipc.n_ipc_msg
+        r"""int: The number of messages in the input comm."""
+        return self.icomm.n_msg
 
     @property
     def n_msg_out(self):
-        r"""int: The number of messages in the output queue."""
-        return self.oipc.n_ipc_msg
+        r"""int: The number of messages in the output comm."""
+        return self.ocomm.n_msg
 
-    def run(self):
-        r"""Run the input/output queue drivers."""
-        super(RPCDriver, self).run()
+    def start(self):
+        r"""Run the input/output comm drivers."""
         self.debug('.run()')
-        self.iipc.start()
-        self.oipc.start()
+        self.icomm.start()
+        self.ocomm.start()
+        super(RPCDriver, self).run()
         self.debug('.run() done')
 
     def graceful_stop(self):
-        r"""Allow the IPC queues to terminate gracefully."""
+        r"""Allow the IPC comms to terminate gracefully."""
         self.debug('.graceful_stop()')
-        self.iipc.graceful_stop()
-        self.oipc.graceful_stop()
+        self.icomm.graceful_stop()
+        self.ocomm.graceful_stop()
         super(RPCDriver, self).graceful_stop()
 
-    def close_queues(self):
-        r"""Close the IPC queues."""
-        self.debug('.close_queues()')
-        self.iipc.close_queue()
-        self.oipc.close_queue()
+    def close_comms(self):
+        r"""Close the IPC comms."""
+        self.debug('.close_comms()')
+        self.icomm.close_comm()
+        self.ocomm.close_comm()
 
     def terminate(self):
-        r"""Terminate input/output queue drivers."""
+        r"""Terminate input/output comm drivers."""
         if self._terminated:
             self.debug(':terminated() Driver already terminated.')
             return
         self.debug('.terminate()')
-        self.iipc.terminate()
-        self.oipc.terminate()
+        self.icomm.terminate()
+        self.ocomm.terminate()
         super(RPCDriver, self).terminate()
 
     def on_exit(self):
         r"""Actions to perform when the driver is finished."""
         self.debug('.on_exit()')
-        self.iipc.on_exit()
-        self.oipc.on_exit()
+        self.icomm.on_exit()
+        self.ocomm.on_exit()
         super(RPCDriver, self).on_exit()
 
     def on_model_exit(self):
         r"""Actions to perform when the associated model driver is finished."""
         self.debug('.on_model_exit()')
-        self.oipc.on_model_exit()
-        self.iipc.on_model_exit()
+        self.ocomm.on_model_exit()
+        self.icomm.on_model_exit()
         super(RPCDriver, self).on_model_exit()
         
     def cleanup(self):
         r"""Perform cleanup for IPC drivers."""
         self.debug('.cleanup()')
-        self.iipc.cleanup()
-        self.oipc.cleanup()
+        self.icomm.cleanup()
+        self.ocomm.cleanup()
         super(RPCDriver, self).cleanup()
 
     def printStatus(self):
         r"""Print information on the status of the driver."""
         super(RPCDriver, self).printStatus()
-        self.iipc.printStatus(beg_msg='RPC Input Driver:')
-        self.oipc.printStatus(beg_msg='RPC Ouput Driver:')
+        self.icomm.printStatus(beg_msg='RPC Input Driver:')
+        self.ocomm.printStatus(beg_msg='RPC Ouput Driver:')
 
-    def ipc_send(self, data, use_input=False):
-        r"""Send message smaller than maxMsgSize to the output queue.
+    def send(self, data, *args, **kwargs):
+        r"""Send message smaller than maxMsgSize to the output comm.
 
         Args:
             data (str): Message to be sent.
-            use_input (bool, optional): If True, the message is sent to the
-                input queue instead of the output one.
-
-        """
-        if use_input:
-            self.iipc.ipc_send(data)
-        else:
-            self.oipc.ipc_send(data)
-
-    def ipc_recv(self, use_output=False):
-        r"""Receive message smaller than maxMsgSize from the input queue.
-
-        Args:
-            use_output (bool, optional): If True, the message is received from
-                the output queue instead of the input one.
+            *args: Arguments are passed to output comm send method.
+            **kwargs: Keyword arguments are passed to output comm send method.
 
         Returns:
-            str: The received message.
+           bool: Succes or failure of send.
 
         """
-        if use_output:
-            data = self.oipc.ipc_recv()
-        else:
-            data = self.iipc.ipc_recv()
-        return data
+        return self.ocomm.send(data, *args, **kwargs)
+
+    def recv(self, *args, **kwargs):
+        r"""Receive message smaller than maxMsgSize from the input comm.
+
+        Args:
+            *args: Arguments are passed to input comm recv method.
+            **kwargs: Keyword arguments are passed to input comm recv method.
+
+        Returns:
+            tuple (bool, str): Success or failure of recv and the received
+                message.
+
+        """
+        return self.icomm.recv(*args, **kwargs)
             
-    def ipc_send_nolimit(self, data, use_input=False):
-        r"""Send message larger than maxMsgSize to the input queue.
+    def send_nolimit(self, data, *args, **kwargs):
+        r"""Send message larger than maxMsgSize to the input comm.
 
         Args:
             data (str): Message to be sent.
-            use_input (bool, optional): If True, the message is sent to the
-                input queue instead of the output one.
-
-        """
-        if use_input:
-            self.iipc.ipc_send_nolimit(data)
-        else:
-            self.oipc.ipc_send_nolimit(data)
-
-    def ipc_recv_nolimit(self, use_output=False):
-        r"""Receive message larger than maxMsgSize from the output queue.
-
-        Args:
-            use_output (bool, optional): If True, the message is received from
-                the output queue instead of the input one.
+            *args: Arguments are passed to output comm send_nolimit method.
+            **kwargs: Keyword arguments are passed to output comm send_nolimit
+                method.
 
         Returns:
-            str: The received message.
+           bool: Succes or failure of send.
 
         """
-        if use_output:
-            data = self.oipc.ipc_recv_nolimit()
-        else:
-            data = self.iipc.ipc_recv_nolimit()
-        return data
+        return self.ocomm.send_nolimit(data, *args, **kwargs)
 
-    def recv_wait(self, use_output=False, timeout=0.0):
-        r"""Receive a message smaller than maxMsgSize. This method will wait
-        until there is a message in the queue to return or the queue is closed.
+    def recv_nolimit(self, *args, **kwargs):
+        r"""Receive message larger than maxMsgSize from the output comm.
 
         Args:
-            use_output (bool, optional): If True, the message is received from
-                the output queue instead of the input one.
-            timeout (float, optional): Max time that should be waited. Defaults
-                to 0 and is infinite.
+            *args: Arguments are passed to input comm recv_nolimit method.
+            **kwargs: Keyword arguments are passed to input comm recv_nolimit
+                method.
 
         Returns:
-            str: The received message.
+            tuple (bool, str): Success or failure of recv and the received
+                message.
 
         """
-        if use_output:
-            data = self.oipc.recv_wait(timeout=timeout)
-        else:
-            data = self.iipc.recv_wait(timeout=timeout)
-        return data
-
-    def recv_wait_nolimit(self, use_output=False, timeout=0.0):
-        r"""Receive a message larger than maxMsgSize. This method will wait
-        until there is a message in the queue to return or the queue is closed.
-
-        Args:
-            use_output (bool, optional): If True, the message is received from
-                the output queue instead of the input one.
-            timeout (float, optional): Max time that should be waited. Defaults
-                to 0 and is infinite.
-
-        Returns:
-            str: The received message.
-
-        """
-        if use_output:
-            data = self.oipc.recv_wait_nolimit(timeout=timeout)
-        else:
-            data = self.iipc.recv_wait_nolimit(timeout=timeout)
-        return data
+        return self.icomm.recv_nolimit(*args, **kwargs)

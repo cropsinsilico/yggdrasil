@@ -16,7 +16,7 @@ class TestCommParam(parent.TestParam, IOInfo):
         IOInfo.__init__(self)
         self.driver = 'CommDriver'
         self.comm_name = 'IPCComm'  # 'CommBase'
-        self.attr_list += ['state', 'numSent', 'numReceived', 'comm_cls',
+        self.attr_list += ['state', 'numSent', 'numReceived', 'comm_name',
                            'comm']
         self.timeout = 1.0
     
