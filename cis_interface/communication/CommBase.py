@@ -84,9 +84,15 @@ class CommBase(CisClass):
         return str(self.__class__).split("'")[1].split(".")[-1]
 
     @classmethod
+    def new_comm_kwargs(cls, *args, **kwargs):
+        r"""Get keyword arguments for new comm."""
+        kwargs.setdefault('address', 'address')
+        return args, kwargs
+
+    @classmethod
     def new_comm(cls, *args, **kwargs):
         r"""Initialize communication with new queue."""
-        kwargs.setdefault('address', 'address')
+        args, kwargs = cls.new_comm_kwargs(*args, **kwargs)
         return cls(*args, **kwargs)
 
     def opp_comm_kwargs(self):

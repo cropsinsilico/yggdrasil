@@ -32,24 +32,15 @@ class IPCComm(CommBase.CommBase):
         return _N_QUEUES
 
     @classmethod
-    def new_comm(cls, name, **kwargs):
-        r"""Initialize communication with new queue.
-
-        Args:
-            name (str): The name of the message queue.
-
-        Returns:
-            IPCComm: Instance with new queue.
-
-        """
+    def new_comm_kwargs(cls, *args, **kwargs):
+        r"""Initialize communication with new queue."""
         global _N_QUEUES
         if 'address' not in kwargs:
             q = tools.get_queue()
             kwargs['address'] = str(q.key)
             _N_QUEUES += 1
         # kwargs.setdefault('address', 'generate')
-        out = cls(name, **kwargs)
-        return out
+        return args, kwargs
 
     def open(self):
         r"""Open the connection by connecting to the queue."""

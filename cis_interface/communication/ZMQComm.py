@@ -98,12 +98,12 @@ class ZMQComm(CommBase.CommBase):
         return out
 
     @classmethod
-    def new_comm(cls, name, protocol='inproc', host='localhost', port=None,
-                 **kwargs):
+    def new_comm_kwargs(cls, name, protocol='inproc', host='localhost', port=None,
+                        **kwargs):
         r"""Initialize communication with new queue.
 
         Args:
-            name (str): The name of the message queue.
+            name (str): Name of new socket.
             protocol (str, optional): The protocol that should be used.
                 Defaults to 'inproc'. See zmq for details.
             host (str, optional): The host that should be used. Invalid for
@@ -113,9 +113,10 @@ class ZMQComm(CommBase.CommBase):
             **kwargs: Additional keywords arguments are passed to ZMQComm.
 
         Returns:
-            ZMQComm: Instance with new socket.
+            dict: Keyword arguments for new socket.
 
         """
+        args = [name]
         if 'address' not in kwargs:
             if host == 'localhost':
                 host = '127.0.0.1'
@@ -126,8 +127,7 @@ class ZMQComm(CommBase.CommBase):
             if port is not None:
                 address += ":%d" % port
             kwargs['address'] = address
-        out = cls(name, **kwargs)
-        return out
+        return args, kwargs
 
     def opp_comm_kwargs(self):
         r"""Get keyword arguments to initialize communication with opposite
