@@ -1,4 +1,4 @@
-# import sysv_ipc
+import sysv_ipc
 from cis_interface import backwards, tools
 from cis_interface.communication import CommBase
 

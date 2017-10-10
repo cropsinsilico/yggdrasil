@@ -1,6 +1,9 @@
 import importlib
 
 
+_default_comm = 'IPCComm'
+
+
 def get_comm_class(comm):
     r"""Return a communication class given it's name.
 
@@ -16,7 +19,7 @@ def get_comm_class(comm):
     return comm_cls
 
 
-def new_comm(name, comm='IPCComm', **kwargs):
+def new_comm(name, comm=None, **kwargs):
     r"""Return a new communicator.
 
     Args:
@@ -28,8 +31,13 @@ def new_comm(name, comm='IPCComm', **kwargs):
         Comm: Communicator of given class.
 
     """
+    if comm is None:
+        comm = _default_comm
     comm_cls = get_comm_class(comm)
     return comm_cls.new_comm(name, **kwargs)
+
+
+DefaultComm = get_comm_class(_default_comm)
 
 
 __all__ = ['new_comm']
