@@ -93,36 +93,6 @@ class PsiRpc(RPCComm.RPCComm):
                                      icomm_kwargs=icomm_kwargs,
                                      ocomm_kwargs=ocomm_kwargs)
 
-    # def rpcSend(self, *args):
-    #     r"""Send arguments as a message created using the output format string.
-
-    #     Args:
-    #         \*args: All arguments are formatted using the output format string
-    #             to create the message.
-
-    #     Returns:
-    #         bool: Success or failure of sending the message.
-
-    #     """
-    #     outmsg = backwards.bytes2unicode(self._outFmt) % args
-    #     return self._out.send_nolimit(backwards.unicode2bytes(outmsg))
-
-    # def rpcRecv(self):
-    #     r"""Receive a message and get arguments by parsing the recieved message
-    #     using the input format string.
-
-    #     Returns:
-    #         tuple (bool, tuple): Success or failure of receiving a message and
-    #             the tuple of arguments retreived by parsing the message using
-    #             the input format string.
-        
-    #     """
-    #     retval, args = self._in.recv_nolimit()
-    #     if retval:
-    #         args = scanf(backwards.bytes2unicode(self._inFmt),
-    #                      backwards.bytes2unicode(args))
-    #     return retval, args
-
     def call(self, *args):
         r"""Send arguments using the output format string to format a message
         and then receive values back by parsing the response message with the

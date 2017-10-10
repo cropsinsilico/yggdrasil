@@ -168,20 +168,20 @@ class TestPsiRpc(TestBase):
         nt.assert_equal(msg_recv, msg_send)
 
 
-# class TestPsiRpcClient(TestPsiRpc):
-#     r"""Test client-side RPC communication with Python."""
-#     def __init__(self, *args, **kwargs):
-#         super(TestPsiRpcClient, self).__init__(*args, **kwargs)
-#         self._cls = 'PsiRpcClient'
-#         self._inst_args = [self.name, self.fmt_str, self.fmt_str]
+class TestPsiRpcClient(TestPsiRpc):
+    r"""Test client-side RPC communication with Python."""
+    def __init__(self, *args, **kwargs):
+        super(TestPsiRpcClient, self).__init__(*args, **kwargs)
+        self._cls = 'PsiRpcClient'
+        self._inst_args = [self.name, self.fmt_str, self.fmt_str]
 
         
-# class TestPsiRpcServer(TestPsiRpc):
-#     r"""Test server-side RPC communication with Python."""
-#     def __init__(self, *args, **kwargs):
-#         super(TestPsiRpcServer, self).__init__(*args, **kwargs)
-#         self._cls = 'PsiRpcServer'
-#         self._inst_args = [self.name, self.fmt_str, self.fmt_str]
+class TestPsiRpcServer(TestPsiRpc):
+    r"""Test server-side RPC communication with Python."""
+    def __init__(self, *args, **kwargs):
+        super(TestPsiRpcServer, self).__init__(*args, **kwargs)
+        self._cls = 'PsiRpcServer'
+        self._inst_args = [self.name, self.fmt_str, self.fmt_str]
 
         
 # class TestPsiAsciiFileInput(CisTest, IOInfo):
