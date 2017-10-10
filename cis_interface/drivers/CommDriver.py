@@ -1,4 +1,3 @@
-import importlib
 from cis_interface.drivers.Driver import Driver
 from cis_interface.tools import PSI_MSG_MAX
 from cis_interface.communication import new_comm

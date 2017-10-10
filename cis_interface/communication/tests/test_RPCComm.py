@@ -60,4 +60,3 @@ class TestRPCComm(test_CommBase.TestCommBase):
         nt.assert_equal(msg_recv, self.msg_long)
         flag, msg_recv = self.send_instance.recv_nolimit()
         nt.assert_equal(msg_recv, self.msg_long)
-

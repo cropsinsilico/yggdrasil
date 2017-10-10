@@ -1,7 +1,8 @@
 import nose.tools as nt
 from cis_interface.drivers.tests.test_IODriver import IOInfo
 from cis_interface.drivers.tests import test_Driver as parent
-from cis_interface.communication import get_comm_class, new_comm, CommBase
+from cis_interface.communication import (
+    get_comm_class, new_comm, CommBase, _default_comm)
 
             
 class TestConnectionParam(parent.TestParam, IOInfo):
@@ -15,7 +16,7 @@ class TestConnectionParam(parent.TestParam, IOInfo):
         super(TestConnectionParam, self).__init__(*args, **kwargs)
         IOInfo.__init__(self)
         self.driver = 'ConnectionDriver'
-        self.comm_name = 'IPCComm'
+        self.comm_name = _default_comm
         self.attr_list += ['icomm_kws', 'ocomm_kws', 'icomm', 'ocomm',
                            'nrecv', 'nproc', 'nsent', 'state']
         self.timeout = 1.0

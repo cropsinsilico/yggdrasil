@@ -1,7 +1,7 @@
 import nose.tools as nt
 from cis_interface.drivers.tests.test_IODriver import IOInfo
 from cis_interface.drivers.tests import test_Driver as parent
-from cis_interface.communication import get_comm_class, new_comm
+from cis_interface.communication import get_comm_class, new_comm, _default_comm
 
             
 class TestCommParam(parent.TestParam, IOInfo):
@@ -15,7 +15,7 @@ class TestCommParam(parent.TestParam, IOInfo):
         super(TestCommParam, self).__init__(*args, **kwargs)
         IOInfo.__init__(self)
         self.driver = 'CommDriver'
-        self.comm_name = 'IPCComm'  # 'CommBase'
+        self.comm_name = _default_comm
         self.attr_list += ['state', 'numSent', 'numReceived', 'comm_name',
                            'comm']
         self.timeout = 1.0
@@ -39,7 +39,7 @@ class TestCommParam(parent.TestParam, IOInfo):
     @property
     def send_comm_kwargs(self):
         r"""dict: Keyword arguments for send comm."""
-        return {'timeout': self.timeout}
+        return {'timeout': self.timeout, 'comm': self.comm_name}
 
     @property
     def recv_comm_kwargs(self):
@@ -55,7 +55,6 @@ class TestCommParam(parent.TestParam, IOInfo):
             out.update(**self.send_comm_kwargs)
         else:
             out.update(**self.recv_comm_kwargs)
-        out['comm'] = self.comm_name
         return out
 
     @property
