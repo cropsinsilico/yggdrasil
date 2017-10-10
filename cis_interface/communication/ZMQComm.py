@@ -143,12 +143,15 @@ class ZMQComm(CommBase.CommBase):
 
     def bind(self):
         r"""Bind to address, getting random port as necessary."""
+        self._bound = True
         if self.port is None:
             port = self.socket.bind_to_random_port(self.address)
             self.address += ":%d" % port
         else:
-            self.socket.bind(self.address)
-        self._bound = True
+            if self.direction == 'send':
+                self.socket.bind(self.address)
+            else:
+                self._bound = False
 
     def open(self, reserve=False):
         r"""Open connection by binding/connect to the specified socket."""

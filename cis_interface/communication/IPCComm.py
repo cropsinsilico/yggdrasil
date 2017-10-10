@@ -1,9 +1,126 @@
 import sysv_ipc
+from subprocess import Popen, PIPE
 from cis_interface import backwards, tools
 from cis_interface.communication import CommBase
 
 
 _N_QUEUES = 0
+_registered_queues = {}
+
+
+def get_queue(qid=None):
+    r"""Create or return a sysv_ipc.MessageQueue and register it.
+
+    Args:
+        qid (int, optional): If provided, ID for existing queue that should be
+           returned. Defaults to None and a new queue is returned.
+
+    Returns:
+        :class:`sysv_ipc.MessageQueue`: Message queue.
+
+    """
+    kwargs = dict(max_message_size=tools.PSI_MSG_MAX)
+    if qid is None:
+        kwargs['flags'] = sysv_ipc.IPC_CREX
+    mq = sysv_ipc.MessageQueue(qid, **kwargs)
+    key = str(mq.key)
+    if key not in _registered_queues:
+        _registered_queues[key] = mq
+    return mq
+
+
+def remove_queue(mq):
+    r"""Remove a sysv_ipc.MessageQueue and unregister it.
+
+    Args:
+        mq (:class:`sysv_ipc.MessageQueue`) Message queue.
+    
+    Raises:
+        KeyError: If the provided queue is not registered.
+
+    """
+    key = str(mq.key)
+    if key not in _registered_queues:
+        raise KeyError("Queue not registered.")
+    _registered_queues.pop(key)
+    mq.remove()
+    
+
+def ipcs(options=[]):
+    r"""Get the output from running the ipcs command.
+
+    Args:
+        options (list): List of flags that should be used. Defaults to an empty
+            list.
+
+    Returns:
+        list: Captured output.
+
+    """
+    cmd = ' '.join(['ipcs'] + options)
+    p = Popen(cmd, stdin=PIPE, stdout=PIPE, stderr=PIPE, shell=True)
+    output, err = p.communicate()
+    exit_code = p.returncode
+    if exit_code != 0:  # pragma: debug
+        if not err.isspace():
+            print(err.decode('utf-8'))
+        raise Exception("Error on spawned process. See output.")
+    return output.decode('utf-8')
+
+
+def ipc_queues():
+    r"""Get a list of active IPC queues.
+
+    Returns:
+       list: List of IPC queues.
+
+    """
+    skip_lines = [
+        '------ Message Queues --------',
+        'key        msqid      owner      perms      used-bytes   messages    ',
+        '']
+    out = ipcs(['-q']).split('\n')
+    qlist = []
+    for l in out:
+        if l not in skip_lines:
+            qlist.append(l)
+    return qlist
+
+
+def ipcrm(options=[]):
+    r"""Remove IPC constructs using the ipcrm command.
+
+    Args:
+        options (list): List of flags that should be used. Defaults to an empty
+            list.
+
+    """
+    cmd = ' '.join(['ipcrm'] + options)
+    p = Popen(cmd, stdin=PIPE, stdout=PIPE, stderr=PIPE, shell=True)
+    output, err = p.communicate()
+    exit_code = p.returncode
+    if exit_code != 0:  # pragma: debug
+        if not err.isspace():
+            print(err.decode('utf-8'))
+        raise Exception("Error on spawned process. See output.")
+    if not output.isspace():
+        print(output.decode('utf-8'))
+
+
+def ipcrm_queues(queue_keys=None):
+    r"""Delete existing IPC queues.
+
+    Args:
+        queue_keys (list, str, optional): A list of keys for queues that should
+            be removed. Defaults to all existing queues.
+
+    """
+    if queue_keys is None:
+        queue_keys = [l.split()[0] for l in ipc_queues()]
+    if isinstance(queue_keys, str):
+        queue_keys = [queue_keys]
+    for q in queue_keys:
+        ipcrm(["-Q %s" % q])
 
 
 class IPCComm(CommBase.CommBase):
@@ -36,7 +153,7 @@ class IPCComm(CommBase.CommBase):
         r"""Initialize communication with new queue."""
         global _N_QUEUES
         if 'address' not in kwargs:
-            q = tools.get_queue()
+            q = get_queue()
             kwargs['address'] = str(q.key)
             _N_QUEUES += 1
         # kwargs.setdefault('address', 'generate')
@@ -47,19 +164,19 @@ class IPCComm(CommBase.CommBase):
         global _N_QUEUES
         if not self.is_open:
             if self.address == 'generate':
-                self.q = tools.get_queue()
+                self.q = get_queue()
                 self.address = str(self.q.key)
                 _N_QUEUES += 1
             else:
                 qid = int(self.address)
-                self.q = tools.get_queue(qid)
+                self.q = get_queue(qid)
             self.debug(": qid %s", self.q.key)
 
     def close(self):
         r"""Close the connection."""
         if self.is_open:
             try:
-                tools.remove_queue(self.q)
+                remove_queue(self.q)
             except KeyError:
                 pass
             self.q = None

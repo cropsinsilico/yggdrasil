@@ -47,6 +47,7 @@ class TestRPCParam(parent.TestParam, IOInfo):
         assert(self.recv_comm.is_closed)
         super(TestRPCParam, self).teardown(*args, **kwargs)
         
+        
 class TestRPCDriverNoStart(TestRPCParam, parent.TestDriverNoStart, IOInfo):
     r"""Test class for RPCDriver class without start.
 
