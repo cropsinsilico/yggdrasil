@@ -17,4 +17,5 @@ class FileOutputDriver(ConnectionDriver):
         ocomm_kws['address'] = args
         kwargs['ocomm_kws'] = ocomm_kws
         super(FileOutputDriver, self).__init__(name, **kwargs)
+        self.env[self.name] = self.icomm.address
         self.debug('(%s)', args)

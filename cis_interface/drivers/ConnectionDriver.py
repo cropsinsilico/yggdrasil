@@ -28,13 +28,15 @@ class ConnectionDriver(Driver):
         # Input communicator
         icomm_kws['direction'] = 'recv'
         icomm_kws['dont_open'] = True
-        self.icomm = new_comm(name, **icomm_kws)
+        self.icomm = new_comm(name + '_IN', **icomm_kws)
         self.icomm_kws = icomm_kws
+        self.env[self.icomm.name] = self.icomm.address
         # Output communicator
         ocomm_kws['direction'] = 'send'
         ocomm_kws['dont_open'] = True
-        self.ocomm = new_comm(name, **ocomm_kws)
+        self.ocomm = new_comm(name + '_OUT', **ocomm_kws)
         self.ocomm_kws = ocomm_kws
+        self.env[self.ocomm.name] = self.ocomm.address
         # Attributes
         self.nrecv = 0
         self.nproc = 0

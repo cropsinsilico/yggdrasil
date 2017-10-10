@@ -233,31 +233,3 @@ class ZMQComm(CommBase.CommBase):
             self.exception(".recv(): Error")
             return (False, None)
         return (True, backwards.unicode2bytes('').join(msg_chunks))
-
-
-class ZMQInput(ZMQComm):
-    r"""Class for handling input via a ZeroMQ socket.
-
-    Args:
-        name (str): The environment variable where the socket address is
-            stored.
-        **kwargs: All additional keywords are passed to ZMQComm.
-
-    """
-    def __init__(self, name, **kwargs):
-        kwargs['direction'] = 'recv'
-        super(ZMQInput, self).__init__(name, **kwargs)
-        
-        
-class ZMQOutput(ZMQComm):
-    r"""Class for handling output via a ZeroMQ socket.
-
-    Args:
-        name (str): The environment variable where the socket address is
-            stored.
-        **kwargs: All additional keywords are passed to ZMQComm.
-
-    """
-    def __init__(self, name, **kwargs):
-        kwargs['direction'] = 'send'
-        super(ZMQOutput, self).__init__(name, **kwargs)

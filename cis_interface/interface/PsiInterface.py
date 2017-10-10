@@ -8,7 +8,8 @@ from cis_interface.dataio.AsciiFile import AsciiFile
 from cis_interface.dataio.AsciiTable import AsciiTable
 from cis_interface import backwards, tools
 from cis_interface.tools import PSI_MSG_MAX, PSI_MSG_EOF
-from cis_interface.communication import DefaultComm, RPCComm
+from cis_interface.communication import (
+    DefaultComm, RPCComm, AsciiFileComm, AsciiTableComm)
 
 
 def PsiMatlab(_type, args=[]):
@@ -145,8 +146,8 @@ class PsiRpcClient(PsiRpc):
     
 
 # Specialized classes for ascii IO
-class PsiAsciiFileInput(object):
-    r"""Class for generic ASCII input from either a file or message queue.
+def PsiAsciiFileInput(name, src_type=1, **kwargs):
+    r"""Wrapper to create interface with the correct base comm.
 
     Args:
         name (str): Path to the local file that input should be read from (if
@@ -154,44 +155,32 @@ class PsiAsciiFileInput(object):
             should be received from.
         src_type (int, optional): If 0, input is read from a local file.
             Otherwise input is received from a message queue. Defauts to 1.
+        **kwargs: Additional keyword arguments are passed to the base comm.
 
     """
-    _name = None
-    _type = 0
-    _file = None
-    _psi = None
 
-    def __init__(self, name, src_type=1, matlab=False):
-        self._name = name
-        self._type = src_type
-        if self._type == 0:
-            self._file = AsciiFile(name, 'r')
-            self._file.open()
-        else:
-            self._psi = PsiInput(name)
-            self._file = AsciiFile(name, None)
+    if src_type == 0:
+        base = AsciiFileComm.AsciiFileComm
+        kwargs.setdefault('address', name)
+    else:
+        base = DefaultComm
+    
+    class PsiAsciiFileInput(base):
+        r"""Class for generic ASCII input from either a file or message queue.
 
-    def __del__(self):
-        if self._type == 0 and (self._file is not None):
-            self._file.close()
-            self._file = None
-
-    def recv_line(self):
-        r"""Receive a single line of ASCII input.
-
-        Returns:
-            tuple(bool, str): Success or failure of receiving a line and the
-                line received (including the newline character).
+        Args:
+            name (str): Path to the local file that input should be read from (if
+                src_type == 0) or the name of the input message queue that input
+                should be received from.
+            **kwargs: Additional keyword arguments are passed to the base comm.
 
         """
-        if self._type == 0:
-            eof, line = self._file.readline()
-            ret = (not eof)
-        else:
-            ret, line = self._psi.recv()
-            if (len(line) == 0) or (line == PSI_MSG_EOF):
-                ret = False
-        return ret, line
+
+        def __init__(self, name, matlab=False, **kwargs):
+            kwargs.setdefault('direction', 'recv')
+            super(PsiAsciiFileInput, self).__init__(name, **kwargs)
+
+    return PsiAsciiFileInput(name, **kwargs)
 
 
 class PsiAsciiFileOutput(object):

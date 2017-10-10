@@ -44,16 +44,19 @@ class TestBase(CisTest, IOInfo):
     def driver_kwargs(self):
         return {}
         
-    def setup(self):
+    def setup(self, skip_start=False):
         r"""Start driver and instance."""
         self.driver = self.driver_class(*self.driver_args, **self.driver_kwargs)
-        self.driver.start()
+        if not skip_start:
+            self.driver.start()
         os.environ.update(self.driver.env)
+        self._skip_start = skip_start
         super(TestBase, self).setup()
 
     def teardown(self):
         r"""Stop the driver."""
-        self.driver.stop()
+        if not self._skip_start:
+            self.driver.stop()
         super(TestBase, self).teardown()
 
     
@@ -184,49 +187,53 @@ class TestPsiRpcServer(TestPsiRpc):
         self._inst_args = [self.name, self.fmt_str, self.fmt_str]
 
         
-# class TestPsiAsciiFileInput(CisTest, IOInfo):
-#     r"""Test input from an unformatted text file."""
-#     def __init__(self, *args, **kwargs):
-#         super(TestPsiAsciiFileInput, self).__init__(*args, **kwargs)
-#         IOInfo.__init__(self)
-#         self.name = 'test'
-#         self.tempfile = os.path.join(os.getcwd(), 'temp_ascii.txt')
+class TestPsiAsciiFileInput(TestBase):
+    r"""Test input from an unformatted text file."""
+    def __init__(self, *args, **kwargs):
+        super(TestPsiAsciiFileInput, self).__init__(*args, **kwargs)
+        self._cls = 'PsiAsciiFileInput'
+        self.tempfile = os.path.join(os.getcwd(), 'temp_ascii.txt')
+        self.driver_class = AsciiFileInputDriver.AsciiFileInputDriver
+        self.driver_args = [self.name, self.tempfile]
+        self._inst_args = [self.name]
+        self._inst_kwargs = {}
 
-#     def setup(self):
-#         r"""Create a test file and start the driver."""
-#         if not os.path.isfile(self.tempfile):
-#             self.write_table(self.tempfile)
-#         self.driver = AsciiFileInputDriver.AsciiFileInputDriver(
-#             self.name, self.tempfile)
-#         self.driver.start()
-#         self.driver.sleep(0.1)
-#         os.environ.update(self.driver.env)
+    def setup(self):
+        r"""Create a test file."""
+        if not os.path.isfile(self.tempfile):
+            self.write_table(self.tempfile)
+        skip_start = False
+        if self.inst_kwargs.get('src_type', 1) == 0:
+            skip_start = True
+        super(TestPsiAsciiFileInput, self).setup(skip_start=skip_start)
 
-#     def teardown(self):
-#         r"""Stop the driver."""
-#         self.driver.terminate()
-#         if os.path.isfile(self.tempfile):
-#             os.remove(self.tempfile)
+    def teardown(self):
+        r"""Remove the test file."""
+        super(TestPsiAsciiFileInput, self).teardown()
+        if os.path.isfile(self.tempfile):
+            os.remove(self.tempfile)
 
-#     def test_recv_line_loc(self):
-#         r"""Test receiving a line from a local file."""
-#         inst = PsiInterface.PsiAsciiFileInput(self.tempfile, src_type=0)
-#         for lans in self.file_lines:
-#             msg_flag, lres = inst.recv_line()
-#             assert(msg_flag)
-#             nt.assert_equal(lres, lans)
-#         msg_flag, lres = inst.recv_line()
-#         assert(not msg_flag)
+    def test_recv_line(self):
+        r"""Test receiving a line from a remote file."""
+        for lans in self.file_lines:
+            msg_flag, lres = self.instance.recv()
+            assert(msg_flag)
+            nt.assert_equal(lres, lans)
+        msg_flag, lres = self.instance.recv()
+        assert(not msg_flag)
 
-#     def test_recv_line_rem(self):
-#         r"""Test receiving a line from a remote file."""
-#         inst = PsiInterface.PsiAsciiFileInput(self.name, src_type=1)
-#         for lans in self.file_lines:
-#             msg_flag, lres = inst.recv_line()
-#             assert(msg_flag)
-#             nt.assert_equal(lres, lans)
-#         msg_flag, lres = inst.recv_line()
-#         assert(not msg_flag)
+
+class TestPsiAsciiFileInput_local(TestPsiAsciiFileInput):
+    r"""Test input from an unformatted text file."""
+    def __init__(self, *args, **kwargs):
+        super(TestPsiAsciiFileInput_local, self).__init__(*args, **kwargs)
+        self._inst_args = [self.tempfile]
+        self._inst_kwargs = {'src_type': 0}  # local
+
+    def test_recv_line(self):
+        r"""Test receiving a line from a local file."""
+        super(TestPsiAsciiFileInput_local, self).test_recv_line()
+        
 
 
 # class TestPsiAsciiFileOutput(CisTest, IOInfo):
