@@ -3,9 +3,7 @@ import numpy as np
 import nose.tools as nt
 from cis_interface.interface import PsiInterface
 from cis_interface.interface.PsiInterface import PSI_MSG_EOF, PSI_MSG_MAX
-from cis_interface.drivers import (IODriver, CommDriver, RPCDriver,
-                                   AsciiFileInputDriver,
-                                   AsciiTableInputDriver)
+from cis_interface.drivers import import_driver, CommDriver
 from cis_interface.tests import CisTest
 from cis_interface.drivers.tests.test_IODriver import IOInfo
 from cis_interface.backwards import pickle
@@ -36,9 +34,14 @@ class TestBase(CisTest, IOInfo):
         self._mod = 'cis_interface.interface.PsiInterface'
         self.name = 'test'
         self.driver = None
-        self.driver_class = CommDriver.CommDriver
+        self.driver_name = 'CommDriver'
         self.driver_args = []
         self._inst_args = [self.name]
+
+    @property
+    def driver_class(self):
+        r"""class: Driver class."""
+        return import_driver(self.driver_name)
 
     @property
     def driver_kwargs(self):
@@ -136,7 +139,6 @@ class TestPsiRpc(TestBase):
         self._cls = 'PsiRpc'
         self._inst_args = [self.name, self.fmt_str,
                            self.name, self.fmt_str]
-        # self.driver_class = RPCDriver.RPCDriver
         self.driver_args = [self.name]
 
     def test_rpcSendRecv(self):
@@ -193,7 +195,7 @@ class TestPsiAsciiFileInput(TestBase):
         super(TestPsiAsciiFileInput, self).__init__(*args, **kwargs)
         self._cls = 'PsiAsciiFileInput'
         self.tempfile = os.path.join(os.getcwd(), 'temp_ascii.txt')
-        self.driver_class = AsciiFileInputDriver.AsciiFileInputDriver
+        self.driver_name = 'AsciiFileInputDriver'
         self.driver_args = [self.name, self.tempfile]
         self._inst_args = [self.name]
         self._inst_kwargs = {}
@@ -215,8 +217,9 @@ class TestPsiAsciiFileInput(TestBase):
 
     def test_recv_line(self):
         r"""Test receiving a line from a remote file."""
+        self.instance.sleep()
         for lans in self.file_lines:
-            msg_flag, lres = self.instance.recv()
+            msg_flag, lres = self.instance.recv(timeout=1)
             assert(msg_flag)
             nt.assert_equal(lres, lans)
         msg_flag, lres = self.instance.recv()
@@ -235,57 +238,86 @@ class TestPsiAsciiFileInput_local(TestPsiAsciiFileInput):
         super(TestPsiAsciiFileInput_local, self).test_recv_line()
         
 
+class TestPsiAsciiFileOutput(TestBase):
+    r"""Test output from an unformatted text file."""
+    def __init__(self, *args, **kwargs):
+        super(TestPsiAsciiFileOutput, self).__init__(*args, **kwargs)
+        self._cls = 'PsiAsciiFileOutput'
+        self.tempfile = os.path.join(os.getcwd(), 'temp_ascii.txt')
+        self.driver_name = 'AsciiFileOutputDriver'
+        self.driver_args = [self.name, self.tempfile]
+        self._inst_args = [self.name]
+        self._inst_kwargs = {}
 
-# class TestPsiAsciiFileOutput(CisTest, IOInfo):
-#     r"""Test output from an unformatted text file."""
-#     def __init__(self, *args, **kwargs):
-#         super(TestPsiAsciiFileOutput, self).__init__(*args, **kwargs)
-#         IOInfo.__init__(self)
-#         self.name = 'test'
-#         self.tempfile = os.path.join(os.getcwd(), 'temp_ascii.txt')
+    @property
+    def file_comm(self):
+        r"""FileComm: File communicator."""
+        if self.inst_kwargs.get('dst_type', 1) == 0:
+            return self.instance
+        else:
+            return self.driver.ocomm
 
-#     def setup(self):
-#         r"""Create a test file and start the driver."""
-#         if not os.path.isfile(self.tempfile):
-#             self.write_table(self.tempfile)
-#         self.driver = IODriver.IODriver(self.name, '_OUT')
-#         self.driver.start()
-#         os.environ.update(self.driver.env)
+    def setup(self):
+        r"""Create a test file."""
+        # if not os.path.isfile(self.tempfile):
+        #     self.write_table(self.tempfile)
+        skip_start = False
+        if self.inst_kwargs.get('dst_type', 1) == 0:
+            skip_start = True
+        super(TestPsiAsciiFileOutput, self).setup(skip_start=skip_start)
 
-#     def teardown(self):
-#         r"""Stop the driver."""
-#         self.driver.stop()
-#         if os.path.isfile(self.tempfile):
-#             os.remove(self.tempfile)
+    def teardown(self):
+        r"""Remove the test file."""
+        self.file_comm.remove_file()
+        super(TestPsiAsciiFileOutput, self).teardown()
+            
+    # def test_send_line_loc(self):
+    #     r"""Test sending a line to a local file."""
+    #     inst = PsiInterface.PsiAsciiFileOutput(self.tempfile, dst_type=0)
+    #     msg_flag = inst.send_line(self.fmt_str_line)
+    #     assert(msg_flag)
+    #     for lans in self.file_lines:
+    #         msg_flag = inst.send_line(lans)
+    #         assert(msg_flag)
+    #     inst.send_eof()
+    #     del inst
+    #     # Read temp file
+    #     assert(os.path.isfile(self.tempfile))
+    #     with open(self.tempfile, 'rb') as fd:
+    #         res = fd.read()
+    #         nt.assert_equal(res, self.file_contents)
 
-#     def test_send_line_loc(self):
-#         r"""Test sending a line to a local file."""
-#         inst = PsiInterface.PsiAsciiFileOutput(self.tempfile, dst_type=0)
-#         msg_flag = inst.send_line(self.fmt_str_line)
-#         assert(msg_flag)
-#         for lans in self.file_lines:
-#             msg_flag = inst.send_line(lans)
-#             assert(msg_flag)
-#         inst.send_eof()
-#         del inst
-#         # Read temp file
-#         assert(os.path.isfile(self.tempfile))
-#         with open(self.tempfile, 'rb') as fd:
-#             res = fd.read()
-#             nt.assert_equal(res, self.file_contents)
+    def test_send_line(self):
+        r"""Test sending a line to a remote file."""
+        msg_flag = self.instance.send(self.fmt_str_line)
+        assert(msg_flag)
+        for lans in self.file_lines:
+            msg_flag = self.instance.send(lans)
+            assert(msg_flag)
+        msg_flag = self.instance.send_eof()
+        # assert(not msg_flag)
+        # Read temp file
+        Tout = self.instance.start_timeout()
+        while self.file_comm.is_open and not Tout.is_out:
+            self.instance.sleep()
+        self.instance.stop_timeout()
+        assert(os.path.isfile(self.tempfile))
+        with open(self.tempfile, 'rb') as fd:
+            res = fd.read()
+            nt.assert_equal(res, self.file_contents)
 
-#     def test_send_line_rem(self):
-#         r"""Test sending a line to a remote file."""
-#         inst = PsiInterface.PsiAsciiFileOutput(self.name, dst_type=1)
-#         for lans in self.file_lines:
-#             msg_flag = inst.send_line(lans)
-#             assert(msg_flag)
-#             lres = self.driver.recv_wait(timeout=1)
-#             nt.assert_equal(lres, lans)
-#         inst.send_eof()
-#         eans = self.driver.recv_wait(timeout=1)
-#         nt.assert_equal(eans, PSI_MSG_EOF)
 
+class TestPsiAsciiFileOutput_local(TestPsiAsciiFileOutput):
+    r"""Test input from an unformatted text file."""
+    def __init__(self, *args, **kwargs):
+        super(TestPsiAsciiFileOutput_local, self).__init__(*args, **kwargs)
+        self._inst_args = [self.tempfile]
+        self._inst_kwargs = {'dst_type': 0}  # local
+
+    def test_send_line(self):
+        r"""Test sending a line to a local file."""
+        super(TestPsiAsciiFileOutput_local, self).test_send_line()
+        
 
 # class TestPsiAsciiTableInput(CisTest, IOInfo):
 #     r"""Test input from an ascii table."""
