@@ -210,7 +210,7 @@ class CommBase(CisClass):
         """
         return True
     
-    def on_send(self, msg, *args, **kwargs):
+    def on_send(self, msg):
         r"""Process message to be sent including handling serializing
         message and handling EOF.
 
@@ -259,36 +259,34 @@ class CommBase(CisClass):
         """
         return self.send_nolimit(self.eof_msg, *args, **kwargs)
         
-    def send(self, msg, *args, **kwargs):
+    def send(self, *args, **kwargs):
         r"""Send a message shorter than PSI_MSG_MAX.
 
         Args:
-            msg (obj): Message to be sent that can be parsed by meth_serialize.
-            *args: All arguments are passed to comm _send method.
+            *args: All arguments are assumed to be part of the message.
             **kwargs: All keywords arguments are passed to comm _send method.
 
         Returns:
             bool: Success or failure of send.
 
         """
-        flag, msg_s = self.on_send(msg)
+        flag, msg_s = self.on_send(args)
         if not flag:
             return False
         try:
-            self.debug('.send(): %d bytes', len(msg))
-            ret = self._send(msg_s, *args, **kwargs)
-            self.debug('.send(): %d bytes sent', len(msg))
+            self.debug('.send(): %d bytes', len(msg_s))
+            ret = self._send(msg_s, **kwargs)
+            self.debug('.send(): %d bytes sent', len(msg_s))
         except:
             self.exception('.send(): Failed to send.')
             return False
         return ret
 
-    def send_nolimit(self, msg, *args, **kwargs):
+    def send_nolimit(self, *args, **kwargs):
         r"""Send a message larger than PSI_MSG_MAX.
 
         Args:
-            msg (obj): Message to be sent that can be parsed by meth_serialize.
-            *args: All arguments are passed to comm _send_nolimit method.
+            *args: All arguments assumed to be part of the message.
             **kwargs: All keywords arguments are passed to comm _send_nolimit
                 method.
 
@@ -296,13 +294,13 @@ class CommBase(CisClass):
             bool: Success or failure of send.
 
         """
-        flag, msg_s = self.on_send(msg)
+        flag, msg_s = self.on_send(args)
         if not flag:
             return False
         try:
-            self.debug('.send_nolimit(): %d bytes', len(msg))
-            ret = self._send_nolimit(msg_s, *args, **kwargs)
-            self.debug('.send_nolimit(): %d bytes sent', len(msg))
+            self.debug('.send_nolimit(): %d bytes', len(msg_s))
+            ret = self._send_nolimit(msg_s, **kwargs)
+            self.debug('.send_nolimit(): %d bytes sent', len(msg_s))
         except:
             self.exception('.send_nolimit(): Failed to send.')
             return False
