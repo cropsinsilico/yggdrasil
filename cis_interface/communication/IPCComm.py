@@ -300,26 +300,3 @@ class IPCComm(CommBase.CommBase):
         if ret:
             self.debug(".send_nolimit %d bytes completed", len(payload))
         return ret
-
-
-class IPCInput(IPCComm):
-    r"""Class for handling input via an IPC queue.
-
-    Args:
-        name (str): The environment variable where the queue ID is stored.
-        **kwargs: All additional keywords are passed to IPCComm.
-
-    """
-    def __init__(self, name, **kwargs):
-        super(IPCInput, self).__init__(name + "_IN", **kwargs)
-
-        
-class IPCOutput(IPCComm):
-    r"""Class for handling output via an IPC queue.
-
-    Args:
-        name (str): The environment variable where the queue ID is stored.
-        **kwargs: All additional keywords are passed to IPCComm.
-    """
-    def __init__(self, name, **kwargs):
-        super(IPCOutput, self).__init__(name + "_OUT", **kwargs)
