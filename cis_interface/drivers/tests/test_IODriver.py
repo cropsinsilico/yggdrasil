@@ -1,3 +1,4 @@
+import os
 import numpy as np
 import nose.tools as nt
 from cis_interface.drivers.IODriver import maxMsgSize
@@ -81,6 +82,11 @@ class IOInfo(object):
             AssertionError: If the two are not equal.
 
         """
+        if isinstance(x, file):
+            x = pickle.load(x)
+        elif isinstance(x, str) and os.path.isfile(x):
+            with open(x, 'rb') as fd:
+                x = pickle.load(fd)
         nt.assert_equal(type(x), type(self.data_dict))
         for k in self.data_dict:
             if k not in x:  # pragma: debug

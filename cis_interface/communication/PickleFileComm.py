@@ -1,5 +1,3 @@
-import os
-from cis_interface.serialize import PickleSerialize, PickleDeserialize
 from cis_interface.communication import FileComm
 
 

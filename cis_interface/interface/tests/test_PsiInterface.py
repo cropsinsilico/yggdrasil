@@ -480,48 +480,61 @@ class TestPsiPickleInput_local(TestPsiPickleInput):
         super(TestPsiPickleInput_local, self).test_recv()
 
         
-# class TestPsiPickleOutput(CisTest, IOInfo):
-#     r"""Test output from a pickle."""
-#     def __init__(self, *args, **kwargs):
-#         super(TestPsiPickleOutput, self).__init__(*args, **kwargs)
-#         IOInfo.__init__(self)
-#         self.name = 'test'
-#         self.tempfile = os.path.join(os.getcwd(), 'temp_ascii.dat')
+class TestPsiPickleOutput(TestBase):
+    r"""Test output from a pickle."""
+    def __init__(self, *args, **kwargs):
+        super(TestPsiPickleOutput, self).__init__(*args, **kwargs)
+        self._cls = 'PsiPickleOutput'
+        self.tempfile = os.path.join(os.getcwd(), 'temp_ascii.dat')
+        self.driver_name = 'PickleFileOutputDriver'
+        self.driver_args = [self.name, self.tempfile]
+        self._inst_args = [self.name]
+        self._inst_kwargs = {}
 
-#     def setup(self):
-#         r"""Create a test file and start the driver."""
-#         if not os.path.isfile(self.tempfile):
-#             self.write_pickle(self.tempfile)
-#         self.driver = IODriver.IODriver(self.name, '_OUT')
-#         self.driver.start()
-#         os.environ.update(self.driver.env)
+    @property
+    def file_comm(self):
+        r"""FileComm: File communicator."""
+        if self.inst_kwargs.get('dst_type', 1) == 0:
+            return self.instance
+        else:
+            return self.driver.ocomm
+        
+    def setup(self):
+        r"""Create a test file and start the driver."""
+        skip_start = False
+        if self.inst_kwargs.get('src_type', 1) == 0:
+            skip_start = True
+        super(TestPsiPickleOutput, self).setup(skip_start=skip_start)
 
-#     def teardown(self):
-#         r"""Stop the driver."""
-#         self.driver.stop()
-#         if os.path.isfile(self.tempfile):
-#             os.remove(self.tempfile)
+    def teardown(self):
+        r"""Remove the test file."""
+        super(TestPsiPickleOutput, self).teardown()
+        if os.path.isfile(self.tempfile):
+            os.remove(self.tempfile)
 
-#     def test_send_loc(self):
-#         r"""Test sending a pickle to a local file."""
-#         inst = PsiInterface.PsiPickleOutput(self.tempfile, dst_type=0)
-#         msg_flag = inst.send(self.data_dict)
-#         assert(msg_flag)
-#         del inst
-#         # Read temp file
-#         assert(os.path.isfile(self.tempfile))
-#         with open(self.tempfile, 'rb') as fd:
-#             res = pickle.load(fd)
-#             self.assert_equal_data_dict(res)
-#             # res_pickle = pickle.dumps(res)
-#             # nt.assert_equal(res_pickle, self.pickled_data)
+    def test_send(self):
+        r"""Test sending a pickle to a remote file."""
+        msg_flag = self.instance.send(self.data_dict)
+        assert(msg_flag)
+        self.instance.send_eof()
+        # assert(msg_flag)
+        # Read temp file
+        Tout = self.instance.start_timeout()
+        while self.file_comm.is_open and not Tout.is_out:
+            self.instance.sleep()
+        self.instance.stop_timeout()
+        # Read temp file
+        assert(os.path.isfile(self.tempfile))
+        self.assert_equal_data_dict(self.tempfile)
 
-#     def test_send_rem(self):
-#         r"""Test sending a pickle to a remote file."""
-#         inst = PsiInterface.PsiPickleOutput(self.name, dst_type=1)
-#         msg_flag = inst.send(self.data_dict)
-#         assert(msg_flag)
-#         res = self.driver.recv_wait_nolimit(timeout=1)
-#         res = pickle.loads(res)
-#         self.assert_equal_data_dict(res)
-#         # nt.assert_equal(res, self.pickled_data)
+
+class TestPsiPickleOutput_local(TestPsiPickleOutput):
+    r"""Test input from an unformatted text file."""
+    def __init__(self, *args, **kwargs):
+        super(TestPsiPickleOutput_local, self).__init__(*args, **kwargs)
+        self._inst_args = [self.tempfile]
+        self._inst_kwargs = {'dst_type': 0}  # local
+
+    def test_send(self):
+        r"""Test sending a pickle to a local file."""
+        super(TestPsiPickleOutput_local, self).test_send()

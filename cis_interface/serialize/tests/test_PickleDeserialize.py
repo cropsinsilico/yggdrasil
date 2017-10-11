@@ -1,4 +1,3 @@
-import nose.tools as nt
 from cis_interface.serialize.tests.test_DefaultDeserialize import \
     TestDefaultDeserialize
 

@@ -1,4 +1,3 @@
-from cis_interface.backwards import pickle
 from cis_interface import backwards
 from cis_interface.tools import PSI_MSG_EOF, PSI_MSG_MAX
 from cis_interface.communication import (
@@ -6,6 +5,16 @@ from cis_interface.communication import (
 from cis_interface.serialize import (
     AsciiTableSerialize, AsciiTableDeserialize,
     PickleSerialize, PickleDeserialize)
+
+
+def maxMsgSize():
+    r"""int: The maximum message size."""
+    return PSI_MSG_MAX
+
+
+def eof_msg():
+    r"""str: Message signalling end of file."""
+    return PSI_MSG_EOF
 
 
 def PsiMatlab(_type, args=[]):
@@ -381,90 +390,43 @@ def PsiPickleInput(name, src_type=1, **kwargs):
             kwargs.setdefault('direction', 'recv')
             super(PsiPickleInput, self).__init__(name, **kwargs)
             self.meth_deserialize = PickleDeserialize.PickleDeserialize()
-            # self.meth_serialize = PickleSerialize.PickleSerialize()
 
-        # def recv(self):
-        #     r"""Receive a single pickled object.
-
-        #     Returns:
-        #         tuple(bool, object): Success or failure of receiving a pickled
-        #             object and the unpickled object that was received.
-
-        #     """
-        #     if self._type == 0:
-        #         try:
-        #             obj = pickle.load(self._file)
-        #             eof = False
-        #         except EOFError:  # pragma: debug
-        #             obj = None
-        #             eof = True
-        #         ret = (not eof)
-        #     else:
-        #         ret, obj = self._psi.recv_nolimit()
-        #         try:
-        #             obj = pickle.loads(obj)
-        #         except pickle.UnpicklingError:  # pragma: debug
-        #             obj = None
-        #             ret = False
-        #     return ret, obj
+        def recv(self, *args, **kwargs):
+            r"""Alias so recv defaults to recv_nolimit."""
+            return self.recv_nolimit(*args, **kwargs)
 
     return PsiPickleInput(name, **kwargs)
 
 
-class PsiPickleOutput(object):
-    r"""Class for handling pickled output.
+def PsiPickleOutput(name, dst_type=1, **kwargs):
 
-    Args:
-        name (str): The path to the local file where output should be saved
-            (if dst_type == 0) or the name of the message queue where the
-            output should be sent.
-        fmt (str): A C style format string specifying how each 'row' of output
-            should be formated. This should include the newline character.
-        dst_type (int, optional): If 0, output is sent to a local file.
-            Otherwise, the output is sent to a message queue. Defaults to 1.
+    if dst_type == 0:
+        base = PickleFileComm.PickleFileComm
+        kwargs.setdefault('address', name)
+    else:
+        base = DefaultComm
+    kwargs['dst_type'] = dst_type
 
-    """
-    _name = None
-    _type = 0
-    _file = None
-    _psi = None
-
-    def __init__(self, name, dst_type=1, matlab=False):
-        self._name = name
-        self._type = dst_type
-        if self._type == 0:
-            self._file = open(name, 'wb')
-        else:
-            self._psi = PsiOutput(name)
-
-    def __del__(self):
-        if self._type == 0 and (self._file is not None):
-            self._file.close()
-            self._file = None
-
-    def send(self, obj):
-        r"""Output an object as a pickled string to either a local file or
-        message queue.
+    class PsiPickleOutput(base):
+        r"""Class for handling pickled output.
 
         Args:
-            obj (object): Any python object that can be pickled.
-
-        Returns:
-            bool: Success or failure of outputing the pickled object.
+            name (str): The path to the local file where output should be saved
+                (if dst_type == 0) or the name of the message queue where the
+                output should be sent.
+            dst_type (int, optional): If 0, output is sent to a local file.
+                Otherwise, the output is sent to a message queue. Defaults to 1.
+            **kwargs: Additional keyword arguments are passed to the base comm.
 
         """
-        if self._type == 0:
-            try:
-                pickle.dump(obj, self._file)
-                ret = True
-            except pickle.PicklingError:  # pragma: debug
-                ret = False
-        else:
-            try:
-                msg = pickle.dumps(obj)
-                ret = True
-            except pickle.PicklingError:  # pragma: debug
-                ret = False
-            if ret:
-                ret = self._psi.send_nolimit(msg)
-        return ret
+
+        def __init__(self, name, matlab=False, **kwargs):
+            kwargs.setdefault('direction', 'send')
+            super(PsiPickleOutput, self).__init__(name, **kwargs)
+            self.meth_serialize = PickleSerialize.PickleSerialize()
+
+        def send(self, *args, **kwargs):
+            r"""Alias so send defaults to send_nolimit."""
+            return self.send_nolimit(*args, **kwargs)
+
+    return PsiPickleOutput(name, **kwargs)

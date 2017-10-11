@@ -37,10 +37,10 @@ class TestPickleFileInputDriver(TestPickleFileInputParam,
         super(parent.TestFileInputDriver, self).assert_before_stop()
         self.instance.sleep()
         # File contents
-        flag, msg_recv = self.recv_comm.recv(self.timeout)
+        flag, msg_recv = self.recv_comm.recv_nolimit(self.timeout)
         assert(flag)
         nt.assert_equal(msg_recv, self.pickled_data)
         # EOF
-        flag, msg_recv = self.recv_comm.recv(self.timeout)
+        flag, msg_recv = self.recv_comm.recv_nolimit(self.timeout)
         assert(not flag)
         nt.assert_equal(msg_recv, self.recv_comm.eof_msg)
