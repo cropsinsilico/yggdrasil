@@ -66,6 +66,7 @@ class FileComm(CommBase.CommBase):
     def close(self):
         r"""Close the file."""
         if self.is_open:
+            os.fsync(self.fd.fileno())
             self.fd.close()
         self.fd = None
 

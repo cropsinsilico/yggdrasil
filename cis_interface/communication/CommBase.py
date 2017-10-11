@@ -227,7 +227,7 @@ class CommBase(CisClass):
             return False, ''
         if len(msg) == 1:
             msg = msg[0]
-        if msg == self.eof_msg:
+        if isinstance(msg, backwards.bytes_type) and msg == self.eof_msg:
             flag = self.on_send_eof()
             msg_s = backwards.unicode2bytes(msg)
         else:
