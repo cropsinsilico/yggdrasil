@@ -36,6 +36,7 @@ class TestBase(CisTest, IOInfo):
         self.driver = None
         self.driver_name = 'CommDriver'
         self.driver_args = []
+        self._driver_kwargs = {}
         self._inst_args = [self.name]
 
     @property
@@ -45,7 +46,7 @@ class TestBase(CisTest, IOInfo):
 
     @property
     def driver_kwargs(self):
-        return {}
+        return self._driver_kwargs
         
     def setup(self, skip_start=False):
         r"""Start driver and instance."""
@@ -268,7 +269,7 @@ class TestPsiAsciiFileOutput(TestBase):
         r"""Remove the test file."""
         self.file_comm.remove_file()
         super(TestPsiAsciiFileOutput, self).teardown()
-            
+        
     def test_send_line(self):
         r"""Test sending a line to a remote file."""
         msg_flag = self.instance.send(self.fmt_str_line)
@@ -329,99 +330,76 @@ class TestPsiAsciiTableInput_local(TestPsiAsciiTableInput):
         r"""Test receiving a row from a local table."""
         super(TestPsiAsciiTableInput_local, self).test_recv_line()
 
+
+class TestPsiAsciiTableInputArray(TestPsiAsciiTableInput):
+    r"""Test input from an ASCII table."""
+    def __init__(self, *args, **kwargs):
+        super(TestPsiAsciiTableInputArray, self).__init__(*args, **kwargs)
+        self._inst_kwargs = {'as_array': True}
+        self._driver_kwargs = {'as_array': True}
+
+    def test_recv_line(self):
+        r"""Test receiving an array from a remote table."""
+        msg_flag, msg_recv = self.instance.recv(timeout=1)
+        assert(msg_flag)
+        np.testing.assert_array_equal(msg_recv, self.file_array)
+        msg_flag, msg_recv = self.instance.recv(timeout=1)
+        assert(not msg_flag)
+
+
+class TestPsiAsciiTableInputArray_local(TestPsiAsciiTableInputArray):
+    r"""Test input from an ASCII table."""
+    def __init__(self, *args, **kwargs):
+        super(TestPsiAsciiTableInputArray_local, self).__init__(*args, **kwargs)
+        self._inst_args = [self.tempfile]
+        self._inst_kwargs['src_type'] = 0  # local
+
+    def test_recv_line(self):
+        r"""Test receiving an array from a local table."""
+        super(TestPsiAsciiTableInputArray_local, self).test_recv_line()
+
         
-# class TestPsiAsciiTableInput_AsArray(CisTest, IOInfo):
-#     r"""Test input from an ascii table in array format."""
-#     def __init__(self, *args, **kwargs):
-#         super(TestPsiAsciiTableInput_AsArray, self).__init__(*args, **kwargs)
-#         IOInfo.__init__(self)
-#         self.name = 'test'
-#         self.tempfile = os.path.join(os.getcwd(), 'temp_ascii.txt')
-
-#     def setup(self):
-#         r"""Create a test file and start the driver."""
-#         if not os.path.isfile(self.tempfile):
-#             self.write_table(self.tempfile)
-#         self.driver = AsciiTableInputDriver.AsciiTableInputDriver(
-#             self.name, self.tempfile, as_array=True)
-#         self.driver.start()
-#         self.driver.sleep(0.1)
-#         os.environ.update(self.driver.env)
-
-#     def teardown(self):
-#         r"""Stop the driver."""
-#         self.driver.terminate()
-#         if os.path.isfile(self.tempfile):
-#             os.remove(self.tempfile)
-
-#     def test_recv_array_loc(self):
-#         r"""Test receiving an array from a local table."""
-#         inst = PsiInterface.PsiAsciiTableInput(self.tempfile, src_type=0)
-#         msg_flag, res = inst.recv_array()
-#         assert(msg_flag)
-#         np.testing.assert_equal(res, self.file_array)
-
-#     def test_recv_array_rem(self):
-#         r"""Test receiving an array from a remote table."""
-#         inst = PsiInterface.PsiAsciiTableInput(self.name, src_type=1)
-#         msg_flag, res = inst.recv_array()
-#         assert(msg_flag)
-#         np.testing.assert_equal(res, self.file_array)
+class TestPsiAsciiTableOutput(TestPsiAsciiFileOutput):
+    r"""Test output from an ascii table."""
+    def __init__(self, *args, **kwargs):
+        super(TestPsiAsciiTableOutput, self).__init__(*args, **kwargs)
+        self._cls = 'PsiAsciiTableOutput'
+        self.tempfile = os.path.join(os.getcwd(), 'temp_ascii.txt')
+        self.driver_name = 'AsciiTableOutputDriver'
+        self.driver_args = [self.name, self.tempfile]
+        self._inst_args = [self.name, self.fmt_str]
+        self._inst_kwargs = {}
         
-
-# class TestPsiAsciiTableOutput(CisTest, IOInfo):
-#     r"""Test output from an ascii table."""
-#     def __init__(self, *args, **kwargs):
-#         super(TestPsiAsciiTableOutput, self).__init__(*args, **kwargs)
-#         IOInfo.__init__(self)
-#         self.name = 'test'
-#         self.tempfile = os.path.join(os.getcwd(), 'temp_ascii.txt')
-
-#     def setup(self):
-#         r"""Create a test table and start the driver."""
-#         if not os.path.isfile(self.tempfile):
-#             self.write_table(self.tempfile)
-#         self.driver = IODriver.IODriver(self.name, '_OUT')
-#         self.driver.start()
-#         os.environ.update(self.driver.env)
-
-#     def teardown(self):
-#         r"""Stop the driver."""
-#         self.driver.stop()
-#         if os.path.isfile(self.tempfile):
-#             os.remove(self.tempfile)
-
-#     def test_send_row_loc(self):
-#         r"""Test sending a row to a local table."""
-#         inst = PsiInterface.PsiAsciiTableOutput(self.tempfile,
-#                                                 self.fmt_str, dst_type=0)
-#         for rans in self.file_rows:
-#             msg_flag = inst.send_row(tuple(rans))
-#             assert(msg_flag)
-#         inst.send_eof()
-#         del inst
-#         # Read temp file
-#         assert(os.path.isfile(self.tempfile))
-#         with open(self.tempfile, 'rb') as fd:
-#             res = fd.read()
-#             nt.assert_equal(res, self.file_contents)
-
-#     def test_send_row_rem(self):
-#         r"""Test sending a row to a remote table."""
-#         inst = PsiInterface.PsiAsciiTableOutput(self.name,
-#                                                 self.fmt_str, dst_type=1)
-#         lres = self.driver.recv_wait(timeout=1)
-#         nt.assert_equal(lres, self.fmt_str)
-#         for lans, rans in zip(self.file_lines, self.file_rows):
-#             msg_flag = inst.send_row(*rans)
-#             assert(msg_flag)
-#             lres = self.driver.recv_wait_nolimit(timeout=1)
-#             nt.assert_equal(lres, lans)
-#         inst.send_eof()
-#         eres = self.driver.recv_wait_nolimit(timeout=1)
-#         nt.assert_equal(eres, PSI_MSG_EOF)
+    def test_send_line(self):
+        r"""Test sending a row to a remote table."""
+        for lans, rans in zip(self.file_lines, self.file_rows):
+            msg_flag = self.instance.send(*rans)
+            assert(msg_flag)
+        msg_flag = self.instance.send_eof()
+        # assert(msg_flag)
+        # Read temp file
+        Tout = self.instance.start_timeout()
+        while self.file_comm.is_open and not Tout.is_out:
+            self.instance.sleep()
+        self.instance.stop_timeout()
+        assert(os.path.isfile(self.tempfile))
+        with open(self.tempfile, 'rb') as fd:
+            res = fd.read()
+            nt.assert_equal(res, self.file_contents)
         
             
+class TestPsiAsciiTableOutput_local(TestPsiAsciiTableOutput):
+    r"""Test input from an ASCII table."""
+    def __init__(self, *args, **kwargs):
+        super(TestPsiAsciiTableOutput_local, self).__init__(*args, **kwargs)
+        self._inst_args = [self.tempfile, self.fmt_str]
+        self._inst_kwargs = {'dst_type': 0}  # local
+
+    def test_send_line(self):
+        r"""Test sending a row to a local table."""
+        super(TestPsiAsciiTableOutput_local, self).test_send_line()
+        
+        
 # class TestPsiAsciiTableOutput_AsArray(CisTest, IOInfo):
 #     r"""Test output from an ascii table."""
 #     def __init__(self, *args, **kwargs):

@@ -11,7 +11,7 @@ from cis_interface.tools import PSI_MSG_MAX, PSI_MSG_EOF
 from cis_interface.communication import (
     DefaultComm, RPCComm, AsciiFileComm, AsciiTableComm)
 from cis_interface.serialize import (
-    AsciiTableDeserialize)
+    AsciiTableSerialize, AsciiTableDeserialize)
 
 
 def PsiMatlab(_type, args=[]):
@@ -224,6 +224,18 @@ def PsiAsciiFileOutput(name, dst_type=1, **kwargs):
 
 # Specialized classes for ascii table IO
 def PsiAsciiTableInput(name, src_type=1, **kwargs):
+    r"""Wrapper to create interface with the correct base comm.
+
+    Args:
+        name (str): The path to the local file to read input from (if src_type
+            == 0) or the name of the message queue input should be received
+            from.
+        src_type (int, optional): If 0, input is read from a local file.
+            Otherwise, the input is received from a message queue. Defaults to
+            1.
+        **kwargs: Additional keyword arguments are passed to the base comm.
+
+    """
 
     if src_type == 0:
         base = AsciiTableComm.AsciiTableComm
@@ -245,6 +257,7 @@ def PsiAsciiTableInput(name, src_type=1, **kwargs):
             as_array (bool, optional): If True, recv returns the entire table
                 array and can only be called once. If False, recv returns row
                 entries. Default to False.
+            **kwargs: Additional keyword arguments are passed to the base comm.
 
         """
 
@@ -273,8 +286,8 @@ def PsiAsciiTableInput(name, src_type=1, **kwargs):
     return PsiAsciiTableInput(name, **kwargs)
 
 
-class PsiAsciiTableOutput(object):
-    r"""Class for handling table-like formatted output.
+def PsiAsciiTableOutput(name, fmt, dst_type=1, **kwargs):
+    r"""Wrapper to create interface with the correct base comm.
 
     Args:
         name (str): The path to the local file where output should be saved
@@ -284,80 +297,60 @@ class PsiAsciiTableOutput(object):
             should be formated. This should include the newline character.
         dst_type (int, optional): If 0, output is sent to a local file.
             Otherwise, the output is sent to a message queue. Defaults to 1.
+        **kwargs: Additional keyword arguments are passed to the base comm.
 
     """
-    _name = None
-    _type = 0
-    _table = None
-    _psi = None
 
-    def __init__(self, name, fmt, dst_type=1, matlab=False):
-        self._name = name
-        self._type = dst_type
-        if matlab:  # pragma: matlab
-            fmt = backwards.decode_escape(fmt)
-        if self._type == 0:
-            self._table = AsciiTable(name, 'w', format_str=fmt)
-            self._table.open()
-            self._table.writeformat()
-        else:
-            self._psi = PsiOutput(name)
-            self._table = AsciiTable(name, None, format_str=fmt)
-            self._psi.send(backwards.decode_escape(fmt))
-
-    def __del__(self):
-        if self._type == 0:
-            self._table.close()
-
-    def send_eof(self):
-        r"""Send an end-of-file message to the message queue."""
-        if self._type == 0:
-            self._table.close()
-        else:
-            self._psi.send_nolimit(PSI_MSG_EOF)
-
-    def send_row(self, *args):
-        r"""Output arguments as a formated row to either a local file or
-        message queue.
+    if dst_type == 0:
+        base = AsciiTableComm.AsciiTableComm
+        kwargs.setdefault('address', name)
+    else:
+        base = DefaultComm
+    kwargs['dst_type'] = dst_type
+    
+    class PsiAsciiTableOutput(base):
+        r"""Class for handling table-like formatted output.
 
         Args:
-            \*args: All arguments are formated to create a table 'row'.
-
-        Returns:
-            bool: Success or failure of outputing the row.
-
-        """
-        if (len(args) == 1) and isinstance(args[0], tuple):
-            args = args[0]
-        if self._type == 0:
-            self._table.writeline(*args)
-            ret = True
-        else:
-            msg = self._table.format_line(*args)
-            ret = self._psi.send_nolimit(msg)
-        return ret
-
-    def send_array(self, arr):
-        r"""Output an array of table data to either a local file or message
-        sueue.
-
-        Args:
-            arr (numpy.ndarray): Array of table data. The first dimension is
-                assumed to be table rows and the second dimension is assumed to
-                be table columns.
-
-        Returns:
-            bool: Success or failure of outputing the array.
+            name (str): The path to the local file where output should be saved
+                (if dst_type == 0) or the name of the message queue where the
+                output should be sent.
+            fmt (str): A C style format string specifying how each 'row' of output
+                should be formated. This should include the newline character.
+            dst_type (int, optional): If 0, output is sent to a local file.
+                Otherwise, the output is sent to a message queue. Defaults to 1.
+            as_array (bool, optional): If True, send expects and entire array.
+                If False, send expects the entries for one table row. Defaults to
+                False.
+            **kwargs: Additional keyword arguments are passed to the base comm.
 
         """
-        if self._type == 0:
-            self._table.write_array(arr, append=True)
-            ret = True
-        else:
-            msg = self._table.array_to_bytes(arr, order='F')
-            ret = self._psi.send_nolimit(msg)
-        return ret
 
+        def __init__(self, name, fmt, dst_type=1, as_array=False, matlab=False,
+                     **kwargs):
+            if matlab:  # pragma: matlab
+                fmt = backwards.decode_escape(fmt)
+            kwargs.setdefault('direction', 'send')
+            if dst_type == 0:
+                kwargs['as_array'] = as_array
+                kwargs['format_str'] = fmt
+            super(PsiAsciiTableOutput, self).__init__(name, **kwargs)
+            if dst_type == 1:
+                ret = self.send(backwards.decode_escape(fmt))
+                if not ret:  # pragma: debug
+                    raise Exception('PsiAsciiTableOutput could not send format ' +
+                                    'string to output.')
+            else:
+                self.file.writeformat()
+            self.meth_serialize = AsciiTableSerialize.AsciiTableSerialize(
+                format_str=fmt, as_array=as_array)
+
+        def send(self, *args, **kwargs):
+            r"""Alias so send defaults to send_nolimit."""
+            return self.send_nolimit(*args, **kwargs)
+
+    return PsiAsciiTableOutput(name, fmt, **kwargs)
+    
     
 class PsiPickleInput(object):
     r"""Class for handling pickled input.
