@@ -14,5 +14,3 @@ class PickleFileComm(FileComm.FileComm):
     def __init__(self, name, **kwargs):
         kwargs.setdefault('readmeth', 'read')
         super(PickleFileComm, self).__init__(name, **kwargs)
-        self.meth_serialize = PickleSerialize.PickleSerialize()
-        self.meth_deserialize = PickleDeserialize.PickleDeserialize()
