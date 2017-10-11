@@ -1,9 +1,11 @@
 from cis_interface.backwards import pickle
 from cis_interface import backwards
+from cis_interface.tools import PSI_MSG_EOF, PSI_MSG_MAX
 from cis_interface.communication import (
-    DefaultComm, RPCComm, AsciiFileComm, AsciiTableComm)
+    DefaultComm, RPCComm, AsciiFileComm, AsciiTableComm, PickleFileComm)
 from cis_interface.serialize import (
-    AsciiTableSerialize, AsciiTableDeserialize)
+    AsciiTableSerialize, AsciiTableDeserialize,
+    PickleSerialize, PickleDeserialize)
 
 
 def PsiMatlab(_type, args=[]):
@@ -266,7 +268,6 @@ def PsiAsciiTableInput(name, src_type=1, **kwargs):
                                     'string from input.')
             else:
                 format_str = self.file.format_str
-            # TODO: Have serialize, deserialize for Ascii comms
             self.meth_deserialize = AsciiTableDeserialize.AsciiTableDeserialize(
                 format_str=backwards.decode_escape(format_str),
                 as_array=as_array)
@@ -343,9 +344,9 @@ def PsiAsciiTableOutput(name, fmt, dst_type=1, **kwargs):
 
     return PsiAsciiTableOutput(name, fmt, **kwargs)
     
-    
-class PsiPickleInput(object):
-    r"""Class for handling pickled input.
+
+def PsiPickleInput(name, src_type=1, **kwargs):
+    r"""Wrapper to create interface with the correct base comm.
 
     Args:
         name (str): The path to the local file to read input from (if src_type
@@ -354,50 +355,60 @@ class PsiPickleInput(object):
         src_type (int, optional): If 0, input is read from a local file.
             Otherwise, the input is received from a message queue. Defaults to
             1.
+        **kwargs: Additional keyword arguments are passed to the base comm.
 
     """
-    _name = None
-    _type = 1
-    _file = None
-    _psi = None
 
-    def __init__(self, name, src_type=1, matlab=False):
-        self._name = name
-        self._type = src_type
-        if self._type == 0:
-            self._file = open(name, 'rb')
-        else:
-            self._psi = PsiInput(name)
+    if src_type == 0:
+        base = PickleFileComm.PickleFileComm
+        kwargs.setdefault('address', name)
+    else:
+        base = DefaultComm
+    kwargs['src_type'] = src_type
+        
+    class PsiPickleInput(base):
+        r"""Class for handling pickled input.
 
-    def __del__(self):
-        if self._type == 0 and (self._file is not None):
-            self._file.close()
-            self._file = None
-
-    def recv(self):
-        r"""Receive a single pickled object.
-
-        Returns:
-            tuple(bool, object): Success or failure of receiving a pickled
-                object and the unpickled object that was received.
+        Args:
+            name (str): The path to the local file to read input from (if src_type
+                == 0) or the name of the message queue input should be received
+                from.
+            **kwargs: Additional keyword arguments are passed to the base comm.
 
         """
-        if self._type == 0:
-            try:
-                obj = pickle.load(self._file)
-                eof = False
-            except EOFError:  # pragma: debug
-                obj = None
-                eof = True
-            ret = (not eof)
-        else:
-            ret, obj = self._psi.recv_nolimit()
-            try:
-                obj = pickle.loads(obj)
-            except pickle.UnpicklingError:  # pragma: debug
-                obj = None
-                ret = False
-        return ret, obj
+
+        def __init__(self, name, matlab=False, **kwargs):
+            kwargs.setdefault('direction', 'recv')
+            super(PsiPickleInput, self).__init__(name, **kwargs)
+            self.meth_deserialize = PickleDeserialize.PickleDeserialize()
+            # self.meth_serialize = PickleSerialize.PickleSerialize()
+
+        # def recv(self):
+        #     r"""Receive a single pickled object.
+
+        #     Returns:
+        #         tuple(bool, object): Success or failure of receiving a pickled
+        #             object and the unpickled object that was received.
+
+        #     """
+        #     if self._type == 0:
+        #         try:
+        #             obj = pickle.load(self._file)
+        #             eof = False
+        #         except EOFError:  # pragma: debug
+        #             obj = None
+        #             eof = True
+        #         ret = (not eof)
+        #     else:
+        #         ret, obj = self._psi.recv_nolimit()
+        #         try:
+        #             obj = pickle.loads(obj)
+        #         except pickle.UnpicklingError:  # pragma: debug
+        #             obj = None
+        #             ret = False
+        #     return ret, obj
+
+    return PsiPickleInput(name, **kwargs)
 
 
 class PsiPickleOutput(object):

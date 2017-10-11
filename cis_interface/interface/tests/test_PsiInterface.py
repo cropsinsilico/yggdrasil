@@ -2,11 +2,10 @@ import os
 import numpy as np
 import nose.tools as nt
 from cis_interface.interface import PsiInterface
-from cis_interface.interface.PsiInterface import PSI_MSG_EOF, PSI_MSG_MAX
+from cis_interface.tools import PSI_MSG_EOF, PSI_MSG_MAX
 from cis_interface.drivers import import_driver, CommDriver
 from cis_interface.tests import CisTest
 from cis_interface.drivers.tests.test_IODriver import IOInfo
-# from cis_interface.backwards import pickle
 
 
 def test_PsiMatlab_class():
@@ -277,7 +276,7 @@ class TestPsiAsciiFileOutput(TestBase):
         for lans in self.file_lines:
             msg_flag = self.instance.send(lans)
             assert(msg_flag)
-        msg_flag = self.instance.send_eof()
+        self.instance.send_eof()
         # assert(not msg_flag)
         # Read temp file
         Tout = self.instance.start_timeout()
@@ -375,7 +374,7 @@ class TestPsiAsciiTableOutput(TestPsiAsciiFileOutput):
         for lans, rans in zip(self.file_lines, self.file_rows):
             msg_flag = self.instance.send(*rans)
             assert(msg_flag)
-        msg_flag = self.instance.send_eof()
+        self.instance.send_eof()
         # assert(msg_flag)
         # Read temp file
         Tout = self.instance.start_timeout()
@@ -436,96 +435,51 @@ class TestPsiAsciiTableOutputArray_local(TestPsiAsciiTableOutputArray):
         super(TestPsiAsciiTableOutputArray_local, self).test_send_line()
         
         
-# class TestPsiAsciiTableOutput_AsArray(CisTest, IOInfo):
-#     r"""Test output from an ascii table."""
-#     def __init__(self, *args, **kwargs):
-#         super(TestPsiAsciiTableOutput_AsArray, self).__init__(*args, **kwargs)
-#         IOInfo.__init__(self)
-#         self.name = 'test'
-#         self.tempfile = os.path.join(os.getcwd(), 'temp_ascii.txt')
+class TestPsiPickleInput(TestBase):
+    r"""Test input from a pickle file."""
+    def __init__(self, *args, **kwargs):
+        super(TestPsiPickleInput, self).__init__(*args, **kwargs)
+        self._cls = 'PsiPickleInput'
+        self.tempfile = os.path.join(os.getcwd(), 'temp_ascii.dat')
+        self.driver_name = 'PickleFileInputDriver'
+        self.driver_args = [self.name, self.tempfile]
+        self._inst_args = [self.name]
+        self._inst_kwargs = {}
 
-#     def setup(self):
-#         r"""Create a test table and start the driver."""
-#         if not os.path.isfile(self.tempfile):
-#             self.write_table(self.tempfile)
-#         self.driver = IODriver.IODriver(self.name, '_OUT')
-#         self.driver.start()
-#         os.environ.update(self.driver.env)
+    def setup(self):
+        r"""Create a test file and start the driver."""
+        if not os.path.isfile(self.tempfile):
+            self.write_pickle(self.tempfile)
+        skip_start = False
+        if self.inst_kwargs.get('src_type', 1) == 0:
+            skip_start = True
+        super(TestPsiPickleInput, self).setup(skip_start=skip_start)
 
-#     def teardown(self):
-#         r"""Stop the driver."""
-#         self.driver.stop()
-#         if os.path.isfile(self.tempfile):
-#             os.remove(self.tempfile)
+    def teardown(self):
+        r"""Remove the test file."""
+        super(TestPsiPickleInput, self).teardown()
+        if os.path.isfile(self.tempfile):
+            os.remove(self.tempfile)
 
-#     def test_send_array_loc(self):
-#         r"""Test sending an array to a local file."""
-#         inst = PsiInterface.PsiAsciiTableOutput(self.tempfile,
-#                                                 self.fmt_str, dst_type=0)
-#         msg_flag = inst.send_array(self.file_array)
-#         assert(msg_flag)
-#         inst.send_eof()
-#         # del inst
-#         # Read temp file
-#         assert(os.path.isfile(self.tempfile))
-#         with open(self.tempfile, 'rb') as fd:
-#             res = fd.read()
-#             nt.assert_equal(res, self.file_contents)
+    def test_recv(self):
+        r"""Test receiving a pickle from a remote file."""
+        msg_flag, res = self.instance.recv(timeout=1)
+        assert(msg_flag)
+        self.assert_equal_data_dict(res)
+
+
+class TestPsiPickleInput_local(TestPsiPickleInput):
+    r"""Test input from a pickle file."""
+    def __init__(self, *args, **kwargs):
+        super(TestPsiPickleInput_local, self).__init__(*args, **kwargs)
+        self._inst_args = [self.tempfile]
+        self._inst_kwargs = {'src_type': 0}  # local
+
+    def test_recv(self):
+        r"""Test receiving a pickle from a local file."""
+        super(TestPsiPickleInput_local, self).test_recv()
+
         
-#     def test_send_array_rem(self):
-#         r"""Test sending an array to a remote file."""
-#         inst = PsiInterface.PsiAsciiTableOutput(self.name,
-#                                                 self.fmt_str, dst_type=1)
-#         msg_flag = inst.send_array(self.file_array)
-#         assert(msg_flag)
-#         res = self.driver.recv_wait(timeout=1)
-#         nt.assert_equal(res, self.fmt_str)
-#         res = self.driver.recv_wait_nolimit(timeout=1)
-#         nt.assert_equal(res, self.file_bytes)
-
-
-# class TestPsiPickleInput(CisTest, IOInfo):
-#     r"""Test input from a pickle file."""
-#     def __init__(self, *args, **kwargs):
-#         super(TestPsiPickleInput, self).__init__(*args, **kwargs)
-#         IOInfo.__init__(self)
-#         self.name = 'test'
-#         self.tempfile = os.path.join(os.getcwd(), 'temp_ascii.dat')
-
-#     def setup(self):
-#         r"""Create a test file and start the driver."""
-#         if not os.path.isfile(self.tempfile):
-#             self.write_pickle(self.tempfile)
-#         self.driver = IODriver.IODriver(self.name, '_IN')
-#         self.driver.start()
-#         os.environ.update(self.driver.env)
-
-#     def teardown(self):
-#         r"""Stop the driver."""
-#         self.driver.stop()
-#         if os.path.isfile(self.tempfile):
-#             os.remove(self.tempfile)
-
-#     def test_recv_loc(self):
-#         r"""Test receiving a pickle from a local file."""
-#         inst = PsiInterface.PsiPickleInput(self.tempfile, src_type=0)
-#         msg_flag, res = inst.recv()
-#         assert(msg_flag)
-#         self.assert_equal_data_dict(res)
-#         # res_pickle = pickle.dumps(res)
-#         # nt.assert_equal(res_pickle, self.pickled_data)
-
-#     def test_recv_rem(self):
-#         r"""Test receiving a pickle from a remote file."""
-#         inst = PsiInterface.PsiPickleInput(self.name, src_type=1)
-#         self.driver.ipc_send_nolimit(self.pickled_data)
-#         msg_flag, res = inst.recv()
-#         assert(msg_flag)
-#         self.assert_equal_data_dict(res)
-#         # res_pickle = pickle.dumps(res)
-#         # nt.assert_equal(res_pickle, self.pickled_data)
-
-
 # class TestPsiPickleOutput(CisTest, IOInfo):
 #     r"""Test output from a pickle."""
 #     def __init__(self, *args, **kwargs):
