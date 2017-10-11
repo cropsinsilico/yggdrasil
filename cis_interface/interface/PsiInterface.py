@@ -273,47 +273,6 @@ def PsiAsciiTableInput(name, src_type=1, **kwargs):
     return PsiAsciiTableInput(name, **kwargs)
 
 
-        # def recv_row(self):
-        #     r"""Receive a single row of variables from the input.
-
-        #     Returns:
-        #         tuple(bool, tuple): Success or failure of receiving the row and
-        #             the variables recovered from the row.
-
-        #     """
-        #     if self._type == 0:
-        #         eof, args = self._table.readline()
-        #         ret = (not eof)
-        #     else:
-        #         ret, args = self._psi.recv_nolimit()
-        #         if ret:
-        #             args = self._table.process_line(args)
-        #             if args is None:
-        #                 ret = False
-        #     return ret, args
-
-        # def recv_array(self):
-        #     r"""Receive an entire array of table data.
-
-        #     Returns:
-        #         tuple(bool, np.ndarray): Success or failure of receiving the row
-        #             and the array of table data.
-
-        #     """
-        #     if self._type == 0:
-        #         arr = self._table.read_array()
-        #         ret = True
-        #     else:
-        #         ret, data = self._psi.recv_nolimit()
-        #         if ret:
-        #             arr = self._table.bytes_to_array(data, order='F')
-        #             if arr is None:  # pragma: debug
-        #                 ret = False
-        #         else:  # pragma: debug
-        #             arr = None
-        #     return ret, arr
-
-
 class PsiAsciiTableOutput(object):
     r"""Class for handling table-like formatted output.
 
