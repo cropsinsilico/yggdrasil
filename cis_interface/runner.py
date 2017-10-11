@@ -1,5 +1,4 @@
 """This module provides tools for running models using cis_interface."""
-import importlib
 import sys
 import logging
 from logging import debug, info, error

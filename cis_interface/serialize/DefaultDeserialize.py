@@ -34,5 +34,3 @@ class DefaultDeserialize(object):
             out = scanf(backwards.bytes2unicode(self.format_str),
                         backwards.bytes2unicode(msg))
         return out
-
-    
