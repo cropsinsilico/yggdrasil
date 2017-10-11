@@ -259,8 +259,6 @@ class TestPsiAsciiFileOutput(TestBase):
 
     def setup(self):
         r"""Create a test file."""
-        # if not os.path.isfile(self.tempfile):
-        #     self.write_table(self.tempfile)
         skip_start = False
         if self.inst_kwargs.get('dst_type', 1) == 0:
             skip_start = True
@@ -309,16 +307,6 @@ class TestPsiAsciiTableInput(TestPsiAsciiFileInput):
         super(TestPsiAsciiTableInput, self).__init__(*args, **kwargs)
         self._cls = 'PsiAsciiTableInput'
         self.driver_name = 'AsciiTableInputDriver'
-
-    # def test_recv_row_loc(self):
-    #     r"""Test receiving a row from a local table."""
-    #     inst = PsiInterface.PsiAsciiTableInput(self.tempfile, src_type=0)
-    #     for rans in self.file_rows:
-    #         msg_flag, rres = inst.recv_row()
-    #         assert(msg_flag)
-    #         nt.assert_equal(rres, rans)
-    #     msg_flag, rres = inst.recv_row()
-    #     assert(not msg_flag)
 
     def test_recv_line(self):
         r"""Test receiving a row from a remote table."""
