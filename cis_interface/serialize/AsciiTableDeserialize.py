@@ -39,5 +39,3 @@ class AsciiTableDeserialize(DefaultDeserialize):
         else:
             out = self.table.process_line(msg)
         return out
-
-    

@@ -1,13 +1,5 @@
-from logging import debug
-import os
-import time
-import sysv_ipc
 from cis_interface.backwards import pickle
-from cis_interface.interface.scanf import scanf
-from cis_interface.dataio.AsciiFile import AsciiFile
-from cis_interface.dataio.AsciiTable import AsciiTable
-from cis_interface import backwards, tools
-from cis_interface.tools import PSI_MSG_MAX, PSI_MSG_EOF
+from cis_interface import backwards
 from cis_interface.communication import (
     DefaultComm, RPCComm, AsciiFileComm, AsciiTableComm)
 from cis_interface.serialize import (

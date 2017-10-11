@@ -6,7 +6,7 @@ from cis_interface.interface.PsiInterface import PSI_MSG_EOF, PSI_MSG_MAX
 from cis_interface.drivers import import_driver, CommDriver
 from cis_interface.tests import CisTest
 from cis_interface.drivers.tests.test_IODriver import IOInfo
-from cis_interface.backwards import pickle
+# from cis_interface.backwards import pickle
 
 
 def test_PsiMatlab_class():
@@ -25,7 +25,7 @@ def test_PsiMatlab_variables():
     nt.assert_equal(PsiInterface.PsiMatlab('PSI_MSG_EOF'), PSI_MSG_EOF)
 
 
-#@nt.nottest
+# @nt.nottest
 class TestBase(CisTest, IOInfo):
     r"""Test class for interface classes."""
     def __init__(self, *args, **kwargs):
@@ -398,6 +398,42 @@ class TestPsiAsciiTableOutput_local(TestPsiAsciiTableOutput):
     def test_send_line(self):
         r"""Test sending a row to a local table."""
         super(TestPsiAsciiTableOutput_local, self).test_send_line()
+        
+        
+class TestPsiAsciiTableOutputArray(TestPsiAsciiTableOutput):
+    r"""Test input from an ASCII table."""
+    def __init__(self, *args, **kwargs):
+        super(TestPsiAsciiTableOutputArray, self).__init__(*args, **kwargs)
+        self._inst_kwargs = {'as_array': True}
+        self._driver_kwargs = {'as_array': True}
+
+    def test_send_line(self):
+        r"""Test sending an array to a remote table."""
+        msg_flag = self.instance.send(self.file_array)
+        assert(msg_flag)
+        self.instance.send_eof()
+        # assert(msg_flag)
+        # Read temp file
+        Tout = self.instance.start_timeout()
+        while self.file_comm.is_open and not Tout.is_out:
+            self.instance.sleep()
+        self.instance.stop_timeout()
+        assert(os.path.isfile(self.tempfile))
+        with open(self.tempfile, 'rb') as fd:
+            res = fd.read()
+            nt.assert_equal(res, self.file_contents)
+        
+        
+class TestPsiAsciiTableOutputArray_local(TestPsiAsciiTableOutputArray):
+    r"""Test input from an ASCII table as array."""
+    def __init__(self, *args, **kwargs):
+        super(TestPsiAsciiTableOutputArray_local, self).__init__(*args, **kwargs)
+        self._inst_args = [self.tempfile, self.fmt_str]
+        self._inst_kwargs['dst_type'] = 0  # local
+
+    def test_send_line(self):
+        r"""Test sending an array to a local table."""
+        super(TestPsiAsciiTableOutputArray_local, self).test_send_line()
         
         
 # class TestPsiAsciiTableOutput_AsArray(CisTest, IOInfo):
