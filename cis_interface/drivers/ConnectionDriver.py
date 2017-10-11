@@ -158,22 +158,25 @@ class ConnectionDriver(Driver):
         r"""Actions to perform after sending messages."""
         pass
 
-    def recv_message(self, nolimit=False):
+    def recv_message(self, nolimit=False, **kwargs):
         r"""Get a new message to send.
 
         Args:
             nolimit (bool, optional): If True, recv_nolimit should be used.
                 Otherwise, recv is used. Defaults to False.
+            **kwargs: Additional keyword arguments are passed to the appropriate
+                recv method.
 
         Returns:
             str, bool: False if no more messages, message otherwise.
 
         """
+        kwargs.setdefault('timeout', 0)
         with self.lock:
             if nolimit:
-                flag, msg = self.icomm.recv_nolimit(timeout=0)
+                flag, msg = self.icomm.recv_nolimit(**kwargs)
             else:
-                flag, msg = self.icomm.recv(timeout=0)
+                flag, msg = self.icomm.recv(**kwargs)
         if msg == self.icomm.eof_msg:
             self.on_eof()
         if flag:

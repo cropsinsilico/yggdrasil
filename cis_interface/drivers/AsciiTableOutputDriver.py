@@ -57,18 +57,19 @@ class AsciiTableOutputDriver(AsciiFileOutputDriver):
     def before_loop(self):
         r"""Receive format string and then write it to the file."""
         super(AsciiTableOutputDriver, self).before_loop()
-        fmt = self.recv_message()
+        fmt = self.recv_message(timeout=self.timeout)
         if not fmt:
             raise RuntimeError('Did not receive format string')
         with self.lock:
             self.ocomm.file.update_format_str(fmt)
             self.ocomm.file.writeformat()
 
-    def recv_message(self):
+    def recv_message(self, **kwargs):
         r"""Get a new message to send.
 
         Returns:
             str, bool: False if no more messages, message otherwise.
 
         """
-        return super(AsciiTableOutputDriver, self).recv_message(nolimit=True)
+        return super(AsciiTableOutputDriver, self).recv_message(
+            nolimit=True, **kwargs)
