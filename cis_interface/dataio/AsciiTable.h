@@ -437,14 +437,15 @@ void at_close(asciiTable_t *t) {
 };
 
 /*!
-  @brief Read a line from the file and parse it.
+  @brief Read a line from the file until one is returned that is not a comment.
   @param[in] t constant asciiTable_t table structure.
-  @param[out] ap va_list Pointers to variables where parsed arguments should be
-  stored.
+  @param[out] buf pointer to memory where read line should be stored.
+  @param[in] len_buf Size of buffer where line should be stored. The the message
+  is larger than len_buf, an error will be returned.
   @return int On success, the number of characters read. -1 on failure.
  */
 static inline
-int at_vreadline(const asciiTable_t t, va_list ap) {
+int at_readline_full(const asciiTable_t t, char *buf, const int len_buf) {
   // Read lines until there's one that's not a comment
   int ret = 0, com = 1;
   size_t nread = LINE_SIZE_MAX;
@@ -457,22 +458,98 @@ int at_vreadline(const asciiTable_t t, va_list ap) {
     }
     com = af_is_comment(t.f, line);
   }
+  if (ret > len_buf) {
+    printf("at_readline_full: line (%d bytes) is larger than destination buffer (%d bytes)\n",
+	   ret, len_buf);
+    ret = -1;
+  } else {
+    strcpy(buf, line);
+  }
+  free(line);
+  return ret;
+};
+
+/*!
+  @brief Write a line to the file.
+  @param[in] t constant asciiTable_t table structure.
+  @param[in] line Pointer to line that should be written.
+  @return int On success, the number of characters written. -1 on failure.
+ */
+static inline
+int at_writeline_full(const asciiTable_t t, const char* line) {
+  int ret;
+  ret = af_writeline_full(t.f, line);
+  return ret;
+};
+
+/*!
+  @brief Parse a line to get row columns.
+  @param[in] t constant asciiTable_t table structure.
+  @param[in] line Pointer to memory containing the line to be parsed.
+  @param[out] ap va_list Pointers to variables where parsed arguments should be
+  stored.
+  @return int On success, the number of arguments filled. -1 on failure.
+ */
+static inline
+int at_vbytes_to_row(const asciiTable_t t, const char* line, va_list ap) {
   // Simplify format for vsscanf
   char fmt[LINE_SIZE_MAX];
   strcpy(fmt, t.format_str);
   int sret = simplify_formats(fmt, LINE_SIZE_MAX);
   if (sret < 0) {
-    printf("at_vreadline: simplify_formats returned %d\n", sret);
+    printf("at_vbytes_to_row: simplify_formats returned %d\n", sret);
     free(line);
     return -1;
   }
   // Interpret line
-  sret = vsscanf(line, fmt, ap);
-  if (sret != t.ncols) {
-    printf("at_vreadline: %d arguments filled, but %d were expected\n",
+  ret = vsscanf(line, fmt, ap);
+  if (ret != t.ncols) {
+    printf("at_vbytes_to_row: %d arguments filled, but %d were expected\n",
 	   sret, t.ncols);
     ret = -1;
   }
+  free(line);
+  return ret;
+};
+
+/*!
+  @brief Format arguments to form a line.
+  @param[in] t constant asciiTable_t table structure.
+  @param[out] buf Pointer to memory where the formated row should be stored.
+  @param[in] buf_siz int Size of buf. If the formatted message will exceed
+  the size of the buffer, an error will be returned.
+  @param[in] ap va_list Variables that should be formatted using the format
+  string to create a line in the table.
+  @return int On success, the number of characters written. -1 on failure.
+ */
+static inline
+int at_vrow_to_bytes(const asciiTable_t t, char *buf, const int buf_siz, va_list ap) {
+  int ret = vsnprintf(buf, buf_siz, t.format_str, ap);
+  return ret;
+};
+
+/*!
+  @brief Read a line from the file and parse it.
+  @param[in] t constant asciiTable_t table structure.
+  @param[out] ap va_list Pointers to variables where parsed arguments should be
+  stored.
+  @return int On success, the number of characters read. -1 on failure.
+ */
+static inline
+int at_vreadline(const asciiTable_t t, va_list ap) {
+  int ret;
+  // Read lines until there's one that's not a comment
+  size_t nread = LINE_SIZE_MAX;
+  char *line = (char*)malloc(nread);
+  ret = at_readline_full(t, line, nread);
+  if (ret < 0) {
+    free(line);
+    return ret;
+  }
+  // Parse line
+  int sret = at_vbytes_to_row(t, line, ap);
+  if (sret < 0)
+    ret = -1;
   free(line);
   return ret;
 };
@@ -751,15 +828,23 @@ int at_vbytes_to_array(const asciiTable_t t, const char *data,
 /*!
   @brief Encode a set of arrays as bytes.
   @param[in] t constant asciiTable_t table structure.
-  @param[out] data Pointer to pointer to memory where encoded arrays should be
-  stored. It does not need to be allocate, only declared.
-  @param[in] nrows int Number of rows in each column array.
-  @param[in] ap va_list Pointers to memory where column data is stored.
+  @param[out] data Pointer to memory where encoded arrays should be stored.
+  @param[in] data_siz Integer size of data.
+  @param[in] ap va_list Pointers to memory where column data is stored. The first
+  argument in this set should be an integer, the number of rows in each column
+  array.
+  @returns int Number of bytes written. If larger than data_siz, the message will
+  not be written to data and data should be resized first.
  */
 static inline
-int at_varray_to_bytes(const asciiTable_t t, char **data, int nrows, va_list ap) {
-  // Allocate
-  *data = (char*)realloc(*data, nrows*t.row_siz);
+int at_varray_to_bytes(const asciiTable_t t, char *data, const int data_siz, va_list ap) {
+  int nrows = va_arg(ap, int);
+  int msg_siz = nrows*t.row_siz;
+  if (msg_siz > data_siz) {
+    printf("at_varray_to_bytes: Message size (%d bytes) will exceed allocated buffer (%d bytes).\n",
+	   msg_siz, data_siz);
+    return msg_siz;
+  }
   // Loop through
   int cur_pos = 0, col_siz;
   char *temp;
@@ -767,7 +852,7 @@ int at_varray_to_bytes(const asciiTable_t t, char **data, int nrows, va_list ap)
   for (i = 0; i < t.ncols; i++) {
     col_siz = nrows*t.format_siz[i];
     temp = va_arg(ap, char*);
-    memcpy(*data+cur_pos, temp, col_siz);
+    memcpy(data+cur_pos, temp, col_siz);
     cur_pos += col_siz;
   }
   return cur_pos;
@@ -795,16 +880,19 @@ int at_bytes_to_array(const asciiTable_t t, char *data, int data_siz, ...) {
 /*!
   @brief Encode a set of arrays as bytes.
   @param[in] t constant asciiTable_t table structure.
-  @param[out] data Pointer to pointer to memory where encoded arrays should be
-  stored. It does not need to be allocate, only declared.
-  @param[in] nrows int Number of rows in each column array.
-  @param[in] ... Pointers to memory where column data is stored.
+  @param[out] data Pointer to memory where encoded arrays should be stored.
+  @param[in] data_siz Integer size of data.
+  @param[in] ... Pointers to memory where column data is stored. The first
+  argument in this set should be an integer, the number of rows in each column
+  array.
+  @returns int Number of bytes written. If larger than data_siz, the message will
+  not be written to data and data should be resized first.
  */
 static inline
-int at_array_to_bytes(const asciiTable_t t, char **data, int nrows, ...) {
+int at_array_to_bytes(const asciiTable_t t, char *data, const int data_siz, ...) {
   va_list ap;
   va_start(ap, nrows);
-  int ret = at_varray_to_bytes(t, data, nrows, ap);
+  int ret = at_varray_to_bytes(t, data, data_siz, ap);
   va_end(ap);
   return ret;
 };
