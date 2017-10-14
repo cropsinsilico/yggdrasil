@@ -9,8 +9,11 @@ from cis_interface import backwards
 
 
 # OS X limit is 2kb
-PSI_MSG_MAX = 1024 * 2
-PSI_MSG_EOF = backwards.unicode2bytes("EOF!!!")
+CIS_MSG_MAX = 1024 * 2
+CIS_MSG_EOF = backwards.unicode2bytes("EOF!!!")
+
+PSI_MSG_MAX = CIS_MSG_MAX
+PSI_MSG_EOF = CIS_MSG_EOF
 
 
 def eval_kwarg(x):
