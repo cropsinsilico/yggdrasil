@@ -1,75 +1,33 @@
 import pika
-import socket
-import requests
-from pprint import pformat
+# import socket
 from cis_interface.communication import CommBase
 from cis_interface.config import cis_cfg
-from cis_interface import backwards
 
 
 _N_CONNECTIONS = 0
 _rmq_param_sep = '_RMQPARAM_'
 
 
-class RMQComm(CommBase):
+class RMQComm(CommBase.CommBase):
     r"""Class for handling basic RabbitMQ communications.
 
     Args:
-        name (str): The environment variable where the queue name is stored.
-            stored.
-        queue (str, optional): Name of the queue that messages will be
-            received from. If and empty string, the queue is exclusive to this
-            connection. Defaults to ''.
-        routing_key (str, optional): Routing key that should be used when the
-            queue is bound. If None, the queue name is used. Defaults to None.
-        user (str, optional): RabbitMQ server username. Defaults to config
-            option 'user' in section 'rmq'.
-        host (str, optional): RabbitMQ server host. Defaults to config option
-            'host' in section 'rmq' if it exists and the output of
-            socket.gethostname() if it does not.
-        vhost (str, optional): RabbitMQ server virtual host. Defaults to
-            config option 'vhost' in section 'rmq'.
-        passwd (str, optional): RabbitMQ server password. Defaults to
-            config option 'password' in section 'rmq'.
-        exchange (str, optional): RabbitMQ exchange. Defaults to 'namespace'
-            attribute which is set from the config option 'namespace' in the
-            section 'rmq'.
-        exclusive (bool, optional): If True, the queue that is created can
-            only be used by this driver. Defaults to False. If a queue
-            name is not provided, it is assumed exclusive.
+        name (str): The environment variable where the comm address is stored.
+        dont_open (bool, optional): If True, the connection will not be opened.
+            Defaults to False.
+        **kwargs: Additional keyword arguments are passed to CommBase.
 
     Attributes:
-        user (str): RabbitMQ server username.
-        passwd (str): RabbitMQ server password.
-        host (str): RabbitMQ server host.
-        vhost (str): RabbitMQ server virtual host.
-        exchange (str): RabbitMQ exchange name.
         connection (:class:`pika.Connection`): RabbitMQ connection.
         channel (:class:`pika.Channel`): RabbitMQ channel.
-        queue (str): Name of the queue that messages will be received
-            from. If an empty string, the queue is exclusive to this
-            connection.
-        routing_key (str): Routing key that should be used when the queue is
-            bound. If None, the queue name is used.
-        times_connected (int): Number of times the connection has been
-            established/re-established.
 
     """
     def __init__(self, name, dont_open=False, **kwargs):
-        kwattr = ['user', 'passwd', 'host', 'vhost', 'exchange', 'exclusive']
-        kwargs_attr = {k: kwargs.pop(k, None) for k in kwattr}
-        super(RMQComm, self).__init__(name, dont_open=False, **kwargs)
-        # Set RMQ attributes
-        self.exclusive = False
-        for k in kwattr:
-            if kwargs_attr[k] is not None:
-                setattr(self, k, kwargs_attr.pop(k))
+        super(RMQComm, self).__init__(name, dont_open=True, **kwargs)
         self.connection = None
         self.channel = None
-        self.consumer_tag = ""
         self._is_open = False
-        self.setDaemon(True)
-        self._q_obj = None
+        self._bound = False
         # Reserve port by binding
         if not dont_open:
             self.open()
@@ -98,7 +56,8 @@ class RMQComm(CommBase):
 
     @classmethod
     def new_comm_kwargs(cls, name, user=None, password=None, host=None,
-                        virtual_host=None, exchange=None, queue=''):
+                        virtual_host=None, port=None, exchange=None, queue='',
+                        **kwargs):
         r"""Initialize communication with new connection.
 
         Args:
@@ -140,8 +99,8 @@ class RMQComm(CommBase):
                 password = cis_cfg.get('rmq', 'password', 'guest')
             if host is None:
                 host = cis_cfg.get('rmq', 'host', 'localhost')
-            if host == 'localhost':
-                host = socket.gethostname()
+            # if host == 'localhost':
+            #     host = socket.gethostname()
             if virtual_host is None:
                 virtual_host = cis_cfg.get('rmq', 'vhost', '/')
             if port is None:
@@ -170,6 +129,7 @@ class RMQComm(CommBase):
 
     def bind(self):
         r"""Declare queue to get random new queue."""
+        global _N_CONNECTIONS
         if self.is_open:
             return
         self._bound = True
@@ -182,8 +142,13 @@ class RMQComm(CommBase):
             exclusive = True
         else:
             exclusive = False
+        if self.queue.startswith('amq.'):
+            passive = True
+        else:
+            passive = False
         res = self.channel.queue_declare(queue=self.queue,
                                          exclusive=exclusive,
+                                         passive=passive,
                                          auto_delete=True)
         if not self.queue:
             self.address += res.method.queue
@@ -191,7 +156,6 @@ class RMQComm(CommBase):
     
     def open(self):
         r"""Open connection and bind/connect to queue as necessary."""
-        global _N_CONNECTIONS
         if not self.is_open:
             if not self._bound:
                 self.bind()
@@ -250,7 +214,7 @@ class RMQComm(CommBase):
                 to. Defaults to self.exchange.
             routing_key (str, optional): Key that exchange should use to route
                 the message. Defaults to self.queue.
-            **kwargs: Additional keyword arguments are passed to 
+            **kwargs: Additional keyword arguments are passed to
                 :method:`pika.BlockingChannel.basic_publish`.
 
         Returns:
