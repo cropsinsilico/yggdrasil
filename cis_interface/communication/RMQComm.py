@@ -1,0 +1,303 @@
+import pika
+import socket
+import requests
+from pprint import pformat
+from cis_interface.communication import CommBase
+from cis_interface.config import cis_cfg
+from cis_interface import backwards
+
+
+_N_CONNECTIONS = 0
+_rmq_param_sep = '_RMQPARAM_'
+
+
+class RMQComm(CommBase):
+    r"""Class for handling basic RabbitMQ communications.
+
+    Args:
+        name (str): The environment variable where the queue name is stored.
+            stored.
+        queue (str, optional): Name of the queue that messages will be
+            received from. If and empty string, the queue is exclusive to this
+            connection. Defaults to ''.
+        routing_key (str, optional): Routing key that should be used when the
+            queue is bound. If None, the queue name is used. Defaults to None.
+        user (str, optional): RabbitMQ server username. Defaults to config
+            option 'user' in section 'rmq'.
+        host (str, optional): RabbitMQ server host. Defaults to config option
+            'host' in section 'rmq' if it exists and the output of
+            socket.gethostname() if it does not.
+        vhost (str, optional): RabbitMQ server virtual host. Defaults to
+            config option 'vhost' in section 'rmq'.
+        passwd (str, optional): RabbitMQ server password. Defaults to
+            config option 'password' in section 'rmq'.
+        exchange (str, optional): RabbitMQ exchange. Defaults to 'namespace'
+            attribute which is set from the config option 'namespace' in the
+            section 'rmq'.
+        exclusive (bool, optional): If True, the queue that is created can
+            only be used by this driver. Defaults to False. If a queue
+            name is not provided, it is assumed exclusive.
+
+    Attributes:
+        user (str): RabbitMQ server username.
+        passwd (str): RabbitMQ server password.
+        host (str): RabbitMQ server host.
+        vhost (str): RabbitMQ server virtual host.
+        exchange (str): RabbitMQ exchange name.
+        connection (:class:`pika.Connection`): RabbitMQ connection.
+        channel (:class:`pika.Channel`): RabbitMQ channel.
+        queue (str): Name of the queue that messages will be received
+            from. If an empty string, the queue is exclusive to this
+            connection.
+        routing_key (str): Routing key that should be used when the queue is
+            bound. If None, the queue name is used.
+        times_connected (int): Number of times the connection has been
+            established/re-established.
+
+    """
+    def __init__(self, name, dont_open=False, **kwargs):
+        kwattr = ['user', 'passwd', 'host', 'vhost', 'exchange', 'exclusive']
+        kwargs_attr = {k: kwargs.pop(k, None) for k in kwattr}
+        super(RMQComm, self).__init__(name, dont_open=False, **kwargs)
+        # Set RMQ attributes
+        self.exclusive = False
+        for k in kwattr:
+            if kwargs_attr[k] is not None:
+                setattr(self, k, kwargs_attr.pop(k))
+        self.connection = None
+        self.channel = None
+        self.consumer_tag = ""
+        self._is_open = False
+        self.setDaemon(True)
+        self._q_obj = None
+        # Reserve port by binding
+        if not dont_open:
+            self.open()
+        else:
+            self.bind()
+
+    @property
+    def comm_count(self):
+        r"""int: Number of connections that have been opened on this process."""
+        return _N_CONNECTIONS
+
+    @property
+    def url(self):
+        r"""str: AMQP server address."""
+        return self.address.split(_rmq_param_sep)[0]
+
+    @property
+    def exchange(self):
+        r"""str: AMQP exchange."""
+        return self.address.split(_rmq_param_sep)[1]
+
+    @property
+    def queue(self):
+        r"""str: AMQP queue."""
+        return self.address.split(_rmq_param_sep)[2]
+
+    @classmethod
+    def new_comm_kwargs(cls, name, user=None, password=None, host=None,
+                        virtual_host=None, exchange=None, queue=''):
+        r"""Initialize communication with new connection.
+
+        Args:
+            name (str): Name of new connection.
+            user (str, optional): RabbitMQ server username. Defaults to config
+                option 'user' in section 'rmq' if it exists and 'guest' if it
+                does not.
+            password (str, optional): RabbitMQ server password. Defaults to
+                config option 'password' in section 'rmq' if it exists and
+                'guest' if it does not.
+            host (str, optional): RabbitMQ server host. Defaults to config option
+                'host' in section 'rmq' if it exists and 'localhost' if it
+                does not. If 'localhost', the output of socket.gethostname()
+                is used.
+            virtual_host (str, optional): RabbitMQ server virtual host. Defaults
+                to config option 'vhost' in section 'rmq' if it exists and '/'
+                if it does not.
+            port (str, optional): Port on host to use. Defaults to config option
+                'port' in section 'rmq' if it exists and '5672' if it does not.
+            exchange (str, optional): RabbitMQ exchange. Defaults to config
+                option 'namespace' in section 'rmq' if it exits and '' if it does
+                not.
+            queue (str, optional): Name of the queue that messages will be
+                send to or received from. If an empty string, the queue will
+                be a random string and exclusive to a receiving comm. Defaults
+                to ''.
+            **kwargs: Additional keywords arguments are returned as keyword
+                arguments for the new comm.
+
+        Returns:
+            tuple(tuple, dict): Arguments and keyword arguments for new comm.
+        
+        """
+        args = [name]
+        if 'address' not in kwargs:
+            if user is None:
+                user = cis_cfg.get('rmq', 'user', 'guest')
+            if password is None:
+                password = cis_cfg.get('rmq', 'password', 'guest')
+            if host is None:
+                host = cis_cfg.get('rmq', 'host', 'localhost')
+            if host == 'localhost':
+                host = socket.gethostname()
+            if virtual_host is None:
+                virtual_host = cis_cfg.get('rmq', 'vhost', '/')
+            if port is None:
+                port = cis_cfg.get('rmq', 'port', '5672')
+            if virtual_host == '/':
+                vhost = '%2f'
+            else:
+                vhost = virtual_host
+            if exchange is None:
+                exchange = cis_cfg.get('rmq', 'namespace', '')
+            url = 'amqp://%s:%s@%s:%s/%s' % (
+                user, password, host, port, vhost)
+            kwargs['address'] = _rmq_param_sep.join([url, exchange, queue])
+        return args, kwargs
+
+    def opp_comm_kwargs(self):
+        r"""Get keyword arguments to initialize communication with opposite
+        comm object.
+
+        Returns:
+            dict: Keyword arguments for opposite comm object.
+
+        """
+        kwargs = super(RMQComm, self).opp_comm_kwargs()
+        return kwargs
+
+    def bind(self):
+        r"""Declare queue to get random new queue."""
+        if self.is_open:
+            return
+        self._bound = True
+        parameters = pika.URLParameters(self.url)
+        self.connection = pika.BlockingConnection(parameters)
+        self.channel = self.connection.channel()
+        self.channel.exchange_declare(exchange=self.exchange,
+                                      auto_delete=True)
+        if self.direction == 'recv' and not self.queue:
+            exclusive = True
+        else:
+            exclusive = False
+        res = self.channel.queue_declare(queue=self.queue,
+                                         exclusive=exclusive,
+                                         auto_delete=True)
+        if not self.queue:
+            self.address += res.method.queue
+        _N_CONNECTIONS += 1
+    
+    def open(self):
+        r"""Open connection and bind/connect to queue as necessary."""
+        global _N_CONNECTIONS
+        if not self.is_open:
+            if not self._bound:
+                self.bind()
+            if self.direction == 'recv':
+                self.channel.queue_bind(exchange=self.exchange,
+                                        # routing_key=self.routing_key,
+                                        queue=self.queue)
+            self._is_open = True
+
+    def close(self):
+        r"""Close connection."""
+        if self.is_open:
+            self._is_open = False
+            if self.direction == 'recv':
+                self.channel.queue_unbind(queue=self.queue,
+                                          exchange=self.exchange)
+                self.channel.queue_delete(queue=self.queue)
+            self.connection.close()
+            self.connection = None
+            self.channel = None
+
+    @property
+    def is_open(self):
+        r"""bool: True if the connection and channel are open."""
+        if self.channel is None or self.connection is None:
+            return False
+        if self.connection.is_open:
+            if self.connection.is_closing:
+                return False
+        else:
+            return False
+        if self.channel.is_open:
+            if self.channel.is_closing:
+                return False
+        else:
+            return False
+        return self._is_open
+        
+    @property
+    def n_msg(self):
+        r"""int: Number of messages in the queue."""
+        out = 0
+        if self.is_open:
+            res = self.channel.queue_declare(queue=self.queue,
+                                             auto_delete=True,
+                                             passive=True)
+            out = res.method.message_count
+        return out
+
+    def _send(self, msg, exchange=None, routing_key=None, **kwargs):
+        r"""Send a message.
+
+        Args:
+            msg (str, bytes): Message to be sent.
+            exchange (str, optional): Exchange that message should be sent
+                to. Defaults to self.exchange.
+            routing_key (str, optional): Key that exchange should use to route
+                the message. Defaults to self.queue.
+            **kwargs: Additional keyword arguments are passed to 
+                :method:`pika.BlockingChannel.basic_publish`.
+
+        Returns:
+            bool: Success or failure of send.
+
+        """
+        if self.is_closed:
+            self.error(".send(): Connection closed.")
+            return False
+        if exchange is None:
+            exchange = self.exchange
+        if routing_key is None:
+            routing_key = self.queue
+        try:
+            kwargs.setdefault('mandatory', True)
+            out = self.channel.basic_publish(exchange, routing_key, msg, **kwargs)
+        except:
+            self.exception(".send(): Error")
+            raise
+        return out
+
+    def _recv(self, queue=None):
+        r"""Receive a message.
+
+        Args:
+            queue (str, optional): Queue that message should be received from.
+                Defaults to self.queue.
+
+        Returns:
+            tuple (bool, obj): Success or failure of receive and received
+                message.
+
+        """
+        if self.is_closed:
+            self.error(".recv(): Connection closed.")
+            return (False, None)
+        if queue is None:
+            queue = self.queue
+        try:
+            method_frame, props, msg = self.channel.basic_get(
+                queue=queue, no_ack=False)
+            if method_frame:
+                self.channel.basic_ack(method_frame.delivery_tag)
+            else:
+                self.debug(".recv(): No message")
+                msg = ''
+        except:
+            self.exception(".recv(): Error")
+            raise
+        return (True, msg)

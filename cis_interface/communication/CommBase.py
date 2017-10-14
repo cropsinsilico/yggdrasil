@@ -1,6 +1,6 @@
 import os
 from cis_interface import backwards
-from cis_interface.tools import CisClass, PSI_MSG_MAX, PSI_MSG_EOF
+from cis_interface.tools import CisClass, CIS_MSG_MAX, CIS_MSG_EOF
 from cis_interface.serialize.DefaultSerialize import DefaultSerialize
 from cis_interface.serialize.DefaultDeserialize import DefaultDeserialize
 
@@ -138,10 +138,10 @@ class CommBase(CisClass):
     @property
     def eof_msg(self):
         r"""str: Message indicating EOF."""
-        return PSI_MSG_EOF
+        return CIS_MSG_EOF
 
     def chunk_message(self, msg):
-        r"""Yield chunks of message of size PSI_MSG_MAX.
+        r"""Yield chunks of message of size CIS_MSG_MAX.
 
         Args:
             msg (str, bytes): Raw message bytes to be chunked.
@@ -152,7 +152,7 @@ class CommBase(CisClass):
         """
         prev = 0
         while prev < len(msg):
-            next = min(prev + PSI_MSG_MAX, len(msg))
+            next = min(prev + CIS_MSG_MAX, len(msg))
             yield msg[prev:next]
             prev = next
 
@@ -262,7 +262,7 @@ class CommBase(CisClass):
         return self.send_nolimit(self.eof_msg, *args, **kwargs)
         
     def send(self, *args, **kwargs):
-        r"""Send a message shorter than PSI_MSG_MAX.
+        r"""Send a message shorter than CIS_MSG_MAX.
 
         Args:
             *args: All arguments are assumed to be part of the message.
@@ -285,7 +285,7 @@ class CommBase(CisClass):
         return ret
 
     def send_nolimit(self, *args, **kwargs):
-        r"""Send a message larger than PSI_MSG_MAX.
+        r"""Send a message larger than CIS_MSG_MAX.
 
         Args:
             *args: All arguments assumed to be part of the message.
@@ -347,7 +347,7 @@ class CommBase(CisClass):
         return flag, msg
         
     def recv(self, *args, **kwargs):
-        r"""Receive a message shorter than PSI_MSG_MAX.
+        r"""Receive a message shorter than CIS_MSG_MAX.
 
         Args:
             *args: All arguments are passed to comm _recv method.
@@ -374,7 +374,7 @@ class CommBase(CisClass):
         return (flag, msg)
 
     def recv_nolimit(self, *args, **kwargs):
-        r"""Receive a message larger than PSI_MSG_MAX.
+        r"""Receive a message larger than CIS_MSG_MAX.
 
         Args:
             *args: All arguments are passed to comm _recv_nolimit method.

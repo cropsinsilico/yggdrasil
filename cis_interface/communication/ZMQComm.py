@@ -110,10 +110,11 @@ class ZMQComm(CommBase.CommBase):
                 'inproc' protocol. Defaults to 'localhost'.
             port (int, optional): The port used. Invalid for 'inproc' protocol.
                 Defaults to None and a random port is choosen.
-            **kwargs: Additional keywords arguments are passed to ZMQComm.
+            **kwargs: Additional keywords arguments are returned as keyword
+                arguments for the new comm.
 
         Returns:
-            dict: Keyword arguments for new socket.
+            tuple(tuple, dict): Arguments and keyword arguments for new socket.
 
         """
         args = [name]
@@ -153,7 +154,7 @@ class ZMQComm(CommBase.CommBase):
             else:
                 self._bound = False
 
-    def open(self, reserve=False):
+    def open(self):
         r"""Open connection by binding/connect to the specified socket."""
         global _N_SOCKETS
         if not self.is_open:
