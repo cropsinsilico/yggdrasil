@@ -1,6 +1,3 @@
-import os
-from scipy.io import loadmat
-from cis_interface.backwards import pickle
 from cis_interface.drivers.FileInputDriver import FileInputDriver
 from cis_interface.serialize import MatDeserialize, PickleSerialize
 

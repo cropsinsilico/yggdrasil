@@ -11,7 +11,6 @@ class TestMatInputParam(parent.TestFileInputParam):
         self.driver = 'MatInputDriver'
         self.filepath = os.path.abspath('mat_input.mat')
         self.args = self.filepath
-        # self.timeout = 60.0
 
     def setup(self):
         r"""Create a driver instance and start the driver."""

@@ -230,7 +230,7 @@ class ConnectionDriver(Driver):
             if msg is False:
                 self.debug(':run: No more messages')
                 break
-            if len(msg) == 0:
+            if isinstance(msg, str) and len(msg) == 0:
                 self.state = 'waiting'
                 self.debug(':run: Waiting for next message.')
                 self.sleep()
