@@ -15,8 +15,7 @@ class RMQClientDriver(RMQDriver, RPCDriver):
         args (str, optional): The name of the server RabbitMQ message queue
             that requests should be sent to. Defaults to name + '_SERVER' if
             not set.
-        **kwargs: Additional keyword arguments are passed to parent class's
-            __init__ method.
+        **kwargs: Additional keyword arguments are passed to parent class.
 
     Attributes:
         request_queue (str): The name of RabbitMQ message queue that requests

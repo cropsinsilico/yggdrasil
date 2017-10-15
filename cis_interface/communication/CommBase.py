@@ -422,13 +422,16 @@ class CommBase(CisClass):
             return False
         return ret
 
-    def send_multipart(self, msg, **kwargs):
+    def send_multipart(self, msg, send_header=False, **kwargs):
         r"""Send a multipart message. If the message is smaller than maxMsgSize,
         it is sent using _send, otherwise it is sent to a worker comm using
         _send_multipart.
 
         Args:
             msg (bytes): Message to be sent.
+            send_header (bool, optional): If True, the message will be sent as
+                multipart with header even if the message is smaller than
+                maxMsgSize. Defaults to False.
             **kwargs: Additional keyword arguments are passed to _send or
                 _send_multipart.
 
@@ -436,7 +439,8 @@ class CommBase(CisClass):
             bool: Success or failure of send.
 
         """
-        if (len(msg) < self.maxMsgSize) or (self.maxMsgSize == 0):
+        if (not send_header) and ((len(msg) < self.maxMsgSize) or
+                                  (self.maxMsgSize == 0)):
             ret = self._send(msg, **kwargs)
         else:
             header = self.get_header(msg)
