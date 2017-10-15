@@ -4,8 +4,9 @@ from cis_interface.serialize.DefaultSerialize import DefaultSerialize
 
 
 class MatSerialize(DefaultSerialize):
-    r"""Class for serializing a python object into a bytes message by pickling.
-    """
+    r"""Class for serializing a python object into a bytes message using the
+    Matlab .mat format."""
+    
     def __init__(self, *args, **kwargs):
         super(MatSerialize, self).__init__(*args, **kwargs)
 
@@ -23,7 +24,7 @@ class MatSerialize(DefaultSerialize):
 
         """
         if not isinstance(args, dict):
-            raise TypeError('Unpickled object (type %s) is not a dictionary' %
+            raise TypeError('Object (type %s) is not a dictionary' %
                             type(args))
         fd = backwards.sio.StringIO()
         savemat(fd, args)
