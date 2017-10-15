@@ -4,7 +4,7 @@ import uuid
 import importlib
 import unittest
 import numpy as np
-from scipy.io import savemat
+from scipy.io import savemat, loadmat
 import nose.tools as nt
 from cis_interface.tools import CIS_MSG_MAX as maxMsgSize
 from cis_interface.backwards import pickle, sio
@@ -233,7 +233,13 @@ class IOInfo(object):
             x = pickle.load(x)
         elif isinstance(x, str) and os.path.isfile(x):
             with open(x, 'rb') as fd:
-                x = pickle.load(fd)
+                if x.endswith('.mat'):
+                    x = loadmat(fd)
+                    mat_keys = ['__header__', '__globals__', '__version__']
+                    for k in mat_keys:
+                        del x[k]
+                else:
+                    x = pickle.load(fd)
         elif isinstance(x, str):
             x = pickle.loads(x)
         nt.assert_equal(type(x), type(self.data_dict))

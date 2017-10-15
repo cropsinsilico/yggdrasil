@@ -19,5 +19,8 @@ class PickleDeserialize(DefaultDeserialize):
             obj: Deserialized Python object.
 
         """
-        out = backwards.pickle.loads(msg)
+        if len(msg) == 0:
+            out = msg
+        else:
+            out = backwards.pickle.loads(msg)
         return out

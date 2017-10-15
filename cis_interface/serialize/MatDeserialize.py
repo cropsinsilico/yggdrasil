@@ -20,6 +20,8 @@ class MatDeserialize(DefaultDeserialize):
             obj: Deserialized Python object.
 
         """
+        if len(msg) == 0:
+            return ''
         fd = backwards.sio.StringIO(msg)
         out = loadmat(fd, squeeze_me=False)
         mat_keys = ['__header__', '__globals__', '__version__']
