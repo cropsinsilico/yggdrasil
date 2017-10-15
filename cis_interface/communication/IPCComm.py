@@ -19,13 +19,15 @@ def get_queue(qid=None):
         :class:`sysv_ipc.MessageQueue`: Message queue.
 
     """
-    kwargs = dict(max_message_size=tools.PSI_MSG_MAX)
+    global _N_QUEUES
+    kwargs = dict(max_message_size=tools.CIS_MSG_MAX)
     if qid is None:
         kwargs['flags'] = sysv_ipc.IPC_CREX
     mq = sysv_ipc.MessageQueue(qid, **kwargs)
     key = str(mq.key)
     if key not in _registered_queues:
         _registered_queues[key] = mq
+        _N_QUEUES += 1
     return mq
 
 
@@ -151,22 +153,19 @@ class IPCComm(CommBase.CommBase):
     @classmethod
     def new_comm_kwargs(cls, *args, **kwargs):
         r"""Initialize communication with new queue."""
-        global _N_QUEUES
         if 'address' not in kwargs:
             q = get_queue()
             kwargs['address'] = str(q.key)
-            _N_QUEUES += 1
         # kwargs.setdefault('address', 'generate')
         return args, kwargs
 
     def open(self):
         r"""Open the connection by connecting to the queue."""
-        global _N_QUEUES
+        super(IPCComm, self).open()
         if not self.is_open:
             if self.address == 'generate':
                 self.q = get_queue()
                 self.address = str(self.q.key)
-                _N_QUEUES += 1
             else:
                 qid = int(self.address)
                 self.q = get_queue(qid)
@@ -180,6 +179,7 @@ class IPCComm(CommBase.CommBase):
             except KeyError:
                 pass
             self.q = None
+        super(IPCComm, self).close()
             
     @property
     def is_open(self):
@@ -194,8 +194,23 @@ class IPCComm(CommBase.CommBase):
         else:
             return 0
 
+    def _send(self, payload):
+        r"""Send a message smaller than CIS_MSG_MAX.
+
+        Args:
+            payload (str): Message to send.
+
+        Returns:
+            bool: Success or failure of sending the message.
+
+        """
+        if not self.is_open:
+            return False
+        self.q.send(payload)
+        return True
+
     def _recv(self, timeout=0):
-        r"""Receive a message smaller than PSI_MSG_MAX. The process will
+        r"""Receive a message smaller than CIS_MSG_MAX. The process will
         sleep until there is a message in the queue to receive.
 
         Returns:
@@ -221,82 +236,3 @@ class IPCComm(CommBase.CommBase):
         self.debug(".recv(): message ready, read it")
         data, _ = self.q.receive()  # ignore ident
         return (True, data)
-
-    def _recv_nolimit(self, *args, **kwargs):
-        r"""Receive a message larger than PSI_MSG_MAX that is sent in multiple
-        parts.
-
-        Args:
-            *args: All arguments are passed to _recv.
-            **kwargs: All keyword arguments are passed to _recv.
-
-        Returns:
-            tuple (bool, str): The success or failure of receiving a message
-                and the complete message received.
-
-        """
-        self.debug(".recv_nolimit()")
-        payload = self._recv(*args, **kwargs)
-        if not payload[0] or (len(payload[1]) == 0):  # pragma: debug
-            self.debug(".recv_nolimit(): Failed to receive payload size.")
-            return payload
-        leng_exp = int(float(payload[1]))
-        data = backwards.unicode2bytes('')
-        ret = True
-        while len(data) < leng_exp:
-            payload = self._recv(*args, **kwargs)
-            if not payload[0]:  # pragma: debug
-                self.debug(
-                    ".recv_nolimit(): read interupted at %d of %d bytes.",
-                    len(data), leng_exp)
-                ret = False
-                break
-            data = data + payload[1]
-        payload = (ret, data)
-        self.debug(".recv_nolimit(): read %d bytes", len(data))
-        return payload
-
-    def _send(self, payload):
-        r"""Send a message smaller than PSI_MSG_MAX.
-
-        Args:
-            payload (str): Message to send.
-
-        Returns:
-            bool: Success or failure of sending the message.
-
-        """
-        if not self.is_open:
-            return False
-        else:
-            self.q.send(payload)
-            return True
-
-    def _send_nolimit(self, payload):
-        r"""Send a message larger than PSI_MSG_MAX in multiple parts.
-
-        Args:
-            payload (str): Message to send.
-
-        Returns:
-            bool: Success or failure of sending the message.
-
-        """
-        ret = self._send("%ld" % len(payload))
-        if not ret:  # pragma: debug
-            self.debug(".send_nolimit: Sending size of payload failed.")
-            return ret
-        nsent = 0
-        for imsg in self.chunk_message(payload):
-            ret = self._send(imsg)
-            if not ret:  # pragma: debug
-                self.debug(
-                    ".send_nolimit(): send interupted at %d of %d bytes.",
-                    nsent, len(payload))
-                break
-            nsent += len(imsg)
-            self.debug(".send_nolimit(): %d of %d bytes sent",
-                       nsent, len(payload))
-        if ret:
-            self.debug(".send_nolimit %d bytes completed", len(payload))
-        return ret
