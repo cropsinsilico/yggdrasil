@@ -8,7 +8,7 @@ class ConnectionDriver(Driver):
     r"""Class that continuously passes messages from one comm to another.
 
     Args:
-        name (str): Name of the queue that messages should be sent to.
+        name (str): Name that should be used to set names of input/output comms.
         icomm_kws (dict, optional): Keyword arguments for the input communicator.
         ocomm_kws (dict, optional): Keyword arguments for the output communicator.
         **kwargs: Additonal keyword arguments are passed to the parent class.
