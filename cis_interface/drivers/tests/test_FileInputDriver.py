@@ -43,22 +43,12 @@ class TestFileInputParam(parent.TestConnectionParam):
 
 class TestFileInputDriverNoStart(TestFileInputParam,
                                  parent.TestConnectionDriverNoStart):
-    r"""Test runner for FileInputDriver without start.
-
-    Attributes (in addition to parent class's):
-        -
-
-    """
+    r"""Test runner for FileInputDriver without start."""
     pass
 
 
 class TestFileInputDriver(TestFileInputParam, parent.TestConnectionDriver):
-    r"""Test runner for FileInputDriver.
-
-    Attributes (in addition to parent class's):
-        -
-
-    """
+    r"""Test runner for FileInputDriver."""
 
     def assert_before_stop(self):
         r"""Assertions to make before stopping the driver instance."""
