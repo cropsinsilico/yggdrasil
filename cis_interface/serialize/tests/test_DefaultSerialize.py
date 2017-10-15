@@ -1,6 +1,5 @@
 import nose.tools as nt
-from cis_interface.tests import CisTest
-from cis_interface.drivers.tests.test_IODriver import IOInfo
+from cis_interface.tests import CisTest, IOInfo
 
 
 class TestDefaultSerialize(CisTest, IOInfo):
