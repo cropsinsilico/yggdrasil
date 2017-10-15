@@ -53,6 +53,12 @@ class TestCommBase(CisTest, IOInfo):
         r"""Alias for instance."""
         return self.instance
 
+    @property
+    def maxMsgSize(self):
+        r"""int: Maximum message size."""
+        return max(self.instance.maxMsgSize,
+                   super(TestCommBase, self).maxMsgSize)
+    
     def setup(self, *args, **kwargs):
         r"""Initialize comm object pair."""
         self.send_instance = new_comm(self.name, **self.send_inst_kwargs)

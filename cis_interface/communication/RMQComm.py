@@ -152,6 +152,9 @@ class RMQComm(CommBase.CommBase):
                                          auto_delete=True)
         if not self.queue:
             self.address += res.method.queue
+        self.channel.queue_bind(exchange=self.exchange,
+                                # routing_key=self.routing_key,
+                                queue=self.queue)
         _N_CONNECTIONS += 1
     
     def open(self):
@@ -159,10 +162,6 @@ class RMQComm(CommBase.CommBase):
         if not self.is_open:
             if not self._bound:
                 self.bind()
-            if self.direction == 'recv':
-                self.channel.queue_bind(exchange=self.exchange,
-                                        # routing_key=self.routing_key,
-                                        queue=self.queue)
             self._is_open = True
 
     def close(self):
@@ -205,6 +204,36 @@ class RMQComm(CommBase.CommBase):
             out = res.method.message_count
         return out
 
+    @property
+    def get_work_comm_kwargs(self):
+        r"""dict: Keyword arguments for an existing work comm."""
+        out = super(RMQComm, self).get_work_comm_kwargs
+        out['exchange'] = self.exchange
+        return out
+
+    @property
+    def create_work_comm_kwargs(self):
+        r"""dict: Keyword arguments for a new work comm."""
+        out = super(RMQComm, self).create_work_comm_kwargs
+        out['exchange'] = self.exchange
+        return out
+
+    def _send_multipart_worker(self, msg, header, **kwargs):
+        r"""Send multipart message to the worker comm identified.
+
+        Args:
+            msg (str): Message to be sent.
+            header (dict): Message info including work comm address.
+
+        Returns:
+            bool: Success or failure of sending the message.
+
+        """
+        workcomm = self.get_work_comm(header['address'])
+        args = [msg]
+        self.sched_task(0, workcomm._send_multipart, args=args, kwargs=kwargs)
+        return True
+    
     def _send(self, msg, exchange=None, routing_key=None, **kwargs):
         r"""Send a message.
 
@@ -236,32 +265,35 @@ class RMQComm(CommBase.CommBase):
             raise
         return out
 
-    def _recv(self, queue=None):
+    def _recv(self, timeout=0):
         r"""Receive a message.
 
         Args:
-            queue (str, optional): Queue that message should be received from.
-                Defaults to self.queue.
+            timeout (float, optional): Time, in seconds, that should be waited
+                for a message. Defaults to 0.
 
         Returns:
             tuple (bool, obj): Success or failure of receive and received
                 message.
 
         """
+        Tout = self.start_timeout(timeout)
+        while self.n_msg == 0 and self.is_open and (not Tout.is_out):
+            self.sleep()
+        self.stop_timeout()
         if self.is_closed:
-            self.error(".recv(): Connection closed.")
+            self.debug(".recv(): Connection closed.")
             return (False, None)
-        if queue is None:
-            queue = self.queue
         try:
             method_frame, props, msg = self.channel.basic_get(
-                queue=queue, no_ack=False)
+                queue=self.queue, no_ack=False)
             if method_frame:
                 self.channel.basic_ack(method_frame.delivery_tag)
             else:
                 self.debug(".recv(): No message")
                 msg = ''
         except:
+            print 'error'
             self.exception(".recv(): Error")
             raise
         return (True, msg)

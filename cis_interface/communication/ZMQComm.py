@@ -1,6 +1,6 @@
 import zmq
 from cis_interface import backwards
-from cis_interface.communication import CommBase
+from cis_interface.communication import CommBase, new_comm
 
 
 _N_SOCKETS = 0
@@ -79,6 +79,12 @@ class ZMQComm(CommBase.CommBase):
             self.open()
         else:
             self.bind()
+
+    @property
+    def maxMsgSize(self):
+        r"""int: Maximum size of a single message that should be sent."""
+        # This is based on limit of 32bit int
+        return 2**30
 
     @property
     def comm_count(self):
@@ -196,41 +202,124 @@ class ZMQComm(CommBase.CommBase):
             return out
         return 0
 
-    def _send(self, msg):
+    @property
+    def get_work_comm_kwargs(self):
+        r"""dict: Keyword arguments for an existing work comm."""
+        out = super(ZMQComm, self).get_work_comm_kwargs
+        out['socket_type'] = 'PAIR'
+        return out
+
+    @property
+    def create_work_comm_kwargs(self):
+        r"""dict: Keyword arguments for a new work comm."""
+        out = super(ZMQComm, self).create_work_comm_kwargs
+        out['socket_type'] = 'PAIR'
+        return out
+    
+    def _send_multipart_worker(self, msg, header, **kwargs):
+        r"""Send multipart message to the worker comm identified.
+
+        Args:
+            msg (str): Message to be sent.
+            header (dict): Message info including work comm address.
+
+        Returns:
+            bool: Success or failure of sending the message.
+
+        """
+        workcomm = self.get_work_comm(header['address'])
+        args = [msg]
+        self.sched_task(0, workcomm._send_multipart, args=args, kwargs=kwargs)
+        return True
+
+    def _send_multipart(self, msg, **kwargs):
+        r"""Send a message larger than maxMsgSize in multiple parts.
+
+        Args:
+            msg (str): Message to send.
+            **kwargs: Additional keyword arguments are apssed to _send.
+
+        Returns:
+            bool: Success or failure of sending the message.
+
+        """
+        flag, _ = self._recv(timeout=self.timeout, flags=0)
+        if not flag:
+            return False
+        flag = self._send(_, flags=0)
+        flag = super(ZMQComm, self)._send_multipart(msg, **kwargs) 
+        return flag
+
+    def _send(self, msg, **kwargs):
         r"""Send a message.
 
         Args:
             msg (str, bytes): Message to be sent.
+            **kwargs: Additional keyword arguments are passed to socket send.
 
         Returns:
             bool: Success or failure of send.
 
         """
-        if self.socket.closed:
+        if self.is_closed:
             self.error(".send(): Socket closed")
             return False
         try:
-            msg_chunks = [_ for _ in self.chunk_message(msg)]
-            self.socket.send_multipart(msg_chunks, flags=zmq.NOBLOCK)
+            kwargs.setdefault('flags', zmq.NOBLOCK)
+            self.socket.send(msg, **kwargs)
         except zmq.ZMQError:
             self.exception(".send(): Error")
             return False
         return True
 
-    def _recv(self):
+    def _recv_multipart(self, *args, **kwargs):
+        r"""Receive a message sent in multiple parts.
+
+        Args:
+            *args: All arguments are passed to parent _recv_multipart.
+            **kwargs: All keyword arguments are passed to parent _recv_multipart.
+
+        Returns:
+            tuple (bool, str): The success or failure of receiving a message
+                and the complete message received.
+
+        """
+        data = backwards.unicode2bytes('')
+        flag = self._send(data)
+        if not flag:
+            return False, data
+        flag, msg = self._recv(flags=0)
+        if not flag:
+            return False, data
+        # kwargs['flags'] = 0
+        # kwargs['timeout'] = self.timeout
+        out = super(ZMQComm, self)._recv_multipart(*args, **kwargs)
+        return out
+    
+    def _recv(self, timeout=0, **kwargs):
         r"""Receive a message.
+
+        Args:
+            timeout (str): Time in seconds to wait for a message. Defaults to 0.
+            **kwargs: Additional keyword arguments are passed to socket send.
 
         Returns:
             tuple (bool, obj): Success or failure of receive and received
                 message.
 
         """
-        if self.socket.closed:
+        if self.is_closed:
             self.error(".recv(): Socket closed")
             return (False, None)
+        self.sleep()
+        ret = self.socket.poll(timeout=1000.0*timeout)
+        if ret == 0:
+            self.debug(".recv(): No messages waiting.")
+            return (True, backwards.unicode2bytes(''))
         try:
-            msg_chunks = self.socket.recv_multipart()
+            kwargs.setdefault('flags', zmq.NOBLOCK)
+            msg = self.socket.recv(**kwargs)
         except zmq.ZMQError:
             self.exception(".recv(): Error")
             return (False, None)
-        return (True, backwards.unicode2bytes('').join(msg_chunks))
+        return (True, msg)

@@ -1,8 +1,15 @@
 import os
+import uuid
 from cis_interface import backwards
 from cis_interface.tools import CisClass, CIS_MSG_MAX, CIS_MSG_EOF
 from cis_interface.serialize.DefaultSerialize import DefaultSerialize
 from cis_interface.serialize.DefaultDeserialize import DefaultDeserialize
+from cis_interface.communication import new_comm, get_comm
+
+
+CIS_MSG_HEAD = 'CIS_MSG_HEAD'
+HEAD_VAL_SEP = ':CIS:'
+HEAD_KEY_SEP = ','
 
     
 class CommBase(CisClass):
@@ -69,8 +76,14 @@ class CommBase(CisClass):
             serialize = DefaultSerialize(format_str=self.format_str)
         self.meth_deserialize = deserialize
         self.meth_serialize = serialize
+        self._work_comms = {}
         if not dont_open:
             self.open()
+
+    @property
+    def maxMsgSize(self):
+        r"""int: Maximum size of a single message that should be sent."""
+        return CIS_MSG_MAX
 
     @property
     def comm_count(self):
@@ -118,7 +131,8 @@ class CommBase(CisClass):
 
     def close(self):
         r"""Close the connection."""
-        pass
+        for c in self._work_comms.keys():
+            self.remove_work_comm(c)
 
     @property
     def is_open(self):
@@ -141,7 +155,7 @@ class CommBase(CisClass):
         return CIS_MSG_EOF
 
     def chunk_message(self, msg):
-        r"""Yield chunks of message of size CIS_MSG_MAX.
+        r"""Yield chunks of message of size maxMsgSize
 
         Args:
             msg (str, bytes): Raw message bytes to be chunked.
@@ -152,7 +166,7 @@ class CommBase(CisClass):
         """
         prev = 0
         while prev < len(msg):
-            next = min(prev + CIS_MSG_MAX, len(msg))
+            next = min(prev + self.maxMsgSize, len(msg))
             yield msg[prev:next]
             prev = next
 
@@ -192,15 +206,165 @@ class CommBase(CisClass):
             raise TypeError("Deserialize method expects bytes type.")
         return self.meth_deserialize(msg)
 
+    # TEMP COMMS
+    @property
+    def get_work_comm_kwargs(self):
+        r"""dict: Keyword arguments for an existing work comm."""
+        return dict(comm=self.comm_class, direction='recv')
+
+    @property
+    def create_work_comm_kwargs(self):
+        r"""dict: Keyword arguments for a new work comm."""
+        return dict(comm=self.comm_class, direction='send')
+
+    def get_work_comm(self, address, **kwargs):
+        r"""Get temporary work comm, creating as necessary.
+
+        Args:
+            address (str): Work comm address.
+            **kwargs: Additional keyword arguments are passed to get_comm.
+
+        Returns:
+            Comm: Work comm.
+
+        """
+        if address in self._work_comms:
+            return self._work_comms[address]
+        kws = self.get_work_comm_kwargs
+        kws.update(**kwargs)
+        c = get_comm('temp_comm',
+                     address=address,
+                     **kws)
+        self._work_comms[address] = c
+        return c
+
+    def create_work_comm(self, **kwargs):
+        r"""Create a temporary work comm.
+
+        Args:
+            **kwargs: Keyword arguments for new_comm that should override
+                work_comm_kwargs.
+
+        Returns:
+            Comm: Work comm.
+
+        """
+        kws = self.create_work_comm_kwargs
+        kws.update(**kwargs)
+        c = new_comm('temp_comm%s' % str(uuid.uuid4()), **kws)
+        self._work_comms[c.address] = c
+        return c
+
+    def remove_work_comm(self, address):
+        r"""Close and remove a work comm.
+
+        Args:
+            address (str): Address of comm that should be removed.
+
+        """
+        if address not in self._work_comms:
+            return
+        c = self._work_comms.pop(address)
+        c.close()
+
+    # HEADER
+    def get_header(self, msg):
+        r"""Create a dictionary of message properties.
+
+        Args:
+            msg (str): Message to get header for.
+
+        Returns:
+           dict: Properties that should be encoded in a messaged header.
+
+        """
+        c = self.create_work_comm()
+        out = {'size': len(msg), 'address':c.address}
+        return out
+
+    def format_header(self, header_info):
+        r"""Format header info to form a string that should prepend a message.
+
+        Args:
+            header_info (dict): Properties that should be incldued in the header.
+
+        Returns:
+            str: Message with header in front.
+
+        """
+        header = CIS_MSG_HEAD
+        header += HEAD_KEY_SEP.join(
+            ['%s%s%s' % (k, HEAD_VAL_SEP, v) for k, v in header_info.items()])
+        header += CIS_MSG_HEAD
+        return header
+
+    def parse_header(self, msg):
+        r"""Extract header info from a message.
+
+        Args:
+            msg (str): Message to extract header from.
+
+        Returns:
+            dict: Message properties.
+
+        """
+        if CIS_MSG_HEAD not in msg:
+            out = dict(body=msg, size=len(msg))
+            return out
+        _, header, body = msg.split(CIS_MSG_HEAD)
+        out = dict(body=body)
+        for x in header.split(HEAD_KEY_SEP):
+            k, v = x.split(HEAD_VAL_SEP)
+            out[k] = v
+        return out
+
     # SEND METHODS
     def _send(self, msg, *args, **kwargs):
         r"""Raw send. Should be overridden by inheriting class."""
         return False
 
-    def _send_nolimit(self, msg, *args, **kwargs):
-        r"""Raw send_nolimit. Should be overridden by inheriting class."""
-        return self._send(msg, *args, **kwargs)
+    def _send_multipart(self, msg, **kwargs):
+        r"""Send a message larger than maxMsgSize in multiple parts.
 
+        Args:
+            msg (str): Message to send.
+            **kwargs: Additional keyword arguments are apssed to _send.
+
+        Returns:
+            bool: Success or failure of sending the message.
+
+        """
+        nsent = 0
+        ret = True
+        for imsg in self.chunk_message(msg):
+            ret = self._send(imsg)
+            if not ret:  # pragma: debug
+                self.debug(
+                    ".send_multipart(): send interupted at %d of %d bytes.",
+                    nsent, len(msg))
+                break
+            nsent += len(imsg)
+            self.debug(".send_multipart(): %d of %d bytes sent",
+                       nsent, len(msg))
+        if ret:
+            self.debug(".send_multipart %d bytes completed", len(msg))
+        return ret
+
+    def _send_multipart_worker(self, msg, header, **kwargs):
+        r"""Send multipart message to the worker comm identified.
+
+        Args:
+            msg (str): Message to be sent.
+            header (dict): Message info including work comm address.
+
+        Returns:
+            bool: Success or failure of sending the message.
+
+        """
+        workcomm = self.get_work_comm(header['address'])
+        ret = workcomm._send_multipart(msg, **kwargs)
+        return ret
+            
     def on_send_eof(self):
         r"""Actions to perform when EOF being sent.
 
@@ -235,34 +399,8 @@ class CommBase(CisClass):
             msg_s = self.serialize(msg)
         return flag, msg_s
 
-    def send_eof(self, *args, **kwargs):
-        r"""Send the EOF message as a short message.
-        
-        Args:
-            *args: All arguments are passed to comm send.
-            **kwargs: All keywords arguments are passed to comm send.
-
-        Returns:
-            bool: Success or failure of send.
-
-        """
-        return self.send(self.eof_msg, *args, **kwargs)
-        
-    def send_nolimit_eof(self, *args, **kwargs):
-        r"""Send the EOF message as a large message.
-        
-        Args:
-            *args: All arguments are passed to comm send_nolimit.
-            **kwargs: All keywords arguments are passed to comm send_nolimit.
-
-        Returns:
-            bool: Success or failure of send.
-
-        """
-        return self.send_nolimit(self.eof_msg, *args, **kwargs)
-        
     def send(self, *args, **kwargs):
-        r"""Send a message shorter than CIS_MSG_MAX.
+        r"""Send a message.
 
         Args:
             *args: All arguments are assumed to be part of the message.
@@ -277,46 +415,124 @@ class CommBase(CisClass):
             return False
         try:
             self.debug('.send(): %d bytes', len(msg_s))
-            ret = self._send(msg_s, **kwargs)
+            ret = self.send_multipart(msg_s, **kwargs)
             self.debug('.send(): %d bytes sent', len(msg_s))
         except:
             self.exception('.send(): Failed to send.')
             return False
         return ret
 
-    def send_nolimit(self, *args, **kwargs):
-        r"""Send a message larger than CIS_MSG_MAX.
+    def send_multipart(self, msg, **kwargs):
+        r"""Send a multipart message. If the message is smaller than maxMsgSize,
+        it is sent using _send, otherwise it is sent to a worker comm using
+        _send_multipart.
 
         Args:
-            *args: All arguments assumed to be part of the message.
-            **kwargs: All keywords arguments are passed to comm _send_nolimit
-                method.
+            msg (bytes): Message to be sent.
+            **kwargs: Additional keyword arguments are passed to _send or
+                _send_multipart.
 
         Returns:
             bool: Success or failure of send.
 
         """
-        flag, msg_s = self.on_send(args)
-        if not flag:
-            return False
-        try:
-            self.debug('.send_nolimit(): %d bytes', len(msg_s))
-            ret = self._send_nolimit(msg_s, **kwargs)
-            self.debug('.send_nolimit(): %d bytes sent', len(msg_s))
-        except:
-            self.exception('.send_nolimit(): Failed to send.')
-            return False
+        if (len(msg) < self.maxMsgSize) or (self.maxMsgSize == 0):
+            ret = self._send(msg, **kwargs)
+        else:
+            header = self.get_header(msg)
+            ret = self.send_header(header)
+            if not ret:  # pragma: debug
+                self.debug(".send_multipart: Sending message header failed.")
+                return ret
+            ret = self._send_multipart_worker(msg, header, **kwargs)
         return ret
+        
+    def send_header(self, header, **kwargs):
+        r"""Send header message.
+
+        Args:
+            header (dict): Header info that should be sent.
+            **kwargs: Additional keyword arguments are passed to _send method.
+
+        Returns:
+            bool: Success or failure of send.
+
+        """
+        header_msg = self.format_header(header)
+        out = self._send(header_msg, **kwargs)
+        return out
+
+    def send_nolimit(self, *args, **kwargs):
+        r"""Alias for send."""
+        return self.send(*args, **kwargs)
+
+    def send_eof(self, *args, **kwargs):
+        r"""Send the EOF message as a short message.
+        
+        Args:
+            *args: All arguments are passed to comm send.
+            **kwargs: All keywords arguments are passed to comm send.
+
+        Returns:
+            bool: Success or failure of send.
+
+        """
+        return self.send(self.eof_msg, *args, **kwargs)
+        
+    def send_nolimit_eof(self, *args, **kwargs):
+        r"""Alias for send_eof."""
+        return self.send_eof(*args, **kwargs)
 
     # RECV METHODS
     def _recv(self, *args, **kwargs):
         r"""Raw recv. Should be overridden by inheriting class."""
         return (False, None)
 
-    def _recv_nolimit(self, *args, **kwargs):
-        r"""Raw send_nolimit. Should be overridden by inheriting class."""
-        return self._recv(*args, **kwargs)
+    def _recv_multipart(self, leng_exp, **kwargs):
+        r"""Receive a message larger than CIS_MSG_MAX that is sent in multiple
+        parts.
 
+        Args:
+            leng_exp (int): Size of message expected.
+            **kwargs: All keyword arguments are passed to _recv.
+
+        Returns:
+            tuple (bool, str): The success or failure of receiving a message
+                and the complete message received.
+
+        """
+        data = backwards.unicode2bytes('')
+        ret = True
+        while len(data) < leng_exp:
+            payload = self._recv(**kwargs)
+            if not payload[0]:  # pragma: debug
+                self.debug(
+                    ".recv_multipart(): read interupted at %d of %d bytes.",
+                    len(data), leng_exp)
+                ret = False
+                break
+            data = data + payload[1]
+        payload = (ret, data)
+        self.debug(".recv_multipart(): read %d bytes", len(data))
+        return payload
+
+    def _recv_multipart_worker(self, info, **kwargs):
+        r"""Receive a message in multiple parts from a worker comm.
+
+        Args:
+            info (dict): Information about the incoming message.
+            **kwargs: All keyword arguments are passed to _recv.
+
+        Returns:
+            tuple (bool, str): The success or failure of receiving a message
+                and the complete message received.
+
+        """
+        workcomm = self.get_work_comm(info['address'])
+        leng_exp = int(float(info['size']))
+        out = workcomm._recv_multipart(leng_exp, **kwargs)
+        return out
+        
     def on_recv_eof(self):
         r"""Actions to perform when EOF received.
 
@@ -345,7 +561,7 @@ class CommBase(CisClass):
             flag = True
             msg = self.deserialize(s_msg)
         return flag, msg
-        
+
     def recv(self, *args, **kwargs):
         r"""Receive a message shorter than CIS_MSG_MAX.
 
@@ -362,7 +578,7 @@ class CommBase(CisClass):
             self.debug('.recv(): comm closed.')
             return (False, None)
         try:
-            flag, s_msg = self._recv(*args, **kwargs)
+            flag, s_msg = self.recv_multipart(*args, **kwargs)
             self.debug('.recv(): %d bytes received', len(s_msg))
         except:
             self.exception('.recv(): Failed to recv.')
@@ -373,30 +589,48 @@ class CommBase(CisClass):
             msg = None
         return (flag, msg)
 
-    def recv_nolimit(self, *args, **kwargs):
-        r"""Receive a message larger than CIS_MSG_MAX.
+    def recv_multipart(self, *args, **kwargs):
+        r"""Receive a multipart message. If a message is received without a
+        header, it assumed to be complete. Otherwise, the message is received
+        in parts from a worker comm initialized by the sender.
 
         Args:
-            *args: All arguments are passed to comm _recv_nolimit method.
-            **kwargs: All keywords arguments are passed to comm _recv_nolimit
-                method.
+            *args: All arguments are passed to comm _recv method.
+            **kwargs: All keywords arguments are passed to comm _recv method.
 
         Returns:
-            tuple (bool, obj): Success or failure of receive and received
+            tuple (bool, str): Success or failure of receive and received
                 message.
 
         """
-        if self.is_closed:
-            self.debug('.recv_nolimit(): comm closed.')
-            return (False, None)
-        try:
-            flag, s_msg = self._recv_nolimit(*args, **kwargs)
-            self.debug('.recv_nolimit(): %d bytes received', len(s_msg))
-        except:
-            self.exception('.recv_nolimit(): Failed to recv.')
-            return (False, None)
-        if flag:
-            flag, msg = self.on_recv(s_msg)
-        else:
-            msg = None
-        return (flag, msg)
+        flag, info = self.recv_header(*args, **kwargs)
+        if not flag or info['size'] == 0:
+            self.debug(".recv_multipart(): Failed to receive message header.")
+            return flag, info['body']
+        if len(info['body']) == int(info['size']):
+            return True, info['body']
+        out = self._recv_multipart_worker(info, **kwargs)
+        self.remove_work_comm(info['address'])
+        return out
+        
+    def recv_header(self, *args, **kwargs):
+        r"""Receive header message.
+
+        Args:
+            *args: All arguments are passed to comm _recv method.
+            **kwargs: All keywords arguments are passed to comm _recv method.
+
+        Returns:
+            tuple (bool, dict): Success or failure of receive and received
+                header information.
+
+        """
+        flag, s_msg = self._recv(*args, **kwargs)
+        if not flag:
+            return flag, dict(body=s_msg, size=0)
+        info = self.parse_header(s_msg)
+        return True, info
+
+    def recv_nolimit(self, *args, **kwargs):
+        r"""Alias for recv."""
+        return self.recv(*args, **kwargs)

@@ -50,15 +50,3 @@ class AsciiTableInputDriver(AsciiFileInputDriver):
         r"""Open the file and send the format string."""
         super(AsciiTableInputDriver, self).before_loop()
         self.send_message(self.icomm.file.format_str)
-
-    def send_message(self, msg):
-        r"""Send a single message as no limit message.
-
-        Args:
-            msg (str): Message to be sent.
-
-        Returns:
-            bool: Success or failure of send.
-
-        """
-        return super(AsciiTableInputDriver, self).send_message(msg, nolimit=True)

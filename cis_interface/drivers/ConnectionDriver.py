@@ -1,3 +1,4 @@
+"""Module for funneling messages from one comm to another."""
 import os
 from cis_interface.communication import new_comm
 from cis_interface.drivers.Driver import Driver
@@ -160,12 +161,10 @@ class ConnectionDriver(Driver):
         r"""Actions to perform after sending messages."""
         pass
 
-    def recv_message(self, nolimit=False, **kwargs):
+    def recv_message(self, **kwargs):
         r"""Get a new message to send.
 
         Args:
-            nolimit (bool, optional): If True, recv_nolimit should be used.
-                Otherwise, recv is used. Defaults to False.
             **kwargs: Additional keyword arguments are passed to the appropriate
                 recv method.
 
@@ -175,10 +174,7 @@ class ConnectionDriver(Driver):
         """
         kwargs.setdefault('timeout', 0)
         with self.lock:
-            if nolimit:
-                flag, msg = self.icomm.recv_nolimit(**kwargs)
-            else:
-                flag, msg = self.icomm.recv(**kwargs)
+            flag, msg = self.icomm.recv(**kwargs)
         if msg == self.icomm.eof_msg:
             self.on_eof()
         if flag:
@@ -203,23 +199,18 @@ class ConnectionDriver(Driver):
         """
         return msg
 
-    def send_message(self, msg, nolimit=False):
+    def send_message(self, msg):
         r"""Send a single message.
 
         Args:
             msg (str): Message to be sent.
-            nolimit (bool, optional): If True, send_nolimit should be used.
-                Otherwise, send is used. Defaults to False.
 
         Returns:
             bool: Success or failure of send.
 
         """
         with self.lock:
-            if nolimit:
-                return self.ocomm.send_nolimit(msg)
-            else:
-                return self.ocomm.send(msg)
+            return self.ocomm.send(msg)
 
     def run(self):
         r"""Run the driver. Continue looping over messages until there are not

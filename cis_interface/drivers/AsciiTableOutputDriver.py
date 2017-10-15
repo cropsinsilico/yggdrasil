@@ -28,14 +28,7 @@ class AsciiTableOutputDriver(AsciiFileOutputDriver):
             the end of a line. Default set by :class:`AsciiFile`.
         as_array (bool, optional): If True, the table contents are sent all at
             once as an array. Defaults to False.
-        \*\*kwargs: Additional keyword arguments are passed to parent class's
-            __init__ method.
-
-    Attributes (in additon to parent class's):
-        file (:class:`AsciiTable.AsciiTable`): Associated special class for
-            ASCII table.
-        as_array (bool): If True, the table contents are received all at once
-            as an array. Defaults to False.
+        **kwargs: Additional keyword arguments are passed to parent class.
 
     """
     def __init__(self, name, args, **kwargs):
@@ -63,13 +56,3 @@ class AsciiTableOutputDriver(AsciiFileOutputDriver):
         with self.lock:
             self.ocomm.file.update_format_str(fmt)
             self.ocomm.file.writeformat()
-
-    def recv_message(self, **kwargs):
-        r"""Get a new message to send.
-
-        Returns:
-            str, bool: False if no more messages, message otherwise.
-
-        """
-        return super(AsciiTableOutputDriver, self).recv_message(
-            nolimit=True, **kwargs)
