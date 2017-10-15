@@ -17,15 +17,3 @@ class PickleFileInputDriver(FileInputDriver):
         kwargs['icomm_kws'] = icomm_kws
         super(PickleFileInputDriver, self).__init__(name, args, **kwargs)
         self.debug('(%s)', args)
-
-    def send_message(self, msg):
-        r"""Send a single message as no limit message.
-
-        Args:
-            msg (str): Message to be sent.
-
-        Returns:
-            bool: Success or failure of send.
-
-        """
-        return super(PickleFileInputDriver, self).send_message(msg, nolimit=True)
