@@ -4,9 +4,10 @@ import uuid
 import importlib
 import unittest
 import numpy as np
+from scipy.io import savemat
 import nose.tools as nt
 from cis_interface.tools import CIS_MSG_MAX as maxMsgSize
-from cis_interface.backwards import pickle
+from cis_interface.backwards import pickle, sio
 from cis_interface.dataio.AsciiTable import AsciiTable
 from cis_interface import backwards
 
@@ -246,6 +247,15 @@ class IOInfo(object):
     def pickled_data(self):
         r"""str: Pickled mock data dictionary."""
         return pickle.dumps(self.data_dict)
+
+    @property
+    def mat_data(self):
+        r"""str: Mat data."""
+        fd = sio.StringIO()
+        savemat(fd, self.data_dict)
+        out = fd.getvalue()
+        fd.close()
+        return out
 
     @property
     def maxMsgSize(self):
