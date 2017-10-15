@@ -234,6 +234,8 @@ class IOInfo(object):
         elif isinstance(x, str) and os.path.isfile(x):
             with open(x, 'rb') as fd:
                 x = pickle.load(fd)
+        elif isinstance(x, str):
+            x = pickle.loads(x)
         nt.assert_equal(type(x), type(self.data_dict))
         for k in self.data_dict:
             if k not in x:  # pragma: debug
