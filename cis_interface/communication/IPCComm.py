@@ -1,6 +1,6 @@
 import sysv_ipc
 from subprocess import Popen, PIPE
-from cis_interface import backwards, tools
+from cis_interface import tools
 from cis_interface.communication import CommBase
 
 

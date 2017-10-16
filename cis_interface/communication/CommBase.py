@@ -284,7 +284,7 @@ class CommBase(CisClass):
 
         """
         c = self.create_work_comm()
-        out = {'size': len(msg), 'address':c.address}
+        out = {'size': len(msg), 'address': c.address}
         return out
 
     def format_header(self, header_info):

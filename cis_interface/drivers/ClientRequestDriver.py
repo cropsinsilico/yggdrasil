@@ -31,7 +31,7 @@ class ClientRequestDriver(ConnectionDriver):
         model_request_name (str): The name of the channel used by the client
             model to send requests.
         request_name (str, optional): The name of the channel used to
-            send requests to the server request driver. Defaults to 
+            send requests to the server request driver. Defaults to
             model_request_name + '_SERVER' if not set.
         comm (str, optional): The comm class that should be used to
             communicate with the server request driver. Defaults to

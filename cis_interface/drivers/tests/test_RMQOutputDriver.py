@@ -1,4 +1,3 @@
-import nose.tools as nt
 import cis_interface.drivers.tests.test_ConnectionDriver as parent
 
 

@@ -74,7 +74,6 @@ class TestConnectionParam(parent.TestParam, IOInfo):
         self.recv_comm.close()
         assert(self.send_comm.is_closed)
         assert(self.recv_comm.is_closed)
-        from cis_interface.communication import IPCComm
         super(TestConnectionParam, self).teardown(*args, **kwargs)
     
 
