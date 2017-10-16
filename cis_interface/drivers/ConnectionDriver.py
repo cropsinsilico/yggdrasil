@@ -199,18 +199,19 @@ class ConnectionDriver(Driver):
         """
         return msg
 
-    def send_message(self, msg):
+    def send_message(self, *args, **kwargs):
         r"""Send a single message.
 
         Args:
-            msg (str): Message to be sent.
+            *args: Arguments are passed to the output comm send method.
+            *kwargs: Keyword arguments are passed to the output comm send method.
 
         Returns:
             bool: Success or failure of send.
 
         """
         with self.lock:
-            return self.ocomm.send(msg)
+            return self.ocomm.send(*args, **kwargs)
 
     def run(self):
         r"""Run the driver. Continue looping over messages until there are not

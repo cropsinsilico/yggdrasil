@@ -35,6 +35,7 @@ class RPCComm(CommBase.CommBase):
         icomm_kwargs['dont_open'] = True
         ocomm_kwargs['dont_open'] = True
         if name in os.environ or 'address' in kwargs:
+            print kwargs
             super(RPCComm, self).__init__(name, dont_open=True, **kwargs)
             icomm_kwargs.setdefault(
                 'address', self.address.split(_rpc_address_split)[0])
@@ -51,10 +52,10 @@ class RPCComm(CommBase.CommBase):
         if not dont_open:
             self.open()
 
-    @property
-    def comm_count(self):
+    @classmethod
+    def comm_count(cls):
         r"""int: Number of communication connections."""
-        return self.icomm.comm_count
+        return get_comm_class().comm_count()
 
     @classmethod
     def new_comm_kwargs(cls, name, icomm_name=None, ocomm_name=None,
@@ -108,8 +109,6 @@ class RPCComm(CommBase.CommBase):
             if 'address' not in ocomm_kwargs:
                 oargs, okwargs = ocomm_class.new_comm_kwargs(ocomm_name,
                                                              **ocomm_kwargs)
-            kwargs['address'] = _rpc_address_split.join([
-                ikwargs['address'], okwargs['address']])
         else:
             ikwargs['address'], okwargs['address'] = kwargs['address'].split(
                 _rpc_address_split)

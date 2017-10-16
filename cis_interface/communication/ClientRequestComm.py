@@ -48,7 +48,7 @@ def ClientRequestComm(name, base_comm=None, **kwargs):
                 AssertionError: If the response_address is None.
 
             """
-            assert(self._reponse_address is not None)
+            assert(self.response_address is not None)
             out = super(ClientRequestComm, self).get_header(msg)
             out['response_address'] = self.response_address
             return out

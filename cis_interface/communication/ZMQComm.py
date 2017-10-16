@@ -86,8 +86,8 @@ class ZMQComm(CommBase.CommBase):
         # This is based on limit of 32bit int
         return 2**30
 
-    @property
-    def comm_count(self):
+    @classmethod
+    def comm_count(cls):
         r"""int: Number of sockets that have been opened on this process."""
         return _N_SOCKETS
 
@@ -150,6 +150,8 @@ class ZMQComm(CommBase.CommBase):
 
     def bind(self):
         r"""Bind to address, getting random port as necessary."""
+        if self.is_open:
+            return
         self._bound = True
         if self.port is None:
             port = self.socket.bind_to_random_port(self.address)
@@ -182,6 +184,7 @@ class ZMQComm(CommBase.CommBase):
         r"""Close connection."""
         if self.is_open:
             self.socket.close()
+            self._openned = False
             
     @property
     def is_open(self):

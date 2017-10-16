@@ -71,9 +71,14 @@ class TestCommParam(parent.TestParam, IOInfo):
         r"""Comm class."""
         return get_comm_class(self.comm_name)
 
+    @property
+    def comm_count(self):
+        r"""int: Return the number of comms."""
+        return self.comm_cls.comm_count
+
     def setup(self, *args, **kwargs):
         r"""Initialize comm object pair."""
-        kwargs['nprev_queues'] = self.comm_cls.comm_count
+        kwargs['nprev_comm'] = self.comm_count
         # If driver receiving, create send comm first
         if 'Input' not in self.driver:
             self.alt_comm = new_comm(self.name, **self.alt_comm_kwargs)
@@ -84,7 +89,7 @@ class TestCommParam(parent.TestParam, IOInfo):
 
     def teardown(self, *args, **kwargs):
         r"""Destroy comm object pair."""
-        kwargs['ncurr_queues'] = self.comm_cls.comm_count
+        kwargs['ncurr_comm'] = self.comm_count
         self.alt_comm.close()
         assert(self.alt_comm.is_closed)
         super(TestCommParam, self).teardown(*args, **kwargs)

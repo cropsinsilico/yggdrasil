@@ -42,13 +42,23 @@ class TestConnectionParam(parent.TestParam, IOInfo):
         return out
 
     @property
+    def comm_count(self):
+        r"""int: Return the number of comms."""
+        out = 0
+        comms = set([self.comm_name, self.icomm_name, self.ocomm_name])
+        for x in comms:
+            cls = get_comm_class(x)
+            out += cls.comm_count()
+        return out
+
+    @property
     def comm_cls(self):
         r"""Connection class."""
         return get_comm_class(self.comm_name)
 
     def setup(self, *args, **kwargs):
         r"""Initialize comm object pair."""
-        kwargs['nprev_queues'] = self.comm_cls.comm_count
+        kwargs.setdefault('nprev_comm', self.comm_count)
         super(TestConnectionParam, self).setup(*args, **kwargs)
         send_kws = self.send_comm_kwargs
         recv_kws = self.recv_comm_kwargs
@@ -60,11 +70,11 @@ class TestConnectionParam(parent.TestParam, IOInfo):
 
     def teardown(self, *args, **kwargs):
         r"""Destroy comm object pair."""
-        kwargs['ncurr_queues'] = self.comm_cls.comm_count
         self.send_comm.close()
         self.recv_comm.close()
         assert(self.send_comm.is_closed)
         assert(self.recv_comm.is_closed)
+        from cis_interface.communication import IPCComm
         super(TestConnectionParam, self).teardown(*args, **kwargs)
     
 

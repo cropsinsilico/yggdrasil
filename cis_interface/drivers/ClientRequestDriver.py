@@ -1,4 +1,5 @@
 from cis_interface.drivers.ConnectionDriver import ConnectionDriver
+from cis_interface.drivers.ClientResponseDriver import ClientResponseDriver
 
 # ----
 # Client sends resquest to local client output comm
@@ -27,52 +28,106 @@ class ClientRequestDriver(ConnectionDriver):
     r"""Class for handling client side RPC type communication.
 
     Args:
-        name (str): The name of the channel used by the client.
-        args (str, optional): The name of the server driver channel. Defaults to
-            name + '_SERVER' if not set.
-        server_comm (str, optional): The comm class that should be used to
-            communicate with the server driver. Defaults to _default_comm.
+        model_request_name (str): The name of the channel used by the client
+            model to send requests.
+        request_name (str, optional): The name of the channel used to
+            send requests to the server request driver. Defaults to 
+            model_request_name + '_SERVER' if not set.
+        comm (str, optional): The comm class that should be used to
+            communicate with the server request driver. Defaults to
+            _default_comm.
         **kwargs: Additional keyword arguments are passed to parent class.
 
     Attributes:
-        server_comm (str): The comm class that should be used to communicate
-            with the server driver. Defaults to _default_comm.
+        comm (str): The comm class that should be used to communicate with the
+            server request driver.
         response_drivers (list): Response drivers created for each request.
 
     """
 
-    def __init__(self, name, args=None, server_comm=None, **kwargs):
-        if args is None:
-            args = name + '_SERVER'
-        self.server_comm = server_comm
+    def __init__(self, model_request_name, request_name=None,
+                 comm=None, **kwargs):
+        if request_name is None:
+            request_name = model_request_name + '_SERVER'
         # Input communicator
         icomm_kws = kwargs.get('icomm_kws', {})
         icomm_kws['comm'] = 'RPCComm'
-        icomm_kws['name'] = name
+        icomm_kws['name'] = model_request_name
         kwargs['icomm_kws'] = icomm_kws
         # Output communicator
         ocomm_kws = kwargs.get('ocomm_kws', {})
-        ocomm_kws['comm'] = 'ClientRequestComm'
-        ocomm_kws['base_comm'] = server_comm
-        ocomm_kws['name'] = args
+        ocomm_kws['comm'] = comm
+        ocomm_kws['name'] = request_name
         kwargs['ocomm_kws'] = ocomm_kws
-        super(ClientRequestDriver, self).__init__(name, **kwargs)
+        super(ClientRequestDriver, self).__init__(model_request_name, **kwargs)
         self.response_drivers = []
+        assert(not hasattr(self, 'comm'))
+        self.comm = comm
 
-    def on_message(self, msg):
-        r"""Process a message and create the client reponse driver.
+    @property
+    def model_request_name(self):
+        r"""str: The name of the channel used by the client model to send
+        requests."""
+        return self.icomm.icomm.name
+
+    @property
+    def model_request_address(self):
+        r"""str: The address of the channel used by the client model to send
+        requests."""
+        return self.icomm.icomm.address
+
+    @property
+    def model_response_name(self):
+        r"""str: The name of the channel used by the client model to receive
+        responses."""
+        return self.icomm.ocomm.name
+
+    @property
+    def model_response_address(self):
+        r"""str: The address of the channel used by the client model to receive
+        responses."""
+        return self.icomm.ocomm.address
+
+    @property
+    def request_name(self):
+        r"""str: The name of the channel used to send requests to the server
+        request driver."""
+        return self.ocomm.name
+    
+    @property
+    def request_address(self):
+        r"""str: The address of the channel used to send requests to the server
+        request driver."""
+        return self.ocomm.address
+    
+    def terminate(self, *args, **kwargs):
+        r"""Stop response drivers."""
+        for x in self.response_drivers:
+            x.terminate()
+        super(ClientRequestDriver, self).terminate(*args, **kwargs)
+
+    def send_message(self, *args, **kwargs):
+        r"""Start a response driver for a request message and send message with
+        header.
 
         Args:
-            msg (bytes, str): Message to be processed.
+            *args: Arguments are passed to parent class send_message.
+            *kwargs: Keyword arguments are passed to parent class send_message.
 
         Returns:
-            bytes, str: Processed message.
+            bool: Success or failure of send.
 
         """
-        args = [self.icomm.ocomm.name, self.icomm.ocomm.address]
-        kwargs = dict(server_comm=self.server_comm)
-        response_driver = ClientResponseDriver(*args, **kwargs)
-        self.response_drivers.append(response_driver)
-        self.ocomm.set_response_address(response_driver.response_address)
-        return msg
-        
+        # Start response driver
+        drv_args = [self.model_response_name, self.model_response_address]
+        drv_kwargs = dict(comm=self.comm)
+        with self.lock:
+            response_driver = ClientResponseDriver(*drv_args, **drv_kwargs)
+            response_driver.start()
+            self.response_drivers.append(response_driver)
+        # Send response address in header
+        kwargs.setdefault('send_header', True)
+        kwargs.setdefault('header_kwargs', {})
+        kwargs['header_kwargs'].setdefault(
+            'response_address', response_driver.response_address)
+        return super(ClientRequestDriver, self).send_message(*args, **kwargs)
