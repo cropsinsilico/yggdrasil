@@ -40,9 +40,8 @@ class FileComm(CommBase.CommBase):
     def maxMsgSize(self):
         r"""int: Maximum size of a single message that should be sent."""
         return 0
-    
-    @property
-    @staticmethod
+
+    @classmethod
     def comm_count(cls):
         r"""int: Number of communication connections."""
         return _N_FILES

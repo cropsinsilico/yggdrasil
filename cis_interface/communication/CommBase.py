@@ -4,7 +4,7 @@ from cis_interface import backwards
 from cis_interface.tools import CisClass, CIS_MSG_MAX, CIS_MSG_EOF
 from cis_interface.serialize.DefaultSerialize import DefaultSerialize
 from cis_interface.serialize.DefaultDeserialize import DefaultDeserialize
-from cis_interface.communication import new_comm, get_comm
+from cis_interface.communication import new_comm, get_comm, get_comm_class
 
 
 CIS_MSG_HEAD = 'CIS_MSG_HEAD'
@@ -76,6 +76,7 @@ class CommBase(CisClass):
             serialize = DefaultSerialize(format_str=self.format_str)
         self.meth_deserialize = deserialize
         self.meth_serialize = serialize
+        self._last_header = None
         self._work_comms = {}
         if not dont_open:
             self.open()
@@ -85,8 +86,8 @@ class CommBase(CisClass):
         r"""int: Maximum size of a single message that should be sent."""
         return CIS_MSG_MAX
 
-    @property
-    def comm_count(self):
+    @classmethod
+    def comm_count(cls):
         r"""int: Number of communication connections."""
         return 0
 
@@ -104,7 +105,11 @@ class CommBase(CisClass):
     @classmethod
     def new_comm(cls, *args, **kwargs):
         r"""Initialize communication with new queue."""
+        new_comm_class = kwargs.pop('new_comm_class', None)
         args, kwargs = cls.new_comm_kwargs(*args, **kwargs)
+        if new_comm_class is not None:
+            new_cls = get_comm_class(new_comm_class)
+            return new_cls(*args, **kwargs)
         return cls(*args, **kwargs)
 
     def opp_comm_kwargs(self):
@@ -346,7 +351,7 @@ class CommBase(CisClass):
             nsent += len(imsg)
             self.debug(".send_multipart(): %d of %d bytes sent",
                        nsent, len(msg))
-        if ret:
+        if ret and len(msg) > 0:
             self.debug(".send_multipart %d bytes completed", len(msg))
         return ret
 
@@ -422,7 +427,8 @@ class CommBase(CisClass):
             return False
         return ret
 
-    def send_multipart(self, msg, send_header=False, **kwargs):
+    def send_multipart(self, msg, send_header=False, header_kwargs=None,
+                       **kwargs):
         r"""Send a multipart message. If the message is smaller than maxMsgSize,
         it is sent using _send, otherwise it is sent to a worker comm using
         _send_multipart.
@@ -432,6 +438,8 @@ class CommBase(CisClass):
             send_header (bool, optional): If True, the message will be sent as
                 multipart with header even if the message is smaller than
                 maxMsgSize. Defaults to False.
+            header_kwargs (dict, optional): Keyword arguments that should be
+                added to the header.
             **kwargs: Additional keyword arguments are passed to _send or
                 _send_multipart.
 
@@ -444,6 +452,8 @@ class CommBase(CisClass):
             ret = self._send(msg, **kwargs)
         else:
             header = self.get_header(msg)
+            if header_kwargs is not None:
+                header.update(**header_kwargs)
             ret = self.send_header(header)
             if not ret:  # pragma: debug
                 self.debug(".send_multipart: Sending message header failed.")
@@ -583,7 +593,8 @@ class CommBase(CisClass):
             return (False, None)
         try:
             flag, s_msg = self.recv_multipart(*args, **kwargs)
-            self.debug('.recv(): %d bytes received', len(s_msg))
+            if flag and len(s_msg) > 0:
+                self.debug('.recv(): %d bytes received', len(s_msg))
         except:
             self.exception('.recv(): Failed to recv.')
             return (False, None)
@@ -609,8 +620,10 @@ class CommBase(CisClass):
         """
         flag, info = self.recv_header(*args, **kwargs)
         if not flag or info['size'] == 0:
-            self.debug(".recv_multipart(): Failed to receive message header.")
+            if not flag:
+                self.debug(".recv_multipart(): Failed to receive message header.")
             return flag, info['body']
+        self._last_header = info
         if len(info['body']) == int(info['size']):
             return True, info['body']
         out = self._recv_multipart_worker(info, **kwargs)

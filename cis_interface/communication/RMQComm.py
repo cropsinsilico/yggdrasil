@@ -34,8 +34,8 @@ class RMQComm(CommBase.CommBase):
         else:
             self.bind()
 
-    @property
-    def comm_count(self):
+    @classmethod
+    def comm_count(cls):
         r"""int: Number of connections that have been opened on this process."""
         return _N_CONNECTIONS
 

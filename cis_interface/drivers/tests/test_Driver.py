@@ -3,6 +3,7 @@ import nose.tools as nt
 from cis_interface import runner, tools
 from cis_interface.config import cis_cfg
 from cis_interface.tests import CisTest
+from cis_interface.communication import get_comm_class
 
 # TODO: Test Ctrl-C interruption
 
@@ -14,8 +15,8 @@ class TestParam(CisTest):
         driver (str): Name of driver class.
         args (object): Driver arguments.
         namespace (str): PSI namespace to run drivers in.
-        nprev_queues (int): The number of IPC queues that exist before the
-            driver instance is created.
+        nprev_comm (int): The number of communication queues, sockets, and
+            channel that exist when the driver instance is created.
 
     """
 
@@ -32,7 +33,7 @@ class TestParam(CisTest):
                              'sleeptime': self.sleeptime,
                              # 'workingDir': self.workingDir,
                              'namespace': self.namespace}
-        self.nprev_queues = 0
+        self.nprev_comm = 0
 
     @property
     def cls(self):
@@ -52,15 +53,20 @@ class TestParam(CisTest):
             out.append(self.args)
         return out
 
-    def setup(self, skip_start=False, nprev_queues=None):
+    @property
+    def comm_count(self):
+        r"""int: Return the number of comms."""
+        return get_comm_count.comm_count()
+
+    def setup(self, skip_start=False, nprev_comm=None):
         r"""Create a driver instance and start the driver.
 
         Args:
             skip_start (bool, optional): If True, the driver will not be
                 started. Defaults to False.
-            nprev_queues (int, optional): Number of previous IPC queues.
+            nprev_comm (int, optional): Number of previous comm channels.
                 If not provided, it is determined to be the present number of
-                queues.
+                default comms.
 
         """
         cis_cfg.set('debug', 'psi', 'INFO')
@@ -69,25 +75,25 @@ class TestParam(CisTest):
         cis_cfg.set('rmq', 'namespace', self.namespace)
         runner.setup_cis_logging(self.__module__)
         runner.setup_rmq_logging()
-        if nprev_queues is None:
-            nprev_queues = len(tools._registered_queues.keys())
-        self.nprev_queues = nprev_queues
+        if nprev_comm is None:
+            nprev_comm = self.comm_count
+        self.nprev_comm = nprev_comm
         super(TestParam, self).setup()
         if not skip_start:
             self.instance.start()
 
-    def teardown(self, ncurr_queues=None):
+    def teardown(self, ncurr_comm=None):
         r"""Remove the instance, stoppping it.
 
         Args:
-            ncurr_queues (int, optional): Number of current queues. If not
-                provided, it is determined to be the present number of queues.
+            ncurr_comm (int, optional): Number of current comms. If not
+                provided, it is determined to be the present number of comms.
 
         """
         super(TestParam, self).teardown()
-        if ncurr_queues is None:
-            ncurr_queues = len(tools._registered_queues.keys())
-        nt.assert_equal(ncurr_queues, self.nprev_queues)
+        if ncurr_comm is None:
+            ncurr_comm = self.comm_count
+        nt.assert_equal(ncurr_comm, self.nprev_comm)
 
     @property
     def name(self):

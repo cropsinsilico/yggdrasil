@@ -41,11 +41,13 @@ def remove_queue(mq):
         KeyError: If the provided queue is not registered.
 
     """
+    global _N_QUEUES
     key = str(mq.key)
     if key not in _registered_queues:
         raise KeyError("Queue not registered.")
     _registered_queues.pop(key)
     mq.remove()
+    _N_QUEUES -= 1
     
 
 def ipcs(options=[]):
@@ -141,11 +143,13 @@ class IPCComm(CommBase.CommBase):
     def __init__(self, name, dont_open=False, **kwargs):
         super(IPCComm, self).__init__(name, dont_open=True, **kwargs)
         self.q = None
-        if not dont_open:
+        self._bound = False
+        if dont_open:
+            self.bind()
+        else:
             self.open()
 
-    @property
-    @staticmethod
+    @classmethod
     def comm_count(cls):
         r"""int: Total number of IPC queues started on this process."""
         return _N_QUEUES
@@ -154,31 +158,40 @@ class IPCComm(CommBase.CommBase):
     def new_comm_kwargs(cls, *args, **kwargs):
         r"""Initialize communication with new queue."""
         if 'address' not in kwargs:
-            q = get_queue()
-            kwargs['address'] = str(q.key)
-        # kwargs.setdefault('address', 'generate')
+            # q = get_queue()
+            # kwargs['address'] = str(q.key)
+            kwargs.setdefault('address', 'generate')
         return args, kwargs
+
+    def bind(self):
+        r"""Bind to random queue if address is generate."""
+        self._bound = False
+        if self.address == 'generate':
+            self._bound = True
+            q = get_queue()
+            self.address = str(q.key)
 
     def open(self):
         r"""Open the connection by connecting to the queue."""
         super(IPCComm, self).open()
         if not self.is_open:
-            if self.address == 'generate':
-                self.q = get_queue()
-                self.address = str(self.q.key)
-            else:
-                qid = int(self.address)
-                self.q = get_queue(qid)
+            if not self._bound:
+                self.bind()
+            qid = int(self.address)
+            self.q = get_queue(qid)
             self.debug(": qid %s", self.q.key)
-
+            
     def close(self):
         r"""Close the connection."""
+        if self._bound and not self.is_open:
+            self.open()
         if self.is_open:
             try:
                 remove_queue(self.q)
             except KeyError:
                 pass
             self.q = None
+            self._bound = False
         super(IPCComm, self).close()
             
     @property
@@ -190,7 +203,11 @@ class IPCComm(CommBase.CommBase):
     def n_msg(self):
         r"""int: Number of messages in the queue."""
         if self.is_open:
-            return self.q.current_messages
+            try:
+                return self.q.current_messages
+            except sysv_ipc.ExistentialError:
+                self.close()
+                return 0
         else:
             return 0
 
@@ -230,7 +247,7 @@ class IPCComm(CommBase.CommBase):
             return (False, '')
         # Return True, '' if there are no messages
         if self.n_msg == 0:
-            self.debug("recv(): no data, returning (True, '')")
+            # self.debug("recv(): no data, returning (True, '')")
             return (True, '')
         # Receive message
         self.debug(".recv(): message ready, read it")

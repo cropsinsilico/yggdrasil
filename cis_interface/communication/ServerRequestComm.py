@@ -35,23 +35,23 @@ def ServerRequestComm(name, base_comm=None, **kwargs):
             super(ServerRequestComm, self).__init__(*args, **kwargs)
             self.response_address = None
 
-        def get_header(self, msg):
-            r"""Create a dictionary of message properties.
+        # def get_header(self, msg):
+        #     r"""Create a dictionary of message properties.
 
-            Args:
-                msg (str): Message to get header for.
+        #     Args:
+        #         msg (str): Message to get header for.
 
-            Returns:
-               dict: Properties that should be encoded in a messaged header.
+        #     Returns:
+        #        dict: Properties that should be encoded in a messaged header.
 
-            Raises:
-                AssertionError: If the response_address is None.
+        #     Raises:
+        #         AssertionError: If the response_address is None.
 
-            """
-            assert(self._reponse_address is not None)
-            out = super(ServerRequestComm, self).get_header(msg)
-            out['response_address'] = self.response_address
-            return out
+        #     """
+        #     assert(self._reponse_address is not None)
+        #     out = super(ServerRequestComm, self).get_header(msg)
+        #     out['response_address'] = self.response_address
+        #     return out
 
         def set_response_address(self, address):
             r"""Sent the reponse address.
@@ -62,18 +62,18 @@ def ServerRequestComm(name, base_comm=None, **kwargs):
             """
             self.response_address = address
 
-        def send_multipart(self, *args, **kwargs):
-            r"""Force send of a multipart message with a header.
+        # def send_multipart(self, *args, **kwargs):
+        #     r"""Force send of a multipart message with a header.
 
-            Args:
-                *args: Arguments are passed to parent send_multipart.
-                **kwargs: Keyword arguments are passed to parent send_multipart.
+        #     Args:
+        #         *args: Arguments are passed to parent send_multipart.
+        #         **kwargs: Keyword arguments are passed to parent send_multipart.
 
-            Returns:
-                bool: Success or failure of send.
+        #     Returns:
+        #         bool: Success or failure of send.
 
-            """
-            kwargs['send_header'] = True
-            return super(ServerRequestComm, self).send_multipart(*args, **kwargs)
+        #     """
+        #     kwargs['send_header'] = True
+        #     return super(ServerRequestComm, self).send_multipart(*args, **kwargs)
 
     return ServerRequestComm(name, **kwargs)
