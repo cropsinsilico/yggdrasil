@@ -88,6 +88,7 @@ class TestClientParam(parent.TestConnectionParam):
             timeout=self.timeout)
         return inst
 
+    
 class TestClientDriverNoStart(TestClientParam,
                               parent.TestConnectionDriverNoStart):
     r"""Test class for ClientDriver class without start."""
@@ -96,7 +97,6 @@ class TestClientDriverNoStart(TestClientParam,
 
 class TestClientDriver(TestClientParam, parent.TestConnectionDriver):
     r"""Test class for ClientDriver class."""
-
 
     # Disabled so that test message is not read by mistake
     def test_purge(self):

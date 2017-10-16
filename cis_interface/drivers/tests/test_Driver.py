@@ -1,6 +1,6 @@
 import os
 import nose.tools as nt
-from cis_interface import runner, tools
+from cis_interface import runner
 from cis_interface.config import cis_cfg
 from cis_interface.tests import CisTest
 from cis_interface.communication import get_comm_class
@@ -56,7 +56,7 @@ class TestParam(CisTest):
     @property
     def comm_count(self):
         r"""int: Return the number of comms."""
-        return get_comm_count.comm_count()
+        return get_comm_class().comm_count()
 
     def setup(self, skip_start=False, nprev_comm=None):
         r"""Create a driver instance and start the driver.

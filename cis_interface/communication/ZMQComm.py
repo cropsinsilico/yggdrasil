@@ -1,6 +1,6 @@
 import zmq
 from cis_interface import backwards
-from cis_interface.communication import CommBase, new_comm
+from cis_interface.communication import CommBase
 
 
 _N_SOCKETS = 0
@@ -250,7 +250,7 @@ class ZMQComm(CommBase.CommBase):
         if not flag:
             return False
         flag = self._send(_, flags=0)
-        flag = super(ZMQComm, self)._send_multipart(msg, **kwargs) 
+        flag = super(ZMQComm, self)._send_multipart(msg, **kwargs)
         return flag
 
     def _send(self, msg, **kwargs):
@@ -315,7 +315,7 @@ class ZMQComm(CommBase.CommBase):
             self.error(".recv(): Socket closed")
             return (False, None)
         self.sleep()
-        ret = self.socket.poll(timeout=1000.0*timeout)
+        ret = self.socket.poll(timeout=1000.0 * timeout)
         if ret == 0:
             self.debug(".recv(): No messages waiting.")
             return (True, backwards.unicode2bytes(''))

@@ -17,9 +17,10 @@ class TestMatInputParam(parent.TestFileInputParam):
         with open(self.filepath, 'wb') as fd:
             fd.write(self.mat_data)
         super(parent.TestFileInputParam, self).setup()
+        
 
 class TestMatInputDriverNoStart(TestMatInputParam,
-                                 parent.TestFileInputDriverNoStart):
+                                parent.TestFileInputDriverNoStart):
     r"""Test runner for MatInputDriver without start."""
     pass
 
