@@ -12,9 +12,11 @@ Welcome to cis_interface's documentation!
 
    includeme
    install
+   getting_started
    config
    code
-
+   examples/examples_toc
+   
 Indices and tables
 ==================
 

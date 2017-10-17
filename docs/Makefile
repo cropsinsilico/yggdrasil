@@ -24,6 +24,7 @@ ghpages: autodoc
 
 .PHONY: autodoc
 autodoc: doxy
+	python $(SOURCEDIR)/examples/make_example_rst.py
 	sphinx-apidoc -fT -o $(SOURCEDIR)/ ../cis_interface ../cis_interface/tests/* ../cis_interface/*/tests/*
 	make html
 
