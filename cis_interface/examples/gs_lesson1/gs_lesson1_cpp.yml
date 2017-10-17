@@ -1,0 +1,4 @@
+model:
+  name: gs_lesson1_cpp
+  driver: GCCModelDriver  # Compiles the source code with the necessary cis_interface libraries
+  args: ./src/gs_lesson1.cpp
