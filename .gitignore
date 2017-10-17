@@ -7,6 +7,7 @@ README.rst
 docs/build
 docs/source/cis_interface*.rst
 docs/source/modules.rst
+docs/source/examples/*.rst
 
 # Coverage
 .coverage

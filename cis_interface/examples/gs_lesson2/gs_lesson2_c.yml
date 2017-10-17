@@ -1,0 +1,8 @@
+models:
+  - name: model1
+    driver: GCCModelDriver  # Compiles the C code with necessary cis_interface libraries
+    args: ./src/gs_lesson2.c
+
+  - name: model2
+    driver: GCCModelDriver
+    args: ./src/gs_lesson2.c

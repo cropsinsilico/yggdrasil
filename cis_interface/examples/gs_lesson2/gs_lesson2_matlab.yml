@@ -1,0 +1,8 @@
+models:
+  - name: model1
+    driver: MatlabModelDriver  # Runs the script using a Matlab engine
+    args: ./src/gs_lesson2.m
+
+  - name: model2
+    driver: MatlabModelDriver
+    args: ./src/gs_lesson2.m
