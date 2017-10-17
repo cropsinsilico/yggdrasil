@@ -1,0 +1,28 @@
+models:
+  - name: matlab_modelA
+    driver: MatlabModelDriver
+    args: ./src/gs_lesson4_modelA.m
+
+    inputs:
+      - name: inputA
+        driver: FileInputDriver
+        args: ./Input/input.txt
+
+    outputs:
+      - name: outputA
+        driver: RMQOutputDriver  # Output to another channel
+        args: A_to_B  # Conneciton to inputB
+
+  - name: matlab_modelB
+    driver: MatlabModelDriver
+    args: ./src/gs_lesson4_modelB.m
+
+    inputs:
+      - name: inputB
+        driver: RMQInputDriver  # Input from another channel
+        args: A_to_B  # Conneciton to inputA
+
+    outputs:
+      - name: outputB
+        driver: FileOutputDriver
+        args: ./output.txt

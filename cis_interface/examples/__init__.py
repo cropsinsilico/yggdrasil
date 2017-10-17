@@ -5,6 +5,7 @@ import os
 ex_dict = {'gs_lesson1': ('python', 'matlab', 'c', 'cpp'),
            'gs_lesson2': ('python', 'matlab', 'c', 'cpp'),
            'gs_lesson3': ('python', 'matlab', 'c', 'cpp'),
+           'gs_lesson4': ('python', 'matlab', 'c', 'cpp'),
            'hello': ('python', 'matlab', 'c', 'cpp'),
            'model_error': ('python', 'matlab', 'c', 'cpp'),
            'SaM': ('python', 'matlab', 'c', 'cpp', 'all', 'all_nomatlab'),
@@ -67,6 +68,14 @@ for k, lang in ex_dict.items():
                                          '%s%s' % (k, ext_map[cli_l])),
                             os.path.join(os.path.dirname(__file__), k, 'src',
                                          '%s%s' % (k, ext_map[srv_l]))]
+    elif k is 'gs_lesson4':
+        for l in lang:
+            yamls[k][l] = os.path.join(os.path.dirname(__file__), k,
+                                       '%s_%s.yml' % (k, l))
+            source[k][l] = [os.path.join(os.path.dirname(__file__), k, 'src',
+                                         '%s_modelA%s' % (k, ext_map[l])),
+                            os.path.join(os.path.dirname(__file__), k, 'src',
+                                         '%s_modelB%s' % (k, ext_map[l]))]
     else:
         for l in lang:
             yamls[k][l] = os.path.join(os.path.dirname(__file__), k,

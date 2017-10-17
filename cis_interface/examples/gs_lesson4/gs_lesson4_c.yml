@@ -1,0 +1,28 @@
+models:
+  - name: c_modelA
+    driver: GCCModelDriver
+    args: ./src/gs_lesson4_modelA.c
+
+    inputs:
+      - name: inputA
+        driver: FileInputDriver
+        args: ./Input/input.txt
+
+    outputs:
+      - name: outputA
+        driver: RMQOutputDriver  # Output to another channel
+        args: A_to_B  # Connection to inputB
+
+  - name: c_modelB
+    driver: GCCModelDriver
+    args: ./src/gs_lesson4_modelB.c
+
+    inputs:
+      - name: inputB
+        driver: RMQInputDriver  # Input from another channel
+        args: A_to_B  # Conneciton to inputA
+
+    outputs:
+      - name: outputB
+        driver: FileOutputDriver
+        args: ./output.txt
