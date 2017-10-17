@@ -1,0 +1,14 @@
+models:
+  - name: python_model
+    driver: PythonModelDriver  # Runs the python script using default Python
+    args: ./src/gs_lesson3.py
+
+    inputs:
+      - name: input
+        driver: FileInputDriver
+        args: ./Input/input.txt
+
+    outputs:
+      - name: output
+        driver: FileOutputDriver
+        args: ./output.txt

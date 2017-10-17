@@ -1,4 +1,4 @@
-model:
-  name: gs_lesson1_python
-  driver: PythonModelDriver  # Runs the python script using default Python
-  args: ./src/gs_lesson1.py
+models:
+  - name: python_model
+    driver: PythonModelDriver  # Runs the python script using default Python
+    args: ./src/gs_lesson1.py
