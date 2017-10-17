@@ -29,7 +29,7 @@ class ModelDriver(Driver):
         \*\*kwargs: Additional keyword arguments are passed to parent class's
             __init__ method.
 
-    Attributes (in additon to parent class's):
+    Attributes:
         args (list): Argument(s) for running the model on the command line.
         process (:class:`subprocess.Popen`): Process used to run the model.
         is_server (bool): If True, the model is assumed to be a server and an
