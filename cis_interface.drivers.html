@@ -95,8 +95,10 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="includeme.html">Overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="code.html">Code</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/examples_toc.html">Examples</a></li>
 </ul>
 
             
@@ -1738,20 +1740,33 @@ __init__ method.</li>
 </tr>
 </tbody>
 </table>
-<dl class="docutils">
-<dt>Attributes (in additon to parent class&#8217;s):</dt>
-<dd><p class="first">args (list): Argument(s) for running the model on the command line.
-process (<a class="reference external" href="https://docs.python.org/2/library/subprocess.html#subprocess.Popen" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">subprocess.Popen</span></code></a>): Process used to run the model.
-is_server (bool): If True, the model is assumed to be a server and an</p>
-<blockquote>
-<div>instance of <a class="reference internal" href="#module-cis_interface.drivers.RMQServerDriver" title="cis_interface.drivers.RMQServerDriver"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.drivers.RMQServerDriver</span></code></a> is
-started.</div></blockquote>
-<dl class="last docutils">
-<dt>client_of (list): The names of server models that this model is a</dt>
-<dd>client of.</dd>
-</dl>
-</dd>
-</dl>
+<dl class="attribute">
+<dt id="cis_interface.drivers.ModelDriver.ModelDriver.args">
+<code class="descname">args</code><a class="headerlink" href="#cis_interface.drivers.ModelDriver.ModelDriver.args" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>list</em> &#8211; Argument(s) for running the model on the command line.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.drivers.ModelDriver.ModelDriver.process">
+<code class="descname">process</code><a class="headerlink" href="#cis_interface.drivers.ModelDriver.ModelDriver.process" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference external" href="https://docs.python.org/2/library/subprocess.html#subprocess.Popen" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">subprocess.Popen</span></code></a> &#8211; Process used to run the model.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.drivers.ModelDriver.ModelDriver.is_server">
+<code class="descname">is_server</code><a class="headerlink" href="#cis_interface.drivers.ModelDriver.ModelDriver.is_server" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>bool</em> &#8211; If True, the model is assumed to be a server and an
+instance of <a class="reference internal" href="#module-cis_interface.drivers.RMQServerDriver" title="cis_interface.drivers.RMQServerDriver"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.drivers.RMQServerDriver</span></code></a> is
+started.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.drivers.ModelDriver.ModelDriver.client_of">
+<code class="descname">client_of</code><a class="headerlink" href="#cis_interface.drivers.ModelDriver.ModelDriver.client_of" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>list</em> &#8211; The names of server models that this model is a
+client of.</p>
+</dd></dl>
+
 <dl class="method">
 <dt id="cis_interface.drivers.ModelDriver.ModelDriver.run">
 <code class="descname">run</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/ModelDriver.html#ModelDriver.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.ModelDriver.ModelDriver.run" title="Permalink to this definition">¶</a></dt>

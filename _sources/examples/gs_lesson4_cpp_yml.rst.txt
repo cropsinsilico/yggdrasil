@@ -1,0 +1,3 @@
+.. literalinclude:: ../../../cis_interface/examples/gs_lesson4/gs_lesson4_cpp.yml
+
+(Example in: `C <gs_lesson4_c.rst>`__, `C++ <gs_lesson4_cpp.rst>`__, `Matlab <gs_lesson4_matlab.rst>`__, `Python <gs_lesson4_python.rst>`__)

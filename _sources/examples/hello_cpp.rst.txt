@@ -1,0 +1,3 @@
+.. include:: hello_cpp_src.rst
+
+.. include:: hello_cpp_yml.rst

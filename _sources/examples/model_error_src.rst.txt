@@ -1,0 +1,3 @@
+.. literalinclude:: ../../../cis_interface/examples/model_error/src/model_error.py
+
+(Example in: `C <model_error_c.rst>`__, `C++ <model_error_cpp.rst>`__, `Matlab <model_error_matlab.rst>`__, `Python <model_error_python.rst>`__)

@@ -1,0 +1,3 @@
+.. include:: SaM_matlab_src.rst
+
+.. include:: SaM_matlab_yml.rst

@@ -1,0 +1,350 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>&lt;no title&gt; &mdash; cis_interface 0.1.3 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="../genindex.html"/>
+        <link rel="search" title="Search" href="../search.html"/>
+    <link rel="top" title="cis_interface 0.1.3 documentation" href="../index.html"/> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> cis_interface
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../includeme.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../config.html">Configuration Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../code.html">Code</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">cis_interface</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+      <li>&lt;no title&gt;</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/examples/ascii_io_c_src.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="highlight-default"><div class="highlight"><pre><span></span><span class="c1">#include &lt;stdio.h&gt;</span>
+<span class="c1">#include &lt;stdlib.h&gt;</span>
+<span class="o">//</span> <span class="n">Include</span> <span class="n">interface</span> <span class="n">methods</span>
+<span class="c1">#include &quot;PsiInterface.h&quot;</span>
+
+
+<span class="nb">int</span> <span class="n">main</span><span class="p">(</span><span class="nb">int</span> <span class="n">argc</span><span class="p">,</span><span class="n">char</span> <span class="o">*</span><span class="n">argv</span><span class="p">[]){</span>
+  <span class="n">const</span> <span class="n">uint</span> <span class="n">BSIZE</span> <span class="o">=</span> <span class="mi">8192</span><span class="p">;</span> <span class="o">//</span> <span class="n">the</span> <span class="nb">max</span>
+  <span class="nb">int</span> <span class="n">ret</span><span class="p">;</span>
+
+  <span class="o">//</span> <span class="n">Input</span> <span class="o">&amp;</span> <span class="n">output</span> <span class="n">to</span> <span class="n">an</span> <span class="n">ASCII</span> <span class="n">file</span> <span class="n">line</span> <span class="n">by</span> <span class="n">line</span>
+  <span class="n">psiAsciiFileInput_t</span> <span class="n">FileInput</span> <span class="o">=</span> <span class="n">psiAsciiFileInput</span><span class="p">(</span><span class="s2">&quot;inputC_file&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+  <span class="n">psiAsciiFileOutput_t</span> <span class="n">FileOutput</span> <span class="o">=</span> <span class="n">psiAsciiFileOutput</span><span class="p">(</span><span class="s2">&quot;outputC_file&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+  <span class="o">//</span> <span class="n">Input</span> <span class="o">&amp;</span> <span class="n">output</span> <span class="kn">from</span> <span class="nn">a</span> <span class="n">table</span> <span class="n">row</span> <span class="n">by</span> <span class="n">row</span>
+  <span class="n">psiAsciiTableInput_t</span> <span class="n">TableInput</span> <span class="o">=</span> <span class="n">psiAsciiTableInput</span><span class="p">(</span><span class="s2">&quot;inputC_table&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+  <span class="n">psiAsciiTableOutput_t</span> <span class="n">TableOutput</span> <span class="o">=</span> <span class="n">psiAsciiTableOutput</span><span class="p">(</span><span class="s2">&quot;outputC_table&quot;</span><span class="p">,</span>
+							  <span class="s2">&quot;</span><span class="si">%5s</span><span class="se">\t</span><span class="si">%ld</span><span class="se">\t</span><span class="si">%3.1f</span><span class="se">\t</span><span class="si">%3.1lf%+3.1lf</span><span class="s2">j</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+  <span class="o">//</span> <span class="n">Input</span> <span class="o">&amp;</span> <span class="n">output</span> <span class="kn">from</span> <span class="nn">a</span> <span class="n">table</span> <span class="k">as</span> <span class="n">an</span> <span class="n">array</span>
+  <span class="n">psiAsciiTableInput_t</span> <span class="n">ArrayInput</span> <span class="o">=</span> <span class="n">psiAsciiTableInput</span><span class="p">(</span><span class="s2">&quot;inputC_array&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+  <span class="n">psiAsciiTableOutput_t</span> <span class="n">ArrayOutput</span> <span class="o">=</span> <span class="n">psiAsciiTableOutput</span><span class="p">(</span><span class="s2">&quot;outputC_array&quot;</span><span class="p">,</span>
+							  <span class="s2">&quot;</span><span class="si">%5s</span><span class="se">\t</span><span class="si">%ld</span><span class="se">\t</span><span class="si">%3.1f</span><span class="se">\t</span><span class="si">%3.1lf%+3.1lf</span><span class="s2">j</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+
+  <span class="o">//</span> <span class="n">Read</span> <span class="n">lines</span> <span class="kn">from</span> <span class="nn">ASCII</span> <span class="n">text</span> <span class="n">file</span> <span class="n">until</span> <span class="n">end</span> <span class="n">of</span> <span class="n">file</span> <span class="ow">is</span> <span class="n">reached</span><span class="o">.</span>
+  <span class="o">//</span> <span class="n">As</span> <span class="n">each</span> <span class="n">line</span> <span class="ow">is</span> <span class="n">received</span><span class="p">,</span> <span class="n">it</span> <span class="ow">is</span> <span class="n">then</span> <span class="n">sent</span> <span class="n">to</span> <span class="n">the</span> <span class="n">output</span> <span class="n">ASCII</span> <span class="n">file</span><span class="o">.</span>
+  <span class="n">printf</span><span class="p">(</span><span class="s2">&quot;ascii_io(C): Receiving/sending ASCII file.</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">);</span>
+  <span class="n">char</span> <span class="n">line</span><span class="p">[</span><span class="n">LINE_SIZE_MAX</span><span class="p">];</span>
+  <span class="n">ret</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+  <span class="k">while</span> <span class="p">(</span><span class="n">ret</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+    <span class="o">//</span> <span class="n">Receive</span> <span class="n">a</span> <span class="n">single</span> <span class="n">line</span>
+    <span class="n">ret</span> <span class="o">=</span> <span class="n">af_recv_line</span><span class="p">(</span><span class="n">FileInput</span><span class="p">,</span> <span class="n">line</span><span class="p">,</span> <span class="n">LINE_SIZE_MAX</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">ret</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+      <span class="o">//</span> <span class="n">If</span> <span class="n">the</span> <span class="n">receive</span> <span class="n">was</span> <span class="n">succesful</span><span class="p">,</span> <span class="n">send</span> <span class="n">the</span> <span class="n">line</span> <span class="n">to</span> <span class="n">output</span>
+      <span class="n">printf</span><span class="p">(</span><span class="s2">&quot;File: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">line</span><span class="p">);</span>
+      <span class="n">ret</span> <span class="o">=</span> <span class="n">af_send_line</span><span class="p">(</span><span class="n">FileOutput</span><span class="p">,</span> <span class="n">line</span><span class="p">);</span>
+      <span class="k">if</span> <span class="p">(</span><span class="n">ret</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+	<span class="n">printf</span><span class="p">(</span><span class="s2">&quot;ascii_io(C): ERROR SENDING LINE</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">);</span>
+	<span class="k">break</span><span class="p">;</span>
+      <span class="p">}</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+      <span class="o">//</span> <span class="n">If</span> <span class="n">the</span> <span class="n">receive</span> <span class="n">was</span> <span class="ow">not</span> <span class="n">succesful</span><span class="p">,</span> <span class="n">send</span> <span class="n">the</span> <span class="n">end</span><span class="o">-</span><span class="n">of</span><span class="o">-</span><span class="n">file</span> <span class="n">message</span> <span class="n">to</span>
+      <span class="o">//</span> <span class="n">close</span> <span class="n">the</span> <span class="n">output</span> <span class="n">file</span><span class="o">.</span>
+      <span class="n">printf</span><span class="p">(</span><span class="s2">&quot;End of file input (C)</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">);</span>
+      <span class="n">af_send_eof</span><span class="p">(</span><span class="n">FileOutput</span><span class="p">);</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+
+  <span class="o">//</span> <span class="n">Read</span> <span class="n">rows</span> <span class="kn">from</span> <span class="nn">ASCII</span> <span class="n">table</span> <span class="n">until</span> <span class="n">end</span> <span class="n">of</span> <span class="n">file</span> <span class="ow">is</span> <span class="n">reached</span><span class="o">.</span>
+  <span class="o">//</span> <span class="n">As</span> <span class="n">each</span> <span class="n">row</span> <span class="ow">is</span> <span class="n">received</span><span class="p">,</span> <span class="n">it</span> <span class="ow">is</span> <span class="n">then</span> <span class="n">sent</span> <span class="n">to</span> <span class="n">the</span> <span class="n">output</span> <span class="n">ASCII</span> <span class="n">table</span>
+  <span class="n">printf</span><span class="p">(</span><span class="s2">&quot;ascii_io(C): Receiving/sending ASCII table.</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">);</span>
+  <span class="n">char</span> <span class="n">name</span><span class="p">[</span><span class="n">BSIZE</span><span class="p">];</span>
+  <span class="n">long</span> <span class="n">number</span><span class="p">;</span>
+  <span class="n">double</span> <span class="n">value</span><span class="p">;</span>
+  <span class="n">double</span> <span class="n">comp_real</span><span class="p">,</span> <span class="n">comp_imag</span><span class="p">;</span>
+  <span class="n">ret</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+  <span class="k">while</span> <span class="p">(</span><span class="n">ret</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+    <span class="o">//</span> <span class="n">Receive</span> <span class="n">a</span> <span class="n">single</span> <span class="n">row</span> <span class="k">with</span> <span class="n">values</span> <span class="n">stored</span> <span class="ow">in</span> <span class="n">scalars</span> <span class="n">declared</span> <span class="n">locally</span>
+    <span class="n">ret</span> <span class="o">=</span> <span class="n">at_recv_row</span><span class="p">(</span><span class="n">TableInput</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">name</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">number</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">value</span><span class="p">,</span>
+		      <span class="o">&amp;</span><span class="n">comp_real</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">comp_imag</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">ret</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+      <span class="o">//</span> <span class="n">If</span> <span class="n">the</span> <span class="n">receive</span> <span class="n">was</span> <span class="n">succesful</span><span class="p">,</span> <span class="n">send</span> <span class="n">the</span> <span class="n">values</span> <span class="n">to</span> <span class="n">output</span><span class="o">.</span> <span class="n">Formatting</span>
+      <span class="o">//</span> <span class="ow">is</span> <span class="n">taken</span> <span class="n">care</span> <span class="n">of</span> <span class="n">on</span> <span class="n">the</span> <span class="n">output</span> <span class="n">driver</span> <span class="n">side</span><span class="o">.</span>
+      <span class="n">printf</span><span class="p">(</span><span class="s2">&quot;Table: </span><span class="si">%.5s</span><span class="s2">, </span><span class="si">%ld</span><span class="s2">, </span><span class="si">%3.1f</span><span class="s2">, </span><span class="si">%g%+g</span><span class="s2">j</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span>
+	     <span class="n">name</span><span class="p">,</span> <span class="n">number</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">comp_real</span><span class="p">,</span> <span class="n">comp_imag</span><span class="p">);</span>
+      <span class="n">ret</span> <span class="o">=</span> <span class="n">at_send_row</span><span class="p">(</span><span class="n">TableOutput</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">number</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">comp_real</span><span class="p">,</span> <span class="n">comp_imag</span><span class="p">);</span>
+      <span class="k">if</span> <span class="p">(</span><span class="n">ret</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+	<span class="n">printf</span><span class="p">(</span><span class="s2">&quot;ascii_io(C): ERROR SENDING ROW</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">);</span>
+	<span class="k">break</span><span class="p">;</span>
+      <span class="p">}</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+      <span class="o">//</span> <span class="n">If</span> <span class="n">the</span> <span class="n">receive</span> <span class="n">was</span> <span class="ow">not</span> <span class="n">succesful</span><span class="p">,</span> <span class="n">send</span> <span class="n">the</span> <span class="n">end</span><span class="o">-</span><span class="n">of</span><span class="o">-</span><span class="n">file</span> <span class="n">message</span> <span class="n">to</span>
+      <span class="o">//</span> <span class="n">close</span> <span class="n">the</span> <span class="n">output</span> <span class="n">file</span><span class="o">.</span>
+      <span class="n">printf</span><span class="p">(</span><span class="s2">&quot;End of table input (C)</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">);</span>
+      <span class="n">at_send_eof</span><span class="p">(</span><span class="n">TableOutput</span><span class="p">);</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+
+  <span class="o">//</span> <span class="n">Read</span> <span class="n">entire</span> <span class="n">array</span> <span class="kn">from</span> <span class="nn">ASCII</span> <span class="n">table</span> <span class="n">into</span> <span class="n">columns</span> <span class="n">that</span> <span class="n">are</span> <span class="n">dynamically</span>
+  <span class="o">//</span> <span class="n">allocated</span><span class="o">.</span> <span class="n">The</span> <span class="n">returned</span> <span class="n">values</span> <span class="n">tells</span> <span class="n">us</span> <span class="n">the</span> <span class="n">number</span> <span class="n">of</span> <span class="n">elements</span> <span class="ow">in</span> <span class="n">the</span>
+  <span class="o">//</span> <span class="n">columns</span><span class="o">.</span>
+  <span class="n">printf</span><span class="p">(</span><span class="s2">&quot;Receiving/sending ASCII table as array.</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">);</span>
+  <span class="n">char</span> <span class="o">*</span><span class="n">name_arr</span> <span class="o">=</span> <span class="n">NULL</span><span class="p">;</span>
+  <span class="n">long</span> <span class="o">*</span><span class="n">number_arr</span> <span class="o">=</span> <span class="n">NULL</span><span class="p">;</span>
+  <span class="n">double</span> <span class="o">*</span><span class="n">value_arr</span> <span class="o">=</span> <span class="n">NULL</span><span class="p">;</span>
+  <span class="n">double</span> <span class="o">*</span><span class="n">comp_real_arr</span> <span class="o">=</span> <span class="n">NULL</span><span class="p">;</span>
+  <span class="n">double</span> <span class="o">*</span><span class="n">comp_imag_arr</span> <span class="o">=</span> <span class="n">NULL</span><span class="p">;</span>
+  <span class="n">ret</span> <span class="o">=</span> <span class="n">at_recv_array</span><span class="p">(</span><span class="n">ArrayInput</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">name_arr</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">number_arr</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">value_arr</span><span class="p">,</span>
+		      <span class="o">&amp;</span><span class="n">comp_real_arr</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">comp_imag_arr</span><span class="p">);</span>
+  <span class="k">if</span> <span class="p">(</span><span class="n">ret</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s2">&quot;ascii_io(C): ERROR RECVING ARRAY</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">);</span>
+  <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s2">&quot;Array: (</span><span class="si">%d</span><span class="s2"> rows)</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">ret</span><span class="p">);</span>
+    <span class="o">//</span> <span class="n">Print</span> <span class="n">each</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">the</span> <span class="n">array</span>
+    <span class="nb">int</span> <span class="n">i</span><span class="p">;</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">ret</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
+      <span class="n">printf</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%.5s</span><span class="s2">, </span><span class="si">%ld</span><span class="s2">, </span><span class="si">%3.1f</span><span class="s2">, </span><span class="si">%3.1lf%+3.1lf</span><span class="s2">j</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">name_arr</span><span class="p">[</span><span class="mi">5</span><span class="o">*</span><span class="n">i</span><span class="p">],</span> <span class="n">number_arr</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+	     <span class="n">value_arr</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">comp_real_arr</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">comp_imag_arr</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span>
+    <span class="o">//</span> <span class="n">Send</span> <span class="n">the</span> <span class="n">columns</span> <span class="ow">in</span> <span class="n">the</span> <span class="n">array</span> <span class="n">to</span> <span class="n">output</span><span class="o">.</span> <span class="n">Formatting</span> <span class="ow">is</span> <span class="n">handled</span> <span class="n">on</span> <span class="n">the</span>
+    <span class="o">//</span> <span class="n">output</span> <span class="n">driver</span> <span class="n">side</span><span class="o">.</span>
+    <span class="n">ret</span> <span class="o">=</span> <span class="n">at_send_array</span><span class="p">(</span><span class="n">ArrayOutput</span><span class="p">,</span> <span class="n">ret</span><span class="p">,</span> <span class="n">name_arr</span><span class="p">,</span> <span class="n">number_arr</span><span class="p">,</span> <span class="n">value_arr</span><span class="p">,</span>
+			<span class="n">comp_real_arr</span><span class="p">,</span> <span class="n">comp_imag_arr</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">ret</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span>
+      <span class="n">printf</span><span class="p">(</span><span class="s2">&quot;ascii_io(C): ERROR SENDING ARRAY</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">);</span>
+  <span class="p">}</span>
+  
+  <span class="o">//</span> <span class="n">Free</span> <span class="n">dynamically</span> <span class="n">allocated</span> <span class="n">columns</span>
+  <span class="k">if</span> <span class="p">(</span><span class="n">name_arr</span><span class="p">)</span> <span class="n">free</span><span class="p">(</span><span class="n">name_arr</span><span class="p">);</span>
+  <span class="k">if</span> <span class="p">(</span><span class="n">number_arr</span><span class="p">)</span> <span class="n">free</span><span class="p">(</span><span class="n">number_arr</span><span class="p">);</span>
+  <span class="k">if</span> <span class="p">(</span><span class="n">value_arr</span><span class="p">)</span> <span class="n">free</span><span class="p">(</span><span class="n">value_arr</span><span class="p">);</span>
+  <span class="k">if</span> <span class="p">(</span><span class="n">comp_real_arr</span><span class="p">)</span> <span class="n">free</span><span class="p">(</span><span class="n">comp_real_arr</span><span class="p">);</span>
+  <span class="k">if</span> <span class="p">(</span><span class="n">comp_imag_arr</span><span class="p">)</span> <span class="n">free</span><span class="p">(</span><span class="n">comp_imag_arr</span><span class="p">);</span>
+
+  <span class="o">//</span> <span class="n">Clean</span> <span class="n">up</span> <span class="n">to</span> <span class="n">deallocate</span> <span class="n">things</span>
+  <span class="n">cleanup_pafi</span><span class="p">(</span><span class="o">&amp;</span><span class="n">FileInput</span><span class="p">);</span>
+  <span class="n">cleanup_pafo</span><span class="p">(</span><span class="o">&amp;</span><span class="n">FileOutput</span><span class="p">);</span>
+  <span class="n">cleanup_pati</span><span class="p">(</span><span class="o">&amp;</span><span class="n">TableInput</span><span class="p">);</span>
+  <span class="n">cleanup_pato</span><span class="p">(</span><span class="o">&amp;</span><span class="n">TableOutput</span><span class="p">);</span>
+  <span class="n">cleanup_pati</span><span class="p">(</span><span class="o">&amp;</span><span class="n">ArrayInput</span><span class="p">);</span>
+  <span class="n">cleanup_pato</span><span class="p">(</span><span class="o">&amp;</span><span class="n">ArrayOutput</span><span class="p">);</span>
+  
+  <span class="k">return</span> <span class="n">ret</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>(Example in: <a class="reference external" href="ascii_io_all.rst">Mixed</a>, <a class="reference external" href="ascii_io_all_nomatlab.rst">Mixed w/o Matlab</a>, <a class="reference external" href="ascii_io_c.rst">C</a>, <a class="reference external" href="ascii_io_cpp.rst">C++</a>, <a class="reference external" href="ascii_io_matlab.rst">Matlab</a>, <a class="reference external" href="ascii_io_python.rst">Python</a>)</p>
+
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Meagan Lang, David Raila.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../',
+            VERSION:'0.1.3',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../_static/jquery.js"></script>
+      <script type="text/javascript" src="../_static/underscore.js"></script>
+      <script type="text/javascript" src="../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

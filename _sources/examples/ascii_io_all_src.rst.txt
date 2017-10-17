@@ -1,0 +1,9 @@
+.. literalinclude:: ../../../cis_interface/examples/ascii_io/src/ascii_io.py
+
+.. literalinclude:: ../../../cis_interface/examples/ascii_io/src/ascii_io.m
+
+.. literalinclude:: ../../../cis_interface/examples/ascii_io/src/ascii_io.c
+
+.. literalinclude:: ../../../cis_interface/examples/ascii_io/src/ascii_io.cpp
+
+(Example in: `Mixed <ascii_io_all.rst>`__, `Mixed w/o Matlab <ascii_io_all_nomatlab.rst>`__, `C <ascii_io_c.rst>`__, `C++ <ascii_io_cpp.rst>`__, `Matlab <ascii_io_matlab.rst>`__, `Python <ascii_io_python.rst>`__)

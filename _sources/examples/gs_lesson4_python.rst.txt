@@ -1,0 +1,3 @@
+.. include:: gs_lesson4_python_src.rst
+
+.. include:: gs_lesson4_python_yml.rst

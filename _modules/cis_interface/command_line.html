@@ -93,8 +93,10 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../includeme.html">Overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../getting_started.html">Getting started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../config.html">Configuration Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../code.html">Code</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples/examples_toc.html">Examples</a></li>
 </ul>
 
             
@@ -175,12 +177,12 @@
 
 
 <span class="c1"># pretty pprint</span>
-<div class="viewcode-block" id="pprint"><a class="viewcode-back" href="../../code_python.html#cis_interface.command_line.pprint">[docs]</a><span class="k">def</span> <span class="nf">pprint</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">):</span>
+<div class="viewcode-block" id="pprint"><a class="viewcode-back" href="../../cis_interface.html#cis_interface.command_line.pprint">[docs]</a><span class="k">def</span> <span class="nf">pprint</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">):</span>
     <span class="n">s</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">args</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">COLOR_TRACE</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="n">COLOR_NORMAL</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">s</span><span class="p">))</span></div>
 
     
-<div class="viewcode-block" id="signal_handler"><a class="viewcode-back" href="../../code_python.html#cis_interface.command_line.signal_handler">[docs]</a><span class="k">def</span> <span class="nf">signal_handler</span><span class="p">(</span><span class="n">sigCaught</span><span class="p">,</span> <span class="n">frame</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
+<div class="viewcode-block" id="signal_handler"><a class="viewcode-back" href="../../cis_interface.html#cis_interface.command_line.signal_handler">[docs]</a><span class="k">def</span> <span class="nf">signal_handler</span><span class="p">(</span><span class="n">sigCaught</span><span class="p">,</span> <span class="n">frame</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
     <span class="k">global</span> <span class="n">INTERRUPT_TIME</span><span class="p">,</span> <span class="n">cisRunner</span>
     <span class="n">debug</span><span class="p">(</span><span class="s1">&#39;CisRunner interrupted with signal </span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">sigCaught</span><span class="p">)</span>
     <span class="n">now</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
@@ -211,7 +213,7 @@
     <span class="k">return</span> <span class="mi">0</span></div>
 
 
-<div class="viewcode-block" id="cisrun"><a class="viewcode-back" href="../../code_python.html#cis_interface.command_line.cisrun">[docs]</a><span class="k">def</span> <span class="nf">cisrun</span><span class="p">():</span>
+<div class="viewcode-block" id="cisrun"><a class="viewcode-back" href="../../cis_interface.html#cis_interface.command_line.cisrun">[docs]</a><span class="k">def</span> <span class="nf">cisrun</span><span class="p">():</span>
     <span class="k">global</span> <span class="n">cisRunner</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="n">signal</span><span class="o">.</span><span class="n">signal</span><span class="p">(</span><span class="n">signal</span><span class="o">.</span><span class="n">SIGTERM</span><span class="p">,</span> <span class="n">signal_handler</span><span class="p">)</span>

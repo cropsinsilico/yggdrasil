@@ -1,0 +1,3 @@
+.. include:: gs_lesson3_cpp_src.rst
+
+.. include:: gs_lesson3_cpp_yml.rst

@@ -1,0 +1,3 @@
+.. include:: gs_lesson3_c_src.rst
+
+.. include:: gs_lesson3_c_yml.rst

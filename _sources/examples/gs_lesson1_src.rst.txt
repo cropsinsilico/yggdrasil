@@ -1,0 +1,6 @@
+.. literalinclude:: /../../cis_interface/examples/gs_lesson1/src/gs_lesson1.py
+   :language: python
+   :linenos:
+
+
+(`Example in other languages <gs_lesson1.rst>`__)

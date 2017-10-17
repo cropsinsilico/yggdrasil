@@ -1,0 +1,59 @@
+gs_lesson1 Example
+==================
+
+Python Version
+--------------
+
+.. literalinclude:: /../../cis_interface/examples/gs_lesson1/src/gs_lesson1.py
+   :language: python
+   :linenos:
+
+
+.. literalinclude:: /../../cis_interface/examples/gs_lesson1/gs_lesson1_python.yml
+   :language: yaml
+   :linenos:
+
+
+
+C++ Version
+-----------
+
+.. literalinclude:: /../../cis_interface/examples/gs_lesson1/src/gs_lesson1.cpp
+   :language: python
+   :linenos:
+
+
+.. literalinclude:: /../../cis_interface/examples/gs_lesson1/gs_lesson1_cpp.yml
+   :language: yaml
+   :linenos:
+
+
+
+C Version
+---------
+
+.. literalinclude:: /../../cis_interface/examples/gs_lesson1/src/gs_lesson1.c
+   :language: python
+   :linenos:
+
+
+.. literalinclude:: /../../cis_interface/examples/gs_lesson1/gs_lesson1_c.yml
+   :language: yaml
+   :linenos:
+
+
+
+Matlab Version
+--------------
+
+.. literalinclude:: /../../cis_interface/examples/gs_lesson1/src/gs_lesson1.m
+   :language: python
+   :linenos:
+
+
+.. literalinclude:: /../../cis_interface/examples/gs_lesson1/gs_lesson1_matlab.yml
+   :language: yaml
+   :linenos:
+
+
+

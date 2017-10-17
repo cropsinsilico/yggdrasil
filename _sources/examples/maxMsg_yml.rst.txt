@@ -1,0 +1,5 @@
+.. literalinclude:: ../../../cis_interface/examples/maxMsg/src/maxMsg.py
+
+.. literalinclude:: ../../../cis_interface/examples/maxMsg/src/maxMsg.py
+
+(Example in: `Mixed <maxMsg_all.rst>`__, `Mixed w/o Matlab <maxMsg_all_nomatlab.rst>`__, `C <maxMsg_c.rst>`__, `C++ <maxMsg_cpp.rst>`__, `Matlab <maxMsg_matlab.rst>`__, `Python <maxMsg_python.rst>`__)

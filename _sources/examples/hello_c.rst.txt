@@ -1,0 +1,3 @@
+.. include:: hello_c_src.rst
+
+.. include:: hello_c_yml.rst
