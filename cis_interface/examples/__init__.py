@@ -2,7 +2,8 @@
 import os
 
 
-ex_dict = {'hello': ('python', 'matlab', 'c', 'cpp'),
+ex_dict = {'gs_lesson1': ('python', 'matlab', 'c', 'cpp'),
+           'hello': ('python', 'matlab', 'c', 'cpp'),
            'model_error': ('python', 'matlab', 'c', 'cpp'),
            'SaM': ('python', 'matlab', 'c', 'cpp', 'all', 'all_nomatlab'),
            'ascii_io': ('python', 'matlab', 'c', 'cpp', 'all', 'all_nomatlab'),
