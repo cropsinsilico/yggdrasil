@@ -13,50 +13,59 @@
 #ifndef CISASCIIFILECOMM_H_
 #define CISASCIIFILECOMM_H_
 
+/*! @brief Number of files creates. */
+static unsigned _cisAsciiFilesCreated;
+
 /*!
   @brief Initialize a ASCII file comm.
-  @param[in] name Full path to file that should be read from or written to.
-  @param[in] direction Direction that messages will go through the comm.
-  Values include "recv" and "send".
-  @param[in] seri_info Format for formatting/parsing messages.
-  @returns comm_t Comm structure.
+  @param[in] comm comm_t Comm structure initialized with init_comm_base.
+  @returns int -1 if the comm could not be initialized.
  */
 static inline
-comm_t init_ascii_file_comm(const char *name, const char *direction,
-			    const void *seri_info) {
+int init_ascii_file_comm(comm_t *comm) {
   // Don't check base validity since address is name
-  comm_t ret = init_base_comm(name, direction, seri_info);
-  ret.type = ASCII_FILE_COMM;
-  ret.address = name;
-  ret.nolimit = 1;
+  comm->type = ASCII_FILE_COMM;
+  strcpy(comm->address, comm->name);
   asciiFile_t *handle = (asciiFile_t*)malloc(sizeof(asciiFile_t));
-  if (strcmp(ret.direction, "send") == 0)
-    handle[0] = asciiFile(ret.address, "w", NULL, NULL);
+  if (strcmp(comm->direction, "send") == 0)
+    handle[0] = asciiFile(comm->address, "w", NULL, NULL);
   else
-    handle[0] = asciiFile(ret.address, "r", NULL, NULL);
-  ret.handle = (void*)handle;
-  int flag = af_open(handle);
-  if (flag != 0) {
-    cislog_error("init_ascii_file_comm: Could not open %s", name);
-    ret.valid = 0;
+    handle[0] = asciiFile(comm->address, "r", NULL, NULL);
+  comm->handle = (void*)handle;
+  int ret = af_open(handle);
+  if (ret != 0) {
+    cislog_error("init_ascii_file_comm: Could not open %s", comm->name);
+    comm->valid = 0;
   }
   return ret;
 };
 
 /*!
+  @brief Create a new file comm.
+  @param[in] comm comm_t * Comm structure initialized with new_comm_base.
+  @returns int -1 if the address could not be created.
+*/
+static inline
+int new_ascii_file_address(comm_t *comm) {
+  sprintf(comm->name, "temp%d", _cisAsciiFilesCreated);
+  int ret = init_ascii_file_comm(comm);
+  return ret;
+};
+
+/*!
   @brief Perform deallocation for ASCII file communicator.
-  @param[in] comm_t Communicator to deallocate.
+  @param[in] x comm_t* Pointer to ommunicator to deallocate.
   @returns int 1 if there is and error, 0 otherwise.
 */
 static inline
-int free_ascii_file_comm(comm_t x) {
-  if (ret.handle != NULL) {
-    asciiFile_t *file = (asciiFile_t*)x.handle;
+int free_ascii_file_comm(comm_t *x) {
+  if (x->handle != NULL) {
+    asciiFile_t *file = (asciiFile_t*)x->handle;
     af_close(file);
-    free(x.handle);
-    x.handle = NULL;
+    free(x->handle);
+    x->handle = NULL;
   }
-  return free_base_comm(x);
+  return 0;
 };
 
 /*!
@@ -83,7 +92,7 @@ static inline
 int ascii_file_comm_send(const comm_t x, const char *data, const int len) {
   if (is_eof(data))
     return 0;
-  asciiFile_t file = (asciiFile_t*)x.handle;
+  asciiFile_t *file = (asciiFile_t*)x.handle;
   return af_writeline_full(file[0], data);
 };
 
@@ -99,8 +108,8 @@ int ascii_file_comm_send(const comm_t x, const char *data, const int len) {
  */
 static inline
 int ascii_file_comm_recv(const comm_t x, char *data, int len) {
-  asciiFile_t file = (asciiFile_t*)x.handle;
-  return af_readline_full(file[0], &data, &len);
+  asciiFile_t *file = (asciiFile_t*)x.handle;
+  return af_readline_full(file[0], &data, (size_t*)(&len));
 };
 
 /*!

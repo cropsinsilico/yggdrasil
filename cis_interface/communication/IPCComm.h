@@ -16,6 +16,8 @@
 #ifndef CISIPCCOMM_H_
 #define CISIPCCOMM_H_
 
+/*! Number of temporary channels created. */
+static unsigned _cisChannelsCreated = 0;
 /*! @brief Maximum number of channels. */
 #define _cisTrackChannels 256
 /*! @brief Names of channels in use. */
@@ -28,59 +30,110 @@ static unsigned _cisChannelsUsed = 0;
 */
 typedef struct msgbuf_t {
   long mtype; //!< Message buffer type
-  char data[PSI_MSG_MAX]; //!< Buffer for the message
+  char data[CIS_MSG_MAX]; //!< Buffer for the message
 } msgbuf_t;
 
 /*!
-  @brief Initialize a sysv_ipc communicator.
-  The name is used to locate the IPC queue handle stored in the associated
-  environment variable.
-  @param[in] name Name of environment variable that the queue address is
-  stored in.
-  @param[in] seri_info Format for formatting/parsing messages.
-  @returns comm_t Comm structure.
+  @brief Check if an IPC channel can be initialized.
+  @param[in] comm comm_t Comm structure with name that should be checked.
+  @returns int -1 if the channel can't be initialized.
  */
 static inline
-comm_t init_ipc_comm(const char *name, const char *direction, const void *seri_info) {
-  comm_t ret = init_comm_base(name, direction, seri_info);
-  ret.type = IPC_COMM;
-  if (ret.valid == 0)
-    return ret;
+int check_channels(comm_t comm) {
   // Fail if trying to re-use the same channel twice
   unsigned i;
-  for (i = 0; i < _psiChannelsUsed; i++ ){
-    if (0 == strcmp(_psiChannelNames[i], name)){
-      psilog_error("Attempt to re-use channel %s", name);
-      ret.valid = 0;
-      return ret;
+  for (i = 0; i < _cisChannelsUsed; i++ ){
+    if (0 == strcmp(_cisChannelNames[i], comm.name)){
+      cislog_error("Attempt to re-use channel %s", comm.name);
+      return -1;
     }
   }
-  // Fail if > _psiTrackChannels channels used
-  if (_psiChannelsUsed >= _psiTrackChannels) {
-    psilog_error("Too many channels in use, max: %d\n", _psiTrackChannels);
-    ret.valid = 0;
-    return ret;
+  // Fail if > _cisTrackChannels channels used
+  if (_cisChannelsUsed >= _cisTrackChannels) {
+    cislog_error("Too many channels in use, max: %d\n", _cisTrackChannels);
+    return -1;
   }
-  _psiChannelNames[_psiChannelsUsed++] = ret.address;
-  int qkey = atoi(qid);
-  int *fid = (int *)malloc(sizeof(int));
-  fid[0] = msgget(qkey, 0600);
-  ret.handle = (void*)fid;
+  return 0;
+};
+
+/*!
+  @brief Add a new channel to the list of existing channels.
+  @param[in] name const char * Name of channel to record.
+*/
+static inline
+void add_channel(char *name) {
+  _cisChannelNames[_cisChannelsUsed++] = name;
+};
+
+/*!
+  @brief Remove a channel.
+  @param[in] comm comm_t Comm with channel that should be removed.
+  @returns int -1 if removal not successful.
+*/
+static inline
+int remove_comm(const comm_t comm) {
+  int ich = atoi(comm.address);
+  int ret = msgctl(((int*)comm.handle)[0], IPC_RMID, NULL);
+  if ((ret != -1) && (ich == (_cisChannelsUsed - 1))) {
+    /* memmove(_cisChannelNames + ich, _cisChannelNames + ich + 1, */
+    /* 	    (_cisTrackChannels - (ich + 1))*sizeof(char*)); */
+    _cisChannelsUsed--;
+  }
   return ret;
 };
 
 /*!
+  @brief Create a new channel.
+  @param[in] comm comm_t * Comm structure initialized with new_comm_base.
+  @returns int -1 if the address could not be created.
+*/
+static inline
+int new_ipc_address(comm_t *comm) {
+  int ret;
+  if (strlen(comm->name) == 0)
+    sprintf(comm->name, "temp%d", _cisChannelsCreated);
+  ret = check_channels(*comm);
+  if (ret < 0)
+    return ret;
+  sprintf(comm->address, "%d", _cisChannelsCreated);
+  int *fid = (int*)malloc(sizeof(int));
+  fid[0] = msgget(IPC_PRIVATE, IPC_CREAT);
+  comm->handle = (void*)fid;
+  add_channel(comm->name);
+  _cisChannelsCreated++;
+  return 0;
+};
+
+/*!
+  @brief Initialize a sysv_ipc communicator.
+  @param[in] comm comm_t * Comm structure initialized with init_comm_base.
+  @returns int -1 if the comm could not be initialized.
+ */
+static inline
+int init_ipc_comm(comm_t *comm) {
+  if (comm->valid == 0)
+    return -1;
+  int ret = check_channels(*comm);
+  if (ret < 0)
+    return ret;
+  add_channel(comm->address);
+  int qkey = atoi(comm->address);
+  int *fid = (int *)malloc(sizeof(int));
+  fid[0] = msgget(qkey, 0600);
+  comm->handle = (void*)fid;
+  return 0;
+};
+
+/*!
   @brief Perform deallocation for basic communicator.
-  @param[in] comm_t Communicator to deallocate.
+  @param[in] x comm_t* Pointer to communicator to deallocate.
   @returns int 1 if there is and error, 0 otherwise.
 */
 static inline
-int free_ipc_comm(comm_t x) {
-  if (free_comm_base(x))
-    return 1;
-  if (x.handle != NULL) {
-    free(x.handle);
-    x.handle = NULL;
+int free_ipc_comm(comm_t *x) {
+  if (x->handle != NULL) {
+    free(x->handle);
+    x->handle = NULL;
   }
   return 0;
 };
@@ -104,7 +157,7 @@ int ipc_comm_nmsg(const comm_t x) {
 
 /*!
   @brief Send a message to the comm.
-  Send a message smaller than PSI_MSG_MAX bytes to an output comm. If the
+  Send a message smaller than CIS_MSG_MAX bytes to an output comm. If the
   message is larger, it will not be sent.
   @param[in] x comm_t structure that comm should be sent to.
   @param[in] data character pointer to message that should be sent.
@@ -113,7 +166,7 @@ int ipc_comm_nmsg(const comm_t x) {
  */
 static inline
 int ipc_comm_send(const comm_t x, const char *data, const int len) {
-  debug("ipc_comm_send(%s): %d bytes", x.name, len);
+  cislog_debug("ipc_comm_send(%s): %d bytes", x.name, len);
   if (comm_base_send(x, data, len) == -1)
     return -1;
   msgbuf_t t;
@@ -122,10 +175,10 @@ int ipc_comm_send(const comm_t x, const char *data, const int len) {
   int ret = -1;
   while (1) {
     ret = msgsnd(((int*)x.handle)[0], &t, len, IPC_NOWAIT);
-    debug("ipc_comm_send(%s): msgsnd returned %d", x.name, ret);
+    cislog_debug("ipc_comm_send(%s): msgsnd returned %d", x.name, ret);
     if (ret == 0) break;
     if (ret == EAGAIN) {
-      debug("ipc_comm_send(%s): msgsnd, sleep", x.name);
+      cislog_debug("ipc_comm_send(%s): msgsnd, sleep", x.name);
       usleep(250*1000);
     } else {
       cislog_error("ipc_comm_send:  msgsend(%d, %p, %d, IPC_NOWAIT) ret(%d), errno(%d): %s",
@@ -134,13 +187,13 @@ int ipc_comm_send(const comm_t x, const char *data, const int len) {
       break;
     }
   }
-  debug("ipc_comm_send(%s): returning %d", x.name, ret);
+  cislog_debug("ipc_comm_send(%s): returning %d", x.name, ret);
   return ret;
 };
 
 /*!
   @brief Receive a message from an input comm.
-  Receive a message smaller than PSI_MSG_MAX bytes from an input comm.
+  Receive a message smaller than CIS_MSG_MAX bytes from an input comm.
   @param[in] x comm_t structure that message should be sent to.
   @param[out] data character pointer to allocated buffer where the message
   should be saved.
@@ -150,18 +203,18 @@ int ipc_comm_send(const comm_t x, const char *data, const int len) {
  */
 static inline
 int ipc_comm_recv(const comm_t x, char *data, const int len) {
-  debug("ipc_comm_recv(%s)", x.name);
+  cislog_debug("ipc_comm_recv(%s)", x.name);
   msgbuf_t t;
   t.mtype = 1;
   int ret = -1;
   while (1) {
     ret = msgrcv(((int*)x.handle)[0], &t, len, 0, IPC_NOWAIT);
     if (ret == -1 && errno == ENOMSG) {
-      debug("ipc_comm_recv(%s): no input, sleep", x.name);
+      cislog_debug("ipc_comm_recv(%s): no input, sleep", x.name);
       usleep(250*1000);
     } else {
-      debug("ipc_comm_recv(%s): received input: %d bytes, ret=%d",
-	    x.name, strlen(t.data), ret);
+      cislog_debug("ipc_comm_recv(%s): received input: %d bytes, ret=%d",
+		   x.name, strlen(t.data), ret);
       break;
     }
   }
@@ -169,17 +222,17 @@ int ipc_comm_recv(const comm_t x, char *data, const int len) {
     memcpy(data, t.data, ret);
     data[ret] = '\0';
   } else {
-    debug("ipc_comm_recv: msgrecv(%d, %p, %d, 0, IPC_NOWAIT: %s",
-	  (int*)x.handle, &t, len, strerror(errno));
+    cislog_debug("ipc_comm_recv: msgrecv(%d, %p, %d, 0, IPC_NOWAIT: %s",
+		 (int*)x.handle, &t, len, strerror(errno));
     ret = -1;
   }
-  debug("ipc_comm_recv(%s): returns %d bytes\n", x.name, ret);
+  cislog_debug("ipc_comm_recv(%s): returns %d bytes\n", x.name, ret);
   return ret;
 };
 
 /*!
   @brief Send a large message to an output comm.
-  Send a message larger than PSI_MSG_MAX bytes to an output comm by breaking
+  Send a message larger than CIS_MSG_MAX bytes to an output comm by breaking
   it up between several smaller messages and sending initial message with the
   size of the message that should be expected. Must be partnered with
   ipc_comm_recv_nolimit for communication to make sense.
@@ -190,40 +243,40 @@ int ipc_comm_recv(const comm_t x, char *data, const int len) {
  */
 static inline
 int ipc_comm_send_nolimit(const comm_t x, const char *data, const int len){
-  debug("ipc_comm_send_nolimit(%s): %d bytes", x.name, len);
+  cislog_debug("ipc_comm_send_nolimit(%s): %d bytes", x.name, len);
   int ret = -1;
   int msgsiz = 0;
-  char msg[PSI_MSG_MAX];
+  char msg[CIS_MSG_MAX];
   sprintf(msg, "%ld", (long)(len));
   ret = ipc_comm_send(x, msg, strlen(msg));
   if (ret != 0) {
-    debug("ipc_comm_send_nolimit(%s): sending size of payload failed.", x.name);
+    cislog_debug("ipc_comm_send_nolimit(%s): sending size of payload failed.", x.name);
     return ret;
   }
   int prev = 0;
   while (prev < len) {
-    if ((len - prev) > PSI_MSG_MAX)
-      msgsiz = PSI_MSG_MAX;
+    if ((len - prev) > CIS_MSG_MAX)
+      msgsiz = CIS_MSG_MAX;
     else
       msgsiz = len - prev;
     ret = ipc_comm_send(x, data + prev, msgsiz);
     if (ret != 0) {
-      debug("ipc_comm_send_nolimit(%s): send interupted at %d of %d bytes.",
-	    x.name, prev, len);
+      cislog_debug("ipc_comm_send_nolimit(%s): send interupted at %d of %d bytes.",
+		   x.name, prev, len);
       break;
     }
     prev += msgsiz;
-    debug("ipc_comm_send_nolimit(%s): %d of %d bytes sent",
-	  x.name, prev, len);
+    cislog_debug("ipc_comm_send_nolimit(%s): %d of %d bytes sent",
+		 x.name, prev, len);
   }
   if (ret == 0)
-    debug("ipc_comm_send_nolimit(%s): %d bytes completed", x.name, len);
+    cislog_debug("ipc_comm_send_nolimit(%s): %d bytes completed", x.name, len);
   return ret;
 };
 
 /*!
   @brief Receive a large message from an input comm.
-  Receive a message larger than PSI_MSG_MAX bytes from an input comm by
+  Receive a message larger than CIS_MSG_MAX bytes from an input comm by
   receiving it in parts. This expects the first message to be the size of
   the total message.
   @param[in] x comm_t structure that message should be sent to.
@@ -236,21 +289,21 @@ int ipc_comm_send_nolimit(const comm_t x, const char *data, const int len){
  */
 static inline
 int ipc_comm_recv_nolimit(const comm_t x, char **data, const int len0){
-  debug("ipc_comm_recv_nolimit(%s)", x.name);
+  cislog_debug("ipc_comm_recv_nolimit(%s)", x.name);
   long len = 0;
   int ret = -1;
   int msgsiz = 0;
-  char msg[PSI_MSG_MAX];
+  char msg[CIS_MSG_MAX];
   int prev = 0;
-  ret = ipc_comm_recv(x, msg, PSI_MSG_MAX);
+  ret = ipc_comm_recv(x, msg, CIS_MSG_MAX);
   if (ret < 0) {
-    debug("ipc_comm_recv_nolimit(%s): failed to receive payload size.", x.name);
+    cislog_debug("ipc_comm_recv_nolimit(%s): failed to receive payload size.", x.name);
     return -1;
   }
   ret = sscanf(msg, "%ld", &len);
   if (ret != 1) {
-    debug("ipc_comm_recv_nolimit(%s): failed to parse payload size (%s)",
-	  x.name, msg);
+    cislog_debug("ipc_comm_recv_nolimit(%s): failed to parse payload size (%s)",
+		 x.name, msg);
     return -1;
   }
   // Reallocate data if necessary
@@ -259,22 +312,22 @@ int ipc_comm_recv_nolimit(const comm_t x, char **data, const int len0){
   }
   ret = -1;
   while (prev < len) {
-    if ((len - prev) > PSI_MSG_MAX)
-      msgsiz = PSI_MSG_MAX;
+    if ((len - prev) > CIS_MSG_MAX)
+      msgsiz = CIS_MSG_MAX;
     else
       msgsiz = len - prev;
     ret = ipc_comm_recv(x, (*data) + prev, msgsiz);
     if (ret < 0) {
-      debug("ipc_comm_recv_nolimit(%s): recv interupted at %d of %d bytes.",
-	    x.name, prev, len);
+      cislog_debug("ipc_comm_recv_nolimit(%s): recv interupted at %d of %d bytes.",
+		   x.name, prev, len);
       break;
     }
     prev += ret;
-    debug("ipc_comm_recv_nolimit(%s): %d of %d bytes received",
-	  x.name, prev, len);
+    cislog_debug("ipc_comm_recv_nolimit(%s): %d of %d bytes received",
+		 x.name, prev, len);
   }
   if (ret > 0) {
-    debug("ipc_comm_recv_nolimit(%s): %d bytes completed", x.name, prev);
+    cislog_debug("ipc_comm_recv_nolimit(%s): %d bytes completed", x.name, prev);
     return prev;
   } else {
     return -1;

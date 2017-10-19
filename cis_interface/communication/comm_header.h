@@ -1,3 +1,4 @@
+#include <../tools.h>
 #include <../dataio/AsciiTable.h>
 
 /*! @brief Flag for checking if this header has already been included. */
@@ -7,16 +8,16 @@
 #define CIS_MSG_HEAD "CIS_MSG_HEAD"
 #define HEAD_VAL_SEP ":CIS:"
 #define HEAD_KEY_SEP ","
-#define BUFSIZ 2000
+#define COMMBUFFSIZ 2000
 
 
 /*! @brief Header information passed by comms for multipart messages. */
 typedef struct comm_head_t {
   int size; //!< Size of incoming message.
-  char address[BUFSIZ]; //!< Address that message will comm in on.
+  char address[COMMBUFFSIZ]; //!< Address that message will comm in on.
   int multipart; //!< 1 if message is multipart, 0 if it is not.
   int bodysiz; //!< Size of body.
-  char *body; //!< Remaining message body following header.
+  int bodybeg; //!< Start of body in header.
   int valid; //!< 1 if the header is valid, 0 otherwise.
 } comm_head_t;
 
@@ -34,7 +35,7 @@ int format_header_entry(char *head, const char *key, const char *value,
   int ret = snprintf(head, headsiz, "%s%s%s%s",
 		     key, HEAD_VAL_SEP, value, HEAD_KEY_SEP);
   if (ret > headsiz) {
-    psilog_error("format_header_entry: Formatted header is larger than bufer.\n");
+    cislog_error("format_header_entry: Formatted header is larger than bufer.\n");
     return -1;
   }
   return ret;
@@ -52,10 +53,10 @@ static inline
 int parse_header_entry(const char *head, const char *key, char *value,
 		       const int valsiz) {
   int ret;
-  int n_match = 0;
   regex_t r;
   // Compile
-  char regex_text[200] = '\0';
+  char regex_text[200];
+  regex_text[0] = '\0';
   strcat(regex_text, key);
   strcat(regex_text, HEAD_VAL_SEP);
   strcat(regex_text, "(.*)");
@@ -99,7 +100,7 @@ int format_comm_header(const comm_head_t head, char *buf, const int bufsiz) {
   // Header tag
   strcpy(buf, CIS_MSG_HEAD);
   // Address entry
-  ret = format_header_entry(head + pos, "address", out.address, bufsiz - pos);
+  ret = format_header_entry(buf + pos, "address", head.address, bufsiz - pos);
   if (ret < 0) {
     cislog_error("Adding address entry would exceed buffer size\n");
     return ret;
@@ -108,8 +109,8 @@ int format_comm_header(const comm_head_t head, char *buf, const int bufsiz) {
   }
   // Size entry
   char size_str[100];
-  sprintf(size_str, "%d", out.size);
-  ret = format_header_entry(head + pos, "size", size_str, bufsiz - pos);
+  sprintf(size_str, "%d", head.size);
+  ret = format_header_entry(buf + pos, "size", size_str, bufsiz - pos);
   if (ret < 0) {
     cislog_error("Adding size entry would exceed buffer size\n");
     return ret;
@@ -117,18 +118,18 @@ int format_comm_header(const comm_head_t head, char *buf, const int bufsiz) {
     pos += ret;
   }
   // Closing header tag
-  buf[pos - strlen(HEAD_KEY_SEP)] = '\0'
+  buf[pos - strlen(HEAD_KEY_SEP)] = '\0';
   strcat(buf, CIS_MSG_HEAD);
-  // Body
-  if (out.body != NULL) {
-    pos += out.bodysiz;
-    if (pos > bufsiz) {
-      cislog_error("Adding body would exceed buffer size\n");
-      return -1;
-    }
-    memcpy(buf, out.body, out.bodysiz);
-    buf[pos] = '\0';
-  }
+  /* // Body */
+  /* if (head.body != NULL) { */
+  /*   pos += head.bodysiz; */
+  /*   if (pos > bufsiz) { */
+  /*     cislog_error("Adding body would exceed buffer size\n"); */
+  /*     return -1; */
+  /*   } */
+  /*   memcpy(buf, head.body, head.bodysiz); */
+  /*   buf[pos] = '\0'; */
+  /* } */
   return pos;
 };
 
@@ -142,13 +143,13 @@ static inline
 comm_head_t parse_comm_header(const char *buf, const int bufsiz) {
   comm_head_t out;
   out.size = 0;
-  out.address = '\0'
+  out.address[0] = '\0';
   out.multipart = 0;
   out.bodysiz = 0;
-  out.body = NULL;
+  out.bodybeg = 0;
   out.valid = 1;
   // Extract just header
-  char re_head[BUFSIZ] = CIS_MSG_HEAD;
+  char re_head[COMMBUFFSIZ] = CIS_MSG_HEAD;
   strcat(re_head, "(.*)");
   strcat(re_head, CIS_MSG_HEAD);
   strcat(re_head, "(.*)");
@@ -159,41 +160,44 @@ comm_head_t parse_comm_header(const char *buf, const int bufsiz) {
     return out;
   } else if (ret == 0) {
     out.multipart = 0;
-    out.size = bufsiz;
-    out.body = (char*)malloc(bufsiz);
-    memcpy(out.body, buf, bufsiz);
+    /* out.size = bufsiz; */
+    /* out.body = (char*)malloc(bufsiz); */
+    /* memcpy(out.body, buf, bufsiz); */
   } else {
     out.multipart = 1;
     // Extract just header
     int sind, eind;
     int ret = find_match(re_head, buf, &sind, &eind);
     int headsiz = (eind-sind);
-    char *head = (char*)malloc(headsiz + strlen(HEAD_KEY_SEP));
     out.bodysiz = bufsiz - headsiz;
-    out.body = (char*)malloc(out.bodysiz);
+    out.bodybeg = eind;
+    char *head = (char*)malloc(headsiz + strlen(HEAD_KEY_SEP));
     memcpy(head, buf + sind, headsiz);
     head[headsiz] = '\0';
-    memcpy(out.body, buf + eind, out.bodysiz);
-    out.body[out.bodysiz] = '\0';
-    strcat(out.body, HEAD_KEY_SEP);
+    strcat(head, HEAD_KEY_SEP);
+    /* out.body = (char*)malloc(out.bodysiz); */
+    /* memcpy(out.body, buf + eind, out.bodysiz); */
+    /* out.body[out.bodysiz] = '\0'; */
     // Extract address
-    ret = parse_header_entry(head, "address", out.address, BUFSIZ);
+    ret = parse_header_entry(head, "address", out.address, COMMBUFFSIZ);
     if (ret < 0) {
       out.valid = 0;
+      free(head);
       return out;
     }
     // Extract size
-    char size_str[BUFSIZ];
-    ret = parse_header_entry(head, "size", size_str, BUFSIZ);
+    char size_str[COMMBUFFSIZ];
+    ret = parse_header_entry(head, "size", size_str, COMMBUFFSIZ);
     if (ret < 0) {
       out.valid = 0;
+      free(head);
       return out;
     }
     out.size = atoi(size_str);
+    free(head);
   }
   return out;
 };
 
 
-
-#endif CISCOMMHEADER_H_
+#endif /*CISCOMMHEADER_H_*/

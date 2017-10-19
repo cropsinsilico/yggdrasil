@@ -12,78 +12,96 @@
 #ifndef CISASCIITABLECOMM_H_
 #define CISASCIITABLECOMM_H_
 
+/*! @brief Number of tables creates. */
+static unsigned _cisAsciiTablesCreated;
+
 /*!
   @brief Initialize a ASCII table comm.
-  @param[in] name Full path to table that should be read from or written to.
-  @param[in] direction Direction that messages will go through the comm.
-  Values include "recv" and "send".
-  @param[in] seri_info Format for formatting/parsing messages.
-  @returns comm_t Comm structure.
+  @param[in] comm comm_t Comm structure initialized with init_comm_base.
+  @returns int -1 if the comm could not be initialized.
  */
 static inline
-comm_t init_ascii_table_comm(const char *name, const char *direction,
-			     const void *seri_info) {
+int init_ascii_table_comm(comm_t *comm) {
   // Don't check base validity since address is name
-  comm_t ret = init_base_comm(name, direction, NULL);
-  ret.type = ASCII_TABLE_COMM;
-  ret.address = name;
+  comm->type = ASCII_TABLE_COMM;
+  strcpy(comm->address, comm->name);
   // Initialize table as handle
-  char *fmt = (char*)seri_info;
+  char *fmt = (char*)(comm->serializer.info);
   asciiTable_t *handle = (asciiTable_t*)malloc(sizeof(asciiTable_t));
-  if (strcmp(ret.direction, "send") == 0)
-    handle[0] = asciiTable(ret.address, "w", fmt,
+  if (strcmp(comm->direction, "send") == 0)
+    handle[0] = asciiTable(comm->address, "w", fmt,
 			   NULL, NULL, NULL);
   else
-    handle[0] = asciiTable(ret.address, "r", NULL,
+    handle[0] = asciiTable(comm->address, "r", NULL,
 			   NULL, NULL, NULL);
-  ret.handle = (void*)handle;
+  comm->handle = (void*)handle;
   // Open the table
   int flag = at_open(handle);
   if (flag != 0) {
-    cislog_error("init_ascii_table_comm: Could not open %s", name);
-    ret.valid = 0;
-    return ret;
+    cislog_error("init_ascii_table_comm: Could not open %s", comm->name);
+    comm->valid = 0;
+    return -1;;
   }
   // Write format to file if "send"
-  if (strcmp(ret.direction, "send") == 0)
+  if (strcmp(comm->direction, "send") == 0)
     at_writeformat(handle[0]);
   // Set AsciiTable serializer
-  ret.serializer.type = ASCII_TABLE_SERI;
-  ret.serializer.info = (void*)handle;
+  comm->serializer.type = ASCII_TABLE_SERI;
+  comm->serializer.info = (void*)handle;
+  return 0;
+};
+
+/*!
+  @brief Create a new ASCII table.
+  @param[in] comm comm_t * Comm structure initialized with new_comm_base.
+  @returns int -1 if the address could not be created.
+*/
+static inline
+int new_ascii_table_address(comm_t *comm) {
+  sprintf(comm->name, "temp%d", _cisChannelsCreated);
+  int ret = init_ascii_table_comm(comm);
   return ret;
 };
 
 /*!
   @brief Initialize a ASCII table comm that will send/recv table as arrays.
-  @param[in] name Full path to table that should be read from or written to.
-  @param[in] direction Direction that messages will go through the comm.
-  Values include "recv" and "send".
-  @param[in] seri_info Format for formatting/parsing messages.
-  @returns comm_t Comm structure.
+  @param[in] comm comm_t Comm structure initialized with init_comm_base.
+  @returns int -1 if the comm could not be initialized.
  */
 static inline
-comm_t init_ascii_table_array_comm(const char *name, const char *direction,
-				   const void *seri_info) {
-  comm_t ret = init_ascii_table_comm(name, direction, seri_info);
-  ret.serializer.type = ASCII_TABLE_ARRAY_SERI;
+int init_ascii_table_array_comm(comm_t *comm) {
+  int ret = init_ascii_table_comm(comm);
+  comm->serializer.type = ASCII_TABLE_ARRAY_SERI;
+  return ret;
+};
+
+/*!
+  @brief Create a new ASCII table that will send/recv table as arrays.
+  @param[in] comm comm_t * Comm structure initialized with new_comm_base.
+  @returns int -1 if the address could not be created.
+*/
+static inline
+int new_ascii_table_array_address(comm_t *comm) {
+  sprintf(comm->name, "temp%d", _cisChannelsCreated);
+  int ret = init_ascii_table_array_comm(comm);
   return ret;
 };
 
 /*!
   @brief Perform deallocation for ASCII table communicator.
-  @param[in] comm_t Communicator to deallocate.
+  @param[in] x comm_t* Pointer to communicator to deallocate.
   @returns int 1 if there is and error, 0 otherwise.
 */
 static inline
-int free_ascii_table_comm(comm_t x) {
-  if (ret.handle != NULL) {
-    asciiTable_t *table = (asciiTable_t*)x.handle;
+int free_ascii_table_comm(comm_t *x) {
+  if (x->handle != NULL) {
+    asciiTable_t *table = (asciiTable_t*)x->handle;
     at_close(table);
     at_cleanup(table);
-    free(x.handle);
-    x.handle = NULL;
+    free(x->handle);
+    x->handle = NULL;
   }
-  return free_base_comm(x);
+  return 0;
 };
 
 /*!
@@ -110,7 +128,7 @@ static inline
 int ascii_table_comm_send(const comm_t x, const char *data, const int len) {
   if (is_eof(data))
     return 0;
-  asciiTable_t table = (asciiTable_t*)x.handle;
+  asciiTable_t *table = (asciiTable_t*)x.handle;
   return at_writeline_full(table[0], data);
 };
 
@@ -126,7 +144,7 @@ int ascii_table_comm_send(const comm_t x, const char *data, const int len) {
  */
 static inline
 int ascii_table_comm_recv(const comm_t x, char *data, const int len) {
-  asciiTable_t table = (asciiTable_t*)x.handle;
+  asciiTable_t *table = (asciiTable_t*)x.handle;
   return at_readline_full(table[0], data, len);
 };
 

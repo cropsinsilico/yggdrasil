@@ -38,7 +38,7 @@
       3. Send:
 	    ret = cis_send(output_channel, buffer, strlen(buffer));
       4. Free:
-            cis_free(output_channel);
+            cis_free(&output_channel);
 
   Input Usage:
       1. One-time: Create output channel (store in named variables)
@@ -48,35 +48,9 @@
       3. Receive:
             int ret = cis_recv(input_channel, buffer, CIS_MSG_MAX);
       4. Free:
-            cis_free(input_channel);
+            cis_free(&input_channel);
 */
 //==============================================================================
-
-/*!
-  @brief Constructor for cisOutput_t output structure.
-  Create a cisOutput_t structure based on a provided name that is used to
-  locate a particular comm address stored in the environment variable name.
-  @param[in] name constant character pointer to name of queue.
-  @returns cisOutput_t output queue structure.
- */
-static inline
-cisOutput_t cisOutput(const char *name) {
-  cisOutput_t ret = init_comm(name, "send", _default_comm, NULL);
-  return ret;
-};
-
-/*!
-  @brief Constructor for cisInput_t structure.
-  Create a cisInput_t structure based on a provided name that is used to
-  locate a particular comm address stored in the environment variable name.
-  @param[in] name constant character pointer to name of queue.
-  @returns cisInput_t input queue structure.
- */
-static inline
-cisInput_t cisInput(const char *name){
-  cisInput_t ret = init_comm(name, "recv", _default_comm, NULL);
-  return ret;
-};
 
 /*!
   @brief Constructor for cisOutput_t structure with format.
@@ -89,8 +63,12 @@ cisInput_t cisInput(const char *name){
   @returns cisOutput_t output queue structure.
  */
 static inline
-cisOutput_t cisOutputFmt(const char *name, const char *fmtString){
-  cisOutput_t ret = init_comm(name, "send", _default_comm, fmtString);
+cisOutput_t cisOutputFmt(const char *name, char *fmtString){
+  char name_suffix[CIS_MSG_MAX];
+  strcpy(name_suffix, name);
+  strcat(name_suffix, "_OUT");
+  cisOutput_t ret = init_comm(name_suffix, "send", _default_comm,
+			      (void*)fmtString);
   return ret;
 };
 
@@ -104,8 +82,38 @@ cisOutput_t cisOutputFmt(const char *name, const char *fmtString){
   @returns cisInput_t input queue structure.
  */
 static inline
-cisInput_t cisInputFmt(const char *name, const char *fmtString){
-  cisInput_t ret = init_comm(name, "recv", _default_comm, fmtString);
+cisInput_t cisInputFmt(const char *name, char *fmtString){
+  char name_suffix[CIS_MSG_MAX];
+  strcpy(name_suffix, name);
+  strcat(name_suffix, "_IN");
+  cisInput_t ret = init_comm(name_suffix, "recv", _default_comm,
+			     (void*)fmtString);
+  return ret;
+};
+
+/*!
+  @brief Constructor for cisOutput_t output structure.
+  Create a cisOutput_t structure based on a provided name that is used to
+  locate a particular comm address stored in the environment variable name.
+  @param[in] name constant character pointer to name of queue.
+  @returns cisOutput_t output queue structure.
+ */
+static inline
+cisOutput_t cisOutput(const char *name) {
+  cisOutput_t ret = cisOutputFmt(name, NULL);
+  return ret;
+};
+
+/*!
+  @brief Constructor for cisInput_t structure.
+  Create a cisInput_t structure based on a provided name that is used to
+  locate a particular comm address stored in the environment variable name.
+  @param[in] name constant character pointer to name of queue.
+  @returns cisInput_t input queue structure.
+ */
+static inline
+cisInput_t cisInput(const char *name){
+  cisInput_t ret = cisInputFmt(name, NULL);
   return ret;
 };
 
@@ -203,7 +211,7 @@ int cis_recv_nolimit(const cisInput_t cisQ, char **data, const int len0){
       2. Send:
 	    ret = cisSend(output_channel, 1, 2);
       3. Free:
-            cis_free(output_channel);
+            cis_free(&output_channel);
 
   Input Usage:
       1. One-time: Create output channel with format specifier.
@@ -213,7 +221,7 @@ int cis_recv_nolimit(const cisInput_t cisQ, char **data, const int len0){
       3. Receive:
             int ret = cisRecv(input_channel, &a, &b);
       4. Free:
-            cis_free(input_channel);
+            cis_free(&input_channel);
 */
 //==============================================================================
 
@@ -379,7 +387,7 @@ int cisRecv_nolimit(const cisInput_t cisQ, ...) {
       5. Send response:
 	    ret = rpcSend(srv, b, c);
       6. Free:
-            cis_free(srv);
+            cis_free(&srv);
 
   Client Usage:
       1. One-time: Create client channels to desired server with format
@@ -391,7 +399,7 @@ int cisRecv_nolimit(const cisInput_t cisQ, ...) {
       3. Call server:
             int ret = rpcCall(cli, 1, &b, &c);
       4. Free:
-            cis_free(cli);
+            cis_free(&cli);
 
    Clients can also send several requests at once before receiving any
    responses. This allows the server to be processing the next requests
@@ -411,6 +419,16 @@ typedef struct cisRpc_t {
   cisInput_t _input; //!< Input queue structure.
   cisOutput_t _output; //!< Output queue structure.
 } cisRpc_t;
+
+/*!
+  @brief Free an RPC structure.
+  @param[in] x cisRpc_t * Pointer to structure to be deallocated.
+*/
+static inline
+void cis_free_rpc(cisRpc_t *x) {
+  cis_free(&(x->_input));
+  cis_free(&(x->_output));
+};
 
 /*!
   @brief Constructor for RPC structure.
@@ -638,6 +656,10 @@ int rpcCall(const cisRpc_t rpc,  ...){
 */
 //==============================================================================
 
+/*! @brief Definitions for file sturctures. */
+#define cisAsciiFileInput_t psiAsciiFileInput_t
+#define cisAsciiFileOutput_t psiAsciiFileOutput_t
+
 /*!
   @brief Constructor for AsciiFile output comm.
   Based on the value of dst_type, either a local file will be opened for output
@@ -765,6 +787,10 @@ comm_t cisAsciiFileInput(const char *name, const int src_type) {
 */
 //==============================================================================
 
+/*! @brief Definitions for table sturctures. */
+#define cisAsciiTableInput_t psiAsciiTableInput_t
+#define cisAsciiTableOutput_t psiAsciiTableOutput_t
+
 /*!
   @brief Constructor for table output comm.
   @param[in] name constant character pointer to local file path or message
@@ -782,14 +808,13 @@ comm_t cisAsciiTableOutput(const char *name, const char *format_str,
 			   const int as_array, const int dst_type) {
   comm_type type;
   if (dst_type == 0)
-    comm_type = ASCII_TABLE_COMM;
+    type = ASCII_TABLE_COMM;
   else
-    comm_type = _default_comm;
+    type = _default_comm;
   comm_t out = init_comm(name, "send", type, (void*)format_str);
-  out.nolimit = 1;
   // For connection, send format and initialize serializer
   if (dst_type != 0) {
-    int ret = comm_send_nolimit(out, format_str, strlen(format_str));
+    int ret = comm_send(out, format_str, strlen(format_str));
     if (ret < 0) {
       cislog_error("cisAsciiTableOutput: Failed to send format string.\n");
       out.valid = 0;
@@ -821,15 +846,14 @@ static inline
 comm_t cisAsciiTableInput(const char *name, const int as_array, const int src_type) {
   comm_type type;
   if (src_type == 0)
-    comm_type = ASCII_TABLE_COMM;
+    type = ASCII_TABLE_COMM;
   else
-    comm_type = _default_comm;
+    type = _default_comm;
   comm_t out = init_comm(name, "recv", type, NULL);
-  out.nolimit = 1;
   // For connection, receive format and initialize serializer
   if (src_type != 0) {
     char format_str[CIS_MSG_MAX];
-    int ret = comm_recv_nolimit(out, format_str, CIS_MSG_MAX);
+    int ret = comm_recv(out, format_str, CIS_MSG_MAX);
     if (ret < 0) {
       cislog_error("cisAsciiTableInput: Failed to recv format string.\n");
       out.valid = 0;

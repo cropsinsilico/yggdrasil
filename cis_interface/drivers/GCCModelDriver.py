@@ -9,6 +9,8 @@ from cis_interface.drivers.ModelDriver import ModelDriver
 _top_dir = os.path.normpath(os.path.join(os.path.dirname(__file__), '../'))
 _incl_interface = os.path.join(_top_dir, 'interface')
 _incl_io = os.path.join(_top_dir, 'io')
+_incl_seri = os.path.join(_top_dir, 'serialize')
+_incl_comm = os.path.join(_top_dir, 'communication')
 
 
 class GCCModelDriver(ModelDriver):
@@ -40,7 +42,7 @@ class GCCModelDriver(ModelDriver):
         # TODO: Allow user to provide a makefile
         self.compile_setup(self.args.pop(0))
         compile_args = [self.gcc, "-g", "-Wall"] + self.flags
-        for x in [_incl_interface, _incl_io]:
+        for x in [_incl_interface, _incl_io, _incl_comm, _incl_seri]:
             compile_args += ["-I" + x]
         run_args = [os.path.join(".", self.efile)]
         for arg in self.args:

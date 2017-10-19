@@ -25,7 +25,7 @@
 static inline
 int serialize_ascii_table(const seri_t s, char *buf, const int buf_siz, va_list ap) {
   asciiTable_t *table = (asciiTable_t*)s.info;
-  int ret = at_vrow_to_bytes(table, buf, buf_siz, ap);
+  int ret = at_vrow_to_bytes(*table, buf, buf_siz, ap);
   return ret;
 };
 
@@ -40,7 +40,7 @@ int serialize_ascii_table(const seri_t s, char *buf, const int buf_siz, va_list 
 static inline
 int deserialize_ascii_table(const seri_t s, const char *buf, const int buf_siz, va_list ap) {
   asciiTable_t *table = (asciiTable_t*)s.info;
-  int ret = at_vbytes_to_row(table, buf, ap);
+  int ret = at_vbytes_to_row(*table, buf, ap);
   return ret;
 };
 
@@ -59,7 +59,7 @@ static inline
 int serialize_ascii_table_array(const seri_t s, char *buf, const int buf_siz,
 				va_list ap) {
   asciiTable_t *table = (asciiTable_t*)s.info;
-  int ret = at_varray_to_bytes(table, buf, buf_siz, ap);
+  int ret = at_varray_to_bytes(*table, buf, buf_siz, ap);
   return ret;
 };
 
@@ -76,7 +76,7 @@ static inline
 int deserialize_ascii_table_array(const seri_t s, const char *buf,
 				  const int buf_siz, va_list ap) {
   asciiTable_t *table = (asciiTable_t*)s.info;
-  int ret = at_vbytes_to_array(table, buf, ap);
+  int ret = at_vbytes_to_array(*table, buf, buf_siz, ap);
   return ret;
 };
 

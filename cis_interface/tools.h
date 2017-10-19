@@ -9,7 +9,7 @@
 #define CISTOOLS_H_
 
 /*! @brief Maximum message size. */
-#define CIS_MSG_MAX 1024*2
+#define CIS_MSG_MAX 2048
 /*! @brief End of file message. */
 #define CIS_MSG_EOF "EOF!!!"
 
@@ -99,18 +99,18 @@ void cisError(const char* fmt, ...) {
 #define cislog_error cisError
 #ifdef CIS_DEBUG
   #if CIS_DEBUG == INFO
-    #define info cisInfo
-    #define debug while (0) cisDebug
+    #define cislog_info cisInfo
+    #define cislog_debug while (0) cisDebug
   #elif CIS_DEBUG == DEBUG
-    #define debug cisInfo
-    #define info cisDebug
+    #define cislog_debug cisInfo
+    #define cislog_info cisDebug
   #else
-    #define debug while (0) cisDebug
-    #define info while (0) cisInfo
+    #define cislog_debug while (0) cisDebug
+    #define cislog_info while (0) cisInfo
   #endif
 #else
-  #define debug while (0) cisDebug
-  #define info while (0) cisInfo
+  #define cislog_debug while (0) cisDebug
+  #define cislog_info while (0) cisInfo
 #endif
 
 /*!
