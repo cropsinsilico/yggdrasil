@@ -74,7 +74,7 @@ static inline
 int remove_comm(const comm_t comm) {
   int ich = atoi(comm.address);
   int ret = msgctl(((int*)comm.handle)[0], IPC_RMID, NULL);
-  if ((ret != -1) && (ich == (_cisChannelsUsed - 1))) {
+  if ((ret != -1) && (ich == (int)(_cisChannelsUsed - 1))) {
     /* memmove(_cisChannelNames + ich, _cisChannelNames + ich + 1, */
     /* 	    (_cisTrackChannels - (ich + 1))*sizeof(char*)); */
     _cisChannelsUsed--;
