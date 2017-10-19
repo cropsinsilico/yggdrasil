@@ -78,7 +78,7 @@ class AsciiFile(object):
         r"""Close the associated file descriptor if it is open."""
         if self.is_open:
             self.fd.close()
-            self.fd = None
+        self.fd = None
 
     def readline(self):
         r"""Continue reading lines until a valid line (uncommented) is

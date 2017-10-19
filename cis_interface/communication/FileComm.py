@@ -61,18 +61,25 @@ class FileComm(CommBase.CommBase):
             else:
                 self.fd = open(self.address, 'wb')
 
-    def open(self):
-        r"""Open the file."""
-        global _N_FILES
-        self._open()
-        _N_FILES += 1
-
-    def close(self):
-        r"""Close the file."""
+    def _close(self):
         if self.is_open:
             os.fsync(self.fd.fileno())
             self.fd.close()
         self.fd = None
+
+    def open(self):
+        r"""Open the file."""
+        global _N_FILES
+        if not self.is_open:
+            _N_FILES += 1
+        self._open()
+
+    def close(self):
+        r"""Close the file."""
+        global _N_FILES
+        if self.is_open:
+            _N_FILES -= 1
+        self._close()
 
     def remove_file(self):
         r"""Remove the file."""
