@@ -41,6 +41,8 @@ class ConnectionDriver(Driver):
         self.ocomm_kws = ocomm_kws
         self.env[self.ocomm.name] = self.ocomm.address
         # Attributes
+        # print self.icomm.name, self.icomm.address
+        # print self.ocomm.name, self.ocomm.address
         self.nrecv = 0
         self.nproc = 0
         self.nsent = 0

@@ -30,7 +30,12 @@ class Driver(CisClass, Thread):
     # METHODS THAT MUST HAVE SUPER AT BEGINNING AND CAN BE OVERRIDEN BY CHILD
     # CLASSES TO ADD DRIVER FUNCTIONALITY. ALL OF THE CHILD CLASSES MUST HAVE
     # COMPATIBLE FORMATS (THE SAME NAMED ARGUMENTS).
-    def __init__(self, name, yml={}, env={}, namespace=None, rank=None, **kwargs):
+    def __init__(self, name, yml=None, env=None, namespace=None, rank=None,
+                 **kwargs):
+        if yml is None:
+            yml = {}
+        if env is None:
+            env = {}
         # Check if thread initialized to avoid doing it twice for drivers
         # with multiple inheritance that both need to call __init__
         if getattr(self, '_thread_initialized', False):  # pragma: debug

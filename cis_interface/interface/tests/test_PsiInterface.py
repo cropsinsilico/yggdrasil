@@ -3,15 +3,14 @@ import numpy as np
 import nose.tools as nt
 from cis_interface.interface import PsiInterface
 from cis_interface.tools import PSI_MSG_EOF, PSI_MSG_MAX
-from cis_interface.drivers import import_driver, CommDriver
-from cis_interface.tests import CisTest
-from cis_interface.drivers.tests.test_IODriver import IOInfo
+from cis_interface.drivers import import_driver, CommDriver, InputCommDriver
+from cis_interface.tests import CisTest, IOInfo
 
 
 def test_PsiMatlab_class():
     r"""Test Matlab interface for classes."""
     name = 'test'
-    drv = CommDriver.CommDriver(name, direction='send')
+    drv = InputCommDriver.InputCommDriver(name, direction='send')
     drv.start()
     os.environ.update(drv.env)
     PsiInterface.PsiMatlab('PsiInput', (name,))
@@ -31,10 +30,10 @@ class TestBase(CisTest, IOInfo):
         super(TestBase, self).__init__(*args, **kwargs)
         IOInfo.__init__(self)
         self._mod = 'cis_interface.interface.PsiInterface'
-        self.name = 'test'
+        self.name = 'test' + self.uuid
         self.driver = None
         self.driver_name = 'CommDriver'
-        self.driver_args = []
+        self.driver_args = [self.name]
         self._driver_kwargs = {}
         self._inst_args = [self.name]
 
@@ -68,14 +67,7 @@ class TestPsiInput(TestBase):
     def __init__(self, *args, **kwargs):
         super(TestPsiInput, self).__init__(*args, **kwargs)
         self._cls = 'PsiInput'
-        self.driver_args = [self.name]
-
-    @property
-    def driver_kwargs(self):
-        r"""Keyword arguments for the driver."""
-        out = super(TestPsiInput, self).driver_kwargs
-        out['direction'] = 'send'
-        return out
+        self.driver_name = 'InputCommDriver'
 
     def test_init(self):
         r"""Test error on init."""
@@ -102,14 +94,7 @@ class TestPsiOutput(TestBase):
     def __init__(self, *args, **kwargs):
         super(TestPsiOutput, self).__init__(*args, **kwargs)
         self._cls = 'PsiOutput'
-        self.driver_args = [self.name]
-
-    @property
-    def driver_kwargs(self):
-        r"""Keyword arguments for the driver."""
-        out = super(TestPsiOutput, self).driver_kwargs
-        out['direction'] = 'recv'
-        return out
+        self.driver_name = 'OutputCommDriver'
 
     def test_init(self):
         r"""Test error on init."""
@@ -137,10 +122,18 @@ class TestPsiRpc(TestBase):
     def __init__(self, *args, **kwargs):
         super(TestPsiRpc, self).__init__(*args, **kwargs)
         self._cls = 'PsiRpc'
+        self.driver_name = 'RPCCommDriver'
         self._inst_args = [self.name, self.fmt_str,
                            self.name, self.fmt_str]
         self.driver_args = [self.name]
 
+    @property
+    def driver_kwargs(self):
+        r"""Keyword arguments for the driver."""
+        out = super(TestPsiRpc, self).driver_kwargs
+        out['comm'] = 'RPCComm'
+        return out
+        
     def test_rpcSendRecv(self):
         r"""Test sending/receiving formated output."""
         var_send = self.file_rows[0]
@@ -520,7 +513,8 @@ class TestPsiPickleOutput(TestBase):
         # assert(msg_flag)
         # Read temp file
         Tout = self.instance.start_timeout()
-        while self.file_comm.is_open and not Tout.is_out:
+        while ((self.file_comm.is_open or (os.stat(self.tempfile).st_size == 0))
+               and not Tout.is_out):
             self.instance.sleep()
         self.instance.stop_timeout()
         # Read temp file
