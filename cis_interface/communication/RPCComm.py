@@ -218,3 +218,16 @@ class RPCComm(CommBase.CommBase):
     def call_nolimit(self, *args, **kwargs):
         r"""Alias for call."""
         return self.call(*args, **kwargs)
+
+    # OLD STYLE ALIASES
+    def rpcSend(self, *args, **kwargs):
+        r"""Alias for RPCComm.send"""
+        return self.send(*args, **kwargs)
+
+    def rpcRecv(self, *args, **kwargs):
+        r"""Alias for RPCComm.recv"""
+        return self.recv(*args, **kwargs)
+    
+    def rpcCall(self, *args, **kwargs):
+        r"""Alias for RPCComm.call"""
+        return self.call(*args, **kwargs)

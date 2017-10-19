@@ -23,7 +23,7 @@ rpc = PsiRpcClient("maxMsgSrv_maxMsgCli", "%s", "%s")
 output = rand_str(PSI_MSG_MAX - 1)
 
 # Call RPC server
-ret, input = rpc.call(output)
+ret, input = rpc.rpcCall(output)
 if not ret:
     print("maxMsgCli(P): RPC ERROR")
     sys.exit(-1)
