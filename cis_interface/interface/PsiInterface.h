@@ -442,8 +442,8 @@ void cis_free_rpc(cisRpc_t *x) {
   @return cisRpc_t structure with provided info.
  */
 static inline 
-cisRpc_t cisRpc(const char *outName, const char *outFormat,
-		const char *inName, const char *inFormat){
+cisRpc_t cisRpc(const char *outName, char *outFormat,
+		const char *inName, char *inFormat){
   cisRpc_t rpc;
   rpc._input = cisInputFmt(inName, inFormat);
   rpc._output = cisOutputFmt(outName, outFormat);
@@ -461,7 +461,7 @@ cisRpc_t cisRpc(const char *outName, const char *outFormat,
   @return cisRpc_t structure with provided info.
  */
 static inline 
-cisRpc_t cisRpcClient(const char *name, const char *outFormat, const char *inFormat){
+cisRpc_t cisRpcClient(const char *name, char *outFormat, char *inFormat){
   cisRpc_t rpc = cisRpc(name, outFormat, name, inFormat);
   return rpc;
 };
@@ -477,7 +477,7 @@ cisRpc_t cisRpcClient(const char *name, const char *outFormat, const char *inFor
   @return cisRpc_t structure with provided info.
  */
 static inline 
-cisRpc_t cisRpcServer(const char *name, const char *inFormat, const char *outFormat){
+cisRpc_t cisRpcServer(const char *name, char *inFormat, char *outFormat){
   cisRpc_t rpc = cisRpc(name, outFormat, name, inFormat);
   return rpc;
 };
@@ -657,8 +657,8 @@ int rpcCall(const cisRpc_t rpc,  ...){
 //==============================================================================
 
 /*! @brief Definitions for file sturctures. */
-#define cisAsciiFileInput_t psiAsciiFileInput_t
-#define cisAsciiFileOutput_t psiAsciiFileOutput_t
+#define cisAsciiFileInput_t comm_t
+#define cisAsciiFileOutput_t comm_t
 
 /*!
   @brief Constructor for AsciiFile output comm.
@@ -788,8 +788,8 @@ comm_t cisAsciiFileInput(const char *name, const int src_type) {
 //==============================================================================
 
 /*! @brief Definitions for table sturctures. */
-#define cisAsciiTableInput_t psiAsciiTableInput_t
-#define cisAsciiTableOutput_t psiAsciiTableOutput_t
+#define cisAsciiTableInput_t comm_t
+#define cisAsciiTableOutput_t comm_t
 
 /*!
   @brief Constructor for table output comm.
@@ -899,13 +899,13 @@ comm_t cisAsciiTableInput(const char *name, const int as_array, const int src_ty
 #define psiRpcClient cisRpcClient
 #define psiRpcServer cisRpcServer
 #define psiAsciiFileInput_t cisAsciiFileInput_t
-#define psiAsciiFileInput cisAsciiFileInput
+#define psiAsciiFileInput cisAsciiFileInput_t
 #define psiAsciiFileOutput_t cisAsciiFileOutput_t
-#define psiAsciiFileOutput cisAsciiFileOutput
+#define psiAsciiFileOutput cisAsciiFileOutput_t
 #define psiAsciiTableInput_t cisAsciiTableInput_t
-#define psiAsciiTableInput cisAsciiTableInput
+#define psiAsciiTableInput cisAsciiTableInput_t
 #define psiAsciiTableOutput_t cisAsciiTableOutput_t
-#define psiAsciiTableOutput cisAsciiTableOutput
+#define psiAsciiTableOutput cisAsciiTableOutput_t
 
 
 #endif /*PSIINTERFACE_H_*/
