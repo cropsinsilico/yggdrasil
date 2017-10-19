@@ -273,18 +273,20 @@ class RMQComm(CommBase.CommBase):
             raise
         return out
 
-    def _recv(self, timeout=0):
+    def _recv(self, timeout=None):
         r"""Receive a message.
 
         Args:
-            timeout (float, optional): Time, in seconds, that should be waited
-                for a message. Defaults to 0.
+            timeout (float, optional): Time in seconds to wait for a message.
+                Defaults to self.recv_timeout.
 
         Returns:
             tuple (bool, obj): Success or failure of receive and received
                 message.
 
         """
+        if timeout is None:
+            timeout = self.recv_timeout
         Tout = self.start_timeout(timeout)
         while self.n_msg == 0 and self.is_open and (not Tout.is_out):
             self.sleep()

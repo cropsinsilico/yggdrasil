@@ -93,6 +93,10 @@ class AsciiTableComm(AsciiFileComm):
     def _recv(self, timeout=0, **kwargs):
         r"""Reads message from a file.
 
+        Args:
+            timeout (float, optional): Time in seconds to wait for a message.
+                Defaults to self.recv_timeout. Unused.
+
         Returns:
             tuple(bool, str): Success or failure of reading from the file.
 

@@ -249,6 +249,9 @@ class ConnectionDriver(Driver):
             if msg is False:
                 self.debug(':run: Could not process message.')
                 break
+            elif len(msg) == 0:
+                self.debug(':run: Message skipped.')
+                continue
             self.nproc += 1
             self.state = 'processed'
             self.debug(':run: Processed message.')
