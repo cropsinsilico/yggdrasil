@@ -58,7 +58,7 @@ def PsiInput(name, format_str=None, matlab=False):
     if matlab and format_str is not None:  # pragma: matlab
         format_str = backwards.decode_escape(format_str)
     return DefaultComm(name + '_IN', direction='recv',
-                       format_str=format_str)
+                       format_str=format_str, recv_timeout=False)
     
 
 def PsiOutput(name, format_str=None, matlab=False):
@@ -79,7 +79,7 @@ def PsiOutput(name, format_str=None, matlab=False):
     if matlab and format_str is not None:  # pragma: matlab
         format_str = backwards.decode_escape(format_str)
     return DefaultComm(name + '_OUT', direction='send',
-                       format_str=format_str)
+                       format_str=format_str, recv_timeout=False)
 
     
 def PsiRpc(outname, outfmt, inname, infmt, matlab=False):  
@@ -100,11 +100,23 @@ def PsiRpc(outname, outfmt, inname, infmt, matlab=False):
     if matlab:  # pragma: matlab
         infmt = backwards.decode_escape(infmt)
         outfmt = backwards.decode_escape(outfmt)
-    icomm_kwargs = dict(name=inname + '_IN', format_str=infmt)
-    ocomm_kwargs = dict(name=outname + '_OUT', format_str=outfmt)
-    return RPCComm.RPCComm('%s_%s' % (inname, outname),
-                           icomm_kwargs=icomm_kwargs,
-                           ocomm_kwargs=ocomm_kwargs)
+    icomm_kwargs = dict(format_str=infmt)
+    ocomm_kwargs = dict(format_str=outfmt)
+    if inname == outname:
+        name = inname
+    else:
+        name = '%s_%s' % (inname, outname)
+        icomm_kwargs['name'] = inname + '_IN'
+        ocomm_kwargs['name'] = outname + '_OUT'
+    out = RPCComm.RPCComm(name,
+                          icomm_kwargs=icomm_kwargs,
+                          ocomm_kwargs=ocomm_kwargs, recv_timeout=False)
+    # print 80*'='
+    # print out.__class__
+    # print out.name
+    # print out.icomm.name, out.icomm.address
+    # print out.ocomm.name, out.ocomm.address
+    return out
 
 
 def PsiRpcServer(name, infmt, outfmt, matlab=False):
@@ -165,7 +177,7 @@ def PsiAsciiFileInput(name, src_type=1, matlab=False, **kwargs):
     else:
         base = DefaultComm
     kwargs.setdefault('direction', 'recv')
-    return base(name, **kwargs)
+    return base(name, recv_timeout=False, **kwargs)
 
 
 def PsiAsciiFileOutput(name, dst_type=1, matlab=False, **kwargs):
@@ -191,7 +203,7 @@ def PsiAsciiFileOutput(name, dst_type=1, matlab=False, **kwargs):
     else:
         base = DefaultComm
     kwargs.setdefault('direction', 'send')
-    return base(name, **kwargs)
+    return base(name, recv_timeout=False, **kwargs)
             
 
 # Specialized classes for ascii table IO
@@ -223,7 +235,7 @@ def PsiAsciiTableInput(name, src_type=1, as_array=False, matlab=False, **kwargs)
     kwargs.setdefault('direction', 'recv')
     if src_type == 0:
         kwargs['as_array'] = as_array
-    out = base(name, **kwargs)
+    out = base(name, recv_timeout=False, **kwargs)
     if src_type == 1:
         ret, format_str = out.recv(timeout=out.timeout)
         if not ret:  # pragma: debug
@@ -270,7 +282,7 @@ def PsiAsciiTableOutput(name, fmt, dst_type=1, as_array=False, matlab=False,
     if dst_type == 0:
         kwargs['as_array'] = as_array
         kwargs['format_str'] = fmt
-    out = base(name, **kwargs)
+    out = base(name, recv_timeout=False, **kwargs)
     if dst_type == 1:
         ret = out.send(backwards.decode_escape(fmt))
         if not ret:  # pragma: debug
@@ -305,7 +317,7 @@ def PsiPickleInput(name, src_type=1, matlab=False, **kwargs):
     else:
         base = DefaultComm
     kwargs.setdefault('direction', 'recv')
-    out = base(name, **kwargs)
+    out = base(name, recv_timeout=False, **kwargs)
     out.meth_deserialize = PickleDeserialize.PickleDeserialize()
     return out
 
@@ -331,6 +343,6 @@ def PsiPickleOutput(name, dst_type=1, matlab=False, **kwargs):
     else:
         base = DefaultComm
     kwargs.setdefault('direction', 'send')
-    out = base(name, **kwargs)
+    out = base(name, recv_timeout=False, **kwargs)
     out.meth_serialize = PickleSerialize.PickleSerialize()
     return out

@@ -240,7 +240,7 @@ class ZMQComm(CommBase.CommBase):
 
         Args:
             msg (str): Message to send.
-            **kwargs: Additional keyword arguments are apssed to _send.
+            **kwargs: Additional keyword arguments are passed to _send.
 
         Returns:
             bool: Success or failure of sending the message.
@@ -299,11 +299,12 @@ class ZMQComm(CommBase.CommBase):
         out = super(ZMQComm, self)._recv_multipart(*args, **kwargs)
         return out
     
-    def _recv(self, timeout=0, **kwargs):
-        r"""Receive a message.
+    def _recv(self, timeout=None, **kwargs):
+        r"""Receive a message from the ZMQ socket.
 
         Args:
-            timeout (str): Time in seconds to wait for a message. Defaults to 0.
+            timeout (float, optional): Time in seconds to wait for a message.
+                Defaults to self.recv_timeout.
             **kwargs: Additional keyword arguments are passed to socket send.
 
         Returns:
@@ -314,6 +315,8 @@ class ZMQComm(CommBase.CommBase):
         if self.is_closed:
             self.error(".recv(): Socket closed")
             return (False, None)
+        if timeout is None:
+            timeout = self.recv_timeout
         self.sleep()
         ret = self.socket.poll(timeout=1000.0 * timeout)
         if ret == 0:

@@ -188,7 +188,7 @@ class IPCComm(CommBase.CommBase):
         if self.is_open:
             try:
                 remove_queue(self.q)
-            except KeyError:
+            except (KeyError, sysv_ipc.ExistentialError):
                 pass
             self.q = None
             self._bound = False
@@ -226,9 +226,12 @@ class IPCComm(CommBase.CommBase):
         self.q.send(payload)
         return True
 
-    def _recv(self, timeout=0):
-        r"""Receive a message smaller than CIS_MSG_MAX. The process will
-        sleep until there is a message in the queue to receive.
+    def _recv(self, timeout=None):
+        r"""Receive a message from the IPC queue.
+
+        Args:
+            timeout (float, optional): Time in seconds to wait for a message.
+                Defaults to self.recv_timeout.
 
         Returns:
             tuple (bool, str): The success or failure of receiving a message
@@ -236,6 +239,8 @@ class IPCComm(CommBase.CommBase):
 
         """
         # Sleep until there is a message
+        if timeout is None:
+            timeout = self.recv_timeout
         Tout = self.start_timeout(timeout)
         while self.n_msg == 0 and self.is_open and (not Tout.is_out):
             # self.debug("recv(): no data, sleep")

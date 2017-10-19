@@ -1,5 +1,7 @@
+import os
 from cis_interface.drivers.ConnectionDriver import ConnectionDriver
 from cis_interface.drivers.ServerResponseDriver import ServerResponseDriver
+from cis_interface.drivers.ClientRequestDriver import CIS_CLIENT_INI
 
 
 class ServerRequestDriver(ConnectionDriver):
@@ -19,6 +21,7 @@ class ServerRequestDriver(ConnectionDriver):
         comm (str): The comm class that should be used to communicate
             with the server driver. Defaults to _default_comm.
         response_drivers (list): Response drivers created for each request.
+        nclients (int): Number of clients signed on.
 
     """
 
@@ -35,11 +38,22 @@ class ServerRequestDriver(ConnectionDriver):
         ocomm_kws = kwargs.get('ocomm_kws', {})
         ocomm_kws['comm'] = 'RPCComm'
         ocomm_kws['name'] = model_request_name
+        ocomm_kws['reverse_names'] = True
         kwargs['ocomm_kws'] = ocomm_kws
         super(ServerRequestDriver, self).__init__(model_request_name, **kwargs)
+        os.environ[self.icomm.name] = self.icomm.address 
+        self.env[self.icomm.name] = self.icomm.address
+        self.env[self.ocomm.icomm.name] = self.ocomm.icomm.address
+        self.env[self.ocomm.ocomm.name] = self.ocomm.ocomm.address
         self.response_drivers = []
+        self.nclients = 0
         assert(not hasattr(self, 'comm'))
         self.comm = comm
+        # print 80*'='
+        # print self.__class__
+        # print self.env
+        # print self.icomm.name, self.icomm.address
+        # print self.ocomm.name, self.ocomm.address
 
     @property
     def model_request_name(self):
@@ -90,6 +104,29 @@ class ServerRequestDriver(ConnectionDriver):
             x.terminate()
         super(ServerRequestDriver, self).terminate(*args, **kwargs)
 
+    def on_eof(self):
+        r"""On EOF, decrement number of clients. Only send EOF if the number
+        of clients drops to 0."""
+        self.nclients -= 1
+        if self.nclients == 0:
+            self.icomm._last_header['response_address'] = 'EOF'
+            super(ServerRequestDriver, self).on_eof()
+
+    def on_message(self, msg):
+        r"""Process a message checking to see if it is a client signing on.
+
+        Args:
+            msg (bytes, str): Message to be processed.
+
+        Returns:
+            bytes, str: Processed message.
+
+        """
+        if msg == CIS_CLIENT_INI:
+            self.nclients += 1
+            msg = ''
+        return super(ServerRequestDriver, self).on_message(msg)
+    
     def send_message(self, *args, **kwargs):
         r"""Send a single message.
 
@@ -102,10 +139,11 @@ class ServerRequestDriver(ConnectionDriver):
 
         """
         # Start response driver
-        drv_args = [self.model_response_name, self.model_response_address,
-                    self.response_address]
-        drv_kwargs = dict(comm=self.comm)
-        response_driver = ServerResponseDriver(*drv_args, **drv_kwargs)
-        response_driver.start()
-        self.response_drivers.append(response_driver)
+        if self.response_address != 'EOF':
+            drv_args = [self.model_response_name, self.model_response_address,
+                        self.response_address]
+            drv_kwargs = dict(comm=self.comm)
+            response_driver = ServerResponseDriver(*drv_args, **drv_kwargs)
+            response_driver.start()
+            self.response_drivers.append(response_driver)
         return super(ServerRequestDriver, self).send_message(*args, **kwargs)

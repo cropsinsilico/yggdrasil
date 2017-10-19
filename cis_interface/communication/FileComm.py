@@ -137,6 +137,10 @@ class FileComm(CommBase.CommBase):
     def _recv(self, timeout=0):
         r"""Reads message from a file.
 
+        Args:
+            timeout (float, optional): Time in seconds to wait for a message.
+                Defaults to self.recv_timeout. Unused.
+
         Returns:
             bool: Success or failure of reading from the file.
 

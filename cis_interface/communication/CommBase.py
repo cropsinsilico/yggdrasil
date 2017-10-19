@@ -37,6 +37,9 @@ class CommBase(CisClass):
             that are sent/received. Defaults to None.
         dont_open (bool, optional): If True, the connection will not be opened.
             Defaults to False.
+        recv_timeout (float, optional): Time that should be waited for an
+            incoming message before returning None. Defaults to 0 (no wait). A
+            value of False indicates that recv should block.
         **kwargs: Additional keywords arguments are passed to parent class.
 
     Attributes:
@@ -51,6 +54,8 @@ class CommBase(CisClass):
         meth_serialize (obj): Callable object that takes any object as
             input and returns a serialized set of bytes. This will be used
             to encode sent messages.
+        recv_timeout (float): Time that should be waited for an incoming
+            message before returning None.
 
     Raises:
         Exception: If there is not an environment variable with the specified
@@ -59,7 +64,7 @@ class CommBase(CisClass):
     """
     def __init__(self, name, address=None, direction='send',
                  deserialize=None, serialize=None, format_str=None,
-                 dont_open=False, **kwargs):
+                 dont_open=False, recv_timeout=0.0, **kwargs):
         super(CommBase, self).__init__(name, **kwargs)
         self.name = name
         if address is None:
@@ -76,6 +81,7 @@ class CommBase(CisClass):
             serialize = DefaultSerialize(format_str=self.format_str)
         self.meth_deserialize = deserialize
         self.meth_serialize = serialize
+        self.recv_timeout = recv_timeout
         self._last_header = None
         self._work_comms = {}
         if not dont_open:
@@ -103,10 +109,12 @@ class CommBase(CisClass):
         return args, kwargs
 
     @classmethod
-    def new_comm(cls, *args, **kwargs):
+    def new_comm(cls, name, *args, **kwargs):
         r"""Initialize communication with new queue."""
+        if name in os.environ:
+            kwargs.setdefault('address', os.environ[name])
         new_comm_class = kwargs.pop('new_comm_class', None)
-        args, kwargs = cls.new_comm_kwargs(*args, **kwargs)
+        args, kwargs = cls.new_comm_kwargs(name, *args, **kwargs)
         if new_comm_class is not None:
             new_cls = get_comm_class(new_comm_class)
             return new_cls(*args, **kwargs)
@@ -596,6 +604,7 @@ class CommBase(CisClass):
         if self.is_closed:
             self.debug('.recv(): comm closed.')
             return (False, None)
+        # kwargs.setdefault('timeout', self.recv_timeout)
         try:
             flag, s_msg = self.recv_multipart(*args, **kwargs)
             if flag and len(s_msg) > 0:

@@ -16,7 +16,7 @@ class TestCommBase(CisTest, IOInfo):
         IOInfo.__init__(self)
         self.comm = 'CommBase'
         self.attr_list += ['name', 'address', 'direction', 'format_str',
-                           'meth_deserialize', 'meth_serialize']
+                           'meth_deserialize', 'meth_serialize', 'recv_timeout']
 
     @property
     def name(self):

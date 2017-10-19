@@ -168,8 +168,8 @@ class CisRunner(object):
             # Add server driver
             if yaml.get('is_server', False):
                 srv = {'name': yaml['name'],
-                       'driver': 'RMQServerDriver',
-                       'args': yaml['name']}
+                       'driver': 'ServerDriver',
+                       'args': yaml['name'] + '_SERVER'}
                 yaml['inputs'].append(srv)
                 yaml['clients'] = []
             # Add client driver
@@ -180,8 +180,8 @@ class CisRunner(object):
                 yaml['client_of'] = srv_names
                 for srv in srv_names:
                     cli = {'name': '%s_%s' % (srv, yaml['name']),
-                           'driver': 'RMQClientDriver',
-                           'args': srv}
+                           'driver': 'ClientDriver',
+                           'args': srv + '_SERVER'}
                     yaml['outputs'].append(cli)
             # Add I/O drivers for this model
             for inp in yaml['inputs']:

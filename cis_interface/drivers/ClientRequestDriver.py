@@ -1,3 +1,4 @@
+import os
 from cis_interface.drivers.ConnectionDriver import ConnectionDriver
 from cis_interface.drivers.ClientResponseDriver import ClientResponseDriver
 
@@ -22,6 +23,9 @@ from cis_interface.drivers.ClientResponseDriver import ClientResponseDriver
 # Server response driver recvs from local server output comm
 # Server response driver sends to client response comm
 # ----
+
+
+CIS_CLIENT_INI = 'CIS_BEGIN_CLIENT'
 
 
 class ClientRequestDriver(ConnectionDriver):
@@ -53,6 +57,7 @@ class ClientRequestDriver(ConnectionDriver):
         icomm_kws = kwargs.get('icomm_kws', {})
         icomm_kws['comm'] = 'RPCComm'
         icomm_kws['name'] = model_request_name
+        icomm_kws['reverse_names'] = True
         kwargs['icomm_kws'] = icomm_kws
         # Output communicator
         ocomm_kws = kwargs.get('ocomm_kws', {})
@@ -60,9 +65,19 @@ class ClientRequestDriver(ConnectionDriver):
         ocomm_kws['name'] = request_name
         kwargs['ocomm_kws'] = ocomm_kws
         super(ClientRequestDriver, self).__init__(model_request_name, **kwargs)
+        os.environ[self.ocomm.name] = self.ocomm.address
+        # self.env[self.name] = self.icomm.opp_address
+        self.env[self.ocomm.name] = self.ocomm.address
+        self.env[self.icomm.icomm.name] = self.icomm.icomm.address
+        self.env[self.icomm.ocomm.name] = self.icomm.ocomm.address
         self.response_drivers = []
         assert(not hasattr(self, 'comm'))
         self.comm = comm
+        # print 80*'='
+        # print self.__class__
+        # print self.env
+        # print self.icomm.name, self.icomm.address
+        # print self.ocomm.name, self.ocomm.address
 
     @property
     def model_request_name(self):
@@ -106,6 +121,21 @@ class ClientRequestDriver(ConnectionDriver):
             x.terminate()
         super(ClientRequestDriver, self).terminate(*args, **kwargs)
 
+    def on_model_exit(self):
+        r"""Close RPC comm when model exits."""
+        self.icomm.close()
+        super(ClientRequestDriver, self).on_model_exit()
+
+    def before_loop(self):
+        r"""Send client sign on to server response driver."""
+        super(ClientRequestDriver, self).before_loop()
+        self.ocomm.send(CIS_CLIENT_INI)
+
+    def after_loop(self):
+        r"""After client model signs off. Sent EOF to server."""
+        self.ocomm.send_eof()
+        super(ClientRequestDriver, self).after_loop()
+    
     def send_message(self, *args, **kwargs):
         r"""Start a response driver for a request message and send message with
         header.

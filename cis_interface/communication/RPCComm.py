@@ -15,6 +15,9 @@ class RPCComm(CommBase.CommBase):
             Defaults to empty dict.
         ocomm_kwargs (dict, optional): Keyword arguments for the output comm.
             Defaults to empty dict.
+        reverse_names (bool, optional): If True, the suffixes added to
+            to name to create icomm_name and ocomm_name are reversed.
+            Defaults to False.
         **kwargs: Additional keywords arguments are passed to parent class.
 
     Attributes:
@@ -23,13 +26,17 @@ class RPCComm(CommBase.CommBase):
 
     """
     def __init__(self, name, icomm_kwargs=None, ocomm_kwargs=None,
-                 dont_open=False, **kwargs):
+                 dont_open=False, reverse_names=False, **kwargs):
         if icomm_kwargs is None:
             icomm_kwargs = dict()
         if ocomm_kwargs is None:
             ocomm_kwargs = dict()
-        icomm_name = icomm_kwargs.pop('name', name + '_IN')
-        ocomm_name = ocomm_kwargs.pop('name', name + '_OUT')
+        if reverse_names:
+            icomm_name = icomm_kwargs.pop('name', name + '_OUT')
+            ocomm_name = ocomm_kwargs.pop('name', name + '_IN')
+        else:
+            icomm_name = icomm_kwargs.pop('name', name + '_IN')
+            ocomm_name = ocomm_kwargs.pop('name', name + '_OUT')
         icomm_kwargs['direction'] = 'recv'
         ocomm_kwargs['direction'] = 'send'
         icomm_kwargs['dont_open'] = True
@@ -48,6 +55,8 @@ class RPCComm(CommBase.CommBase):
             kwargs.setdefault('address', _rpc_address_split.join(
                 [self.icomm.address, self.ocomm.address]))
             super(RPCComm, self).__init__(name, dont_open=True, **kwargs)
+        self.icomm.recv_timeout = self.recv_timeout
+        self.ocomm.recv_timeout = self.recv_timeout
         if not dont_open:
             self.open()
 
@@ -59,7 +68,8 @@ class RPCComm(CommBase.CommBase):
     @classmethod
     def new_comm_kwargs(cls, name, icomm_name=None, ocomm_name=None,
                         icomm_comm=None, ocomm_comm=None,
-                        icomm_kwargs=None, ocomm_kwargs=None, **kwargs):
+                        icomm_kwargs=None, ocomm_kwargs=None,
+                        reverse_names=False, **kwargs):
         r"""Initialize communication with new comms.
 
         Args:
@@ -80,6 +90,9 @@ class RPCComm(CommBase.CommBase):
                 new_comm_kwargs class method.
             ocomm_kwargs (dict, optional): Keyword arguments for the ocomm_comm
                 new_comm_kwargs class method.
+            reverse_names (bool, optional): If True, the suffixes added to
+                to name to create icomm_name and ocomm_name are reversed.
+                Defaults to False.
 
         """
         args = [name]
@@ -88,9 +101,15 @@ class RPCComm(CommBase.CommBase):
         if ocomm_kwargs is None:
             ocomm_kwargs = dict()
         if icomm_name is None:
-            icomm_name = name + '_IN'
+            if reverse_names:
+                icomm_name = name + '_OUT'
+            else:
+                icomm_name = name + '_IN'
         if ocomm_name is None:
-            ocomm_name = name + '_OUT'
+            if reverse_names:
+                ocomm_name = name + '_IN'
+            else:
+                ocomm_name = name + '_OUT'
         icomm_name = icomm_kwargs.pop('name', icomm_name)
         ocomm_name = ocomm_kwargs.pop('name', ocomm_name)
         icomm_comm = icomm_kwargs.pop('comm', icomm_comm)

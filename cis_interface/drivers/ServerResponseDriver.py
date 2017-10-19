@@ -41,6 +41,11 @@ class ServerResponseDriver(ConnectionDriver):
         super(ServerResponseDriver, self).__init__(response_name, **kwargs)
         assert(not hasattr(self, 'comm'))
         self.comm = comm
+        # print 80*'='
+        # print self.__class__
+        # print self.env
+        # print self.icomm.name, self.icomm.address
+        # print self.ocomm.name, self.ocomm.address
 
     @property
     def model_response_name(self):
