@@ -1,9 +1,7 @@
 from cis_interface.drivers.Driver import Driver
-from cis_interface.tools import PSI_MSG_MAX
 from cis_interface.communication import new_comm
 
 
-maxMsgSize = PSI_MSG_MAX
 DEBUG_SLEEPS = True
 
 
@@ -32,7 +30,7 @@ class CommDriver(Driver):
         self.numReceived = 0
         self.comm = new_comm(name, dont_open=True, **kwargs)
         self.comm_name = self.comm.comm_class
-        self.env[name] = self.comm.address
+        self.env[name] = self.comm.opp_address
         self.debug(".env: %s", self.env)
 
     @property

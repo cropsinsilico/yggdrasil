@@ -112,6 +112,11 @@ class CommBase(CisClass):
             return new_cls(*args, **kwargs)
         return cls(*args, **kwargs)
 
+    @property
+    def opp_address(self):
+        r"""str: Address for opposite comm."""
+        return self.address
+
     def opp_comm_kwargs(self):
         r"""Get keyword arguments to initialize communication with opposite
         comm object.
@@ -121,7 +126,7 @@ class CommBase(CisClass):
 
         """
         kwargs = {'comm': self.comm_class}
-        kwargs['address'] = self.address
+        kwargs['address'] = self.opp_address
         kwargs['serialize'] = self.meth_serialize
         kwargs['deserialize'] = self.meth_deserialize
         if self.direction == 'send':

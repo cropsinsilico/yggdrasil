@@ -35,7 +35,6 @@ class RPCComm(CommBase.CommBase):
         icomm_kwargs['dont_open'] = True
         ocomm_kwargs['dont_open'] = True
         if name in os.environ or 'address' in kwargs:
-            print kwargs
             super(RPCComm, self).__init__(name, dont_open=True, **kwargs)
             icomm_kwargs.setdefault(
                 'address', self.address.split(_rpc_address_split)[0])
@@ -120,20 +119,11 @@ class RPCComm(CommBase.CommBase):
         kwargs['ocomm_kwargs'] = okwargs
         return args, kwargs
 
-    def opp_comm_kwargs(self):
-        r"""Get keyword arguments to initialize communication with opposite
-        comm object.
-
-        Returns:
-            dict: Keyword arguments for opposite comm object.
-
-        """
-        kwargs = {'comm': self.comm_class}
+    @property
+    def opp_address(self):
+        r"""str: Address for opposite RPC comm."""
         adds = self.address.split(_rpc_address_split)
-        kwargs['address'] = _rpc_address_split.join([adds[1], adds[0]])
-        kwargs['serialize'] = self.meth_serialize
-        kwargs['deserialize'] = self.meth_deserialize
-        return kwargs
+        return _rpc_address_split.join([adds[1], adds[0]])
 
     def open(self):
         r"""Open the connection."""
@@ -161,34 +151,51 @@ class RPCComm(CommBase.CommBase):
         return self.icomm.n_msg
 
     # SEND METHODS
-    def send(self, msg, *args, **kwargs):
-        r"""Send a message shorter than PSI_MSG_MAX to input comm."""
-        return self.ocomm.send(msg, *args, **kwargs)
+    def send(self, *args, **kwargs):
+        r"""Send a message to the output comm.
 
-    def send_nolimit(self, msg, *args, **kwargs):
-        r"""Send a message larger than PSI_MSG_MAX to output comm."""
-        return self.ocomm.send_nolimit(msg, *args, **kwargs)
+        Args:
+            *args: Arguments are passed to output comm send method.
+            **kwargs: Keyword arguments are passed to output comm send method.
+
+        Returns:
+            obj: Output from output comm send method.
+
+        """
+        return self.ocomm.send(*args, **kwargs)
 
     # RECV METHODS
     def recv(self, *args, **kwargs):
-        r"""Receive a message shorter than PSI_MSG_MAX from input comm."""
+        r"""Receive a message from the input comm.
+
+        Args:
+            *args: Arguments are passed to input comm recv method.
+            **kwargs: Keyword arguments are passed to input comm recv method.
+
+        Returns:
+            obj: Output from input comm recv method.
+
+        """
         return self.icomm.recv(*args, **kwargs)
 
-    def recv_nolimit(self, *args, **kwargs):
-        r"""Receive a message larger than PSI_MSG_MAX from input comm."""
-        return self.icomm.recv_nolimit(*args, **kwargs)
-
     # CALL
-    def call(self, msg):
-        r"""Do RPC call for request message shorter than PSI_MSG_MAX."""
-        flag = self.send(msg)
+    def call(self, *args, **kwargs):
+        r"""Do RPC call. The request message is sent to the output comm and the
+        response is received from the input comm.
+
+        Args:
+            *args: Arguments are passed to output comm send method.
+            **kwargs: Keyword arguments are passed to output comm send method
+
+        Returns:
+            obj: Output from input comm recv method.
+
+        """
+        flag = self.send(*args, **kwargs)
         if not flag:
             return (False, '')
         return self.recv(timeout=False)
 
-    def call_nolimit(self, msg):
-        r"""Do RPC call for request message larger than PSI_MSG_MAX."""
-        flag = self.send_nolimit(msg)
-        if not flag:
-            return (False, '')
-        return self.recv_nolimit(timeout=False)
+    def call_nolimit(self, *args, **kwargs):
+        r"""Alias for call."""
+        return self.call(*args, **kwargs)

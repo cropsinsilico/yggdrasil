@@ -133,6 +133,7 @@ class RMQComm(CommBase.CommBase):
         if self.is_open:
             return
         self._bound = True
+        print self.url, type(self.url)
         parameters = pika.URLParameters(self.url)
         self.connection = pika.BlockingConnection(parameters)
         self.channel = self.connection.channel()

@@ -57,9 +57,6 @@ def new_comm(name, comm=None, **kwargs):
     if comm is None:
         comm = _default_comm
     comm_cls = get_comm_class(comm)
-    if hasattr(comm_cls, '__call__') and comm != 'RPCComm':
-        kwargs['new_comm_class'] = comm
-        comm_cls = get_comm_class(kwargs.get('base_comm', None))
     return comm_cls.new_comm(name, **kwargs)
 
 
