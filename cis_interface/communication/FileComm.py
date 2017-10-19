@@ -35,6 +35,7 @@ class FileComm(CommBase.CommBase):
         self.read_meth = read_meth
         self.append = append
         super(FileComm, self).__init__(name, **kwargs)
+        self.address = os.path.abspath(self.address)
 
     @property
     def maxMsgSize(self):
@@ -69,6 +70,7 @@ class FileComm(CommBase.CommBase):
 
     def open(self):
         r"""Open the file."""
+        super(FileComm, self).open()
         global _N_FILES
         if not self.is_open:
             _N_FILES += 1
@@ -80,6 +82,7 @@ class FileComm(CommBase.CommBase):
         if self.is_open:
             _N_FILES -= 1
         self._close()
+        super(FileComm, self).close()
 
     def remove_file(self):
         r"""Remove the file."""

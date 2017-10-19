@@ -2,6 +2,7 @@ import os
 import nose.tools as nt
 from cis_interface import runner
 from cis_interface.config import cis_cfg
+from cis_interface.tools import CisClass
 from cis_interface.tests import CisTest
 from cis_interface.communication import get_comm_class
 
@@ -92,6 +93,12 @@ class TestParam(CisTest):
         """
         super(TestParam, self).teardown()
         if ncurr_comm is None:
+            x = CisClass(self.name, timeout=self.timeout,
+                         sleeptime=self.sleeptime)
+            Tout = x.start_timeout()
+            while (not Tout.is_out) and (self.comm_count > self.nprev_comm):
+                x.sleep()
+            x.stop_timeout()
             ncurr_comm = self.comm_count
         nt.assert_equal(ncurr_comm, self.nprev_comm)
 

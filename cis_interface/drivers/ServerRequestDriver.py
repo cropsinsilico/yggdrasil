@@ -140,10 +140,14 @@ class ServerRequestDriver(ConnectionDriver):
         """
         # Start response driver
         if self.response_address != 'EOF':
-            drv_args = [self.model_response_name, self.model_response_address,
-                        self.response_address]
-            drv_kwargs = dict(comm=self.comm)
-            response_driver = ServerResponseDriver(*drv_args, **drv_kwargs)
-            response_driver.start()
-            self.response_drivers.append(response_driver)
+            with self.lock:
+                if self.is_comm_open:
+                    drv_args = [self.model_response_name, self.model_response_address,
+                                self.response_address]
+                    drv_kwargs = dict(comm=self.comm)
+                    response_driver = ServerResponseDriver(*drv_args, **drv_kwargs)
+                    response_driver.start()
+                    self.response_drivers.append(response_driver)
+                else:
+                    return False
         return super(ServerRequestDriver, self).send_message(*args, **kwargs)

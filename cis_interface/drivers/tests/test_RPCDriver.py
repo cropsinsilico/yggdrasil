@@ -1,6 +1,6 @@
 import nose.tools as nt
+from cis_interface.tests import IOInfo
 import cis_interface.drivers.tests.test_Driver as parent
-from cis_interface.drivers.tests.test_IODriver import IOInfo
 from cis_interface.communication import new_comm
 
 
