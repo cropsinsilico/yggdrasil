@@ -32,14 +32,16 @@ class ConnectionDriver(Driver):
         icomm_name = icomm_kws.pop('name', name + '_IN')
         self.icomm = new_comm(icomm_name, **icomm_kws)
         self.icomm_kws = icomm_kws
-        self.env[self.icomm.name] = self.icomm.address
+        self.env[self.name + '_OUT'] = self.icomm.address
+        # self.env[self.icomm.name] = self.icomm.address
         # Output communicator
         ocomm_kws['direction'] = 'send'
         ocomm_kws['dont_open'] = True
         ocomm_name = ocomm_kws.pop('name', name + '_OUT')
         self.ocomm = new_comm(ocomm_name, **ocomm_kws)
         self.ocomm_kws = ocomm_kws
-        self.env[self.ocomm.name] = self.ocomm.address
+        self.env[self.name + '_IN'] = self.ocomm.address
+        # self.env[self.ocomm.name] = self.ocomm.address
         # Attributes
         # print self.icomm.name, self.icomm.address
         # print self.ocomm.name, self.ocomm.address

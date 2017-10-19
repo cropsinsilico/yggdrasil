@@ -5,6 +5,7 @@ from cis_interface.config import cis_cfg
 
 
 _N_CONNECTIONS = 0
+_registered_connections = {}
 _rmq_param_sep = '_RMQPARAM_'
 
 
@@ -37,7 +38,7 @@ class RMQComm(CommBase.CommBase):
     @classmethod
     def comm_count(cls):
         r"""int: Number of connections that have been opened on this process."""
-        return _N_CONNECTIONS
+        return len(_registered_connections)
 
     @property
     def url(self):
@@ -129,11 +130,10 @@ class RMQComm(CommBase.CommBase):
 
     def bind(self):
         r"""Declare queue to get random new queue."""
-        global _N_CONNECTIONS
+        global _registered_connections
         if self.is_open:
             return
         self._bound = True
-        print self.url, type(self.url)
         parameters = pika.URLParameters(self.url)
         self.connection = pika.BlockingConnection(parameters)
         self.channel = self.connection.channel()
@@ -156,7 +156,8 @@ class RMQComm(CommBase.CommBase):
         self.channel.queue_bind(exchange=self.exchange,
                                 # routing_key=self.routing_key,
                                 queue=self.queue)
-        _N_CONNECTIONS += 1
+        if self.address not in _registered_connections:
+            _registered_connections[self.address] = res
     
     def open(self):
         r"""Open connection and bind/connect to queue as necessary."""
@@ -164,15 +165,21 @@ class RMQComm(CommBase.CommBase):
             if not self._bound:
                 self.bind()
             self._is_open = True
+            self._bound = False
 
     def close(self):
         r"""Close connection."""
-        if self.is_open:
+        if self.is_open or self._bound:
+            global _registered_connections
             self._is_open = False
+            self._bound = False
             if self.direction == 'recv':
                 self.channel.queue_unbind(queue=self.queue,
                                           exchange=self.exchange)
                 self.channel.queue_delete(queue=self.queue)
+                if self.address not in _registered_connections:
+                    raise KeyError("Connection not registered.")
+                del _registered_connections[self.address]
             self.connection.close()
             self.connection = None
             self.channel = None
@@ -294,7 +301,6 @@ class RMQComm(CommBase.CommBase):
                 self.debug(".recv(): No message")
                 msg = ''
         except:
-            print 'error'
             self.exception(".recv(): Error")
             raise
         return (True, msg)
