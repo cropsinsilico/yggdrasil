@@ -152,9 +152,12 @@ class ClientRequestDriver(ConnectionDriver):
         drv_args = [self.model_response_name, self.model_response_address]
         drv_kwargs = dict(comm=self.comm)
         with self.lock:
-            response_driver = ClientResponseDriver(*drv_args, **drv_kwargs)
-            response_driver.start()
-            self.response_drivers.append(response_driver)
+            if self.is_comm_open:
+                response_driver = ClientResponseDriver(*drv_args, **drv_kwargs)
+                response_driver.start()
+                self.response_drivers.append(response_driver)
+            else:
+                return False
         # Send response address in header
         kwargs.setdefault('send_header', True)
         kwargs.setdefault('header_kwargs', {})

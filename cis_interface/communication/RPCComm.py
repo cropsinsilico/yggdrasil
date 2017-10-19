@@ -146,6 +146,7 @@ class RPCComm(CommBase.CommBase):
 
     def open(self):
         r"""Open the connection."""
+        super(RPCComm, self).open()
         self.icomm.open()
         self.ocomm.open()
 
@@ -153,6 +154,7 @@ class RPCComm(CommBase.CommBase):
         r"""Close the connection."""
         self.icomm.close()
         self.ocomm.close()
+        super(RPCComm, self).close()
 
     @property
     def is_open(self):

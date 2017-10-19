@@ -140,7 +140,7 @@ class RMQComm(CommBase.CommBase):
         self.channel.exchange_declare(exchange=self.exchange,
                                       auto_delete=True)
         if self.direction == 'recv' and not self.queue:
-            exclusive = True
+            exclusive = False  # True
         else:
             exclusive = False
         if self.queue.startswith('amq.'):
@@ -180,7 +180,10 @@ class RMQComm(CommBase.CommBase):
                 if self.address not in _registered_connections:
                     raise KeyError("Connection not registered.")
                 del _registered_connections[self.address]
-            self.connection.close()
+            try:
+                self.connection.close()
+            except pika.exceptions.ChannelClosed:
+                pass
             self.connection = None
             self.channel = None
 

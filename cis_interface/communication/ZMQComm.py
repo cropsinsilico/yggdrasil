@@ -164,6 +164,7 @@ class ZMQComm(CommBase.CommBase):
 
     def open(self):
         r"""Open connection by binding/connect to the specified socket."""
+        super(ZMQComm, self).open()
         global _N_SOCKETS
         if not self.is_open:
             if self.direction == 'send':
@@ -185,6 +186,7 @@ class ZMQComm(CommBase.CommBase):
         if self.is_open:
             self.socket.close()
             self._openned = False
+        super(ZMQComm, self).close()
             
     @property
     def is_open(self):

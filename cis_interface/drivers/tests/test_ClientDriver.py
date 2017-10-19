@@ -42,8 +42,8 @@ class TestClientParam(parent.TestConnectionParam):
     
     def setup(self, *args, **kwargs):
         r"""Recover new client message on start-up."""
-        if self.comm_count > 0:
-            raise Exception('setup')
+        # if self.comm_count > 0:
+        #     raise Exception('setup')
         kwargs.setdefault('nprev_comm', self.comm_count)
         skip_start = kwargs.get('skip_start', False)
         self.srv_drv = self.create_server()
@@ -103,15 +103,17 @@ class TestClientDriver(TestClientParam, parent.TestConnectionDriver):
         r"""Test purge of queue."""
         pass
 
-    def test_send_recv(self):
+    def test_send_recv(self, msg_send=None):
         r"""Test routing of a short message between client and server."""
+        if msg_send is None:
+            msg_send = self.msg_short
         T = self.instance.start_timeout()
         while ((not T.is_out) and ((not self.instance.is_valid) or
                                    (not self.srv_drv.is_valid))):
             self.instance.sleep()  # pragma: debug
         self.instance.stop_timeout()
         # Send a message to local output
-        flag = self.send_comm.send(self.msg_short)
+        flag = self.send_comm.send(msg_send)
         assert(flag)
         # Wait for message to be routed
         T = self.instance.start_timeout()
@@ -121,14 +123,14 @@ class TestClientDriver(TestClientParam, parent.TestConnectionDriver):
         # Receive on server side, then send back
         flag, srv_msg = self.srv_recv_comm.recv(timeout=self.timeout)
         assert(flag)
-        nt.assert_equal(srv_msg, self.msg_short)
+        nt.assert_equal(srv_msg, msg_send)
         flag = self.srv_send_comm.send(srv_msg)
         assert(flag)
         # Receive response on client side
         flag, cli_msg = self.recv_comm.recv(timeout=self.timeout)
         assert(flag)
-        nt.assert_equal(cli_msg, self.msg_short)
+        nt.assert_equal(cli_msg, msg_send)
 
     def test_send_recv_nolimit(self):
         r"""Test sending/receiving large message."""
-        pass
+        self.test_send_recv(msg_send=self.msg_long)

@@ -1,11 +1,11 @@
 import nose.tools as nt
+from cis_interface.tests import IOInfo
 import cis_interface.drivers.tests.test_Driver as parent
-from cis_interface.drivers.tests.test_IODriver import IOInfo
 from cis_interface.config import cis_cfg
 
 
-class TestRMQParam(parent.TestParam, IOInfo):
-    r"""Test parameters for RMQDriver class.
+class TestRMQAsyncParam(parent.TestParam, IOInfo):
+    r"""Test parameters for RMQAsyncDriver class.
 
     Attributes (in addition to parent class's):
         -
@@ -13,8 +13,8 @@ class TestRMQParam(parent.TestParam, IOInfo):
     """
 
     def __init__(self, *args, **kwargs):
-        super(TestRMQParam, self).__init__(*args, **kwargs)
-        self.driver = 'RMQDriver'
+        super(TestRMQAsyncParam, self).__init__(*args, **kwargs)
+        self.driver = 'RMQAsyncDriver'
         self.args = None
         self.attr_list += ['user', 'host', 'passwd', 'exchange',
                            'connection', 'queue', 'channel',
@@ -24,8 +24,8 @@ class TestRMQParam(parent.TestParam, IOInfo):
         self.inst_kwargs['user'] = cis_cfg.get('RMQ', 'user')
 
         
-class TestRMQDriverNoStart(TestRMQParam, parent.TestDriverNoStart):
-    r"""Test class for RMQDriver class without start.
+class TestRMQAsyncDriverNoStart(TestRMQAsyncParam, parent.TestDriverNoStart):
+    r"""Test class for RMQAsyncDriver class without start.
 
     Attributes (in addition to parent class's):
         -
@@ -34,8 +34,8 @@ class TestRMQDriverNoStart(TestRMQParam, parent.TestDriverNoStart):
     pass
 
 
-class TestRMQDriver(TestRMQParam, parent.TestDriver):
-    r"""Test class for RMQDriver class.
+class TestRMQAsyncDriver(TestRMQAsyncParam, parent.TestDriver):
+    r"""Test class for RMQAsyncDriver class.
 
     Attributes (in addition to parent class's):
         -
@@ -45,7 +45,7 @@ class TestRMQDriver(TestRMQParam, parent.TestDriver):
     def teardown(self):
         r"""Make sure the queue is empty before closing the driver."""
         self.instance.purge_queue()
-        super(TestRMQDriver, self).teardown()
+        super(TestRMQAsyncDriver, self).teardown()
 
     def test_purge(self):
         r"""Test purge of queue."""
@@ -64,11 +64,11 @@ class TestRMQDriver(TestRMQParam, parent.TestDriver):
         nt.assert_equal(self.instance.channel, None)
         assert(not self.instance._opening)
         assert(not self.instance._closing)
-        super(TestRMQDriver, self).assert_after_terminate()
+        super(TestRMQAsyncDriver, self).assert_after_terminate()
 
     def test_reconnect(self):
         r"""Close the connection to simulation failure and force reconnect."""
-        if self.driver == 'RMQDriver':
+        if self.driver == 'RMQAsyncDriver':
             with self.instance.lock:
                 self.instance.connection.close(reply_code=100,
                                                reply_text="Test shutdown")

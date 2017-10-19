@@ -2,13 +2,13 @@ import pika
 import socket
 import requests
 from pprint import pformat
+from cis_interface.tools import CIS_MSG_MAX as maxMsgSize
 from cis_interface.drivers.Driver import Driver
-from cis_interface.drivers.IODriver import maxMsgSize
 from cis_interface.config import cis_cfg
 from cis_interface import backwards
 
 
-class RMQDriver(Driver):
+class RMQAsyncDriver(Driver):
     r"""Class for handling basic RabbitMQ communications.
 
     Args:
@@ -54,7 +54,7 @@ class RMQDriver(Driver):
     def __init__(self, name, queue='', routing_key=None, **kwargs):
         kwattr = ['user', 'passwd', 'host', 'vhost', 'exchange', 'exclusive']
         kwargs_attr = {k: kwargs.pop(k, None) for k in kwattr}
-        super(RMQDriver, self).__init__(name, **kwargs)
+        super(RMQAsyncDriver, self).__init__(name, **kwargs)
         self.debug()
         self.user = cis_cfg.get('rmq', 'user')
         self.host = cis_cfg.get('rmq', 'host', socket.gethostname())
@@ -84,7 +84,7 @@ class RMQDriver(Driver):
         r"""bool: True if the channel is stable and the parent class is
         valid."""
         with self.lock:
-            return (super(RMQDriver, self).is_valid and self.channel_stable)
+            return (super(RMQAsyncDriver, self).is_valid and self.channel_stable)
 
     @property
     def channel_open(self):
@@ -109,7 +109,7 @@ class RMQDriver(Driver):
     def start(self):
         r"""Start the driver. Waiting for connection."""
         self._opening = True
-        super(RMQDriver, self).start()
+        super(RMQAsyncDriver, self).start()
         T = self.start_timeout()
         interval = 1  # timeout / 5
         while (not T.is_out) and (not self.channel_stable):
@@ -121,7 +121,7 @@ class RMQDriver(Driver):
 
     def run(self):
         r"""Run the driver. Connect to the connection and begin the IO loop."""
-        super(RMQDriver, self).run()
+        super(RMQAsyncDriver, self).run()
         self.debug("::run")
         self.connect()
         self.connection.ioloop.start()
@@ -151,19 +151,19 @@ class RMQDriver(Driver):
         # (e.g. keyboard interupt)
         # if self.connection:
         #     self.connection.ioloop.start()
-        super(RMQDriver, self).terminate()
+        super(RMQAsyncDriver, self).terminate()
         self.debug('::terminate returns')
 
     def on_model_exit(self):
         r"""Stop this driver if the model exits."""
         self.debug('::on_model_exit()')
         self.stop()
-        super(RMQDriver, self).on_model_exit()
+        super(RMQAsyncDriver, self).on_model_exit()
 
     def printStatus(self):
         r"""Print the driver status."""
         self.debug('::printStatus')
-        super(RMQDriver, self).printStatus()
+        super(RMQAsyncDriver, self).printStatus()
         qdata = self.get_message_stats()
         if qdata:
             qdata = pformat(qdata)
@@ -173,8 +173,6 @@ class RMQDriver(Driver):
     def get_message_stats(self):
         r"""Return message stats from the server."""
         hoststr = self.host
-        # if self.host == '/':
-        #     hoststr = '%2f'
         url = 'http://%s:%s/api/%s/%s/%s' % (
             hoststr, 15672, 'queues', '%2f', self.queue)
         res = requests.get(url, auth=(self.user, self.passwd))

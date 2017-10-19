@@ -184,7 +184,11 @@ class IPCComm(CommBase.CommBase):
     def close(self):
         r"""Close the connection."""
         if self._bound and not self.is_open:
-            self.open()
+            try:
+                self.open()
+            except sysv_ipc.ExistentialError:
+                self.q = None
+                self._bound = False
         if self.is_open:
             try:
                 remove_queue(self.q)
