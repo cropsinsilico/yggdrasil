@@ -77,6 +77,7 @@ int deserialize(const seri_t s, const char *buf, const int buf_siz, va_list ap) 
   else {
     cislog_error("deserialize: Unsupported seri_type %d", t);
   }
+  return ret;
 };
 
 

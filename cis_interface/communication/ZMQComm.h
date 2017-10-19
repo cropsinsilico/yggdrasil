@@ -10,34 +10,42 @@
 #ifndef CISZMQCOMM_H_
 #define CISZMQCOMM_H_
 
+static unsigned _cisSocketsCreated;
+
+/*!
+  @brief Create a new socket.
+  @param[in] comm comm_t * Comm structure initialized with new_comm_base.
+  @returns int -1 if the address could not be created.
+*/
+static inline
+int new_zmq_address(comm_t *comm) {
+  sprintf(comm->name, "temp%d", _cisSocketsCreated);
+  int ret = -1;
+  // TODO: Actually open comm
+  return ret;
+};
+
 /*!
   @brief Initialize a ZeroMQ communicator.
-  The name is used to locate the ZMQ socket address stored in the associated
-  environment variable.
-  @param[in] name Name of environment variable that the address is stored in.
-  @param[in] seri_info Format for formatting/parsing messages.
-  @returns comm_t Comm structure.
+  @param[in] comm comm_t * Comm structure initialized with init_comm_base.
+  @returns int -1 if the comm could not be initialized.
  */
 static inline
-comm_t init_zmq_comm(const char *name, const char *direction, const void *seri_info) {
-  comm_t ret = init_comm_base(name, direction, seri_info);
-  ret.type = ZMQ_COMM;
-  if (ret.valid == 0)
-    return ret;
+int init_zmq_comm(comm_t *comm) {
+  int ret = -1;
+  if (comm->valid == 0)
+    return -1;
   // TODO: Populate
-  ret.valid = 1;
   return ret;
 };
 
 /*!
   @brief Perform deallocation for ZMQ communicator.
-  @param[in] comm_t Communicator to deallocate.
+  @param[in] x comm_t Pointer to communicator to deallocate.
   @returns int 1 if there is and error, 0 otherwise.
 */
 static inline
-int free_zmq_comm(comm_t x) {
-  if (free_comm_base(x))
-    return 1;
+int free_zmq_comm(comm_t *x) {
   // TODO: Populate
   return 1;
 };
@@ -64,12 +72,12 @@ int zmq_comm_nmsg(const comm_t x) {
  */
 static inline
 int zmq_comm_send(const comm_t x, const char *data, const int len) {
-  debug("zmq_comm_send(%s): %d bytes", x.name, len);
+  cislog_debug("zmq_comm_send(%s): %d bytes", x.name, len);
   if (comm_base_send(x, data, len) == -1)
     return -1;
   // TODO: Populate
   int ret = -1;
-  debug("zmq_comm_send(%s): returning %d", x.name, ret);
+  cislog_debug("zmq_comm_send(%s): returning %d", x.name, ret);
   return ret;
 };
 
@@ -85,10 +93,10 @@ int zmq_comm_send(const comm_t x, const char *data, const int len) {
  */
 static inline
 int zmq_comm_recv(const comm_t x, char *data, const int len) {
-  debug("zmq_comm_recv(%s)", x.name);
+  cislog_debug("zmq_comm_recv(%s)", x.name);
   // TODO: Populate
   int ret = -1;
-  debug("zmq_comm_recv(%s): returns %d bytes\n", x.name, ret);
+  cislog_debug("zmq_comm_recv(%s): returns %d bytes\n", x.name, ret);
   return ret;
 };
 
@@ -105,11 +113,11 @@ int zmq_comm_recv(const comm_t x, char *data, const int len) {
  */
 static inline
 int zmq_comm_send_nolimit(const comm_t x, const char *data, const int len){
-  debug("zmq_comm_send_nolimit(%s): %d bytes", x.name, len);
+  cislog_debug("zmq_comm_send_nolimit(%s): %d bytes", x.name, len);
   int ret = -1;
   // TODO: Populate
   if (ret == 0)
-    debug("zmq_comm_send_nolimit(%s): %d bytes completed", x.name, len);
+    cislog_debug("zmq_comm_send_nolimit(%s): %d bytes completed", x.name, len);
   return ret;
 };
 
@@ -128,11 +136,11 @@ int zmq_comm_send_nolimit(const comm_t x, const char *data, const int len){
  */
 static inline
 int zmq_comm_recv_nolimit(const comm_t x, char **data, const int len0){
-  debug("zmq_comm_recv_nolimit(%s)", x.name);
+  cislog_debug("zmq_comm_recv_nolimit(%s)", x.name);
   // TODO: Populate
   int ret = -1;
   if (ret > 0) {
-    debug("zmq_comm_recv_nolimit(%s): %d bytes completed", x.name, ret);
+    cislog_debug("zmq_comm_recv_nolimit(%s): %d bytes completed", x.name, ret);
   }
   return ret;
 };

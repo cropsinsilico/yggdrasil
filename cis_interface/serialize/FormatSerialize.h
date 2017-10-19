@@ -7,6 +7,7 @@
 #include <regex.h>
 #include <../tools.h>
 #include <SerializeBase.h>
+#include <../dataio/AsciiTable.h>
 
 #ifndef CISFORMATSERIALIZE_H_
 #define CISFORMATSERIALIZE_H_
@@ -25,7 +26,7 @@ static inline
 int serialize_format(const seri_t s, char *buf, const int buf_siz, va_list ap) {
   char *fmt = (char*)s.info;
   int ret = vsnprintf(buf, buf_siz, fmt, ap);
-  debug("serialize_format: vsnprintf returns %d", ret);
+  cislog_debug("serialize_format: vsnprintf returns %d", ret);
   if (ret < 0) {
     cislog_error("serialize_format: vsnprintf encoding error");
     ret = -1;
@@ -52,7 +53,7 @@ int deserialize_format(const seri_t s, const char *buf, const int buf_siz, va_li
     cislog_error("deserialize_format: simplify_formats returned %d", sret);
     return -1;
   }
-  debug("deserialize_format: simplify_formats returns %d", sret);
+  cislog_debug("deserialize_format: simplify_formats returns %d", sret);
   int nfmt = count_formats(fmt);
   // Interpret message
   sret = vsscanf(buf, fmt, ap);
@@ -61,7 +62,7 @@ int deserialize_format(const seri_t s, const char *buf, const int buf_siz, va_li
 		 sret, nfmt);
     return -1;
   }
-  debug("deserialize_format: vsscanf returns %d", sret);
+  cislog_debug("deserialize_format: vsscanf returns %d", sret);
   return sret;
 };
 

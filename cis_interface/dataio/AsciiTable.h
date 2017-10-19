@@ -498,17 +498,15 @@ int at_vbytes_to_row(const asciiTable_t t, const char* line, va_list ap) {
   int sret = simplify_formats(fmt, LINE_SIZE_MAX);
   if (sret < 0) {
     printf("at_vbytes_to_row: simplify_formats returned %d\n", sret);
-    free(line);
     return -1;
   }
   // Interpret line
-  ret = vsscanf(line, fmt, ap);
+  int ret = vsscanf(line, fmt, ap);
   if (ret != t.ncols) {
     printf("at_vbytes_to_row: %d arguments filled, but %d were expected\n",
 	   sret, t.ncols);
     ret = -1;
   }
-  free(line);
   return ret;
 };
 
@@ -891,7 +889,7 @@ int at_bytes_to_array(const asciiTable_t t, char *data, int data_siz, ...) {
 static inline
 int at_array_to_bytes(const asciiTable_t t, char *data, const int data_siz, ...) {
   va_list ap;
-  va_start(ap, nrows);
+  va_start(ap, data);
   int ret = at_varray_to_bytes(t, data, data_siz, ap);
   va_end(ap);
   return ret;

@@ -12,14 +12,15 @@
 
 
 /*! @brief Serializer types. */
-enum seri_type { DIRECT_SERI, FORMAT_SERI,
+enum seri_enum { DIRECT_SERI, FORMAT_SERI,
 		 ASCII_TABLE_SERI, ASCII_TABLE_ARRAY_SERI };
+typedef enum seri_enum seri_type;
 
 /*!
   @brief Serializer structure.
 */
 typedef struct seri_t {
-  const seri_type type; //!< Serializer type.
+  seri_type type; //!< Serializer type.
   void *info; //!< Pointer to any extra info serializer requires.
 } seri_t;
 
@@ -27,8 +28,8 @@ typedef struct seri_t {
 /*!
   @brief Serialize arguments to create a message.
   @param[in] s seri_t Structure sepcifying how to serialize arguments.
-  @param[in] buf character pointer to pointer to memory where serialized message
-  should be stored.
+  @param[in] buf character pointer to memory where serialized message should be
+  stored.
   @param[in] buf_siz int Size of memory allocated to buf.
   @param[in] allow_realloc int If 1, buf will be realloced if it is not big
   enough to hold the serialized emssage. If 0, an error will be returned.
@@ -36,11 +37,11 @@ typedef struct seri_t {
   returns: int The length of the serialized message or -1 if there is an error. 
  */
 static inline
-int serialize_direct(const seri_t s, char **buf, const int buf_siz, va_list ap) {
+int serialize_direct(const seri_t s, char *buf, const int buf_siz, va_list ap) {
   char *msg = va_arg(ap, char*);
   int ret = strlen(msg);
   if (ret < buf_siz)
-    strcpy(*buf, msg);
+    strcpy(buf, msg);
   return ret;
 };
 
