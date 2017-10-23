@@ -42,7 +42,7 @@ class ServerRequestDriver(ConnectionDriver):
         ocomm_kws['reverse_names'] = True
         kwargs['ocomm_kws'] = ocomm_kws
         super(ServerRequestDriver, self).__init__(model_request_name, **kwargs)
-        os.environ[self.icomm.name] = self.icomm.address 
+        os.environ[self.icomm.name] = self.icomm.address
         self.env[self.icomm.name] = self.icomm.address
         self.env[self.ocomm.icomm.name] = self.ocomm.icomm.address
         self.env[self.ocomm.ocomm.name] = self.ocomm.ocomm.address

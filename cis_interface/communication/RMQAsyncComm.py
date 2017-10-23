@@ -1,6 +1,6 @@
 import pika
 from threading import Thread, RLock
-from cis_interface.communication.RMQComm import RMQComm, _registered_connections
+from cis_interface.communication.RMQComm import RMQComm
 
 
 class RMQAsyncComm(RMQComm):
@@ -71,7 +71,6 @@ class RMQAsyncComm(RMQComm):
 
     def bind(self):
         r"""Declare queue to get random new queue."""
-        global _registered_connections
         if self.is_open:
             return
         self._bound = True
@@ -79,8 +78,7 @@ class RMQAsyncComm(RMQComm):
         # Register queue
         if not self.queue:
             self.error("Queue was not initialized.")
-        if self.address not in _registered_connections:
-            _registered_connections[self.address] = self.queue  # self.thread
+        self.register_connection(self.queue)
     
     def open(self):
         r"""Open connection and bind/connect to queue as necessary."""
@@ -99,7 +97,6 @@ class RMQAsyncComm(RMQComm):
         with self.lock:
             if self._closing:  # pragma: debug
                 return  # Don't close more than once
-        global _registered_connections
         # Wait for connection to finish opening to close it
         T = self.start_timeout()
         while (not T.is_out) and self._opening:
@@ -119,9 +116,7 @@ class RMQAsyncComm(RMQComm):
                                               consumer_tag=self.consumer_tag)
                 except pika.exceptions.ChannelClosed:  # pragma: debug
                     self._closing = False
-                if self.address not in _registered_connections:
-                    raise KeyError("Connection not registered.")
-                del _registered_connections[self.address]
+                self.unregister_connection()
             else:
                 self.channel.close()
         # Wait for connection to finish closing & then force if it dosn't
@@ -351,7 +346,7 @@ class RMQAsyncComm(RMQComm):
         r"""Actions to perform once the queue is succesfully bound. Start
         consuming messages."""
         self.debug('::Queue bound')
-        self.channel.basic_qos(prefetch_count=1)                                         
+        self.channel.basic_qos(prefetch_count=1)
         self.channel.add_on_cancel_callback(self.on_cancelok)
         if self.direction == 'recv':
             self.consumer_tag = self.channel.basic_consume(self.on_message,

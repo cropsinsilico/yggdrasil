@@ -3,7 +3,7 @@ import numpy as np
 import nose.tools as nt
 from cis_interface.interface import PsiInterface
 from cis_interface.tools import PSI_MSG_EOF, PSI_MSG_MAX
-from cis_interface.drivers import import_driver, CommDriver, InputCommDriver
+from cis_interface.drivers import import_driver, InputCommDriver
 from cis_interface.tests import CisTest, IOInfo
 
 
@@ -513,8 +513,8 @@ class TestPsiPickleOutput(TestBase):
         # assert(msg_flag)
         # Read temp file
         Tout = self.instance.start_timeout()
-        while ((self.file_comm.is_open or (os.stat(self.tempfile).st_size == 0))
-               and not Tout.is_out):
+        while ((not Tout.is_out) and
+               (self.file_comm.is_open or (os.stat(self.tempfile).st_size == 0))):
             self.instance.sleep()
         self.instance.stop_timeout()
         # Read temp file

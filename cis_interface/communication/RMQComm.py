@@ -130,7 +130,6 @@ class RMQComm(CommBase.CommBase):
 
     def bind(self):
         r"""Declare queue to get random new queue."""
-        global _registered_connections
         if self.is_open:
             return
         self._bound = True
@@ -156,8 +155,25 @@ class RMQComm(CommBase.CommBase):
         self.channel.queue_bind(exchange=self.exchange,
                                 # routing_key=self.routing_key,
                                 queue=self.queue)
+        self.register_connection(res)
+
+    def register_connection(self, res):
+        r"""Add connection to list of registered connections.
+
+        Args:
+            res (obj): Object to register with connection address.
+
+        """
+        global _registered_connections
         if self.address not in _registered_connections:
             _registered_connections[self.address] = res
+
+    def unregister_connection(self):
+        r"""Remove connection from list of registered connections."""
+        global _registered_connections
+        if self.address not in _registered_connections:
+            raise KeyError("Connection not registered.")
+        del _registered_connections[self.address]
     
     def open(self):
         r"""Open connection and bind/connect to queue as necessary."""
@@ -170,16 +186,13 @@ class RMQComm(CommBase.CommBase):
     def close(self):
         r"""Close connection."""
         if self.is_open or self._bound:
-            global _registered_connections
             self._is_open = False
             self._bound = False
             if self.direction == 'recv':
                 self.channel.queue_unbind(queue=self.queue,
                                           exchange=self.exchange)
                 self.channel.queue_delete(queue=self.queue)
-                if self.address not in _registered_connections:
-                    raise KeyError("Connection not registered.")
-                del _registered_connections[self.address]
+                self.unregister_connection()
             try:
                 self.connection.close()
             except pika.exceptions.ChannelClosed:

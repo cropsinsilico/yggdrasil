@@ -335,5 +335,5 @@ class ZMQComm(CommBase.CommBase):
     def purge(self):
         r"""Purge all messages from the comm."""
         while self.n_msg > 0:
-            _ = self.socket.recv()
+            self.socket.recv()
         super(ZMQComm, self).purge()
