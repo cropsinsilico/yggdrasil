@@ -186,6 +186,7 @@ class RMQComm(CommBase.CommBase):
                 pass
             self.connection = None
             self.channel = None
+        super(RMQComm, self).close()
 
     @property
     def is_open(self):
