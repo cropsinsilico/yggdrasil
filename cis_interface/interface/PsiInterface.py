@@ -82,7 +82,7 @@ def PsiOutput(name, format_str=None, matlab=False):
                        format_str=format_str, recv_timeout=False)
 
     
-def PsiRpc(outname, outfmt, inname, infmt, matlab=False):  
+def PsiRpc(outname, outfmt, inname, infmt, matlab=False):
     r"""Get class for sending a message and then receiving a response.
 
     Args:

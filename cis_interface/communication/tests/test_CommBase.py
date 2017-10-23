@@ -150,5 +150,5 @@ class TestCommBase(CisTest, IOInfo):
         nt.assert_equal(self.send_instance.n_msg, 0)
         nt.assert_equal(self.recv_instance.n_msg, 0)
         # Purge while closed
-        self.recv_instance.close() 
+        self.recv_instance.close()
         self.recv_instance.purge()

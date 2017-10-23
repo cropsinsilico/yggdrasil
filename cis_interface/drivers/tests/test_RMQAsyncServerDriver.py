@@ -12,7 +12,7 @@ class TestRMQAsyncServerParam(parent.TestServerParam):
 
     
 class TestRMQAsyncServerDriverNoStart(TestRMQAsyncServerParam,
-                                 parent.TestServerDriverNoStart):
+                                      parent.TestServerDriverNoStart):
     r"""Test class for RMQAsyncServerDriver class without start."""
     pass
 

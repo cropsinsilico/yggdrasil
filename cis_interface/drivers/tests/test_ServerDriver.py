@@ -1,5 +1,4 @@
 import nose.tools as nt
-from cis_interface.drivers.ServerRequestDriver import CIS_CLIENT_INI
 from cis_interface.communication import _default_comm, new_comm
 import cis_interface.drivers.tests.test_ConnectionDriver as parent
 from cis_interface import runner
