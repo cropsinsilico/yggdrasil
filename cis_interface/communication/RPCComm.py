@@ -233,3 +233,9 @@ class RPCComm(CommBase.CommBase):
     def rpcCall(self, *args, **kwargs):
         r"""Alias for RPCComm.call"""
         return self.call(*args, **kwargs)
+
+    def purge(self):
+        r"""Purge input and output comms."""
+        self.icomm.purge()
+        self.ocomm.purge()
+        super(RPCComm, self).purge()
