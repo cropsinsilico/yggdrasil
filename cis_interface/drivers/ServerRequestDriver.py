@@ -33,6 +33,7 @@ class ServerRequestDriver(ConnectionDriver):
         icomm_kws = kwargs.get('icomm_kws', {})
         icomm_kws['comm'] = comm
         icomm_kws['name'] = request_name
+        icomm_kws['close_on_eof_recv'] = False
         kwargs['icomm_kws'] = icomm_kws
         # Output communicator
         ocomm_kws = kwargs.get('ocomm_kws', {})
@@ -110,7 +111,8 @@ class ServerRequestDriver(ConnectionDriver):
         self.nclients -= 1
         if self.nclients == 0:
             self.icomm._last_header['response_address'] = 'EOF'
-            super(ServerRequestDriver, self).on_eof()
+            return super(ServerRequestDriver, self).on_eof()
+        return ''
 
     def on_message(self, msg):
         r"""Process a message checking to see if it is a client signing on.

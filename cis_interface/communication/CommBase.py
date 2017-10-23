@@ -40,6 +40,9 @@ class CommBase(CisClass):
         recv_timeout (float, optional): Time that should be waited for an
             incoming message before returning None. Defaults to 0 (no wait). A
             value of False indicates that recv should block.
+        close_on_eof_recv (bool, optional): If True, the comm will be closed
+            when it receives an end-of-file messages. Otherwise, it will remain
+            open. Defaults to True.
         **kwargs: Additional keywords arguments are passed to parent class.
 
     Attributes:
@@ -56,6 +59,8 @@ class CommBase(CisClass):
             to encode sent messages.
         recv_timeout (float): Time that should be waited for an incoming
             message before returning None.
+        close_on_eof_recv (bool): If True, the comm will be closed when it
+            receives an end-of-file messages. Otherwise, it will remain open.
 
     Raises:
         Exception: If there is not an environment variable with the specified
@@ -64,7 +69,8 @@ class CommBase(CisClass):
     """
     def __init__(self, name, address=None, direction='send',
                  deserialize=None, serialize=None, format_str=None,
-                 dont_open=False, recv_timeout=0.0, **kwargs):
+                 dont_open=False, recv_timeout=0.0, close_on_eof_recv=True,
+                 **kwargs):
         super(CommBase, self).__init__(name, **kwargs)
         self.name = name
         if address is None:
@@ -82,6 +88,7 @@ class CommBase(CisClass):
         self.meth_deserialize = deserialize
         self.meth_serialize = serialize
         self.recv_timeout = recv_timeout
+        self.close_on_eof_recv = close_on_eof_recv
         self._last_header = None
         self._work_comms = {}
         if not dont_open:
@@ -567,8 +574,11 @@ class CommBase(CisClass):
             bool: Flag that should be returned for EOF.
 
         """
-        self.close()
-        return False
+        if self.close_on_eof_recv:
+            self.close()
+            return False
+        else:
+            return True
     
     def on_recv(self, s_msg, *args, **kwargs):
         r"""Process raw received message including handling deserializing
@@ -665,3 +675,7 @@ class CommBase(CisClass):
     def recv_nolimit(self, *args, **kwargs):
         r"""Alias for recv."""
         return self.recv(*args, **kwargs)
+
+    def purge(self):
+        r"""Purge all messages from the comm."""
+        pass

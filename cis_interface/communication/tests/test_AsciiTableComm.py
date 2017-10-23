@@ -44,6 +44,20 @@ class TestAsciiTableComm(parent.TestAsciiFileComm):
         nt.assert_equal(self.send_instance.n_msg, 0)
         nt.assert_equal(self.recv_instance.n_msg, 0)
 
+    def test_purge(self):
+        r"""Test purging messages form the comm."""
+        nt.assert_equal(self.send_instance.n_msg, 0)
+        nt.assert_equal(self.recv_instance.n_msg, 0)
+        flag = self.send_instance.send(self.file_lines[0])
+        assert(flag)
+        nt.assert_equal(self.recv_instance.n_msg, 1)
+        self.recv_instance.purge()
+        nt.assert_equal(self.send_instance.n_msg, 0)
+        nt.assert_equal(self.recv_instance.n_msg, 0)
+        # Purge while closed
+        self.recv_instance.close() 
+        self.recv_instance.purge()
+        
 
 class TestAsciiTableComm_AsArray(TestAsciiTableComm):
     r"""Test for AsciiTableComm communication class."""

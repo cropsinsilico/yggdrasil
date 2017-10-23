@@ -331,3 +331,9 @@ class ZMQComm(CommBase.CommBase):
             self.exception(".recv(): Error")
             return (False, None)
         return (True, msg)
+
+    def purge(self):
+        r"""Purge all messages from the comm."""
+        while self.n_msg > 0:
+            _ = self.socket.recv()
+        super(ZMQComm, self).purge()

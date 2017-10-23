@@ -180,16 +180,22 @@ class ConnectionDriver(Driver):
         with self.lock:
             flag, msg = self.icomm.recv(**kwargs)
         if msg == self.icomm.eof_msg:
-            self.on_eof()
+            return self.on_eof()
         if flag:
             return msg
         else:
             return flag
 
     def on_eof(self):
-        r"""Actions to take when EOF received."""
+        r"""Actions to take when EOF received.
+
+        Returns:
+            str, bool: Value that should be returned by recv_message on EOF.
+
+        """
         self.debug(': EOF received')
         self.send_message(self.ocomm.eof_msg)
+        return False
 
     def on_message(self, msg):
         r"""Process a message.

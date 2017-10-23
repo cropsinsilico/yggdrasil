@@ -16,7 +16,8 @@ class TestCommBase(CisTest, IOInfo):
         IOInfo.__init__(self)
         self.comm = 'CommBase'
         self.attr_list += ['name', 'address', 'direction', 'format_str',
-                           'meth_deserialize', 'meth_serialize', 'recv_timeout']
+                           'meth_deserialize', 'meth_serialize', 'recv_timeout',
+                           'close_on_eof_recv']
 
     @property
     def name(self):
@@ -135,3 +136,19 @@ class TestCommBase(CisTest, IOInfo):
             nt.assert_equal(msg_recv, self.msg_long)
         nt.assert_equal(self.send_instance.n_msg, 0)
         nt.assert_equal(self.recv_instance.n_msg, 0)
+
+    def test_purge(self):
+        r"""Test purging messages form the comm."""
+        # Purge while open
+        nt.assert_equal(self.send_instance.n_msg, 0)
+        nt.assert_equal(self.recv_instance.n_msg, 0)
+        if self.comm != 'CommBase':
+            flag = self.send_instance.send(self.msg_short)
+            assert(flag)
+            nt.assert_equal(self.recv_instance.n_msg, 1)
+        self.recv_instance.purge()
+        nt.assert_equal(self.send_instance.n_msg, 0)
+        nt.assert_equal(self.recv_instance.n_msg, 0)
+        # Purge while closed
+        self.recv_instance.close() 
+        self.recv_instance.purge()

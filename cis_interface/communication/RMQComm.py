@@ -310,3 +310,9 @@ class RMQComm(CommBase.CommBase):
             self.exception(".recv(): Error")
             raise
         return (True, msg)
+
+    def purge(self):
+        r"""Remove all messages from the associated queue."""
+        if self.channel:
+            self.channel.queue_purge(queue=self.queue)
+        super(RMQComm, self).purge()
