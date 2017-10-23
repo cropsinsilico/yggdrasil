@@ -827,7 +827,7 @@ comm_t cisAsciiTableOutput(const char *name, const char *format_str,
     out.serializer.info = (void*)table;
   }
   // Change serializer type if as_array
-  if (as_array == 0)
+  if (as_array == 1)
     out.serializer.type = ASCII_TABLE_ARRAY_SERI;
   return out;
 };
@@ -866,7 +866,7 @@ comm_t cisAsciiTableInput(const char *name, const int as_array, const int src_ty
     out.serializer.info = (void*)table;
   }
   // Change serializer type if as_array
-  if (as_array == 0)
+  if (as_array == 1)
     out.serializer.type = ASCII_TABLE_ARRAY_SERI;
   return out;
 };
@@ -878,6 +878,7 @@ comm_t cisAsciiTableInput(const char *name, const int as_array, const int src_ty
 #define psiOutput_t cisOutput_t
 #define psiInput cisInput
 #define psiOutput cisOutput
+#define psi_free cis_free
 #define psi_input cisInput
 #define psi_output cisOutput
 #define psiInputFmt cisInputFmt
@@ -898,14 +899,15 @@ comm_t cisAsciiTableInput(const char *name, const int as_array, const int src_ty
 #define psiRpc cisRpc
 #define psiRpcClient cisRpcClient
 #define psiRpcServer cisRpcServer
+#define psi_free_rpc cis_free_rpc
 #define psiAsciiFileInput_t cisAsciiFileInput_t
-#define psiAsciiFileInput cisAsciiFileInput_t
+#define psiAsciiFileInput cisAsciiFileInput
 #define psiAsciiFileOutput_t cisAsciiFileOutput_t
-#define psiAsciiFileOutput cisAsciiFileOutput_t
+#define psiAsciiFileOutput cisAsciiFileOutput
 #define psiAsciiTableInput_t cisAsciiTableInput_t
-#define psiAsciiTableInput cisAsciiTableInput_t
+#define psiAsciiTableInput cisAsciiTableInput
 #define psiAsciiTableOutput_t cisAsciiTableOutput_t
-#define psiAsciiTableOutput cisAsciiTableOutput_t
+#define psiAsciiTableOutput cisAsciiTableOutput
 
 
 #endif /*PSIINTERFACE_H_*/

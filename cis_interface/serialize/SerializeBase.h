@@ -40,7 +40,7 @@ static inline
 int serialize_direct(const seri_t s, char *buf, const int buf_siz, va_list ap) {
   char *msg = va_arg(ap, char*);
   int ret = strlen(msg);
-  if (ret < buf_siz)
+  if ((ret + 1) < buf_siz)
     strcpy(buf, msg);
   return ret;
 };
@@ -56,8 +56,9 @@ int serialize_direct(const seri_t s, char *buf, const int buf_siz, va_list ap) {
 static inline
 int deserialize_direct(const seri_t s, const char *buf, const int buf_siz, va_list ap) {
   char **msg = va_arg(ap, char**);
-  *msg = (char*)realloc(*msg, buf_siz);
-  memcpy(msg, buf, buf_siz);
+  *msg = (char*)realloc(*msg, buf_siz + 1);
+  memcpy(*msg, buf, buf_siz);
+  (*msg)[buf_siz] = '\0';
   return 1;
 };
   
