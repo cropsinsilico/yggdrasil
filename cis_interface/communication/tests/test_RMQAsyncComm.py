@@ -6,4 +6,4 @@ class TestRMQAsyncComm(parent.TestRMQComm):
     def __init__(self, *args, **kwargs):
         super(TestRMQAsyncComm, self).__init__(*args, **kwargs)
         self.comm = 'RMQAsyncComm'
-        self.attr_list += ['times_connected']
+        self.attr_list += ['times_connected', 'lock', 'thread']

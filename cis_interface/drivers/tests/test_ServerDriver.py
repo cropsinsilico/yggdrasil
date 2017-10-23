@@ -1,4 +1,5 @@
 import nose.tools as nt
+from cis_interface.drivers.ServerRequestDriver import CIS_CLIENT_INI
 from cis_interface.communication import _default_comm, new_comm
 import cis_interface.drivers.tests.test_ConnectionDriver as parent
 from cis_interface import runner
@@ -11,7 +12,7 @@ class TestServerParam(parent.TestConnectionParam):
         super(TestServerParam, self).__init__(*args, **kwargs)
         self.driver = 'ServerDriver'
         self.args = None
-        self.attr_list += ['comm', 'response_drivers']
+        self.attr_list += ['comm', 'response_drivers', 'nclients']
         self.sleeptime = 0.5
         self.comm_name = _default_comm
         self.client_comm = _default_comm
@@ -82,8 +83,8 @@ class TestServerParam(parent.TestConnectionParam):
     def create_client(self):
         r"""Create a new ClientDriver instance."""
         inst = runner.create_driver(
-            'ClientDriver', 'test_model_request' + self.uuid,
-            request_name='test_request' + self.uuid, comm=self.client_comm,
+            'ClientDriver', 'test_model_request.' + self.uuid,
+            request_name='test_request.' + self.uuid, comm=self.client_comm,
             namespace=self.namespace, workingDir=self.workingDir,
             timeout=self.timeout)
         return inst
@@ -102,6 +103,36 @@ class TestServerDriver(TestServerParam, parent.TestConnectionDriver):
     def test_purge(self):
         r"""Test purge of queue."""
         pass
+
+    def test_client_count(self):
+        r"""Test to ensure client count is correct."""
+        T = self.instance.start_timeout()
+        while ((not T.is_out) and (self.instance.nclients != 1)):
+            self.instance.sleep()
+        self.instance.stop_timeout()
+        nt.assert_equal(self.instance.nclients, 1)
+        # Create new client
+        cli_drv2 = self.create_client()
+        cli_drv2.start()
+        T = self.instance.start_timeout()
+        while ((not T.is_out) and (self.instance.nclients != 2)):
+            self.instance.sleep()
+        self.instance.stop_timeout()
+        nt.assert_equal(self.instance.nclients, 2)
+        # Send sign off
+        cli_drv2.icomm.close()
+        T = self.instance.start_timeout()
+        while ((not T.is_out) and (self.instance.nclients != 1)):
+            self.instance.sleep()
+        self.instance.stop_timeout()
+        nt.assert_equal(self.instance.nclients, 1)
+        # Close client and wait for sign off
+        self.cli_drv.icomm.close()
+        T = self.instance.start_timeout()
+        while ((not T.is_out) and (self.instance.nclients != 0)):
+            self.instance.sleep()
+        self.instance.stop_timeout()
+        nt.assert_equal(self.instance.nclients, 0)
 
     def test_send_recv(self, msg_send=None):
         r"""Test routing of a short message between server and server."""

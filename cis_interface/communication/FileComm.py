@@ -162,3 +162,8 @@ class FileComm(CommBase.CommBase):
         if len(out) == 0:
             out = self.eof_msg
         return (True, out)
+
+    def purge(self):
+        r"""Purge all messages from the comm."""
+        if self.is_open and self.direction == 'recv':
+            self.fd.seek(0, os.SEEK_END)

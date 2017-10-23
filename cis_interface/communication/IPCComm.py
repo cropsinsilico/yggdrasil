@@ -262,3 +262,9 @@ class IPCComm(CommBase.CommBase):
         self.debug(".recv(): message ready, read it")
         data, _ = self.q.receive()  # ignore ident
         return (True, data)
+
+    def purge(self):
+        r"""Purge all messages from the comm."""
+        while self.n_msg > 0:
+            _, _ = self.q.receive()
+        super(IPCComm, self).purge()
