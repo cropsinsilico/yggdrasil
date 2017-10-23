@@ -510,7 +510,7 @@ int vcommRecv(const comm_t x, va_list ap) {
   }
   cislog_debug("vcommRecv(%s): comm_recv returns %d: %s", x.name, ret, buf);
   // Deserialize message
-  ret = deserialize(x.serializer, buf, CIS_MSG_MAX, ap);
+  ret = deserialize(x.serializer, buf, ret, ap);
   if (ret < 0) {
     cislog_error("vcommRecv(%s): error deserializing message (ret=%d)",
 		 x.name, ret);
