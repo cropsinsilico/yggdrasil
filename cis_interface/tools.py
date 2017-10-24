@@ -89,6 +89,7 @@ class CisClass(object):
         workingDir (str): Working directory.
         errors (list): List of errors.
         extra_kwargs (dict): Keyword arguments that were not parsed.
+        sched_out (obj): Output from the last scheduled task with output.
 
     """
     def __init__(self, name, workingDir=None, timeout=60.0, sleeptime=0.01,
@@ -105,12 +106,16 @@ class CisClass(object):
         self.workingDir = workingDir
         self.errors = []
         self.extra_kwargs = kwargs
+        self.sched_out = None
 
     def printStatus(self):
         r"""Print the class status."""
         error('%s(%s): state:', self.__module__, self.name)
 
-    def sched_task(self, t, func, args=[], kwargs={}):
+    def _task_with_output(self, func, *args, **kwargs):
+        self.sched_out = func(*args, **kwargs)
+
+    def sched_task(self, t, func, args=[], kwargs={}, store_output=False):
         r"""Schedule a task that will be executed after a certain time has
         elapsed.
 
@@ -122,9 +127,17 @@ class CisClass(object):
                 Defaults to [].
             kwargs (dict, optional): Keyword arguments for the provided
                 function. Defaults to {}.
+            store_output (bool, optional): If True, the output from the
+                scheduled task is stored in self.sched_out. Otherwise, it is not
+                stored. Defaults to False.
 
         """
-        tobj = Timer(t, func, args=args, kwargs=kwargs)
+        self.sched_out = None
+        if store_output:
+            tobj = Timer(t, self._task_with_output,
+                         args=[func] + args, kwargs=kwargs)
+        else:
+            tobj = Timer(t, func, args=args, kwargs=kwargs)
         tobj.start()
 
     @property
