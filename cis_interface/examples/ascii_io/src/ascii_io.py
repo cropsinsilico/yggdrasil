@@ -17,9 +17,10 @@ if __name__ == '__main__':
     out_table = PsiAsciiTableOutput('outputPy_table',
                                     '%5s\t%ld\t%3.1f\t%3.1lf%+3.1lfj\n')
     # Input & output from a table as an array
-    in_array = PsiAsciiTableInput('inputPy_array')
+    in_array = PsiAsciiTableInput('inputPy_array', as_array=True)
     out_array = PsiAsciiTableOutput('outputPy_array',
-                                    '%5s\t%ld\t%3.1f\t%3.1lf%+3.1lfj\n')
+                                    '%5s\t%ld\t%3.1f\t%3.1lf%+3.1lfj\n',
+                                    as_array=True)
 
     # Read lines from ASCII text file until end of file is reached.
     # As each line is received, it is then sent to the output ASCII file.
