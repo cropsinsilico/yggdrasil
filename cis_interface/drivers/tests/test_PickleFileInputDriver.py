@@ -34,7 +34,8 @@ class TestPickleFileInputDriver(TestPickleFileInputParam,
 
     def assert_before_stop(self):
         r"""Assertions to make before stopping the driver instance."""
-        super(parent.TestFileInputDriver, self).assert_before_stop()
+        super(parent.TestFileInputDriver, self).assert_before_stop(
+            check_open=False)
         self.instance.sleep()
         # File contents
         flag, msg_recv = self.recv_comm.recv_nolimit(self.timeout)

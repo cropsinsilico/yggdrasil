@@ -157,10 +157,10 @@ class TestConnectionDriver(TestConnectionParam, parent.TestDriver):
             assert(flag)
             nt.assert_equal(msg_recv, self.msg_long)
 
-    def assert_before_stop(self):
+    def assert_before_stop(self, check_open=True):
         r"""Assertions to make before stopping the driver instance."""
         super(TestConnectionDriver, self).assert_before_stop()
-        if self.comm_name != 'CommBase':
+        if self.comm_name != 'CommBase' and check_open:
             assert(self.instance.is_comm_open)
 
     def run_before_terminate(self):
