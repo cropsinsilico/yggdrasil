@@ -6,9 +6,9 @@ in_table = PsiInterface('PsiAsciiTableInput', 'inputM_table');
 out_table = PsiInterface('PsiAsciiTableOutput', 'outputM_table', ...
 			 '%5s\t%ld\t%3.1f\t%3.1lf%+3.1lfj\n');
 % Input & output from a table as an array
-in_array = PsiInterface('PsiAsciiTableInput', 'inputM_array');
+in_array = PsiInterface('PsiAsciiTableInput', 'inputM_array', 1);
 out_array = PsiInterface('PsiAsciiTableOutput', 'outputM_array', ...
-			 '%5s\t%ld\t%3.1f\t%3.1lf%+3.1lfj\n');
+			 '%5s\t%ld\t%3.1f\t%3.1lf%+3.1lfj\n', 1);
 
 % Read lines from ASCII text file until end of file is reached.
 % As each line is received, it is then sent to the output ASCII file.
