@@ -1,4 +1,3 @@
-import os
 from cis_interface.drivers.ConnectionDriver import ConnectionDriver
 from cis_interface.drivers.ClientResponseDriver import ClientResponseDriver
 
