@@ -33,7 +33,7 @@ public:
   CisInput(const char *name) : _pi(cisInput(name)) {}
 
   /*! @brief Empty constructor for inheritance. */
-  CisInput() {}
+  CisInput(cisInput_t x) : _pi(x) {}
 
   /*!
     @brief Constructor for CisInput with format.
@@ -50,6 +50,14 @@ public:
   ~CisInput() { cis_free(&_pi); }
   
   /*!
+    @brief Return the cisInput_t structure.
+    @return cisInput_t structure underlying the class.
+  */
+  cisInput_t pi() {
+    return _pi;
+  };
+
+  /*!
     @brief Receive a message shorter than CIS_MSG_MAX from the input queue.
     See cis_recv in PsiInterface.h for additional details.
     @param[out] data character pointer to allocated buffer where the message
@@ -58,9 +66,7 @@ public:
     @returns int -1 if message could not be received. Length of the received
     message if message was received.
    */
-  int recv(char *data, const int len) {
-    return cis_recv(_pi, data, len);
-  }
+  int recv(char *data, const int len) { return cis_recv(_pi, data, len); }
 
   /*!
     @brief Receive and parse a message shorter than CIS_MSG_MAX from the input
@@ -152,7 +158,7 @@ public:
   CisOutput(const char *name, char *fmt) : _pi(cisOutputFmt(name, fmt)) {}
 
   /*! @brief Empty constructor for inheritance. */
-  CisOutput() {}
+  CisOutput(cisOutput_t x) : _pi(x) {}
   
   /*!
     @brief Destructor for CisOutput.
@@ -160,6 +166,14 @@ public:
   */
   ~CisOutput() { cis_free(&_pi); }
   
+  /*!
+    @brief Return the cisOutput_t structure.
+    @return cisOutput_t structure underlying the class.
+  */
+  cisOutput_t pi() {
+    return _pi;
+  };
+
   /*!
     @brief Send a message smaller than CIS_MSG_MAX to the output queue.
     If the message is larger than CIS_MSG_MAX an error code will be returned.
@@ -225,6 +239,11 @@ public:
     return ret;
   }
 
+  /*!
+    @brief Send EOF message to output file, closing it.
+    @returns int 0 if send was succesfull. All other values indicate errors.
+   */
+  int send_eof() { return cis_send_eof(_pi); }
 };
 	
 
@@ -402,7 +421,6 @@ public:
   ASCII file output operations.
  */
 class CisAsciiFileOutput : public CisOutput {
-  cisAsciiFileOutput_t _pi;
 public:
 
   /*!
@@ -413,16 +431,11 @@ public:
     queue.
    */
   CisAsciiFileOutput(const char *name, const int dst_type = 1) :
-    _pi(cisAsciiFileOutput(name, dst_type)) {}
+    CisOutput(cisAsciiFileOutput(name, dst_type)) {}
   
   /*! @brief Empty constructor for inheritance. */
-  CisAsciiFileOutput() {}
-  
-  /*!
-    @brief Send EOF message to output file, closing it.
-    @returns int 0 if send was succesfull. All other values indicate errors.
-   */
-  int send_eof() { return cis_send_eof(_pi); }
+  CisAsciiFileOutput(cisOutput_t x) :
+    CisOutput(x) {}
   
   /*!
     @brief Send a single line to a file or queue.
@@ -443,7 +456,6 @@ public:
   ASCII file input operations.
  */
 class CisAsciiFileInput : public CisInput {
-  cisAsciiFileInput_t _pi;
 public:
 
   /*!
@@ -454,10 +466,11 @@ public:
     queue.
    */
   CisAsciiFileInput(const char *name, const int src_type = 1) :
-    _pi(cisAsciiFileInput(name, src_type)) {}
+    CisInput(cisAsciiFileInput(name, src_type)) {}
 
   /*! @brief Empty constructor for inheritance. */
-  CisAsciiFileInput() {}
+  CisAsciiFileInput(cisInput_t x) :
+    CisInput(x) {}
   
   /*!
     @brief Receive a single line from an associated file or queue.
@@ -468,7 +481,7 @@ public:
     @returns int Number of bytes read/received. Negative values indicate that
     there was either an error or the EOF message was received.
    */
-  int recv_line(char *line, size_t n) { return recv(line, n); }
+  int recv_line(char *line, const size_t n) { return recv(line, n); }
   
 };
 
@@ -482,7 +495,6 @@ public:
   ASCII table output operations.
  */
 class CisAsciiTableOutput : public CisAsciiFileOutput {
-  cisAsciiTableOutput_t _pi;
 public:
 
   /*!
@@ -499,7 +511,7 @@ public:
    */
   CisAsciiTableOutput(const char *name, const char *format_str,
 		      const int as_array = 0, const int dst_type = 1) :
-    _pi(cisAsciiTableOutput(name, format_str, as_array, dst_type)) {}
+    CisAsciiFileOutput(cisAsciiTableOutput(name, format_str, as_array, dst_type)) {}
 
 };
 
@@ -512,8 +524,7 @@ public:
   PsiInterface.h header. It provides the user with C++ style access to basic
   ASCII table input operations.
  */
-class CisAsciiTableInput {
-  cisAsciiTableInput_t _pi;
+class CisAsciiTableInput : public CisAsciiFileInput {
 public:
 
   /*!
@@ -531,8 +542,8 @@ public:
    */
   CisAsciiTableInput(const char *name, const int as_array = 0,
 		     const int src_type = 1) :
-    _pi(cisAsciiTableInput(name, as_array, src_type)) {
-    char *fmt = ((asciiTable_t*)(_pi.serializer.info))->format_str;
+    CisAsciiFileInput(cisAsciiTableInput(name, as_array, src_type)) {
+    char *fmt = ((asciiTable_t*)(pi().serializer.info))->format_str;
     // For input, remove precision from floats to avoid confusing vsscanf
     // C version
     // int ret = simplify_formats(fmt, CIS_MSG_MAX);
@@ -552,17 +563,17 @@ public:
     // strcpy(fmt, result.c_str());
   }
 
-  /*!
-    @brief Recv a nolimit message from a table input queue.
-    @param[in] data character pointer to pointer to memory where received
-    message should be stored. It does not need to be allocated, only defined.
-    @param[in] len int length of allocated buffer.
-    @returns int -1 if message could not be received. Length of the received
-    message if message was received.
-   */
-  int recv(char **data, const int len) {
-    return cis_recv_nolimit(_pi, data, len);
-  }
+  // /*!
+  //   @brief Recv a nolimit message from a table input queue.
+  //   @param[in] data character pointer to pointer to memory where received
+  //   message should be stored. It does not need to be allocated, only defined.
+  //   @param[in] len int length of allocated buffer.
+  //   @returns int -1 if message could not be received. Length of the received
+  //   message if message was received.
+  //  */
+  // int recv(char **data, const int len) {
+  //   return cis_recv_nolimit(_pi, data, len);
+  // }
   
 };
 

@@ -176,6 +176,7 @@ def PsiAsciiFileInput(name, src_type=1, matlab=False, **kwargs):
         kwargs.setdefault('address', name)
     else:
         base = DefaultComm
+        name += '_IN'
     kwargs.setdefault('direction', 'recv')
     return base(name, recv_timeout=False, **kwargs)
 
@@ -202,6 +203,7 @@ def PsiAsciiFileOutput(name, dst_type=1, matlab=False, **kwargs):
         kwargs.setdefault('address', name)
     else:
         base = DefaultComm
+        name += '_OUT'
     kwargs.setdefault('direction', 'send')
     return base(name, recv_timeout=False, **kwargs)
             
@@ -232,6 +234,7 @@ def PsiAsciiTableInput(name, src_type=1, as_array=False, matlab=False, **kwargs)
         kwargs.setdefault('address', name)
     else:
         base = DefaultComm
+        name += '_IN'
     kwargs.setdefault('direction', 'recv')
     if src_type == 0:
         kwargs['as_array'] = as_array
@@ -276,6 +279,7 @@ def PsiAsciiTableOutput(name, fmt, dst_type=1, as_array=False, matlab=False,
         kwargs.setdefault('address', name)
     else:
         base = DefaultComm
+        name += '_OUT'
     if matlab:  # pragma: matlab
         fmt = backwards.decode_escape(fmt)
     kwargs.setdefault('direction', 'send')
@@ -316,6 +320,7 @@ def PsiPickleInput(name, src_type=1, matlab=False, **kwargs):
         kwargs.setdefault('address', name)
     else:
         base = DefaultComm
+        name += '_IN'
     kwargs.setdefault('direction', 'recv')
     out = base(name, recv_timeout=False, **kwargs)
     out.meth_deserialize = PickleDeserialize.PickleDeserialize()
@@ -342,6 +347,7 @@ def PsiPickleOutput(name, dst_type=1, matlab=False, **kwargs):
         kwargs.setdefault('address', name)
     else:
         base = DefaultComm
+        name += '_OUT'
     kwargs.setdefault('direction', 'send')
     out = base(name, recv_timeout=False, **kwargs)
     out.meth_serialize = PickleSerialize.PickleSerialize()

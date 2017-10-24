@@ -672,11 +672,15 @@ int rpcCall(const cisRpc_t rpc,  ...){
 static inline
 comm_t cisAsciiFileOutput(const char *name, const int dst_type) {
   comm_type type;
+  char name_suffix[CIS_MSG_MAX];
+  strcpy(name_suffix, name);
   if (dst_type == 0)
     type = ASCII_FILE_COMM;
-  else
+  else {
     type = _default_comm;
-  comm_t out = init_comm(name, "send", type, NULL);
+    strcat(name_suffix, "_OUT");
+  }
+  comm_t out = init_comm(name_suffix, "send", type, NULL);
   return out;
 };
 
@@ -692,11 +696,15 @@ comm_t cisAsciiFileOutput(const char *name, const int dst_type) {
 static inline
 comm_t cisAsciiFileInput(const char *name, const int src_type) {
   comm_type type;
+  char name_suffix[CIS_MSG_MAX];
+  strcpy(name_suffix, name);
   if (src_type == 0)
     type = ASCII_FILE_COMM;
-  else
+  else {
     type = _default_comm;
-  comm_t out = init_comm(name, "recv", type, NULL);
+    strcat(name_suffix, "_IN");
+  }
+  comm_t out = init_comm(name_suffix, "recv", type, NULL);
   return out;
 };
 
@@ -807,11 +815,15 @@ static inline
 comm_t cisAsciiTableOutput(const char *name, const char *format_str,
 			   const int as_array, const int dst_type) {
   comm_type type;
+  char name_suffix[CIS_MSG_MAX];
+  strcpy(name_suffix, name);
   if (dst_type == 0)
     type = ASCII_TABLE_COMM;
-  else
+  else {
     type = _default_comm;
-  comm_t out = init_comm(name, "send", type, (void*)format_str);
+    strcat(name_suffix, "_OUT");
+  }
+  comm_t out = init_comm(name_suffix, "send", type, (void*)format_str);
   // For connection, send format and initialize serializer
   if (dst_type != 0) {
     int ret = comm_send(out, format_str, strlen(format_str));
@@ -821,7 +833,7 @@ comm_t cisAsciiTableOutput(const char *name, const char *format_str,
     }
     // TODO: Make sure this is freed.
     asciiTable_t *table = (asciiTable_t*)malloc(sizeof(asciiTable_t));
-    table[0] = asciiTable(name, "0", format_str,
+    table[0] = asciiTable(name_suffix, "0", format_str,
 			  NULL, NULL, NULL);
     out.serializer.type = ASCII_TABLE_SERI;
     out.serializer.info = (void*)table;
@@ -845,11 +857,15 @@ comm_t cisAsciiTableOutput(const char *name, const char *format_str,
 static inline
 comm_t cisAsciiTableInput(const char *name, const int as_array, const int src_type) {
   comm_type type;
+  char name_suffix[CIS_MSG_MAX];
+  strcpy(name_suffix, name);
   if (src_type == 0)
     type = ASCII_TABLE_COMM;
-  else
+  else {
     type = _default_comm;
-  comm_t out = init_comm(name, "recv", type, NULL);
+    strcat(name_suffix, "_IN");
+  }
+  comm_t out = init_comm(name_suffix, "recv", type, NULL);
   // For connection, receive format and initialize serializer
   if (src_type != 0) {
     char format_str[CIS_MSG_MAX];
@@ -860,7 +876,7 @@ comm_t cisAsciiTableInput(const char *name, const int as_array, const int src_ty
     }
     // TODO: Make sure this is freed.
     asciiTable_t *table = (asciiTable_t*)malloc(sizeof(asciiTable_t));
-    table[0] = asciiTable(name, "0", format_str,
+    table[0] = asciiTable(name_suffix, "0", format_str,
 			  NULL, NULL, NULL);
     out.serializer.type = ASCII_TABLE_SERI;
     out.serializer.info = (void*)table;

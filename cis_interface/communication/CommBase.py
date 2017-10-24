@@ -679,3 +679,28 @@ class CommBase(CisClass):
     def purge(self):
         r"""Purge all messages from the comm."""
         pass
+
+    # ALIASES
+    def send_line(self, *args, **kwargs):
+        r"""Alias for send."""
+        return self.send(*args, **kwargs)
+
+    def recv_line(self, *args, **kwargs):
+        r"""Alias for recv."""
+        return self.recv(*args, **kwargs)
+
+    def send_row(self, *args, **kwargs):
+        r"""Alias for send."""
+        return self.send(*args, **kwargs)
+
+    def recv_row(self, *args, **kwargs):
+        r"""Alias for recv."""
+        return self.recv(*args, **kwargs)
+
+    def send_array(self, *args, **kwargs):
+        r"""Alias for send."""
+        return self.send(*args, **kwargs)
+
+    def recv_array(self, *args, **kwargs):
+        r"""Alias for recv."""
+        return self.recv(*args, **kwargs)
