@@ -15,24 +15,29 @@ class ServerRequestDriver(ConnectionDriver):
             model_request_name + '_SERVER' if not set.
         comm (str, optional): The comm class that should be used to
             communicate with the client request driver. Defaults to _default_comm.
+        comm_address (str, optional): Address for the client request driver.
+            Defaults to None and a new address is generated.
         **kwargs: Additional keyword arguments are passed to parent class.
 
     Attributes:
         comm (str): The comm class that should be used to communicate
             with the server driver. Defaults to _default_comm.
+        comm_address (str): Address for the client request driver.
         response_drivers (list): Response drivers created for each request.
         nclients (int): Number of clients signed on.
 
     """
 
     def __init__(self, model_request_name, request_name=None,
-                 comm=None, **kwargs):
+                 comm=None, comm_address=None, **kwargs):
         if request_name is None:
             request_name = model_request_name + '_SERVER'
         # Input communicator
         icomm_kws = kwargs.get('icomm_kws', {})
         icomm_kws['comm'] = comm
         icomm_kws['name'] = request_name
+        if comm_address is not None:
+            icomm_kws['address'] = comm_address
         icomm_kws['close_on_eof_recv'] = False
         kwargs['icomm_kws'] = icomm_kws
         # Output communicator
@@ -42,14 +47,13 @@ class ServerRequestDriver(ConnectionDriver):
         ocomm_kws['reverse_names'] = True
         kwargs['ocomm_kws'] = ocomm_kws
         super(ServerRequestDriver, self).__init__(model_request_name, **kwargs)
-        os.environ[self.icomm.name] = self.icomm.address
-        self.env[self.icomm.name] = self.icomm.address
         self.env[self.ocomm.icomm.name] = self.ocomm.icomm.address
         self.env[self.ocomm.ocomm.name] = self.ocomm.ocomm.address
         self.response_drivers = []
         self.nclients = 0
         assert(not hasattr(self, 'comm'))
         self.comm = comm
+        self.comm_address = self.icomm.address
         # print 80*'='
         # print self.__class__
         # print self.env

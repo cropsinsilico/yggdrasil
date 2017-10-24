@@ -40,17 +40,20 @@ class ClientRequestDriver(ConnectionDriver):
         comm (str, optional): The comm class that should be used to
             communicate with the server request driver. Defaults to
             _default_comm.
+        comm_address (str, optional): Address for the server request driver.
+            Defaults to None and a new address is generated.
         **kwargs: Additional keyword arguments are passed to parent class.
 
     Attributes:
         comm (str): The comm class that should be used to communicate with the
             server request driver.
+        comm_address (str): Address for the server request driver.
         response_drivers (list): Response drivers created for each request.
 
     """
 
     def __init__(self, model_request_name, request_name=None,
-                 comm=None, **kwargs):
+                 comm=None, comm_address=None, **kwargs):
         if request_name is None:
             request_name = model_request_name + '_SERVER'
         # Input communicator
@@ -63,16 +66,16 @@ class ClientRequestDriver(ConnectionDriver):
         ocomm_kws = kwargs.get('ocomm_kws', {})
         ocomm_kws['comm'] = comm
         ocomm_kws['name'] = request_name
+        if comm_address is not None:
+            ocomm_kws['address'] = comm_address
         kwargs['ocomm_kws'] = ocomm_kws
         super(ClientRequestDriver, self).__init__(model_request_name, **kwargs)
-        os.environ[self.ocomm.name] = self.ocomm.address
-        # self.env[self.name] = self.icomm.opp_address
-        self.env[self.ocomm.name] = self.ocomm.address
         self.env[self.icomm.icomm.name] = self.icomm.icomm.address
         self.env[self.icomm.ocomm.name] = self.icomm.ocomm.address
         self.response_drivers = []
         assert(not hasattr(self, 'comm'))
         self.comm = comm
+        self.comm_address = self.ocomm.address
         # print 80*'='
         # print self.__class__
         # print self.env
