@@ -52,7 +52,7 @@ class TestFileInputDriver(TestFileInputParam, parent.TestConnectionDriver):
 
     def assert_before_stop(self):
         r"""Assertions to make before stopping the driver instance."""
-        super(TestFileInputDriver, self).assert_before_stop()
+        super(TestFileInputDriver, self).assert_before_stop(check_open=False)
         self.instance.sleep()
         # File contents
         flag, msg_recv = self.recv_comm.recv(self.timeout)

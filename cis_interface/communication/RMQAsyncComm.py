@@ -98,10 +98,10 @@ class RMQAsyncComm(RMQComm):
             if self._closing:  # pragma: debug
                 return  # Don't close more than once
         # Wait for connection to finish opening to close it
-        T = self.start_timeout()
+        T = self.start_timeout(key=self.timeout_key + '_opening')
         while (not T.is_out) and self._opening:
             self.sleep()
-        self.stop_timeout()
+        self.stop_timeout(key=self.timeout_key + '_opening')
         # Don't close a connection that was never opened
         if not (self.is_open or self._bound):
             return
