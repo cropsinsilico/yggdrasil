@@ -209,19 +209,19 @@ def PsiAsciiFileOutput(name, dst_type=1, matlab=False, **kwargs):
             
 
 # Specialized classes for ascii table IO
-def PsiAsciiTableInput(name, src_type=1, as_array=False, matlab=False, **kwargs):
+def PsiAsciiTableInput(name, as_array=False, src_type=1, matlab=False, **kwargs):
     r"""Get class for handling table-like formatted input.
 
     Args:
         name (str): The path to the local file to read input from (if src_type
             == 0) or the name of the message queue input should be received
             from.
-        src_type (int, optional): If 0, input is read from a local file.
-            Otherwise, the input is received from a message queue. Defaults to
-            1.
         as_array (bool, optional): If True, recv returns the entire table
             array and can only be called once. If False, recv returns row
             entries. Default to False.
+        src_type (int, optional): If 0, input is read from a local file.
+            Otherwise, the input is received from a message queue. Defaults to
+            1.
         **kwargs: Additional keyword arguments are passed to the base comm.
 
     Returns:
@@ -252,7 +252,7 @@ def PsiAsciiTableInput(name, src_type=1, as_array=False, matlab=False, **kwargs)
     return out
 
 
-def PsiAsciiTableOutput(name, fmt, dst_type=1, as_array=False, matlab=False,
+def PsiAsciiTableOutput(name, fmt, as_array=False, dst_type=1, matlab=False,
                         **kwargs):
     r"""Get class for handling table-like formatted output.
 
