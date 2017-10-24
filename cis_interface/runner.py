@@ -91,6 +91,7 @@ class CisRunner(object):
         self.modeldrivers = {}
         self.inputdrivers = {}
         self.outputdrivers = {}
+        self.serverdrivers = {}
         self._inputchannels = []
         self._outputchannels = []
         self.error_flag = False
@@ -258,6 +259,9 @@ class CisRunner(object):
         try:
             debug('creating %s, a %s', yml['name'], yml['driver'])
             curpath = os.getcwd()
+            if 'ClientDriver' in yml['driver']:
+                yml['kwargs'].setdefault('comm_address',
+                                         self.serverdrivers[yml['args']])
             os.chdir(yml['workingDir'])
             instance = create_driver(yml['driver'], yml['name'], yml['args'],
                                      yml=yml, env=yml.get('env', {}),
@@ -266,6 +270,8 @@ class CisRunner(object):
                                      **yml['kwargs'])
             yml['instance'] = instance
             os.chdir(curpath)
+            if 'ServerDriver' in yml['driver']:
+                self.serverdrivers[yml['args']] = instance.comm_address
         except Exception as e:  # pragma: debug
             error("Exception %s: Unable to load driver from yaml %s",
                   e, pformat(yml))

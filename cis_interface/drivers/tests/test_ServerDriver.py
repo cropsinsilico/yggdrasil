@@ -34,6 +34,7 @@ class TestServerParam(parent.TestConnectionParam):
         out = super(TestServerParam, self).inst_kwargs
         out['request_name'] = self.cli_drv.request_name
         out['comm'] = self.cli_drv.comm
+        out['comm_address'] = self.cli_drv.comm_address
         out['ocomm_kws']['comm'] = 'RPCComm'
         out['ocomm_kws']['icomm_kwargs'] = {'comm': self.comm_name}
         out['ocomm_kws']['ocomm_kwargs'] = {'comm': self.comm_name}
@@ -79,11 +80,12 @@ class TestServerParam(parent.TestConnectionParam):
             assert(self.cli_recv_comm.is_closed)
         super(TestServerParam, self).teardown()
 
-    def create_client(self):
+    def create_client(self, comm_address=None):
         r"""Create a new ClientDriver instance."""
         inst = runner.create_driver(
             'ClientDriver', 'test_model_request.' + self.uuid,
             request_name='test_request.' + self.uuid, comm=self.client_comm,
+            comm_address=comm_address,
             namespace=self.namespace, workingDir=self.workingDir,
             timeout=self.timeout)
         return inst
@@ -111,7 +113,7 @@ class TestServerDriver(TestServerParam, parent.TestConnectionDriver):
         self.instance.stop_timeout()
         nt.assert_equal(self.instance.nclients, 1)
         # Create new client
-        cli_drv2 = self.create_client()
+        cli_drv2 = self.create_client(comm_address=self.cli_drv.comm_address)
         cli_drv2.start()
         T = self.instance.start_timeout()
         while ((not T.is_out) and (self.instance.nclients != 2)):

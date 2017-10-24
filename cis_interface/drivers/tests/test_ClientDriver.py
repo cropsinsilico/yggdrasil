@@ -34,6 +34,7 @@ class TestClientParam(parent.TestConnectionParam):
         out = super(TestClientParam, self).inst_kwargs
         out['request_name'] = self.srv_drv.request_name
         out['comm'] = self.srv_drv.comm
+        out['comm_address'] = self.srv_drv.comm_address
         out['icomm_kws']['comm'] = 'RPCComm'
         out['icomm_kws']['icomm_kwargs'] = {'comm': self.comm_name}
         out['icomm_kws']['ocomm_kwargs'] = {'comm': self.comm_name}
@@ -79,11 +80,12 @@ class TestClientParam(parent.TestConnectionParam):
             assert(self.srv_recv_comm.is_closed)
         super(TestClientParam, self).teardown()
 
-    def create_server(self):
+    def create_server(self, comm_address=None):
         r"""Create a new ServerDriver instance."""
         inst = runner.create_driver(
             'ServerDriver', 'test_model_request' + self.uuid,
             request_name='test_request' + self.uuid, comm=self.server_comm,
+            comm_address=comm_address,
             namespace=self.namespace, workingDir=self.workingDir,
             timeout=self.timeout)
         return inst
