@@ -1,27 +1,8 @@
 import os
 import nose.tools as nt
 from cis_interface import runner
-from cis_interface.drivers import Driver, ModelDriver, IODriver
-from cis_interface.tests import scripts
 from cis_interface.tests import yamls as sc_yamls
 from cis_interface.examples import yamls as ex_yamls
-
-
-def test_import_driver():
-    r"""Check a few drivers."""
-    drvs = [('Driver', Driver.Driver),
-            ('ModelDriver', ModelDriver.ModelDriver),
-            ('IODriver', IODriver.IODriver)]
-    for n, dans in drvs:
-        dres = runner.import_driver(n)
-        nt.assert_equal(dres, dans)
-
-
-def test_create_driver():
-    r"""Test driver creation w/ and w/o args."""
-    runner.create_driver('Driver', 'test_io_driver')
-    runner.create_driver('ModelDriver', 'test_model_driver',
-                         args=scripts['python'])
 
 
 def test_get_runner():
