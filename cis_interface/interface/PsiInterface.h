@@ -415,20 +415,21 @@ int cisRecv_nolimit(const cisInput_t cisQ, ...) {
   Contains information required to coordinate sending/receiving 
   response/requests from/to an RPC server/client.
  */
-typedef struct cisRpc_t {
-  cisInput_t _input; //!< Input queue structure.
-  cisOutput_t _output; //!< Output queue structure.
-} cisRpc_t;
+#define cisRpc_t comm_t
+/* typedef struct cisRpc_t { */
+/*   cisInput_t _input; //!< Input queue structure. */
+/*   cisOutput_t _output; //!< Output queue structure. */
+/* } cisRpc_t; */
 
 /*!
   @brief Free an RPC structure.
   @param[in] x cisRpc_t * Pointer to structure to be deallocated.
 */
-static inline
-void cis_free_rpc(cisRpc_t *x) {
-  cis_free(&(x->_input));
-  cis_free(&(x->_output));
-};
+/* static inline */
+/* void cis_free_rpc(cisRpc_t *x) { */
+/*   cis_free(&(x->_input)); */
+/*   cis_free(&(x->_output)); */
+/* }; */
 
 /*!
   @brief Constructor for RPC structure.
@@ -442,12 +443,14 @@ void cis_free_rpc(cisRpc_t *x) {
   @return cisRpc_t structure with provided info.
  */
 static inline 
-cisRpc_t cisRpc(const char *outName, char *outFormat,
-		const char *inName, char *inFormat){
-  cisRpc_t rpc;
-  rpc._input = cisInputFmt(inName, inFormat);
-  rpc._output = cisOutputFmt(outName, outFormat);
-  return rpc;
+cisRpc_t cisRpc(const char *name, char *outFormat, char *inFormat) {
+  /*            const char *outName, char *outFormat, */
+  /* 		const char *inName, char *inFormat){ */
+  /* cisRpc_t rpc; */
+  /* rpc._input = cisInputFmt(inName, inFormat); */
+  /* rpc._output = cisOutputFmt(outName, outFormat); */
+  /* return rpc; */
+  return init_comm(name, outFormat, RPC_COMM, inFormat);
 };
 
 /*!
@@ -460,11 +463,14 @@ cisRpc_t cisRpc(const char *outName, char *outFormat,
   parsing input.
   @return cisRpc_t structure with provided info.
  */
-static inline 
-cisRpc_t cisRpcClient(const char *name, char *outFormat, char *inFormat){
-  cisRpc_t rpc = cisRpc(name, outFormat, name, inFormat);
-  return rpc;
+static inline
+comm_t cisRpcClient(const char *name, char *outFormat, char *inFormat){
+  return init_comm(name, outFormat, CLIENT_COMM, inFormat);
 };
+/* cisRpc_t cisRpcClient(const char *name, char *outFormat, char *inFormat){ */
+/*   cisRpc_t rpc = cisRpc(name, outFormat, name, inFormat); */
+/*   return rpc; */
+/* }; */
 
 /*!
   @brief Constructor for server side RPC structure.
@@ -476,11 +482,14 @@ cisRpc_t cisRpcClient(const char *name, char *outFormat, char *inFormat){
   formatting output.
   @return cisRpc_t structure with provided info.
  */
-static inline 
-cisRpc_t cisRpcServer(const char *name, char *inFormat, char *outFormat){
-  cisRpc_t rpc = cisRpc(name, outFormat, name, inFormat);
-  return rpc;
+static inline
+comm_t cisRpcServer(const char *name, char *inFormat, char *outFormat){
+  return init_comm(name, inFormat, SERVER_COMM, outFormat);
 };
+/* cisRpc_t cisRpcServer(const char *name, char *inFormat, char *outFormat){ */
+/*   cisRpc_t rpc = cisRpc(name, outFormat, name, inFormat); */
+/*   return rpc; */
+/* }; */
 
 /*!
   @brief Format and send a message to an RPC output queue.

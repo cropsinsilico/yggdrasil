@@ -11,8 +11,8 @@
 #define CISCOMMBASE_H_
 
 /*! @brief Communicator types. */
-enum comm_enum { IPC_COMM, ZMQ_COMM, ASCII_FILE_COMM,
-		 ASCII_TABLE_COMM, ASCII_TABLE_ARRAY_COMM };
+enum comm_enum { IPC_COMM, ZMQ_COMM, SERVER_COMM, CLIENT_COMM,
+		 ASCII_FILE_COMM, ASCII_TABLE_COMM, ASCII_TABLE_ARRAY_COMM };
 typedef enum comm_enum comm_type;
 #define COMM_NAME_SIZE 100
 #define COMM_ADDRESS_SIZE 500
@@ -32,6 +32,7 @@ typedef struct comm_t {
   void *info; //!< Pointer to any extra info comm requires.
   seri_t serializer; //!< Serializer for comm messages.
   int maxMsgSize; //!< The maximum message size.
+  int always_send_header; //!< 1 if comm should always send a header.
 } comm_t;
 
 /*!
@@ -69,6 +70,7 @@ comm_t new_comm_base(char *address, const char *direction, const comm_type t,
     ret.serializer.info = seri_info;
   }
   ret.maxMsgSize = CIS_MSG_MAX;
+  ret.always_send_header = 0;
   return ret;
 };
 
