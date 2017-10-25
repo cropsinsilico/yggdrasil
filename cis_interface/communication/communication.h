@@ -6,12 +6,11 @@
 #include <ZMQComm.h>
 #include <AsciiFileComm.h>
 #include <AsciiTableComm.h>
+#include <DefaultComm.h>
 
 /*! @brief Flag for checking if this header has already been included. */
 #ifndef CISCOMMUNICATION_H_
 #define CISCOMMUNICATION_H_
-
-comm_type _default_comm = IPC_COMM;
 
 // Forward declaration of eof
 static inline
@@ -32,6 +31,10 @@ int free_comm(comm_t *x) {
     ret = free_ipc_comm(x);
   else if (t == ZMQ_COMM)
     ret = free_zmq_comm(x);
+  else if (t == SERVER_COMM)
+    ret = free_server_comm(x);
+  else if (t == CLIENT_COMM)
+    ret = free_client_comm(x);
   else if (t == ASCII_FILE_COMM)
     ret = free_ascii_file_comm(x);
   else if ((t == ASCII_TABLE_COMM) || (t == ASCII_TABLE_ARRAY_COMM))
@@ -57,6 +60,10 @@ int new_comm_type(comm_t *x) {
     flag = new_ipc_address(x);
   else if (t == ZMQ_COMM)
     flag = new_zmq_address(x);
+  /* else if (t == SERVER_COMM) */
+  /*   flag = new_server_address(x); */
+  /* else if (t == CLIENT_COMM) */
+  /*   flag = new_client_address(x); */
   else if (t == ASCII_FILE_COMM)
     flag = new_ascii_file_address(x);
   else if (t == ASCII_TABLE_COMM)
@@ -84,6 +91,10 @@ int init_comm_type(comm_t *x) {
     flag = init_ipc_comm(x);
   else if (t == ZMQ_COMM)
     flag = init_zmq_comm(x);
+  else if (t == SERVER_COMM)
+    flag = init_server_comm(x);
+  else if (t == CLIENT_COMM)
+    flag = init_client_comm(x);
   else if (t == ASCII_FILE_COMM)
     flag = init_ascii_file_comm(x);
   else if (t == ASCII_TABLE_COMM)
@@ -161,6 +172,10 @@ int comm_nmsg(const comm_t x) {
     ret = ipc_comm_nmsg(x);
   else if (t == ZMQ_COMM)
     ret = zmq_comm_nmsg(x);
+  else if (t == SERVER_COMM)
+    ret = server_comm_nmsg(x);
+  else if (t == CLIENT_COMM)
+    ret = client_comm_nmsg(x);
   else if (t == ASCII_FILE_COMM)
     ret = ascii_file_comm_nmsg(x);
   else if ((t == ASCII_TABLE_COMM) || (t == ASCII_TABLE_ARRAY_COMM))
@@ -188,6 +203,10 @@ int comm_send_single(const comm_t x, const char *data, const int len) {
     ret = ipc_comm_send(x, data, len);
   else if (t == ZMQ_COMM)
     ret = zmq_comm_send(x, data, len);
+  else if (t == SERVER_COMM)
+    ret = server_comm_send(x, data, len);
+  else if (t == CLIENT_COMM)
+    ret = client_comm_send(x, data, len);
   else if (t == ASCII_FILE_COMM)
     ret = ascii_file_comm_send(x, data, len);
   else if ((t == ASCII_TABLE_COMM) || (t == ASCII_TABLE_ARRAY_COMM))
@@ -217,6 +236,8 @@ int comm_send_multipart(const comm_t x, const char *data, const int len) {
   comm_head_t head;
   head.size = len;
   strcpy(head.address, xmulti.address);
+  if (x.type == SERVER_COMM)
+    strcpy(head.id, x.address);
   char headbuf[BUFSIZ];
   int ret = format_comm_header(head, headbuf, BUFSIZ);
   if (ret < 0) {
@@ -233,8 +254,8 @@ int comm_send_multipart(const comm_t x, const char *data, const int len) {
   int msgsiz;
   int prev = 0;
   while (prev < head.size) {
-    if ((head.size - prev) > x.maxMsgSize)
-      msgsiz = x.maxMsgSize;
+    if ((head.size - prev) > xmulti.maxMsgSize)
+      msgsiz = xmulti.maxMsgSize;
     else
       msgsiz = head.size - prev;
     ret = comm_send_single(x, data + prev, msgsiz);
@@ -267,7 +288,8 @@ int comm_send_multipart(const comm_t x, const char *data, const int len) {
 static inline
 int comm_send(const comm_t x, const char *data, const int len) {
   int ret = -1;
-  if ((len > x.maxMsgSize) && (x.maxMsgSize > 0)) {
+  if (((len > x.maxMsgSize) && (x.maxMsgSize > 0)) ||
+      ((x.always_send_header) && (!(is_eof(data))))) {
     return comm_send_multipart(x, data, len);
   }
   ret = comm_send_single(x, data, len);
@@ -304,6 +326,10 @@ int comm_recv_single(const comm_t x, char *data, const int len) {
     ret = ipc_comm_recv(x, data, len);
   else if (t == ZMQ_COMM)
     ret = zmq_comm_recv(x, data, len);
+  else if (t == SERVER_COMM)
+    ret = server_comm_recv(x, data, len);
+  else if (t == CLIENT_COMM)
+    ret = client_comm_recv(x, data, len);
   else if (t == ASCII_FILE_COMM)
     ret = ascii_file_comm_recv(x, data, len);
   else if ((t == ASCII_TABLE_COMM) || (t == ASCII_TABLE_ARRAY_COMM))
@@ -354,8 +380,8 @@ int comm_recv_multipart(const comm_t x, char **data, const int len,
       }
       ret = -1;
       while (prev < head.size) {
-	if ((head.size - prev) > x.maxMsgSize)
-	  msgsiz = x.maxMsgSize;
+	if ((head.size - prev) > xmulti.maxMsgSize)
+	  msgsiz = xmulti.maxMsgSize;
 	else
 	  msgsiz = head.size - prev;
 	ret = comm_recv_single(xmulti, (*data) + prev, msgsiz);

@@ -268,15 +268,18 @@ public:
     @param[in] inFormat character pointer to format that should be used for
     parsing input.
    */
-  CisRpc(const char *outName, char *outFormat,
-	 const char *inName, char *inFormat) :
-    _pi(cisRpc(outName, outFormat, inName, inFormat)) {}
+  CisRpc(const char *name, char *outFormat, char *inFormat) :
+    _pi(cisRpc(name, outFormat, inFormat)) {}
+  // CisRpc(const char *outName, char *outFormat,
+  // 	 const char *inName, char *inFormat) :
+  //   _pi(cisRpc(outName, outFormat, inName, inFormat)) {}
 
   /*!
     @brief Destructor for CisRpc.
     See cis_free in PsiInterface.h for details.
   */
-  ~CisRpc() { cis_free_rpc(&_pi); }
+  ~CisRpc() { cis_free(&_pi); }
+  // ~CisRpc() { cis_free_rpc(&_pi); }
   
   /*!
     @brief Return the cisRpc_t structure.
@@ -353,7 +356,8 @@ public:
     formatting output.
    */
   CisRpcServer(const char *name, char *inFormat, char *outFormat) :
-    CisRpc(name, outFormat, name, inFormat) {}
+    CisRpc(name, outFormat, inFormat) {}
+    // CisRpc(name, outFormat, name, inFormat) {}
 
 };
 
@@ -379,7 +383,8 @@ public:
     parsing input.
    */
   CisRpcClient(const char *name, char *outFormat, char *inFormat) :
-    CisRpc(name, outFormat, name, inFormat) {
+    CisRpc(name, outFormat, inFormat) {
+    // CisRpc(name, outFormat, name, inFormat) {
   }
 
   /*!                                                                                                                                                                               

@@ -19,6 +19,8 @@ typedef struct comm_head_t {
   int bodysiz; //!< Size of body.
   int bodybeg; //!< Start of body in header.
   int valid; //!< 1 if the header is valid, 0 otherwise.
+  char id[COMMBUFFSIZ]; //!< Unique ID associated with this message.
+  char response_address[COMMBUFFSIZ]; //!< Response address.
 } comm_head_t;
 
 /*!
@@ -117,6 +119,27 @@ int format_comm_header(const comm_head_t head, char *buf, const int bufsiz) {
   } else {
     pos += ret;
   }
+  // ID
+  if (strlen(head.id) > 0) {
+    ret = format_header_entry(buf + pos, "id", head.id, bufsiz - pos);
+    if (ret < 0) {
+      cislog_error("Adding id entry would exceed buffer size\n");
+      return ret;
+    } else {
+      pos += ret;
+    }
+  }
+  // RESPONSE_ADDRESS
+  if (strlen(head.response_address) > 0) {
+    ret = format_header_entry(buf + pos, "response_address",
+			      head.response_address, bufsiz - pos);
+    if (ret < 0) {
+      cislog_error("Adding response_address entry would exceed buffer size\n");
+      return ret;
+    } else {
+      pos += ret;
+    }
+  }
   // Closing header tag
   buf[pos - strlen(HEAD_KEY_SEP)] = '\0';
   strcat(buf, CIS_MSG_HEAD);
@@ -194,6 +217,9 @@ comm_head_t parse_comm_header(const char *buf, const int bufsiz) {
       return out;
     }
     out.size = atoi(size_str);
+    // Extract id & response address
+    ret = parse_header_entry(head, "id", out.id, COMMBUFFSIZ);
+    ret = parse_header_entry(head, "response_address", out.response_address, COMMBUFFSIZ);
     free(head);
   }
   return out;
