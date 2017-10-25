@@ -15,8 +15,8 @@ class ServerComm(CommBase.CommBase):
 
     Attributes:
         response_kwargs (dict): Keyword arguments for the response comm.
-        icomm (Comm): Input comm.
-        ocomm (Comm): Output comm.
+        icomm (Comm): Request comm.
+        ocomm (Comm): Response comm for last request.
 
     """
     def __init__(self, name, request_comm=None, response_kwargs=None,
@@ -109,7 +109,8 @@ class ServerComm(CommBase.CommBase):
             raise RuntimeError("Last header does not contain response address.")
         comm_kwargs = dict(address=self.icomm._last_header['response_address'],
                            direction='send', **self.response_kwargs)
-        self.ocomm = get_comm(self.name + '.server_response_comm', **comm_kwargs)
+        self.ocomm = get_comm(self.name + '.server_response_comm',
+                              **comm_kwargs)
 
     def remove_response_comm(self):
         r"""Remove response comm."""
