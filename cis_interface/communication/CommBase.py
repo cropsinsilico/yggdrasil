@@ -242,31 +242,34 @@ class CommBase(CisClass):
         r"""dict: Keyword arguments for a new work comm."""
         return dict(comm=self.comm_class, direction='send')
 
-    def get_work_comm(self, address, **kwargs):
+    def get_work_comm(self, header, **kwargs):
         r"""Get temporary work comm, creating as necessary.
 
         Args:
-            address (str): Work comm address.
+            header (dict): Information that will be sent in the message header
+                to the work comm.
             **kwargs: Additional keyword arguments are passed to get_comm.
 
         Returns:
             Comm: Work comm.
 
         """
-        if address in self._work_comms:
-            return self._work_comms[address]
+        c = self._work_comms.get(header['id'], None)
+        if c is not None:
+            return c
         kws = self.get_work_comm_kwargs
         kws.update(**kwargs)
-        c = get_comm('temp_comm',
-                     address=address,
+        c = get_comm('temp_comm.' + header['id'],
+                     address=header['address'],
                      **kws)
-        self._work_comms[address] = c
+        self.add_work_comm(header['id'], c)
         return c
 
-    def create_work_comm(self, **kwargs):
+    def create_work_comm(self, header, **kwargs):
         r"""Create a temporary work comm.
 
         Args:
+            header (dict): Info that should be sent with message.
             **kwargs: Keyword arguments for new_comm that should override
                 work_comm_kwargs.
 
@@ -276,20 +279,30 @@ class CommBase(CisClass):
         """
         kws = self.create_work_comm_kwargs
         kws.update(**kwargs)
-        c = new_comm('temp_comm%s' % str(uuid.uuid4()), **kws)
-        self._work_comms[c.address] = c
+        c = new_comm('temp_comm.' + header['id'], **kws)
+        self.add_work_comm(header['id'], c)
         return c
 
-    def remove_work_comm(self, address):
+    def add_work_comm(self, key, comm):
+        r"""Add work comm to dict.
+
+        Args:
+            key (str): Key that should be used to log the comm.
+            comm (Comm): Comm that should be added.
+
+        """
+        self._work_comms[key] = comm
+
+    def remove_work_comm(self, key):
         r"""Close and remove a work comm.
 
         Args:
-            address (str): Address of comm that should be removed.
+            key (str): Key of comm that should be removed.
 
         """
-        if address not in self._work_comms:
+        if key not in self._work_comms:
             return
-        c = self._work_comms.pop(address)
+        c = self._work_comms.pop(key)
         c.close()
 
     # HEADER
@@ -303,8 +316,9 @@ class CommBase(CisClass):
            dict: Properties that should be encoded in a messaged header.
 
         """
-        c = self.create_work_comm()
-        out = {'size': len(msg), 'address': c.address}
+        out = {'size': len(msg), 'id': str(uuid.uuid4())}
+        c = self.create_work_comm(out)
+        out['address'] = c.address
         return out
 
     def format_header(self, header_info):
@@ -386,7 +400,7 @@ class CommBase(CisClass):
             bool: Success or failure of sending the message.
 
         """
-        workcomm = self.get_work_comm(header['address'])
+        workcomm = self.get_work_comm(header)
         ret = workcomm._send_multipart(msg, **kwargs)
         return ret
             
@@ -562,7 +576,7 @@ class CommBase(CisClass):
                 and the complete message received.
 
         """
-        workcomm = self.get_work_comm(info['address'])
+        workcomm = self.get_work_comm(info)
         leng_exp = int(float(info['size']))
         out = workcomm._recv_multipart(leng_exp, **kwargs)
         return out
@@ -651,7 +665,7 @@ class CommBase(CisClass):
         if len(info['body']) == int(info['size']):
             return True, info['body']
         out = self._recv_multipart_worker(info, **kwargs)
-        self.remove_work_comm(info['address'])
+        self.remove_work_comm(info['id'])
         return out
         
     def recv_header(self, *args, **kwargs):

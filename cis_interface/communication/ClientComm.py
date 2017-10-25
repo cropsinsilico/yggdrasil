@@ -16,8 +16,8 @@ class ClientComm(CommBase.CommBase):
 
     Attributes:
         response_kwargs (dict): Keyword arguments for the response comm.
-        icomm (Comm): Input comm.
-        ocomm (Comm): Output comm.
+        icomm (list): Response comms in the order of the sent requests.
+        ocomm (Comm): Request comm.
 
     """
     def __init__(self, name, request_comm=None, response_kwargs=None,
@@ -31,7 +31,7 @@ class ClientComm(CommBase.CommBase):
         ocomm_kwargs['comm'] = request_comm
         self.response_kwargs = response_kwargs
         self.ocomm = get_comm(ocomm_name, **ocomm_kwargs)
-        self.icomm = None
+        self.icomm = []
         self.response_kwargs.setdefault('comm', self.ocomm.comm_class)
         super(ClientComm, self).__init__(name, dont_open=dont_open,
                                          address=self.ocomm.address)
@@ -82,8 +82,8 @@ class ClientComm(CommBase.CommBase):
     def close(self):
         r"""Close the connection."""
         self.ocomm.close()
-        if self.icomm is not None:
-            self.icomm.close()
+        for icomm in self.icomm:
+            icomm.close()
         super(ClientComm, self).close()
 
     @property
@@ -105,12 +105,13 @@ class ClientComm(CommBase.CommBase):
     def create_response_comm(self):
         r"""Create a response comm based on information from the last header."""
         comm_kwargs = dict(direction='recv', **self.response_kwargs)
-        self.icomm = new_comm(self.name + '.client_response_comm', **comm_kwargs)
+        self.icomm.append(new_comm(self.name + '.client_response_comm',
+                                   **comm_kwargs))
 
     def remove_response_comm(self):
         r"""Remove response comm."""
-        self.icomm.close()
-        self.icomm = None
+        icomm = self.icomm.pop(0)
+        icomm.close()
 
     # SEND METHODS
     def send(self, *args, **kwargs):
@@ -127,7 +128,7 @@ class ClientComm(CommBase.CommBase):
         """
         self.create_response_comm()
         kwargs['send_header'] = True
-        kwargs['header_kwargs'] = dict(response_address=self.icomm.address)
+        kwargs['header_kwargs'] = dict(response_address=self.icomm[-1].address)
         out = self.ocomm.send(*args, **kwargs)
         return out
 
@@ -144,9 +145,9 @@ class ClientComm(CommBase.CommBase):
             obj: Output from input comm recv method.
 
         """
-        if self.icomm is None:
-            raise RuntimeError("There is no registered response comm.")
-        out = self.icomm.recv(*args, **kwargs)
+        if len(self.icomm) == 0:
+            raise RuntimeError("There are not any registered response comms.")
+        out = self.icomm[0].recv(*args, **kwargs)
         self.remove_response_comm()
         return out
 
