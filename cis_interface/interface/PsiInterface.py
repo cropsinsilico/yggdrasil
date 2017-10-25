@@ -1,7 +1,8 @@
 from cis_interface import backwards
 from cis_interface.tools import PSI_MSG_EOF, PSI_MSG_MAX
 from cis_interface.communication import (
-    DefaultComm, RPCComm, AsciiFileComm, AsciiTableComm, PickleFileComm)
+    DefaultComm, RPCComm, ServerComm, ClientComm,
+    AsciiFileComm, AsciiTableComm, PickleFileComm)
 from cis_interface.serialize import (
     AsciiTableSerialize, AsciiTableDeserialize,
     PickleSerialize, PickleDeserialize)
@@ -130,10 +131,22 @@ def PsiRpcServer(name, infmt, outfmt, matlab=False):
             message sent to the response queue.
 
     Returns:
-        DefaultComm: Communication object.
+        ServerComm: Communication object.
         
     """
-    return PsiRpc(name, outfmt, name, infmt, matlab=matlab)
+    if matlab:  # pragma: matlab
+        infmt = backwards.decode_escape(infmt)
+        outfmt = backwards.decode_escape(outfmt)
+    icomm_kwargs = dict(format_str=infmt)
+    ocomm_kwargs = dict(format_str=outfmt)
+    out = ServerComm.ServerComm(name, response_kwargs=ocomm_kwargs,
+                                recv_timeout=False, **icomm_kwargs)
+    # print 80*'='
+    # print out.__class__
+    # print out.name
+    # print out.icomm.name, out.icomm.address
+    # print out.ocomm.name, out.ocomm.address
+    return out
     
 
 def PsiRpcClient(name, outfmt, infmt, matlab=False):
@@ -148,10 +161,22 @@ def PsiRpcClient(name, outfmt, infmt, matlab=False):
             messages received from the response queue.
 
     Returns:
-        DefaultComm: Communication object.
+        ClientComm: Communication object.
         
     """
-    return PsiRpc(name, outfmt, name, infmt, matlab=matlab)
+    if matlab:  # pragma: matlab
+        infmt = backwards.decode_escape(infmt)
+        outfmt = backwards.decode_escape(outfmt)
+    icomm_kwargs = dict(format_str=infmt)
+    ocomm_kwargs = dict(format_str=outfmt)
+    out = ClientComm.ClientComm(name, response_kwargs=icomm_kwargs,
+                                recv_timeout=False, **ocomm_kwargs)
+    # print 80*'='
+    # print out.__class__
+    # print out.name
+    # print out.icomm.name, out.icomm.address
+    # print out.ocomm.name, out.ocomm.address
+    return out
     
 
 # Specialized classes for ascii IO

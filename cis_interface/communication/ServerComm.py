@@ -32,7 +32,9 @@ class ServerComm(CommBase.CommBase):
         self.icomm = get_comm(icomm_name, **icomm_kwargs)
         self.ocomm = None
         self.response_kwargs.setdefault('comm', self.icomm.comm_class)
+        self.response_kwargs.setdefault('recv_timeout', self.icomm.recv_timeout)
         super(ServerComm, self).__init__(name, dont_open=dont_open,
+                                         recv_timeout=self.icomm.recv_timeout,
                                          address=self.icomm.address)
 
     @classmethod

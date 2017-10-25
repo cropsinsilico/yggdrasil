@@ -36,7 +36,9 @@ class ClientComm(CommBase.CommBase):
         self.icomm = dict()
         self.icomm_order = []
         self.response_kwargs.setdefault('comm', self.ocomm.comm_class)
+        self.response_kwargs.setdefault('recv_timeout', self.ocomm.recv_timeout)
         super(ClientComm, self).__init__(name, dont_open=dont_open,
+                                         recv_timeout=self.ocomm.recv_timeout,
                                          address=self.ocomm.address)
 
     @classmethod
