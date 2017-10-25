@@ -1,5 +1,5 @@
 import nose.tools as nt
-from cis_interface.communication import _default_comm, new_comm
+from cis_interface.communication import _default_comm
 import cis_interface.drivers.tests.test_ConnectionDriver as parent
 from cis_interface import runner
 
@@ -21,12 +21,16 @@ class TestClientParam(parent.TestConnectionParam):
     @property
     def send_comm_kwargs(self):
         r"""dict: Keyword arguments for send comm."""
-        return self.instance.icomm.icomm.opp_comm_kwargs()
+        out = self.instance.icomm.opp_comm_kwargs()
+        out['comm'] = 'ClientComm'
+        return out
 
     @property
     def recv_comm_kwargs(self):
         r"""dict: Keyword arguments for recv comm."""
-        return self.instance.icomm.ocomm.opp_comm_kwargs()
+        out = self.srv_drv.ocomm.opp_comm_kwargs()
+        out['comm'] = 'ServerComm'
+        return out
 
     @property
     def inst_kwargs(self):
@@ -35,56 +39,30 @@ class TestClientParam(parent.TestConnectionParam):
         out['request_name'] = self.srv_drv.request_name
         out['comm'] = self.srv_drv.comm
         out['comm_address'] = self.srv_drv.comm_address
-        out['icomm_kws']['comm'] = 'RPCComm'
-        out['icomm_kws']['icomm_kwargs'] = {'comm': self.comm_name}
-        out['icomm_kws']['ocomm_kwargs'] = {'comm': self.comm_name}
-        out['ocomm_kws']['address'] = self.srv_drv.request_address
+        out['icomm_kws']['comm'] = self.comm_name
         return out
     
     def setup(self, *args, **kwargs):
         r"""Recover new client message on start-up."""
-        # if self.comm_count > 0:
-        #     raise Exception('setup')
         kwargs.setdefault('nprev_comm', self.comm_count)
         skip_start = kwargs.get('skip_start', False)
         self.srv_drv = self.create_server()
         if not skip_start:
             self.srv_drv.start()
-        send_kws = self.srv_send_comm_kwargs
-        recv_kws = self.srv_recv_comm_kwargs
-        if skip_start:
-            send_kws['dont_open'] = True
-            recv_kws['dont_open'] = True
-        self.srv_send_comm = new_comm(self.srv_drv.name, **send_kws)
-        self.srv_recv_comm = new_comm(self.srv_drv.name, **recv_kws)
         super(TestClientParam, self).setup(*args, **kwargs)
 
-    @property
-    def srv_send_comm_kwargs(self):
-        r"""dict: Keyword arguments for server send comm."""
-        return self.srv_drv.ocomm.icomm.opp_comm_kwargs()
-
-    @property
-    def srv_recv_comm_kwargs(self):
-        r"""dict: Keyword arguments for server recv comm."""
-        return self.srv_drv.ocomm.ocomm.opp_comm_kwargs()
-            
     def teardown(self):
         r"""Recover end client message on teardown."""
         if hasattr(self, 'srv_drv'):
             self.remove_instance(self.srv_drv)
             delattr(self, 'srv_drv')
-            self.srv_send_comm.close()
-            self.srv_recv_comm.close()
-            assert(self.srv_send_comm.is_closed)
-            assert(self.srv_recv_comm.is_closed)
         super(TestClientParam, self).teardown()
 
     def create_server(self, comm_address=None):
         r"""Create a new ServerDriver instance."""
         inst = runner.create_driver(
-            'ServerDriver', 'test_model_request' + self.uuid,
-            request_name='test_request' + self.uuid, comm=self.server_comm,
+            'ServerDriver', 'test_model_request.' + self.uuid,
+            request_name='test_request.' + self.uuid, comm=self.server_comm,
             comm_address=comm_address,
             namespace=self.namespace, workingDir=self.workingDir,
             timeout=self.timeout)
@@ -119,17 +97,17 @@ class TestClientDriver(TestClientParam, parent.TestConnectionDriver):
         assert(flag)
         # Wait for message to be routed
         T = self.instance.start_timeout()
-        while ((not T.is_out) and (self.srv_recv_comm.n_msg == 0)):
+        while ((not T.is_out) and (self.recv_comm.n_msg == 0)):
             self.instance.sleep()
         self.instance.stop_timeout()
         # Receive on server side, then send back
-        flag, srv_msg = self.srv_recv_comm.recv(timeout=self.timeout)
+        flag, srv_msg = self.recv_comm.recv(timeout=self.timeout)
         assert(flag)
         nt.assert_equal(srv_msg, msg_send)
-        flag = self.srv_send_comm.send(srv_msg)
+        flag = self.recv_comm.send(srv_msg)
         assert(flag)
         # Receive response on client side
-        flag, cli_msg = self.recv_comm.recv(timeout=self.timeout)
+        flag, cli_msg = self.send_comm.recv(timeout=self.timeout)
         assert(flag)
         nt.assert_equal(cli_msg, msg_send)
 

@@ -149,9 +149,10 @@ class ServerComm(CommBase.CommBase):
             obj: Output from input comm recv method.
 
         """
-        out = self.icomm.recv(*args, **kwargs)
-        self.create_response_comm()
-        return out
+        flag, msg = self.icomm.recv(*args, **kwargs)
+        if flag:
+            self.create_response_comm()
+        return flag, msg
 
     # OLD STYLE ALIASES
     def rpcSend(self, *args, **kwargs):
