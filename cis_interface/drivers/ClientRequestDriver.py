@@ -57,9 +57,8 @@ class ClientRequestDriver(ConnectionDriver):
             request_name = model_request_name + '_SERVER'
         # Input communicator
         icomm_kws = kwargs.get('icomm_kws', {})
-        icomm_kws['comm'] = 'RPCComm'
-        icomm_kws['name'] = model_request_name
-        icomm_kws['reverse_names'] = True
+        icomm_kws['comm'] = None  # 'RPCComm'
+        icomm_kws['name'] = model_request_name + '_OUT'
         kwargs['icomm_kws'] = icomm_kws
         # Output communicator
         ocomm_kws = kwargs.get('ocomm_kws', {})
@@ -68,11 +67,10 @@ class ClientRequestDriver(ConnectionDriver):
         if comm_address is not None:
             ocomm_kws['address'] = comm_address
         kwargs['ocomm_kws'] = ocomm_kws
+        # Parent and attributes
         super(ClientRequestDriver, self).__init__(model_request_name, **kwargs)
-        self.env[self.icomm.icomm.name] = self.icomm.icomm.address
-        self.env[self.icomm.ocomm.name] = self.icomm.ocomm.address
+        self.env[self.icomm.name] = self.icomm.address
         self.response_drivers = []
-        assert(not hasattr(self, 'comm'))
         self.comm = comm
         self.comm_address = self.ocomm.address
         # print 80*'='
@@ -82,28 +80,15 @@ class ClientRequestDriver(ConnectionDriver):
         # print self.ocomm.name, self.ocomm.address
 
     @property
-    def model_request_name(self):
-        r"""str: The name of the channel used by the client model to send
-        requests."""
-        return self.icomm.icomm.name
-
-    @property
-    def model_request_address(self):
-        r"""str: The address of the channel used by the client model to send
-        requests."""
-        return self.icomm.icomm.address
-
-    @property
-    def model_response_name(self):
-        r"""str: The name of the channel used by the client model to receive
-        responses."""
-        return self.icomm.ocomm.name
+    def request_id(self):
+        r"""str: Unique ID for the last message."""
+        return self.icomm._last_header['id']
 
     @property
     def model_response_address(self):
         r"""str: The address of the channel used by the client model to receive
         responses."""
-        return self.icomm.ocomm.address
+        return self.icomm._last_header['response_address']
 
     @property
     def request_name(self):
@@ -151,8 +136,8 @@ class ClientRequestDriver(ConnectionDriver):
 
         """
         # Start response driver
-        drv_args = [self.model_response_name, self.model_response_address]
-        drv_kwargs = dict(comm=self.comm)
+        drv_args = [self.model_response_address]
+        drv_kwargs = dict(comm=self.comm, msg_id=self.request_id)
         with self.lock:
             if self.is_comm_open:
                 response_driver = ClientResponseDriver(*drv_args, **drv_kwargs)
@@ -165,4 +150,5 @@ class ClientRequestDriver(ConnectionDriver):
         kwargs.setdefault('header_kwargs', {})
         kwargs['header_kwargs'].setdefault(
             'response_address', response_driver.response_address)
+        kwargs['header_kwargs'].setdefault('id', self.request_id)
         return super(ClientRequestDriver, self).send_message(*args, **kwargs)

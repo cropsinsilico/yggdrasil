@@ -1,5 +1,5 @@
 import nose.tools as nt
-from cis_interface.communication import _default_comm, new_comm
+from cis_interface.communication import _default_comm
 import cis_interface.drivers.tests.test_ConnectionDriver as parent
 from cis_interface import runner
 
@@ -21,12 +21,16 @@ class TestServerParam(parent.TestConnectionParam):
     @property
     def send_comm_kwargs(self):
         r"""dict: Keyword arguments for send comm."""
-        return self.instance.ocomm.icomm.opp_comm_kwargs()
+        out = self.cli_drv.icomm.opp_comm_kwargs()
+        out['comm'] = 'ClientComm'
+        return out
 
     @property
     def recv_comm_kwargs(self):
         r"""dict: Keyword arguments for recv comm."""
-        return self.instance.ocomm.ocomm.opp_comm_kwargs()
+        out = self.instance.ocomm.opp_comm_kwargs()
+        out['comm'] = 'ServerComm'
+        return out
 
     @property
     def inst_kwargs(self):
@@ -35,49 +39,23 @@ class TestServerParam(parent.TestConnectionParam):
         out['request_name'] = self.cli_drv.request_name
         out['comm'] = self.cli_drv.comm
         out['comm_address'] = self.cli_drv.comm_address
-        out['ocomm_kws']['comm'] = 'RPCComm'
-        out['ocomm_kws']['icomm_kwargs'] = {'comm': self.comm_name}
-        out['ocomm_kws']['ocomm_kwargs'] = {'comm': self.comm_name}
-        out['icomm_kws']['address'] = self.cli_drv.request_address
+        out['ocomm_kws']['comm'] = self.comm_name
         return out
     
     def setup(self, *args, **kwargs):
         r"""Recover new server message on start-up."""
-        # if self.comm_count > 0:
-        #     raise Exception('setup')
         kwargs.setdefault('nprev_comm', self.comm_count)
         skip_start = kwargs.get('skip_start', False)
         self.cli_drv = self.create_client()
         if not skip_start:
             self.cli_drv.start()
-        send_kws = self.cli_send_comm_kwargs
-        recv_kws = self.cli_recv_comm_kwargs
-        if skip_start:
-            send_kws['dont_open'] = True
-            recv_kws['dont_open'] = True
-        self.cli_send_comm = new_comm(self.cli_drv.name, **send_kws)
-        self.cli_recv_comm = new_comm(self.cli_drv.name, **recv_kws)
         super(TestServerParam, self).setup(*args, **kwargs)
 
-    @property
-    def cli_send_comm_kwargs(self):
-        r"""dict: Keyword arguments for client send comm."""
-        return self.cli_drv.icomm.icomm.opp_comm_kwargs()
-
-    @property
-    def cli_recv_comm_kwargs(self):
-        r"""dict: Keyword arguments for client recv comm."""
-        return self.cli_drv.icomm.ocomm.opp_comm_kwargs()
-            
     def teardown(self):
         r"""Recover end server message on teardown."""
         if hasattr(self, 'cli_drv'):
             self.remove_instance(self.cli_drv)
             delattr(self, 'cli_drv')
-            self.cli_send_comm.close()
-            self.cli_recv_comm.close()
-            assert(self.cli_send_comm.is_closed)
-            assert(self.cli_recv_comm.is_closed)
         super(TestServerParam, self).teardown()
 
     def create_client(self, comm_address=None):
@@ -145,7 +123,7 @@ class TestServerDriver(TestServerParam, parent.TestConnectionDriver):
             self.instance.sleep()  # pragma: debug
         self.instance.stop_timeout()
         # Send a message to local output
-        flag = self.cli_send_comm.send(msg_send)
+        flag = self.send_comm.send(msg_send)
         assert(flag)
         # Wait for message to be routed
         T = self.instance.start_timeout()
@@ -156,10 +134,10 @@ class TestServerDriver(TestServerParam, parent.TestConnectionDriver):
         flag, srv_msg = self.recv_comm.recv(timeout=self.timeout)
         assert(flag)
         nt.assert_equal(srv_msg, msg_send)
-        flag = self.send_comm.send(srv_msg)
+        flag = self.recv_comm.send(srv_msg)
         assert(flag)
         # Receive response on server side
-        flag, cli_msg = self.cli_recv_comm.recv(timeout=self.timeout)
+        flag, cli_msg = self.send_comm.recv(timeout=self.timeout)
         assert(flag)
         nt.assert_equal(cli_msg, msg_send)
 
