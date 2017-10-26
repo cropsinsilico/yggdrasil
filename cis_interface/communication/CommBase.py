@@ -506,7 +506,7 @@ class CommBase(CisClass):
             bool: Success or failure of send.
 
         """
-        # print 'send_header', header
+        # print 'send_header', self.name, header
         header_msg = self.format_header(header)
         out = self._send(header_msg, **kwargs)
         return out
@@ -658,11 +658,11 @@ class CommBase(CisClass):
 
         """
         flag, info = self.recv_header(*args, **kwargs)
-        # print 'recv_header', info
         if not flag or info['size'] == 0:
             if not flag:
                 self.debug(".recv_multipart(): Failed to receive message header.")
             return flag, info['body']
+        # print 'recv_header', self.name, info, self.q
         self._last_header = info
         if len(info['body']) == int(info['size']):
             return True, info['body']

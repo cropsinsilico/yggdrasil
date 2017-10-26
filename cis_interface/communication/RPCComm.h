@@ -6,8 +6,8 @@
 #ifndef CISRPCCOMM_H_
 #define CISRPCCOMM_H_
 
-// Handle is recv address
-// Info is response
+// Handle is output comm
+// Info is input comm
 
 /*!
   @brief Create a new channel.
@@ -31,7 +31,7 @@ int init_rpc_comm(comm_t *comm) {
   // Input comm
   char name_in[BUFSIZ];
   strcpy(name_in, comm->name);
-  strcat(name_in, '_IN');
+  strcat(name_in, "_IN");
   comm_t *info = (comm_t*)malloc(sizeof(comm_t));
   info[0] = init_comm_base(name_in, "recv", _default_comm, comm->serializer.info);
   ret = init_default_comm(info);
@@ -43,7 +43,7 @@ int init_rpc_comm(comm_t *comm) {
   // Output comm
   char name_out[BUFSIZ];
   strcpy(name_out, comm->name);
-  strcat(name_out, '_OUT');
+  strcat(name_out, "_OUT");
   char *seri_out = (char*)malloc(strlen(comm->direction) + 1);
   strcpy(seri_out, comm->direction);
   comm_t *handle = (comm_t*)malloc(sizeof(comm_t));
@@ -89,8 +89,8 @@ int free_rpc_comm(comm_t *x) {
  */
 static inline
 int rpc_comm_nmsg(const comm_t x) {
-  comm_t *handle = (comm_t*)(x->handle);
-  int ret = default_comm_nmsg(*handle);
+  comm_t *info = (comm_t*)(x.info);
+  int ret = default_comm_nmsg(*info);
   return ret;
 };
 

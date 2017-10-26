@@ -19,7 +19,8 @@ int main(int argc, char *argv[]) {
       rpcSend(rpc, input);
     }
 
+    psi_free(&rpc);
     printf("maxMsgSrv(C): Goodbye!\n");
-    
+    return 0;
 }
 

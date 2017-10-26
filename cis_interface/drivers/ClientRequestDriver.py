@@ -25,6 +25,7 @@ from cis_interface.drivers.ClientResponseDriver import ClientResponseDriver
 
 
 CIS_CLIENT_INI = 'CIS_BEGIN_CLIENT'
+CIS_CLIENT_EOF = 'CIS_END_CLIENT'
 
 
 class ClientRequestDriver(ConnectionDriver):
@@ -120,8 +121,16 @@ class ClientRequestDriver(ConnectionDriver):
 
     def after_loop(self):
         r"""After client model signs off. Sent EOF to server."""
-        self.ocomm.send_eof()
+        self.icomm.close()
+        if self.icomm._last_header['response_address'] != CIS_CLIENT_EOF:
+            self.icomm._last_header['response_address'] = CIS_CLIENT_EOF
+            self.ocomm.send_eof()
         super(ClientRequestDriver, self).after_loop()
+    
+    def on_eof(self):
+        r"""On EOF, set response_address to EOF, then send it along."""
+        self.icomm._last_header['response_address'] = CIS_CLIENT_EOF
+        return super(ClientRequestDriver, self).on_eof()
     
     def send_message(self, *args, **kwargs):
         r"""Start a response driver for a request message and send message with
@@ -136,19 +145,20 @@ class ClientRequestDriver(ConnectionDriver):
 
         """
         # Start response driver
-        drv_args = [self.model_response_address]
-        drv_kwargs = dict(comm=self.comm, msg_id=self.request_id)
-        with self.lock:
-            if self.is_comm_open:
-                response_driver = ClientResponseDriver(*drv_args, **drv_kwargs)
-                response_driver.start()
-                self.response_drivers.append(response_driver)
-            else:
-                return False
-        # Send response address in header
-        kwargs.setdefault('send_header', True)
-        kwargs.setdefault('header_kwargs', {})
-        kwargs['header_kwargs'].setdefault(
-            'response_address', response_driver.response_address)
-        kwargs['header_kwargs'].setdefault('id', self.request_id)
+        if self.model_response_address != CIS_CLIENT_EOF:
+            drv_args = [self.model_response_address]
+            drv_kwargs = dict(comm=self.comm, msg_id=self.request_id)
+            with self.lock:
+                if self.is_comm_open:
+                    response_driver = ClientResponseDriver(*drv_args, **drv_kwargs)
+                    response_driver.start()
+                    self.response_drivers.append(response_driver)
+                else:
+                    return False
+            # Send response address in header
+            kwargs.setdefault('send_header', True)
+            kwargs.setdefault('header_kwargs', {})
+            kwargs['header_kwargs'].setdefault(
+                'response_address', response_driver.response_address)
+            kwargs['header_kwargs'].setdefault('id', self.request_id)
         return super(ClientRequestDriver, self).send_message(*args, **kwargs)

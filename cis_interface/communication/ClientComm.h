@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include <../tools.h>
 #include <CommBase.h>
 #include <DefaultComm.h>
@@ -29,17 +30,82 @@ int new_client_address(comm_t *comm) {
 static inline
 int init_client_comm(comm_t *comm) {
   int ret;
+  // Called to create temp comm for send/recv
+  if ((strlen(comm->name) == 0) && (strlen(comm->address) > 0)) {
+    comm->type = _default_comm;
+    return init_default_comm(comm);
+  }
+  // Called to initialize/create client comm
   char *seri_out = (char*)malloc(strlen(comm->direction) + 1);
   strcpy(seri_out, comm->direction);
   comm_t *handle = (comm_t*)malloc(sizeof(comm_t));
-  handle[0] = init_comm_base(comm->name, "send", _default_comm, (void*)seri_out);
+  if (strlen(comm->name) == 0) {
+    handle[0] = new_comm_base(comm->address, "send", _default_comm, (void*)seri_out);
+    sprintf(handle->name, "client_request.%s", comm->address);
+  } else {
+    handle[0] = init_comm_base(comm->name, "send", _default_comm, (void*)seri_out);
+  }
   ret = init_default_comm(handle);
+  /* printf("init_client_comm: name = %s, type=%d, address = %s\n", */
+  /* 	 handle->name, handle->type, handle->address); */
+  int *ncomm = (int*)malloc(sizeof(int));
+  ncomm[0] = 0;
+  handle->info = (void*)ncomm;
   strcpy(comm->direction, "send");
   comm->handle = (void*)handle;
   comm->always_send_header = 1;
-  comm->maxMsgSize = 0; // Used by this comm to be the number of response comms
+  comm_t **info = (comm_t**)malloc(sizeof(comm_t*));
+  info[0] = NULL;
+  comm->info = (void*)info;
   free(seri_out);
   return ret;
+};
+
+static inline
+int get_client_response_count(const comm_t x) {
+  comm_t *handle = (comm_t*)(x.handle);
+  int out = 0;
+  if (handle != NULL) {
+    out = ((int*)(handle->info))[0];
+  }
+  return out;
+};
+
+static inline
+void set_client_response_count(const comm_t x, const int new_val) {
+  comm_t *handle = (comm_t*)(x.handle);
+  if (handle != NULL) {
+    int *count = (int*)(handle->info);
+    count[0] = new_val;
+  }
+};
+
+static inline
+void inc_client_response_count(const comm_t x) {
+  comm_t *handle = (comm_t*)(x.handle);
+  if (handle != NULL) {
+    int *count = (int*)(handle->info);
+    count[0]++;
+  }
+};
+
+static inline
+void dec_client_response_count(const comm_t x) {
+  comm_t *handle = (comm_t*)(x.handle);
+  if (handle != NULL) {
+    int *count = (int*)(handle->info);
+    count[0]--;
+  }
+};
+
+static inline
+void free_client_response_count(comm_t *x) {
+  comm_t *handle = (comm_t*)(x->handle);
+  if (handle != NULL) {
+    int *count = (int*)(handle->info);
+    free(count);
+    handle->info = NULL;
+  }
 };
 
 /*!
@@ -49,21 +115,28 @@ int init_client_comm(comm_t *comm) {
 */
 static inline
 int free_client_comm(comm_t *x) {
+  if (x->info != NULL) {
+    comm_t **info = (comm_t**)(x->info);
+    if (*info != NULL) {
+      int ncomm = get_client_response_count(*x);
+      int i;
+      for (i = 0; i < ncomm; i++) {
+	free_default_comm(info[0] + i);
+      }
+      free(*info);
+      info[0] = NULL;
+    }
+    free(info);
+    x->info = NULL;
+  }
+  free_client_response_count(x);
   if (x->handle != NULL) {
     comm_t *handle = (comm_t*)(x->handle);
+    char buf[CIS_MSG_MAX] = CIS_MSG_EOF;
+    default_comm_send(*handle, buf, strlen(buf));
     free_default_comm(handle);
     free(x->handle);
     x->handle = NULL;
-  }
-  if (x->info != NULL) {
-    int i;
-    comm_t *info;
-    for (i = 0; i < x->maxMsgSize; i++) {
-      info = (comm_t*)(x->info) + i;
-      free_default_comm(info);
-    }
-    free(x->info);
-    x->info = NULL;
   }
   return 0;
 };
@@ -75,7 +148,7 @@ int free_client_comm(comm_t *x) {
  */
 static inline
 int client_comm_nmsg(const comm_t x) {
-  comm_t *handle = (comm_t*)(x->handle);
+  comm_t *handle = (comm_t*)(x.handle);
   int ret = default_comm_nmsg(*handle);
   return ret;
 };
@@ -102,32 +175,38 @@ int client_comm_send(comm_t x, const char *data, const int len) {
     return ret;
   }
   // Initialize new comm
-  comm_t *res_comm = (comm_t*)(x.info);
-  res_comm = (comm_t*)realloc(res_comm, sizeof(comm_t)*(x.maxMsgSize + 1));
-  res_comm[x.maxMsgSize] = new_comm_base(NULL, "recv", _default_comm,
-					 x->serializer.info);
-  ret = new_default_address(res_comm + x.maxMsgSize);
+  int ncomm = get_client_response_count(x);
+  comm_t **res_comm = (comm_t**)(x.info);
+  res_comm[0] = (comm_t*)realloc(res_comm[0], sizeof(comm_t)*(ncomm + 1));
+  (*res_comm)[ncomm] = new_comm_base(NULL, "recv", _default_comm,
+				     x.serializer.info);
+  /* sprintf((*res_comm)[ncomm].name, "client_response.%s", (*res_comm)[ncomm].address); */
+  ret = new_default_address(*res_comm + ncomm);
   if (ret < 0) {
     cislog_error("client_comm_send(%s): could not create response comm", x.name);
     return -1;
   }
-  x.maxMsgSize++;
-  x->info = (void*)res_comm;
+  inc_client_response_count(x);
+  ncomm = get_client_response_count(x);
   // Add address to header
   comm_head_t head = parse_comm_header(data, len);
   if (!(head.valid)) {
     cislog_error("client_comm_send(%s): Error parsing header.", x.name);
     return -1;
   }
-  strcpy(head.response_address, res_comm[x.maxMsgSize - 1].address);
-  ret = format_comm_header(head, data, BUFSIZ);
+  strcpy(head.response_address, (*res_comm)[ncomm - 1].address);
+  sprintf(head.id, "%d", rand());
+  char *new_data = (char*)malloc(BUFSIZ);
+  ret = format_comm_header(head, new_data, BUFSIZ);
   if (ret < 0) {
     cislog_error("client_comm_send(%s): Error formatting.", x.name);
+    free(new_data);
     return -1;
   }    
   // Send message with header
   comm_t *req_comm = (comm_t*)(x.handle);
-  ret = default_comm_send(*req_comm, data, len);
+  ret = default_comm_send(*req_comm, new_data, ret);
+  free(new_data);
   return ret;
 };
 
@@ -143,23 +222,19 @@ int client_comm_send(comm_t x, const char *data, const int len) {
 static inline
 int client_comm_recv(comm_t x, char *data, const int len) {
   cislog_debug("client_comm_recv(%s)", x.name);
-  if (x.info == NULL) {
+  if ((x.info == NULL) || (get_client_response_count(x) == 0)) {
     cislog_error("client_comm_recv(%s): no response comm registered", x.name);
     return -1;
   }
-  comm_t *res_comm = (comm_t*)(x.info);
-  int ret = default_comm_recv(res_comm[0], data, len);
+  comm_t **res_comm = (comm_t**)(x.info);
+  int ret = default_comm_recv((*res_comm)[0], data, len);
   if (ret < 0)
     return ret;
   // Close response comm and decrement count of response comms
-  free_default_comm(res_comm);
-  x.maxMsgSize -= 1;
-  if (x.maxMsgSize == 0) {
-    free(x.info);
-    x.info = NULL;
-  } else {
-    memmove(res_comm, res_comm + 1, x.maxMsgSize*sizeof(comm_t));
-  }
+  free_default_comm(&((*res_comm)[0]));
+  dec_client_response_count(x);
+  int nresp = get_client_response_count(x);
+  memmove(*res_comm, *res_comm + 1, nresp*sizeof(comm_t));
   return ret;
 };
 

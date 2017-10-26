@@ -1,6 +1,7 @@
 from cis_interface.drivers.ConnectionDriver import ConnectionDriver
 from cis_interface.drivers.ServerResponseDriver import ServerResponseDriver
-from cis_interface.drivers.ClientRequestDriver import CIS_CLIENT_INI
+from cis_interface.drivers.ClientRequestDriver import (
+    CIS_CLIENT_INI, CIS_CLIENT_EOF)
 
 
 class ServerRequestDriver(ConnectionDriver):
@@ -81,12 +82,25 @@ class ServerRequestDriver(ConnectionDriver):
             x.terminate()
         super(ServerRequestDriver, self).terminate(*args, **kwargs)
 
+    def on_model_exit(self):
+        r"""Close RPC comm when model exits."""
+        self.ocomm.close()
+        super(ServerRequestDriver, self).on_model_exit()
+
+    def after_loop(self):
+        r"""After server model signs off."""
+        self.icomm.close()
+        if self.icomm._last_header['response_address'] != CIS_CLIENT_EOF:
+            self.icomm._last_header['response_address'] = CIS_CLIENT_EOF
+            self.ocomm.send_eof()
+        super(ServerRequestDriver, self).after_loop()
+    
     def on_eof(self):
         r"""On EOF, decrement number of clients. Only send EOF if the number
         of clients drops to 0."""
         self.nclients -= 1
         if self.nclients == 0:
-            self.icomm._last_header['response_address'] = 'EOF'
+            self.icomm._last_header['response_address'] = CIS_CLIENT_EOF
             return super(ServerRequestDriver, self).on_eof()
         return ''
 
@@ -117,7 +131,7 @@ class ServerRequestDriver(ConnectionDriver):
 
         """
         # Start response driver
-        if self.response_address != 'EOF':
+        if self.response_address != CIS_CLIENT_EOF:
             with self.lock:
                 if not self.is_comm_open:
                     return False

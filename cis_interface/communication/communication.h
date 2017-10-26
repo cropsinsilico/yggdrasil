@@ -4,6 +4,9 @@
 #include <CommBase.h>
 #include <IPCComm.h>
 #include <ZMQComm.h>
+#include <RPCComm.h>
+#include <ServerComm.h>
+#include <ClientComm.h>
 #include <AsciiFileComm.h>
 #include <AsciiTableComm.h>
 #include <DefaultComm.h>
@@ -31,6 +34,8 @@ int free_comm(comm_t *x) {
     ret = free_ipc_comm(x);
   else if (t == ZMQ_COMM)
     ret = free_zmq_comm(x);
+  else if (t == RPC_COMM)
+    ret = free_rpc_comm(x);
   else if (t == SERVER_COMM)
     ret = free_server_comm(x);
   else if (t == CLIENT_COMM)
@@ -60,10 +65,12 @@ int new_comm_type(comm_t *x) {
     flag = new_ipc_address(x);
   else if (t == ZMQ_COMM)
     flag = new_zmq_address(x);
-  /* else if (t == SERVER_COMM) */
-  /*   flag = new_server_address(x); */
-  /* else if (t == CLIENT_COMM) */
-  /*   flag = new_client_address(x); */
+  else if (t == RPC_COMM)
+    flag = new_rpc_address(x);
+  else if (t == SERVER_COMM)
+    flag = new_server_address(x);
+  else if (t == CLIENT_COMM)
+    flag = new_client_address(x);
   else if (t == ASCII_FILE_COMM)
     flag = new_ascii_file_address(x);
   else if (t == ASCII_TABLE_COMM)
@@ -91,6 +98,8 @@ int init_comm_type(comm_t *x) {
     flag = init_ipc_comm(x);
   else if (t == ZMQ_COMM)
     flag = init_zmq_comm(x);
+  else if (t == RPC_COMM)
+    flag = init_rpc_comm(x);
   else if (t == SERVER_COMM)
     flag = init_server_comm(x);
   else if (t == CLIENT_COMM)
@@ -132,6 +141,9 @@ comm_t new_comm(char *address, const char *direction, const comm_type t,
     cislog_error("new_comm: Failed to initialized new comm address.");
     ret.valid = 0;
   }
+  if (strlen(ret.name) == 0) {
+    sprintf(ret.name, "temp.%s", ret.address);
+  }
   return ret;
 };
 
@@ -172,6 +184,8 @@ int comm_nmsg(const comm_t x) {
     ret = ipc_comm_nmsg(x);
   else if (t == ZMQ_COMM)
     ret = zmq_comm_nmsg(x);
+  else if (t == RPC_COMM)
+    ret = rpc_comm_nmsg(x);
   else if (t == SERVER_COMM)
     ret = server_comm_nmsg(x);
   else if (t == CLIENT_COMM)
@@ -203,6 +217,8 @@ int comm_send_single(const comm_t x, const char *data, const int len) {
     ret = ipc_comm_send(x, data, len);
   else if (t == ZMQ_COMM)
     ret = zmq_comm_send(x, data, len);
+  else if (t == RPC_COMM)
+    ret = rpc_comm_send(x, data, len);
   else if (t == SERVER_COMM)
     ret = server_comm_send(x, data, len);
   else if (t == CLIENT_COMM)
@@ -233,9 +249,7 @@ int comm_send_multipart(const comm_t x, const char *data, const int len) {
     return -1;
   }
   // Create header
-  comm_head_t head;
-  head.size = len;
-  strcpy(head.address, xmulti.address);
+  comm_head_t head = init_header(len, xmulti.address, NULL, NULL);
   if (x.type == SERVER_COMM)
     strcpy(head.id, x.address);
   char headbuf[BUFSIZ];
@@ -258,7 +272,7 @@ int comm_send_multipart(const comm_t x, const char *data, const int len) {
       msgsiz = xmulti.maxMsgSize;
     else
       msgsiz = head.size - prev;
-    ret = comm_send_single(x, data + prev, msgsiz);
+    ret = comm_send_single(xmulti, data + prev, msgsiz);
     if (ret < 0) {
       cislog_debug("comm_send_multipart(%s): send interupted at %d of %d bytes.",
 		   x.name, prev, head.size);
@@ -326,6 +340,8 @@ int comm_recv_single(const comm_t x, char *data, const int len) {
     ret = ipc_comm_recv(x, data, len);
   else if (t == ZMQ_COMM)
     ret = zmq_comm_recv(x, data, len);
+  else if (t == RPC_COMM)
+    ret = rpc_comm_recv(x, data, len);
   else if (t == SERVER_COMM)
     ret = server_comm_recv(x, data, len);
   else if (t == CLIENT_COMM)

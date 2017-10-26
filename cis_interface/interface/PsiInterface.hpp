@@ -270,16 +270,15 @@ public:
    */
   CisRpc(const char *name, char *outFormat, char *inFormat) :
     _pi(cisRpc(name, outFormat, inFormat)) {}
-  // CisRpc(const char *outName, char *outFormat,
-  // 	 const char *inName, char *inFormat) :
-  //   _pi(cisRpc(outName, outFormat, inName, inFormat)) {}
 
+  /*! @brief Empty constructor for inheritance. */
+  CisRpc(cisRpc_t x) : _pi(x) {}
+  
   /*!
     @brief Destructor for CisRpc.
     See cis_free in PsiInterface.h for details.
   */
   ~CisRpc() { cis_free(&_pi); }
-  // ~CisRpc() { cis_free_rpc(&_pi); }
   
   /*!
     @brief Return the cisRpc_t structure.
@@ -298,11 +297,6 @@ public:
     success.
   */
   int send(const int nargs, ...) {
-    // if (nargs != _pi._output._nfmt) {
-    //   cislog_error("CisRpc(%s).send: %d args provided, but format expects %d.\n",
-    // 		   _pi._output._name, nargs, _pi._output._nfmt);
-    //   return -1;
-    // }
     va_list va;
     va_start(va, nargs);
     int ret = vrpcSend(_pi, va);
@@ -321,11 +315,6 @@ public:
     indicate success.
    */
   int recv(const int nargs, ...) {
-    // if (nargs != _pi._input._nfmt) {
-    //   cislog_error("CisRpc(%s).recv: %d args provided, but format expects %d.\n",
-    // 		   _pi._input._name, nargs, _pi._input._nfmt);
-    //   return -1;
-    // }
     va_list va;
     va_start(va, nargs);
     int ret = vrpcRecv(_pi, va);
@@ -337,7 +326,6 @@ public:
 
 /*!
   @brief C++ interface to cisRpc_t server-side functionality.
-
   The CisRpcServer class is a basic wrapper around the C cisRpc_t
   structure and associated server-side functions from the PsiInterface.h
   header. It provides the user with C++ style access to basic RPC server
@@ -356,15 +344,13 @@ public:
     formatting output.
    */
   CisRpcServer(const char *name, char *inFormat, char *outFormat) :
-    CisRpc(name, outFormat, inFormat) {}
-    // CisRpc(name, outFormat, name, inFormat) {}
+    CisRpc(cisRpcServer(name, outFormat, inFormat)) {}
 
 };
 
 
 /*!
   @brief C++ interface to cisRpc_t client-side functionality.
-
   The CisRpcClient class is a basic wrapper around the C cisRpc_t
   structure and associated client-side functions from the PsiInterface.h
   header. It provides the user with C++ style access to basic RPC client
@@ -383,11 +369,9 @@ public:
     parsing input.
    */
   CisRpcClient(const char *name, char *outFormat, char *inFormat) :
-    CisRpc(name, outFormat, inFormat) {
-    // CisRpc(name, outFormat, name, inFormat) {
-  }
+    CisRpc(cisRpcClient(name, outFormat, inFormat)) {}
 
-  /*!                                                                                                                                                                               
+  /*!
     @brief Send request to an RPC server from the client and wait for a
     response.
     See rpcCall in PsiInterface.h for details.
@@ -401,12 +385,6 @@ public:
   */
   int call(const int nargs, ...) {
     cisRpc_t _cpi = pi();
-    // int nfmt_tot = _cpi._output._nfmt + _cpi._input._nfmt;
-    // if (nargs != nfmt_tot) {
-    //   cislog_error("CisRpcClient(%s).call: %d args provided, but format expects %d.\n",
-    // 		   _cpi._output._name, nargs, nfmt_tot);
-    //   return -1;
-    // }
     va_list va;
     va_start(va, nargs);
     int ret = vrpcCall(_cpi, va);
@@ -419,7 +397,6 @@ public:
 
 /*!
   @brief C++ interface to cisAsciiFileOutput_t functionality.
-
   The CisAsciiFileOutput class is a basic wrapper around the C
   cisAsciiFileOutput_t structure and associated functions from the
   PsiInterface.h header. It provides the user with C++ style access to basic
@@ -454,7 +431,6 @@ public:
 
 /*!
   @brief C++ interface to cisAsciiFileInput_t functionality.
-
   The CisAsciiFileInput class is a basic wrapper around the C
   cisAsciiFileInput_t structure and associated functions from the
   PsiInterface.h header. It provides the user with C++ style access to basic

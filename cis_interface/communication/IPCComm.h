@@ -40,11 +40,16 @@ typedef struct msgbuf_t {
  */
 static inline
 int check_channels(comm_t comm) {
+  // Fail if name is empty
+  if (strlen(comm.name) == 0) {
+    cislog_error("Cannot create channel with empty name.");
+    return -1;
+  }
   // Fail if trying to re-use the same channel twice
   unsigned i;
   for (i = 0; i < _cisChannelsUsed; i++ ){
     if (0 == strcmp(_cisChannelNames[i], comm.name)){
-      cislog_error("Attempt to re-use channel %s", comm.name);
+      cislog_error("Attempt to re-use channel: name=%s", comm.name);
       return -1;
     }
   }
@@ -90,14 +95,20 @@ int remove_comm(const comm_t comm) {
 static inline
 int new_ipc_address(comm_t *comm) {
   int ret;
+  int key = _cisChannelsCreated + 1;
   if (strlen(comm->name) == 0)
-    sprintf(comm->name, "temp%d", _cisChannelsCreated);
+    sprintf(comm->name, "tempIPC.%d", key);
   ret = check_channels(*comm);
   if (ret < 0)
     return ret;
-  sprintf(comm->address, "%d", _cisChannelsCreated);
+  sprintf(comm->address, "%d", key);
   int *fid = (int*)malloc(sizeof(int));
-  fid[0] = msgget(IPC_PRIVATE, IPC_CREAT);
+  fid[0] = msgget(key, (IPC_CREAT | 0777));
+  if (fid[0] < 0) {
+      cislog_error("new_ipc_address: msgget(%d, %d) ret(%d), errno(%d): %s",
+		   IPC_PRIVATE, IPC_CREAT, fid[0], errno, strerror(errno));
+      return -1;
+  }
   comm->handle = (void*)fid;
   add_channel(comm->name);
   _cisChannelsCreated++;
@@ -113,6 +124,8 @@ static inline
 int init_ipc_comm(comm_t *comm) {
   if (comm->valid == 0)
     return -1;
+  if (strlen(comm->name) == 0)
+    sprintf(comm->name, "tempIPC.%s", comm->address);
   int ret = check_channels(*comm);
   if (ret < 0)
     return ret;
@@ -132,6 +145,9 @@ int init_ipc_comm(comm_t *comm) {
 static inline
 int free_ipc_comm(comm_t *x) {
   if (x->handle != NULL) {
+    if (strcmp(x->direction, "recv") == 0) {
+      remove_comm(*x);
+    }
     free(x->handle);
     x->handle = NULL;
   }
@@ -173,8 +189,9 @@ int ipc_comm_send(const comm_t x, const char *data, const int len) {
   t.mtype = 1;
   memcpy(t.data, data, len);
   int ret = -1;
+  int handle = ((int*)(x.handle))[0];
   while (1) {
-    ret = msgsnd(((int*)x.handle)[0], &t, len, IPC_NOWAIT);
+    ret = msgsnd(handle, &t, len, IPC_NOWAIT);
     cislog_debug("ipc_comm_send(%s): msgsnd returned %d", x.name, ret);
     if (ret == 0) break;
     if (ret == EAGAIN) {
