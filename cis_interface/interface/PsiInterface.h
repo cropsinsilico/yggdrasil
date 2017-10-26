@@ -416,20 +416,6 @@ int cisRecv_nolimit(const cisInput_t cisQ, ...) {
   response/requests from/to an RPC server/client.
  */
 #define cisRpc_t comm_t
-/* typedef struct cisRpc_t { */
-/*   cisInput_t _input; //!< Input queue structure. */
-/*   cisOutput_t _output; //!< Output queue structure. */
-/* } cisRpc_t; */
-
-/*!
-  @brief Free an RPC structure.
-  @param[in] x cisRpc_t * Pointer to structure to be deallocated.
-*/
-/* static inline */
-/* void cis_free_rpc(cisRpc_t *x) { */
-/*   cis_free(&(x->_input)); */
-/*   cis_free(&(x->_output)); */
-/* }; */
 
 /*!
   @brief Constructor for RPC structure.
@@ -444,12 +430,6 @@ int cisRecv_nolimit(const cisInput_t cisQ, ...) {
  */
 static inline 
 cisRpc_t cisRpc(const char *name, char *outFormat, char *inFormat) {
-  /*            const char *outName, char *outFormat, */
-  /* 		const char *inName, char *inFormat){ */
-  /* cisRpc_t rpc; */
-  /* rpc._input = cisInputFmt(inName, inFormat); */
-  /* rpc._output = cisOutputFmt(outName, outFormat); */
-  /* return rpc; */
   return init_comm(name, outFormat, RPC_COMM, inFormat);
 };
 
@@ -465,12 +445,11 @@ cisRpc_t cisRpc(const char *name, char *outFormat, char *inFormat) {
  */
 static inline
 comm_t cisRpcClient(const char *name, char *outFormat, char *inFormat){
-  return init_comm(name, outFormat, CLIENT_COMM, inFormat);
+  char name_suffix[CIS_MSG_MAX];
+  strcpy(name_suffix, name);
+  strcat(name_suffix, "_OUT");
+  return init_comm(name_suffix, outFormat, CLIENT_COMM, inFormat);
 };
-/* cisRpc_t cisRpcClient(const char *name, char *outFormat, char *inFormat){ */
-/*   cisRpc_t rpc = cisRpc(name, outFormat, name, inFormat); */
-/*   return rpc; */
-/* }; */
 
 /*!
   @brief Constructor for server side RPC structure.
@@ -484,12 +463,11 @@ comm_t cisRpcClient(const char *name, char *outFormat, char *inFormat){
  */
 static inline
 comm_t cisRpcServer(const char *name, char *inFormat, char *outFormat){
-  return init_comm(name, inFormat, SERVER_COMM, outFormat);
+  char name_suffix[CIS_MSG_MAX];
+  strcpy(name_suffix, name);
+  strcat(name_suffix, "_IN");
+  return init_comm(name_suffix, inFormat, SERVER_COMM, outFormat);
 };
-/* cisRpc_t cisRpcServer(const char *name, char *inFormat, char *outFormat){ */
-/*   cisRpc_t rpc = cisRpc(name, outFormat, name, inFormat); */
-/*   return rpc; */
-/* }; */
 
 /*!
   @brief Format and send a message to an RPC output queue.
@@ -503,7 +481,7 @@ comm_t cisRpcServer(const char *name, char *inFormat, char *outFormat){
  */
 static inline
 int vrpcSend(const cisRpc_t rpc, va_list ap) {
-  int ret = vcommSend_nolimit(rpc._output, ap);
+  int ret = vcommSend_nolimit(rpc, ap);
   return ret;
 };
 
@@ -522,7 +500,7 @@ int vrpcSend(const cisRpc_t rpc, va_list ap) {
 */
 static inline
 int vrpcRecv(const cisRpc_t rpc, va_list ap) {
-  int ret = vcommRecv_nolimit(rpc._input, ap);
+  int ret = vcommRecv_nolimit(rpc, ap);
   return ret;
 };
 
@@ -585,7 +563,7 @@ int vrpcCall(const cisRpc_t rpc, va_list ap) {
   int ret;
   
   // pack the args and call
-  ret = vcommSend_nolimit(rpc._output, ap);
+  ret = vcommSend_nolimit(rpc, ap);
   if (ret < 0) {
     printf("vrpcCall: vcisSend_nolimit error: ret %d: %s\n", ret, strerror(errno));
     return -1;
@@ -594,7 +572,7 @@ int vrpcCall(const cisRpc_t rpc, va_list ap) {
   // unpack the messages into the remaining variable arguments
   va_list op;
   va_copy(op, ap);
-  ret = vcommRecv_nolimit(rpc._input, op);
+  ret = vcommRecv_nolimit(rpc, op);
   va_end(op);
   
   return ret;

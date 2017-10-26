@@ -49,8 +49,9 @@ int main(int argc, char *argv[]) {
         printf("maxMsgCli(C): CONFIRM\n");
     }
 
-    // All done, say goodbye
+    // All done, free and say goodbye
+    psi_free(&rpc);
     printf("maxMsgCli(C): Goodbye!\n");
-    
+    return 0;
 }
 

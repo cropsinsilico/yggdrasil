@@ -24,6 +24,41 @@ typedef struct comm_head_t {
 } comm_head_t;
 
 /*!
+  @brief Initialize a header struct.
+  @param[in] size int Size of message to be sent.
+  @param[in] address char* Address that should be used for remainder of 
+  message following this header if it is a multipart message.
+  @param[in] id char* Message ID.
+  @param[in] response_address char* Address that should be used to repond to
+  the message sent following this header.
+  @returns comm_head_t Structure with provided information, char arrays
+  correctly initialized to empty strings if NULLs provided.
+ */
+static inline
+comm_head_t init_header(const int size, const char *address,
+			const char *id, const char *response_address) {
+  comm_head_t out;
+  out.size = size;
+  out.multipart = 0;
+  out.bodysiz = 0;
+  out.bodybeg = 0;
+  out.valid = 1;
+  if (address == NULL)
+    out.address[0] = '\0';
+  else
+    strcpy(out.address, address);
+  if (id == NULL)
+    out.id[0] = '\0';
+  else
+    strcpy(out.id, id);
+  if (response_address == NULL)
+    out.response_address[0] = '\0';
+  else
+    strcpy(out.response_address, response_address);
+  return out;
+};
+
+/*!
   @brief Format single key, value pair into header.
   @param[out] head char * Buffer where key, value pair should be written.
   @param[in] key const char * Key to be written.
@@ -57,11 +92,18 @@ int parse_header_entry(const char *head, const char *key, char *value,
   int ret;
   regex_t r;
   // Compile
+  if (strlen(HEAD_KEY_SEP) > 1) {
+    cislog_error("parse_header_entry: HEAD_KEY_SEP is more than one character. Fix regex.");
+    return -1;
+  }
   char regex_text[200];
   regex_text[0] = '\0';
+  strcat(regex_text, HEAD_KEY_SEP);
   strcat(regex_text, key);
   strcat(regex_text, HEAD_VAL_SEP);
-  strcat(regex_text, "(.*)");
+  strcat(regex_text, "([^");
+  strcat(regex_text, HEAD_KEY_SEP);
+  strcat(regex_text, "]*)");
   strcat(regex_text, HEAD_KEY_SEP);
   ret = compile_regex(&r, regex_text);
   if (ret)
@@ -94,13 +136,14 @@ int parse_header_entry(const char *head, const char *key, char *value,
 static inline
 int format_comm_header(const comm_head_t head, char *buf, const int bufsiz) {
   int ret, pos;
+  // Header tag
+  pos = 0;
+  strcpy(buf, CIS_MSG_HEAD);
   pos += strlen(CIS_MSG_HEAD);
   if (pos > bufsiz) {
     cislog_error("First header tag would exceed buffer size\n");
     return -1;
   }
-  // Header tag
-  strcpy(buf, CIS_MSG_HEAD);
   // Address entry
   ret = format_header_entry(buf + pos, "address", head.address, bufsiz - pos);
   if (ret < 0) {
@@ -141,7 +184,13 @@ int format_comm_header(const comm_head_t head, char *buf, const int bufsiz) {
     }
   }
   // Closing header tag
-  buf[pos - strlen(HEAD_KEY_SEP)] = '\0';
+  pos -= strlen(HEAD_KEY_SEP);
+  buf[pos] = '\0';
+  pos += strlen(CIS_MSG_HEAD);
+  if (pos > bufsiz) {
+    cislog_error("Closing header tag would exceed buffer size\n");
+    return -1;
+  }
   strcat(buf, CIS_MSG_HEAD);
   /* // Body */
   /* if (head.body != NULL) { */
@@ -164,13 +213,7 @@ int format_comm_header(const comm_head_t head, char *buf, const int bufsiz) {
  */
 static inline
 comm_head_t parse_comm_header(const char *buf, const int bufsiz) {
-  comm_head_t out;
-  out.size = 0;
-  out.address[0] = '\0';
-  out.multipart = 0;
-  out.bodysiz = 0;
-  out.bodybeg = 0;
-  out.valid = 1;
+  comm_head_t out = init_header(0, NULL, NULL, NULL);
   // Extract just header
   char re_head[COMMBUFFSIZ] = CIS_MSG_HEAD;
   strcat(re_head, "(.*)");
@@ -189,14 +232,14 @@ comm_head_t parse_comm_header(const char *buf, const int bufsiz) {
   } else {
     out.multipart = 1;
     // Extract just header
-    int sind, eind;
-    int ret = find_match(re_head, buf, &sind, &eind);
     int headsiz = (eind-sind);
     out.bodysiz = bufsiz - headsiz;
+    headsiz -= 2*strlen(CIS_MSG_HEAD);
     out.bodybeg = eind;
-    char *head = (char*)malloc(headsiz + strlen(HEAD_KEY_SEP));
-    memcpy(head, buf + sind, headsiz);
-    head[headsiz] = '\0';
+    char *head = (char*)malloc(headsiz + 2*strlen(HEAD_KEY_SEP) + 1);
+    strcpy(head, HEAD_KEY_SEP);
+    memcpy(head + strlen(HEAD_KEY_SEP), buf + sind + strlen(CIS_MSG_HEAD), headsiz);
+    head[headsiz + strlen(HEAD_KEY_SEP)] = '\0';
     strcat(head, HEAD_KEY_SEP);
     /* out.body = (char*)malloc(out.bodysiz); */
     /* memcpy(out.body, buf + eind, out.bodysiz); */

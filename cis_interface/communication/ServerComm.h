@@ -28,14 +28,30 @@ int new_server_address(comm_t *comm) {
 static inline
 int init_server_comm(comm_t *comm) {
   int ret;
+  // Called to create temp comm for send/recv
+  if ((strlen(comm->name) == 0) && (strlen(comm->address) > 0)) {
+    comm->type = _default_comm;
+    return init_default_comm(comm);
+  }
+  // Called to initialize/create server comm
   char *seri_in = (char*)malloc(strlen(comm->direction) + 1);
   strcpy(seri_in, comm->direction);
   comm_t *handle = (comm_t*)malloc(sizeof(comm_t));
-  handle[0] = init_comm_base(comm->name, "recv", _default_comm, (void*)seri_in);
+  if (strlen(comm->name) == 0) {
+    handle[0] = new_comm_base(comm->address, "recv", _default_comm, (void*)seri_in);
+    sprintf(handle->name, "server_request.%s", comm->address);
+  } else {
+    handle[0] = init_comm_base(comm->name, "recv", _default_comm, (void*)seri_in);
+  }
   ret = init_default_comm(handle);
+  /* printf("init_server_comm: name = %s, type=%d, address = %s\n", */
+  /* 	 handle->name, handle->type, handle->address); */
   strcpy(comm->direction, "recv");
   comm->handle = (void*)handle;
   comm->always_send_header = 1;
+  comm_t **info = (comm_t**)malloc(sizeof(comm_t*));
+  info[0] = NULL;
+  comm->info = (void*)info;
   free(seri_in);
   return ret;
 };
@@ -54,9 +70,12 @@ int free_server_comm(comm_t *x) {
     x->handle = NULL;
   }
   if (x->info != NULL) {
-    comm_t *info = (comm_t*)(x->info);
-    free_default_comm(info);
-    free(x->info);
+    comm_t **info = (comm_t**)(x->info);
+    if (*info != NULL) {
+      free_default_comm(*info);
+      free(*info);
+    }
+    free(info);
     x->info = NULL;
   }
   return 0;
@@ -69,7 +88,7 @@ int free_server_comm(comm_t *x) {
  */
 static inline
 int server_comm_nmsg(const comm_t x) {
-  comm_t *handle = (comm_t*)(x->handle);
+  comm_t *handle = (comm_t*)(x.handle);
   int ret = default_comm_nmsg(*handle);
   return ret;
 };
@@ -88,8 +107,12 @@ int server_comm_send(const comm_t x, const char *data, const int len) {
     cislog_error("server_comm_send(%s): no response comm registered", x.name);
     return -1;
   }
-  comm_t *res_comm = (comm_t*)(x.info);
-  return default_comm_send(*res_comm, data, len);
+  comm_t **res_comm = (comm_t**)(x.info);
+  if (res_comm[0] == NULL) {
+    cislog_error("server_comm_send(%s): no response comm registered", x.name);
+    return -1;
+  }
+  return default_comm_send((*res_comm)[0], data, len);
 };
 
 /*!
@@ -102,7 +125,7 @@ int server_comm_send(const comm_t x, const char *data, const int len) {
   message if message was received.
  */
 static inline
-int server_comm_recv(const comm_t x, char *data, const int len) {
+int server_comm_recv(comm_t x, char *data, const int len) {
   cislog_debug("server_comm_recv(%s)", x.name);
   if (x.handle == NULL) {
     cislog_error("server_comm_recv(%s): no request comm registered", x.name);
@@ -112,18 +135,33 @@ int server_comm_recv(const comm_t x, char *data, const int len) {
   int ret = default_comm_recv(*req_comm, data, len);
   if (ret < 0)
     return ret;
+  // Return EOF
+  if (is_eof(data)) {
+    return ret;
+  }
   // Initialize new comm from received address
   comm_head_t head = parse_comm_header(data, ret);
-  strcpy(x.address, head.id);
   if (!(head.valid)) {
     cislog_error("server_comm_recv(%s): Error parsing header.", x.name);
     return -1;
   }
-  comm_t *res_comm = (comm_t*)malloc(sizeof(comm_t));
-  res_comm[0] = new_comm_base(head.response_address, "send", _default_comm,
-			      x->serializer.info);
-  ret = new_default_address(res_comm);
-  x->info = (void*)res_comm;
+  // If there is not a response address
+  if (strlen(head.response_address) == 0) {
+    cislog_error("server_comm_recv(%s): No response address in message.", x.name);
+    return -1;
+  }
+  strcpy(x.address, head.id);
+  comm_t **res_comm = (comm_t**)(x.info);
+  res_comm[0] = (comm_t*)realloc(res_comm[0], sizeof(comm_t));
+  res_comm[0][0] = new_comm_base(head.response_address, "send", _default_comm,
+				 x.serializer.info);
+  sprintf(res_comm[0]->name, "server_response.%s", res_comm[0]->address);
+  int newret;
+  newret = init_default_comm(res_comm[0]);
+  if (newret < 0) {
+    cislog_error("server_comm_recv(%s): Could not initialize response comm.", x.name);
+    return newret;
+  }
   return ret;
 };
 
