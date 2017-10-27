@@ -232,7 +232,7 @@ class ZMQComm(CommBase.CommBase):
             bool: Success or failure of sending the message.
 
         """
-        workcomm = self.get_work_comm(header['address'])
+        workcomm = self.get_work_comm(header)
         args = [msg]
         self.sched_task(0, workcomm._send_multipart, args=args, kwargs=kwargs)
         return True
