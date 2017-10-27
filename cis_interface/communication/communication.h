@@ -138,7 +138,7 @@ comm_t new_comm(char *address, const char *direction, const comm_type t,
     flag = init_comm_type(&ret);
   }
   if (flag < 0) {
-    cislog_error("new_comm: Failed to initialized new comm address.");
+    cislog_error("new_comm: Failed to initialize new comm address.");
     ret.valid = 0;
   }
   if (strlen(ret.name) == 0) {
@@ -256,12 +256,14 @@ int comm_send_multipart(const comm_t x, const char *data, const int len) {
   int ret = format_comm_header(head, headbuf, BUFSIZ);
   if (ret < 0) {
     cislog_error("comm_send_multipart: Failed to format header.");
+    free_comm(&xmulti);
     return -1;
   }
   // Send header
   ret = comm_send_single(x, headbuf, ret);
   if (ret < 0) {
     cislog_error("comm_send_multipart: Failed to send header.");
+    free_comm(&xmulti);
     return -1;
   }
   // Send multipart
@@ -391,6 +393,7 @@ int comm_recv_multipart(const comm_t x, char **data, const int len,
 	} else {
 	  cislog_error("comm_recv_multipart(%s): buffer is not large enough",
 		       x.name);
+	  free_comm(&xmulti);
 	  return -1;
 	}
       }
@@ -414,6 +417,7 @@ int comm_recv_multipart(const comm_t x, char **data, const int len,
 	cislog_debug("comm_recv_multipart(%s): %d bytes completed", x.name, prev);
 	ret = prev;
       }
+      free_comm(&xmulti);
     } else {
       ret = headlen;
     }
@@ -517,7 +521,12 @@ int comm_recv_nolimit(const comm_t x, char **data, const int len) {
 static inline
 int vcommSend(const comm_t x, va_list ap) {
   char *buf = (char*)malloc(CIS_MSG_MAX);
-  int ret = serialize(x.serializer, &buf, CIS_MSG_MAX, 0, ap);
+  seri_t serializer = x.serializer;
+  if (x.type == CLIENT_COMM) {
+    comm_t *handle = (comm_t*)(x.handle);
+    serializer = handle->serializer;
+  }
+  int ret = serialize(serializer, &buf, CIS_MSG_MAX, 0, ap);
   if (ret < 0) {
     cislog_error("vcommSend(%s): serialization error", x.name);
     free(buf);
@@ -544,81 +553,34 @@ int vcommSend(const comm_t x, va_list ap) {
 static inline
 int vcommRecv(const comm_t x, va_list ap) {
   // Receive message
-  char buf[CIS_MSG_MAX];
-  int ret = comm_recv(x, buf, CIS_MSG_MAX);
+  char *buf = (char*)malloc(CIS_MSG_MAX);
+  int ret = comm_recv_nolimit(x, &buf, CIS_MSG_MAX);
   if (ret < 0) {
     /* cislog_error("vcommRecv(%s): Error receiving.", x.name); */
+    free(buf);
     return ret;
   }
   cislog_debug("vcommRecv(%s): comm_recv returns %d: %s", x.name, ret, buf);
   // Deserialize message
-  ret = deserialize(x.serializer, buf, ret, ap);
+  seri_t serializer = x.serializer;
+  if (x.type == SERVER_COMM) {
+    comm_t *handle = (comm_t*)(x.handle);
+    serializer = handle->serializer;
+  }
+  ret = deserialize(serializer, buf, ret, ap);
   if (ret < 0) {
     cislog_error("vcommRecv(%s): error deserializing message (ret=%d)",
 		 x.name, ret);
-    return -1;
-  }
-  cislog_debug("vcommRecv(%s): deserialize_format returns %d", x.name, ret);
-  return ret;
-};
-
-/*!
-  @brief Send arguments as a large formatted message to an output comm.
-  Use the format string to create a message from the input arguments that
-  is then sent to the specified output comm. The message can be larger than
-  CIS_MSG_MAX. If it cannot be encoded, it will not be sent.  
-  @param[in] cisQ cisOutput_t structure that comm should be sent to.
-  @param[in] ap va_list arguments to be formatted into a message using sprintf.
-  @returns int 0 if formatting and send succesfull, -1 if formatting or send
-  unsuccessful.
- */
-static inline
-int vcommSend_nolimit(const comm_t x, va_list ap) {
-  char *buf = (char*)malloc(CIS_MSG_MAX);
-  int ret = serialize(x.serializer, &buf, CIS_MSG_MAX, 1, ap);
-  if (ret < 0) {
-    cislog_error("vcommSend_nolimit(%s): serialization error", x.name);
     free(buf);
     return -1;
   }
-  ret = comm_send_nolimit(x, buf, ret);
-  cislog_debug("vcommSend_nolimit(%s): comm_send_nolimit returns %d", x.name, ret);
+  cislog_debug("vcommRecv(%s): deserialize_format returns %d", x.name, ret);
   free(buf);
   return ret;
 };
 
-/*!
-  @brief Assign arguments by receiving and parsing a message from an input comm.
-  Receive a message larger than CIS_MSG_MAX bytes in chunks from an input comm
-  and parse it using the associated format string.
-  @param[in] cisQ cisOutput_t structure that message should be sent to.
-  @param[out] ap va_list arguments that should be assigned by parsing the
-  received message using sscanf. As these are being assigned, they should be
-  pointers to memory that has already been allocated.
-  @returns int -1 if message could not be received or could not be parsed.
-  Length of the received message if message was received and parsed. -2 is
-  returned if EOF is received.
- */
-static inline
-int vcommRecv_nolimit(const comm_t x, va_list ap) {
-  // Receive message
-  char *buf = (char*)malloc(CIS_MSG_MAX);
-  int ret = comm_recv_nolimit(x, &buf, CIS_MSG_MAX);
-  if (ret < 0) {
-    /* cislog_error("vcommRecv_nolimit(%s): Error receiving.", x.name); */
-    return ret;
-  }
-  cislog_debug("vcommRecv_nolimit(%s): comm_recv returns %d: %s", x.name, ret, buf);
-  // Deserialize message
-  ret = deserialize(x.serializer, buf, CIS_MSG_MAX, ap);
-  if (ret < 0) {
-    cislog_error("vcommRecv_nolimit(%s): error deserializing message (ret=%d)",
-		 x.name, ret);
-    return -1;
-  }
-  cislog_debug("vcommRecv_nolimit(%s): deserialize_format returns %d", x.name, ret);
-  return ret;
-};
+#define vcommSend_nolimit vcommSend
+#define vcommRecv_nolimit vcommRecv
 
 
 #endif /*CISCOMMUNICATION_H_*/

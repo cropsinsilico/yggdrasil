@@ -88,7 +88,12 @@ class ModelDriver(Driver):
         # Handle error
         if self.process is not None:
             T = self.start_timeout()
-            self.process.poll()
+            try:
+                self.process.poll()
+            except:
+                if self.process is None:
+                    return
+                raise
             while ((not T.is_out) and
                    (self.process.returncode is None)):  # pragma: debug
                 self.sleep()
