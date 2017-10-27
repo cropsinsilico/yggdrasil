@@ -22,12 +22,6 @@ class TestClientComm(test_CommBase.TestCommBase):
         flag, msg_recv = self.recv_instance.recv()
         assert(not flag)
         nt.assert_equal(msg_recv, self.send_instance.eof_msg)
-        # Backwards
-        flag = self.recv_instance.send_eof()
-        assert(flag)
-        flag, msg_recv = self.send_instance.recv()
-        assert(not flag)
-        nt.assert_equal(msg_recv, self.recv_instance.eof_msg)
         # Assert
         # assert(self.recv_instance.is_closed)
 
@@ -39,12 +33,6 @@ class TestClientComm(test_CommBase.TestCommBase):
         flag, msg_recv = self.recv_instance.recv_nolimit()
         assert(not flag)
         nt.assert_equal(msg_recv, self.send_instance.eof_msg)
-        # Backwards
-        flag = self.recv_instance.send_nolimit_eof()
-        assert(flag)
-        flag, msg_recv = self.send_instance.recv_nolimit()
-        assert(not flag)
-        nt.assert_equal(msg_recv, self.recv_instance.eof_msg)
         # Assert
         # assert(self.recv_instance.is_closed)
 
