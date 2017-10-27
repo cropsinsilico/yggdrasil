@@ -122,7 +122,9 @@ class ClientRequestDriver(ConnectionDriver):
     def after_loop(self):
         r"""After client model signs off. Sent EOF to server."""
         self.icomm.close()
-        if self.icomm._last_header['response_address'] != CIS_CLIENT_EOF:
+        if self.icomm._last_header is None:
+            self.icomm._last_header = dict()
+        if self.icomm._last_header.get('response_address', None) != CIS_CLIENT_EOF:
             self.icomm._last_header['response_address'] = CIS_CLIENT_EOF
             self.ocomm.send_eof()
         super(ClientRequestDriver, self).after_loop()

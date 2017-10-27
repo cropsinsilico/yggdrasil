@@ -9,6 +9,7 @@
 #include <stdlib.h>
 #include <stdarg.h>
 #include <unistd.h>
+#include <time.h>
 #include <errno.h>
 #include <CommBase.h>
 
@@ -21,9 +22,11 @@ static unsigned _cisChannelsCreated = 0;
 /*! @brief Maximum number of channels. */
 #define _cisTrackChannels 256
 /*! @brief Names of channels in use. */
-static char * _cisChannelNames[_cisTrackChannels];
+static int _cisChannelNames[_cisTrackChannels]; 
+//static char * _cisChannelNames[_cisTrackChannels];
 /*! @brief Number of channels in use. */
 static unsigned _cisChannelsUsed = 0;
+static unsigned _rand_seeded = 0;
 
 /*!
   @brief Message buffer structure.
@@ -47,9 +50,12 @@ int check_channels(comm_t comm) {
   }
   // Fail if trying to re-use the same channel twice
   unsigned i;
-  for (i = 0; i < _cisChannelsUsed; i++ ){
-    if (0 == strcmp(_cisChannelNames[i], comm.name)){
-      cislog_error("Attempt to re-use channel: name=%s", comm.name);
+  char *key = comm.address;
+  for (i = 0; i < _cisChannelsUsed; i++ ) {
+    if (_cisChannelNames[i] == atoi(comm.address)) {
+    /* if (0 == strcmp(_cisChannelNames[i], key)) { */
+      cislog_error("Attempt to re-use channel: name=%s, key=%s, i=%d",
+		   comm.name, key, i);
       return -1;
     }
   }
@@ -66,24 +72,49 @@ int check_channels(comm_t comm) {
   @param[in] name const char * Name of channel to record.
 */
 static inline
-void add_channel(char *name) {
-  _cisChannelNames[_cisChannelsUsed++] = name;
+void add_channel(const comm_t comm) {
+  // printf("add_channel(%s): %d, %s\n", comm.name, _cisChannelsUsed, comm.address);
+  _cisChannelNames[_cisChannelsUsed++] = atoi(comm.address);
 };
 
 /*!
   @brief Remove a channel.
   @param[in] comm comm_t Comm with channel that should be removed.
+  @param[in] close_comm int If 1, the queue will be closed, otherwise it will
+  just be removed from the register and it is assumed that another process
+  will close it.
   @returns int -1 if removal not successful.
 */
 static inline
-int remove_comm(const comm_t comm) {
-  int ich = atoi(comm.address);
-  int ret = msgctl(((int*)comm.handle)[0], IPC_RMID, NULL);
-  if ((ret != -1) && (ich == (int)(_cisChannelsUsed - 1))) {
-    /* memmove(_cisChannelNames + ich, _cisChannelNames + ich + 1, */
-    /* 	    (_cisTrackChannels - (ich + 1))*sizeof(char*)); */
-    _cisChannelsUsed--;
+int remove_comm(const comm_t comm, const int close_comm) {
+  int ret;
+  if (close_comm) {
+    ret = msgctl(((int*)comm.handle)[0], IPC_RMID, NULL);
+    /* if (ret < 0) { */
+    /*   cislog_error("remove_comm(%s): Could not close comm.", comm.name); */
+    /*   return ret; */
+    /* } */
   }
+  ret = -1;
+  unsigned i;
+  int ich = atoi(comm.address);
+  for (i = 0; i < _cisChannelsUsed; i++) {
+    if (ich == _cisChannelNames[i]) {
+      memmove(_cisChannelNames + i, _cisChannelNames + i + 1,
+	      (_cisTrackChannels - (i + 1))*sizeof(int));
+      _cisChannelsUsed--;
+      ret = 0;
+      break;
+    }
+  }
+  if (ret < 0) {
+    cislog_error("remove_comm(%s): Could not locate comm in register.", comm.name);
+  }
+  /* if ((ret != -1) && (ich == (int)(_cisChannelsUsed - 1))) { */
+  /*   /\* memmove(_cisChannelNames + ich, _cisChannelNames + ich + 1, *\/ */
+  /*   /\* 	    (_cisTrackChannels - (ich + 1))*sizeof(char*)); *\/ */
+  /*   _cisChannelsUsed--; */
+  /* } */
   return ret;
 };
 
@@ -95,12 +126,22 @@ int remove_comm(const comm_t comm) {
 static inline
 int new_ipc_address(comm_t *comm) {
   int ret;
-  int key = _cisChannelsCreated + 1;
-  if (strlen(comm->name) == 0)
-    sprintf(comm->name, "tempIPC.%d", key);
-  ret = check_channels(*comm);
-  if (ret < 0)
-    return ret;
+  // TODO: small chance of reusing same number
+  int key = 0;
+  if (!(_rand_seeded)) {
+    srand((unsigned long)comm); //time(NULL));
+    _rand_seeded = 1;
+  }
+  while (key == 0) {
+    key = rand();
+  } // _cisChannelsUsed + 1;
+  if (strlen(comm->name) == 0) {
+    sprintf(comm->name, "tempnewIPC.%d", key);
+  } else {
+    ret = check_channels(*comm);
+    if (ret < 0)
+      return ret;
+  }
   sprintf(comm->address, "%d", key);
   int *fid = (int*)malloc(sizeof(int));
   fid[0] = msgget(key, (IPC_CREAT | 0777));
@@ -110,7 +151,7 @@ int new_ipc_address(comm_t *comm) {
       return -1;
   }
   comm->handle = (void*)fid;
-  add_channel(comm->name);
+  add_channel(*comm);
   _cisChannelsCreated++;
   return 0;
 };
@@ -124,12 +165,14 @@ static inline
 int init_ipc_comm(comm_t *comm) {
   if (comm->valid == 0)
     return -1;
-  if (strlen(comm->name) == 0)
-    sprintf(comm->name, "tempIPC.%s", comm->address);
-  int ret = check_channels(*comm);
-  if (ret < 0)
-    return ret;
-  add_channel(comm->address);
+  if (strlen(comm->name) == 0) {
+    sprintf(comm->name, "tempinitIPC.%s", comm->address);
+  } else {
+    int ret = check_channels(*comm);
+    if (ret < 0)
+      return ret;
+  }
+  add_channel(*comm);
   int qkey = atoi(comm->address);
   int *fid = (int *)malloc(sizeof(int));
   fid[0] = msgget(qkey, 0600);
@@ -146,7 +189,9 @@ static inline
 int free_ipc_comm(comm_t *x) {
   if (x->handle != NULL) {
     if (strcmp(x->direction, "recv") == 0) {
-      remove_comm(*x);
+      remove_comm(*x, 1);
+    } else {
+      remove_comm(*x, 0);
     }
     free(x->handle);
     x->handle = NULL;

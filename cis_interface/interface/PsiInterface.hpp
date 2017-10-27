@@ -344,7 +344,7 @@ public:
     formatting output.
    */
   CisRpcServer(const char *name, char *inFormat, char *outFormat) :
-    CisRpc(cisRpcServer(name, outFormat, inFormat)) {}
+    CisRpc(cisRpcServer(name, inFormat, outFormat)) {}
 
 };
 

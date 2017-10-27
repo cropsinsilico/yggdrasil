@@ -23,6 +23,7 @@ int main(int argc, char *argv[]) {
     ret = rpcSend(rpc, i);
     if (ret != 0) {
       printf("rpcFibCliPar(C): SEND FAILED\n");
+      psi_free(&rpc);
       exit(-1);
     }
   }
@@ -34,11 +35,13 @@ int main(int argc, char *argv[]) {
     ret = rpcRecv(rpc, &fibNo, &fib);
     if (ret < 0) {
       printf("rpcFibCliPar(C): RECV FAILED\n");
+      psi_free(&rpc);
       exit(-1);
     }
     printf("rpcFibCliPar(C):  fib(%2d<-) = %-2d<-\n", fibNo, fib);
   }
 
+  psi_free(&rpc);
   printf("Goodbye from C rpcFibCliPar\n");
   exit(0);
     

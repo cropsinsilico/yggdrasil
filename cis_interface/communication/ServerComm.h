@@ -36,6 +36,7 @@ int init_server_comm(comm_t *comm) {
   // Called to initialize/create server comm
   char *seri_in = (char*)malloc(strlen(comm->direction) + 1);
   strcpy(seri_in, comm->direction);
+  /* printf("init_server_comm(%s): seri: %s\n", comm->name, seri_in); */
   comm_t *handle = (comm_t*)malloc(sizeof(comm_t));
   if (strlen(comm->name) == 0) {
     handle[0] = new_comm_base(comm->address, "recv", _default_comm, (void*)seri_in);
@@ -52,7 +53,6 @@ int init_server_comm(comm_t *comm) {
   comm_t **info = (comm_t**)malloc(sizeof(comm_t*));
   info[0] = NULL;
   comm->info = (void*)info;
-  free(seri_in);
   return ret;
 };
 
@@ -65,6 +65,7 @@ static inline
 int free_server_comm(comm_t *x) {
   if (x->handle != NULL) {
     comm_t *handle = (comm_t*)(x->handle);
+    free((char*)(handle->serializer.info));
     free_default_comm(handle);
     free(x->handle);
     x->handle = NULL;
@@ -72,12 +73,16 @@ int free_server_comm(comm_t *x) {
   if (x->info != NULL) {
     comm_t **info = (comm_t**)(x->info);
     if (*info != NULL) {
+      free((char*)(info[0]->serializer.info));
       free_default_comm(*info);
       free(*info);
     }
     free(info);
     x->info = NULL;
   }
+  // TODO: Why is the pointer invalid?
+  /* printf("serializer: %s\n", (char*)(x->serializer.info)); */
+  /* free((char*)(x->serializer.info)); */
   return 0;
 };
 
@@ -112,7 +117,11 @@ int server_comm_send(const comm_t x, const char *data, const int len) {
     cislog_error("server_comm_send(%s): no response comm registered", x.name);
     return -1;
   }
-  return default_comm_send((*res_comm)[0], data, len);
+  int ret = default_comm_send((*res_comm)[0], data, len);
+  free((char*)(res_comm[0]->serializer.info));
+  free_default_comm(res_comm[0]);
+  res_comm[0] = NULL;
+  return ret;
 };
 
 /*!
@@ -153,9 +162,11 @@ int server_comm_recv(comm_t x, char *data, const int len) {
   strcpy(x.address, head.id);
   comm_t **res_comm = (comm_t**)(x.info);
   res_comm[0] = (comm_t*)realloc(res_comm[0], sizeof(comm_t));
+  char *seri_copy = (char*)malloc(strlen((char*)(x.serializer.info)) + 1);
+  strcpy(seri_copy, (char*)(x.serializer.info));
   res_comm[0][0] = new_comm_base(head.response_address, "send", _default_comm,
-				 x.serializer.info);
-  sprintf(res_comm[0]->name, "server_response.%s", res_comm[0]->address);
+				 seri_copy);
+  /* sprintf(res_comm[0]->name, "server_response.%s", res_comm[0]->address); */
   int newret;
   newret = init_default_comm(res_comm[0]);
   if (newret < 0) {

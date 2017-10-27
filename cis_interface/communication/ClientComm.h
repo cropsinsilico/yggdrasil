@@ -38,6 +38,7 @@ int init_client_comm(comm_t *comm) {
   // Called to initialize/create client comm
   char *seri_out = (char*)malloc(strlen(comm->direction) + 1);
   strcpy(seri_out, comm->direction);
+  /* printf("init_client_comm(%s): seri: %s\n", comm->name, seri_out); */
   comm_t *handle = (comm_t*)malloc(sizeof(comm_t));
   if (strlen(comm->name) == 0) {
     handle[0] = new_comm_base(comm->address, "send", _default_comm, (void*)seri_out);
@@ -57,7 +58,6 @@ int init_client_comm(comm_t *comm) {
   comm_t **info = (comm_t**)malloc(sizeof(comm_t*));
   info[0] = NULL;
   comm->info = (void*)info;
-  free(seri_out);
   return ret;
 };
 
@@ -121,6 +121,7 @@ int free_client_comm(comm_t *x) {
       int ncomm = get_client_response_count(*x);
       int i;
       for (i = 0; i < ncomm; i++) {
+	free((char*)(info[0][i].serializer.info));
 	free_default_comm(info[0] + i);
       }
       free(*info);
@@ -134,10 +135,14 @@ int free_client_comm(comm_t *x) {
     comm_t *handle = (comm_t*)(x->handle);
     char buf[CIS_MSG_MAX] = CIS_MSG_EOF;
     default_comm_send(*handle, buf, strlen(buf));
+    free((char*)(handle->serializer.info));
     free_default_comm(handle);
     free(x->handle);
     x->handle = NULL;
   }
+  // TODO: Why is the pointer invalid?
+  /* printf("serializer: %s\n", (char*)(x->serializer.info)); */
+  /* free((char*)(x->serializer.info)); */
   return 0;
 };
 
@@ -178,8 +183,9 @@ int client_comm_send(comm_t x, const char *data, const int len) {
   int ncomm = get_client_response_count(x);
   comm_t **res_comm = (comm_t**)(x.info);
   res_comm[0] = (comm_t*)realloc(res_comm[0], sizeof(comm_t)*(ncomm + 1));
-  (*res_comm)[ncomm] = new_comm_base(NULL, "recv", _default_comm,
-				     x.serializer.info);
+  char *seri_copy = (char*)malloc(strlen((char*)(x.serializer.info)) + 1);
+  strcpy(seri_copy, (char*)(x.serializer.info));
+  (*res_comm)[ncomm] = new_comm_base(NULL, "recv", _default_comm, seri_copy);
   /* sprintf((*res_comm)[ncomm].name, "client_response.%s", (*res_comm)[ncomm].address); */
   ret = new_default_address(*res_comm + ncomm);
   if (ret < 0) {
@@ -231,6 +237,7 @@ int client_comm_recv(comm_t x, char *data, const int len) {
   if (ret < 0)
     return ret;
   // Close response comm and decrement count of response comms
+  free((char*)((*res_comm)[0].serializer.info));
   free_default_comm(&((*res_comm)[0]));
   dec_client_response_count(x);
   int nresp = get_client_response_count(x);
