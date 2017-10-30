@@ -4,7 +4,8 @@ from cis_interface import backwards
 from cis_interface.tools import CisClass, CIS_MSG_MAX, CIS_MSG_EOF
 from cis_interface.serialize.DefaultSerialize import DefaultSerialize
 from cis_interface.serialize.DefaultDeserialize import DefaultDeserialize
-from cis_interface.communication import new_comm, get_comm, get_comm_class
+from cis_interface.communication import (
+    new_comm, get_comm, get_comm_class, _default_comm)
 
 
 CIS_MSG_HEAD = 'CIS_MSG_HEAD'
@@ -43,6 +44,8 @@ class CommBase(CisClass):
         close_on_eof_recv (bool, optional): If True, the comm will be closed
             when it receives an end-of-file messages. Otherwise, it will remain
             open. Defaults to True.
+        single_use (bool, optional): If True, the comm will only be used to
+            send/recv a single message. Defaults to False.
         **kwargs: Additional keywords arguments are passed to parent class.
 
     Attributes:
@@ -61,6 +64,8 @@ class CommBase(CisClass):
             message before returning None.
         close_on_eof_recv (bool): If True, the comm will be closed when it
             receives an end-of-file messages. Otherwise, it will remain open.
+        single_use (bool): If True, the comm will only be used to send/recv a
+            single message.
 
     Raises:
         Exception: If there is not an environment variable with the specified
@@ -70,7 +75,7 @@ class CommBase(CisClass):
     def __init__(self, name, address=None, direction='send',
                  deserialize=None, serialize=None, format_str=None,
                  dont_open=False, recv_timeout=0.0, close_on_eof_recv=True,
-                 **kwargs):
+                 single_use=False, **kwargs):
         super(CommBase, self).__init__(name, **kwargs)
         self.name = name
         if address is None:
@@ -91,6 +96,8 @@ class CommBase(CisClass):
         self.close_on_eof_recv = close_on_eof_recv
         self._last_header = None
         self._work_comms = {}
+        self.single_use = single_use
+        self._used = False
         if not dont_open:
             self.open()
 
@@ -235,12 +242,16 @@ class CommBase(CisClass):
     @property
     def get_work_comm_kwargs(self):
         r"""dict: Keyword arguments for an existing work comm."""
-        return dict(comm=self.comm_class, direction='recv')
+        return dict(comm=self.comm_class, direction='recv',
+                    recv_timeout=self.recv_timeout,
+                    single_use=True)
 
     @property
     def create_work_comm_kwargs(self):
         r"""dict: Keyword arguments for a new work comm."""
-        return dict(comm=self.comm_class, direction='send')
+        return dict(comm=self.comm_class, direction='send',
+                    recv_timeout=self.recv_timeout,
+                    single_use=True)
 
     def get_work_comm(self, header, **kwargs):
         r"""Get temporary work comm, creating as necessary.
@@ -259,7 +270,8 @@ class CommBase(CisClass):
             return c
         kws = self.get_work_comm_kwargs
         kws.update(**kwargs)
-        c = get_comm('temp_comm.' + header['id'],
+        cls = kws.get("comm", _default_comm)
+        c = get_comm('temp_recv_%s.%s' % (cls, header['id']),
                      address=header['address'],
                      **kws)
         self.add_work_comm(header['id'], c)
@@ -279,7 +291,8 @@ class CommBase(CisClass):
         """
         kws = self.create_work_comm_kwargs
         kws.update(**kwargs)
-        c = new_comm('temp_comm.' + header['id'], **kws)
+        cls = kws.get("comm", _default_comm)
+        c = new_comm('temp_send_%s.%s' % (cls, header['id']), **kws)
         self.add_work_comm(header['id'], c)
         return c
 
@@ -290,33 +303,45 @@ class CommBase(CisClass):
             key (str): Key that should be used to log the comm.
             comm (Comm): Comm that should be added.
 
+        Raises:
+            KeyError: If there is already a comm associated with the key.
+
         """
+        if key in self._work_comms:
+            raise KeyError("Comm already registered with key %s." % key)
         self._work_comms[key] = comm
 
-    def remove_work_comm(self, key):
+    def remove_work_comm(self, key, dont_close=False):
         r"""Close and remove a work comm.
 
         Args:
             key (str): Key of comm that should be removed.
+            dont_close (bool, optional): If True, the comm will be removed
+                from the list, but it won't be closed. Defaults to False.
 
         """
         if key not in self._work_comms:
             return
-        c = self._work_comms.pop(key)
-        c.close()
+        if not dont_close:
+            c = self._work_comms.pop(key)
+            c.close()
 
     # HEADER
-    def get_header(self, msg):
+    def get_header(self, msg, **kwargs):
         r"""Create a dictionary of message properties.
 
         Args:
             msg (str): Message to get header for.
+            **kwargs: Additional keyword args are used to initialized the
+                header.
 
         Returns:
            dict: Properties that should be encoded in a messaged header.
 
         """
-        out = {'size': len(msg), 'id': str(uuid.uuid4())}
+        out = dict(**kwargs)
+        out['size'] = len(msg)
+        out.setdefault('id', str(uuid.uuid4()))
         c = self.create_work_comm(out)
         out['address'] = c.address
         return out
@@ -402,6 +427,7 @@ class CommBase(CisClass):
         """
         workcomm = self.get_work_comm(header)
         ret = workcomm._send_multipart(msg, **kwargs)
+        self.remove_work_comm(header['id'], dont_close=True)
         return ret
             
     def on_send_eof(self):
@@ -452,9 +478,12 @@ class CommBase(CisClass):
         flag, msg_s = self.on_send(args)
         if not flag:
             return False
+        if self.single_use and self._used:
+            raise RuntimeError("This comm is single use and it was already used.")
         try:
             self.debug('.send(): %d bytes', len(msg_s))
             ret = self.send_multipart(msg_s, **kwargs)
+            self._used = True
             self.debug('.send(): %d bytes sent', len(msg_s))
         except:
             self.exception('.send(): Failed to send.')
@@ -485,9 +514,11 @@ class CommBase(CisClass):
                                   (self.maxMsgSize == 0)):
             ret = self._send(msg, **kwargs)
         else:
-            header = self.get_header(msg)
-            if header_kwargs is not None:
-                header.update(**header_kwargs)
+            if header_kwargs is None:
+                header_kwargs = dict()
+            header = self.get_header(msg, **header_kwargs)
+            # if header_kwargs is not None:
+            #     header.update(**header_kwargs)
             ret = self.send_header(header)
             if not ret:  # pragma: debug
                 self.debug(".send_multipart: Sending message header failed.")
@@ -506,7 +537,6 @@ class CommBase(CisClass):
             bool: Success or failure of send.
 
         """
-        # print 'send_header', self.name, header, self.address
         header_msg = self.format_header(header)
         out = self._send(header_msg, **kwargs)
         return out
@@ -561,6 +591,8 @@ class CommBase(CisClass):
                 ret = False
                 break
             data = data + payload[1]
+            if len(payload[1]) == 0:
+                self.sleep()
         payload = (ret, data)
         self.debug(".recv_multipart(): read %d bytes", len(data))
         return payload
@@ -580,6 +612,7 @@ class CommBase(CisClass):
         workcomm = self.get_work_comm(info)
         leng_exp = int(float(info['size']))
         out = workcomm._recv_multipart(leng_exp, **kwargs)
+        self.remove_work_comm(info['id'])
         return out
         
     def on_recv_eof(self):
@@ -630,10 +663,13 @@ class CommBase(CisClass):
             self.debug('.recv(): comm closed.')
             return (False, None)
         # kwargs.setdefault('timeout', self.recv_timeout)
+        if self.single_use and self._used:
+            raise RuntimeError("This comm is single use and it was already used.")
         try:
             flag, s_msg = self.recv_multipart(*args, **kwargs)
             if flag and len(s_msg) > 0:
                 self.debug('.recv(): %d bytes received', len(s_msg))
+            self._used = True
         except:
             self.exception('.recv(): Failed to recv.')
             return (False, None)
@@ -641,6 +677,8 @@ class CommBase(CisClass):
             flag, msg = self.on_recv(s_msg)
         else:
             msg = None
+        if self.single_use:
+            self.close()
         return (flag, msg)
 
     def recv_multipart(self, *args, **kwargs):
@@ -662,7 +700,6 @@ class CommBase(CisClass):
             if not flag:
                 self.debug(".recv_multipart(): Failed to receive message header.")
             return flag, info['body']
-        # print 'recv_header', self.name, info, self.address
         self._last_header = info
         if len(info['body']) == int(info['size']):
             return True, info['body']

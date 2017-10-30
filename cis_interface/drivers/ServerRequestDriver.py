@@ -52,11 +52,6 @@ class ServerRequestDriver(ConnectionDriver):
         self.nclients = 0
         self.comm = comm
         self.comm_address = self.icomm.address
-        # print 80*'='
-        # print self.__class__
-        # print self.env
-        # print self.icomm.name, self.icomm.address
-        # print self.ocomm.name, self.ocomm.address
 
     @property
     def request_id(self):
@@ -78,8 +73,10 @@ class ServerRequestDriver(ConnectionDriver):
 
     def terminate(self, *args, **kwargs):
         r"""Stop response drivers."""
-        for x in self.response_drivers:
-            x.terminate()
+        with self.lock:
+            for x in self.response_drivers:
+                x.terminate()
+            self.response_drivers = []
         super(ServerRequestDriver, self).terminate(*args, **kwargs)
 
     def on_model_exit(self):
@@ -139,8 +136,11 @@ class ServerRequestDriver(ConnectionDriver):
                     return False
                 drv_args = [self.response_address]
                 drv_kwargs = dict(comm=self.comm, msg_id=self.request_id)
-                response_driver = ServerResponseDriver(*drv_args, **drv_kwargs)
-                response_driver.start()
+                try:
+                    response_driver = ServerResponseDriver(*drv_args, **drv_kwargs)
+                    response_driver.start()
+                except:
+                    return False
                 self.response_drivers.append(response_driver)
             # Send response address in header
             kwargs.setdefault('send_header', True)

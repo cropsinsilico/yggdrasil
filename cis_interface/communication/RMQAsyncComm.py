@@ -82,15 +82,11 @@ class RMQAsyncComm(RMQComm):
     
     def open(self):
         r"""Open connection and bind/connect to queue as necessary."""
-        if not self.is_open:
-            if not self._bound:
-                self.bind()
-            T = self.start_timeout()
-            while (not T.is_out) and self._opening:
-                self.sleep()
-            self.stop_timeout()
-            self._is_open = True
-            self._bound = False
+        super(RMQAsyncComm, self).open()
+        T = self.start_timeout()
+        while (not T.is_out) and self._opening:
+            self.sleep()
+        self.stop_timeout()
 
     def close(self):
         r"""Close connection."""
@@ -102,23 +98,22 @@ class RMQAsyncComm(RMQComm):
         while (not T.is_out) and self._opening:
             self.sleep()
         self.stop_timeout(key=self.timeout_key + '_opening')
-        # Don't close a connection that was never opened
-        if not (self.is_open or self._bound):
-            return
         # Close by cancelling consumption
-        with self.lock:
-            self._closing = True
-            self._is_open = False
-            self._bound = False
-            if self.direction == 'recv':
-                try:
-                    self.channel.basic_cancel(callback=self.on_cancelok,
-                                              consumer_tag=self.consumer_tag)
-                except pika.exceptions.ChannelClosed:  # pragma: debug
-                    self._closing = False
-                self.unregister_connection()
-            else:
-                self.channel.close()
+        if self.is_open or self._bound:
+            with self.lock:
+                self._closing = True
+                self._is_open = False
+                self._bound = False
+                if self.channel is not None:
+                    try:
+                        if self.direction == 'recv':
+                            self.channel.basic_cancel(callback=self.on_cancelok,
+                                                      consumer_tag=self.consumer_tag)
+                        else:
+                            self.channel.close()
+                    except pika.exceptions.ChannelClosed:  # pragma: debug
+                        self._closing = False
+            self.unregister_connection()
         # Wait for connection to finish closing & then force if it dosn't
         T = self.start_timeout()
         while (not T.is_out) and self._closing:
@@ -126,15 +121,11 @@ class RMQAsyncComm(RMQComm):
         self.stop_timeout()
         if self._closing:  # pragma: debug
             self.force_close()
-        if self.connection is not None:
-            try:
-                self.connection.close()
-            except pika.exceptions.ChannelClosed:
-                pass
-        self.thread.join()
-        self.thread = None
-        self.connection = None
-        self.channel = None
+        if self.thread is not None:
+            self.thread.join(self.timeout)
+            if self.thread.isAlive():
+                raise RuntimeError("Thread still running.")
+            self.thread = None
         # Close workers
         super(RMQAsyncComm, self).close()
 
@@ -143,8 +134,7 @@ class RMQAsyncComm(RMQComm):
         r"""int: Number of messages in the queue."""
         out = 0
         with self.lock:
-            if self.is_open:
-                out = len(self._buffered_messages)
+            out = len(self._buffered_messages)
         return out
 
     def _send(self, msg, exchange=None, routing_key=None, **kwargs):
@@ -167,6 +157,7 @@ class RMQAsyncComm(RMQComm):
             out = super(RMQAsyncComm, self)._send(msg, exchange=exchange,
                                                   routing_key=routing_key,
                                                   **kwargs)
+        # Basic publish returns None for asynchronous connection
         if out is None:
             out = True
         return out
@@ -189,18 +180,21 @@ class RMQAsyncComm(RMQComm):
         while self.n_msg == 0 and self.is_open and (not Tout.is_out):
             self.sleep()
         self.stop_timeout()
+        if self.n_msg != 0:
+            with self.lock:
+                out = (True, self._buffered_messages.pop(0))
+            return out
         if self.is_closed:
             self.debug(".recv(): Connection closed.")
             return (False, None)
         if self.n_msg == 0:
             # self.debug(".recv(): No buffered messages.")
             return (True, '')
-        with self.lock:
-            out = (True, self._buffered_messages.pop(0))
-        return out
 
     def on_message(self, ch, method, props, body):
         r"""Buffer received messages."""
+        if self.direction == 'send':
+            raise Exception("Send comm received a message.")
         with self.lock:
             self._buffered_messages.append(body)
         ch.basic_ack(delivery_tag=method.delivery_tag)
@@ -237,7 +231,8 @@ class RMQAsyncComm(RMQComm):
             self.debug('::on_connection_closed code %d %s', reply_code,
                        reply_text)
             if self._closing or reply_code == 200:
-                self.connection.ioloop.stop()
+                if self.connection is not None:
+                    self.connection.ioloop.stop()
                 self.connection = None
                 self._closing = False
             else:
@@ -297,7 +292,8 @@ class RMQAsyncComm(RMQComm):
             self.debug('::channel %i was closed: (%s) %s',
                        channel, reply_code, reply_text)
             self.channel = None
-            self.connection.close()
+            if self.connection is not None:
+                self.connection.close()
 
     # EXCHANGE
     def setup_exchange(self, exchange_name):
@@ -378,6 +374,7 @@ class RMQAsyncComm(RMQComm):
             self.remove_queue()
         if self.connection:
             self.connection.ioloop.stop()
+            self.connection.close()
         self.channel = None
         self.connection = None
         self._closing = False
