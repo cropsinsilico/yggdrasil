@@ -172,11 +172,13 @@ class RMQComm(CommBase.CommBase):
         r"""Remove connection from list of registered connections."""
         global _registered_connections
         if self.address not in _registered_connections:
-            raise KeyError("Connection not registered.")
+            return
+            # raise KeyError("Connection not registered.")
         del _registered_connections[self.address]
     
     def open(self):
         r"""Open connection and bind/connect to queue as necessary."""
+        super(RMQComm, self).open()
         if not self.is_open:
             if not self._bound:
                 self.bind()
@@ -188,15 +190,16 @@ class RMQComm(CommBase.CommBase):
         if self.is_open or self._bound:
             self._is_open = False
             self._bound = False
-            if self.direction == 'recv':
-                self.channel.queue_unbind(queue=self.queue,
-                                          exchange=self.exchange)
-                self.channel.queue_delete(queue=self.queue)
-                self.unregister_connection()
             try:
-                self.connection.close()
+                if self.channel is not None:
+                    self.channel.queue_unbind(queue=self.queue,
+                                              exchange=self.exchange)
+                    self.channel.queue_delete(queue=self.queue)
+                if self.connection is not None:
+                    self.connection.close()
             except pika.exceptions.ChannelClosed:
                 pass
+            self.unregister_connection()
             self.connection = None
             self.channel = None
         super(RMQComm, self).close()
@@ -254,10 +257,22 @@ class RMQComm(CommBase.CommBase):
             bool: Success or failure of sending the message.
 
         """
-        workcomm = self.get_work_comm(header)
-        args = [msg]
-        self.sched_task(0, workcomm._send_multipart, args=args, kwargs=kwargs)
-        return True
+        self.sched_task(0.0, super(RMQComm, self)._send_multipart_worker,
+                        args=[msg, header], kwargs=kwargs, store_output=True)
+        T = self.start_timeout()
+        while (not T.is_out) and (self.sched_out is None):
+            self.sleep()
+        self.stop_timeout()
+        out = self.sched_out
+        self.sched_out = None
+        # workcomm = self.get_work_comm(header)
+        # args = [msg]
+        # self.sched_task(self.sleeptime, workcomm._send_multipart,
+        #                 args=args, kwargs=kwargs)
+        # self.sched_task(1, self.remove_work_comm,
+        #                 args=[header['id']], kwargs=dict(dont_close=True))
+        # self.remove_work_comm(header['id'], dont_close=True)
+        return out
     
     def _send(self, msg, exchange=None, routing_key=None, **kwargs):
         r"""Send a message.

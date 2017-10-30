@@ -87,7 +87,7 @@ class TestClientDriver(TestClientParam, parent.TestConnectionDriver):
         r"""Test routing of a short message between client and server."""
         if msg_send is None:
             msg_send = self.msg_short
-        T = self.instance.start_timeout()
+        T = self.instance.start_timeout(self.timeout)
         while ((not T.is_out) and ((not self.instance.is_valid) or
                                    (not self.srv_drv.is_valid))):
             self.instance.sleep()  # pragma: debug
@@ -96,7 +96,7 @@ class TestClientDriver(TestClientParam, parent.TestConnectionDriver):
         flag = self.send_comm.send(msg_send)
         assert(flag)
         # Wait for message to be routed
-        T = self.instance.start_timeout()
+        T = self.instance.start_timeout(self.timeout)
         while ((not T.is_out) and (self.recv_comm.n_msg == 0)):
             self.instance.sleep()
         self.instance.stop_timeout()

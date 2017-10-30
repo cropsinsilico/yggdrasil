@@ -12,3 +12,4 @@ class RMQAsyncClientDriver(ClientDriver):
     def __init__(self, *args, **kwargs):
         kwargs['comm'] = 'RMQAsyncComm'
         super(RMQAsyncClientDriver, self).__init__(*args, **kwargs)
+        self.timeout = 10.0

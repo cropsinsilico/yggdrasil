@@ -42,18 +42,13 @@ class ServerResponseDriver(ConnectionDriver):
         self.comm = comm
         self.msg_id = msg_id
         self._unused = True
-        # print 80*'='
-        # print self.__class__
-        # print self.env
-        # print self.icomm.name, self.icomm.address
-        # print self.ocomm.name, self.ocomm.address
         
     @property
     def is_valid(self):
         r"""bool: Returns True if the connection is unused and the parent class
         is valid."""
         with self.lock:
-            return (super(ConnectionDriver, self).is_valid and self._unused)
+            return (super(ServerResponseDriver, self).is_valid and self._unused)
 
     @property
     def model_response_name(self):
@@ -73,6 +68,11 @@ class ServerResponseDriver(ConnectionDriver):
         response driver."""
         return self.ocomm.address
 
+    def after_loop(self):
+        r"""Send EOF to the client response driver."""
+        self.icomm.close()
+        super(ServerResponseDriver, self).after_loop()
+        
     def send_message(self, *args, **kwargs):
         r"""Set comm to used and then send the message.
 
@@ -84,5 +84,6 @@ class ServerResponseDriver(ConnectionDriver):
             bool: Success or failure of send.
 
         """
-        self._unused = False
+        with self.lock:
+            self._unused = False
         super(ServerResponseDriver, self).send_message(*args, **kwargs)

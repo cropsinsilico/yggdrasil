@@ -43,17 +43,25 @@ class ClientResponseDriver(ConnectionDriver):
         assert(not hasattr(self, 'comm'))
         self.comm = comm
         self.msg_id = msg_id
-        # print 80*'='
-        # print self.__class__
-        # print self.env
-        # print self.icomm.name, self.icomm.address
-        # print self.ocomm.name, self.ocomm.address
+        self._unused = True
+
+    @property
+    def is_valid(self):
+        r"""bool: Returns True if the connection is unused and the parent class
+        is valid."""
+        with self.lock:
+            return (super(ClientResponseDriver, self).is_valid and self._unused)
 
     @property
     def response_address(self):
         r"""str: Address of response comm."""
         return self.icomm.address
 
+    def after_loop(self):
+        r"""Send EOF to the client response driver."""
+        self.icomm.close()
+        super(ClientResponseDriver, self).after_loop()
+        
     def send_message(self, *args, **kwargs):
         r"""Close the input comm once message sent.
 
@@ -65,6 +73,8 @@ class ClientResponseDriver(ConnectionDriver):
             bool: Success or failure of send.
 
         """
+        with self.lock:
+            self._unused = False
         out = super(ClientResponseDriver, self).send_message(*args, **kwargs)
         self.icomm.close()
         return out

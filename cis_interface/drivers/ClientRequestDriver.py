@@ -74,11 +74,6 @@ class ClientRequestDriver(ConnectionDriver):
         self.response_drivers = []
         self.comm = comm
         self.comm_address = self.ocomm.address
-        # print 80*'='
-        # print self.__class__
-        # print self.env
-        # print self.icomm.name, self.icomm.address
-        # print self.ocomm.name, self.ocomm.address
 
     @property
     def request_id(self):
@@ -105,8 +100,10 @@ class ClientRequestDriver(ConnectionDriver):
     
     def terminate(self, *args, **kwargs):
         r"""Stop response drivers."""
-        for x in self.response_drivers:
-            x.terminate()
+        with self.lock:
+            for x in self.response_drivers:
+                x.terminate()
+            self.response_drivers = []
         super(ClientRequestDriver, self).terminate(*args, **kwargs)
 
     def on_model_exit(self):
