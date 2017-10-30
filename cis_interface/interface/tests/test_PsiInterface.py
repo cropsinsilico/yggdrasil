@@ -122,7 +122,7 @@ class TestPsiRpc(TestBase):
     def __init__(self, *args, **kwargs):
         super(TestPsiRpc, self).__init__(*args, **kwargs)
         self._cls = 'PsiRpc'
-        self.driver_name = 'RPCCommDriver'
+        # self.driver_name = 'RPCCommDriver'
         self._inst_args = [self.name, self.fmt_str,
                            self.name, self.fmt_str]
         self.driver_args = [self.name]
@@ -133,37 +133,60 @@ class TestPsiRpc(TestBase):
         out = super(TestPsiRpc, self).driver_kwargs
         out['comm'] = 'RPCComm'
         return out
+
+    @property
+    def client_comm(self):
+        r"""comm: Client side comm."""
+        return self.instance
+        
+    @property
+    def server_comm(self):
+        r"""comm: Server side comm."""
+        return self.driver
+
+    @property
+    def client_msg(self):
+        r"""str: Test message for client side."""
+        return self.file_rows[0]
+
+    @property
+    def server_msg(self):
+        r"""str: Test message for server side."""
+        return self.file_lines[0]
         
     def test_rpcSendRecv(self):
         r"""Test sending/receiving formated output."""
-        var_send = self.file_rows[0]
-        msg_send = self.file_lines[0]
+        cli_send = self.client_msg
+        srv_send = self.server_msg
         # Send message to driver
-        var_flag = self.instance.send_nolimit(*var_send)
-        assert(var_flag)
-        msg_flag, msg_recv = self.driver.recv_nolimit(timeout=1)
-        assert(msg_flag)
-        nt.assert_equal(msg_recv, msg_send)
+        flag = self.client_comm.send(cli_send)
+        assert(flag)
+        flag, msg_recv = self.server_comm.recv(timeout=self.timeout)
+        assert(flag)
+        nt.assert_equal(msg_recv, srv_send)
         # Send response back to instance
-        var_flag = self.driver.send_nolimit(msg_recv)
-        assert(var_flag)
+        flag = self.server_comm.send(srv_send)
+        assert(flag)
         # self.driver.sleep(1)
-        var_flag, var_recv = self.instance.recv_nolimit(timeout=1)
-        assert(var_flag)
-        nt.assert_equal(var_recv, var_send)
+        flag, msg_recv = self.client_comm.recv(timeout=self.timeout)
+        assert(flag)
+        nt.assert_equal(msg_recv, cli_send)
+
+    def server_side_call(self, msg_sent):
+        r"""Actions to respond to a mock call on the server side."""
+        flag, msg_recv = self.server_comm.recv(timeout=self.timeout)
+        assert(flag)
+        nt.assert_equal(msg_recv, msg_sent)
+        flag = self.server_comm.send(msg_sent)
+        assert(flag)
 
     def test_rpcCall(self):
         r"""Test rpc call."""
-        var_send = self.file_rows[0]
-        msg_send = self.file_lines[0]
-        var_flag = self.driver.send_nolimit(msg_send)
-        assert(var_flag)
-        var_flag, var_recv = self.instance.call(*var_send)
-        assert(var_flag)
-        nt.assert_equal(var_recv, var_send)
-        vaf_flag, msg_recv = self.driver.recv_nolimit(timeout=1)
-        assert(var_flag)
-        nt.assert_equal(msg_recv, msg_send)
+        self.server_comm.sched_task(2 * self.sleeptime, self.server_side_call,
+                                    args=[self.server_msg])
+        flag, msg_recv = self.client_comm.call(*self.client_msg)
+        assert(flag)
+        nt.assert_equal(msg_recv, self.client_msg)
 
 
 class TestPsiRpcClient(TestPsiRpc):
@@ -173,6 +196,13 @@ class TestPsiRpcClient(TestPsiRpc):
         self._cls = 'PsiRpcClient'
         self._inst_args = [self.name, self.fmt_str, self.fmt_str]
 
+    @property
+    def driver_kwargs(self):
+        r"""Keyword arguments for the driver."""
+        out = super(TestPsiRpc, self).driver_kwargs
+        out['comm'] = 'ServerComm'
+        return out
+        
         
 class TestPsiRpcServer(TestPsiRpc):
     r"""Test server-side RPC communication with Python."""
@@ -181,6 +211,37 @@ class TestPsiRpcServer(TestPsiRpc):
         self._cls = 'PsiRpcServer'
         self._inst_args = [self.name, self.fmt_str, self.fmt_str]
 
+    @property
+    def driver_kwargs(self):
+        r"""Keyword arguments for the driver."""
+        out = super(TestPsiRpc, self).driver_kwargs
+        out['comm'] = 'ClientComm'
+        return out
+        
+    def test_rpcCall(self):
+        r"""Test rpc call (disabled for server test)."""
+        pass
+
+    @property
+    def client_comm(self):
+        r"""comm: Client side comm."""
+        return self.driver
+        
+    @property
+    def server_comm(self):
+        r"""comm: Server side comm."""
+        return self.instance
+
+    @property
+    def client_msg(self):
+        r"""str: Test message for client side."""
+        return self.file_lines[0]
+
+    @property
+    def server_msg(self):
+        r"""str: Test message for server side."""
+        return self.file_rows[0]
+        
         
 class TestPsiAsciiFileInput(TestBase):
     r"""Test input from an unformatted text file."""
@@ -212,7 +273,7 @@ class TestPsiAsciiFileInput(TestBase):
         r"""Test receiving a line from a remote file."""
         self.instance.sleep()
         for lans in self.file_lines:
-            msg_flag, lres = self.instance.recv(timeout=1)
+            msg_flag, lres = self.instance.recv(timeout=self.timeout)
             assert(msg_flag)
             nt.assert_equal(lres, lans)
         msg_flag, lres = self.instance.recv()
@@ -332,10 +393,10 @@ class TestPsiAsciiTableInputArray(TestPsiAsciiTableInput):
 
     def test_recv_line(self):
         r"""Test receiving an array from a remote table."""
-        msg_flag, msg_recv = self.instance.recv(timeout=1)
+        msg_flag, msg_recv = self.instance.recv(timeout=self.timeout)
         assert(msg_flag)
         np.testing.assert_array_equal(msg_recv, self.file_array)
-        msg_flag, msg_recv = self.instance.recv(timeout=1)
+        msg_flag, msg_recv = self.instance.recv(timeout=self.timeout)
         assert(not msg_flag)
 
 
@@ -441,7 +502,8 @@ class TestPsiPickleInput(TestBase):
 
     def setup(self):
         r"""Create a test file and start the driver."""
-        if not os.path.isfile(self.tempfile):
+        if (((not os.path.isfile(self.tempfile)) or
+             (os.stat(self.tempfile).st_size == 0))):
             self.write_pickle(self.tempfile)
         skip_start = False
         if self.inst_kwargs.get('src_type', 1) == 0:
@@ -456,7 +518,11 @@ class TestPsiPickleInput(TestBase):
 
     def test_recv(self):
         r"""Test receiving a pickle from a remote file."""
-        msg_flag, res = self.instance.recv(timeout=1)
+        Tout = self.instance.start_timeout()
+        while ((not Tout.is_out) and (os.stat(self.tempfile).st_size == 0)):
+            self.instance.sleep()
+        self.instance.stop_timeout()
+        msg_flag, res = self.instance.recv(timeout=self.timeout)
         assert(msg_flag)
         self.assert_equal_data_dict(res)
 
@@ -495,8 +561,10 @@ class TestPsiPickleOutput(TestBase):
     def setup(self):
         r"""Create a test file and start the driver."""
         skip_start = False
-        if self.inst_kwargs.get('src_type', 1) == 0:
+        if self.inst_kwargs.get('dst_type', 1) == 0:
             skip_start = True
+        if os.path.isfile(self.tempfile):
+            os.remove(self.tempfile)
         super(TestPsiPickleOutput, self).setup(skip_start=skip_start)
 
     def teardown(self):
@@ -510,11 +578,9 @@ class TestPsiPickleOutput(TestBase):
         msg_flag = self.instance.send(self.data_dict)
         assert(msg_flag)
         self.instance.send_eof()
-        # assert(msg_flag)
         # Read temp file
         Tout = self.instance.start_timeout()
-        while ((not Tout.is_out) and
-               (self.file_comm.is_open or (os.stat(self.tempfile).st_size == 0))):
+        while ((not Tout.is_out) and self.file_comm.is_open):
             self.instance.sleep()
         self.instance.stop_timeout()
         # Read temp file

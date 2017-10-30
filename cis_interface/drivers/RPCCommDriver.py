@@ -9,12 +9,7 @@ class RPCCommDriver(CommDriver):
             connect to.
         **kwargs: Additional keyword arguments are passed to the parent class.
 
-    Attributes:
-        -
-
     """
     def __init__(self, name, **kwargs):
         kwargs['comm'] = 'RPCComm'
         super(RPCCommDriver, self).__init__(name, **kwargs)
-        self.env[self.name + '_OUT'] = self.comm.icomm.address
-        self.env[self.name + '_IN'] = self.comm.ocomm.address

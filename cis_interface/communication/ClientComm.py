@@ -13,6 +13,8 @@ class ClientComm(CommBase.CommBase):
             request comm. Defaults to None.
         response_kwargs (dict, optional): Keyword arguments for the response
             comm. Defaults to empty dict.
+        reverse_names (bool, optional): If True, the suffix added to
+            name to create ocomm_name are reversed. Defaults to False.
         **kwargs: Additional keywords arguments are passed to the output comm.
 
     Attributes:
@@ -23,10 +25,13 @@ class ClientComm(CommBase.CommBase):
 
     """
     def __init__(self, name, request_comm=None, response_kwargs=None,
-                 dont_open=False, **kwargs):
+                 dont_open=False, reverse_names=False, **kwargs):
         if response_kwargs is None:
             response_kwargs = dict()
-        ocomm_name = name + '_OUT'
+        if reverse_names:
+            ocomm_name = name + '_IN'
+        else:
+            ocomm_name = name + '_OUT'
         ocomm_kwargs = kwargs
         ocomm_kwargs['direction'] = 'send'
         ocomm_kwargs['dont_open'] = True
@@ -64,6 +69,13 @@ class ClientComm(CommBase.CommBase):
                                                         **kwargs)
         kwargs['request_comm'] = request_comm
         return args, kwargs
+
+    @property
+    def opp_comms(self):
+        r"""dict: Name/address pairs for opposite comms."""
+        out = super(ClientComm, self).opp_comms
+        out.update(**self.ocomm.opp_comms)
+        return out
 
     def opp_comm_kwargs(self):
         r"""Get keyword arguments to initialize communication with opposite

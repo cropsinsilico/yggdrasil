@@ -46,6 +46,8 @@ class CommBase(CisClass):
             open. Defaults to True.
         single_use (bool, optional): If True, the comm will only be used to
             send/recv a single message. Defaults to False.
+        reverse_names (bool, optional): Only included for compatiblity with
+            comms that have directional names.
         **kwargs: Additional keywords arguments are passed to parent class.
 
     Attributes:
@@ -75,7 +77,7 @@ class CommBase(CisClass):
     def __init__(self, name, address=None, direction='send',
                  deserialize=None, serialize=None, format_str=None,
                  dont_open=False, recv_timeout=0.0, close_on_eof_recv=True,
-                 single_use=False, **kwargs):
+                 single_use=False, reverse_names=False, **kwargs):
         super(CommBase, self).__init__(name, **kwargs)
         self.name = name
         if address is None:
@@ -138,6 +140,11 @@ class CommBase(CisClass):
     def opp_address(self):
         r"""str: Address for opposite comm."""
         return self.address
+
+    @property
+    def opp_comms(self):
+        r"""dict: Name/address pairs for opposite comms."""
+        return {self.name: self.opp_address}
 
     def opp_comm_kwargs(self):
         r"""Get keyword arguments to initialize communication with opposite
@@ -662,7 +669,6 @@ class CommBase(CisClass):
         if self.is_closed:
             self.debug('.recv(): comm closed.')
             return (False, None)
-        # kwargs.setdefault('timeout', self.recv_timeout)
         if self.single_use and self._used:
             raise RuntimeError("This comm is single use and it was already used.")
         try:
