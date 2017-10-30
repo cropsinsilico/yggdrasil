@@ -144,6 +144,14 @@ class RPCComm(CommBase.CommBase):
         adds = self.address.split(_rpc_address_split)
         return _rpc_address_split.join([adds[1], adds[0]])
 
+    @property
+    def opp_comms(self):
+        r"""dict: Name/address pairs for opposite comms."""
+        out = super(RPCComm, self).opp_comms
+        out.update(**self.icomm.opp_comms)
+        out.update(**self.ocomm.opp_comms)
+        return out
+
     def open(self):
         r"""Open the connection."""
         super(RPCComm, self).open()

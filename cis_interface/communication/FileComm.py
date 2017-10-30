@@ -127,6 +127,7 @@ class FileComm(CommBase.CommBase):
             bool: False so that message not sent.
 
         """
+        self.fd.flush()
         self.close()
         return False
 

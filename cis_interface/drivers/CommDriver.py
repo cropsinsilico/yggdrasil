@@ -28,9 +28,12 @@ class CommDriver(Driver):
         self.state = 'Started'
         self.numSent = 0
         self.numReceived = 0
+        kwargs.setdefault('reverse_names', True)
         self.comm = new_comm(name, dont_open=True, **kwargs)
         self.comm_name = self.comm.comm_class
-        self.env[name] = self.comm.opp_address
+        for k, v in self.comm.opp_comms.items():
+            self.env[k] = v
+        # self.env[name] = self.comm.opp_address
         self.debug(".env: %s", self.env)
 
     @property
