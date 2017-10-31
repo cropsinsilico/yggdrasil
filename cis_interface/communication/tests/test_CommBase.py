@@ -1,6 +1,7 @@
 import nose.tools as nt
 from cis_interface.drivers.tests.test_IODriver import IOInfo
 from cis_interface.tests import CisTest
+from cis_interface.communication import new_comm
 
 
 class TestCommBase(CisTest, IOInfo):
@@ -51,8 +52,7 @@ class TestCommBase(CisTest, IOInfo):
 
     def setup(self, *args, **kwargs):
         r"""Initialize comm object pair."""
-        self.send_instance = self.import_cls.new_comm(
-            self.name, **self.send_inst_kwargs)
+        self.send_instance = new_comm(self.name, **self.send_isnt_kwargs)
         super(TestCommBase, self).setup(*args, **kwargs)
         # CommBase is dummy class that never opens
         if self.comm != 'CommBase':

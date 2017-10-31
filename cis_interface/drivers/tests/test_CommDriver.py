@@ -2,6 +2,7 @@ import importlib
 import nose.tools as nt
 from cis_interface.drivers.tests.test_IODriver import IOInfo
 from cis_interface.drivers.tests import test_Driver as parent
+from cis_interface.communication import get_comm_class, new_comm
 
             
 class TestCommParam(parent.TestParam, IOInfo):
@@ -70,22 +71,18 @@ class TestCommParam(parent.TestParam, IOInfo):
     @property
     def comm_cls(self):
         r"""Comm class."""
-        comm_mod = importlib.import_module('cis_interface.communication.%s' %
-                                           self.comm_name)
-        comm_cls = getattr(comm_mod, self.comm_name)
-        return comm_cls
+        return get_comm_class(self.comm_name)
 
     def setup(self, *args, **kwargs):
         r"""Initialize comm object pair."""
-        comm_cls = self.comm_cls
-        kwargs['nprev_queues'] = comm_cls.comm_count
+        kwargs['nprev_queues'] = self.comm_cls.comm_count
         # If driver receiving, create send comm first
         if 'Input' not in self.driver:
-            self.alt_comm = comm_cls.new_comm(self.name, **self.alt_comm_kwargs)
+            self.alt_comm = new_comm(self.name, **self.alt_comm_kwargs)
         super(TestCommParam, self).setup(*args, **kwargs)
         # If driver sending, create recv comm second
         if 'Input' in self.driver:
-            self.alt_comm = comm_cls.new_comm(self.name, **self.alt_comm_kwargs)
+            self.alt_comm = new_comm(self.name, **self.alt_comm_kwargs)
 
     def teardown(self, *args, **kwargs):
         r"""Destroy comm object pair."""

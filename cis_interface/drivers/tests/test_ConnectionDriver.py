@@ -2,6 +2,7 @@ import importlib
 import nose.tools as nt
 from cis_interface.drivers.tests.test_IODriver import IOInfo
 from cis_interface.drivers.tests import test_Driver as parent
+from cis_interface.communication import get_comm_class, new_comm
 
             
 class TestConnectionParam(parent.TestParam, IOInfo):
@@ -41,23 +42,19 @@ class TestConnectionParam(parent.TestParam, IOInfo):
     @property
     def comm_cls(self):
         r"""Connection class."""
-        comm_mod = importlib.import_module('cis_interface.communication.%s' %
-                                           self.comm_name)
-        comm_cls = getattr(comm_mod, self.comm_name)
-        return comm_cls
+        return get_comm_class(self.comm_name)
 
     def setup(self, *args, **kwargs):
         r"""Initialize comm object pair."""
-        comm_cls = self.comm_cls
-        kwargs['nprev_queues'] = comm_cls.comm_count
+        kwargs['nprev_queues'] = self.comm_cls.comm_count
         super(TestConnectionParam, self).setup(*args, **kwargs)
         send_kws = self.send_comm_kwargs
         recv_kws = self.recv_comm_kwargs
         if kwargs.get('skip_start', False):
             send_kws['dont_open'] = True
             recv_kws['dont_open'] = True
-        self.send_comm = comm_cls.new_comm(self.name, **send_kws)
-        self.recv_comm = comm_cls.new_comm(self.name, **recv_kws)
+        self.send_comm = new_comm(self.name, **send_kws)
+        self.recv_comm = new_comm(self.name, **recv_kws)
 
     def teardown(self, *args, **kwargs):
         r"""Destroy comm object pair."""

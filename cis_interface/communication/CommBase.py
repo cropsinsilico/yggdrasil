@@ -1,4 +1,3 @@
-# from logging import debug, error, exception
 import os
 from cis_interface import backwards
 from cis_interface.tools import CisClass, PSI_MSG_MAX  # , PSI_MSG_EOF
@@ -93,7 +92,7 @@ class CommBase(CisClass):
             dict: Keyword arguments for opposite comm object.
 
         """
-        kwargs = {}
+        kwargs = {'comm': str(self.__class__).split("'")[1].split(".")[-1]}
         kwargs['address'] = self.address
         kwargs['serialize'] = self.meth_serialize
         kwargs['deserialize'] = self.meth_deserialize

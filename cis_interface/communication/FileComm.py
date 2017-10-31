@@ -15,22 +15,26 @@ class FileComm(CommBase.CommBase):
             stored.
         read_meth (str, optional): Method that should be used to read data
             from the file. Defaults to 'read'. Ignored if direction is 'send'.
+        append (bool, optional): If True and writing, file is openned in append
+            mode. Defaults to False.
         **kwargs: Additional keywords arguments are passed to parent class.
 
     Attributes:
         fd (file): File that should be read/written.
         read_meth (str): Method that should be used to read data from the file.
+        append (bool): If True and writing, file is openned in append mode.
 
     Raises:
         ValueError: If the read_meth is not one of the supported values.
 
     """
-    def __init__(self, name, read_meth='read', **kwargs):
+    def __init__(self, name, read_meth='read', append=False, **kwargs):
         self.fd = None
-        super(FileComm, self).__init__(name, **kwargs)
         if read_meth not in ['read', 'readline']:
             raise ValueError("read_meth '%s' not supported." % read_meth)
         self.read_meth = read_meth
+        self.append = append
+        super(FileComm, self).__init__(name, **kwargs)
 
     @property
     @staticmethod
@@ -50,7 +54,10 @@ class FileComm(CommBase.CommBase):
         if self.direction == 'recv':
             self.fd = open(self.address, 'rb')
         else:
-            self.fd = open(self.address, 'wb')
+            if self.append:
+                self.fd = open(self.address, 'ab')
+            else:
+                self.fd = open(self.address, 'wb')
         _N_FILES += 1
 
     def close(self):
@@ -72,7 +79,8 @@ class FileComm(CommBase.CommBase):
     @property
     def n_msg(self):
         r"""int: The number of messages in the file."""
-        # TODO: How to count messages
+        if self.is_closed:
+            return 0
         if self.direction == 'send':
             out = 0
         else:
@@ -99,7 +107,7 @@ class FileComm(CommBase.CommBase):
         self.fd.flush()
         return True
 
-    def _recv(self):
+    def _recv(self, timeout=0):
         r"""Reads message from a file.
 
         Returns:

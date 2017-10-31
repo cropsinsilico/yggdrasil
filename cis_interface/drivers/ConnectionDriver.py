@@ -154,7 +154,7 @@ class ConnectionDriver(Driver):
 
     def after_loop(self):
         r"""Actions to perform after sending messages."""
-        self.close_comm()
+        pass
 
     def recv_message(self):
         r"""Get a new message to send.
