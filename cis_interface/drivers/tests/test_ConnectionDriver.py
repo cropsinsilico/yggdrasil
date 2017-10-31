@@ -74,6 +74,12 @@ class TestConnectionDriverNoStart(TestConnectionParam, parent.TestDriverNoStart)
 
     """
 
+    def setup(self, *args, **kwargs):
+        r"""Create a driver instance without starting the driver."""
+        kwargs['skip_start'] = True
+        super(TestConnectionDriverNoStart, self).setup(*args, **kwargs)
+        assert(not self.instance.is_alive())
+
     def test_send_recv(self):
         r"""Test sending/receiving with queues closed."""
         self.instance.close_comm()
