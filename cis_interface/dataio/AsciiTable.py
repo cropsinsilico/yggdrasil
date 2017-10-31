@@ -16,7 +16,7 @@ try:
                                        convert_numpy(np.complex)]
     if not backwards.PY2:  # pragma: Python 3
         _use_astropy = False
-except:  # pragma: no cover
+except ImportError:  # pragma: no cover
     apy_ascii, apy_Table = None, None
     print("astropy is not installed, reading/writing as an array will be " +
           "disabled. astropy can be installed using 'pip install astropy'.")

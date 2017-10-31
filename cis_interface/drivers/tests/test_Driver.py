@@ -188,7 +188,7 @@ class TestDriverNoStart(TestParam):
         self.instance.exception(1)
         try:
             raise Exception("Test exception")
-        except:
+        except Exception:
             self.instance.exception(1)
         self.instance.printStatus()
 
