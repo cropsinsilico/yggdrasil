@@ -43,7 +43,7 @@ for k, lang in ex_dict.items():
                                         '%sCliPar_%s.yml' % (k, par_l)),
                            os.path.join(os.path.dirname(__file__), k,
                                         '%sSrv_%s.yml' % (k, srv_l))]
-            source[k][l] = [os.path.join(os.path.dirname(__file__), k, 'src', 
+            source[k][l] = [os.path.join(os.path.dirname(__file__), k, 'src',
                                          '%sCli%s' % (k, ext_map[cli_l])),
                             os.path.join(os.path.dirname(__file__), k, 'src',
                                          '%sCliPar%s' % (k, ext_map[par_l])),
