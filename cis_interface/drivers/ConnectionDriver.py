@@ -236,7 +236,7 @@ class ConnectionDriver(Driver):
         self.debug(':run in %s', os.getcwd())
         try:
             self.before_loop()
-        except:  # pragma: debug
+        except Exception:  # pragma: debug
             self.exception('Could not prep for loop.')
             self.close_comm()
             return

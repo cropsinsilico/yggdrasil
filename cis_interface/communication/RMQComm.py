@@ -300,7 +300,7 @@ class RMQComm(CommBase.CommBase):
         try:
             kwargs.setdefault('mandatory', True)
             out = self.channel.basic_publish(exchange, routing_key, msg, **kwargs)
-        except:
+        except pika.exceptions.AMQPError:
             self.exception(".send(): Error")
             raise
         return out
@@ -334,7 +334,7 @@ class RMQComm(CommBase.CommBase):
             else:
                 self.debug(".recv(): No message")
                 msg = ''
-        except:
+        except pika.exception.AMQPError:
             self.exception(".recv(): Error")
             raise
         return (True, msg)

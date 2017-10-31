@@ -492,7 +492,7 @@ class CommBase(CisClass):
             ret = self.send_multipart(msg_s, **kwargs)
             self._used = True
             self.debug('.send(): %d bytes sent', len(msg_s))
-        except:
+        except Exception:
             self.exception('.send(): Failed to send.')
             return False
         return ret
@@ -676,7 +676,7 @@ class CommBase(CisClass):
             if flag and len(s_msg) > 0:
                 self.debug('.recv(): %d bytes received', len(s_msg))
             self._used = True
-        except:
+        except Exception:
             self.exception('.recv(): Failed to recv.')
             return (False, None)
         if flag:

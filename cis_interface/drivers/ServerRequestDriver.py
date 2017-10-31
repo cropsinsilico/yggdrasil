@@ -139,7 +139,7 @@ class ServerRequestDriver(ConnectionDriver):
                 try:
                     response_driver = ServerResponseDriver(*drv_args, **drv_kwargs)
                     response_driver.start()
-                except:
+                except Exception:
                     return False
                 self.response_drivers.append(response_driver)
             # Send response address in header
