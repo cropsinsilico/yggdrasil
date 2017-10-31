@@ -7,6 +7,7 @@ if PY2:  # pragma: Python 2
     import ConfigParser as configparser
     import StringIO as sio
     from __builtin__ import unicode
+    file_type = file
     bytes_type = str
     unicode_type = str
     np_dtype_str = 'S'
@@ -14,6 +15,7 @@ else:  # pragma: Python 3
     import pickle
     import configparser
     import io as sio
+    file_type = sio.IOBase
     bytes_type = bytes
     unicode_type = str
     unicode = None

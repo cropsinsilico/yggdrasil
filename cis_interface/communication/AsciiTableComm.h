@@ -51,6 +51,7 @@ int init_ascii_table_comm(comm_t *comm) {
   return 0;
 };
 
+// TODO: Don't create a new file, just send to original
 /*!
   @brief Create a new ASCII table.
   @param[in] comm comm_t * Comm structure initialized with new_comm_base.
@@ -58,8 +59,9 @@ int init_ascii_table_comm(comm_t *comm) {
 */
 static inline
 int new_ascii_table_address(comm_t *comm) {
-  sprintf(comm->name, "temp%d", _cisChannelsCreated);
+  sprintf(comm->name, "tempASCIITable.%d", _cisAsciiTablesCreated);
   int ret = init_ascii_table_comm(comm);
+  _cisAsciiTablesCreated++;
   return ret;
 };
 
@@ -82,8 +84,9 @@ int init_ascii_table_array_comm(comm_t *comm) {
 */
 static inline
 int new_ascii_table_array_address(comm_t *comm) {
-  sprintf(comm->name, "temp%d", _cisChannelsCreated);
+  sprintf(comm->name, "tempASCIITableArray.%d", _cisAsciiTablesCreated);
   int ret = init_ascii_table_array_comm(comm);
+  _cisAsciiTablesCreated++;
   return ret;
 };
 

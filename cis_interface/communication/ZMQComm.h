@@ -25,8 +25,8 @@ int new_zmq_address(comm_t *comm) {
   char protocol[50] = "inproc";
   char host[50] = "localhost";
   char address[100];
-  if (stcmp(host, "localhost") == 0)
-    host = "127.0.0.1";
+  if (strcmp(host, "localhost") == 0)
+    strcpy(host, "127.0.0.1");
   int ret;
   if (strcmp(protocol, "inproc") == 0) {
     // TODO: small chance of reusing same number
@@ -49,7 +49,7 @@ int new_zmq_address(comm_t *comm) {
     cislog_error("new_zmq_address: Could not initialize empty socket.");
     return -1;
   }
-  int port = zsock_bind(s, address);
+  int port = zsock_bind(s, "%s", address);
   if (port == -1) {
     cislog_error("new_zmq_address: Could not bind socket to address = %s",
 		 address);
@@ -60,12 +60,12 @@ int new_zmq_address(comm_t *comm) {
   strcpy(comm->address, zsock_endpoint(s));
   // Unbind and connect if this is a recv socket
   if (strcmp(comm->direction, "recv") == 0) {
-    ret = zsock_unbind(s, comm->address);
+    ret = zsock_unbind(s, "%s", comm->address);
     if (ret == -1) {
       cislog_error("new_zmq_address: Could not unbind socket for connect.");
       return ret;
     }
-    ret = zsock_connect(z, comm->address);
+    ret = zsock_connect(s, "%s", comm->address);
     if (ret == -1) {
       cislog_error("new_zmq_address: Could not connect socket to address = %s",
 		   address);
@@ -84,6 +84,7 @@ int new_zmq_address(comm_t *comm) {
  */
 static inline
 int init_zmq_comm(comm_t *comm) {
+  int ret;
   if (comm->valid == 0)
     return -1;
   zsock_t *s = zsock_new(ZMQ_PAIR);
@@ -100,24 +101,23 @@ int init_zmq_comm(comm_t *comm) {
   /* if (strlen(comm->name) == 0) */
   /*  sprintf(comm->name, "tempinitZMQ-%d", port); */
   if (strcmp(comm->direction, "recv") == 0) {
-    ret = zsock_connect(z, comm->address);
+    ret = zsock_connect(s, "%s", comm->address);
     if (ret == -1) {
       cislog_error("new_zmq_address: Could not connect socket to address = %s",
-		   address);
+		   comm->address);
       return ret;
     }
   } else {
-    ret = zsock_bind(z, comm->address);
+    ret = zsock_bind(s, "%s", comm->address);
     if (ret == -1) {
       cislog_error("new_zmq_address: Could not bind socket to address = %s",
-		   address);
+		   comm->address);
       return ret;
     }
   }
   if (strlen(comm->name) == 0)
     sprintf(comm->name, "tempinitZMQ-%s", comm->address);
-  
-  zsock_t *s = zsock_new_pair(comm->address);
+  // Asign to void pointer
   comm->handle = (void*)s;
   return 0;
 };
@@ -145,14 +145,14 @@ int free_zmq_comm(comm_t *x) {
 static inline
 int zmq_comm_nmsg(const comm_t x) {
   int out = 0;
-  if (x->handle != NULL) {
-    zsock_t *s = (zsock_t*)(x->handle);
+  if (x.handle != NULL) {
+    zsock_t *s = (zsock_t*)(x.handle);
     zpoller_t *poller = zpoller_new(s);
     if (poller == NULL) {
       cislog_error("zmq_comm_nmsg: Could not create poller");
       return -1;
     }
-    zsock_t *p = zpoller_wait(s, 1);
+    zsock_t *p = zpoller_wait(poller, 1);
     if (p == NULL)
       out = 0;
     else
@@ -176,7 +176,7 @@ int zmq_comm_send(const comm_t x, const char *data, const int len) {
   cislog_debug("zmq_comm_send(%s): %d bytes", x.name, len);
   if (comm_base_send(x, data, len) == -1)
     return -1;
-  zsock_t *s = (zsock_t*)(x->handle);
+  zsock_t *s = (zsock_t*)(x.handle);
   int ret = zstr_send(s, data);
   cislog_debug("zmq_comm_send(%s): returning %d", x.name, ret);
   return ret;
@@ -195,13 +195,14 @@ int zmq_comm_send(const comm_t x, const char *data, const int len) {
 static inline
 int zmq_comm_recv(const comm_t x, char *data, const int len) {
   cislog_debug("zmq_comm_recv(%s)", x.name);
+  zsock_t *s = (zsock_t*)(x.handle);
   char *out = zstr_recv(s);
   if (out == NULL) {
     cislog_debug("zmq_comm_recv(%s): did not receive", x.name);
     return -1;
   }
   strcpy(data, out);
-  zstr_free(&s);
+  zstr_free(&out);
   return strlen(data);
 };
 

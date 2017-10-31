@@ -229,7 +229,7 @@ class IOInfo(object):
             AssertionError: If the two are not equal.
 
         """
-        if isinstance(x, file):
+        if isinstance(x, backwards.file_type):
             x = pickle.load(x)
         elif isinstance(x, str) and os.path.isfile(x):
             with open(x, 'rb') as fd:

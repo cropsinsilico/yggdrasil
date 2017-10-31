@@ -11,6 +11,11 @@ _incl_interface = os.path.join(_top_dir, 'interface')
 _incl_io = os.path.join(_top_dir, 'io')
 _incl_seri = os.path.join(_top_dir, 'serialize')
 _incl_comm = os.path.join(_top_dir, 'communication')
+# TODO: conditional on libzmq installed
+_compile_links = ["-lczmq", "-lzmq"]
+_compile_flags = []
+for x in [_incl_interface, _incl_io, _incl_comm, _incl_seri]:
+    _compile_flags += ["-I" + x]
 
 
 class GCCModelDriver(ModelDriver):
@@ -41,9 +46,7 @@ class GCCModelDriver(ModelDriver):
         # Prepare arguments to compile the file
         # TODO: Allow user to provide a makefile
         self.compile_setup(self.args.pop(0))
-        compile_args = [self.gcc, "-g", "-Wall"] + self.flags
-        for x in [_incl_interface, _incl_io, _incl_comm, _incl_seri]:
-            compile_args += ["-I" + x]
+        compile_args = [self.gcc, "-g", "-Wall"] + self.flags + _compile_flags
         run_args = [os.path.join(".", self.efile)]
         for arg in self.args:
             if arg.startswith("-I"):
@@ -51,6 +54,7 @@ class GCCModelDriver(ModelDriver):
             else:
                 run_args.append(arg)
         compile_args += ["-o", self.efile, self.cfile]
+        compile_args += _compile_links
         # Compile in a new process
         self.args = run_args
         self.compiled = True
