@@ -47,6 +47,7 @@ int init_client_comm(comm_t *comm) {
     handle[0] = init_comm_base(comm->name, "send", _default_comm, (void*)seri_out);
   }
   ret = init_default_comm(handle);
+  strcpy(comm->address, handle->address);
   /* printf("init_client_comm: name = %s, type=%d, address = %s\n", */
   /* 	 handle->name, handle->type, handle->address); */
   int *ncomm = (int*)malloc(sizeof(int));

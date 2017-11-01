@@ -27,7 +27,6 @@ typedef struct comm_t {
   char name[COMM_NAME_SIZE]; //!< Comm name.
   char address[COMM_ADDRESS_SIZE]; //!< Comm address.
   char direction[COMM_DIR_SIZE]; //!< send or recv for direction messages will go.
-  char suffix[COMM_DIR_SIZE]; //!< Suffix to be added to the name.
   int valid; //!< 1 if communicator initialized, 0 otherwise.
   void *handle; //!< Pointer to handle for comm.
   void *info; //!< Pointer to any extra info comm requires.
@@ -59,13 +58,8 @@ comm_t new_comm_base(char *address, const char *direction, const comm_type t,
   if (direction == NULL) {
     ret.direction[0] = '\0';
     ret.valid = 0;
-    ret.suffix[0] = '\0';
   } else {
     strcpy(ret.direction, direction);
-    if (strcmp(direction, "send") == 0)
-      strcpy(ret.suffix, "_OUT");
-    else
-      strcpy(ret.suffix, "_IN");
   }
   ret.handle = NULL;
   ret.info = NULL;
@@ -100,10 +94,12 @@ comm_t init_comm_base(const char *name, const char *direction,
   char *address = NULL;
   if (name != NULL) {
     strcpy(full_name, name);
-    if (strcmp(direction, "send") == 0)
-      strcat(full_name, "_OUT");
-    else
-      strcat(full_name, "_IN");
+    if (t != RPC_COMM) {
+      if (strcmp(direction, "send") == 0)
+	strcat(full_name, "_OUT");
+      else if (strcmp(direction, "recv") == 0)
+	strcat(full_name, "_IN");
+    }
     address = getenv(full_name);
   }
   comm_t ret = new_comm_base(address, direction, t, seri_info);
@@ -112,7 +108,7 @@ comm_t init_comm_base(const char *name, const char *direction,
     ret.valid = 0;
   } else
     strcpy(ret.name, full_name);
-  if (strlen(ret.address) == 0) {
+  if ((strlen(ret.address) == 0) && (t != SERVER_COMM) && (t != CLIENT_COMM)) {
     cislog_error("init_comm_base: %s not registered as environment variable.\n",
 		 full_name);
     ret.valid = 0;
