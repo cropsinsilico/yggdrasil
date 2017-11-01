@@ -368,6 +368,141 @@ public:
   
 };
 
+#typedef state_map std::unordered_map<std::string, double>
+
+static inline
+state_map str2map(const char *input) {
+  state_map out;
+  // Compile
+  // char re[1000] = ".*: ([^,]*)([0-9]+[\.]*[0-9]*)([^:]*), "
+  char re[1000] = "(.*): ([^,]*)([[:digit:]]+[\.]*[[:digit:]]*)([^:]*), ";
+  // Search
+  int ret;
+  int n_match = 0;
+  regex_t r;
+  // Compile
+  ret = compile_regex(&r, regex_text);
+  if (ret) {
+    cislog_error("str2map: Could not compile regex");
+    return out;
+  }
+  // Loop until string done
+  const char * p = input;
+  const int n_sub_matches = 4;
+  regmatch_t m[n_sub_matches];
+  int nomatch = 0;
+  int sind, eind;
+  int keylen, vallen;
+  int keyind = 1;
+  int valind = 3;
+  char key[1000];
+  char val[1000];
+  while (!(nomatch)) {
+    nomatch = regexec(&r, p, n_sub_matches, m, 0);
+    if (!(nomatch)) {
+      // Key
+      if ((m[keyind].rm_so == -1) && (m[keyind].rm_eo == -1)) {
+	cislog_error("str2map: No match for key substring.");
+	return out;
+      }
+      keylen = m[keyind].rm_eo - m[keyind].rm_so;
+      strncpy(key, p + m[keyind].rm_so, keylen);
+      key[keylen] = '\0';
+      // Value
+      if ((m[valind].rm_so == -1) && (m[valind].rm_eo == -1)) {
+	cislog_error("str2map: No match for value substring.");
+	return out;
+      }
+      vallen = m[valind].rm_eo - m[valind].rm_so;
+      strncpy(val, p + m[valind].rm_so, vallen);
+      val[vallen] = '\0';
+      // Assign to map & advance pointer
+      out[key] = atof(val);
+      p += m[0].rm_eo;
+    }
+  }
+  return out;
+};
+
+
+static inline
+char* map2str(const state_map) {
+  int curlen = PSI_MSG_MAX;
+  char* out_str = (char*)malloc(curlen);
+  out_str[0] = '\0';
+  char temp_str[1000];
+  for( const auto& n : state_map ) {
+    sprintf(temp_str, "%s: %lf, ", n.first, n.second);
+    if ((strlen(out_str) + strlen(temp_str)) > curlen) {
+      curlen += PSI_MSG_MAX;
+      out_str = (char*)realloc(out_str, curlen);
+    }
+    strcat(out_str, temp_str);
+  }
+  return out_str;
+};
+
+
+class PsiRpcClientMap : public PsiRpcClient {
+public:
+
+  PsiRpcClientMap(const char *name) :
+    PsiRpcClient(name, "%s", "%s") {}
+
+  state_map call(state_map in_map) {
+    state_map out_map;
+    char *in_str = map2str(in_map);
+    char *out_str = NULL;
+    int ret = call(2, in_str, &out_str);
+    out_map = str2map(out_str);
+    free(in_str);
+    free(out_str);
+    return out_map;
+  }
+  
+};
+
+class PsiRpcServerMap : public PsiRpcServer {
+public:
+
+  PsiRpcServerMap(const char *name) :
+    PsiRpcServer(name, "%s", "%s") {}
+
+  state_map recv() {
+    state_map in_map;
+    char *in_str = NULL;
+    int ret = recv(1, &in_str);
+    if (ret < 0) {
+      cislog_error("PsiRpcServerMap:recv(): Could not receive input.");
+      return in_map;
+    }
+    in_map = str2map(in_str);
+    free(in_str);
+    return in_map;
+  }
+
+  int send(const state_map out_map) {
+    char *out_str = map2str(out_map);
+    int ret = send(1, out_str);
+    if (ret < 0) {
+      cislog_error("PsiRpcServerMap:send(): Could not send output.");
+    }
+    free(out_str);
+    return ret;
+  }
+
+  state_map call(const state_map in_map) {
+    state_map out_map;
+    char *in_str = map2str(in_map);
+    char *out_str = NULL;
+    int ret = call(2, in_str, &out_str);
+    out_map = str2map(out_str);
+    free(in_str);
+    free(out_str);
+    return out_map;
+  }
+  
+};
 
 /*!
   @brief C++ interface to psiAsciiFileOutput_t functionality.
