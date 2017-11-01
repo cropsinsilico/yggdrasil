@@ -51,6 +51,7 @@ class TestBase(CisTest, IOInfo):
         self.driver = self.driver_class(*self.driver_args, **self.driver_kwargs)
         if not skip_start:
             self.driver.start()
+        print self.driver.env
         os.environ.update(self.driver.env)
         self._skip_start = skip_start
         super(TestBase, self).setup()

@@ -4,8 +4,6 @@
 #ifndef CISDEFAULTCOMM_H_
 #define CISDEFAULTCOMM_H_
 
-#define IPCDEF
-
 // IPC Comm
 #ifdef IPCDEF
 #include <IPCComm.h>

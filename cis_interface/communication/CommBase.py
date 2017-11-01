@@ -46,8 +46,10 @@ class CommBase(CisClass):
             open. Defaults to True.
         single_use (bool, optional): If True, the comm will only be used to
             send/recv a single message. Defaults to False.
-        reverse_names (bool, optional): Only included for compatiblity with
-            comms that have directional names.
+        reverse_names (bool, optional): If True, the suffix added to the comm
+            with be reversed. Defaults to False.
+        no_suffix (bool, optional): If True, no directional suffix will be added
+            to the comm name. Defaults to False.
         **kwargs: Additional keywords arguments are passed to parent class.
 
     Attributes:
@@ -77,9 +79,18 @@ class CommBase(CisClass):
     def __init__(self, name, address=None, direction='send',
                  deserialize=None, serialize=None, format_str=None,
                  dont_open=False, recv_timeout=0.0, close_on_eof_recv=True,
-                 single_use=False, reverse_names=False, **kwargs):
+                 single_use=False, reverse_names=False, no_suffix=False,
+                 **kwargs):
         super(CommBase, self).__init__(name, **kwargs)
-        self.name = name
+        if no_suffix:
+            suffix = ''
+        else:
+            if ((((direction == 'send') and (not reverse_names)) or
+                 ((direction == 'recv') and reverse_names))):
+                suffix = '_OUT'
+            else:
+                suffix = '_IN'
+        self.name = name + suffix
         if address is None:
             if self.name not in os.environ:
                 raise Exception('Cannot see %s in env.' % self.name)

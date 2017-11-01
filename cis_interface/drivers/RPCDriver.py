@@ -21,8 +21,8 @@ class RPCDriver(Driver):
     def __init__(self, name, args=None, **kwargs):
         super(RPCDriver, self).__init__(name, **kwargs)
         self.debug()
-        self.icomm = CommDriver(name + '_IN', direction='recv', **kwargs)
-        self.ocomm = CommDriver(name + '_OUT', direction='send', **kwargs)
+        self.icomm = CommDriver(name, direction='recv', **kwargs)
+        self.ocomm = CommDriver(name, direction='send', **kwargs)
         out = {}
         out.update(self.icomm.env)
         out.update(self.ocomm.env)

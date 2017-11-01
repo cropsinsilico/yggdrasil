@@ -58,8 +58,8 @@ class ClientRequestDriver(ConnectionDriver):
             request_name = model_request_name + '_SERVER'
         # Input communicator
         icomm_kws = kwargs.get('icomm_kws', {})
-        icomm_kws['comm'] = None  # 'RPCComm'
-        icomm_kws['name'] = model_request_name + '_OUT'
+        icomm_kws['comm'] = None
+        icomm_kws['name'] = model_request_name
         kwargs['icomm_kws'] = icomm_kws
         # Output communicator
         ocomm_kws = kwargs.get('ocomm_kws', {})
@@ -67,6 +67,7 @@ class ClientRequestDriver(ConnectionDriver):
         ocomm_kws['name'] = request_name
         if comm_address is not None:
             ocomm_kws['address'] = comm_address
+        ocomm_kws['no_suffix'] = True
         kwargs['ocomm_kws'] = ocomm_kws
         # Parent and attributes
         super(ClientRequestDriver, self).__init__(model_request_name, **kwargs)

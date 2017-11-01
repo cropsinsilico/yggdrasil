@@ -37,7 +37,7 @@ class TestCommBase(CisTest, IOInfo):
     @property
     def send_inst_kwargs(self):
         r"""dict: Keyword arguments for send instance."""
-        return {'comm': self.comm}
+        return {'comm': self.comm, 'reverse_names': True}
 
     @property
     def inst_args(self):

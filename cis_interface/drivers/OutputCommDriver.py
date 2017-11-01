@@ -12,4 +12,4 @@ class OutputCommDriver(CommDriver):
     """
     def __init__(self, name, **kwargs):
         kwargs['direction'] = 'recv'
-        super(OutputCommDriver, self).__init__(name + '_OUT', **kwargs)
+        super(OutputCommDriver, self).__init__(name, **kwargs)

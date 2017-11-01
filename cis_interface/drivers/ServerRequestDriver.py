@@ -36,6 +36,7 @@ class ServerRequestDriver(ConnectionDriver):
         icomm_kws = kwargs.get('icomm_kws', {})
         icomm_kws['comm'] = comm
         icomm_kws['name'] = request_name
+        icomm_kws['no_suffix'] = True
         if comm_address is not None:
             icomm_kws['address'] = comm_address
         icomm_kws['close_on_eof_recv'] = False
@@ -43,7 +44,7 @@ class ServerRequestDriver(ConnectionDriver):
         # Output communicator
         ocomm_kws = kwargs.get('ocomm_kws', {})
         ocomm_kws['comm'] = None
-        ocomm_kws['name'] = model_request_name + '_IN'
+        ocomm_kws['name'] = model_request_name
         kwargs['ocomm_kws'] = ocomm_kws
         # Parent and attributes
         super(ServerRequestDriver, self).__init__(model_request_name, **kwargs)

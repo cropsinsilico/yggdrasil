@@ -3,6 +3,7 @@
 #
 import subprocess
 import os
+from cis_interface.communication import _default_comm
 from cis_interface.drivers.ModelDriver import ModelDriver
 
 
@@ -16,6 +17,8 @@ _compile_links = ["-lczmq", "-lzmq"]
 _compile_flags = []
 for x in [_incl_interface, _incl_io, _incl_comm, _incl_seri]:
     _compile_flags += ["-I" + x]
+if _default_comm == 'IPCComm':
+    _compile_flags += ["-DIPCDEF"]
 
 
 class GCCModelDriver(ModelDriver):

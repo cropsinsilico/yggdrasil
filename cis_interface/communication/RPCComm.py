@@ -31,16 +31,14 @@ class RPCComm(CommBase.CommBase):
             icomm_kwargs = dict()
         if ocomm_kwargs is None:
             ocomm_kwargs = dict()
-        if reverse_names:
-            icomm_name = icomm_kwargs.pop('name', name + '_OUT')
-            ocomm_name = ocomm_kwargs.pop('name', name + '_IN')
-        else:
-            icomm_name = icomm_kwargs.pop('name', name + '_IN')
-            ocomm_name = ocomm_kwargs.pop('name', name + '_OUT')
+        icomm_name = icomm_kwargs.pop('name', name)
+        ocomm_name = ocomm_kwargs.pop('name', name)
         icomm_kwargs['direction'] = 'recv'
         ocomm_kwargs['direction'] = 'send'
         icomm_kwargs['dont_open'] = True
         ocomm_kwargs['dont_open'] = True
+        icomm_kwargs['reverse_names'] = reverse_names
+        ocomm_kwargs['reverse_names'] = reverse_names
         if name in os.environ or 'address' in kwargs:
             super(RPCComm, self).__init__(name, dont_open=True, **kwargs)
             icomm_kwargs.setdefault(
@@ -101,15 +99,9 @@ class RPCComm(CommBase.CommBase):
         if ocomm_kwargs is None:
             ocomm_kwargs = dict()
         if icomm_name is None:
-            if reverse_names:
-                icomm_name = name + '_OUT'
-            else:
-                icomm_name = name + '_IN'
+            icomm_name = name
         if ocomm_name is None:
-            if reverse_names:
-                ocomm_name = name + '_IN'
-            else:
-                ocomm_name = name + '_OUT'
+            ocomm_name = name
         icomm_name = icomm_kwargs.pop('name', icomm_name)
         ocomm_name = ocomm_kwargs.pop('name', ocomm_name)
         icomm_comm = icomm_kwargs.pop('comm', icomm_comm)
@@ -118,6 +110,8 @@ class RPCComm(CommBase.CommBase):
         ocomm_class = get_comm_class(ocomm_comm)
         icomm_kwargs['direction'] = 'recv'
         ocomm_kwargs['direction'] = 'send'
+        icomm_kwargs['reverse_names'] = reverse_names
+        ocomm_kwargs['reverse_names'] = reverse_names
         ikwargs = dict(**icomm_kwargs)
         okwargs = dict(**ocomm_kwargs)
         if 'address' not in kwargs:

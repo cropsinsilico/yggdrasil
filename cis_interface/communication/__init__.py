@@ -1,7 +1,11 @@
 import importlib
+from cis_interface import platform
 
 
-_default_comm = 'IPCComm'
+if platform._is_win:
+    _default_comm = 'ZMQComm'
+else:
+    _default_comm = 'IPCComm'
 
 
 def get_comm_class(comm=None):

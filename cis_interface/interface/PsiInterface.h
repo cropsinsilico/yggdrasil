@@ -64,10 +64,7 @@
  */
 static inline
 cisOutput_t cisOutputFmt(const char *name, char *fmtString){
-  char name_suffix[CIS_MSG_MAX];
-  strcpy(name_suffix, name);
-  strcat(name_suffix, "_OUT");
-  cisOutput_t ret = init_comm(name_suffix, "send", _default_comm,
+  cisOutput_t ret = init_comm(name, "send", _default_comm,
 			      (void*)fmtString);
   return ret;
 };
@@ -83,10 +80,7 @@ cisOutput_t cisOutputFmt(const char *name, char *fmtString){
  */
 static inline
 cisInput_t cisInputFmt(const char *name, char *fmtString){
-  char name_suffix[CIS_MSG_MAX];
-  strcpy(name_suffix, name);
-  strcat(name_suffix, "_IN");
-  cisInput_t ret = init_comm(name_suffix, "recv", _default_comm,
+  cisInput_t ret = init_comm(name, "recv", _default_comm,
 			     (void*)fmtString);
   return ret;
 };
@@ -445,10 +439,7 @@ cisRpc_t cisRpc(const char *name, char *outFormat, char *inFormat) {
  */
 static inline
 comm_t cisRpcClient(const char *name, char *outFormat, char *inFormat){
-  char name_suffix[CIS_MSG_MAX];
-  strcpy(name_suffix, name);
-  strcat(name_suffix, "_OUT");
-  return init_comm(name_suffix, outFormat, CLIENT_COMM, inFormat);
+  return init_comm(name, outFormat, CLIENT_COMM, inFormat);
 };
 
 /*!
@@ -463,10 +454,7 @@ comm_t cisRpcClient(const char *name, char *outFormat, char *inFormat){
  */
 static inline
 comm_t cisRpcServer(const char *name, char *inFormat, char *outFormat){
-  char name_suffix[CIS_MSG_MAX];
-  strcpy(name_suffix, name);
-  strcat(name_suffix, "_IN");
-  return init_comm(name_suffix, inFormat, SERVER_COMM, outFormat);
+  return init_comm(name, inFormat, SERVER_COMM, outFormat);
 };
 
 /*!
@@ -659,15 +647,11 @@ int rpcCall(const cisRpc_t rpc,  ...){
 static inline
 comm_t cisAsciiFileOutput(const char *name, const int dst_type) {
   comm_type type;
-  char name_suffix[CIS_MSG_MAX];
-  strcpy(name_suffix, name);
   if (dst_type == 0)
     type = ASCII_FILE_COMM;
-  else {
+  else
     type = _default_comm;
-    strcat(name_suffix, "_OUT");
-  }
-  comm_t out = init_comm(name_suffix, "send", type, NULL);
+  comm_t out = init_comm(name, "send", type, NULL);
   return out;
 };
 
@@ -683,15 +667,11 @@ comm_t cisAsciiFileOutput(const char *name, const int dst_type) {
 static inline
 comm_t cisAsciiFileInput(const char *name, const int src_type) {
   comm_type type;
-  char name_suffix[CIS_MSG_MAX];
-  strcpy(name_suffix, name);
   if (src_type == 0)
     type = ASCII_FILE_COMM;
-  else {
+  else
     type = _default_comm;
-    strcat(name_suffix, "_IN");
-  }
-  comm_t out = init_comm(name_suffix, "recv", type, NULL);
+  comm_t out = init_comm(name, "recv", type, NULL);
   return out;
 };
 
@@ -802,15 +782,11 @@ static inline
 comm_t cisAsciiTableOutput(const char *name, const char *format_str,
 			   const int as_array, const int dst_type) {
   comm_type type;
-  char name_suffix[CIS_MSG_MAX];
-  strcpy(name_suffix, name);
   if (dst_type == 0)
     type = ASCII_TABLE_COMM;
-  else {
+  else
     type = _default_comm;
-    strcat(name_suffix, "_OUT");
-  }
-  comm_t out = init_comm(name_suffix, "send", type, (void*)format_str);
+  comm_t out = init_comm(name, "send", type, (void*)format_str);
   // For connection, send format and initialize serializer
   if (dst_type != 0) {
     int ret = comm_send(out, format_str, strlen(format_str));
@@ -820,7 +796,7 @@ comm_t cisAsciiTableOutput(const char *name, const char *format_str,
     }
     // TODO: Make sure this is freed.
     asciiTable_t *table = (asciiTable_t*)malloc(sizeof(asciiTable_t));
-    table[0] = asciiTable(name_suffix, "0", format_str,
+    table[0] = asciiTable(name, "0", format_str,
 			  NULL, NULL, NULL);
     out.serializer.type = ASCII_TABLE_SERI;
     out.serializer.info = (void*)table;
@@ -844,15 +820,11 @@ comm_t cisAsciiTableOutput(const char *name, const char *format_str,
 static inline
 comm_t cisAsciiTableInput(const char *name, const int as_array, const int src_type) {
   comm_type type;
-  char name_suffix[CIS_MSG_MAX];
-  strcpy(name_suffix, name);
   if (src_type == 0)
     type = ASCII_TABLE_COMM;
-  else {
+  else
     type = _default_comm;
-    strcat(name_suffix, "_IN");
-  }
-  comm_t out = init_comm(name_suffix, "recv", type, NULL);
+  comm_t out = init_comm(name, "recv", type, NULL);
   // For connection, receive format and initialize serializer
   if (src_type != 0) {
     char format_str[CIS_MSG_MAX];
@@ -863,7 +835,7 @@ comm_t cisAsciiTableInput(const char *name, const int as_array, const int src_ty
     }
     // TODO: Make sure this is freed.
     asciiTable_t *table = (asciiTable_t*)malloc(sizeof(asciiTable_t));
-    table[0] = asciiTable(name_suffix, "0", format_str,
+    table[0] = asciiTable(name, "0", format_str,
 			  NULL, NULL, NULL);
     out.serializer.type = ASCII_TABLE_SERI;
     out.serializer.info = (void*)table;

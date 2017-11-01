@@ -12,4 +12,4 @@ class InputCommDriver(CommDriver):
     """
     def __init__(self, name, **kwargs):
         kwargs['direction'] = 'send'
-        super(InputCommDriver, self).__init__(name + '_IN', **kwargs)
+        super(InputCommDriver, self).__init__(name, **kwargs)

@@ -152,7 +152,7 @@ int zmq_comm_nmsg(const comm_t x) {
       cislog_error("zmq_comm_nmsg: Could not create poller");
       return -1;
     }
-    zsock_t *p = zpoller_wait(poller, 1);
+    void *p = zpoller_wait(poller, 1);
     if (p == NULL)
       out = 0;
     else

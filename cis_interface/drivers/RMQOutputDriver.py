@@ -1,8 +1,8 @@
 """Module for sending output to a RabbitMQ server."""
-from cis_interface.drivers import ConnectionDriver
+from cis_interface.drivers.OutputDriver import OutputDriver
 
 
-class RMQOutputDriver(ConnectionDriver.ConnectionDriver):
+class RMQOutputDriver(OutputDriver):
     r"""Driver for sending output to a RabbitMQ server.
 
     Args:
@@ -20,4 +20,4 @@ class RMQOutputDriver(ConnectionDriver.ConnectionDriver):
         ocomm_kws.setdefault('comm', 'RMQComm')
         ocomm_kws['queue'] = args
         kwargs['ocomm_kws'] = ocomm_kws
-        super(RMQOutputDriver, self).__init__(name, **kwargs)
+        super(RMQOutputDriver, self).__init__(name, args, **kwargs)

@@ -28,13 +28,11 @@ class ClientComm(CommBase.CommBase):
                  dont_open=False, reverse_names=False, **kwargs):
         if response_kwargs is None:
             response_kwargs = dict()
-        if reverse_names:
-            ocomm_name = name + '_IN'
-        else:
-            ocomm_name = name + '_OUT'
+        ocomm_name = name
         ocomm_kwargs = kwargs
         ocomm_kwargs['direction'] = 'send'
         ocomm_kwargs['dont_open'] = True
+        ocomm_kwargs['reverse_names'] = reverse_names
         ocomm_kwargs['comm'] = request_comm
         self.response_kwargs = response_kwargs
         self.ocomm = get_comm(ocomm_name, **ocomm_kwargs)
@@ -65,8 +63,7 @@ class ClientComm(CommBase.CommBase):
         ocomm_class = get_comm_class(request_comm)
         kwargs['direction'] = 'send'
         if 'address' not in kwargs:
-            oargs, kwargs = ocomm_class.new_comm_kwargs(name + '_OUT',
-                                                        **kwargs)
+            oargs, kwargs = ocomm_class.new_comm_kwargs(name, **kwargs)
         kwargs['request_comm'] = request_comm
         return args, kwargs
 

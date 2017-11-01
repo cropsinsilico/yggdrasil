@@ -1,8 +1,8 @@
 """Module for receiving input from a RabbitMQ server."""
-from cis_interface.drivers import ConnectionDriver
+from cis_interface.drivers.InputDriver import InputDriver
 
 
-class RMQInputDriver(ConnectionDriver.ConnectionDriver):
+class RMQInputDriver(InputDriver):
     r"""Driver for receiving input from a RabbitMQ server via a local comm.
 
     Args:
@@ -20,4 +20,4 @@ class RMQInputDriver(ConnectionDriver.ConnectionDriver):
         icomm_kws.setdefault('comm', 'RMQComm')
         icomm_kws['queue'] = args
         kwargs['icomm_kws'] = icomm_kws
-        super(RMQInputDriver, self).__init__(name, **kwargs)
+        super(RMQInputDriver, self).__init__(name, args, **kwargs)

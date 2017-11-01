@@ -25,12 +25,10 @@ class ServerComm(CommBase.CommBase):
                  dont_open=False, reverse_names=False, **kwargs):
         if response_kwargs is None:
             response_kwargs = dict()
-        if reverse_names:
-            icomm_name = name + '_OUT'
-        else:
-            icomm_name = name + '_IN'
+        icomm_name = name
         icomm_kwargs = kwargs
         icomm_kwargs['direction'] = 'recv'
+        icomm_kwargs['reverse_names'] = reverse_names
         icomm_kwargs['dont_open'] = True
         icomm_kwargs['comm'] = request_comm
         self.response_kwargs = response_kwargs
@@ -61,8 +59,7 @@ class ServerComm(CommBase.CommBase):
         icomm_class = get_comm_class(request_comm)
         kwargs['direction'] = 'recv'
         if 'address' not in kwargs:
-            iargs, kwargs = icomm_class.new_comm_kwargs(name + '_IN',
-                                                        **kwargs)
+            iargs, kwargs = icomm_class.new_comm_kwargs(name, **kwargs)
         kwargs['request_comm'] = request_comm
         return args, kwargs
 

@@ -24,27 +24,30 @@ class ConnectionDriver(Driver):
         state (str): Descriptor of last action taken.
 
     """
-    def __init__(self, name, icomm_kws={}, ocomm_kws={}, **kwargs):
+    def __init__(self, name, icomm_kws=None, ocomm_kws=None, **kwargs):
         super(ConnectionDriver, self).__init__(name, **kwargs)
+        if icomm_kws is None:
+            icomm_kws = dict()
+        if ocomm_kws is None:
+            ocomm_kws = dict()
         # Input communicator
         icomm_kws['direction'] = 'recv'
         icomm_kws['dont_open'] = True
-        icomm_name = icomm_kws.pop('name', name + '_IN')
+        icomm_kws['reverse_names'] = True
+        icomm_name = icomm_kws.pop('name', name)
         self.icomm = new_comm(icomm_name, **icomm_kws)
         self.icomm_kws = icomm_kws
-        self.env[self.name + '_OUT'] = self.icomm.address
-        # self.env[self.icomm.name] = self.icomm.address
+        self.env[self.icomm.name] = self.icomm.address
         # Output communicator
         ocomm_kws['direction'] = 'send'
         ocomm_kws['dont_open'] = True
-        ocomm_name = ocomm_kws.pop('name', name + '_OUT')
+        ocomm_kws['reverse_names'] = True
+        ocomm_name = ocomm_kws.pop('name', name)
         self.ocomm = new_comm(ocomm_name, **ocomm_kws)
         self.ocomm_kws = ocomm_kws
-        self.env[self.name + '_IN'] = self.ocomm.address
-        # self.env[self.ocomm.name] = self.ocomm.address
+        self.env[self.ocomm.name] = self.ocomm.address
+        print 'driver', self.env, self.ocomm.name, self.icomm.name
         # Attributes
-        # print self.icomm.name, self.icomm.address
-        # print self.ocomm.name, self.ocomm.address
         self.nrecv = 0
         self.nproc = 0
         self.nsent = 0
