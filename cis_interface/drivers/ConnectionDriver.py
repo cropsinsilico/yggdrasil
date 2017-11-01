@@ -46,7 +46,6 @@ class ConnectionDriver(Driver):
         self.ocomm = new_comm(ocomm_name, **ocomm_kws)
         self.ocomm_kws = ocomm_kws
         self.env[self.ocomm.name] = self.ocomm.address
-        print 'driver', self.env, self.ocomm.name, self.icomm.name
         # Attributes
         self.nrecv = 0
         self.nproc = 0
@@ -56,7 +55,7 @@ class ConnectionDriver(Driver):
         if False:
             print(80 * '=')
             print(self.__class__)
-            # print(self.env)
+            print(self.env)
             print(self.icomm.name, self.icomm.address)
             print(self.ocomm.name, self.ocomm.address)
 

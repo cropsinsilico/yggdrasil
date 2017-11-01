@@ -81,7 +81,7 @@ def cfg_environment(env=None, cfg=None):
     if cfg is None:
         cfg = cis_cfg
     for s, o, e in env_map:
-        v = cis_cfg.get(s, o)
+        v = cfg.get(s, o)
         if v:
             env[e] = v
 

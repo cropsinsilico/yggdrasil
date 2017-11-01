@@ -33,7 +33,6 @@ class CommDriver(Driver):
         self.comm_name = self.comm.comm_class
         for k, v in self.comm.opp_comms.items():
             self.env[k] = v
-        # self.env[name] = self.comm.opp_address
         self.debug(".env: %s", self.env)
 
     @property

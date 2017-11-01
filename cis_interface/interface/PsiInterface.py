@@ -112,11 +112,6 @@ def PsiRpc(outname, outfmt, inname, infmt, matlab=False):
     out = RPCComm.RPCComm(name,
                           icomm_kwargs=icomm_kwargs,
                           ocomm_kwargs=ocomm_kwargs, recv_timeout=False)
-    # print 80*'='
-    # print out.__class__
-    # print out.name
-    # print out.icomm.name, out.icomm.address
-    # print out.ocomm.name, out.ocomm.address
     return out
 
 
@@ -141,11 +136,6 @@ def PsiRpcServer(name, infmt, outfmt, matlab=False):
     ocomm_kwargs = dict(format_str=outfmt)
     out = ServerComm.ServerComm(name, response_kwargs=ocomm_kwargs,
                                 recv_timeout=False, **icomm_kwargs)
-    # print 80*'='
-    # print out.__class__
-    # print out.name
-    # print out.icomm.name, out.icomm.address
-    # print out.ocomm.name, out.ocomm.address
     return out
     
 
@@ -171,11 +161,6 @@ def PsiRpcClient(name, outfmt, infmt, matlab=False):
     ocomm_kwargs = dict(format_str=outfmt)
     out = ClientComm.ClientComm(name, response_kwargs=icomm_kwargs,
                                 recv_timeout=False, **ocomm_kwargs)
-    # print 80*'='
-    # print out.__class__
-    # print out.name
-    # print out.icomm.name, out.icomm.address
-    # print out.ocomm.name, out.ocomm.address
     return out
     
 

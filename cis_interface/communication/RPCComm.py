@@ -39,6 +39,7 @@ class RPCComm(CommBase.CommBase):
         ocomm_kwargs['dont_open'] = True
         icomm_kwargs['reverse_names'] = reverse_names
         ocomm_kwargs['reverse_names'] = reverse_names
+        kwargs['no_suffix'] = True
         if name in os.environ or 'address' in kwargs:
             super(RPCComm, self).__init__(name, dont_open=True, **kwargs)
             icomm_kwargs.setdefault(
