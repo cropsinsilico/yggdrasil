@@ -1,4 +1,5 @@
 import uuid
+from cis_interface import backwards
 from cis_interface.communication import (
     CommBase, new_comm, get_comm, get_comm_class)
 
@@ -187,7 +188,7 @@ class ClientComm(CommBase.CommBase):
         """
         flag = self.send(*args, **kwargs)
         if not flag:
-            return (False, '')
+            return (False, backwards.unicode2bytes(''))
         return self.recv(timeout=False)
 
     def call_nolimit(self, *args, **kwargs):

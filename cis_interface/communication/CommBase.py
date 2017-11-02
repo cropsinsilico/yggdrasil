@@ -8,9 +8,9 @@ from cis_interface.communication import (
     new_comm, get_comm, get_comm_class, _default_comm)
 
 
-CIS_MSG_HEAD = 'CIS_MSG_HEAD'
-HEAD_VAL_SEP = ':CIS:'
-HEAD_KEY_SEP = ','
+CIS_MSG_HEAD = backwards.unicode2bytes('CIS_MSG_HEAD')
+HEAD_VAL_SEP = backwards.unicode2bytes(':CIS:')
+HEAD_KEY_SEP = backwards.unicode2bytes(',')
 
     
 class CommBase(CisClass):
@@ -184,7 +184,8 @@ class CommBase(CisClass):
 
     def close(self):
         r"""Close the connection."""
-        for c in self._work_comms.keys():
+        keys = [k for k in self._work_comms.keys()]
+        for c in keys:
             self.remove_work_comm(c)
 
     @property
@@ -205,7 +206,7 @@ class CommBase(CisClass):
     @property
     def eof_msg(self):
         r"""str: Message indicating EOF."""
-        return CIS_MSG_EOF
+        return backwards.unicode2bytes(CIS_MSG_EOF)
 
     def chunk_message(self, msg):
         r"""Yield chunks of message of size maxMsgSize
@@ -377,11 +378,14 @@ class CommBase(CisClass):
             str: Message with header in front.
 
         """
-        header = CIS_MSG_HEAD
-        header += HEAD_KEY_SEP.join(
-            ['%s%s%s' % (k, HEAD_VAL_SEP, v) for k, v in header_info.items()])
-        header += CIS_MSG_HEAD
-        return header
+        header = backwards.bytes2unicode(CIS_MSG_HEAD)
+        header += backwards.bytes2unicode(HEAD_KEY_SEP).join(
+            ['%s%s%s' % (backwards.bytes2unicode(k),
+                         backwards.bytes2unicode(HEAD_VAL_SEP),
+                         backwards.bytes2unicode(str(v))) for k, v in
+             header_info.items()])
+        header += backwards.bytes2unicode(CIS_MSG_HEAD)
+        return backwards.unicode2bytes(header)
 
     def parse_header(self, msg):
         r"""Extract header info from a message.
@@ -400,7 +404,7 @@ class CommBase(CisClass):
         out = dict(body=body)
         for x in header.split(HEAD_KEY_SEP):
             k, v = x.split(HEAD_VAL_SEP)
-            out[k] = v
+            out[backwards.bytes2unicode(k)] = backwards.bytes2unicode(v)
         return out
 
     # SEND METHODS
@@ -474,7 +478,7 @@ class CommBase(CisClass):
         """
         if self.is_closed:
             self.debug('.on_send(): comm closed.')
-            return False, ''
+            return False, backwards.unicode2bytes('')
         if len(msg) == 1:
             msg = msg[0]
         if isinstance(msg, backwards.bytes_type) and msg == self.eof_msg:

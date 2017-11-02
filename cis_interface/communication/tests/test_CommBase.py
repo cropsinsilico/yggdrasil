@@ -91,7 +91,7 @@ class TestCommBase(CisTest, IOInfo):
         if self.comm != 'CommBase':
             flag = self.send_instance.send(self.send_instance.eof_msg)
             assert(flag)
-            flag, msg_recv = self.recv_instance.recv()
+            flag, msg_recv = self.recv_instance.recv(timeout=self.timeout)
             assert(not flag)
             nt.assert_equal(msg_recv, self.send_instance.eof_msg)
             assert(self.recv_instance.is_closed)
@@ -101,7 +101,7 @@ class TestCommBase(CisTest, IOInfo):
         if self.comm != 'CommBase':
             flag = self.send_instance.send_nolimit(self.send_instance.eof_msg)
             assert(flag)
-            flag, msg_recv = self.recv_instance.recv_nolimit()
+            flag, msg_recv = self.recv_instance.recv_nolimit(timeout=self.timeout)
             assert(not flag)
             nt.assert_equal(msg_recv, self.send_instance.eof_msg)
             assert(self.recv_instance.is_closed)
@@ -113,6 +113,10 @@ class TestCommBase(CisTest, IOInfo):
         if self.comm != 'CommBase':
             flag = self.send_instance.send(self.msg_short)
             assert(flag)
+            T = self.recv_instance.start_timeout()
+            while (not T.is_out) and (self.recv_instance.n_msg == 0):
+                self.recv_instance.sleep()
+            self.recv_instance.stop_timeout()
             nt.assert_equal(self.recv_instance.n_msg, 1)
             flag, msg_recv = self.recv_instance.recv()
             assert(flag)
@@ -128,6 +132,10 @@ class TestCommBase(CisTest, IOInfo):
             assert(len(self.msg_long) > self.maxMsgSize)
             flag = self.send_instance.send_nolimit(self.msg_long)
             assert(flag)
+            T = self.recv_instance.start_timeout()
+            while (not T.is_out) and (self.recv_instance.n_msg == 0):
+                self.recv_instance.sleep()
+            self.recv_instance.stop_timeout()
             assert(self.recv_instance.n_msg >= 1)
             # IPC nolimit sends multiple messages
             # nt.assert_equal(self.recv_instance.n_msg, 1)
@@ -145,6 +153,10 @@ class TestCommBase(CisTest, IOInfo):
         if self.comm != 'CommBase':
             flag = self.send_instance.send(self.msg_short)
             assert(flag)
+            T = self.recv_instance.start_timeout()
+            while (not T.is_out) and (self.recv_instance.n_msg == 0):
+                self.recv_instance.sleep()
+            self.recv_instance.stop_timeout()
             nt.assert_equal(self.recv_instance.n_msg, 1)
         self.recv_instance.purge()
         nt.assert_equal(self.send_instance.n_msg, 0)

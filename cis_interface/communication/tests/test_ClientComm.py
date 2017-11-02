@@ -41,6 +41,7 @@ class TestClientComm(test_CommBase.TestCommBase):
         self.send_instance.sched_task(0.0, self.send_instance.call,
                                       args=[self.msg_short], store_output=True)
         flag, msg_recv = self.recv_instance.recv(timeout=self.timeout)
+        
         assert(flag)
         nt.assert_equal(msg_recv, self.msg_short)
         flag = self.recv_instance.send(msg_recv)

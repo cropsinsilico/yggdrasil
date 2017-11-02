@@ -1,5 +1,6 @@
 import pika
 # import socket
+from cis_interface import backwards
 from cis_interface.communication import CommBase
 from cis_interface.config import cis_cfg
 
@@ -333,7 +334,7 @@ class RMQComm(CommBase.CommBase):
                 self.channel.basic_ack(method_frame.delivery_tag)
             else:
                 self.debug(".recv(): No message")
-                msg = ''
+                msg = backwards.unicode2bytes('')
         except pika.exception.AMQPError:
             self.exception(".recv(): Error")
             raise

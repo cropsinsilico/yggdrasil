@@ -1,5 +1,6 @@
 import pika
 from threading import Thread, RLock
+from cis_interface import backwards
 from cis_interface.communication.RMQComm import RMQComm
 
 
@@ -189,14 +190,14 @@ class RMQAsyncComm(RMQComm):
             return (False, None)
         if self.n_msg == 0:
             # self.debug(".recv(): No buffered messages.")
-            return (True, '')
+            return (True, backwards.unicode2bytes(''))
 
     def on_message(self, ch, method, props, body):
         r"""Buffer received messages."""
         if self.direction == 'send':
             raise Exception("Send comm received a message.")
         with self.lock:
-            self._buffered_messages.append(body)
+            self._buffered_messages.append(backwards.unicode2bytes(body))
         ch.basic_ack(delivery_tag=method.delivery_tag)
 
     # CONNECTION

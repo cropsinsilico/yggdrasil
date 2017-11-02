@@ -1,4 +1,5 @@
 import os
+from cis_interface import backwards
 from cis_interface.communication import CommBase, get_comm, get_comm_class
 
 
@@ -217,7 +218,7 @@ class RPCComm(CommBase.CommBase):
         """
         flag = self.send(*args, **kwargs)
         if not flag:
-            return (False, '')
+            return (False, backwards.unicode2bytes(''))
         return self.recv(timeout=False)
 
     def call_nolimit(self, *args, **kwargs):

@@ -1,6 +1,7 @@
 import sysv_ipc
 from subprocess import Popen, PIPE
 from cis_interface import tools
+from cis_interface import backwards
 from cis_interface.communication import CommBase
 
 
@@ -227,10 +228,7 @@ class IPCComm(CommBase.CommBase):
         """
         if not self.is_open:
             return False
-        try:
-            self.q.send(payload)
-        except OSError:
-            return False
+        self.q.send(payload)
         return True
 
     def _recv(self, timeout=None):
@@ -256,11 +254,11 @@ class IPCComm(CommBase.CommBase):
         # Return False if the queue is closed
         if self.is_closed:
             self.debug("recv(): queue closed, returning (False, '')")
-            return (False, '')
+            return (False, backwards.unicode2bytes(''))
         # Return True, '' if there are no messages
         if self.n_msg == 0:
             # self.debug("recv(): no data, returning (True, '')")
-            return (True, '')
+            return (True, backwards.unicode2bytes(''))
         # Receive message
         self.debug(".recv(): message ready, read it")
         data, _ = self.q.receive()  # ignore ident
