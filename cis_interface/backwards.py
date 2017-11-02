@@ -7,7 +7,8 @@ if PY2:  # pragma: Python 2
     import ConfigParser as configparser
     import StringIO as sio
     from __builtin__ import unicode
-    file_type = file
+    import types
+    file_type = types.FileType
     bytes_type = str
     unicode_type = str
     np_dtype_str = 'S'
