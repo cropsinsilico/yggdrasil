@@ -1,4 +1,3 @@
-from cis_interface import backwards
 from cis_interface.communication import CommBase, get_comm, get_comm_class
 
 
