@@ -14,7 +14,7 @@ class OutputDriver(ConnectionDriver):
     """
 
     def __init__(self, name, args, **kwargs):
-        #icomm_kws = kwargs.get('icomm_kws', {})
+        # icomm_kws = kwargs.get('icomm_kws', {})
         ocomm_kws = kwargs.get('ocomm_kws', {})
         ocomm_kws['name'] = args
         ocomm_kws['no_suffix'] = True

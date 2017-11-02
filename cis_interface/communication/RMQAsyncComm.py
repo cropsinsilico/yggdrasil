@@ -115,10 +115,10 @@ class RMQAsyncComm(RMQComm):
                         self._closing = False
             self.unregister_connection()
         # Wait for connection to finish closing & then force if it dosn't
-        T = self.start_timeout()
+        T = self.start_timeout(key=self.timeout_key + '_closing')
         while (not T.is_out) and self._closing:
             self.sleep()
-        self.stop_timeout()
+        self.stop_timeout(key=self.timeout_key + '_closing')
         if self._closing:  # pragma: debug
             self.force_close()
         if self.thread is not None:
