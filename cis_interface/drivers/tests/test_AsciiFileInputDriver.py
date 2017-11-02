@@ -39,6 +39,8 @@ class TestAsciiFileInputDriver(TestAsciiFileInputParam,
 
     def assert_before_stop(self):
         r"""Assertions to make before stopping the driver instance."""
+        super(parent.TestFileInputDriver, self).assert_before_stop(
+            check_open=False)
         T = self.instance.start_timeout()
         while self.recv_comm.n_msg == 0 and not T.is_out:
             self.instance.sleep()  # pragma: debug

@@ -8,6 +8,7 @@ if PY2:  # pragma: Python 2
     import StringIO as sio
     from __builtin__ import unicode
     import types
+    MatIO = sio.StringIO
     file_type = types.FileType
     bytes_type = str
     unicode_type = str
@@ -16,6 +17,7 @@ else:  # pragma: Python 3
     import pickle
     import configparser
     import io as sio
+    MatIO = sio.BytesIO
     file_type = sio.IOBase
     bytes_type = bytes
     unicode_type = str

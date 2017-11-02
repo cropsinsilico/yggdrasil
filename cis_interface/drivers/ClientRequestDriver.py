@@ -1,3 +1,4 @@
+from cis_interface import backwards
 from cis_interface.drivers.ConnectionDriver import ConnectionDriver
 from cis_interface.drivers.ClientResponseDriver import ClientResponseDriver
 
@@ -24,8 +25,8 @@ from cis_interface.drivers.ClientResponseDriver import ClientResponseDriver
 # ----
 
 
-CIS_CLIENT_INI = 'CIS_BEGIN_CLIENT'
-CIS_CLIENT_EOF = 'CIS_END_CLIENT'
+CIS_CLIENT_INI = backwards.unicode2bytes('CIS_BEGIN_CLIENT')
+CIS_CLIENT_EOF = backwards.unicode2bytes('CIS_END_CLIENT')
 
 
 class ClientRequestDriver(ConnectionDriver):
