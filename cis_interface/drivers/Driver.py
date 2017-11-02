@@ -13,6 +13,8 @@ class Driver(CisClass, Thread):
             driver. Defaults to empty dict.
         env (dict, optional): Dictionary of environment variables that should
             be set when the driver starts. Defaults to {}.
+        comm_env (dict, optional): Dictionary of environment variables for
+            paired IO communication drivers. Defaults to {}.
         namespace (str, optional): Namespace for set of drivers running
             together. If not provided, the config option ('rmq', 'namespace')
             is used.
@@ -21,6 +23,8 @@ class Driver(CisClass, Thread):
     Attributes:
         name (str): Driver name.
         env (dict): Dictionary of environment variables.
+        comm_env (dict): Dictionary of environment variables for paired IO
+            communication drivers.
         yml (dict): Dictionary of yaml specification options for this driver.
         namespace (str): Namespace for set of drivers running together.
         rank (int): Rank of the integration.
@@ -30,12 +34,14 @@ class Driver(CisClass, Thread):
     # METHODS THAT MUST HAVE SUPER AT BEGINNING AND CAN BE OVERRIDEN BY CHILD
     # CLASSES TO ADD DRIVER FUNCTIONALITY. ALL OF THE CHILD CLASSES MUST HAVE
     # COMPATIBLE FORMATS (THE SAME NAMED ARGUMENTS).
-    def __init__(self, name, yml=None, env=None, namespace=None, rank=None,
-                 **kwargs):
+    def __init__(self, name, yml=None, env=None, comm_env=None, namespace=None,
+                 rank=None, **kwargs):
         if yml is None:
             yml = {}
         if env is None:
             env = {}
+        if comm_env is None:
+            comm_env = {}
         # Check if thread initialized to avoid doing it twice for drivers
         # with multiple inheritance that both need to call __init__
         if getattr(self, '_thread_initialized', False):  # pragma: debug
@@ -60,6 +66,7 @@ class Driver(CisClass, Thread):
         # Assign things
         self.yml = yml
         self.env = env
+        self.comm_env = comm_env
         self.namespace = namespace
         self.rank = rank
         self._term_meth = "terminate"

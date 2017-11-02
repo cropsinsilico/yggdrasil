@@ -138,7 +138,10 @@ class CommBase(CisClass):
     @classmethod
     def new_comm(cls, name, *args, **kwargs):
         r"""Initialize communication with new queue."""
-        if name in os.environ:
+        env = kwargs.get('env', {})
+        if name in env:
+            kwargs.setdefault('address', env[name])
+        elif name in os.environ:
             kwargs.setdefault('address', os.environ[name])
         new_comm_class = kwargs.pop('new_comm_class', None)
         args, kwargs = cls.new_comm_kwargs(name, *args, **kwargs)

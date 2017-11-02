@@ -10,7 +10,7 @@ models:
 
     outputs:
       - name: outputA
-        driver: RMQOutputDriver  # Output to another channel
+        driver: OutputDriver  # Output to another channel
         args: A_to_B  # Conneciton to inputB
 
   - name: matlab_modelB
@@ -19,7 +19,7 @@ models:
 
     inputs:
       - name: inputB
-        driver: RMQInputDriver  # Input from another channel
+        driver: InputDriver  # Input from another channel
         args: A_to_B  # Conneciton to inputA
 
     outputs:

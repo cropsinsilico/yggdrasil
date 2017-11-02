@@ -92,8 +92,8 @@ class CisRunner(object):
         self.inputdrivers = {}
         self.outputdrivers = {}
         self.serverdrivers = {}
-        self._inputchannels = []
-        self._outputchannels = []
+        self._inputchannels = {}
+        self._outputchannels = {}
         self.error_flag = False
         # Setup logging
         if cis_debug_prefix is None:
@@ -159,10 +159,10 @@ class CisRunner(object):
         """
         if dtype == 'input':
             dd = self.inputdrivers
-            self._inputchannels.append(yaml['args'])
+            self._inputchannels[yaml['args']] = yaml
         elif dtype == 'output':
             dd = self.outputdrivers
-            self._outputchannels.append(yaml['args'])
+            self._outputchannels[yaml['args']] = yaml
         elif dtype == 'model':
             yaml.setdefault('inputs', [])
             yaml.setdefault('outputs', [])
@@ -332,6 +332,10 @@ class CisRunner(object):
             object: An instance of the specified driver.
 
         """
+        if yml['args'] in self._inputchannels:
+            yml['kwargs'].setdefault('comm_env', {})
+            yml['kwargs']['comm_env'] = self._inputchannels[
+                yml['args']]['instance'].comm_env
         drv = self.createDriver(yml)
         if yml['args'] not in self._inputchannels:
             try:
@@ -342,6 +346,10 @@ class CisRunner(object):
                                  "FileOutputDriver and there is not a " +
                                  "corresponding input channel %s.") % (
                                      yml["name"], yml["args"]))
+        else:
+            
+            # TODO: Add input comm environment variables somehow
+            pass
         return drv
         
     def loadDrivers(self):
