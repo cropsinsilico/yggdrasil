@@ -27,7 +27,6 @@ if not os.path.isfile(usr_config_file):
 cov_installed = False
 try:
     from coverage.config import HandyConfigParser
-    import configparser
     cov_installed = True
 except ImportError:
     pass
@@ -40,7 +39,7 @@ if cov_installed:
     if not cp.has_section('report'):
         try:
             cp.add_section('report')
-        except configparser.DuplicateSectionError:
+        except Exception:
             pass
     if cp.has_option('report', 'exclude_lines'):
         excl_list = cp.getlist('report', 'exclude_lines')
