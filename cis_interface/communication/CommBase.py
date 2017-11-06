@@ -510,7 +510,7 @@ class CommBase(CisClass):
             ret = self.send_multipart(msg_s, **kwargs)
             self._used = True
             self.debug('.send(): %d bytes sent', len(msg_s))
-        except Exception:
+        except BaseException:
             self.exception('.send(): Failed to send.')
             return False
         return ret
