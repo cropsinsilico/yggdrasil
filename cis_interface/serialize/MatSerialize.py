@@ -26,7 +26,7 @@ class MatSerialize(DefaultSerialize):
         if not isinstance(args, dict):
             raise TypeError('Object (type %s) is not a dictionary' %
                             type(args))
-        fd = backwards.sio.StringIO()
+        fd = backwards.BytesIO()
         savemat(fd, args)
         out = fd.getvalue()
         fd.close()

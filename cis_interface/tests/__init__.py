@@ -7,7 +7,7 @@ import numpy as np
 from scipy.io import savemat, loadmat
 import nose.tools as nt
 from cis_interface.tools import CIS_MSG_MAX as maxMsgSize
-from cis_interface.backwards import pickle, MatIO
+from cis_interface.backwards import pickle, BytesIO
 from cis_interface.dataio.AsciiTable import AsciiTable
 from cis_interface import backwards
 
@@ -240,7 +240,7 @@ class IOInfo(object):
                         del x[k]
                 else:
                     x = pickle.load(fd)
-        elif isinstance(x, str):
+        elif isinstance(x, backwards.bytes_type):
             x = pickle.loads(x)
         nt.assert_equal(type(x), type(self.data_dict))
         for k in self.data_dict:
@@ -259,7 +259,7 @@ class IOInfo(object):
     @property
     def mat_data(self):
         r"""str: Mat data."""
-        fd = MatIO()
+        fd = BytesIO()
         savemat(fd, self.data_dict)
         out = fd.getvalue()
         fd.close()
