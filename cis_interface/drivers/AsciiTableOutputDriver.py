@@ -52,7 +52,10 @@ class AsciiTableOutputDriver(AsciiFileOutputDriver):
         super(AsciiTableOutputDriver, self).before_loop()
         fmt = self.recv_message(timeout=self.timeout)
         if not fmt:
-            raise RuntimeError('Did not receive format string')
+            if self.is_comm_open:
+                raise RuntimeError('Did not receive format string')
+            else:
+                return
         with self.lock:
             self.ocomm.file.update_format_str(fmt)
             self.ocomm.file.writeformat()

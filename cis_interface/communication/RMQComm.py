@@ -335,7 +335,7 @@ class RMQComm(CommBase.CommBase):
             else:
                 self.debug(".recv(): No message")
                 msg = backwards.unicode2bytes('')
-        except pika.exception.AMQPError:
+        except pika.exceptions.AMQPError:
             self.exception(".recv(): Error")
             raise
         return (True, msg)

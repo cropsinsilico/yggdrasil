@@ -217,7 +217,7 @@ class IPCComm(CommBase.CommBase):
             return 0
 
     def _send(self, payload):
-        r"""Send a message smaller than CIS_MSG_MAX.
+        r"""Send a message to the IPC queue.
 
         Args:
             payload (str): Message to send.
@@ -231,6 +231,7 @@ class IPCComm(CommBase.CommBase):
         try:
             self.q.send(payload)
         except OSError:
+            self.close()
             return False
         return True
 
@@ -264,7 +265,11 @@ class IPCComm(CommBase.CommBase):
             return (True, backwards.unicode2bytes(''))
         # Receive message
         self.debug(".recv(): message ready, read it")
-        data, _ = self.q.receive()  # ignore ident
+        try:
+            data, _ = self.q.receive()  # ignore ident
+        except sysv_ipc.ExistentialError:
+            self.close()
+            return (False, backwards.unicode2bytes(''))
         return (True, data)
 
     def purge(self):

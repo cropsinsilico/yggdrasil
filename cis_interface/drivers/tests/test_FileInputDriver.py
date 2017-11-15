@@ -36,9 +36,7 @@ class TestFileInputParam(parent.TestConnectionParam):
     def teardown(self):
         r"""Remove the instance, stoppping it."""
         super(TestFileInputParam, self).teardown()
-        self.instance.icomm.remove_file()
-        # if os.path.isfile(self.filepath):
-        #     os.remove(self.filepath)
+        self.send_comm.remove_file()
 
 
 class TestFileInputDriverNoStart(TestFileInputParam,

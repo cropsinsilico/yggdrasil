@@ -47,6 +47,7 @@ class ConnectionDriver(Driver):
         self.ocomm_kws = ocomm_kws
         self.env[self.ocomm.name] = self.ocomm.address
         # Attributes
+        self._comm_closed = False
         self.nrecv = 0
         self.nproc = 0
         self.nsent = 0
@@ -70,7 +71,8 @@ class ConnectionDriver(Driver):
     def is_comm_open(self):
         r"""bool: Returns True if both communicators are open."""
         with self.lock:
-            return self.icomm.is_open and self.ocomm.is_open
+            return (self.icomm.is_open and self.ocomm.is_open and
+                    not self._comm_closed)
 
     @property
     def is_comm_closed(self):
@@ -88,6 +90,9 @@ class ConnectionDriver(Driver):
         r"""Open the communicators."""
         self.debug(':open_comm()')
         with self.lock:
+            if self._comm_closed:
+                self.debug(':open_comm(): aborted as comm closed')
+                return
             self.icomm.open()
             self.ocomm.open()
         self.debug(':open_comm(): done')
@@ -96,6 +101,7 @@ class ConnectionDriver(Driver):
         r"""Close the communicators."""
         self.debug(':close_comm()')
         with self.lock:
+            self._comm_closed = True
             self.icomm.close()
             self.ocomm.close()
         self.debug(':close_comm(): done')
@@ -242,7 +248,7 @@ class ConnectionDriver(Driver):
         self.debug(':run in %s', os.getcwd())
         try:
             self.before_loop()
-        except Exception:  # pragma: debug
+        except BaseException:  # pragma: debug
             self.exception('Could not prep for loop.')
             self.close_comm()
             return
