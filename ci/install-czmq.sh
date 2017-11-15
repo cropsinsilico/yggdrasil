@@ -9,7 +9,7 @@ sudo apt-get install -y \
 git clone git://github.com/jedisct1/libsodium.git
 cd libsodium
 ./autogen.sh
-./configure && make check
+./configure # && make check
 sudo make install
 if [ $TRAVIS_OS_NAME != 'osx' ]; then
     sudo ldconfig  # Don't do for MAC
@@ -23,7 +23,7 @@ cd libzmq
 # do not specify "--with-libsodium" if you prefer to use internal tweetnacl
 # security implementation (recommended for development)
 ./configure --with-libsodium
-make check
+# make check
 sudo make install
 if [ $TRAVIS_OS_NAME != 'osx' ]; then
     sudo ldconfig  # Don't do for MAC
@@ -34,7 +34,7 @@ cd ..
 git clone git://github.com/zeromq/czmq.git
 cd czmq
 ./autogen.sh
-./configure && make check
+./configure # && make check
 sudo make install
 if [ $TRAVIS_OS_NAME != 'osx' ]; then
     sudo ldconfig  # Don't do for MAC
