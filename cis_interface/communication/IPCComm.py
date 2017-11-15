@@ -228,7 +228,10 @@ class IPCComm(CommBase.CommBase):
         """
         if not self.is_open:
             return False
-        self.q.send(payload)
+        try:
+            self.q.send(payload)
+        except OSError:
+            return False
         return True
 
     def _recv(self, timeout=None):
