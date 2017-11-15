@@ -5,7 +5,9 @@ from cis_interface.communication.RMQComm import RMQComm
 
 
 class RMQAsyncComm(RMQComm):
-    r"""Class for handling asynchronous RabbitMQ communications.
+    r"""Class for handling asynchronous RabbitMQ communications. It is not
+    recommended to use this class as it can leave hanging threads if not
+    closed propertly. The normal RMQComm will cover most use cases.
 
     Args:
         name (str): The environment variable where the comm address is stored.
@@ -130,7 +132,10 @@ class RMQAsyncComm(RMQComm):
                 raise RuntimeError("Thread still running.")
             self.thread = None
         # Close workers
-        super(RMQAsyncComm, self).close()
+        print("Closing RMQAsyncComm workers: %s" % self.name)
+        with self.lock:
+            super(RMQAsyncComm, self).close()
+        print("Closed RMQAsyncComm: %s" % self.name)
 
     @property
     def n_msg(self):
@@ -139,6 +144,27 @@ class RMQAsyncComm(RMQComm):
         with self.lock:
             out = len(self._buffered_messages)
         return out
+
+    # Access work comms with lock
+    def get_work_comm(self, *args, **kwargs):
+        r"""Alias for parent class that wraps method in Lock."""
+        with self.lock:
+            return super(RMQAsyncComm, self).get_work_comm(*args, **kwargs)
+
+    def create_work_comm(self, *args, **kwargs):
+        r"""Alias for parent class that wraps method in Lock."""
+        with self.lock:
+            return super(RMQAsyncComm, self).create_work_comm(*args, **kwargs)
+
+    def add_work_comm(self, *args, **kwargs):
+        r"""Alias for parent class that wraps method in Lock."""
+        with self.lock:
+            return super(RMQAsyncComm, self).add_work_comm(*args, **kwargs)
+
+    def remove_work_comm(self, *args, **kwargs):
+        r"""Alias for parent class that wraps method in Lock."""
+        with self.lock:
+            return super(RMQAsyncComm, self).remove_work_comm(*args, **kwargs)
 
     def _send(self, msg, exchange=None, routing_key=None, **kwargs):
         r"""Send a message.
@@ -157,6 +183,8 @@ class RMQAsyncComm(RMQComm):
 
         """
         with self.lock:
+            if self.is_closed:
+                return False
             out = super(RMQAsyncComm, self)._send(msg, exchange=exchange,
                                                   routing_key=routing_key,
                                                   **kwargs)

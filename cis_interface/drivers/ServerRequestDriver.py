@@ -75,7 +75,7 @@ class ServerRequestDriver(ConnectionDriver):
 
     def terminate(self, *args, **kwargs):
         r"""Stop response drivers."""
-        print("ServerRequestDriver terminate: %s", self.name)
+        print("ServerRequestDriver terminate: %s" % self.name)
         with self.lock:
             self._block_response = True
             for x in self.response_drivers:
