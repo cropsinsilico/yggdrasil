@@ -69,6 +69,11 @@ class TestFileOutputDriver(TestFileOutputParam, parent.TestConnectionDriver):
             data = fd.read()
         nt.assert_equal(data, self.file_contents)
 
+    def run_before_terminate(self):
+        r"""Commands to run while the instance is running, before terminate."""
+        # Don't send any messages to the file
+        pass
+    
     def assert_after_terminate(self):
         r"""Assertions to make after terminating the driver instance."""
         super(TestFileOutputDriver, self).assert_after_terminate()
