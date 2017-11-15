@@ -167,10 +167,11 @@ class ClientRequestDriver(ConnectionDriver):
                 drv_kwargs = dict(comm=self.comm, msg_id=self.request_id)
                 try:
                     response_driver = ClientResponseDriver(*drv_args, **drv_kwargs)
+                    self.response_drivers.append(response_driver)
                     response_driver.start()
-                except BaseException:
+                except BaseExceptionas e:
+                    print('ClientRequestError', e)
                     return False
-                self.response_drivers.append(response_driver)
             # Send response address in header
             kwargs.setdefault('send_header', True)
             kwargs.setdefault('header_kwargs', {})
