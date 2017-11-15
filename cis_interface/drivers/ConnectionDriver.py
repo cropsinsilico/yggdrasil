@@ -186,6 +186,8 @@ class ConnectionDriver(Driver):
         """
         kwargs.setdefault('timeout', 0)
         with self.lock:
+            if self.icomm.is_closed:
+                return False
             flag, msg = self.icomm.recv(**kwargs)
         if msg == self.icomm.eof_msg:
             return self.on_eof()
@@ -229,6 +231,8 @@ class ConnectionDriver(Driver):
 
         """
         with self.lock:
+            if self.ocomm.is_closed:
+                return False
             return self.ocomm.send(*args, **kwargs)
 
     def run(self):
