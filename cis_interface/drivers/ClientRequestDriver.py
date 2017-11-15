@@ -113,27 +113,31 @@ class ClientRequestDriver(ConnectionDriver):
 
     def on_model_exit(self):
         r"""Close RPC comm when model exits."""
-        self.icomm.close()
+        with self.lock:
+            self.icomm.close()
         super(ClientRequestDriver, self).on_model_exit()
 
     def before_loop(self):
         r"""Send client sign on to server response driver."""
         super(ClientRequestDriver, self).before_loop()
-        self.ocomm.send(CIS_CLIENT_INI)
+        super(ClientRequestDriver, self).send_message(CIS_CLIENT_INI)
+        # self.ocomm.send(CIS_CLIENT_INI)
 
     def after_loop(self):
         r"""After client model signs off. Sent EOF to server."""
-        self.icomm.close()
-        if self.icomm._last_header is None:
-            self.icomm._last_header = dict()
-        if self.icomm._last_header.get('response_address', None) != CIS_CLIENT_EOF:
-            self.icomm._last_header['response_address'] = CIS_CLIENT_EOF
-            self.ocomm.send_eof()
+        with self.lock:
+            self.icomm.close()
+            if self.icomm._last_header is None:
+                self.icomm._last_header = dict()
+            if self.icomm._last_header.get('response_address', None) != CIS_CLIENT_EOF:
+                self.icomm._last_header['response_address'] = CIS_CLIENT_EOF
+                self.ocomm.send_eof()
         super(ClientRequestDriver, self).after_loop()
     
     def on_eof(self):
         r"""On EOF, set response_address to EOF, then send it along."""
-        self.icomm._last_header['response_address'] = CIS_CLIENT_EOF
+        with self.lock:
+            self.icomm._last_header['response_address'] = CIS_CLIENT_EOF
         return super(ClientRequestDriver, self).on_eof()
     
     def send_message(self, *args, **kwargs):

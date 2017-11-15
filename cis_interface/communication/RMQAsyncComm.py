@@ -28,8 +28,10 @@ class RMQAsyncComm(RMQComm):
         self.lock = RLock()
         self.thread = Thread(name=name, target=self.run_thread)
         self.thread.setDaemon(True)
+        self._thread_started = False
         self._opening = False
         self._closing = False
+        self._close_called = False
         self._buffered_messages = []
         super(RMQAsyncComm, self).__init__(name, **kwargs)
         # print("Creating RMQAsyncComm: %s" % self.name)
@@ -75,8 +77,9 @@ class RMQAsyncComm(RMQComm):
 
     def bind(self):
         r"""Declare queue to get random new queue."""
-        if self.is_open:
-            return
+        with self.lock:
+            if self.is_open or self._close_called:
+                return
         self._bound = True
         self.start_thread()
         # Register queue
@@ -94,6 +97,8 @@ class RMQAsyncComm(RMQComm):
 
     def close(self):
         r"""Close connection."""
+        with self.lock:
+            self._close_called = True
         with self.lock:
             if self._closing:  # pragma: debug
                 return  # Don't close more than once

@@ -85,26 +85,29 @@ class ServerRequestDriver(ConnectionDriver):
 
     def on_model_exit(self):
         r"""Close RPC comm when model exits."""
-        self.ocomm.close()
+        with self.lock:
+            self.ocomm.close()
         super(ServerRequestDriver, self).on_model_exit()
 
     def after_loop(self):
         r"""After server model signs off."""
-        self.icomm.close()
-        if self.icomm._last_header is None:
-            self.icomm._last_header = dict()
-        if self.icomm._last_header.get('response_address', None) != CIS_CLIENT_EOF:
-            self.icomm._last_header['response_address'] = CIS_CLIENT_EOF
-            self.ocomm.send_eof()
+        with self.lock:
+            self.icomm.close()
+            if self.icomm._last_header is None:
+                self.icomm._last_header = dict()
+            if self.icomm._last_header.get('response_address', None) != CIS_CLIENT_EOF:
+                self.icomm._last_header['response_address'] = CIS_CLIENT_EOF
+                self.ocomm.send_eof()
         super(ServerRequestDriver, self).after_loop()
     
     def on_eof(self):
         r"""On EOF, decrement number of clients. Only send EOF if the number
         of clients drops to 0."""
-        self.nclients -= 1
-        if self.nclients == 0:
-            self.icomm._last_header['response_address'] = CIS_CLIENT_EOF
-            return super(ServerRequestDriver, self).on_eof()
+        with self.lock:
+            self.nclients -= 1
+            if self.nclients == 0:
+                self.icomm._last_header['response_address'] = CIS_CLIENT_EOF
+                return super(ServerRequestDriver, self).on_eof()
         return ''
 
     def on_message(self, msg):
@@ -117,9 +120,10 @@ class ServerRequestDriver(ConnectionDriver):
             bytes, str: Processed message.
 
         """
-        if msg == CIS_CLIENT_INI:
-            self.nclients += 1
-            msg = ''
+        with self.lock:
+            if msg == CIS_CLIENT_INI:
+                self.nclients += 1
+                msg = ''
         return super(ServerRequestDriver, self).on_message(msg)
     
     def send_message(self, *args, **kwargs):
