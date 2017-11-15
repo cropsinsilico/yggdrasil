@@ -51,8 +51,10 @@ class TestFileOutputDriver(TestFileOutputParam, parent.TestConnectionDriver):
 
     def teardown(self):
         r"""Remove the instance, stoppping it."""
+        filename = self.instance.ocomm.address
         super(TestFileOutputDriver, self).teardown()
-        self.instance.ocomm.remove_file()
+        if os.path.isfile(filename):
+            os.remove(filename)
 
     def assert_before_stop(self):
         r"""Assertions to make before stopping the driver instance."""
