@@ -32,7 +32,7 @@ class RMQAsyncComm(RMQComm):
         self._closing = False
         self._buffered_messages = []
         super(RMQAsyncComm, self).__init__(name, **kwargs)
-        print("Creating RMQAsyncComm: %s" % self.name)
+        # print("Creating RMQAsyncComm: %s" % self.name)
 
     def getattr_safe(self, attr, **kwargs):
         r"""Return an attribute using the lock to ensure thread safety.
@@ -97,7 +97,7 @@ class RMQAsyncComm(RMQComm):
         with self.lock:
             if self._closing:  # pragma: debug
                 return  # Don't close more than once
-        print("Closing RMQAsyncComm: %s" % self.name)
+        # print("Closing RMQAsyncComm: %s" % self.name)
         # Wait for connection to finish opening to close it
         T = self.start_timeout(key=self.timeout_key + '_opening')
         while (not T.is_out) and self._opening:
@@ -132,10 +132,10 @@ class RMQAsyncComm(RMQComm):
                 raise RuntimeError("Thread still running.")
             self.thread = None
         # Close workers
-        print("Closing RMQAsyncComm workers: %s" % self.name)
+        # print("Closing RMQAsyncComm workers: %s" % self.name)
         with self.lock:
             super(RMQAsyncComm, self).close()
-        print("Closed RMQAsyncComm: %s" % self.name)
+        # print("Closed RMQAsyncComm: %s" % self.name)
 
     @property
     def n_msg(self):
