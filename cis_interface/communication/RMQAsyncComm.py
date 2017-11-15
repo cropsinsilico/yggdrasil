@@ -22,7 +22,6 @@ class RMQAsyncComm(RMQComm):
 
     """
     def __init__(self, name, **kwargs):
-        print("Creating RMQAsyncComm: %s" % name)
         self.times_connected = 0
         self.lock = RLock()
         self.thread = Thread(name=name, target=self.run_thread)
@@ -31,6 +30,7 @@ class RMQAsyncComm(RMQComm):
         self._closing = False
         self._buffered_messages = []
         super(RMQAsyncComm, self).__init__(name, **kwargs)
+        print("Creating RMQAsyncComm: %s" % self.name)
 
     def getattr_safe(self, attr, **kwargs):
         r"""Return an attribute using the lock to ensure thread safety.

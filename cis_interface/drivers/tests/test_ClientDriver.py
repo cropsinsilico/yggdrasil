@@ -79,6 +79,15 @@ class TestClientDriverNoStart(TestClientParam,
 class TestClientDriver(TestClientParam, parent.TestConnectionDriver):
     r"""Test class for ClientDriver class."""
 
+    def setup(self, *args, **kwargs):
+        r"""Wait for drivers to start."""
+        super(TestClientDriver, self).setup(*args, **kwargs)
+        T = self.instance.start_timeout(self.timeout)
+        while ((not T.is_out) and ((not self.instance.is_valid) or
+                                   (not self.srv_drv.is_valid))):
+            self.instance.sleep()  # pragma: debug
+        self.instance.stop_timeout()
+
     # Disabled so that test message is not read by mistake
     def test_purge(self):
         r"""Test purge of queue."""

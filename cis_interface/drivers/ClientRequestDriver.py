@@ -76,6 +76,7 @@ class ClientRequestDriver(ConnectionDriver):
         self.response_drivers = []
         self.comm = comm
         self.comm_address = self.ocomm.address
+        self._block_response = False
 
     @property
     def request_id(self):
@@ -103,6 +104,7 @@ class ClientRequestDriver(ConnectionDriver):
     def terminate(self, *args, **kwargs):
         r"""Stop response drivers."""
         with self.lock:
+            self._block_response = True
             for x in self.response_drivers:
                 x.terminate()
             self.response_drivers = []
@@ -147,15 +149,17 @@ class ClientRequestDriver(ConnectionDriver):
         """
         # Start response driver
         if self.model_response_address != CIS_CLIENT_EOF:
-            drv_args = [self.model_response_address]
-            drv_kwargs = dict(comm=self.comm, msg_id=self.request_id)
             with self.lock:
-                if self.is_comm_open:
+                if (not self.is_comm_open) or self._block_response:
+                    return False
+                drv_args = [self.model_response_address]
+                drv_kwargs = dict(comm=self.comm, msg_id=self.request_id)
+                try:
                     response_driver = ClientResponseDriver(*drv_args, **drv_kwargs)
                     response_driver.start()
-                    self.response_drivers.append(response_driver)
-                else:
+                except BaseException:
                     return False
+                self.response_drivers.append(response_driver)
             # Send response address in header
             kwargs.setdefault('send_header', True)
             kwargs.setdefault('header_kwargs', {})
