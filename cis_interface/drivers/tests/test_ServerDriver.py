@@ -114,7 +114,7 @@ class TestServerDriver(TestServerParam, parent.TestConnectionDriver):
         nt.assert_equal(self.instance.nclients, 0)
 
     def test_send_recv(self, msg_send=None):
-        r"""Test routing of a short message between server and server."""
+        r"""Test routing of a short message between client and server."""
         if msg_send is None:
             msg_send = self.msg_short
         T = self.instance.start_timeout()
@@ -142,5 +142,5 @@ class TestServerDriver(TestServerParam, parent.TestConnectionDriver):
         nt.assert_equal(cli_msg, msg_send)
 
     def test_send_recv_nolimit(self):
-        r"""Test sending/receiving large message."""
+        r"""Test routing of a large message between client and server."""
         self.test_send_recv(msg_send=self.msg_long)
