@@ -69,25 +69,21 @@ class TestFileOutputDriver(TestFileOutputParam, parent.TestConnectionDriver):
             data = fd.read()
         nt.assert_equal(data, self.file_contents)
 
-    def run_before_terminate(self):
-        r"""Commands to run while the instance is running, before terminate."""
-        # Don't send any messages to the file
-        pass
-    
     def assert_after_terminate(self):
         r"""Assertions to make after terminating the driver instance."""
         super(TestFileOutputDriver, self).assert_after_terminate()
         assert(self.instance.is_comm_closed)
 
     # These are disabled to prevent writting extraneous data
+    def run_before_terminate(self):
+        r"""Commands to run while the instance is running, before terminate."""
+        # Don't send any messages to the file
+        pass
+    
     def test_send_recv(self):
         r"""Test sending/receiving small message."""
         pass
 
     def test_send_recv_nolimit(self):
         r"""Test sending/receiving large message."""
-        pass
-
-    def run_before_terminate(self):
-        r"""Comands to run while the instance is running, before terminate."""
         pass

@@ -63,16 +63,17 @@ class TestFileInputDriver(TestFileInputParam, parent.TestConnectionDriver):
         assert(not flag)
         nt.assert_equal(msg_recv, self.recv_comm.eof_msg)
 
-    def run_before_terminate(self):
-        r"""Commands to run while the instance is running, before terminate."""
-        # Don't send any messages to the file
-        pass
-    
     def assert_after_terminate(self):
         r"""Assertions to make after stopping the driver instance."""
         super(TestFileInputDriver, self).assert_after_terminate()
         assert(self.instance.is_comm_closed)
         
+    # These are disabled to prevent writting extraneous data
+    def run_before_terminate(self):
+        r"""Commands to run while the instance is running, before terminate."""
+        # Don't send any messages to the file
+        pass
+    
     def test_send_recv(self):
         r"""Test sending/receiving small message."""
         pass
