@@ -106,7 +106,7 @@ class ClientRequestDriver(ConnectionDriver):
             for x in self.response_drivers:
                 x.terminate()
             self.response_drivers = []
-            super(ClientRequestDriver, self).terminate(*args, **kwargs)
+        super(ClientRequestDriver, self).terminate(*args, **kwargs)
 
     def on_model_exit(self):
         r"""Close RPC comm when model exits."""
