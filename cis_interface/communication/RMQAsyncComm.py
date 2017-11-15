@@ -22,6 +22,7 @@ class RMQAsyncComm(RMQComm):
 
     """
     def __init__(self, name, **kwargs):
+        print("Creating RMQAsyncComm: %s" % name)
         self.times_connected = 0
         self.lock = RLock()
         self.thread = Thread(name=name, target=self.run_thread)
@@ -94,6 +95,7 @@ class RMQAsyncComm(RMQComm):
         with self.lock:
             if self._closing:  # pragma: debug
                 return  # Don't close more than once
+        print("Closing RMQAsyncComm: %s" % self.name)
         # Wait for connection to finish opening to close it
         T = self.start_timeout(key=self.timeout_key + '_opening')
         while (not T.is_out) and self._opening:
