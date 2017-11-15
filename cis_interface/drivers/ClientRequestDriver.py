@@ -168,6 +168,7 @@ class ClientRequestDriver(ConnectionDriver):
                 try:
                     response_driver = ClientResponseDriver(*drv_args, **drv_kwargs)
                     self.response_drivers.append(response_driver)
+                    print('starting response driver', self._block_response)
                     response_driver.start()
                 except BaseException as e:
                     print('ClientRequestError', e)
