@@ -149,8 +149,9 @@ class ServerRequestDriver(ConnectionDriver):
                     self.response_drivers.append(response_driver)
                     response_driver.start()
                 except BaseException as e:
-                    print('ServerRequestError', e)
-                    return False
+                    raise
+                    # print('ServerRequestError', e)
+                    # return False
             # Send response address in header
             kwargs.setdefault('send_header', True)
             kwargs.setdefault('header_kwargs', {})

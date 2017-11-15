@@ -171,8 +171,9 @@ class ClientRequestDriver(ConnectionDriver):
                     print('starting response driver', self._block_response)
                     response_driver.start()
                 except BaseException as e:
-                    print('ClientRequestError', e)
-                    return False
+                    raise
+                    # print('ClientRequestError', e)
+                    # return False
             # Send response address in header
             kwargs.setdefault('send_header', True)
             kwargs.setdefault('header_kwargs', {})
