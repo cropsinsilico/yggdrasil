@@ -104,11 +104,13 @@ class ClientRequestDriver(ConnectionDriver):
     def terminate(self, *args, **kwargs):
         r"""Stop response drivers."""
         # print("ClientRequestDriver terminate: %s" % self.name)
+        print('terminate start')
         with self.lock:
             self._block_response = True
             for x in self.response_drivers:
                 x.terminate()
             self.response_drivers = []
+        print('terminate stop')
         super(ClientRequestDriver, self).terminate(*args, **kwargs)
 
     def on_model_exit(self):
@@ -119,12 +121,15 @@ class ClientRequestDriver(ConnectionDriver):
 
     def before_loop(self):
         r"""Send client sign on to server response driver."""
+        print('before_loop start')
         super(ClientRequestDriver, self).before_loop()
         super(ClientRequestDriver, self).send_message(CIS_CLIENT_INI)
         # self.ocomm.send(CIS_CLIENT_INI)
+        print('before_loop end')
 
     def after_loop(self):
         r"""After client model signs off. Sent EOF to server."""
+        print('after_loop start')
         with self.lock:
             self.icomm.close()
             if self.icomm._last_header is None:
@@ -133,6 +138,7 @@ class ClientRequestDriver(ConnectionDriver):
                 self.icomm._last_header['response_address'] = CIS_CLIENT_EOF
                 self.ocomm.send_eof()
         super(ClientRequestDriver, self).after_loop()
+        print('after_loop end')
     
     def on_eof(self):
         r"""On EOF, set response_address to EOF, then send it along."""

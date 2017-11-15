@@ -53,7 +53,7 @@ class ConnectionDriver(Driver):
         self.nsent = 0
         self.state = 'started'
         self.debug()
-        if False:
+        if True:
             print(80 * '=')
             print(self.__class__)
             print(self.env)
