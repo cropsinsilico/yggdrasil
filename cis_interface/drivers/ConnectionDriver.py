@@ -111,8 +111,21 @@ class ConnectionDriver(Driver):
         with self.lock:
             print('closing comms', self.__class__, self.name)
             self._comm_closed = True
-            self.icomm.close()
-            self.ocomm.close()
+            # Capture errors for both comms
+            ie = None
+            oe = None
+            try:
+                self.icomm.close()
+            except BaseException as ie:
+                pass
+            try:
+                self.ocomm.close()
+            except BaseException as oe:
+                pass
+            if ie:
+                raise ie
+            if oe:
+                raise oe
         self.debug(':close_comm(): done')
 
     def start(self):
