@@ -32,13 +32,15 @@ class RPCDriver(Driver):
     def comms_open(self):
         r"""bool: True if both input and output comms open."""
         with self.lock:
-            return (self.icomm.comm_open and self.ocomm.comm_open)
+            return (self.icomm.is_comm_open and self.ocomm.is_comm_open)
 
     @property
     def is_valid(self):
         r"""bool: True if both comms are open and parent class is valid."""
         with self.lock:
-            return (super(RPCDriver, self).is_valid and self.comms_open)
+            return (super(RPCDriver, self).is_valid and
+                    self.icomm.is_valid and
+                    self.ocomm.is_valid)
         
     @property
     def n_msg_in(self):

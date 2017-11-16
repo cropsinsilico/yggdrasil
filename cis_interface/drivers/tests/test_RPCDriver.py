@@ -106,6 +106,8 @@ class TestRPCDriver(TestRPCParam, parent.TestDriver, IOInfo):
         super(TestRPCDriver, self).assert_before_stop()
         assert(self.instance.icomm.is_comm_open)
         assert(self.instance.ocomm.is_comm_open)
+        assert(self.instance.comms_open)
+        assert(self.instance.is_valid)
         
     def run_before_terminate(self):
         r"""Commands to run while the instance is running, before terminate."""
@@ -118,8 +120,14 @@ class TestRPCDriver(TestRPCParam, parent.TestDriver, IOInfo):
         assert(self.instance.icomm.is_comm_closed)
         assert(self.instance.ocomm.is_comm_closed)
 
-    # def test_close_comms(self):
-    #     r"""Test closing comms."""
-    #     self.instance.close_comms()
-    #     assert(self.instance.icomm.is_comm_closed)
-    #     assert(self.instance.ocomm.is_comm_closed)
+    def test_close_comms(self):
+        r"""Test closing comms."""
+        self.instance.close_comms()
+        assert(self.instance.icomm.is_comm_closed)
+        assert(self.instance.ocomm.is_comm_closed)
+        assert(not self.instance.comms_open)
+        assert(not self.instance.is_valid)
+
+    def test_on_model_exit(self):
+        r"""Test actions on model exit."""
+        self.instance.on_model_exit()
