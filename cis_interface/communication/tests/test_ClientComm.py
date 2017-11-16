@@ -41,7 +41,6 @@ class TestClientComm(test_CommBase.TestCommBase):
         self.send_instance.sched_task(0.0, self.send_instance.rpcCall,
                                       args=[self.msg_short], store_output=True)
         flag, msg_recv = self.recv_instance.rpcRecv(timeout=self.timeout)
-        
         assert(flag)
         nt.assert_equal(msg_recv, self.msg_short)
         flag = self.recv_instance.rpcSend(msg_recv)
@@ -51,6 +50,21 @@ class TestClientComm(test_CommBase.TestCommBase):
             self.recv_instance.sleep()
         self.recv_instance.stop_timeout()
         flag, msg_recv = self.send_instance.sched_out
+        assert(flag)
+        nt.assert_equal(msg_recv, self.msg_short)
+
+    def test_call_alias(self):
+        r"""Test RPC call aliases."""
+        # self.send_instance.sched_task(0.0, self.send_instance.rpcSend,
+        #                               args=[self.msg_short], store_output=True)
+        flag = self.send_instance.rpcSend(self.msg_short)
+        assert(flag)
+        flag, msg_recv = self.recv_instance.rpcRecv(timeout=self.timeout)
+        assert(flag)
+        nt.assert_equal(msg_recv, self.msg_short)
+        flag = self.recv_instance.rpcSend(msg_recv)
+        assert(flag)
+        flag, msg_recv = self.send_instance.rpcRecv(timeout=self.timeout)
         assert(flag)
         nt.assert_equal(msg_recv, self.msg_short)
 

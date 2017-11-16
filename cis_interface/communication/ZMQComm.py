@@ -183,9 +183,11 @@ class ZMQComm(CommBase.CommBase):
 
     def close(self):
         r"""Close connection."""
+        global _N_SOCKETS
         if self.is_open:
             self.socket.close()
             self._openned = False
+            _N_SOCKETS -= 1
         super(ZMQComm, self).close()
             
     @property

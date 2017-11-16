@@ -1,6 +1,6 @@
 import nose.tools as nt
 from cis_interface.tests import CisTest, IOInfo
-from cis_interface.communication import new_comm
+from cis_interface.communication import new_comm, get_comm_class
 
 
 class TestCommBase(CisTest, IOInfo):
@@ -59,9 +59,20 @@ class TestCommBase(CisTest, IOInfo):
         r"""int: Maximum message size."""
         return max(self.instance.maxMsgSize,
                    super(TestCommBase, self).maxMsgSize)
-    
+
+    @property
+    def comm_count(self):
+        r"""int: Return the number of comms."""
+        out = 0
+        comms = set([self.comm, self.send_inst_kwargs['comm']])
+        for x in comms:
+            cls = get_comm_class(x)
+            out += cls.comm_count()
+        return out
+        
     def setup(self, *args, **kwargs):
         r"""Initialize comm object pair."""
+        self.nprev_comm = self.comm_count
         self.send_instance = new_comm(self.name, **self.send_inst_kwargs)
         super(TestCommBase, self).setup(*args, **kwargs)
         # CommBase is dummy class that never opens
@@ -73,6 +84,7 @@ class TestCommBase(CisTest, IOInfo):
         r"""Destroy comm object pair."""
         self.remove_instance(self.send_instance)
         super(TestCommBase, self).teardown(*args, **kwargs)
+        nt.assert_equal(self.comm_count, self.nprev_comm)
 
     def remove_instance(self, inst):
         r"""Remove an instance."""
