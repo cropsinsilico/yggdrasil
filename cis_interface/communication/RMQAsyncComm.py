@@ -55,19 +55,6 @@ class RMQAsyncComm(RMQComm):
             with self.lock:
                 return getattr(self, attr)
 
-    def start_thread(self):
-        r"""Start the thread and wait for connection."""
-        self._opening = True
-        self.thread.start()
-        T = self.start_timeout()
-        # interval = 1  # timeout / 5
-        while (not T.is_out) and (not self.channel_stable):
-            self.sleep(self.timeout / 5)  # interval)
-        if not self.channel_stable:  # pragma: debug
-            raise RuntimeError("Connection never finished opening " +
-                               "(%f/%f timeout)." % (T.elapsed, T.max_time))
-        self.stop_timeout()
-        
     def run_thread(self):
         r"""Connect to the connection and begin the IO loop."""
         self.debug("::run")
@@ -88,7 +75,8 @@ class RMQAsyncComm(RMQComm):
         T = self.start_timeout()
         # interval = 1  # timeout / 5
         while (not T.is_out) and (not self.channel_stable):
-            self.sleep()  # interval)
+            print('sleep', self.sleeptime)
+            self.sleep(0.5)  # interval)
         if not self.channel_stable:  # pragma: debug
             raise RuntimeError("Connection never finished opening " +
                                "(%f/%f timeout)." % (T.elapsed, T.max_time))
