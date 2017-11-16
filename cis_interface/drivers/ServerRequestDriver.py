@@ -151,11 +151,13 @@ class ServerRequestDriver(ConnectionDriver):
                 try:
                     print('starting server response driver', self._block_response)
                     response_driver = ServerResponseDriver(*drv_args, **drv_kwargs)
+                    print('adding server response')
                     self.response_drivers.append(response_driver)
+                    print('starting server response')
                     response_driver.start()
                 except BaseException as e:
+                    print('ServerRequestError', e)
                     raise e
-                    # print('ServerRequestError', e)
                     # return False
             # Send response address in header
             kwargs.setdefault('send_header', True)

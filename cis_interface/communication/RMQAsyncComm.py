@@ -62,7 +62,7 @@ class RMQAsyncComm(RMQComm):
         T = self.start_timeout()
         # interval = 1  # timeout / 5
         while (not T.is_out) and (not self.channel_stable):
-            self.sleep()  # interval)
+            self.sleep(self.timeout / 5)  # interval)
         if not self.channel_stable:  # pragma: debug
             raise RuntimeError("Connection never finished opening " +
                                "(%f/%f timeout)." % (T.elapsed, T.max_time))
