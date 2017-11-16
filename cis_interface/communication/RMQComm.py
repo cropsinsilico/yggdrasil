@@ -226,10 +226,14 @@ class RMQComm(CommBase.CommBase):
         r"""int: Number of messages in the queue."""
         out = 0
         if self.is_open:
-            res = self.channel.queue_declare(queue=self.queue,
-                                             auto_delete=True,
-                                             passive=True)
-            out = res.method.message_count
+            try:
+                res = self.channel.queue_declare(queue=self.queue,
+                                                 auto_delete=True,
+                                                 passive=True)
+                out = res.method.message_count
+            except pika.exceptions.ChannelClosed:
+                self.close()
+                out = 0
         return out
 
     @property

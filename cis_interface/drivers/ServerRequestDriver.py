@@ -145,9 +145,9 @@ class ServerRequestDriver(ConnectionDriver):
                 drv_args = [self.response_address]
                 drv_kwargs = dict(comm=self.comm, msg_id=self.request_id)
                 try:
+                    print('starting server response driver', self._block_response)
                     response_driver = ServerResponseDriver(*drv_args, **drv_kwargs)
                     self.response_drivers.append(response_driver)
-                    print('starting server response driver', self._block_response)
                     response_driver.start()
                 except BaseException as e:
                     raise e
