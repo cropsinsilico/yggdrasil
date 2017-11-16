@@ -49,7 +49,6 @@ class TestConnectionParam(parent.TestParam, IOInfo):
         for x in comms:
             cls = get_comm_class(x)
             out += cls.comm_count()
-            print(cls, cls.comm_count())
         return out
 
     @property

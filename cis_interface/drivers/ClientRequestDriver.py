@@ -103,7 +103,8 @@ class ClientRequestDriver(ConnectionDriver):
     
     def terminate(self, *args, **kwargs):
         r"""Stop response drivers."""
-        self.sleep(0.5)
+        # To force response server to connect after response client has stopped
+        # self.sleep(0.5)
         with self.lock:
             self._block_response = True
             for x in self.response_drivers:

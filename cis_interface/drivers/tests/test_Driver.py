@@ -92,18 +92,15 @@ class TestParam(CisTest):
 
         """
         super(TestParam, self).teardown()
-        print('doing lowest teardown')
         if ncurr_comm is None:
             x = CisClass(self.name, timeout=self.timeout,
                          sleeptime=self.sleeptime)
             Tout = x.start_timeout()
             while (not Tout.is_out) and (self.comm_count > self.nprev_comm):
-                print('waiting for comms to clear', self.comm_count, self.nprev_comm)
                 x.sleep()
             x.stop_timeout()
             ncurr_comm = self.comm_count
         nt.assert_equal(ncurr_comm, self.nprev_comm)
-        print('driver teardown complete')
 
     @property
     def name(self):
