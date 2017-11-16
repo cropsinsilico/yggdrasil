@@ -75,17 +75,12 @@ class ServerRequestDriver(ConnectionDriver):
 
     def terminate(self, *args, **kwargs):
         r"""Stop response drivers."""
-        print("ServerRequestDriver terminate: %s" % self.name)
         with self.lock:
             self._block_response = True
-            print("ServerRequestDriver removing %d response drivers" %
-                  len(self.response_drivers))
             for x in self.response_drivers:
                 x.terminate()
             self.response_drivers = []
-        print("ServerRequestDriver termnate stop: %s" % self.name)
         super(ServerRequestDriver, self).terminate(*args, **kwargs)
-        print("ServerRequestDriver termnate final: %s" % self.name)
 
     def on_model_exit(self):
         r"""Close RPC comm when model exits."""
@@ -149,16 +144,12 @@ class ServerRequestDriver(ConnectionDriver):
                 drv_args = [self.response_address]
                 drv_kwargs = dict(comm=self.comm, msg_id=self.request_id)
                 try:
-                    print('starting server response driver', self._block_response)
                     response_driver = ServerResponseDriver(*drv_args, **drv_kwargs)
-                    print('adding server response')
                     self.response_drivers.append(response_driver)
-                    print('starting server response')
                     response_driver.start()
-                except BaseException as e:
-                    print('ServerRequestError', e)
-                    raise e
-                    # return False
+                except BaseException:
+                    self.exception("Could not create/start response driver.")
+                    return False
             # Send response address in header
             kwargs.setdefault('send_header', True)
             kwargs.setdefault('header_kwargs', {})

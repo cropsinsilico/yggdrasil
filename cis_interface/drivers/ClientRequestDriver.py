@@ -103,17 +103,13 @@ class ClientRequestDriver(ConnectionDriver):
     
     def terminate(self, *args, **kwargs):
         r"""Stop response drivers."""
-        print("ClientRequestDriver terminate: %s" % self.name)
+        self.sleep(0.5)
         with self.lock:
             self._block_response = True
-            print("ClientRequestDriver removing %d response drivers" %
-                  len(self.response_drivers))
             for x in self.response_drivers:
                 x.terminate()
             self.response_drivers = []
-        print("ClientRequestDriver terminate stop: %s" % self.name)
         super(ClientRequestDriver, self).terminate(*args, **kwargs)
-        print("ClientRequestDriver terminate final: %s" % self.name)
 
     def on_model_exit(self):
         r"""Close RPC comm when model exits."""
@@ -123,15 +119,12 @@ class ClientRequestDriver(ConnectionDriver):
 
     def before_loop(self):
         r"""Send client sign on to server response driver."""
-        print('before_loop start')
         super(ClientRequestDriver, self).before_loop()
         super(ClientRequestDriver, self).send_message(CIS_CLIENT_INI)
         # self.ocomm.send(CIS_CLIENT_INI)
-        print('before_loop end')
 
     def after_loop(self):
         r"""After client model signs off. Sent EOF to server."""
-        print('after_loop start')
         with self.lock:
             self.icomm.close()
             if self.icomm._last_header is None:
@@ -140,7 +133,6 @@ class ClientRequestDriver(ConnectionDriver):
                 self.icomm._last_header['response_address'] = CIS_CLIENT_EOF
                 self.ocomm.send_eof()
         super(ClientRequestDriver, self).after_loop()
-        print('after_loop end')
     
     def on_eof(self):
         r"""On EOF, set response_address to EOF, then send it along."""
@@ -168,14 +160,12 @@ class ClientRequestDriver(ConnectionDriver):
                 drv_args = [self.model_response_address]
                 drv_kwargs = dict(comm=self.comm, msg_id=self.request_id)
                 try:
-                    print('starting client response driver', self._block_response)
                     response_driver = ClientResponseDriver(*drv_args, **drv_kwargs)
                     self.response_drivers.append(response_driver)
                     response_driver.start()
-                except BaseException as e:
-                    raise e
-                    # print('ClientRequestError', e)
-                    # return False
+                except BaseException:
+                    self.exception("Could not create/start response driver.")
+                    return False
             # Send response address in header
             kwargs.setdefault('send_header', True)
             kwargs.setdefault('header_kwargs', {})

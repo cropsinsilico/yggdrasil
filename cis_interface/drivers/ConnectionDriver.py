@@ -43,7 +43,11 @@ class ConnectionDriver(Driver):
         ocomm_kws['dont_open'] = True
         ocomm_kws['reverse_names'] = True
         ocomm_name = ocomm_kws.pop('name', name)
-        self.ocomm = new_comm(ocomm_name, **ocomm_kws)
+        try:
+            self.ocomm = new_comm(ocomm_name, **ocomm_kws)
+        except BaseException as e:
+            self.icomm.close()
+            raise e
         self.ocomm_kws = ocomm_kws
         self.env[self.ocomm.name] = self.ocomm.address
         # Attributes
@@ -93,14 +97,19 @@ class ConnectionDriver(Driver):
             if self._comm_closed:
                 self.debug(':open_comm(): aborted as comm closed')
                 return
-            self.icomm.open()
-            self.ocomm.open()
+            try:
+                self.icomm.open()
+                self.ocomm.open()
+            except BaseException as e:
+                self.close_comm()
+                raise e
         self.debug(':open_comm(): done')
 
     def close_comm(self):
         r"""Close the communicators."""
         self.debug(':close_comm()')
         with self.lock:
+            print('closing comms', self.__class__, self.name)
             self._comm_closed = True
             self.icomm.close()
             self.ocomm.close()
@@ -173,11 +182,13 @@ class ConnectionDriver(Driver):
 
     def before_loop(self):
         r"""Actions to perform prior to sending messages."""
+        print('before_loop', self.__class__, self.name)
         self.open_comm()
 
     def after_loop(self):
         r"""Actions to perform after sending messages."""
-        pass
+        print('after_loop', self.__class__, self.name)
+        # pass
 
     def recv_message(self, **kwargs):
         r"""Get a new message to send.

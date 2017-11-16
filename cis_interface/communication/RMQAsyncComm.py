@@ -60,27 +60,35 @@ class RMQAsyncComm(RMQComm):
         self.debug("::run")
         self.connect()
         self.connection.ioloop.start()
-        print("run returns")
         self.debug("::run returns")
 
     def bind(self):
         r"""Declare queue to get random new queue."""
+        # Start ioloop in a new thread
         with self.lock:
             if self.is_open or self._close_called:
                 return
             self._bound = True
-            # self.start_thread()
             self._opening = True
             self.thread.start()
+        # Wait for connection to be established
         T = self.start_timeout()
         # interval = 1  # timeout / 5
-        while (not T.is_out) and (not self.channel_stable):
+        while (not T.is_out) and (not self.channel_stable) and self.thread.isAlive():
             print('sleep', self.sleeptime)
             self.sleep(0.5)  # interval)
+        self.stop_timeout()
+        # Check that connection was established
+        if not self.thread.isAlive():
+            self._opening = False
+            self.force_close()
+            raise Exception("Connection ioloop could not be established.")
         if not self.channel_stable:  # pragma: debug
+            # self.error("Connection never finished opening " +
+            #            "(%f/%f timeout)." % (T.elapsed, T.max_time))
+            self.force_close()
             raise RuntimeError("Connection never finished opening " +
                                "(%f/%f timeout)." % (T.elapsed, T.max_time))
-        self.stop_timeout()
         # Register queue
         if not self.queue:
             self.error("Queue was not initialized.")
@@ -101,7 +109,6 @@ class RMQAsyncComm(RMQComm):
         with self.lock:
             if self._closing:  # pragma: debug
                 return  # Don't close more than once
-        # print("Closing RMQAsyncComm: %s" % self.name)
         # Wait for connection to finish opening to close it
         T = self.start_timeout(key=self.timeout_key + '_opening')
         while (not T.is_out) and self._opening:
@@ -136,10 +143,8 @@ class RMQAsyncComm(RMQComm):
                 raise RuntimeError("Thread still running.")
             self.thread = None
         # Close workers
-        # print("Closing RMQAsyncComm workers: %s" % self.name)
         with self.lock:
             super(RMQAsyncComm, self).close()
-        # print("Closed RMQAsyncComm: %s" % self.name)
 
     @property
     def n_msg(self):
@@ -239,7 +244,6 @@ class RMQAsyncComm(RMQComm):
         r"""Establish the connection."""
         self.times_connected += 1
         parameters = pika.URLParameters(self.url)
-        print('connecting')
         self.connection = pika.SelectConnection(
             parameters,
             on_open_callback=self.on_connection_open,
@@ -249,7 +253,6 @@ class RMQAsyncComm(RMQComm):
     def on_connection_open(self, connection):
         r"""Actions that must be taken when the connection is opened.
         Add the close connection callback and open the RabbitMQ channel."""
-        print('connection opened')
         self.debug('::Connection opened')
         connection.add_on_close_callback(self.on_connection_closed)
         self.open_channel()
@@ -311,13 +314,11 @@ class RMQAsyncComm(RMQComm):
     def open_channel(self):
         r"""Open a RabbitMQ channel."""
         self.debug('::Creating a new channel')
-        print('opening channel')
         self.connection.channel(on_open_callback=self.on_channel_open)
 
     def on_channel_open(self, channel):
         r"""Actions to perform after a channel is opened. Add the channel
         close callback and setup the exchange."""
-        print('channel openned')
         self.debug('::Channel opened')
         self.channel = channel
         channel.add_on_close_callback(self.on_channel_closed)
@@ -345,7 +346,6 @@ class RMQAsyncComm(RMQComm):
         r"""Actions to perform once an exchange is succesfully declared.
         Set up the queue."""
         self.debug('::Exchange declared')
-        print('exchanged declared')
         self.setup_queue()
 
     # QUEUE
@@ -360,18 +360,15 @@ class RMQAsyncComm(RMQComm):
             passive = True
         else:
             passive = False
-        print('declaring queue')
-        out = self.channel.queue_declare(self.on_queue_declareok,
-                                         queue=self.queue,
-                                         exclusive=exclusive,
-                                         passive=passive,
-                                         auto_delete=True)
-        print("queue_declare returns:", out)
+        self.channel.queue_declare(self.on_queue_declareok,
+                                   queue=self.queue,
+                                   exclusive=exclusive,
+                                   passive=passive,
+                                   auto_delete=True)
 
     def on_queue_declareok(self, method_frame):
         r"""Actions to perform once the queue is succesfully declared. Bind
         the queue."""
-        print("queue declared")
         self.debug('::Binding')
         with self.lock:
             if not self.queue:
@@ -384,7 +381,6 @@ class RMQAsyncComm(RMQComm):
     def on_bindok(self, unused_frame):
         r"""Actions to perform once the queue is succesfully bound. Start
         consuming messages."""
-        print('queue bound')
         self.debug('::Queue bound')
         self.channel.basic_qos(prefetch_count=1)
         self.channel.add_on_cancel_callback(self.on_cancelok)
@@ -399,7 +395,6 @@ class RMQAsyncComm(RMQComm):
         r"""Actions to perform after succesfully cancelling consumption. Closes
         the channel."""
         self.debug('::on_cancelok()')
-        print('cancelok', self.channel_open)
         with self.lock:
             self.close_queue()
             self.close_channel()
