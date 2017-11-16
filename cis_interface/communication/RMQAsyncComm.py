@@ -361,6 +361,7 @@ class RMQAsyncComm(RMQComm):
             passive = True
         else:
             passive = False
+        print('declaring queue')
         out = self.channel.queue_declare(self.on_queue_declareok,
                                          queue=self.queue,
                                          exclusive=exclusive,
