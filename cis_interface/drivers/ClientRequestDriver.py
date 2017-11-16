@@ -103,15 +103,17 @@ class ClientRequestDriver(ConnectionDriver):
     
     def terminate(self, *args, **kwargs):
         r"""Stop response drivers."""
-        # print("ClientRequestDriver terminate: %s" % self.name)
-        print('terminate start')
+        print("ClientRequestDriver terminate: %s" % self.name)
         with self.lock:
             self._block_response = True
+            print("ClientRequestDriver removing %d response drivers" %
+                  len(self.response_Drivers))
             for x in self.response_drivers:
                 x.terminate()
             self.response_drivers = []
-        print('terminate stop')
+        print("ClientRequestDriver terminate stop: %s" % self.name)
         super(ClientRequestDriver, self).terminate(*args, **kwargs)
+        print("ClientRequestDriver terminate final: %s" % self.name)
 
     def on_model_exit(self):
         r"""Close RPC comm when model exits."""
