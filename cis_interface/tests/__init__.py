@@ -64,6 +64,7 @@ class CisTest(unittest.TestCase):
         self._inst_kwargs = dict()
         self.timeout = 1.0
         self.sleeptime = 0.01
+        self._teardown_complete = False
         super(CisTest, self).__init__(*args, **kwargs)
 
     def setUp(self, *args, **kwargs):
@@ -83,6 +84,7 @@ class CisTest(unittest.TestCase):
             self._instance = None
             self.remove_instance(inst)
             delattr(self, '_instance')
+        self._teardown_complete = True
 
     @property
     def description_prefix(self):
@@ -139,6 +141,8 @@ class CisTest(unittest.TestCase):
     @property
     def instance(self):
         r"""object: Instance of the test driver."""
+        if self._teardown_complete:
+            raise RuntimeError("Instance referenced after teardown.")
         if not hasattr(self, '_instance'):  # pragma: debug
             self._instance = self.create_instance()
         return self._instance

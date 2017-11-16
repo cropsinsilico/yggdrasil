@@ -57,7 +57,7 @@ class ConnectionDriver(Driver):
         self.nsent = 0
         self.state = 'started'
         self.debug()
-        if True:
+        if False:
             print(80 * '=')
             print(self.__class__)
             print(self.env)
@@ -109,7 +109,6 @@ class ConnectionDriver(Driver):
         r"""Close the communicators."""
         self.debug(':close_comm()')
         with self.lock:
-            print('closing comms', self.__class__, self.name)
             self._comm_closed = True
             # Capture errors for both comms
             ie = None
@@ -195,13 +194,11 @@ class ConnectionDriver(Driver):
 
     def before_loop(self):
         r"""Actions to perform prior to sending messages."""
-        print('before_loop', self.__class__, self.name)
         self.open_comm()
 
     def after_loop(self):
         r"""Actions to perform after sending messages."""
-        print('after_loop', self.__class__, self.name)
-        # pass
+        pass
 
     def recv_message(self, **kwargs):
         r"""Get a new message to send.
