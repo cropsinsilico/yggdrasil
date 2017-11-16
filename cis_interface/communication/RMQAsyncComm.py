@@ -361,11 +361,12 @@ class RMQAsyncComm(RMQComm):
             passive = True
         else:
             passive = False
-        self.channel.queue_declare(self.on_queue_declareok,
-                                   queue=self.queue,
-                                   exclusive=exclusive,
-                                   passive=passive,
-                                   auto_delete=True)
+        out = self.channel.queue_declare(self.on_queue_declareok,
+                                         queue=self.queue,
+                                         exclusive=exclusive,
+                                         passive=passive,
+                                         auto_delete=True)
+        print("queue_declare returns:", out)
 
     def on_queue_declareok(self, method_frame):
         r"""Actions to perform once the queue is succesfully declared. Bind
