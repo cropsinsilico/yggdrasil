@@ -38,13 +38,13 @@ class TestClientComm(test_CommBase.TestCommBase):
 
     def test_call(self):
         r"""Test RPC call."""
-        self.send_instance.sched_task(0.0, self.send_instance.call,
+        self.send_instance.sched_task(0.0, self.send_instance.rpcCall,
                                       args=[self.msg_short], store_output=True)
-        flag, msg_recv = self.recv_instance.recv(timeout=self.timeout)
+        flag, msg_recv = self.recv_instance.rpcRecv(timeout=self.timeout)
         
         assert(flag)
         nt.assert_equal(msg_recv, self.msg_short)
-        flag = self.recv_instance.send(msg_recv)
+        flag = self.recv_instance.rpcSend(msg_recv)
         assert(flag)
         T = self.recv_instance.start_timeout()
         while (not T.is_out) and (self.send_instance.sched_out is None):
@@ -70,3 +70,21 @@ class TestClientComm(test_CommBase.TestCommBase):
         flag, msg_recv = self.send_instance.sched_out
         assert(flag)
         nt.assert_equal(msg_recv, self.msg_long)
+
+    def test_purge_recv(self):
+        r"""Test purging messages from the client comm."""
+        # Purge send while open
+        if self.comm != 'CommBase':
+            flag = self.send_instance.send(self.msg_short)
+            assert(flag)
+            T = self.recv_instance.start_timeout()
+            while (not T.is_out) and (self.recv_instance.n_msg == 0):
+                self.recv_instance.sleep()
+            self.recv_instance.stop_timeout()
+            nt.assert_equal(self.recv_instance.n_msg, 1)
+        self.send_instance.purge()
+        nt.assert_equal(self.send_instance.n_msg, 0)
+        nt.assert_equal(self.recv_instance.n_msg, 0)
+        # Purge send while closed
+        self.send_instance.close()
+        self.send_instance.purge()

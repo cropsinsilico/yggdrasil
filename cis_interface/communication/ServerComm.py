@@ -115,9 +115,9 @@ class ServerComm(CommBase.CommBase):
     # RESPONSE COMM
     def create_response_comm(self):
         r"""Create a response comm based on information from the last header."""
-        if not isinstance(self.icomm._last_header, dict):
+        if not isinstance(self.icomm._last_header, dict):  # pragma: debug
             raise RuntimeError("No header received with last message.")
-        elif 'response_address' not in self.icomm._last_header:
+        elif 'response_address' not in self.icomm._last_header:  # pragma: debug
             raise RuntimeError("Last header does not contain response address.")
         comm_kwargs = dict(address=self.icomm._last_header['response_address'],
                            direction='send', **self.response_kwargs)
@@ -142,7 +142,7 @@ class ServerComm(CommBase.CommBase):
             obj: Output from output comm send method.
 
         """
-        if self.ocomm is None:
+        if self.ocomm is None:  # pragma: debug
             raise RuntimeError("There is no registered response comm.")
         out = self.ocomm.send(*args, **kwargs)
         self.remove_response_comm()
@@ -178,6 +178,7 @@ class ServerComm(CommBase.CommBase):
     def purge(self):
         r"""Purge input and output comms."""
         self.icomm.purge()
-        if self.ocomm is not None:
-            self.ocomm.purge()
+        # Not sure if server should purge the response queue...
+        # if self.ocomm is not None:
+        #     self.ocomm.purge()
         super(ServerComm, self).purge()

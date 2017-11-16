@@ -146,10 +146,10 @@ class TestCommBase(CisTest, IOInfo):
         nt.assert_equal(self.recv_instance.n_msg, 0)
 
     def test_purge(self):
-        r"""Test purging messages form the comm."""
-        # Purge while open
+        r"""Test purging messages from the comm."""
         nt.assert_equal(self.send_instance.n_msg, 0)
         nt.assert_equal(self.recv_instance.n_msg, 0)
+        # Purge recv while open
         if self.comm != 'CommBase':
             flag = self.send_instance.send(self.msg_short)
             assert(flag)
@@ -161,6 +161,6 @@ class TestCommBase(CisTest, IOInfo):
         self.recv_instance.purge()
         nt.assert_equal(self.send_instance.n_msg, 0)
         nt.assert_equal(self.recv_instance.n_msg, 0)
-        # Purge while closed
+        # Purge recv while closed
         self.recv_instance.close()
         self.recv_instance.purge()

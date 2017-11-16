@@ -167,7 +167,7 @@ class ClientComm(CommBase.CommBase):
             obj: Output from input comm recv method.
 
         """
-        if len(self.icomm) == 0:
+        if len(self.icomm) == 0:  # pragma: debug
             raise RuntimeError("There are not any registered response comms.")
         out = self.icomm[self.icomm_order[0]].recv(*args, **kwargs)
         self.remove_response_comm()
@@ -187,7 +187,7 @@ class ClientComm(CommBase.CommBase):
 
         """
         flag = self.send(*args, **kwargs)
-        if not flag:
+        if not flag:  # pragma: debug
             return (False, backwards.unicode2bytes(''))
         return self.recv(timeout=False)
 
@@ -211,6 +211,7 @@ class ClientComm(CommBase.CommBase):
     def purge(self):
         r"""Purge input and output comms."""
         self.ocomm.purge()
-        for k in self.icomm_order:
-            self.icomm[k].purge()
+        # Unsure if client should purge all input comms...
+        # for k in self.icomm_order:
+        #     self.icomm[k].purge()
         super(ClientComm, self).purge()

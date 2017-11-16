@@ -56,7 +56,6 @@ class RMQAsyncComm(RMQComm):
         T = self.start_timeout()
         # interval = 1  # timeout / 5
         while (not T.is_out) and (not self.channel_stable) and self.thread.isAlive():
-            print('sleep', self.sleeptime)
             self.sleep()  # 0.5 # interval)
         self.stop_timeout()
         # Check that connection was established
