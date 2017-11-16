@@ -211,7 +211,10 @@ class RMQComm(CommBase.CommBase):
     def close_channel(self):
         r"""Close the channel if it exists."""
         if self.channel:
-            self.channel.close()
+            try:
+                self.channel.close()
+            except pika.exceptions.ChannelClosed:
+                pass
         self.channel = None
 
     def close_connection(self):
