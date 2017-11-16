@@ -399,21 +399,26 @@ class RMQAsyncComm(RMQComm):
     def remove_queue(self):
         r"""Unbind the queue from the exchange and delete the queue."""
         self.debug('::remove_queue: unbinding queue')
-        if self.channel:
-            self.channel.queue_unbind(queue=self.queue,
-                                      exchange=self.exchange)
-            self.channel.queue_delete(queue=self.queue)
+        with self.lock:
+            if self.channel:
+                try:
+                    self.channel.queue_unbind(queue=self.queue,
+                                              exchange=self.exchange)
+                    self.channel.queue_delete(queue=self.queue)
+                except pika.exceptions.ChannelClosed:
+                    pass
 
     def force_close(self):  # pragma: debug
         r"""Force stop by removing the queue and stopping the IO loop."""
-        if self.channel_open:
-            self.remove_queue()
-        if self.connection:
-            self.connection.ioloop.stop()
-            self.connection.close()
-        self.channel = None
-        self.connection = None
-        self._closing = False
+        with self.lock:
+            if self.channel_open:
+                self.remove_queue()
+            if self.connection:
+                self.connection.ioloop.stop()
+                self.connection.close()
+            self.channel = None
+            self.connection = None
+            self._closing = False
 
     def purge(self):
         r"""Remove all messages from the associated queue."""
