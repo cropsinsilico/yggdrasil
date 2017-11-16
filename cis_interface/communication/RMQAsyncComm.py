@@ -81,8 +81,18 @@ class RMQAsyncComm(RMQComm):
         with self.lock:
             if self.is_open or self._close_called:
                 return
-        self._bound = True
-        self.start_thread()
+            self._bound = True
+            # self.start_thread()
+            self._opening = True
+            self.thread.start()
+        T = self.start_timeout()
+        # interval = 1  # timeout / 5
+        while (not T.is_out) and (not self.channel_stable):
+            self.sleep()  # interval)
+        if not self.channel_stable:  # pragma: debug
+            raise RuntimeError("Connection never finished opening " +
+                               "(%f/%f timeout)." % (T.elapsed, T.max_time))
+        self.stop_timeout()
         # Register queue
         if not self.queue:
             self.error("Queue was not initialized.")
@@ -248,12 +258,12 @@ class RMQAsyncComm(RMQComm):
             on_open_error_callback=self.on_connection_open_error,
             stop_ioloop_on_close=False)
 
-    def on_connection_open(self, unused_connection):
+    def on_connection_open(self, connection):
         r"""Actions that must be taken when the connection is opened.
         Add the close connection callback and open the RabbitMQ channel."""
         print('connection opened')
         self.debug('::Connection opened')
-        self.connection.add_on_close_callback(self.on_connection_closed)
+        connection.add_on_close_callback(self.on_connection_closed)
         self.open_channel()
 
     def on_connection_open_error(self, unused_connection):  # pragma: debug
@@ -276,7 +286,7 @@ class RMQAsyncComm(RMQComm):
             else:
                 self.warn('Connection closed, reopening in %f seconds: (%s) %s',
                           self.sleeptime, reply_code, reply_text)
-                self.connection.add_timeout(self.sleeptime, self.reconnect)
+                connection.add_timeout(self.sleeptime, self.reconnect)
 
     def reconnect(self):
         r"""Try to re-establish a connection and resume a new IO loop."""
@@ -322,7 +332,7 @@ class RMQAsyncComm(RMQComm):
         print('channel openned')
         self.debug('::Channel opened')
         self.channel = channel
-        self.channel.add_on_close_callback(self.on_channel_closed)
+        channel.add_on_close_callback(self.on_channel_closed)
         self.setup_exchange(self.exchange)
 
     def on_channel_closed(self, channel, reply_code, reply_text):
