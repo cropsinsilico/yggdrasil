@@ -73,6 +73,7 @@ class RMQAsyncComm(RMQComm):
         self.debug("::run")
         self.connect()
         self.connection.ioloop.start()
+        print("run returns")
         self.debug("::run returns")
 
     def bind(self):
@@ -269,8 +270,7 @@ class RMQAsyncComm(RMQComm):
             self.debug('::on_connection_closed code %d %s', reply_code,
                        reply_text)
             if self._closing or reply_code == 200:
-                if self.connection is not None:
-                    self.connection.ioloop.stop()
+                connection.ioloop.stop()
                 self.connection = None
                 self._closing = False
             else:
@@ -331,9 +331,10 @@ class RMQAsyncComm(RMQComm):
         with self.lock:
             self.debug('::channel %i was closed: (%s) %s',
                        channel, reply_code, reply_text)
+            channel.connection.close()
             self.channel = None
-            if self.connection is not None:
-                self.connection.close()
+            # if self.connection is not None:
+            #     self.connection.close()
 
     # EXCHANGE
     def setup_exchange(self, exchange_name):
@@ -402,31 +403,20 @@ class RMQAsyncComm(RMQComm):
         self.debug('::on_cancelok()')
         print('cancelok', self.channel_open)
         with self.lock:
-            if self.channel_open:
-                self.remove_queue()
-                self.channel.close()
+            self.close_queue()
+            self.close_channel()
 
-    def remove_queue(self):
-        r"""Unbind the queue from the exchange and delete the queue."""
-        self.debug('::remove_queue: unbinding queue')
-        print('remove queue')
-        with self.lock:
-            if self.channel:
-                try:
-                    self.channel.queue_unbind(queue=self.queue,
-                                              exchange=self.exchange)
-                    self.channel.queue_delete(queue=self.queue)
-                except pika.exceptions.ChannelClosed:
-                    pass
+    def close_connection(self):
+        r"""Stop the ioloop and close the connection."""
+        if self.connection:
+            self.connection.ioloop.stop()
+        super(RMQAsyncComm, self).close_connection()
 
     def force_close(self):  # pragma: debug
         r"""Force stop by removing the queue and stopping the IO loop."""
         with self.lock:
-            if self.channel_open:
-                self.remove_queue()
-            if self.connection:
-                self.connection.ioloop.stop()
-                self.connection.close()
+            self.close_queue()
+            self.close_connection()
             self.channel = None
             self.connection = None
             self._closing = False

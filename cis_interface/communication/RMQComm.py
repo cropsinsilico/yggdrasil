@@ -190,19 +190,35 @@ class RMQComm(CommBase.CommBase):
         r"""Close connection."""
         self._is_open = False
         self._bound = False
-        try:
-            if self.channel is not None:
-                self.channel.queue_unbind(queue=self.queue,
-                                          exchange=self.exchange)
-                self.channel.queue_delete(queue=self.queue)
-            if self.connection is not None:
-                self.connection.close()
-        except pika.exceptions.ChannelClosed:
-            pass
+        self.close_queue()
+        self.close_channel()
+        self.close_connection()
         self.unregister_connection()
         self.connection = None
         self.channel = None
         super(RMQComm, self).close()
+
+    def close_queue(self):
+        r"""Close the queue if the channel exists."""
+        if self.channel:
+            try:
+                self.channel.queue_unbind(queue=self.queue,
+                                          exchange=self.exchange)
+                self.channel.queue_delete(queue=self.queue)
+            except pika.exceptions.ChannelClosed:
+                pass
+
+    def close_channel(self):
+        r"""Close the channel if it exists."""
+        if self.channel:
+            self.channel.close()
+        self.channel = None
+
+    def close_connection(self):
+        r"""Close the connection."""
+        if self.connection:
+            self.connection.close()
+        self.connection = None
 
     @property
     def is_open(self):

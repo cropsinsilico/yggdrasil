@@ -79,7 +79,7 @@ class ServerRequestDriver(ConnectionDriver):
         with self.lock:
             self._block_response = True
             print("ServerRequestDriver removing %d response drivers" %
-                  len(self.response_Drivers))
+                  len(self.response_drivers))
             for x in self.response_drivers:
                 x.terminate()
             self.response_drivers = []
