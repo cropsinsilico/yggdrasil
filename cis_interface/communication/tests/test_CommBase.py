@@ -110,6 +110,10 @@ class TestCommBase(CisTest, IOInfo):
         kwargs['direction'] = 'invalid'
         nt.assert_raises(ValueError, new_comm, self.name, **kwargs)
 
+    def test_opp_comm_kwargs(self):
+        r"""Test getting keyword arguments for the opposite comm."""
+        self.instance.opp_comm_kwargs()
+
     def test_eof(self):
         r"""Test send/recv of EOF message."""
         if self.comm != 'CommBase':
