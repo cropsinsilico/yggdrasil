@@ -47,18 +47,33 @@ class RPCComm(CommBase.CommBase):
                 'address', self.address.split(_rpc_address_split)[0])
             ocomm_kwargs.setdefault(
                 'address', self.address.split(_rpc_address_split)[1])
-            self.icomm = get_comm(icomm_name, **icomm_kwargs)
-            self.ocomm = get_comm(ocomm_name, **ocomm_kwargs)
+            self._setup_comms(icomm_name, icomm_kwargs,
+                              ocomm_name, ocomm_kwargs)
         else:
-            self.icomm = get_comm(icomm_name, **icomm_kwargs)
-            self.ocomm = get_comm(ocomm_name, **ocomm_kwargs)
+            self._setup_comms(icomm_name, icomm_kwargs,
+                              ocomm_name, ocomm_kwargs)
             kwargs.setdefault('address', _rpc_address_split.join(
                 [self.icomm.address, self.ocomm.address]))
-            super(RPCComm, self).__init__(name, dont_open=True, **kwargs)
+            # Close before raising the error
+            try:
+                super(RPCComm, self).__init__(name, dont_open=True, **kwargs)
+            except BaseException as e:
+                self.close(skip_base=True)
+                raise e
         self.icomm.recv_timeout = self.recv_timeout
         self.ocomm.recv_timeout = self.recv_timeout
         if not dont_open:
             self.open()
+
+    def _setup_comms(self, icomm_name, icomm_kwargs,
+                     ocomm_name, ocomm_kwargs):
+        r"""Set up input/output comms."""
+        try:
+            self.icomm = get_comm(icomm_name, **icomm_kwargs)
+            self.ocomm = get_comm(ocomm_name, **ocomm_kwargs)
+        except BaseException as e:
+            self.close(skip_base=True)
+            raise e
 
     @classmethod
     def comm_count(cls):
@@ -151,14 +166,39 @@ class RPCComm(CommBase.CommBase):
     def open(self):
         r"""Open the connection."""
         super(RPCComm, self).open()
-        self.icomm.open()
-        self.ocomm.open()
+        try:
+            self.icomm.open()
+            self.ocomm.open()
+        except BaseException as e:
+            self.close()
+            raise e
 
-    def close(self):
-        r"""Close the connection."""
-        self.icomm.close()
-        self.ocomm.close()
-        super(RPCComm, self).close()
+    def close(self, skip_base=False):
+        r"""Close the connection.
+        
+        Args:
+            skip_base (bool, optional): If True, close for the parent class will
+                not be called. Defaults to False.
+
+        """
+        ie = None
+        oe = None
+        try:
+            if self.icomm is not None:
+                self.icomm.close()
+        except BaseException as ie:  # pragma: debug
+            pass
+        try:
+            if self.ocomm is not None:
+                self.ocomm.close()
+        except BaseException as oe:  # pragma: debug
+            pass
+        if ie:
+            raise ie
+        if oe:
+            raise oe
+        if not skip_base:
+            super(RPCComm, self).close()
 
     @property
     def is_open(self):

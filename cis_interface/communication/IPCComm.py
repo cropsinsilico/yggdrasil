@@ -5,7 +5,6 @@ from cis_interface import backwards
 from cis_interface.communication import CommBase
 
 
-_N_QUEUES = 0
 _registered_queues = {}
 
 
@@ -20,7 +19,7 @@ def get_queue(qid=None):
         :class:`sysv_ipc.MessageQueue`: Message queue.
 
     """
-    global _N_QUEUES
+    global _registered_queues
     kwargs = dict(max_message_size=tools.CIS_MSG_MAX)
     if qid is None:
         kwargs['flags'] = sysv_ipc.IPC_CREX
@@ -28,7 +27,6 @@ def get_queue(qid=None):
     key = str(mq.key)
     if key not in _registered_queues:
         _registered_queues[key] = mq
-        _N_QUEUES += 1
     return mq
 
 
@@ -42,13 +40,12 @@ def remove_queue(mq):
         KeyError: If the provided queue is not registered.
 
     """
-    global _N_QUEUES
+    global _registered_queues
     key = str(mq.key)
     if key not in _registered_queues:
         raise KeyError("Queue not registered.")
     _registered_queues.pop(key)
     mq.remove()
-    _N_QUEUES -= 1
     
 
 def ipcs(options=[]):
@@ -153,7 +150,7 @@ class IPCComm(CommBase.CommBase):
     @classmethod
     def comm_count(cls):
         r"""int: Total number of IPC queues started on this process."""
-        return _N_QUEUES
+        return len(_registered_queues)
 
     @classmethod
     def new_comm_kwargs(cls, *args, **kwargs):

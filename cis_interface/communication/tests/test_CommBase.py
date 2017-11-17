@@ -1,4 +1,5 @@
 import nose.tools as nt
+# from cis_interface.tools import CisClass
 from cis_interface.tests import CisTest, IOInfo
 from cis_interface.communication import new_comm, get_comm_class
 
@@ -84,6 +85,11 @@ class TestCommBase(CisTest, IOInfo):
         r"""Destroy comm object pair."""
         self.remove_instance(self.send_instance)
         super(TestCommBase, self).teardown(*args, **kwargs)
+        # x = CisClass(self.name, timeout=self.timeout, sleeptime=self.sleeptime)
+        # Tout = x.start_timeout()
+        # while (not Tout.is_out) and (self.comm_count > self.nprev_comm):
+        #     x.sleep()
+        # x.stop_timeout()
         nt.assert_equal(self.comm_count, self.nprev_comm)
 
     def remove_instance(self, inst):

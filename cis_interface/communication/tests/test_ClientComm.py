@@ -14,6 +14,10 @@ class TestClientComm(test_CommBase.TestCommBase):
         r"""dict: Keyword arguments for send instance."""
         return {'comm': 'ClientComm'}
     
+    def test_invalid_direction(self):
+        r"""Disabled test of error on incorrect direction."""
+        pass
+    
     def test_eof(self):
         r"""Test send/recv of EOF message."""
         # Forwards

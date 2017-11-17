@@ -115,11 +115,11 @@ class ConnectionDriver(Driver):
             oe = None
             try:
                 self.icomm.close()
-            except BaseException as ie:
+            except BaseException as ie:  # pragma: debug
                 pass
             try:
                 self.ocomm.close()
-            except BaseException as oe:
+            except BaseException as oe:  # pragma: debug
                 pass
             if ie:
                 raise ie
