@@ -71,7 +71,7 @@ class RPCComm(CommBase.CommBase):
         try:
             self.icomm = get_comm(icomm_name, **icomm_kwargs)
             self.ocomm = get_comm(ocomm_name, **ocomm_kwargs)
-        except BaseException as e:
+        except BaseException as e:  # pragma: debug
             self.close(skip_base=True)
             raise e
 

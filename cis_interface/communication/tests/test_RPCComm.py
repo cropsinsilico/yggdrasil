@@ -51,6 +51,18 @@ class TestRPCComm(test_CommBase.TestCommBase):
         nt.assert_equal(msg_recv, self.msg_short)
         flag, msg_recv = self.send_instance.recv()
         nt.assert_equal(msg_recv, self.msg_short)
+        self.recv_instance.close()
+        flag, msg_recv = self.recv_instance.call(self.msg_short)
+        assert(not flag)
+
+    def test_call_alias(self):
+        r"""Test RPC call aliases."""
+        self.send_instance.sched_task(0.01, self.send_instance.rpcSend,
+                                      args=[self.msg_short])
+        flag, msg_recv = self.recv_instance.rpcCall(self.msg_short)
+        nt.assert_equal(msg_recv, self.msg_short)
+        flag, msg_recv = self.send_instance.rpcRecv()
+        nt.assert_equal(msg_recv, self.msg_short)
 
     def test_call_nolimit(self):
         r"""Test RPC nolimit call."""
