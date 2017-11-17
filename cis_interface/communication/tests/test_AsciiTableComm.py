@@ -44,6 +44,10 @@ class TestAsciiTableComm(parent.TestAsciiFileComm):
         nt.assert_equal(self.send_instance.n_msg, 0)
         nt.assert_equal(self.recv_instance.n_msg, 0)
 
+    def test_send_recv_array(self):
+        r"""Disabled test send/recv of array message."""
+        pass
+
     def test_purge(self):
         r"""Test purging messages form the comm."""
         nt.assert_equal(self.send_instance.n_msg, 0)
@@ -96,3 +100,7 @@ class TestAsciiTableComm_AsArray(TestAsciiTableComm):
         nt.assert_equal(msg_recv, self.file_bytes)
         nt.assert_equal(self.send_instance.n_msg, 0)
         nt.assert_equal(self.recv_instance.n_msg, 0)
+
+    def test_send_recv_array(self):
+        r"""Disabled test send/recv of array message."""
+        pass

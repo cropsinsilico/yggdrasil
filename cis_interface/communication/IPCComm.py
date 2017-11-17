@@ -223,7 +223,7 @@ class IPCComm(CommBase.CommBase):
             bool: Success or failure of sending the message.
 
         """
-        if not self.is_open:
+        if not self.is_open:  # pragma: debug
             return False
         try:
             self.q.send(payload)

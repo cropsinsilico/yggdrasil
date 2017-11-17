@@ -13,6 +13,7 @@ omit =
 [report]
 sort = Cover
 ignore_errors = True
+show_missing = True
 exclude_lines =
     pragma: no cover
     pragma: debug

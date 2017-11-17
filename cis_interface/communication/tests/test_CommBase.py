@@ -169,6 +169,24 @@ class TestCommBase(CisTest, IOInfo):
         nt.assert_equal(self.send_instance.n_msg, 0)
         nt.assert_equal(self.recv_instance.n_msg, 0)
 
+    def test_send_recv_array(self):
+        r"""Test send/recv of a array message."""
+        nt.assert_equal(self.send_instance.n_msg, 0)
+        nt.assert_equal(self.recv_instance.n_msg, 0)
+        if self.comm != 'CommBase':
+            flag = self.send_instance.send_array(self.msg_short)
+            assert(flag)
+            T = self.recv_instance.start_timeout()
+            while (not T.is_out) and (self.recv_instance.n_msg == 0):
+                self.recv_instance.sleep()
+            self.recv_instance.stop_timeout()
+            nt.assert_equal(self.recv_instance.n_msg, 1)
+            flag, msg_recv = self.recv_instance.recv_array()
+            assert(flag)
+            nt.assert_equal(msg_recv, self.msg_short)
+        nt.assert_equal(self.send_instance.n_msg, 0)
+        nt.assert_equal(self.recv_instance.n_msg, 0)
+
     def test_purge(self):
         r"""Test purging messages from the comm."""
         nt.assert_equal(self.send_instance.n_msg, 0)

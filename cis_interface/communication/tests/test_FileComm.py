@@ -1,4 +1,5 @@
 import nose.tools as nt
+from cis_interface.communication import new_comm
 from cis_interface.communication.tests import test_CommBase as parent
 
 
@@ -13,6 +14,19 @@ class TestFileComm(parent.TestCommBase):
         r"""Remove the file."""
         super(TestFileComm, self).teardown()
         self.send_instance.remove_file()
+
+    def test_invalid_read_meth(self):
+        r"""Test raise of error on invalid read_meth."""
+        kwargs = self.send_inst_kwargs
+        kwargs['read_meth'] = 'invalid'
+        nt.assert_raises(ValueError, new_comm, self.name, **kwargs)
+
+    def test_remaining_bytes(self):
+        r"""Test remaining_bytes."""
+        nt.assert_equal(self.send_instance.remaining_bytes, 0)
+        self.recv_instance.close()
+        assert(self.recv_instance.is_closed)
+        nt.assert_equal(self.recv_instance.remaining_bytes, 0)
 
     def test_eof(self):
         r"""Test send/recv of EOF message."""
