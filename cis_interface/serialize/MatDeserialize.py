@@ -21,7 +21,7 @@ class MatDeserialize(DefaultDeserialize):
 
         """
         if len(msg) == 0:
-            return backwards.unicod2bytes('')
+            return dict()
         fd = backwards.BytesIO(msg)
         out = loadmat(fd, squeeze_me=False)
         mat_keys = ['__header__', '__globals__', '__version__']

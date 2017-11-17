@@ -1,3 +1,5 @@
+import nose.tools as nt
+from cis_interface import backwards
 from cis_interface.serialize.tests.test_DefaultDeserialize import \
     TestDefaultDeserialize
 
@@ -13,3 +15,5 @@ class TestMatDeserialize(TestDefaultDeserialize):
         r"""Test call."""
         out = self.instance(self.mat_data)
         self.assert_equal_data_dict(out)
+        empty = backwards.unicode2bytes('')
+        nt.assert_equal(self.instance(empty), dict())

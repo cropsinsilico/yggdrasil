@@ -1,4 +1,5 @@
 import nose.tools as nt
+from cis_interface import backwards
 from cis_interface.serialize.tests.test_DefaultSerialize import \
     TestDefaultSerialize
 
@@ -16,6 +17,18 @@ class TestAsciiTableSerialize(TestDefaultSerialize):
         for iline, iargs in zip(self.file_lines, self.file_rows):
             iout = self.instance(iargs)
             nt.assert_equal(iout, iline)
+
+
+class TestAsciiTableSerializeSingle(TestAsciiTableSerialize):
+    r"""Test class for AsciiTableSerialize class."""
+
+    def __init__(self, *args, **kwargs):
+        super(TestAsciiTableSerializeSingle, self).__init__(*args, **kwargs)
+        self._inst_kwargs['format_str'] = '%d'
+
+    def test_call(self):
+        r"""Test call for single element."""
+        nt.assert_equal(self.instance(1), backwards.unicode2bytes('1'))
 
 
 class TestAsciiTableSerialize_asarray(TestAsciiTableSerialize):
