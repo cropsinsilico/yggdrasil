@@ -74,6 +74,7 @@ class CommBase(CisClass):
     Raises:
         Exception: If there is not an environment variable with the specified
             name.
+        ValueError: If directions is not 'send' or 'recv'.
 
     """
     def __init__(self, name, address=None, direction='send',
@@ -97,6 +98,8 @@ class CommBase(CisClass):
             self.address = os.environ[self.name]
         else:
             self.address = address
+        if direction not in ['send', 'recv']:
+            raise ValueError("Unrecognized message direction: %s" % direction)
         self.direction = direction
         self.format_str = format_str
         if deserialize is None:
@@ -426,7 +429,7 @@ class CommBase(CisClass):
         nsent = 0
         ret = True
         for imsg in self.chunk_message(msg):
-            ret = self._send(imsg)
+            ret = self._send(imsg, **kwargs)
             if not ret:  # pragma: debug
                 self.debug(
                     ".send_multipart(): send interupted at %d of %d bytes.",

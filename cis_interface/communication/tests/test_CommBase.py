@@ -37,7 +37,7 @@ class TestCommBase(CisTest, IOInfo):
     @property
     def send_inst_kwargs(self):
         r"""dict: Keyword arguments for send instance."""
-        return {'comm': self.comm, 'reverse_names': True}
+        return {'comm': self.comm, 'reverse_names': True, 'direction': 'send'}
 
     @property
     def inst_args(self):
@@ -97,6 +97,12 @@ class TestCommBase(CisTest, IOInfo):
         for a in self.attr_list:
             if not hasattr(self.instance, a):  # pragma: debug
                 raise AttributeError("Driver does not have attribute %s" % a)
+
+    def test_invalid_direction(self):
+        r"""Check that error raised for invalid direction."""
+        kwargs = self.send_inst_kwargs
+        kwargs['direction'] = 'invalid'
+        nt.assert_raises(ValueError, new_comm, self.name, **kwargs)
 
     def test_eof(self):
         r"""Test send/recv of EOF message."""

@@ -3,16 +3,18 @@ from cis_interface import backwards
 from cis_interface.communication import CommBase
 
 
-_N_SOCKETS = 0
+_registered_sockets = dict()
 
 
 _socket_type_pairs = [('PUSH', 'PULL'),
                       ('PUB', 'SUB'),
                       ('REP', 'REQ'),
-                      ('DEALER', 'ROUTER'),
+                      ('ROUTER', 'DEALER'),
                       ('PAIR', 'PAIR')]
 _socket_send_types = [t[0] for t in _socket_type_pairs]
 _socket_recv_types = [t[1] for t in _socket_type_pairs]
+_socket_protocols = ['tcp', 'inproc', 'ipc', 'udp', 'pgm', 'epgm']
+_flag_zmq_filter = backwards.unicode2bytes('_ZMQFILTER_')
 
 
 def get_socket_type_mate(t_in):
@@ -50,6 +52,11 @@ class ZMQComm(CommBase.CommBase):
             Defaults to None and the global context is used.
         socket_type (str, optional): The type of socket that should be created.
             Defaults to 'PAIR'. See zmq for all options.
+        topic_filter (str, optional): Message filter to use when subscribing.
+            This is only used for 'SUB' socket types. Defaults to '' which is
+            all messages.
+        dealer_identity (str, optional): Identity that should be used to route
+            messages to a dealer socket. Defaults to '0'.
         dont_open (bool, optional): If True, the connection will not be opened.
             Defaults to False.
         **kwargs: Additional keyword arguments are passed to CommBase.
@@ -59,21 +66,27 @@ class ZMQComm(CommBase.CommBase):
         socket (zmq.Socket): ZeroMQ socket.
         socket_type_name (str): The type of socket that should be created.
         socket_type (int): ZeroMQ socket type.
+        topic_filter (str): Message filter to use when subscribing.
+        dealer_identity (str): Identity that should be used to route messages
+            to a dealer socket.
 
     """
-    def __init__(self, name, context=None, socket_type='PAIR', dont_open=False,
-                 **kwargs):
+    def __init__(self, name, context=None, socket_type='PAIR', topic_filter='',
+                 dealer_identity='0', dont_open=False, **kwargs):
         super(ZMQComm, self).__init__(name, dont_open=True, **kwargs)
         self.context = context or zmq.Context.instance()
         self.socket_type_name = socket_type
         self.socket_type = getattr(zmq, socket_type)
         self.socket = self.context.socket(self.socket_type)
-        if socket_type in ['PULL', 'SUB', 'REQ', 'ROUTER']:
-            self.direction = 'recv'
-        elif socket_type in ['PUSH', 'PUB', 'REP', 'DEALER']:
-            self.direction = 'send'
+        if socket_type in ['PULL', 'SUB', 'REQ', 'DEALER']:
+            self.direction = 'recv'  # connect
+        elif socket_type in ['PUSH', 'PUB', 'REP', 'ROUTER']:
+            self.direction = 'send'  # bind
+        self.topic_filter = backwards.unicode2bytes(topic_filter)
+        self.dealer_identity = backwards.unicode2bytes(dealer_identity)
         self._openned = False
         self._bound = False
+        self._recv_identities = set([])
         # Reserve port by binding
         if not dont_open:
             self.open()
@@ -89,7 +102,7 @@ class ZMQComm(CommBase.CommBase):
     @classmethod
     def comm_count(cls):
         r"""int: Number of sockets that have been opened on this process."""
-        return _N_SOCKETS
+        return len(_registered_sockets)
 
     @property
     def port(self):
@@ -97,15 +110,15 @@ class ZMQComm(CommBase.CommBase):
         res = self.address.split(':')
         if len(res) == 3:
             out = int(res[-1])
-        elif res[0] == 'inproc':
-            out = 'inproc'
+        elif res[0] in ['inproc', 'ipc']:
+            out = res[0]
         else:
             out = None
         return out
 
     @classmethod
-    def new_comm_kwargs(cls, name, protocol='inproc', host='localhost', port=None,
-                        **kwargs):
+    def new_comm_kwargs(cls, name, protocol='inproc', host='localhost',
+                        port=None, **kwargs):
         r"""Initialize communication with new queue.
 
         Args:
@@ -127,12 +140,14 @@ class ZMQComm(CommBase.CommBase):
         if 'address' not in kwargs:
             if host == 'localhost':
                 host = '127.0.0.1'
-            if protocol == 'inproc':
-                address = "inproc://%s" % name
+            if protocol in ['inproc', 'ipc']:
+                address = "%s://%s" % (protocol, name)
+            elif protocol not in _socket_protocols:
+                raise ValueError("Unrecognized protocol: %s" % protocol)
             else:
                 address = "%s://%s" % (protocol, host)
-            if port is not None:
-                address += ":%d" % port
+                if port is not None:
+                    address += ":%d" % port
             kwargs['address'] = address
         return args, kwargs
 
@@ -148,9 +163,22 @@ class ZMQComm(CommBase.CommBase):
         kwargs['socket_type'] = get_socket_type_mate(self.socket_type_name)
         return kwargs
 
+    def register_socket(self):
+        r"""Register a socket."""
+        global _registered_sockets
+        key = '%s_%s' % (self.socket_type_name, self.address)
+        _registered_sockets[key] = self.address
+
+    def unregister_socket(self):
+        r"""Unregister a socket."""
+        global _registered_sockets
+        key = '%s_%s' % (self.socket_type_name, self.address)
+        if key in _registered_sockets:
+            del _registered_sockets[key]
+        
     def bind(self):
         r"""Bind to address, getting random port as necessary."""
-        if self.is_open:
+        if self.is_open or self._bound:  # pragma: debug
             return
         self._bound = True
         if self.port is None:
@@ -158,36 +186,50 @@ class ZMQComm(CommBase.CommBase):
             self.address += ":%d" % port
         else:
             if self.direction == 'send':
-                self.socket.bind(self.address)
+                try:
+                    self.socket.bind(self.address)
+                except zmq.ZMQError as e:
+                    if (self.socket_type_name == 'PAIR') and (e.errno == 98):
+                        self.error(("There is already a 'PAIR' socket sending " +
+                                    "to %s. Maybe you meant to create a recv " +
+                                    "PAIR?") % self.address)
+                    raise e
             else:
                 self._bound = False
+        if self._bound:
+            self.register_socket()
+
+    def unbind(self):
+        r"""Unbind from address."""
+        if self._bound:
+            self.socket.unbind(self.address)
+            self.unregister_socket()
 
     def open(self):
         r"""Open connection by binding/connect to the specified socket."""
         super(ZMQComm, self).open()
-        global _N_SOCKETS
         if not self.is_open:
             if self.direction == 'send':
-                if not self._bound:
-                    self.bind()
+                self.bind()
             elif self.direction == 'recv':
-                if self.port is None:
-                    self.bind()
-                if self._bound:
-                    self.socket.unbind(self.address)
+                # Bind then unbind to get port as necessary
+                self.bind()
+                self.unbind()
+                # Connect and register
+                if self.socket_type_name == 'DEALER':
+                    self.socket.setsockopt(zmq.IDENTITY, self.dealer_identity)
                 self.socket.connect(self.address)
-            else:
-                raise ValueError("Direction must be 'send' or 'recv'")
+                self.register_socket()
+                if self.socket_type_name == 'SUB':
+                    self.socket.setsockopt(zmq.SUBSCRIBE, self.topic_filter)
             self._openned = True
-            _N_SOCKETS += 1
 
     def close(self):
         r"""Close connection."""
-        global _N_SOCKETS
-        if self.is_open:
+        if self.is_open or self._bound:
             self.socket.close()
             self._openned = False
-            _N_SOCKETS -= 1
+            self.unregister_socket()
         super(ZMQComm, self).close()
             
     @property
@@ -206,7 +248,6 @@ class ZMQComm(CommBase.CommBase):
             #     return 1
             else:
                 return 0
-            return out
         return 0
 
     @property
@@ -251,29 +292,41 @@ class ZMQComm(CommBase.CommBase):
 
         """
         flag, _ = self._recv(timeout=self.timeout, flags=0)
-        if not flag:
+        if not flag:  # pragma: debug
             return False
         flag = self._send(_, flags=0)
         flag = super(ZMQComm, self)._send_multipart(msg, **kwargs)
         return flag
 
-    def _send(self, msg, **kwargs):
+    def _send(self, msg, topic='', identity='0', **kwargs):
         r"""Send a message.
 
         Args:
             msg (str, bytes): Message to be sent.
+            topic (str, optional): Filter that should be sent with the
+                message for 'PUB' sockets. Defaults to ''.
+            identity (str, optional): Identify of identified worker that
+                should be sent for 'ROUTER' sockets. Defaults to '0'.
             **kwargs: Additional keyword arguments are passed to socket send.
 
         Returns:
             bool: Success or failure of send.
 
         """
-        if self.is_closed:
+        if self.is_closed:  # pragma: debug
             self.error(".send(): Socket closed")
             return False
+        topic = backwards.unicode2bytes(topic)
+        identity = backwards.unicode2bytes(identity)
+        if self.socket_type_name == 'PUB':
+            total_msg = topic + _flag_zmq_filter + msg
+        else:
+            total_msg = msg
         try:
             kwargs.setdefault('flags', zmq.NOBLOCK)
-            self.socket.send(msg, **kwargs)
+            if self.socket_type_name == 'ROUTER':
+                self.socket.send(identity, zmq.SNDMORE)
+            self.socket.send(total_msg, **kwargs)
         except zmq.ZMQError:
             self.exception(".send(): Error")
             return False
@@ -293,10 +346,10 @@ class ZMQComm(CommBase.CommBase):
         """
         data = backwards.unicode2bytes('')
         flag = self._send(data)
-        if not flag:
+        if not flag:  # pragma: debug
             return False, data
         flag, msg = self._recv(flags=0)
-        if not flag:
+        if not flag:  # pragma: debug
             return False, data
         # kwargs['flags'] = 0
         # kwargs['timeout'] = self.timeout
@@ -316,7 +369,7 @@ class ZMQComm(CommBase.CommBase):
                 message.
 
         """
-        if self.is_closed:
+        if self.is_closed:  # pragma: debug
             self.error(".recv(): Socket closed")
             return (False, None)
         if timeout is None:
@@ -327,11 +380,19 @@ class ZMQComm(CommBase.CommBase):
             self.debug(".recv(): No messages waiting.")
             return (True, backwards.unicode2bytes(''))
         try:
+            if self.socket_type_name == 'ROUTER':
+                identity = self.socket.recv(zmq.NOBLOCK)
+                self._recv_identities.add(identity)
             kwargs.setdefault('flags', zmq.NOBLOCK)
-            msg = self.socket.recv(**kwargs)
-        except zmq.ZMQError:
+            total_msg = self.socket.recv(**kwargs)
+        except zmq.ZMQError:  # pragma: debug
             self.exception(".recv(): Error")
             return (False, None)
+        if self.socket_type_name == 'SUB':
+            topic, msg = total_msg.split(_flag_zmq_filter)
+            assert(topic == self.topic_filter)
+        else:
+            msg = total_msg
         return (True, msg)
 
     def purge(self):
