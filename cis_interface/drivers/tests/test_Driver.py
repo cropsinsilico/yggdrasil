@@ -51,10 +51,7 @@ class TestParam(CisTest):
         r"""tuple: Driver arguments."""
         out = [self.name]
         if self.args is not None:
-            if isinstance(self.args, list):
-                out += self.args
-            else:
-                out.append(self.args)
+            out.append(self.args)
         return out
 
     @property
