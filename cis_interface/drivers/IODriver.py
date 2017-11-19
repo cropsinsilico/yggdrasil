@@ -16,10 +16,10 @@ class IODriver(CommDriver):
         super(IODriver, self).__init__(name + suffix, **kwargs)
         self.debug()
 
-    @property
-    def n_ipc_msg(self):
-        r"""int: The number of messages in the queue."""
-        return super(IODriver, self).n_msg
+    # @property
+    # def n_ipc_msg(self):
+    #     r"""int: The number of messages in the queue."""
+    #     return super(IODriver, self).n_msg
 
     # def ipc_send(self, data):
     #     r"""Send a message smaller than maxMsgSize.

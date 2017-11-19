@@ -36,7 +36,8 @@ class ServerResponseDriver(ConnectionDriver):
         ocomm_kws = kwargs.get('ocomm_kws', {})
         ocomm_kws['comm'] = comm
         ocomm_kws['name'] = response_name
-        ocomm_kws['address'] = response_address
+        if response_address is not None:
+            ocomm_kws['address'] = response_address
         kwargs['ocomm_kws'] = ocomm_kws
         super(ServerResponseDriver, self).__init__(response_name, **kwargs)
         self.comm = comm

@@ -37,7 +37,7 @@ class TestServerParam(parent.TestConnectionParam):
     def inst_kwargs(self):
         r"""dict: Keyword arguments for tested class."""
         out = super(TestServerParam, self).inst_kwargs
-        out['request_name'] = self.cli_drv.request_name
+        # out['request_name'] = self.cli_drv.request_name
         out['comm'] = self.cli_drv.comm
         out['comm_address'] = self.cli_drv.comm_address
         out['ocomm_kws']['comm'] = self.comm_name
@@ -63,7 +63,8 @@ class TestServerParam(parent.TestConnectionParam):
         r"""Create a new ClientDriver instance."""
         inst = runner.create_driver(
             'ClientDriver', 'test_model_request.' + self.uuid,
-            request_name='test_request.' + self.uuid, comm=self.client_comm,
+            # request_name='test_request.' + self.uuid,
+            comm=self.client_comm,
             comm_address=comm_address,
             namespace=self.namespace, workingDir=self.workingDir,
             timeout=self.timeout)

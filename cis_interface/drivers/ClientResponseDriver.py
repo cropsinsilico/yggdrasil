@@ -37,7 +37,8 @@ class ClientResponseDriver(ConnectionDriver):
         ocomm_kws = kwargs.get('ocomm_kws', {})
         ocomm_kws['comm'] = None
         ocomm_kws['name'] = 'client_model_response.' + msg_id
-        ocomm_kws['address'] = model_response_address
+        if model_response_address is not None:
+            ocomm_kws['address'] = model_response_address
         kwargs['ocomm_kws'] = ocomm_kws
         super(ClientResponseDriver, self).__init__(response_name, **kwargs)
         assert(not hasattr(self, 'comm'))
