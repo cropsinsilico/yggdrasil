@@ -26,10 +26,14 @@ if not os.path.isfile(usr_config_file):
 # Set coverage options in .coveragerc
 cov_installed = False
 try:
-    from coverage.config import HandyConfigParser
+    from ConfigParser import RawConfigParser as HandyConfigParser
     cov_installed = True
 except ImportError:
-    pass
+    try:
+        from configparser import RawConfigParser as HandyConfigParser
+        cov_installed = True
+    except ImportError:
+        pass
 if cov_installed:
     # Read options
     covrc = '.coveragerc'
@@ -37,12 +41,10 @@ if cov_installed:
     cp.read(covrc)
     # Exclude rules for all files
     if not cp.has_section('report'):
-        try:
-            cp.add_section('report')
-        except Exception:
-            pass
+        cp.add_section('report')
     if cp.has_option('report', 'exclude_lines'):
-        excl_list = cp.getlist('report', 'exclude_lines')
+        excl_str = cp.get('report', 'exclude_lines')
+        excl_list = excl_str.strip().split('\n')
     else:
         excl_list = []
     # Funcs to add/rm rules
