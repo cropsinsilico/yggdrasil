@@ -162,6 +162,8 @@ class TestDriver(TestParam):
         r"""Start the thread, then stop it."""
         self.assert_before_stop()
         self.run_before_stop()
+        self.instance.wait(self.sleeptime)
+        self.instance.stop()
         self.instance.stop()
         self.assert_after_stop()
 

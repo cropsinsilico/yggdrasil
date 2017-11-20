@@ -90,7 +90,7 @@ class ModelDriver(Driver):
             T = self.start_timeout()
             try:
                 self.process.poll()
-            except AttributeError:
+            except AttributeError:  # pragma: debug
                 if self.process is None:
                     return
                 raise

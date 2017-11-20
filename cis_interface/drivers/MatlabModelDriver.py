@@ -47,7 +47,7 @@ def start_matlab():
                not T.is_out):
             debug('Waiting for matlab engine to start')
             time.sleep(1)  # Usually 3 seconds
-        if (len(set(matlab.engine.find_matlab()) - old_matlab) == 0):
+        if (len(set(matlab.engine.find_matlab()) - old_matlab) == 0):  # pragma: debug
             raise Exception("start_matlab timed out at %f s" % T.elapsed)
         new_matlab = list(set(matlab.engine.find_matlab()) - old_matlab)[0]
     else:  # pragma: no matlab
@@ -90,7 +90,7 @@ def stop_matlab(screen_session, matlab_engine, matlab_session):
                    not T.is_out):
                 debug("Waiting for matlab engine to exit")
                 time.sleep(1)
-            if (matlab_session in matlab.engine.find_matlab()):
+            if (matlab_session in matlab.engine.find_matlab()):  # pragma: debug
                 raise Exception("stp[_matlab timed out at %f s" % T.elapsed)
     # else:  # pragma: no matlab
     #     warn("Matlab not installed. Matlab could not be stopped.")

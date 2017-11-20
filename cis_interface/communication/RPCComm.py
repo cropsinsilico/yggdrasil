@@ -184,12 +184,12 @@ class RPCComm(CommBase.CommBase):
         ie = None
         oe = None
         try:
-            if self.icomm is not None:
+            if getattr(self, 'icomm', None) is not None:
                 self.icomm.close()
         except BaseException as ie:  # pragma: debug
             pass
         try:
-            if self.ocomm is not None:
+            if getattr(self, 'ocomm', None) is not None:
                 self.ocomm.close()
         except BaseException as oe:  # pragma: debug
             pass

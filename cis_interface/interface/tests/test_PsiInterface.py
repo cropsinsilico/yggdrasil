@@ -3,17 +3,35 @@ import numpy as np
 import nose.tools as nt
 from cis_interface.interface import PsiInterface
 from cis_interface.tools import PSI_MSG_EOF, PSI_MSG_MAX
-from cis_interface.drivers import import_driver, InputCommDriver
+from cis_interface.drivers import (
+    import_driver, InputCommDriver, OutputCommDriver)
 from cis_interface.tests import CisTest, IOInfo
+
+
+def test_maxMsgSize():
+    r"""Test max message size."""
+    nt.assert_equal(PsiInterface.maxMsgSize(), PSI_MSG_MAX)
+
+
+def test_eof_msg():
+    r"""Test eof message signal."""
+    nt.assert_equal(PsiInterface.eof_msg(), PSI_MSG_EOF)
 
 
 def test_PsiMatlab_class():
     r"""Test Matlab interface for classes."""
     name = 'test'
+    # Input
     drv = InputCommDriver.InputCommDriver(name, direction='send')
     drv.start()
     os.environ.update(drv.env)
-    PsiInterface.PsiMatlab('PsiInput', (name,))
+    PsiInterface.PsiMatlab('PsiInput', (name, 'hello\\nhello'))
+    drv.terminate()
+    # Output
+    drv = OutputCommDriver.OutputCommDriver(name, direction='send')
+    drv.start()
+    os.environ.update(drv.env)
+    PsiInterface.PsiMatlab('PsiOutput', (name, 'hello\\nhello'))
     drv.terminate()
 
 
@@ -31,6 +49,7 @@ class TestBase(CisTest, IOInfo):
         IOInfo.__init__(self)
         self._mod = 'cis_interface.interface.PsiInterface'
         self.name = 'test' + self.uuid
+        self.matlab = False
         self.driver = None
         self.driver_name = 'CommDriver'
         self.driver_args = [self.name]
@@ -44,7 +63,15 @@ class TestBase(CisTest, IOInfo):
 
     @property
     def driver_kwargs(self):
+        r"""dict: Arguments for the test driver."""
         return self._driver_kwargs
+
+    @property
+    def inst_kwargs(self):
+        r"""dict: Arguments for the interface instance."""
+        out = super(TestBase, self).inst_kwargs
+        out['matlab'] = self.matlab
+        return out
         
     def setup(self, skip_start=False):
         r"""Start driver and instance."""
@@ -89,6 +116,13 @@ class TestPsiInput(TestBase):
         nt.assert_equal(msg_recv, self.msg_long)
 
 
+class TestPsiInputMatlab(TestPsiInput):
+    r"""Test basic input to python as passed from matlab."""
+    def __init__(self, *args, **kwargs):
+        super(TestPsiInputMatlab, self).__init__(*args, **kwargs)
+        self.matlab = True
+
+
 class TestPsiOutput(TestBase):
     r"""Test basic output to python."""
     def __init__(self, *args, **kwargs):
@@ -115,6 +149,13 @@ class TestPsiOutput(TestBase):
         msg_flag, msg_recv = self.driver.recv_nolimit(self.timeout)
         assert(msg_flag)
         nt.assert_equal(msg_recv, self.msg_long)
+
+
+class TestPsiOutputMatlab(TestPsiOutput):
+    r"""Test basic output to python as passed from matlab."""
+    def __init__(self, *args, **kwargs):
+        super(TestPsiOutputMatlab, self).__init__(*args, **kwargs)
+        self.matlab = True
 
 
 class TestPsiRpc(TestBase):
@@ -189,6 +230,35 @@ class TestPsiRpc(TestBase):
         nt.assert_equal(msg_recv, self.client_msg)
 
 
+class TestPsiRpcSplit(TestPsiRpc):
+    r"""Test basic RPC communication with Python using split comm."""
+    def __init__(self, *args, **kwargs):
+        super(TestPsiRpcSplit, self).__init__(*args, **kwargs)
+        self.icomm_name = self.name + 'A'
+        self.ocomm_name = self.name + 'B'
+        self._inst_args = [self.icomm_name, self.fmt_str,
+                           self.ocomm_name, self.fmt_str]
+        self.driver_args = ['%s_%s' % (self.ocomm_name, self.icomm_name)]
+
+    @property
+    def driver_kwargs(self):
+        r"""Keyword arguments for the driver."""
+        out = super(TestPsiRpcSplit, self).driver_kwargs
+        # Reversed
+        out['icomm_kwargs'] = dict(name=self.ocomm_name)
+        out['ocomm_kwargs'] = dict(name=self.icomm_name)
+        return out
+    
+
+class TestPsiRpcMatlab(TestPsiRpc):
+    r"""Test basic RPC communication with Python as passed through Matlab."""
+    def __init__(self, *args, **kwargs):
+        super(TestPsiRpcMatlab, self).__init__(*args, **kwargs)
+        self.matlab = True
+        self._inst_args = [self.name, self.fmt_str_matlab,
+                           self.name, self.fmt_str_matlab]
+
+
 class TestPsiRpcClient(TestPsiRpc):
     r"""Test client-side RPC communication with Python."""
     def __init__(self, *args, **kwargs):
@@ -204,6 +274,14 @@ class TestPsiRpcClient(TestPsiRpc):
         return out
         
         
+class TestPsiRpcClientMatlab(TestPsiRpcClient):
+    r"""Test client-side RPC communication with Python as passed through Matlab."""
+    def __init__(self, *args, **kwargs):
+        super(TestPsiRpcClientMatlab, self).__init__(*args, **kwargs)
+        self.matlab = True
+        self._inst_args = [self.name, self.fmt_str_matlab, self.fmt_str_matlab]
+
+
 class TestPsiRpcServer(TestPsiRpc):
     r"""Test server-side RPC communication with Python."""
     def __init__(self, *args, **kwargs):
@@ -243,6 +321,14 @@ class TestPsiRpcServer(TestPsiRpc):
         return self.file_rows[0]
         
         
+class TestPsiRpcServerMatlab(TestPsiRpcServer):
+    r"""Test server-side RPC communication with Python as passed through Matlab."""
+    def __init__(self, *args, **kwargs):
+        super(TestPsiRpcServerMatlab, self).__init__(*args, **kwargs)
+        self.matlab = True
+        self._inst_args = [self.name, self.fmt_str_matlab, self.fmt_str_matlab]
+
+
 class TestPsiAsciiFileInput(TestBase):
     r"""Test input from an unformatted text file."""
     def __init__(self, *args, **kwargs):
@@ -441,6 +527,14 @@ class TestPsiAsciiTableOutput(TestPsiAsciiFileOutput):
             nt.assert_equal(res, self.file_contents)
         
             
+class TestPsiAsciiTableOutputMatlab(TestPsiAsciiTableOutput):
+    r"""Test output from an ascii table as passed through Matlab."""
+    def __init__(self, *args, **kwargs):
+        super(TestPsiAsciiTableOutputMatlab, self).__init__(*args, **kwargs)
+        self.matlab = True
+        self._inst_args = [self.name, self.fmt_str_matlab]
+
+
 class TestPsiAsciiTableOutput_local(TestPsiAsciiTableOutput):
     r"""Test input from an ASCII table."""
     def __init__(self, *args, **kwargs):
