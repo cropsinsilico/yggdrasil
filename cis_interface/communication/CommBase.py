@@ -242,7 +242,7 @@ class CommBase(CisClass):
 
         """
         msg_s = self.meth_serialize(msg)
-        if not isinstance(msg_s, backwards.bytes_type):
+        if not isinstance(msg_s, backwards.bytes_type):  # pragma: debug
             raise TypeError("Serialize method did not yield bytes type.")
         return msg_s
 
@@ -259,7 +259,7 @@ class CommBase(CisClass):
             TypeError: If msg is not bytes type.
 
         """
-        if not isinstance(msg, backwards.bytes_type):
+        if not isinstance(msg, backwards.bytes_type):  # pragma: debug
             raise TypeError("Deserialize method expects bytes type.")
         return self.meth_deserialize(msg)
 
@@ -278,12 +278,15 @@ class CommBase(CisClass):
                     recv_timeout=self.recv_timeout,
                     single_use=True)
 
-    def get_work_comm(self, header, **kwargs):
+    def get_work_comm(self, header, work_comm_name=None, **kwargs):
         r"""Get temporary work comm, creating as necessary.
 
         Args:
             header (dict): Information that will be sent in the message header
                 to the work comm.
+            work_comm_name (str, optional): Name that should be used for the
+                work comm. If not provided, one is created from the header id
+                and the comm class.
             **kwargs: Additional keyword arguments are passed to get_comm.
 
         Returns:
@@ -295,18 +298,22 @@ class CommBase(CisClass):
             return c
         kws = self.get_work_comm_kwargs
         kws.update(**kwargs)
-        cls = kws.get("comm", _default_comm)
-        c = get_comm('temp_recv_%s.%s' % (cls, header['id']),
-                     address=header['address'],
-                     **kws)
+        if work_comm_name is None:
+            cls = kws.get("comm", _default_comm)
+            work_comm_name = 'temp_%s_%s.%s' % (
+                cls, kws['direction'], header['id'])
+        c = get_comm(work_comm_name, address=header['address'], **kws)
         self.add_work_comm(header['id'], c)
         return c
 
-    def create_work_comm(self, header, **kwargs):
+    def create_work_comm(self, header, work_comm_name=None, **kwargs):
         r"""Create a temporary work comm.
 
         Args:
             header (dict): Info that should be sent with message.
+            work_comm_name (str, optional): Name that should be used for the
+                work comm. If not provided, one is created from the header id
+                and the comm class.
             **kwargs: Keyword arguments for new_comm that should override
                 work_comm_kwargs.
 
@@ -316,8 +323,11 @@ class CommBase(CisClass):
         """
         kws = self.create_work_comm_kwargs
         kws.update(**kwargs)
-        cls = kws.get("comm", _default_comm)
-        c = new_comm('temp_send_%s.%s' % (cls, header['id']), **kws)
+        if work_comm_name is None:
+            cls = kws.get("comm", _default_comm)
+            work_comm_name = 'temp_%s_%s.%s' % (
+                cls, kws['direction'], header['id'])
+        c = new_comm(work_comm_name, **kws)
         self.add_work_comm(header['id'], c)
         return c
 
@@ -413,7 +423,7 @@ class CommBase(CisClass):
     # SEND METHODS
     def _send(self, msg, *args, **kwargs):
         r"""Raw send. Should be overridden by inheriting class."""
-        return False
+        raise NotImplementedError("_send method needs implemented.")
 
     def _send_multipart(self, msg, **kwargs):
         r"""Send a message larger than maxMsgSize in multiple parts.
@@ -510,8 +520,8 @@ class CommBase(CisClass):
             raise RuntimeError("This comm is single use and it was already used.")
         try:
             self.debug('.send(): %d bytes', len(msg_s))
-            ret = self.send_multipart(msg_s, **kwargs)
             self._used = True
+            ret = self.send_multipart(msg_s, **kwargs)
             self.debug('.send(): %d bytes sent', len(msg_s))
         except BaseException:
             print(args, kwargs)
@@ -594,7 +604,7 @@ class CommBase(CisClass):
     # RECV METHODS
     def _recv(self, *args, **kwargs):
         r"""Raw recv. Should be overridden by inheriting class."""
-        return (False, None)
+        raise NotImplementedError("_recv method needs implemented.")
 
     def _recv_multipart(self, leng_exp, **kwargs):
         r"""Receive a message larger than CIS_MSG_MAX that is sent in multiple
@@ -688,11 +698,11 @@ class CommBase(CisClass):
                 message.
 
         """
+        if self.single_use and self._used:
+            raise RuntimeError("This comm is single use and it was already used.")
         if self.is_closed:
             self.debug('.recv(): comm closed.')
             return (False, None)
-        if self.single_use and self._used:
-            raise RuntimeError("This comm is single use and it was already used.")
         try:
             flag, s_msg = self.recv_multipart(*args, **kwargs)
             if flag and len(s_msg) > 0:

@@ -18,6 +18,10 @@ class TestClientComm(test_CommBase.TestCommBase):
         r"""Disabled test of error on incorrect direction."""
         pass
     
+    def test_work_comm(self):
+        r"""Disabled test creating/removing a work comm."""
+        pass
+        
     def test_eof(self):
         r"""Test send/recv of EOF message."""
         # Forwards

@@ -1,4 +1,5 @@
 import nose.tools as nt
+import os
 # from cis_interface.tools import CisClass
 from cis_interface.tests import CisTest, IOInfo
 from cis_interface.communication import new_comm, get_comm_class
@@ -70,6 +71,11 @@ class TestCommBase(CisTest, IOInfo):
             cls = get_comm_class(x)
             out += cls.comm_count()
         return out
+
+    @property
+    def test_msg(self):
+        r"""str: Test message that should be used for any send/recv tests."""
+        return self.msg_short
         
     def setup(self, *args, **kwargs):
         r"""Initialize comm object pair."""
@@ -114,6 +120,37 @@ class TestCommBase(CisTest, IOInfo):
         r"""Test getting keyword arguments for the opposite comm."""
         self.instance.opp_comm_kwargs()
 
+    def test_work_comm(self):
+        r"""Test creating/removing a work comm."""
+        header_send = dict(id=self.uuid + '0')
+        wc_send = self.instance.create_work_comm(header_send)
+        nt.assert_raises(KeyError, self.instance.add_work_comm,
+                         header_send['id'], wc_send)
+        # Create recv instance in way that tests new_comm
+        header_recv = dict(id=self.uuid + '1', address=wc_send.address)
+        recv_kwargs = self.instance.get_work_comm_kwargs
+        recv_kwargs['work_comm_name'] = 'test_worker_%s' % header_recv['id']
+        recv_kwargs['new_comm_class'] = wc_send.comm_class
+        os.environ[recv_kwargs['work_comm_name']] = wc_send.opp_address
+        wc_recv = self.instance.create_work_comm(header_recv, **recv_kwargs)
+        # wc_recv = self.instance.get_work_comm(header_recv)
+        if self.comm == 'CommBase':
+            flag = wc_send.send(self.test_msg)
+            assert(not flag)
+            flag, msg_recv = wc_recv.recv()
+            assert(not flag)
+        else:
+            flag = wc_send.send(self.test_msg)
+            assert(flag)
+            flag, msg_recv = wc_recv.recv(self.timeout)
+            assert(flag)
+            nt.assert_equal(msg_recv, self.test_msg)
+            # Assert errors on second attempt
+            nt.assert_raises(RuntimeError, wc_send.send, self.test_msg)
+            nt.assert_raises(RuntimeError, wc_recv.recv)
+        self.instance.remove_work_comm(header_send['id'])
+        self.instance.remove_work_comm(header_recv['id'])
+
     def test_eof(self):
         r"""Test send/recv of EOF message."""
         if self.comm != 'CommBase':
@@ -134,31 +171,21 @@ class TestCommBase(CisTest, IOInfo):
             nt.assert_equal(msg_recv, self.send_instance.eof_msg)
             assert(self.recv_instance.is_closed)
 
-    def test_send_recv(self):
-        r"""Test send/recv of a small message."""
+    def do_send_recv(self, send_meth='send', recv_meth='recv', msg_send=None):
+        r"""Generic send/recv of a message."""
+        if msg_send is None:
+            msg_send = self.test_msg
         nt.assert_equal(self.send_instance.n_msg, 0)
         nt.assert_equal(self.recv_instance.n_msg, 0)
-        if self.comm != 'CommBase':
-            flag = self.send_instance.send(self.msg_short)
-            assert(flag)
-            T = self.recv_instance.start_timeout()
-            while (not T.is_out) and (self.recv_instance.n_msg == 0):
-                self.recv_instance.sleep()
-            self.recv_instance.stop_timeout()
-            nt.assert_equal(self.recv_instance.n_msg, 1)
-            flag, msg_recv = self.recv_instance.recv()
-            assert(flag)
-            nt.assert_equal(msg_recv, self.msg_short)
-        nt.assert_equal(self.send_instance.n_msg, 0)
-        nt.assert_equal(self.recv_instance.n_msg, 0)
-
-    def test_send_recv_nolimit(self):
-        r"""Test send/recv of a large message."""
-        nt.assert_equal(self.send_instance.n_msg, 0)
-        nt.assert_equal(self.recv_instance.n_msg, 0)
-        if self.comm != 'CommBase':
-            assert(len(self.msg_long) > self.maxMsgSize)
-            flag = self.send_instance.send_nolimit(self.msg_long)
+        fsend_meth = getattr(self.send_instance, send_meth)
+        frecv_meth = getattr(self.recv_instance, recv_meth)
+        if self.comm == 'CommBase':
+            flag = fsend_meth(msg_send)
+            assert(not flag)
+            flag, msg_recv = frecv_meth()
+            assert(not flag)
+        else:
+            flag = fsend_meth(msg_send)
             assert(flag)
             T = self.recv_instance.start_timeout()
             while (not T.is_out) and (self.recv_instance.n_msg == 0):
@@ -167,29 +194,33 @@ class TestCommBase(CisTest, IOInfo):
             assert(self.recv_instance.n_msg >= 1)
             # IPC nolimit sends multiple messages
             # nt.assert_equal(self.recv_instance.n_msg, 1)
-            flag, msg_recv = self.recv_instance.recv_nolimit()
+            flag, msg_recv = frecv_meth()
             assert(flag)
-            nt.assert_equal(msg_recv, self.msg_long)
+            nt.assert_equal(msg_recv, msg_send)
         nt.assert_equal(self.send_instance.n_msg, 0)
         nt.assert_equal(self.recv_instance.n_msg, 0)
 
+    def test_send_recv(self):
+        r"""Test send/recv of a small message."""
+        self.do_send_recv()
+
+    def test_send_recv_nolimit(self):
+        r"""Test send/recv of a large message."""
+        if self.comm != 'AsciiTableComm':
+            assert(len(self.msg_long) > self.maxMsgSize)
+        self.do_send_recv('send_nolimit', 'recv_nolimit', self.msg_long)
+
+    def test_send_recv_line(self):
+        r"""Test send/recv of a line message."""
+        self.do_send_recv('send_line', 'recv_line')
+        
+    def test_send_recv_row(self):
+        r"""Test send/recv of a row message."""
+        self.do_send_recv('send_row', 'recv_row')
+        
     def test_send_recv_array(self):
         r"""Test send/recv of a array message."""
-        nt.assert_equal(self.send_instance.n_msg, 0)
-        nt.assert_equal(self.recv_instance.n_msg, 0)
-        if self.comm != 'CommBase':
-            flag = self.send_instance.send_array(self.msg_short)
-            assert(flag)
-            T = self.recv_instance.start_timeout()
-            while (not T.is_out) and (self.recv_instance.n_msg == 0):
-                self.recv_instance.sleep()
-            self.recv_instance.stop_timeout()
-            nt.assert_equal(self.recv_instance.n_msg, 1)
-            flag, msg_recv = self.recv_instance.recv_array()
-            assert(flag)
-            nt.assert_equal(msg_recv, self.msg_short)
-        nt.assert_equal(self.send_instance.n_msg, 0)
-        nt.assert_equal(self.recv_instance.n_msg, 0)
+        self.do_send_recv('send_array', 'recv_array')
 
     def test_purge(self):
         r"""Test purging messages from the comm."""

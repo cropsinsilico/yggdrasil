@@ -21,6 +21,10 @@ class TestFileComm(parent.TestCommBase):
         kwargs['read_meth'] = 'invalid'
         nt.assert_raises(ValueError, new_comm, self.name, **kwargs)
 
+    def test_work_comm(self):
+        r"""Disabled test creating/removing a work comm."""
+        pass
+        
     def test_remaining_bytes(self):
         r"""Test remaining_bytes."""
         nt.assert_equal(self.send_instance.remaining_bytes, 0)
