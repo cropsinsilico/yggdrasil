@@ -83,7 +83,10 @@ class TestCommBase(CisTest, IOInfo):
         self.send_instance = new_comm(self.name, **self.send_inst_kwargs)
         super(TestCommBase, self).setup(*args, **kwargs)
         # CommBase is dummy class that never opens
-        if self.comm != 'CommBase':
+        if self.comm == 'CommBase':
+            assert(not self.send_instance.is_open)
+            assert(not self.recv_instance.is_open)
+        else:
             assert(self.send_instance.is_open)
             assert(self.recv_instance.is_open)
 
@@ -103,6 +106,22 @@ class TestCommBase(CisTest, IOInfo):
         inst.close()
         assert(inst.is_closed)
         super(TestCommBase, self).remove_instance(inst)
+
+    def test_double_open(self):
+        r"""Test that opening twice dosn't cause errors."""
+        self.send_instance.open()
+        self.recv_instance.open()
+
+    def test_send_recv_after_close(self):
+        r"""Test that send/recv after close returns false."""
+        self.send_instance.close()
+        self.recv_instance.close()
+        assert(self.send_instance.is_closed)
+        assert(self.recv_instance.is_closed)
+        flag = self.send_instance.send(self.msg_short)
+        assert(not flag)
+        flag, msg_recv = self.recv_instance.recv()
+        assert(not flag)
 
     def test_attributes(self):
         r"""Assert that the instance has all of the required attributes."""

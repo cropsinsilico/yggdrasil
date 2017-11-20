@@ -105,16 +105,14 @@ class RMQComm(CommBase.CommBase):
             #     host = socket.gethostname()
             if virtual_host is None:
                 virtual_host = cis_cfg.get('rmq', 'vhost', '/')
+            if virtual_host == '/':
+                virtual_host = '%2f'
             if port is None:
                 port = cis_cfg.get('rmq', 'port', '5672')
-            if virtual_host == '/':
-                vhost = '%2f'
-            else:
-                vhost = virtual_host
             if exchange is None:
                 exchange = cis_cfg.get('rmq', 'namespace', '')
             url = 'amqp://%s:%s@%s:%s/%s' % (
-                user, password, host, port, vhost)
+                user, password, host, port, virtual_host)
             kwargs['address'] = _rmq_param_sep.join([url, exchange, queue])
         return args, kwargs
 
@@ -229,12 +227,12 @@ class RMQComm(CommBase.CommBase):
         if self.channel is None or self.connection is None:
             return False
         if self.connection.is_open:
-            if self.connection.is_closing:
+            if self.connection.is_closing:  # pragma: debug
                 return False
-        else:
+        else:  # pragma: debug
             return False
         if self.channel.is_open:
-            if self.channel.is_closing:
+            if self.channel.is_closing:  # pragma: debug
                 return False
         else:
             return False
@@ -313,9 +311,6 @@ class RMQComm(CommBase.CommBase):
             bool: Success or failure of send.
 
         """
-        if self.is_closed:
-            self.error(".send(): Connection closed.")
-            return False
         if exchange is None:
             exchange = self.exchange
         if routing_key is None:

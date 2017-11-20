@@ -439,6 +439,9 @@ class CommBase(CisClass):
         nsent = 0
         ret = True
         for imsg in self.chunk_message(msg):
+            if self.is_closed:
+                self.error("._send_multipart(): Connection closed.")
+                return False
             ret = self._send(imsg, **kwargs)
             if not ret:  # pragma: debug
                 self.debug(
@@ -551,6 +554,9 @@ class CommBase(CisClass):
         """
         if (not send_header) and ((len(msg) < self.maxMsgSize) or
                                   (self.maxMsgSize == 0)):
+            if self.is_closed:
+                self.error(".send_multipart(): Connection closed.")
+                return False
             ret = self._send(msg, **kwargs)
         else:
             if header_kwargs is None:
@@ -577,6 +583,9 @@ class CommBase(CisClass):
 
         """
         header_msg = self.format_header(header)
+        if self.is_closed:
+            self.error(".send_header(): Connection closed.")
+            return False
         out = self._send(header_msg, **kwargs)
         return out
 
