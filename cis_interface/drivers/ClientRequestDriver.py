@@ -79,15 +79,25 @@ class ClientRequestDriver(ConnectionDriver):
         self._block_response = False
 
     @property
+    def last_header(self):
+        r"""dict: Information contained in the header of the last message
+        received from the client model."""
+        if self.icomm._last_header is None:
+            raise AttributeError("No new requests have been received, so there " +
+                                 "does not yet exist information required for " +
+                                 "sending a response.")
+        return self.icomm._last_header
+
+    @property
     def request_id(self):
         r"""str: Unique ID for the last message."""
-        return self.icomm._last_header['id']
+        return self.last_header['id']
 
     @property
     def model_response_address(self):
         r"""str: The address of the channel used by the client model to receive
         responses."""
-        return self.icomm._last_header['response_address']
+        return self.last_header['response_address']
 
     @property
     def request_name(self):
@@ -164,7 +174,7 @@ class ClientRequestDriver(ConnectionDriver):
                     response_driver = ClientResponseDriver(*drv_args, **drv_kwargs)
                     self.response_drivers.append(response_driver)
                     response_driver.start()
-                except BaseException:
+                except BaseException:  # pragma: debug
                     self.exception("Could not create/start response driver.")
                     return False
             # Send response address in header

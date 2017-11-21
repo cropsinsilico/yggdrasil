@@ -11,7 +11,8 @@ class TestClientParam(parent.TestConnectionParam):
         super(TestClientParam, self).__init__(*args, **kwargs)
         self.driver = 'ClientDriver'
         self.args = None
-        self.attr_list += ['comm', 'response_drivers']
+        self.attr_list += ['comm', 'response_drivers',
+                           'request_name', 'request_address']
         self.sleeptime = 0.5
         self.timeout = 10.0
         self.comm_name = _default_comm
@@ -74,8 +75,13 @@ class TestClientParam(parent.TestConnectionParam):
 class TestClientDriverNoStart(TestClientParam,
                               parent.TestConnectionDriverNoStart):
     r"""Test class for ClientDriver class without start."""
-    pass
 
+    def test_error_attributes(self):
+        r"""Test error raised when trying to access attributes set on recv."""
+        err_attr = ['request_id', 'model_response_address']
+        for k in err_attr:
+            nt.assert_raises(AttributeError, getattr, self.instance, k)
+            
 
 class TestClientDriver(TestClientParam, parent.TestConnectionDriver):
     r"""Test class for ClientDriver class."""
