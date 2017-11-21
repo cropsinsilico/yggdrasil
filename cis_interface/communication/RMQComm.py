@@ -235,7 +235,7 @@ class RMQComm(CommBase.CommBase):
         if self.channel.is_open:
             if self.channel.is_closing:  # pragma: debug
                 return False
-        else:
+        else:  # pragma: debug
             return False
         return self._is_open
         
@@ -319,7 +319,7 @@ class RMQComm(CommBase.CommBase):
         try:
             kwargs.setdefault('mandatory', True)
             out = self.channel.basic_publish(exchange, routing_key, msg, **kwargs)
-        except pika.exceptions.AMQPError:
+        except pika.exceptions.AMQPError:  # pragma: debug
             self.exception(".send(): Error")
             raise
         return out
@@ -353,7 +353,7 @@ class RMQComm(CommBase.CommBase):
             else:
                 self.debug(".recv(): No message")
                 msg = backwards.unicode2bytes('')
-        except pika.exceptions.AMQPError:
+        except pika.exceptions.AMQPError:  # pragma: debug
             self.exception(".recv(): Error")
             raise
         return (True, msg)
