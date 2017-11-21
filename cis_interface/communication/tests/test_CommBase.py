@@ -217,14 +217,21 @@ class TestCommBase(CisTest, IOInfo):
             nt.assert_equal(msg_recv, self.send_instance.eof_msg)
             assert(self.recv_instance.is_closed)
 
-    def do_send_recv(self, send_meth='send', recv_meth='recv', msg_send=None):
+    def do_send_recv(self, send_meth='send', recv_meth='recv', msg_send=None,
+                     reverse_comms=False):
         r"""Generic send/recv of a message."""
         if msg_send is None:
             msg_send = self.test_msg
         nt.assert_equal(self.send_instance.n_msg, 0)
         nt.assert_equal(self.recv_instance.n_msg, 0)
-        fsend_meth = getattr(self.send_instance, send_meth)
-        frecv_meth = getattr(self.recv_instance, recv_meth)
+        if reverse_comms:
+            send_instance = self.recv_instance
+            recv_instance = self.send_instance
+        else:
+            send_instance = self.send_instance
+            recv_instance = self.recv_instance
+        fsend_meth = getattr(send_instance, send_meth)
+        frecv_meth = getattr(recv_instance, recv_meth)
         if self.comm == 'CommBase':
             flag = fsend_meth(msg_send)
             assert(not flag)
@@ -233,13 +240,13 @@ class TestCommBase(CisTest, IOInfo):
         else:
             flag = fsend_meth(msg_send)
             assert(flag)
-            T = self.recv_instance.start_timeout()
-            while (not T.is_out) and (self.recv_instance.n_msg == 0):
-                self.recv_instance.sleep()
-            self.recv_instance.stop_timeout()
-            assert(self.recv_instance.n_msg >= 1)
+            T = recv_instance.start_timeout()
+            while (not T.is_out) and (recv_instance.n_msg == 0):
+                recv_instance.sleep()
+            recv_instance.stop_timeout()
+            assert(recv_instance.n_msg >= 1)
             # IPC nolimit sends multiple messages
-            # nt.assert_equal(self.recv_instance.n_msg, 1)
+            # nt.assert_equal(recv_instance.n_msg, 1)
             flag, msg_recv = frecv_meth()
             assert(flag)
             nt.assert_equal(msg_recv, msg_send)

@@ -327,7 +327,7 @@ class ZMQComm(CommBase.CommBase):
             if self.socket_type_name == 'ROUTER':
                 self.socket.send(identity, zmq.SNDMORE)
             self.socket.send(total_msg, **kwargs)
-        except zmq.ZMQError:
+        except zmq.ZMQError:  # pragma: debug
             self.exception(".send(): Error")
             return False
         return True
