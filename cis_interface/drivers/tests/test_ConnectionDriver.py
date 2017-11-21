@@ -23,6 +23,7 @@ class TestConnectionParam(parent.TestParam, IOInfo):
         self.timeout = 1.0
         self.icomm_name = self.comm_name
         self.ocomm_name = self.comm_name
+        self._extra_instances = []
     
     @property
     def send_comm_kwargs(self):
@@ -112,28 +113,35 @@ class TestConnectionDriverNoStart(TestConnectionParam, parent.TestDriverNoStart)
         assert(not flag)
         nt.assert_equal(ret, None)
 
-    def test_error_init_ocomm(self):
-        r"""Test forwarding of error from init of ocomm."""
+    def get_fresh_error_instance(self, comm, error_on_init=False, **kwargs):
+        r"""Get a driver instance with ErrorComm class for one or both comms."""
         args = self.inst_args
         kwargs = self.inst_kwargs
         if 'comm_address' in kwargs:
             del kwargs['comm_address']
-        kwargs['ocomm_kws'].update(
-            base_comm=self.ocomm_name, new_comm_class='ErrorComm',
-            error_on_init=True)
+        if comm in ['ocomm', 'both']:
+            kwargs['ocomm_kws'].update(
+                base_comm=self.ocomm_name, new_comm_class='ErrorComm',
+                error_on_init=error_on_init, **kwargs)
+        if comm in ['icomm', 'both']:
+            kwargs['icomm_kws'].update(
+                base_comm=self.icomm_name, new_comm_class='ErrorComm',
+                error_on_init=error_on_init, **kwargs)
         driver_class = import_driver(self.driver)
-        nt.assert_raises(MagicTestError, driver_class, *args, **kwargs)
+        if error_on_init:
+            nt.assert_raises(MagicTestError, driver_class, *args, **kwargs)
+        else:
+            inst = driver_class(*args, **kwargs)
+            self._extra_instances.append(inst)
+            return inst
+
+    def test_error_init_ocomm(self):
+        r"""Test forwarding of error from init of ocomm."""
+        self.get_fresh_error_instance('ocomm', error_on_init=True)
 
     def test_error_open_icomm(self):
         r"""Test fowarding of error from open of icomm."""
-        args = self.inst_args
-        kwargs = self.inst_kwargs
-        if 'comm_address' in kwargs:
-            del kwargs['comm_address']
-        kwargs['icomm_kws'].update(
-            base_comm=self.icomm_name, new_comm_class='ErrorComm')
-        driver_class = import_driver(self.driver)
-        inst = driver_class(*args, **kwargs)
+        inst = self.get_fresh_error_instance('icomm')
         inst.icomm.error_replace('open')
         nt.assert_raises(MagicTestError, inst.open_comm)
         assert(inst.icomm.is_closed)
@@ -141,14 +149,7 @@ class TestConnectionDriverNoStart(TestConnectionParam, parent.TestDriverNoStart)
 
     def test_error_close_icomm(self):
         r"""Test forwarding of error from close of icomm."""
-        args = self.inst_args
-        kwargs = self.inst_kwargs
-        if 'comm_address' in kwargs:
-            del kwargs['comm_address']
-        kwargs['icomm_kws'].update(
-            base_comm=self.icomm_name, new_comm_class='ErrorComm')
-        driver_class = import_driver(self.driver)
-        inst = driver_class(*args, **kwargs)
+        inst = self.get_fresh_error_instance('icomm')
         inst.open_comm()
         inst.icomm.error_replace('close')
         nt.assert_raises(MagicTestError, inst.close_comm)
@@ -159,14 +160,7 @@ class TestConnectionDriverNoStart(TestConnectionParam, parent.TestDriverNoStart)
         
     def test_error_close_ocomm(self):
         r"""Test forwarding of error from close of ocomm."""
-        args = self.inst_args
-        kwargs = self.inst_kwargs
-        if 'comm_address' in kwargs:
-            del kwargs['comm_address']
-        kwargs['ocomm_kws'].update(
-            base_comm=self.ocomm_name, new_comm_class='ErrorComm')
-        driver_class = import_driver(self.driver)
-        inst = driver_class(*args, **kwargs)
+        inst = self.get_fresh_error_instance('ocomm')
         inst.open_comm()
         inst.ocomm.error_replace('close')
         nt.assert_raises(MagicTestError, inst.close_comm)
@@ -177,16 +171,7 @@ class TestConnectionDriverNoStart(TestConnectionParam, parent.TestDriverNoStart)
 
     def test_error_open_fails(self):
         r"""Test error raised when comms fail to open."""
-        args = self.inst_args
-        kwargs = self.inst_kwargs
-        if 'comm_address' in kwargs:
-            del kwargs['comm_address']
-        kwargs['icomm_kws'].update(
-            base_comm=self.icomm_name, new_comm_class='ErrorComm')
-        kwargs['ocomm_kws'].update(
-            base_comm=self.ocomm_name, new_comm_class='ErrorComm')
-        driver_class = import_driver(self.driver)
-        inst = driver_class(*args, **kwargs)
+        inst = self.get_fresh_error_instance('both')
         old_timeout = inst.timeout
         inst.icomm.empty_replace('open')
         inst.ocomm.empty_replace('open')

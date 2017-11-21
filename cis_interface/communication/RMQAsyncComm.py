@@ -115,11 +115,14 @@ class RMQAsyncComm(RMQComm):
         self.stop_timeout(key=self.timeout_key + '_closing')
         if self._closing:  # pragma: debug
             self.force_close()
-        if self.thread is not None:
+        try:
             self.thread.join(self.timeout)
             if self.thread.isAlive():  # pragma: debug
                 raise RuntimeError("Thread still running.")
-            self.thread = None
+        except AttributeError:  # pragma: debug
+            if self.thread is not None:
+                raise
+        self.thread = None
         # Close workers
         with self.lock:
             super(RMQAsyncComm, self).close()

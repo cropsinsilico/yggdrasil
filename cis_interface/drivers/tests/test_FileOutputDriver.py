@@ -23,6 +23,12 @@ class TestFileOutputParam(parent.TestConnectionParam):
         r"""Keyword arguments for receive comm."""
         return {'comm': 'CommBase'}
         
+    def teardown(self):
+        r"""Remove the instance, stoppping it."""
+        super(TestFileOutputParam, self).teardown()
+        if os.path.isfile(self.filepath):
+            os.remove(self.filepath)
+
 
 class TestFileOutputDriverNoStart(TestFileOutputParam,
                                   parent.TestConnectionDriverNoStart):

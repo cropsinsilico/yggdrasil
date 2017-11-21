@@ -343,8 +343,6 @@ def ErrorClass(base_class, *args, **kwargs):
             if error_on_init:
                 self.error_method()
             self._replaced_methods = dict()
-            self._replaced_method = None
-            self.error_location = None
             super(ErrorClass, self).__init__(*args, **kwargs)
 
         def empty_method(self, *args, **kwargs):
@@ -355,14 +353,28 @@ def ErrorClass(base_class, *args, **kwargs):
             r"""Method that will raise a MagicTestError."""
             raise MagicTestError("This is a test error.")
 
+        def getattr(self, attr):
+            r"""Get the underlying object for an attribute name."""
+            for obj in [self] + self.__class__.mro():
+                if attr in obj.__dict__:
+                    return obj.__dict__[attr]
+            raise AttributeError
+
+        def setattr(self, attr, value):
+            r"""Set the attribute at the class level."""
+            setattr(self.__class__, attr, value)
+
         def replace_method(self, method_name, replacement):
             r"""Temporarily replace method with another."""
-            self._replaced_methods[method_name] = getattr(self, method_name)
-            setattr(self, method_name, replacement)
-
+            self._replaced_methods[method_name] = self.getattr(method_name)
+            if isinstance(self._replaced_methods[method_name], property):
+                self.setattr(method_name, property(replacement))
+            else:
+                self.setattr(method_name, replacement)
+                
         def restore_method(self, method_name):
             r"""Restore the original method."""
-            setattr(self, method_name, self._replaced_methods.pop(method_name))
+            self.setattr(method_name, self._replaced_methods.pop(method_name))
 
         def restore_all(self):
             r"""Restored all replaced methods."""
@@ -370,13 +382,13 @@ def ErrorClass(base_class, *args, **kwargs):
             for k in meth_list:
                 self.restore_method(k)
 
-        def empty_replace(self, method_name):
+        def empty_replace(self, method_name, **kwargs):
             r"""Replace a method with an empty method."""
-            self.replace_method(method_name, self.empty_method)
+            self.replace_method(method_name, self.empty_method, **kwargs)
 
-        def error_replace(self, method_name):
+        def error_replace(self, method_name, **kwargs):
             r"""Replace a method with an errored method."""
-            self.replace_method(method_name, self.error_method)
+            self.replace_method(method_name, self.error_method, **kwargs)
 
     return ErrorClass(*args, **kwargs)
 

@@ -1,7 +1,9 @@
 import nose.tools as nt
-from cis_interface.tests import IOInfo
+from cis_interface.tests import IOInfo, MagicTestError
+from cis_interface.drivers import import_driver
 from cis_interface.drivers.tests import test_Driver as parent
-from cis_interface.communication import get_comm_class, new_comm, _default_comm
+from cis_interface.communication import (
+    get_comm_class, new_comm, _default_comm)
 
             
 class TestCommParam(parent.TestParam, IOInfo):
@@ -19,6 +21,7 @@ class TestCommParam(parent.TestParam, IOInfo):
         self.attr_list += ['state', 'numSent', 'numReceived', 'comm_name',
                            'comm']
         self.timeout = 1.0
+        self._extra_instances = []
     
     @property
     def send_comm(self):
@@ -50,7 +53,9 @@ class TestCommParam(parent.TestParam, IOInfo):
     def inst_kwargs(self):
         r"""dict: Keyword arguments for tested class."""
         out = super(TestCommParam, self).inst_kwargs
-        del out['namespace'], out['yml']
+        for k in ['namespace', 'yml']:
+            if k in out:
+                del out[k]
         if 'Input' in self.driver:
             out.update(**self.send_comm_kwargs)
         else:
@@ -105,21 +110,57 @@ class TestCommDriverNoStart(TestCommParam, parent.TestDriverNoStart):
 
     def test_send_recv(self):
         r"""Test sending/receiving with queues closed."""
-        self.instance.close_comm()
+        self.send_comm.close()
+        self.recv_comm.close()
+        # self.instance.close_comm()
         assert(not self.instance.is_comm_open)
         # Short
-        flag = self.send_comm.send(self.msg_short)
-        # assert(not flag)  # Send comm open
+        flag = self.instance.send(self.msg_short)
+        assert(not flag)
         flag, ret = self.instance.recv()
         assert(not flag)
         nt.assert_equal(ret, None)
         # Long
-        flag = self.send_comm.send_nolimit(self.msg_short)
-        # assert(not flag)  # Send comm open
+        flag = self.instance.send_nolimit(self.msg_short)
+        assert(not flag)
         flag, ret = self.instance.recv_nolimit()
         assert(not flag)
         nt.assert_equal(ret, None)
 
+    def get_fresh_error_instance(self, **kwargs):
+        r"""Get CommDriver instance with an ErrorComm parent class."""
+        args = self.inst_args
+        kwargs = self.inst_kwargs
+        if 'address' in kwargs:
+            del kwargs['address']
+        kwargs.update(
+            base_comm=self.comm_name, new_comm_class='ErrorComm', **kwargs)
+        driver_class = import_driver(self.driver)
+        inst = driver_class(*args, **kwargs)
+        self._extra_instances.append(inst)
+        return inst
+
+    def test_error_open_fails(self):
+        r"""Test error raised when comm fails to open."""
+        inst = self.get_fresh_error_instance()
+        old_timeout = inst.timeout
+        inst.comm.empty_replace('open')
+        inst.timeout = inst.sleeptime / 2.0
+        nt.assert_raises(Exception, inst.start)
+        inst.comm.restore_all()
+        inst.timeout = old_timeout
+        inst.close_comm()
+        assert(inst.is_comm_closed)
+
+    def test_error_on_graceful_stop(self):
+        r"""Test error raised during graceful stop."""
+        inst = self.get_fresh_error_instance()
+        inst.comm.error_replace('n_msg')
+        nt.assert_raises(MagicTestError, inst.stop)
+        inst.comm.restore_all()
+        inst.close_comm()
+        assert(inst.is_comm_closed)
+        
 
 class TestCommDriver(TestCommParam, parent.TestDriver):
     r"""Test class for the CommDriver class.
@@ -174,9 +215,22 @@ class TestCommDriver(TestCommParam, parent.TestDriver):
 
     def run_before_terminate(self):
         r"""Commands to run while the instance is running, before terminate."""
+        super(TestCommDriver, self).run_before_terminate()
         self.send_comm.send(self.msg_short)
 
+    def run_before_stop(self):
+        r"""Commands to run while the instance is running."""
+        super(TestCommDriver, self).run_before_stop()
+        self.send_comm.send(self.msg_short)
+        self._old_timeout = self.instance.timeout
+        self.instance.timeout = self.instance.sleeptime
+        
     def assert_after_terminate(self):
         r"""Assertions to make after terminating the driver instance."""
         super(TestCommDriver, self).assert_after_terminate()
         assert(self.instance.is_comm_closed)
+
+    def assert_after_stop(self):
+        r"""Assertions to make after stopping the driver instance."""
+        super(TestCommDriver, self).assert_after_stop()
+        self.instance.timeout = self._old_timeout
