@@ -2,10 +2,10 @@ import nose.tools as nt
 from cis_interface.communication.tests import test_CommBase
 
 
-class TestClientComm(test_CommBase.TestCommBase):
-    r"""Tests for ClientComm communication class."""
+class TestServerComm(test_CommBase.TestCommBase):
+    r"""Tests for ServerComm communication class."""
     def __init__(self, *args, **kwargs):
-        super(TestClientComm, self).__init__(*args, **kwargs)
+        super(TestServerComm, self).__init__(*args, **kwargs)
         self.comm = 'ServerComm'
         self.attr_list += ['response_kwargs', 'icomm', 'ocomm']
 
