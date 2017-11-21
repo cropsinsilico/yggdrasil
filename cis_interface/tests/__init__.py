@@ -224,6 +224,22 @@ class IOInfo(object):
                 'z': np.ones((3, 4), dtype=np.float64)}
         return self._data_dict
 
+    def load_mat(self, fd):
+        r"""Load mat data from an open file object.
+
+        Args:
+            fd (file): Open file object.
+
+        Returns:
+            dict: Loaded dictionary of matrices.
+
+        """
+        x = loadmat(fd)
+        mat_keys = ['__header__', '__globals__', '__version__']
+        for k in mat_keys:
+            del x[k]
+        return x
+
     def assert_equal_data_dict(self, x):
         r"""Assert that the provided object is equivalent to data_dict.
 
@@ -235,14 +251,14 @@ class IOInfo(object):
 
         """
         if isinstance(x, backwards.file_type):
-            x = pickle.load(x)
+            if x.name.endswith('.mat'):
+                x = self.load_mat(x)
+            else:
+                x = pickle.load(x)
         elif isinstance(x, str) and os.path.isfile(x):
             with open(x, 'rb') as fd:
                 if x.endswith('.mat'):
-                    x = loadmat(fd)
-                    mat_keys = ['__header__', '__globals__', '__version__']
-                    for k in mat_keys:
-                        del x[k]
+                    x = self.load_mat(fd)
                 else:
                     x = pickle.load(fd)
         elif isinstance(x, backwards.bytes_type):
