@@ -3,17 +3,28 @@ import nose.tools as nt
 from cis_interface.tests import CisTest, IOInfo
 
 
-def test_CisTest():
+class TestCisTest(CisTest):
     r"""Test errors for uninitialized CisTest."""
-    out = CisTest()
-    out.description_prefix
-    out.shortDescription()
-    nt.assert_raises(Exception, getattr, out, 'import_cls')
-    out._mod = 'drivers'
-    nt.assert_raises(Exception, getattr, out, 'import_cls')
-    out._cls = 'Driver'
-    out.teardown()
-    nt.assert_raises(RuntimeError, getattr, out, 'instance')
+
+    def create_instance(self):
+        r"""Dummy overload to prevent initialization."""
+        return None
+
+    def test_description(self):
+        r"""Get uninitialized description."""
+        self.description_prefix
+        self.shortDescription()
+
+    def test_import_cls(self):
+        r"""Test import class with mod/cls unset."""
+        nt.assert_raises(Exception, getattr, self, 'import_cls')
+        self._mod = 'drivers'
+        nt.assert_raises(Exception, getattr, self, 'import_cls')
+
+    def test_post_teardown_ref(self):
+        r"""Test errors on instance ref post teardown."""
+        self.teardown()
+        nt.assert_raises(RuntimeError, getattr, self, 'instance')
 
     
 def test_IOInfo():
