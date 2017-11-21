@@ -19,8 +19,6 @@ def test_CisTest():
 def test_IOInfo():
     r"""Test funcitonality of IOInfo."""
     out = IOInfo()
-    
-    filename = 'test_data_dict.dat'
     # Pickle version
     fname_pickle = 'test_data_dict.dat'
     with open(fname_pickle, 'wb') as fd:
