@@ -7,3 +7,9 @@ class TestRMQComm(parent.TestCommBase):
         super(TestRMQComm, self).__init__(*args, **kwargs)
         self.comm = 'RMQComm'
         self.attr_list += ['connection', 'channel']
+
+    def test_double_open(self):
+        r"""test that opening/binding twice dosn't cause errors."""
+        super(TestRMQComm, self).test_double_open()
+        self.send_instance.bind()
+        self.recv_instance.bind()

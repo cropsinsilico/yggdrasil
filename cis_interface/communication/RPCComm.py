@@ -71,7 +71,7 @@ class RPCComm(CommBase.CommBase):
         try:
             self.icomm = get_comm(icomm_name, **icomm_kwargs)
             self.ocomm = get_comm(ocomm_name, **ocomm_kwargs)
-        except BaseException as e:  # pragma: debug
+        except BaseException as e:
             self.close(skip_base=True)
             raise e
 
@@ -186,13 +186,13 @@ class RPCComm(CommBase.CommBase):
         try:
             if getattr(self, 'icomm', None) is not None:
                 self.icomm.close()
-        except BaseException as ie:  # pragma: debug
-            pass
+        except BaseException as e:
+            ie = e
         try:
             if getattr(self, 'ocomm', None) is not None:
                 self.ocomm.close()
-        except BaseException as oe:  # pragma: debug
-            pass
+        except BaseException as e:
+            oe = e
         if ie:
             raise ie
         if oe:

@@ -113,7 +113,7 @@ class TestConnectionDriverNoStart(TestConnectionParam, parent.TestDriverNoStart)
         assert(not flag)
         nt.assert_equal(ret, None)
 
-    def get_fresh_error_instance(self, comm, error_on_init=False, **kwargs):
+    def get_fresh_error_instance(self, comm, error_on_init=False):
         r"""Get a driver instance with ErrorComm class for one or both comms."""
         args = self.inst_args
         kwargs = self.inst_kwargs
@@ -122,11 +122,11 @@ class TestConnectionDriverNoStart(TestConnectionParam, parent.TestDriverNoStart)
         if comm in ['ocomm', 'both']:
             kwargs['ocomm_kws'].update(
                 base_comm=self.ocomm_name, new_comm_class='ErrorComm',
-                error_on_init=error_on_init, **kwargs)
+                error_on_init=error_on_init)
         if comm in ['icomm', 'both']:
             kwargs['icomm_kws'].update(
                 base_comm=self.icomm_name, new_comm_class='ErrorComm',
-                error_on_init=error_on_init, **kwargs)
+                error_on_init=error_on_init)
         driver_class = import_driver(self.driver)
         if error_on_init:
             nt.assert_raises(MagicTestError, driver_class, *args, **kwargs)

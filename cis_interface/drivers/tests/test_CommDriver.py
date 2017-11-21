@@ -127,14 +127,14 @@ class TestCommDriverNoStart(TestCommParam, parent.TestDriverNoStart):
         assert(not flag)
         nt.assert_equal(ret, None)
 
-    def get_fresh_error_instance(self, **kwargs):
+    def get_fresh_error_instance(self):
         r"""Get CommDriver instance with an ErrorComm parent class."""
         args = self.inst_args
         kwargs = self.inst_kwargs
         if 'address' in kwargs:
             del kwargs['address']
         kwargs.update(
-            base_comm=self.comm_name, new_comm_class='ErrorComm', **kwargs)
+            base_comm=self.comm_name, new_comm_class='ErrorComm')
         driver_class = import_driver(self.driver)
         inst = driver_class(*args, **kwargs)
         self._extra_instances.append(inst)

@@ -1,11 +1,11 @@
 import importlib
-from cis_interface import platform
+# from cis_interface import platform
 
 
-if platform._is_win:
-    _default_comm = 'ZMQComm'
-else:
-    _default_comm = 'IPCComm'
+# if platform._is_win:
+#     _default_comm = 'ZMQComm'
+# else:
+_default_comm = 'IPCComm'
 
 
 def get_comm_class(comm=None):
@@ -26,12 +26,14 @@ def get_comm_class(comm=None):
     return comm_cls
 
 
-def get_comm(name, comm=None, **kwargs):
+def get_comm(name, comm=None, new_comm_class=None, **kwargs):
     r"""Return communicator for existing comm components.
 
     Args:
         name (str): Communicator name.
         comm (str, optional): Name of communicator class.
+        new_comm_class (str, optional): Name of communicator class that will
+            override comm if set.
         **kwargs: Additional keyword arguments are passed to communicator class.
 
     Returns:
@@ -40,6 +42,8 @@ def get_comm(name, comm=None, **kwargs):
     """
     if comm is None:
         comm = _default_comm
+    if new_comm_class is not None:
+        comm = new_comm_class
     comm_cls = get_comm_class(comm)
     return comm_cls(name, **kwargs)
     
