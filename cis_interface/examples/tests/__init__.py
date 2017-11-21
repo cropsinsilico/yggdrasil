@@ -26,7 +26,7 @@ class TestExample(unittest.TestCase):
 
     def teardown(self, *args, **kwargs):
         r"""Teardown to perform after test."""
-        pass  # pragma: no cover
+        pass
 
     def shortDescription(self):
         r"""Prefix first line of doc string with driver."""
