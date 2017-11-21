@@ -9,8 +9,12 @@ class TestRPCComm(test_CommBase.TestCommBase):
         self.comm = 'RPCComm'
         self.attr_list += ['icomm', 'ocomm']
 
+    def test_error_send(self):
+        r"""Disabled: Test error on send."""
+        pass
+    
     def test_work_comm(self):
-        r"""Disabled test creating/removing a work comm."""
+        r"""Disabled: Test creating/removing a work comm."""
         pass
     
     def test_eof(self):

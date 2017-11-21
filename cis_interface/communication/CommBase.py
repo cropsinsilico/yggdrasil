@@ -421,7 +421,7 @@ class CommBase(CisClass):
         return out
 
     # SEND METHODS
-    def _send(self, msg, *args, **kwargs):
+    def _send(self, msg, *args, **kwargs):  # pragma: debug
         r"""Raw send. Should be overridden by inheriting class."""
         raise NotImplementedError("_send method needs implemented.")
 
@@ -439,7 +439,7 @@ class CommBase(CisClass):
         nsent = 0
         ret = True
         for imsg in self.chunk_message(msg):
-            if self.is_closed:
+            if self.is_closed:  # pragma: debug
                 self.error("._send_multipart(): Connection closed.")
                 return False
             ret = self._send(imsg, **kwargs)
@@ -611,7 +611,7 @@ class CommBase(CisClass):
         return self.send_eof(*args, **kwargs)
 
     # RECV METHODS
-    def _recv(self, *args, **kwargs):
+    def _recv(self, *args, **kwargs):  # pragma: debug
         r"""Raw recv. Should be overridden by inheriting class."""
         raise NotImplementedError("_recv method needs implemented.")
 

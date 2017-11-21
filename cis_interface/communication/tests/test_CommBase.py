@@ -107,6 +107,22 @@ class TestCommBase(CisTest, IOInfo):
         assert(inst.is_closed)
         super(TestCommBase, self).remove_instance(inst)
 
+    def get_fresh_error_instance(self):
+        r"""Get comm instance with ErrorClass parent class."""
+        kwargs = self.send_inst_kwargs
+        kwargs.update(base_comm=kwargs['comm'], new_comm_class='ErrorComm')
+        inst = new_comm(self.name + '_' + self.uuid, **kwargs)
+        return inst
+
+    def test_error_send(self):
+        r"""Test error on send."""
+        inst = self.get_fresh_error_instance()
+        inst.error_replace('send_multipart')
+        flag = inst.send(self.msg_short)
+        assert(not flag)
+        inst.restore_all()
+        inst.close()
+
     def test_double_open(self):
         r"""Test that opening twice dosn't cause errors."""
         self.send_instance.open()

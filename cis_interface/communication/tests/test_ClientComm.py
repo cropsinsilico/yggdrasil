@@ -14,12 +14,16 @@ class TestClientComm(test_CommBase.TestCommBase):
         r"""dict: Keyword arguments for send instance."""
         return {'comm': 'ClientComm'}
     
+    def test_error_send(self):
+        r"""Disabled: Test error on send."""
+        pass
+        
     def test_invalid_direction(self):
-        r"""Disabled test of error on incorrect direction."""
+        r"""Disabled: Test of error on incorrect direction."""
         pass
     
     def test_work_comm(self):
-        r"""Disabled test creating/removing a work comm."""
+        r"""Disabled: Test creating/removing a work comm."""
         pass
         
     def test_eof(self):
