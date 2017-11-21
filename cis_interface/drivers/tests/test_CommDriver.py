@@ -79,7 +79,7 @@ class TestCommParam(parent.TestParam, IOInfo):
     @property
     def comm_count(self):
         r"""int: Return the number of comms."""
-        return self.comm_cls.comm_count
+        return self.comm_cls.comm_count()
 
     def setup(self, *args, **kwargs):
         r"""Initialize comm object pair."""
@@ -94,7 +94,7 @@ class TestCommParam(parent.TestParam, IOInfo):
 
     def teardown(self, *args, **kwargs):
         r"""Destroy comm object pair."""
-        kwargs['ncurr_comm'] = self.comm_count
+        # kwargs['ncurr_comm'] = self.comm_count
         self.alt_comm.close()
         assert(self.alt_comm.is_closed)
         super(TestCommParam, self).teardown(*args, **kwargs)

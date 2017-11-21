@@ -100,7 +100,7 @@ class TestParam(CisTest):
                 x.sleep()
             x.stop_timeout()
             ncurr_comm = self.comm_count
-        nt.assert_equal(ncurr_comm, self.nprev_comm)
+        nt.assert_less_equal(ncurr_comm, self.nprev_comm)
 
     @property
     def name(self):
