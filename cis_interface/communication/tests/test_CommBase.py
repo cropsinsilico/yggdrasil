@@ -107,9 +107,11 @@ class TestCommBase(CisTest, IOInfo):
         assert(inst.is_closed)
         super(TestCommBase, self).remove_instance(inst)
 
-    def get_fresh_error_instance(self):
+    def get_fresh_error_instance(self, recv=False):
         r"""Get comm instance with ErrorClass parent class."""
         kwargs = self.send_inst_kwargs
+        if recv:
+            kwargs['direction'] = 'recv'
         kwargs.update(base_comm=kwargs['comm'], new_comm_class='ErrorComm')
         inst = new_comm(self.name + '_' + self.uuid, **kwargs)
         return inst
@@ -119,6 +121,15 @@ class TestCommBase(CisTest, IOInfo):
         inst = self.get_fresh_error_instance()
         inst.error_replace('send_multipart')
         flag = inst.send(self.msg_short)
+        assert(not flag)
+        inst.restore_all()
+        inst.close()
+
+    def test_error_recv(self):
+        r"""Test error on recv."""
+        inst = self.get_fresh_error_instance(recv=True)
+        inst.error_replace('recv_multipart')
+        flag, msg_recv = inst.recv()
         assert(not flag)
         inst.restore_all()
         inst.close()

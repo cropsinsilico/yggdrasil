@@ -13,6 +13,10 @@ class TestRPCComm(test_CommBase.TestCommBase):
         r"""Disabled: Test error on send."""
         pass
     
+    def test_error_recv(self):
+        r"""Disabled: Test error on recv."""
+        pass
+    
     def test_work_comm(self):
         r"""Disabled: Test creating/removing a work comm."""
         pass

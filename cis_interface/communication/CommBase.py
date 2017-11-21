@@ -554,7 +554,7 @@ class CommBase(CisClass):
         """
         if (not send_header) and ((len(msg) < self.maxMsgSize) or
                                   (self.maxMsgSize == 0)):
-            if self.is_closed:
+            if self.is_closed:  # pragma: debug
                 self.error(".send_multipart(): Connection closed.")
                 return False
             ret = self._send(msg, **kwargs)
@@ -583,7 +583,7 @@ class CommBase(CisClass):
 
         """
         header_msg = self.format_header(header)
-        if self.is_closed:
+        if self.is_closed:  # pragma: debug
             self.error(".send_header(): Connection closed.")
             return False
         out = self._send(header_msg, **kwargs)
