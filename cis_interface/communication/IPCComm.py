@@ -156,8 +156,6 @@ class IPCComm(CommBase.CommBase):
     def new_comm_kwargs(cls, *args, **kwargs):
         r"""Initialize communication with new queue."""
         if 'address' not in kwargs:
-            # q = get_queue()
-            # kwargs['address'] = str(q.key)
             kwargs.setdefault('address', 'generate')
         return args, kwargs
 
@@ -169,21 +167,25 @@ class IPCComm(CommBase.CommBase):
             q = get_queue()
             self.address = str(q.key)
 
+    def open_after_bind(self):
+        r"""Open the connection by getting the queue from the bound address."""
+        qid = int(self.address)
+        self.q = get_queue(qid)
+
     def open(self):
         r"""Open the connection by connecting to the queue."""
         super(IPCComm, self).open()
         if not self.is_open:
             if not self._bound:
                 self.bind()
-            qid = int(self.address)
-            self.q = get_queue(qid)
+            self.open_after_bind()
             self.debug(": qid %s", self.q.key)
             
     def close(self):
         r"""Close the connection."""
         if self._bound and not self.is_open:
             try:
-                self.open()
+                self.open_after_bind()
             except sysv_ipc.ExistentialError:
                 self.q = None
                 self._bound = False

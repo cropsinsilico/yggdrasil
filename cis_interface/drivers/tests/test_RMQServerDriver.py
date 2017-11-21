@@ -8,7 +8,7 @@ class TestRMQServerParam(parent.TestServerParam):
         super(TestRMQServerParam, self).__init__(*args, **kwargs)
         self.driver = 'RMQServerDriver'
         self.client_comm = 'RMQComm'
-        self.ocomm_name = self.client_comm
+        self.icomm_name = self.client_comm
 
     
 class TestRMQServerDriverNoStart(TestRMQServerParam,

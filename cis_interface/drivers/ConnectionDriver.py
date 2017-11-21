@@ -114,12 +114,14 @@ class ConnectionDriver(Driver):
             ie = None
             oe = None
             try:
-                self.icomm.close()
-            except BaseException as e:  # pragma: debug
+                if getattr(self, 'icomm', None) is not None:
+                    self.icomm.close()
+            except BaseException as e:
                 ie = e
             try:
-                self.ocomm.close()
-            except BaseException as e:  # pragma: debug
+                if getattr(self, 'ocomm', None) is not None:
+                    self.ocomm.close()
+            except BaseException as e:
                 oe = e
             if ie:
                 raise ie
@@ -291,7 +293,7 @@ class ConnectionDriver(Driver):
             # Process message
             self.state = 'processing'
             msg = self.on_message(msg)
-            if msg is False:
+            if msg is False:  # pragma: debug
                 self.debug(':run: Could not process message.')
                 break
             elif len(msg) == 0:

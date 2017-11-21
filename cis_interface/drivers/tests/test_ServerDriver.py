@@ -16,8 +16,8 @@ class TestServerParam(parent.TestConnectionParam):
         self.timeout = 5.0
         self.comm_name = _default_comm
         self.client_comm = _default_comm
-        self.icomm_name = self.comm_name
-        self.ocomm_name = self.client_comm
+        self.icomm_name = self.client_comm
+        self.ocomm_name = self.comm_name
             
     @property
     def send_comm_kwargs(self):

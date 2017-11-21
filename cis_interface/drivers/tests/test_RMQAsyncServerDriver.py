@@ -8,7 +8,7 @@ class TestRMQAsyncServerParam(parent.TestServerParam):
         super(TestRMQAsyncServerParam, self).__init__(*args, **kwargs)
         self.driver = 'RMQAsyncServerDriver'
         self.client_comm = 'RMQAsyncComm'
-        self.ocomm_name = self.client_comm
+        self.icomm_name = self.client_comm
         self.timeout = 10.0
 
     

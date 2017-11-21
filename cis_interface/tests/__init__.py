@@ -307,5 +307,78 @@ class IOInfo(object):
         with open(fname, 'wb') as fd:
             pickle.dump(self.data_dict, fd)
 
+
+class MagicTestError(Exception):
+    r"""Special exception for testing."""
+    pass
+
             
-__all__ = ['data', 'scripts', 'yamls', 'CisTest', 'IOInfo']
+def ErrorClass(base_class, *args, **kwargs):
+    r"""Wrapper to return errored version of a class.
+
+    Args:
+        base_class (class): Base class to use.
+        *args: Additional arguments are passed to the class constructor.
+        **kwargs: Additional keyword arguments are passed to the class
+            constructor.
+
+    """
+
+    class ErrorClass(base_class):
+        r"""Dummy class that will raise an error for any requested method.
+
+        Args:
+            error_on_init (bool, optional): If True, an error will be raised
+                in place of the base class's __init__ method. Defaults to False.
+            *args: Additional arguments are passed to the parent class.
+            **kwargs: Additional keyword arguments are passed to the parent class.
+
+        Attributes:
+            error_location (str): Name of the method/attribute that will raise
+                an error.
+
+        """
+        def __init__(self, *args, **kwargs):
+            error_on_init = kwargs.pop('error_on_init', False)
+            if error_on_init:
+                self.error_method()
+            self._replaced_methods = dict()
+            self._replaced_method = None
+            self.error_location = None
+            super(ErrorClass, self).__init__(*args, **kwargs)
+
+        def empty_method(self, *args, **kwargs):
+            r"""Method that won't do anything."""
+            pass
+                
+        def error_method(self, *args, **kwargs):
+            r"""Method that will raise a MagicTestError."""
+            raise MagicTestError("This is a test error.")
+
+        def replace_method(self, method_name, replacement):
+            r"""Temporarily replace method with another."""
+            self._replaced_methods[method_name] = getattr(self, method_name)
+            setattr(self, method_name, replacement)
+
+        def restore_method(self, method_name):
+            r"""Restore the original method."""
+            setattr(self, method_name, self._replaced_methods.pop(method_name))
+
+        def restore_all(self):
+            r"""Restored all replaced methods."""
+            meth_list = list(self._replaced_methods.keys())
+            for k in meth_list:
+                self.restore_method(k)
+
+        def empty_replace(self, method_name):
+            r"""Replace a method with an empty method."""
+            self.replace_method(method_name, self.empty_method)
+
+        def error_replace(self, method_name):
+            r"""Replace a method with an errored method."""
+            self.replace_method(method_name, self.error_method)
+
+    return ErrorClass(*args, **kwargs)
+
+
+__all__ = ['data', 'scripts', 'yamls', 'CisTest', 'IOInfo', 'ErrorClass']

@@ -211,7 +211,8 @@ class RMQComm(CommBase.CommBase):
         if self.channel:
             try:
                 self.channel.close()
-            except pika.exceptions.ChannelClosed:
+            except (pika.exceptions.ChannelClosed,
+                    pika.exceptions.ChannelAlreadyClosing):
                 pass
         self.channel = None
 
