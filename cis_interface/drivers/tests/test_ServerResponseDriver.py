@@ -20,12 +20,8 @@ class TestServerResponseParam(parent.TestConnectionParam):
     @property
     def inst_args(self):
         r"""tuple: Driver arguments."""
-        out = [None]  # Force driver to create an address
-        if self.args is not None:
-            if isinstance(self.args, list):
-                out += self.args
-            else:
-                out.append(self.args)
+        out = super(TestServerResponseParam, self).inst_args
+        out[0] = None  # Force driver to create an address
         return out
     
     @property

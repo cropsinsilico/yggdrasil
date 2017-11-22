@@ -54,10 +54,10 @@ class TestConnectionParam(parent.TestParam, IOInfo):
             # print(cls, cls.comm_count())
         return out
 
-    @property
-    def comm_cls(self):
-        r"""Connection class."""
-        return get_comm_class(self.comm_name)
+    # @property
+    # def comm_cls(self):
+    #     r"""Connection class."""
+    #     return get_comm_class(self.comm_name)
 
     def setup(self, *args, **kwargs):
         r"""Initialize comm object pair."""
