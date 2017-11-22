@@ -163,6 +163,8 @@ class ClientRequestDriver(ConnectionDriver):
             bool: Success or failure of send.
 
         """
+        if self.ocomm.is_closed:
+            return False
         # Start response driver
         if self.model_response_address != CIS_CLIENT_EOF:
             with self.lock:

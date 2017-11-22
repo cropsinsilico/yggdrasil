@@ -152,7 +152,7 @@ class ConnectionDriver(Driver):
         """
         self.debug('.graceful_stop()')
         T = self.start_timeout(timeout)
-        while (self.n_msg > 0) and (not T.is_out):
+        while (self.n_msg > 0) and (not T.is_out):  # pragma: debug
             self.debug('.graceful_stop(): draining %d messages',
                        self.n_msg)
             self.sleep()
