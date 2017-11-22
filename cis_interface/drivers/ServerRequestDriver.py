@@ -149,7 +149,7 @@ class ServerRequestDriver(ConnectionDriver):
                     response_driver = ServerResponseDriver(*drv_args, **drv_kwargs)
                     self.response_drivers.append(response_driver)
                     response_driver.start()
-                except BaseException:
+                except BaseException:  # pragma: debug
                     self.exception("Could not create/start response driver.")
                     return False
             # Send response address in header
