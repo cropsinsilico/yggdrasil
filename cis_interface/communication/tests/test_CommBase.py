@@ -160,7 +160,8 @@ class TestCommBase(CisTest, IOInfo):
         r"""Check that error raised for invalid direction."""
         kwargs = self.send_inst_kwargs
         kwargs['direction'] = 'invalid'
-        nt.assert_raises(ValueError, new_comm, self.name, **kwargs)
+        nt.assert_raises(ValueError, new_comm, self.name + "_" + self.uuid,
+                         **kwargs)
 
     def test_opp_comm_kwargs(self):
         r"""Test getting keyword arguments for the opposite comm."""

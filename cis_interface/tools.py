@@ -5,6 +5,8 @@ import os
 import sys
 import inspect
 import time
+import subprocess
+from cis_interface import platform
 from cis_interface import backwards
 
 
@@ -14,6 +16,38 @@ CIS_MSG_EOF = backwards.unicode2bytes("EOF!!!")
 
 PSI_MSG_MAX = CIS_MSG_MAX
 PSI_MSG_EOF = CIS_MSG_EOF
+
+
+def is_ipc_installed():
+    r"""Determine if the IPC libraries are installed.
+
+    Returns:
+        bool: True if the IPC libraries are installed, False otherwise.
+
+    """
+    if platform._is_linux or platform._is_osx:
+        return True
+    return False
+
+
+def is_zmq_installed():
+    r"""Determine if the libczmq & libzmq libraries are installed.
+
+    Returns:
+        bool: True if both libraries are installed, False otherwise.
+
+    """
+    process = subprocess.Popen(['gcc', '-lzmq', '-lczmq'],
+                               stdout=subprocess.PIPE,
+                               stderr=subprocess.PIPE)
+    outs, errs = process.communicate()
+    # Python 3
+    # try:
+    #     outs, errs = process.communicate(timeout=15)
+    # except subprocess.TimeoutExpired:
+    #     process.kill()
+    #     outs, errs = process.communicate()
+    return (backwards.unicode2bytes('zmq') not in errs)
 
 
 def eval_kwarg(x):

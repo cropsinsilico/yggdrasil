@@ -141,7 +141,8 @@ class ZMQComm(CommBase.CommBase):
             if host == 'localhost':
                 host = '127.0.0.1'
             if protocol in ['inproc', 'ipc']:
-                address = "%s://%s" % (protocol, name)
+                suffix = cls._determine_suffix(**kwargs)
+                address = "%s://%s" % (protocol, name + suffix)
             elif protocol not in _socket_protocols:
                 raise ValueError("Unrecognized protocol: %s" % protocol)
             else:
@@ -322,6 +323,7 @@ class ZMQComm(CommBase.CommBase):
             total_msg = topic + _flag_zmq_filter + msg
         else:
             total_msg = msg
+        # print('sending', self.address, self.is_open)
         try:
             kwargs.setdefault('flags', zmq.NOBLOCK)
             if self.socket_type_name == 'ROUTER':
@@ -375,15 +377,22 @@ class ZMQComm(CommBase.CommBase):
         if timeout is None:
             timeout = self.recv_timeout
         self.sleep()
-        ret = self.socket.poll(timeout=1000.0 * timeout)
-        if ret == 0:
-            self.debug(".recv(): No messages waiting.")
-            return (True, backwards.unicode2bytes(''))
+        if timeout is not False:
+            if self.is_closed:
+                return (False, None)
+            ret = self.socket.poll(timeout=1000.0 * timeout)
+            if ret == 0:
+                self.debug(".recv(): No messages waiting.")
+                return (True, backwards.unicode2bytes(''))
+            flags = zmq.NOBLOCK
+        else:
+            flags = 0
+        # print('recving', self.address, self.is_open)
         try:
             if self.socket_type_name == 'ROUTER':
-                identity = self.socket.recv(zmq.NOBLOCK)
+                identity = self.socket.recv(flags)
                 self._recv_identities.add(identity)
-            kwargs.setdefault('flags', zmq.NOBLOCK)
+            kwargs.setdefault('flags', flags)
             total_msg = self.socket.recv(**kwargs)
         except zmq.ZMQError:  # pragma: debug
             self.exception(".recv(): Error")

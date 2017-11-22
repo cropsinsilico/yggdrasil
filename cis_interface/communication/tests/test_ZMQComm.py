@@ -47,14 +47,16 @@ class TestZMQComm(parent.TestCommBase):
         r"""String prefix to prepend docstr test message with."""
         return '%s(%s, %s)' % (self.comm, self.protocol, self.socket_type)
 
-    @property
-    def inst_kwargs(self):
-        r"""dict: Keyword arguments for tested class."""
-        args, kwargs = ZMQComm.new_comm_kwargs(self.name, protocol=self.protocol,
-                                               port=self.send_instance.port)
-        out = super(TestZMQComm, self).inst_kwargs
-        out.update(**kwargs)
-        return out
+    # Unclear why this was modified
+    # @property
+    # def inst_kwargs(self):
+    #     r"""dict: Keyword arguments for tested class."""
+    #     args, kwargs = ZMQComm.new_comm_kwargs(self.name, protocol=self.protocol,
+    #                                            port=self.send_instance.port,
+    #                                            direction=out['direction'])
+    #     out = super(TestZMQComm, self).inst_kwargs
+    #     out.update(**kwargs)
+    #     return out
         
     @property
     def send_inst_kwargs(self):

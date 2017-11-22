@@ -1,11 +1,13 @@
 import importlib
-# from cis_interface import platform
+from cis_interface.tools import is_zmq_installed, is_ipc_installed
 
 
-# if platform._is_win:
-#     _default_comm = 'ZMQComm'
-# else:
-_default_comm = 'IPCComm'
+if is_zmq_installed():
+    _default_comm = 'ZMQComm'
+elif is_ipc_installed():
+    _default_comm = 'IPCComm'
+else:
+    raise Exception('Neither ZMQ or IPC installed.')
 
 
 def get_comm_class(comm=None):

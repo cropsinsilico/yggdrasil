@@ -4,12 +4,16 @@
 #include <stdarg.h>
 #include <unistd.h>
 #include <errno.h>
+#ifdef ZMQINSTALLED
 #include <czmq.h>
+#endif /*ZMQINSTALLED*/
 #include <CommBase.h>
 
 /*! @brief Flag for checking if this header has already been included. */
 #ifndef CISZMQCOMM_H_
 #define CISZMQCOMM_H_
+
+#ifdef ZMQINSTALLED
 
 static unsigned _zmq_rand_seeded = 0;
 static unsigned _cisSocketsCreated;
@@ -100,6 +104,7 @@ int init_zmq_comm(comm_t *comm) {
   /* } */
   /* if (strlen(comm->name) == 0) */
   /*  sprintf(comm->name, "tempinitZMQ-%d", port); */
+  printf("init: %s, %s\n", comm->direction, comm->address);
   if (strcmp(comm->direction, "recv") == 0) {
     ret = zsock_connect(s, "%s", comm->address);
     if (ret == -1) {
@@ -119,6 +124,7 @@ int init_zmq_comm(comm_t *comm) {
     sprintf(comm->name, "tempinitZMQ-%s", comm->address);
   // Asign to void pointer
   comm->handle = (void*)s;
+  printf("done with init\n");
   return 0;
 };
 
@@ -206,5 +212,91 @@ int zmq_comm_recv(const comm_t x, char *data, const int len) {
   return strlen(data);
 };
 
+// Definitions in the case where ZMQ libraries not installed
+#else /*ZMQINSTALLED*/
 
+/*!
+  @brief Print error message about ZMQ library not being installed.
+ */
+static inline
+void zmq_install_error() {
+  cislog_error("Compiler flag 'ZMQINSTALLED' not defined so ZMQ bindings are disabled.");
+};
+
+/*!
+  @brief Perform deallocation for ZMQ communicator.
+  @param[in] x comm_t Pointer to communicator to deallocate.
+  @returns int 1 if there is and error, 0 otherwise.
+*/
+static inline
+int free_zmq_comm(comm_t *x) {
+  zmq_install_error();
+  return 1;
+};
+
+/*!
+  @brief Create a new socket.
+  @param[in] comm comm_t * Comm structure initialized with new_comm_base.
+  @returns int -1 if the address could not be created.
+*/
+static inline
+int new_zmq_address(comm_t *comm) {
+  zmq_install_error();
+  return -1;
+};
+
+/*!
+  @brief Initialize a ZeroMQ communicator.
+  @param[in] comm comm_t * Comm structure initialized with init_comm_base.
+  @returns int -1 if the comm could not be initialized.
+ */
+static inline
+int init_zmq_comm(comm_t *comm) {
+  zmq_install_error();
+  return -1;
+};
+
+/*!
+  @brief Get number of messages in the comm.
+  @param[in] comm_t Communicator to check.
+  @returns int Number of messages. -1 indicates an error.
+ */
+static inline
+int zmq_comm_nmsg(const comm_t x) {
+  zmq_install_error();
+  return -1;
+};
+
+/*!
+  @brief Send a message to the comm.
+  Send a message smaller than PSI_MSG_MAX bytes to an output comm. If the
+  message is larger, it will not be sent.
+  @param[in] x comm_t structure that comm should be sent to.
+  @param[in] data character pointer to message that should be sent.
+  @param[in] len int length of message to be sent.
+  @returns int 0 if send succesfull, -1 if send unsuccessful.
+ */
+static inline
+int zmq_comm_send(const comm_t x, const char *data, const int len) {
+  zmq_install_error();
+  return -1;
+};
+
+/*!
+  @brief Receive a message from an input comm.
+  Receive a message smaller than PSI_MSG_MAX bytes from an input comm.
+  @param[in] x comm_t structure that message should be sent to.
+  @param[out] data character pointer to allocated buffer where the message
+  should be saved.
+  @param[in] len const int length of the allocated message buffer in bytes.
+  @returns int -1 if message could not be received. Length of the received
+  message if message was received.
+ */
+static inline
+int zmq_comm_recv(const comm_t x, char *data, const int len) {
+  zmq_install_error();
+  return -1;
+};
+
+#endif /*ZMQINSTALLED*/
 #endif /*CISZMQCOMM_H_*/

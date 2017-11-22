@@ -83,14 +83,10 @@ class CommBase(CisClass):
                  single_use=False, reverse_names=False, no_suffix=False,
                  **kwargs):
         super(CommBase, self).__init__(name, **kwargs)
-        if no_suffix:
-            suffix = ''
-        else:
-            if ((((direction == 'send') and (not reverse_names)) or
-                 ((direction == 'recv') and reverse_names))):
-                suffix = '_OUT'
-            else:
-                suffix = '_IN'
+        suffix = self.__class__._determine_suffix(
+            no_suffix=no_suffix, reverse_names=reverse_names, direction=direction)
+        self.name_base = name
+        self.suffix = suffix
         self.name = name + suffix
         if address is None:
             if self.name not in os.environ:
@@ -98,8 +94,6 @@ class CommBase(CisClass):
             self.address = os.environ[self.name]
         else:
             self.address = address
-        if direction not in ['send', 'recv']:
-            raise ValueError("Unrecognized message direction: %s" % direction)
         self.direction = direction
         self.format_str = format_str
         if deserialize is None:
@@ -117,6 +111,22 @@ class CommBase(CisClass):
         if not dont_open:
             self.open()
 
+    @classmethod
+    def _determine_suffix(cls, no_suffix=False, reverse_names=False,
+                          direction='send', **kwargs):
+        r"""Determine the suffix that should be used for the comm name."""
+        if direction not in ['send', 'recv']:
+            raise ValueError("Unrecognized message direction: %s" % direction)
+        if no_suffix:
+            suffix = ''
+        else:
+            if ((((direction == 'send') and (not reverse_names)) or
+                 ((direction == 'recv') and reverse_names))):
+                suffix = '_OUT'
+            else:
+                suffix = '_IN'
+        return suffix
+    
     @property
     def maxMsgSize(self):
         r"""int: Maximum size of a single message that should be sent."""

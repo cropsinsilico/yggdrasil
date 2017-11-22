@@ -4,6 +4,7 @@
 import subprocess
 import os
 from cis_interface.communication import _default_comm
+from cis_interface.tools import is_zmq_installed, is_ipc_installed
 from cis_interface.drivers.ModelDriver import ModelDriver
 
 
@@ -13,8 +14,13 @@ _incl_io = os.path.join(_top_dir, 'io')
 _incl_seri = os.path.join(_top_dir, 'serialize')
 _incl_comm = os.path.join(_top_dir, 'communication')
 # TODO: conditional on libzmq installed
-_compile_links = ["-lczmq", "-lzmq"]
+_compile_links = []
 _compile_flags = []
+if is_zmq_installed():
+    _compile_links += ["-lczmq", "-lzmq"]
+    _compile_flags += ["-DZMQINSTALLED"]
+if is_ipc_installed():
+    _compile_flags += ["-DIPCINSTALLED"]
 for x in [_incl_interface, _incl_io, _incl_comm, _incl_seri]:
     _compile_flags += ["-I" + x]
 if _default_comm == 'IPCComm':
