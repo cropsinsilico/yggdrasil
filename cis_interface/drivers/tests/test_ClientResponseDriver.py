@@ -9,7 +9,7 @@ class TestClientResponseParam(parent.TestConnectionParam):
         super(TestClientResponseParam, self).__init__(*args, **kwargs)
         self.driver = 'ClientResponseDriver'
         self.args = None
-        self.attr_list += ['comm', 'msg_id']
+        self.attr_list += ['comm', 'msg_id', 'response_address']
         self.sleeptime = 0.5
         self.timeout = 5.0
         self.comm_name = _default_comm
@@ -20,12 +20,8 @@ class TestClientResponseParam(parent.TestConnectionParam):
     @property
     def inst_args(self):
         r"""tuple: Driver arguments."""
-        out = [None]  # Force driver to create an address
-        if self.args is not None:
-            if isinstance(self.args, list):
-                out += self.args
-            else:
-                out.append(self.args)
+        out = super(TestClientResponseParam, self).inst_args
+        out[0] = None  # Force driver to create an address
         return out
     
     @property

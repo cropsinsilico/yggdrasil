@@ -9,7 +9,8 @@ class TestServerResponseParam(parent.TestConnectionParam):
         super(TestServerResponseParam, self).__init__(*args, **kwargs)
         self.driver = 'ServerResponseDriver'
         self.args = None
-        self.attr_list += ['comm', 'msg_id']
+        self.attr_list += ['comm', 'msg_id', 'model_response_name',
+                           'model_response_address', 'response_address']
         self.sleeptime = 0.5
         self.timeout = 5.0
         self.comm_name = _default_comm

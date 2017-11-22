@@ -9,6 +9,14 @@ class TestFileComm(parent.TestCommBase):
         super(TestFileComm, self).__init__(*args, **kwargs)
         self.comm = 'FileComm'
         self.attr_list += ['fd', 'read_meth', 'append']
+        self.read_meth = 'read'
+
+    @property
+    def inst_kwargs(self):
+        r"""dict: Keyword arguments for tested class."""
+        out = super(TestFileComm, self).inst_kwargs
+        out['read_meth'] = self.read_meth
+        return out
 
     def teardown(self):
         r"""Remove the file."""
@@ -22,7 +30,7 @@ class TestFileComm(parent.TestCommBase):
         nt.assert_raises(ValueError, new_comm, self.name, **kwargs)
 
     def test_work_comm(self):
-        r"""Disabled test creating/removing a work comm."""
+        r"""Disabled: Test creating/removing a work comm."""
         pass
         
     def test_remaining_bytes(self):
@@ -51,3 +59,10 @@ class TestFileComm(parent.TestCommBase):
         assert(not flag)
         nt.assert_equal(msg_recv, self.send_instance.eof_msg)
         assert(self.recv_instance.is_closed)
+
+
+class TestFileComm_readline(TestFileComm):
+    r"""Test for FileComm communication class with read_meth = 'readline'."""
+    def __init__(self, *args, **kwargs):
+        super(TestFileComm_readline, self).__init__(*args, **kwargs)
+        self.read_meth = 'readline'
