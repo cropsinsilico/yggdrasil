@@ -33,9 +33,6 @@ class TestRPCParam(parent.TestParam, IOInfo):
         super(TestRPCParam, self).setup(*args, **kwargs)
         send_kws = self.send_comm_kwargs
         recv_kws = self.recv_comm_kwargs
-        if kwargs.get('skip_start', False):
-            send_kws['dont_open'] = True
-            recv_kws['dont_open'] = True
         self.send_comm = new_comm(self.name, **send_kws)
         self.recv_comm = new_comm(self.name, **recv_kws)
 
@@ -55,7 +52,19 @@ class TestRPCDriverNoStart(TestRPCParam, parent.TestDriverNoStart, IOInfo):
         -
 
     """
-    pass
+    @property
+    def send_comm_kwargs(self):
+        r"""dict: Keyword arguments for send comm."""
+        out = super(TestRPCDriverNoStart, self).send_comm_kwargs
+        out['dont_open'] = True
+        return out
+
+    @property
+    def recv_comm_kwargs(self):
+        r"""dict: Keyword arguments for recv comm."""
+        out = super(TestRPCDriverNoStart, self).recv_comm_kwargs
+        out['dont_open'] = True
+        return out
 
 
 class TestRPCDriver(TestRPCParam, parent.TestDriver, IOInfo):
