@@ -241,7 +241,7 @@ class TestCommBase(CisTest, IOInfo):
             flag = fsend_meth(msg_send)
             assert(flag)
             T = recv_instance.start_timeout()
-            while (not T.is_out) and (recv_instance.n_msg == 0):
+            while (not T.is_out) and (recv_instance.n_msg == 0):  # pragma: debug
                 recv_instance.sleep()
             recv_instance.stop_timeout()
             assert(recv_instance.n_msg >= 1)
