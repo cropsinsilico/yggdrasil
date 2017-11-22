@@ -56,9 +56,20 @@ class ServerRequestDriver(ConnectionDriver):
         self._block_response = False
 
     @property
+    def last_header(self):
+        r"""dict: Information contained in the header of the last message
+        received from the client model."""
+        if self.icomm._last_header is None:
+            raise AttributeError("No new requests have been received, so there " +
+                                 "does not yet exist information required for " +
+                                 "creating a response comm and fowarding the " +
+                                 "request.")
+        return self.icomm._last_header
+
+    @property
     def request_id(self):
         r"""str: Unique ID for the last message."""
-        return self.icomm._last_header['id']
+        return self.last_header['id']
 
     @property
     def request_name(self):
@@ -70,8 +81,7 @@ class ServerRequestDriver(ConnectionDriver):
     def response_address(self):
         r"""str: The address of the channel used by the server response driver
         to send responses."""
-        assert(isinstance(self.icomm._last_header, dict))
-        return self.icomm._last_header['response_address']
+        return self.last_header['response_address']
 
     def terminate(self, *args, **kwargs):
         r"""Stop response drivers."""

@@ -85,7 +85,8 @@ class ClientRequestDriver(ConnectionDriver):
         if self.icomm._last_header is None:
             raise AttributeError("No new requests have been received, so there " +
                                  "does not yet exist information required for " +
-                                 "sending a response.")
+                                 "creating a response comm and fowarding the " +
+                                 "request.")
         return self.icomm._last_header
 
     @property
