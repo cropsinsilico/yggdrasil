@@ -394,7 +394,7 @@ class CisRunner(object):
         while (len(running) > 0) and (not self.error_flag):
             for drv in running:
                 d = drv['instance']
-                if d.errors:
+                if d.errors:  # pragma: debug
                     error('Error in model %s', drv['name'])
                     self.error_flag = True
                     break
