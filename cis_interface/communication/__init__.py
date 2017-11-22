@@ -64,9 +64,9 @@ def new_comm(name, comm=None, **kwargs):
     """
     if comm is None:
         comm = _default_comm
-    elif comm == 'ErrorComm':
-        comm = kwargs.get('base_comm', _default_comm)
-        kwargs['new_comm_class'] = 'ErrorComm'
+    # elif comm == 'ErrorComm':
+    #     comm = kwargs.get('base_comm', _default_comm)
+    #     kwargs['new_comm_class'] = 'ErrorComm'
     comm_cls = get_comm_class(comm)
     return comm_cls.new_comm(name, **kwargs)
 

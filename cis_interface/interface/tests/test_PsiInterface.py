@@ -613,7 +613,8 @@ class TestPsiPickleInput(TestBase):
     def test_recv(self):
         r"""Test receiving a pickle from a remote file."""
         Tout = self.instance.start_timeout()
-        while ((not Tout.is_out) and (os.stat(self.tempfile).st_size == 0)):
+        while ((not Tout.is_out) and
+               (os.stat(self.tempfile).st_size == 0)):  # pragma: debug
             self.instance.sleep()
         self.instance.stop_timeout()
         msg_flag, res = self.instance.recv(timeout=self.timeout)
@@ -657,7 +658,7 @@ class TestPsiPickleOutput(TestBase):
         skip_start = False
         if self.inst_kwargs.get('dst_type', 1) == 0:
             skip_start = True
-        if os.path.isfile(self.tempfile):
+        if os.path.isfile(self.tempfile):  # pragma: debug
             os.remove(self.tempfile)
         super(TestPsiPickleOutput, self).setup(skip_start=skip_start)
 

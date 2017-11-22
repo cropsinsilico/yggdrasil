@@ -108,7 +108,7 @@ class TestServerComm(test_CommBase.TestCommBase):
             flag = self.send_instance.send(self.msg_short)
             assert(flag)
             T = self.recv_instance.start_timeout()
-            while (not T.is_out) and (self.recv_instance.n_msg == 0):
+            while (not T.is_out) and (self.recv_instance.n_msg == 0):  # pragma: debug
                 self.recv_instance.sleep()
             self.recv_instance.stop_timeout()
             nt.assert_equal(self.recv_instance.n_msg, 1)

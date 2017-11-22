@@ -96,7 +96,8 @@ class TestParam(CisTest):
             x = CisClass(self.name, timeout=self.timeout,
                          sleeptime=self.sleeptime)
             Tout = x.start_timeout()
-            while (not Tout.is_out) and (self.comm_count > self.nprev_comm):
+            while ((not Tout.is_out) and
+                   (self.comm_count > self.nprev_comm)):  # pragma: debug
                 x.sleep()
             x.stop_timeout()
             ncurr_comm = self.comm_count

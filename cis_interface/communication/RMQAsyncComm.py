@@ -173,7 +173,7 @@ class RMQAsyncComm(RMQComm):
 
         """
         with self.lock:
-            if self.is_closed:
+            if self.is_closed:  # pragma: debug
                 return False
             out = super(RMQAsyncComm, self)._send(msg, exchange=exchange,
                                                   routing_key=routing_key,

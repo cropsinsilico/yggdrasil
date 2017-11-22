@@ -374,7 +374,7 @@ def ErrorClass(base_class, *args, **kwargs):
             for obj in [self] + self.__class__.mro():
                 if attr in obj.__dict__:
                     return obj.__dict__[attr]
-            raise AttributeError
+            raise AttributeError  # pragma: debug
 
         def setattr(self, attr, value):
             r"""Set the attribute at the class level."""

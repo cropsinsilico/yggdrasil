@@ -97,7 +97,7 @@ class TestServerDriver(TestServerParam, parent.TestConnectionDriver):
     def test_client_count(self):
         r"""Test to ensure client count is correct."""
         T = self.instance.start_timeout()
-        while ((not T.is_out) and (self.instance.nclients != 1)):
+        while ((not T.is_out) and (self.instance.nclients != 1)):  # pragma: debug
             self.instance.sleep()
         self.instance.stop_timeout()
         nt.assert_equal(self.instance.nclients, 1)

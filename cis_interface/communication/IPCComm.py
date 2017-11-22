@@ -229,7 +229,7 @@ class IPCComm(CommBase.CommBase):
             return False
         try:
             self.q.send(payload)
-        except OSError:
+        except OSError:  # pragma: debug
             self.close()
             return False
         return True
@@ -266,7 +266,7 @@ class IPCComm(CommBase.CommBase):
         self.debug(".recv(): message ready, read it")
         try:
             data, _ = self.q.receive()  # ignore ident
-        except sysv_ipc.ExistentialError:
+        except sysv_ipc.ExistentialError:  # pragma: debug
             self.close()
             return (False, backwards.unicode2bytes(''))
         return (True, data)
