@@ -3,7 +3,7 @@ from cis_interface.tests import IOInfo, MagicTestError
 from cis_interface.drivers import import_driver
 from cis_interface.drivers.tests import test_Driver as parent
 from cis_interface.communication import (
-    get_comm_class, new_comm, CommBase, _default_comm)
+    get_comm_class, new_comm, _default_comm)
 
             
 class TestConnectionParam(parent.TestParam, IOInfo):
@@ -200,9 +200,9 @@ class TestConnectionDriver(TestConnectionParam, parent.TestDriver):
         r"""Initialize comm object pair."""
         super(TestConnectionDriver, self).setup(*args, **kwargs)
         # CommBase is dummy class that never opens
-        if not isinstance(self.send_comm, CommBase.CommBase):
+        if (self.send_comm.comm_class != 'CommBase'):
             assert(self.send_comm.is_open)
-        if not isinstance(self.recv_comm, CommBase.CommBase):
+        if (self.recv_comm.comm_class != 'CommBase'):
             assert(self.recv_comm.is_open)
 
     def test_early_close(self):
