@@ -84,6 +84,7 @@ class TestZMQComm_client(TestZMQComm):
         r"""Disabled send/recv of large message."""
         pass
 
+    
 # Tests for all the supported protocols
 class TestZMQCommINPROC(TestZMQComm):
     r"""Test for ZMQComm communication class with INPROC socket."""
