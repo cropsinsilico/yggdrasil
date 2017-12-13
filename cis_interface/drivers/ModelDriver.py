@@ -88,18 +88,23 @@ class ModelDriver(Driver):
         # Handle error
         if self.process is not None:
             T = self.start_timeout()
-            self.process.poll()
-            while ((not T.is_out) and
-                   (self.process.returncode is None)):  # pragma: debug
-                self.sleep()
+            try:
                 self.process.poll()
-            self.stop_timeout()
-            if self.process.returncode is None:  # pragma: debug
-                self.process.kill()
-                self.error("Return code is None, killing process")
-            if self.process.returncode != 0:
-                self.error("return code of %s indicates model error.",
-                           str(self.process.returncode))
+                while ((not T.is_out) and
+                       (self.process.returncode is None)):  # pragma: debug
+                    self.sleep()
+                    self.process.poll()
+                self.stop_timeout()
+                if self.process.returncode is None:  # pragma: debug
+                    self.process.kill()
+                    self.error("Return code is None, killing process")
+                if self.process.returncode != 0:
+                    self.error("return code of %s indicates model error.",
+                               str(self.process.returncode))
+            except AttributeError:  # pragma: debug
+                if self.process is None:
+                    return
+                raise
 
     def terminate(self):
         r"""Terminate the process running the model."""
