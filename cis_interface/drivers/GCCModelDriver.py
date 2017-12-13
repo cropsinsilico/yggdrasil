@@ -57,13 +57,16 @@ class GCCModelDriver(ModelDriver):
         self.compile_setup(self.args.pop(0))
         compile_args = [self.gcc, "-g", "-Wall"] + self.flags + _compile_flags
         run_args = [os.path.join(".", self.efile)]
+        link_args = []
         for arg in self.args:
             if arg.startswith("-I"):
                 compile_args.append(arg)
+            elif arg.startswith("-L") or arg.startswith("-l"):
+                link_args.append(arg)
             else:
                 run_args.append(arg)
         compile_args += ["-o", self.efile, self.cfile]
-        compile_args += _compile_links
+        compile_args += _compile_links + link_args
         # Compile in a new process
         self.args = run_args
         self.compiled = True
