@@ -5,13 +5,24 @@ from cis_interface.interface.PsiInterface import PsiInput, PsiOutput
 in_channel = PsiInput('input')
 out_channel = PsiOutput('output')
 
-# Receive input from input channel
-# If there is an error, the flag will be False
-flag, msg = in_channel.recv()
+flag = True
 
-# Print received message
-print(msg)
+# Loop until there is no longer input or the queues are closed
+while flag:
+    
+    # Receive input from input channel
+    # If there is an error, the flag will be False
+    flag, msg = in_channel.recv()
+    if not flag:
+        print("No more input.")
+        break
 
-# Send output to output channel
-# If there is an error, the flag will be False
-flag = out_channel.send(msg)
+    # Print received message
+    print(msg)
+
+    # Send output to output channel
+    # If there is an error, the flag will be False
+    flag = out_channel.send(msg)
+    if not flag:
+        print("Error sending output.")
+        break

@@ -56,7 +56,9 @@ class FileInputDriver(FileDriver):
 
     def on_eof(self):
         r"""Actions to perform when the end of file is reached."""
-        pass
+        while (self.n_ipc_msg > 0) and (self.is_valid):
+            self.sleep()
+        self.close_queue()
 
     def run(self):
         r"""Run the driver. The file is opened and then data is read from the
