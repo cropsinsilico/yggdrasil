@@ -43,12 +43,16 @@ class GCCModelDriver(ModelDriver):
         for x in [_incl_interface, _incl_io]:
             compile_args += ["-I" + x]
         run_args = [os.path.join(".", self.efile)]
+        link_args = []
         for arg in self.args:
             if arg.startswith("-I"):
                 compile_args.append(arg)
+            elif arg.startswith("-l") or arg.startswith("-L"):
+                link_args.append(arg)
             else:
                 run_args.append(arg)
         compile_args += ["-o", self.efile, self.cfile]
+        compile_args += link_args
         # Compile in a new process
         self.args = run_args
         self.compiled = True
