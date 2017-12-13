@@ -69,13 +69,14 @@ class ClientRequestDriver(ConnectionDriver):
         if comm_address is not None:
             ocomm_kws['address'] = comm_address
         ocomm_kws['no_suffix'] = True
+        ocomm_kws['is_client'] = True
         kwargs['ocomm_kws'] = ocomm_kws
         # Parent and attributes
         super(ClientRequestDriver, self).__init__(model_request_name, **kwargs)
         self.env[self.icomm.name] = self.icomm.address
         self.response_drivers = []
         self.comm = comm
-        self.comm_address = self.ocomm.address
+        self.comm_address = self.ocomm.opp_address
         self._block_response = False
 
     @property
@@ -92,7 +93,7 @@ class ClientRequestDriver(ConnectionDriver):
     @property
     def request_id(self):
         r"""str: Unique ID for the last message."""
-        return self.last_header['id']
+        return self.last_header['request_id']
 
     @property
     def model_response_address(self):
@@ -110,7 +111,7 @@ class ClientRequestDriver(ConnectionDriver):
     def request_address(self):
         r"""str: The address of the channel used to send requests to the server
         request driver."""
-        return self.ocomm.address
+        return self.ocomm.opp_address
     
     def terminate(self, *args, **kwargs):
         r"""Stop response drivers."""
@@ -132,8 +133,8 @@ class ClientRequestDriver(ConnectionDriver):
     def before_loop(self):
         r"""Send client sign on to server response driver."""
         super(ClientRequestDriver, self).before_loop()
+        # self.sleep()  # Help ensure that the server is connected
         super(ClientRequestDriver, self).send_message(CIS_CLIENT_INI)
-        # self.ocomm.send(CIS_CLIENT_INI)
 
     def after_loop(self):
         r"""After client model signs off. Sent EOF to server."""
@@ -185,5 +186,5 @@ class ClientRequestDriver(ConnectionDriver):
             kwargs.setdefault('header_kwargs', {})
             kwargs['header_kwargs'].setdefault(
                 'response_address', response_driver.response_address)
-            kwargs['header_kwargs'].setdefault('id', self.request_id)
+            kwargs['header_kwargs'].setdefault('request_id', self.request_id)
         return super(ClientRequestDriver, self).send_message(*args, **kwargs)

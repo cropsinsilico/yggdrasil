@@ -37,6 +37,7 @@ class ServerRequestDriver(ConnectionDriver):
         icomm_kws['comm'] = comm
         icomm_kws['name'] = request_name
         icomm_kws['no_suffix'] = True
+        icomm_kws['is_server'] = True
         if comm_address is not None:
             icomm_kws['address'] = comm_address
         icomm_kws['close_on_eof_recv'] = False
@@ -52,7 +53,7 @@ class ServerRequestDriver(ConnectionDriver):
         self.response_drivers = []
         self.nclients = 0
         self.comm = comm
-        self.comm_address = self.icomm.address
+        self.comm_address = self.icomm.address  # opp_address
         self._block_response = False
 
     @property
@@ -69,7 +70,7 @@ class ServerRequestDriver(ConnectionDriver):
     @property
     def request_id(self):
         r"""str: Unique ID for the last message."""
-        return self.last_header['id']
+        return self.last_header['request_id']
 
     @property
     def request_name(self):
@@ -95,7 +96,7 @@ class ServerRequestDriver(ConnectionDriver):
     def on_model_exit(self):
         r"""Close RPC comm when model exits."""
         with self.lock:
-            self.ocomm.close()
+            self.icomm.close()
         super(ServerRequestDriver, self).on_model_exit()
 
     def after_loop(self):
@@ -167,5 +168,5 @@ class ServerRequestDriver(ConnectionDriver):
             kwargs.setdefault('header_kwargs', {})
             kwargs['header_kwargs'].setdefault(
                 'response_address', response_driver.model_response_address)
-            kwargs['header_kwargs'].setdefault('id', self.request_id)
+            kwargs['header_kwargs'].setdefault('request_id', self.request_id)
         return super(ServerRequestDriver, self).send_message(*args, **kwargs)

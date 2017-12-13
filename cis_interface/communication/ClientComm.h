@@ -202,7 +202,7 @@ int client_comm_send(comm_t x, const char *data, const int len) {
     return -1;
   }
   strcpy(head.response_address, (*res_comm)[ncomm - 1].address);
-  sprintf(head.id, "%d", rand());
+  sprintf(head.request_id, "%d", rand());
   char *new_data = (char*)malloc(BUFSIZ);
   ret = format_comm_header(head, new_data, BUFSIZ);
   if (ret < 0) {

@@ -26,9 +26,9 @@ def test_error_on_send_open_twice():
         # Send comm
         name1 = 'test_%s' % s
         comm1 = new_comm(name1 + '_1', comm='ZMQComm', socket_type=s,
-                         dont_open=True)
+                         dont_open=True, socket_action='bind')
         nt.assert_raises(zmq.ZMQError, ZMQComm, name1 + '_2', socket_type=s,
-                         address=comm1.opp_address)
+                         address=comm1.opp_address, socket_action='bind')
         comm1.close()
 
         
@@ -37,10 +37,10 @@ class TestZMQComm(parent.TestCommBase):
     def __init__(self, *args, **kwargs):
         super(TestZMQComm, self).__init__(*args, **kwargs)
         self.comm = 'ZMQComm'
-        self.protocol = 'inproc'
-        self.socket_type = 'PAIR'
+        self.protocol = None
+        self.socket_type = None
         self.attr_list += ['context', 'socket', 'socket_type_name',
-                           'socket_type']
+                           'socket_type', 'protocol', 'host', 'port']
 
     @property
     def description_prefix(self):
@@ -66,8 +66,36 @@ class TestZMQComm(parent.TestCommBase):
         out['socket_type'] = self.socket_type
         return out
 
+    
+# Tests for server/client
+class TestZMQComm_client(TestZMQComm):
+    r"""Test for ZMQComm communication class for client/server."""
+    def __init__(self, *args, **kwargs):
+        super(TestZMQComm_client, self).__init__(*args, **kwargs)
+
+    @property
+    def send_inst_kwargs(self):
+        r"""Keyword arguments for send instance."""
+        out = super(TestZMQComm_client, self).send_inst_kwargs
+        out['is_client'] = True
+        return out
+        
+    def test_send_recv_nolimit(self):
+        r"""Disabled send/recv of large message."""
+        pass
 
 # Tests for all the supported protocols
+class TestZMQCommINPROC(TestZMQComm):
+    r"""Test for ZMQComm communication class with INPROC socket."""
+    def __init__(self, *args, **kwargs):
+        super(TestZMQCommINPROC, self).__init__(*args, **kwargs)
+        self.protocol = 'inproc'
+
+    def test_send_recv_nolimit(self):
+        r"""Disabled send/recv of large message."""
+        pass
+
+    
 class TestZMQCommTCP(TestZMQComm):
     r"""Test for ZMQComm communication class with TCP socket."""
     def __init__(self, *args, **kwargs):
@@ -125,6 +153,17 @@ class TestZMQCommIPC(TestZMQComm):
 
 
 # Tests for all the socket types
+class TestZMQCommPAIR(TestZMQComm):
+    r"""Test for ZMQComm communication class with PAIR/PAIR socket."""
+    def __init__(self, *args, **kwargs):
+        super(TestZMQCommPAIR, self).__init__(*args, **kwargs)
+        self.socket_type = 'PAIR'
+
+    def test_send_recv_nolimit(self):
+        r"""Disabled send/recv of large message."""
+        pass
+
+    
 class TestZMQCommPUSH(TestZMQComm):
     r"""Test for ZMQComm communication class with PUSH/PULL socket."""
     def __init__(self, *args, **kwargs):
@@ -166,8 +205,9 @@ class TestZMQCommROUTER(TestZMQComm):
 
     def test_router_recv(self):
         r"""Test router receipt of message from the dealer with an identity."""
-        self.do_send_recv(reverse_comms=True)
-        print(self.instance._recv_identities)
+        self.do_send_recv(reverse_comms=True, send_kwargs=dict(
+            identity=self.recv_instance.dealer_identity))
+        # print(self.instance._recv_identities)
 
     def test_send_recv_nolimit(self):
         r"""Disabled send/recv of large message."""

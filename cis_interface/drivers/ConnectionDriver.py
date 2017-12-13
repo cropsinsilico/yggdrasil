@@ -1,5 +1,6 @@
 """Module for funneling messages from one comm to another."""
 import os
+from cis_interface import backwards
 from cis_interface.communication import new_comm
 from cis_interface.drivers.Driver import Driver
 
@@ -51,6 +52,7 @@ class ConnectionDriver(Driver):
         self.ocomm_kws = ocomm_kws
         self.env[self.ocomm.name] = self.ocomm.address
         # Attributes
+        self._first_send_done = False
         self._comm_closed = False
         self.nrecv = 0
         self.nproc = 0
@@ -160,6 +162,11 @@ class ConnectionDriver(Driver):
         super(ConnectionDriver, self).graceful_stop()
         self.debug('.graceful_stop(): done')
 
+    # def on_model_exit(self):
+    #     r"""Close the comms."""
+    #     self.close_comm()
+    #     super(ConnectionDriver, self).on_model_exit()
+
     def terminate(self):
         r"""Stop the driver, closing the communicators."""
         if self._terminated:
@@ -197,6 +204,7 @@ class ConnectionDriver(Driver):
     def before_loop(self):
         r"""Actions to perform prior to sending messages."""
         self.open_comm()
+        self.sleep()  # Help ensure senders/receivers connected before messages
 
     def after_loop(self):
         r"""Actions to perform after sending messages."""
@@ -248,7 +256,7 @@ class ConnectionDriver(Driver):
         """
         return msg
 
-    def send_message(self, *args, **kwargs):
+    def _send_message(self, *args, **kwargs):
         r"""Send a single message.
 
         Args:
@@ -262,7 +270,45 @@ class ConnectionDriver(Driver):
         with self.lock:
             if self.ocomm.is_closed:
                 return False
-            return self.ocomm.send(*args, **kwargs)
+            flag = self.ocomm.send(*args, **kwargs)
+            return flag
+        
+    def _send_1st_message(self, *args, **kwargs):
+        r"""Send the first message, trying multiple times.
+
+        Args:
+            *args: Arguments are passed to the output comm send method.
+            *kwargs: Keyword arguments are passed to the output comm send method.
+
+        Returns:
+            bool: Success or failure of send.
+
+        """
+        self.ocomm._first_send_done = True
+        flag = False
+        T = self.start_timeout()
+        while (not T.is_out) and (not flag) and self.ocomm.is_open:
+            flag = self._send_message(*args, **kwargs)
+        self.stop_timeout()
+        self._first_send_done = True
+        return flag
+
+    def send_message(self, *args, **kwargs):
+        r"""Send a single message.
+
+        Args:
+            *args: Arguments are passed to the output comm send method.
+            *kwargs: Keyword arguments are passed to the output comm send method.
+
+        Returns:
+            bool: Success or failure of send.
+
+        """
+        if self._first_send_done:
+            flag = self._send_message(*args, **kwargs)
+        else:
+            flag = self._send_1st_message(*args, **kwargs)
+        return flag
 
     def run(self):
         r"""Run the driver. Continue looping over messages until there are not
@@ -282,7 +328,7 @@ class ConnectionDriver(Driver):
             if msg is False:
                 self.debug(':run: No more messages')
                 break
-            if isinstance(msg, str) and len(msg) == 0:
+            if isinstance(msg, backwards.bytes_type) and len(msg) == 0:
                 self.state = 'waiting'
                 self.debug(':run: Waiting for next message.')
                 self.sleep()

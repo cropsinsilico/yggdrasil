@@ -50,6 +50,16 @@ class CommBase(CisClass):
             with be reversed. Defaults to False.
         no_suffix (bool, optional): If True, no directional suffix will be added
             to the comm name. Defaults to False.
+        is_client (bool, optional): If True, the comm is one of many potential
+            clients that will be sending messages to one or more servers.
+            Defaults to False.
+        is_response_client (bool, optional): If True, the comm is a client-side
+            response comm. Defaults to False.
+        is_server (bool, optional): If True, the commis one of many potential
+            servers that will be receiving messages from one or more clients.
+            Defaults to False.
+        is_response_server (bool, optional): If True, the comm is a server-side
+            response comm. Defaults to False.
         **kwargs: Additional keywords arguments are passed to parent class.
 
     Attributes:
@@ -70,6 +80,14 @@ class CommBase(CisClass):
             receives an end-of-file messages. Otherwise, it will remain open.
         single_use (bool): If True, the comm will only be used to send/recv a
             single message.
+        is_client (bool): If True, the comm is one of many potential clients
+            that will be sending messages to one or more servers.
+        is_response_client (bool): If True, the comm is a client-side response
+            comm.
+        is_server (bool): If True, the commis one of many potential servers
+            that will be receiving messages from one or more clients.
+        is_response_server (bool): If True, the comm is a server-side response
+            comm.
 
     Raises:
         Exception: If there is not an environment variable with the specified
@@ -81,6 +99,8 @@ class CommBase(CisClass):
                  deserialize=None, serialize=None, format_str=None,
                  dont_open=False, recv_timeout=0.0, close_on_eof_recv=True,
                  single_use=False, reverse_names=False, no_suffix=False,
+                 is_client=False, is_response_client=False,
+                 is_server=False, is_response_server=False,
                  **kwargs):
         super(CommBase, self).__init__(name, **kwargs)
         suffix = self.__class__._determine_suffix(
@@ -102,12 +122,17 @@ class CommBase(CisClass):
             serialize = DefaultSerialize(format_str=self.format_str)
         self.meth_deserialize = deserialize
         self.meth_serialize = serialize
+        self.is_client = is_client
+        self.is_response_client = is_response_client
+        self.is_response_server = is_response_server
+        self.is_server = is_server
         self.recv_timeout = recv_timeout
         self.close_on_eof_recv = close_on_eof_recv
         self._last_header = None
         self._work_comms = {}
         self.single_use = single_use
         self._used = False
+        self._first_send_done = False
         if not dont_open:
             self.open()
 
@@ -431,6 +456,20 @@ class CommBase(CisClass):
         return out
 
     # SEND METHODS
+    def _send_1st(self, *args, **kwargs):
+        r"""Send first message until it succeeds."""
+        flag = False
+        T = self.start_timeout()
+        while (not T.is_out) and (self.is_open):
+            # print('send 1st', self.name, self.__class__, args)
+            flag = self._send(*args, **kwargs)
+            if flag or (self.is_closed):
+                break
+            self.sleep()
+        self.stop_timeout()
+        self._first_send_done = True
+        return flag
+        
     def _send(self, msg, *args, **kwargs):  # pragma: debug
         r"""Raw send. Should be overridden by inheriting class."""
         raise NotImplementedError("_send method needs implemented.")
@@ -452,7 +491,10 @@ class CommBase(CisClass):
             if self.is_closed:  # pragma: debug
                 self.error("._send_multipart(): Connection closed.")
                 return False
-            ret = self._send(imsg, **kwargs)
+            if not self._first_send_done:
+                ret = self._send_1st(imsg, **kwargs)
+            else:
+                ret = self._send(imsg, **kwargs)
             if not ret:  # pragma: debug
                 self.debug(
                     ".send_multipart(): send interupted at %d of %d bytes.",
@@ -489,7 +531,7 @@ class CommBase(CisClass):
 
         """
         return True
-    
+
     def on_send(self, msg):
         r"""Process message to be sent including handling serializing
         message and handling EOF.
@@ -567,7 +609,10 @@ class CommBase(CisClass):
             if self.is_closed:  # pragma: debug
                 self.error(".send_multipart(): Connection closed.")
                 return False
-            ret = self._send(msg, **kwargs)
+            if not self._first_send_done:
+                ret = self._send_1st(msg, **kwargs)
+            else:
+                ret = self._send(msg, **kwargs)
         else:
             if header_kwargs is None:
                 header_kwargs = dict()
@@ -596,7 +641,10 @@ class CommBase(CisClass):
         if self.is_closed:  # pragma: debug
             self.error(".send_header(): Connection closed.")
             return False
-        out = self._send(header_msg, **kwargs)
+        if not self._first_send_done:
+            out = self._send_1st(header_msg, **kwargs)
+        else:
+            out = self._send(header_msg, **kwargs)
         return out
 
     def send_nolimit(self, *args, **kwargs):
@@ -700,9 +748,11 @@ class CommBase(CisClass):
         if s_msg == self.eof_msg:
             flag = self.on_recv_eof()
             msg = s_msg
+            self._used = True
         else:
             flag = True
             msg = self.deserialize(s_msg)
+            self._used = True
         return flag, msg
 
     def recv(self, *args, **kwargs):
@@ -726,15 +776,14 @@ class CommBase(CisClass):
             flag, s_msg = self.recv_multipart(*args, **kwargs)
             if flag and len(s_msg) > 0:
                 self.debug('.recv(): %d bytes received', len(s_msg))
-            self._used = True
         except Exception:
             self.exception('.recv(): Failed to recv.')
             return (False, None)
         if flag:
-            flag, msg = self.on_recv(s_msg)
+            flag, msg = self.on_recv(s_msg, *args, **kwargs)
         else:
             msg = None
-        if self.single_use:
+        if self.single_use and self._used:
             self.close()
         return (flag, msg)
 

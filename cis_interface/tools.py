@@ -85,12 +85,12 @@ class TimeOut(object):
 
     def __init__(self, max_time):
         self.max_time = max_time
-        self.start_time = time.clock()
+        self.start_time = backwards.clock_time()
 
     @property
     def elapsed(self):
         r"""float: Total time that has elapsed since the start."""
-        return time.clock() - self.start_time
+        return backwards.clock_time() - self.start_time
     
     @property
     def is_out(self):

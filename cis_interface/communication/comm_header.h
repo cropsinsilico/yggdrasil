@@ -21,6 +21,7 @@ typedef struct comm_head_t {
   int valid; //!< 1 if the header is valid, 0 otherwise.
   char id[COMMBUFFSIZ]; //!< Unique ID associated with this message.
   char response_address[COMMBUFFSIZ]; //!< Response address.
+  char request_id[COMMBUFFSIZ]; //!< Request id.
 } comm_head_t;
 
 /*!
@@ -35,8 +36,7 @@ typedef struct comm_head_t {
   correctly initialized to empty strings if NULLs provided.
  */
 static inline
-comm_head_t init_header(const int size, const char *address,
-			const char *id, const char *response_address) {
+comm_head_t init_header(const int size, const char *address, const char *id) {
   comm_head_t out;
   out.size = size;
   out.multipart = 0;
@@ -51,10 +51,12 @@ comm_head_t init_header(const int size, const char *address,
     out.id[0] = '\0';
   else
     strcpy(out.id, id);
-  if (response_address == NULL)
-    out.response_address[0] = '\0';
-  else
-    strcpy(out.response_address, response_address);
+  out.response_address[0] = '\0';
+  out.request_id[0] = '\0';
+  /* if (response_address == NULL) */
+  /*   out.response_address[0] = '\0'; */
+  /* else */
+  /*   strcpy(out.response_address, response_address); */
   return out;
 };
 
@@ -172,6 +174,17 @@ int format_comm_header(const comm_head_t head, char *buf, const int bufsiz) {
       pos += ret;
     }
   }
+  // REQUEST_ID
+  if (strlen(head.request_id) > 0) {
+    ret = format_header_entry(buf + pos, "request_id",
+			      head.request_id, bufsiz - pos);
+    if (ret < 0) {
+      cislog_error("Adding request_id entry would exceed buffer size\n");
+      return ret;
+    } else {
+      pos += ret;
+    }
+  }
   // RESPONSE_ADDRESS
   if (strlen(head.response_address) > 0) {
     ret = format_header_entry(buf + pos, "response_address",
@@ -213,7 +226,7 @@ int format_comm_header(const comm_head_t head, char *buf, const int bufsiz) {
  */
 static inline
 comm_head_t parse_comm_header(const char *buf, const int bufsiz) {
-  comm_head_t out = init_header(0, NULL, NULL, NULL);
+  comm_head_t out = init_header(0, NULL, NULL);
   // Extract just header
   char re_head[COMMBUFFSIZ] = CIS_MSG_HEAD;
   strcat(re_head, "(.*)");
@@ -263,6 +276,7 @@ comm_head_t parse_comm_header(const char *buf, const int bufsiz) {
     // Extract id & response address
     ret = parse_header_entry(head, "id", out.id, COMMBUFFSIZ);
     ret = parse_header_entry(head, "response_address", out.response_address, COMMBUFFSIZ);
+    ret = parse_header_entry(head, "request_id", out.request_id, COMMBUFFSIZ);
     free(head);
   }
   return out;

@@ -120,7 +120,10 @@ class CisTest(unittest.TestCase):
     @property
     def inst_kwargs(self):
         r"""dict: Keyword arguments for creating a class instance."""
-        return self._inst_kwargs
+        out = self._inst_kwargs
+        out['timeout'] = self.timeout
+        out['sleeptime'] = self.sleeptime
+        return out
 
     @property
     def workingDir(self):

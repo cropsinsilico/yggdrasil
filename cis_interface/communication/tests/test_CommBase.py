@@ -119,6 +119,7 @@ class TestCommBase(CisTest, IOInfo):
     def test_error_send(self):
         r"""Test error on send."""
         inst = self.get_fresh_error_instance()
+        inst._first_send_done = True
         inst.error_replace('send_multipart')
         flag = inst.send(self.msg_short)
         assert(not flag)
@@ -219,10 +220,14 @@ class TestCommBase(CisTest, IOInfo):
             assert(self.recv_instance.is_closed)
 
     def do_send_recv(self, send_meth='send', recv_meth='recv', msg_send=None,
-                     reverse_comms=False):
+                     reverse_comms=False, send_kwargs=None, recv_kwargs=None):
         r"""Generic send/recv of a message."""
         if msg_send is None:
             msg_send = self.test_msg
+        if send_kwargs is None:
+            send_kwargs = dict()
+        if recv_kwargs is None:
+            recv_kwargs = dict()
         nt.assert_equal(self.send_instance.n_msg, 0)
         nt.assert_equal(self.recv_instance.n_msg, 0)
         if reverse_comms:
@@ -234,12 +239,12 @@ class TestCommBase(CisTest, IOInfo):
         fsend_meth = getattr(send_instance, send_meth)
         frecv_meth = getattr(recv_instance, recv_meth)
         if self.comm == 'CommBase':
-            flag = fsend_meth(msg_send)
+            flag = fsend_meth(msg_send, **send_kwargs)
             assert(not flag)
-            flag, msg_recv = frecv_meth()
+            flag, msg_recv = frecv_meth(**recv_kwargs)
             assert(not flag)
         else:
-            flag = fsend_meth(msg_send)
+            flag = fsend_meth(msg_send, **send_kwargs)
             assert(flag)
             T = recv_instance.start_timeout()
             while (not T.is_out) and (recv_instance.n_msg == 0):  # pragma: debug
@@ -248,7 +253,7 @@ class TestCommBase(CisTest, IOInfo):
             assert(recv_instance.n_msg >= 1)
             # IPC nolimit sends multiple messages
             # nt.assert_equal(recv_instance.n_msg, 1)
-            flag, msg_recv = frecv_meth()
+            flag, msg_recv = frecv_meth(timeout=self.timeout, **recv_kwargs)
             assert(flag)
             nt.assert_equal(msg_recv, msg_send)
         nt.assert_equal(self.send_instance.n_msg, 0)
@@ -288,9 +293,10 @@ class TestCommBase(CisTest, IOInfo):
             while (not T.is_out) and (self.recv_instance.n_msg == 0):  # pragma: debug
                 self.recv_instance.sleep()
             self.recv_instance.stop_timeout()
-            nt.assert_equal(self.recv_instance.n_msg, 1)
+            nt.assert_greater(self.recv_instance.n_msg, 0)
         self.recv_instance.purge()
-        nt.assert_equal(self.send_instance.n_msg, 0)
+        # Uni-directional comms can't know about messages sent
+        # nt.assert_equal(self.send_instance.n_msg, 0)
         nt.assert_equal(self.recv_instance.n_msg, 0)
         # Purge recv while closed
         self.recv_instance.close()

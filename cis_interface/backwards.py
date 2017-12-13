@@ -1,5 +1,6 @@
 r"""This module allows for backward compatibility."""
 import sys
+import time
 PY2 = (sys.version_info[0] == 2)
 PY34 = ((sys.version_info[0] == 3) and (sys.version_info[1] == 4))
 if PY2:  # pragma: Python 2
@@ -23,6 +24,10 @@ else:  # pragma: Python 3
     unicode_type = str
     unicode = None
     np_dtype_str = 'S'
+if sys.version_info >= (3, 3):
+    clock_time = time.perf_counter
+else:
+    clock_time = time.clock
 
 
 def assert_bytes(s):

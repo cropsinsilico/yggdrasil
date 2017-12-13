@@ -120,12 +120,13 @@ class ClientComm(CommBase.CommBase):
     # RESPONSE COMM
     def create_response_comm(self):
         r"""Create a response comm based on information from the last header."""
-        comm_kwargs = dict(direction='recv', **self.response_kwargs)
-        header = dict(id=str(uuid.uuid4()))
-        c = new_comm('client_response_comm.' + header['id'], **comm_kwargs)
+        comm_kwargs = dict(direction='recv', is_response_client=True,
+                           **self.response_kwargs)
+        header = dict(request_id=str(uuid.uuid4()))
+        c = new_comm('client_response_comm.' + header['request_id'], **comm_kwargs)
         header['response_address'] = c.address
-        self.icomm[header['id']] = c
-        self.icomm_order.append(header['id'])
+        self.icomm[header['request_id']] = c
+        self.icomm_order.append(header['request_id'])
         return header
 
     def remove_response_comm(self):

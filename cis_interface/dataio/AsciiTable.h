@@ -795,6 +795,7 @@ int at_vbytes_to_array(const asciiTable_t t, const char *data,
   // check size of array
   /* int data_siz = strlen(data); */
   if ((data_siz % t.row_siz) != 0) {
+    printf("Data: %s\n", data);
     printf("Data size (%d) not an even number of rows (row size is %d)\n",
 	   data_siz, t.row_siz);
     return -1;

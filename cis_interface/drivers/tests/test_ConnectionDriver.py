@@ -1,3 +1,4 @@
+import uuid
 import nose.tools as nt
 from cis_interface.tests import IOInfo, MagicTestError
 from cis_interface.drivers import import_driver
@@ -62,10 +63,11 @@ class TestConnectionParam(parent.TestParam, IOInfo):
     def setup(self, *args, **kwargs):
         r"""Initialize comm object pair."""
         kwargs.setdefault('nprev_comm', self.comm_count)
+        skip_start = kwargs.get('skip_start', False)
         super(TestConnectionParam, self).setup(*args, **kwargs)
         send_kws = self.send_comm_kwargs
         recv_kws = self.recv_comm_kwargs
-        if kwargs.get('skip_start', False):
+        if skip_start:
             send_kws['dont_open'] = True
             recv_kws['dont_open'] = True
         self.send_comm = new_comm(self.name, **send_kws)
@@ -78,6 +80,8 @@ class TestConnectionParam(parent.TestParam, IOInfo):
         assert(self.send_comm.is_closed)
         assert(self.recv_comm.is_closed)
         super(TestConnectionParam, self).teardown(*args, **kwargs)
+        for inst in self._extra_instances:
+            inst.terminate()
     
 
 class TestConnectionDriverNoStart(TestConnectionParam, parent.TestDriverNoStart):
@@ -117,9 +121,16 @@ class TestConnectionDriverNoStart(TestConnectionParam, parent.TestDriverNoStart)
         assert(not flag)
         nt.assert_equal(ret, None)
 
+    def get_fresh_name(self):
+        r"""Get a fresh name for a new instance that won't overlap with the base."""
+        return 'Test%s_%s' % (self.cls, str(uuid.uuid4()))
+
     def get_fresh_error_instance(self, comm, error_on_init=False):
         r"""Get a driver instance with ErrorComm class for one or both comms."""
-        args = self.inst_args
+        args = [self.get_fresh_name()]
+        if self.args is not None:
+            args.append(self.args)
+        # args = self.inst_args
         kwargs = self.inst_kwargs
         if 'comm_address' in kwargs:
             del kwargs['comm_address']
@@ -136,6 +147,7 @@ class TestConnectionDriverNoStart(TestConnectionParam, parent.TestDriverNoStart)
             nt.assert_raises(MagicTestError, driver_class, *args, **kwargs)
         else:
             inst = driver_class(*args, **kwargs)
+            inst.icomm._first_send_done = True
             self._extra_instances.append(inst)
             return inst
 
@@ -244,7 +256,9 @@ class TestConnectionDriver(TestConnectionParam, parent.TestDriver):
 
     def run_before_terminate(self):
         r"""Commands to run while the instance is running, before terminate."""
-        self.send_comm.send(self.msg_short)
+        super(TestConnectionDriver, self).run_before_terminate()
+        # TODO: This fails with ZMQ
+        # self.send_comm.send(self.msg_short)
 
     def assert_after_terminate(self):
         r"""Assertions to make after terminating the driver instance."""

@@ -16,7 +16,8 @@
 #ifdef ZMQINSTALLED
 
 static unsigned _zmq_rand_seeded = 0;
-static unsigned _cisSocketsCreated;
+static unsigned _cisSocketsCreated = 0;
+static int _last_port = 49152;
 
 /*!
   @brief Create a new socket.
@@ -26,13 +27,14 @@ static unsigned _cisSocketsCreated;
 static inline
 int new_zmq_address(comm_t *comm) {
   // TODO: Get protocol/host from input
-  char protocol[50] = "inproc";
+  char protocol[50] = "tcp";
   char host[50] = "localhost";
   char address[100];
   if (strcmp(host, "localhost") == 0)
     strcpy(host, "127.0.0.1");
   int ret;
-  if (strcmp(protocol, "inproc") == 0) {
+  if ((strcmp(protocol, "inproc") == 0) ||
+      (strcmp(protocol, "ipc") == 0)) {
     // TODO: small chance of reusing same number
     int key = 0;
     if (!(_zmq_rand_seeded)) {
@@ -42,40 +44,50 @@ int new_zmq_address(comm_t *comm) {
     while (key == 0) key = rand();
     if (strlen(comm->name) == 0)
       sprintf(comm->name, "tempnewZMQ-%d", key);
-    sprintf(address, "inproc://%s", comm->name);
+    sprintf(address, "%s://%s", protocol, comm->name);
   } else {
-    sprintf(address, "%s://%s", protocol, host);
-    strcat(address, ":!"); // For random port
+    sprintf(address, "%s://%s:*[%d-]", protocol, host, _last_port + 1);
+    /* strcat(address, ":!"); // For random port */
   }
   // Bind
   zsock_t *s = zsock_new(ZMQ_PAIR);
+  zsock_set_linger(s, 10);
   if (s == NULL) {
     cislog_error("new_zmq_address: Could not initialize empty socket.");
     return -1;
   }
+  printf("bind to %s\n", address);
   int port = zsock_bind(s, "%s", address);
   if (port == -1) {
     cislog_error("new_zmq_address: Could not bind socket to address = %s",
 		 address);
     return -1;
   }
+  printf("bound to port %d, direction = %s\n", port, comm->direction);
+  // Add port to address
+  if ((strcmp(protocol, "inproc") != 0) &&
+      (strcmp(protocol, "ipc") != 0)) {
+    _last_port = port;
+    sprintf(address, "%s://%s:%d", protocol, host, port);
+  }
+  strcpy(comm->address, address);
   if (strlen(comm->name) == 0)
     sprintf(comm->name, "tempnewZMQ-%d", port);
-  strcpy(comm->address, zsock_endpoint(s));
   // Unbind and connect if this is a recv socket
-  if (strcmp(comm->direction, "recv") == 0) {
-    ret = zsock_unbind(s, "%s", comm->address);
-    if (ret == -1) {
-      cislog_error("new_zmq_address: Could not unbind socket for connect.");
-      return ret;
-    }
-    ret = zsock_connect(s, "%s", comm->address);
-    if (ret == -1) {
-      cislog_error("new_zmq_address: Could not connect socket to address = %s",
-		   address);
-      return ret;
-    }
-  }
+  /* if (strcmp(comm->direction, "recv") == 0) { */
+  /*   ret = zsock_unbind(s, "%s", comm->address); */
+  /*   printf("unbound from %s (ret = %d)\n", comm->address, ret); */
+  /*   if (ret == -1) { */
+  /*     cislog_error("new_zmq_address: Could not unbind socket for connect."); */
+  /*     return ret; */
+  /*   } */
+  /*   ret = zsock_connect(s, "%s", comm->address); */
+  /*   if (ret == -1) { */
+  /*     cislog_error("new_zmq_address: Could not connect socket to address = %s", */
+  /* 		   address); */
+  /*     return ret; */
+  /*   } */
+  /* } */
   comm->handle = (void*)s;
   _cisSocketsCreated++;
   return 0;
@@ -96,6 +108,7 @@ int init_zmq_comm(comm_t *comm) {
     cislog_error("init_zmq_address: Could not initialize empty socket.");
     return -1;
   }
+  zsock_set_linger(s, 10);
   /* int port = zsock_bind(s, comm->address); */
   /* if (port == -1) { */
   /*   cislog_error("init_zmq_address: Could not bind socket to address = %s", */
@@ -104,27 +117,26 @@ int init_zmq_comm(comm_t *comm) {
   /* } */
   /* if (strlen(comm->name) == 0) */
   /*  sprintf(comm->name, "tempinitZMQ-%d", port); */
-  printf("init: %s, %s\n", comm->direction, comm->address);
-  if (strcmp(comm->direction, "recv") == 0) {
-    ret = zsock_connect(s, "%s", comm->address);
-    if (ret == -1) {
-      cislog_error("new_zmq_address: Could not connect socket to address = %s",
-		   comm->address);
-      return ret;
-    }
-  } else {
-    ret = zsock_bind(s, "%s", comm->address);
-    if (ret == -1) {
-      cislog_error("new_zmq_address: Could not bind socket to address = %s",
-		   comm->address);
-      return ret;
-    }
+  /* if (0) { */
+  /* if (strcmp(comm->direction, "send") == 0) { */
+  /*   ret = zsock_bind(s, "%s", comm->address); */
+  /*   if (ret == -1) { */
+  /*     cislog_error("new_zmq_address: Could not bind socket to address = %s", */
+  /* 		   comm->address); */
+  /*     return ret; */
+  /*   } */
+  /* } else { */
+  ret = zsock_connect(s, "%s", comm->address);
+  if (ret == -1) {
+    cislog_error("new_zmq_address: Could not connect socket to address = %s",
+		 comm->address);
+    return ret;
   }
+  /* } */
   if (strlen(comm->name) == 0)
     sprintf(comm->name, "tempinitZMQ-%s", comm->address);
   // Asign to void pointer
   comm->handle = (void*)s;
-  printf("done with init\n");
   return 0;
 };
 
@@ -182,8 +194,11 @@ int zmq_comm_send(const comm_t x, const char *data, const int len) {
   cislog_debug("zmq_comm_send(%s): %d bytes", x.name, len);
   if (comm_base_send(x, data, len) == -1)
     return -1;
+  /* printf("(C) sending %d bytes to %s\n", len, x.address); */
   zsock_t *s = (zsock_t*)(x.handle);
-  int ret = zstr_send(s, data);
+  zframe_t *f = zframe_new(data, len);
+  int ret = zframe_send(&f, s, 0);
+  zframe_destroy(&f);
   cislog_debug("zmq_comm_send(%s): returning %d", x.name, ret);
   return ret;
 };
@@ -202,15 +217,24 @@ static inline
 int zmq_comm_recv(const comm_t x, char *data, const int len) {
   cislog_debug("zmq_comm_recv(%s)", x.name);
   zsock_t *s = (zsock_t*)(x.handle);
-  char *out = zstr_recv(s);
+  zframe_t *out = zframe_recv(s);
   if (out == NULL) {
     cislog_debug("zmq_comm_recv(%s): did not receive", x.name);
     return -1;
   }
-  strcpy(data, out);
-  zstr_free(&out);
-  return strlen(data);
+  int len_recv = zframe_size(out);
+  /* printf("(C) received %d bytes from %s\n", len_recv, x.address); */
+  if ((len_recv + 1) > len) {
+    cislog_debug("zmq_comm_recv(%s): buffer (%d bytes) is not large enough for message (%d bytes)",
+		 x.name, len, len_recv);
+    return -1;
+  }
+  memcpy(data, zframe_data(out), len_recv + 1);
+  data[len_recv] = '\0';
+  zframe_destroy(&out);
+  return len_recv;
 };
+
 
 // Definitions in the case where ZMQ libraries not installed
 #else /*ZMQINSTALLED*/

@@ -40,7 +40,7 @@ class TestServerParam(parent.TestConnectionParam):
         out = super(TestServerParam, self).inst_kwargs
         # out['request_name'] = self.cli_drv.request_name
         out['comm'] = self.cli_drv.comm
-        out['comm_address'] = self.cli_drv.comm_address
+        out['comm_address'] = self.cli_drv.ocomm.opp_address
         out['ocomm_kws']['comm'] = self.comm_name
         return out
     
@@ -129,6 +129,8 @@ class TestServerDriver(TestServerParam, parent.TestConnectionDriver):
             self.instance.sleep()
         self.instance.stop_timeout()
         nt.assert_equal(self.instance.nclients, 0)
+        # Clean up
+        cli_drv2.terminate()
 
     def test_send_recv(self, msg_send=None):
         r"""Test routing of a short message between client and server."""

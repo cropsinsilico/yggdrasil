@@ -36,7 +36,11 @@ class TestServerResponseParam(parent.TestConnectionParam):
 class TestServerResponseDriverNoStart(TestServerResponseParam,
                                       parent.TestConnectionDriverNoStart):
     r"""Test class for ServerResponseDriver class without start."""
-    pass
+
+    def get_fresh_name(self):
+        r"""Get a fresh name for a new instance that won't overlap with the base."""
+        # This ensures that a new address will be generated
+        return None
 
 
 class TestServerResponseDriver(TestServerResponseParam,

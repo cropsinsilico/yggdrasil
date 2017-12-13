@@ -29,7 +29,7 @@ int main(int argc, char *argv[]) {
     psiRpc_t rpc = psiRpcClient("maxMsgSrv_maxMsgCli", "%s", "%s");
     
     // Create a max message
-    rand_str(output, PSI_MSG_MAX-1);
+    rand_str(output, PSI_MSG_MAX - 1);
     output[PSI_MSG_MAX] == '\0';
     
     // Save a copy of the string

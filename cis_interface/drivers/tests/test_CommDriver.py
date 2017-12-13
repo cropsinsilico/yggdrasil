@@ -1,3 +1,4 @@
+import uuid
 import nose.tools as nt
 from cis_interface.tests import IOInfo, MagicTestError
 from cis_interface.drivers import import_driver
@@ -22,11 +23,16 @@ class TestCommParam(parent.TestParam, IOInfo):
                            'comm']
         self.timeout = 1.0
         self._extra_instances = []
+
+    @property
+    def is_input(self):
+        r"""bool: True if the driver is for input, False otherwise."""
+        return ('Input' in self.driver)
     
     @property
     def send_comm(self):
         r"""Communicator for sending."""
-        if 'Input' in self.driver:
+        if self.is_input:
             return self.instance.comm
         else:
             return self.alt_comm
@@ -34,7 +40,7 @@ class TestCommParam(parent.TestParam, IOInfo):
     @property
     def recv_comm(self):
         r"""Communicator for receiving."""
-        if 'Input' in self.driver:
+        if self.is_input:
             return self.alt_comm
         else:
             return self.instance.comm
@@ -56,7 +62,7 @@ class TestCommParam(parent.TestParam, IOInfo):
         for k in ['namespace', 'yml']:
             if k in out:
                 del out[k]
-        if 'Input' in self.driver:
+        if self.is_input:
             out.update(**self.send_comm_kwargs)
         else:
             out.update(**self.recv_comm_kwargs)
@@ -65,7 +71,7 @@ class TestCommParam(parent.TestParam, IOInfo):
     @property
     def alt_comm_kwargs(self):
         r"""dict: Keyword arguments for opposite comm."""
-        if 'Input' in self.driver:
+        if self.is_input:
             out = self.recv_comm_kwargs
         else:
             out = self.send_comm_kwargs
@@ -85,11 +91,11 @@ class TestCommParam(parent.TestParam, IOInfo):
         r"""Initialize comm object pair."""
         kwargs['nprev_comm'] = self.comm_count
         # If driver receiving, create send comm first
-        if 'Input' not in self.driver:
+        if not self.is_input:
             self.alt_comm = new_comm(self.name, **self.alt_comm_kwargs)
         super(TestCommParam, self).setup(*args, **kwargs)
         # If driver sending, create recv comm second
-        if 'Input' in self.driver:
+        if self.is_input:
             self.alt_comm = new_comm(self.name, **self.alt_comm_kwargs)
 
     def teardown(self, *args, **kwargs):
@@ -127,9 +133,16 @@ class TestCommDriverNoStart(TestCommParam, parent.TestDriverNoStart):
         assert(not flag)
         nt.assert_equal(ret, None)
 
+    def get_fresh_name(self):
+        r"""Get a fresh name for a new instance that won't overlap with the base."""
+        return 'Test%s_%s' % (self.cls, str(uuid.uuid4()))
+
     def get_fresh_error_instance(self):
         r"""Get CommDriver instance with an ErrorComm parent class."""
-        args = self.inst_args
+        args = [self.get_fresh_name()]
+        if self.args is not None:
+            args.append(self.args)
+        # args = self.inst_args
         kwargs = self.inst_kwargs
         if 'address' in kwargs:
             del kwargs['address']
@@ -154,6 +167,7 @@ class TestCommDriverNoStart(TestCommParam, parent.TestDriverNoStart):
 
     def test_error_on_graceful_stop(self):
         r"""Test error raised during graceful stop."""
+        # if not self.is_input:
         inst = self.get_fresh_error_instance()
         inst.comm.error_replace('n_msg')
         nt.assert_raises(MagicTestError, inst.stop)
@@ -184,25 +198,44 @@ class TestCommDriver(TestCommParam, parent.TestDriver):
 
     def test_send_recv(self):
         r"""Test sending/receiving small message."""
-        flag = self.send_comm.send(self.msg_short)
+        if self.is_input:
+            recv_mech = self.recv_comm
+            send_mech = self.instance
+        else:
+            recv_mech = self.instance
+            send_mech = self.send_comm
+        flag = send_mech.send(self.msg_short)
         if self.comm_name != 'CommBase':
             assert(flag)
-        self.instance.sleep()
-        if self.comm_name != 'CommBase':
-            nt.assert_equal(self.instance.n_msg, 1)
-        flag, msg_recv = self.instance.recv()
+            T = self.instance.start_timeout()
+            while (not T.is_out) and (recv_mech.n_msg == 0):
+                self.instance.sleep()
+            self.instance.stop_timeout()
+            nt.assert_equal(recv_mech.n_msg, 1)
+        flag, msg_recv = recv_mech.recv()
         if self.comm_name != 'CommBase':
             assert(flag)
             nt.assert_equal(msg_recv, self.msg_short)
-            nt.assert_equal(self.instance.n_msg, 0)
+            nt.assert_equal(recv_mech.n_msg, 0)
 
     def test_send_recv_nolimit(self):
         r"""Test sending/receiving large message."""
         assert(len(self.msg_long) > self.maxMsgSize)
-        flag = self.send_comm.send_nolimit(self.msg_long)
+        if self.is_input:
+            recv_mech = self.recv_comm
+            send_mech = self.instance
+        else:
+            recv_mech = self.instance
+            send_mech = self.send_comm
+        flag = send_mech.send_nolimit(self.msg_long)
         if self.comm_name != 'CommBase':
             assert(flag)
-        flag, msg_recv = self.instance.recv_nolimit()
+            T = self.instance.start_timeout()
+            while (not T.is_out) and (recv_mech.n_msg == 0):
+                self.instance.sleep()
+            self.instance.stop_timeout()
+            assert(recv_mech.n_msg > 0)
+        flag, msg_recv = recv_mech.recv_nolimit()
         if self.comm_name != 'CommBase':
             assert(flag)
             nt.assert_equal(msg_recv, self.msg_long)

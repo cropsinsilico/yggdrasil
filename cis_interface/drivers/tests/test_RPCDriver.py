@@ -88,10 +88,11 @@ class TestRPCDriver(TestRPCParam, parent.TestDriver, IOInfo):
         # Output
         msg_flag = self.instance.send(self.msg_short)
         assert(msg_flag)
-        nt.assert_equal(self.instance.n_msg_out, 1)
+        nt.assert_equal(self.recv_comm.n_msg, 1)
         msg_flag, msg_recv = self.recv_comm.recv(self.timeout)
         assert(msg_flag)
         nt.assert_equal(msg_recv, self.msg_short)
+        nt.assert_equal(self.recv_comm.n_msg, 0)
         nt.assert_equal(self.instance.n_msg_out, 0)
 
     def test_send_recv_nolimit(self):

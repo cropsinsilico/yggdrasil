@@ -97,7 +97,7 @@ class TestClientDriver(TestClientParam, parent.TestConnectionDriver):
 
     # Disabled so that test message is not read by mistake
     def test_purge(self):
-        r"""Test purge of queue."""
+        r"""Disabled: Test purge of queue."""
         pass
 
     def test_send_recv(self, msg_send=None):

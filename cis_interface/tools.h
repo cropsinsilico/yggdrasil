@@ -120,10 +120,11 @@ void cisError(const char* fmt, ...) {
  */
 static inline
 int is_eof(const char *buf) {
-  if (strcmp(buf, CIS_MSG_EOF) == 0)
+  if (strcmp(buf, CIS_MSG_EOF) == 0) {
     return 1;
-  else
+  } else {
     return 0;
+  }
 };
 
 

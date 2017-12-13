@@ -205,6 +205,9 @@ class RMQComm(CommBase.CommBase):
                 self.channel.queue_delete(queue=self.queue)
             except pika.exceptions.ChannelClosed:
                 pass
+            except AttributeError:
+                if self.channel is not None:
+                    raise
 
     def close_channel(self):
         r"""Close the channel if it exists."""
@@ -219,7 +222,10 @@ class RMQComm(CommBase.CommBase):
     def close_connection(self):
         r"""Close the connection."""
         if self.connection:
-            self.connection.close()
+            try:
+                self.connection.close()
+            except AttributeError:
+                pass
         self.connection = None
 
     @property

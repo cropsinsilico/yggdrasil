@@ -249,7 +249,9 @@ int comm_send_multipart(const comm_t x, const char *data, const int len) {
     return -1;
   }
   // Create header
-  comm_head_t head = init_header(len, xmulti.address, NULL, NULL);
+  comm_head_t head = init_header(len, xmulti.address, NULL);
+  sprintf(head.id, "%d", rand());
+  // Why was this necessary?
   if (x.type == SERVER_COMM)
     strcpy(head.id, x.address);
   char headbuf[BUFSIZ];
@@ -387,9 +389,9 @@ int comm_recv_multipart(const comm_t x, char **data, const int len,
       int prev = 0;
       int msgsiz = 0;
       // Reallocate data if necessary
-      if (head.size > len) {
+      if ((head.size + 1) > len) {
 	if (allow_realloc) {
-	  *data = (char*)realloc(*data, head.size);
+	  *data = (char*)realloc(*data, head.size + 1);
 	} else {
 	  cislog_error("comm_recv_multipart(%s): buffer is not large enough",
 		       x.name);
@@ -402,7 +404,7 @@ int comm_recv_multipart(const comm_t x, char **data, const int len,
 	if ((head.size - prev) > xmulti.maxMsgSize)
 	  msgsiz = xmulti.maxMsgSize;
 	else
-	  msgsiz = head.size - prev;
+	  msgsiz = head.size - prev + 1;
 	ret = comm_recv_single(xmulti, (*data) + prev, msgsiz);
 	if (ret < 0) {
 	  cislog_debug("comm_recv_multipart(%s): recv interupted at %d of %d bytes.",
@@ -463,7 +465,7 @@ int comm_recv_realloc(const comm_t x, char **data, const int len) {
   int ret = comm_recv_single(x, *data, len);
   if (ret > 0) {
     if (is_eof(*data)) {
-      cislog_debug("comm_recv(%s): EOF received.\n", x.name);
+      cislog_debug("comm_recv_realloc(%s): EOF received.\n", x.name);
       ret = -2;
     } else {
       ret = comm_recv_multipart(x, data, len, ret, 1);

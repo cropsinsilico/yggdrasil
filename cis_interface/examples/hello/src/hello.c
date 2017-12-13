@@ -17,7 +17,7 @@ int main(int argc, char *argv[]) {
   psiInput_t inq = psiInput("helloQueueIn");
   psiOutput_t outq = psiOutput("helloQueueOut");
   printf("hello(C): Created I/O channels\n");
-  
+
   // Receive input from a local file
   ret = psi_recv(inf, buf, bufsiz0);
   if (ret < 0) {
@@ -52,6 +52,12 @@ int main(int argc, char *argv[]) {
   }
   printf("hello(C): Sent to outf\n");
 
+  // Free input/output channels
+  psi_free(&inf);
+  psi_free(&outf);
+  psi_free(&inq);
+  psi_free(&outq);
+  
   printf("Goodbye from C\n");
   return 0;
 }

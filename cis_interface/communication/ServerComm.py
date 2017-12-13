@@ -120,14 +120,15 @@ class ServerComm(CommBase.CommBase):
         elif 'response_address' not in self.icomm._last_header:  # pragma: debug
             raise RuntimeError("Last header does not contain response address.")
         comm_kwargs = dict(address=self.icomm._last_header['response_address'],
-                           direction='send', **self.response_kwargs)
+                           direction='send', is_response_server=True,
+                           **self.response_kwargs)
         self.ocomm = get_comm(self.name + '.server_response_comm',
                               **comm_kwargs)
 
     def remove_response_comm(self):
         r"""Remove response comm."""
         self.icomm._last_header = None
-        # self.ocomm.close()
+        self.ocomm.close()
         self.ocomm = None
 
     # SEND METHODS

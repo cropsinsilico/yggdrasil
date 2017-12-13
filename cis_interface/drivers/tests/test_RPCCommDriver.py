@@ -27,7 +27,10 @@ class TestRPCCommDriverNoStart(TestRPCCommParam, parent.TestCommDriverNoStart):
     
     def get_fresh_error_instance(self, comm, error_on_init=False):
         r"""Get CommDriver instance with an ErrorComm parent class."""
-        args = self.inst_args
+        args = [self.get_fresh_name()]
+        if self.args is not None:
+            args.append(self.args)
+        # args = self.inst_args
         kwargs = self.inst_kwargs
         kwargs.setdefault('icomm_kwargs', {})
         kwargs.setdefault('ocomm_kwargs', {})
