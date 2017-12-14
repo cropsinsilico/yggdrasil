@@ -32,7 +32,6 @@ int new_zmq_address(comm_t *comm) {
   char address[100];
   if (strcmp(host, "localhost") == 0)
     strcpy(host, "127.0.0.1");
-  int ret;
   if ((strcmp(protocol, "inproc") == 0) ||
       (strcmp(protocol, "ipc") == 0)) {
     // TODO: small chance of reusing same number
@@ -56,14 +55,12 @@ int new_zmq_address(comm_t *comm) {
     cislog_error("new_zmq_address: Could not initialize empty socket.");
     return -1;
   }
-  printf("bind to %s\n", address);
   int port = zsock_bind(s, "%s", address);
   if (port == -1) {
     cislog_error("new_zmq_address: Could not bind socket to address = %s",
 		 address);
     return -1;
   }
-  printf("bound to port %d, direction = %s\n", port, comm->direction);
   // Add port to address
   if ((strcmp(protocol, "inproc") != 0) &&
       (strcmp(protocol, "ipc") != 0)) {
@@ -74,6 +71,7 @@ int new_zmq_address(comm_t *comm) {
   if (strlen(comm->name) == 0)
     sprintf(comm->name, "tempnewZMQ-%d", port);
   // Unbind and connect if this is a recv socket
+  // int ret;
   /* if (strcmp(comm->direction, "recv") == 0) { */
   /*   ret = zsock_unbind(s, "%s", comm->address); */
   /*   printf("unbound from %s (ret = %d)\n", comm->address, ret); */

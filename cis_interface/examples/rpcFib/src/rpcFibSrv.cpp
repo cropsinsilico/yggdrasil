@@ -44,6 +44,6 @@ int main(int argc, char *argv[]) {
   }
 
   printf("Goodbye from C++ rpcFibSrv\n");
-  
+  return 0;
 }
 

@@ -289,6 +289,9 @@ class ConnectionDriver(Driver):
         T = self.start_timeout()
         while (not T.is_out) and (not flag) and self.ocomm.is_open:
             flag = self._send_message(*args, **kwargs)
+            if not flag:
+                print("send 1st")
+                self.sleep()
         self.stop_timeout()
         self._first_send_done = True
         return flag

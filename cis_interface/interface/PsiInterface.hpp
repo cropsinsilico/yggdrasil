@@ -43,11 +43,13 @@ public:
    */
   CisInput(const char *name, char *fmt) : _pi(cisInputFmt(name, fmt)) {}
 
+  void _destroy_pi() { cis_free(&_pi); }
+  
   /*!
     @brief Destructor for CisInput.
     See cis_free in PsiInterface.h for details.
   */
-  ~CisInput() { cis_free(&_pi); }
+  ~CisInput() { _destroy_pi(); }
   
   /*!
     @brief Return the cisInput_t structure.
@@ -160,11 +162,13 @@ public:
   /*! @brief Empty constructor for inheritance. */
   CisOutput(cisOutput_t x) : _pi(x) {}
   
+  void _destroy_pi() { cis_free(&_pi); }
+  
   /*!
     @brief Destructor for CisOutput.
     See cis_free in PsiInterface.h for details.
   */
-  ~CisOutput() { cis_free(&_pi); }
+  ~CisOutput() { _destroy_pi(); }
   
   /*!
     @brief Return the cisOutput_t structure.
@@ -274,11 +278,13 @@ public:
   /*! @brief Empty constructor for inheritance. */
   CisRpc(cisRpc_t x) : _pi(x) {}
   
+  void _destroy_pi() { cis_free(&_pi); }
+  
   /*!
     @brief Destructor for CisRpc.
     See cis_free in PsiInterface.h for details.
   */
-  ~CisRpc() { cis_free(&_pi); }
+  ~CisRpc() { _destroy_pi(); }
   
   /*!
     @brief Return the cisRpc_t structure.
@@ -346,6 +352,12 @@ public:
   CisRpcServer(const char *name, char *inFormat, char *outFormat) :
     CisRpc(cisRpcServer(name, inFormat, outFormat)) {}
 
+  /*!
+    @brief Destructor for CisRpcServer.
+    See cis_free in PsiInterface.h for details.
+  */
+  ~CisRpcServer() { _destroy_pi(); }
+  
 };
 
 
@@ -371,6 +383,12 @@ public:
   CisRpcClient(const char *name, char *outFormat, char *inFormat) :
     CisRpc(cisRpcClient(name, outFormat, inFormat)) {}
 
+  /*!
+    @brief Destructor for CisRpcClient.
+    See cis_free in PsiInterface.h for details.
+  */
+  ~CisRpcClient() { _destroy_pi(); }
+  
   /*!
     @brief Send request to an RPC server from the client and wait for a
     response.

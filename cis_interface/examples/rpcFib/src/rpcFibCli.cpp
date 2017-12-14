@@ -49,7 +49,7 @@ int main(int argc, char *argv[]) {
     if (ret < 0) {
       printf("rpcFibCli(CPP): RPC CALL ERROR\n");
       free(logmsg);
-      exit(-1);
+      return -1;
     }
 
     // Log result by sending it to the log connection
@@ -59,13 +59,12 @@ int main(int argc, char *argv[]) {
     if (ret != 0) {
       printf("rpcFibCli(CPP): SEND ERROR\n");
       free(logmsg);
-      exit(-1);
+      return -1;
     }
   }
 
   printf("Goodbye from C++ rpcFibCli\n");
   free(logmsg);
-  exit(0);
-    
+  return 0;
 }
 

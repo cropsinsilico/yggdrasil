@@ -27,7 +27,7 @@ int comm_send_eof(const comm_t x);
 static inline
 int free_comm(comm_t *x) {
   comm_type t = x->type;
-  if (strcmp(x->direction, "send") == 0)
+  if ((strcmp(x->direction, "send") == 0) && (t != CLIENT_COMM))
     comm_send_eof(*x);
   int ret = 1;
   if (t == IPC_COMM)

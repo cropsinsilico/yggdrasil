@@ -173,6 +173,8 @@ class ZMQProxy(threading.Thread, CisClass):
         **kwargs: Additional keyword arguments are passed to the parent class.
 
     Attributes:
+        lock (threading.RLock): Lock for accessing the sockets from multiple
+            threads.
         srv_address (str): Address that faces the server(s).
         cli_address (str): Address that faces the client(s).
         context (zmq.Context): ZeroMQ context that will be used.
@@ -182,6 +184,7 @@ class ZMQProxy(threading.Thread, CisClass):
 
     """
     def __init__(self, srv_address, context=None, **kwargs):
+        self.lock = threading.RLock()
         # Get parameters
         srv_param = parse_address(srv_address)
         cli_param = dict()
@@ -208,6 +211,29 @@ class ZMQProxy(threading.Thread, CisClass):
         self.cli_count = 0
         self._running = False
 
+    def client_recv(self):
+        r"""Receive single message from the client."""
+        with self.lock:
+            if self._running:
+                return self.cli_socket.recv_multipart()
+            else:
+                return None
+
+    def server_send(self, msg):
+        r"""Send single message to the server."""
+        with self.lock:
+            if self._running and (msg is not None):
+                self.srv_socket.send(msg, zmq.NOBLOCK)
+                # self.srv_socket.send_multipart(msg, zmq.NOBLOCK)
+
+    def poll(self):
+        with self.lock:
+            if self._running:
+                out = self.cli_socket.poll(timeout=1, flags=zmq.POLLIN)
+                return (out == zmq.POLLIN)
+            else:
+                return False
+
     def run(self):
         r"""Run the proxy, handling errors on exit."""
         self._running = True
@@ -216,16 +242,16 @@ class ZMQProxy(threading.Thread, CisClass):
         try:
             # This version does explicit checking of polls
             while self._running:
-                socks = dict(self.poller.poll())
-                # out = self.cli_socket.poll(timeout=1, flags=zmq.POLLIN)
-                # if out == zmq.POLLIN:
-                if socks.get(self.cli_socket) == zmq.POLLIN:
-                    message = self.cli_socket.recv_multipart()
+                # socks = dict(self.poller.poll())
+                # if socks.get(self.cli_socket) == zmq.POLLIN:
+                if self.poll():
+                    message = self.client_recv()
                     # print('fowarding', message)
                     self.debug('.run(): forwarding message of size %d from %s',
                                len(message[1]), message[0])
-                    # self.srv_socket.send_multipart(message, zmq.NOBLOCK)
-                    self.srv_socket.send(message[1], zmq.NOBLOCK)
+                    self.server_send(message[1])
+                    # For multipart
+                    # self.server_send(message)
             # This version does fowarding in a black box
             # zmq.proxy(self.cli_socket, self.srv_socket)
         except zmq.ZMQError:
@@ -236,17 +262,18 @@ class ZMQProxy(threading.Thread, CisClass):
 
     def terminate(self):
         r"""Stop the proxy."""
-        self._running = False
-        if self.cli_socket:
-            self.cli_socket.close()
-            self.cli_socket = None
-        if self.srv_socket:
-            self.srv_socket.close()
-            self.srv_socket = None
-        unregister_socket('ROUTER', self.cli_address)
-        unregister_socket('DEALER', self.srv_address)
-        if hasattr(super(ZMQProxy, self), 'terminate'):
-            super(ZMQProxy, self).terminate()
+        with self.lock:
+            self._running = False
+            if self.cli_socket:
+                self.cli_socket.close()
+                self.cli_socket = None
+            if self.srv_socket:
+                self.srv_socket.close()
+                self.srv_socket = None
+            unregister_socket('ROUTER', self.cli_address)
+            unregister_socket('DEALER', self.srv_address)
+            if hasattr(super(ZMQProxy, self), 'terminate'):
+                super(ZMQProxy, self).terminate()
 
 
 class ZMQComm(CommBase.CommBase):
@@ -478,6 +505,7 @@ class ZMQComm(CommBase.CommBase):
         if (srv_address not in _registered_servers) or (srv_param['port'] is None):
             proxy = ZMQProxy(srv_address, context=self.context)
             proxy.start()
+            srv_address = proxy.srv_address
             _registered_servers[srv_address] = proxy
         _registered_servers[srv_address].cli_count += 1
         self._client_proxy = _registered_servers[srv_address]
