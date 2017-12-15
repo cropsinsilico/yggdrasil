@@ -233,6 +233,28 @@ int comm_send_single(const comm_t x, const char *data, const int len) {
   return ret;
 };
 
+
+/*!
+  @brief Create header for multipart message.
+  @param[in] x comm_t structure that header will be sent to.
+  @param[in] len int Size of message body.
+  @param[out] comm_head_t Header info that should be sent before the message
+  body.
+*/
+static inline
+comm_head_t comm_send_multipart_header(const comm_t x, const int len) {
+  comm_head_t head = init_header(len, NULL, NULL);
+  sprintf(head.id, "%d", rand());
+  head.multipart = 1;
+  head.valid = 1;
+  // Why was this necessary?
+  if (x.type == SERVER_COMM)
+    strcpy(head.id, x.address);
+  else if (x.type == CLIENT_COMM)
+    head = client_response_header(x, head);
+  return head;
+};
+
 /*!
   @brief Send a large message in multiple parts via a new comm.
   @param[in] x comm_t Structure that message should be sent to.
@@ -242,31 +264,56 @@ int comm_send_single(const comm_t x, const char *data, const int len) {
 */
 static inline
 int comm_send_multipart(const comm_t x, const char *data, const int len) {
-  // Get address for new comm
-  comm_t xmulti = new_comm(NULL, "send", x.type, NULL);
-  if (!(xmulti.valid)) {
-    cislog_error("comm_send_multipart: Failed to initialize a new comm.");
+  char headbuf[BUFSIZ];
+  int headlen, ret;
+  comm_t xmulti;
+  // Get header
+  comm_head_t head = comm_send_multipart_header(x, len);
+  if (head.valid == 0) {
+    cislog_error("comm_send_multipart: Invalid header generated.");
     return -1;
   }
-  // Create header
-  comm_head_t head = init_header(len, xmulti.address, NULL);
-  sprintf(head.id, "%d", rand());
-  // Why was this necessary?
-  if (x.type == SERVER_COMM)
-    strcpy(head.id, x.address);
-  char headbuf[BUFSIZ];
-  int ret = format_comm_header(head, headbuf, BUFSIZ);
-  if (ret < 0) {
-    cislog_error("comm_send_multipart: Failed to format header.");
-    free_comm(&xmulti);
-    return -1;
+  // Try to send body in header
+  if (len < x.maxMsgSize) {
+    headlen = format_comm_header(head, headbuf, BUFSIZ);
+    if (headlen < 0) {
+      cislog_error("comm_send_multipart: Failed to format header.");
+      return -1;
+    }
+    if ((headlen + len) < x.maxMsgSize) {
+      head.multipart = 0;
+      memcpy(headbuf + headlen, data, len);
+      headlen += len;
+      headbuf[headlen] = '\0';
+    }
+  }
+  // Get head string
+  if (head.multipart == 1) {
+    // Get address for new comm and add to header
+    xmulti = new_comm(NULL, "send", x.type, NULL);
+    if (!(xmulti.valid)) {
+      cislog_error("comm_send_multipart: Failed to initialize a new comm.");
+      return -1;
+    }
+    strcpy(head.address, xmulti.address);
+    headlen = format_comm_header(head, headbuf, BUFSIZ);
+    if (headlen < 0) {
+      cislog_error("comm_send_multipart: Failed to format header.");
+      free_comm(&xmulti);
+      return -1;
+    }
   }
   // Send header
-  ret = comm_send_single(x, headbuf, ret);
+  ret = comm_send_single(x, headbuf, headlen);
   if (ret < 0) {
     cislog_error("comm_send_multipart: Failed to send header.");
-    free_comm(&xmulti);
+    if (head.multipart == 1)
+      free_comm(&xmulti);
     return -1;
+  }
+  if (head.multipart == 0) {
+    cislog_debug("comm_send_multipart(%s): %d bytes completed", x.name, head.size);
+    return ret;
   }
   // Send multipart
   int msgsiz;
@@ -365,6 +412,7 @@ int comm_recv_single(const comm_t x, char *data, const int len) {
   @param[in] x comm_t Comm that message should be recieved from.
   @param[in] data char ** Pointer to buffer where message should be stored.
   @param[in] len int Size of data buffer.
+  @param[in] headlen int
   @param[in] allow_realloc int If 1, data will be realloced if the incoming
   message is larger than the buffer. Otherwise, an error will be returned.
   @returns int -1 if unsucessful, size of message received otherwise.
@@ -379,6 +427,13 @@ int comm_recv_multipart(const comm_t x, char **data, const int len,
     ret = -1;
   } else {
     if (head.multipart) {
+      // Move part of message after header to front of data
+      memmove(*data, *data + head.bodybeg, head.bodysiz);
+      (*data)[head.bodysiz] = '\0';
+      // Return early if header contained entire message
+      if (head.size == head.bodysiz) {
+	return head.bodysiz;
+      }
       // Get address for new comm
       comm_t xmulti = new_comm(head.address, "recv", x.type, NULL);
       if (!(xmulti.valid)) {
@@ -386,7 +441,7 @@ int comm_recv_multipart(const comm_t x, char **data, const int len,
 	return -1;
       }
       // Receive parts of message
-      int prev = 0;
+      int prev = head.bodysiz;
       int msgsiz = 0;
       // Reallocate data if necessary
       if ((head.size + 1) > len) {

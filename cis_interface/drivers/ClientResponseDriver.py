@@ -78,5 +78,6 @@ class ClientResponseDriver(ConnectionDriver):
         with self.lock:
             self._unused = False
         out = super(ClientResponseDriver, self).send_message(*args, **kwargs)
-        self.icomm.close()
+        with self.lock:
+            self.icomm.close()
         return out

@@ -147,12 +147,14 @@ int format_comm_header(const comm_head_t head, char *buf, const int bufsiz) {
     return -1;
   }
   // Address entry
-  ret = format_header_entry(buf + pos, "address", head.address, bufsiz - pos);
-  if (ret < 0) {
-    cislog_error("Adding address entry would exceed buffer size\n");
-    return ret;
-  } else {
-    pos += ret;
+  if (strlen(head.address) > 0) {
+    ret = format_header_entry(buf + pos, "address", head.address, bufsiz - pos);
+    if (ret < 0) {
+      cislog_error("Adding address entry would exceed buffer size\n");
+      return ret;
+    } else {
+      pos += ret;
+    }
   }
   // Size entry
   char size_str[100];
@@ -231,7 +233,7 @@ comm_head_t parse_comm_header(const char *buf, const int bufsiz) {
   char re_head[COMMBUFFSIZ] = CIS_MSG_HEAD;
   strcat(re_head, "(.*)");
   strcat(re_head, CIS_MSG_HEAD);
-  strcat(re_head, "(.*)");
+  /* strcat(re_head, "(.*)"); */
   int sind, eind;
   int ret = find_match(re_head, buf, &sind, &eind);
   if (ret < 0) {
@@ -239,31 +241,21 @@ comm_head_t parse_comm_header(const char *buf, const int bufsiz) {
     return out;
   } else if (ret == 0) {
     out.multipart = 0;
-    /* out.size = bufsiz; */
-    /* out.body = (char*)malloc(bufsiz); */
-    /* memcpy(out.body, buf, bufsiz); */
+    out.size = bufsiz;
   } else {
     out.multipart = 1;
     // Extract just header
     int headsiz = (eind-sind);
     out.bodysiz = bufsiz - headsiz;
-    headsiz -= 2*strlen(CIS_MSG_HEAD);
     out.bodybeg = eind;
+    headsiz -= 2*strlen(CIS_MSG_HEAD);
     char *head = (char*)malloc(headsiz + 2*strlen(HEAD_KEY_SEP) + 1);
     strcpy(head, HEAD_KEY_SEP);
     memcpy(head + strlen(HEAD_KEY_SEP), buf + sind + strlen(CIS_MSG_HEAD), headsiz);
     head[headsiz + strlen(HEAD_KEY_SEP)] = '\0';
     strcat(head, HEAD_KEY_SEP);
-    /* out.body = (char*)malloc(out.bodysiz); */
-    /* memcpy(out.body, buf + eind, out.bodysiz); */
-    /* out.body[out.bodysiz] = '\0'; */
     // Extract address
     ret = parse_header_entry(head, "address", out.address, COMMBUFFSIZ);
-    if (ret < 0) {
-      out.valid = 0;
-      free(head);
-      return out;
-    }
     // Extract size
     char size_str[COMMBUFFSIZ];
     ret = parse_header_entry(head, "size", size_str, COMMBUFFSIZ);

@@ -157,6 +157,36 @@ int client_comm_nmsg(const comm_t x) {
 };
 
 /*!
+  @brief Create response comm and add info to header.
+  @param[in] x comm_t structure that header will be sent to.
+  @param[in] head comm_head_t Prexisting header structure.
+  @param[out] comm_head_t Header structure that includes the additional
+  information about the response comm.
+*/
+static inline
+comm_head_t client_response_header(comm_t x, comm_head_t head) {
+  // Initialize new comm
+  int ncomm = get_client_response_count(x);
+  comm_t **res_comm = (comm_t**)(x.info);
+  res_comm[0] = (comm_t*)realloc(res_comm[0], sizeof(comm_t)*(ncomm + 1));
+  char *seri_copy = (char*)malloc(strlen((char*)(x.serializer.info)) + 1);
+  strcpy(seri_copy, (char*)(x.serializer.info));
+  (*res_comm)[ncomm] = new_comm_base(NULL, "recv", _default_comm, seri_copy);
+  int ret = new_default_address(*res_comm + ncomm);
+  if (ret < 0) {
+    cislog_error("client_comm_send(%s): could not create response comm", x.name);
+    head.valid = 0;
+    return head;
+  }
+  inc_client_response_count(x);
+  ncomm = get_client_response_count(x);
+  // Add address & request ID to header
+  strcpy(head.response_address, (*res_comm)[ncomm - 1].address);
+  sprintf(head.request_id, "%d", rand());
+  return head;
+};
+
+/*!
   @brief Send a message to the comm.
   @param[in] x comm_t structure that comm should be sent to.
   @param[in] data character pointer to message that should be sent.
@@ -177,40 +207,9 @@ int client_comm_send(comm_t x, const char *data, const int len) {
     ret = default_comm_send(*req_comm, data, len);
     return ret;
   }
-  // Initialize new comm
-  int ncomm = get_client_response_count(x);
-  comm_t **res_comm = (comm_t**)(x.info);
-  res_comm[0] = (comm_t*)realloc(res_comm[0], sizeof(comm_t)*(ncomm + 1));
-  char *seri_copy = (char*)malloc(strlen((char*)(x.serializer.info)) + 1);
-  strcpy(seri_copy, (char*)(x.serializer.info));
-  (*res_comm)[ncomm] = new_comm_base(NULL, "recv", _default_comm, seri_copy);
-  /* sprintf((*res_comm)[ncomm].name, "client_response.%s", (*res_comm)[ncomm].address); */
-  ret = new_default_address(*res_comm + ncomm);
-  if (ret < 0) {
-    cislog_error("client_comm_send(%s): could not create response comm", x.name);
-    return -1;
-  }
-  inc_client_response_count(x);
-  ncomm = get_client_response_count(x);
-  // Add address to header
-  comm_head_t head = parse_comm_header(data, len);
-  if (!(head.valid)) {
-    cislog_error("client_comm_send(%s): Error parsing header.", x.name);
-    return -1;
-  }
-  strcpy(head.response_address, (*res_comm)[ncomm - 1].address);
-  sprintf(head.request_id, "%d", rand());
-  char *new_data = (char*)malloc(BUFSIZ);
-  ret = format_comm_header(head, new_data, BUFSIZ);
-  if (ret < 0) {
-    cislog_error("client_comm_send(%s): Error formatting.", x.name);
-    free(new_data);
-    return -1;
-  }    
   // Send message with header
   comm_t *req_comm = (comm_t*)(x.handle);
-  ret = default_comm_send(*req_comm, new_data, ret);
-  free(new_data);
+  ret = default_comm_send(*req_comm, data, len);
   return ret;
 };
 

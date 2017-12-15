@@ -50,7 +50,7 @@ int init_server_comm(comm_t *comm) {
   /* 	 handle->name, handle->type, handle->address); */
   strcpy(comm->direction, "recv");
   comm->handle = (void*)handle;
-  comm->always_send_header = 1;
+  comm->always_send_header = 0;
   comm_t **info = (comm_t**)malloc(sizeof(comm_t*));
   info[0] = NULL;
   comm->info = (void*)info;

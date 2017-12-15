@@ -228,11 +228,10 @@ class ZMQProxy(threading.Thread, CisClass):
 
     def poll(self):
         with self.lock:
-            if self._running:
-                out = self.cli_socket.poll(timeout=1, flags=zmq.POLLIN)
-                return (out == zmq.POLLIN)
-            else:
+            if not self._running:
                 return False
+        out = self.cli_socket.poll(timeout=1, flags=zmq.POLLIN)
+        return (out == zmq.POLLIN)
 
     def run(self):
         r"""Run the proxy, handling errors on exit."""
@@ -255,6 +254,7 @@ class ZMQProxy(threading.Thread, CisClass):
             # This version does fowarding in a black box
             # zmq.proxy(self.cli_socket, self.srv_socket)
         except zmq.ZMQError:
+            # print('proxy stopped')
             self.debug('.run(): Proxy fowarding stopped.')
             pass
         # self.cli_socket.close()
@@ -508,6 +508,7 @@ class ZMQComm(CommBase.CommBase):
             srv_address = proxy.srv_address
             _registered_servers[srv_address] = proxy
         _registered_servers[srv_address].cli_count += 1
+        # print("New client", srv_address, _registered_servers[srv_address].cli_count)
         self._client_proxy = _registered_servers[srv_address]
         return self._client_proxy.cli_address
 
@@ -516,6 +517,8 @@ class ZMQComm(CommBase.CommBase):
         are not more clients."""
         global _registered_servers
         self._client_proxy.cli_count -= 1
+        # print("Removed client", self._client_proxy.srv_address,
+        #       self._client_proxy.cli_count)
         if self._client_proxy.cli_count <= 0:
             self._client_proxy.terminate()
             self._client_proxy.join()

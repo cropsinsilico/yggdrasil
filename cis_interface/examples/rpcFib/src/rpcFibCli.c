@@ -27,7 +27,7 @@ int main(int argc, char *argv[]) {
   psiInput_t ymlfile = psiInput("yaml_in");
   psiRpc_t rpc = psiRpcClient("rpcFibSrv_rpcFibCli", "%d", "%d %d");
   psiOutput_t log = psiOutput("output_log");
-  
+
   // Read entire contents of yaml
   char *ycontent = (char*)malloc(PSI_MSG_MAX*sizeof(char));
   int ret = psi_recv(ymlfile, ycontent, PSI_MSG_MAX);
@@ -40,6 +40,7 @@ int main(int argc, char *argv[]) {
     exit(-1);
   }
   printf("rpcFibCli: yaml has %d lines\n", count_lines(ycontent, "\n") + 1);
+  ret = psi_recv(ymlfile, ycontent, PSI_MSG_MAX);
   free(ycontent);
   
   int fib = -1;

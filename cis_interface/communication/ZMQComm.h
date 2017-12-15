@@ -50,7 +50,7 @@ int new_zmq_address(comm_t *comm) {
   }
   // Bind
   zsock_t *s = zsock_new(ZMQ_PAIR);
-  zsock_set_linger(s, 10);
+  zsock_set_linger(s, 100);
   if (s == NULL) {
     cislog_error("new_zmq_address: Could not initialize empty socket.");
     return -1;
@@ -106,7 +106,7 @@ int init_zmq_comm(comm_t *comm) {
     cislog_error("init_zmq_address: Could not initialize empty socket.");
     return -1;
   }
-  zsock_set_linger(s, 10);
+  zsock_set_linger(s, 100);
   /* int port = zsock_bind(s, comm->address); */
   /* if (port == -1) { */
   /*   cislog_error("init_zmq_address: Could not bind socket to address = %s", */

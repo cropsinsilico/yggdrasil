@@ -65,6 +65,7 @@ class ConnectionDriver(Driver):
             print(self.env)
             print(self.icomm.name, self.icomm.address)
             print(self.ocomm.name, self.ocomm.address)
+            print(80 * '=')
 
     @property
     def is_valid(self):
@@ -229,6 +230,8 @@ class ConnectionDriver(Driver):
         if msg == self.icomm.eof_msg:
             return self.on_eof()
         if flag:
+            # if len(msg) > 0:
+            #     print('recv', self.__class__, msg)
             return msg
         else:
             return flag
@@ -310,6 +313,7 @@ class ConnectionDriver(Driver):
             flag = self._send_message(*args, **kwargs)
         else:
             flag = self._send_1st_message(*args, **kwargs)
+        # print('send', self.__class__, args, flag)
         return flag
 
     def run(self):

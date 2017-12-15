@@ -397,11 +397,13 @@ class CommBase(CisClass):
             c.close()
 
     # HEADER
-    def get_header(self, msg, **kwargs):
+    def get_header(self, msg, no_address=False, **kwargs):
         r"""Create a dictionary of message properties.
 
         Args:
             msg (str): Message to get header for.
+            no_address (bool, optional): If True, an address won't be added to
+                the header and a work comm won't be created. Defaults to False.
             **kwargs: Additional keyword args are used to initialized the
                 header.
 
@@ -412,8 +414,9 @@ class CommBase(CisClass):
         out = dict(**kwargs)
         out['size'] = len(msg)
         out.setdefault('id', str(uuid.uuid4()))
-        c = self.create_work_comm(out)
-        out['address'] = c.address
+        if not no_address:
+            c = self.create_work_comm(out)
+            out['address'] = c.address
         return out
 
     def format_header(self, header_info):
@@ -456,6 +459,14 @@ class CommBase(CisClass):
         return out
 
     # SEND METHODS
+    def _safe_send(self, *args, **kwargs):
+        r"""Send message checking if is 1st message and then waiting."""
+        if not self._first_send_done:
+            out = self._send_1st(*args, **kwargs)
+        else:
+            out = self._send(*args, **kwargs)
+        return out
+    
     def _send_1st(self, *args, **kwargs):
         r"""Send first message until it succeeds."""
         flag = False
@@ -491,10 +502,7 @@ class CommBase(CisClass):
             if self.is_closed:  # pragma: debug
                 self.error("._send_multipart(): Connection closed.")
                 return False
-            if not self._first_send_done:
-                ret = self._send_1st(imsg, **kwargs)
-            else:
-                ret = self._send(imsg, **kwargs)
+            ret = self._safe_send(imsg, **kwargs)
             if not ret:  # pragma: debug
                 self.debug(
                     ".send_multipart(): send interupted at %d of %d bytes.",
@@ -609,21 +617,23 @@ class CommBase(CisClass):
             if self.is_closed:  # pragma: debug
                 self.error(".send_multipart(): Connection closed.")
                 return False
-            if not self._first_send_done:
-                ret = self._send_1st(msg, **kwargs)
-            else:
-                ret = self._send(msg, **kwargs)
+            ret = self._safe_send(msg, **kwargs)
         else:
             if header_kwargs is None:
                 header_kwargs = dict()
-            header = self.get_header(msg, **header_kwargs)
-            # if header_kwargs is not None:
-            #     header.update(**header_kwargs)
-            ret = self.send_header(header)
-            if not ret:  # pragma: debug
-                self.debug(".send_multipart: Sending message header failed.")
-                return ret
-            ret = self._send_multipart_worker(msg, header, **kwargs)
+            header = self.get_header(msg, no_address=True, **header_kwargs)
+            header_msg = self.format_header(header)
+            if (((len(header_msg) + len(msg)) < self.maxMsgSize) or
+                (self.maxMsgSize == 0)):
+                ret = self._safe_send(header_msg + msg)
+            else:
+                header = self.get_header(msg, **header_kwargs)
+                header_msg = self.format_header(header)
+                ret = self._safe_send(header_msg)
+                if not ret:  # pragma: debug
+                    self.debug(".send_multipart: Sending message header failed.")
+                    return ret
+                ret = self._send_multipart_worker(msg, header, **kwargs)
         return ret
         
     def send_header(self, header, **kwargs):
@@ -641,10 +651,7 @@ class CommBase(CisClass):
         if self.is_closed:  # pragma: debug
             self.error(".send_header(): Connection closed.")
             return False
-        if not self._first_send_done:
-            out = self._send_1st(header_msg, **kwargs)
-        else:
-            out = self._send(header_msg, **kwargs)
+        out = self._safe_send(header_msg, **kwargs)
         return out
 
     def send_nolimit(self, *args, **kwargs):
