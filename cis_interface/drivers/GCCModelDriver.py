@@ -6,6 +6,7 @@ import os
 from cis_interface.communication import _default_comm
 from cis_interface.tools import is_zmq_installed, is_ipc_installed
 from cis_interface.drivers.ModelDriver import ModelDriver
+from cis_interface.config import cis_cfg
 
 
 _top_dir = os.path.normpath(os.path.join(os.path.dirname(__file__), '../'))
@@ -15,7 +16,7 @@ _incl_seri = os.path.join(_top_dir, 'serialize')
 _incl_comm = os.path.join(_top_dir, 'communication')
 # TODO: conditional on libzmq installed
 _compile_links = []
-_compile_flags = []
+_compile_flags = ["-DCIS_DEBUG='%s'" % cis_cfg.get('debug', 'psi', 'NOTSET')]
 if is_zmq_installed():
     _compile_links += ["-lczmq", "-lzmq"]
     _compile_flags += ["-DZMQINSTALLED"]

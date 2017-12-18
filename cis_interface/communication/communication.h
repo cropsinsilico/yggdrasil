@@ -617,7 +617,7 @@ int vcommRecv(const comm_t x, va_list ap) {
     free(buf);
     return ret;
   }
-  cislog_debug("vcommRecv(%s): comm_recv returns %d: %s", x.name, ret, buf);
+  cislog_debug("vcommRecv(%s): comm_recv returns %d: %.10s...", x.name, ret, buf);
   // Deserialize message
   seri_t serializer = x.serializer;
   if (x.type == SERVER_COMM) {

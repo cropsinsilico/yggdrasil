@@ -102,19 +102,19 @@ void cisError(const char* fmt, ...) {
   
 #define cislog_error cisError
 #ifdef CIS_DEBUG
-  #if CIS_DEBUG == INFO
-    #define cislog_info cisInfo
-    #define cislog_debug while (0) cisDebug
-  #elif CIS_DEBUG == DEBUG
-    #define cislog_debug cisInfo
-    #define cislog_info cisDebug
-  #else
-    #define cislog_debug while (0) cisDebug
-    #define cislog_info while (0) cisInfo
-  #endif
+#if CIS_DEBUG=='INFO'
+#define cislog_info cisInfo
+#define cislog_debug while (0) cisDebug
+#elif CIS_DEBUG=='DEBUG'
+#define cislog_info cisInfo
+#define cislog_debug cisDebug
 #else
-  #define cislog_debug while (0) cisDebug
-  #define cislog_info while (0) cisInfo
+#define cislog_info while (0) cisInfo
+#define cislog_debug while (0) cisDebug
+#endif
+#else
+#define cislog_info while (0) cisInfo
+#define cislog_debug while (0) cisDebug
 #endif
 
 /*!

@@ -8,12 +8,7 @@ from cis_interface.communication import (
 
             
 class TestConnectionParam(parent.TestParam, IOInfo):
-    r"""Test parameters for the ConnectionDriver class.
-
-    Attributes (in addition to parent class's):
-        -
-
-    """
+    r"""Test parameters for the ConnectionDriver class."""
     def __init__(self, *args, **kwargs):
         super(TestConnectionParam, self).__init__(*args, **kwargs)
         IOInfo.__init__(self)
