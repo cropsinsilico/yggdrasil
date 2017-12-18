@@ -623,8 +623,8 @@ class CommBase(CisClass):
                 header_kwargs = dict()
             header = self.get_header(msg, no_address=True, **header_kwargs)
             header_msg = self.format_header(header)
-            if (((len(header_msg) + len(msg)) < self.maxMsgSize) or
-                (self.maxMsgSize == 0)):
+            if ((((len(header_msg) + len(msg)) < self.maxMsgSize) or
+                 (self.maxMsgSize == 0))):
                 ret = self._safe_send(header_msg + msg)
             else:
                 header = self.get_header(msg, **header_kwargs)
