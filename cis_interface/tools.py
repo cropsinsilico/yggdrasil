@@ -1,6 +1,6 @@
 """This modules offers various tools."""
 from threading import Timer
-from logging import info, debug, error, warn, exception, critical
+import logging
 import os
 import sys
 import inspect
@@ -8,14 +8,6 @@ import time
 import subprocess
 from cis_interface import platform
 from cis_interface import backwards
-
-
-# OS X limit is 2kb
-CIS_MSG_MAX = 1024 * 2
-CIS_MSG_EOF = backwards.unicode2bytes("EOF!!!")
-
-PSI_MSG_MAX = CIS_MSG_MAX
-PSI_MSG_EOF = CIS_MSG_EOF
 
 
 def is_ipc_installed():
@@ -48,6 +40,17 @@ def is_zmq_installed():
     #     process.kill()
     #     outs, errs = process.communicate()
     return (backwards.unicode2bytes('zmq') not in errs)
+
+
+# OS X limit is 2kb
+if is_zmq_installed():
+    CIS_MSG_MAX = 2**20
+else:
+    CIS_MSG_MAX = 1024 * 2
+CIS_MSG_EOF = backwards.unicode2bytes("EOF!!!")
+
+PSI_MSG_MAX = CIS_MSG_MAX
+PSI_MSG_EOF = CIS_MSG_EOF
 
 
 def eval_kwarg(x):
@@ -124,6 +127,7 @@ class CisClass(object):
         errors (list): List of errors.
         extra_kwargs (dict): Keyword arguments that were not parsed.
         sched_out (obj): Output from the last scheduled task with output.
+        logger (logging.Logger): Logger object for this object.
 
     """
     def __init__(self, name, workingDir=None, timeout=60.0, sleeptime=0.01,
@@ -141,10 +145,11 @@ class CisClass(object):
         self.errors = []
         self.extra_kwargs = kwargs
         self.sched_out = None
+        self.logger = logging.getLogger(self.__module__)
 
     def printStatus(self):
         r"""Print the class status."""
-        error('%s(%s): state:', self.__module__, self.name)
+        self.logger.error('%s(%s): state:', self.__module__, self.name)
 
     def _task_with_output(self, func, *args, **kwargs):
         self.sched_out = func(*args, **kwargs)
@@ -293,7 +298,7 @@ class CisClass(object):
         """
         if not isinstance(fmt_str, str):
             fmt_str = str(fmt_str)
-        info(self.logger_prefix + fmt_str, *args)
+        self.logger.info(self.logger_prefix + fmt_str, *args)
 
     def debug(self, fmt_str='', *args):
         r"""Log a debug message that is prepended with the class and name.
@@ -305,7 +310,7 @@ class CisClass(object):
         """
         if not isinstance(fmt_str, str):
             fmt_str = str(fmt_str)
-        debug(self.logger_prefix + fmt_str, *args)
+        self.logger.debug(self.logger_prefix + fmt_str, *args)
 
     def critical(self, fmt_str='', *args):
         r"""Log a critical message that is prepended with the class and name.
@@ -317,7 +322,7 @@ class CisClass(object):
         """
         if not isinstance(fmt_str, str):
             fmt_str = str(fmt_str)
-        critical(self.logger_prefix + fmt_str, *args)
+        self.logger.critical(self.logger_prefix + fmt_str, *args)
 
     def warn(self, fmt_str='', *args):
         r"""Log a warning message that is prepended with the class and name.
@@ -329,7 +334,7 @@ class CisClass(object):
         """
         if not isinstance(fmt_str, str):
             fmt_str = str(fmt_str)
-        warn(self.logger_prefix + fmt_str, *args)
+        self.logger.warn(self.logger_prefix + fmt_str, *args)
 
     def error(self, fmt_str='', *args):
         r"""Log an error message that is prepended with the class and name.
@@ -341,7 +346,7 @@ class CisClass(object):
         """
         if not isinstance(fmt_str, str):
             fmt_str = str(fmt_str)
-        error(self.logger_prefix + fmt_str, *args)
+        self.logger.error(self.logger_prefix + fmt_str, *args)
         self.errors.append((self.logger_prefix + fmt_str) % args)
 
     def exception(self, fmt_str='', *args):
@@ -356,9 +361,9 @@ class CisClass(object):
             fmt_str = str(fmt_str)
         exc_info = sys.exc_info()
         if exc_info is not None and exc_info != (None, None, None):
-            exception(self.logger_prefix + fmt_str, *args)
+            self.logger.exception(self.logger_prefix + fmt_str, *args)
         else:
-            error(self.logger_prefix + fmt_str, *args)
+            self.logger.error(self.logger_prefix + fmt_str, *args)
         self.errors.append((self.logger_prefix + fmt_str) % args)
 
     def raise_error(self, e):

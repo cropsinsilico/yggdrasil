@@ -1,56 +1,41 @@
 """This module provides tools for running models using cis_interface."""
 import sys
 import logging
-from logging import debug, info, error
 import os
 import yaml
 import pystache
 from pprint import pformat
 from itertools import chain
 import socket
+from cis_interface.tools import CisClass
 from cis_interface.backwards import sio
 from cis_interface.config import cis_cfg, cfg_environment
 from cis_interface import drivers
 from cis_interface.drivers import create_driver
 
 
-COLOR_TRACE = '\033[30;43;22m'
-COLOR_NORMAL = '\033[0m'
+# COLOR_TRACE = '\033[30;43;22m'
+# COLOR_NORMAL = '\033[0m'
 
 
-def setup_cis_logging(prog, level=None):
-    r"""Set the log lovel based on environment variable 'PSI_DEBUG'. If the
-    variable is not set, the log level is set to 'NOTSET'.
+# def setup_cis_logging(prog, level=None):
+#     r"""Set the log lovel based on environment variable 'PSI_DEBUG'. If the
+#     variable is not set, the log level is set to 'NOTSET'.
 
-    Args:
-        prog (str): Name to prepend log messages with.
-        level (str, optional): String specifying the logging level. Defaults
-            to None and the environment variable 'PSI_DEBUG' is used.
+#     Args:
+#         prog (str): Name to prepend log messages with.
+#         level (str, optional): String specifying the logging level. Defaults
+#             to None and the environment variable 'PSI_DEBUG' is used.
 
-    """
-    if level is None:
-        level = cis_cfg.get('debug', 'psi', 'NOTSET')
-    logLevel = eval('logging.' + level)
-    logging.basicConfig(level=logLevel, stream=sys.stdout, format=COLOR_TRACE +
-                        prog + ': %(message)s' + COLOR_NORMAL)
-
-    
-def setup_rmq_logging(level=None):
-    r"""Set the log level for RabbitMQ to value of environment variable
-    'RMQ_DEBUG'. If the variable is not set, the log level is set to 'INFO'.
-
-    Args:
-        level (str, optional): String specifying the logging level. Defaults
-            to None and the environment variable 'RMQ_DEBUG' is used.
-
-    """
-    if level is None:
-        level = cis_cfg.get('debug', 'rmq', 'INFO')
-    rmqLogLevel = eval('logging.' + level)
-    logging.getLogger("pika").setLevel(level=rmqLogLevel)
+#     """
+#     if level is None:
+#         level = cis_cfg.get('debug', 'psi', 'NOTSET')
+#     logLevel = eval('logging.' + level)
+#     logging.basicConfig(level=logLevel, stream=sys.stdout, format=COLOR_TRACE +
+#                         prog + ': %(message)s' + COLOR_NORMAL)
 
     
-class CisRunner(object):
+class CisRunner(CisClass):
     r"""This class handles the orchestration of starting the model and
     IO drivers, monitoring their progress, and cleaning up on exit.
 
@@ -85,6 +70,7 @@ class CisRunner(object):
     def __init__(self, modelYmls, namespace, host=None, rank=0,
                  cis_debug_level=None, rmq_debug_level=None,
                  cis_debug_prefix=None):
+        super(CisRunner, self).__init__('runner')
         self.namespace = namespace
         self.host = host
         self.rank = rank
@@ -96,10 +82,9 @@ class CisRunner(object):
         self._outputchannels = {}
         self.error_flag = False
         # Setup logging
-        if cis_debug_prefix is None:
-            cis_debug_prefix = namespace
-        setup_cis_logging(cis_debug_prefix, level=cis_debug_level)
-        setup_rmq_logging(level=rmq_debug_level)
+        # if cis_debug_prefix is None:
+        #     cis_debug_prefix = namespace
+        # setup_cis_logging(cis_debug_prefix, level=cis_debug_level)
         # Update environment based on config
         cfg_environment()
         # Parse yamls
@@ -125,24 +110,20 @@ class CisRunner(object):
         if not os.path.isfile(yamlpath):
             raise IOError("Unable locate yaml file %s" % yamlpath)
         # Open file and parse yaml
-        info("CisRunner: Loading yaml %s", yamlpath)
+        self.info("Loading yaml %s", yamlpath)
         with open(modelYml, 'r') as f:
-            try:
-                # Mustache replace vars
-                yamlparsed = f.read()
-                yamlparsed = pystache.render(
-                    sio.StringIO(yamlparsed).getvalue(), dict(os.environ))
-                yamlparsed = yaml.safe_load(yamlparsed)
-                debug("CisRunner: yaml after stache: %s", pformat(yamlparsed))
-                # Store parsed models
-                yml_models = yamlparsed.get('models', [])
-                if 'model' in yamlparsed:
-                    yml_models.append(yamlparsed['model'])
-                for yml in yml_models:
-                    self.add_driver('model', yml, yamldir)
-            except Exception as e:  # pragma: debug
-                error("CisRunner: could not load yaml: %s: %s", modelYml, e)
-                raise  # Nothing started yet so just raise
+            # Mustache replace vars
+            yamlparsed = f.read()
+            yamlparsed = pystache.render(
+                sio.StringIO(yamlparsed).getvalue(), dict(os.environ))
+            yamlparsed = yaml.safe_load(yamlparsed)
+            self.debug(":parseModelYaml: after stache: %s", pformat(yamlparsed))
+            # Store parsed models
+            yml_models = yamlparsed.get('models', [])
+            if 'model' in yamlparsed:
+                yml_models.append(yamlparsed['model'])
+            for yml in yml_models:
+                self.add_driver('model', yml, yamldir)
 
     def add_driver(self, dtype, yaml, yamldir):
         r"""Add a driver to the appropriate driver dictionary with yamldir.
@@ -256,26 +237,21 @@ class CisRunner(object):
             object: An instance of the specified driver.
 
         """
-        try:
-            debug('creating %s, a %s', yml['name'], yml['driver'])
-            curpath = os.getcwd()
-            if 'ClientDriver' in yml['driver']:
-                yml['kwargs'].setdefault('comm_address',
-                                         self.serverdrivers[yml['args']])
-            os.chdir(yml['workingDir'])
-            instance = create_driver(yml['driver'], yml['name'], yml['args'],
-                                     yml=yml, env=yml.get('env', {}),
-                                     namespace=self.namespace, rank=self.rank,
-                                     workingDir=yml['workingDir'],
-                                     **yml['kwargs'])
-            yml['instance'] = instance
-            os.chdir(curpath)
-            if 'ServerDriver' in yml['driver']:
-                self.serverdrivers[yml['args']] = instance.comm_address
-        except Exception as e:  # pragma: debug
-            error("Exception %s: Unable to load driver from yaml %s",
-                  e, pformat(yml))
-            raise  # Nothing started yet so just raise
+        self.debug('creating %s, a %s', yml['name'], yml['driver'])
+        curpath = os.getcwd()
+        if 'ClientDriver' in yml['driver']:
+            yml['kwargs'].setdefault('comm_address',
+                                     self.serverdrivers[yml['args']])
+        os.chdir(yml['workingDir'])
+        instance = create_driver(yml['driver'], yml['name'], yml['args'],
+                                 yml=yml, env=yml.get('env', {}),
+                                 namespace=self.namespace, rank=self.rank,
+                                 workingDir=yml['workingDir'],
+                                 **yml['kwargs'])
+        yml['instance'] = instance
+        os.chdir(curpath)
+        if 'ServerDriver' in yml['driver']:
+            self.serverdrivers[yml['args']] = instance.comm_address
         return instance
 
     def createModelDriver(self, yml):
@@ -290,14 +266,13 @@ class CisRunner(object):
         """
         yml['env'] = {}
         for iod in self.io_drivers(yml['name']):
-            debug("CisRunner::loadDrivers: Add env: %s", iod['instance'].env)
             yml['env'].update(iod['instance'].env)
         drv = self.createDriver(yml)
         if 'client_of' in yml:
             for srv in yml['client_of']:
                 self.modeldrivers[srv]['clients'].append(yml['name'])
-        debug("CisRunner::loadDrivers(): model %s: env: %s",
-              yml['name'], pformat(yml['instance'].env))
+        self.debug("createModelDriver: model %s: env: %s",
+                   yml['name'], pformat(yml['instance'].env))
         return drv
 
     def createInputDriver(self, yml):
@@ -355,47 +330,47 @@ class CisRunner(object):
     def loadDrivers(self):
         r"""Load all of the necessary drivers, doing the IO drivers first
         and adding IO driver environmental variables back tot he models."""
-        debug("CisRunner.loadDrivers()")
+        self.debug("loadDrivers()")
         # Create input drivers
-        debug("CisRunner::loadDrivers(): loading input drivers")
+        self.debug("loadDrivers(): loading input drivers")
         for driver in self.inputdrivers.values():
             self.createInputDriver(driver)
         # Create output drivers
-        debug("CisRunner::loadDrivers(): loading output drivers")
+        self.debug("loadDrivers(): loading output drivers")
         for driver in self.outputdrivers.values():
             self.createOutputDriver(driver)
         # Create model drivers
-        debug("CisRunner::loadDrivers(): loading model drivers")
+        self.debug("loadDrivers(): loading model drivers")
         for driver in self.modeldrivers.values():
             self.createModelDriver(driver)
 
     def startDrivers(self):
         r"""Start drivers, starting with the IO drivers."""
-        info('Starting I/O drivers and models on system ' +
-             '{} in namespace {} with rank {}'.format(
-                 self.host, self.namespace, self.rank))
+        self.info('Starting I/O drivers and models on system ' +
+                  '{} in namespace {} with rank {}'.format(
+                      self.host, self.namespace, self.rank))
         for driver in self.all_drivers:
-            debug("CisRunner.startDrivers(): starting driver %s",
-                  driver['name'])
+            self.debug("startDrivers(): starting driver %s",
+                       driver['name'])
             d = driver['instance']
             try:
                 d.start()
             except Exception as e:  # pragma: debug
-                error("CisRunner: %s did not start", d.name)
+                self.error("%s did not start", d.name)
                 self.terminate()
                 raise e
-        debug('CisRunner.startDrivers(): ALL DRIVERS STARTED')
+        self.debug('startDrivers(): ALL DRIVERS STARTED')
 
     def waitModels(self):
         r"""Wait for all model drivers to finish. When a model finishes,
         join the thread and perform exits for associated IO drivers."""
-        debug('CisRunner:waitDrivers(): ')
+        self.debug('waitDrivers()')
         running = [d for d in self.modeldrivers.values()]
         while (len(running) > 0) and (not self.error_flag):
             for drv in running:
                 d = drv['instance']
                 if d.errors:  # pragma: debug
-                    error('Error in model %s', drv['name'])
+                    self.error('Error in model %s', drv['name'])
                     self.error_flag = True
                     break
                 d.join(1)
@@ -403,16 +378,16 @@ class CisRunner(object):
                     self.do_model_exits(drv)
                     running.remove(drv)
                 else:
-                    info('%s still running', drv['name'])
+                    self.info('%s still running', drv['name'])
         for d in self.modeldrivers.values():
             if d['instance'].errors:
                 self.error_flag = True
         if not self.error_flag:
-            info('All models completed')
+            self.info('All models completed')
         else:
-            error('One or more models generated errors.')
+            self.error('One or more models generated errors.')
             self.terminate()
-        debug('RunModels.run() returns')
+        self.debug('RunModels.run() returns')
 
     def do_exits(self, driver):
         r"""Perform basic exits for a driver.
@@ -421,11 +396,11 @@ class CisRunner(object):
             model (dict): Dictionary of driver parameters.
 
         """
-        debug("CisRunner::do_exits for driver %s", driver['name'])
+        self.debug("do_exits(%s)", driver['name'])
         # Stop the driver and join the thread
         driver['instance'].on_exit()
         driver['instance'].join()
-        debug("CisRunner: join finished: (%s)", pformat(driver))
+        self.debug("do_exits(%s): join finished", driver['name'])
 
     def do_model_exits(self, model):
         r"""Perform exists for IO drivers associated with a model.
@@ -456,9 +431,9 @@ class CisRunner(object):
         for drv in self.io_drivers(model['name']):
             if not drv['instance'].is_alive():
                 continue
-            debug('CisRunner::do_model_exits(): on_model_exit %s', drv['name'])
+            self.debug('do_model_exits(): on_model_exit %s', drv['name'])
             if 'onexit' in drv:
-                debug('CisRunner::onexit: %s', drv['onexit'])
+                self.debug('onexit: %s', drv['onexit'])
                 if drv['onexit'] != 'pass':
                     exit_method = getattr(drv['instance'], drv['onexit'])
                     exit_method()
@@ -467,29 +442,29 @@ class CisRunner(object):
     
     def terminate(self):
         r"""Immediately stop all drivers, beginning with IO drivers."""
-        debug('CisRunner::terminate()')
+        self.debug('terminate()')
         # self.closeChannels(force_stop=True)
-        # debug('CisRunner::terminate(): stop models')
+        # self.debug('terminate(): stop models')
         for driver in self.all_drivers:
             if 'instance' in driver:
-                debug('CisRunner::terminate(): stop %s', driver)
+                self.debug('terminate(): stop %s', driver['name'])
                 driver['instance'].terminate()
                 # Terminate should ensure instance not alive
                 assert(not driver['instance'].is_alive())
                 # if driver['instance'].is_alive():
                 #     driver['instance'].join()
-        debug('CisRunner::terminate(): returns')
+        self.debug('terminate(): returns')
 
     def cleanup(self):
         r"""Perform cleanup operations for all drivers."""
-        debug('CisRunner::cleanup()')
+        self.debug('cleanup()')
         for driver in self.all_drivers:
             if 'instance' in driver:
                 driver['instance'].cleanup()
 
     def printStatus(self):
         r"""Print the status of all drivers, starting with the IO drivers."""
-        debug("CisRunner: printStatus()")
+        self.debug("printStatus()")
         for driver in self.all_drivers:
             if 'instance' in driver:
                 driver['instance'].printStatus()
@@ -504,27 +479,27 @@ class CisRunner(object):
                 will exit as quickly as possible. Defaults to False.
 
         """
-        debug('CisRunner::closeChannels()')
+        self.debug('closeChannels()')
         drivers = [i for i in self.io_drivers()]
         for drv in drivers:
             if 'instance' in drv:
                 driver = drv['instance']
-                debug("CisRunner:closeChannels(): stopping %s", drv)
+                self.debug("closeChannels(): stopping %s", drv['name'])
                 if force_stop or self.error_flag:
                     driver.terminate()
                 else:
                     driver.stop()
-                debug("CisRunner:closeChannels(): stop(%s) returns", drv)
-        debug('closeChannels(): Channel Stops DONE')
+                self.debug("closeChannels(): stop(%s) returns", drv['name'])
+        self.debug('closeChannels(): Channel Stops DONE')
         for drv in drivers:
             if 'instance' in drv:
                 driver = drv['instance']
                 assert(not driver.is_alive())
-                # debug("CisRunner:closeChannels: join %s", drv)
+                # self.debug("closeChannels: join %s", drv['name'])
                 # if driver.is_alive():
                 #     driver.join()
-                # debug("CisRunner:closeChannels: join %s done", drv)
-        debug('CisRunner::closeChannels(): done')
+                # self.debug("closeChannels: join %s done", drv['name'])
+        self.debug('closeChannels(): done')
 
         
 def get_runner(models, **kwargs):
@@ -544,6 +519,7 @@ def get_runner(models, **kwargs):
 
     """
     # Get environment variables
+    logger = logging.getLogger(__name__)
     namespace = kwargs.pop('namespace', cis_cfg.get('rmq', 'namespace', False))
     if not namespace:  # pragma: debug
         raise Exception('rmq:namespace not set in config file')
@@ -554,7 +530,7 @@ def get_runner(models, **kwargs):
     rank = int(rank)
     kwargs.update(rank=rank, host=host)
     # Run
-    debug("run_models in %s with path %s namespace %s rank %d",
-          os.getcwd(), sys.path, namespace, rank)
+    logger.debug("run_models in %s with path %s namespace %s rank %d",
+                 os.getcwd(), sys.path, namespace, rank)
     cisRunner = CisRunner(models, namespace, **kwargs)
     return cisRunner

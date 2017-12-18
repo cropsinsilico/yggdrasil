@@ -6,6 +6,7 @@ This module imports the configuration for cis_interface.
 
 """
 import os
+import logging
 from cis_interface.backwards import configparser
 
 
@@ -51,6 +52,15 @@ loc_config_file = os.path.join(os.getcwd(), config_file)
 assert(os.path.isfile(def_config_file))
 files = [def_config_file, usr_config_file, loc_config_file]
 cis_cfg.read(files)
+
+
+# Set log level
+logLevelCIS = eval('logging.%s' % cis_cfg.get('debug', 'psi', 'NOTSET'))
+logLevelRMQ = eval('logging.%s' % cis_cfg.get('debug', 'rmq', 'INFO'))
+logging.getLogger("cis_interface").setLevel(level=logLevelCIS)
+logging.getLogger("pika").setLevel(level=logLevelRMQ)
+logging.basicConfig()
+
 
 # Set associated environment variables
 env_map = [('debug', 'psi', 'PSI_DEBUG'),

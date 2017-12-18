@@ -210,6 +210,8 @@ class ZMQProxy(threading.Thread, CisClass):
         self.poller.register(frontend, zmq.POLLIN)
         self.cli_count = 0
         self._running = False
+        # Cis class init
+        CisClass.__init__(self, 'ZMQProxy.%s' % srv_address, **kwargs)
 
     def client_recv(self):
         r"""Receive single message from the client."""
