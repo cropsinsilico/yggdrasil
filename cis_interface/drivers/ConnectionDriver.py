@@ -231,7 +231,7 @@ class ConnectionDriver(Driver):
             return self.on_eof()
         if flag:
             # if len(msg) > 0:
-            #     print('recv', self.__class__, msg)
+            #     print('recv', self.__class__, msg[:min(100, len(msg))])
             return msg
         else:
             return flag
@@ -313,7 +313,8 @@ class ConnectionDriver(Driver):
             flag = self._send_message(*args, **kwargs)
         else:
             flag = self._send_1st_message(*args, **kwargs)
-        # print('send', self.__class__, args, flag)
+        msg = args[0]
+        # print('send', self.__class__, msg[:min(100, len(msg))], flag)
         return flag
 
     def run(self):

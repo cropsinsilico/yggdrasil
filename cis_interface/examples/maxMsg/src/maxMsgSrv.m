@@ -8,7 +8,7 @@ while (1)
   if (~input{1})
     break;
   end
-  fprintf('maxMsgSrv(M): rpcRecv returned %d, input %s\n', ...
+  fprintf('maxMsgSrv(M): rpcRecv returned %d, input %.10s...\n', ...
 	  input{1}, char(input{2}{1}));
   rpc.rpcSend(input{2}{1});
 end

@@ -583,7 +583,7 @@ int vcommSend(const comm_t x, va_list ap) {
     comm_t *handle = (comm_t*)(x.handle);
     serializer = handle->serializer;
   }
-  int ret = serialize(serializer, &buf, CIS_MSG_MAX, 0, ap);
+  int ret = serialize(serializer, &buf, CIS_MSG_MAX, 1, ap);
   if (ret < 0) {
     cislog_error("vcommSend(%s): serialization error", x.name);
     free(buf);

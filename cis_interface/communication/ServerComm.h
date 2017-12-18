@@ -143,8 +143,9 @@ int server_comm_recv(comm_t x, char *data, const int len) {
   }
   comm_t *req_comm = (comm_t*)(x.handle);
   int ret = default_comm_recv(*req_comm, data, len);
-  if (ret < 0)
+  if (ret < 0) {
     return ret;
+  }
   // Return EOF
   if (is_eof(data)) {
     return ret;

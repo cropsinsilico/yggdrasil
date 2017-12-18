@@ -556,7 +556,7 @@ int vrpcCall(const cisRpc_t rpc, va_list ap) {
     printf("vrpcCall: vcisSend_nolimit error: ret %d: %s\n", ret, strerror(errno));
     return -1;
   }
-  
+
   // unpack the messages into the remaining variable arguments
   va_list op;
   va_copy(op, ap);

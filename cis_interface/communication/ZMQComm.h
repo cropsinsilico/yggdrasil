@@ -223,9 +223,9 @@ int zmq_comm_recv(const comm_t x, char *data, const int len) {
   int len_recv = zframe_size(out);
   /* printf("(C) received %d bytes from %s\n", len_recv, x.address); */
   if ((len_recv + 1) > len) {
-    cislog_debug("zmq_comm_recv(%s): buffer (%d bytes) is not large enough for message (%d bytes)",
+    cislog_error("zmq_comm_recv(%s): buffer (%d bytes) is not large enough for message (%d bytes)",
 		 x.name, len, len_recv);
-    return -1;
+    return -(len_recv + 1);
   }
   memcpy(data, zframe_data(out), len_recv + 1);
   data[len_recv] = '\0';

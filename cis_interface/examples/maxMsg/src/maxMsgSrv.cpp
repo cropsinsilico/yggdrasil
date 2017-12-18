@@ -15,11 +15,11 @@ int main(int argc, char *argv[]) {
       int ret = rpc.recv(1, &input);
       if (ret < 0)
 	break;
-      printf("maxMsgSrv(CPP): rpcRecv returned %d, input %s\n", ret, input);
+      printf("maxMsgSrv(CPP): rpcRecv returned %d, input %.10s...\n", ret, input);
       rpc.send(1, input);
     }
 
     printf("maxMsgSrv(CPP): Goodbye!\n");
-    
+    return 0;
 }
 

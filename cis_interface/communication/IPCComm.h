@@ -284,7 +284,12 @@ int ipc_comm_recv(const comm_t x, char *data, const int len) {
       break;
     }
   }
-  if (ret > 0){
+  if (ret > 0) {
+    if ((ret + 1) > len) {
+      cislog_debug("ipc_comm_recv(%s): buffer (%d bytes) is not large enough for message (%d bytes)",
+		   x.name, len, ret);
+      ret = -ret;
+    }
     memcpy(data, t.data, ret);
     data[ret] = '\0';
   } else {

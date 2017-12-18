@@ -9,7 +9,11 @@
 #define CISTOOLS_H_
 
 /*! @brief Maximum message size. */
+#ifdef IPCDEF
 #define CIS_MSG_MAX 2048
+#else
+#define CIS_MSG_MAX 1048576
+#endif
 /*! @brief End of file message. */
 #define CIS_MSG_EOF "EOF!!!"
 

@@ -368,8 +368,9 @@ class ZMQComm(CommBase.CommBase):
     @property
     def maxMsgSize(self):
         r"""int: Maximum size of a single message that should be sent."""
-        # This is based on limit of 32bit int
-        return 2**30
+        # Based on limit of 32bit int, this could be 2**30, but this is
+        # too large for stack allocation in C so 2**20 will be used.
+        return 2**20
 
     @classmethod
     def comm_count(cls):
