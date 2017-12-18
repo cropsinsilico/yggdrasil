@@ -313,7 +313,7 @@ class ConnectionDriver(Driver):
             flag = self._send_message(*args, **kwargs)
         else:
             flag = self._send_1st_message(*args, **kwargs)
-        msg = args[0]
+        # msg = args[0]
         # print('send', self.__class__, msg[:min(100, len(msg))], flag)
         return flag
 
