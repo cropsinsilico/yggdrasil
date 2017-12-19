@@ -5,6 +5,7 @@ from logging import debug
 import signal
 import traceback
 from cis_interface import runner
+from cis_interface.drivers import GCCModelDriver
 
 
 cisRunner = None
@@ -66,6 +67,29 @@ def cisrun():
         pprint("cisrun: exception: %s" % type(ex))
         print(traceback.format_exc())
     print('')
+
+
+def cc_flags():
+    r"""Get the compiler flags necessary for including the interface
+    library in a C or C++ program.
+
+    Returns:
+        list: The necessary compiler flags and preprocessor definitions.
+
+    """
+    # return GCCModelDriver._compile_flags
+    return ' '.join(GCCModelDriver._compile_flags)
+
+def ld_flags():
+    r"""Get the linker flags necessary for calling functions/classes from
+    the interface library in a C or C++ program.
+
+    Returns:
+        list: The necessary library linking flags.
+
+    """
+    # return GCCModelDriver._linker_flags
+    return ' '.join(GCCModelDriver._linker_flags)
 
 
 if __name__ == '__main__':

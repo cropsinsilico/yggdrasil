@@ -1,6 +1,3 @@
-#
-# This should not be used directly by modelers
-#
 import subprocess
 import os
 from cis_interface.communication import _default_comm
@@ -14,11 +11,12 @@ _incl_interface = os.path.join(_top_dir, 'interface')
 _incl_io = os.path.join(_top_dir, 'io')
 _incl_seri = os.path.join(_top_dir, 'serialize')
 _incl_comm = os.path.join(_top_dir, 'communication')
+
 # TODO: conditional on libzmq installed
-_compile_links = []
-_compile_flags = ["-DCIS_DEBUG='%s'" % cis_cfg.get('debug', 'psi', 'NOTSET')]
+_linker_flags = []
+_compile_flags = []  # '-DCIS_DEBUG="%s"' % cis_cfg.get('debug', 'psi', 'NOTSET')]
 if is_zmq_installed():
-    _compile_links += ["-lczmq", "-lzmq"]
+    _linker_flags += ["-lczmq", "-lzmq"]
     _compile_flags += ["-DZMQINSTALLED"]
 if is_ipc_installed():
     _compile_flags += ["-DIPCINSTALLED"]
@@ -29,7 +27,7 @@ if _default_comm == 'IPCComm':
 
 
 class GCCModelDriver(ModelDriver):
-    r"""Class from running gcc compiled driveres.
+    r"""Class for running gcc compiled drivers.
 
     Args:
         name (str): Driver name.
@@ -38,8 +36,7 @@ class GCCModelDriver(ModelDriver):
             compile the code with the necessary interface include directories.
             Additional arguments that start with '-I' are included in the
             compile command. Others are assumed to be runtime arguments.
-        \*\*kwargs: Additional keyword arguments are passed to parent class's
-            __init__ method.
+        **kwargs: Additional keyword arguments are passed to parent class.
 
     Attributes (in additon to parent class's):
         compiled (bool): True if the compilation was succesful. False otherwise.
@@ -57,6 +54,7 @@ class GCCModelDriver(ModelDriver):
         # TODO: Allow user to provide a makefile
         self.compile_setup(self.args.pop(0))
         compile_args = [self.gcc, "-g", "-Wall"] + self.flags + _compile_flags
+        compile_args.append('-DCIS_DEBUG=%d' % self.logger.getEffectiveLevel())
         run_args = [os.path.join(".", self.efile)]
         link_args = []
         for arg in self.args:
@@ -67,11 +65,11 @@ class GCCModelDriver(ModelDriver):
             else:
                 run_args.append(arg)
         compile_args += ["-o", self.efile, self.cfile]
-        compile_args += _compile_links + link_args
+        compile_args += _linker_flags + link_args
         # Compile in a new process
         self.args = run_args
         self.compiled = True
-        self.debug("::compiling")
+        self.debug("Compiling")
         comp_process = subprocess.Popen(['stdbuf', '-o0'] + compile_args,
                                         bufsize=0, stdin=subprocess.PIPE,
                                         stderr=subprocess.STDOUT,
@@ -79,9 +77,11 @@ class GCCModelDriver(ModelDriver):
         output, err = comp_process.communicate()
         exit_code = comp_process.returncode
         if exit_code != 0:  # pragma: debug
+            self.compiled=False
             self.error(output)
             raise RuntimeError("Compilation failed with code %d." % exit_code)
-        self.debug('::compiled executable with gcc')
+        self.compiled = True
+        self.debug('Compiled executable with gcc')
 
     def compile_setup(self, cfile):
         r"""Perform setup based on source file.

@@ -1,7 +1,6 @@
 import os
 import nose.tools as nt
-from cis_interface import runner
-from cis_interface.config import cis_cfg
+from cis_interface.config import cis_cfg, cfg_logging
 from cis_interface.tools import CisClass
 from cis_interface.tests import CisTest
 from cis_interface.communication import get_comm_class
@@ -55,6 +54,14 @@ class TestParam(CisTest):
         return out
 
     @property
+    def inst_kwargs(self):
+        r"""dict: Keyword arguments for creating a class instance."""
+        out = super(TestParam, self).inst_kwargs
+        out['timeout'] = self.timeout
+        out['sleeptime'] = self.sleeptime
+        return out
+
+    @property
     def comm_count(self):
         r"""int: Return the number of comms."""
         return get_comm_class().comm_count()
@@ -70,12 +77,11 @@ class TestParam(CisTest):
                 default comms.
 
         """
-        cis_cfg.set('debug', 'psi', 'INFO')
+        cis_cfg.set('debug', 'psi', 'DEBUG')
         cis_cfg.set('debug', 'rmq', 'INFO')
         cis_cfg.set('debug', 'client', 'INFO')
         cis_cfg.set('rmq', 'namespace', self.namespace)
-        runner.setup_cis_logging(self.__module__)
-        runner.setup_rmq_logging()
+        cfg_logging()
         if nprev_comm is None:
             nprev_comm = self.comm_count
         self.nprev_comm = nprev_comm

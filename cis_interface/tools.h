@@ -100,19 +100,26 @@ void cisError(const char* fmt, ...) {
   va_end(ap);
 };
   
-#define cislog_error cisError
 #ifdef CIS_DEBUG
-#if CIS_DEBUG=='INFO'
-#define cislog_info cisInfo
-#define cislog_debug while (0) cisDebug
-#elif CIS_DEBUG=='DEBUG'
+#if CIS_DEBUG <= 10
+#define cislog_error cisError
 #define cislog_info cisInfo
 #define cislog_debug cisDebug
+#elif CIS_DEBUG <= 20
+#define cislog_error cisError
+#define cislog_info cisInfo
+#define cislog_debug while (0) cisDebug
+#elif CIS_DEBUG <= 40
+#define cislog_error cisError
+#define cislog_info while (0) cisInfo
+#define cislog_debug while (0) cisDebug
 #else
+#define cislog_error while (0) cisError
 #define cislog_info while (0) cisInfo
 #define cislog_debug while (0) cisDebug
 #endif
 #else
+#define cislog_error cisError
 #define cislog_info while (0) cisInfo
 #define cislog_debug while (0) cisDebug
 #endif
