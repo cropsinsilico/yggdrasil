@@ -37,12 +37,12 @@ int init_server_comm(comm_t *comm) {
   char *seri_in = (char*)malloc(strlen(comm->direction) + 1);
   strcpy(seri_in, comm->direction);
   /* printf("init_server_comm(%s): seri: %s\n", comm->name, seri_in); */
-  comm_t *handle = (comm_t*)malloc(sizeof(comm_t));
+  comm_t *handle;
   if (strlen(comm->name) == 0) {
-    handle[0] = new_comm_base(comm->address, "recv", _default_comm, (void*)seri_in);
+    handle = new_comm_base(comm->address, "recv", _default_comm, (void*)seri_in);
     sprintf(handle->name, "server_request.%s", comm->address);
   } else {
-    handle[0] = init_comm_base(comm->name, "recv", _default_comm, (void*)seri_in);
+    handle = init_comm_base(comm->name, "recv", _default_comm, (void*)seri_in);
   }
   ret = init_default_comm(handle);
   strcpy(comm->address, handle->address);
@@ -121,6 +121,7 @@ int server_comm_send(const comm_t x, const char *data, const int len) {
   int ret = default_comm_send((*res_comm)[0], data, len);
   free((char*)(res_comm[0]->serializer.info));
   free_default_comm(res_comm[0]);
+  free(res_comm[0]);
   res_comm[0] = NULL;
   return ret;
 };
@@ -162,12 +163,11 @@ int server_comm_recv(comm_t x, char *data, const int len) {
     return -1;
   }
   strcpy(x.address, head.id);
-  comm_t **res_comm = (comm_t**)(x.info);
-  res_comm[0] = (comm_t*)realloc(res_comm[0], sizeof(comm_t));
   char *seri_copy = (char*)malloc(strlen((char*)(x.serializer.info)) + 1);
   strcpy(seri_copy, (char*)(x.serializer.info));
-  res_comm[0][0] = new_comm_base(head.response_address, "send", _default_comm,
-				 seri_copy);
+  comm_t **res_comm = (comm_t**)(x.info);
+  res_comm[0] = new_comm_base(head.response_address, "send", _default_comm,
+			      seri_copy);
   /* sprintf(res_comm[0]->name, "server_response.%s", res_comm[0]->address); */
   int newret;
   newret = init_default_comm(res_comm[0]);

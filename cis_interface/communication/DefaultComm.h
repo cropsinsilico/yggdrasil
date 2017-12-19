@@ -7,7 +7,7 @@
 // IPC Comm
 #ifdef IPCDEF
 #include <IPCComm.h>
-comm_type _default_comm = IPC_COMM;
+static comm_type _default_comm = IPC_COMM;
 #define new_default_address new_ipc_address
 #define init_default_comm init_ipc_comm
 #define free_default_comm free_ipc_comm
@@ -17,7 +17,7 @@ comm_type _default_comm = IPC_COMM;
 // ZMQ Comm
 #else
 #include <ZMQComm.h>
-comm_type _default_comm = ZMQ_COMM;
+static comm_type _default_comm = ZMQ_COMM;
 #define new_default_address new_zmq_address
 #define init_default_comm init_zmq_comm
 #define free_default_comm free_zmq_comm

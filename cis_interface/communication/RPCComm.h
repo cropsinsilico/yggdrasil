@@ -29,8 +29,8 @@ static inline
 int init_rpc_comm(comm_t *comm) {
   int ret;
   // Input comm
-  comm_t *info = (comm_t*)malloc(sizeof(comm_t));
-  info[0] = init_comm_base(comm->name, "recv", _default_comm, comm->serializer.info);
+  comm_t *info = init_comm_base(comm->name, "recv", _default_comm,
+				comm->serializer.info);
   ret = init_default_comm(info);
   if (ret < 0) {
     cislog_error("init_rpc_comm(%s): Failed to initialize input comm", comm->name);
@@ -40,8 +40,8 @@ int init_rpc_comm(comm_t *comm) {
   // Output comm
   char *seri_out = (char*)malloc(strlen(comm->direction) + 1);
   strcpy(seri_out, comm->direction);
-  comm_t *handle = (comm_t*)malloc(sizeof(comm_t));
-  handle[0] = init_comm_base(comm->name, "send", _default_comm, (void*)seri_out);
+  comm_t *handle = init_comm_base(comm->name, "send", _default_comm,
+				  (void*)seri_out);
   ret = init_default_comm(handle);
   if (ret < 0) {
     cislog_error("init_rpc_comm(%s): Failed to initialize output comm", comm->name);

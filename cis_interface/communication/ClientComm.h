@@ -38,12 +38,12 @@ int init_client_comm(comm_t *comm) {
   // Called to initialize/create client comm
   char *seri_out = (char*)malloc(strlen(comm->direction) + 1);
   strcpy(seri_out, comm->direction);
-  comm_t *handle = (comm_t*)malloc(sizeof(comm_t));
+  comm_t *handle;
   if (strlen(comm->name) == 0) {
-    handle[0] = new_comm_base(comm->address, "send", _default_comm, (void*)seri_out);
+    handle = new_comm_base(comm->address, "send", _default_comm, (void*)seri_out);
     sprintf(handle->name, "client_request.%s", comm->address);
   } else {
-    handle[0] = init_comm_base(comm->name, "send", _default_comm, (void*)seri_out);
+    handle = init_comm_base(comm->name, "send", _default_comm, (void*)seri_out);
   }
   ret = init_default_comm(handle);
   strcpy(comm->address, handle->address);
@@ -53,7 +53,7 @@ int init_client_comm(comm_t *comm) {
   strcpy(comm->direction, "send");
   comm->handle = (void*)handle;
   comm->always_send_header = 1;
-  comm_t **info = (comm_t**)malloc(sizeof(comm_t*));
+  comm_t ***info = (comm_t***)malloc(sizeof(comm_t**));
   info[0] = NULL;
   comm->info = (void*)info;
   return ret;
@@ -114,13 +114,14 @@ void free_client_response_count(comm_t *x) {
 static inline
 int free_client_comm(comm_t *x) {
   if (x->info != NULL) {
-    comm_t **info = (comm_t**)(x->info);
-    if (*info != NULL) {
+    comm_t ***info = (comm_t***)(x->info);
+    if (info[0] != NULL) {
       int ncomm = get_client_response_count(*x);
       int i;
       for (i = 0; i < ncomm; i++) {
-	free((char*)(info[0][i].serializer.info));
-	free_default_comm(info[0] + i);
+	free((char*)(info[0][i]->serializer.info));
+	free_default_comm(info[0][i]);
+	free(info[0][i]);
       }
       free(*info);
       info[0] = NULL;
@@ -167,12 +168,12 @@ static inline
 comm_head_t client_response_header(comm_t x, comm_head_t head) {
   // Initialize new comm
   int ncomm = get_client_response_count(x);
-  comm_t **res_comm = (comm_t**)(x.info);
-  res_comm[0] = (comm_t*)realloc(res_comm[0], sizeof(comm_t)*(ncomm + 1));
+  comm_t ***res_comm = (comm_t***)(x.info);
+  res_comm[0] = (comm_t**)realloc(res_comm[0], sizeof(comm_t*)*(ncomm + 1));
   char *seri_copy = (char*)malloc(strlen((char*)(x.serializer.info)) + 1);
   strcpy(seri_copy, (char*)(x.serializer.info));
-  (*res_comm)[ncomm] = new_comm_base(NULL, "recv", _default_comm, seri_copy);
-  int ret = new_default_address(*res_comm + ncomm);
+  res_comm[0][ncomm] = new_comm_base(NULL, "recv", _default_comm, seri_copy);
+  int ret = new_default_address(res_comm[0][ncomm]);
   if (ret < 0) {
     cislog_error("client_comm_send(%s): could not create response comm", x.name);
     head.valid = 0;
@@ -181,7 +182,7 @@ comm_head_t client_response_header(comm_t x, comm_head_t head) {
   inc_client_response_count(x);
   ncomm = get_client_response_count(x);
   // Add address & request ID to header
-  strcpy(head.response_address, (*res_comm)[ncomm - 1].address);
+  strcpy(head.response_address, res_comm[0][ncomm - 1]->address);
   sprintf(head.request_id, "%d", rand());
   return head;
 };
@@ -229,16 +230,16 @@ int client_comm_recv(comm_t x, char *data, const int len) {
     cislog_error("client_comm_recv(%s): no response comm registered", x.name);
     return -1;
   }
-  comm_t **res_comm = (comm_t**)(x.info);
-  int ret = default_comm_recv((*res_comm)[0], data, len);
+  comm_t ***res_comm = (comm_t***)(x.info);
+  int ret = default_comm_recv(res_comm[0][0][0], data, len);
   if (ret < 0)
     return ret;
   // Close response comm and decrement count of response comms
-  free((char*)((*res_comm)[0].serializer.info));
-  free_default_comm(&((*res_comm)[0]));
+  free((char*)(res_comm[0][0]->serializer.info));
+  free_default_comm(res_comm[0][0]);
   dec_client_response_count(x);
   int nresp = get_client_response_count(x);
-  memmove(*res_comm, *res_comm + 1, nresp*sizeof(comm_t));
+  memmove(*res_comm, *res_comm + 1, nresp*sizeof(comm_t*));
   return ret;
 };
 

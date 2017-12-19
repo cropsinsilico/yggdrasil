@@ -15,6 +15,11 @@
 #ifndef CISCOMMUNICATION_H_
 #define CISCOMMUNICATION_H_
 
+/*! @brief Memory to keep track of comms to clean up at exit. */
+static void **vcomms2clean;
+static size_t ncomms2clean = 0;
+static size_t clean_registered = 0;
+
 // Forward declaration of eof
 static inline
 int comm_send_eof(const comm_t x);
@@ -48,7 +53,46 @@ int free_comm(comm_t *x) {
     cislog_error("free_comm: Unsupported comm_type %d", t);
   }
   free_comm_base(x);
+  if (x->index_in_register >= 0) {
+    vcomms2clean[x->index_in_register] = NULL;
+  }
   return ret;
+};
+
+/*!
+  @brief Free comms created that were not freed.
+*/
+static inline
+void clean_comms(void) {
+  size_t i;
+  for (i = 0; i < ncomms2clean; i++) {
+    if (vcomms2clean[i] != NULL) {
+      free_comm((comm_t*)(vcomms2clean[i]));
+    }
+  }
+  free(vcomms2clean);
+};
+
+/*!
+  @brief Register a comm so that it can be cleaned up later if not done explicitly.
+  @param[in] x comm_t* Address of communicator structure that should be
+  registered.
+  @returns int -1 if there is an error, 0 otherwise.
+ */
+static inline
+int register_comm(comm_t *x) {
+  if (clean_registered == 0) {
+    atexit(clean_comms);
+    clean_registered = 1;
+  }
+  vcomms2clean = realloc(vcomms2clean, sizeof(void*)*(ncomms2clean + 1));
+  if (vcomms2clean == NULL) {
+    cislog_error("register_comm(%s): Failed to realloc the comm list.", x->name);
+    return -1;
+  }
+  x->index_in_register = ncomms2clean;
+  vcomms2clean[ncomms2clean++] = (void*)x;
+  return 0;
 };
 
 /*!
@@ -130,21 +174,27 @@ int init_comm_type(comm_t *x) {
 static inline
 comm_t new_comm(char *address, const char *direction, const comm_type t,
 		void *seri_info) {
-  comm_t ret = new_comm_base(address, direction, t, seri_info);
+  comm_t *ret = new_comm_base(address, direction, t, seri_info);
   int flag;
   if (address == NULL) {
-    flag = new_comm_type(&ret);
+    flag = new_comm_type(ret);
   } else {
-    flag = init_comm_type(&ret);
+    flag = init_comm_type(ret);
   }
   if (flag < 0) {
     cislog_error("new_comm: Failed to initialize new comm address.");
-    ret.valid = 0;
+    ret->valid = 0;
+  } else {
+    if (strlen(ret->name) == 0) {
+      sprintf(ret->name, "temp.%s", ret->address);
+    }
+    flag = register_comm(ret);
+    if (flag < 0) {
+      cislog_error("new_comm: Failed to register new comm.");
+      ret->valid = 0;
+    }
   }
-  if (strlen(ret.name) == 0) {
-    sprintf(ret.name, "temp.%s", ret.address);
-  }
-  return ret;
+  return ret[0];
 };
 
 /*!
@@ -162,13 +212,19 @@ comm_t new_comm(char *address, const char *direction, const comm_type t,
 static inline
 comm_t init_comm(const char *name, const char *direction, const comm_type t,
 		 void *seri_info) {
-  comm_t ret = init_comm_base(name, direction, t, seri_info);
-  int flag = init_comm_type(&ret);
+  comm_t *ret = init_comm_base(name, direction, t, seri_info);
+  int flag = init_comm_type(ret);
   if (flag < 0) {
     cislog_error("init_comm: Could not initialize comm.");
-    ret.valid = 0;
+    ret->valid = 0;
+  } else {
+    flag = register_comm(ret);
+    if (flag < 0) {
+      cislog_error("init_comm: Failed to register new comm.");
+      ret->valid = 0;
+    }
   }
-  return ret;
+  return ret[0];
 };
 
 /*!

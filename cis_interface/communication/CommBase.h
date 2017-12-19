@@ -18,7 +18,6 @@ typedef enum comm_enum comm_type;
 #define COMM_ADDRESS_SIZE 500
 #define COMM_DIR_SIZE 100
 
-
 /*!
   @brief Communication structure.
  */
@@ -33,6 +32,7 @@ typedef struct comm_t {
   seri_t serializer; //!< Serializer for comm messages.
   int maxMsgSize; //!< The maximum message size.
   int always_send_header; //!< 1 if comm should always send a header.
+  int index_in_register; //!< Index of the comm in the comm register.
 } comm_t;
 
 /*!
@@ -42,36 +42,37 @@ typedef struct comm_t {
   Values include "recv" and "send".
   @param[in] t comm_type Type of comm that should be created.
   @param[in] seri_info Pointer to info for the serializer (e.g. format string).
-  @returns comm_t Comm structure.
+  @returns comm_t* Address of comm structure.
 */
 static inline
-comm_t new_comm_base(char *address, const char *direction, const comm_type t,
+comm_t* new_comm_base(char *address, const char *direction, const comm_type t,
 		     void *seri_info) {
-  comm_t ret;
-  ret.type = t;
-  ret.valid = 1;
-  ret.name[0] = '\0';
+  comm_t* ret = (comm_t*)malloc(sizeof(comm_t));
+  ret->type = t;
+  ret->valid = 1;
+  ret->name[0] = '\0';
   if (address == NULL)
-    ret.address[0] = '\0';
+    ret->address[0] = '\0';
   else
-    strcpy(ret.address, address);
+    strcpy(ret->address, address);
   if (direction == NULL) {
-    ret.direction[0] = '\0';
-    ret.valid = 0;
+    ret->direction[0] = '\0';
+    ret->valid = 0;
   } else {
-    strcpy(ret.direction, direction);
+    strcpy(ret->direction, direction);
   }
-  ret.handle = NULL;
-  ret.info = NULL;
+  ret->handle = NULL;
+  ret->info = NULL;
   if (seri_info == NULL) {
-    ret.serializer.type = DIRECT_SERI;
-    ret.serializer.info = seri_info;
+    ret->serializer.type = DIRECT_SERI;
+    ret->serializer.info = seri_info;
   } else {
-    ret.serializer.type = FORMAT_SERI;
-    ret.serializer.info = seri_info;
+    ret->serializer.type = FORMAT_SERI;
+    ret->serializer.info = seri_info;
   }
-  ret.maxMsgSize = CIS_MSG_MAX;
-  ret.always_send_header = 0;
+  ret->maxMsgSize = CIS_MSG_MAX;
+  ret->always_send_header = 0;
+  ret->index_in_register = -1;
   return ret;
 };
 
@@ -85,10 +86,10 @@ comm_t new_comm_base(char *address, const char *direction, const comm_type t,
   Values include "recv" and "send".
   @param[in] t comm_type Type of comm that should be created.
   @param[in] seri_info Format for formatting/parsing messages.
-  @returns comm_t Comm structure.
+  @returns comm_t* Address of comm structure.
  */
 static inline
-comm_t init_comm_base(const char *name, const char *direction,
+comm_t* init_comm_base(const char *name, const char *direction,
 		      const comm_type t, void *seri_info) {
   char full_name[COMM_NAME_SIZE];
   char *address = NULL;
@@ -102,16 +103,16 @@ comm_t init_comm_base(const char *name, const char *direction,
     }
     address = getenv(full_name);
   }
-  comm_t ret = new_comm_base(address, direction, t, seri_info);
+  comm_t *ret = new_comm_base(address, direction, t, seri_info);
   if (name == NULL) {
-    ret.name[0] = '\0';
-    ret.valid = 0;
+    ret->name[0] = '\0';
+    ret->valid = 0;
   } else
-    strcpy(ret.name, full_name);
-  if ((strlen(ret.address) == 0) && (t != SERVER_COMM) && (t != CLIENT_COMM)) {
+    strcpy(ret->name, full_name);
+  if ((strlen(ret->address) == 0) && (t != SERVER_COMM) && (t != CLIENT_COMM)) {
     cislog_error("init_comm_base: %s not registered as environment variable.\n",
 		 full_name);
-    ret.valid = 0;
+    ret->valid = 0;
   }
   return ret;
 };

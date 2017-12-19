@@ -55,9 +55,6 @@ int main(int argc, char *argv[]) {
     if (ret < 0) {
       printf("rpcFibCli(C): RPC CALL ERROR\n");
       free(logmsg);
-      psi_free(&ymlfile);
-      psi_free(&rpc);
-      psi_free(&log);
       exit(-1);
     }
 
@@ -68,17 +65,11 @@ int main(int argc, char *argv[]) {
     if (ret != 0) {
       printf("rpcFibCli(C): SEND ERROR\n");
       free(logmsg);
-      psi_free(&ymlfile);
-      psi_free(&rpc);
-      psi_free(&log);
       exit(-1);
     }
   }
 
   free(logmsg);
-  psi_free(&ymlfile);
-  psi_free(&rpc);
-  psi_free(&log);
   printf("Goodbye from C rpcFibCli\n");
   exit(0);
     
