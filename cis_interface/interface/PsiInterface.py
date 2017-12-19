@@ -115,15 +115,15 @@ def PsiRpc(outname, outfmt, inname, infmt, matlab=False):
     return out
 
 
-def PsiRpcServer(name, infmt, outfmt, matlab=False):
+def PsiRpcServer(name, infmt='%s', outfmt='%s', matlab=False):
     r"""Get class for handling requests and response for an RPC Server.
 
     Args:
         name (str): The name of the server queues.
-        infmt (str): Format string used to recover variables from
-            messages received from the request queue.
-        outfmt (str): Format string used to format variables in a
-            message sent to the response queue.
+        infmt (str, optional): Format string used to recover variables from
+            messages received from the request queue. Defaults to '%s'.
+        outfmt (str, optional): Format string used to format variables in a
+            message sent to the response queue. Defautls to '%s'.
 
     Returns:
         ServerComm: Communication object.
@@ -139,16 +139,16 @@ def PsiRpcServer(name, infmt, outfmt, matlab=False):
     return out
     
 
-def PsiRpcClient(name, outfmt, infmt, matlab=False):
+def PsiRpcClient(name, outfmt='%s', infmt='%s', matlab=False):
     r"""Get class for handling requests and response to an RPC Server from a
     client.
 
     Args:
         name (str): The name of the server queues.
-        outfmt (str): Format string used to format variables in a
-            message sent to the request queue.
-        infmt (str): Format string used to recover variables from
-            messages received from the response queue.
+        outfmt (str, optional): Format string used to format variables in a
+            message sent to the request queue. Defautls to '%s'.
+        infmt (str, optional): Format string used to recover variables from
+            messages received from the response queue. Defautls to '%s'.
 
     Returns:
         ClientComm: Communication object.
