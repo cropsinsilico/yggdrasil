@@ -43,7 +43,6 @@ int main(int argc, char *argv[]) {
     int flag = rpcSend(rpc, input, result);
   }
 
-  psi_free(&rpc);
   printf("Goodbye from C rpcFibSrv\n");
   return 0;
 }

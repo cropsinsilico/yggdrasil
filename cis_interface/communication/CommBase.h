@@ -46,7 +46,7 @@ typedef struct comm_t {
 */
 static inline
 comm_t* new_comm_base(char *address, const char *direction, const comm_type t,
-		     void *seri_info) {
+		      void *seri_info) {
   comm_t* ret = (comm_t*)malloc(sizeof(comm_t));
   ret->type = t;
   ret->valid = 1;
@@ -129,7 +129,7 @@ int free_comm_base(comm_t *x) {
 
 /*!
   @brief Send a message to the comm.
-  Send a message smaller than PSI_MSG_MAX bytes to an output comm. If the
+  Send a message smaller than CIS_MSG_MAX bytes to an output comm. If the
   message is larger, it will not be sent.
   @param[in] x comm_t structure that comm should be sent to.
   @param[in] data character pointer to message that should be sent.
@@ -138,9 +138,9 @@ int free_comm_base(comm_t *x) {
  */
 static inline
 int comm_base_send(const comm_t x, const char *data, const int len) {
-  if (len > PSI_MSG_MAX) {
-    cislog_error("comm_base_send(%s): message too large for single packet (PSI_MSG_MAX=%d, len=%d)",
-		 x.name, PSI_MSG_MAX, len);
+  if (len > CIS_MSG_MAX) {
+    cislog_error("comm_base_send(%s): message too large for single packet (CIS_MSG_MAX=%d, len=%d)",
+		 x.name, CIS_MSG_MAX, len);
     return -1;
   }
   return 0;

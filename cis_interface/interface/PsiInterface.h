@@ -33,7 +33,7 @@
       1. One-time: Create output channel (store in named variables)
             cisOutput_t output_channel = cisOutput("out_name");
       2. Prepare: Format data to a character array buffer.
-            char buffer[CIS_MSG_MAX]; 
+            char buffer[CIS_MSG_BUF]; 
 	    sprintf(buffer, "a=%d, b=%d", 1, 2);
       3. Send:
 	    ret = cis_send(output_channel, buffer, strlen(buffer));
@@ -44,9 +44,9 @@
       1. One-time: Create output channel (store in named variables)
             cisInput_t input_channel = cisInput("in_name");
       2. Prepare: Allocate a character array buffer.
-            char buffer[CIS_MSG_MAX];
+            char buffer[CIS_MSG_BUF];
       3. Receive:
-            int ret = cis_recv(input_channel, buffer, CIS_MSG_MAX);
+            int ret = cis_recv(input_channel, buffer, CIS_MSG_BUF);
       4. Free:
             cis_free(&input_channel);
 */
@@ -827,8 +827,8 @@ comm_t cisAsciiTableInput(const char *name, const int as_array, const int src_ty
   comm_t out = init_comm(name, "recv", type, NULL);
   // For connection, receive format and initialize serializer
   if (src_type != 0) {
-    char format_str[CIS_MSG_MAX];
-    int ret = comm_recv(out, format_str, CIS_MSG_MAX);
+    char format_str[CIS_MSG_BUF];
+    int ret = comm_recv(out, format_str, CIS_MSG_BUF);
     if (ret < 0) {
       cislog_error("cisAsciiTableInput: Failed to recv format string.\n");
       out.valid = 0;

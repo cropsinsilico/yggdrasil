@@ -16,6 +16,8 @@
 #endif
 /*! @brief End of file message. */
 #define CIS_MSG_EOF "EOF!!!"
+/*! @brief Resonable size for buffer. */
+#define CIS_MSG_BUF 2048
 
 /*! @brief Define old style names for compatibility. */
 #define PSI_MSG_MAX CIS_MSG_MAX

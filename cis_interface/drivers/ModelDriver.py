@@ -24,10 +24,15 @@ class ModelDriver(Driver):
         is_server (bool, optional): If True, the model is assumed to be a server
             and an instance of :class:`cis_interface.drivers.RMQServerDriver`
             is started. Defaults to False.
-        client_of (str, list, optional): THe names of ne or more servers that
+        client_of (str, list, optional): The names of ne or more servers that
             this model is a client of. Defaults to empty list.
-        \*\*kwargs: Additional keyword arguments are passed to parent class's
-            __init__ method.
+        with_strace (bool, optional): If True, the command is run with strace.
+            Defaults to False.
+        strace_flags (list, optional): Flags to pass to strace. Defaults to [].
+        with_valgrind (bool, optional): If True, the command is run with valgrind.
+            Defaults to False.
+        valgrind_flags (list, optional): Flags to pass to valgrind. Defaults to [].
+        **kwargs: Additional keyword arguments are passed to parent class.
 
     Attributes:
         args (list): Argument(s) for running the model on the command line.
@@ -37,10 +42,19 @@ class ModelDriver(Driver):
             started.
         client_of (list): The names of server models that this model is a
             client of.
+        with_strace (bool): If True, the command is run with strace.
+        strace_flags (list): Flags to pass to strace.
+        with_valgrind (bool): If True, the command is run with valgrind.
+        valgrind_flags (list): Flags to pass to valgrind.
+
+    Raises:
+        RuntimeError: If both with_strace and with_valgrind are True.
 
     """
 
     def __init__(self, name, args, is_server=False, client_of=[],
+                 with_strace=False, strace_flags=None,
+                 with_valgrind=False, valgrind_flags=None,
                  **kwargs):
         super(ModelDriver, self).__init__(name, **kwargs)
         self.debug(str(args))
@@ -51,6 +65,17 @@ class ModelDriver(Driver):
         self.process = None
         self.is_server = is_server
         self.client_of = client_of
+        # Strace/valgrind
+        if with_strace and with_valgrind:
+            raise RuntimeError("Trying to run with strace and valgrind.")
+        self.with_strace = with_strace
+        if strace_flags is None:
+            strace_flags = []
+        self.strace_flags = strace_flags
+        self.with_valgrind = with_valgrind
+        if valgrind_flags is None:
+            valgrind_flags = []
+        self.valgrind_flags = valgrind_flags
         self.env.update(os.environ)
 
     def start(self, no_popen=False):
@@ -58,8 +83,13 @@ class ModelDriver(Driver):
         if not no_popen:
             self.debug(':run %s from %s with cwd %s and env %s',
                        self.args, os.getcwd(), self.workingDir, pformat(self.env))
+            pre_args = ['stdbuf', '-o0', '-e0']
+            if self.with_strace:
+                pre_args += ['strace'] + self.strace_flags
+            elif self.with_valgrind:
+                pre_args += ['valgrind'] + self.valgrind_flags
             self.process = subprocess.Popen(
-                ['stdbuf', '-o0', '-e0'] + self.args, bufsize=0,
+                pre_args + self.args, bufsize=0,
                 # If PIPEs are used, communicate must be used below
                 # stdin=subprocess.PIPE, stderr=subprocess.PIPE,
                 stdout=subprocess.PIPE, stderr=subprocess.STDOUT,

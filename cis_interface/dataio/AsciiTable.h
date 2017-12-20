@@ -66,6 +66,7 @@ int count_matches(const char *regex_text, const char *to_match) {
     n_match++;
     p += m[0].rm_eo;
   }
+  regfree(&r);
   return n_match;
 };
 
@@ -100,6 +101,7 @@ int find_match(const char *regex_text, const char *to_match,
     *eind = m[0].rm_eo;
     n_match++;
   }
+  regfree(&r);
   return n_match;
 };
 
@@ -168,6 +170,7 @@ int regex_replace_nosub(char *buf, const int len_buf,
   }
   /* printf("regex_replace_nosub() = %s\n", buf); */
   free(m);
+  regfree(&r);
   return cur_siz;
 };
 
@@ -192,6 +195,7 @@ int get_subrefs(const char *buf, int **refs) {
   const int ngroups = r.re_nsub + 1;
   if (ngroups != 2) {
     printf("ERROR: regex could not find subgroup\n");
+    regfree(&r);
     return -1;
   }
   regmatch_t *m = (regmatch_t*)malloc(ngroups * sizeof(regmatch_t));
@@ -224,6 +228,7 @@ int get_subrefs(const char *buf, int **refs) {
       printf("Number longer than %d digits unlikely.\n", max_grp);
       free(m);
       free(ref_bytes);
+      regfree(&r);
       return -1;
     }
     strncpy(igrp, p + m[1].rm_so, igrp_len);
@@ -234,6 +239,7 @@ int get_subrefs(const char *buf, int **refs) {
       printf("Reference to substr %d exceeds limit (%d)\n", iref, max_ref);
       free(m);
       free(ref_bytes);
+      regfree(&r);
       return -1;
     }
     ref_bytes[iref] = 1;
@@ -255,6 +261,7 @@ int get_subrefs(const char *buf, int **refs) {
   }
   free(m);
   free(ref_bytes);
+  regfree(&r);
   // printf("%d refs in %s\n", nref, buf);
   return nref;
 }
@@ -324,6 +331,7 @@ int regex_replace_sub(char *buf, const int len_buf,
       if (ret < 0) {
 	printf("regex_replace_sub: Error replacing substring $%d.\n", i);
 	free(m);
+	regfree(&r);
 	return -1;
       }
     }
@@ -349,6 +357,7 @@ int regex_replace_sub(char *buf, const int len_buf,
     creplace += 1;
   }
   free(m);
+  regfree(&r);
   return cur_siz;
 };
 

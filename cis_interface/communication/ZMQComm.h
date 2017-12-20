@@ -180,7 +180,7 @@ int zmq_comm_nmsg(const comm_t x) {
 
 /*!
   @brief Send a message to the comm.
-  Send a message smaller than PSI_MSG_MAX bytes to an output comm. If the
+  Send a message smaller than CIS_MSG_MAX bytes to an output comm. If the
   message is larger, it will not be sent.
   @param[in] x comm_t structure that comm should be sent to.
   @param[in] data character pointer to message that should be sent.
@@ -203,7 +203,7 @@ int zmq_comm_send(const comm_t x, const char *data, const int len) {
 
 /*!
   @brief Receive a message from an input comm.
-  Receive a message smaller than PSI_MSG_MAX bytes from an input comm.
+  Receive a message smaller than CIS_MSG_MAX bytes from an input comm.
   @param[in] x comm_t structure that message should be sent to.
   @param[out] data character pointer to allocated buffer where the message
   should be saved.
@@ -291,7 +291,7 @@ int zmq_comm_nmsg(const comm_t x) {
 
 /*!
   @brief Send a message to the comm.
-  Send a message smaller than PSI_MSG_MAX bytes to an output comm. If the
+  Send a message smaller than CIS_MSG_MAX bytes to an output comm. If the
   message is larger, it will not be sent.
   @param[in] x comm_t structure that comm should be sent to.
   @param[in] data character pointer to message that should be sent.
@@ -306,7 +306,7 @@ int zmq_comm_send(const comm_t x, const char *data, const int len) {
 
 /*!
   @brief Receive a message from an input comm.
-  Receive a message smaller than PSI_MSG_MAX bytes from an input comm.
+  Receive a message smaller than CIS_MSG_MAX bytes from an input comm.
   @param[in] x comm_t structure that message should be sent to.
   @param[out] data character pointer to allocated buffer where the message
   should be saved.

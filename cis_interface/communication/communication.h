@@ -52,9 +52,11 @@ int free_comm(comm_t *x) {
   else {
     cislog_error("free_comm: Unsupported comm_type %d", t);
   }
+  int idx = x->index_in_register;
   free_comm_base(x);
-  if (x->index_in_register >= 0) {
-    vcomms2clean[x->index_in_register] = NULL;
+  if (idx >= 0) {
+    free(vcomms2clean[idx]);
+    vcomms2clean[idx] = NULL;
   }
   return ret;
 };
@@ -424,7 +426,7 @@ int comm_send(const comm_t x, const char *data, const int len) {
 */
 static inline
 int comm_send_eof(const comm_t x) {
-  char buf[CIS_MSG_MAX] = CIS_MSG_EOF;
+  char buf[2048] = CIS_MSG_EOF;
   int ret = comm_send(x, buf, strlen(buf));
   return ret;
 };
@@ -599,7 +601,7 @@ int comm_send_nolimit(const comm_t x, const char *data, const int len) {
 */
 static inline
 int comm_send_nolimit_eof(const comm_t x) {
-  char buf[CIS_MSG_MAX] = CIS_MSG_EOF;
+  char buf[2048] = CIS_MSG_EOF;
   int ret = comm_send_nolimit(x, buf, strlen(buf));
   return ret;
 };
@@ -633,13 +635,13 @@ int comm_recv_nolimit(const comm_t x, char **data, const int len) {
  */
 static inline
 int vcommSend(const comm_t x, va_list ap) {
-  char *buf = (char*)malloc(CIS_MSG_MAX);
+  char *buf = (char*)malloc(CIS_MSG_BUF);
   seri_t serializer = x.serializer;
   if (x.type == CLIENT_COMM) {
     comm_t *handle = (comm_t*)(x.handle);
     serializer = handle->serializer;
   }
-  int ret = serialize(serializer, &buf, CIS_MSG_MAX, 1, ap);
+  int ret = serialize(serializer, &buf, CIS_MSG_BUF, 1, ap);
   if (ret < 0) {
     cislog_error("vcommSend(%s): serialization error", x.name);
     free(buf);
@@ -666,8 +668,8 @@ int vcommSend(const comm_t x, va_list ap) {
 static inline
 int vcommRecv(const comm_t x, va_list ap) {
   // Receive message
-  char *buf = (char*)malloc(CIS_MSG_MAX);
-  int ret = comm_recv_nolimit(x, &buf, CIS_MSG_MAX);
+  char *buf = (char*)malloc(CIS_MSG_BUF);
+  int ret = comm_recv_nolimit(x, &buf, CIS_MSG_BUF);
   if (ret < 0) {
     /* cislog_error("vcommRecv(%s): Error receiving.", x.name); */
     free(buf);

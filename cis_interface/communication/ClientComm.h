@@ -237,6 +237,7 @@ int client_comm_recv(comm_t x, char *data, const int len) {
   // Close response comm and decrement count of response comms
   free((char*)(res_comm[0][0]->serializer.info));
   free_default_comm(res_comm[0][0]);
+  free(res_comm[0][0]);
   dec_client_response_count(x);
   int nresp = get_client_response_count(x);
   memmove(*res_comm, *res_comm + 1, nresp*sizeof(comm_t*));
