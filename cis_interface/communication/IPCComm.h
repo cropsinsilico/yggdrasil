@@ -261,14 +261,16 @@ int ipc_comm_send(const comm_t x, const char *data, const int len) {
   @brief Receive a message from an input comm.
   Receive a message smaller than CIS_MSG_MAX bytes from an input comm.
   @param[in] x comm_t structure that message should be sent to.
-  @param[out] data character pointer to allocated buffer where the message
-  should be saved.
+  @param[out] data char ** pointer to allocated buffer where the message
+  should be saved. This should be a malloc'd buffer if allow_realloc is 1.
   @param[in] len const int length of the allocated message buffer in bytes.
+  @param[in] allow_realloc const int If 1, the buffer will be realloced if it
+  is not large enought. Otherwise an error will be returned.
   @returns int -1 if message could not be received. Length of the received
   message if message was received.
  */
 static inline
-int ipc_comm_recv(const comm_t x, char *data, const int len) {
+int ipc_comm_recv(const comm_t x, char **data, const int len, const int allow_realloc) {
   cislog_debug("ipc_comm_recv(%s)", x.name);
   msgbuf_t t;
   t.mtype = 1;
@@ -286,12 +288,18 @@ int ipc_comm_recv(const comm_t x, char *data, const int len) {
   }
   if (ret > 0) {
     if ((ret + 1) > len) {
-      cislog_debug("ipc_comm_recv(%s): buffer (%d bytes) is not large enough for message (%d bytes)",
-		   x.name, len, ret);
-      ret = -ret;
+      if (allow_realloc) {
+	cislog_debug("ipc_comm_recv(%s): reallocating buffer from %d to %d bytes.\n",
+		     x.name, len, ret + 1);
+	(*data) = (char*)realloc(*data, ret + 1);
+      } else {
+	cislog_error("ipc_comm_recv(%s): buffer (%d bytes) is not large enough for message (%d bytes)",
+		     x.name, len, ret);
+	ret = -ret;
+      }
     }
-    memcpy(data, t.data, ret);
-    data[ret] = '\0';
+    memcpy(*data, t.data, ret);
+    (*data)[ret] = '\0';
   } else {
     cislog_debug("ipc_comm_recv: msgrecv(%d, %p, %d, 0, IPC_NOWAIT: %s",
 		 (int*)x.handle, &t, len, strerror(errno));
@@ -345,65 +353,6 @@ int ipc_comm_send_nolimit(const comm_t x, const char *data, const int len){
   return ret;
 };
 
-/*!
-  @brief Receive a large message from an input comm.
-  Receive a message larger than CIS_MSG_MAX bytes from an input comm by
-  receiving it in parts. This expects the first message to be the size of
-  the total message.
-  @param[in] x comm_t structure that message should be sent to.
-  @param[out] data character pointer to pointer for allocated buffer where the
-  message should be stored. A pointer to a pointer is used so that the buffer
-  may be reallocated as necessary for the incoming message.
-  @param[in] len0 int length of the initial allocated message buffer in bytes.
-  @returns int -1 if message could not be received. Length of the received
-  message if message was received.
- */
-static inline
-int ipc_comm_recv_nolimit(const comm_t x, char **data, const int len0){
-  cislog_debug("ipc_comm_recv_nolimit(%s)", x.name);
-  long len = 0;
-  int ret = -1;
-  int msgsiz = 0;
-  char msg[CIS_MSG_MAX];
-  int prev = 0;
-  ret = ipc_comm_recv(x, msg, CIS_MSG_MAX);
-  if (ret < 0) {
-    cislog_debug("ipc_comm_recv_nolimit(%s): failed to receive payload size.", x.name);
-    return -1;
-  }
-  ret = sscanf(msg, "%ld", &len);
-  if (ret != 1) {
-    cislog_debug("ipc_comm_recv_nolimit(%s): failed to parse payload size (%s)",
-		 x.name, msg);
-    return -1;
-  }
-  // Reallocate data if necessary
-  if (len > len0) {
-    *data = (char*)realloc(*data, len);
-  }
-  ret = -1;
-  while (prev < len) {
-    if ((len - prev) > CIS_MSG_MAX)
-      msgsiz = CIS_MSG_MAX;
-    else
-      msgsiz = len - prev;
-    ret = ipc_comm_recv(x, (*data) + prev, msgsiz);
-    if (ret < 0) {
-      cislog_debug("ipc_comm_recv_nolimit(%s): recv interupted at %d of %d bytes.",
-		   x.name, prev, len);
-      break;
-    }
-    prev += ret;
-    cislog_debug("ipc_comm_recv_nolimit(%s): %d of %d bytes received",
-		 x.name, prev, len);
-  }
-  if (ret > 0) {
-    cislog_debug("ipc_comm_recv_nolimit(%s): %d bytes completed", x.name, prev);
-    return prev;
-  } else {
-    return -1;
-  }
-};
 
 // Definitions in the case where IPC libraries not installed
 #else /*IPCINSTALLED*/

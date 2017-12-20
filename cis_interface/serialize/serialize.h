@@ -30,6 +30,10 @@ int serialize(const seri_t s, char **buf, const int buf_siz,
 	      const int allow_realloc, va_list ap) {
   seri_type t = s.type;
   int ret = -1;
+  va_list ap2;
+  if (allow_realloc) {
+    va_copy(ap2, ap);
+  }
   if (t == DIRECT_SERI)
     ret = serialize_direct(s, *buf, buf_siz, ap);
   else if (t == FORMAT_SERI)
@@ -44,12 +48,15 @@ int serialize(const seri_t s, char **buf, const int buf_siz,
   if (ret > buf_siz) {
     if (allow_realloc) {
       *buf = (char*)realloc(*buf, ret+1); 
-      ret = serialize(s, buf, ret+1, 0, ap);
+      ret = serialize(s, buf, ret+1, 0, ap2);
     } else {
       cislog_error("serialize: encoded message too large for the buffer. (buf_siz=%d, len=%d)",
 		   buf_siz, ret);
       ret = -1;
     }
+  }
+  if (allow_realloc) {
+    va_end(ap2);
   }
   return ret;
 }

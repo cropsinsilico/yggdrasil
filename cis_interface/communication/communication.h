@@ -435,30 +435,33 @@ int comm_send_eof(const comm_t x) {
   @brief Receive a message from an input comm.
   Receive a message smaller than CIS_MSG_MAX bytes from an input comm.
   @param[in] x comm_t structure that message should be sent to.
-  @param[out] data character pointer to allocated buffer where the message
-  mshould be saved.
+  @param[out] data char ** pointer to allocated buffer where the message
+  should be saved. This should be a malloc'd buffer if allow_realloc is 1.
   @param[in] len const int length of the allocated message buffer in bytes.
+  @param[in] allow_realloc const int If 1, the buffer will be realloced if it
+  is not large enought. Otherwise an error will be returned.
   @returns int -1 if message could not be received, otherwise the length of
   the received message.
  */
 static inline
-int comm_recv_single(const comm_t x, char *data, const int len) {
+int comm_recv_single(const comm_t x, char **data, const int len,
+		     const int allow_realloc) {
   comm_type t = x.type;
   int ret = -1;
   if (t == IPC_COMM)
-    ret = ipc_comm_recv(x, data, len);
+    ret = ipc_comm_recv(x, data, len, allow_realloc);
   else if (t == ZMQ_COMM)
-    ret = zmq_comm_recv(x, data, len);
+    ret = zmq_comm_recv(x, data, len, allow_realloc);
   else if (t == RPC_COMM)
-    ret = rpc_comm_recv(x, data, len);
+    ret = rpc_comm_recv(x, data, len, allow_realloc);
   else if (t == SERVER_COMM)
-    ret = server_comm_recv(x, data, len);
+    ret = server_comm_recv(x, data, len, allow_realloc);
   else if (t == CLIENT_COMM)
-    ret = client_comm_recv(x, data, len);
+    ret = client_comm_recv(x, data, len, allow_realloc);
   else if (t == ASCII_FILE_COMM)
-    ret = ascii_file_comm_recv(x, data, len);
+    ret = ascii_file_comm_recv(x, data, len, allow_realloc);
   else if ((t == ASCII_TABLE_COMM) || (t == ASCII_TABLE_ARRAY_COMM))
-    ret = ascii_table_comm_recv(x, data, len);
+    ret = ascii_table_comm_recv(x, data, len, allow_realloc);
   else {
     cislog_error("comm_recv: Unsupported comm_type %d", t);
   }
@@ -513,18 +516,20 @@ int comm_recv_multipart(const comm_t x, char **data, const int len,
 	}
       }
       ret = -1;
+      char *pos = (*data) + prev;
       while (prev < head.size) {
 	if ((head.size - prev) > xmulti.maxMsgSize)
 	  msgsiz = xmulti.maxMsgSize;
 	else
 	  msgsiz = head.size - prev + 1;
-	ret = comm_recv_single(xmulti, (*data) + prev, msgsiz);
+	ret = comm_recv_single(xmulti, &pos, msgsiz, 0);
 	if (ret < 0) {
 	  cislog_debug("comm_recv_multipart(%s): recv interupted at %d of %d bytes.",
 		       x.name, prev, head.size);
 	  break;
 	}
 	prev += ret;
+	pos += ret;
 	cislog_debug("comm_recv_multipart(%s): %d of %d bytes received",
 		     x.name, prev, head.size);
       }
@@ -552,7 +557,7 @@ int comm_recv_multipart(const comm_t x, char **data, const int len,
  */
 static inline
 int comm_recv(const comm_t x, char *data, const int len) {
-  int ret = comm_recv_single(x, data, len);
+  int ret = comm_recv_single(x, &data, len, 0);
   if (ret > 0) {
     if (is_eof(data)) {
       cislog_debug("comm_recv(%s): EOF received.\n", x.name);
@@ -575,7 +580,7 @@ int comm_recv(const comm_t x, char *data, const int len) {
  */
 static inline
 int comm_recv_realloc(const comm_t x, char **data, const int len) {
-  int ret = comm_recv_single(x, *data, len);
+  int ret = comm_recv_single(x, data, len, 1);
   if (ret > 0) {
     if (is_eof(*data)) {
       cislog_debug("comm_recv_realloc(%s): EOF received.\n", x.name);

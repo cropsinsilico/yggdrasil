@@ -139,16 +139,19 @@ int ascii_table_comm_send(const comm_t x, const char *data, const int len) {
   @brief Receive a message from an input comm.
   Receive a message smaller than PSI_MSG_MAX bytes from an input comm.
   @param[in] x comm_t structure that message should be sent to.
-  @param[out] data character pointer to allocated buffer where the message
-  should be saved.
+  @param[out] data char ** pointer to allocated buffer where the message
+  should be saved. This should be a malloc'd buffer if allow_realloc is 1.
   @param[in] len const int length of the allocated message buffer in bytes.
+  @param[in] allow_realloc const int If 1, the buffer will be realloced if it
+  is not large enought. Otherwise an error will be returned.
   @returns int -1 if message could not be received. Length of the received
   message if message was received.
  */
 static inline
-int ascii_table_comm_recv(const comm_t x, char *data, const int len) {
+int ascii_table_comm_recv(const comm_t x, char **data, const int len,
+			  const int allow_realloc) {
   asciiTable_t *table = (asciiTable_t*)x.handle;
-  return at_readline_full(table[0], data, len);
+  return at_readline_full_realloc(table[0], data, len, allow_realloc);
 };
 
 /*!

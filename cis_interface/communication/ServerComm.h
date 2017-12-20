@@ -129,30 +129,32 @@ int server_comm_send(const comm_t x, const char *data, const int len) {
 /*!
   @brief Receive a message from an input comm.
   @param[in] x comm_t structure that message should be sent to.
-  @param[out] data character pointer to allocated buffer where the message
-  should be saved.
+  @param[out] data char ** pointer to allocated buffer where the message
+  should be saved. This should be a malloc'd buffer if allow_realloc is 1.
   @param[in] len const int length of the allocated message buffer in bytes.
+  @param[in] allow_realloc const int If 1, the buffer will be realloced if it
+  is not large enought. Otherwise an error will be returned.
   @returns int -1 if message could not be received. Length of the received
   message if message was received.
  */
 static inline
-int server_comm_recv(comm_t x, char *data, const int len) {
+int server_comm_recv(comm_t x, char **data, const int len, const int allow_realloc) {
   cislog_debug("server_comm_recv(%s)", x.name);
   if (x.handle == NULL) {
     cislog_error("server_comm_recv(%s): no request comm registered", x.name);
     return -1;
   }
   comm_t *req_comm = (comm_t*)(x.handle);
-  int ret = default_comm_recv(*req_comm, data, len);
+  int ret = default_comm_recv(*req_comm, data, len, allow_realloc);
   if (ret < 0) {
     return ret;
   }
   // Return EOF
-  if (is_eof(data)) {
+  if (is_eof(*data)) {
     return ret;
   }
   // Initialize new comm from received address
-  comm_head_t head = parse_comm_header(data, ret);
+  comm_head_t head = parse_comm_header(*data, ret);
   if (!(head.valid)) {
     cislog_error("server_comm_recv(%s): Error parsing header.", x.name);
     return -1;

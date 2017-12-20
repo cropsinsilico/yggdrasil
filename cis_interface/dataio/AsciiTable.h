@@ -449,12 +449,14 @@ void at_close(asciiTable_t *t) {
   @brief Read a line from the file until one is returned that is not a comment.
   @param[in] t constant asciiTable_t table structure.
   @param[out] buf pointer to memory where read line should be stored.
-  @param[in] len_buf Size of buffer where line should be stored. The the message
-  is larger than len_buf, an error will be returned.
+  @param[in] len_buf Size of buffer where line should be stored.
+  @param[in] allow_realloc const int If 1, the buffer will be realloced if it
+  is not large enought. Otherwise an error will be returned.
   @return int On success, the number of characters read. -1 on failure.
  */
 static inline
-int at_readline_full(const asciiTable_t t, char *buf, const int len_buf) {
+int at_readline_full_realloc(const asciiTable_t t, char **buf, const int len_buf,
+			     const int allow_realloc) {
   // Read lines until there's one that's not a comment
   int ret = 0, com = 1;
   size_t nread = LINE_SIZE_MAX;
@@ -468,14 +470,35 @@ int at_readline_full(const asciiTable_t t, char *buf, const int len_buf) {
     com = af_is_comment(t.f, line);
   }
   if (ret > len_buf) {
-    printf("at_readline_full: line (%d bytes) is larger than destination buffer (%d bytes)\n",
-	   ret, len_buf);
-    ret = -1;
-  } else {
-    strcpy(buf, line);
+    if (allow_realloc) {
+      printf("at_readline_full_realloc: reallocating buffer from %d to %d bytes.\n",
+	     len_buf, ret + 1);
+      (*buf) = (char*)realloc(*buf, ret + 1);
+    } else {
+      printf("at_readline_full: line (%d bytes) is larger than destination buffer (%d bytes)\n",
+	     ret, len_buf);
+      ret = -1;
+      free(line);
+      return ret;
+    }
   }
+  strcpy(*buf, line);
   free(line);
   return ret;
+};
+
+/*!
+  @brief Read a line from the file until one is returned that is not a comment.
+  @param[in] t constant asciiTable_t table structure.
+  @param[out] buf pointer to memory where read line should be stored.
+  @param[in] len_buf Size of buffer where line should be stored. The the message
+  is larger than len_buf, an error will be returned.
+  @return int On success, the number of characters read. -1 on failure.
+ */
+static inline
+int at_readline_full(const asciiTable_t t, char *buf, const int len_buf) {
+  // Read but don't realloc buf
+  return at_readline_full_realloc(t, &buf, len_buf, 0);
 };
 
 /*!

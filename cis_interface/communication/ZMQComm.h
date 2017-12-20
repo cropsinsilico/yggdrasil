@@ -205,14 +205,17 @@ int zmq_comm_send(const comm_t x, const char *data, const int len) {
   @brief Receive a message from an input comm.
   Receive a message smaller than CIS_MSG_MAX bytes from an input comm.
   @param[in] x comm_t structure that message should be sent to.
-  @param[out] data character pointer to allocated buffer where the message
-  should be saved.
+  @param[out] data char ** pointer to allocated buffer where the message
+  should be saved. This should be a malloc'd buffer if allow_realloc is 1.
   @param[in] len const int length of the allocated message buffer in bytes.
+  @param[in] allow_realloc const int If 1, the buffer will be realloced if it
+  is not large enought. Otherwise an error will be returned.
   @returns int -1 if message could not be received. Length of the received
   message if message was received.
  */
 static inline
-int zmq_comm_recv(const comm_t x, char *data, const int len) {
+int zmq_comm_recv(const comm_t x, char **data, const int len,
+		  const int allow_realloc) {
   cislog_debug("zmq_comm_recv(%s)", x.name);
   zsock_t *s = (zsock_t*)(x.handle);
   zframe_t *out = zframe_recv(s);
@@ -223,12 +226,18 @@ int zmq_comm_recv(const comm_t x, char *data, const int len) {
   int len_recv = zframe_size(out);
   /* printf("(C) received %d bytes from %s\n", len_recv, x.address); */
   if ((len_recv + 1) > len) {
-    cislog_error("zmq_comm_recv(%s): buffer (%d bytes) is not large enough for message (%d bytes)",
-		 x.name, len, len_recv);
-    return -(len_recv + 1);
+    if (allow_realloc) {
+      cislog_debug("zmq_comm_recv(%s): reallocating buffer from %d to %d bytes.\n",
+		   x.name, len, len_recv + 1);
+      (*data) = (char*)realloc(*data, len_recv + 1);
+    } else {
+      cislog_error("zmq_comm_recv(%s): buffer (%d bytes) is not large enough for message (%d bytes)",
+		   x.name, len, len_recv);
+      return -(len_recv + 1);
+    }
   }
-  memcpy(data, zframe_data(out), len_recv + 1);
-  data[len_recv] = '\0';
+  memcpy(*data, zframe_data(out), len_recv + 1);
+  (*data)[len_recv] = '\0';
   zframe_destroy(&out);
   return len_recv;
 };
