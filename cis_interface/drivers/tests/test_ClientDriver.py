@@ -47,9 +47,8 @@ class TestClientParam(parent.TestConnectionParam):
     def setup(self, *args, **kwargs):
         r"""Recover new client message on start-up."""
         kwargs.setdefault('nprev_comm', self.comm_count)
-        skip_start = kwargs.get('skip_start', False)
         self.srv_drv = self.create_server()
-        if not skip_start:
+        if not self.skip_start:
             self.srv_drv.start()
         super(TestClientParam, self).setup(*args, **kwargs)
 

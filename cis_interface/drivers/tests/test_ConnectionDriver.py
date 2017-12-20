@@ -58,11 +58,10 @@ class TestConnectionParam(parent.TestParam, IOInfo):
     def setup(self, *args, **kwargs):
         r"""Initialize comm object pair."""
         kwargs.setdefault('nprev_comm', self.comm_count)
-        skip_start = kwargs.get('skip_start', False)
         super(TestConnectionParam, self).setup(*args, **kwargs)
         send_kws = self.send_comm_kwargs
         recv_kws = self.recv_comm_kwargs
-        if skip_start:
+        if self.skip_start:
             send_kws['dont_open'] = True
             recv_kws['dont_open'] = True
         self.send_comm = new_comm(self.name, **send_kws)
@@ -80,18 +79,7 @@ class TestConnectionParam(parent.TestParam, IOInfo):
     
 
 class TestConnectionDriverNoStart(TestConnectionParam, parent.TestDriverNoStart):
-    r"""Test class for the ConnectionDriver class without start.
-
-    Attributes (in addition to parent class's):
-        -
-
-    """
-
-    def setup(self, *args, **kwargs):
-        r"""Create a driver instance without starting the driver."""
-        kwargs['skip_start'] = True
-        super(TestConnectionDriverNoStart, self).setup(*args, **kwargs)
-        assert(not self.instance.is_alive())
+    r"""Test class for the ConnectionDriver class without start."""
 
     def test_send_recv(self):
         r"""Test sending/receiving with queues closed."""
@@ -99,6 +87,8 @@ class TestConnectionDriverNoStart(TestConnectionParam, parent.TestDriverNoStart)
         self.send_comm.close()
         self.recv_comm.close()
         assert(self.instance.is_comm_closed)
+        assert(self.send_comm.is_closed)
+        assert(self.recv_comm.is_closed)
         flag = self.instance.send_message()
         assert(not flag)
         flag = self.instance.recv_message()

@@ -36,6 +36,11 @@ class TestParam(CisTest):
         self.nprev_comm = 0
 
     @property
+    def skip_start(self):
+        r"""bool: True if driver shouldn't be started. False otherwise."""
+        return ('NoStart' in str(self.__class__))
+
+    @property
     def cls(self):
         r"""str: Driver class."""
         return self.driver
@@ -66,12 +71,10 @@ class TestParam(CisTest):
         r"""int: Return the number of comms."""
         return get_comm_class().comm_count()
 
-    def setup(self, skip_start=False, nprev_comm=None):
+    def setup(self, nprev_comm=None):
         r"""Create a driver instance and start the driver.
 
         Args:
-            skip_start (bool, optional): If True, the driver will not be
-                started. Defaults to False.
             nprev_comm (int, optional): Number of previous comm channels.
                 If not provided, it is determined to be the present number of
                 default comms.
@@ -86,7 +89,7 @@ class TestParam(CisTest):
             nprev_comm = self.comm_count
         self.nprev_comm = nprev_comm
         super(TestParam, self).setup()
-        if not skip_start:
+        if not self.skip_start:
             self.instance.start()
 
     def teardown(self, ncurr_comm=None):
@@ -187,16 +190,10 @@ class TestDriver(TestParam):
 
         
 class TestDriverNoStart(TestParam):
-    r"""Test runner for basic Driver class without starting driver.
-
-    Attributes (in addition to parent class):
-        -
-
-    """
+    r"""Test runner for basic Driver class without starting driver."""
 
     def setup(self, *args, **kwargs):
         r"""Create a driver instance without starting the driver."""
-        kwargs['skip_start'] = True
         super(TestDriverNoStart, self).setup(*args, **kwargs)
         assert(not self.instance.is_alive())
 
