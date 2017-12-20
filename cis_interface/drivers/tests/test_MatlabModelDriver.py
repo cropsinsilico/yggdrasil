@@ -15,17 +15,11 @@ def test_matlab_runner():
     cr.run()
 
 
-class TestMatlabModelDriver(parent.TestModelDriver,
-                            parent.TestModelDriverNoStart):
-    r"""Test runner for MatlabModelDriver.
-
-    Attributes (in addition to parent class's):
-        -
-
-    """
+class TestMatlabModelParam(parent.TestModelParam):
+    r"""Test parameters for MatlabModelDriver."""
 
     def __init__(self, *args, **kwargs):
-        super(TestMatlabModelDriver, self).__init__(*args, **kwargs)
+        super(TestMatlabModelParam, self).__init__(*args, **kwargs)
         self.driver = "MatlabModelDriver"
         self.args = [scripts["matlab"], "test", 1]
         self.attr_list += ['started_matlab', 'mlengine']
@@ -52,3 +46,16 @@ class TestMatlabModelDriver(parent.TestModelDriver,
         else:  # pragma: debug
             print("Skipping removal of Matlab session as the test did " +
                   "not create it.")
+
+class TestMatlabModelDriverNoStart(TestMatlabModelParam,
+                                   parent.TestModelDriverNoStart):
+    r"""Test runner for MatlabModelDriver."""
+    
+    pass
+
+
+class TestMatlabModelDriver(TestMatlabModelParam,
+                            parent.TestModelDriver):
+    r"""Test runner for MatlabModelDriver."""
+    
+    pass

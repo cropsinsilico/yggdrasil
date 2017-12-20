@@ -128,7 +128,7 @@ class ServerComm(CommBase.CommBase):
     def remove_response_comm(self):
         r"""Remove response comm."""
         self.icomm._last_header = None
-        self.ocomm.close()
+        # self.ocomm.close()
         self.ocomm = None
 
     # SEND METHODS
@@ -143,6 +143,9 @@ class ServerComm(CommBase.CommBase):
             obj: Output from output comm send method.
 
         """
+        # if self.is_closed:
+        #     self.debug("send(): Connection closed.")
+        #     return False
         if self.ocomm is None:  # pragma: debug
             raise RuntimeError("There is no registered response comm.")
         out = self.ocomm.send(*args, **kwargs)
@@ -162,6 +165,9 @@ class ServerComm(CommBase.CommBase):
             obj: Output from input comm recv method.
 
         """
+        # if self.is_closed:
+        #     self.debug("recv(): Connection closed.")
+        #     return (False, None)
         flag, msg = self.icomm.recv(*args, **kwargs)
         if flag:
             self.create_response_comm()

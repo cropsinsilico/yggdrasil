@@ -206,8 +206,8 @@ class ZMQProxy(threading.Thread, CisClass):
         self.srv_socket = backend
         register_socket('DEALER', self.srv_address)
         # Set up poller
-        self.poller = zmq.Poller()
-        self.poller.register(frontend, zmq.POLLIN)
+        # self.poller = zmq.Poller()
+        # self.poller.register(frontend, zmq.POLLIN)
         self.cli_count = 0
         self._running = False
         # Cis class init
@@ -223,12 +223,20 @@ class ZMQProxy(threading.Thread, CisClass):
 
     def server_send(self, msg):
         r"""Send single message to the server."""
-        with self.lock:
-            if self._running and (msg is not None):
-                self.srv_socket.send(msg, zmq.NOBLOCK)
-                # self.srv_socket.send_multipart(msg, zmq.NOBLOCK)
+        if msg is None:
+            return
+        while self._running:
+            try:
+                with self.lock:
+                    self.srv_socket.send(msg, zmq.NOBLOCK)
+                    # self.srv_socket.send_multipart(msg, zmq.NOBLOCK)
+                break
+            except zmq.ZMQError:
+                self.sleep(0.0001)
 
     def poll(self):
+        # socks = dict(self.poller.poll())
+        # return (socks.get(self.cli_socket) == zmq.POLLIN)
         with self.lock:
             if not self._running:
                 return False
@@ -243,8 +251,6 @@ class ZMQProxy(threading.Thread, CisClass):
         try:
             # This version does explicit checking of polls
             while self._running:
-                # socks = dict(self.poller.poll())
-                # if socks.get(self.cli_socket) == zmq.POLLIN:
                 if self.poll():
                     message = self.client_recv()
                     # print('fowarding', message)
@@ -258,22 +264,26 @@ class ZMQProxy(threading.Thread, CisClass):
         except zmq.ZMQError:
             # print('proxy stopped')
             self.debug('.run(): Proxy fowarding stopped.')
-            pass
-        # self.cli_socket.close()
-        # self.srv_socket.close()
+            raise
+        self.close_sockets()
+
+    def close_sockets(self):
+        r"""Close the sockets."""
+        self.debug('Closing sockets')
+        if self.cli_socket:
+            self.cli_socket.close()
+            self.cli_socket = None
+        if self.srv_socket:
+            self.srv_socket.close()
+            self.srv_socket = None
+        unregister_socket('ROUTER', self.cli_address)
+        unregister_socket('DEALER', self.srv_address)
 
     def terminate(self):
         r"""Stop the proxy."""
         with self.lock:
             self._running = False
-            if self.cli_socket:
-                self.cli_socket.close()
-                self.cli_socket = None
-            if self.srv_socket:
-                self.srv_socket.close()
-                self.srv_socket = None
-            unregister_socket('ROUTER', self.cli_address)
-            unregister_socket('DEALER', self.srv_address)
+            # self.close_sockets()
             if hasattr(super(ZMQProxy, self), 'terminate'):
                 super(ZMQProxy, self).terminate()
 
@@ -563,7 +573,7 @@ class ZMQComm(CommBase.CommBase):
     def close(self):
         r"""Close connection."""
         if self.is_open or self._bound:
-            self.socket.close()
+            self.socket.close()  # linger=1000*self.sleeptime)
             self._openned = False
             self.unregister_socket()
         if self.is_client and self._client_proxy:

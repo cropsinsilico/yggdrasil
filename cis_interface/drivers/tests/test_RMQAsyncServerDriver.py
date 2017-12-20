@@ -9,7 +9,7 @@ class TestRMQAsyncServerParam(parent.TestServerParam):
         self.driver = 'RMQAsyncServerDriver'
         self.client_comm = 'RMQAsyncComm'
         self.icomm_name = self.client_comm
-        self.timeout = 10.0
+        # self.timeout = 3.0
 
     
 class TestRMQAsyncServerDriverNoStart(TestRMQAsyncServerParam,

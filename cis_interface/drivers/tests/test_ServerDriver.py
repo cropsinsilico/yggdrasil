@@ -13,8 +13,8 @@ class TestServerParam(parent.TestConnectionParam):
         self.args = None
         self.attr_list += ['comm', 'response_drivers', 'nclients',
                            'request_name']
-        self.sleeptime = 0.5
-        self.timeout = 10.0
+        # self.sleeptime = 0.5
+        # self.timeout = 10.0
         self.comm_name = _default_comm
         self.client_comm = _default_comm
         self.icomm_name = self.client_comm

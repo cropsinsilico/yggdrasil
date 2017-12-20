@@ -2,12 +2,7 @@ import cis_interface.drivers.tests.test_Driver as parent
 
 
 class TestModelParam(parent.TestParam):
-    r"""Test parameters for basic ModelDriver class.
-
-    Attributes (in addition to parent class's):
-        -
-
-    """
+    r"""Test parameters for basic ModelDriver class."""
     
     def __init__(self, *args, **kwargs):
         super(TestModelParam, self).__init__(*args, **kwargs)
@@ -17,22 +12,13 @@ class TestModelParam(parent.TestParam):
         
 
 class TestModelDriverNoStart(TestModelParam, parent.TestDriverNoStart):
-    r"""Test runner for basic ModelDriver class.
-
-    Attributes (in addition to parent class's):
-        -
-
-    """
+    r"""Test runner for basic ModelDriver class."""
+    
     pass
 
 
 class TestModelDriver(TestModelParam, parent.TestDriver):
-    r"""Test runner for basic ModelDriver class.
-
-    Attributes (in addition to parent class's):
-        -
-
-    """
+    r"""Test runner for basic ModelDriver class."""
     
     def run_before_stop(self):
         r"""Commands to run while the instance is running."""

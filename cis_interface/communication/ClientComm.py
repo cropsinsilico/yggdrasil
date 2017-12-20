@@ -148,6 +148,9 @@ class ClientComm(CommBase.CommBase):
             obj: Output from output comm send method.
 
         """
+        # if self.is_closed:
+        #     self.debug("send(): Connection closed.")
+        #     return False
         kwargs['send_header'] = True
         kwargs['header_kwargs'] = self.create_response_comm()
         out = self.ocomm.send(*args, **kwargs)
@@ -168,6 +171,9 @@ class ClientComm(CommBase.CommBase):
             obj: Output from input comm recv method.
 
         """
+        # if self.is_closed:
+        #     self.debug("recv(): Connection closed.")
+        #     return (False, None)
         if len(self.icomm) == 0:  # pragma: debug
             raise RuntimeError("There are not any registered response comms.")
         out = self.icomm[self.icomm_order[0]].recv(*args, **kwargs)
