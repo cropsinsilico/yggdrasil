@@ -34,7 +34,7 @@ class TestMakeModelParam(parent.TestModelParam):
         
 
 class TestMakeModelDriverNoStart(TestMakeModelParam,
-                                parent.TestModelDriverNoStart):
+                                 parent.TestModelDriverNoStart):
     r"""Test runner for MakeModelDriver without start."""
     
     def __init__(self, *args, **kwargs):
