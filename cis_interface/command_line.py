@@ -77,8 +77,8 @@ def cc_flags():
         list: The necessary compiler flags and preprocessor definitions.
 
     """
-    # return GCCModelDriver._compile_flags
     return ' '.join(GCCModelDriver._compile_flags)
+
 
 def ld_flags():
     r"""Get the linker flags necessary for calling functions/classes from
@@ -88,7 +88,6 @@ def ld_flags():
         list: The necessary library linking flags.
 
     """
-    # return GCCModelDriver._linker_flags
     return ' '.join(GCCModelDriver._linker_flags)
 
 

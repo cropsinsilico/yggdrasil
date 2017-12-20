@@ -47,6 +47,7 @@ class TestMatlabModelParam(parent.TestModelParam):
             print("Skipping removal of Matlab session as the test did " +
                   "not create it.")
 
+            
 class TestMatlabModelDriverNoStart(TestMatlabModelParam,
                                    parent.TestModelDriverNoStart):
     r"""Test runner for MatlabModelDriver."""

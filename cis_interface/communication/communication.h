@@ -87,7 +87,7 @@ int register_comm(comm_t *x) {
     atexit(clean_comms);
     clean_registered = 1;
   }
-  vcomms2clean = realloc(vcomms2clean, sizeof(void*)*(ncomms2clean + 1));
+  vcomms2clean = (void**)realloc(vcomms2clean, sizeof(void*)*(ncomms2clean + 1));
   if (vcomms2clean == NULL) {
     cislog_error("register_comm(%s): Failed to realloc the comm list.", x->name);
     return -1;

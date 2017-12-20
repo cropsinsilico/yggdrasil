@@ -1,9 +1,7 @@
 import subprocess
 import os
-from cis_interface.communication import _default_comm
 from cis_interface.drivers.ModelDriver import ModelDriver
 from cis_interface.drivers import GCCModelDriver
-from cis_interface.config import cis_cfg
 
 
 def setup_environ(compile_flags=[], linker_flags=[]):
@@ -35,10 +33,12 @@ class MakeModelDriver(ModelDriver):
             any arguments for the executable.
         make_command (str, optional): Command that should be used for make.
             Defaults to 'make'
-        makedir (str, optional): Directory where make should be invoked from.
-            Defaults to self.workingDir.
         makefile (str, optional): Path to make file either relative to makedir
             or absolute. Defaults to Makefile.
+        makedir (str, optional): Directory where make should be invoked from
+            if it is not the same as the directory containing the makefile.
+            Defaults to directory containing makefile if an absolute path is
+            provided, otherwise self.workingDir.
         **kwargs: Additional keyword arguments are passed to parent class.
 
     Attributes:
@@ -56,13 +56,15 @@ class MakeModelDriver(ModelDriver):
         self.compiled = False
         self.target = self.args[0]
         if makedir is None:
-            makedir = self.workingDir
+            if (makefile is not None) and os.path.isabs(makefile):
+                makedir = os.path.dirname(makefile)
+            else:
+                makedir = self.workingDir
         if makefile is None:
             makefile = 'Makefile'
         self.make_command = make_command
         self.makedir = makedir
         self.makefile = makefile
-        # TODO: Handle absolute path
         self.args[0] = os.path.join(self.makedir, self.target)
         # Set environment variables
         self.debug("Setting environment variables.")
@@ -87,6 +89,8 @@ class MakeModelDriver(ModelDriver):
         os.chdir(self.makedir)
         make_args = [self.make_command, '-f', self.makefile, target]
         self.debug(' '.join(make_args))
+        if not os.path.isfile(self.makefile):
+            raise IOError("Makefile %s not found" % self.makefile)
         comp_process = subprocess.Popen(['stdbuf', '-o0'] + make_args,
                                         bufsize=0, stdin=subprocess.PIPE,
                                         stderr=subprocess.STDOUT,
@@ -94,9 +98,8 @@ class MakeModelDriver(ModelDriver):
         output, err = comp_process.communicate()
         exit_code = comp_process.returncode
         os.chdir(curdir)
-        if exit_code != 0:  # pragma: debug
+        if exit_code != 0:
             self.error(output)
-            self.make_target('clean')
             raise RuntimeError("Make failed with code %d." % exit_code)
         self.debug('Make complete')
 
@@ -111,5 +114,3 @@ class MakeModelDriver(ModelDriver):
         r"""Remove compile executable."""
         self.make_target('clean')
         super(MakeModelDriver, self).cleanup()
-
-

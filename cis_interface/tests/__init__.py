@@ -21,16 +21,26 @@ data = {k: os.path.join(data_dir, v) for k, v in data_list}
 # Test scripts
 script_dir = os.path.join(os.path.dirname(__file__), 'scripts')
 script_list = [
-    ('c', 'gcc_model.c'),
+    ('c', ['gcc_model.c', 'hellofunc.c']),
+    ('cpp', ['gcc_model.cpp', 'hellofunc.c']),
+    ('make', 'gcc_model'),
     ('matlab', 'matlab_model.m'),
     ('python', 'python_model.py'),
     ('error', 'error_model.py')]
-scripts = {k: os.path.join(script_dir, v) for k, v in script_list}
+scripts = {}
+for k, v in script_list:
+    if isinstance(v, list):
+        scripts[k] = [os.path.join(script_dir, iv) for iv in v]
+    else:
+        scripts[k] = os.path.join(script_dir, v)
+# scripts = {k: os.path.join(script_dir, v) for k, v in script_list}
     
 # Test yamls
 yaml_dir = os.path.join(os.path.dirname(__file__), 'yamls')
 yaml_list = [
     ('c', 'gcc_model.yml'),
+    ('cpp', 'gpp_model.yml'),
+    ('make', 'make_model.yml'),
     ('matlab', 'matlab_model.yml'),
     ('python', 'python_model.yml'),
     ('error', 'error_model.yml')]
