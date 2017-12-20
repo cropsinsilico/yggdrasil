@@ -62,6 +62,8 @@ class MakeModelDriver(ModelDriver):
         self.make_command = make_command
         self.makedir = makedir
         self.makefile = makefile
+        # TODO: Handle absolute path
+        self.args[0] = os.path.join(self.makedir, self.target)
         # Set environment variables
         self.debug("Setting environment variables.")
         compile_flags = ['-DCIS_DEBUG=%d' % self.logger.getEffectiveLevel()]
