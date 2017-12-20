@@ -116,6 +116,7 @@ class Driver(CisClass, Thread):
         self.stop_timeout()
         self.on_exit()
         self._terminated = True
+        self.debug(':terminate() done')
 
     def on_exit(self):
         r"""Processes that should be run when the driver exits."""

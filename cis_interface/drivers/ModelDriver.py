@@ -102,10 +102,12 @@ class ModelDriver(Driver):
                    self.args, os.getcwd(), self.workingDir, pformat(self.env))
         # Continue reading until there is not any output
         while True:
-            with self.lock:
-                if self.process is None:
-                    break
+            if self.process is None:
+                break
+            try:  # with self.lock:
                 line = self.process.stdout.readline()
+            except BaseException:
+                break
             if len(line) == 0:
                 break
             print(backwards.bytes2unicode(line), end="")

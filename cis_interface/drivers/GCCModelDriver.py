@@ -95,6 +95,8 @@ class GCCModelDriver(ModelDriver):
                 list.
 
         """
+        if isinstance(args, str):
+            args = [args]
         self.src = []
         self.ldflags = _linker_flags
         self.ccflags = ['-g', '-Wall'] + _compile_flags
