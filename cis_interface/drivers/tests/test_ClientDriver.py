@@ -94,10 +94,10 @@ class TestClientDriver(TestClientParam, parent.TestConnectionDriver):
             self.instance.sleep()  # pragma: debug
         self.instance.stop_timeout()
 
-    # Disabled so that test message is not read by mistake
-    def test_purge(self):
-        r"""Disabled: Test purge of queue."""
-        pass
+    # # Disabled so that test message is not read by mistake
+    # def test_purge(self):
+    #     r"""Disabled: Test purge of queue."""
+    #     pass
 
     def test_send_recv(self, msg_send=None):
         r"""Test routing of a short message between client and server."""

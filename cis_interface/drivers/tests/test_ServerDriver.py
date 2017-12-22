@@ -94,10 +94,10 @@ class TestServerDriver(TestServerParam, parent.TestConnectionDriver):
             self.instance.sleep()  # pragma: debug
         self.instance.stop_timeout()
         
-    # Disabled so that test message is not read by mistake
-    def test_purge(self):
-        r"""Test purge of queue."""
-        pass
+    # # Disabled so that test message is not read by mistake
+    # def test_purge(self):
+    #     r"""Test purge of queue."""
+    #     pass
 
     def test_client_count(self):
         r"""Test to ensure client count is correct."""
