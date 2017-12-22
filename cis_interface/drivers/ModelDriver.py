@@ -76,30 +76,43 @@ class ModelDriver(Driver):
         if valgrind_flags is None:
             valgrind_flags = []
         self.valgrind_flags = valgrind_flags
-        self.env.update(os.environ)
+        # self.env.update(os.environ)
 
     def start(self, no_popen=False):
         r"""Start subprocess before monitoring."""
         if not no_popen:
-            self.debug(':run %s from %s with cwd %s and env %s',
-                       self.args, os.getcwd(), self.workingDir, pformat(self.env))
-            pre_args = ['stdbuf', '-o0', '-e0']
-            if self.with_strace:
-                pre_args += ['strace'] + self.strace_flags
-            elif self.with_valgrind:
-                pre_args += ['valgrind'] + self.valgrind_flags
-            self.process = subprocess.Popen(
-                pre_args + self.args, bufsize=0,
-                # If PIPEs are used, communicate must be used below
-                # stdin=subprocess.PIPE, stderr=subprocess.PIPE,
-                stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
-                env=self.env, cwd=self.workingDir, preexec_fn=preexec)
+            self.start_setup()
         super(ModelDriver, self).start()
 
     def run(self):
         r"""Run the model on a new process, receiving output from."""
-        self.debug(':run %s from %s with cwd %s and env %s',
+        self.debug('run(): %s from %s with cwd %s and env %s',
                    self.args, os.getcwd(), self.workingDir, pformat(self.env))
+        self.run_setup()
+        self.run_loop()
+        self.run_finalize()
+
+    def run_setup(self):
+        pass
+
+    def start_setup(self):
+        r"""Actions to perform before the run loop."""
+        self.debug('run_setup(): %s from %s with cwd %s and env %s',
+                   self.args, os.getcwd(), self.workingDir, pformat(self.env))
+        pre_args = ['stdbuf', '-o0', '-e0']
+        if self.with_strace:
+            pre_args += ['strace'] + self.strace_flags
+        elif self.with_valgrind:
+            pre_args += ['valgrind'] + self.valgrind_flags
+        self.process = subprocess.Popen(
+            pre_args + self.args, bufsize=0,
+            # If PIPEs are used, communicate must be used below
+            # stdin=subprocess.PIPE, stderr=subprocess.PIPE,
+            stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+            env=self.env, cwd=self.workingDir, preexec_fn=preexec)
+
+    def run_loop(self):
+        r"""Loop to check if model is still running and forward output."""
         # Continue reading until there is not any output
         while True:
             if self.process is None:
@@ -111,6 +124,10 @@ class ModelDriver(Driver):
             if len(line) == 0:
                 break
             print(backwards.bytes2unicode(line), end="")
+
+    def run_finalize(self):
+        r"""Actions to perform after run_loop has finished. Mainly checking
+        if there was an error and then handling it."""
         # Wait for process to stop w/o PIPE redirect
         # self.process.wait()
         # Wait for process to stop w/ PIPE redirect
@@ -141,14 +158,14 @@ class ModelDriver(Driver):
     def terminate(self):
         r"""Terminate the process running the model."""
         if self._terminated:
-            self.debug(':terminated() Driver already terminated.')
+            self.debug('terminated(): Driver already terminated.')
             return
-        self.debug(':terminate()')
+        self.debug('terminate()')
         with self.lock:
             if self.process:
                 self.process.poll()
                 if self.process.returncode is None:
-                    self.debug(':terminate(): terminate process')
+                    self.debug('terminate(): terminating model process')
                     try:
                         self.process.kill()  # terminate()
                     except OSError:  # pragma: debug
