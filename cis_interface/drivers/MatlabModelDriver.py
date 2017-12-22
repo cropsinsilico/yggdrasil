@@ -263,7 +263,7 @@ class MatlabModelDriver(ModelDriver):
     def terminate(self):
         r"""Terminate the driver, including the matlab engine."""
         if self._terminated:
-            self.debug('terminate(): Driver already terminated.')
+            self.debug('Driver already terminated.')
             return
         super(MatlabModelDriver, self).terminate()
         with self.lock:
@@ -293,14 +293,14 @@ class MatlabModelDriver(ModelDriver):
         # Run
         with self.lock:
             if self.mlengine is None:  # pragma: debug
-                self.debug('run(): Matlab engine not set. Stopping')
+                self.debug('Matlab engine not set. Stopping')
                 return
             try:
-                self.debug('run(): Starting MatlabProcess')
+                self.debug('Starting MatlabProcess')
                 self.process = MatlabProcess(target=getattr(self.mlengine, name),
                                              args=self.args[1:])
                 self.process.start()
-                self.debug('run(): MatlabProcess running model.')
+                self.debug('MatlabProcess running model.')
             except Exception as e:
                 self.error(e)
                 raise

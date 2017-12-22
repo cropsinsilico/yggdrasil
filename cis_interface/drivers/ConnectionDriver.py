@@ -95,10 +95,10 @@ class ConnectionDriver(Driver):
 
     def open_comm(self):
         r"""Open the communicators."""
-        self.debug(':open_comm()')
+        self.debug()
         with self.lock:
             if self._comm_closed:
-                self.debug(':open_comm(): aborted as comm closed')
+                self.debug('Aborted as comm closed')
                 return
             try:
                 self.icomm.open()
@@ -106,11 +106,11 @@ class ConnectionDriver(Driver):
             except BaseException as e:
                 self.close_comm()
                 raise e
-        self.debug(':open_comm(): done')
+        self.debug('Returning')
 
     def close_comm(self):
         r"""Close the communicators."""
-        self.debug(':close_comm()')
+        self.debug()
         with self.lock:
             self._comm_closed = True
             # Capture errors for both comms
@@ -130,7 +130,7 @@ class ConnectionDriver(Driver):
                 raise ie
             if oe:
                 raise oe
-        self.debug(':close_comm(): done')
+        self.debug('Returning')
 
     def start(self):
         r"""Open connection before running."""
@@ -153,15 +153,14 @@ class ConnectionDriver(Driver):
                 class's graceful_stop method.
 
         """
-        self.debug('.graceful_stop()')
+        self.debug()
         T = self.start_timeout(timeout)
         while (self.n_msg > 0) and (not T.is_out):  # pragma: debug
-            self.debug('.graceful_stop(): draining %d messages',
-                       self.n_msg)
+            self.debug('Draining %d messages', self.n_msg)
             self.sleep()
         self.stop_timeout()
         super(ConnectionDriver, self).graceful_stop()
-        self.debug('.graceful_stop(): done')
+        self.debug('Returning')
 
     # def on_model_exit(self):
     #     r"""Close the comms."""
@@ -171,16 +170,16 @@ class ConnectionDriver(Driver):
     def terminate(self):
         r"""Stop the driver, closing the communicators."""
         if self._terminated:
-            self.debug(':terminated() Driver already terminated.')
+            self.debug('Driver already terminated.')
             return
-        self.debug(':terminate()')
+        self.debug()
         self.close_comm()
         super(ConnectionDriver, self).terminate()
-        self.debug(':terminate(): done')
+        self.debug('Returning')
 
     def cleanup(self):
         r"""Ensure that the communicators are closed."""
-        self.debug(':cleanup()')
+        self.debug()
         self.close_comm()
         super(ConnectionDriver, self).cleanup()
 
@@ -243,7 +242,7 @@ class ConnectionDriver(Driver):
             str, bool: Value that should be returned by recv_message on EOF.
 
         """
-        self.debug(': EOF received')
+        self.debug('EOF received')
         self.send_message(self.ocomm.eof_msg)
         return False
 
@@ -321,7 +320,7 @@ class ConnectionDriver(Driver):
         r"""Run the driver. Continue looping over messages until there are not
         any left or the communication channel is closed.
         """
-        self.debug(':run in %s', os.getcwd())
+        self.debug('Running in %s', os.getcwd())
         try:
             self.before_loop()
         except BaseException:  # pragma: debug
@@ -333,7 +332,7 @@ class ConnectionDriver(Driver):
             self.state = 'receiving'
             msg = self.recv_message()
             if msg is False:
-                self.debug(':run: No more messages')
+                self.debug('No more messages')
                 break
             if isinstance(msg, backwards.bytes_type) and len(msg) == 0:
                 self.state = 'waiting'
@@ -342,29 +341,29 @@ class ConnectionDriver(Driver):
                 continue
             self.nrecv += 1
             self.state = 'received'
-            self.debug(':run: Received message that is %d bytes.', len(msg))
+            self.debug('Received message that is %d bytes.', len(msg))
             # Process message
             self.state = 'processing'
             msg = self.on_message(msg)
             if msg is False:  # pragma: debug
-                self.debug(':run: Could not process message.')
+                self.debug('Could not process message.')
                 break
             elif len(msg) == 0:
-                self.debug(':run: Message skipped.')
+                self.debug('Message skipped.')
                 continue
             self.nproc += 1
             self.state = 'processed'
-            self.debug(':run: Processed message.')
+            self.debug('Processed message.')
             # Send a message
             self.state = 'sending'
             ret = self.send_message(msg)
             if ret is False:
-                self.debug(':run: Could not send message.')
+                self.debug('Could not send message.')
                 break
             self.nsent += 1
             self.state = 'sent'
-            self.debug(':run: Sent message.')
+            self.debug('Sent message.')
         # Perform post-loop follow up
         self.after_loop()
-        self.debug(':run: Received %d messages, processed %d, sent %d.',
+        self.debug('Received %d messages, processed %d, sent %d.',
                    self.nrecv, self.nproc, self.nsent)

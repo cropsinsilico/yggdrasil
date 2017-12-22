@@ -83,7 +83,7 @@ class Driver(CisClass, Thread):
 
     def run(self):
         r"""Run something in a seperate thread."""
-        self.debug(':run()')
+        self.debug()
 
     @property
     def is_valid(self):
@@ -93,43 +93,43 @@ class Driver(CisClass, Thread):
     def stop(self):
         r"""Stop the driver."""
         if self._terminated:
-            self.debug(':stop() Driver already terminated.')
+            self.debug('Driver already terminated.')
             return
-        self.debug(':stop()')
+        self.debug()
         self._term_meth = 'stop'
         self.graceful_stop()
         self.terminate()
 
     def graceful_stop(self):
         r"""Gracefully stop the driver."""
-        self.debug(':graceful_stop()')
+        self.debug()
 
     def terminate(self):
         r"""Stop the driver, without attempting to allow it to finish."""
         if self._terminated:
-            self.debug(':terminated() Driver already terminated.')
+            self.debug('Driver already terminated.')
             return
-        self.debug(':terminate()')
+        self.debug()
         T = self.start_timeout()
         while self.is_alive() and (not T.is_out):
             self.sleep()
         self.stop_timeout()
         self.on_exit()
         self._terminated = True
-        self.debug(':terminate() done')
+        self.debug('Returning')
 
     def on_exit(self):
         r"""Processes that should be run when the driver exits."""
-        self.debug(':on_exit()')
+        self.debug()
 
     def on_model_exit(self):
         r"""Processes that should be run when an associated model exits."""
-        self.debug(':on_model_exit()')
+        self.debug()
 
     def cleanup(self):
         r"""Processes that should be run to clean up a driver that is not
         running."""
-        self.debug(':cleanup()')
+        self.debug()
 
     def wait(self, timeout=0.0):
         r"""Wait until model finish to return.

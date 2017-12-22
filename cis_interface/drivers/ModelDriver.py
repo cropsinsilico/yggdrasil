@@ -86,7 +86,7 @@ class ModelDriver(Driver):
 
     def run(self):
         r"""Run the model on a new process, receiving output from."""
-        self.debug('run(): %s from %s with cwd %s and env %s',
+        self.debug('Running %s from %s with cwd %s and env %s',
                    self.args, os.getcwd(), self.workingDir, pformat(self.env))
         self.run_setup()
         self.run_loop()
@@ -97,8 +97,6 @@ class ModelDriver(Driver):
 
     def start_setup(self):
         r"""Actions to perform before the run loop."""
-        self.debug('run_setup(): %s from %s with cwd %s and env %s',
-                   self.args, os.getcwd(), self.workingDir, pformat(self.env))
         pre_args = ['stdbuf', '-o0', '-e0']
         if self.with_strace:
             pre_args += ['strace'] + self.strace_flags
@@ -158,14 +156,14 @@ class ModelDriver(Driver):
     def terminate(self):
         r"""Terminate the process running the model."""
         if self._terminated:
-            self.debug('terminated(): Driver already terminated.')
+            self.debug('Driver already terminated.')
             return
-        self.debug('terminate()')
+        self.debug()
         with self.lock:
             if self.process:
                 self.process.poll()
                 if self.process.returncode is None:
-                    self.debug('terminate(): terminating model process')
+                    self.debug('Terminating model process')
                     try:
                         self.process.kill()  # terminate()
                     except OSError:  # pragma: debug

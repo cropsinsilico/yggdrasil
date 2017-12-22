@@ -62,17 +62,17 @@ class CommDriver(Driver):
 
     def open_comm(self):
         r"""Open the queue."""
-        self.debug(':open()')
+        self.debug()
         with self.lock:
             self.comm.open()
-        self.debug(':open(): done')
+        self.debug('Returning')
         
     def close_comm(self):
         r"""Close the queue."""
-        self.debug(':close()')
+        self.debug()
         with self.lock:
             self.comm.close()
-        self.debug(':close(): done')
+        self.debug('Returning')
 
     def start(self):
         r"""Open connection before running."""
@@ -97,33 +97,32 @@ class CommDriver(Driver):
                 class's graceful_stop method.
 
         """
-        self.debug('.graceful_stop()')
+        self.debug()
         T = self.start_timeout(timeout)
         try:
             while (self.n_msg > 0) and (not T.is_out):
                 if DEBUG_SLEEPS:
-                    self.debug('.graceful_stop(): draining %d messages',
-                               self.n_msg)
+                    self.debug('Draining %d messages', self.n_msg)
                 self.sleep()
         except Exception as e:  # pragma: debug
             self.raise_error(e)
         self.stop_timeout()
         super(CommDriver, self).graceful_stop()
-        self.debug('.graceful_stop(): done')
+        self.debug('Returning')
 
     def terminate(self):
         r"""Stop the CommDriver, removing the queue."""
         if self._terminated:
-            self.debug(':terminated() Driver already terminated.')
+            self.debug('Driver already terminated.')
             return
-        self.debug(':terminate()')
+        self.debug()
         self.close_comm()
         super(CommDriver, self).terminate()
-        self.debug(':terminate(): done')
+        self.debug('Returning')
 
     def cleanup(self):
         r"""Ensure that the queues are removed."""
-        self.debug(':cleanup()')
+        self.debug()
         self.close_comm()
         super(CommDriver, self).cleanup()
 
