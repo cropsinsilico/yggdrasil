@@ -93,11 +93,13 @@ class TestCommParam(parent.TestParam, IOInfo):
         kwargs['nprev_comm'] = self.comm_count
         # If driver receiving, create send comm first
         if not self.is_input:
-            self.alt_comm = new_comm(self.name, **self.alt_comm_kwargs)
+            self.alt_comm = new_comm(self.name, dont_open=self.skip_start,
+                                     **self.alt_comm_kwargs)
         super(TestCommParam, self).setup(*args, **kwargs)
         # If driver sending, create recv comm second
         if self.is_input:
-            self.alt_comm = new_comm(self.name, **self.alt_comm_kwargs)
+            self.alt_comm = new_comm(self.name, dont_open=self.skip_start,
+                                     **self.alt_comm_kwargs)
 
     def teardown(self, *args, **kwargs):
         r"""Destroy comm object pair."""
@@ -119,7 +121,7 @@ class TestCommDriverNoStart(TestCommParam, parent.TestDriverNoStart):
         r"""Test sending/receiving with queues closed."""
         self.send_comm.close()
         self.recv_comm.close()
-        # self.instance.close_comm()
+        self.instance.close_comm()
         assert(not self.instance.is_comm_open)
         # Short
         flag = self.instance.send(self.msg_short)

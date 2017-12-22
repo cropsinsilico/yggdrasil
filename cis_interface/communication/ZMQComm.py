@@ -369,6 +369,7 @@ class ZMQComm(CommBase.CommBase):
         self.dealer_identity = backwards.unicode2bytes(dealer_identity)
         self._openned = False
         self._bound = False
+        self._connected = False
         self._recv_identities = set([])
         self._client_proxy = None
         # Reserve/set port by binding
@@ -479,7 +480,7 @@ class ZMQComm(CommBase.CommBase):
         
     def bind(self):
         r"""Bind to address, getting random port as necessary."""
-        if self.is_open or self._bound:  # pragma: debug
+        if self.is_open or self._bound or self._connected:  # pragma: debug
             return
         # Do client things
         if self.is_client and not self._client_proxy:
@@ -547,6 +548,13 @@ class ZMQComm(CommBase.CommBase):
             self.unregister_socket()
             self._bound = False
 
+    # def disconnect(self):
+    #     r"""Disconnect from address."""
+    #     if self._connected:
+    #         self.socket.disconnect(self.address)
+    #         self.unregister_socket()
+    #         self._connected = False
+
     def open(self):
         r"""Open connection by binding/connect to the specified socket."""
         super(ZMQComm, self).open()
@@ -563,6 +571,7 @@ class ZMQComm(CommBase.CommBase):
                 self.unbind()
                 self.debug('.open(): Connecting %s socket to %s.',
                            self.socket_type_name, self.address)
+                self._connected = True
                 self.socket.connect(self.address)
                 self.register_socket()
             # Set topic filter
@@ -572,7 +581,7 @@ class ZMQComm(CommBase.CommBase):
 
     def close(self):
         r"""Close connection."""
-        if self.is_open or self._bound:
+        if self.is_open or self._bound or self._connected:
             self.socket.close()  # linger=1000*self.sleeptime)
             self._openned = False
             self.unregister_socket()
