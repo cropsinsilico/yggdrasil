@@ -12,6 +12,8 @@ class ConnectionDriver(Driver):
         name (str): Name that should be used to set names of input/output comms.
         icomm_kws (dict, optional): Keyword arguments for the input communicator.
         ocomm_kws (dict, optional): Keyword arguments for the output communicator.
+        timeout_send_1st (float, optional): Time in seconds that should be waited
+            before giving up on the first send. Defaults to self.timeout.
         **kwargs: Additonal keyword arguments are passed to the parent class.
 
     Attributes:
@@ -23,9 +25,12 @@ class ConnectionDriver(Driver):
         nproc (int): Number of messages processed.
         nsent (int): Number of messages sent.
         state (str): Descriptor of last action taken.
+        timeout_send_1st (float): Time in seconds that should be waited before
+            giving up on the first send.
 
     """
-    def __init__(self, name, icomm_kws=None, ocomm_kws=None, **kwargs):
+    def __init__(self, name, icomm_kws=None, ocomm_kws=None,
+                 timeout_send_1st=None, **kwargs):
         super(ConnectionDriver, self).__init__(name, **kwargs)
         if icomm_kws is None:
             icomm_kws = dict()
@@ -52,6 +57,8 @@ class ConnectionDriver(Driver):
         self.ocomm_kws = ocomm_kws
         self.env[self.ocomm.name] = self.ocomm.address
         # Attributes
+        if timeout_send_1st is None:
+            self.timeout_send_1st = self.timeout
         self._first_send_done = False
         self._comm_closed = False
         self.nrecv = 0
@@ -288,7 +295,7 @@ class ConnectionDriver(Driver):
         """
         self.ocomm._first_send_done = True
         flag = False
-        T = self.start_timeout()
+        T = self.start_timeout(self.timeout_send_1st)
         while (not T.is_out) and (not flag) and self.ocomm.is_open:
             flag = self._send_message(*args, **kwargs)
             if not flag:
