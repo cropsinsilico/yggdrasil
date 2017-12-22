@@ -185,7 +185,9 @@ class CisClass(object):
         stack = inspect.stack()
         the_class = os.path.splitext(os.path.basename(
             stack[2][0].f_globals["__file__"]))[0]
-        return '%s(%s): ' % (the_class, self.name)
+        the_line = stack[2][2]
+        the_func = stack[2][3]
+        return '%s(%s).%s[%d]: ' % (the_class, self.name, the_func, the_line)
 
     def sleep(self, t=None):
         r"""Have the class sleep for some period of time.

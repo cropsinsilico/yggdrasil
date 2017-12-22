@@ -82,7 +82,7 @@ def cfg_logging(cfg=None):
     logLevelRMQ = eval('logging.%s' % cfg.get('debug', 'rmq', 'INFO'))
     logging.getLogger("cis_interface").setLevel(level=logLevelCIS)
     logging.getLogger("pika").setLevel(level=logLevelRMQ)
-    logging.basicConfig()
+    logging.basicConfig(level=logging.INFO)
         
 
 def cfg_environment(env=None, cfg=None):
