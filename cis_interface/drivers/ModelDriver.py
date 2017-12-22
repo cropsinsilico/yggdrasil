@@ -3,6 +3,7 @@
 #
 from __future__ import print_function
 import os
+import copy
 import subprocess
 from pprint import pformat
 from cis_interface import backwards
@@ -76,7 +77,11 @@ class ModelDriver(Driver):
         if valgrind_flags is None:
             valgrind_flags = []
         self.valgrind_flags = valgrind_flags
+        self.env_copy = ['LANG', 'PATH', 'USER']
+        for k in self.env_copy:
+            self.env[k] = os.environ[k]
         # self.env.update(os.environ)
+        # print(os.environ.keys())
 
     def start(self, no_popen=False):
         r"""Start subprocess before monitoring."""
@@ -102,12 +107,14 @@ class ModelDriver(Driver):
             pre_args += ['strace'] + self.strace_flags
         elif self.with_valgrind:
             pre_args += ['valgrind'] + self.valgrind_flags
+        env = copy.deepcopy(self.env)
+        # env.update(os.environ)
         self.process = subprocess.Popen(
             pre_args + self.args, bufsize=0,
             # If PIPEs are used, communicate must be used below
             # stdin=subprocess.PIPE, stderr=subprocess.PIPE,
             stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
-            env=self.env, cwd=self.workingDir, preexec_fn=preexec)
+            env=env, cwd=self.workingDir, preexec_fn=preexec)
 
     def run_loop(self):
         r"""Loop to check if model is still running and forward output."""

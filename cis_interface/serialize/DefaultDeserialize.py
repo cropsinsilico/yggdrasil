@@ -1,5 +1,4 @@
 from cis_interface import backwards
-from cis_interface.interface.scanf import scanf
 
 
 class DefaultDeserialize(object):
@@ -31,6 +30,5 @@ class DefaultDeserialize(object):
         if self.format_str is None:
             out = msg
         else:
-            out = scanf(backwards.bytes2unicode(self.format_str),
-                        backwards.bytes2unicode(msg))
+            out = backwards.scanf_bytes(self.format_str, msg)
         return out

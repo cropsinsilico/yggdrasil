@@ -1,6 +1,7 @@
 r"""This module allows for backward compatibility."""
 import sys
 import time
+from cis_interface.scanf import scanf
 PY2 = (sys.version_info[0] == 2)
 PY34 = ((sys.version_info[0] == 3) and (sys.version_info[1] == 4))
 if PY2:  # pragma: Python 2
@@ -28,6 +29,21 @@ if sys.version_info >= (3, 3):
     clock_time = time.perf_counter
 else:
     clock_time = time.clock
+
+
+def scanf_bytes(fmt, bytes_line):
+    r"""Extract parameters from a bytes object using scanf."""
+    if PY2:
+        out_byt = scanf(fmt, bytes_line)
+    else:
+        out_uni = scanf(bytes2unicode(fmt), bytes2unicode(bytes_line))
+        out_byt = []
+        for a in out_uni:
+            if isinstance(a, unicode_type):
+                out_byt.append(unicode2bytes(a))
+            else:
+                out_byt.append(a)
+    return out_uni
 
 
 def assert_bytes(s):
@@ -73,10 +89,10 @@ def bytes2unicode(b):
     """
     if PY2:  # pragma: Python 2
         if isinstance(b, (str, bytearray)):
-            s = bytes_type(b)
+            s = unicode_type(b)
             # s = unicode(b)
         elif isinstance(b, unicode):
-            s = bytes_type(b)
+            s = unicode_type(b)
             # s = b
         else:
             raise TypeError("Cannot convert type %s to str" % type(b))
@@ -118,7 +134,8 @@ def unicode2bytes(s):
         elif isinstance(s, bytearray):
             b = bytes_type(s)
         elif isinstance(s, str):
-            b = bytes_type(s, 'utf-8')
+            b = s.encode("utf-8")
+            # b = bytes_type(s, 'utf-8')
             # b = bytearray(s.encode('utf-8'))
         else:
             raise TypeError("Cannot convert type %s to bytes" % type(s))
