@@ -324,7 +324,7 @@ class CisClass(object):
         """
         if not isinstance(fmt_str, str):
             fmt_str = str(fmt_str)
-        self.logger.log(11, self.logger_prefix + fmt_str, *args)
+        self.logger.log(9, self.logger_prefix + fmt_str, *args)
         
     def critical(self, fmt_str='', *args):
         r"""Log a critical message that is prepended with the class and name.
