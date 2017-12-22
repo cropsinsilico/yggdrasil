@@ -86,7 +86,9 @@ class ServerRequestDriver(ConnectionDriver):
 
     def terminate(self, *args, **kwargs):
         r"""Stop response drivers."""
+        self.debug()
         with self.lock:
+            self.debug("Closing response drivers.")
             self._block_response = True
             for x in self.response_drivers:
                 x.terminate()
@@ -95,12 +97,14 @@ class ServerRequestDriver(ConnectionDriver):
 
     def on_model_exit(self):
         r"""Close RPC comm when model exits."""
+        self.debug("on_model_exit()")
         with self.lock:
             self.icomm.close()
         super(ServerRequestDriver, self).on_model_exit()
 
     def after_loop(self):
         r"""After server model signs off."""
+        self.debug("after_loop()")
         with self.lock:
             self.icomm.close()
             if self.icomm._last_header is None:
@@ -113,9 +117,11 @@ class ServerRequestDriver(ConnectionDriver):
     def on_eof(self):
         r"""On EOF, decrement number of clients. Only send EOF if the number
         of clients drops to 0."""
+        self.debug("Client signed off.")
         with self.lock:
             self.nclients -= 1
             if self.nclients == 0:
+                self.debug("All clients have signed off.")
                 self.icomm._last_header['response_address'] = CIS_CLIENT_EOF
                 return super(ServerRequestDriver, self).on_eof()
         return ''
@@ -132,6 +138,7 @@ class ServerRequestDriver(ConnectionDriver):
         """
         with self.lock:
             if msg == CIS_CLIENT_INI:
+                self.debug("New client signed on.")
                 self.nclients += 1
                 msg = ''
         return super(ServerRequestDriver, self).on_message(msg)
@@ -151,8 +158,11 @@ class ServerRequestDriver(ConnectionDriver):
             return False
         # Start response driver
         if self.response_address != CIS_CLIENT_EOF:
+            self.debug("Starting new ServerResponseDriver at: %s" %
+                       self.response_address)
             with self.lock:
                 if (not self.is_comm_open) or self._block_response:
+                    self.debug("Comm closed, not creating response driver.")
                     return False
                 drv_args = [self.response_address]
                 drv_kwargs = dict(comm=self.comm, msg_id=self.request_id)
@@ -160,6 +170,7 @@ class ServerRequestDriver(ConnectionDriver):
                     response_driver = ServerResponseDriver(*drv_args, **drv_kwargs)
                     self.response_drivers.append(response_driver)
                     response_driver.start()
+                    self.debug("ServerResponseDriver started.")
                 except BaseException:  # pragma: debug
                     self.exception("Could not create/start response driver.")
                     return False
