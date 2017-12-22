@@ -1,6 +1,5 @@
 import os
 import nose.tools as nt
-from cis_interface.config import cis_cfg, cfg_logging
 from cis_interface.tools import CisClass
 from cis_interface.tests import CisTest
 from cis_interface.communication import get_comm_class
@@ -80,11 +79,6 @@ class TestParam(CisTest):
                 default comms.
 
         """
-        cis_cfg.set('debug', 'psi', 'DEBUG')
-        cis_cfg.set('debug', 'rmq', 'INFO')
-        cis_cfg.set('debug', 'client', 'INFO')
-        cis_cfg.set('rmq', 'namespace', self.namespace)
-        cfg_logging()
         if nprev_comm is None:
             nprev_comm = self.comm_count
         self.nprev_comm = nprev_comm

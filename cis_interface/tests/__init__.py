@@ -6,6 +6,7 @@ import unittest
 import numpy as np
 from scipy.io import savemat, loadmat
 import nose.tools as nt
+# from cis_interface.config import cis_cfg, cfg_logging
 from cis_interface.tools import CIS_MSG_MAX as maxMsgSize
 from cis_interface.backwards import pickle, BytesIO
 from cis_interface.dataio.AsciiTable import AsciiTable
@@ -85,6 +86,11 @@ class CisTest(unittest.TestCase):
 
     def setup(self, *args, **kwargs):
         r"""Create an instance of the class."""
+        # cis_cfg.set('debug', 'psi', 'INFO')
+        # cis_cfg.set('debug', 'rmq', 'INFO')
+        # cis_cfg.set('debug', 'client', 'INFO')
+        # cis_cfg.set('rmq', 'namespace', self.namespace)
+        # cfg_logging()
         self._instance = self.create_instance()
 
     def teardown(self, *args, **kwargs):
