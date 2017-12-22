@@ -58,7 +58,8 @@ class ConnectionDriver(Driver):
         self.env[self.ocomm.name] = self.ocomm.address
         # Attributes
         if timeout_send_1st is None:
-            self.timeout_send_1st = self.timeout
+            timeout_send_1st = self.timeout
+        self.timeout_send_1st = timeout_send_1st
         self._first_send_done = False
         self._comm_closed = False
         self.nrecv = 0
