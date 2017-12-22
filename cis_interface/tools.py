@@ -312,6 +312,18 @@ class CisClass(object):
             fmt_str = str(fmt_str)
         self.logger.debug(self.logger_prefix + fmt_str, *args)
 
+    def verbose_debug(self, fmt_str='', *args):
+        r"""Log a verbose debug message that is prepended with the class and name.
+
+        Args:
+            fmt_str (str, optional): Format string.
+            \*args: Additional arguments are formated using the format string.
+
+        """
+        if not isinstance(fmt_str, str):
+            fmt_str = str(fmt_str)
+        self.logger.log(11, self.logger_prefix + fmt_str, *args)
+        
     def critical(self, fmt_str='', *args):
         r"""Log a critical message that is prepended with the class and name.
 

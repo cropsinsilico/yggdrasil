@@ -260,7 +260,7 @@ class IPCComm(CommBase.CommBase):
             return (False, backwards.unicode2bytes(''))
         # Return True, '' if there are no messages
         if self.n_msg == 0:
-            # self.debug("recv(): no data, returning (True, '')")
+            self.verbose_debug("recv(): no data, returning (True, '')")
             return (True, backwards.unicode2bytes(''))
         # Receive message
         self.debug(".recv(): message ready, read it")

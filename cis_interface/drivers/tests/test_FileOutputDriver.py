@@ -16,6 +16,7 @@ class TestFileOutputParam(parent.TestConnectionParam):
         self.driver = 'FileOutputDriver'
         self.filepath = os.path.abspath('%s_input.txt' % self.name)
         self.args = self.filepath
+        self.timeout = 5.0
         self.ocomm_name = 'FileComm'
 
     @property

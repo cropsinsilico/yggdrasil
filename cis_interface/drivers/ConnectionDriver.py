@@ -337,7 +337,7 @@ class ConnectionDriver(Driver):
                 break
             if isinstance(msg, backwards.bytes_type) and len(msg) == 0:
                 self.state = 'waiting'
-                self.debug(':run: Waiting for next message.')
+                self.verbose_debug(':run: Waiting for next message.')
                 self.sleep()
                 continue
             self.nrecv += 1

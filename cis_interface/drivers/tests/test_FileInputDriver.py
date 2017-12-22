@@ -18,6 +18,7 @@ class TestFileInputParam(parent.TestConnectionParam):
         self.filepath = os.path.join(tempfile.gettempdir(),
                                      '%s_input.txt' % self.name)
         self.args = self.filepath
+        self.timeout = 5.0
         self.icomm_name = 'FileComm'
 
     @property

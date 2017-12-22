@@ -752,7 +752,7 @@ class ZMQComm(CommBase.CommBase):
                 return (False, None)
             ret = self.socket.poll(timeout=1000.0 * timeout)
             if ret == 0:
-                self.debug(".recv(): No messages waiting.")
+                self.verbose_debug(".recv(): No messages waiting.")
                 return (True, backwards.unicode2bytes(''))
             flags = zmq.NOBLOCK
         else:
