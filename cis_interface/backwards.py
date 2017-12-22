@@ -37,13 +37,17 @@ def scanf_bytes(fmt, bytes_line):
         out_byt = scanf(fmt, bytes_line)
     else:
         out_uni = scanf(bytes2unicode(fmt), bytes2unicode(bytes_line))
-        out_byt = []
-        for a in out_uni:
-            if isinstance(a, unicode_type):
-                out_byt.append(unicode2bytes(a))
-            else:
-                out_byt.append(a)
-    return out_uni
+        out_byt = out_uni
+        # if out_uni is None:
+        #     out_byt = None
+        # else:
+        #     out_byt = []
+        #     for a in out_uni:
+        #         if isinstance(a, unicode_type):
+        #             out_byt.append(unicode2bytes(a))
+        #         else:
+        #             out_byt.append(a)
+    return out_byt
 
 
 def assert_bytes(s):
