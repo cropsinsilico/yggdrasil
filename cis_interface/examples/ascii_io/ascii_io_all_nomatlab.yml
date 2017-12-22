@@ -22,15 +22,15 @@ models:
 
     outputs:
       - name: outputC_file
-        driver: RMQOutputDriver
+        driver: OutputDriver
         args: outputC_file
 
       - name: outputC_table
-        driver: RMQOutputDriver
+        driver: OutputDriver
         args: outputC_table
 
       - name: outputC_array
-        driver: RMQOutputDriver
+        driver: OutputDriver
         args: outputC_array
 
   -
@@ -40,28 +40,28 @@ models:
 
     inputs:
       - name: inputPy_file
-        driver: RMQInputDriver
+        driver: InputDriver
         args: outputC_file
 
       - name: inputPy_table
-        driver: RMQInputDriver
+        driver: InputDriver
         args: outputC_table
 
       - name: inputPy_array
-        driver: RMQInputDriver
+        driver: InputDriver
         args: outputC_array
 
     outputs:
       - name: outputPy_file
-        driver: RMQOutputDriver
+        driver: OutputDriver
         args: outputPy_file
 
       - name: outputPy_table
-        driver: RMQOutputDriver
+        driver: OutputDriver
         args: outputPy_table
 
       - name: outputPy_array
-        driver: RMQOutputDriver
+        driver: OutputDriver
         args: outputPy_array
 
   -
@@ -71,15 +71,15 @@ models:
 
     inputs:
       - name: inputCPP_file
-        driver: RMQInputDriver
+        driver: InputDriver
         args: outputPy_file
 
       - name: inputCPP_table
-        driver: RMQInputDriver
+        driver: InputDriver
         args: outputPy_table
 
       - name: inputCPP_array
-        driver: RMQInputDriver
+        driver: InputDriver
         args: outputPy_array
 
     outputs:
