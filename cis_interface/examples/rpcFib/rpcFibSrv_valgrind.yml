@@ -1,0 +1,14 @@
+---
+
+model:
+  name: rpcFibSrv
+  driver: GCCModelDriver
+  args:
+    - ./src/rpcFibSrv.c
+    - '{{ FIB_SERVER_SLEEP_SECONDS }}'    # env var - time to sleep before returning
+  is_server: True  # Creates a RPC queue called $name
+  with_valgrind: True
+  valgrind_flags:
+    - --leak-check=full
+    - --show-leak-kinds=all
+    - -v
