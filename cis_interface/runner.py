@@ -2,6 +2,8 @@
 import sys
 import logging
 import os
+import time
+import signal
 import yaml
 import pystache
 from pprint import pformat
@@ -14,8 +16,8 @@ from cis_interface import drivers
 from cis_interface.drivers import create_driver
 
 
-# COLOR_TRACE = '\033[30;43;22m'
-# COLOR_NORMAL = '\033[0m'
+COLOR_TRACE = '\033[30;43;22m'
+COLOR_NORMAL = '\033[0m'
 
 
 # def setup_cis_logging(prog, level=None):
@@ -63,6 +65,10 @@ class CisRunner(CisClass):
         modeldrivers (dict): Model drivers associated with this run.
         inputdrivers (dict): Input drivers associated with this run.
         outputdrivers (dict): Output drivers associated with this run.
+        serverdrivers (dict): The addresses associated with different server
+            drivers.
+        interrupt_time (float): Time of last interrupt signal.
+        error_flag (bool): True if one or more models raises an error.
 
     ..todo:: namespace, host, and rank do not seem strictly necessary.
 
@@ -78,6 +84,7 @@ class CisRunner(CisClass):
         self.inputdrivers = {}
         self.outputdrivers = {}
         self.serverdrivers = {}
+        self.interrupt_time = 0
         self._inputchannels = {}
         self._outputchannels = {}
         self.error_flag = False
@@ -194,10 +201,58 @@ class CisRunner(CisClass):
         yaml['workingDir'] = yamldir
         dd[yaml['name']] = yaml
 
-    def run(self):
+    def pprint(self, *args):
+        r"""Print with color."""
+        s = ''.join(str(i) for i in args)
+        print((COLOR_TRACE + '{}' + COLOR_NORMAL).format(s))
+
+    def signal_handler(self, sig, frame):
+        r"""Terminate all drivers on interrrupt."""
+        self.debug("signal_handler: Interrupt with signal %d", sig)
+        now = time.time()
+        elapsed = now - self.interrupt_time
+        self.debug('signal_handler: elapsed since last interrupt: %d', elapsed)
+        self.interrupt_time = now
+        self.pprint(' ')
+        self.pprint(80 * '*')
+        if elapsed < 5:
+            self.pprint('* %76s *' % 'Interrupted twice within 5 seconds: shutting down')
+            self.pprint(80 * '*')
+            # signal.siginterrupt(signal.SIGTERM, True)
+            # signal.siginterrupt(signal.SIGINT, True)
+            self.debug("signal_handler: terminating models and closing all channels")
+            self.terminate()
+            self.pprint(80 * '*')
+            return 1
+        else:
+            self.pprint('* %76s *' % 'Interrupted: Displaying channel summary')
+            self.pprint('* %76s *' % 'interrupt again (within 5 seconds) to exit')
+            self.pprint(80 * '*')
+            self.printStatus()
+            self.pprint(80 * '*')
+        self.debug('signal_handler: %d returns', sig)
+        
+    def set_signal_handler(self, signal_handler=None):
+        r"""Set the signal handler.
+
+        Args:
+            signal_handler (function, optional): Function that should handle
+                received SIGINT and SIGTERM signals. Defaults to
+                self.signal_handler.
+
+        """
+        if signal_handler is None:
+            signal_handler = self.signal_handler
+        signal.signal(signal.SIGTERM, signal_handler)
+        signal.signal(signal.SIGINT, signal_handler)
+        signal.siginterrupt(signal.SIGTERM, False)
+        signal.siginterrupt(signal.SIGINT, False)
+
+    def run(self, signal_handler=None):
         r"""Run all of the models and wait for them to exit."""
         self.loadDrivers()
         self.startDrivers()
+        self.set_signal_handler(signal_handler)
         self.waitModels()
         self.closeChannels()
         self.cleanup()
@@ -331,34 +386,41 @@ class CisRunner(CisClass):
         r"""Load all of the necessary drivers, doing the IO drivers first
         and adding IO driver environmental variables back tot he models."""
         self.debug("loadDrivers()")
-        # Create input drivers
-        self.debug("loadDrivers(): loading input drivers")
-        for driver in self.inputdrivers.values():
-            self.createInputDriver(driver)
-        # Create output drivers
-        self.debug("loadDrivers(): loading output drivers")
-        for driver in self.outputdrivers.values():
-            self.createOutputDriver(driver)
-        # Create model drivers
-        self.debug("loadDrivers(): loading model drivers")
-        for driver in self.modeldrivers.values():
-            self.createModelDriver(driver)
+        driver = dict(name='name')
+        try:
+            # Create input drivers
+            self.debug("loadDrivers(): loading input drivers")
+            for driver in self.inputdrivers.values():
+                self.createInputDriver(driver)
+            # Create output drivers
+            self.debug("loadDrivers(): loading output drivers")
+            for driver in self.outputdrivers.values():
+                self.createOutputDriver(driver)
+            # Create model drivers
+            self.debug("loadDrivers(): loading model drivers")
+            for driver in self.modeldrivers.values():
+                self.createModelDriver(driver)
+        except BaseException:
+            self.error("%s could not be created.", driver['name'])
+            self.terminate()
+            raise
 
     def startDrivers(self):
         r"""Start drivers, starting with the IO drivers."""
         self.info('Starting I/O drivers and models on system ' +
                   '{} in namespace {} with rank {}'.format(
                       self.host, self.namespace, self.rank))
-        for driver in self.all_drivers:
-            self.debug("startDrivers(): starting driver %s",
-                       driver['name'])
-            d = driver['instance']
-            try:
+        driver = dict(name='name')
+        try:
+            for driver in self.all_drivers:
+                self.debug("startDrivers(): starting driver %s",
+                           driver['name'])
+                d = driver['instance']
                 d.start()
-            except Exception as e:  # pragma: debug
-                self.error("%s did not start", d.name)
-                self.terminate()
-                raise e
+        except BaseException:
+            self.error("%s did not start", driver['name'])
+            self.terminate()
+            raise
         self.debug('startDrivers(): ALL DRIVERS STARTED')
 
     def waitModels(self):
