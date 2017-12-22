@@ -1,4 +1,5 @@
 import uuid
+import copy
 import nose.tools as nt
 from cis_interface.tests import IOInfo, MagicTestError
 from cis_interface.drivers import import_driver
@@ -21,7 +22,7 @@ class TestCommParam(parent.TestParam, IOInfo):
         self.comm_name = _default_comm
         self.attr_list += ['state', 'numSent', 'numReceived', 'comm_name',
                            'comm']
-        self.timeout = 1.0
+        # self.timeout = 1.0
         self._extra_instances = []
 
     @property
@@ -141,9 +142,9 @@ class TestCommDriverNoStart(TestCommParam, parent.TestDriverNoStart):
         r"""Get CommDriver instance with an ErrorComm parent class."""
         args = [self.get_fresh_name()]
         if self.args is not None:
-            args.append(self.args)
+            args.append(copy.deepcopy(self.args))
         # args = self.inst_args
-        kwargs = self.inst_kwargs
+        kwargs = copy.deepcopy(self.inst_kwargs)
         if 'address' in kwargs:
             del kwargs['address']
         kwargs.update(
