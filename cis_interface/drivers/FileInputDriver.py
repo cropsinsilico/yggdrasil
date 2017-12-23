@@ -16,7 +16,7 @@ class FileInputDriver(ConnectionDriver):
         icomm_kws.setdefault('comm', 'FileComm')
         icomm_kws['address'] = args
         kwargs['icomm_kws'] = icomm_kws
-        kwargs.setdefault('timeout_send_1st', 10.0)
+        kwargs.setdefault('timeout_send_1st', 60)
         super(FileInputDriver, self).__init__(name, **kwargs)
         self.env[self.name] = self.ocomm.address
         self.debug('(%s)', args)

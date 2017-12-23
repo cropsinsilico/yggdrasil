@@ -28,10 +28,17 @@ class AsciiTableOutputDriver(AsciiFileOutputDriver):
             the end of a line. Default set by :class:`AsciiFile`.
         as_array (bool, optional): If True, the table contents are sent all at
             once as an array. Defaults to False.
+        timeout_recv_format (float, optional): Time in seconds that should be
+            waited before giving up on recieving the format string. Defaults to
+            60 s.
         **kwargs: Additional keyword arguments are passed to parent class.
 
+    Attributes:
+        timeout_recv_format (float): Time in seconds that should be waited
+            before giving up on recieving the format string.
+
     """
-    def __init__(self, name, args, **kwargs):
+    def __init__(self, name, args, timeout_recv_format=None, **kwargs):
         file_keys = ['format_str', 'dtype', 'column_names', 'use_astropy',
                      'column', 'as_array']
         # icomm_kws = kwargs.get('icomm_kws', {})
@@ -46,11 +53,14 @@ class AsciiTableOutputDriver(AsciiFileOutputDriver):
         kwargs['ocomm_kws'] = ocomm_kws
         super(AsciiTableOutputDriver, self).__init__(name, args, **kwargs)
         self.debug('(%s)', args)
+        if timeout_recv_format is None:
+            timeout_recv_format = 60
+        self.timeout_recv_format = timeout_recv_format
 
     def before_loop(self):
         r"""Receive format string and then write it to the file."""
         super(AsciiTableOutputDriver, self).before_loop()
-        fmt = self.recv_message(timeout=self.timeout)
+        fmt = self.recv_message(timeout=self.timeout_recv_format)
         if not fmt:
             if self.is_comm_open:  # pragma: debug
                 raise RuntimeError('Did not receive format string')
