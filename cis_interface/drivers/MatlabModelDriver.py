@@ -101,7 +101,7 @@ def stop_matlab(screen_session, matlab_engine, matlab_session):
     #     warn("Matlab not installed. Matlab could not be stopped.")
 
 
-class MatlabProcess(object):
+class MatlabProcess(object):  # pragma: matlab
     r"""Add features to mimic subprocess.Popen while running Matlab function
     asynchronously.
 
@@ -300,35 +300,34 @@ class MatlabModelDriver(ModelDriver):
 
     def start_setup(self):
         r"""Actions to perform before the run loop."""
-        name = os.path.splitext(os.path.basename(self.args[0]))[0]
+        if _matlab_installed:  # pragma: matlab
+            name = os.path.splitext(os.path.basename(self.args[0]))[0]
 
-        # Add environment variables
-        self.debug('Setting environment variables for Matlab engine.')
-        for k, v in self.env.items():
+            # Add environment variables
+            self.debug('Setting environment variables for Matlab engine.')
+            for k, v in self.env.items():
+                with self.lock:
+                    if self.mlengine is None:  # pragma: debug
+                        return
+                    self.mlengine.setenv(k, v, nargout=0)
+
+            # Run
             with self.lock:
                 if self.mlengine is None:  # pragma: debug
+                    self.debug('Matlab engine not set. Stopping')
                     return
-                self.mlengine.setenv(k, v, nargout=0)
-
-        # Run
-        with self.lock:
-            if self.mlengine is None:  # pragma: debug
-                self.debug('Matlab engine not set. Stopping')
-                return
-            try:
                 self.debug('Starting MatlabProcess')
                 self.process = MatlabProcess(target=getattr(self.mlengine, name),
                                              args=self.args[1:])
                 self.process.start()
                 self.debug('MatlabProcess running model.')
-            except Exception as e:
-                self.error(e)
-                raise
+        else:  # pragma: no matlab
+            self.error("Matlab not installed. Could not run setup.")
 
-    def run_loop(self):
+    def run_loop(self):  # pragma: matlab
         r"""Loop to check if model is still running and forward output."""
         while True:
-            if self.process is None:
+            if self.process is None:  # pragma: debug
                 break
             self.process.print_output()
             if self.process.is_done():

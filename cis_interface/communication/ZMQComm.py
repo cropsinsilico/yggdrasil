@@ -673,7 +673,7 @@ class ZMQComm(CommBase.CommBase):
 
         """
         if self.is_closed:  # pragma: debug
-            self.error(".send(): Socket closed")
+            self.error("Socket closed")
             return False
         if identity is None:
             identity = self.dealer_identity
@@ -739,9 +739,11 @@ class ZMQComm(CommBase.CommBase):
                 message.
 
         """
+        # Return False if the socket is closed
         if self.is_closed:  # pragma: debug
-            self.error(".recv(): Socket closed")
-            return (False, None)
+            self.error("Socket closed")
+            return (False, self.empty_msg)
+        # Poll until there is a message
         if timeout is None:
             timeout = self.recv_timeout
         self.sleep()
@@ -750,11 +752,12 @@ class ZMQComm(CommBase.CommBase):
                 return (False, None)
             ret = self.socket.poll(timeout=1000.0 * timeout)
             if ret == 0:
-                self.verbose_debug(".recv(): No messages waiting.")
-                return (True, backwards.unicode2bytes(''))
+                self.verbose_debug("No messages waiting.")
+                return (True, self.empty_msg)
             flags = zmq.NOBLOCK
         else:
             flags = 0
+        # Receive message
         try:
             if self.socket_type_name == 'ROUTER':
                 identity = self.socket.recv(flags)
@@ -762,8 +765,8 @@ class ZMQComm(CommBase.CommBase):
             kwargs.setdefault('flags', flags)
             total_msg = self.socket.recv(**kwargs)
         except zmq.ZMQError:  # pragma: debug
-            self.exception(".recv(): Error")
-            return (False, None)
+            self.exception("Error receiving")
+            return (False, self.empty_msg)
         # print('(python) received %d bytes from %s' % (len(total_msg), self.address))
         if self.socket_type_name == 'SUB':
             topic, msg = total_msg.split(_flag_zmq_filter)

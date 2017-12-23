@@ -157,6 +157,11 @@ class CommBase(CisClass):
         r"""int: Maximum size of a single message that should be sent."""
         return CIS_MSG_MAX
 
+    @property
+    def empty_msg(self):
+        r"""str: Empty message."""
+        return backwards.unicode2bytes('')
+
     @classmethod
     def comm_count(cls):
         r"""int: Number of communication connections."""

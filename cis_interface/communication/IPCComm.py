@@ -1,7 +1,6 @@
 import sysv_ipc
 from subprocess import Popen, PIPE
 from cis_interface import tools
-from cis_interface import backwards
 from cis_interface.communication import CommBase
 
 
@@ -147,6 +146,12 @@ class IPCComm(CommBase.CommBase):
         else:
             self.open()
 
+    @property
+    def maxMsgSize(self):
+        r"""int: Maximum size of a single message that should be sent."""
+        # Based on IPC limit on OSX
+        return 2048
+    
     @classmethod
     def comm_count(cls):
         r"""int: Total number of IPC queues started on this process."""
@@ -258,18 +263,18 @@ class IPCComm(CommBase.CommBase):
         # Return False if the queue is closed
         if self.is_closed:  # pragma: debug
             self.debug("Queue closed")
-            return (False, backwards.unicode2bytes(''))
+            return (False, self.empty_msg)
         # Return True, '' if there are no messages
         if self.n_msg == 0:
-            self.verbose_debug("No data")
-            return (True, backwards.unicode2bytes(''))
+            self.verbose_debug("No messages waiting.")
+            return (True, self.empty_msg)
         # Receive message
         self.debug("Message ready, reading it.")
         try:
             data, _ = self.q.receive()  # ignore ident
         except sysv_ipc.ExistentialError:  # pragma: debug
             self.close()
-            return (False, backwards.unicode2bytes(''))
+            return (False, self.empty_msg)
         return (True, data)
 
     def purge(self):

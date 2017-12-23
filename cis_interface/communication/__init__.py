@@ -6,7 +6,7 @@ if is_zmq_installed():
     _default_comm = 'ZMQComm'
 elif is_ipc_installed():
     _default_comm = 'IPCComm'
-else:
+else:  # pragma: debug
     raise Exception('Neither ZMQ or IPC installed.')
 
 
