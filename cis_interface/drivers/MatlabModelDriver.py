@@ -102,11 +102,29 @@ def stop_matlab(screen_session, matlab_engine, matlab_session):
 
 
 class MatlabProcess(object):
-    r"""Add features to mimic subprocess.Popen."""
+    r"""Add features to mimic subprocess.Popen while running Matlab function
+    asynchronously.
 
-    def __init__(self, target, args=None, kwargs=None):
-        if args is None:
-            args = []
+    Args:
+        target (func): Matlab function that should be called.
+        args (list, tuple): Arguments that should be passed to target.
+        kwargs (dict, optional): Keyword arguments that should be passed to
+            target. Defaults to empty dict.
+
+    Attributes:
+        stdout (StringIO): File like string buffer that stdout from target will
+            be written to.
+        stderr (StringIO): File like string buffer that stderr from target will
+            be written to.
+        target (func): Matlab function that should be called.
+        args (list, tuple): Arguments that should be passed to target.
+        kwargs (dict): Keyword arguments that should be passed to target.
+        future (MatlabFutureResult): Future result from async function. This
+            will be None until start is called.
+
+    """
+
+    def __init__(self, target, args, kwargs=None):
         if kwargs is None:
             kwargs = {}
         self.stdout = backwards.sio.StringIO()
@@ -126,6 +144,7 @@ class MatlabProcess(object):
 
     @property
     def stdout_line(self):
+        r"""str: Output to stdout from function call."""
         if self._stdout_line is None:
             if self.stdout is not None:
                 line = self.stdout.getvalue()
@@ -135,6 +154,7 @@ class MatlabProcess(object):
 
     @property
     def stderr_line(self):
+        r"""str: Output to stderr from function call."""
         if self._stderr_line is None:
             if self.stderr is not None:
                 line = self.stderr.getvalue()
@@ -181,7 +201,7 @@ class MatlabProcess(object):
             return None
 
     def kill(self, *args, **kwargs):
-        r"""Alias for terminate."""
+        r"""Cancel the async call."""
         if self.is_alive():
             self.future.cancel()
         self.print_output()
