@@ -46,6 +46,11 @@ class ClientComm(CommBase.CommBase):
                                          direction='send', no_suffix=True,
                                          address=self.ocomm.address)
 
+    @property
+    def maxMsgSize(self):
+        r"""int: Maximum size of a single message that should be sent."""
+        return self.ocomm.maxMsgSize
+        
     @classmethod
     def comm_count(cls):
         r"""int: Number of communication connections."""

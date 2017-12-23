@@ -41,6 +41,11 @@ class ServerComm(CommBase.CommBase):
                                          direction='recv', no_suffix=True,
                                          address=self.icomm.address)
 
+    @property
+    def maxMsgSize(self):
+        r"""int: Maximum size of a single message that should be sent."""
+        return self.icomm.maxMsgSize
+        
     @classmethod
     def comm_count(cls):
         r"""int: Number of communication connections."""

@@ -75,6 +75,11 @@ class RPCComm(CommBase.CommBase):
             self.close(skip_base=True)
             raise e
 
+    @property
+    def maxMsgSize(self):
+        r"""int: Maximum size of a single message that should be sent."""
+        return min(self.icomm.maxMsgSize, self.ocomm.maxMsgSize)
+        
     @classmethod
     def comm_count(cls):
         r"""int: Number of communication connections."""
