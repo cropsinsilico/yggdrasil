@@ -115,6 +115,10 @@ class TestCommBase(CisTest, IOInfo):
         inst = new_comm(self.name + '_' + self.uuid, **kwargs)
         return inst
 
+    def test_maxMsgSize(self):
+        r"""Print maxMsgSize."""
+        self.instance.debug('maxMsgSize: %d', self.maxMsgSize)
+
     def test_error_send(self):
         r"""Test error on send."""
         inst = self.get_fresh_error_instance()

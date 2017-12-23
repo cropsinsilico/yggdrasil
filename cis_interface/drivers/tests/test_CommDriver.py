@@ -9,12 +9,7 @@ from cis_interface.communication import (
 
             
 class TestCommParam(parent.TestParam, IOInfo):
-    r"""Test parameters for the CommDriver class.
-
-    Attributes (in addition to parent class's):
-        -
-
-    """
+    r"""Test parameters for the CommDriver class."""
     def __init__(self, *args, **kwargs):
         super(TestCommParam, self).__init__(*args, **kwargs)
         IOInfo.__init__(self)
@@ -115,12 +110,7 @@ class TestCommParam(parent.TestParam, IOInfo):
     
 
 class TestCommDriverNoStart(TestCommParam, parent.TestDriverNoStart):
-    r"""Test class for the CommDriver class without start.
-
-    Attributes (in addition to parent class's):
-        -
-
-    """
+    r"""Test class for the CommDriver class without start."""
 
     def test_send_recv(self):
         r"""Test sending/receiving with queues closed."""
@@ -185,12 +175,7 @@ class TestCommDriverNoStart(TestCommParam, parent.TestDriverNoStart):
         
 
 class TestCommDriver(TestCommParam, parent.TestDriver):
-    r"""Test class for the CommDriver class.
-
-    Attributes (in addition to parent class's):
-        -
-
-    """
+    r"""Test class for the CommDriver class."""
 
     def setup(self, *args, **kwargs):
         r"""Initialize comm object pair."""
@@ -239,7 +224,7 @@ class TestCommDriver(TestCommParam, parent.TestDriver):
         if self.comm_name != 'CommBase':
             assert(flag)
             T = self.instance.start_timeout()
-            while (not T.is_out) and (recv_mech.n_msg == 0):
+            while (not T.is_out) and (recv_mech.n_msg == 0):  # pragma: debug
                 self.instance.sleep()
             self.instance.stop_timeout()
             assert(recv_mech.n_msg > 0)

@@ -5,12 +5,7 @@ from cis_interface.drivers.tests import test_CommDriver as parent
 
 
 class TestRPCCommParam(parent.TestCommParam):
-    r"""Test parameters for the RPCCommDriver class.
-
-    Attributes:
-        -
-
-    """
+    r"""Test parameters for the RPCCommDriver class."""
     def __init__(self, *args, **kwargs):
         super(TestRPCCommParam, self).__init__(*args, **kwargs)
         self.driver = 'RPCCommDriver'
@@ -18,17 +13,12 @@ class TestRPCCommParam(parent.TestCommParam):
     
 
 class TestRPCCommDriverNoStart(TestRPCCommParam, parent.TestCommDriverNoStart):
-    r"""Test class for the RPCCommDriver class without start.
-
-    Attributes (in addition to parent class's):
-        -
-
-    """
+    r"""Test class for the RPCCommDriver class without start."""
     
     def get_fresh_error_instance(self, comm, error_on_init=False):
         r"""Get CommDriver instance with an ErrorComm parent class."""
         args = [self.get_fresh_name()]
-        if self.args is not None:
+        if self.args is not None:  # pragma: debug
             args.append(self.args)
         # args = self.inst_args
         kwargs = self.inst_kwargs
@@ -91,10 +81,5 @@ class TestRPCCommDriverNoStart(TestRPCCommParam, parent.TestCommDriverNoStart):
 
 
 class TestRPCCommDriver(TestRPCCommParam, parent.TestCommDriver):
-    r"""Test class for the RPCCommDriver class.
-
-    Attributes (in addition to parent class's):
-        -
-
-    """
+    r"""Test class for the RPCCommDriver class."""
     pass

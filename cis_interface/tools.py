@@ -190,6 +190,22 @@ class CisClass(object):
         the_func = stack[2][3]
         return '%s(%s).%s[%d]: ' % (the_class, self.name, the_func, the_line)
 
+    def as_str(self, obj):
+        r"""Return str version of object if it is not already a string.
+
+        Args:
+            obj (object): Object that should be turned into a string.
+
+        Returns:
+            str: String version of provided object.
+
+        """
+        if not isinstance(obj, str):
+            obj_str = str(obj)
+        else:
+            obj_str = obj
+        return obj_str
+            
     def sleep(self, t=None):
         r"""Have the class sleep for some period of time.
 
@@ -287,9 +303,7 @@ class CisClass(object):
             \*args: Additional arguments are formated using the format string.
 
         """
-        if not isinstance(fmt_str, str):
-            fmt_str = str(fmt_str)
-        print(self.logger_prefix + fmt_str % args)
+        print(self.logger_prefix + self.as_str(fmt_str) % args)
 
     def info(self, fmt_str='', *args):
         r"""Log an info message that is prepended with the class and name.
@@ -299,9 +313,7 @@ class CisClass(object):
             \*args: Additional arguments are formated using the format string.
 
         """
-        if not isinstance(fmt_str, str):
-            fmt_str = str(fmt_str)
-        self.logger.info(self.logger_prefix + fmt_str, *args)
+        self.logger.info(self.logger_prefix + self.as_str(fmt_str), *args)
 
     def debug(self, fmt_str='', *args):
         r"""Log a debug message that is prepended with the class and name.
@@ -311,9 +323,7 @@ class CisClass(object):
             \*args: Additional arguments are formated using the format string.
 
         """
-        if not isinstance(fmt_str, str):
-            fmt_str = str(fmt_str)
-        self.logger.debug(self.logger_prefix + fmt_str, *args)
+        self.logger.debug(self.logger_prefix + self.as_str(fmt_str), *args)
 
     def special_debug(self, fmt_str='', *args):
         r"""Log a debug message that is prepended with the class and name, but
@@ -325,9 +335,7 @@ class CisClass(object):
 
         """
         if not self.suppress_special_debug:
-            if not isinstance(fmt_str, str):
-                fmt_str = str(fmt_str)
-            self.logger.debug(self.logger_prefix + fmt_str, *args)
+            self.logger.debug(self.logger_prefix + self.as_str(fmt_str), *args)
 
     def verbose_debug(self, fmt_str='', *args):
         r"""Log a verbose debug message that is prepended with the class and name.
@@ -337,9 +345,7 @@ class CisClass(object):
             \*args: Additional arguments are formated using the format string.
 
         """
-        if not isinstance(fmt_str, str):
-            fmt_str = str(fmt_str)
-        self.logger.log(9, self.logger_prefix + fmt_str, *args)
+        self.logger.log(9, self.logger_prefix + self.as_str(fmt_str), *args)
         
     def critical(self, fmt_str='', *args):
         r"""Log a critical message that is prepended with the class and name.
@@ -349,9 +355,7 @@ class CisClass(object):
             \*args: Additional arguments are formated using the format string.
 
         """
-        if not isinstance(fmt_str, str):
-            fmt_str = str(fmt_str)
-        self.logger.critical(self.logger_prefix + fmt_str, *args)
+        self.logger.critical(self.logger_prefix + self.as_str(fmt_str), *args)
 
     def warn(self, fmt_str='', *args):
         r"""Log a warning message that is prepended with the class and name.
@@ -361,9 +365,7 @@ class CisClass(object):
             \*args: Additional arguments are formated using the format string.
 
         """
-        if not isinstance(fmt_str, str):
-            fmt_str = str(fmt_str)
-        self.logger.warn(self.logger_prefix + fmt_str, *args)
+        self.logger.warn(self.logger_prefix + self.as_str(fmt_str), *args)
 
     def error(self, fmt_str='', *args):
         r"""Log an error message that is prepended with the class and name.
@@ -373,8 +375,7 @@ class CisClass(object):
             \*args: Additional arguments are formated using the format string.
 
         """
-        if not isinstance(fmt_str, str):
-            fmt_str = str(fmt_str)
+        fmt_str = self.as_str(fmt_str)
         self.logger.error(self.logger_prefix + fmt_str, *args)
         self.errors.append((self.logger_prefix + fmt_str) % args)
 
@@ -386,8 +387,7 @@ class CisClass(object):
             \*args: Additional arguments are formated using the format string.
 
         """
-        if not isinstance(fmt_str, str):
-            fmt_str = str(fmt_str)
+        fmt_str = self.as_str(fmt_str)
         exc_info = sys.exc_info()
         if exc_info is not None and exc_info != (None, None, None):
             self.logger.exception(self.logger_prefix + fmt_str, *args)
