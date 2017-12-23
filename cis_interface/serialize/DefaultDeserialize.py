@@ -29,6 +29,8 @@ class DefaultDeserialize(object):
         """
         if self.format_str is None:
             out = msg
+        elif len(msg) == 0:
+            out = tuple()
         else:
             out = backwards.scanf_bytes(self.format_str, msg)
         return out

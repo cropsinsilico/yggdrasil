@@ -10,10 +10,9 @@ class TestMatDeserialize(TestDefaultDeserialize):
     def __init__(self, *args, **kwargs):
         super(TestMatDeserialize, self).__init__(*args, **kwargs)
         self._cls = 'MatDeserialize'
+        self._result_empty = dict()
 
     def test_call(self):
         r"""Test call."""
         out = self.instance(self.mat_data)
         self.assert_equal_data_dict(out)
-        empty = backwards.unicode2bytes('')
-        nt.assert_equal(self.instance(empty), dict())

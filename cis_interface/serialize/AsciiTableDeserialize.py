@@ -34,7 +34,9 @@ class AsciiTableDeserialize(DefaultDeserialize):
             obj: Deserialized message.
 
         """
-        if self.as_array:
+        if (len(msg) == 0):
+            out = tuple()
+        elif self.as_array:
             out = self.table.bytes_to_array(msg, order='F')
         else:
             out = self.table.process_line(msg)

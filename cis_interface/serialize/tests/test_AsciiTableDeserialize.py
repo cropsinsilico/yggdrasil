@@ -11,6 +11,7 @@ class TestAsciiTableDeserialize(TestDefaultDeserialize):
         super(TestAsciiTableDeserialize, self).__init__(*args, **kwargs)
         self._cls = 'AsciiTableDeserialize'
         self._inst_kwargs = {'format_str': self.fmt_str}
+        self._result_empty = tuple()
 
     def test_call(self):
         r"""Test call as rows."""
