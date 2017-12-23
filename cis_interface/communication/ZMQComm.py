@@ -130,6 +130,7 @@ def parse_address(address):
     else:
         if ':' in res:
             host, port = res.split(':')
+            port = int(port)
         else:
             host = res
             port = None
@@ -218,12 +219,12 @@ class ZMQProxy(threading.Thread, CisClass):
         with self.lock:
             if self._running:
                 return self.cli_socket.recv_multipart()
-            else:
+            else:  # pragma: debug
                 return None
 
     def server_send(self, msg):
         r"""Send single message to the server."""
-        if msg is None:
+        if msg is None:  # pragma: debug
             return
         while self._running:
             try:
@@ -238,7 +239,7 @@ class ZMQProxy(threading.Thread, CisClass):
         # socks = dict(self.poller.poll())
         # return (socks.get(self.cli_socket) == zmq.POLLIN)
         with self.lock:
-            if not self._running:
+            if not self._running:  # pragma: debug
                 return False
         out = self.cli_socket.poll(timeout=1, flags=zmq.POLLIN)
         return (out == zmq.POLLIN)
@@ -246,7 +247,7 @@ class ZMQProxy(threading.Thread, CisClass):
     def run(self):
         r"""Run the proxy, handling errors on exit."""
         self._running = True
-        self.debug('.run(): Proxy forwarding messages from %s to %s',
+        self.debug('Proxy forwarding messages from %s to %s',
                    self.cli_address, self.srv_address)
         try:
             # This version does explicit checking of polls
@@ -254,16 +255,16 @@ class ZMQProxy(threading.Thread, CisClass):
                 if self.poll():
                     message = self.client_recv()
                     # print('fowarding', message)
-                    self.debug('.run(): forwarding message of size %d from %s',
+                    self.debug('Forwarding message of size %d from %s',
                                len(message[1]), message[0])
                     self.server_send(message[1])
                     # For multipart
                     # self.server_send(message)
             # This version does fowarding in a black box
             # zmq.proxy(self.cli_socket, self.srv_socket)
-        except zmq.ZMQError:
+        except zmq.ZMQError:  # pragma: debug
             # print('proxy stopped')
-            self.debug('.run(): Proxy fowarding stopped.')
+            self.debug('Proxy fowarding stopped.')
             raise
         self.close_sockets()
 
@@ -283,9 +284,6 @@ class ZMQProxy(threading.Thread, CisClass):
         r"""Stop the proxy."""
         with self.lock:
             self._running = False
-            # self.close_sockets()
-            if hasattr(super(ZMQProxy, self), 'terminate'):
-                super(ZMQProxy, self).terminate()
 
 
 class ZMQComm(CommBase.CommBase):
@@ -488,7 +486,7 @@ class ZMQComm(CommBase.CommBase):
         # Bind to reserve port if that is this sockets action
         if (self.socket_action == 'bind') or (self.port is None):
             self._bound = True
-            self.debug('.bind(): Binding %s socket to %s.',
+            self.debug('Binding %s socket to %s.',
                        self.socket_type_name, self.address)
             try:
                 self.address = bind_socket(self.socket, self.address)
@@ -569,7 +567,7 @@ class ZMQComm(CommBase.CommBase):
                 # Bind then unbind to get port as necessary
                 self.bind()
                 self.unbind()
-                self.debug('.open(): Connecting %s socket to %s.',
+                self.debug('Connecting %s socket to %s.',
                            self.socket_type_name, self.address)
                 self._connected = True
                 self.socket.connect(self.address)
@@ -693,11 +691,11 @@ class ZMQComm(CommBase.CommBase):
             self.socket.send(total_msg, **kwargs)
         except zmq.ZMQError as e:  # pragma: debug
             # if e.errno == 11:
-            #     self.debug(".send(): Socket not yet bound on receiving end. " +
+            #     self.debug("Socket not yet bound on receiving end. " +
             #                "Retrying in %5.2f s." % self.sleeptime)
             #     self.sleep()
             # else:
-            self.debug(".send(): Socket could not send. (errno=%d)", e.errno)
+            self.special_debug("Socket could not send. (errno=%d)", e.errno)
             return False
         return True
 

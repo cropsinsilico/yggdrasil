@@ -36,13 +36,22 @@ class TestGCCModelDriverNoStart(TestGCCModelParam,
         super(TestGCCModelDriverNoStart, self).__init__(*args, **kwargs)
         src = scripts['cpp']
         script_dir = os.path.dirname(src[0])
-        self.args = src + ['1', '-I' + script_dir, '-L' + script_dir]
+        self.args = src + ['1', '-I' + script_dir, '-L' + script_dir,
+                           '-o', 'test_exe']
     
     # Done in driver, but driver not started
     def teardown(self):
         r"""Remove the instance, stoppping it."""
         self.instance.cleanup()
         super(TestGCCModelDriverNoStart, self).teardown()
+
+
+class TestGCCModelDriverNoStart_std(TestGCCModelDriverNoStart):
+    r"""Test runner for GCCModelDriver with std lib specified."""
+
+    def __init__(self, *args, **kwargs):
+        super(TestGCCModelDriverNoStart_std, self).__init__(*args, **kwargs)
+        self.args.append('-std=c++11')
 
 
 class TestGCCModelDriver(TestGCCModelParam, parent.TestModelDriver):

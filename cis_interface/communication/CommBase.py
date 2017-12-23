@@ -469,8 +469,9 @@ class CommBase(CisClass):
     
     def _send_1st(self, *args, **kwargs):
         r"""Send first message until it succeeds."""
-        flag = False
         T = self.start_timeout()
+        flag = self._send(*args, **kwargs)
+        self.suppress_special_debug = True
         while (not T.is_out) and (self.is_open):
             # print('send 1st', self.name, self.__class__, self.is_open)
             flag = self._send(*args, **kwargs)
@@ -478,6 +479,7 @@ class CommBase(CisClass):
                 break
             self.sleep()
         self.stop_timeout()
+        self.suppress_special_debug = False
         self._first_send_done = True
         return flag
         
@@ -504,15 +506,13 @@ class CommBase(CisClass):
                 return False
             ret = self._safe_send(imsg, **kwargs)
             if not ret:  # pragma: debug
-                self.debug(
-                    ".send_multipart(): send interupted at %d of %d bytes.",
-                    nsent, len(msg))
+                self.debug("Send interupted at %d of %d bytes.",
+                           nsent, len(msg))
                 break
             nsent += len(imsg)
-            self.debug(".send_multipart(): %d of %d bytes sent",
-                       nsent, len(msg))
+            self.debug("%d of %d bytes sent", nsent, len(msg))
         if ret and len(msg) > 0:
-            self.debug(".send_multipart %d bytes completed", len(msg))
+            self.debug("%d bytes completed", len(msg))
         return ret
 
     def _send_multipart_worker(self, msg, header, **kwargs):
@@ -553,7 +553,7 @@ class CommBase(CisClass):
 
         """
         if self.is_closed:
-            self.debug('.on_send(): comm closed.')
+            self.debug('Comm closed')
             return False, backwards.unicode2bytes('')
         if len(msg) == 1:
             msg = msg[0]
@@ -582,10 +582,13 @@ class CommBase(CisClass):
         if self.single_use and self._used:
             raise RuntimeError("This comm is single use and it was already used.")
         try:
-            self.debug('.send(): %d bytes', len(msg_s))
+            self.special_debug('Sending %d bytes', len(msg_s))
             self._used = True
             ret = self.send_multipart(msg_s, **kwargs)
-            self.debug('.send(): %d bytes sent', len(msg_s))
+            if ret:
+                self.debug('Sent %d bytes', len(msg_s))
+            else:
+                self.special_debug('Failed to send %d bytes', len(msg_s))
         except BaseException:
             print(args, kwargs)
             self.exception('.send(): Failed to send.')
@@ -615,7 +618,7 @@ class CommBase(CisClass):
         if (not send_header) and ((len(msg) < self.maxMsgSize) or
                                   (self.maxMsgSize == 0)):
             if self.is_closed:  # pragma: debug
-                self.error(".send_multipart(): Connection closed.")
+                self.error("Connection closed.")
                 return False
             ret = self._safe_send(msg, **kwargs)
         else:
@@ -631,28 +634,28 @@ class CommBase(CisClass):
                 header_msg = self.format_header(header)
                 ret = self._safe_send(header_msg)
                 if not ret:  # pragma: debug
-                    self.debug(".send_multipart: Sending message header failed.")
+                    self.special_debug("Sending message header failed.")
                     return ret
                 ret = self._send_multipart_worker(msg, header, **kwargs)
         return ret
         
-    def send_header(self, header, **kwargs):
-        r"""Send header message.
+    # def send_header(self, header, **kwargs):
+    #     r"""Send header message.
 
-        Args:
-            header (dict): Header info that should be sent.
-            **kwargs: Additional keyword arguments are passed to _send method.
+    #     Args:
+    #         header (dict): Header info that should be sent.
+    #         **kwargs: Additional keyword arguments are passed to _send method.
 
-        Returns:
-            bool: Success or failure of send.
+    #     Returns:
+    #         bool: Success or failure of send.
 
-        """
-        header_msg = self.format_header(header)
-        if self.is_closed:  # pragma: debug
-            self.error(".send_header(): Connection closed.")
-            return False
-        out = self._safe_send(header_msg, **kwargs)
-        return out
+    #     """
+    #     header_msg = self.format_header(header)
+    #     if self.is_closed:  # pragma: debug
+    #         self.error("Connection closed.")
+    #         return False
+    #     out = self._safe_send(header_msg, **kwargs)
+    #     return out
 
     def send_nolimit(self, *args, **kwargs):
         r"""Alias for send."""
@@ -698,16 +701,15 @@ class CommBase(CisClass):
         while len(data) < leng_exp:
             payload = self._recv(**kwargs)
             if not payload[0]:  # pragma: debug
-                self.debug(
-                    ".recv_multipart(): read interupted at %d of %d bytes.",
-                    len(data), leng_exp)
+                self.debug("Read interupted at %d of %d bytes.",
+                           len(data), leng_exp)
                 ret = False
                 break
             data = data + payload[1]
             if len(payload[1]) == 0:
                 self.sleep()
         payload = (ret, data)
-        self.debug(".recv_multipart(): read %d bytes", len(data))
+        self.debug("Read %d bytes", len(data))
         return payload
 
     def _recv_multipart_worker(self, info, **kwargs):
@@ -777,14 +779,14 @@ class CommBase(CisClass):
         if self.single_use and self._used:
             raise RuntimeError("This comm is single use and it was already used.")
         if self.is_closed:
-            self.debug('.recv(): comm closed.')
+            self.debug('Comm closed')
             return (False, None)
         try:
             flag, s_msg = self.recv_multipart(*args, **kwargs)
             if flag and len(s_msg) > 0:
-                self.debug('.recv(): %d bytes received', len(s_msg))
+                self.debug('%d bytes received', len(s_msg))
         except Exception:
-            self.exception('.recv(): Failed to recv.')
+            self.exception('Failed to recv.')
             return (False, None)
         if flag:
             flag, msg = self.on_recv(s_msg, *args, **kwargs)
@@ -811,7 +813,7 @@ class CommBase(CisClass):
         flag, info = self.recv_header(*args, **kwargs)
         if not flag or info['size'] == 0:
             if not flag:
-                self.debug(".recv_multipart(): Failed to receive message header.")
+                self.debug("Failed to receive message header.")
             return flag, info['body']
         self._last_header = info
         if len(info['body']) == int(info['size']):

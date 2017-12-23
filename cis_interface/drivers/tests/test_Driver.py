@@ -202,6 +202,7 @@ class TestDriverNoStart(TestParam):
         self.instance.display(1)
         self.instance.info(1)
         self.instance.debug(1)
+        self.instance.verbose_debug(1)
         self.instance.critical(1)
         self.instance.warn(1)
         self.instance.error(1)

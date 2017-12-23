@@ -17,9 +17,7 @@ def is_ipc_installed():
         bool: True if the IPC libraries are installed, False otherwise.
 
     """
-    if platform._is_linux or platform._is_osx:
-        return True
-    return False
+    return (platform._is_linux or platform._is_osx)
 
 
 def is_zmq_installed():
@@ -128,6 +126,8 @@ class CisClass(object):
         extra_kwargs (dict): Keyword arguments that were not parsed.
         sched_out (obj): Output from the last scheduled task with output.
         logger (logging.Logger): Logger object for this object.
+        suppress_special_debug (bool): If True, special_debug log messages
+            are suppressed.
 
     """
     def __init__(self, name, workingDir=None, timeout=60.0, sleeptime=0.01,
@@ -145,6 +145,7 @@ class CisClass(object):
         self.errors = []
         self.extra_kwargs = kwargs
         self.sched_out = None
+        self.suppress_special_debug = False
         self.logger = logging.getLogger(self.__module__)
 
     def printStatus(self):
@@ -313,6 +314,20 @@ class CisClass(object):
         if not isinstance(fmt_str, str):
             fmt_str = str(fmt_str)
         self.logger.debug(self.logger_prefix + fmt_str, *args)
+
+    def special_debug(self, fmt_str='', *args):
+        r"""Log a debug message that is prepended with the class and name, but
+        only if self.suppress_special_debug is not True.
+
+        Args:
+            fmt_str (str, optional): Format string.
+            \*args: Additional arguments are formated using the format string.
+
+        """
+        if not self.suppress_special_debug:
+            if not isinstance(fmt_str, str):
+                fmt_str = str(fmt_str)
+            self.logger.debug(self.logger_prefix + fmt_str, *args)
 
     def verbose_debug(self, fmt_str='', *args):
         r"""Log a verbose debug message that is prepended with the class and name.

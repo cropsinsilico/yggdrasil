@@ -60,6 +60,12 @@ class TestFileComm(parent.TestCommBase):
         nt.assert_equal(msg_recv, self.send_instance.eof_msg)
         assert(self.recv_instance.is_closed)
 
+    def test_recv_nomsg(self):
+        r"""Test recieve when there is no waiting message."""
+        flag, msg_recv = self.recv_instance.recv(timeout=self.sleeptime)
+        assert(not flag)
+        nt.assert_equal(msg_recv, self.recv_instance.eof_msg)
+
 
 class TestFileComm_readline(TestFileComm):
     r"""Test for FileComm communication class with read_meth = 'readline'."""

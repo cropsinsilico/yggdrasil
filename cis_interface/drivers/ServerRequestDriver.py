@@ -161,7 +161,7 @@ class ServerRequestDriver(ConnectionDriver):
             self.debug("Starting new ServerResponseDriver at: %s" %
                        self.response_address)
             with self.lock:
-                if (not self.is_comm_open) or self._block_response:
+                if (not self.is_comm_open) or self._block_response:  # pragma: debug
                     self.debug("Comm closed, not creating response driver.")
                     return False
                 drv_args = [self.response_address]

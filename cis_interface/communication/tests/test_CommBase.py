@@ -259,6 +259,15 @@ class TestCommBase(CisTest, IOInfo):
         nt.assert_equal(self.send_instance.n_msg, 0)
         nt.assert_equal(self.recv_instance.n_msg, 0)
 
+    def test_recv_nomsg(self):
+        r"""Test recieve when there is no waiting message."""
+        flag, msg_recv = self.recv_instance.recv(timeout=self.sleeptime)
+        if self.comm == 'CommBase':
+            assert(not flag)
+        else:
+            assert(flag)
+        assert(not msg_recv)
+
     def test_send_recv(self):
         r"""Test send/recv of a small message."""
         self.do_send_recv()

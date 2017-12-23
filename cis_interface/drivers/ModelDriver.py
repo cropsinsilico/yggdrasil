@@ -124,7 +124,7 @@ class ModelDriver(Driver):
                 break
             try:  # with self.lock:
                 line = self.process.stdout.readline()
-            except BaseException:
+            except BaseException:  # pragma: debug
                 break
             if len(line) == 0:
                 break

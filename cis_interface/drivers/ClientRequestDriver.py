@@ -170,7 +170,7 @@ class ClientRequestDriver(ConnectionDriver):
         # Start response driver
         if self.model_response_address != CIS_CLIENT_EOF:
             with self.lock:
-                if (not self.is_comm_open) or self._block_response:
+                if (not self.is_comm_open) or self._block_response:  # pragma: debug
                     return False
                 drv_args = [self.model_response_address]
                 drv_kwargs = dict(comm=self.comm, msg_id=self.request_id)

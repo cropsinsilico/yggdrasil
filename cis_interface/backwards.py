@@ -33,9 +33,9 @@ else:
 
 def scanf_bytes(fmt, bytes_line):
     r"""Extract parameters from a bytes object using scanf."""
-    if PY2:
+    if PY2:  # pragma: Python 2
         out_byt = scanf(fmt, bytes_line)
-    else:
+    else:  # pragma: Python 3
         out_uni = scanf(bytes2unicode(fmt), bytes2unicode(bytes_line))
         out_byt = out_uni
         # if out_uni is None:

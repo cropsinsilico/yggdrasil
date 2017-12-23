@@ -169,7 +169,7 @@ class ServerComm(CommBase.CommBase):
         #     self.debug("recv(): Connection closed.")
         #     return (False, None)
         flag, msg = self.icomm.recv(*args, **kwargs)
-        if flag:
+        if flag and msg:
             self.create_response_comm()
         return flag, msg
 

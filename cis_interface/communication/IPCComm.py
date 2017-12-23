@@ -179,14 +179,14 @@ class IPCComm(CommBase.CommBase):
             if not self._bound:
                 self.bind()
             self.open_after_bind()
-            self.debug(": qid %s", self.q.key)
+            self.debug("qid: %s", self.q.key)
             
     def close(self):
         r"""Close the connection."""
         if self._bound and not self.is_open:
             try:
                 self.open_after_bind()
-            except sysv_ipc.ExistentialError:
+            except sysv_ipc.ExistentialError:  # pragma: debug
                 self.q = None
                 self._bound = False
         if self.is_open:
@@ -209,7 +209,7 @@ class IPCComm(CommBase.CommBase):
         if self.is_open:
             try:
                 return self.q.current_messages
-            except sysv_ipc.ExistentialError:
+            except sysv_ipc.ExistentialError:  # pragma: debug
                 self.close()
                 return 0
         else:
@@ -230,6 +230,7 @@ class IPCComm(CommBase.CommBase):
         try:
             self.q.send(payload)
         except OSError:  # pragma: debug
+            # self.debug("Send failed")
             self.close()
             return False
         return True
@@ -251,19 +252,19 @@ class IPCComm(CommBase.CommBase):
             timeout = self.recv_timeout
         Tout = self.start_timeout(timeout)
         while self.n_msg == 0 and self.is_open and (not Tout.is_out):
-            # self.debug("recv(): no data, sleep")
+            # self.debug("No data, sleeping")
             self.sleep()
         self.stop_timeout()
         # Return False if the queue is closed
-        if self.is_closed:
-            self.debug("recv(): queue closed, returning (False, '')")
+        if self.is_closed:  # pragma: debug
+            self.debug("Queue closed")
             return (False, backwards.unicode2bytes(''))
         # Return True, '' if there are no messages
         if self.n_msg == 0:
-            self.verbose_debug("recv(): no data, returning (True, '')")
+            self.verbose_debug("No data")
             return (True, backwards.unicode2bytes(''))
         # Receive message
-        self.debug(".recv(): message ready, read it")
+        self.debug("Message ready, reading it.")
         try:
             data, _ = self.q.receive()  # ignore ident
         except sysv_ipc.ExistentialError:  # pragma: debug

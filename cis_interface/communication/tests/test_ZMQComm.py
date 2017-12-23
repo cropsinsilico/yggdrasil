@@ -2,16 +2,29 @@ import nose.tools as nt
 import zmq
 from cis_interface.communication import new_comm
 from cis_interface.communication.tests import test_CommBase as parent
-from cis_interface.communication.ZMQComm import (
-    ZMQComm, get_socket_type_mate, _socket_type_pairs)
+from cis_interface.communication import ZMQComm
 
 
 def test_get_socket_type_mate():
     r"""Test socket type matching."""
-    for s, r in _socket_type_pairs:
-        nt.assert_equal(get_socket_type_mate(s), r)
-        nt.assert_equal(get_socket_type_mate(r), s)
-    nt.assert_raises(ValueError, get_socket_type_mate, 'INVALID')
+    for s, r in ZMQComm._socket_type_pairs:
+        nt.assert_equal(ZMQComm.get_socket_type_mate(s), r)
+        nt.assert_equal(ZMQComm.get_socket_type_mate(r), s)
+    nt.assert_raises(ValueError, ZMQComm.get_socket_type_mate, 'INVALID')
+
+
+def test_format_address():
+    r"""Test format/parse of address."""
+    protocol = 'tcp'
+    host = '127.0.0.1'
+    port = 5555
+    address = ZMQComm.format_address(protocol, host, port)
+    result = ZMQComm.parse_address(address)
+    nt.assert_equal(result['protocol'], protocol)
+    nt.assert_equal(result['host'], host)
+    nt.assert_equal(result['port'], port)
+    nt.assert_raises(ValueError, ZMQComm.parse_address, 'INVALID')
+    nt.assert_raises(ValueError, ZMQComm.parse_address, 'INVALID://')
 
 
 def test_invalid_protocol():
@@ -22,12 +35,13 @@ def test_invalid_protocol():
 
 def test_error_on_send_open_twice():
     r"""Test creation of the same send socket twice for an error."""
-    for s, r in _socket_type_pairs:
+    for s, r in ZMQComm._socket_type_pairs:
         # Send comm
         name1 = 'test_%s' % s
         comm1 = new_comm(name1 + '_1', comm='ZMQComm', socket_type=s,
                          dont_open=True, socket_action='bind')
-        nt.assert_raises(zmq.ZMQError, ZMQComm, name1 + '_2', socket_type=s,
+        nt.assert_raises(zmq.ZMQError, ZMQComm.ZMQComm,
+                         name1 + '_2', socket_type=s,
                          address=comm1.opp_address, socket_action='bind')
         comm1.close()
 
@@ -51,9 +65,10 @@ class TestZMQComm(parent.TestCommBase):
     # @property
     # def inst_kwargs(self):
     #     r"""dict: Keyword arguments for tested class."""
-    #     args, kwargs = ZMQComm.new_comm_kwargs(self.name, protocol=self.protocol,
-    #                                            port=self.send_instance.port,
-    #                                            direction=out['direction'])
+    #     args, kwargs = ZMQComm.ZMQComm.new_comm_kwargs(
+    #         self.name, protocol=self.protocol,
+    #         port=self.send_instance.port,
+    #         direction=out['direction'])
     #     out = super(TestZMQComm, self).inst_kwargs
     #     out.update(**kwargs)
     #     return out
@@ -117,6 +132,11 @@ class TestZMQCommIPC(TestZMQComm):
     def test_send_recv_nolimit(self):
         r"""Disabled send/recv of large message."""
         pass
+    
+
+class TestZMQCommIPC_client(TestZMQComm_client, TestZMQCommIPC):
+    r"""Test for ZMQComm communication class with IPC socket."""
+    pass
     
 
 # Unsupported

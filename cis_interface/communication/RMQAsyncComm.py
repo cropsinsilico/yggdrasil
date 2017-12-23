@@ -59,7 +59,7 @@ class RMQAsyncComm(RMQComm):
             self.sleep()  # 0.5 # interval)
         self.stop_timeout()
         # Check that connection was established
-        if not self.thread.isAlive():
+        if not self.thread.isAlive():  # pragma: debug
             self._opening = False
             self.force_close()
             raise Exception("Connection ioloop could not be established.")

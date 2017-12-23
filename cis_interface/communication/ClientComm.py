@@ -215,10 +215,10 @@ class ClientComm(CommBase.CommBase):
         r"""Alias for RPCComm.call"""
         return self.call(*args, **kwargs)
     
-    def purge(self):
-        r"""Purge input and output comms."""
-        self.ocomm.purge()
-        # Unsure if client should purge all input comms...
-        # for k in self.icomm_order:
-        #     self.icomm[k].purge()
-        super(ClientComm, self).purge()
+    # def purge(self):
+    #     r"""Purge input and output comms."""
+    #     self.ocomm.purge()
+    #     # Unsure if client should purge all input comms...
+    #     # for k in self.icomm_order:
+    #     #     self.icomm[k].purge()
+    #     super(ClientComm, self).purge()

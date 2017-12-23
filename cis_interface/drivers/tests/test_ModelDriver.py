@@ -1,4 +1,12 @@
+import nose.tools as nt
+from cis_interface.drivers.ModelDriver import ModelDriver
 import cis_interface.drivers.tests.test_Driver as parent
+
+
+def test_error_valgrind_strace():
+    r"""Test error if both valgrind and strace set."""
+    nt.assert_raises(RuntimeError, ModelDriver, 'test', 'test',
+                     with_strace=True, with_valgrind=True)
 
 
 class TestModelParam(parent.TestParam):
@@ -23,3 +31,25 @@ class TestModelDriver(TestModelParam, parent.TestDriver):
     def run_before_stop(self):
         r"""Commands to run while the instance is running."""
         self.instance.wait()
+
+
+class TestModelDriver_valgrind(TestModelDriver):
+    r"""Test with valgrind."""
+
+    @property
+    def inst_kwargs(self):
+        r"""dict: Keyword arguments for creating a class instance."""
+        out = super(TestModelDriver_valgrind, self).inst_kwargs
+        out['with_valgrind'] = True
+        return out
+
+
+class TestModelDriver_strace(TestModelDriver):
+    r"""Test with strace."""
+
+    @property
+    def inst_kwargs(self):
+        r"""dict: Keyword arguments for creating a class instance."""
+        out = super(TestModelDriver_strace, self).inst_kwargs
+        out['with_strace'] = True
+        return out

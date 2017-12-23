@@ -295,13 +295,15 @@ class ConnectionDriver(Driver):
 
         """
         self.ocomm._first_send_done = True
-        flag = False
         T = self.start_timeout(self.timeout_send_1st)
+        flag = self._send_message(*args, **kwargs)
+        self.ocomm.suppress_special_debug = True
         while (not T.is_out) and (not flag) and self.ocomm.is_open:
             flag = self._send_message(*args, **kwargs)
             if not flag:
                 self.sleep()
         self.stop_timeout()
+        self.ocomm.suppress_special_debug = False
         self._first_send_done = True
         return flag
 
