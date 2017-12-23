@@ -62,7 +62,7 @@ class TestServerComm(test_CommBase.TestCommBase):
         flag = self.recv_instance.rpcSend(msg_recv)
         assert(flag)
         T = self.recv_instance.start_timeout()
-        while (not T.is_out) and (self.send_instance.sched_out is None):
+        while (not T.is_out) and (self.send_instance.sched_out is None):  # pragma: debug
             self.recv_instance.sleep()
         self.recv_instance.stop_timeout()
         flag, msg_recv = self.send_instance.sched_out
@@ -79,7 +79,7 @@ class TestServerComm(test_CommBase.TestCommBase):
         flag = self.send_instance.rpcSend(self.msg_short)
         assert(flag)
         T = self.recv_instance.start_timeout()
-        while (not T.is_out) and (self.recv_instance.sched_out is None):
+        while (not T.is_out) and (self.recv_instance.sched_out is None):  # pragma: debug
             self.recv_instance.sleep()
         self.recv_instance.stop_timeout()
         flag, msg_recv = self.recv_instance.sched_out
@@ -102,13 +102,18 @@ class TestServerComm(test_CommBase.TestCommBase):
         flag = self.recv_instance.send_nolimit(msg_recv)
         assert(flag)
         T = self.recv_instance.start_timeout()
-        while (not T.is_out) and (self.send_instance.sched_out is None):
+        while (not T.is_out) and (self.send_instance.sched_out is None):  # pragma: debug
             self.recv_instance.sleep()
         self.recv_instance.stop_timeout()
         flag, msg_recv = self.send_instance.sched_out
         assert(flag)
         nt.assert_equal(msg_recv, self.msg_long)
 
+    def test_maxMsgSize(self):
+        r"""Print maxMsgSize."""
+        super(TestServerComm, self).test_maxMsgSize()
+        self.send_instance.debug('maxMsgSize: %d', self.send_instance.maxMsgSize)
+        
     # # This dosn't work for comms that are uni-directional
     # def test_purge_recv(self):
     #     r"""Test purging messages from the client comm."""
