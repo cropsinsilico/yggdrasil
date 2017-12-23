@@ -26,6 +26,11 @@ class TestCommParam(parent.TestParam, IOInfo):
         self._extra_instances = []
 
     @property
+    def maxMsgSize(self):
+        r"""int: Maximum message size."""
+        return self.instance.maxMsgSize
+
+    @property
     def is_input(self):
         r"""bool: True if the driver is for input, False otherwise."""
         return ('Input' in self.driver)
