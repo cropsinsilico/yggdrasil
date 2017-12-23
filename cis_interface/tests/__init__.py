@@ -73,7 +73,7 @@ class CisTest(unittest.TestCase):
         self.attr_list = list()
         self._inst_args = list()
         self._inst_kwargs = dict()
-        self.timeout = 1.0
+        self.timeout = 5.0
         self.sleeptime = 0.01
         self._teardown_complete = False
         super(CisTest, self).__init__(*args, **kwargs)
