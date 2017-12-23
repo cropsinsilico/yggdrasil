@@ -220,7 +220,7 @@ class ZMQProxy(threading.Thread, CisClass):
             if self._running:
                 return self.cli_socket.recv_multipart()
             else:  # pragma: debug
-                return None
+                None
 
     def server_send(self, msg):
         r"""Send single message to the server."""
@@ -255,9 +255,10 @@ class ZMQProxy(threading.Thread, CisClass):
                 if self.poll():
                     message = self.client_recv()
                     # print('fowarding', message)
-                    self.debug('Forwarding message of size %d from %s',
-                               len(message[1]), message[0])
-                    self.server_send(message[1])
+                    if message is not None:
+                        self.debug('Forwarding message of size %d from %s',
+                                   len(message[1]), message[0])
+                        self.server_send(message[1])
                     # For multipart
                     # self.server_send(message)
             # This version does fowarding in a black box
