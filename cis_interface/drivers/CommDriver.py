@@ -36,6 +36,11 @@ class CommDriver(Driver):
         self.debug(".env: %s", self.env)
 
     @property
+    def maxMsgSize(self):
+        r"""int: Maximum message size."""
+        return self.comm.maxMsgSize
+
+    @property
     def is_valid(self):
         r"""bool: Returns True if the connection is open and the parent class
         is valid."""
