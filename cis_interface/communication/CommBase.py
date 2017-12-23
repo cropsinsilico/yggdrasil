@@ -472,7 +472,7 @@ class CommBase(CisClass):
         T = self.start_timeout()
         flag = self._send(*args, **kwargs)
         self.suppress_special_debug = True
-        while (not T.is_out) and (self.is_open):
+        while (not T.is_out) and (self.is_open) and (not flag):
             # print('send 1st', self.name, self.__class__, self.is_open)
             flag = self._send(*args, **kwargs)
             if flag or (self.is_closed):
