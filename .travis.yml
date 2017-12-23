@@ -10,6 +10,7 @@ env:
     NUMPY=numpy
     MATPLOTLIB=matplotlib
     MPLBACKEND=agg
+    INSTALLZMQ=1
 
 services:
   - rabbitmq
@@ -17,7 +18,7 @@ services:
 matrix:
   include:
     - python: 2.7
-      env: NUMPY=numpy==1.10.4 MATPLOTLIB=matplotlib==1.5.3
+      env: NUMPY=numpy==1.10.4 MATPLOTLIB=matplotlib==1.5.3 INSTALLZMQ=0
     - python: 2.7
     - python: 3.4
     - python: 3.5
@@ -44,7 +45,9 @@ before_install:
        brew install ccache
        export PATH=/usr/local/opt/ccache/libexec:$PATH
     fi
-    sh ci/install-czmq.sh
+    if [[ $INSTALLZMQ == 1]]; then
+        sh ci/install-czmq.sh
+    fi
 
 install:
   - |
