@@ -45,8 +45,8 @@ before_install:
        brew install ccache
        export PATH=/usr/local/opt/ccache/libexec:$PATH
     fi
-    if [[ $INSTALLZMQ == '1']]; then
-        sh ci/install-czmq.sh
+    if [[ $INSTALLZMQ == '1' ]]; then
+       sh ci/install-czmq.sh
     fi
 
 install:
