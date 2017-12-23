@@ -201,7 +201,7 @@ class TestCommDriver(TestCommParam, parent.TestDriver):
         if self.comm_name != 'CommBase':
             assert(flag)
             T = self.instance.start_timeout()
-            while (not T.is_out) and (recv_mech.n_msg == 0):
+            while (not T.is_out) and (recv_mech.n_msg == 0):  # pragma: debug
                 self.instance.sleep()
             self.instance.stop_timeout()
             nt.assert_equal(recv_mech.n_msg, 1)

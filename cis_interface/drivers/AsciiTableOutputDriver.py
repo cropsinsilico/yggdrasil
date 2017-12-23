@@ -61,8 +61,8 @@ class AsciiTableOutputDriver(AsciiFileOutputDriver):
         r"""Receive format string and then write it to the file."""
         super(AsciiTableOutputDriver, self).before_loop()
         fmt = self.recv_message(timeout=self.timeout_recv_format)
-        if not fmt:
-            if self.is_comm_open:  # pragma: debug
+        if not fmt:  # pragma: debug
+            if self.is_comm_open:
                 raise RuntimeError('Did not receive format string')
             else:
                 return
