@@ -400,7 +400,7 @@ class CisRunner(CisClass):
             self.debug("Loading model drivers")
             for driver in self.modeldrivers.values():
                 self.createModelDriver(driver)
-        except BaseException:
+        except BaseException:  # pragma: debug
             self.error("%s could not be created.", driver['name'])
             self.terminate()
             raise
@@ -416,7 +416,7 @@ class CisRunner(CisClass):
                 self.debug("Starting driver %s", driver['name'])
                 d = driver['instance']
                 d.start()
-        except BaseException:
+        except BaseException:  # pragma: debug
             self.error("%s did not start", driver['name'])
             self.terminate()
             raise

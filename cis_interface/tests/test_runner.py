@@ -1,5 +1,6 @@
 import os
 import nose.tools as nt
+import signal
 from cis_interface import runner
 from cis_interface.tests import yamls as sc_yamls
 from cis_interface.examples import yamls as ex_yamls
@@ -15,6 +16,16 @@ def test_runner_error():
     r"""Start a runner for a model with an error."""
     cr = runner.get_runner([sc_yamls['error']])
     cr.run()
+
+    
+def test_runner_interrupt():
+    r"""Start a runner then stop it with a keyboard interrupt."""
+    cr = runner.get_runner([ex_yamls['hello']['python']])
+    cr.loadDrivers()
+    cr.startDrivers()
+    cr.set_signal_handler()
+    os.kill(os.getpid(), signal.SIGINT)
+    os.kill(os.getpid(), signal.SIGINT)
     
     
 def test_runner_terminate():
