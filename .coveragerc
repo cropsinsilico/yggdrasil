@@ -8,7 +8,7 @@ omit =
     */unittest2/*
     cis_interface/tests/scripts/python_model.py
     cis_interface/command_line.py
-    cis_interface/interface/scanf.py
+    cis_interface/scanf.py
 
 [report]
 sort = Cover
