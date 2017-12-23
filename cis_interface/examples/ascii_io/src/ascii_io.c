@@ -25,7 +25,7 @@ int main(int argc,char *argv[]){
   // Read lines from ASCII text file until end of file is reached.
   // As each line is received, it is then sent to the output ASCII file.
   printf("ascii_io(C): Receiving/sending ASCII file.\n");
-  char *line;
+  char *line = (char*)malloc(LINE_SIZE_MAX);
   ret = 0;
   while (ret >= 0) {
     // Receive a single line
@@ -44,8 +44,7 @@ int main(int argc,char *argv[]){
       printf("End of file input (C)\n");
     }
   }
-  psi_free(&FileInput);
-  psi_free(&FileOutput);
+  if (line) free(line);
 
   // Read rows from ASCII table until end of file is reached.
   // As each row is received, it is then sent to the output ASCII table
@@ -75,8 +74,6 @@ int main(int argc,char *argv[]){
       printf("End of table input (C)\n");
     }
   }
-  psi_free(&TableInput);
-  psi_free(&TableOutput);
 
   // Read entire array from ASCII table into columns that are dynamically
   // allocated. The returned values tells us the number of elements in the
@@ -106,11 +103,8 @@ int main(int argc,char *argv[]){
     if (ret != 0)
       printf("ascii_io(C): ERROR SENDING ARRAY\n");
   }
-  psi_free(&ArrayInput);
-  psi_free(&ArrayOutput);
   
   // Free dynamically allocated columns
-  if (line) free(line);
   if (name_arr) free(name_arr);
   if (number_arr) free(number_arr);
   if (value_arr) free(value_arr);
