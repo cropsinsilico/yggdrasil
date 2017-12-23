@@ -59,8 +59,7 @@ class TestCommBase(CisTest, IOInfo):
     @property
     def maxMsgSize(self):
         r"""int: Maximum message size."""
-        return max(self.instance.maxMsgSize,
-                   super(TestCommBase, self).maxMsgSize)
+        return self.instance.maxMsgSize
 
     @property
     def comm_count(self):
