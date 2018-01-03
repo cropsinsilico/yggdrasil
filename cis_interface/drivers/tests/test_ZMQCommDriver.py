@@ -1,5 +1,4 @@
 import unittest
-import nose.tools as nt
 from cis_interface.tools import is_zmq_installed
 from cis_interface.drivers.tests import test_CommDriver as parent
 
