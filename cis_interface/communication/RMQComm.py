@@ -1,6 +1,4 @@
 import pika
-# import socket
-from cis_interface import backwards
 from cis_interface.communication import CommBase
 from cis_interface.config import cis_cfg
 

@@ -1,5 +1,4 @@
 import uuid
-from cis_interface import backwards
 from cis_interface.communication import (
     CommBase, new_comm, get_comm, get_comm_class)
 
