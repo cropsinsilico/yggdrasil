@@ -427,6 +427,7 @@ class CisRunner(CisClass):
         join the thread and perform exits for associated IO drivers."""
         self.debug()
         running = [d for d in self.modeldrivers.values()]
+        dead = []
         while (len(running) > 0) and (not self.error_flag):
             for drv in running:
                 d = drv['instance']
@@ -440,6 +441,13 @@ class CisRunner(CisClass):
                     running.remove(drv)
                 else:
                     self.info('%s still running', drv['name'])
+            dead = []
+            for drv in self.all_drivers:
+                d = drv['instance']
+                d.join(0.1)
+                if not d.is_alive():
+                    dead.append(drv['name'])
+            print("Dead drivers: ", dead)
         for d in self.modeldrivers.values():
             if d['instance'].errors:
                 self.error_flag = True
