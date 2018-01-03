@@ -1,4 +1,6 @@
 import nose.tools as nt
+import uuid
+from cis_interface.communication import new_comm
 from cis_interface.communication.tests import test_CommBase
 
 
@@ -29,28 +31,17 @@ class TestServerComm(test_CommBase.TestCommBase):
     def test_work_comm(self):
         r"""Disabled: Test creating/removing a work comm."""
         pass
-        
-    def test_eof(self):
-        r"""Test send/recv of EOF message."""
-        # Forwards
-        flag = self.send_instance.send_eof()
-        assert(flag)
-        flag, msg_recv = self.recv_instance.recv()
-        assert(not flag)
-        nt.assert_equal(msg_recv, self.send_instance.eof_msg)
-        # Assert
-        # assert(self.recv_instance.is_closed)
 
-    def test_eof_nolimit(self):
-        r"""Test send/recv of EOF message through nolimit."""
+    def test_newcomm_server(self):
+        r"""Test creation of server using newcomm."""
+        inst = new_comm('testserver_%s' % str(uuid.uuid4()), comm=self.comm)
+        self.remove_instance(inst)
+        
+    def test_eof_no_close(self):
+        r"""Test send/recv of EOF message with no close."""
         # Forwards
-        flag = self.send_instance.send_nolimit_eof()
-        assert(flag)
-        flag, msg_recv = self.recv_instance.recv_nolimit()
-        assert(not flag)
-        nt.assert_equal(msg_recv, self.send_instance.eof_msg)
-        # Assert
-        # assert(self.recv_instance.is_closed)
+        self.recv_instance.icomm.close_on_eof_recv = False
+        self.do_send_recv(send_meth='send_eof', close_on_recv_eof=False)
 
     def test_call(self):
         r"""Test RPC call."""
@@ -109,11 +100,6 @@ class TestServerComm(test_CommBase.TestCommBase):
         assert(flag)
         nt.assert_equal(msg_recv, self.msg_long)
 
-    def test_maxMsgSize(self):
-        r"""Print maxMsgSize."""
-        super(TestServerComm, self).test_maxMsgSize()
-        self.send_instance.debug('maxMsgSize: %d', self.send_instance.maxMsgSize)
-        
     # # This dosn't work for comms that are uni-directional
     # def test_purge_recv(self):
     #     r"""Test purging messages from the client comm."""

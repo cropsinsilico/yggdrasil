@@ -1,4 +1,5 @@
 import os
+import copy
 from cis_interface import backwards
 from cis_interface.communication import CommBase, get_comm, get_comm_class
 
@@ -12,22 +13,28 @@ class RPCComm(CommBase.CommBase):
     Args:
         name (str): The environment variable where communication address is
             stored.
+        address (str, optional): Communication info. Default to None and
+            address is taken from the environment variable.
+        comm (str, optional): The comm type for input and output comms. This is
+            overridden by 'comm' in icomm_kwargs or ocomm_kwargs. Defaults to
+            None. If this is the RPCComm class, it will be ignored.
         icomm_kwargs (dict, optional): Keyword arguments for the input comm.
             Defaults to empty dict.
         ocomm_kwargs (dict, optional): Keyword arguments for the output comm.
             Defaults to empty dict.
-        reverse_names (bool, optional): If True, the suffixes added to
-            to name to create icomm_name and ocomm_name are reversed.
+        dont_open (bool, optional): If True, the connection will not be opened.
             Defaults to False.
-        **kwargs: Additional keywords arguments are passed to parent class.
+        **kwargs: Additional keywords arguments are passed to parent class as
+            well as the input and output comms.
 
     Attributes:
         icomm (Comm): Input comm.
         ocomm (Comm): Output comm.
 
     """
-    def __init__(self, name, icomm_kwargs=None, ocomm_kwargs=None,
-                 dont_open=False, reverse_names=False, **kwargs):
+    def __init__(self, name, address=None, comm=None,
+                 icomm_kwargs=None, ocomm_kwargs=None,
+                 dont_open=False, **kwargs):
         if icomm_kwargs is None:
             icomm_kwargs = dict()
         if ocomm_kwargs is None:
@@ -38,25 +45,35 @@ class RPCComm(CommBase.CommBase):
         ocomm_kwargs['direction'] = 'send'
         icomm_kwargs['dont_open'] = True
         ocomm_kwargs['dont_open'] = True
-        icomm_kwargs['reverse_names'] = reverse_names
-        ocomm_kwargs['reverse_names'] = reverse_names
+        if comm not in [None, self.comm_class]:
+            icomm_kwargs.setdefault('comm', comm)
+            ocomm_kwargs.setdefault('comm', comm)
+            comm = self.comm_class
+        # Combine kwargs and icomm/ocomm specific ones
+        ikwargs = copy.deepcopy(kwargs)
+        okwargs = copy.deepcopy(kwargs)
+        ikwargs.update(**icomm_kwargs)
+        okwargs.update(**ocomm_kwargs)
         kwargs['no_suffix'] = True
-        if name in os.environ or 'address' in kwargs:
-            super(RPCComm, self).__init__(name, dont_open=True, **kwargs)
-            icomm_kwargs.setdefault(
+        if (name in os.environ) or (address is not None):
+            super(RPCComm, self).__init__(name, address=address, comm=comm,
+                                          dont_open=True, **kwargs)
+            ikwargs.setdefault(
                 'address', self.address.split(_rpc_address_split)[0])
-            ocomm_kwargs.setdefault(
+            okwargs.setdefault(
                 'address', self.address.split(_rpc_address_split)[1])
-            self._setup_comms(icomm_name, icomm_kwargs,
-                              ocomm_name, ocomm_kwargs)
+            self._setup_comms(icomm_name, ikwargs,
+                              ocomm_name, okwargs)
         else:
-            self._setup_comms(icomm_name, icomm_kwargs,
-                              ocomm_name, ocomm_kwargs)
-            kwargs.setdefault('address', _rpc_address_split.join(
-                [self.icomm.address, self.ocomm.address]))
+            self._setup_comms(icomm_name, ikwargs,
+                              ocomm_name, okwargs)
+            if address is None:
+                address = _rpc_address_split.join(
+                    [self.icomm.address, self.ocomm.address])
             # Close before raising the error
             try:
-                super(RPCComm, self).__init__(name, dont_open=True, **kwargs)
+                super(RPCComm, self).__init__(name, address=address, comm=comm,
+                                              dont_open=True, **kwargs)
             except BaseException as e:
                 self.close(skip_base=True)
                 raise e
@@ -71,9 +88,14 @@ class RPCComm(CommBase.CommBase):
         try:
             self.icomm = get_comm(icomm_name, **icomm_kwargs)
             self.ocomm = get_comm(ocomm_name, **ocomm_kwargs)
-        except BaseException as e:
+        except BaseException:
             self.close(skip_base=True)
-            raise e
+            raise
+
+    @classmethod
+    def is_installed(cls):
+        r"""bool: Is the comm installed."""
+        return get_comm_class().is_installed()
 
     @property
     def maxMsgSize(self):
@@ -86,14 +108,17 @@ class RPCComm(CommBase.CommBase):
         return get_comm_class().comm_count()
 
     @classmethod
-    def new_comm_kwargs(cls, name, icomm_name=None, ocomm_name=None,
+    def new_comm_kwargs(cls, name, address=None,
+                        icomm_name=None, ocomm_name=None,
                         icomm_comm=None, ocomm_comm=None,
-                        icomm_kwargs=None, ocomm_kwargs=None,
-                        reverse_names=False, **kwargs):
+                        icomm_kwargs=None, ocomm_kwargs=None, **kwargs):
         r"""Initialize communication with new comms.
 
         Args:
             name (str): Name for new comm.
+            address (str, optional): Communication info. Default to None and
+                address is taken from combination of input/output comm addresses
+                that are provided or generated.
             icomm_name (str, optional): Name for new input comm. Defaults to
                 name + '_IN'. This will be overriden if 'name' is in
                 icomm_kwargs.
@@ -110,9 +135,6 @@ class RPCComm(CommBase.CommBase):
                 new_comm_kwargs class method.
             ocomm_kwargs (dict, optional): Keyword arguments for the ocomm_comm
                 new_comm_kwargs class method.
-            reverse_names (bool, optional): If True, the suffixes added to
-                to name to create icomm_name and ocomm_name are reversed.
-                Defaults to False.
 
         """
         args = [name]
@@ -132,11 +154,11 @@ class RPCComm(CommBase.CommBase):
         ocomm_class = get_comm_class(ocomm_comm)
         icomm_kwargs['direction'] = 'recv'
         ocomm_kwargs['direction'] = 'send'
-        icomm_kwargs['reverse_names'] = reverse_names
-        ocomm_kwargs['reverse_names'] = reverse_names
-        ikwargs = dict(**icomm_kwargs)
-        okwargs = dict(**ocomm_kwargs)
-        if 'address' not in kwargs:
+        ikwargs = copy.deepcopy(kwargs)
+        okwargs = copy.deepcopy(kwargs)
+        ikwargs.update(**icomm_kwargs)
+        okwargs.update(**ocomm_kwargs)
+        if address is None:
             if 'address' not in icomm_kwargs:
                 iargs, ikwargs = icomm_class.new_comm_kwargs(icomm_name,
                                                              **icomm_kwargs)
@@ -144,7 +166,8 @@ class RPCComm(CommBase.CommBase):
                 oargs, okwargs = ocomm_class.new_comm_kwargs(ocomm_name,
                                                              **ocomm_kwargs)
         else:
-            ikwargs['address'], okwargs['address'] = kwargs['address'].split(
+            kwargs['address'] = address
+            ikwargs['address'], okwargs['address'] = address.split(
                 _rpc_address_split)
         ikwargs['name'] = icomm_name
         okwargs['name'] = ocomm_name
@@ -210,10 +233,10 @@ class RPCComm(CommBase.CommBase):
         r"""bool: True if the connection is open."""
         return self.icomm.is_open and self.ocomm.is_open
 
-    @property
-    def is_closed(self):
-        r"""bool: True if the connection is closed."""
-        return self.icomm.is_closed and self.ocomm.is_closed
+    # @property
+    # def is_closed(self):
+    #     r"""bool: True if the connection is closed."""
+    #     return self.icomm.is_closed and self.ocomm.is_closed
 
     @property
     def n_msg(self):

@@ -20,7 +20,8 @@ class TestCommBase(CisTest, IOInfo):
         self.comm = 'CommBase'
         self.attr_list += ['name', 'address', 'direction', 'format_str',
                            'meth_deserialize', 'meth_serialize', 'recv_timeout',
-                           'close_on_eof_recv', 'opp_address', 'opp_comms']
+                           'close_on_eof_recv', 'opp_address', 'opp_comms',
+                           'maxMsgSize']
 
     @property
     def name(self):
@@ -106,6 +107,11 @@ class TestCommBase(CisTest, IOInfo):
         # x.stop_timeout()
         nt.assert_equal(self.comm_count, self.nprev_comm)
 
+    # def create_instance(self):
+    #     r"""Create a new instance of the class."""
+    #     inst = new_comm(*self.inst_args, **self.inst_kwargs)
+    #     return inst
+
     def remove_instance(self, inst):
         r"""Remove an instance."""
         inst.close()
@@ -123,7 +129,9 @@ class TestCommBase(CisTest, IOInfo):
 
     def test_maxMsgSize(self):
         r"""Print maxMsgSize."""
-        self.instance.debug('maxMsgSize: %d', self.maxMsgSize)
+        self.instance.debug('maxMsgSize: %d, %d, %d', self.maxMsgSize,
+                            self.send_instance.maxMsgSize,
+                            self.recv_instance.maxMsgSize)
 
     def test_error_name(self):
         r"""Test error on missing address."""
@@ -167,8 +175,10 @@ class TestCommBase(CisTest, IOInfo):
     def test_attributes(self):
         r"""Assert that the instance has all of the required attributes."""
         for a in self.attr_list:
-            if not hasattr(self.instance, a):  # pragma: debug
-                raise AttributeError("Driver does not have attribute %s" % a)
+            if not hasattr(self.send_instance, a):  # pragma: debug
+                raise AttributeError("Send comm does not have attribute %s" % a)
+            if not hasattr(self.recv_instance, a):  # pragma: debug
+                raise AttributeError("Recv comm does not have attribute %s" % a)
 
     def test_invalid_direction(self):
         r"""Check that error raised for invalid direction."""
@@ -214,46 +224,24 @@ class TestCommBase(CisTest, IOInfo):
         # Create work comm that should be cleaned up on teardown
         self.instance.get_header(self.test_msg)
 
-    def test_eof(self):
-        r"""Test send/recv of EOF message."""
-        if self.comm != 'CommBase':
-            flag = self.send_instance.send_eof()
-            assert(flag)
-            flag, msg_recv = self.recv_instance.recv(timeout=self.timeout)
-            assert(not flag)
-            nt.assert_equal(msg_recv, self.send_instance.eof_msg)
-            assert(self.recv_instance.is_closed)
-
-    def test_eof_no_close(self):
-        r"""Test send/recv of EOF message with no close."""
-        if self.comm != 'CommBase':
-            self.recv_instance.close_on_eof_recv = False
-            flag = self.send_instance.send_eof()
-            assert(flag)
-            flag, msg_recv = self.recv_instance.recv(timeout=self.timeout)
-            assert(flag)
-            nt.assert_equal(msg_recv, self.send_instance.eof_msg)
-            assert(not self.recv_instance.is_closed)
-
-    def test_eof_nolimit(self):
-        r"""Test send/recv of EOF message through nolimit."""
-        if self.comm != 'CommBase':
-            flag = self.send_instance.send_nolimit_eof()
-            assert(flag)
-            flag, msg_recv = self.recv_instance.recv_nolimit(timeout=self.timeout)
-            assert(not flag)
-            nt.assert_equal(msg_recv, self.send_instance.eof_msg)
-            assert(self.recv_instance.is_closed)
-
     def do_send_recv(self, send_meth='send', recv_meth='recv', msg_send=None,
-                     reverse_comms=False, send_kwargs=None, recv_kwargs=None):
+                     reverse_comms=False, send_kwargs=None, recv_kwargs=None,
+                     close_on_send_eof=False, close_on_recv_eof=True):
         r"""Generic send/recv of a message."""
+        is_eof = ('eof' in send_meth)
         if msg_send is None:
-            msg_send = self.test_msg
+            if is_eof:
+                msg_send = self.send_instance.eof_msg
+            else:
+                msg_send = self.test_msg
         if send_kwargs is None:
             send_kwargs = dict()
         if recv_kwargs is None:
             recv_kwargs = dict()
+        if is_eof:
+            send_args = tuple()
+        else:
+            send_args = (msg_send,)
         nt.assert_equal(self.send_instance.n_msg, 0)
         nt.assert_equal(self.recv_instance.n_msg, 0)
         if reverse_comms:
@@ -262,27 +250,37 @@ class TestCommBase(CisTest, IOInfo):
         else:
             send_instance = self.send_instance
             recv_instance = self.recv_instance
+        recv_instance.close_on_eof_recv = close_on_recv_eof
         fsend_meth = getattr(send_instance, send_meth)
         frecv_meth = getattr(recv_instance, recv_meth)
         if self.comm == 'CommBase':
-            flag = fsend_meth(msg_send, **send_kwargs)
+            flag = fsend_meth(*send_args, **send_kwargs)
             assert(not flag)
             flag, msg_recv = frecv_meth(**recv_kwargs)
             assert(not flag)
             nt.assert_raises(NotImplementedError, self.recv_instance._send, self.test_msg)
             nt.assert_raises(NotImplementedError, self.recv_instance._recv)
         else:
-            flag = fsend_meth(msg_send, **send_kwargs)
-            assert(flag)
-            T = recv_instance.start_timeout()
-            while (not T.is_out) and (recv_instance.n_msg == 0):  # pragma: debug
-                recv_instance.sleep()
-            recv_instance.stop_timeout()
-            assert(recv_instance.n_msg >= 1)
-            # IPC nolimit sends multiple messages
-            # nt.assert_equal(recv_instance.n_msg, 1)
+            flag = fsend_meth(*send_args, **send_kwargs)
+            if is_eof and close_on_send_eof:
+                assert(not flag)
+                assert(send_instance.is_closed)
+            else:
+                assert(flag)
+            if not is_eof:
+                T = recv_instance.start_timeout()
+                while (not T.is_out) and (recv_instance.n_msg == 0):  # pragma: debug
+                    recv_instance.sleep()
+                recv_instance.stop_timeout()
+                assert(recv_instance.n_msg >= 1)
+                # IPC nolimit sends multiple messages
+                # nt.assert_equal(recv_instance.n_msg, 1)
             flag, msg_recv = frecv_meth(timeout=self.timeout, **recv_kwargs)
-            assert(flag)
+            if is_eof and close_on_recv_eof:
+                assert(not flag)
+                assert(recv_instance.is_closed)
+            else:
+                assert(flag)
             nt.assert_equal(msg_recv, msg_send)
         nt.assert_equal(self.send_instance.n_msg, 0)
         nt.assert_equal(self.recv_instance.n_msg, 0)
@@ -317,6 +315,18 @@ class TestCommBase(CisTest, IOInfo):
     def test_send_recv_array(self):
         r"""Test send/recv of a array message."""
         self.do_send_recv('send_array', 'recv_array')
+
+    def test_eof(self):
+        r"""Test send/recv of EOF message."""
+        self.do_send_recv(send_meth='send_eof')
+
+    def test_eof_no_close(self):
+        r"""Test send/recv of EOF message with no close."""
+        self.do_send_recv(send_meth='send_eof', close_on_recv_eof=False)
+
+    def test_eof_nolimit(self):
+        r"""Test send/recv of EOF message through nolimit."""
+        self.do_send_recv(send_meth='send_nolimit_eof')
 
     def test_purge(self):
         r"""Test purging messages from the comm."""

@@ -60,6 +60,8 @@ class CommBase(CisClass):
             Defaults to False.
         is_response_server (bool, optional): If True, the comm is a server-side
             response comm. Defaults to False.
+        comm (str, optional): The comm that should be created. This only serves
+            as a check that the correct class is being created. Defaults to None.
         **kwargs: Additional keywords arguments are passed to parent class.
 
     Attributes:
@@ -102,7 +104,9 @@ class CommBase(CisClass):
                  single_use=False, reverse_names=False, no_suffix=False,
                  is_client=False, is_response_client=False,
                  is_server=False, is_response_server=False,
-                 **kwargs):
+                 comm=None, **kwargs):
+        if comm is not None:
+            assert(comm == self.comm_class)
         super(CommBase, self).__init__(name, **kwargs)
         if not self.__class__.is_installed():
             raise RuntimeError("Comm class %s not installed" % self.__class__)

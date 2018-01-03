@@ -1,3 +1,4 @@
+import numpy as np
 from cis_interface.communication.tests import test_AsciiFileComm as parent
 
 
@@ -45,3 +46,9 @@ class TestAsciiTableComm_AsArray(TestAsciiTableComm):
     def msg_long(self):
         r"""str: Always use file bytes as message."""
         return self.file_bytes
+
+    @property
+    def double_msg(self):
+        r"""str: Message that should result from writing two test messages."""
+        darr = np.hstack([self.file_array, self.file_array])
+        return self.to_bytes(darr)

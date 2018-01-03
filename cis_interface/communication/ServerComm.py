@@ -11,8 +11,6 @@ class ServerComm(CommBase.CommBase):
             request comm. Defaults to None.
         response_kwargs (dict, optional): Keyword arguments for the response
             comm. Defaults to empty dict.
-        reverse_names (bool, optional): If True, the suffix added to
-            name to create icomm_name are reversed. Defaults to False.
         **kwargs: Additional keywords arguments are passed to the input comm.
 
     Attributes:
@@ -22,13 +20,12 @@ class ServerComm(CommBase.CommBase):
 
     """
     def __init__(self, name, request_comm=None, response_kwargs=None,
-                 dont_open=False, reverse_names=False, **kwargs):
+                 dont_open=False, **kwargs):
         if response_kwargs is None:
             response_kwargs = dict()
         icomm_name = name
         icomm_kwargs = kwargs
         icomm_kwargs['direction'] = 'recv'
-        icomm_kwargs['reverse_names'] = reverse_names
         icomm_kwargs['dont_open'] = True
         icomm_kwargs['comm'] = request_comm
         self.response_kwargs = response_kwargs
@@ -40,6 +37,11 @@ class ServerComm(CommBase.CommBase):
                                          recv_timeout=self.icomm.recv_timeout,
                                          direction='recv', no_suffix=True,
                                          address=self.icomm.address)
+
+    @classmethod
+    def is_installed(cls):
+        r"""bool: Is the comm installed."""
+        return get_comm_class().is_installed()
 
     @property
     def maxMsgSize(self):

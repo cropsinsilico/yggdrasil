@@ -24,36 +24,26 @@ class TestRPCComm(test_CommBase.TestCommBase):
     def test_eof(self):
         r"""Test send/recv of EOF message."""
         # Forwards
-        flag = self.send_instance.send(self.send_instance.eof_msg)
-        assert(flag)
-        flag, msg_recv = self.recv_instance.recv()
-        assert(not flag)
-        nt.assert_equal(msg_recv, self.send_instance.eof_msg)
+        self.do_send_recv(send_meth='send_eof')
         # Backwards
-        flag = self.recv_instance.send(self.recv_instance.eof_msg)
-        assert(flag)
-        flag, msg_recv = self.send_instance.recv()
-        assert(not flag)
-        nt.assert_equal(msg_recv, self.recv_instance.eof_msg)
-        # Assert
-        # assert(self.recv_instance.is_closed)
+        self.do_send_recv(send_meth='send_eof', reverse_comms=True)
+
+    def test_eof_no_close(self):
+        r"""Test send/recv of EOF message with no close."""
+        # Forwards
+        self.recv_instance.icomm.close_on_eof_recv = False
+        self.do_send_recv(send_meth='send_eof', close_on_recv_eof=False)
+        # Backwards
+        self.send_instance.icomm.close_on_eof_recv = False
+        self.do_send_recv(send_meth='send_eof', close_on_recv_eof=False,
+                          reverse_comms=True)
 
     def test_eof_nolimit(self):
         r"""Test send/recv of EOF message through nolimit."""
         # Forwards
-        flag = self.send_instance.send_nolimit(self.send_instance.eof_msg)
-        assert(flag)
-        flag, msg_recv = self.recv_instance.recv_nolimit()
-        assert(not flag)
-        nt.assert_equal(msg_recv, self.send_instance.eof_msg)
+        self.do_send_recv(send_meth='send_nolimit_eof')
         # Backwards
-        flag = self.recv_instance.send_nolimit(self.recv_instance.eof_msg)
-        assert(flag)
-        flag, msg_recv = self.send_instance.recv_nolimit()
-        assert(not flag)
-        nt.assert_equal(msg_recv, self.recv_instance.eof_msg)
-        # Assert
-        # assert(self.recv_instance.is_closed)
+        self.do_send_recv(send_meth='send_nolimit_eof', reverse_comms=True)
 
     def test_call(self):
         r"""Test RPC call."""
