@@ -10,6 +10,50 @@ _registered_connections = {}
 _rmq_param_sep = '_RMQPARAM_'
 
 
+def check_rmq_server(url=None, **kwargs):
+    r"""Check that connection to a RabbitMQ server is possible.
+
+    Args:
+        url (str, optional): Address of RMQ server that includes all the
+            necessary information. If this is provided, the remaining arguments
+            are ignored. Defaults to None and the connection parameters are
+            taken from the other arguments.
+        username (str, optional): RMQ server username. Defaults to config value.
+        password (str, optional): RMQ server password. Defaults to config value.
+        host (str, optional): RMQ hostname or IP Address to connect to. Defaults
+            to config value.
+        port (str, optional): RMQ server TCP port to connect to. Defaults to
+            config value.
+        vhost (str, optional): RMQ virtual host to use. Defaults to config value.
+
+    Returns:
+        bool: True if connection to RabbitMQ server is possible, False
+            otherwise.
+
+    """
+    if url is not None:
+        parameters = pika.URLParameters(url)
+    else:
+        username = kwargs.get('username', cis_cfg.get('rmq', 'user', 'guest'))
+        password = kwargs.get('password', cis_cfg.get('rmq', 'password', 'guest'))
+        host = kwargs.get('host', cis_cfg.get('rmq', 'host', 'localhost'))
+        port = kwargs.get('port', cis_cfg.get('rmq', 'port', '5672'))
+        vhost = kwargs.get('vhost', cis_cfg.get('rmq', 'vhost', '/'))
+        credentials = pika.PlainCredentials(username, password)
+        parameters = pika.ConnectionParameters(host=host, port=port,
+                                               virtual_host=vhost,
+                                               credentials=credentials)
+    # Try to establish connection
+    try:
+        connection = pika.BlockingConnection(parameters)
+        if not connection.is_open:
+            return False
+        connection.close()
+    except BaseException:
+        return False
+    return True
+
+
 class RMQComm(CommBase.CommBase):
     r"""Class for handling basic RabbitMQ communications.
 
@@ -23,6 +67,9 @@ class RMQComm(CommBase.CommBase):
         connection (:class:`pika.Connection`): RabbitMQ connection.
         channel (:class:`pika.Channel`): RabbitMQ channel.
 
+    Raises:
+        RuntimeError: If a connection cannot be established.
+
     """
     def __init__(self, name, dont_open=False, **kwargs):
         super(RMQComm, self).__init__(name, dont_open=True, **kwargs)
@@ -30,6 +77,9 @@ class RMQComm(CommBase.CommBase):
         self.channel = None
         self._is_open = False
         self._bound = False
+        # Check that connection is possible
+        if not check_rmq_server(self.url):
+            raise RuntimeError("Could not connect to RabbitMQ server.")
         # Reserve port by binding
         if not dont_open:
             self.open()
@@ -358,7 +408,7 @@ class RMQComm(CommBase.CommBase):
                 self.channel.basic_ack(method_frame.delivery_tag)
             else:
                 self.debug(".recv(): No message")
-                msg = backwards.unicode2bytes('')
+                msg = self.empty_msg
         except pika.exceptions.AMQPError:  # pragma: debug
             self.exception(".recv(): Error")
             raise

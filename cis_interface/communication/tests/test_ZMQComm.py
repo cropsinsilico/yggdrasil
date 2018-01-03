@@ -1,10 +1,13 @@
+import unittest
 import nose.tools as nt
 import zmq
+from cis_interface.tools import is_zmq_installed
 from cis_interface.communication import new_comm
 from cis_interface.communication.tests import test_CommBase as parent
 from cis_interface.communication import ZMQComm
 
 
+@unittest.skipIf(not is_zmq_installed(), "ZMQ library not installed")
 def test_get_socket_type_mate():
     r"""Test socket type matching."""
     for s, r in ZMQComm._socket_type_pairs:
@@ -13,6 +16,7 @@ def test_get_socket_type_mate():
     nt.assert_raises(ValueError, ZMQComm.get_socket_type_mate, 'INVALID')
 
 
+@unittest.skipIf(not is_zmq_installed(), "ZMQ library not installed")
 def test_format_address():
     r"""Test format/parse of address."""
     protocol = 'tcp'
@@ -27,12 +31,14 @@ def test_format_address():
     nt.assert_raises(ValueError, ZMQComm.parse_address, 'INVALID://')
 
 
+@unittest.skipIf(not is_zmq_installed(), "ZMQ library not installed")
 def test_invalid_protocol():
     r"""Test raise of an error in the event of an invalid protocol."""
     nt.assert_raises(ValueError, new_comm, 'test_invalid_protocol',
                      comm='ZMQComm', protocol='invalid')
 
 
+@unittest.skipIf(not is_zmq_installed(), "ZMQ library not installed")
 def test_error_on_send_open_twice():
     r"""Test creation of the same send socket twice for an error."""
     for s, r in ZMQComm._socket_type_pairs:
@@ -46,6 +52,7 @@ def test_error_on_send_open_twice():
         comm1.close()
 
         
+@unittest.skipIf(not is_zmq_installed(), "ZMQ library not installed")
 class TestZMQComm(parent.TestCommBase):
     r"""Test for ZMQComm communication class."""
     def __init__(self, *args, **kwargs):
@@ -233,3 +240,10 @@ class TestZMQCommROUTER(TestZMQComm):
     def test_send_recv_nolimit(self):
         r"""Disabled send/recv of large message."""
         pass
+
+
+@unittest.skipIf(is_zmq_installed(), "ZMQ library installed")
+def test_not_running():
+    r"""Test raise of an error if a ZMQ library is not installed."""
+    comm_kwargs = dict(comm='ZMQComm', direction='send', reverse_names=True)
+    nt.assert_raises(RuntimeError, new_comm, 'test', **comm_kwargs)

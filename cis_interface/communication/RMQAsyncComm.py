@@ -210,7 +210,7 @@ class RMQAsyncComm(RMQComm):
             return (False, None)
         if self.n_msg == 0:
             # self.debug(".recv(): No buffered messages.")
-            return (True, backwards.unicode2bytes(''))
+            return (True, self.empty_msg)
 
     def on_message(self, ch, method, props, body):
         r"""Buffer received messages."""

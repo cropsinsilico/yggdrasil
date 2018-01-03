@@ -1,8 +1,12 @@
+import unittest
 import nose.tools as nt
+from cis_interface.tools import is_ipc_installed
+from cis_interface.communication import new_comm
 from cis_interface.communication import IPCComm
 from cis_interface.communication.tests import test_CommBase as parent
 
 
+@unittest.skipIf(not is_ipc_installed(), "IPC library not installed")
 def test_queue():
     r"""Test creation/removal of queue."""
     mq = IPCComm.get_queue()
@@ -15,21 +19,25 @@ def test_queue():
     assert(key not in IPCComm._registered_queues)
 
 
+@unittest.skipIf(not is_ipc_installed(), "IPC library not installed")
 def test_ipcs():
     r"""Test list of ipc objects."""
     IPCComm.ipcs()
 
     
+@unittest.skipIf(not is_ipc_installed(), "IPC library not installed")
 def test_ipc_queues():
     r"""Test list of ipc queues."""
     IPCComm.ipc_queues()
 
 
+@unittest.skipIf(not is_ipc_installed(), "IPC library not installed")
 def test_ipcrm():
     r"""Test removal of ipc objects."""
     IPCComm.ipcrm()
 
 
+@unittest.skipIf(not is_ipc_installed(), "IPC library not installed")
 def test_ipcrm_queues():
     r"""Test removal of ipc queues."""
     IPCComm.ipcrm_queues()
@@ -40,9 +48,17 @@ def test_ipcrm_queues():
     assert(len(IPCComm.ipc_queues()) == 0)
 
     
+@unittest.skipIf(not is_ipc_installed(), "IPC library not installed")
 class TestIPCComm(parent.TestCommBase):
     r"""Test for IPCComm communication class."""
     def __init__(self, *args, **kwargs):
         super(TestIPCComm, self).__init__(*args, **kwargs)
         self.comm = 'IPCComm'
         self.attr_list += ['q']
+
+
+@unittest.skipIf(is_ipc_installed(), "IPC library installed")
+def test_not_running():
+    r"""Test raise of an error if a IPC library is not installed."""
+    comm_kwargs = dict(comm='IPCComm', direction='send', reverse_names=True)
+    nt.assert_raises(RuntimeError, new_comm, 'test', **comm_kwargs)

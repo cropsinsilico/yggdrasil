@@ -4,7 +4,7 @@ import threading
 # import multiprocessing
 from cis_interface import backwards
 from cis_interface.communication import CommBase
-from cis_interface.tools import CisClass
+from cis_interface.tools import CisClass, is_zmq_installed
 
 
 _registered_sockets = dict()
@@ -377,6 +377,11 @@ class ZMQComm(CommBase.CommBase):
         else:
             self.bind()
 
+    @classmethod
+    def is_installed(cls):
+        r"""bool: Is the comm installed."""
+        return is_zmq_installed()
+
     @property
     def maxMsgSize(self):
         r"""int: Maximum size of a single message that should be sent."""
@@ -713,7 +718,7 @@ class ZMQComm(CommBase.CommBase):
 
     #     """
     #     data = backwards.unicode2bytes('CISHANDSHAKE')
-    #     nodata = backwards.unicode2bytes('')
+    #     nodata = self.empty_msg
     #     flag = self._send(data)
     #     if not flag:  # pragma: debug
     #         return False, nodata

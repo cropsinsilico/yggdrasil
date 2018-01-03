@@ -90,7 +90,8 @@ class CommBase(CisClass):
             comm.
 
     Raises:
-        Exception: If there is not an environment variable with the specified
+        RuntimeError: If the comm class is not installed.
+        RuntimeError: If there is not an environment variable with the specified
             name.
         ValueError: If directions is not 'send' or 'recv'.
 
@@ -103,6 +104,8 @@ class CommBase(CisClass):
                  is_server=False, is_response_server=False,
                  **kwargs):
         super(CommBase, self).__init__(name, **kwargs)
+        if not self.__class__.is_installed():
+            raise RuntimeError("Comm class %s not installed" % self.__class__)
         suffix = self.__class__._determine_suffix(
             no_suffix=no_suffix, reverse_names=reverse_names, direction=direction)
         self.name_base = name
@@ -110,7 +113,7 @@ class CommBase(CisClass):
         self.name = name + suffix
         if address is None:
             if self.name not in os.environ:
-                raise Exception('Cannot see %s in env.' % self.name)
+                raise RuntimeError('Cannot see %s in env.' % self.name)
             self.address = os.environ[self.name]
         else:
             self.address = address
@@ -152,6 +155,11 @@ class CommBase(CisClass):
                 suffix = '_IN'
         return suffix
     
+    @classmethod
+    def is_installed(cls):
+        r"""bool: Is the comm installed."""
+        return True
+
     @property
     def maxMsgSize(self):
         r"""int: Maximum size of a single message that should be sent."""
@@ -488,7 +496,7 @@ class CommBase(CisClass):
         self._first_send_done = True
         return flag
         
-    def _send(self, msg, *args, **kwargs):  # pragma: debug
+    def _send(self, msg, *args, **kwargs):
         r"""Raw send. Should be overridden by inheriting class."""
         raise NotImplementedError("_send method needs implemented.")
 
@@ -559,7 +567,7 @@ class CommBase(CisClass):
         """
         if self.is_closed:
             self.debug('Comm closed')
-            return False, backwards.unicode2bytes('')
+            return False, self.empty_msg
         if len(msg) == 1:
             msg = msg[0]
         if isinstance(msg, backwards.bytes_type) and msg == self.eof_msg:
@@ -684,7 +692,7 @@ class CommBase(CisClass):
         return self.send_eof(*args, **kwargs)
 
     # RECV METHODS
-    def _recv(self, *args, **kwargs):  # pragma: debug
+    def _recv(self, *args, **kwargs):
         r"""Raw recv. Should be overridden by inheriting class."""
         raise NotImplementedError("_recv method needs implemented.")
 
@@ -701,7 +709,7 @@ class CommBase(CisClass):
                 and the complete message received.
 
         """
-        data = backwards.unicode2bytes('')
+        data = self.empty_msg
         ret = True
         while len(data) < leng_exp:
             payload = self._recv(**kwargs)

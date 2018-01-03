@@ -1,6 +1,6 @@
 import sysv_ipc
 from subprocess import Popen, PIPE
-from cis_interface import tools
+from cis_interface.tools import CIS_MSG_MAX, is_ipc_installed
 from cis_interface.communication import CommBase
 
 
@@ -19,7 +19,7 @@ def get_queue(qid=None):
 
     """
     global _registered_queues
-    kwargs = dict(max_message_size=tools.CIS_MSG_MAX)
+    kwargs = dict(max_message_size=CIS_MSG_MAX)
     if qid is None:
         kwargs['flags'] = sysv_ipc.IPC_CREX
     mq = sysv_ipc.MessageQueue(qid, **kwargs)
@@ -145,6 +145,11 @@ class IPCComm(CommBase.CommBase):
             self.bind()
         else:
             self.open()
+
+    @classmethod
+    def is_installed(cls):
+        r"""bool: Is the comm installed."""
+        return is_ipc_installed()
 
     @property
     def maxMsgSize(self):

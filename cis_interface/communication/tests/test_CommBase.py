@@ -1,5 +1,6 @@
-import nose.tools as nt
 import os
+import uuid
+import nose.tools as nt
 # from cis_interface.tools import CisClass
 from cis_interface.tests import CisTest, IOInfo
 from cis_interface.communication import new_comm, get_comm_class
@@ -19,7 +20,7 @@ class TestCommBase(CisTest, IOInfo):
         self.comm = 'CommBase'
         self.attr_list += ['name', 'address', 'direction', 'format_str',
                            'meth_deserialize', 'meth_serialize', 'recv_timeout',
-                           'close_on_eof_recv']
+                           'close_on_eof_recv', 'opp_address', 'opp_comms']
 
     @property
     def name(self):
@@ -35,6 +36,11 @@ class TestCommBase(CisTest, IOInfo):
     def mod(self):
         r"""str: Absolute module import."""
         return 'cis_interface.communication.%s' % self.cls
+
+    @property
+    def is_installed(self):
+        r"""bool: Is the communication class installed."""
+        return self.import_cls.is_installed()
 
     @property
     def send_inst_kwargs(self):
@@ -119,6 +125,10 @@ class TestCommBase(CisTest, IOInfo):
         r"""Print maxMsgSize."""
         self.instance.debug('maxMsgSize: %d', self.maxMsgSize)
 
+    def test_error_name(self):
+        r"""Test error on missing address."""
+        nt.assert_raises(RuntimeError, self.import_cls, 'test%s' % uuid.uuid4())
+
     def test_error_send(self):
         r"""Test error on send."""
         inst = self.get_fresh_error_instance()
@@ -201,21 +211,34 @@ class TestCommBase(CisTest, IOInfo):
             nt.assert_raises(RuntimeError, wc_recv.recv)
         self.instance.remove_work_comm(header_send['id'])
         self.instance.remove_work_comm(header_recv['id'])
+        # Create work comm that should be cleaned up on teardown
+        self.instance.get_header(self.test_msg)
 
     def test_eof(self):
         r"""Test send/recv of EOF message."""
         if self.comm != 'CommBase':
-            flag = self.send_instance.send(self.send_instance.eof_msg)
+            flag = self.send_instance.send_eof()
             assert(flag)
             flag, msg_recv = self.recv_instance.recv(timeout=self.timeout)
             assert(not flag)
             nt.assert_equal(msg_recv, self.send_instance.eof_msg)
             assert(self.recv_instance.is_closed)
 
+    def test_eof_no_close(self):
+        r"""Test send/recv of EOF message with no close."""
+        if self.comm != 'CommBase':
+            self.recv_instance.close_on_eof_recv = False
+            flag = self.send_instance.send_eof()
+            assert(flag)
+            flag, msg_recv = self.recv_instance.recv(timeout=self.timeout)
+            assert(flag)
+            nt.assert_equal(msg_recv, self.send_instance.eof_msg)
+            assert(not self.recv_instance.is_closed)
+
     def test_eof_nolimit(self):
         r"""Test send/recv of EOF message through nolimit."""
         if self.comm != 'CommBase':
-            flag = self.send_instance.send_nolimit(self.send_instance.eof_msg)
+            flag = self.send_instance.send_nolimit_eof()
             assert(flag)
             flag, msg_recv = self.recv_instance.recv_nolimit(timeout=self.timeout)
             assert(not flag)
@@ -246,6 +269,8 @@ class TestCommBase(CisTest, IOInfo):
             assert(not flag)
             flag, msg_recv = frecv_meth(**recv_kwargs)
             assert(not flag)
+            nt.assert_raises(NotImplementedError, self.recv_instance._send, self.test_msg)
+            nt.assert_raises(NotImplementedError, self.recv_instance._recv)
         else:
             flag = fsend_meth(msg_send, **send_kwargs)
             assert(flag)

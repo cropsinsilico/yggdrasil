@@ -79,7 +79,8 @@ class ModelDriver(Driver):
         self.valgrind_flags = valgrind_flags
         self.env_copy = ['LANG', 'PATH', 'USER']
         for k in self.env_copy:
-            self.env[k] = os.environ[k]
+            if k in os.environ:
+                self.env[k] = os.environ[k]
         # self.env.update(os.environ)
         # print(os.environ.keys())
 
