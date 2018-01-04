@@ -149,6 +149,7 @@ class IPCComm(CommBase.CommBase):
         self.backlog_recv = []
         self.backlog_send = []
         self.backlog_thread = threading.Thread(target=self.run_backlog)
+        self.backlog_thread.daemon = True
         if dont_open:
             self.bind()
         else:
