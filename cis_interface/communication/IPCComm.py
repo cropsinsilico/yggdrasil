@@ -1,6 +1,8 @@
+import sys
 import sysv_ipc
 import threading
 from subprocess import Popen, PIPE
+from cis_interface import platform
 from cis_interface.tools import CIS_MSG_MAX, is_ipc_installed
 from cis_interface.communication import CommBase
 
@@ -78,14 +80,34 @@ def ipc_queues():
 
     """
     skip_lines = [
+        # Linux
         '------ Message Queues --------',
         'key        msqid      owner      perms      used-bytes   messages    ',
-        '']
+        # OSX
+        'IPC status from',
+        'Message Queues:',
+        'T     ID     KEY        MODE       OWNER    GROUP']
     out = ipcs(['-q']).split('\n')
     qlist = []
     for l in out:
-        if l not in skip_lines:
-            qlist.append(l)
+        skip = False
+        if len(l) == 0:
+            skip = True
+        else:
+            for ls in skip_lines:
+                if ls in l:
+                    skip = True
+                    break
+        if not skip:
+            if platform._is_linux:
+                key_col = 0
+            elif platform._is_osx:
+                key_col = 2
+            else:  # pragma: debug
+                raise NotImplementedError("Unsure what column the queue key " +
+                                          "is in on this platform " +
+                                          "(%s)" % sys.platform)
+            qlist.append(l.split()[key_col])
     return qlist
 
 
@@ -118,7 +140,7 @@ def ipcrm_queues(queue_keys=None):
 
     """
     if queue_keys is None:
-        queue_keys = [l.split()[0] for l in ipc_queues()]
+        queue_keys = ipc_queues()
     if isinstance(queue_keys, str):
         queue_keys = [queue_keys]
     for q in queue_keys:
