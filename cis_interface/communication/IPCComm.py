@@ -136,20 +136,21 @@ class IPCComm(CommBase.CommBase):
         
     Attributes:
         q (:class:`sysv_ipc.MessageQueue`): Message queue.
-        backlog_recv (list): A list of messages that have been received.
-        backlog_send (list): A list of messages that should be sent.
         backlog_thread (threading.Thread): Thread that will handle sending
             or receiving backlogged messages.
+        backlog_lock (threading.RLock): Lock for handling access of backlogs
+            between threads.
         
     """
     def __init__(self, name, dont_open=False, **kwargs):
         super(IPCComm, self).__init__(name, dont_open=True, **kwargs)
         self.q = None
         self._bound = False
-        self.backlog_recv = []
-        self.backlog_send = []
+        self._backlog_recv = []
+        self._backlog_send = []
         self.backlog_thread = threading.Thread(target=self.run_backlog)
         self.backlog_thread.daemon = True
+        self.backlog_lock = threading.RLock()
         if dont_open:
             self.bind()
         else:
@@ -239,7 +240,7 @@ class IPCComm(CommBase.CommBase):
     def n_msg_backlogged(self):
         r"""int: Number of backlogged messages."""
         if self.is_open:
-            return len(self.backlog_recv) + len(self.backlog_send)
+            return len(self.backlog_recv)
         else:
             return 0
 
@@ -247,6 +248,64 @@ class IPCComm(CommBase.CommBase):
     def n_msg(self):
         r"""int: Number of messages in the queue and backlogged."""
         return self.n_msg_queued + self.n_msg_backlogged
+
+    @property
+    def backlog_recv(self):
+        r"""list: Messages that have been received."""
+        with self.backlog_lock:
+            return self._backlog_recv
+
+    @property
+    def backlog_send(self):
+        r"""list: Messages that should be sent."""
+        with self.backlog_lock:
+            return self._backlog_send
+
+    def add_backlog_recv(self, msg):
+        r"""Add a message to the backlog of received messages.
+
+        Args:
+            msg (str): Received message that should be backlogged.
+
+        """
+        with self.backlog_lock:
+            self.debug("Added %d bytes to recv backlog.", len(msg))
+            self._backlog_recv.append(msg)
+
+    def add_backlog_send(self, msg):
+        r"""Add a message to the backlog of messages to be sent.
+
+        Args:
+            msg (str): Message that should be backlogged for sending.
+
+        """
+        with self.backlog_lock:
+            self.debug("Added %d bytes to send backlog.", len(msg))
+            self._backlog_send.append(msg)
+
+    def pop_backlog_recv(self):
+        r"""Pop a message from the front of the recv backlog.
+
+        Returns:
+            str: First backlogged recv message.
+
+        """
+        with self.backlog_lock:
+            msg = self._backlog_recv.pop(0)
+            self.debug("Popped %d bytes from recv backlog.", len(msg))
+        return msg
+
+    def pop_backlog_send(self):
+        r"""Pop a message from the front of the send backlog.
+
+        Returns:
+            str: First backlogged send message.
+
+        """
+        with self.backlog_lock:
+            msg = self._backlog_send.pop(0)
+            self.debug("Popped %d bytes from send backlog.", len(msg))
+        return msg
 
     def run_backlog(self):
         r"""Continue checking for buffered messages to be sent/recveived."""
@@ -265,9 +324,9 @@ class IPCComm(CommBase.CommBase):
         try:
             flag = self._send(self.backlog_send[0], no_backlog=True)
             if flag:
-                self.backlog_send.pop(0)
+                self.pop_backlog_send()
         except sysv_ipc.BusyError:
-            pass
+            self.debug('Queue full, failed to send backlogged message.')
         return True
 
     def recv_backlog(self):
@@ -275,7 +334,8 @@ class IPCComm(CommBase.CommBase):
         backlog."""
         flag, data = self._recv(no_backlog=True)
         if flag and data:
-            self.backlog_recv.append(data)
+            self.add_backlog_recv(data)
+            self.debug('Backlogged received message.')
         return flag
 
     def _send(self, payload, no_backlog=False):
@@ -297,18 +357,20 @@ class IPCComm(CommBase.CommBase):
             return False
         try:
             if no_backlog or len(self.backlog_send) == 0:
+                self.debug('Sending %d bytes', len(payload))
                 self.q.send(payload, block=False)
             else:
                 raise sysv_ipc.BusyError(
-                    'Backlogged messages must be received first')
+                    'Backlogged messages must be sent first')
         except sysv_ipc.BusyError:
             if no_backlog:
+                self.debug('Could not send %d bytes', len(payload))
                 return False
             else:
-                self.backlog_send.append(payload)
+                self.add_backlog_send(payload)
                 self.debug('%d bytes backlogged', len(payload))
         except OSError:  # pragma: debug
-            # self.debug("Send failed")
+            self.debug("Send failed")
             self.close()
             return False
         return True
@@ -328,40 +390,53 @@ class IPCComm(CommBase.CommBase):
                 and the message received.
 
         """
-        # Sleep until there is a message
-        if timeout is None:
-            timeout = self.recv_timeout
-        if not no_backlog:
+        # If no backlog, receive from queue
+        if no_backlog:
+            # Return False if the queue is closed
+            if self.is_closed:  # pragma: debug
+                self.debug("Queue closed")
+                return (False, self.empty_msg)
+            # Return True, '' if there are no messages
+            if self.n_msg_queued == 0:
+                self.verbose_debug("No messages waiting.")
+                return (True, self.empty_msg)
+            # Receive message
+            self.debug("Message ready, reading it.")
+            try:
+                data, _ = self.q.receive()  # ignore ident
+                self.debug("Received %d bytes", len(data))
+            except sysv_ipc.ExistentialError:  # pragma: debug
+                self.debug("sysv_ipc.ExistentialError: closing")
+                self.close()
+                return (False, self.empty_msg)
+            return (True, data)
+        else:
+            # Sleep until there is a message
+            if timeout is None:
+                timeout = self.recv_timeout
             Tout = self.start_timeout(timeout)
-            while self.n_msg == 0 and self.is_open and (not Tout.is_out):
+            while self.n_msg_backlogged == 0 and self.is_open and (not Tout.is_out):
                 # self.debug("No data, sleeping")
                 self.sleep()
             self.stop_timeout()
-        # Return False if the queue is closed
-        if self.is_closed:  # pragma: debug
-            self.debug("Queue closed")
-            return (False, self.empty_msg)
-        # Return backlogged message
-        if (not no_backlog) and (len(self.backlog_recv) > 0):
-            self.debug('Returning backlogged message')
-            return (True, self.backlog_recv.pop(0))
-        # Return True, '' if there are no messages
-        if self.n_msg_queued == 0:
-            self.verbose_debug("No messages waiting.")
-            return (True, self.empty_msg)
-        # Receive message
-        self.debug("Message ready, reading it.")
-        try:
-            data, _ = self.q.receive()  # ignore ident
-        except sysv_ipc.ExistentialError:  # pragma: debug
-            self.close()
-            return (False, self.empty_msg)
-        return (True, data)
+            # Return False if the queue is closed
+            if self.is_closed:  # pragma: debug
+                self.debug("Queue closed")
+                return (False, self.empty_msg)
+            # Return True, '' if there are no messages
+            if self.n_msg_backlogged == 0:
+                self.verbose_debug("No messages waiting.")
+                return (True, self.empty_msg)
+            # Return backlogged message
+            # if len(self.backlog_recv) > 0:
+            self.debug('Returning backlogged received message')
+            return (True, self.pop_backlog_recv())
 
     def purge(self):
         r"""Purge all messages from the comm."""
-        self.backlog_recv = []
-        self.backlog_send = []
+        with self.backlog_lock:
+            self._backlog_recv = []
+            self._backlog_send = []
         while self.n_msg_queued > 0:
             _, _ = self.q.receive()
         super(IPCComm, self).purge()
