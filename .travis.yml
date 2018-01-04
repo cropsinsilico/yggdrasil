@@ -98,7 +98,7 @@ before_script:
 
 script:
   - |
-    nosetests --nologcapture --with-coverage --cover-package=cis_interface -sv cis_interface
+    nosetests --nologcapture --with-coverage --cover-package=cis_interface -svx
 
 after_success:
   - coveralls
