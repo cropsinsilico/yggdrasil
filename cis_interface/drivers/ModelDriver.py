@@ -6,7 +6,7 @@ import os
 import copy
 import subprocess
 from pprint import pformat
-from cis_interface import backwards
+from cis_interface import backwards, platform
 from cis_interface.drivers.Driver import Driver
 
 
@@ -27,9 +27,10 @@ class ModelDriver(Driver):
             is started. Defaults to False.
         client_of (str, list, optional): The names of ne or more servers that
             this model is a client of. Defaults to empty list.
-        with_strace (bool, optional): If True, the command is run with strace.
-            Defaults to False.
-        strace_flags (list, optional): Flags to pass to strace. Defaults to [].
+        with_strace (bool, optional): If True, the command is run with strace (on
+            Linux) or dtrace (on OSX). Defaults to False.
+        strace_flags (list, optional): Flags to pass to strace (or dtrace).
+            Defaults to [].
         with_valgrind (bool, optional): If True, the command is run with valgrind.
             Defaults to False.
         valgrind_flags (list, optional): Flags to pass to valgrind. Defaults to [].
@@ -43,8 +44,8 @@ class ModelDriver(Driver):
             started.
         client_of (list): The names of server models that this model is a
             client of.
-        with_strace (bool): If True, the command is run with strace.
-        strace_flags (list): Flags to pass to strace.
+        with_strace (bool): If True, the command is run with strace or dtrace.
+        strace_flags (list): Flags to pass to strace/dtrace.
         with_valgrind (bool): If True, the command is run with valgrind.
         valgrind_flags (list): Flags to pass to valgrind.
 
@@ -69,6 +70,8 @@ class ModelDriver(Driver):
         # Strace/valgrind
         if with_strace and with_valgrind:
             raise RuntimeError("Trying to run with strace and valgrind.")
+        if (with_strace or with_valgrind) and platform._is_win:
+            raise RuntimeError("strace/valgrind options invalid on windows.")
         self.with_strace = with_strace
         if strace_flags is None:
             strace_flags = []
@@ -105,7 +108,11 @@ class ModelDriver(Driver):
         r"""Actions to perform before the run loop."""
         pre_args = ['stdbuf', '-o0', '-e0']
         if self.with_strace:
-            pre_args += ['strace'] + self.strace_flags
+            if platform._is_linux:
+                pre_cmd = 'strace'
+            elif platform._is_osx:
+                pre_cmd = 'dtrace'
+            pre_args += [pre_cmd] + self.strace_flags
         elif self.with_valgrind:
             pre_args += ['valgrind'] + self.valgrind_flags
         env = copy.deepcopy(self.env)

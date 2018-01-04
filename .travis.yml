@@ -40,11 +40,13 @@ before_install:
        brew update
        brew install ccache
        export PATH=/usr/local/opt/ccache/libexec:$PATH
+       brew install valgrind
     else
        pip install --upgrade virtualenv
        python -m virtualenv venv
        source venv/bin/activate
        export PATH=/usr/lib/ccache:$PATH
+       sudo apt-get install strace valgrind
     fi
 
     # Install ZeroMQ
@@ -63,14 +65,14 @@ before_install:
        if [[ $TRAVIS_OS_NAME == 'osx' ]]; then
           sh ci/install-rmqserver-osx.sh
        else
-          sh ci/install-rmqserver-linux.sh
+          # sh ci/install-rmqserver-linux.sh
        fi
 
        echo Starting RabbitMQ...;
        if [[ $TRAVIS_OS_NAME == 'osx' ]]; then
           sh ci/start-rmqserver-osx.sh
        else
-          sh ci/start-rmqserver-linux.sh
+          # sh ci/start-rmqserver-linux.sh
        fi
        
     fi
