@@ -384,3 +384,16 @@ class Driver(Thread):
         else:
             error(self.logger_prefix + fmt_str, *args)
         self.errors.append((self.logger_prefix + fmt_str) % args)
+
+    def raise_error(self, e):
+        r"""Raise an exception, logging it first.
+
+        Args:
+            e (Exception): Exception to raise.
+
+        Raises:
+            The provided exception.
+
+        """
+        self.errors.append(repr(e))
+        raise e
