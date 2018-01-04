@@ -17,9 +17,6 @@ htmlcov
 tmp/
 
 # Temporary file copies
-*.dSYM/
-.#*
-\#*\#
 *~
 
 # Compiled things - not managed
