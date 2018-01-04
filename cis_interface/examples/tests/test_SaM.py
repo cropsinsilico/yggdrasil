@@ -1,5 +1,6 @@
 import os
 import nose.tools as nt
+import tempfile
 from cis_interface.examples.tests import TestExample
 from cis_interface.drivers.MatlabModelDriver import _matlab_installed
 
@@ -24,6 +25,11 @@ class TestExampleSaM(TestExample):
             s = 3
         return '%d' % s
 
+    @property
+    def output_file(self):
+        r"""Output file."""
+        return os.path.join(tempfile.gettempdir(), 'SaM_output.txt')
+    
     def check_result(self):
         r"""Assert that contents of input/output files are identical."""
         assert(os.path.isfile(self.output_file))

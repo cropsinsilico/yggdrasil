@@ -1,5 +1,6 @@
 import os
 import nose.tools as nt
+import tempfile
 from cis_interface.examples.tests import TestExample
 
 
@@ -14,6 +15,11 @@ class TestExampleHello(TestExample):
     def input_file(self):
         r"""Input file."""
         return os.path.join(self.yamldir, 'Input', 'input.txt')
+    
+    @property
+    def output_file(self):
+        r"""Output file."""
+        return os.path.join(tempfile.gettempdir(), 'output_hello.txt')
     
     def check_result(self):
         r"""Assert that contents of input/output files are identical."""
