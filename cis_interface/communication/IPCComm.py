@@ -247,7 +247,8 @@ class IPCComm(CommBase.CommBase):
     @property
     def n_msg(self):
         r"""int: Number of messages in the queue and backlogged."""
-        return self.n_msg_queued + self.n_msg_backlogged
+        return self.n_msg_backlogged
+        # return self.n_msg_queued + self.n_msg_backlogged
 
     @property
     def backlog_recv(self):
