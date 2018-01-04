@@ -2,7 +2,7 @@ import os
 import uuid
 import nose.tools as nt
 # from cis_interface.tools import CisClass
-from cis_interface.config import cis_cfg, cfg_logging
+# from cis_interface.config import cis_cfg, cfg_logging
 from cis_interface.tests import CisTest, IOInfo
 from cis_interface.communication import new_comm, get_comm_class
 
