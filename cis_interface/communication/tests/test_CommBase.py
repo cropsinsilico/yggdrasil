@@ -86,10 +86,10 @@ class TestCommBase(CisTest, IOInfo):
         
     def setup(self, *args, **kwargs):
         r"""Initialize comm object pair."""
-        cis_cfg.set('debug', 'psi', 'DEBUG')
-        cis_cfg.set('debug', 'rmq', 'INFO')
-        cis_cfg.set('debug', 'client', 'INFO')
-        cfg_logging()
+        # cis_cfg.set('debug', 'psi', 'DEBUG')
+        # cis_cfg.set('debug', 'rmq', 'INFO')
+        # cis_cfg.set('debug', 'client', 'INFO')
+        # cfg_logging()
         assert(self.is_installed)
         self.nprev_comm = self.comm_count
         self.send_instance = new_comm(self.name, **self.send_inst_kwargs)
