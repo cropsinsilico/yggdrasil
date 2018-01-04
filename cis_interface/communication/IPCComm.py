@@ -189,7 +189,6 @@ class IPCComm(CommBase.CommBase):
         r"""Open the connection by getting the queue from the bound address."""
         qid = int(self.address)
         self.q = get_queue(qid)
-        self.backlog_thread.start()
 
     def open(self):
         r"""Open the connection by connecting to the queue."""
@@ -198,6 +197,7 @@ class IPCComm(CommBase.CommBase):
             if not self._bound:
                 self.bind()
             self.open_after_bind()
+            self.backlog_thread.start()
             self.debug("qid: %s", self.q.key)
             
     def close(self):
