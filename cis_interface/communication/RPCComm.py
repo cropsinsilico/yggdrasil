@@ -15,9 +15,8 @@ class RPCComm(CommBase.CommBase):
             stored.
         address (str, optional): Communication info. Default to None and
             address is taken from the environment variable.
-        comm (str, optional): The comm type for input and output comms. This is
-            overridden by 'comm' in icomm_kwargs or ocomm_kwargs. Defaults to
-            None. If this is the RPCComm class, it will be ignored.
+        comm (str, optional): The comm that should be created. This only serves
+            as a check that the correct class is being created. Defaults to None.
         icomm_kwargs (dict, optional): Keyword arguments for the input comm.
             Defaults to empty dict.
         ocomm_kwargs (dict, optional): Keyword arguments for the output comm.
@@ -45,10 +44,10 @@ class RPCComm(CommBase.CommBase):
         ocomm_kwargs['direction'] = 'send'
         icomm_kwargs['dont_open'] = True
         ocomm_kwargs['dont_open'] = True
-        if comm not in [None, self.comm_class]:
-            icomm_kwargs.setdefault('comm', comm)
-            ocomm_kwargs.setdefault('comm', comm)
-            comm = self.comm_class
+        # if comm not in [None, self.comm_class]:
+        #     icomm_kwargs.setdefault('comm', comm)
+        #     ocomm_kwargs.setdefault('comm', comm)
+        #     comm = self.comm_class
         # Combine kwargs and icomm/ocomm specific ones
         ikwargs = copy.deepcopy(kwargs)
         okwargs = copy.deepcopy(kwargs)

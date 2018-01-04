@@ -44,7 +44,7 @@ def check_rmq_server(url=None, **kwargs):
     # Try to establish connection
     try:
         connection = pika.BlockingConnection(parameters)
-        if not connection.is_open:
+        if not connection.is_open:  # pragma: debug
             return False
         connection.close()
     except BaseException:

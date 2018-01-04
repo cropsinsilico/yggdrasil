@@ -24,15 +24,15 @@ matrix:
     - python: 3.4
     - python: 3.5
     - python: 3.6
-    # - os: osx
-    #   osx_image: xcode7.3
-    #   language: generic  # https://github.com/travis-ci/travis-ci/issues/2312
-    #   cache:
-    #      pip: false
-    #      directories:
-    #       - $HOME/Library/Caches/pip
-    #       # `cache` does not support `env`-like `global` so copy-paste from top
-    #       - $HOME/.ccache  # https://github.com/travis-ci/travis-ci/issues/5853
+    - os: osx
+      osx_image: xcode7.3
+      language: generic  # https://github.com/travis-ci/travis-ci/issues/2312
+      cache:
+         pip: false
+         directories:
+          - $HOME/Library/Caches/pip
+          # `cache` does not support `env`-like `global` so copy-paste from top
+          - $HOME/.ccache  # https://github.com/travis-ci/travis-ci/issues/5853
 
 before_install:
   - |
@@ -70,6 +70,7 @@ before_install:
 
        echo Starting RabbitMQ...;
        if [[ $TRAVIS_OS_NAME == 'osx' ]]; then
+          export PATH="${PATH}:/usr/local/sbin";
           sh ci/start-rmqserver-osx.sh
        else
           sh ci/start-rmqserver-linux.sh

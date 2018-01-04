@@ -85,6 +85,7 @@ class TestCommBase(CisTest, IOInfo):
         
     def setup(self, *args, **kwargs):
         r"""Initialize comm object pair."""
+        assert(self.is_installed)
         self.nprev_comm = self.comm_count
         self.send_instance = new_comm(self.name, **self.send_inst_kwargs)
         super(TestCommBase, self).setup(*args, **kwargs)
