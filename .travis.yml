@@ -11,6 +11,7 @@ env:
     MATPLOTLIB=matplotlib
     MPLBACKEND=agg
     INSTALLZMQ=1
+    INSTALLRMQ=1
 
 services:
   - rabbitmq
@@ -18,7 +19,7 @@ services:
 matrix:
   include:
     - python: 2.7
-      env: NUMPY=numpy==1.10.4 MATPLOTLIB=matplotlib==1.5.3 INSTALLZMQ=0
+      env: NUMPY=numpy==1.10.4 MATPLOTLIB=matplotlib==1.5.3 INSTALLZMQ=0 INSTALLRMQ=0
     - python: 2.7
     - python: 3.4
     - python: 3.5
@@ -35,18 +36,43 @@ matrix:
 
 before_install:
   - |
-    if [[ $TRAVIS_OS_NAME != 'osx' ]]; then
+    if [[ $TRAVIS_OS_NAME == 'osx' ]]; then
+       brew update
+       brew install ccache
+       export PATH=/usr/local/opt/ccache/libexec:$PATH
+    else
        pip install --upgrade virtualenv
        python -m virtualenv venv
        source venv/bin/activate
        export PATH=/usr/lib/ccache:$PATH
-    else
-       brew update
-       brew install ccache
-       export PATH=/usr/local/opt/ccache/libexec:$PATH
     fi
+
+    # Install ZeroMQ
     if [[ $INSTALLZMQ == '1' ]]; then
-       sh ci/install-czmq.sh
+       echo Installing ZeroMQ...;
+       if [[ $TRAVIS_OS_NAME == 'osx' ]]; then
+          sh ci/install-czmq-osx.sh
+       else
+          sh ci/install-czmq-linux.sh
+       fi
+    fi
+
+    # Install RabbitMQ & Start a server
+    if [[ $INSTALLRMQ == '1' ]]; then
+       echo Installing RabbitMQ...;
+       if [[ $TRAVIS_OS_NAME == 'osx' ]]; then
+          sh ci/install-rmqserver-osx.sh
+       else
+          sh ci/install-rmqserver-linux.sh
+       fi
+
+       echo Starting RabbitMQ...;
+       if [[ $TRAVIS_OS_NAME == 'osx' ]]; then
+          sh ci/start-rmqserver-osx.sh
+       else
+          sh ci/start-rmqserver-linux.sh
+       fi
+       
     fi
 
 install:
