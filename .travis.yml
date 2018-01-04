@@ -64,8 +64,7 @@ before_script:
     flake8 cis_interface
 
 script:
-  - |
-    nosetests --nologcapture --with-coverage --cover-package=cis_interface -sv cis_interface
+  - nosetests --nologcapture --with-coverage --cover-package=cis_interface -sv cis_interface
 
 after_success:
   - coveralls
