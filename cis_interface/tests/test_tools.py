@@ -1,6 +1,6 @@
 import os
 import nose.tools as nt
-from cis_interface import tools
+from cis_interface import tools, backwards
 
 
 def test_popen_nobuffer():
@@ -9,12 +9,12 @@ def test_popen_nobuffer():
     args = ['pwd']
     p = tools.popen_nobuffer(args)
     out, err = p.communicate()
-    nt.assert_equal(out, os.getcwd() + '\n')
+    nt.assert_equal(out, backwards.unicode2bytes(os.getcwd() + '\n'))
     # Test w/ shell
     args = 'pwd'
     p = tools.popen_nobuffer(args, shell=True)
     out, err = p.communicate()
-    nt.assert_equal(out, os.getcwd() + '\n')
+    nt.assert_equal(out, backwards.unicode2bytes(os.getcwd() + '\n'))
 
 
 def test_eval_kwarg():
