@@ -86,10 +86,10 @@ class CisTest(unittest.TestCase):
 
     def setup(self, *args, **kwargs):
         r"""Create an instance of the class."""
-        # cis_cfg.set('debug', 'psi', 'INFO')
+        # cis_cfg.set('debug', 'psi', 'DEBUG')
         # cis_cfg.set('debug', 'rmq', 'INFO')
         # cis_cfg.set('debug', 'client', 'INFO')
-        # cis_cfg.set('rmq', 'namespace', self.namespace)
+        # # cis_cfg.set('rmq', 'namespace', self.namespace)
         # cfg_logging()
         self._instance = self.create_instance()
 
