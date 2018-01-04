@@ -409,6 +409,11 @@ class IPCComm(CommBase.CommBase):
                 self.debug("sysv_ipc.ExistentialError: closing")
                 self.close()
                 return (False, self.empty_msg)
+            except AttributeError:  # pragma: debug
+                if self.is_closed:
+                    self.debug("Queue closed")
+                    return (False, self.empty_msg)
+                raise
             return (True, data)
         else:
             # Sleep until there is a message
