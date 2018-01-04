@@ -249,23 +249,25 @@ class IPCComm(CommBase.CommBase):
 
     def run_backlog(self):
         r"""Continue checking for buffered messages to be sent/recveived."""
-        while self.is_open:
+        flag = True
+        while self.is_open and flag:
             if self.direction == 'recv':
-                self.recv_backlog()
+                flag = self.recv_backlog()
             else:
-                self.send_backlog()
+                flag = self.send_backlog()
             self.sleep()
 
     def send_backlog(self):
         r"""Send a message from the send backlog to the queue."""
         if len(self.backlog_send) == 0:
-            return
+            return True
         try:
             flag = self._send(self.backlog_send[0], no_backlog=True)
             if flag:
                 self.backlog_send.pop(0)
         except sysv_ipc.BusyError:
             pass
+        return True
 
     def recv_backlog(self):
         r"""Check for any messages in the queue and add them to the recv
@@ -273,6 +275,7 @@ class IPCComm(CommBase.CommBase):
         flag, data = self._recv(no_backlog=True)
         if flag and data:
             self.backlog_recv.append(data)
+        return flag
 
     def _send(self, payload, no_backlog=False):
         r"""Send a message to the IPC queue.
