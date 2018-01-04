@@ -1,14 +1,45 @@
 """This modules offers various tools."""
-from subprocess import Popen, PIPE
+from subprocess import Popen, PIPE, STDOUT
+import sys
 import sysv_ipc
 import time
-from cis_interface import backwards
+from cis_interface import backwards, platform
 
 
 # OS X limit is 2kb
 PSI_MSG_MAX = 1024 * 2
 PSI_MSG_EOF = backwards.unicode2bytes("EOF!!!")
 _registered_queues = {}
+
+
+def popen_nobuffer(args, **kwargs):
+    r"""Uses Popen to open a process without a buffer. If not already set,
+    the keyword arguments 'bufsize', 'stdout', and 'stderr' are set to
+    0, subprocess.PIPE, and subprocess.STDOUT respectively. This sets the
+    output stream to unbuffered and directs both stdout and stderr to the
+    stdout pipe.
+
+    Args:
+        args (list, str): Shell command or list of arguments that should be
+            run.
+        **kwargs: Additional keywords arguments are passed to Popen.
+
+    Returns:
+        subprocess.Process: Process that was started.
+
+    """
+    # stdbuf only for linux
+    if platform._is_linux:
+        stdbuf_args = ['stdbuf', '-o0', '-e0']
+        if isinstance(args, str):
+            args = ' '.join(stdbuf_args + [args])
+        else:
+            args = stdbuf_args + args
+    kwargs.setdefault('bufsize', 0)
+    kwargs.setdefault('stdout', PIPE)
+    kwargs.setdefault('stderr', STDOUT)
+    out = Popen(args, **kwargs)
+    return out
 
 
 def eval_kwarg(x):
@@ -96,14 +127,34 @@ def ipc_queues():
 
     """
     skip_lines = [
+        # Linux
         '------ Message Queues --------',
         'key        msqid      owner      perms      used-bytes   messages    ',
-        '']
+        # OSX
+        'IPC status from',
+        'Message Queues:',
+        'T     ID     KEY        MODE       OWNER    GROUP']
     out = ipcs(['-q']).split('\n')
     qlist = []
     for l in out:
-        if l not in skip_lines:
-            qlist.append(l)
+        skip = False
+        if len(l) == 0:
+            skip = True
+        else:
+            for ls in skip_lines:
+                if ls in l:
+                    skip = True
+                    break
+        if not skip:
+            if platform._is_linux:
+                key_col = 0
+            elif platform._is_osx:
+                key_col = 2
+            else:  # pragma: debug
+                raise NotImplementedError("Unsure what column the queue key " +
+                                          "is in on this platform " +
+                                          "(%s)" % sys.platform)
+            qlist.append(l.split()[key_col])
     return qlist
 
 
@@ -122,7 +173,8 @@ def ipcrm(options=[]):
     if exit_code != 0:  # pragma: debug
         print(err.decode('utf-8'))
         raise Exception("Error on spawned process. See output.")
-    print(output.decode('utf-8'))
+    if output:
+        print(output.decode('utf-8'))
 
 
 def ipcrm_queues(queue_keys=None):
@@ -134,7 +186,7 @@ def ipcrm_queues(queue_keys=None):
 
     """
     if queue_keys is None:
-        queue_keys = [l.split()[0] for l in ipc_queues()]
+        queue_keys = ipc_queues()
     if isinstance(queue_keys, str):
         queue_keys = [queue_keys]
     for q in queue_keys:

@@ -1,5 +1,20 @@
+import os
 import nose.tools as nt
 from cis_interface import tools
+
+
+def test_popen_nobuffer():
+    r"""Test open of process without buffer."""
+    # Test w/o shell
+    args = ['pwd']
+    p = tools.popen_nobuffer(args)
+    out, err = p.communicate()
+    nt.assert_equal(out, os.getcwd() + '\n')
+    # Test w/ shell
+    args = 'pwd'
+    p = tools.popen_nobuffer(args, shell=True)
+    out, err = p.communicate()
+    nt.assert_equal(out, os.getcwd() + '\n')
 
 
 def test_eval_kwarg():
