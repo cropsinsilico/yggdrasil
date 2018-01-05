@@ -31,7 +31,7 @@ class TestParam(CisTest):
                              # 'workingDir': self.workingDir,
                              'namespace': self.namespace}
         self.nprev_comm = 0
-        self.debug_flag = True
+        self.debug_flag = False
 
     @property
     def skip_start(self):
