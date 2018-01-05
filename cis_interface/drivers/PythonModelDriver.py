@@ -21,9 +21,6 @@ class PythonModelDriver(ModelDriver):
         \*\*kwargs: Additional keyword arguments are passed to parent class's
             __init__ method.
 
-    Attributes (in additon to parent class's):
-        -
-
     """
 
     def __init__(self, name, args, **kwargs):

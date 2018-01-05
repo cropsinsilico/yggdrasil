@@ -49,6 +49,7 @@ class Driver(CisClass, Thread):
                             "Check multiple inheritance")
         Thread.__init__(self)
         super(Driver, self).__init__(name, **kwargs)
+        self.daemon = True
         self._thread_initialized = True
         self.debug()
         self.name = name
@@ -110,12 +111,10 @@ class Driver(CisClass, Thread):
             self.debug('Driver already terminated.')
             return
         self.debug()
-        T = self.start_timeout()
-        while self.is_alive() and (not T.is_out):
-            self.sleep()
-        self.stop_timeout()
+        self.wait()
         self.on_exit()
         self._terminated = True
+        assert(not self.is_alive())
         self.debug('Returning')
 
     def on_exit(self):

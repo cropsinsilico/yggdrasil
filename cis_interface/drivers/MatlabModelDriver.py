@@ -331,4 +331,5 @@ class MatlabModelDriver(ModelDriver):
             self.process.future.result()
             self.process.print_output()
             return False
+        self.sleep()
         return True
