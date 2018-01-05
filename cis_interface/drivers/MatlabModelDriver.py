@@ -326,12 +326,9 @@ class MatlabModelDriver(ModelDriver):
 
     def run_loop(self):  # pragma: matlab
         r"""Loop to check if model is still running and forward output."""
-        while True:
-            if self.process is None:  # pragma: debug
-                break
+        self.process.print_output()
+        if self.process.is_done():
+            self.process.future.result()
             self.process.print_output()
-            if self.process.is_done():
-                self.process.future.result()
-                self.process.print_output()
-                break
-            self.sleep()
+            return False
+        return True

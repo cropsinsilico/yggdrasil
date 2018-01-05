@@ -64,6 +64,7 @@ class ModelDriver(Driver):
             self.args = [args]
         else:
             self.args = args
+        self._running = False
         self.process = None
         self.is_server = is_server
         self.client_of = client_of
@@ -90,6 +91,7 @@ class ModelDriver(Driver):
     def start(self, no_popen=False):
         r"""Start subprocess before monitoring."""
         if not no_popen:
+            self._running = True
             self.start_setup()
         super(ModelDriver, self).start()
 
@@ -98,14 +100,17 @@ class ModelDriver(Driver):
         self.debug('Running %s from %s with cwd %s and env %s',
                    self.args, os.getcwd(), self.workingDir, pformat(self.env))
         self.run_setup()
-        self.run_loop()
+        flag = True
+        while self._running and (self.process is not None) and flag:
+            flag = self.run_loop()
+            self.sleep()
         self.run_finalize()
 
     def run_setup(self):
         pass
 
     def start_setup(self):
-        r"""Actions to perform before the run loop."""
+        r"""Actions to perform before the run starts."""
         pre_args = ['stdbuf', '-o0', '-e0']
         if self.with_strace:
             if platform._is_linux:
@@ -127,16 +132,14 @@ class ModelDriver(Driver):
     def run_loop(self):
         r"""Loop to check if model is still running and forward output."""
         # Continue reading until there is not any output
-        while True:
-            if self.process is None:
-                break
-            try:  # with self.lock:
-                line = self.process.stdout.readline()
-            except BaseException:  # pragma: debug
-                break
-            if len(line) == 0:
-                break
-            print(backwards.bytes2unicode(line), end="")
+        try:  # with self.lock:
+            line = self.process.stdout.readline()
+        except BaseException:  # pragma: debug
+            return False
+        if len(line) == 0:
+            return False
+        print(backwards.bytes2unicode(line), end="")
+        return True
 
     def run_finalize(self):
         r"""Actions to perform after run_loop has finished. Mainly checking
@@ -175,6 +178,7 @@ class ModelDriver(Driver):
             return
         self.debug()
         with self.lock:
+            self._running = False
             if self.process:
                 self.process.poll()
                 if self.process.returncode is None:
