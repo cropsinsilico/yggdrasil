@@ -1,7 +1,8 @@
 import subprocess
 import os
 from cis_interface.communication import _default_comm
-from cis_interface.tools import is_zmq_installed, is_ipc_installed
+from cis_interface.tools import (
+    is_zmq_installed, is_ipc_installed, popen_nobuffer)
 from cis_interface.drivers.ModelDriver import ModelDriver
 # from cis_interface.config import cis_cfg
 
@@ -65,7 +66,7 @@ class GCCModelDriver(ModelDriver):
         self.args = [os.path.join(".", self.efile)] + self.run_args
         self.compiled = True
         self.debug("Compiling")
-        comp_process = tools.popen_nobuffer(compile_args)
+        comp_process = popen_nobuffer(compile_args)
         output, err = comp_process.communicate()
         exit_code = comp_process.returncode
         if exit_code != 0:  # pragma: debug
