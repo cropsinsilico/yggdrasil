@@ -1,5 +1,5 @@
-import subprocess
 import os
+from cis_interface import tools
 from cis_interface.drivers.ModelDriver import ModelDriver
 from cis_interface.drivers import GCCModelDriver
 
@@ -91,10 +91,7 @@ class MakeModelDriver(ModelDriver):
         self.debug(' '.join(make_args))
         if not os.path.isfile(self.makefile):
             raise IOError("Makefile %s not found" % self.makefile)
-        comp_process = subprocess.Popen(['stdbuf', '-o0'] + make_args,
-                                        bufsize=0, stdin=subprocess.PIPE,
-                                        stderr=subprocess.STDOUT,
-                                        stdout=subprocess.PIPE)
+        comp_process = tools.popen_nobuffer(make_args)
         output, err = comp_process.communicate()
         exit_code = comp_process.returncode
         os.chdir(curdir)
