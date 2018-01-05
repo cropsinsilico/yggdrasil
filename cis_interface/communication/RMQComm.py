@@ -38,7 +38,7 @@ def check_rmq_server(url=None, **kwargs):
         port = kwargs.get('port', cis_cfg.get('rmq', 'port', '5672'))
         vhost = kwargs.get('vhost', cis_cfg.get('rmq', 'vhost', '/'))
         credentials = pika.PlainCredentials(username, password)
-        parameters = pika.ConnectionParameters(host=host, port=port,
+        parameters = pika.ConnectionParameters(host=host, port=int(port),
                                                virtual_host=vhost,
                                                credentials=credentials)
     # Try to establish connection
