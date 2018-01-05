@@ -4,8 +4,6 @@ from cis_interface.tools import CisClass
 from cis_interface.tests import CisTest
 from cis_interface.communication import get_comm_class
 
-# TODO: Test Ctrl-C interruption
-
 
 class TestParam(CisTest):
     r"""Test parameters for basic Driver test class.
@@ -33,6 +31,7 @@ class TestParam(CisTest):
                              # 'workingDir': self.workingDir,
                              'namespace': self.namespace}
         self.nprev_comm = 0
+        self.debug_flag = True
 
     @property
     def skip_start(self):
