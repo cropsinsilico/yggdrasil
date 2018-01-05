@@ -1,6 +1,7 @@
 import unittest
 import nose.tools as nt
 import zmq
+from cis_interface import platform
 from cis_interface.tools import is_zmq_installed
 from cis_interface.communication import new_comm
 from cis_interface.communication.tests import test_CommBase as parent
@@ -39,6 +40,7 @@ def test_invalid_protocol():
 
 
 @unittest.skipIf(not is_zmq_installed(), "ZMQ library not installed")
+@unittest.skipIf(platform._is_osx, "Testing on OSX")
 def test_error_on_send_open_twice():
     r"""Test creation of the same send socket twice for an error."""
     for s, r in ZMQComm._socket_type_pairs:
