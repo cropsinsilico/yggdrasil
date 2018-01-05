@@ -5,6 +5,9 @@ import os
 import sys
 import inspect
 import time
+import yaml
+import pystache
+from cis_interface.backwards import sio
 import subprocess
 from cis_interface import platform
 from cis_interface import backwards
@@ -51,6 +54,26 @@ PSI_MSG_MAX = CIS_MSG_MAX
 PSI_MSG_EOF = CIS_MSG_EOF
 
 
+def parse_yaml(fname):
+    r"""Parse a yaml file defining a run.
+
+    Args:
+        fname (str): Path to the yaml file.
+
+    Returns:
+        dict: Contents of yaml file.
+
+    """
+    # Open file and parse yaml
+    with open(fname, 'r') as f:
+        # Mustache replace vars
+        yamlparsed = f.read()
+        yamlparsed = pystache.render(
+            sio.StringIO(yamlparsed).getvalue(), dict(os.environ))
+        yamlparsed = yaml.safe_load(yamlparsed)
+    return yamlparsed
+
+    
 def popen_nobuffer(args, **kwargs):
     r"""Uses Popen to open a process without a buffer. If not already set,
     the keyword arguments 'bufsize', 'stdout', and 'stderr' are set to
