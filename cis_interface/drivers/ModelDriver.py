@@ -127,12 +127,16 @@ class ModelDriver(Driver):
     def enqueue_output(self, out, queue):
         r"""Method to call in thread to keep passing output to queue."""
         try:
-            for line in iter(out.readline, backwards.unicode2bytes('')):
+            while self.process is not None:
+                line = out.readline()
+                if len(line) == 0:
+                    break
                 self.debug("line = %s", line)
                 queue.put(line)
         except BaseException:  # pragma: debug
             self.error("Error getting output")
             raise
+        queue.put(backwards.unicode2bytes(''))
         out.close()
 
     def run(self):
@@ -152,11 +156,9 @@ class ModelDriver(Driver):
     def run_loop(self):
         r"""Loop to check if model is still running and forward output."""
         # Continue reading until there is not any output
-        self.debug()
         try:
             line = self.queue.get_nowait()
         except Empty:
-            self.debug("Empty line")
             self.sleep()
             return True
         else:
