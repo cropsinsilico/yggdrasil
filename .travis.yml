@@ -98,7 +98,7 @@ before_script:
 
 script:
   - |
-    nosetests --nologcapture --with-coverage --cover-package=cis_interface -svx cis_interface/drivers/tests/test_ModelDriver.py
+    nosetests --nologcapture --with-coverage --cover-package=cis_interface -svx
 
 after_success:
   - coveralls
