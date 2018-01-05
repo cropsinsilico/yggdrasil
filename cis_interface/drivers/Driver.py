@@ -111,9 +111,9 @@ class Driver(CisClass, Thread):
             self.debug('Driver already terminated.')
             return
         self.debug()
-        self.wait(self.timeout)
         self.on_exit()
         self._terminated = True
+        self.wait(self.timeout)
         assert(not self.is_alive())
         self.debug('Returning')
 
@@ -140,7 +140,7 @@ class Driver(CisClass, Thread):
         """
         T = self.start_timeout(timeout)
         while self.is_alive() and not T.is_out:
-            self.debug('Waiting for driver to finish...')
+            # self.debug('Waiting for driver to finish...')
             self.sleep()
         self.stop_timeout()
 
