@@ -4,7 +4,6 @@ import warnings
 import unittest
 from cis_interface import runner
 from cis_interface.examples import yamls
-from cis_interface.config import cis_cfg, cfg_logging
 from cis_interface.drivers.MatlabModelDriver import _matlab_installed
 
 
@@ -17,13 +16,11 @@ class TestExample(unittest.TestCase):
         self.uuid = str(uuid.uuid4())
         self.env = {}
         super(TestExample, self).__init__(*args, **kwargs)
+        self.debug_flag = True
 
     def setup(self, *args, **kwargs):
         r"""Setup to perform before test."""
-        cis_cfg.set('debug', 'psi', 'DEBUG')
-        cis_cfg.set('debug', 'rmq', 'INFO')
-        cis_cfg.set('debug', 'client', 'INFO')
-        cfg_logging()
+        pass
 
     def teardown(self, *args, **kwargs):
         r"""Teardown to perform after test."""
