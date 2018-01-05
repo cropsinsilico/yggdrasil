@@ -1,4 +1,3 @@
-import subprocess
 import os
 from cis_interface.communication import _default_comm
 from cis_interface.tools import (

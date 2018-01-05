@@ -4,9 +4,8 @@
 from __future__ import print_function
 import os
 import copy
-import subprocess
 from pprint import pformat
-from cis_interface import backwards, platform
+from cis_interface import backwards, platform, tools
 from cis_interface.drivers.Driver import Driver
 
 
