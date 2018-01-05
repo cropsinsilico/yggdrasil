@@ -154,12 +154,12 @@ class ModelDriver(Driver):
         if self.process is not None:
             try:
                 self.process.poll()
-                T = self.start_timeout()
-                while ((not T.is_out) and
-                       (self.process.returncode is None)):  # pragma: debug
-                    self.sleep()
-                    self.process.poll()
-                self.stop_timeout()
+                # T = self.start_timeout()
+                # while ((not T.is_out) and
+                #        (self.process.returncode is None)):  # pragma: debug
+                #     self.sleep()
+                #     self.process.poll()
+                # self.stop_timeout()
                 if self.process.returncode is None:  # pragma: debug
                     self.process.kill()
                     self.error("Return code is None, killing process")
@@ -179,13 +179,13 @@ class ModelDriver(Driver):
         self.debug()
         with self.lock:
             self._running = False
-            if self.process:
-                self.process.poll()
-                if self.process.returncode is None:
-                    self.debug('Terminating model process')
-                    try:
-                        self.process.kill()  # terminate()
-                    except OSError:  # pragma: debug
-                        pass
-                    self.process = None
+            # if self.process:
+            #     self.process.poll()
+            #     if self.process.returncode is None:
+            #         self.debug('Terminating model process')
+            #         try:
+            #             self.process.kill()  # terminate()
+            #         except OSError:  # pragma: debug
+            #             pass
+            #         self.process = None
         super(ModelDriver, self).terminate()
