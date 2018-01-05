@@ -16,5 +16,6 @@ model:
   outputs:
     - name: output_python
       driver: FileOutputDriver
-      args: /tmp/SaM_output.txt
+      args: SaM_output.txt
+      in_temp: True
 
