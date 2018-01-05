@@ -120,7 +120,9 @@ setup(
         "Development Status :: 3 - Alpha",
     ],
     entry_points = {
-        'console_scripts': ['cisrun=cis_interface.command_line:cisrun'],
+        'console_scripts': ['cisrun=cis_interface.command_line:cisrun',
+                            'cisccflags=cis_interface.command_line:cc_flags',
+                            'cisldflags=cis_interface.command_line:ld_flags'],
     },
     license="BSD",
 )

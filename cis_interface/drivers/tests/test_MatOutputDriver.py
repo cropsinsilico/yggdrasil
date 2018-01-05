@@ -1,16 +1,9 @@
 import os
-import numpy as np
-from scipy.io import loadmat
-import cis_interface.drivers.tests.test_IODriver as parent
+import cis_interface.drivers.tests.test_FileOutputDriver as parent
 
 
-class TestMatOutputParam(parent.TestIOParam):
-    r"""Test parameters for MatOutputDriver.
-
-    Attributes (in addition to parent class's):
-        filepath (str): Full path to test file.
-    
-    """
+class TestMatOutputParam(parent.TestFileOutputParam):
+    r"""Test parameters for MatOutputDriver."""
 
     def __init__(self, *args, **kwargs):
         super(TestMatOutputParam, self).__init__(*args, **kwargs)
@@ -20,60 +13,25 @@ class TestMatOutputParam(parent.TestIOParam):
         
 
 class TestMatOutputDriverNoStart(TestMatOutputParam,
-                                 parent.TestIODriverNoStart):
-    r"""Test runner for MatOutputDriver.
-
-    Attributes (in addition to parent class's):
-        -
-    
-    """
+                                 parent.TestFileOutputDriverNoStart):
+    r"""Test runner for MatOutputDriver."""
     pass
 
 
-class TestMatOutputDriver(TestMatOutputParam, parent.TestIODriver):
-    r"""Test runner for MatOutputDriver.
-
-    Attributes (in addition to parent class's):
-        -
-    
-    """
+class TestMatOutputDriver(TestMatOutputParam, parent.TestFileOutputDriver):
+    r"""Test runner for MatOutputDriver."""
 
     def setup(self):
         r"""Create a driver instance and start the driver."""
-        super(TestMatOutputDriver, self).setup()
-        self.instance.ipc_send_nolimit(self.pickled_data)
-        self.instance.ipc_send_nolimit(self.instance.eof_msg)
-        # self.timeout = 10.0
-
-    def teardown(self):
-        r"""Remove the instance, stoppping it."""
-        super(TestMatOutputDriver, self).teardown()
-        if os.path.isfile(self.filepath):
-            os.remove(self.filepath)
+        super(parent.TestFileOutputDriver, self).setup()
+        self.send_comm.send(self.pickled_data)
+        self.send_comm.send_eof()
 
     def assert_after_stop(self):
         r"""Assertions to make after stopping the driver instance."""
-        super(TestMatOutputDriver, self).assert_after_stop()
+        super(parent.TestFileOutputDriver, self).assert_after_stop()
         assert(os.path.isfile(self.filepath))
-        with open(self.filepath, 'rb') as fd:
-            dat_recv = loadmat(fd)
-        for k in self.data_dict.keys():
-            np.testing.assert_array_equal(dat_recv[k], self.data_dict[k])
-
-    def assert_after_terminate(self):
-        r"""Assertions to make after stopping the driver instance."""
-        super(TestMatOutputDriver, self).assert_after_terminate()
-        assert(self.instance.fd is None)
-
-    # These are disabled to prevent writting extraneous data
-    def test_send_recv(self):
-        r"""Test sending/receiving small message."""
-        pass
-
-    def test_send_recv_nolimit(self):
-        r"""Test sending/receiving large message."""
-        pass
-
-    def run_before_terminate(self):
-        r"""Commands to run while the instance is running, before terminate."""
-        pass
+        self.assert_equal_data_dict(self.filepath)
+        #     dat_recv = loadmat(fd)
+        # for k in self.data_dict.keys():
+        #     np.testing.assert_array_equal(dat_recv[k], self.data_dict[k])

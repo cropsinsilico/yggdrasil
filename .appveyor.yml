@@ -1,0 +1,72 @@
+# AppVeyor.com is a Continuous Integration service to build and run tests under
+# Windows
+
+# branches to build
+branches:
+  # whitelist
+  only:
+    - topic/windows
+    - topic/zmq
+
+  # blacklist
+  except:
+    - gh-pages
+
+# Do not build on tags (GitHub and BitBucket)
+skip_tags: true
+
+#---------------------------------#
+#    environment configuration    #
+#---------------------------------#
+
+environment:
+
+  global:
+    PYTHON: "C:\\Miniconda3-x64"
+
+  matrix:
+    - PYTHON_VERSION: "2.7"
+    - PYTHON_VERSION: "3.6"
+
+platform:
+  -x64
+
+install:
+  - "SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%"
+  - "SET MPLBACKEND=agg"
+
+  # Install the build and runtime dependencies of the project.
+  # Create a conda environment
+  - "conda update -q --yes conda"
+  - "conda create -q --yes -n test python=%PYTHON_VERSION%"
+  - "activate test"
+
+  # Check that we have the expected version of Python
+  - "python --version"
+
+  # Install ZeroMQ
+  - "ci/install-czmq-windows.bat"
+
+  # Install & start RabbitMQ
+  - "ci/install-rmqserver-windows.bat"  
+  - "ci/start-rmqserver-windows.bat"  
+
+  # Install specified version of numpy and dependencies
+  - "conda install --yes -c conda-forge numpy nose coverage coveralls
+  flake8 setuptools pystache pika pyyaml astropy scipy zmq"
+  - "pip install sysv_ipc"
+
+  # Install cis_interface
+  - "pip install -e ."
+
+# Not a .NET project
+build: false
+
+before_test:
+  - "flake8 cis_interface"
+
+test_script:
+  - "nosetests --nologcapture --with-coverage --cover-package=cis_interface -svx"
+
+after_test:
+  - "coveralls"

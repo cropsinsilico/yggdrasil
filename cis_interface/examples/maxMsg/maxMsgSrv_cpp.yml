@@ -3,5 +3,5 @@
 model:
   name: maxMsgSrv
   driver: GCCModelDriver
-  args: ./src/maxMsgSrv.c
+  args: ./src/maxMsgSrv.cpp
   is_server: True

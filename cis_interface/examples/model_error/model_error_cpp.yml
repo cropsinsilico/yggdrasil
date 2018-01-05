@@ -10,13 +10,13 @@ model:
       driver: FileInputDriver
       args: ./Input/input.txt
     - name: model_errorQueueIn    
-      driver: RMQInputDriver
+      driver: InputDriver
       args: model_errorQueue
       onexit: on_model_exit
 
   outputs:
     - name: model_errorQueueOut
-      driver: RMQOutputDriver
+      driver: OutputDriver
       args: model_errorQueue
     - name: outFile
       driver: FileOutputDriver

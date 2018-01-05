@@ -4,7 +4,7 @@ import warnings
 import unittest
 from cis_interface import runner
 from cis_interface.examples import yamls
-from cis_interface.config import cis_cfg
+from cis_interface.config import cis_cfg, cfg_logging
 from cis_interface.drivers.MatlabModelDriver import _matlab_installed
 
 
@@ -21,13 +21,14 @@ class TestExample(unittest.TestCase):
 
     def setup(self, *args, **kwargs):
         r"""Setup to perform before test."""
-        cis_cfg.set('debug', 'psi', 'INFO')
+        cis_cfg.set('debug', 'psi', 'DEBUG')
         cis_cfg.set('debug', 'rmq', 'INFO')
         cis_cfg.set('debug', 'client', 'INFO')
+        cfg_logging()
 
     def teardown(self, *args, **kwargs):
         r"""Teardown to perform after test."""
-        pass  # pragma: no cover
+        pass
 
     def shortDescription(self):
         r"""Prefix first line of doc string with driver."""

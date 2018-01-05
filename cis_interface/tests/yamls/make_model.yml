@@ -1,0 +1,5 @@
+model:
+  name: make_model
+  driver: MakeModelDriver
+  args: gcc_model
+  makefile: ../scripts/Makefile      

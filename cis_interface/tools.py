@@ -1,15 +1,54 @@
 """This modules offers various tools."""
-from subprocess import Popen, PIPE, STDOUT
+from threading import Timer
+import logging
+import os
 import sys
-import sysv_ipc
+import inspect
 import time
-from cis_interface import backwards, platform
+import subprocess
+from cis_interface import platform
+from cis_interface import backwards
+
+
+def is_ipc_installed():
+    r"""Determine if the IPC libraries are installed.
+
+    Returns:
+        bool: True if the IPC libraries are installed, False otherwise.
+
+    """
+    return (platform._is_linux or platform._is_osx)
+
+
+def is_zmq_installed():
+    r"""Determine if the libczmq & libzmq libraries are installed.
+
+    Returns:
+        bool: True if both libraries are installed, False otherwise.
+
+    """
+    process = subprocess.Popen(['gcc', '-lzmq', '-lczmq'],
+                               stdout=subprocess.PIPE,
+                               stderr=subprocess.PIPE)
+    outs, errs = process.communicate()
+    # Python 3
+    # try:
+    #     outs, errs = process.communicate(timeout=15)
+    # except subprocess.TimeoutExpired:
+    #     process.kill()
+    #     outs, errs = process.communicate()
+    return (backwards.unicode2bytes('zmq') not in errs)
 
 
 # OS X limit is 2kb
-PSI_MSG_MAX = 1024 * 2
-PSI_MSG_EOF = backwards.unicode2bytes("EOF!!!")
-_registered_queues = {}
+if is_zmq_installed():
+    CIS_MSG_MAX = 2**20
+else:
+    CIS_MSG_MAX = 1024 * 2
+CIS_MSG_EOF = backwards.unicode2bytes("EOF!!!")
+
+PSI_MSG_MAX = CIS_MSG_MAX
+PSI_MSG_EOF = CIS_MSG_EOF
 
 
 def popen_nobuffer(args, **kwargs):
@@ -36,9 +75,9 @@ def popen_nobuffer(args, **kwargs):
         else:
             args = stdbuf_args + args
     kwargs.setdefault('bufsize', 0)
-    kwargs.setdefault('stdout', PIPE)
-    kwargs.setdefault('stderr', STDOUT)
-    out = Popen(args, **kwargs)
+    kwargs.setdefault('stdout', subprocess.PIPE)
+    kwargs.setdefault('stderr', subprocess.STDOUT)
+    out = subprocess.Popen(args, **kwargs)
     return out
 
 
@@ -49,7 +88,7 @@ def eval_kwarg(x):
         x (str, obj): String to be evaluated as an object or an object.
 
     Returns:
-        obj: Evaluation result of x for strings if x is a string. x otherwise.
+        obj: Result of evaluated string or the input object.
 
     """
     if isinstance(x, str):
@@ -60,145 +99,13 @@ def eval_kwarg(x):
     return x
 
 
-def get_queue(qid=None):
-    r"""Create or return a sysv_ipc.MessageQueue and register it.
-
-    Args:
-        qid (int, optional): If provided, ID for existing queue that should be
-           returned. Defaults to None and a new queue is returned.
-
-    Returns:
-        :class:`sysv_ipc.MessageQueue`: Message queue.
-
-    """
-    kwargs = dict(max_message_size=PSI_MSG_MAX)
-    if qid is None:
-        kwargs['flags'] = sysv_ipc.IPC_CREX
-    mq = sysv_ipc.MessageQueue(qid, **kwargs)
-    key = str(mq.key)
-    if key not in _registered_queues:
-        _registered_queues[key] = mq
-    return mq
-
-
-def remove_queue(mq):
-    r"""Remove a sysv_ipc.MessageQueue and unregister it.
-
-    Args:
-        mq (:class:`sysv_ipc.MessageQueue`) Message queue.
-    
-    Raises:
-        KeyError: If the provided queue is not registered.
-
-    """
-    key = str(mq.key)
-    if key not in _registered_queues:
-        raise KeyError("Queue not registered.")
-    _registered_queues.pop(key)
-    mq.remove()
-    
-
-def ipcs(options=[]):
-    r"""Get the output from running the ipcs command.
-
-    Args:
-        options (list): List of flags that should be used. Defaults to an empty
-            list.
-
-    Returns:
-        list: Captured output.
-
-    """
-    cmd = ' '.join(['ipcs'] + options)
-    p = Popen(cmd, stdin=PIPE, stdout=PIPE, stderr=PIPE, shell=True)
-    output, err = p.communicate()
-    exit_code = p.returncode
-    if exit_code != 0:  # pragma: debug
-        print(err.decode('utf-8'))
-        raise Exception("Error on spawned process. See output.")
-    return output.decode('utf-8')
-
-
-def ipc_queues():
-    r"""Get a list of active IPC queues.
-
-    Returns:
-       list: List of IPC queues.
-
-    """
-    skip_lines = [
-        # Linux
-        '------ Message Queues --------',
-        'key        msqid      owner      perms      used-bytes   messages    ',
-        # OSX
-        'IPC status from',
-        'Message Queues:',
-        'T     ID     KEY        MODE       OWNER    GROUP']
-    out = ipcs(['-q']).split('\n')
-    qlist = []
-    for l in out:
-        skip = False
-        if len(l) == 0:
-            skip = True
-        else:
-            for ls in skip_lines:
-                if ls in l:
-                    skip = True
-                    break
-        if not skip:
-            if platform._is_linux:
-                key_col = 0
-            elif platform._is_osx:
-                key_col = 2
-            else:  # pragma: debug
-                raise NotImplementedError("Unsure what column the queue key " +
-                                          "is in on this platform " +
-                                          "(%s)" % sys.platform)
-            qlist.append(l.split()[key_col])
-    return qlist
-
-
-def ipcrm(options=[]):
-    r"""Remove IPC constructs using the ipcrm command.
-
-    Args:
-        options (list): List of flags that should be used. Defaults to an empty
-            list.
-
-    """
-    cmd = ' '.join(['ipcrm'] + options)
-    p = Popen(cmd, stdin=PIPE, stdout=PIPE, stderr=PIPE, shell=True)
-    output, err = p.communicate()
-    exit_code = p.returncode
-    if exit_code != 0:  # pragma: debug
-        print(err.decode('utf-8'))
-        raise Exception("Error on spawned process. See output.")
-    if output:
-        print(output.decode('utf-8'))
-
-
-def ipcrm_queues(queue_keys=None):
-    r"""Delete existing IPC queues.
-
-    Args:
-        queue_keys (list, str, optional): A list of keys for queues that should
-            be removed. Defaults to all existing queues.
-
-    """
-    if queue_keys is None:
-        queue_keys = ipc_queues()
-    if isinstance(queue_keys, str):
-        queue_keys = [queue_keys]
-    for q in queue_keys:
-        ipcrm(["-Q %s" % q])
-
-
 class TimeOut(object):
     r"""Class for checking if a period of time has been elapsed.
 
     Args:
-        max_time (float): Maximum period of time that should elapsed before
-            'is_out' returns True.
+        max_time (float, bbol): Maximum period of time that should elapse before
+            'is_out' returns True. If False, 'is_out' will never return True.
+            Providing 0 indicates that 'is_out' should immediately return True.
 
     Attributes:
         max_time (float): Maximum period of time that should elapsed before
@@ -209,16 +116,324 @@ class TimeOut(object):
 
     def __init__(self, max_time):
         self.max_time = max_time
-        self.start_time = time.clock()
+        self.start_time = backwards.clock_time()
 
     @property
     def elapsed(self):
         r"""float: Total time that has elapsed since the start."""
-        return time.clock() - self.start_time
+        return backwards.clock_time() - self.start_time
     
     @property
     def is_out(self):
         r"""bool: True if there is not any time remaining. False otherwise."""
-        if not self.max_time:
+        if self.max_time is False:
             return False
         return (self.elapsed > self.max_time)
+
+
+class CisClass(object):
+    r"""Base class for CiS classes.
+
+    Args:
+        name (str): Class name.
+        workingDir (str, optional): Working directory. If not provided, the
+            current working directory is used.
+        timeout (float, optional): Maximum time (in seconds) that should be
+            spent waiting on a process. Defaults to 60.
+        sleeptime (float, optional): Time that class should sleep for when
+            sleep is called. Defaults to 0.01.
+        **kwargs: Additional keyword arguments are assigned to the extra_kwargs
+            dictionary.
+
+    Attributes:
+        name (str): Class name.
+        sleeptime (float): Time that class should sleep for when sleep called.
+        longsleep (float): Time that the class will sleep for when waiting for
+            longer tasks to complete (10x longer than sleeptime).
+        timeout (float): Maximum time that should be spent waiting on a process.
+        workingDir (str): Working directory.
+        errors (list): List of errors.
+        extra_kwargs (dict): Keyword arguments that were not parsed.
+        sched_out (obj): Output from the last scheduled task with output.
+        logger (logging.Logger): Logger object for this object.
+        suppress_special_debug (bool): If True, special_debug log messages
+            are suppressed.
+
+    """
+    def __init__(self, name, workingDir=None, timeout=60.0, sleeptime=0.01,
+                 **kwargs):
+        self.name = name
+        self.sleeptime = sleeptime
+        self.longsleep = self.sleeptime * 10
+        self.timeout = timeout
+        self._timeouts = {}
+        # Set defaults
+        if workingDir is None:
+            workingDir = os.getcwd()
+        # Assign things
+        self.workingDir = workingDir
+        self.errors = []
+        self.extra_kwargs = kwargs
+        self.sched_out = None
+        self.suppress_special_debug = False
+        self.logger = logging.getLogger(self.__module__)
+
+    def printStatus(self):
+        r"""Print the class status."""
+        self.logger.error('%s(%s): state:', self.__module__, self.name)
+
+    def _task_with_output(self, func, *args, **kwargs):
+        self.sched_out = func(*args, **kwargs)
+
+    def sched_task(self, t, func, args=[], kwargs={}, store_output=False):
+        r"""Schedule a task that will be executed after a certain time has
+        elapsed.
+
+        Args:
+            t (float): Number of seconds that should be waited before task
+                is executed.
+            func (object): Function that should be executed.
+            args (list, optional): Arguments for the provided function.
+                Defaults to [].
+            kwargs (dict, optional): Keyword arguments for the provided
+                function. Defaults to {}.
+            store_output (bool, optional): If True, the output from the
+                scheduled task is stored in self.sched_out. Otherwise, it is not
+                stored. Defaults to False.
+
+        """
+        self.sched_out = None
+        if store_output:
+            tobj = Timer(t, self._task_with_output,
+                         args=[func] + args, kwargs=kwargs)
+        else:
+            tobj = Timer(t, func, args=args, kwargs=kwargs)
+        tobj.start()
+
+    @property
+    def logger_prefix(self):
+        r"""Prefix to add to logger messages."""
+        stack = inspect.stack()
+        the_class = os.path.splitext(os.path.basename(
+            stack[2][0].f_globals["__file__"]))[0]
+        the_line = stack[2][2]
+        the_func = stack[2][3]
+        return '%s(%s).%s[%d]: ' % (the_class, self.name, the_func, the_line)
+
+    def as_str(self, obj):
+        r"""Return str version of object if it is not already a string.
+
+        Args:
+            obj (object): Object that should be turned into a string.
+
+        Returns:
+            str: String version of provided object.
+
+        """
+        if not isinstance(obj, str):
+            obj_str = str(obj)
+        else:
+            obj_str = obj
+        return obj_str
+            
+    def sleep(self, t=None):
+        r"""Have the class sleep for some period of time.
+
+        Args:
+            t (float, optional): Time that class should sleep for. If not
+                provided, the attribute 'sleeptime' is used.
+
+        """
+        if t is None:
+            t = self.sleeptime
+        time.sleep(t)
+
+    @property
+    def timeout_key(self):
+        r"""str: Key identifying calling object and method."""
+        stack = inspect.stack()
+        fcn = stack[2][3]
+        cls = os.path.splitext(os.path.basename(stack[2][1]))[0]
+        key = '%s(%s).%s' % (cls, self.name, fcn)
+        return key
+
+    def start_timeout(self, t=None, key=None):
+        r"""Start a timeout for the calling function/method.
+
+        Args:
+            t (float, optional): Maximum time that the calling function should
+                wait before timeing out. If not provided, the attribute
+                'timeout' is used.
+            key (str, optional): Key that should be associated with the timeout
+                that is created. Defaults to None and is set by the calling
+                class and function/method (See `timeout_key`).
+
+        Raises:
+            KeyError: If the key already exists.
+
+        """
+        if t is None:
+            t = self.timeout
+        if key is None:
+            key = self.timeout_key
+        if key in self._timeouts:
+            raise KeyError("Timeout already registered for %s" % key)
+        self._timeouts[key] = TimeOut(t)
+        return self._timeouts[key]
+
+    def check_timeout(self, key=None):
+        r"""Check timeout for the calling function/method.
+
+        Args:
+            key (str, optional): Key for timeout that should be checked.
+                Defaults to None and is set by the calling class and
+                function/method (See `timeout_key`).
+
+        Raises:
+            KeyError: If there is not a timeout registered for the specified
+                key.
+
+        """
+        if key is None:
+            key = self.timeout_key
+        if key not in self._timeouts:
+            raise KeyError("No timeout registered for %s" % key)
+        t = self._timeouts[key]
+        return t.is_out
+        
+    def stop_timeout(self, key=None):
+        r"""Stop a timeout for the calling function method.
+
+        Args:
+            key (str, optional): Key for timeout that should be stopped.
+                Defaults to None and is set by the calling class and
+                function/method (See `timeout_key`).
+
+        Raises:
+            KeyError: If there is not a timeout registered for the specified
+                key.
+
+        """
+        if key is None:
+            key = self.timeout_key
+        if key not in self._timeouts:
+            raise KeyError("No timeout registered for %s" % key)
+        t = self._timeouts[key]
+        if t.is_out and t.max_time > 0:
+            self.error("Timeout for %s at %5.2f s" % (key, t.elapsed))
+            print("Stopped %s at %f/%f" % (key, t.elapsed, t.max_time))
+        del self._timeouts[key]
+
+    def display(self, fmt_str='', *args):
+        r"""Log a message at level 1000 that is prepended with the class
+        and name. These messages will always be printed.
+
+        Args:
+            fmt_str (str, optional): Format string.
+            \*args: Additional arguments are formated using the format string.
+
+        """
+        print(self.logger_prefix + self.as_str(fmt_str) % args)
+
+    def info(self, fmt_str='', *args):
+        r"""Log an info message that is prepended with the class and name.
+
+        Args:
+            fmt_str (str, optional): Format string.
+            \*args: Additional arguments are formated using the format string.
+
+        """
+        self.logger.info(self.logger_prefix + self.as_str(fmt_str), *args)
+
+    def debug(self, fmt_str='', *args):
+        r"""Log a debug message that is prepended with the class and name.
+
+        Args:
+            fmt_str (str, optional): Format string.
+            \*args: Additional arguments are formated using the format string.
+
+        """
+        self.logger.debug(self.logger_prefix + self.as_str(fmt_str), *args)
+
+    def special_debug(self, fmt_str='', *args):
+        r"""Log a debug message that is prepended with the class and name, but
+        only if self.suppress_special_debug is not True.
+
+        Args:
+            fmt_str (str, optional): Format string.
+            \*args: Additional arguments are formated using the format string.
+
+        """
+        if not self.suppress_special_debug:
+            self.logger.debug(self.logger_prefix + self.as_str(fmt_str), *args)
+
+    def verbose_debug(self, fmt_str='', *args):
+        r"""Log a verbose debug message that is prepended with the class and name.
+
+        Args:
+            fmt_str (str, optional): Format string.
+            \*args: Additional arguments are formated using the format string.
+
+        """
+        self.logger.log(9, self.logger_prefix + self.as_str(fmt_str), *args)
+        
+    def critical(self, fmt_str='', *args):
+        r"""Log a critical message that is prepended with the class and name.
+
+        Args:
+            fmt_str (str, optional): Format string.
+            \*args: Additional arguments are formated using the format string.
+
+        """
+        self.logger.critical(self.logger_prefix + self.as_str(fmt_str), *args)
+
+    def warn(self, fmt_str='', *args):
+        r"""Log a warning message that is prepended with the class and name.
+
+        Args:
+            fmt_str (str, optional): Format string.
+            \*args: Additional arguments are formated using the format string.
+
+        """
+        self.logger.warn(self.logger_prefix + self.as_str(fmt_str), *args)
+
+    def error(self, fmt_str='', *args):
+        r"""Log an error message that is prepended with the class and name.
+
+        Args:
+            fmt_str (str, optional): Format string.
+            \*args: Additional arguments are formated using the format string.
+
+        """
+        fmt_str = self.as_str(fmt_str)
+        self.logger.error(self.logger_prefix + fmt_str, *args)
+        self.errors.append((self.logger_prefix + fmt_str) % args)
+
+    def exception(self, fmt_str='', *args):
+        r"""Log an exception message that is prepended with the class name.
+
+        Args:
+            fmt_str (str, optional): Format string.
+            \*args: Additional arguments are formated using the format string.
+
+        """
+        fmt_str = self.as_str(fmt_str)
+        exc_info = sys.exc_info()
+        if exc_info is not None and exc_info != (None, None, None):
+            self.logger.exception(self.logger_prefix + fmt_str, *args)
+        else:
+            self.logger.error(self.logger_prefix + fmt_str, *args)
+        self.errors.append((self.logger_prefix + fmt_str) % args)
+
+    def raise_error(self, e):
+        r"""Raise an exception, logging it first.
+
+        Args:
+            e (Exception): Exception to raise.
+
+        Raises:
+            The provided exception.
+
+        """
+        self.errors.append(repr(e))
+        raise e

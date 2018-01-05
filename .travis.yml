@@ -10,18 +10,16 @@ env:
     NUMPY=numpy
     MATPLOTLIB=matplotlib
     MPLBACKEND=agg
+    INSTALLZMQ=1
+    INSTALLRMQ=1
 
-services:
-  - rabbitmq
+# services:
+#   - rabbitmq
 
 matrix:
   include:
     # - python: 2.7
-    #   env: NUMPY=numpy==1.10.4 MATPLOTLIB=matplotlib==1.5.3
-    # - python: 2.7
-    # - python: 3.4
-    # - python: 3.5
-    # - python: 3.6
+    #   env: NUMPY=numpy==1.10.4 MATPLOTLIB=matplotlib==1.5.3 INSTALLZMQ=0 INSTALLRMQ=0
     - os: osx
       osx_image: xcode7.3
       language: generic  # https://github.com/travis-ci/travis-ci/issues/2312
@@ -34,25 +32,46 @@ matrix:
 
 before_install:
   - |
-    if [[ $TRAVIS_OS_NAME != 'osx' ]]; then
+    if [[ $TRAVIS_OS_NAME == 'osx' ]]; then
+       brew update
+       brew install ccache
+       export PATH=/usr/local/opt/ccache/libexec:$PATH
+       brew install valgrind
+    else
        pip install --upgrade virtualenv
        python -m virtualenv venv
        source venv/bin/activate
        export PATH=/usr/lib/ccache:$PATH
-    else
-       brew update
-       brew install ccache
-       export PATH=/usr/local/opt/ccache/libexec:$PATH
+       sudo apt-get install strace valgrind
+    fi
 
-       # Install & start RabbitMQ
+    # Install ZeroMQ
+    if [[ $INSTALLZMQ == '1' ]]; then
+       echo Installing ZeroMQ...;
+       if [[ $TRAVIS_OS_NAME == 'osx' ]]; then
+          sh ci/install-czmq-osx.sh
+       else
+          sh ci/install-czmq-linux.sh
+       fi
+    fi
+
+    # Install RabbitMQ & Start a server
+    if [[ $INSTALLRMQ == '1' ]]; then
        echo Installing RabbitMQ...;
-       # echo "find / -name rabbitmq-server" `find / -name rabbitmq-server 2>/dev/null`;
-       brew install rabbitmq;
-       
-       echo Starting RabbitMQ...;
-       export PATH="${PATH}:/usr/local/sbin";
-       sudo rabbitmq-server -detached;
+       if [[ $TRAVIS_OS_NAME == 'osx' ]]; then
+          sh ci/install-rmqserver-osx.sh
+       else
+          sh ci/install-rmqserver-linux.sh
+       fi
 
+       echo Starting RabbitMQ...;
+       if [[ $TRAVIS_OS_NAME == 'osx' ]]; then
+          export PATH="${PATH}:/usr/local/sbin";
+          sh ci/start-rmqserver-osx.sh
+       else
+          sh ci/start-rmqserver-linux.sh
+       fi
+       
     fi
 
 install:
@@ -65,7 +84,7 @@ install:
     pip install --upgrade setuptools
     # Install dependencies
     pip install $NUMPY $MATPLOTLIB
-    pip install nose coverage coveralls flake8 sysv_ipc pystache pika pyyaml astropy scipy
+    pip install nose coverage coveralls flake8 pystache pika pyyaml astropy scipy zmq sysv_ipc
     # install cis_interface
     pip install -e .
     
@@ -74,7 +93,8 @@ before_script:
     flake8 cis_interface
 
 script:
-  - nosetests --nologcapture --with-coverage --cover-package=cis_interface -sv
+  - |
+    nosetests --nologcapture --with-coverage --cover-package=cis_interface -svx
 
 after_success:
   - coveralls

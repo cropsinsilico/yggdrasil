@@ -44,7 +44,7 @@ class AsciiFile(object):
         if not isinstance(filepath, str):
             raise TypeError('File path must be provided as a string.')
         self.filepath = os.path.abspath(filepath)
-        if io_mode not in ['r', 'w', None]:
+        if io_mode not in ['r', 'w', 'a', None]:
             raise ValueError("IO specifier must be 'r' or 'w'.")
         self.io_mode = io_mode
         if self.io_mode == 'r' and not os.path.isfile(filepath):
@@ -78,7 +78,7 @@ class AsciiFile(object):
         r"""Close the associated file descriptor if it is open."""
         if self.is_open:
             self.fd.close()
-            self.fd = None
+        self.fd = None
 
     def readline(self):
         r"""Continue reading lines until a valid line (uncommented) is

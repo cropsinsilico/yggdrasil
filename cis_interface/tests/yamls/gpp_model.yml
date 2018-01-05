@@ -1,0 +1,6 @@
+model:
+  name: gpp_model
+  driver: GCCModelDriver
+  args:
+    - ../scripts/gcc_model.cpp
+      

@@ -66,6 +66,7 @@ int count_matches(const char *regex_text, const char *to_match) {
     n_match++;
     p += m[0].rm_eo;
   }
+  regfree(&r);
   return n_match;
 };
 
@@ -100,6 +101,7 @@ int find_match(const char *regex_text, const char *to_match,
     *eind = m[0].rm_eo;
     n_match++;
   }
+  regfree(&r);
   return n_match;
 };
 
@@ -168,6 +170,7 @@ int regex_replace_nosub(char *buf, const int len_buf,
   }
   /* printf("regex_replace_nosub() = %s\n", buf); */
   free(m);
+  regfree(&r);
   return cur_siz;
 };
 
@@ -192,6 +195,7 @@ int get_subrefs(const char *buf, int **refs) {
   const int ngroups = r.re_nsub + 1;
   if (ngroups != 2) {
     printf("ERROR: regex could not find subgroup\n");
+    regfree(&r);
     return -1;
   }
   regmatch_t *m = (regmatch_t*)malloc(ngroups * sizeof(regmatch_t));
@@ -224,6 +228,7 @@ int get_subrefs(const char *buf, int **refs) {
       printf("Number longer than %d digits unlikely.\n", max_grp);
       free(m);
       free(ref_bytes);
+      regfree(&r);
       return -1;
     }
     strncpy(igrp, p + m[1].rm_so, igrp_len);
@@ -234,6 +239,7 @@ int get_subrefs(const char *buf, int **refs) {
       printf("Reference to substr %d exceeds limit (%d)\n", iref, max_ref);
       free(m);
       free(ref_bytes);
+      regfree(&r);
       return -1;
     }
     ref_bytes[iref] = 1;
@@ -255,6 +261,7 @@ int get_subrefs(const char *buf, int **refs) {
   }
   free(m);
   free(ref_bytes);
+  regfree(&r);
   // printf("%d refs in %s\n", nref, buf);
   return nref;
 }
@@ -324,6 +331,7 @@ int regex_replace_sub(char *buf, const int len_buf,
       if (ret < 0) {
 	printf("regex_replace_sub: Error replacing substring $%d.\n", i);
 	free(m);
+	regfree(&r);
 	return -1;
       }
     }
@@ -349,6 +357,7 @@ int regex_replace_sub(char *buf, const int len_buf,
     creplace += 1;
   }
   free(m);
+  regfree(&r);
   return cur_siz;
 };
 
@@ -437,14 +446,17 @@ void at_close(asciiTable_t *t) {
 };
 
 /*!
-  @brief Read a line from the file and parse it.
+  @brief Read a line from the file until one is returned that is not a comment.
   @param[in] t constant asciiTable_t table structure.
-  @param[out] ap va_list Pointers to variables where parsed arguments should be
-  stored.
+  @param[out] buf pointer to memory where read line should be stored.
+  @param[in] len_buf Size of buffer where line should be stored.
+  @param[in] allow_realloc const int If 1, the buffer will be realloced if it
+  is not large enought. Otherwise an error will be returned.
   @return int On success, the number of characters read. -1 on failure.
  */
 static inline
-int at_vreadline(const asciiTable_t t, va_list ap) {
+int at_readline_full_realloc(const asciiTable_t t, char **buf, const int len_buf,
+			     const int allow_realloc) {
   // Read lines until there's one that's not a comment
   int ret = 0, com = 1;
   size_t nread = LINE_SIZE_MAX;
@@ -457,22 +469,117 @@ int at_vreadline(const asciiTable_t t, va_list ap) {
     }
     com = af_is_comment(t.f, line);
   }
+  if (ret > len_buf) {
+    if (allow_realloc) {
+      printf("at_readline_full_realloc: reallocating buffer from %d to %d bytes.\n",
+	     len_buf, ret + 1);
+      (*buf) = (char*)realloc(*buf, ret + 1);
+    } else {
+      printf("at_readline_full: line (%d bytes) is larger than destination buffer (%d bytes)\n",
+	     ret, len_buf);
+      ret = -1;
+      free(line);
+      return ret;
+    }
+  }
+  strcpy(*buf, line);
+  free(line);
+  return ret;
+};
+
+/*!
+  @brief Read a line from the file until one is returned that is not a comment.
+  @param[in] t constant asciiTable_t table structure.
+  @param[out] buf pointer to memory where read line should be stored.
+  @param[in] len_buf Size of buffer where line should be stored. The the message
+  is larger than len_buf, an error will be returned.
+  @return int On success, the number of characters read. -1 on failure.
+ */
+static inline
+int at_readline_full(const asciiTable_t t, char *buf, const int len_buf) {
+  // Read but don't realloc buf
+  return at_readline_full_realloc(t, &buf, len_buf, 0);
+};
+
+/*!
+  @brief Write a line to the file.
+  @param[in] t constant asciiTable_t table structure.
+  @param[in] line Pointer to line that should be written.
+  @return int On success, the number of characters written. -1 on failure.
+ */
+static inline
+int at_writeline_full(const asciiTable_t t, const char* line) {
+  int ret;
+  ret = af_writeline_full(t.f, line);
+  return ret;
+};
+
+/*!
+  @brief Parse a line to get row columns.
+  @param[in] t constant asciiTable_t table structure.
+  @param[in] line Pointer to memory containing the line to be parsed.
+  @param[out] ap va_list Pointers to variables where parsed arguments should be
+  stored.
+  @return int On success, the number of arguments filled. -1 on failure.
+ */
+static inline
+int at_vbytes_to_row(const asciiTable_t t, const char* line, va_list ap) {
   // Simplify format for vsscanf
   char fmt[LINE_SIZE_MAX];
   strcpy(fmt, t.format_str);
   int sret = simplify_formats(fmt, LINE_SIZE_MAX);
   if (sret < 0) {
-    printf("at_vreadline: simplify_formats returned %d\n", sret);
-    free(line);
+    printf("at_vbytes_to_row: simplify_formats returned %d\n", sret);
     return -1;
   }
   // Interpret line
-  sret = vsscanf(line, fmt, ap);
-  if (sret != t.ncols) {
-    printf("at_vreadline: %d arguments filled, but %d were expected\n",
+  int ret = vsscanf(line, fmt, ap);
+  if (ret != t.ncols) {
+    printf("at_vbytes_to_row: %d arguments filled, but %d were expected\n",
 	   sret, t.ncols);
     ret = -1;
   }
+  return ret;
+};
+
+/*!
+  @brief Format arguments to form a line.
+  @param[in] t constant asciiTable_t table structure.
+  @param[out] buf Pointer to memory where the formated row should be stored.
+  @param[in] buf_siz int Size of buf. If the formatted message will exceed
+  the size of the buffer, an error will be returned.
+  @param[in] ap va_list Variables that should be formatted using the format
+  string to create a line in the table.
+  @return int On success, the number of characters written. -1 on failure.
+ */
+static inline
+int at_vrow_to_bytes(const asciiTable_t t, char *buf, const int buf_siz, va_list ap) {
+  int ret = vsnprintf(buf, buf_siz, t.format_str, ap);
+  return ret;
+};
+
+/*!
+  @brief Read a line from the file and parse it.
+  @param[in] t constant asciiTable_t table structure.
+  @param[out] ap va_list Pointers to variables where parsed arguments should be
+  stored.
+  @return int On success, the number of characters read. -1 on failure.
+ */
+static inline
+int at_vreadline(const asciiTable_t t, va_list ap) {
+  int ret;
+  // Read lines until there's one that's not a comment
+  size_t nread = LINE_SIZE_MAX;
+  char *line = (char*)malloc(nread);
+  ret = at_readline_full(t, line, nread);
+  if (ret < 0) {
+    free(line);
+    return ret;
+  }
+  // Parse line
+  int sret = at_vbytes_to_row(t, line, ap);
+  if (sret < 0)
+    ret = -1;
   free(line);
   return ret;
 };
@@ -720,6 +827,7 @@ int at_vbytes_to_array(const asciiTable_t t, const char *data,
   // check size of array
   /* int data_siz = strlen(data); */
   if ((data_siz % t.row_siz) != 0) {
+    printf("Data: %s\n", data);
     printf("Data size (%d) not an even number of rows (row size is %d)\n",
 	   data_siz, t.row_siz);
     return -1;
@@ -751,15 +859,23 @@ int at_vbytes_to_array(const asciiTable_t t, const char *data,
 /*!
   @brief Encode a set of arrays as bytes.
   @param[in] t constant asciiTable_t table structure.
-  @param[out] data Pointer to pointer to memory where encoded arrays should be
-  stored. It does not need to be allocate, only declared.
-  @param[in] nrows int Number of rows in each column array.
-  @param[in] ap va_list Pointers to memory where column data is stored.
+  @param[out] data Pointer to memory where encoded arrays should be stored.
+  @param[in] data_siz Integer size of data.
+  @param[in] ap va_list Pointers to memory where column data is stored. The first
+  argument in this set should be an integer, the number of rows in each column
+  array.
+  @returns int Number of bytes written. If larger than data_siz, the message will
+  not be written to data and data should be resized first.
  */
 static inline
-int at_varray_to_bytes(const asciiTable_t t, char **data, int nrows, va_list ap) {
-  // Allocate
-  *data = (char*)realloc(*data, nrows*t.row_siz);
+int at_varray_to_bytes(const asciiTable_t t, char *data, const int data_siz, va_list ap) {
+  int nrows = va_arg(ap, int);
+  int msg_siz = nrows*t.row_siz;
+  if (msg_siz > data_siz) {
+    printf("at_varray_to_bytes: Message size (%d bytes) will exceed allocated buffer (%d bytes).\n",
+	   msg_siz, data_siz);
+    return msg_siz;
+  }
   // Loop through
   int cur_pos = 0, col_siz;
   char *temp;
@@ -767,7 +883,7 @@ int at_varray_to_bytes(const asciiTable_t t, char **data, int nrows, va_list ap)
   for (i = 0; i < t.ncols; i++) {
     col_siz = nrows*t.format_siz[i];
     temp = va_arg(ap, char*);
-    memcpy(*data+cur_pos, temp, col_siz);
+    memcpy(data+cur_pos, temp, col_siz);
     cur_pos += col_siz;
   }
   return cur_pos;
@@ -795,16 +911,19 @@ int at_bytes_to_array(const asciiTable_t t, char *data, int data_siz, ...) {
 /*!
   @brief Encode a set of arrays as bytes.
   @param[in] t constant asciiTable_t table structure.
-  @param[out] data Pointer to pointer to memory where encoded arrays should be
-  stored. It does not need to be allocate, only declared.
-  @param[in] nrows int Number of rows in each column array.
-  @param[in] ... Pointers to memory where column data is stored.
+  @param[out] data Pointer to memory where encoded arrays should be stored.
+  @param[in] data_siz Integer size of data.
+  @param[in] ... Pointers to memory where column data is stored. The first
+  argument in this set should be an integer, the number of rows in each column
+  array.
+  @returns int Number of bytes written. If larger than data_siz, the message will
+  not be written to data and data should be resized first.
  */
 static inline
-int at_array_to_bytes(const asciiTable_t t, char **data, int nrows, ...) {
+int at_array_to_bytes(const asciiTable_t t, char *data, const int data_siz, ...) {
   va_list ap;
-  va_start(ap, nrows);
-  int ret = at_varray_to_bytes(t, data, nrows, ap);
+  va_start(ap, data);
+  int ret = at_varray_to_bytes(t, data, data_siz, ap);
   va_end(ap);
   return ret;
 };

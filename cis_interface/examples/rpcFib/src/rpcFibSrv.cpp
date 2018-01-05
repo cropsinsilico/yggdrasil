@@ -40,10 +40,10 @@ int main(int argc, char *argv[]) {
     // Sleep and then send response back
     if (timeSleep) 
       sleep(timeSleep);
-    rpc.send(2, input, result);
+    int flag = rpc.send(2, input, result);
   }
 
   printf("Goodbye from C++ rpcFibSrv\n");
-  
+  return 0;
 }
 

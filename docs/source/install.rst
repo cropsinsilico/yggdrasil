@@ -24,6 +24,16 @@ If you do not have admin privileges on the target machine, ``--user`` can be
 added to either the ``pip`` or ``setup.py`` installation commands.
 
 
+Additional Steps on Windows
+---------------------------
+
+As local communication on Windows is handled by ZeroMQ, running models written
+in C or C++ will require installing the ZeroMQ libraries for C and C++.
+
+Instructions for installing the ZeroMQ C and C++ libraries can be found
+`here <https://github.com/zeromq/czmq#building-and-installing>`_
+
+
 Additional Steps for Matlab Models
 ----------------------------------
 

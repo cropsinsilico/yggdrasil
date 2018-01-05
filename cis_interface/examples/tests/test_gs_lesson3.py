@@ -29,3 +29,4 @@ class TestExampleGS3(TestExample):
         with open(self.output_file, 'r') as fd:
             ocont = fd.read()
         nt.assert_equal(icont, ocont)
+        os.remove(self.output_file)

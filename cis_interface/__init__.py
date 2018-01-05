@@ -10,6 +10,7 @@ from cis_interface import drivers
 from cis_interface import dataio
 from cis_interface import tests
 from cis_interface import examples
+from cis_interface import runner
 
 
 # Set paths so that c headers are located
@@ -28,4 +29,4 @@ os.environ['CIS_INCLUDE'] = cis_include
 
 __all__ = ['backwards', 'platform', 'config', 'tools',
            'interface', 'drivers', 'dataio',
-           'tests', 'examples']
+           'tests', 'examples', 'runner']
