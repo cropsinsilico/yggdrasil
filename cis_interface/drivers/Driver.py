@@ -111,7 +111,7 @@ class Driver(CisClass, Thread):
             self.debug('Driver already terminated.')
             return
         self.debug()
-        self.wait()
+        self.wait(self.timeout)
         self.on_exit()
         self._terminated = True
         assert(not self.is_alive())
@@ -130,12 +130,12 @@ class Driver(CisClass, Thread):
         running."""
         self.debug()
 
-    def wait(self, timeout=0.0):
+    def wait(self, timeout=None):
         r"""Wait until model finish to return.
 
         Args:
             timeout (float, optional): Maximum time that should be waited for
-                the driver to finish. Defaults to 0 and is infinite.
+                the driver to finish. Defaults to None and is infinite.
 
         """
         T = self.start_timeout(timeout)
