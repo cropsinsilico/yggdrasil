@@ -2,7 +2,7 @@ import os
 import uuid
 import warnings
 import unittest
-from cis_interface import runner
+from cis_interface import runner, tools
 from cis_interface.examples import yamls
 from cis_interface.config import cis_cfg, cfg_logging
 from cis_interface.drivers.MatlabModelDriver import _matlab_installed
@@ -66,6 +66,13 @@ class TestExample(unittest.TestCase):
         if self.yaml is None:  # pragma: no cover
             return None
         return os.path.dirname(self.yaml)
+
+    @property
+    def yaml_contents(self):
+        r"""dict: Contents of yaml file."""
+        if self.yaml is None:  # pragma: no cover
+            return None
+        return tools.parse_yaml(self.yaml)
 
     @property
     def output_file(self):
