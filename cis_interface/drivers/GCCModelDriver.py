@@ -137,6 +137,9 @@ class GCCModelDriver(ModelDriver):
         if self.efile is None:
             osuffix = '_%s.out' % src_ext[1:]
             self.efile = src_base + osuffix
+        else:
+            if not os.path.isabs(self.efile):
+                self.efile = os.path.join(self.workingDir, self.efile)
         # Get flag specifying standard library
         if '++' in self.cc:
             std_flag = None
