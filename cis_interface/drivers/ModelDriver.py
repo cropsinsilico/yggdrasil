@@ -90,8 +90,6 @@ class ModelDriver(Driver):
         for k in self.env_copy:
             if k in os.environ:
                 self.env[k] = os.environ[k]
-        # self.env.update(os.environ)
-        # print(os.environ.keys())
 
     def start(self, no_popen=False):
         r"""Start subprocess before monitoring."""
