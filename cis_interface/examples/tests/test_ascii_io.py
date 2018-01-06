@@ -12,6 +12,30 @@ class TestExampleAsciiIO(TestExample):
     def __init__(self, *args, **kwargs):
         super(TestExampleAsciiIO, self).__init__(*args, **kwargs)
         self.name = 'ascii_io'
+        self._old_encoding = None
+
+    def set_utf8_encoding(self):
+        r"""Set the encoding to utf-8 if it is not already."""
+        old_lang = os.environ.get('LANG', '')
+        if 'UTF-8' not in old_lang:
+            self._old_encoding = old_lang
+            os.environ['LANG'] = 'en_US.UTF-8'
+            
+    def reset_encoding(self):
+        r"""Reset the encoding to the original value before the test."""
+        if self._old_encoding is not None:
+            os.environ['LANG'] = self._old_encoding
+            self._old_encoding = None
+
+    def setup(self):
+        r"""Set encoding before setup."""
+        self.set_utf8_encoding()
+        super(TestExampleAsciiIO, self).setup()
+
+    def teardown(self):
+        r"""Reset encoding to previous value after teardown."""
+        super(TestExampleAsciiIO, self).teardown()
+        self.reset_encoding()
 
     @property
     def input_file(self):

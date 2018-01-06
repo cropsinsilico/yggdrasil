@@ -1,7 +1,3 @@
-#
-# This should not be used directly by modelers
-#
-from __future__ import print_function
 import time
 import subprocess
 from logging import debug, warn
@@ -165,9 +161,9 @@ class MatlabProcess(object):  # pragma: matlab
     def print_output(self):
         r"""Print output from stdout and stderr."""
         if self.stdout_line:
-            print(self.stdout_line, end="")
+            self.print_encoded(self.stdout_line, end="")
         if self.stderr_line:
-            print(self.stderr_line, end="")
+            self.print_encoded(self.stderr_line, end="")
             
     def start(self):
         r"""Start asychronous call."""

@@ -1,7 +1,6 @@
 #
 # This should not be used directly by modelers
 #
-from __future__ import print_function
 import os
 import copy
 import subprocess
@@ -166,7 +165,7 @@ class ModelDriver(Driver):
                 self.debug("No more output")
                 return False
             self.debug("Received output")
-            print(backwards.bytes2unicode(line), end="")
+            self.print_encoded(line, end="")
         return True
 
     def run_finalize(self):
