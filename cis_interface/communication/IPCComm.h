@@ -30,7 +30,7 @@ static int _cisChannelNames[_cisTrackChannels];
 //static char * _cisChannelNames[_cisTrackChannels];
 /*! @brief Number of channels in use. */
 static unsigned _cisChannelsUsed = 0;
-static unsigned _rand_seeded = 0;
+static unsigned _ipc_rand_seeded = 0;
 
 /*!
   @brief Message buffer structure.
@@ -132,9 +132,9 @@ int new_ipc_address(comm_t *comm) {
   int ret;
   // TODO: small chance of reusing same number
   int key = 0;
-  if (!(_rand_seeded)) {
+  if (!(_ipc_rand_seeded)) {
     srand((unsigned long)comm); //time(NULL));
-    _rand_seeded = 1;
+    _ipc_rand_seeded = 1;
   }
   while (key == 0) {
     key = rand();
