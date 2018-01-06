@@ -139,6 +139,7 @@ class ClientRequestDriver(ConnectionDriver):
     def after_loop(self):
         r"""After client model signs off. Sent EOF to server."""
         with self.lock:
+            self.debug()
             self.icomm.close()
             if self.icomm._last_header is None:
                 self.icomm._last_header = dict()
@@ -180,6 +181,8 @@ class ClientRequestDriver(ConnectionDriver):
                     response_driver = ClientResponseDriver(*drv_args, **drv_kwargs)
                     self.response_drivers.append(response_driver)
                     response_driver.start()
+                    self.debug("Started response comm: address = %s, request_id = %s",
+                               self.model_response_address, self.request_id)
                 except BaseException:  # pragma: debug
                     self.exception("Could not create/start response driver.")
                     return False
