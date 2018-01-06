@@ -239,6 +239,7 @@ int zmq_comm_recv(const comm_t x, char **data, const int len,
   memcpy(*data, zframe_data(out), len_recv + 1);
   (*data)[len_recv] = '\0';
   zframe_destroy(&out);
+  cislog_debug("zmq_comm_recv(%s): returning %d", x.name, len_recv);
   return len_recv;
 };
 

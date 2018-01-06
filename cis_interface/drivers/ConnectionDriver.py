@@ -67,13 +67,14 @@ class ConnectionDriver(Driver):
         self.nsent = 0
         self.state = 'started'
         self.debug()
-        if False:
-            print(80 * '=')
-            print(self.__class__)
-            print(self.env)
-            print(self.icomm.name, self.icomm.address)
-            print(self.ocomm.name, self.ocomm.address)
-            print(80 * '=')
+        self.debug(80 * '=')
+        self.debug('class = %s', self.__class__)
+        # self.debug('    env: %s', str(self.env))
+        self.debug('    input: name = %s, address = %s',
+                   self.icomm.name, self.icomm.address)
+        self.debug('    output: name = %s, address = %s',
+                   self.ocomm.name, self.ocomm.address)
+        self.debug(80 * '=')
 
     @property
     def is_valid(self):

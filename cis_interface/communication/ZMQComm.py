@@ -508,6 +508,8 @@ class ZMQComm(CommBase.CommBase):
                                         "to %s. Maybe you meant to create a recv " +
                                         "PAIR?") % self.address)
                         raise e2
+            self.debug('Bound %s socket to %s.',
+                       self.socket_type_name, self.address)
             # Unbind if action should be connect
             if self.socket_action == 'connect':
                 self.unbind()
