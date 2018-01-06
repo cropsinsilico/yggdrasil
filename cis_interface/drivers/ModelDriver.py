@@ -164,7 +164,6 @@ class ModelDriver(Driver):
             if len(line) == 0:
                 self.debug("No more output")
                 return False
-            self.debug("Received output")
             self.print_encoded(line, end="")
         return True
 
