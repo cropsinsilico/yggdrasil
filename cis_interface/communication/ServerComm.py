@@ -97,11 +97,18 @@ class ServerComm(CommBase.CommBase):
         super(ServerComm, self).open()
         self.icomm.open()
 
-    def close(self):
-        r"""Close the connection."""
+    def close(self, wait_for_send=False):
+        r"""Close the connection.
+
+        Args:
+            wait_for_send (bool, optional): If True, any existing response
+                comms will be closed such that any pending messages can be
+                send/received. Defaults to False.
+
+        """
         self.icomm.close()
         if self.ocomm is not None:
-            self.ocomm.close()
+            self.ocomm.close(wait_for_send=wait_for_send)
         super(ServerComm, self).close()
 
     @property

@@ -80,8 +80,15 @@ class RMQAsyncComm(RMQComm):
             self.sleep()
         self.stop_timeout()
 
-    def close(self):
-        r"""Close connection."""
+    def close(self, wait_for_send=False):
+        r"""Close connection.
+
+        Args:
+            wait_for_send (bool, optional): If True, the connection will be
+                closed such that pending messages can still be received. Defaults
+                to False.
+
+        """
         with self.lock:
             self._close_called = True
         with self.lock:
@@ -125,7 +132,7 @@ class RMQAsyncComm(RMQComm):
         self.thread = None
         # Close workers
         with self.lock:
-            super(RMQAsyncComm, self).close()
+            super(RMQAsyncComm, self).close(wait_for_send=wait_for_send)
 
     @property
     def n_msg(self):

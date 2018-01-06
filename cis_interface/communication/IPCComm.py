@@ -224,8 +224,14 @@ class IPCComm(CommBase.CommBase):
             self.backlog_thread.start()
             self.debug("qid: %s", self.q.key)
             
-    def close(self):
-        r"""Close the connection."""
+    def close(self, wait_for_send=False):
+        r"""Close the connection.
+
+        Args:
+            wait_for_send (bool, optional): If True, the thread will block
+                until the queue is empty. Defaults to False.
+
+        """
         if self._bound and not self.is_open:
             try:
                 self.open_after_bind()
@@ -233,13 +239,17 @@ class IPCComm(CommBase.CommBase):
                 self.q = None
                 self._bound = False
         if self.is_open:
+            if wait_for_send:
+                while self.n_msg_queued > 0:
+                    self.verbose_debug("Waiting for messages to be dequeued.")
+                    self.sleep()
             try:
                 remove_queue(self.q)
             except (KeyError, sysv_ipc.ExistentialError):
                 pass
             self.q = None
             self._bound = False
-        super(IPCComm, self).close()
+        super(IPCComm, self).close(wait_for_send=wait_for_send)
             
     @property
     def is_open(self):
