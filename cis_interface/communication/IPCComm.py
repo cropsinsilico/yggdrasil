@@ -238,11 +238,11 @@ class IPCComm(CommBase.CommBase):
             except sysv_ipc.ExistentialError:  # pragma: debug
                 self.q = None
                 self._bound = False
-        if self.is_open:
-            if wait_for_send:
-                while self.n_msg_queued > 0:
-                    self.verbose_debug("Waiting for messages to be dequeued.")
-                    self.sleep()
+        if self.is_open and not wait_for_send:
+            # if wait_for_send:
+            #     while self.n_msg_queued > 0:
+            #         self.verbose_debug("Waiting for messages to be dequeued.")
+            #         self.sleep()
             try:
                 remove_queue(self.q)
             except (KeyError, sysv_ipc.ExistentialError):
