@@ -521,12 +521,13 @@ class ZMQComm(CommBase.CommBase):
         global _registered_servers
         srv_param = parse_address(srv_address)
         if (srv_address not in _registered_servers) or (srv_param['port'] is None):
+            self.debug("Creating new server proxy")
             proxy = ZMQProxy(srv_address, context=self.context)
             proxy.start()
             srv_address = proxy.srv_address
             _registered_servers[srv_address] = proxy
+        self.debug("Adding client to server proxy")
         _registered_servers[srv_address].cli_count += 1
-        # print("New client", srv_address, _registered_servers[srv_address].cli_count)
         self._client_proxy = _registered_servers[srv_address]
         return self._client_proxy.cli_address
 
@@ -534,10 +535,10 @@ class ZMQComm(CommBase.CommBase):
         r"""Sign-off from client proxy, closing the additional sockets if there
         are not more clients."""
         global _registered_servers
+        self.debug("Removing client from server proxy")
         self._client_proxy.cli_count -= 1
-        # print("Removed client", self._client_proxy.srv_address,
-        #       self._client_proxy.cli_count)
         if self._client_proxy.cli_count <= 0:
+            self.debug("Shutting down server proxy")
             self._client_proxy.terminate()
             self._client_proxy.join()
             assert(not self._client_proxy.is_alive())
