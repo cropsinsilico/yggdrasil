@@ -238,8 +238,6 @@ class ConnectionDriver(Driver):
         if msg == self.icomm.eof_msg:
             return self.on_eof()
         if flag:
-            # if len(msg) > 0:
-            #     print('recv', self.__class__, msg[:min(100, len(msg))])
             return msg
         else:
             return flag
@@ -323,8 +321,6 @@ class ConnectionDriver(Driver):
             flag = self._send_message(*args, **kwargs)
         else:
             flag = self._send_1st_message(*args, **kwargs)
-        # msg = args[0]
-        # print('send', self.__class__, msg[:min(100, len(msg))], flag)
         return flag
 
     def run(self):
@@ -352,7 +348,8 @@ class ConnectionDriver(Driver):
                 continue
             self.nrecv += 1
             self.state = 'received'
-            self.debug('Received message that is %d bytes.', len(msg))
+            self.debug('Received message that is %d bytes from %s.',
+                       len(msg), self.icomm.address)
             # Process message
             self.state = 'processing'
             msg = self.on_message(msg)
@@ -373,7 +370,7 @@ class ConnectionDriver(Driver):
                 break
             self.nsent += 1
             self.state = 'sent'
-            self.debug('Sent message.')
+            self.debug('Sent message to %s.', self.ocomm.address)
         # Perform post-loop follow up
         self.after_loop()
         self.debug('Received %d messages, processed %d, sent %d.',
