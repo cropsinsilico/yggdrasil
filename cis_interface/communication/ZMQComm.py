@@ -585,7 +585,7 @@ class ZMQComm(CommBase.CommBase):
             elif self.socket_action == 'connect':
                 self.disconnect()
             if wait_for_send:
-                linger=100
+                linger = 100
             else:
                 linger = 0
             self.socket.close(linger=linger)
