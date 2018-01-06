@@ -246,9 +246,10 @@ class CommBase(CisClass):
 
         """
         self.debug("Cleaning up work comms")
-        keys = [k for k in self._work_comms.keys()]
-        for c in keys:
-            self.remove_work_comm(c)
+        if not wait_for_send:
+            keys = [k for k in self._work_comms.keys()]
+            for c in keys:
+                self.remove_work_comm(c)
 
     @property
     def is_open(self):
