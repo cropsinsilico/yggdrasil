@@ -536,8 +536,10 @@ class ZMQComm(CommBase.CommBase):
         are not more clients."""
         global _registered_servers
         self.debug("Removing client from server proxy")
-        self._client_proxy.cli_count -= 1
-        if self._client_proxy.cli_count <= 0:
+        # self._client_proxy.cli_count -= 1
+        # if self._client_proxy.cli_count <= 0:
+        _registered_servers[self._client_proxy.srv_address].cli_count -= 1
+        if _registered_servers[self._client_proxy.srv_address].cli_count <= 0:
             self.debug("Shutting down server proxy")
             self._client_proxy.terminate()
             self._client_proxy.join()
