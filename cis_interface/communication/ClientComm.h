@@ -10,6 +10,7 @@
 
 // Handle is send address
 // Info is response
+static unsigned _client_rand_seeded = 0;
 
 /*!
   @brief Create a new channel.
@@ -18,6 +19,10 @@
 */
 static inline
 int new_client_address(comm_t *comm) {
+  if (!(_client_rand_seeded)) {
+    srand((unsigned long)comm);
+    _client_rand_seeded = 1;
+  }
   comm->type = _default_comm;
   return new_default_address(comm);
 };
@@ -29,6 +34,10 @@ int new_client_address(comm_t *comm) {
  */
 static inline
 int init_client_comm(comm_t *comm) {
+  if (!(_client_rand_seeded)) {
+    srand((unsigned long)comm);
+    _client_rand_seeded = 1;
+  }
   int ret;
   // Called to create temp comm for send/recv
   if ((strlen(comm->name) == 0) && (strlen(comm->address) > 0)) {
@@ -181,9 +190,13 @@ comm_head_t client_response_header(comm_t x, comm_head_t head) {
   }
   inc_client_response_count(x);
   ncomm = get_client_response_count(x);
+  cislog_debug("client_comm_send(%s): Created response comm number %d",
+	       x.name, ncomm);
   // Add address & request ID to header
   strcpy(head.response_address, res_comm[0][ncomm - 1]->address);
   sprintf(head.request_id, "%d", rand());
+  cislog_debug("client_comm_send(%s): response_address = %s, request_id = %s",
+	       x.name, head.response_address, head.request_id);
   return head;
 };
 
@@ -234,9 +247,14 @@ int client_comm_recv(comm_t x, char **data, const int len, const int allow_reall
   }
   comm_t ***res_comm = (comm_t***)(x.info);
   int ret = default_comm_recv(res_comm[0][0][0], data, len, allow_realloc);
-  if (ret < 0)
+  if (ret < 0) {
+    cislog_error("client_comm_recv(%s): default_comm_recv returned %d",
+		 x.name, ret);
     return ret;
+  }
   // Close response comm and decrement count of response comms
+  cislog_debug("client_comm_recv(%s): default_comm_recv returned %d",
+	       x.name, ret);
   free((char*)(res_comm[0][0]->serializer.info));
   free_default_comm(res_comm[0][0]);
   free(res_comm[0][0]);
