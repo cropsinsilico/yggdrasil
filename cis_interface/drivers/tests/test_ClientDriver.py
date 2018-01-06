@@ -15,6 +15,8 @@ class TestClientParam(parent.TestConnectionParam):
                            'request_name', 'request_address']
         # self.sleeptime = 0.5
         # self.timeout = 10.0
+        # Increased to allow forwarding between IPC comms on OSX
+        self.timeout = 5.0
         self.comm_name = _default_comm
         self.server_comm = _default_comm
         self.icomm_name = self.comm_name
