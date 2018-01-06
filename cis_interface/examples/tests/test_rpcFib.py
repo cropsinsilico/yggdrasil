@@ -12,6 +12,7 @@ class TestExampleRpcFib(TestExample):
         self.name = 'rpcFib'
         self.env = {'FIB_ITERATIONS': '3',
                     'FIB_SERVER_SLEEP_SECONDS': '0.01'}
+        self.debug_flag = True
 
     @property
     def result(self):
