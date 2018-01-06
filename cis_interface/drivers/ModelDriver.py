@@ -87,6 +87,7 @@ class ModelDriver(Driver):
             valgrind_flags = []
         self.valgrind_flags = valgrind_flags
         self.env_copy = ['LANG', 'PATH', 'USER']
+        # print(os.environ.keys())
         for k in self.env_copy:
             if k in os.environ:
                 self.env[k] = os.environ[k]
@@ -131,7 +132,6 @@ class ModelDriver(Driver):
                 line = out.readline()
                 if len(line) == 0:
                     break
-                self.debug("line = %s", line)
                 queue.put(line)
         except BaseException:  # pragma: debug
             self.error("Error getting output")
