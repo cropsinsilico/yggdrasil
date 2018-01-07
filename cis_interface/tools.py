@@ -161,7 +161,7 @@ class CisClass(object):
         """
         try:
             print(backwards.bytes2unicode(msg), *args, **kwargs)
-        except UnicodeEncodeError:
+        except UnicodeEncodeError:  # pragma: debug
             self.error("sys.stdout.encoding = %s, cannot print unicode",
                        sys.stdout.encoding)
             kwargs.pop('end', None)

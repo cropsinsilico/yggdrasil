@@ -1,7 +1,6 @@
 import uuid
 import zmq
 import threading
-# import multiprocessing
 from cis_interface import backwards
 from cis_interface.communication import CommBase
 from cis_interface.tools import CisClass, is_zmq_installed
@@ -159,7 +158,6 @@ def bind_socket(socket, address):
     return address
 
     
-# class ZMQProxy(multiprocessing.Process):
 class ZMQProxy(threading.Thread, CisClass):
     r"""Start a proxy in a new thread for a server address. A client-side
     address will be randomly generated.
@@ -796,7 +794,7 @@ class ZMQComm(CommBase.CommBase):
             timeout = self.recv_timeout
         # self.sleep()
         if timeout is not False:
-            if self.is_closed:
+            if self.is_closed:  # pragma: debug
                 return (False, None)
             ret = self.socket.poll(timeout=1000.0 * timeout)
             if ret == 0:

@@ -107,7 +107,7 @@ class ServerRequestDriver(ConnectionDriver):
         self.debug("after_loop()")
         with self.lock:
             self.icomm.close()
-            if self.icomm._last_header is None:
+            if self.icomm._last_header is None:  # pragma: debug
                 self.icomm._last_header = dict()
             if self.icomm._last_header.get('response_address', None) != CIS_CLIENT_EOF:
                 self.icomm._last_header['response_address'] = CIS_CLIENT_EOF

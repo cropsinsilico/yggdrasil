@@ -80,13 +80,13 @@ class CisTest(unittest.TestCase):
         self.debug_flag = False
         super(CisTest, self).__init__(*args, **kwargs)
 
-    def debug_log(self):
+    def debug_log(self):  # pragma: debug
         r"""Turn on debugging."""
         self._old_loglevel = cis_cfg.get('debug', 'psi')
         cis_cfg.set('debug', 'psi', 'DEBUG')
         cfg_logging()
 
-    def reset_log(self):
+    def reset_log(self):  # pragma: debug
         r"""Resetting logging to prior value."""
         if self._old_loglevel is not None:
             cis_cfg.set('debug', 'psi', self._old_loglevel)
@@ -101,7 +101,7 @@ class CisTest(unittest.TestCase):
 
     def setup(self, *args, **kwargs):
         r"""Create an instance of the class."""
-        if self.debug_flag:
+        if self.debug_flag:  # pragma: debug
             self.debug_log()
         self._instance = self.create_instance()
 
