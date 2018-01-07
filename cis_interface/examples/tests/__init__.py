@@ -5,7 +5,6 @@ import unittest
 from cis_interface import runner, tools
 from cis_interface.examples import yamls
 from cis_interface.config import cis_cfg, cfg_logging
-from cis_interface.examples import yamls
 from cis_interface.drivers.MatlabModelDriver import _matlab_installed
 
 
