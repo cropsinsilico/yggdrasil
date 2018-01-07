@@ -38,10 +38,11 @@ class TestModelDriverNoStart(TestModelParam, parent.TestDriverNoStart):
 
 class TestModelDriver(TestModelParam, parent.TestDriver):
     r"""Test runner for basic ModelDriver class."""
-    
-    def run_before_stop(self):
-        r"""Commands to run while the instance is running."""
-        self.instance.wait()
+
+    pass
+    # def run_before_stop(self):
+    #     r"""Commands to run while the instance is running."""
+    #     self.instance.wait(0.0)
 
 
 @unittest.skipIf(platform._is_win, "Platform is windows")

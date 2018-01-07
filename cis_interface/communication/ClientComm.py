@@ -101,9 +101,16 @@ class ClientComm(CommBase.CommBase):
         super(ClientComm, self).open()
         self.ocomm.open()
 
-    def close(self):
-        r"""Close the connection."""
-        self.ocomm.close()
+    def close(self, wait_for_send=False):
+        r"""Close the connection.
+
+        Args:
+            wait_for_send (bool, optional): If True, the output comm will
+                close such that any pending messages can be sent/received.
+                Defaults to False.
+
+        """
+        self.ocomm.close(wait_for_send=wait_for_send)
         for k in self.icomm_order:
             self.icomm[k].close()
         super(ClientComm, self).close()
@@ -129,6 +136,8 @@ class ClientComm(CommBase.CommBase):
         comm_kwargs = dict(direction='recv', is_response_client=True,
                            **self.response_kwargs)
         header = dict(request_id=str(uuid.uuid4()))
+        if header['request_id'] in self.icomm:  # pragma: debug
+            raise ValueError("Request ID %s already in use." % header['request_id'])
         c = new_comm('client_response_comm.' + header['request_id'], **comm_kwargs)
         header['response_address'] = c.address
         self.icomm[header['request_id']] = c

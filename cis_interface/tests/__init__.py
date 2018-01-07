@@ -6,7 +6,7 @@ import unittest
 import numpy as np
 from scipy.io import savemat, loadmat
 import nose.tools as nt
-# from cis_interface.config import cis_cfg, cfg_logging
+from cis_interface.config import cis_cfg, cfg_logging
 from cis_interface.tools import CIS_MSG_MAX as maxMsgSize
 from cis_interface.backwards import pickle, BytesIO
 from cis_interface.dataio.AsciiTable import AsciiTable
@@ -76,7 +76,22 @@ class CisTest(unittest.TestCase):
         self.timeout = 5.0
         self.sleeptime = 0.01
         self._teardown_complete = False
+        self._old_loglevel = None
+        self.debug_flag = False
         super(CisTest, self).__init__(*args, **kwargs)
+
+    def debug_log(self):
+        r"""Turn on debugging."""
+        self._old_loglevel = cis_cfg.get('debug', 'psi')
+        cis_cfg.set('debug', 'psi', 'DEBUG')
+        cfg_logging()
+
+    def reset_log(self):
+        r"""Resetting logging to prior value."""
+        if self._old_loglevel is not None:
+            cis_cfg.set('debug', 'psi', self._old_loglevel)
+            cfg_logging()
+            self._old_loglevel = None
 
     def setUp(self, *args, **kwargs):
         self.setup(*args, **kwargs)
@@ -86,11 +101,8 @@ class CisTest(unittest.TestCase):
 
     def setup(self, *args, **kwargs):
         r"""Create an instance of the class."""
-        # cis_cfg.set('debug', 'psi', 'DEBUG')
-        # cis_cfg.set('debug', 'rmq', 'INFO')
-        # cis_cfg.set('debug', 'client', 'INFO')
-        # # cis_cfg.set('rmq', 'namespace', self.namespace)
-        # cfg_logging()
+        if self.debug_flag:
+            self.debug_log()
         self._instance = self.create_instance()
 
     def teardown(self, *args, **kwargs):
@@ -101,6 +113,7 @@ class CisTest(unittest.TestCase):
             self.remove_instance(inst)
             delattr(self, '_instance')
         self._teardown_complete = True
+        self.reset_log()
 
     @property
     def description_prefix(self):

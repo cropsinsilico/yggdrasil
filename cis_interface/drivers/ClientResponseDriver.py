@@ -61,7 +61,9 @@ class ClientResponseDriver(ConnectionDriver):
     def after_loop(self):
         r"""Send EOF to the client response driver."""
         with self.lock:
+            self.debug()
             self.icomm.close()
+            self.ocomm.close(wait_for_send=True)
         super(ClientResponseDriver, self).after_loop()
         
     def send_message(self, *args, **kwargs):

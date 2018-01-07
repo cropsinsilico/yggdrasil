@@ -71,7 +71,7 @@ class GCCModelDriver(ModelDriver):
         if exit_code != 0:  # pragma: debug
             self.compiled = False
             self.error(' '.join(compile_args))
-            self.error(output)
+            self.print_encoded(output, end="")
             raise RuntimeError("Compilation failed with code %d." % exit_code)
         self.compiled = True
         self.debug('Compiled executable with gcc')
@@ -134,6 +134,9 @@ class GCCModelDriver(ModelDriver):
         if self.efile is None:
             osuffix = '_%s.out' % src_ext[1:]
             self.efile = src_base + osuffix
+        else:
+            if not os.path.isabs(self.efile):
+                self.efile = os.path.join(self.workingDir, self.efile)
         # Get flag specifying standard library
         if '++' in self.cc:
             std_flag = None

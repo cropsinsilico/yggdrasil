@@ -74,14 +74,6 @@ class Driver(CisClass, Thread):
         self._terminated = False
         self.lock = RLock()
 
-    # def __del__(self):
-    #     # self.debug('~')
-    #     if self.isAlive():  # pragma: debug
-    #         self.terminate()
-    #         self.join()
-    #     assert(not self.isAlive())
-    #     self.cleanup()
-
     def run(self):
         r"""Run something in a seperate thread."""
         self.debug()
@@ -111,9 +103,9 @@ class Driver(CisClass, Thread):
             self.debug('Driver already terminated.')
             return
         self.debug()
-        self.wait(self.timeout)
         self.on_exit()
         self._terminated = True
+        self.wait(self.timeout)
         assert(not self.is_alive())
         self.debug('Returning')
 
@@ -143,20 +135,3 @@ class Driver(CisClass, Thread):
             self.debug('Waiting for driver to finish...')
             self.sleep()
         self.stop_timeout()
-
-    # def copy_env(self, solf=None):
-    #     r"""Copy environment variables over from another model or the overall
-    #     environment.
-
-    #     Args:
-    #         solf (object, optional): Driver that environment variables should
-    #             be copied from. Defaults to None and the current environment
-    #             variables are copied over.
-
-    #     """
-    #     if solf is None:
-    #         self.env.update(os.environ)
-    #     else:
-    #         self.env.update(solf.env)
-
-    # =========================================================================

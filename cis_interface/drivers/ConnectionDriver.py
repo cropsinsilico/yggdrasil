@@ -67,13 +67,14 @@ class ConnectionDriver(Driver):
         self.nsent = 0
         self.state = 'started'
         self.debug()
-        if False:
-            print(80 * '=')
-            print(self.__class__)
-            print(self.env)
-            print(self.icomm.name, self.icomm.address)
-            print(self.ocomm.name, self.ocomm.address)
-            print(80 * '=')
+        self.debug(80 * '=')
+        self.debug('class = %s', self.__class__)
+        # self.debug('    env: %s', str(self.env))
+        self.debug('    input: name = %s, address = %s',
+                   self.icomm.name, self.icomm.address)
+        self.debug('    output: name = %s, address = %s',
+                   self.ocomm.name, self.ocomm.address)
+        self.debug(80 * '=')
 
     @property
     def is_valid(self):
@@ -237,8 +238,6 @@ class ConnectionDriver(Driver):
         if msg == self.icomm.eof_msg:
             return self.on_eof()
         if flag:
-            # if len(msg) > 0:
-            #     print('recv', self.__class__, msg[:min(100, len(msg))])
             return msg
         else:
             return flag
@@ -322,8 +321,6 @@ class ConnectionDriver(Driver):
             flag = self._send_message(*args, **kwargs)
         else:
             flag = self._send_1st_message(*args, **kwargs)
-        # msg = args[0]
-        # print('send', self.__class__, msg[:min(100, len(msg))], flag)
         return flag
 
     def run(self):
@@ -351,7 +348,8 @@ class ConnectionDriver(Driver):
                 continue
             self.nrecv += 1
             self.state = 'received'
-            self.debug('Received message that is %d bytes.', len(msg))
+            self.debug('Received message that is %d bytes from %s.',
+                       len(msg), self.icomm.address)
             # Process message
             self.state = 'processing'
             msg = self.on_message(msg)
@@ -372,7 +370,7 @@ class ConnectionDriver(Driver):
                 break
             self.nsent += 1
             self.state = 'sent'
-            self.debug('Sent message.')
+            self.debug('Sent message to %s.', self.ocomm.address)
         # Perform post-loop follow up
         self.after_loop()
         self.debug('Received %d messages, processed %d, sent %d.',

@@ -5,6 +5,7 @@ import unittest
 from cis_interface import runner, tools
 from cis_interface.examples import yamls
 from cis_interface.config import cis_cfg, cfg_logging
+from cis_interface.examples import yamls
 from cis_interface.drivers.MatlabModelDriver import _matlab_installed
 
 
@@ -17,18 +18,31 @@ class TestExample(unittest.TestCase):
         self.uuid = str(uuid.uuid4())
         self.env = {}
         self.runner = None
+        self._old_loglevel = None
+        self.debug_flag = False
         super(TestExample, self).__init__(*args, **kwargs)
+
+    def debug_log(self):
+        r"""Turn on debugging."""
+        self._old_loglevel = cis_cfg.get('debug', 'psi')
+        cis_cfg.set('debug', 'psi', 'DEBUG')
+        cfg_logging()
+
+    def reset_log(self):
+        r"""Resetting logging to prior value."""
+        if self._old_loglevel is not None:
+            cis_cfg.set('debug', 'psi', self._old_loglevel)
+            cfg_logging()
+            self._old_loglevel = None
 
     def setup(self, *args, **kwargs):
         r"""Setup to perform before test."""
-        cis_cfg.set('debug', 'psi', 'DEBUG')
-        cis_cfg.set('debug', 'rmq', 'INFO')
-        cis_cfg.set('debug', 'client', 'INFO')
-        cfg_logging()
+        if self.debug_flag:
+            self.debug_log()
 
     def teardown(self, *args, **kwargs):
         r"""Teardown to perform after test."""
-        pass
+        self.reset_log()
 
     def shortDescription(self):
         r"""Prefix first line of doc string with driver."""

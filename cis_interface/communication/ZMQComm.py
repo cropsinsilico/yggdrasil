@@ -508,6 +508,8 @@ class ZMQComm(CommBase.CommBase):
                                         "to %s. Maybe you meant to create a recv " +
                                         "PAIR?") % self.address)
                         raise e2
+            self.debug('Bound %s socket to %s.',
+                       self.socket_type_name, self.address)
             # Unbind if action should be connect
             if self.socket_action == 'connect':
                 self.unbind()
@@ -515,6 +517,91 @@ class ZMQComm(CommBase.CommBase):
             self._bound = False
         if self._bound:
             self.register_socket()
+
+    def connect(self):
+        r"""Connect to address."""
+        if self.is_open or self._bound or self._connected:  # pragma: debug
+            return
+        if (self.socket_action == 'connect'):
+            self._connected = True
+            self.debug("Connecting %s socket to %s",
+                       self.socket_type_name, self.address)
+            self.socket.connect(self.address)
+        if self._connected:
+            self.register_socket()
+
+    def unbind(self):
+        r"""Unbind from address."""
+        if self._bound:
+            self.debug('Unbinding from %s' % self.address)
+            self.socket.unbind(self.address)
+            self.unregister_socket()
+            self._bound = False
+
+    def disconnect(self):
+        r"""Disconnect from address."""
+        if self._connected:
+            self.debug('Disconnecting from %s' % self.address)
+            self.socket.disconnect(self.address)
+            self.unregister_socket()
+            self._connected = False
+
+    def open(self):
+        r"""Open connection by binding/connect to the specified socket."""
+        super(ZMQComm, self).open()
+        if not self.is_open:
+            # Set dealer identity
+            if self.socket_type_name == 'DEALER':
+                self.socket.setsockopt(zmq.IDENTITY, self.dealer_identity)
+            # Bind/connect
+            if self.socket_action == 'bind':
+                self.bind()
+            elif self.socket_action == 'connect':
+                # Bind then unbind to get port as necessary
+                self.bind()
+                self.unbind()
+                self.connect()
+            # Set topic filter
+            if self.socket_type_name == 'SUB':
+                self.socket.setsockopt(zmq.SUBSCRIBE, self.topic_filter)
+            self._openned = True
+
+    def close(self, wait_for_send=False):
+        r"""Close connection.
+
+        Args:
+            wait_for_send (bool, optional): If True, linger will be set to
+                100 on close to ensure that the message is routed. Defaults
+                to False.
+
+        """
+        self.debug("self.socket.closed = %s", str(self.socket.closed))
+        if self.socket.closed:
+            self.debug("Socket already closed: %s", self.address)
+        else:
+            self.debug("Closing socket %s", self.address)
+            if self.socket_action == 'bind':
+                self.unbind()
+            elif self.socket_action == 'connect':
+                self.disconnect()
+            if wait_for_send:
+                linger = 100
+            else:
+                linger = 0
+            self.socket.close(linger=linger)
+        # Ensure socket not still open
+        self._openned = False
+        self.unregister_socket()
+        # if self.is_open or self._bound or self._connected:
+        #     self.debug("Closing socket %s", self.address)
+        #     self.socket.close()  # linger=1000*self.sleeptime)
+        #     self._openned = False
+        #     self.unregister_socket()
+        # Close proxy
+        if self.is_client and self._client_proxy:
+            self.debug("Closing client proxy")
+            self.close_client_proxy()
+        super(ZMQComm, self).close(wait_for_send=wait_for_send)
 
     def get_client_proxy(self, srv_address):
         r"""Create a new client proxy for the specified address."""
@@ -536,8 +623,10 @@ class ZMQComm(CommBase.CommBase):
         are not more clients."""
         global _registered_servers
         self.debug("Removing client from server proxy")
-        self._client_proxy.cli_count -= 1
-        if self._client_proxy.cli_count <= 0:
+        # self._client_proxy.cli_count -= 1
+        # if self._client_proxy.cli_count <= 0:
+        _registered_servers[self._client_proxy.srv_address].cli_count -= 1
+        if _registered_servers[self._client_proxy.srv_address].cli_count <= 0:
             self.debug("Shutting down server proxy")
             self._client_proxy.terminate()
             self._client_proxy.join()
@@ -546,54 +635,6 @@ class ZMQComm(CommBase.CommBase):
                 del _registered_servers[self._client_proxy.srv_address]
         self._client_proxy = None
 
-    def unbind(self):
-        r"""Unbind from address."""
-        if self._bound:
-            self.socket.unbind(self.address)
-            self.unregister_socket()
-            self._bound = False
-
-    # def disconnect(self):
-    #     r"""Disconnect from address."""
-    #     if self._connected:
-    #         self.socket.disconnect(self.address)
-    #         self.unregister_socket()
-    #         self._connected = False
-
-    def open(self):
-        r"""Open connection by binding/connect to the specified socket."""
-        super(ZMQComm, self).open()
-        if not self.is_open:
-            # Set dealer identity
-            if self.socket_type_name == 'DEALER':
-                self.socket.setsockopt(zmq.IDENTITY, self.dealer_identity)
-            # Bind/connect
-            if self.socket_action == 'bind':
-                self.bind()
-            elif self.socket_action == 'connect':
-                # Bind then unbind to get port as necessary
-                self.bind()
-                self.unbind()
-                self.debug('Connecting %s socket to %s.',
-                           self.socket_type_name, self.address)
-                self._connected = True
-                self.socket.connect(self.address)
-                self.register_socket()
-            # Set topic filter
-            if self.socket_type_name == 'SUB':
-                self.socket.setsockopt(zmq.SUBSCRIBE, self.topic_filter)
-            self._openned = True
-
-    def close(self):
-        r"""Close connection."""
-        if self.is_open or self._bound or self._connected:
-            self.socket.close()  # linger=1000*self.sleeptime)
-            self._openned = False
-            self.unregister_socket()
-        if self.is_client and self._client_proxy:
-            self.close_client_proxy()
-        super(ZMQComm, self).close()
-            
     @property
     def is_open(self):
         r"""bool: True if the socket is open."""
@@ -753,7 +794,7 @@ class ZMQComm(CommBase.CommBase):
         # Poll until there is a message
         if timeout is None:
             timeout = self.recv_timeout
-        self.sleep()
+        # self.sleep()
         if timeout is not False:
             if self.is_closed:
                 return (False, None)

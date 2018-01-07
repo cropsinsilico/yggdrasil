@@ -1,12 +1,16 @@
 #
 # This should not be used directly by modelers
 #
-from __future__ import print_function
 import os
 import copy
 from pprint import pformat
 from cis_interface import backwards, platform, tools
 from cis_interface.drivers.Driver import Driver
+from threading import Thread
+try:
+    from Queue import Queue, Empty
+except ImportError:
+    from queue import Queue, Empty  # python 3.x
 
 
 def preexec():  # pragma: no cover
@@ -81,11 +85,10 @@ class ModelDriver(Driver):
             valgrind_flags = []
         self.valgrind_flags = valgrind_flags
         self.env_copy = ['LANG', 'PATH', 'USER']
+        # print(os.environ.keys())
         for k in self.env_copy:
             if k in os.environ:
                 self.env[k] = os.environ[k]
-        # self.env.update(os.environ)
-        # print(os.environ.keys())
 
     def start(self, no_popen=False):
         r"""Start subprocess before monitoring."""
@@ -110,6 +113,26 @@ class ModelDriver(Driver):
         self.process = tools.popen_nobuffer(pre_args + self.args, env=env,
                                             cwd=self.workingDir,
                                             preexec_fn=preexec)
+        # Start thread to queue output
+        self.queue = Queue()
+        self.queue_thread = Thread(target=self.enqueue_output,
+                                   args=(self.process.stdout, self.queue))
+        self.queue_thread.daemon = True
+        self.queue_thread.start()
+
+    def enqueue_output(self, out, queue):
+        r"""Method to call in thread to keep passing output to queue."""
+        try:
+            while self.process is not None:
+                line = out.readline()
+                if len(line) == 0:
+                    break
+                queue.put(line)
+        except BaseException:  # pragma: debug
+            self.error("Error getting output")
+            raise
+        queue.put(backwards.unicode2bytes(''))
+        out.close()
 
     def run(self):
         r"""Run the model on a new process, receiving output from."""
@@ -117,11 +140,9 @@ class ModelDriver(Driver):
                    self.args, os.getcwd(), self.workingDir, pformat(self.env))
         self.run_setup()
         flag = True
+        self.debug("Beginning loop")
         while self._running and (self.process is not None) and flag:
             flag = self.run_loop()
-            # if not flag:
-            #     break
-            # self.sleep()
         self.run_finalize()
 
     def run_setup(self):
@@ -130,54 +151,32 @@ class ModelDriver(Driver):
     def run_loop(self):
         r"""Loop to check if model is still running and forward output."""
         # Continue reading until there is not any output
-        self.debug()
         try:
-            line = self.process.stdout.readline()
-        except BaseException:  # pragma: debug
-            self.error("Error getting output")
-            return False
-        if len(line) == 0:
-            self.debug("No more output")
-            return False
-        self.debug("Received output")
-        print(backwards.bytes2unicode(line), end="")
+            line = self.queue.get_nowait()
+        except Empty:
+            self.sleep()
+            return True
+        else:
+            if len(line) == 0:
+                self.debug("No more output")
+                return False
+            self.print_encoded(line, end="")
         return True
 
     def run_finalize(self):
         r"""Actions to perform after run_loop has finished. Mainly checking
         if there was an error and then handling it."""
+        self.debug()
         self.kill_process()
-        # # Handle error
-        # if self.process is not None:
-        #     try:
-        #         self.process.poll()
-        #         # T = self.start_timeout()
-        #         # while ((not T.is_out) and
-        #         #        (self.process.returncode is None)):  # pragma: debug
-        #         #     self.sleep()
-        #         #     self.process.poll()
-        #         # self.stop_timeout()
-        #         if self.process.returncode is None:  # pragma: debug
-        #             self.error("Return code is None, killing model process")
-        #             self.process.kill()
-        #         if self.process.returncode != 0:
-        #             self.error("return code of %s indicates model error.",
-        #                        str(self.process.returncode))
-        #     except AttributeError:  # pragma: debug
-        #         if self.process is None:
-        #             return
-        #         raise
 
     def wait_process(self, timeout=None):
         r"""Wait for some amount of time for the process to finish.
 
         Args:
             timeout (float, optional): Time (in seconds) that should be waited.
-                Defaults to self.timeout.
+                Defaults to None and is infinite.
 
         """
-        if timeout is None:
-            timeout = self.timeout
         self.process.poll()
         T = self.start_timeout(timeout)
         while ((not T.is_out) and
@@ -188,7 +187,9 @@ class ModelDriver(Driver):
 
     def kill_process(self):
         r"""Kill the process running the model, checking return code."""
+        self.debug()
         with self.lock:
+            self.debug()
             self._running = False
             if self.process is not None:
                 # Kill process if it is still running
@@ -197,8 +198,7 @@ class ModelDriver(Driver):
                     self.error("Return code is None, killing model process")
                     try:
                         self.process.kill()
-                        self.wait_process()
-                        self.debug("Killed model process")
+                        self.wait_process(self.timeout)
                     except OSError:  # pragma: debug
                         self.error("Error killing model process")
                 # Check return code
@@ -215,15 +215,4 @@ class ModelDriver(Driver):
             return
         self.debug()
         self.kill_process()
-        # with self.lock:
-        #     self._running = False
-        #     if self.process:
-        #         self.process.poll()
-        #         if self.process.returncode is None:
-        #             self.debug('Terminating model process')
-        #             try:
-        #                 self.process.kill()
-        #             except OSError:  # pragma: debug
-        #                 self.error("Error killing model process")
-        #             self.process = None
         super(ModelDriver, self).terminate()

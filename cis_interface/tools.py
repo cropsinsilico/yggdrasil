@@ -1,4 +1,5 @@
 """This modules offers various tools."""
+from __future__ import print_function
 from threading import Timer
 import logging
 import os
@@ -200,6 +201,24 @@ class CisClass(object):
         self.sched_out = None
         self.suppress_special_debug = False
         self.logger = logging.getLogger(self.__module__)
+
+    def print_encoded(self, msg, *args, **kwargs):
+        r"""Print bytes to stdout, encoding if possible.
+
+        Args:
+            msg (str, bytes): Message to print.
+            *args: Additional arguments are passed to print.
+            **kwargs: Additional keyword arguments are passed to print.
+
+
+        """
+        try:
+            print(backwards.bytes2unicode(msg), *args, **kwargs)
+        except UnicodeEncodeError:
+            self.error("sys.stdout.encoding = %s, cannot print unicode",
+                       sys.stdout.encoding)
+            kwargs.pop('end', None)
+            print(msg, *args, **kwargs)
 
     def printStatus(self):
         r"""Print the class status."""

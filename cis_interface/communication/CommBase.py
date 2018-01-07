@@ -237,11 +237,19 @@ class CommBase(CisClass):
         r"""Open the connection."""
         pass
 
-    def close(self):
-        r"""Close the connection."""
-        keys = [k for k in self._work_comms.keys()]
-        for c in keys:
-            self.remove_work_comm(c)
+    def close(self, wait_for_send=False):
+        r"""Close the connection.
+
+        Args:
+            wait_for_send (bool, optional): If True, close will be delayed or
+                done such that a recently sent message has time to be received.
+
+        """
+        self.debug("Cleaning up work comms")
+        if not wait_for_send:
+            keys = [k for k in self._work_comms.keys()]
+            for c in keys:
+                self.remove_work_comm(c)
 
     @property
     def is_open(self):
