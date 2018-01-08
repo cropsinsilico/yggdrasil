@@ -14,9 +14,13 @@ except ImportError:
     from queue import Queue, Empty  # python 3.x
 
 
-def preexec():  # pragma: no cover
-    # Don't forward signals - used to ignore signals
-    os.setpgrp()
+if platform._is_win:
+    # TODO: Signal fowarding on Windows
+    preexec = None
+else:
+    def preexec():  # pragma: no cover
+        # Don't forward signals - used to ignore signals
+        os.setpgrp()
 
 
 class ModelDriver(Driver):
