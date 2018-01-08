@@ -29,7 +29,6 @@ environment:
 
   matrix:
     - PYTHON_VERSION: "2.7"
-      INSTALLZMQ: 0
       INSTALLRMQ: 0
     - PYTHON_VERSION: "2.7"
     - PYTHON_VERSION: "3.6"
