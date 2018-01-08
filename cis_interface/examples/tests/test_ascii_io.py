@@ -1,6 +1,7 @@
 import os
 import numpy as np
 import nose.tools as nt
+import tempfile
 from cis_interface.examples.tests import TestExample
 from cis_interface.dataio.AsciiTable import AsciiTable
 
@@ -56,7 +57,7 @@ class TestExampleAsciiIO(TestExample):
         r"""str: Output file for the run."""
         for o, yml in self.runner.outputdrivers.items():
             if yml['driver'] == 'AsciiFileOutputDriver':
-                return yml['args']
+                return os.path.join(tempfile.gettempdir(), yml['args'])
         raise Exception('Could not locate output file in yaml.')  # pragma: debug
 
     @property
@@ -65,7 +66,7 @@ class TestExampleAsciiIO(TestExample):
         for o, yml in self.runner.outputdrivers.items():
             if (((yml['driver'] == 'AsciiTableOutputDriver') and
                  (not yml.get('as_array', False)))):
-                return yml['args']
+                return os.path.join(tempfile.gettempdir(), yml['args'])
         raise Exception('Could not locate output table in yaml.')  # pragma: debug
 
     @property
@@ -74,7 +75,7 @@ class TestExampleAsciiIO(TestExample):
         for o, yml in self.runner.outputdrivers.items():
             if (((yml['driver'] == 'AsciiTableOutputDriver') and
                  (yml.get('as_array', False)))):
-                return yml['args']
+                return os.path.join(tempfile.gettempdir(), yml['args'])
         raise Exception('Could not locate output array in yaml.')  # pragma: debug
 
     def check_file(self):
