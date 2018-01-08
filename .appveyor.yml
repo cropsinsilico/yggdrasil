@@ -63,7 +63,6 @@ install:
   # Install specified version of numpy and dependencies
   - "conda install --yes -c conda-forge numpy nose coverage coveralls
   flake8 setuptools pystache pika pyyaml astropy scipy"
-  - "pip install sysv_ipc"
   - "pip install zmq"
 
   # Install cis_interface
