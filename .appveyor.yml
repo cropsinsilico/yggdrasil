@@ -28,13 +28,13 @@ environment:
     INSTALLRMQ: 1
 
   matrix:
-    - PYTHON_VERSION: "2.7"
+    - platform: x64
+      PYTHON_VERSION: "2.7"
       INSTALLRMQ: 0
-    - PYTHON_VERSION: "2.7"
-    - PYTHON_VERSION: "3.6"
-
-platform:
-  -x64
+    - platform: x64
+      PYTHON_VERSION: "2.7"
+    - platform: x64
+      PYTHON_VERSION: "3.6"
 
 install:
   - "SET MSVCVER=%APPVEYOR_BUILD_WORKER_IMAGE:~-2,2%"
@@ -45,9 +45,9 @@ install:
 
   # Setup Visual C++ toolset
   # TODO: Generic case. This is specific to 64bit VS 2015/2017 (14.0/16.0)
-  - if "%MSVCVER%" == "16" if "%PLATFORM%" == "-x64" call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars64.bat"
-  - if "%MSVCVER%" == "14" if "%PLATFORM%" == "-x64" call "C:\Program Files\Microsoft SDKs\Windows\v7.1\Bin\SetEnv.cmd" /x64
-  - if "%MSVCVER%" == "14" if "%PLATFORM%" == "-x64" call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x86_amd64
+  - if "%MSVCVER%" == "16" if "%PLATFORM%" == "x64" call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars64.bat"
+  - if "%MSVCVER%" == "14" if "%PLATFORM%" == "x64" call "C:\Program Files\Microsoft SDKs\Windows\v7.1\Bin\SetEnv.cmd" /x64
+  - if "%MSVCVER%" == "14" if "%PLATFORM%" == "x64" call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x86_amd64
 
   # Create a conda environment
   - "conda update -q --yes conda"
