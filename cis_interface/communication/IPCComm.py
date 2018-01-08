@@ -358,7 +358,7 @@ class IPCComm(CommBase.CommBase):
             flag = self._send(self.backlog_send[0], no_backlog=True)
             if flag:
                 self.pop_backlog_send()
-        except sysv_ipc.BusyError:
+        except sysv_ipc.BusyError:  # pragma: debug
             self.debug('Queue full, failed to send backlogged message.')
         return True
 
@@ -392,7 +392,7 @@ class IPCComm(CommBase.CommBase):
             if no_backlog or len(self.backlog_send) == 0:
                 self.debug('Sending %d bytes', len(payload))
                 self.q.send(payload, block=False)
-            else:
+            else:  # pragma: debug
                 raise sysv_ipc.BusyError(
                     'Backlogged messages must be sent first')
         except sysv_ipc.BusyError:
@@ -479,6 +479,6 @@ class IPCComm(CommBase.CommBase):
         with self.backlog_lock:
             self._backlog_recv = []
             self._backlog_send = []
-        while self.n_msg_queued > 0:
+        while self.n_msg_queued > 0:  # pragma: debug
             _, _ = self.q.receive()
         super(IPCComm, self).purge()
