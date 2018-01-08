@@ -65,7 +65,7 @@ install:
   - "if %INSTALLRMQ% == 1 ci/start-rmqserver-windows.bat"  
 
   # Install dependencies using conda/pip
-  - "conda install --yes -c conda-forge numpy nose coverage coveralls flake8"
+  - "conda install --yes -c conda-forge numpy nose coverage coveralls codecov flake8"
   - "conda install --yes -c conda-forge pystache pyyaml astropy scipy pika"
   - "pip install zmq"
 
@@ -84,3 +84,4 @@ test_script:
 
 after_test:
   - "coveralls"
+  - "codecov"
