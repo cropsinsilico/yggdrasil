@@ -1,5 +1,6 @@
 import subprocess
 import os
+from cis_interface import platform
 from cis_interface.communication import _default_comm
 from cis_interface.tools import is_zmq_installed, is_ipc_installed
 from cis_interface.drivers.ModelDriver import ModelDriver
@@ -37,7 +38,8 @@ class GCCModelDriver(ModelDriver):
             Additional arguments that start with '-I' are included in the
             compile command. Others are assumed to be runtime arguments.
         cc (str, optional): C/C++ Compiler that should be used. Defaults to
-            gcc for '.c' files, and g++ for '.cpp' or '.cc' files.
+            gcc for '.c' files, and g++ for '.cpp' or '.cc' files on Linux or
+            OSX. Defaults to cl on Windows.
         **kwargs: Additional keyword arguments are passed to parent class.
 
     Attributes (in additon to parent class's):
@@ -77,7 +79,7 @@ class GCCModelDriver(ModelDriver):
             self.print_encoded(output, end="")
             raise RuntimeError("Compilation failed with code %d." % exit_code)
         self.compiled = True
-        self.debug('Compiled executable with gcc')
+        self.debug('Compiled executable with %s', self.cc)
 
     def parse_arguments(self, args):
         r"""Sort arguments based on their syntax. Arguments ending with '.c' or
@@ -130,10 +132,13 @@ class GCCModelDriver(ModelDriver):
         self.cfile = self.src[0]
         src_base, src_ext = os.path.splitext(self.cfile)
         if self.cc is None:
-            if src_ext in '.c':
-                self.cc = 'gcc'
+            if platform._is_win:
+                self.cc = 'cl'
             else:
-                self.cc = 'g++'
+                if src_ext in '.c':
+                    self.cc = 'gcc'
+                else:
+                    self.cc = 'g++'
         if self.efile is None:
             osuffix = '_%s.out' % src_ext[1:]
             self.efile = src_base + osuffix
