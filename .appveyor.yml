@@ -24,8 +24,13 @@ environment:
 
   global:
     PYTHON: "C:\\Miniconda3-x64"
+    INSTALLZMQ: 1
+    INSTALLRMQ: 1
 
   matrix:
+    - PYTHON_VERSION: "2.7"
+      INSTALLZMQ: 0
+      INSTALLRMQ: 0
     - PYTHON_VERSION: "2.7"
     - PYTHON_VERSION: "3.6"
 
@@ -49,11 +54,11 @@ install:
   - "python --version"
 
   # Install ZeroMQ
-  - "ci/install-czmq-windows.bat"
+  - "if %INSTALLZMQ% == 1 ci/install-czmq-windows.bat"
 
   # Install & start RabbitMQ
-  - "ci/install-rmqserver-windows.bat"  
-  - "ci/start-rmqserver-windows.bat"  
+  - "if %INSTALLRMQ% == 1 ci/install-rmqserver-windows.bat"  
+  - "if %INSTALLRMQ% == 1 ci/start-rmqserver-windows.bat"  
 
   # Install specified version of numpy and dependencies
   - "conda install --yes -c conda-forge numpy nose coverage coveralls
