@@ -36,8 +36,6 @@ platform:
 install:
   - "SET MSVCVER=%APPVEYOR_BUILD_WORKER_IMAGE:~-2,2%"
   - "if %MSVCVER% gtr 11 set /a MSVCVER = MSVCVER - 1"
-  - "ECHO %MSVCVER%"
-  - "SET MSVCVER=14"
   - "SET VSINSTALLDIR=%ProgramFiles(x86)%\\Microsoft Visual Studio %MSVCVER%.0\\"
   - "SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%"
   - "SET MPLBACKEND=agg"
