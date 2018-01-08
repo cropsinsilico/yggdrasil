@@ -36,7 +36,8 @@ platform:
 install:
   - "ECHO %APPVEYOR_BUILD_WORKER_IMAGE%"
   - "SET MSVCVER=14"
-  - "SET VSINSTALLDIR=%PROGRAMFILES%\Microsoft Visual Studio %MSVCVER%.0\VC\"
+  - "SET VSINSTALLDIR=C:\Program Files (x86)\Microsoft Visual Studio %MSVCVER%.0\VC\"
+  #- "SET VSINSTALLDIR=%PROGRAMFILES%\Microsoft Visual Studio %MSVCVER%.0\VC\"
   #- "SET VSINSTALLDIR=%ProgramFiles(x86)%\Microsoft Visual Studio %MSVCVER%.0\VC\"
   - "SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%"
   - "SET MPLBACKEND=agg"

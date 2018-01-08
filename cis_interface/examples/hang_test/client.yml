@@ -1,0 +1,10 @@
+---
+
+models:
+  - name: client1
+    driver: GCCModelDriver
+    args: ./src/client1.cpp
+
+  - name: client2
+    driver: GCCModelDriver
+    args: ./src/client2.cpp

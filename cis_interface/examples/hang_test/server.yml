@@ -1,0 +1,6 @@
+---
+
+model:
+  name: server
+  driver: GCCModelDriver
+  args: ./src/server.cpp
