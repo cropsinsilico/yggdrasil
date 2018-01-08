@@ -60,11 +60,20 @@ class GCCModelDriver(ModelDriver):
         self.cc = cc
         # Prepare arguments to compile the file
         self.parse_arguments(args)
-        compile_args = [self.cc, "-o", self.efile]
-        compile_args += self.src + self.ccflags + self.ldflags
+        compile_args = [self.cc]
+        if not platform._is_win:
+            compile_args += ["-o", self.efile]
+        compile_args += self.src + self.ccflags
+        if platform._is_win:
+            compile_args += ['/link', '/out:%s' % self.efile]
+        compile_args.append(self.ldflags)
         if os.path.isfile(self.efile):
             os.remove(self.efile)
-        self.args = [os.path.join(".", self.efile)] + self.run_args
+        if platform._is_win:
+            self.args = [os.path.splitext(self.efile)[0]]
+        else:
+            self.args = [os.path.join(".", self.efile)]
+        self.args += self.run_args
         self.compiled = True
         self.debug("Compiling")
         comp_process = popen_nobuffer(compile_args)
@@ -98,20 +107,30 @@ class GCCModelDriver(ModelDriver):
             args = [args]
         self.src = []
         self.ldflags = _linker_flags
-        self.ccflags = ['-g', '-Wall'] + _compile_flags
+        if platform._is_win:
+            self.ccflags = ['/W4']
+        else:
+            self.ccflags = ['-g', '-Wall']
+        self.ccflags += _compile_flags
         self.ccflags.append('-DCIS_DEBUG=%d' % self.logger.getEffectiveLevel())
         self.run_args = []
         self.efile = None
         is_object = False
+        is_link = False
         for a in args:
             if os.path.splitext(a)[1] in ['.c', '.cpp', '.cc']:
                 self.src.append(a)
-            elif a.startswith('-l') or a.startswith('-L'):
+            elif a.startswith('-l') or a.startswith('-L') or is_link:
+                if a.startswith('/out:'):
+                    self.efile = a.split('/out:')[-1]
                 if a not in self.ldflags:
                     self.ldflags.append(a)
             elif a == '-o':
                 # Next argument should be the name of the executable
                 is_object = True
+            elif a == '/link':
+                # Following arguments should be linker options
+                is_link = True
             elif a.startswith('-'):
                 if a not in self.ccflags:
                     self.ccflags.append(a)
@@ -137,13 +156,16 @@ class GCCModelDriver(ModelDriver):
                 else:
                     self.cc = 'g++'
         if self.efile is None:
-            osuffix = '_%s.out' % src_ext[1:]
+            if platform._is_win:
+                osuffix = '_%s.exe'
+            else:
+                osuffix = '_%s.out' % src_ext[1:]
             self.efile = src_base + osuffix
         else:
             if not os.path.isabs(self.efile):
                 self.efile = os.path.join(self.workingDir, self.efile)
         # Get flag specifying standard library
-        if '++' in self.cc:
+        if '++' in self.cc and (not platform._is_win):
             std_flag = None
             for a in self.ccflags:
                 if a.startswith('-std='):
