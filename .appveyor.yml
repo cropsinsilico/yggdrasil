@@ -15,11 +15,18 @@ branches:
 # Do not build on tags (GitHub and BitBucket)
 skip_tags: true
 
+os: Visual Studio 2015
+
 #---------------------------------#
 #    environment configuration    #
 #---------------------------------#
 
 environment:
+
+  CMAKE_GENERATOR: "Visual Studio 14 2015"
+  MSVCVERSION: "v140"
+  MSVCYEAR: "vs2015"
+  WITH_TWEETNACL: ON
 
   global:
     PYTHON: "C:\\Miniconda3-x64"
@@ -30,6 +37,11 @@ environment:
 
 platform:
   -x64
+
+init:
+  - cmake --version
+  - msbuild /version
+  - cmd: reg add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp" /v UserAuthentication /t REG_DWORD /d 0 /f
 
 install:
   - "SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%"
