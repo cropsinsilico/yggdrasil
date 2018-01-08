@@ -6,7 +6,6 @@ branches:
   # whitelist
   only:
     - topic/windows
-    - topic/zmq
 
   # blacklist
   except:
