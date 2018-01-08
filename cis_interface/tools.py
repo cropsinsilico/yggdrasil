@@ -28,7 +28,11 @@ def is_zmq_installed():
         bool: True if both libraries are installed, False otherwise.
 
     """
-    process = subprocess.Popen(['gcc', '-lzmq', '-lczmq'],
+    if platform._is_win:
+        cc = 'cl'
+    else:
+        cc = 'gcc'
+    process = subprocess.Popen([cc, '-lzmq', '-lczmq'],
                                stdout=subprocess.PIPE,
                                stderr=subprocess.PIPE)
     outs, errs = process.communicate()
