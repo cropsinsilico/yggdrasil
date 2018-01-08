@@ -53,9 +53,11 @@ git clone git://github.com/zeromq/czmq.git %CZMQ_SOURCEDIR%
 md %CZMQ_BUILDDIR%
 cd %CZMQ_BUILDDIR%
 cmake -G "%CMAKE_GENERATOR%" -D CMAKE_INCLUDE_PATH="%ZEROMQ_INCLUDE_DIR%" -D CMAKE_LIBRARY_PATH="%ZEROMQ_LIBRARY_DIR%" -D CMAKE_C_FLAGS_RELEASE="/MT" -D CMAKE_CXX_FLAGS_RELEASE="/MT" -D CMAKE_C_FLAGS_DEBUG="/MTd" %CZMQ_SOURCEDIR%
+ls
 make install
 make
-msbuild /v:minimal /p:Configuration=Release libczmq.vcxproj
+msbuild /v:minimal /p:Configuration=Release czmq.sln libczmq
+:: msbuild /v:minimal /p:Configuration=Release libczmq.vcxproj
 :: cd %CZMQ_SOURCEDIR%\builds\msvc
 :: CALL configure.bat
 :: cd vs20%DIRVER%
