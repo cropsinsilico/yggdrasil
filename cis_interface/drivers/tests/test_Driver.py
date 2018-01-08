@@ -1,99 +1,121 @@
 import os
-import uuid
 import nose.tools as nt
-from cis_interface import runner, tools
-from cis_interface.config import cis_cfg
+from cis_interface.tools import CisClass
 from cis_interface.tests import CisTest
-
-# TODO: Test Ctrl-C interruption
+from cis_interface.communication import get_comm_class
 
 
 class TestParam(CisTest):
     r"""Test parameters for basic Driver test class.
 
     Attributes:
-        driver (str): The driver class.
+        driver (str): Name of driver class.
         args (object): Driver arguments.
-        uuid (str): Random unique identifier.
         namespace (str): PSI namespace to run drivers in.
-        attr_list (list): List of attributes that should be checked for after
-            initialization.
-        inst_kwargs (dict): Keyword arguments for the driver.
-        nprev_queues (int): The number of IPC queues that exist before the
-            driver instance is created.
+        nprev_comm (int): The number of communication queues, sockets, and
+            channel that exist when the driver instance is created.
 
     """
 
     def __init__(self, *args, **kwargs):
+        super(TestParam, self).__init__(*args, **kwargs)
         self.driver = 'Driver'
         self.args = None
-        self.uuid = str(uuid.uuid4())
         self.namespace = 'TESTING_%s' % self.uuid
-        self.attr_list = ['name', 'sleeptime', 'longsleep', 'timeout',
-                          'yml', 'env', 'namespace', 'rank', 'workingDir',
-                          'lock']
-        self.inst_kwargs = {'yml': {'workingDir': self.workingDir}}
-        self.nprev_queues = 0
-        self.timeout = 1.0
-        self.sleeptime = 0.01
-        super(TestParam, self).__init__(*args, **kwargs)
+        self.attr_list += ['name', 'sleeptime', 'longsleep', 'timeout',
+                           'yml', 'env', 'namespace', 'rank', 'workingDir',
+                           'lock']
+        self._inst_kwargs = {'yml': {'workingDir': self.workingDir},
+                             'timeout': self.timeout,
+                             'sleeptime': self.sleeptime,
+                             # 'workingDir': self.workingDir,
+                             'namespace': self.namespace}
+        self.nprev_comm = 0
+        self.debug_flag = False
 
     @property
-    def description_prefix(self):
-        r"""Set description prefix to driver name."""
+    def skip_start(self):
+        r"""bool: True if driver shouldn't be started. False otherwise."""
+        return ('NoStart' in str(self.__class__))
+
+    @property
+    def cls(self):
+        r"""str: Driver class."""
         return self.driver
 
-    def setup(self, skip_start=False):
-        r"""Create a driver instance and start the driver."""
-        cis_cfg.set('debug', 'psi', 'INFO')
-        cis_cfg.set('debug', 'rmq', 'INFO')
-        cis_cfg.set('debug', 'client', 'INFO')
-        cis_cfg.set('rmq', 'namespace', self.namespace)
-        runner.setup_cis_logging(self.__module__)
-        runner.setup_rmq_logging()
-        self.nprev_queues = len(tools._registered_queues.keys())
-        self._instance = self.create_instance()
-        if not skip_start:
+    @property
+    def mod(self):
+        r"""str: Absolute path to module containing driver."""
+        return 'cis_interface.drivers.%s' % self.cls
+
+    @property
+    def inst_args(self):
+        r"""tuple: Driver arguments."""
+        out = [self.name]
+        if self.args is not None:
+            out.append(self.args)
+        return out
+
+    @property
+    def inst_kwargs(self):
+        r"""dict: Keyword arguments for creating a class instance."""
+        out = super(TestParam, self).inst_kwargs
+        out['timeout'] = self.timeout
+        out['sleeptime'] = self.sleeptime
+        return out
+
+    @property
+    def comm_count(self):
+        r"""int: Return the number of comms."""
+        return get_comm_class().comm_count()
+
+    def setup(self, nprev_comm=None):
+        r"""Create a driver instance and start the driver.
+
+        Args:
+            nprev_comm (int, optional): Number of previous comm channels.
+                If not provided, it is determined to be the present number of
+                default comms.
+
+        """
+        if nprev_comm is None:
+            nprev_comm = self.comm_count
+        self.nprev_comm = nprev_comm
+        super(TestParam, self).setup()
+        if not self.skip_start:
             self.instance.start()
 
-    def teardown(self):
-        r"""Remove the instance, stoppping it."""
-        if hasattr(self, '_instance'):
-            inst = self._instance
-            self._instance = None
-            self.remove_instance(inst)
-            delattr(self, '_instance')
-        nt.assert_equal(len(tools._registered_queues.keys()), self.nprev_queues)
+    def teardown(self, ncurr_comm=None):
+        r"""Remove the instance, stoppping it.
+
+        Args:
+            ncurr_comm (int, optional): Number of current comms. If not
+                provided, it is determined to be the present number of comms.
+
+        """
+        super(TestParam, self).teardown()
+        if ncurr_comm is None:
+            x = CisClass(self.name, timeout=self.timeout,
+                         sleeptime=self.sleeptime)
+            Tout = x.start_timeout()
+            while ((not Tout.is_out) and
+                   (self.comm_count > self.nprev_comm)):  # pragma: debug
+                x.sleep()
+            x.stop_timeout()
+            ncurr_comm = self.comm_count
+        nt.assert_less_equal(ncurr_comm, self.nprev_comm)
 
     @property
     def name(self):
         r"""str: Name of the test driver."""
-        return 'Test%s_%s' % (self.driver, self.uuid)
-
-    @property
-    def instance(self):
-        r"""object: Instance of the test driver."""
-        if not hasattr(self, '_instance'):  # pragma: debug
-            self._instance = self.create_instance()
-        return self._instance
-
-    @property
-    def workingDir(self):
-        r"""str: Working directory."""
-        return os.path.dirname(__file__)
+        return 'Test%s_%s' % (self.cls, self.uuid)
 
     def create_instance(self):
         r"""Create a new instance object."""
         curpath = os.getcwd()
         os.chdir(self.workingDir)
-        inst = runner.create_driver(self.driver, self.name, self.args,
-                                    namespace=self.namespace,
-                                    # workingDir=self.workingDir,
-                                    timeout=self.timeout,
-                                    sleeptime=self.sleeptime,
-                                    **self.inst_kwargs)
+        inst = super(TestParam, self).create_instance()
         os.chdir(curpath)
-        # print("created instance")
         return inst
 
     def remove_instance(self, inst):
@@ -104,7 +126,7 @@ class TestParam(CisTest):
             inst.join()
         inst.cleanup()
         assert(not inst.is_alive())
-        # print("removed instance")
+        super(TestParam, self).remove_instance(inst)
 
 
 class TestDriver(TestParam):
@@ -143,6 +165,8 @@ class TestDriver(TestParam):
         r"""Start the thread, then stop it."""
         self.assert_before_stop()
         self.run_before_stop()
+        self.instance.wait(self.sleeptime)
+        self.instance.stop()
         self.instance.stop()
         self.assert_after_stop()
 
@@ -159,16 +183,11 @@ class TestDriver(TestParam):
 
         
 class TestDriverNoStart(TestParam):
-    r"""Test runner for basic Driver class without starting driver.
+    r"""Test runner for basic Driver class without starting driver."""
 
-    Attributes (in addition to parent class):
-        -
-
-    """
-
-    def setup(self):
+    def setup(self, *args, **kwargs):
         r"""Create a driver instance without starting the driver."""
-        super(TestDriverNoStart, self).setup(skip_start=True)
+        super(TestDriverNoStart, self).setup(*args, **kwargs)
         assert(not self.instance.is_alive())
 
     def test_attributes(self):
@@ -182,6 +201,7 @@ class TestDriverNoStart(TestParam):
         self.instance.display(1)
         self.instance.info(1)
         self.instance.debug(1)
+        self.instance.verbose_debug(1)
         self.instance.critical(1)
         self.instance.warn(1)
         self.instance.error(1)

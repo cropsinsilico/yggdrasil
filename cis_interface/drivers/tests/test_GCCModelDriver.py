@@ -1,13 +1,13 @@
+import os
 import nose.tools as nt
 from cis_interface.tests import scripts
 import cis_interface.drivers.tests.test_ModelDriver as parent
-from cis_interface.drivers.GCCModelDriver import (
-    _incl_interface, GCCModelDriver)
+from cis_interface.drivers.GCCModelDriver import GCCModelDriver
 
 
 def test_GCCModelDriver_errors():
     r"""Test GCCModelDriver errors."""
-    nt.assert_raises(ValueError, GCCModelDriver, 'test', 'test.py')
+    nt.assert_raises(RuntimeError, GCCModelDriver, 'test', 'test.py')
 
 
 class TestGCCModelParam(parent.TestModelParam):
@@ -16,24 +16,40 @@ class TestGCCModelParam(parent.TestModelParam):
     def __init__(self, *args, **kwargs):
         super(TestGCCModelParam, self).__init__(*args, **kwargs)
         self.driver = 'GCCModelDriver'
-        self.args = [scripts['c'], '1', '-I' + _incl_interface, '-lm']
         self.attr_list += ['compiled']
+        src = scripts['c']
+        script_dir = os.path.dirname(src[0])
+        self.args = src + ['1', '-I' + script_dir, '-L' + script_dir]
 
-    # Done in driver
-    # def teardown(self):
-    #     r"""Remove the instance, stoppping it."""
-    #     fexec = self.instance.efile
-    #     super(TestGCCModelParam, self).teardown()
-    #     if os.path.isfile(fexec):
-    #         os.remove(fexec)
-            
-
+        
 class TestGCCModelDriverNoStart(TestGCCModelParam,
                                 parent.TestModelDriverNoStart):
     r"""Test runner for GCCModelDriver without start."""
-    pass
+
+    def __init__(self, *args, **kwargs):
+        # Version to run C++ example
+        super(TestGCCModelDriverNoStart, self).__init__(*args, **kwargs)
+        src = scripts['cpp']
+        script_dir = os.path.dirname(src[0])
+        self.args = src + ['1', '-I' + script_dir, '-L' + script_dir,
+                           '-o', 'test_exe']
+    
+    # Done in driver, but driver not started
+    def teardown(self):
+        r"""Remove the instance, stoppping it."""
+        self.instance.cleanup()
+        super(TestGCCModelDriverNoStart, self).teardown()
+
+
+class TestGCCModelDriverNoStart_std(TestGCCModelDriverNoStart):
+    r"""Test runner for GCCModelDriver with std lib specified."""
+
+    def __init__(self, *args, **kwargs):
+        super(TestGCCModelDriverNoStart_std, self).__init__(*args, **kwargs)
+        self.args.append('-std=c++11')
 
 
 class TestGCCModelDriver(TestGCCModelParam, parent.TestModelDriver):
     r"""Test runner for GCCModelDriver."""
+
     pass

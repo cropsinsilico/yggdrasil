@@ -24,6 +24,10 @@ int main(int argc, char *argv[]) {
   // If there is an error, the flag will be negative
   flag = psi_send(out_channel, buf, flag);
   
+  // Free input/output channels
+  psi_free(&in_channel);
+  psi_free(&out_channel);
+  
   return 0;
 }
 

@@ -1,6 +1,6 @@
 import numpy as np
 import copy
-from cis_interface.interface.scanf import scanf
+# from cis_interface.interface.scanf import scanf
 from cis_interface.dataio.AsciiFile import AsciiFile
 from cis_interface import backwards
 from numpy.compat import asbytes
@@ -466,8 +466,7 @@ class AsciiTable(AsciiFile):
         new_fmt = (self.column.join(
             [backwards.unicode2bytes(cformat2pyscanf(f)) for f in self.fmts]) +
             self.newline)
-        out = scanf(backwards.bytes2unicode(new_fmt),
-                    backwards.bytes2unicode(line))
+        out = backwards.scanf_bytes(new_fmt, line)
         return out
         
     def validate_line(self, line):

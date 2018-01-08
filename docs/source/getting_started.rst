@@ -93,7 +93,10 @@ and 'outputB' is to a local file.
 
 .. include:: examples/gs_lesson4_yml.rst
 
-The RMQ input and output drivers allow for models to pass messages reguardless
-of if the models are on the same machine.
+This example uses the standard input/output drivers (IPC for Linux and OSX,
+ZeroMQ for Windows) which only work for communication between models that
+are on the same system. However, these can be replaced with RMQ input and output
+drivers (RMQInputDriver/RMQOutputDriver), which allow for message passing
+when the models are not on the same machine.
 
-.. todo:: Conneciton drivers.
+.. todo:: Connection drivers.

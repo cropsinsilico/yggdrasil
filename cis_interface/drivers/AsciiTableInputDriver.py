@@ -1,5 +1,4 @@
 from cis_interface.drivers.AsciiFileInputDriver import AsciiFileInputDriver
-from cis_interface.dataio.AsciiTable import AsciiTable
 from cis_interface.tools import eval_kwarg
 
 
@@ -29,61 +28,25 @@ class AsciiTableInputDriver(AsciiFileInputDriver):
             the end of a line. Default set by :class:`AsciiFile`.
         as_array (bool, optional): If True, the table contents are sent all at
             once as an array. Defaults to False.
-        \*\*kwargs: Additional keyword arguments are passed to parent class's
-            __init__ method.
-
-    Attributes (in additon to parent class's):
-        file (:class:`AsciiTable.AsciiTable`): Associated special class for
-            ASCII table.
-        as_array (bool): If True, the table contents are sent all at once as an
-            array.
+        **kwargs: Additional keyword arguments are passed to parent class.
 
     """
-    def __init__(self, name, args, as_array=False, **kwargs):
+    def __init__(self, name, args, **kwargs):
         file_keys = ['format_str', 'dtype', 'column_names', 'use_astropy',
-                     'column']
-        file_kwargs = {}
+                     'column', 'as_array']
+        icomm_kws = kwargs.get('icomm_kws', {})
+        icomm_kws.setdefault('comm', 'AsciiTableComm')
         for k in file_keys:
             if k in kwargs:
-                file_kwargs[k] = kwargs.pop(k)
-                if k in ['column_names', 'use_astropy']:
-                    file_kwargs[k] = eval_kwarg(file_kwargs[k])
-        super(AsciiTableInputDriver, self).__init__(
-            name, args, skip_AsciiFile=True, **kwargs)
+                icomm_kws[k] = kwargs.pop(k)
+                # Eval commands non-string args from yaml string
+                if k in ['column_names', 'use_astropy', 'as_array']:
+                    icomm_kws[k] = eval_kwarg(icomm_kws[k])
+        kwargs['icomm_kws'] = icomm_kws
+        super(AsciiTableInputDriver, self).__init__(name, args, **kwargs)
         self.debug('(%s)', args)
-        self.file_kwargs.update(**file_kwargs)
-        self.as_array = eval_kwarg(as_array)
-        self.file = AsciiTable(self.args, 'r', **self.file_kwargs)
-        self.debug('(%s): done with init', args)
 
-    def open_file(self):
+    def before_loop(self):
         r"""Open the file and send the format string."""
-        with self.lock:
-            self.ipc_send(self.file.format_str)
-            self.file.open()
-
-    def file_read(self):
-        r"""Read either the entire table or just a single row.
-
-        Returns:
-            str: Read data.
-
-        """
-        if self.as_array:
-            with self.lock:
-                data = self.file.read_bytes(order='F')
-                # Only read the table array once
-                self.close_file()
-        else:
-            data = super(AsciiTableInputDriver, self).file_read(dont_parse=True)
-        return data
-
-    def file_send(self, data):
-        r"""Send table data as a long message.
-
-        Args:
-            data (str): Message.
-
-        """
-        with self.lock:
-            return self.ipc_send_nolimit(data)
+        super(AsciiTableInputDriver, self).before_loop()
+        self.send_message(self.icomm.file.format_str)

@@ -12,26 +12,28 @@ int main(int argc,char *argv[]){
   psiAsciiFileInput_t FileInput = psiAsciiFileInput("inputC_file", 1);
   psiAsciiFileOutput_t FileOutput = psiAsciiFileOutput("outputC_file", 1);
   // Input & output from a table row by row
-  psiAsciiTableInput_t TableInput = psiAsciiTableInput("inputC_table", 1);
+  psiAsciiTableInput_t TableInput = psiAsciiTableInput("inputC_table", 0, 1);
   psiAsciiTableOutput_t TableOutput = psiAsciiTableOutput("outputC_table",
-							  "%5s\t%ld\t%3.1f\t%3.1lf%+3.1lfj\n", 1);
+							  "%5s\t%ld\t%3.1f\t%3.1lf%+3.1lfj\n",
+							  0, 1);
   // Input & output from a table as an array
-  psiAsciiTableInput_t ArrayInput = psiAsciiTableInput("inputC_array", 1);
+  psiAsciiTableInput_t ArrayInput = psiAsciiTableInput("inputC_array", 1, 1);
   psiAsciiTableOutput_t ArrayOutput = psiAsciiTableOutput("outputC_array",
-							  "%5s\t%ld\t%3.1f\t%3.1lf%+3.1lfj\n", 1);
+							  "%5s\t%ld\t%3.1f\t%3.1lf%+3.1lfj\n",
+							  1, 1);
 
   // Read lines from ASCII text file until end of file is reached.
   // As each line is received, it is then sent to the output ASCII file.
   printf("ascii_io(C): Receiving/sending ASCII file.\n");
-  char line[LINE_SIZE_MAX];
+  char *line = (char*)malloc(LINE_SIZE_MAX);
   ret = 0;
   while (ret >= 0) {
     // Receive a single line
-    ret = af_recv_line(FileInput, line, LINE_SIZE_MAX);
+    ret = psiRecv(FileInput, &line);
     if (ret >= 0) {
       // If the receive was succesful, send the line to output
       printf("File: %s", line);
-      ret = af_send_line(FileOutput, line);
+      ret = psiSend(FileOutput, line);
       if (ret != 0) {
 	printf("ascii_io(C): ERROR SENDING LINE\n");
 	break;
@@ -40,9 +42,9 @@ int main(int argc,char *argv[]){
       // If the receive was not succesful, send the end-of-file message to
       // close the output file.
       printf("End of file input (C)\n");
-      af_send_eof(FileOutput);
     }
   }
+  if (line) free(line);
 
   // Read rows from ASCII table until end of file is reached.
   // As each row is received, it is then sent to the output ASCII table
@@ -54,14 +56,14 @@ int main(int argc,char *argv[]){
   ret = 0;
   while (ret >= 0) {
     // Receive a single row with values stored in scalars declared locally
-    ret = at_recv_row(TableInput, &name, &number, &value,
-		      &comp_real, &comp_imag);
+    ret = psiRecv(TableInput, &name, &number, &value, &comp_real, &comp_imag);
+		      
     if (ret >= 0) {
       // If the receive was succesful, send the values to output. Formatting
       // is taken care of on the output driver side.
       printf("Table: %.5s, %ld, %3.1f, %g%+gj\n",
 	     name, number, value, comp_real, comp_imag);
-      ret = at_send_row(TableOutput, name, number, value, comp_real, comp_imag);
+      ret = psiSend(TableOutput, name, number, value, comp_real, comp_imag);
       if (ret != 0) {
 	printf("ascii_io(C): ERROR SENDING ROW\n");
 	break;
@@ -70,7 +72,6 @@ int main(int argc,char *argv[]){
       // If the receive was not succesful, send the end-of-file message to
       // close the output file.
       printf("End of table input (C)\n");
-      at_send_eof(TableOutput);
     }
   }
 
@@ -83,8 +84,9 @@ int main(int argc,char *argv[]){
   double *value_arr = NULL;
   double *comp_real_arr = NULL;
   double *comp_imag_arr = NULL;
-  ret = at_recv_array(ArrayInput, &name_arr, &number_arr, &value_arr,
-		      &comp_real_arr, &comp_imag_arr);
+  ret = psiRecv(ArrayInput, &name_arr, &number_arr, &value_arr,
+		&comp_real_arr, &comp_imag_arr);
+		      
   if (ret < 0) {
     printf("ascii_io(C): ERROR RECVING ARRAY\n");
   } else {
@@ -96,8 +98,8 @@ int main(int argc,char *argv[]){
 	     value_arr[i], comp_real_arr[i], comp_imag_arr[i]);
     // Send the columns in the array to output. Formatting is handled on the
     // output driver side.
-    ret = at_send_array(ArrayOutput, ret, name_arr, number_arr, value_arr,
-			comp_real_arr, comp_imag_arr);
+    ret = psiSend(ArrayOutput, ret, name_arr, number_arr, value_arr,
+		  comp_real_arr, comp_imag_arr);
     if (ret != 0)
       printf("ascii_io(C): ERROR SENDING ARRAY\n");
   }
@@ -109,13 +111,5 @@ int main(int argc,char *argv[]){
   if (comp_real_arr) free(comp_real_arr);
   if (comp_imag_arr) free(comp_imag_arr);
 
-  // Clean up to deallocate things
-  cleanup_pafi(&FileInput);
-  cleanup_pafo(&FileOutput);
-  cleanup_pati(&TableInput);
-  cleanup_pato(&TableOutput);
-  cleanup_pati(&ArrayInput);
-  cleanup_pato(&ArrayOutput);
-  
   return ret;
 }

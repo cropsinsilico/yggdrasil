@@ -2,22 +2,36 @@ import os
 import numpy as np
 import nose.tools as nt
 from cis_interface.interface import PsiInterface
-from cis_interface.interface.PsiInterface import PSI_MSG_EOF, PSI_MSG_MAX
-from cis_interface.drivers import (IODriver, RPCDriver,
-                                   AsciiFileInputDriver,
-                                   AsciiTableInputDriver)
-from cis_interface.tests import CisTest
-from cis_interface.drivers.tests.test_IODriver import IOInfo
-from cis_interface.backwards import pickle
+from cis_interface.tools import PSI_MSG_EOF, PSI_MSG_MAX
+from cis_interface.drivers import (
+    import_driver, InputCommDriver, OutputCommDriver)
+from cis_interface.tests import CisTest, IOInfo
+
+
+def test_maxMsgSize():
+    r"""Test max message size."""
+    nt.assert_equal(PsiInterface.maxMsgSize(), PSI_MSG_MAX)
+
+
+def test_eof_msg():
+    r"""Test eof message signal."""
+    nt.assert_equal(PsiInterface.eof_msg(), PSI_MSG_EOF)
 
 
 def test_PsiMatlab_class():
     r"""Test Matlab interface for classes."""
     name = 'test'
-    drv = IODriver.IODriver(name, '_IN')
+    # Input
+    drv = InputCommDriver.InputCommDriver(name, direction='send')
     drv.start()
     os.environ.update(drv.env)
-    PsiInterface.PsiMatlab('PsiInput', (name,))
+    PsiInterface.PsiMatlab('PsiInput', (name, 'hello\\nhello'))
+    drv.terminate()
+    # Output
+    drv = OutputCommDriver.OutputCommDriver(name, direction='send')
+    drv.start()
+    os.environ.update(drv.env)
+    PsiInterface.PsiMatlab('PsiOutput', (name, 'hello\\nhello'))
     drv.terminate()
 
 
@@ -25,27 +39,62 @@ def test_PsiMatlab_variables():
     r"""Test Matlab interface for variables."""
     nt.assert_equal(PsiInterface.PsiMatlab('PSI_MSG_MAX'), PSI_MSG_MAX)
     nt.assert_equal(PsiInterface.PsiMatlab('PSI_MSG_EOF'), PSI_MSG_EOF)
-    
-    
-class TestPsiInput(CisTest, IOInfo):
-    r"""Test basic input to python."""
-    def __init__(self, *args, **kwargs):
-        super(TestPsiInput, self).__init__(*args, **kwargs)
-        IOInfo.__init__(self)
-        self.name = 'test'
-        self.driver = None
-        self.instance = None
 
-    def setup(self):
+
+# @nt.nottest
+class TestBase(CisTest, IOInfo):
+    r"""Test class for interface classes."""
+    def __init__(self, *args, **kwargs):
+        super(TestBase, self).__init__(*args, **kwargs)
+        IOInfo.__init__(self)
+        self._mod = 'cis_interface.interface.PsiInterface'
+        self.name = 'test' + self.uuid
+        self.matlab = False
+        self.driver = None
+        self.driver_name = 'CommDriver'
+        self.driver_args = [self.name]
+        self._driver_kwargs = {}
+        self._inst_args = [self.name]
+
+    @property
+    def driver_class(self):
+        r"""class: Driver class."""
+        return import_driver(self.driver_name)
+
+    @property
+    def driver_kwargs(self):
+        r"""dict: Arguments for the test driver."""
+        return self._driver_kwargs
+
+    @property
+    def inst_kwargs(self):
+        r"""dict: Arguments for the interface instance."""
+        out = super(TestBase, self).inst_kwargs
+        out['matlab'] = self.matlab
+        return out
+        
+    def setup(self, skip_start=False):
         r"""Start driver and instance."""
-        self.driver = IODriver.IODriver(self.name, '_IN')
-        self.driver.start()
+        self.driver = self.driver_class(*self.driver_args, **self.driver_kwargs)
+        if not skip_start:
+            self.driver.start()
         os.environ.update(self.driver.env)
-        self.instance = PsiInterface.PsiInput(self.name)
+        self._skip_start = skip_start
+        super(TestBase, self).setup()
 
     def teardown(self):
         r"""Stop the driver."""
-        self.driver.stop()
+        if not self._skip_start:
+            self.driver.stop()
+        super(TestBase, self).teardown()
+
+    
+class TestPsiInput(TestBase):
+    r"""Test basic input to python."""
+    def __init__(self, *args, **kwargs):
+        super(TestPsiInput, self).__init__(*args, **kwargs)
+        self._cls = 'PsiInput'
+        self.driver_name = 'InputCommDriver'
 
     def test_init(self):
         r"""Test error on init."""
@@ -53,40 +102,33 @@ class TestPsiInput(CisTest, IOInfo):
 
     def test_recv(self):
         r"""Test receiving small message."""
-        # self.driver.ipc_send(self.msg_short)
-        self.driver.sched_task(0.01, self.driver.ipc_send,
+        self.driver.sched_task(0.01, self.driver.send,
                                args=[self.msg_short])
-        msg_flag, msg_recv = self.instance.recv()
+        msg_flag, msg_recv = self.instance.recv(self.timeout)
         assert(msg_flag)
         nt.assert_equal(msg_recv, self.msg_short)
 
     def test_recv_nolimit(self):
         r"""Test receiving large message."""
-        self.driver.ipc_send_nolimit(self.msg_long)
-        msg_flag, msg_recv = self.instance.recv_nolimit()
+        self.driver.send_nolimit(self.msg_long)
+        msg_flag, msg_recv = self.instance.recv_nolimit(self.timeout)
         assert(msg_flag)
         nt.assert_equal(msg_recv, self.msg_long)
 
 
-class TestPsiOutput(CisTest, IOInfo):
+class TestPsiInputMatlab(TestPsiInput):
+    r"""Test basic input to python as passed from matlab."""
+    def __init__(self, *args, **kwargs):
+        super(TestPsiInputMatlab, self).__init__(*args, **kwargs)
+        self.matlab = True
+
+
+class TestPsiOutput(TestBase):
     r"""Test basic output to python."""
     def __init__(self, *args, **kwargs):
         super(TestPsiOutput, self).__init__(*args, **kwargs)
-        IOInfo.__init__(self)
-        self.name = 'test'
-        self.driver = None
-        self.instance = None
-
-    def setup(self):
-        r"""Start driver and instance."""
-        self.driver = IODriver.IODriver(self.name, '_OUT')
-        self.driver.start()
-        os.environ.update(self.driver.env)
-        self.instance = PsiInterface.PsiOutput(self.name)
-
-    def teardown(self):
-        r"""Stop the driver."""
-        self.driver.stop()
+        self._cls = 'PsiOutput'
+        self.driver_name = 'OutputCommDriver'
 
     def test_init(self):
         r"""Test error on init."""
@@ -96,454 +138,558 @@ class TestPsiOutput(CisTest, IOInfo):
         r"""Test sending small message."""
         msg_flag = self.instance.send(self.msg_short)
         assert(msg_flag)
-        msg_recv = self.driver.recv_wait(timeout=1)
+        msg_flag, msg_recv = self.driver.recv(self.timeout)
+        assert(msg_flag)
         nt.assert_equal(msg_recv, self.msg_short)
 
     def test_send_nolimit(self):
         r"""Test sending large message."""
         msg_flag = self.instance.send_nolimit(self.msg_long)
         assert(msg_flag)
-        msg_recv = self.driver.recv_wait_nolimit(timeout=1)
+        msg_flag, msg_recv = self.driver.recv_nolimit(self.timeout)
+        assert(msg_flag)
         nt.assert_equal(msg_recv, self.msg_long)
 
 
-class TestPsiRpc(CisTest, IOInfo):
+class TestPsiOutputMatlab(TestPsiOutput):
+    r"""Test basic output to python as passed from matlab."""
+    def __init__(self, *args, **kwargs):
+        super(TestPsiOutputMatlab, self).__init__(*args, **kwargs)
+        self.matlab = True
+
+
+class TestPsiRpc(TestBase):
     r"""Test basic RPC communication with Python."""
     def __init__(self, *args, **kwargs):
         super(TestPsiRpc, self).__init__(*args, **kwargs)
-        IOInfo.__init__(self)
-        self.name = 'test'
-        self.driver = None
-        self.instance = None
+        self._cls = 'PsiRpc'
+        # self.driver_name = 'RPCCommDriver'
+        self._inst_args = [self.name, self.fmt_str,
+                           self.name, self.fmt_str]
+        self.driver_args = [self.name]
 
-    def setup(self):
-        r"""Start driver and instance."""
-        self.driver = RPCDriver.RPCDriver(self.name)
-        self.driver.start()
-        os.environ.update(self.driver.env)
-        self.instance = PsiInterface.PsiRpc(
-            self.name, self.fmt_str,
-            self.name, self.fmt_str)
+    @property
+    def driver_kwargs(self):
+        r"""Keyword arguments for the driver."""
+        out = super(TestPsiRpc, self).driver_kwargs
+        out['comm'] = 'RPCComm'
+        return out
 
-    def teardown(self):
-        r"""Stop the driver."""
-        self.driver.stop()
+    @property
+    def client_comm(self):
+        r"""comm: Client side comm."""
+        return self.instance
+        
+    @property
+    def server_comm(self):
+        r"""comm: Server side comm."""
+        return self.driver.comm
 
-    def test_rpcSend_rpcRecv(self):
+    @property
+    def client_msg(self):
+        r"""str: Test message for client side."""
+        return self.file_rows[0]
+
+    @property
+    def server_msg(self):
+        r"""str: Test message for server side."""
+        return self.file_lines[0]
+        
+    def test_rpcSendRecv(self):
         r"""Test sending/receiving formated output."""
-        var_send = self.file_rows[0]
-        msg_send = self.file_lines[0]
-        var_flag = self.instance.rpcSend(*var_send)
-        assert(var_flag)
-        msg_recv = self.driver.oipc.recv_wait_nolimit(timeout=1)
-        nt.assert_equal(msg_recv, msg_send)
-        self.driver.iipc.ipc_send_nolimit(msg_recv)
-        self.driver.sleep(1)
-        var_flag, var_recv = self.instance.rpcRecv()
-        assert(var_flag)
-        nt.assert_equal(var_recv, var_send)
+        cli_send = self.client_msg
+        srv_send = self.server_msg
+        # Send message to driver
+        flag = self.client_comm.send(cli_send)
+        assert(flag)
+        flag, msg_recv = self.server_comm.recv(timeout=self.timeout)
+        assert(flag)
+        nt.assert_equal(msg_recv, srv_send)
+        # Send response back to instance
+        flag = self.server_comm.send(srv_send)
+        assert(flag)
+        # self.driver.sleep(1)
+        flag, msg_recv = self.client_comm.recv(timeout=self.timeout)
+        assert(flag)
+        nt.assert_equal(msg_recv, cli_send)
+
+    def server_side_call(self, msg_sent):
+        r"""Actions to respond to a mock call on the server side."""
+        flag, msg_recv = self.server_comm.recv(timeout=self.timeout)
+        assert(flag)
+        nt.assert_equal(msg_recv, msg_sent)
+        flag = self.server_comm.send(msg_sent)
+        assert(flag)
 
     def test_rpcCall(self):
         r"""Test rpc call."""
-        var_send = self.file_rows[0]
-        msg_send = self.file_lines[0]
-        self.driver.iipc.ipc_send_nolimit(msg_send)
-        var_flag, var_recv = self.instance.rpcCall(*var_send)
-        assert(var_flag)
-        nt.assert_equal(var_recv, var_send)
-        msg_recv = self.driver.oipc.recv_wait_nolimit(timeout=1)
-        nt.assert_equal(msg_recv, msg_send)
+        self.server_comm.sched_task(2 * self.sleeptime, self.server_side_call,
+                                    args=[self.server_msg])
+        flag, msg_recv = self.client_comm.call(*self.client_msg)
+        assert(flag)
+        nt.assert_equal(msg_recv, self.client_msg)
+
+
+class TestPsiRpcSplit(TestPsiRpc):
+    r"""Test basic RPC communication with Python using split comm."""
+    def __init__(self, *args, **kwargs):
+        super(TestPsiRpcSplit, self).__init__(*args, **kwargs)
+        self.icomm_name = self.name + 'A'
+        self.ocomm_name = self.name + 'B'
+        self._inst_args = [self.icomm_name, self.fmt_str,
+                           self.ocomm_name, self.fmt_str]
+        self.driver_args = ['%s_%s' % (self.ocomm_name, self.icomm_name)]
+
+    @property
+    def driver_kwargs(self):
+        r"""Keyword arguments for the driver."""
+        out = super(TestPsiRpcSplit, self).driver_kwargs
+        # Reversed
+        out['icomm_kwargs'] = dict(name=self.ocomm_name)
+        out['ocomm_kwargs'] = dict(name=self.icomm_name)
+        return out
+    
+
+class TestPsiRpcMatlab(TestPsiRpc):
+    r"""Test basic RPC communication with Python as passed through Matlab."""
+    def __init__(self, *args, **kwargs):
+        super(TestPsiRpcMatlab, self).__init__(*args, **kwargs)
+        self.matlab = True
+        self._inst_args = [self.name, self.fmt_str_matlab,
+                           self.name, self.fmt_str_matlab]
 
 
 class TestPsiRpcClient(TestPsiRpc):
     r"""Test client-side RPC communication with Python."""
+    def __init__(self, *args, **kwargs):
+        super(TestPsiRpcClient, self).__init__(*args, **kwargs)
+        self._cls = 'PsiRpcClient'
+        self._inst_args = [self.name, self.fmt_str, self.fmt_str]
 
-    def setup(self):
-        r"""Start driver and instance."""
-        self.driver = RPCDriver.RPCDriver(self.name)
-        self.driver.start()
-        os.environ.update(self.driver.env)
-        self.instance = PsiInterface.PsiRpcClient(
-            self.name, self.fmt_str, self.fmt_str)
-
+    @property
+    def driver_kwargs(self):
+        r"""Keyword arguments for the driver."""
+        out = super(TestPsiRpc, self).driver_kwargs
+        out['comm'] = 'ServerComm'
+        return out
         
+        
+class TestPsiRpcClientMatlab(TestPsiRpcClient):
+    r"""Test client-side RPC communication with Python as passed through Matlab."""
+    def __init__(self, *args, **kwargs):
+        super(TestPsiRpcClientMatlab, self).__init__(*args, **kwargs)
+        self.matlab = True
+        self._inst_args = [self.name, self.fmt_str_matlab, self.fmt_str_matlab]
+
+
 class TestPsiRpcServer(TestPsiRpc):
     r"""Test server-side RPC communication with Python."""
+    def __init__(self, *args, **kwargs):
+        super(TestPsiRpcServer, self).__init__(*args, **kwargs)
+        self._cls = 'PsiRpcServer'
+        self._inst_args = [self.name, self.fmt_str, self.fmt_str]
 
-    def setup(self):
-        r"""Start driver and instance."""
-        self.driver = RPCDriver.RPCDriver(self.name)
-        self.driver.start()
-        os.environ.update(self.driver.env)
-        self.instance = PsiInterface.PsiRpcServer(
-            self.name, self.fmt_str, self.fmt_str)
-
+    @property
+    def driver_kwargs(self):
+        r"""Keyword arguments for the driver."""
+        out = super(TestPsiRpc, self).driver_kwargs
+        out['comm'] = 'ClientComm'
+        return out
         
-class TestPsiAsciiFileInput(CisTest, IOInfo):
+    def test_rpcCall(self):
+        r"""Test rpc call (disabled for server test)."""
+        pass
+
+    @property
+    def client_comm(self):
+        r"""comm: Client side comm."""
+        return self.driver
+        
+    @property
+    def server_comm(self):
+        r"""comm: Server side comm."""
+        return self.instance
+
+    @property
+    def client_msg(self):
+        r"""str: Test message for client side."""
+        return self.file_lines[0]
+
+    @property
+    def server_msg(self):
+        r"""str: Test message for server side."""
+        return self.file_rows[0]
+        
+        
+class TestPsiRpcServerMatlab(TestPsiRpcServer):
+    r"""Test server-side RPC communication with Python as passed through Matlab."""
+    def __init__(self, *args, **kwargs):
+        super(TestPsiRpcServerMatlab, self).__init__(*args, **kwargs)
+        self.matlab = True
+        self._inst_args = [self.name, self.fmt_str_matlab, self.fmt_str_matlab]
+
+
+class TestPsiAsciiFileInput(TestBase):
     r"""Test input from an unformatted text file."""
     def __init__(self, *args, **kwargs):
         super(TestPsiAsciiFileInput, self).__init__(*args, **kwargs)
-        IOInfo.__init__(self)
-        self.name = 'test'
+        self._cls = 'PsiAsciiFileInput'
         self.tempfile = os.path.join(os.getcwd(), 'temp_ascii.txt')
+        self.driver_name = 'AsciiFileInputDriver'
+        self.driver_args = [self.name, self.tempfile]
+        self._inst_args = [self.name]
+        self._inst_kwargs = {}
 
     def setup(self):
-        r"""Create a test file and start the driver."""
+        r"""Create a test file."""
         if not os.path.isfile(self.tempfile):
             self.write_table(self.tempfile)
-        self.driver = AsciiFileInputDriver.AsciiFileInputDriver(
-            self.name, self.tempfile)
-        self.driver.start()
-        self.driver.sleep(0.1)
-        os.environ.update(self.driver.env)
+        skip_start = False
+        if self.inst_kwargs.get('src_type', 1) == 0:
+            skip_start = True
+        super(TestPsiAsciiFileInput, self).setup(skip_start=skip_start)
 
     def teardown(self):
-        r"""Stop the driver."""
-        self.driver.terminate()
+        r"""Remove the test file."""
+        super(TestPsiAsciiFileInput, self).teardown()
         if os.path.isfile(self.tempfile):
             os.remove(self.tempfile)
 
-    def test_recv_line_loc(self):
-        r"""Test receiving a line from a local file."""
-        inst = PsiInterface.PsiAsciiFileInput(self.tempfile, src_type=0)
-        for lans in self.file_lines:
-            msg_flag, lres = inst.recv_line()
-            assert(msg_flag)
-            nt.assert_equal(lres, lans)
-        msg_flag, lres = inst.recv_line()
-        assert(not msg_flag)
-
-    def test_recv_line_rem(self):
+    def test_recv_line(self):
         r"""Test receiving a line from a remote file."""
-        inst = PsiInterface.PsiAsciiFileInput(self.name, src_type=1)
+        self.instance.sleep()
         for lans in self.file_lines:
-            msg_flag, lres = inst.recv_line()
+            msg_flag, lres = self.instance.recv(timeout=self.timeout)
             assert(msg_flag)
             nt.assert_equal(lres, lans)
-        msg_flag, lres = inst.recv_line()
+        msg_flag, lres = self.instance.recv()
         assert(not msg_flag)
 
 
-class TestPsiAsciiFileOutput(CisTest, IOInfo):
+class TestPsiAsciiFileInput_local(TestPsiAsciiFileInput):
+    r"""Test input from an unformatted text file."""
+    def __init__(self, *args, **kwargs):
+        super(TestPsiAsciiFileInput_local, self).__init__(*args, **kwargs)
+        self._inst_args = [self.tempfile]
+        self._inst_kwargs = {'src_type': 0}  # local
+
+    def test_recv_line(self):
+        r"""Test receiving a line from a local file."""
+        super(TestPsiAsciiFileInput_local, self).test_recv_line()
+        
+
+class TestPsiAsciiFileOutput(TestBase):
     r"""Test output from an unformatted text file."""
     def __init__(self, *args, **kwargs):
         super(TestPsiAsciiFileOutput, self).__init__(*args, **kwargs)
-        IOInfo.__init__(self)
-        self.name = 'test'
+        self._cls = 'PsiAsciiFileOutput'
         self.tempfile = os.path.join(os.getcwd(), 'temp_ascii.txt')
+        self.driver_name = 'AsciiFileOutputDriver'
+        self.driver_args = [self.name, self.tempfile]
+        self._inst_args = [self.name]
+        self._inst_kwargs = {}
+
+    @property
+    def file_comm(self):
+        r"""FileComm: File communicator."""
+        if self.inst_kwargs.get('dst_type', 1) == 0:
+            return self.instance
+        else:
+            return self.driver.ocomm
 
     def setup(self):
-        r"""Create a test file and start the driver."""
-        if not os.path.isfile(self.tempfile):
-            self.write_table(self.tempfile)
-        self.driver = IODriver.IODriver(self.name, '_OUT')
-        self.driver.start()
-        os.environ.update(self.driver.env)
+        r"""Create a test file."""
+        skip_start = False
+        if self.inst_kwargs.get('dst_type', 1) == 0:
+            skip_start = True
+        super(TestPsiAsciiFileOutput, self).setup(skip_start=skip_start)
 
     def teardown(self):
-        r"""Stop the driver."""
-        self.driver.stop()
-        if os.path.isfile(self.tempfile):
-            os.remove(self.tempfile)
-
-    def test_send_line_loc(self):
-        r"""Test sending a line to a local file."""
-        inst = PsiInterface.PsiAsciiFileOutput(self.tempfile, dst_type=0)
-        msg_flag = inst.send_line(self.fmt_str_line)
+        r"""Remove the test file."""
+        self.file_comm.remove_file()
+        super(TestPsiAsciiFileOutput, self).teardown()
+        
+    def test_send_line(self):
+        r"""Test sending a line to a remote file."""
+        msg_flag = self.instance.send(self.fmt_str_line)
         assert(msg_flag)
         for lans in self.file_lines:
-            msg_flag = inst.send_line(lans)
+            msg_flag = self.instance.send(lans)
             assert(msg_flag)
-        inst.send_eof()
-        del inst
+        self.instance.send_eof()
+        # assert(not msg_flag)
         # Read temp file
+        Tout = self.instance.start_timeout()
+        while self.file_comm.is_open and not Tout.is_out:
+            self.instance.sleep()
+        self.instance.stop_timeout()
         assert(os.path.isfile(self.tempfile))
         with open(self.tempfile, 'rb') as fd:
             res = fd.read()
             nt.assert_equal(res, self.file_contents)
 
-    def test_send_line_rem(self):
-        r"""Test sending a line to a remote file."""
-        inst = PsiInterface.PsiAsciiFileOutput(self.name, dst_type=1)
-        for lans in self.file_lines:
-            msg_flag = inst.send_line(lans)
-            assert(msg_flag)
-            lres = self.driver.recv_wait(timeout=1)
-            nt.assert_equal(lres, lans)
-        inst.send_eof()
-        eans = self.driver.recv_wait(timeout=1)
-        nt.assert_equal(eans, PSI_MSG_EOF)
 
+class TestPsiAsciiFileOutput_local(TestPsiAsciiFileOutput):
+    r"""Test input from an unformatted text file."""
+    def __init__(self, *args, **kwargs):
+        super(TestPsiAsciiFileOutput_local, self).__init__(*args, **kwargs)
+        self._inst_args = [self.tempfile]
+        self._inst_kwargs = {'dst_type': 0}  # local
 
-class TestPsiAsciiTableInput(CisTest, IOInfo):
+    def test_send_line(self):
+        r"""Test sending a line to a local file."""
+        super(TestPsiAsciiFileOutput_local, self).test_send_line()
+        
+
+class TestPsiAsciiTableInput(TestPsiAsciiFileInput):
     r"""Test input from an ascii table."""
     def __init__(self, *args, **kwargs):
         super(TestPsiAsciiTableInput, self).__init__(*args, **kwargs)
-        IOInfo.__init__(self)
-        self.name = 'test'
-        self.tempfile = os.path.join(os.getcwd(), 'temp_ascii.txt')
+        self._cls = 'PsiAsciiTableInput'
+        self.driver_name = 'AsciiTableInputDriver'
 
-    def setup(self):
-        r"""Create a test file and start the driver."""
-        if not os.path.isfile(self.tempfile):
-            self.write_table(self.tempfile)
-        self.driver = AsciiTableInputDriver.AsciiTableInputDriver(
-            self.name, self.tempfile)
-        self.driver.start()
-        self.driver.sleep(0.1)
-        os.environ.update(self.driver.env)
-
-    def teardown(self):
-        r"""Stop the driver."""
-        self.driver.terminate()
-        if os.path.isfile(self.tempfile):
-            os.remove(self.tempfile)
-
-    def test_recv_row_loc(self):
-        r"""Test receiving a row from a local table."""
-        inst = PsiInterface.PsiAsciiTableInput(self.tempfile, src_type=0)
-        for rans in self.file_rows:
-            msg_flag, rres = inst.recv_row()
-            assert(msg_flag)
-            nt.assert_equal(rres, rans)
-        msg_flag, rres = inst.recv_row()
-        assert(not msg_flag)
-
-    def test_recv_row_rem(self):
+    def test_recv_line(self):
         r"""Test receiving a row from a remote table."""
-        inst = PsiInterface.PsiAsciiTableInput(self.name, src_type=1)
         for rans in self.file_rows:
-            msg_flag, rres = inst.recv_row()
+            msg_flag, rres = self.instance.recv()
             assert(msg_flag)
             nt.assert_equal(rres, rans)
-        msg_flag, rres = inst.recv_row()
+        msg_flag, rres = self.instance.recv()
         assert(not msg_flag)
 
         
-class TestPsiAsciiTableInput_AsArray(CisTest, IOInfo):
-    r"""Test input from an ascii table in array format."""
+class TestPsiAsciiTableInput_local(TestPsiAsciiTableInput):
+    r"""Test input from an ASCII table."""
     def __init__(self, *args, **kwargs):
-        super(TestPsiAsciiTableInput_AsArray, self).__init__(*args, **kwargs)
-        IOInfo.__init__(self)
-        self.name = 'test'
-        self.tempfile = os.path.join(os.getcwd(), 'temp_ascii.txt')
+        super(TestPsiAsciiTableInput_local, self).__init__(*args, **kwargs)
+        self._inst_args = [self.tempfile]
+        self._inst_kwargs = {'src_type': 0}  # local
 
-    def setup(self):
-        r"""Create a test file and start the driver."""
-        if not os.path.isfile(self.tempfile):
-            self.write_table(self.tempfile)
-        self.driver = AsciiTableInputDriver.AsciiTableInputDriver(
-            self.name, self.tempfile, as_array=True)
-        self.driver.start()
-        self.driver.sleep(0.1)
-        os.environ.update(self.driver.env)
+    def test_recv_line(self):
+        r"""Test receiving a row from a local table."""
+        super(TestPsiAsciiTableInput_local, self).test_recv_line()
 
-    def teardown(self):
-        r"""Stop the driver."""
-        self.driver.terminate()
-        if os.path.isfile(self.tempfile):
-            os.remove(self.tempfile)
 
-    def test_recv_array_loc(self):
-        r"""Test receiving an array from a local table."""
-        inst = PsiInterface.PsiAsciiTableInput(self.tempfile, src_type=0)
-        msg_flag, res = inst.recv_array()
-        assert(msg_flag)
-        np.testing.assert_equal(res, self.file_array)
+class TestPsiAsciiTableInputArray(TestPsiAsciiTableInput):
+    r"""Test input from an ASCII table."""
+    def __init__(self, *args, **kwargs):
+        super(TestPsiAsciiTableInputArray, self).__init__(*args, **kwargs)
+        self._inst_kwargs = {'as_array': True}
+        self._driver_kwargs = {'as_array': True}
 
-    def test_recv_array_rem(self):
+    def test_recv_line(self):
         r"""Test receiving an array from a remote table."""
-        inst = PsiInterface.PsiAsciiTableInput(self.name, src_type=1)
-        msg_flag, res = inst.recv_array()
+        msg_flag, msg_recv = self.instance.recv(timeout=self.timeout)
         assert(msg_flag)
-        np.testing.assert_equal(res, self.file_array)
-        
+        np.testing.assert_array_equal(msg_recv, self.file_array)
+        msg_flag, msg_recv = self.instance.recv(timeout=self.timeout)
+        assert(not msg_flag)
 
-class TestPsiAsciiTableOutput(CisTest, IOInfo):
+
+class TestPsiAsciiTableInputArray_local(TestPsiAsciiTableInputArray):
+    r"""Test input from an ASCII table."""
+    def __init__(self, *args, **kwargs):
+        super(TestPsiAsciiTableInputArray_local, self).__init__(*args, **kwargs)
+        self._inst_args = [self.tempfile]
+        self._inst_kwargs['src_type'] = 0  # local
+
+    def test_recv_line(self):
+        r"""Test receiving an array from a local table."""
+        super(TestPsiAsciiTableInputArray_local, self).test_recv_line()
+
+        
+class TestPsiAsciiTableOutput(TestPsiAsciiFileOutput):
     r"""Test output from an ascii table."""
     def __init__(self, *args, **kwargs):
         super(TestPsiAsciiTableOutput, self).__init__(*args, **kwargs)
-        IOInfo.__init__(self)
-        self.name = 'test'
+        self._cls = 'PsiAsciiTableOutput'
         self.tempfile = os.path.join(os.getcwd(), 'temp_ascii.txt')
-
-    def setup(self):
-        r"""Create a test table and start the driver."""
-        if not os.path.isfile(self.tempfile):
-            self.write_table(self.tempfile)
-        self.driver = IODriver.IODriver(self.name, '_OUT')
-        self.driver.start()
-        os.environ.update(self.driver.env)
-
-    def teardown(self):
-        r"""Stop the driver."""
-        self.driver.stop()
-        if os.path.isfile(self.tempfile):
-            os.remove(self.tempfile)
-
-    def test_send_row_loc(self):
-        r"""Test sending a row to a local table."""
-        inst = PsiInterface.PsiAsciiTableOutput(self.tempfile,
-                                                self.fmt_str, dst_type=0)
-        for rans in self.file_rows:
-            msg_flag = inst.send_row(tuple(rans))
+        self.driver_name = 'AsciiTableOutputDriver'
+        self.driver_args = [self.name, self.tempfile]
+        self._inst_args = [self.name, self.fmt_str]
+        self._inst_kwargs = {}
+        
+    def test_send_line(self):
+        r"""Test sending a row to a remote table."""
+        for lans, rans in zip(self.file_lines, self.file_rows):
+            msg_flag = self.instance.send(*rans)
             assert(msg_flag)
-        inst.send_eof()
-        del inst
+        self.instance.send_eof()
+        # assert(msg_flag)
         # Read temp file
+        Tout = self.instance.start_timeout()
+        while self.file_comm.is_open and not Tout.is_out:
+            self.instance.sleep()
+        self.instance.stop_timeout()
         assert(os.path.isfile(self.tempfile))
         with open(self.tempfile, 'rb') as fd:
             res = fd.read()
             nt.assert_equal(res, self.file_contents)
-
-    def test_send_row_rem(self):
-        r"""Test sending a row to a remote table."""
-        inst = PsiInterface.PsiAsciiTableOutput(self.name,
-                                                self.fmt_str, dst_type=1)
-        lres = self.driver.recv_wait(timeout=1)
-        nt.assert_equal(lres, self.fmt_str)
-        for lans, rans in zip(self.file_lines, self.file_rows):
-            msg_flag = inst.send_row(*rans)
-            assert(msg_flag)
-            lres = self.driver.recv_wait_nolimit(timeout=1)
-            nt.assert_equal(lres, lans)
-        inst.send_eof()
-        eres = self.driver.recv_wait_nolimit(timeout=1)
-        nt.assert_equal(eres, PSI_MSG_EOF)
         
             
-class TestPsiAsciiTableOutput_AsArray(CisTest, IOInfo):
-    r"""Test output from an ascii table."""
+class TestPsiAsciiTableOutputMatlab(TestPsiAsciiTableOutput):
+    r"""Test output from an ascii table as passed through Matlab."""
     def __init__(self, *args, **kwargs):
-        super(TestPsiAsciiTableOutput_AsArray, self).__init__(*args, **kwargs)
-        IOInfo.__init__(self)
-        self.name = 'test'
-        self.tempfile = os.path.join(os.getcwd(), 'temp_ascii.txt')
+        super(TestPsiAsciiTableOutputMatlab, self).__init__(*args, **kwargs)
+        self.matlab = True
+        self._inst_args = [self.name, self.fmt_str_matlab]
 
-    def setup(self):
-        r"""Create a test table and start the driver."""
-        if not os.path.isfile(self.tempfile):
-            self.write_table(self.tempfile)
-        self.driver = IODriver.IODriver(self.name, '_OUT')
-        self.driver.start()
-        os.environ.update(self.driver.env)
 
-    def teardown(self):
-        r"""Stop the driver."""
-        self.driver.stop()
-        if os.path.isfile(self.tempfile):
-            os.remove(self.tempfile)
+class TestPsiAsciiTableOutput_local(TestPsiAsciiTableOutput):
+    r"""Test input from an ASCII table."""
+    def __init__(self, *args, **kwargs):
+        super(TestPsiAsciiTableOutput_local, self).__init__(*args, **kwargs)
+        self._inst_args = [self.tempfile, self.fmt_str]
+        self._inst_kwargs = {'dst_type': 0}  # local
 
-    def test_send_array_loc(self):
-        r"""Test sending an array to a local file."""
-        inst = PsiInterface.PsiAsciiTableOutput(self.tempfile,
-                                                self.fmt_str, dst_type=0)
-        msg_flag = inst.send_array(self.file_array)
+    def test_send_line(self):
+        r"""Test sending a row to a local table."""
+        super(TestPsiAsciiTableOutput_local, self).test_send_line()
+        
+        
+class TestPsiAsciiTableOutputArray(TestPsiAsciiTableOutput):
+    r"""Test input from an ASCII table."""
+    def __init__(self, *args, **kwargs):
+        super(TestPsiAsciiTableOutputArray, self).__init__(*args, **kwargs)
+        self._inst_kwargs = {'as_array': True}
+        self._driver_kwargs = {'as_array': True}
+
+    def test_send_line(self):
+        r"""Test sending an array to a remote table."""
+        msg_flag = self.instance.send(self.file_array)
         assert(msg_flag)
-        inst.send_eof()
-        # del inst
+        self.instance.send_eof()
+        # assert(msg_flag)
         # Read temp file
+        Tout = self.instance.start_timeout()
+        while self.file_comm.is_open and not Tout.is_out:
+            self.instance.sleep()
+        self.instance.stop_timeout()
         assert(os.path.isfile(self.tempfile))
         with open(self.tempfile, 'rb') as fd:
             res = fd.read()
             nt.assert_equal(res, self.file_contents)
         
-    def test_send_array_rem(self):
-        r"""Test sending an array to a remote file."""
-        inst = PsiInterface.PsiAsciiTableOutput(self.name,
-                                                self.fmt_str, dst_type=1)
-        msg_flag = inst.send_array(self.file_array)
-        assert(msg_flag)
-        res = self.driver.recv_wait(timeout=1)
-        nt.assert_equal(res, self.fmt_str)
-        res = self.driver.recv_wait_nolimit(timeout=1)
-        nt.assert_equal(res, self.file_bytes)
+        
+class TestPsiAsciiTableOutputArray_local(TestPsiAsciiTableOutputArray):
+    r"""Test input from an ASCII table as array."""
+    def __init__(self, *args, **kwargs):
+        super(TestPsiAsciiTableOutputArray_local, self).__init__(*args, **kwargs)
+        self._inst_args = [self.tempfile, self.fmt_str]
+        self._inst_kwargs['dst_type'] = 0  # local
 
-
-class TestPsiPickleInput(CisTest, IOInfo):
+    def test_send_line(self):
+        r"""Test sending an array to a local table."""
+        super(TestPsiAsciiTableOutputArray_local, self).test_send_line()
+        
+        
+class TestPsiPickleInput(TestBase):
     r"""Test input from a pickle file."""
     def __init__(self, *args, **kwargs):
         super(TestPsiPickleInput, self).__init__(*args, **kwargs)
-        IOInfo.__init__(self)
-        self.name = 'test'
+        self._cls = 'PsiPickleInput'
         self.tempfile = os.path.join(os.getcwd(), 'temp_ascii.dat')
+        self.driver_name = 'PickleFileInputDriver'
+        self.driver_args = [self.name, self.tempfile]
+        self._inst_args = [self.name]
+        self._inst_kwargs = {}
 
     def setup(self):
         r"""Create a test file and start the driver."""
-        if not os.path.isfile(self.tempfile):
+        if (((not os.path.isfile(self.tempfile)) or
+             (os.stat(self.tempfile).st_size == 0))):
             self.write_pickle(self.tempfile)
-        self.driver = IODriver.IODriver(self.name, '_IN')
-        self.driver.start()
-        os.environ.update(self.driver.env)
+        skip_start = False
+        if self.inst_kwargs.get('src_type', 1) == 0:
+            skip_start = True
+        super(TestPsiPickleInput, self).setup(skip_start=skip_start)
 
     def teardown(self):
-        r"""Stop the driver."""
-        self.driver.stop()
+        r"""Remove the test file."""
+        super(TestPsiPickleInput, self).teardown()
         if os.path.isfile(self.tempfile):
             os.remove(self.tempfile)
 
-    def test_recv_loc(self):
-        r"""Test receiving a pickle from a local file."""
-        inst = PsiInterface.PsiPickleInput(self.tempfile, src_type=0)
-        msg_flag, res = inst.recv()
-        assert(msg_flag)
-        self.assert_equal_data_dict(res)
-        # res_pickle = pickle.dumps(res)
-        # nt.assert_equal(res_pickle, self.pickled_data)
-
-    def test_recv_rem(self):
+    def test_recv(self):
         r"""Test receiving a pickle from a remote file."""
-        inst = PsiInterface.PsiPickleInput(self.name, src_type=1)
-        self.driver.ipc_send_nolimit(self.pickled_data)
-        msg_flag, res = inst.recv()
+        Tout = self.instance.start_timeout()
+        while ((not Tout.is_out) and
+               (os.stat(self.tempfile).st_size == 0)):  # pragma: debug
+            self.instance.sleep()
+        self.instance.stop_timeout()
+        msg_flag, res = self.instance.recv(timeout=self.timeout)
         assert(msg_flag)
         self.assert_equal_data_dict(res)
-        # res_pickle = pickle.dumps(res)
-        # nt.assert_equal(res_pickle, self.pickled_data)
 
 
-class TestPsiPickleOutput(CisTest, IOInfo):
+class TestPsiPickleInput_local(TestPsiPickleInput):
+    r"""Test input from a pickle file."""
+    def __init__(self, *args, **kwargs):
+        super(TestPsiPickleInput_local, self).__init__(*args, **kwargs)
+        self._inst_args = [self.tempfile]
+        self._inst_kwargs = {'src_type': 0}  # local
+
+    def test_recv(self):
+        r"""Test receiving a pickle from a local file."""
+        super(TestPsiPickleInput_local, self).test_recv()
+
+        
+class TestPsiPickleOutput(TestBase):
     r"""Test output from a pickle."""
     def __init__(self, *args, **kwargs):
         super(TestPsiPickleOutput, self).__init__(*args, **kwargs)
-        IOInfo.__init__(self)
-        self.name = 'test'
+        self._cls = 'PsiPickleOutput'
         self.tempfile = os.path.join(os.getcwd(), 'temp_ascii.dat')
+        self.driver_name = 'PickleFileOutputDriver'
+        self.driver_args = [self.name, self.tempfile]
+        self._inst_args = [self.name]
+        self._inst_kwargs = {}
 
+    @property
+    def file_comm(self):
+        r"""FileComm: File communicator."""
+        if self.inst_kwargs.get('dst_type', 1) == 0:
+            return self.instance
+        else:
+            return self.driver.ocomm
+        
     def setup(self):
         r"""Create a test file and start the driver."""
-        if not os.path.isfile(self.tempfile):
-            self.write_pickle(self.tempfile)
-        self.driver = IODriver.IODriver(self.name, '_OUT')
-        self.driver.start()
-        os.environ.update(self.driver.env)
+        skip_start = False
+        if self.inst_kwargs.get('dst_type', 1) == 0:
+            skip_start = True
+        if os.path.isfile(self.tempfile):  # pragma: debug
+            os.remove(self.tempfile)
+        super(TestPsiPickleOutput, self).setup(skip_start=skip_start)
 
     def teardown(self):
-        r"""Stop the driver."""
-        self.driver.stop()
+        r"""Remove the test file."""
+        super(TestPsiPickleOutput, self).teardown()
         if os.path.isfile(self.tempfile):
             os.remove(self.tempfile)
 
-    def test_send_loc(self):
-        r"""Test sending a pickle to a local file."""
-        inst = PsiInterface.PsiPickleOutput(self.tempfile, dst_type=0)
-        msg_flag = inst.send(self.data_dict)
+    def test_send(self):
+        r"""Test sending a pickle to a remote file."""
+        msg_flag = self.instance.send(self.data_dict)
         assert(msg_flag)
-        del inst
+        self.instance.send_eof()
+        # Read temp file
+        Tout = self.instance.start_timeout()
+        while ((not Tout.is_out) and self.file_comm.is_open):
+            self.instance.sleep()
+        self.instance.stop_timeout()
         # Read temp file
         assert(os.path.isfile(self.tempfile))
-        with open(self.tempfile, 'rb') as fd:
-            res = pickle.load(fd)
-            self.assert_equal_data_dict(res)
-            # res_pickle = pickle.dumps(res)
-            # nt.assert_equal(res_pickle, self.pickled_data)
+        self.assert_equal_data_dict(self.tempfile)
 
-    def test_send_rem(self):
-        r"""Test sending a pickle to a remote file."""
-        inst = PsiInterface.PsiPickleOutput(self.name, dst_type=1)
-        msg_flag = inst.send(self.data_dict)
-        assert(msg_flag)
-        res = self.driver.recv_wait_nolimit(timeout=1)
-        res = pickle.loads(res)
-        self.assert_equal_data_dict(res)
-        # nt.assert_equal(res, self.pickled_data)
+
+class TestPsiPickleOutput_local(TestPsiPickleOutput):
+    r"""Test input from an unformatted text file."""
+    def __init__(self, *args, **kwargs):
+        super(TestPsiPickleOutput_local, self).__init__(*args, **kwargs)
+        self._inst_args = [self.tempfile]
+        self._inst_kwargs = {'dst_type': 0}  # local
+
+    def test_send(self):
+        r"""Test sending a pickle to a local file."""
+        super(TestPsiPickleOutput_local, self).test_send()

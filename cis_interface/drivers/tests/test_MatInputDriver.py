@@ -1,55 +1,43 @@
 import os
-import numpy as np
-from scipy.io import savemat
-from cis_interface.backwards import pickle
-import cis_interface.drivers.tests.test_IODriver as parent
+import nose.tools as nt
+import cis_interface.drivers.tests.test_FileInputDriver as parent
 
 
-class TestMatInputDriver(parent.TestIODriver):
-    r"""Test runner for MatInputDriver.
-
-    Attributes (in addition to parent class's):
-        filepath (str): Full path to test file.
-    
-    """
+class TestMatInputParam(parent.TestFileInputParam):
+    r"""Test runner for MatInputDriver."""
 
     def __init__(self, *args, **kwargs):
-        super(TestMatInputDriver, self).__init__(*args, **kwargs)
+        super(TestMatInputParam, self).__init__(*args, **kwargs)
         self.driver = 'MatInputDriver'
         self.filepath = os.path.abspath('mat_input.mat')
         self.args = self.filepath
-        # self.timeout = 60.0
 
     def setup(self):
         r"""Create a driver instance and start the driver."""
         with open(self.filepath, 'wb') as fd:
-            savemat(fd, self.data_dict)
-        super(TestMatInputDriver, self).setup()
+            fd.write(self.mat_data)
+        super(parent.TestFileInputParam, self).setup()
+        
 
-    def teardown(self):
-        r"""Remove the instance, stoppping it."""
-        super(TestMatInputDriver, self).teardown()
-        if os.path.isfile(self.filepath):
-            os.remove(self.filepath)
+class TestMatInputDriverNoStart(TestMatInputParam,
+                                parent.TestFileInputDriverNoStart):
+    r"""Test runner for MatInputDriver without start."""
+    pass
 
+
+class TestMatInputDriver(TestMatInputParam, parent.TestFileInputDriver):
+    r"""Test runner for MatInputDriver."""
+    
     def assert_before_stop(self):
         r"""Assertions to make before stopping the driver instance."""
-        super(TestMatInputDriver, self).assert_before_stop()
-        msg_recv = self.instance.recv_wait_nolimit()
-        assert(msg_recv)
-        dat_recv = pickle.loads(msg_recv)
-        for k in self.data_dict.keys():
-            np.testing.assert_array_equal(dat_recv[k], self.data_dict[k])
-
-    def assert_after_terminate(self):
-        r"""Assertions to make after stopping the driver instance."""
-        super(TestMatInputDriver, self).assert_after_terminate()
-        assert(self.instance.fd is None)
-
-    def test_send_recv(self):
-        r"""Test sending/receiving small message."""
-        pass
-
-    def test_send_recv_nolimit(self):
-        r"""Test sending/receiving large message."""
-        pass
+        super(parent.TestFileInputDriver, self).assert_before_stop(
+            check_open=False)
+        self.instance.sleep()
+        # File contents
+        flag, msg_recv = self.recv_comm.recv(self.timeout)
+        assert(flag)
+        self.assert_equal_data_dict(msg_recv)
+        # EOF
+        flag, msg_recv = self.recv_comm.recv(self.timeout)
+        assert(not flag)
+        nt.assert_equal(msg_recv, self.recv_comm.eof_msg)

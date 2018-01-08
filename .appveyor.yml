@@ -6,6 +6,7 @@ branches:
   # whitelist
   only:
     - topic/windows
+    - topic/zmq
 
   # blacklist
   except:
@@ -43,10 +44,19 @@ install:
   # Check that we have the expected version of Python
   - "python --version"
 
+  # Install ZeroMQ
+  - "ci/install-czmq-windows.bat"
+
+  # Install & start RabbitMQ
+  - "ci/install-rmqserver-windows.bat"  
+  - "ci/start-rmqserver-windows.bat"  
+
   # Install specified version of numpy and dependencies
-  - "conda install --yes -c conda-forge numpy nose coverage
-  flake8 setuptools matplotlib scipy pyyaml pystache pika astropy"
+  - "conda install --yes -c conda-forge numpy nose coverage coveralls
+  flake8 setuptools pystache pika pyyaml astropy scipy zmq"
   - "pip install sysv_ipc"
+
+  # Install cis_interface
   - "pip install -e ."
 
 # Not a .NET project
@@ -56,7 +66,7 @@ before_test:
   - "flake8 cis_interface"
 
 test_script:
-  - "nosetests --nologcapture --with-coverage --cover-package=cis_interface -sv cis_interface"
+  - "nosetests --nologcapture --with-coverage --cover-package=cis_interface -svx"
 
 after_test:
   - "coveralls"
