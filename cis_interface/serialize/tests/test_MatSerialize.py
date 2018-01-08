@@ -1,4 +1,5 @@
 import nose.tools as nt
+from cis_interface import backwards
 from cis_interface.serialize.tests.test_DefaultSerialize import \
     TestDefaultSerialize
 
@@ -17,4 +18,6 @@ class TestMatSerialize(TestDefaultSerialize):
     def test_call(self):
         r"""Test call without format string."""
         out = self.instance(self.data_dict)
-        nt.assert_equal(out, self.mat_data)
+        # Exclude header with timestamp that could differ
+        assert(out.startswith(backwards.unicode2bytes("MATLAB")))
+        nt.assert_equal(out.split()[-1], self.mat_data.split()[-1])
