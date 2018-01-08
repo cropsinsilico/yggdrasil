@@ -88,6 +88,12 @@ class TestBase(CisTest, IOInfo):
             self.driver.stop()
         super(TestBase, self).teardown()
 
+    def remove_instance(self, inst):
+        r"""Remove an instance."""
+        inst.close()
+        assert(inst.is_closed)
+        super(TestBase, self).remove_instance(inst)
+
     
 class TestPsiInput(TestBase):
     r"""Test basic input to python."""
