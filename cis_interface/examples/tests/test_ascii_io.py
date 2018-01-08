@@ -16,13 +16,13 @@ class TestExampleAsciiIO(TestExample):
     def set_utf8_encoding(self):
         r"""Set the encoding to utf-8 if it is not already."""
         old_lang = os.environ.get('LANG', '')
-        if 'UTF-8' not in old_lang:
+        if 'UTF-8' not in old_lang:  # pragma: debug
             self._old_encoding = old_lang
             os.environ['LANG'] = 'en_US.UTF-8'
             
     def reset_encoding(self):
         r"""Reset the encoding to the original value before the test."""
-        if self._old_encoding is not None:
+        if self._old_encoding is not None:  # pragma: debug
             os.environ['LANG'] = self._old_encoding
             self._old_encoding = None
 
