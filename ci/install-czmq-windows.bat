@@ -16,6 +16,7 @@ set CMAKE_GENERATOR=Visual Studio %VSVER% 20%DIRVER%
 echo %CMAKE_GENERATOR%
 set MSVCVERSION="v%VSVER%0"
 set MSVCYEAR="vs20%DIRVER%"
+choco install make -y
 
 :: Install Libsodium
 :: if libsodium is on disk, the Windows build of libzmq will automatically use it
