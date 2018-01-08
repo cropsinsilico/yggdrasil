@@ -19,7 +19,7 @@ if %VSVER% gtr 10 set /a DIRVER = DIRVER + 1
 :: if libsodium is on disk, the Windows build of libzmq will automatically use it
 git clone --depth 1 -b stable https://github.com/jedisct1/libsodium.git
 cd libsodium\builds\msvc\build
-CALL buildbase.bat ..\vs20%DIRVER%\libsodium.sln %VSVER% %MAKECLEAN%
+CALL buildbase.bat ..\vs20%DIRVER%\libsodium.sln %VSVER%
 :: buildall.bat
 cd ..\..\..\..
 

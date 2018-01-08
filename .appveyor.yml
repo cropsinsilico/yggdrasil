@@ -24,9 +24,9 @@ os: Visual Studio 2015
 environment:
 
   CMAKE_GENERATOR: "Visual Studio 14 2015"
+  VSINSTALLDIR: "%ProgramFiles(x86)%\Microsoft Visual Studio 14.0\VC\
   MSVCVERSION: "v140"
   MSVCYEAR: "vs2015"
-  WITH_TWEETNACL: ON
 
   global:
     PYTHON: "C:\\Miniconda3-x64"
