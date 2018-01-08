@@ -35,4 +35,5 @@ esac
 
 cisrun $yaml
 
-cat /tmp/output_model_error.txt
+outfile="${TMPDIR}output_model_error.txt"
+cat $outfile
