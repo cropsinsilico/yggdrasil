@@ -37,6 +37,7 @@ class ConnectionDriver(Driver):
         if ocomm_kws is None:
             ocomm_kws = dict()
         # Input communicator
+        self.debug("Creating input comm")
         icomm_kws['direction'] = 'recv'
         icomm_kws['dont_open'] = True
         icomm_kws['reverse_names'] = True
@@ -45,6 +46,7 @@ class ConnectionDriver(Driver):
         self.icomm_kws = icomm_kws
         self.env[self.icomm.name] = self.icomm.address
         # Output communicator
+        self.debug("Creating output comm")
         ocomm_kws['direction'] = 'send'
         ocomm_kws['dont_open'] = True
         ocomm_kws['reverse_names'] = True
