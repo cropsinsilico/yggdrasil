@@ -27,9 +27,9 @@ ECHO Installing libzmq...
 git clone git://github.com/zeromq/libzmq.git
 cd libzmq\builds\msvc\build
 CALL build.bat
-:: configure.bat
+:: CALL configure.bat
 :: cd build
-:: buildall.bat
+:: CALL buildall.bat
 cd ..\..\..\..
 
 :: Install czmq
@@ -40,7 +40,7 @@ CALL configure.bat
 cd vs20%DIRVER%
 CALL build.bat
 :: cd build
-:: buildall.bat
+:: CALL buildall.bat
 cd ..\..\..\..
 
 :: Finalize and print stop time
