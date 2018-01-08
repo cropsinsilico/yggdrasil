@@ -91,6 +91,12 @@ except (ImportError, IOError):
             long_description = file.read()
     else:
         raise IOError("Could not find README.rst or README.md")
+
+# Create requirements list based on platform
+requirements = ["pyyaml", "pystache", "scipy", "zmq", "pika"]
+_is_win = (sys.platform in ['win32', 'cygwin'])
+if not _is_win:
+    requirements.append("sysv_ipc")
     
 setup(
     name="cis_interface",
@@ -105,7 +111,7 @@ setup(
     url="https://github.com/cropsinsilico/cis_interface",
     download_url = "https://github.com/cropsinsilico/cis_interface/archive/%s.tar.gz" % cis_ver,
     keywords=["plants", "simulation", "models", "framework"],
-    install_requires=["sysv_ipc", "pika", "pyyaml", "pystache", "scipy"],
+    install_requires=requirements,
     classifiers=[
         "Programming Language :: Python",
         "Programming Language :: C",

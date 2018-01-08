@@ -44,7 +44,6 @@ install:
   - "SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%"
   - "SET MPLBACKEND=agg"
 
-  # Install the build and runtime dependencies of the project.
   # Create a conda environment
   - "conda update -q --yes conda"
   - "conda create -q --yes -n test python=%PYTHON_VERSION%"
@@ -53,6 +52,11 @@ install:
   # Check that we have the expected version of Python
   - "python --version"
 
+  # Upgrade pip and setuptools and wheel to get clean install
+  - "pip install --upgrade pip"
+  - "pip install --upgrade wheel"
+  - "pip install --upgrade setuptools"
+
   # Install ZeroMQ
   - "if %INSTALLZMQ% == 1 ci/install-czmq-windows.bat"
 
@@ -60,9 +64,9 @@ install:
   - "if %INSTALLRMQ% == 1 ci/install-rmqserver-windows.bat"  
   - "if %INSTALLRMQ% == 1 ci/start-rmqserver-windows.bat"  
 
-  # Install specified version of numpy and dependencies
-  - "conda install --yes -c conda-forge numpy nose coverage coveralls
-  flake8 setuptools pystache pika pyyaml astropy scipy"
+  # Install dependencies using conda/pip
+  - "conda install --yes -c conda-forge numpy nose coverage coveralls flake8"
+  - "conda install --yes -c conda-forge pystache pyyaml astropy scipy pika"
   - "pip install zmq"
 
   # Install cis_interface
