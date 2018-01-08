@@ -81,6 +81,7 @@ install:
 build: false
 
 before_test:
+  - "cl -lzmq -lczmq"
   - "flake8 cis_interface"
 
 test_script:
