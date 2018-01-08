@@ -1,17 +1,55 @@
 """This modules offers various tools."""
 from __future__ import print_function
-from threading import Timer
+import threading
 import logging
 import os
 import sys
 import inspect
 import time
+import signal
 import yaml
 import pystache
 from cis_interface.backwards import sio
 import subprocess
 from cis_interface import platform
 from cis_interface import backwards
+# https://stackoverflow.com/questions/35772001/
+# how-to-handle-the-signal-in-python-on-windows-machine
+if platform._is_win:
+    def kill(pid, signum):
+        r"""Kill process by mapping signal number."""
+        sigmap = {signal.SIGINT: signal.CTRL_C_EVENT,
+                  signal.SIGBREAK: signal.CTRL_BREAK_EVENT}
+        if signum in sigmap and pid == os.getpid():
+            # we don't know if the current process is a
+            # process group leader, so just broadcast
+            # to all processes attached to this console.
+            pid = 0
+        thread = threading.current_thread()
+        handler = signal.getsignal(signum)
+        # work around the synchronization problem when calling
+        # kill from the main thread.
+        if (signum in sigmap and
+            thread.name == 'MainThread' and
+            callable(handler) and
+            pid == 0):
+            event = threading.Event()
+            def handler_set_event(signum, frame):
+                event.set()
+                return handler(signum, frame)
+            signal.signal(signum, handler_set_event)                
+            try:
+                os.kill(pid, sigmap[signum])
+                # busy wait because we can't block in the main
+                # thread, else the signal handler can't execute.
+                while not event.is_set():
+                    pass
+            finally:
+                signal.signal(signum, handler)
+        else:
+            os.kill(pid, sigmap.get(signum, signum))
+else:
+    from os import kill
 
 
 def is_ipc_installed():
@@ -251,10 +289,10 @@ class CisClass(object):
         """
         self.sched_out = None
         if store_output:
-            tobj = Timer(t, self._task_with_output,
-                         args=[func] + args, kwargs=kwargs)
+            tobj = threading.Timer(t, self._task_with_output,
+                                   args=[func] + args, kwargs=kwargs)
         else:
-            tobj = Timer(t, func, args=args, kwargs=kwargs)
+            tobj = threading.Timer(t, func, args=args, kwargs=kwargs)
         tobj.start()
 
     @property
