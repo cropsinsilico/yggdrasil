@@ -9,7 +9,7 @@ from itertools import chain
 import socket
 from cis_interface.tools import CisClass, parse_yaml
 from cis_interface.config import cis_cfg, cfg_environment
-from cis_interface import drivers
+from cis_interface import drivers, platform
 from cis_interface.drivers import create_driver
 
 
@@ -237,8 +237,9 @@ class CisRunner(CisClass):
             signal_handler = self.signal_handler
         signal.signal(signal.SIGTERM, signal_handler)
         signal.signal(signal.SIGINT, signal_handler)
-        signal.siginterrupt(signal.SIGTERM, False)
-        signal.siginterrupt(signal.SIGINT, False)
+        if not platform._is_win:
+            signal.siginterrupt(signal.SIGTERM, False)
+            signal.siginterrupt(signal.SIGINT, False)
 
     def run(self, signal_handler=None):
         r"""Run all of the models and wait for them to exit."""
