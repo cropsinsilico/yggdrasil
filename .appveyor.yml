@@ -34,14 +34,11 @@ platform:
   -x64
 
 install:
-  - "ECHO %APPVEYOR_BUILD_WORKER_IMAGE%"
   - "SET MSVCVER=%APPVEYOR_BUILD_WORKER_IMAGE:~-2,2%"
+  - "if %MSVCVER% gtr 11 set /a MSVCVER = MSVCVER - 1"
   - "ECHO %MSVCVER%"
   - "SET MSVCVER=14"
-  - "ECHO %ProgramFiles(x86)%"
-  - "SET VSINSTALLDIR=C:\\Program Files (x86)\\Microsoft Visual Studio %MSVCVER%.0\\"
-  #- "SET VSINSTALLDIR=%PROGRAMFILES%\Microsoft Visual Studio %MSVCVER%.0\VC\"
-  #- "SET VSINSTALLDIR=%ProgramFiles(x86)%\Microsoft Visual Studio %MSVCVER%.0\VC\"
+  - "SET VSINSTALLDIR=%ProgramFiles(x86)%\\Microsoft Visual Studio %MSVCVER%.0\\"
   - "SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%"
   - "SET MPLBACKEND=agg"
 
