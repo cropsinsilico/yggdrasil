@@ -64,6 +64,7 @@ install:
 
   # Install ZeroMQ
   - "if %INSTALLZMQ% == 1 ci\\install-czmq-windows.bat"
+  - "if %INSTALLZMQ% == 1 set PATH=%PATH%;C:\\projects\\build_czmq;C:\\projects\\build_libzmq\\lib\\Release"
 
   # Install & start RabbitMQ
   - "if %INSTALLRMQ% == 1 ci\\install-rmqserver-windows.bat"  
