@@ -12,6 +12,7 @@ set STARTTIME=%DATE% %TIME%
 ::
 
 set VSVER=%VSINSTALLDIR:~-5,2%
+echo VSVER=%VSVER%
 set DIRVER=%VSVER%
 if %VSVER% gtr 10 set /a DIRVER = DIRVER + 1
 
