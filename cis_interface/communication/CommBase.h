@@ -1,9 +1,3 @@
-#include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdarg.h>
-#include <unistd.h>
-#include <errno.h>
 #include <../tools.h>
 
 /*! @brief Flag for checking if this header has already been included. */

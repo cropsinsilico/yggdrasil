@@ -6,13 +6,6 @@
 #include <sys/sem.h>
 #include <sys/shm.h>
 #endif /*IPCINSTALLED*/
-#include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdarg.h>
-#include <unistd.h>
-#include <time.h>
-#include <errno.h>
 #include <CommBase.h>
 
 /*! @brief Flag for checking if this header has already been included. */

@@ -3,11 +3,16 @@
 #include <stdlib.h>
 #include <stdarg.h>
 #include <errno.h>
+#include <time.h>
 #ifdef _WIN32
 #include <windows.h>
 static inline
 void sleep(const int tsec) {
   Sleep(1000*tsec);
+};
+static inline
+void usleep(const int microsec) {
+  Sleep(microsec/1000);
 };
 #else
 #include <unistd.h>

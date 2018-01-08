@@ -1,14 +1,7 @@
-#include <fcntl.h>           /* For O_* constants */
-#include <sys/stat.h>        /* For mode constants */
-#include <sys/msg.h>
-#include <sys/types.h>
-#include <sys/sem.h>
-#include <sys/shm.h>
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
-#include <unistd.h>
 #include <errno.h>
 #include <regex.h>
 #include <../tools.h>
