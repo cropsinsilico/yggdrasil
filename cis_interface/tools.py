@@ -30,6 +30,7 @@ def is_zmq_installed():
     """
     if platform._is_win:
         cc = 'cl'
+        return True
     else:
         cc = 'gcc'
     process = subprocess.Popen([cc, '-lzmq', '-lczmq'],
