@@ -1,11 +1,18 @@
 import sys
-import sysv_ipc
+from logging import warn
 import threading
 from subprocess import Popen, PIPE
 from cis_interface import platform
 from cis_interface.tools import CIS_MSG_MAX, is_ipc_installed
 from cis_interface.communication import CommBase
-
+try:
+    import sysv_ipc
+    _ipc_installed = is_ipc_installed()
+except ImportError:
+    warn("Could not import sysv_ipc. " +
+         "IPC support will be disabled.")
+    sysv_ipc = None
+    _ipc_installed = False
 
 _registered_queues = {}
 
@@ -21,15 +28,19 @@ def get_queue(qid=None):
         :class:`sysv_ipc.MessageQueue`: Message queue.
 
     """
-    global _registered_queues
-    kwargs = dict(max_message_size=CIS_MSG_MAX)
-    if qid is None:
-        kwargs['flags'] = sysv_ipc.IPC_CREX
-    mq = sysv_ipc.MessageQueue(qid, **kwargs)
-    key = str(mq.key)
-    if key not in _registered_queues:
-        _registered_queues[key] = mq
-    return mq
+    if _ipc_installed:
+        global _registered_queues
+        kwargs = dict(max_message_size=CIS_MSG_MAX)
+        if qid is None:
+            kwargs['flags'] = sysv_ipc.IPC_CREX
+        mq = sysv_ipc.MessageQueue(qid, **kwargs)
+        key = str(mq.key)
+        if key not in _registered_queues:
+            _registered_queues[key] = mq
+        return mq
+    else:
+        warn("IPC not installed. Queue cannot be returned.")
+        return None
 
 
 def remove_queue(mq):
@@ -58,18 +69,22 @@ def ipcs(options=[]):
             list.
 
     Returns:
-        list: Captured output.
+        str: Captured output.
 
     """
-    cmd = ' '.join(['ipcs'] + options)
-    p = Popen(cmd, stdin=PIPE, stdout=PIPE, stderr=PIPE, shell=True)
-    output, err = p.communicate()
-    exit_code = p.returncode
-    if exit_code != 0:  # pragma: debug
-        if not err.isspace():
-            print(err.decode('utf-8'))
-        raise Exception("Error on spawned process. See output.")
-    return output.decode('utf-8')
+    if _ipc_installed:
+        cmd = ' '.join(['ipcs'] + options)
+        p = Popen(cmd, stdin=PIPE, stdout=PIPE, stderr=PIPE, shell=True)
+        output, err = p.communicate()
+        exit_code = p.returncode
+        if exit_code != 0:  # pragma: debug
+            if not err.isspace():
+                print(err.decode('utf-8'))
+            raise Exception("Error on spawned process. See output.")
+        return output.decode('utf-8')
+    else:
+        warn("IPC not installed. ipcs cannot be run.")
+        return ''
 
 
 def ipc_queues():
@@ -119,16 +134,19 @@ def ipcrm(options=[]):
             list.
 
     """
-    cmd = ' '.join(['ipcrm'] + options)
-    p = Popen(cmd, stdin=PIPE, stdout=PIPE, stderr=PIPE, shell=True)
-    output, err = p.communicate()
-    exit_code = p.returncode
-    if exit_code != 0:  # pragma: debug
-        if not err.isspace():
-            print(err.decode('utf-8'))
-        raise Exception("Error on spawned process. See output.")
-    if not output.isspace():
-        print(output.decode('utf-8'))
+    if _ipc_installed:
+        cmd = ' '.join(['ipcrm'] + options)
+        p = Popen(cmd, stdin=PIPE, stdout=PIPE, stderr=PIPE, shell=True)
+        output, err = p.communicate()
+        exit_code = p.returncode
+        if exit_code != 0:  # pragma: debug
+            if not err.isspace():
+                print(err.decode('utf-8'))
+            raise Exception("Error on spawned process. See output.")
+        if not output.isspace():
+            print(output.decode('utf-8'))
+    else:
+        warn("IPC not installed. ipcrm cannot be run.")
 
 
 def ipcrm_queues(queue_keys=None):
@@ -139,12 +157,15 @@ def ipcrm_queues(queue_keys=None):
             be removed. Defaults to all existing queues.
 
     """
-    if queue_keys is None:
-        queue_keys = ipc_queues()
-    if isinstance(queue_keys, str):
-        queue_keys = [queue_keys]
-    for q in queue_keys:
-        ipcrm(["-Q %s" % q])
+    if _ipc_installed:
+        if queue_keys is None:
+            queue_keys = ipc_queues()
+        if isinstance(queue_keys, str):
+            queue_keys = [queue_keys]
+        for q in queue_keys:
+            ipcrm(["-Q %s" % q])
+    else:
+        warn("IPC not installed. ipcrm cannot be run.")
 
 
 class IPCComm(CommBase.CommBase):
@@ -181,7 +202,7 @@ class IPCComm(CommBase.CommBase):
     @classmethod
     def is_installed(cls):
         r"""bool: Is the comm installed."""
-        return is_ipc_installed()
+        return _ipc_installed
 
     @property
     def maxMsgSize(self):
