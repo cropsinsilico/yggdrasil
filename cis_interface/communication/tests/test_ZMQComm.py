@@ -2,7 +2,7 @@ import unittest
 import nose.tools as nt
 import zmq
 from cis_interface import platform
-from cis_interface.tools import is_zmq_installed
+from cis_interface.tools import is_zmq_installed, is_ipc_installed
 from cis_interface.communication import new_comm
 from cis_interface.communication.tests import test_CommBase as parent
 from cis_interface.communication import ZMQComm
@@ -132,6 +132,7 @@ class TestZMQCommTCP(TestZMQComm):
         pass
 
     
+@unittest.skipIf(not is_ipc_installed(), "IPC library not installed")
 class TestZMQCommIPC(TestZMQComm):
     r"""Test for ZMQComm communication class with IPC socket."""
     def __init__(self, *args, **kwargs):
