@@ -85,7 +85,7 @@ before_test:
   - "flake8 cis_interface"
 
 test_script:
-  - "nosetests --nologcapture --with-coverage --cover-package=cis_interface -svx"
+  - "nosetests --nologcapture --with-coverage --cover-package=cis_interface -sv"
 
 after_test:
   - "coveralls"

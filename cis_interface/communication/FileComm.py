@@ -64,7 +64,11 @@ class FileComm(CommBase.CommBase):
 
     def _close(self):
         if self.is_open:
-            os.fsync(self.fd.fileno())
+            try:
+                self.fd.flush()
+                os.fsync(self.fd.fileno())
+            except OSError:
+                pass
             self.fd.close()
         self.fd = None
 
