@@ -57,6 +57,11 @@ if cov_installed:
         if new_rule in excl_list:
             excl_list.remove(new_rule)
         return excl_list
+    # Platform
+    if IS_WINDOWS:
+        excl_list = rm_excl_rule(excl_list, 'pragma: windows')
+    else:
+        excl_list = add_excl_rule(excl_list, 'pragma: windows')
     # Python version
     verlist = [2, 3]
     for v in verlist:

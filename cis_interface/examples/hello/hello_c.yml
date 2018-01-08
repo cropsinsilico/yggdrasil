@@ -20,4 +20,5 @@ model:
       args: helloQueue
     - name: outFile
       driver: FileOutputDriver
-      args: /tmp/output_hello.txt
+      args: output_hello.txt
+      in_temp: True

@@ -6,6 +6,9 @@ import os
 import sys
 import inspect
 import time
+import yaml
+import pystache
+from cis_interface.backwards import sio
 import subprocess
 from cis_interface import platform
 from cis_interface import backwards
@@ -57,6 +60,56 @@ PSI_MSG_MAX = CIS_MSG_MAX
 PSI_MSG_EOF = CIS_MSG_EOF
 
 
+def parse_yaml(fname):
+    r"""Parse a yaml file defining a run.
+
+    Args:
+        fname (str): Path to the yaml file.
+
+    Returns:
+        dict: Contents of yaml file.
+
+    """
+    # Open file and parse yaml
+    with open(fname, 'r') as f:
+        # Mustache replace vars
+        yamlparsed = f.read()
+        yamlparsed = pystache.render(
+            sio.StringIO(yamlparsed).getvalue(), dict(os.environ))
+        yamlparsed = yaml.safe_load(yamlparsed)
+    return yamlparsed
+
+    
+def popen_nobuffer(args, **kwargs):
+    r"""Uses Popen to open a process without a buffer. If not already set,
+    the keyword arguments 'bufsize', 'stdout', and 'stderr' are set to
+    0, subprocess.PIPE, and subprocess.STDOUT respectively. This sets the
+    output stream to unbuffered and directs both stdout and stderr to the
+    stdout pipe.
+
+    Args:
+        args (list, str): Shell command or list of arguments that should be
+            run.
+        **kwargs: Additional keywords arguments are passed to Popen.
+
+    Returns:
+        subprocess.Process: Process that was started.
+
+    """
+    # stdbuf only for linux
+    if platform._is_linux:
+        stdbuf_args = ['stdbuf', '-o0', '-e0']
+        if isinstance(args, str):
+            args = ' '.join(stdbuf_args + [args])
+        else:
+            args = stdbuf_args + args
+    kwargs.setdefault('bufsize', 0)
+    kwargs.setdefault('stdout', subprocess.PIPE)
+    kwargs.setdefault('stderr', subprocess.STDOUT)
+    out = subprocess.Popen(args, **kwargs)
+    return out
+
+
 def eval_kwarg(x):
     r"""If x is a string, eval it. Otherwise just return it.
 
@@ -64,7 +117,7 @@ def eval_kwarg(x):
         x (str, obj): String to be evaluated as an object or an object.
 
     Returns:
-        obj: Evaluation result of x for strings if x is a string. x otherwise.
+        obj: Result of evaluated string or the input object.
 
     """
     if isinstance(x, str):

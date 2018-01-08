@@ -16,7 +16,8 @@ model:
   outputs:
     - name: output_log
       driver: FileOutputDriver
-      args: /tmp/fibCli.txt
+      args: fibCli.txt
+      in_temp: True
 
   inputs:
     - name: yaml_in

@@ -4,13 +4,10 @@ import logging
 import os
 import time
 import signal
-import yaml
-import pystache
 from pprint import pformat
 from itertools import chain
 import socket
-from cis_interface.tools import CisClass
-from cis_interface.backwards import sio
+from cis_interface.tools import CisClass, parse_yaml
 from cis_interface.config import cis_cfg, cfg_environment
 from cis_interface import drivers
 from cis_interface.drivers import create_driver
@@ -36,7 +33,7 @@ COLOR_NORMAL = '\033[0m'
 #     logging.basicConfig(level=logLevel, stream=sys.stdout, format=COLOR_TRACE +
 #                         prog + ': %(message)s' + COLOR_NORMAL)
 
-    
+
 class CisRunner(CisClass):
     r"""This class handles the orchestration of starting the model and
     IO drivers, monitoring their progress, and cleaning up on exit.
@@ -118,19 +115,14 @@ class CisRunner(CisClass):
             raise IOError("Unable locate yaml file %s" % yamlpath)
         # Open file and parse yaml
         self.info("Loading yaml %s", yamlpath)
-        with open(modelYml, 'r') as f:
-            # Mustache replace vars
-            yamlparsed = f.read()
-            yamlparsed = pystache.render(
-                sio.StringIO(yamlparsed).getvalue(), dict(os.environ))
-            yamlparsed = yaml.safe_load(yamlparsed)
-            self.debug("After stache: %s", pformat(yamlparsed))
-            # Store parsed models
-            yml_models = yamlparsed.get('models', [])
-            if 'model' in yamlparsed:
-                yml_models.append(yamlparsed['model'])
-            for yml in yml_models:
-                self.add_driver('model', yml, yamldir)
+        yamlparsed = parse_yaml(yamlpath)
+        self.debug("After stache: %s", pformat(yamlparsed))
+        # Store parsed models
+        yml_models = yamlparsed.get('models', [])
+        if 'model' in yamlparsed:
+            yml_models.append(yamlparsed['model'])
+        for yml in yml_models:
+            self.add_driver('model', yml, yamldir)
 
     def add_driver(self, dtype, yaml, yamldir):
         r"""Add a driver to the appropriate driver dictionary with yamldir.

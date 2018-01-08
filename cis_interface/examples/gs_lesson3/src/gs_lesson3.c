@@ -14,7 +14,7 @@ int main(int argc, char *argv[]) {
 
   // Loop until there is no longer input or the queues are closed
   while (flag >= 0) {
-    
+  
     // Receive input from input channel
     // If there is an error or the queue is closed, the flag will be negative
     // Otherwise, it is the size of the received message
@@ -37,6 +37,10 @@ int main(int argc, char *argv[]) {
 
   }
 
+  // Free input/output channels
+  psi_free(&in_channel);
+  psi_free(&out_channel);
+  
   return 0;
 }
 

@@ -148,7 +148,7 @@ class ServerRequestDriver(ConnectionDriver):
 
         Args:
             *args: Arguments are passed to parent class send_message.
-            *kwargs: Keyword arguments are passed to parent class send_message.
+            **kwargs: Keyword arguments are passed to parent class send_message.
 
         Returns:
             bool: Success or failure of send.

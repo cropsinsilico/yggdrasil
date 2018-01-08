@@ -1,5 +1,5 @@
-# from logging import debug, error, exception
 import os
+import tempfile
 from cis_interface.communication import CommBase
 
 
@@ -22,12 +22,15 @@ class FileComm(CommBase.CommBase):
         fd (file): File that should be read/written.
         read_meth (str): Method that should be used to read data from the file.
         append (bool): If True and writing, file is openned in append mode.
+        in_temp (bool, optional): If True, the path will be considered relative
+            to the platform temporary directory. Defaults to False.
 
     Raises:
         ValueError: If the read_meth is not one of the supported values.
 
     """
-    def __init__(self, name, read_meth='read', append=False, **kwargs):
+    def __init__(self, name, read_meth='read', append=False, in_temp=False,
+                 **kwargs):
         if not hasattr(self, 'fd'):
             self.fd = None
         if read_meth not in ['read', 'readline']:
@@ -35,6 +38,8 @@ class FileComm(CommBase.CommBase):
         self.read_meth = read_meth
         self.append = append
         super(FileComm, self).__init__(name, **kwargs)
+        if in_temp:
+            self.address = os.path.join(tempfile.gettempdir(), self.address)
         self.address = os.path.abspath(self.address)
 
     @property
