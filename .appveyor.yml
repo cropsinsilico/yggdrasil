@@ -63,11 +63,11 @@ install:
   - "pip install --upgrade setuptools"
 
   # Install ZeroMQ
-  - "if %INSTALLZMQ% == 1 ci/install-czmq-windows.bat"
+  - "if %INSTALLZMQ% == 1 ci\\install-czmq-windows.bat"
 
   # Install & start RabbitMQ
-  - "if %INSTALLRMQ% == 1 ci/install-rmqserver-windows.bat"  
-  - "if %INSTALLRMQ% == 1 ci/start-rmqserver-windows.bat"  
+  - "if %INSTALLRMQ% == 1 ci\\install-rmqserver-windows.bat"  
+  - "if %INSTALLRMQ% == 1 ci\\start-rmqserver-windows.bat"  
 
   # Install dependencies using conda/pip
   - "conda install --yes -c conda-forge numpy nose coverage coveralls codecov flake8"
