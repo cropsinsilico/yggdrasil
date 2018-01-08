@@ -53,13 +53,15 @@ ECHO Installing czmq...
 set CZMQ_SOURCEDIR=C:\projects\czmq
 set CZMQ_BUILDDIR=C:\projects\build_czmq
 git clone git://github.com/zeromq/czmq.git %CZMQ_SOURCEDIR%
-echo CZMQ_LIBRARY=%CZMQ_BUILDDIR%
-ls %CZMQ_BUILDDIR%
 md %CZMQ_BUILDDIR%
 cd %CZMQ_BUILDDIR%
 cmake -G "%CMAKE_GENERATOR%" -D CMAKE_INCLUDE_PATH="%ZEROMQ_INCLUDE_DIR%" -D CMAKE_LIBRARY_PATH="%ZEROMQ_LIBRARY_DIR%" -D CMAKE_C_FLAGS_RELEASE="/MT" -D CMAKE_CXX_FLAGS_RELEASE="/MT" -D CMAKE_C_FLAGS_DEBUG="/MTd" %CZMQ_SOURCEDIR%
-:: ls %CZMQ_SOURCEDIR%
 msbuild /v:minimal /p:Configuration=Release czmq.vcxproj
+set CZMQ_INCLUDE_DIR="%CZMQ_SOURCEDIR%\include"
+set CZMQ_LIBRARY_DIR="%CZMQ_BUILDDIR%"
+:: move 
+echo CZMQ_LIBRARY=%CZMQ_LIBRARY_DIR%
+ls %CZMQ_LIBRARY_DIR%
 :: cd %CZMQ_SOURCEDIR%\builds\msvc
 :: CALL configure.bat
 :: cd vs20%DIRVER%
