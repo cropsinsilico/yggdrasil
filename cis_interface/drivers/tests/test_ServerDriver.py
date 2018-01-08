@@ -13,12 +13,14 @@ class TestServerParam(parent.TestConnectionParam):
         self.args = None
         self.attr_list += ['comm', 'response_drivers', 'nclients',
                            'request_name']
+        self.timeout = 2.0
         # self.sleeptime = 0.5
         # self.timeout = 10.0
         self.comm_name = _default_comm
         self.client_comm = _default_comm
         self.icomm_name = self.client_comm
         self.ocomm_name = self.comm_name
+        self.debug_flag = True
             
     @property
     def send_comm_kwargs(self):
