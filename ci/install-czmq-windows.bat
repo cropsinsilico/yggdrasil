@@ -26,7 +26,7 @@ cd ..\..\..\..
 ECHO Installing libzmq...
 git clone git://github.com/zeromq/libzmq.git
 cd libzmq\builds\msvc\build
-build.bat
+CALL build.bat
 :: configure.bat
 :: cd build
 :: buildall.bat
@@ -36,9 +36,9 @@ cd ..\..\..\..
 ECHO Installing czmq...
 git clone git://github.com/zeromq/czmq.git
 cd czmq\builds\msvc
-configure.bat
+CALL configure.bat
 cd vs20%DIRVER%
-build.bat
+CALL build.bat
 :: cd build
 :: buildall.bat
 cd ..\..\..\..
