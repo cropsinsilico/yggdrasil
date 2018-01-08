@@ -406,6 +406,10 @@ class IPCComm(CommBase.CommBase):
             self.debug("Send failed")
             self.close()
             return False
+        except AttributeError:  # pragma: debug
+            if self.is_closed:
+                return False
+            raise
         return True
 
     def _recv(self, timeout=None, no_backlog=False):
