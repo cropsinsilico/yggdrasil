@@ -1,1 +1,1 @@
-choco install -y rabbitmq --ignoredependencies -y
+choco install rabbitmq --ignoredependencies -y

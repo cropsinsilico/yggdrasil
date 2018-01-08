@@ -1,1 +1,3 @@
-rabbitmq-server -detached
+:: rabbitmq-server -detached
+choco info -h
+choco info rabbitmq --localonly
