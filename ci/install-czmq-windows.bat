@@ -34,6 +34,8 @@ git clone --depth 1 git://github.com/zeromq/libzmq.git %LIBZMQ_SOURCEDIR%
 md %LIBZMQ_BUILDDIR%
 cd %LIBZMQ_BUILDDIR%
 cmake -D CMAKE_CXX_FLAGS_RELEASE="/MT" -D CMAKE_CXX_FLAGS_DEBUG="/MTd" -G "%CMAKE_GENERATOR%" %LIBZMQ_SOURCEDIR%
+make install
+make
 msbuild /v:minimal /p:Configuration=Release libzmq.vcxproj
 set ZEROMQ_INCLUDE_DIR="%LIBZMQ_SOURCEDIR%\include"
 set ZEROMQ_LIBRARY_DIR="%LIBZMQ_BUILDDIR%\lib\Release"
