@@ -2,8 +2,16 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
-#include <unistd.h>
 #include <errno.h>
+#ifdef _WIN32
+#include <windows.h>
+static inline
+void sleep(const int tsec) {
+  Sleep(1000*tsec);
+};
+#else
+#include <unistd.h>
+#endif
 
 #ifndef CISTOOLS_H_
 #define CISTOOLS_H_
