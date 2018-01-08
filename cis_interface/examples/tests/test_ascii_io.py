@@ -57,7 +57,7 @@ class TestExampleAsciiIO(TestExample):
         for o, yml in self.runner.outputdrivers.items():
             if yml['driver'] == 'AsciiFileOutputDriver':
                 return yml['args']
-        raise Exception('Could not locate output file in yaml.')
+        raise Exception('Could not locate output file in yaml.')  # pragma: debug
 
     @property
     def output_table(self):
@@ -66,7 +66,7 @@ class TestExampleAsciiIO(TestExample):
             if (((yml['driver'] == 'AsciiTableOutputDriver') and
                  (not yml.get('as_array', False)))):
                 return yml['args']
-        raise Exception('Could not locate output table in yaml.')
+        raise Exception('Could not locate output table in yaml.')  # pragma: debug
 
     @property
     def output_array(self):
@@ -75,7 +75,7 @@ class TestExampleAsciiIO(TestExample):
             if (((yml['driver'] == 'AsciiTableOutputDriver') and
                  (yml.get('as_array', False)))):
                 return yml['args']
-        raise Exception('Could not locate output array in yaml.')
+        raise Exception('Could not locate output array in yaml.')  # pragma: debug
 
     def check_file(self):
         r"""Assert that contents of input/output ascii files are identical."""

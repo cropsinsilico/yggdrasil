@@ -2,7 +2,7 @@ import os
 import uuid
 import warnings
 import unittest
-from cis_interface import runner, tools
+from cis_interface import runner  # , tools
 from cis_interface.examples import yamls
 from cis_interface.config import cis_cfg, cfg_logging
 from cis_interface.drivers.MatlabModelDriver import _matlab_installed
@@ -80,20 +80,20 @@ class TestExample(unittest.TestCase):
             return None
         return os.path.dirname(self.yaml)
 
-    @property
-    def yaml_contents(self):
-        r"""dict: Contents of yaml file."""
-        if self.yaml is None:  # pragma: no cover
-            return None
-        return tools.parse_yaml(self.yaml)
+    # @property
+    # def yaml_contents(self):
+    #     r"""dict: Contents of yaml file."""
+    #     if self.yaml is None:  # pragma: no cover
+    #         return None
+    #     return tools.parse_yaml(self.yaml)
 
-    @property
-    def output_file(self):
-        r"""str: Output file for the run."""
-        for o, yml in self.runner.outputdrivers.items():
-            if yml['driver'] == 'FileOutputDriver':
-                return yml['args']
-        raise Exception('Could not locate output file in yaml.')
+    # @property
+    # def output_file(self):
+    #     r"""str: Output file for the run."""
+    #     for o, yml in self.runner.outputdrivers.items():
+    #         if yml['driver'] == 'FileOutputDriver':
+    #             return yml['args']
+    #     raise Exception('Could not locate output file in yaml.')
 
     def check_result(self):
         r"""This should be overridden with checks for the result."""

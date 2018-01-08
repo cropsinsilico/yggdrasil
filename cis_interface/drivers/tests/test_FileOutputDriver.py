@@ -33,22 +33,22 @@ class TestFileOutputParam(parent.TestConnectionParam):
 
 class TestFileOutputDriverNoStart(TestFileOutputParam,
                                   parent.TestConnectionDriverNoStart):
-    r"""Test runner for FileOutputDriver without start.
+    r"""Test runner for FileOutputDriver without start."""
 
-    Attributes (in addition to parent class's):
-        -
-
-    """
-    pass
+    def __init__(self, *args, **kwargs):
+        super(TestFileOutputDriverNoStart, self).__init__(*args, **kwargs)
+        self.args = os.path.basename(self.filepath)
+        
+    @property
+    def inst_kwargs(self):
+        r"""dict: Keyword arguments for creating a class instance."""
+        out = super(TestFileOutputDriverNoStart, self).inst_kwargs
+        out['in_temp'] = 'True'
+        return out
 
 
 class TestFileOutputDriver(TestFileOutputParam, parent.TestConnectionDriver):
-    r"""Test runner for FileOutputDriver.
-
-    Attributes (in addition to parent class's):
-        -
-
-    """
+    r"""Test runner for FileOutputDriver."""
 
     def setup(self):
         r"""Create a driver instance and start the driver."""
