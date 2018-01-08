@@ -21,7 +21,6 @@ class TestServerParam(parent.TestConnectionParam):
         self.client_comm = _default_comm
         self.icomm_name = self.client_comm
         self.ocomm_name = self.comm_name
-        self.debug_flag = True
             
     @property
     def send_comm_kwargs(self):
