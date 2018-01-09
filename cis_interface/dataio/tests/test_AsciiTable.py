@@ -36,8 +36,15 @@ map_nptype2cformat = [
     # (['int8', 'short', 'intc', 'int_', 'longlong'], '%d'),
     # (['uint8', 'ushort', 'uintc', 'uint64', 'ulonglong'], '%u'),
     ('int8', '%hhd'), ('short', '%hd'), ('intc', '%d'),
-    ('uint8', '%hhu'), ('ushort', '%hu'), ('uintc', '%u'), ('uint64', '%lu'),
+    ('uint8', '%hhu'), ('ushort', '%hu'), ('uintc', '%u'),
     ('S', '%s'), ('S5', '%5s'), ('U', '%s'), ('U5', '%20s')]
+if platform._is_win:
+    map_nptype2cformat.append(('int64', '%l64d'))
+    map_nptype2cformat.append(('uint64', '%l64u'))
+else:
+    map_nptype2cformat.append(('int64', '%ld'))
+    map_nptype2cformat.append(('uint64', '%lu'))
+# Conditional on if default int 32bit or 64bit
 # This is for when default int is 32bit
 if np.dtype('int_') != np.dtype('intc'):
     map_nptype2cformat.append(('int_', '%ld'))
