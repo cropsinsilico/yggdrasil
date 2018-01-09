@@ -17,7 +17,8 @@ _incl_comm = os.path.join(_top_dir, 'communication')
 _linker_flags = []
 _compile_flags = []  # '-DCIS_DEBUG="%s"' % cis_cfg.get('debug', 'psi', 'NOTSET')]
 if is_zmq_installed():
-    _linker_flags += ["-lczmq", "-lzmq"]
+    if not platform._is_win:
+        _linker_flags += ["-lczmq", "-lzmq"]
     _compile_flags += ["-DZMQINSTALLED"]
 if is_ipc_installed():
     _compile_flags += ["-DIPCINSTALLED"]
