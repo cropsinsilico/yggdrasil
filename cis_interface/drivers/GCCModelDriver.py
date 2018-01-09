@@ -66,7 +66,7 @@ class GCCModelDriver(ModelDriver):
         compile_args += self.src + self.ccflags
         if platform._is_win:
             compile_args += ['/link', '/out:%s' % self.efile]
-        compile_args.append(self.ldflags)
+        compile_args += self.ldflags
         if os.path.isfile(self.efile):
             os.remove(self.efile)
         if platform._is_win:
