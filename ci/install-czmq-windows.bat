@@ -76,4 +76,4 @@ set STOPTIME=%DATE% %TIME%
 @echo Start Time: %STARTTIME%
 
 :done
-@endlocal
+@endlocal & set _return1=%ZEROMQ_LIBRARY_DIR%& set _return2=%CZMQ_LIBRARY_DIR%
