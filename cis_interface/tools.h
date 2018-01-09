@@ -1,10 +1,10 @@
+#include "stdint.h"  // Use local copy for MSVC support
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
 #include <errno.h>
 #include <time.h>
-#include <stdint.h>
 
 #ifndef CISTOOLS_H_
 #define CISTOOLS_H_
