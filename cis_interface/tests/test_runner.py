@@ -2,7 +2,7 @@ import os
 import nose.tools as nt
 import signal
 from cis_interface import runner, tools
-from cis_interface.tests import yamls as sc_yamls
+# from cis_interface.tests import yamls as sc_yamls
 from cis_interface.examples import yamls as ex_yamls
 
 
