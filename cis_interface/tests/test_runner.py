@@ -12,10 +12,10 @@ def test_get_runner():
     cr.run()
 
 
-def test_runner_error():
-    r"""Start a runner for a model with an error."""
-    cr = runner.get_runner([sc_yamls['error']])
-    cr.run()
+# def test_runner_error():
+#     r"""Start a runner for a model with an error."""
+#     cr = runner.get_runner([sc_yamls['error']])
+#     cr.run()
 
 
 def test_runner_interrupt():
