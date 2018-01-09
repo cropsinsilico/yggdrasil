@@ -3,7 +3,11 @@
 #include <stdlib.h>
 #include <stdarg.h>
 #include <stdint.h>
+#ifdef _WIN32
+#include <regex>
+#else
 #include <regex.h>
+#endif
 #include "AsciiFile.h"
 
 /*! @brief Flag for checking if AsciiTable.h has already been included.*/
