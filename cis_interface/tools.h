@@ -4,6 +4,7 @@
 #include <stdarg.h>
 #include <errno.h>
 #include <time.h>
+#include <stdint.h>
 
 #ifndef CISTOOLS_H_
 #define CISTOOLS_H_
@@ -11,11 +12,13 @@
 // Platform specific
 #ifdef _WIN32
 #include <windows.h>
+#include <regex>
 #define getpid GetCurrentProcessId
 #define sleep(tsec) Sleep(1000*tsec)
 #define usleep(usec) Sleep(usec/1000)
 #else
 #include <unistd.h>
+#include <regex.h>
 #endif
 
 /*! @brief Maximum message size. */

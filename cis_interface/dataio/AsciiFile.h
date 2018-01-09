@@ -1,7 +1,4 @@
-#include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdarg.h>
+#include <../tools.h>
 
 /*! @brief Flag for checking if AsciiFile.h has already been included.*/
 #ifndef ASCIIFILE_H_
