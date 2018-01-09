@@ -81,7 +81,7 @@ class GCCModelDriver(ModelDriver):
         exit_code = comp_process.returncode
         if exit_code != 0:  # pragma: debug
             self.compiled = False
-            self.error(' '.join(compile_args))
+            self.error('%s', ' '.join(compile_args))
             self.print_encoded(output, end="")
             raise RuntimeError("Compilation failed with code %d." % exit_code)
         self.compiled = True
