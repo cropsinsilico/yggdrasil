@@ -2,7 +2,7 @@ import numpy as np
 import copy
 # from cis_interface.interface.scanf import scanf
 from cis_interface.dataio.AsciiFile import AsciiFile
-from cis_interface import backwards
+from cis_interface import backwards, platform
 from numpy.compat import asbytes
 try:
     from astropy.io import ascii as apy_ascii
@@ -59,9 +59,12 @@ def nptype2cformat(nptype):
         cfmt = "%d"
     elif t == np.dtype("int_"):
         cfmt = "%ld"
-    elif t == np.dtype("longlong"):  # pragma: no cover
-        # If it is different than C long
-        cfmt = "%lld"
+    elif t == np.dtype("longlong"):
+        # On windows C long is 32bit and long long is 64bit
+        if platform._is_win:
+            cfmt = "%l64d"
+        else:  # pragma: no cover
+            cfmt = "%lld"
     elif t == np.dtype("uint8"):
         cfmt = "%hhu"
     elif t == np.dtype("ushort"):
@@ -70,8 +73,12 @@ def nptype2cformat(nptype):
         cfmt = "%u"
     elif t == np.dtype("uint64"):  # Platform dependent
         cfmt = "%lu"
-    elif t == np.dtype("ulonglong"):  # pragma: no cover
-        cfmt = "%llu"
+    elif t == np.dtype("ulonglong"):
+        # On windows C unsigned long is 32bit and unsigned long long is 64bit
+        if platform._is_win:
+            cfmt = "%l64u"
+        else:  # pragma: no cover
+            cfmt = "%llu"
     elif np.issubdtype(t, np.dtype("S")):
         if t.itemsize is 0:
             cfmt = '%s'
@@ -137,7 +144,7 @@ def cformat2nptype(cfmt):
             out = 'int8'
         elif cfmt_str[-2] == 'h':  # short
             out = 'short'
-        elif 'll' in cfmt_str:
+        elif ('ll' in cfmt_str) or ('l64' in cfmt_str):
             out = 'longlong'  # long long
         elif cfmt_str[-2] == 'l':
             out = 'int_'  # long (broken in python)
@@ -148,7 +155,7 @@ def cformat2nptype(cfmt):
             out = 'uint8'
         elif cfmt_str[-2] == 'h':  # short
             out = 'ushort'
-        elif 'll' in cfmt_str:
+        elif ('ll' in cfmt_str) or ('l64' in cfmt_str):
             out = 'ulonglong'  # long long
         elif cfmt_str[-2] == 'l':
             out = 'uint64'  # long (broken in python)
@@ -201,6 +208,7 @@ def cformat2pyscanf(cfmt):
         out += cfmt_str[-1]
         out = out.replace('h', '')
         out = out.replace('l', '')
+        out = out.replace('64', '')
     return backwards.unicode2bytes(out)
 
 
