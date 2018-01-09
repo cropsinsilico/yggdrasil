@@ -59,6 +59,11 @@ def nptype2cformat(nptype):
         cfmt = "%d"
     elif t == np.dtype("int_"):
         cfmt = "%ld"
+    # elif t == np.dtype("int64"):
+    #     if platform._is_win:
+    #         cfmt = "%l64d"
+    #     else:  # pragma: no cover
+    #         cfmt = "%ld"
     elif t == np.dtype("longlong"):
         # On windows C long is 32bit and long long is 64bit
         if platform._is_win:
@@ -72,12 +77,15 @@ def nptype2cformat(nptype):
     elif t == np.dtype("uintc"):
         cfmt = "%u"
     elif t == np.dtype("uint64"):  # Platform dependent
-        cfmt = "%lu"
-    elif t == np.dtype("ulonglong"):
+        if platform._is_win:
+            cfmt = "%l64u"
+        else:
+            cfmt = "%lu"
+    elif t == np.dtype("ulonglong"):  # pragma: no cover
         # On windows C unsigned long is 32bit and unsigned long long is 64bit
         if platform._is_win:
             cfmt = "%l64u"
-        else:  # pragma: no cover
+        else:
             cfmt = "%llu"
     elif np.issubdtype(t, np.dtype("S")):
         if t.itemsize is 0:
