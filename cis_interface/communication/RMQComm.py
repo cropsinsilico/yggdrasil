@@ -52,6 +52,9 @@ def check_rmq_server(url=None, **kwargs):
     return True
 
 
+_rmq_server_running = check_rmq_server()
+
+
 class RMQComm(CommBase.CommBase):
     r"""Class for handling basic RabbitMQ communications.
 

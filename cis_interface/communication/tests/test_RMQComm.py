@@ -1,11 +1,11 @@
 import unittest
 import nose.tools as nt
 from cis_interface.communication import new_comm
-from cis_interface.communication.RMQComm import check_rmq_server
+from cis_interface.communication.RMQComm import _rmq_server_running
 from cis_interface.communication.tests import test_CommBase as parent
 
 
-@unittest.skipIf(not check_rmq_server(), "RMQ Server not running")
+@unittest.skipIf(not _rmq_server_running, "RMQ Server not running")
 class TestRMQComm(parent.TestCommBase):
     r"""Test for RMQComm communication class."""
     def __init__(self, *args, **kwargs):
@@ -20,7 +20,7 @@ class TestRMQComm(parent.TestCommBase):
         self.recv_instance.bind()
 
 
-@unittest.skipIf(check_rmq_server(), "RMQ Server running")
+@unittest.skipIf(_rmq_server_running, "RMQ Server running")
 def test_not_running():
     r"""Test raise of an error if a RMQ server is not running."""
     comm_kwargs = dict(comm='RMQComm', direction='send', reverse_names=True)
