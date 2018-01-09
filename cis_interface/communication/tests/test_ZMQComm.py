@@ -41,6 +41,7 @@ def test_invalid_protocol():
 
 @unittest.skipIf(not is_zmq_installed(), "ZMQ library not installed")
 @unittest.skipIf(platform._is_osx, "Testing on OSX")
+@unittest.skipIf(platform._is_win, "Testing on Windows")
 def test_error_on_send_open_twice():
     r"""Test creation of the same send socket twice for an error."""
     for s, r in ZMQComm._socket_type_pairs:
