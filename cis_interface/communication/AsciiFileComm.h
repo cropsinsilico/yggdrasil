@@ -1,9 +1,3 @@
-#include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdarg.h>
-#include <unistd.h>
-#include <errno.h>
 #include <../tools.h>
 #include <CommBase.h>
 #include <../dataio/AsciiFile.h>

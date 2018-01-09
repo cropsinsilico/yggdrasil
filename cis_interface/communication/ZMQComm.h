@@ -1,9 +1,3 @@
-#include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdarg.h>
-#include <unistd.h>
-#include <errno.h>
 #ifdef ZMQINSTALLED
 #include <czmq.h>
 #endif /*ZMQINSTALLED*/

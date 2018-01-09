@@ -1,4 +1,3 @@
-#include <stdlib.h>
 #include <../tools.h>
 #include <CommBase.h>
 #include <DefaultComm.h>
