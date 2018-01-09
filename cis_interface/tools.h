@@ -12,7 +12,7 @@
 // Platform specific
 #ifdef _WIN32
 #include <windows.h>
-#include <regex>
+//#include <regex>
 #define getpid GetCurrentProcessId
 #define sleep(tsec) Sleep(1000*tsec)
 #define usleep(usec) Sleep(usec/1000)
