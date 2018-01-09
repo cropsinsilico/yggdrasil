@@ -363,13 +363,16 @@ class IPCComm(CommBase.CommBase):
 
     def run_backlog(self):
         r"""Continue checking for buffered messages to be sent/recveived."""
-        flag = True
-        while self.is_open and flag:
-            if self.direction == 'recv':
-                flag = self.recv_backlog()
-            else:
-                flag = self.send_backlog()
-            self.sleep()
+        try:
+            flag = True
+            while self.is_open and flag:
+                if self.direction == 'recv':
+                    flag = self.recv_backlog()
+                else:
+                    flag = self.send_backlog()
+                self.sleep()
+        except TypeError:  # pragma: debug
+            pass
 
     def send_backlog(self):
         r"""Send a message from the send backlog to the queue."""
