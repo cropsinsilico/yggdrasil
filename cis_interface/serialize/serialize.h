@@ -1,10 +1,3 @@
-#include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdarg.h>
-#include <unistd.h>
-#include <errno.h>
-#include <regex.h>
 #include <../tools.h>
 #include <SerializeBase.h>
 #include <FormatSerialize.h>
