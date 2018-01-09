@@ -4,22 +4,19 @@
 #include <stdarg.h>
 #include <errno.h>
 #include <time.h>
-#ifdef _WIN32
-#include <windows.h>
-static inline
-void sleep(const int tsec) {
-  Sleep(1000*tsec);
-};
-static inline
-void usleep(const int microsec) {
-  Sleep(microsec/1000);
-};
-#else
-#include <unistd.h>
-#endif
 
 #ifndef CISTOOLS_H_
 #define CISTOOLS_H_
+
+// Platform specific
+#ifdef _WIN32
+#include <windows.h>
+#define getpid GetCurrentProcessId
+#define sleep(tsec) Sleep(1000*tsec)
+#define usleep(usec) Sleep(usec/1000)
+#else
+#include <unistd.h>
+#endif
 
 /*! @brief Maximum message size. */
 #ifdef IPCDEF
