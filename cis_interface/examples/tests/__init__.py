@@ -109,6 +109,7 @@ class TestExample(unittest.TestCase):
             os.environ.update(self.env)
             self.runner = runner.get_runner(self.yaml, namespace=self.namespace)
             self.runner.run()
+            self.sleep()
             self.check_result()
 
     def test_all(self):
