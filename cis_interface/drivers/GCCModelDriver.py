@@ -38,9 +38,9 @@ def build_regex_win32():
     _regex_win32_dir = os.path.dirname(_regex_win32_lib)
     _regex_win32_cpp = os.path.join(_regex_win32_dir, 'regex_win32.cpp')
     _regex_win32_obj = os.path.join(_regex_win32_dir, 'regex_win32.obj')
-    cmd = ['cl', '-Zi', '-EHsc',
-           '-I "%s"' % _regex_win32_dir,
-           '-c %s' % _regex_win32_cpp, '&&',
+    cmd = ['cl', '/c', '/Zi',  # '-EHsc',
+           '/I', '%s' % _regex_win32_dir, _regex_win32_cpp,
+           '&&',
            'lib', '/out:%s' % _regex_win32_lib,
            _regex_win32_obj]
     comp_process = popen_nobuffer(cmd)
@@ -49,7 +49,7 @@ def build_regex_win32():
     if exit_code != 0:  # pragma: debug
         print(' '.join(cmd))
         print_encoded(output, end="")
-        time.sleep(3)
+        time.sleep(10)
         raise RuntimeError("Could not build regex_win32.lib")
     assert(os.path.isfile(_regex_win32_lib))
 
