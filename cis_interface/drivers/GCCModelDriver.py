@@ -38,11 +38,20 @@ def build_regex_win32():
     _regex_win32_dir = os.path.dirname(_regex_win32_lib)
     _regex_win32_cpp = os.path.join(_regex_win32_dir, 'regex_win32.cpp')
     _regex_win32_obj = os.path.join(_regex_win32_dir, 'regex_win32.obj')
+    # Compile object
     cmd = ['cl', '/c', '/Zi',  # '-EHsc',
-           '/I', '%s' % _regex_win32_dir, _regex_win32_cpp,
-           '&&',
-           'lib', '/out:%s' % _regex_win32_lib,
-           _regex_win32_obj]
+           '/I', '%s' % _regex_win32_dir, _regex_win32_cpp]
+    comp_process = popen_nobuffer(cmd)
+    output, err = comp_process.communicate()
+    exit_code = comp_process.returncode
+    if exit_code != 0:  # pragma: debug
+        print(' '.join(cmd))
+        print_encoded(output, end="")
+        time.sleep(10)
+        raise RuntimeError("Could not create regex_win32.obj")
+    assert(os.path.isfile(_regex_win32_obj))
+    # Create library
+    cmd = ['lib', '/out:%s' % _regex_win32_lib, _regex_win32_obj]
     comp_process = popen_nobuffer(cmd)
     output, err = comp_process.communicate()
     exit_code = comp_process.returncode
