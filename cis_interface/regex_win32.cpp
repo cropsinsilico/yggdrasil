@@ -223,22 +223,23 @@ int regex_replace_sub(char *buf, const int len_buf,
     std::regex r(re);
     // Loop making replacements
     std::cmatch m;
-    char rp_sub[2*len_buf];
-    char re_sub[len_buf];
-    char igrp[len_buf];
+    char *rp_sub = (char*)malloc(2*len_buf*sizeof(char));
+    char *re_sub = (char*)malloc(len_buf*sizeof(char));
+    char *igrp = (char*)malloc(len_buf*sizeof(char));
     int len_m, rem_s, rem_l, delta_siz, len_rp;
     int cur_pos = 0;
     int cur_siz = strlen(buf);
     int creplace = 0;
     int i, j;
+    int ret = 0;
     while (1) {
       if ((nreplace > 0) && (creplace >= nreplace)) {
 	printf("regex_replace_nosub: Maximum of %d replacements reached\n",
 	       creplace);
 	break;
       }
-      const char *first = buf + cur_pos;
-      const char *last = buf + cur_siz;
+      char *first = buf + cur_pos;
+      char *last = buf + cur_siz;
       if (!(regex_search(first, last, m, r))) {
 	/* printf("regex_replace_sub: nomatch for %s in %s\n", re, p); */
 	break;
@@ -256,19 +257,22 @@ int regex_replace_sub(char *buf, const int len_buf,
       for (j = 0; j < nref; j++) {
 	i = refs[j];
 	strcpy(igrp, first + m.position(i));
-	igrp[m.length(i)] = 0; // terminate
+	igrp[m.length(i)] = '\0'; // terminate
 	sprintf(re_sub, "\\$%d", i);
 	ret = regex_replace_nosub(rp_sub, 2*len_buf, re_sub, igrp, 0);
 	if (ret < 0) {
 	  printf("regex_replace_sub: Error replacing substring $%d.\n", i);
 	  free(refs);
+	  free(rp_sub);
+	  free(re_sub);
+	  free(igrp);
 	  return -1;
 	}
       }
       // Ensure replacement will not exceed buffer
       len_rp = ret;
-      len_m = m.length()
-	delta_siz = len_rp - len_m;
+      len_m = m.length();
+      delta_siz = len_rp - len_m;
       if ((cur_siz + delta_siz + 1) > len_buf) {
 	printf("regex_replace_sub: Relacement will exceed buffer.\n");
 	cur_siz = -1;
@@ -286,6 +290,9 @@ int regex_replace_sub(char *buf, const int len_buf,
       creplace += 1;
       free(refs);
     }
+    free(rp_sub);
+    free(re_sub);
+    free(igrp);
     return cur_siz;
   } catch (const std::regex_error& rerr) {
     return -1;
