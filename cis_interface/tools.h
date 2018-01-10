@@ -10,7 +10,7 @@
 
 // Platform specific
 #ifdef _WIN32
-#include "regex_posix.h"
+#include "regex_win32.h"
 #include "stdint.h"  // Use local copy for MSVC support
 #include <windows.h>
 #define getpid GetCurrentProcessId
