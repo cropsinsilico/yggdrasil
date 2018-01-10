@@ -1,8 +1,9 @@
 import os
+import time
 from cis_interface import platform
 from cis_interface.communication import _default_comm
 from cis_interface.tools import (
-    is_zmq_installed, is_ipc_installed, popen_nobuffer)
+    is_zmq_installed, is_ipc_installed, popen_nobuffer, print_encoded)
 from cis_interface.drivers.ModelDriver import ModelDriver
 
 
@@ -46,7 +47,9 @@ def build_regex_win32():
     output, err = comp_process.communicate()
     exit_code = comp_process.returncode
     if exit_code != 0:  # pragma: debug
-        print(output)
+        print(' '.join(cmd))
+        print_encoded(output, end="")
+        time.sleep(3)
         raise RuntimeError("Could not build regex_win32.lib")
     assert(os.path.isfile(_regex_win32_lib))
 

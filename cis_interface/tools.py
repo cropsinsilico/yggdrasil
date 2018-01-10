@@ -168,6 +168,25 @@ def popen_nobuffer(args, **kwargs):
     return out
 
 
+def print_encoded(msg, *args, **kwargs):
+    r"""Print bytes to stdout, encoding if possible.
+
+    Args:
+        msg (str, bytes): Message to print.
+        *args: Additional arguments are passed to print.
+        **kwargs: Additional keyword arguments are passed to print.
+
+
+    """
+    try:
+        print(backwards.bytes2unicode(msg), *args, **kwargs)
+    except UnicodeEncodeError:  # pragma: debug
+        logging.error("sys.stdout.encoding = %s, cannot print unicode",
+                      sys.stdout.encoding)
+        kwargs.pop('end', None)
+        print(msg, *args, **kwargs)
+
+
 class TimeOut(object):
     r"""Class for checking if a period of time has been elapsed.
 
@@ -257,13 +276,7 @@ class CisClass(object):
 
 
         """
-        try:
-            print(backwards.bytes2unicode(msg), *args, **kwargs)
-        except UnicodeEncodeError:  # pragma: debug
-            self.error("sys.stdout.encoding = %s, cannot print unicode",
-                       sys.stdout.encoding)
-            kwargs.pop('end', None)
-            print(msg, *args, **kwargs)
+        return print_encoded(msg, *args, **kwargs)
 
     def printStatus(self):
         r"""Print the class status."""
