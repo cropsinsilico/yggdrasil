@@ -39,7 +39,7 @@ def build_regex_win32():
     _regex_win32_cpp = os.path.join(_regex_win32_dir, 'regex_win32.cpp')
     _regex_win32_obj = os.path.join(_regex_win32_dir, 'regex_win32.obj')
     # Compile object
-    cmd = ['cl', '/c', '/Zi',  # '-EHsc',
+    cmd = ['cl', '/c', '/Zi', '/EHsc',
            '/I', '%s' % _regex_win32_dir, _regex_win32_cpp]
     comp_process = popen_nobuffer(cmd)
     output, err = comp_process.communicate()
