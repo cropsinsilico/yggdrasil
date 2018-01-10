@@ -40,9 +40,9 @@ def build_regex_win32():
     _regex_win32_obj = os.path.join(_regex_win32_dir, 'regex_win32.obj')
     # Compile object
     cmd = ['cl', '/c', '/Zi', '/EHsc',
-           '/I', '%s' % _regex_win32_dir,
-           '/out:%s' % _regex_win32_obj, _regex_win32_cpp]
-    comp_process = popen_nobuffer(cmd)
+           '/I', '%s' % _regex_win32_dir, _regex_win32_cpp]
+    # '/out:%s' % _regex_win32_obj,
+    comp_process = popen_nobuffer(cmd, cwd=_regex_win32_dir)
     output, err = comp_process.communicate()
     exit_code = comp_process.returncode
     if output:
@@ -54,7 +54,7 @@ def build_regex_win32():
     assert(os.path.isfile(_regex_win32_obj))
     # Create library
     cmd = ['lib', '/out:%s' % _regex_win32_lib, _regex_win32_obj]
-    comp_process = popen_nobuffer(cmd)
+    comp_process = popen_nobuffer(cmd, cwd=_regex_win32_dir)
     output, err = comp_process.communicate()
     exit_code = comp_process.returncode
     if output:
