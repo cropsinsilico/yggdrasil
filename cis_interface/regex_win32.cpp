@@ -238,8 +238,8 @@ int regex_replace_sub(char *buf, const int len_buf,
 	       creplace);
 	break;
       }
-      char *first = buf + cur_pos;
-      char *last = buf + cur_siz;
+      const char *first = buf + cur_pos;
+      const char *last = buf + cur_siz;
       if (!(regex_search(first, last, m, r))) {
 	/* printf("regex_replace_sub: nomatch for %s in %s\n", re, p); */
 	break;
@@ -256,7 +256,7 @@ int regex_replace_sub(char *buf, const int len_buf,
       strcpy(rp_sub, rp);
       for (j = 0; j < nref; j++) {
 	i = refs[j];
-	strcpy(igrp, first + m.position(i));
+	strcpy(igrp, buf + cur_pos + m.position(i));
 	igrp[m.length(i)] = '\0'; // terminate
 	sprintf(re_sub, "\\$%d", i);
 	ret = regex_replace_nosub(rp_sub, 2*len_buf, re_sub, igrp, 0);
@@ -281,9 +281,10 @@ int regex_replace_sub(char *buf, const int len_buf,
       // Move trailing
       rem_l = cur_siz - (cur_pos + m.position() + m.length());
       rem_s = m.position() + len_rp;
-      memmove(first + rem_s, first + m.position() + m.length(), rem_l + 1);
+      memmove(buf + cur_pos + rem_s,
+	      buf + cur_pos + m.position() + m.length(), rem_l + 1);
       // Copy replacement
-      strncpy(first + m.position(), rp_sub, len_rp);
+      strncpy(buf + cur_pos + m.position(), rp_sub, len_rp);
       // Advance
       cur_pos += m.position() + len_rp;
       cur_siz += delta_siz;
