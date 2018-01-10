@@ -1,4 +1,3 @@
-#include "stdint.h"  // Use local copy for MSVC support
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -11,14 +10,16 @@
 
 // Platform specific
 #ifdef _WIN32
+#include "regex_posix.h"
+#include "stdint.h"  // Use local copy for MSVC support
 #include <windows.h>
-//#include <regex>
 #define getpid GetCurrentProcessId
 #define sleep(tsec) Sleep(1000*tsec)
 #define usleep(usec) Sleep(usec/1000)
 #else
+#include "regex_posix.h"
+#include <stdint.h>
 #include <unistd.h>
-#include <regex.h>
 #endif
 
 /*! @brief Maximum message size. */
