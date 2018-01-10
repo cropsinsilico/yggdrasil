@@ -44,22 +44,25 @@ def build_regex_win32():
     comp_process = popen_nobuffer(cmd)
     output, err = comp_process.communicate()
     exit_code = comp_process.returncode
-    if exit_code != 0:  # pragma: debug
+    if output:
         print(' '.join(cmd))
         print_encoded(output, end="")
+    if exit_code != 0:  # pragma: debug
         time.sleep(10)
         raise RuntimeError("Could not create regex_win32.obj")
-    assert(os.path.isfile(_regex_win32_obj))
+    # assert(os.path.isfile(_regex_win32_obj))
     # Create library
     cmd = ['lib', '/out:%s' % _regex_win32_lib, _regex_win32_obj]
     comp_process = popen_nobuffer(cmd)
     output, err = comp_process.communicate()
     exit_code = comp_process.returncode
-    if exit_code != 0:  # pragma: debug
+    if output:
         print(' '.join(cmd))
         print_encoded(output, end="")
+    if exit_code != 0:  # pragma: debug
         time.sleep(10)
         raise RuntimeError("Could not build regex_win32.lib")
+    time.sleep(10)
     assert(os.path.isfile(_regex_win32_lib))
 
 
