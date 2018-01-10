@@ -1,6 +1,7 @@
 #include <string>
 #include <regex>
 #include <cstdint>
+#include "regex_win32.h"
 
 
 typedef std::regex_iterator<const char *> Myiter;

@@ -4,7 +4,6 @@ from cis_interface.communication import _default_comm
 from cis_interface.tools import (
     is_zmq_installed, is_ipc_installed, popen_nobuffer)
 from cis_interface.drivers.ModelDriver import ModelDriver
-# from cis_interface.config import cis_cfg
 
 
 _top_dir = os.path.normpath(os.path.join(os.path.dirname(__file__), '../'))
@@ -12,10 +11,15 @@ _incl_interface = os.path.join(_top_dir, 'interface')
 _incl_io = os.path.join(_top_dir, 'io')
 _incl_seri = os.path.join(_top_dir, 'serialize')
 _incl_comm = os.path.join(_top_dir, 'communication')
+_regex_win32_lib = os.path.join(_top_dir, 'regex_win32.lib')
 
-# TODO: conditional on libzmq installed
+
 _linker_flags = []
-_compile_flags = []  # '-DCIS_DEBUG="%s"' % cis_cfg.get('debug', 'psi', 'NOTSET')]
+_compile_flags = []
+if platform._is_win:
+    _regex_win32 = os.path.split(_regex_win32_lib)
+    _compile_flags += ["-I" + _regex_win32[0]]
+    _linker_flags += [_regex_win32[1], '/LIBPATH:"%s"' % _regex_win32[0]]
 if is_zmq_installed():
     if not platform._is_win:
         _linker_flags += ["-lczmq", "-lzmq"]
@@ -26,6 +30,29 @@ for x in [_incl_interface, _incl_io, _incl_comm, _incl_seri]:
     _compile_flags += ["-I" + x]
 if _default_comm == 'IPCComm':
     _compile_flags += ["-DIPCDEF"]
+
+
+def build_regex_win32():
+    r"""Build the regex_win32 library."""
+    _regex_win32_dir = os.path.dirname(_regex_win32_lib)
+    _regex_win32_cpp = os.path.join(_regex_win32_dir, 'regex_win32.cpp')
+    _regex_win32_obj = os.path.join(_regex_win32_dir, 'regex_win32.obj')
+    cmd = ['cl', '-Zi', '-EHsc',
+           '-I "%s"' % _regex_win32_dir,
+           '-c %s' % _regex_win32_cpp, '&&',
+           'lib', '/out:%s' % _regex_win32_lib,
+           _regex_win32_obj]
+    comp_process = popen_nobuffer(cmd)
+    output, err = comp_process.communicate()
+    exit_code = comp_process.returncode
+    if exit_code != 0:  # pragma: debug
+        print(output)
+        raise RuntimeError("Could not build regex_win32.lib")
+    assert(os.path.isfile(_regex_win32_lib))
+
+
+if platform._is_win and (not os.path.isfile(_regex_win32_lib)):
+    build_regex_win32()
 
 
 class GCCModelDriver(ModelDriver):
