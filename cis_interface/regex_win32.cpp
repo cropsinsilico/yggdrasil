@@ -30,6 +30,41 @@ int count_matches(const char *regex_text, const char *to_match) {
   }
 }
 
+
+/*!
+  @brief Find first match to regex and any sub-matches.
+  @param[in] regex_text constant character pointer to string that should be
+  compiled into a regex.
+  @param[in] to_match constant character pointer to string that should be
+  checked for matches.
+  @param[out] sind int ** indices of where matches begin.
+  @param[out] eind int ** indices of where matches ends.
+  @return int Number of matches/submatches found. -1 is returned if the regex
+  could not be compiled.
+*/
+int find_matches(const char *regex_text, const char *to_match,
+		 int **sind, int **eind) {
+  try {
+    std::regex r(regex_text);
+    std::cmatch m;
+    int ret = 0;
+    if (regex_search(to_match, to_match + strlen(to_match), m, r)) {
+      ret += m.size();
+      *sind = (int*)realloc(*sind, ret*sizeof(int));
+      *eind = (int*)realloc(*eind, ret*sizeof(int));
+      int i;
+      for (i = 0; i < ret; i++) {
+	(*sind)[i] = m.position(i);
+	(*eind)[i] = (*sind)[i] + m.length(i);
+      }
+    }
+    return ret;
+  } catch (const std::regex_error& rerr) {
+    return -1;
+  }
+}
+
+
 /*!
   @brief Find first match to regex.
   @param[in] regex_text constant character pointer to string that should be

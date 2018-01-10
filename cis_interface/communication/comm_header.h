@@ -91,8 +91,6 @@ int format_header_entry(char *head, const char *key, const char *value,
 static inline
 int parse_header_entry(const char *head, const char *key, char *value,
 		       const int valsiz) {
-  int ret;
-  regex_t r;
   // Compile
   if (strlen(HEAD_KEY_SEP) > 1) {
     cislog_error("parse_header_entry: HEAD_KEY_SEP is more than one character. Fix regex.");
@@ -107,22 +105,20 @@ int parse_header_entry(const char *head, const char *key, char *value,
   strcat(regex_text, HEAD_KEY_SEP);
   strcat(regex_text, "]*)");
   strcat(regex_text, HEAD_KEY_SEP);
-  ret = compile_regex(&r, regex_text);
-  if (ret)
-    return -1;
+  // Extract substring
+  int *sind = NULL;
+  int *eind = NULL;
+  int n_sub_matches = find_matches(regex_text, head, &sind, &eind);
   // Loop until string done
-  const int n_sub_matches = 10;
-  regmatch_t m[n_sub_matches];
-  int nomatch = regexec(&r, head, n_sub_matches, m, 0);
-  if (nomatch)
+  if (n_sub_matches < 0)
     return -1;
   // Extract substring
-  int value_size = m[1].rm_eo - m[1].rm_so;
+  int value_size = eind[1] - sind[1];
   if (value_size > valsiz) {
     cislog_error("parse_header_entry: Value is larger than buffer.\n");
     return -1;
   }
-  memcpy(value, head + m[1].rm_so, value_size);
+  memcpy(value, head + sind[1], value_size);
   value[value_size] = '\0';
   return value_size;
 };

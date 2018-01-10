@@ -60,6 +60,7 @@ int count_matches(const char *regex_text, const char *to_match) {
   return n_match;
 };
 
+
 /*!
   @brief Find first match to regex.
   @param[in] regex_text constant character pointer to string that should be
@@ -94,6 +95,56 @@ int find_match(const char *regex_text, const char *to_match,
   regfree(&r);
   return n_match;
 };
+
+
+/*!
+  @brief Find first match to regex and any sub-matches.
+  @param[in] regex_text constant character pointer to string that should be
+  compiled into a regex.
+  @param[in] to_match constant character pointer to string that should be
+  checked for matches.
+  @param[out] sind int ** indices of where matches begin.
+  @param[out] eind int ** indices of where matches ends.
+  @return int Number of matches/submatches found. -1 is returned if the regex
+  could not be compiled.
+*/
+static inline
+int find_matches(const char *regex_text, const char *to_match,
+		 int **sind, int **eind) {
+  int ret;
+  int n_match = 0;
+  regex_t r;
+  // Compile
+  ret = compile_regex(&r, regex_text);
+  if (ret)
+    return -1;
+  // Loop until string done
+  const char * p = to_match;
+  const int n_sub_matches = 10;
+  regmatch_t m[n_sub_matches];
+  int nomatch = regexec(&r, p, n_sub_matches, m, 0);
+  if (!(nomatch)) {
+    // Count
+    while (1) {
+      if ((m[n_match].rm_so == -1) && (m[n_match].rm_eo == -1)) {
+	break;
+      }
+      n_match++;
+    }
+    // Realloc
+    *sind = (int*)realloc(*sind, n_match*sizeof(int));
+    *eind = (int*)realloc(*eind, n_match*sizeof(int));
+    // Record
+    int i;
+    for (i = 0; i < n_match; i++) {
+      (*sind)[i] = m[i].rm_so;
+      (*eind)[i] = m[i].rm_eo;
+    }
+  }
+  regfree(&r);
+  return n_match;
+};
+
 
 /*!
   @brief Make a replacement of regex matches, ignoring captured substrings.

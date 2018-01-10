@@ -389,7 +389,7 @@ int at_set_format_typ(asciiTable_t *t) {
   size_t beg = 0, end;
   int icol = 0;
   const char fmt_len = 100;
-  char ifmt[fmt_len];
+  char *ifmt = (char*)malloc(fmt_len*sizeof(char));
   // Initialize
   for (icol = 0; icol < (*t).ncols; icol++) {
     (*t).format_typ[icol] = -1;
@@ -398,13 +398,15 @@ int at_set_format_typ(asciiTable_t *t) {
   // Loop over string
   icol = 0;
   int mres, sind, eind;
-  char re_fmt[fmt_len];
+  char *re_fmt = (char*)malloc(fmt_len*sizeof(char));
   sprintf(re_fmt, "%%[^%s%s]+[%s%s]",
 	  (*t).column, (*t).f.newline, (*t).column, (*t).f.newline);
   while (beg < strlen((*t).format_str)) {
     mres = find_match(re_fmt, (*t).format_str + beg, &sind, &eind);
     if (mres < 0) {
       printf("ERROR: find_match returned %d\n", mres);
+      free(ifmt);
+      free(re_fmt);
       return -1;
     } else if (mres == 0) {
       beg++;
@@ -452,11 +454,15 @@ int at_set_format_typ(asciiTable_t *t) {
       (*t).format_typ[icol] = AT_UINT;
     } else {
       printf("ERROR: Could not parse format string: %s\n", ifmt);
+      free(ifmt);
+      free(re_fmt);
       return -1;
     }
     beg = end;
     icol++;
   }
+  free(ifmt);
+  free(re_fmt);
   return at_set_format_siz(t);
 };
 
