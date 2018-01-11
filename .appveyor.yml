@@ -66,7 +66,7 @@ install:
   - "set ZMQ_LIB_DIR=C:\\projects\\build_libzmq\\lib\\Release"
   - "set CZMQ_LIB_DIR=C:\\projects\\build_czmq\\Release"
   - if "%INSTALLZMQ%" == "1" IF NOT EXIST %CZMQ_LIB_DIR% call "ci\\install-czmq-windows.bat"
-  - if "%INSTALLZMQ%" == "1" set PATH="%PATH%;%ZMQ_LIB_DIR%;%CZMQ_LIB_DIR%"
+  - if "%INSTALLZMQ%" == "1" set PATH=%PATH%;%ZMQ_LIB_DIR%;%CZMQ_LIB_DIR%
   - "ECHO %PATH%"
   - "ECHO %CZMQ_LIB_DIR%"
 
