@@ -70,8 +70,8 @@ install:
   - if "%INSTALLZMQ%" == "1" set PATH=%PATH%;%ZMQ_LIB_DIR%;%CZMQ_LIB_DIR%
   - "ECHO %PATH%"
   - "ECHO %CZMQ_LIB_DIR%"
+  - where zmq.lib
   - where czmq.lib
-  - for %i in (czmq.lib) do @echo %~dp$PATH:i
 
   # Install & start RabbitMQ
   - "if %INSTALLRMQ% == 1 ci\\install-rmqserver-windows.bat"  
