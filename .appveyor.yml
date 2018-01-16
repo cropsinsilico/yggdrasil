@@ -26,6 +26,7 @@ environment:
     PYTHON: "C:\\Miniconda3-x64"
     INSTALLZMQ: 1
     INSTALLRMQ: 1
+    APPVEYOR_SAVE_CACHE_ON_ERROR: true
 
   matrix:
     - platform: x64
