@@ -1,7 +1,12 @@
-#include <limits.h>
-
 #ifndef GETLINE_WIN32_H_
 #define GETLINE_WIN32_H_
+
+
+#if defined(_WIN64)
+#define SSIZE_MAX _I64_MAX
+#else
+#define SSIZE_MAX LONG_MAX
+#endif
 
 
 /*!
