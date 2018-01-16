@@ -31,8 +31,10 @@ typedef struct seri_t {
  */
 static inline
 int serialize_direct(const seri_t s, char *buf, const int buf_siz, va_list ap) {
+  if (s.type != DIRECT_SERI)
+    return -1;
   char *msg = va_arg(ap, char*);
-  int ret = strlen(msg);
+  int ret = (int)strlen(msg);
   if ((ret + 1) < buf_siz)
     strcpy(buf, msg);
   return ret;
@@ -47,7 +49,10 @@ int serialize_direct(const seri_t s, char *buf, const int buf_siz, va_list ap) {
   returns: int The number of populated arguments. -1 indicates an error.
  */
 static inline
-int deserialize_direct(const seri_t s, const char *buf, const int buf_siz, va_list ap) {
+int deserialize_direct(const seri_t s, const char *buf, const int buf_siz,
+		       va_list ap) {
+  if (s.type != DIRECT_SERI)
+    return -1;
   char **msg = va_arg(ap, char**);
   *msg = (char*)realloc(*msg, buf_siz + 1);
   memcpy(*msg, buf, buf_siz);

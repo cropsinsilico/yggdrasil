@@ -13,6 +13,7 @@
 #include "regex_win32.h"
 #include "stdint.h"  // Use local copy for MSVC support
 #include <windows.h>
+#include "getline_win32.h"
 #define getpid GetCurrentProcessId
 #define sleep(tsec) Sleep(1000*tsec)
 #define usleep(usec) Sleep(usec/1000)
