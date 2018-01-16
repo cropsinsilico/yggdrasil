@@ -27,7 +27,7 @@ int getline(char** lineptr, size_t* n, FILE* stream) {
     char* prev = *lineptr + nread;
     if (fgets(prev, (int)(*n) - nread, stream) != prev)
       return -1;
-    nread = strlen(*lineptr);
+    nread = (int)strlen(*lineptr);
 
     // Break if new line reached or buffer not filled
     if ((nread < (*n - 1)) || ((*lineptr)[nread - 1] == '\n'))

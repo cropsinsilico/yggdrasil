@@ -15,6 +15,21 @@ from cis_interface import platform
 from cis_interface import backwards
 
 
+def locate_path(fname):
+    r"""Find the full path to a file using where on Windows."""
+    try:
+        if platform._is_win:
+            out = subprocess.check_output(["where", fname])
+        else:
+            out = subprocess.check_output(["locate", "-b", "--regex",
+                                           "^%s" % fname])
+    except subprocess.CalledProcessError:
+        return False
+    if out.isspace():
+        return False
+    return backwards.bytes2unicode(out).split("\n")[0]
+
+
 def is_ipc_installed():
     r"""Determine if the IPC libraries are installed.
 
@@ -32,6 +47,15 @@ def is_zmq_installed():
         bool: True if both libraries are installed, False otherwise.
 
     """
+    print("!!!!!!!!!!!!!!!!!!!!IS_ZMQ_INSTALLED")
+    # Check existence of files
+    check_files = ['zmq.h', 'czmq.h']
+    if platform._is_win:
+        check_files += ['zmq.lib', 'czmq.lib']
+    for f in check_files:
+        if not locate_path(f):
+            return False
+    # Check validity of compile flags
     if platform._is_win:
         cc = 'cl'
         return True
@@ -50,8 +74,10 @@ def is_zmq_installed():
     return (backwards.unicode2bytes('zmq') not in errs)
 
 
+_ipc_installed = is_ipc_installed()
+_zmq_installed = is_zmq_installed()
 # OS X limit is 2kb
-if is_zmq_installed():
+if _zmq_installed:
     CIS_MSG_MAX = 2**20
 else:
     CIS_MSG_MAX = 1024 * 2

@@ -121,11 +121,11 @@ int at_readline_full_realloc(const asciiTable_t t, char **buf,
   if (ret > len_buf) {
     if (allow_realloc) {
       printf("at_readline_full_realloc: reallocating buffer from %d to %d bytes.\n",
-	     len_buf, ret + 1);
+	     (int)len_buf, ret + 1);
       (*buf) = (char*)realloc(*buf, ret + 1);
     } else {
       printf("at_readline_full_realloc: line (%d bytes) is larger than destination buffer (%d bytes)\n",
-	     ret, len_buf);
+	     ret, (int)len_buf);
       ret = -1;
       free(line);
       return ret;
@@ -287,7 +287,7 @@ static inline
 int at_writeformat(const asciiTable_t t) {
   int ret;
   if (af_is_open(t.f) == 1) {
-    ret = fwrite(t.f.comment, 1, strlen(t.f.comment), t.f.fd);
+    ret = (int)fwrite(t.f.comment, 1, strlen(t.f.comment), t.f.fd);
     if (ret < 0)
       return ret;
   }

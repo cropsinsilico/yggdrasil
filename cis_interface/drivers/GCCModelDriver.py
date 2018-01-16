@@ -3,7 +3,7 @@ import time
 from cis_interface import platform
 from cis_interface.communication import _default_comm
 from cis_interface.tools import (
-    is_zmq_installed, is_ipc_installed, popen_nobuffer, print_encoded)
+    _zmq_installed, _ipc_installed, popen_nobuffer, print_encoded)
 from cis_interface.drivers.ModelDriver import ModelDriver
 
 
@@ -21,14 +21,14 @@ if platform._is_win:
     _regex_win32 = os.path.split(_regex_win32_lib)
     _compile_flags += ["-D_CRT_SECURE_NO_WARNINGS", "-I" + _regex_win32[0]]
     _linker_flags += [_regex_win32[1], '/LIBPATH:"%s"' % _regex_win32[0]]
-if is_zmq_installed():
+if _zmq_installed:
     if platform._is_win:
         _linker_flags += ["czmq.lib", "zmq.lib"]
         # LIBPATH?
     else:
         _linker_flags += ["-lczmq", "-lzmq"]
     _compile_flags += ["-DZMQINSTALLED"]
-if is_ipc_installed():
+if _ipc_installed:
     _compile_flags += ["-DIPCINSTALLED"]
 for x in [_incl_interface, _incl_io, _incl_comm, _incl_seri]:
     _compile_flags += ["-I" + x]

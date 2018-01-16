@@ -3,11 +3,12 @@ from logging import warn
 import threading
 from subprocess import Popen, PIPE
 from cis_interface import platform
-from cis_interface.tools import CIS_MSG_MAX, is_ipc_installed
+from cis_interface.tools import CIS_MSG_MAX
+from cis_interface.tools import _ipc_installed as _ipc_installed0
 from cis_interface.communication import CommBase
 try:
     import sysv_ipc
-    _ipc_installed = is_ipc_installed()
+    _ipc_installed = _ipc_installed0
 except ImportError:
     warn("Could not import sysv_ipc. " +
          "IPC support will be disabled.")

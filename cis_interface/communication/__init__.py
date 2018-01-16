@@ -1,10 +1,10 @@
 import importlib
-from cis_interface.tools import is_zmq_installed, is_ipc_installed
+from cis_interface.tools import _zmq_installed, _ipc_installed
 
 
-if is_zmq_installed():
+if _zmq_installed:
     _default_comm = 'ZMQComm'
-elif is_ipc_installed():
+elif _ipc_installed:
     _default_comm = 'IPCComm'
 else:  # pragma: debug
     raise Exception('Neither ZMQ or IPC installed.')

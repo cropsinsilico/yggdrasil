@@ -3,7 +3,7 @@ import zmq
 import threading
 from cis_interface import backwards
 from cis_interface.communication import CommBase
-from cis_interface.tools import CisClass, is_zmq_installed
+from cis_interface.tools import CisClass, _zmq_installed
 
 
 _registered_sockets = dict()
@@ -378,7 +378,7 @@ class ZMQComm(CommBase.CommBase):
     @classmethod
     def is_installed(cls):
         r"""bool: Is the comm installed."""
-        return is_zmq_installed()
+        return _zmq_installed
 
     @property
     def maxMsgSize(self):
