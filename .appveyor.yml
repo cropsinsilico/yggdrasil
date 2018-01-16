@@ -43,6 +43,8 @@ install:
   - "SET VSINSTALLDIR=%ProgramFiles(x86)%\\Microsoft Visual Studio %MSVCVER%.0\\"
   - "SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%"
   - "SET MPLBACKEND=agg"
+  # - "SET ZMQINSTALLDIR=C:\\projects"
+  - "SET ZMQINSTALLDIR=%APPVEYOR_BUILD_FOLDER%"
 
   # Setup Visual C++ toolset
   # TODO: Generic case. This is specific to 64bit VS 2015/2017 (14.0/16.0)
@@ -64,14 +66,20 @@ install:
   - "pip install --upgrade setuptools"
 
   # Install ZeroMQ
-  - "set ZMQ_LIB_DIR=C:\\projects\\build_libzmq\\lib\\Release"
-  - "set CZMQ_LIB_DIR=C:\\projects\\build_czmq\\Release"
-  - if "%INSTALLZMQ%" == "1" IF NOT EXIST %CZMQ_LIB_DIR% call "ci\\install-czmq-windows.bat"
-  - if "%INSTALLZMQ%" == "1" set PATH=%PATH%;%ZMQ_LIB_DIR%;%CZMQ_LIB_DIR%
+  - "ECHO %CD%"
+  # - "set ZMQ_LIB_DIR=C:\\projects\\build_libzmq\\lib\\Release"
+  # - "set CZMQ_LIB_DIR=C:\\projects\\build_czmq\\Release"
+  - if "%INSTALLZMQ%" == "1" call "ci\\install-czmq-windows.bat"
+  - "ECHO %CD%"
+  - if "%INSTALLZMQ%" == "1" set PATH=%PATH%;%ZEROMQ_LIBRARY_DIR%;%CZMQ_LIBRARY_DIR%
+  # - if "%INSTALLZMQ%" == "1" set PATH=%PATH%;%ZMQ_LIB_DIR%;%CZMQ_LIB_DIR%
   - "ECHO %PATH%"
-  - "ECHO %CZMQ_LIB_DIR%"
+  # - "ECHO %CZMQ_LIB_DIR%"
+  - "ECHO %CZMQ_LIBRARY_DIR%"
   - where zmq.lib
   - where czmq.lib
+  - where zmq.h
+  - where czmq.h
 
   # Install & start RabbitMQ
   - "if %INSTALLRMQ% == 1 ci\\install-rmqserver-windows.bat"  
@@ -86,15 +94,21 @@ install:
   - "pip install -e ."
 
 cache:
-  - '%ZMQ_LIB_DIR% -> ci\install-czmq_windows.bat'
-  - '%CZMQ_LIB_DIR% -> ci\install-czmq_windows.bat'
+  - '%LIBSODIUM_SOURCEDIR%'
+  - '%LIBZMQ_SOURCEDIR%'
+  - '%LIBZMQ_BUILDDIR%'
+  - '%CZMQ_SOURCEDIR%'
+  - '%CZMQ_BUILDDIR%'
+  # - '%ZMQ_LIB_DIR%'
+  # -> ci\install-czmq_windows.bat'
+  # - '%CZMQ_LIB_DIR%'
+  # -> ci\install-czmq_windows.bat'
   - '%LOCALAPPDATA%\pip\Cache'
 
 # Not a .NET project
 build: false
 
 before_test:
-  # - "cl -lzmq -lczmq"
   - "flake8 cis_interface"
 
 test_script:
