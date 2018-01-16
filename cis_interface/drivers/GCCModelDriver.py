@@ -22,7 +22,10 @@ if platform._is_win:
     _compile_flags += ["-D_CRT_SECURE_NO_WARNINGS", "-I" + _regex_win32[0]]
     _linker_flags += [_regex_win32[1], '/LIBPATH:"%s"' % _regex_win32[0]]
 if is_zmq_installed():
-    if not platform._is_win:
+    if platform._is_win:
+        _linker_flags += ["czmq.lib", "zmq.lib"]
+        # LIBPATH?
+    else:
         _linker_flags += ["-lczmq", "-lzmq"]
     _compile_flags += ["-DZMQINSTALLED"]
 if is_ipc_installed():
