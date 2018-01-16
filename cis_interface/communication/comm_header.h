@@ -146,7 +146,7 @@ int format_comm_header(const comm_head_t head, char *buf, const int bufsiz) {
   // Header tag
   pos = 0;
   strcpy(buf, CIS_MSG_HEAD);
-  pos += strlen(CIS_MSG_HEAD);
+  pos += (int)strlen(CIS_MSG_HEAD);
   if (pos > bufsiz) {
     cislog_error("First header tag would exceed buffer size\n");
     return -1;
@@ -204,9 +204,9 @@ int format_comm_header(const comm_head_t head, char *buf, const int bufsiz) {
     }
   }
   // Closing header tag
-  pos -= strlen(HEAD_KEY_SEP);
+  pos -= (int)strlen(HEAD_KEY_SEP);
   buf[pos] = '\0';
-  pos += strlen(CIS_MSG_HEAD);
+  pos += (int)strlen(CIS_MSG_HEAD);
   if (pos > bufsiz) {
     cislog_error("Closing header tag would exceed buffer size\n");
     return -1;
@@ -254,7 +254,7 @@ comm_head_t parse_comm_header(const char *buf, const int bufsiz) {
     int headsiz = (eind-sind);
     out.bodysiz = bufsiz - headsiz;
     out.bodybeg = eind;
-    headsiz -= 2*strlen(CIS_MSG_HEAD);
+    headsiz -= (int)(2*strlen(CIS_MSG_HEAD));
     char *head = (char*)malloc(headsiz + 2*strlen(HEAD_KEY_SEP) + 1);
     strcpy(head, HEAD_KEY_SEP);
     memcpy(head + strlen(HEAD_KEY_SEP), buf + sind + strlen(CIS_MSG_HEAD), headsiz);

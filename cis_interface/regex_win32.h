@@ -9,6 +9,8 @@
 #endif
 
 EXTERNC int count_matches(const char *regex_text, const char *to_match);
+EXTERNC int find_matches(const char *regex_text, const char *to_match,
+			 int **sind, int **eind);
 EXTERNC int find_match(const char *regex_text, const char *to_match,
 		       int *sind, int *eind);
 EXTERNC int regex_replace_nosub(char *buf, const int len_buf,

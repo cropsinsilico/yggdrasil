@@ -106,7 +106,7 @@ int af_readline_full(const asciiFile_t t, char **line, size_t *n) {
 static inline
 int af_writeline_full(const asciiFile_t t, const char *line) {
   if (af_is_open(t) == 1)
-    return fwrite(line, 1, strlen(line), t.fd);
+    return (int)fwrite(line, 1, strlen(line), t.fd);
   return -1;
 };
 

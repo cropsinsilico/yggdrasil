@@ -1,3 +1,8 @@
+#include <limits.h>
+
+#ifndef GETLINE_WIN32_H_
+#define GETLINE_WIN32_H_
+
 
 /*!
   @brief Implementation of getline in C for MSVC.
@@ -14,7 +19,7 @@ size_t getline(char** lineptr, size_t* n, FILE* stream) {
   size_t nread = 0;
   
   while (1) {
-    char* const prev = *lineptr + nread;
+    char* prev = *lineptr + nread;
     if (fgets(prev, *n - nread, stream) != prev)
       return -1;
     nread = strlen(*lineptr);
@@ -28,7 +33,7 @@ size_t getline(char** lineptr, size_t* n, FILE* stream) {
       return -1;
 
     // Get size
-    const size_t new_n;
+    size_t new_n;
     if ((*n >> (sizeof(size_t) * 8 - 1)) == 1)
       new_n = SSIZE_MAX;
     else
@@ -47,3 +52,6 @@ size_t getline(char** lineptr, size_t* n, FILE* stream) {
 
   return nread;
 };
+
+
+#endif /*GETLINE_WIN32_H_*/

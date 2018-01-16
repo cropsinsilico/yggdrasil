@@ -108,7 +108,7 @@ int at_readline_full_realloc(const asciiTable_t t, char **buf, const int len_buf
 			     const int allow_realloc) {
   // Read lines until there's one that's not a comment
   int ret = 0, com = 1;
-  size_t nread = LINE_SIZE_MAX;
+  int nread = LINE_SIZE_MAX;
   char *line = (char*)malloc(nread);
   while ((ret >= 0) && (com == 1)) {
     ret = af_readline_full(t.f, &line, &nread);
@@ -218,7 +218,7 @@ static inline
 int at_vreadline(const asciiTable_t t, va_list ap) {
   int ret;
   // Read lines until there's one that's not a comment
-  size_t nread = LINE_SIZE_MAX;
+  int nread = LINE_SIZE_MAX;
   char *line = (char*)malloc(nread);
   ret = at_readline_full(t, line, nread);
   if (ret < 0) {

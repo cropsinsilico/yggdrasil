@@ -31,7 +31,8 @@ int serialize_ascii_table(const seri_t s, char *buf, const int buf_siz, va_list 
   returns: int The number of populated arguments. -1 indicates an error.
  */
 static inline
-int deserialize_ascii_table(const seri_t s, const char *buf, const int buf_siz, va_list ap) {
+int deserialize_ascii_table(const seri_t s, const char *buf, const int buf_siz,
+			    va_list ap) {
   asciiTable_t *table = (asciiTable_t*)s.info;
   int ret = at_vbytes_to_row(*table, buf, ap);
   return ret;
