@@ -46,8 +46,6 @@ IF NOT EXIST %LIBZMQ_BUILDDIR% (
     msbuild /v:minimal /p:Configuration=Release libzmq.vcxproj
     move "%ZEROMQ_LIBRARY_DIR%\libzmq-*lib" "%ZEROMQ_LIBRARY_DIR%\zmq.lib"
 )
-echo ZMQ_LIBRARY=%ZEROMQ_LIBRARY_DIR%
-ls %ZEROMQ_LIBRARY_DIR%
 
 :: Install czmq
 ECHO Installing czmq...
@@ -56,17 +54,17 @@ set CZMQ_BUILDDIR=%ZMQINSTALLDIR%\build_czmq
 set CZMQ_INCLUDE_DIR="%CZMQ_SOURCEDIR%\include"
 set CZMQ_LIBRARY_DIR="%CZMQ_BUILDDIR%\Release"
 IF NOT EXIST %CZMQ_SOURCEDIR% (
+    ECHO Cloning czmq...
     git clone git://github.com/zeromq/czmq.git %CZMQ_SOURCEDIR%
 )
 IF NOT EXIST %CZMQ_BUILDDIR% (
     md %CZMQ_BUILDDIR%
     cd %CZMQ_BUILDDIR%
+    ECHO Cmake czmq...
     cmake -G "%CMAKE_GENERATOR%" -D CMAKE_INCLUDE_PATH="%ZEROMQ_INCLUDE_DIR%" -D CMAKE_LIBRARY_PATH="%ZEROMQ_LIBRARY_DIR%" -D CMAKE_C_FLAGS_RELEASE="/MT" -D CMAKE_CXX_FLAGS_RELEASE="/MT" -D CMAKE_C_FLAGS_DEBUG="/MTd" %CZMQ_SOURCEDIR%
+    ECHO Building czmq...
     msbuild /v:minimal /p:Configuration=Release czmq.vcxproj
-    :: move
 )
-echo CZMQ_LIBRARY=%CZMQ_LIBRARY_DIR%
-ls %CZMQ_LIBRARY_DIR%
 
 :: Finalize and print stop time
 set STOPTIME=%DATE% %TIME%

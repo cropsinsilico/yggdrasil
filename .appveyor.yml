@@ -92,6 +92,7 @@ install:
 
   # Install cis_interface
   - "pip install -e ."
+  - echo %LIBSODIUM_SOURCEDIR%
 
 cache:
   - '%LIBSODIUM_SOURCEDIR%'
