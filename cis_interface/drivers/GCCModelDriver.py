@@ -19,7 +19,7 @@ _linker_flags = []
 _compile_flags = []
 if platform._is_win:
     _regex_win32 = os.path.split(_regex_win32_lib)
-    _compile_flags += ["-I" + _regex_win32[0]]
+    _compile_flags += ["-D_CRT_SECURE_NO_WARNINGS", "-I" + _regex_win32[0]]
     _linker_flags += [_regex_win32[1], '/LIBPATH:"%s"' % _regex_win32[0]]
 if is_zmq_installed():
     if not platform._is_win:
