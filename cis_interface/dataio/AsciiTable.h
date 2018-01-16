@@ -104,11 +104,11 @@ void at_close(asciiTable_t *t) {
   @return int On success, the number of characters read. -1 on failure.
  */
 static inline
-int at_readline_full_realloc(const asciiTable_t t, char **buf, const int len_buf,
-			     const int allow_realloc) {
+int at_readline_full_realloc(const asciiTable_t t, char **buf,
+			     const size_t len_buf, const int allow_realloc) {
   // Read lines until there's one that's not a comment
   int ret = 0, com = 1;
-  int nread = LINE_SIZE_MAX;
+  size_t nread = LINE_SIZE_MAX;
   char *line = (char*)malloc(nread);
   while ((ret >= 0) && (com == 1)) {
     ret = af_readline_full(t.f, &line, &nread);
@@ -124,7 +124,7 @@ int at_readline_full_realloc(const asciiTable_t t, char **buf, const int len_buf
 	     len_buf, ret + 1);
       (*buf) = (char*)realloc(*buf, ret + 1);
     } else {
-      printf("at_readline_full: line (%d bytes) is larger than destination buffer (%d bytes)\n",
+      printf("at_readline_full_realloc: line (%d bytes) is larger than destination buffer (%d bytes)\n",
 	     ret, len_buf);
       ret = -1;
       free(line);
@@ -145,7 +145,7 @@ int at_readline_full_realloc(const asciiTable_t t, char **buf, const int len_buf
   @return int On success, the number of characters read. -1 on failure.
  */
 static inline
-int at_readline_full(const asciiTable_t t, char *buf, const int len_buf) {
+int at_readline_full(const asciiTable_t t, char *buf, const size_t len_buf) {
   // Read but don't realloc buf
   return at_readline_full_realloc(t, &buf, len_buf, 0);
 };
@@ -218,7 +218,7 @@ static inline
 int at_vreadline(const asciiTable_t t, va_list ap) {
   int ret;
   // Read lines until there's one that's not a comment
-  int nread = LINE_SIZE_MAX;
+  size_t nread = LINE_SIZE_MAX;
   char *line = (char*)malloc(nread);
   ret = at_readline_full(t, line, nread);
   if (ret < 0) {

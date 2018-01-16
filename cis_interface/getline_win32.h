@@ -8,19 +8,19 @@
   @brief Implementation of getline in C for MSVC.
   Reads in a single line from a file using fgets.
   @param[out] lineptr char** reference to location where line should be stored.
-  @param[out] n size_t* reference to location where the size of the allocated
+  @param[out] n int* reference to location where the size of the allocated
   lineptr memory block should be stored.
   @param[in] stream FILE* Stream that line should be read from.
   @return Number of characters read, -1 on failure.
  */
 static inline
-size_t getline(char** lineptr, size_t* n, FILE* stream) {
+int getline(char** lineptr, size_t* n, FILE* stream) {
 
-  size_t nread = 0;
+  int nread = 0;
   
   while (1) {
     char* prev = *lineptr + nread;
-    if (fgets(prev, *n - nread, stream) != prev)
+    if (fgets(prev, (int)(*n) - nread, stream) != prev)
       return -1;
     nread = strlen(*lineptr);
 
