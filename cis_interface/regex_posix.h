@@ -119,10 +119,9 @@ int find_matches(const char *regex_text, const char *to_match,
   if (ret)
     return -1;
   // Loop until string done
-  const char * p = to_match;
   const int n_sub_matches = 10;
   regmatch_t m[n_sub_matches];
-  int nomatch = regexec(&r, p, n_sub_matches, m, 0);
+  int nomatch = regexec(&r, to_match, n_sub_matches, m, 0);
   if (!(nomatch)) {
     // Count
     while (1) {

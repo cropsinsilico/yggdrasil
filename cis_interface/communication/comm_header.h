@@ -110,16 +110,25 @@ int parse_header_entry(const char *head, const char *key, char *value,
   int *eind = NULL;
   int n_sub_matches = find_matches(regex_text, head, &sind, &eind);
   // Loop until string done
-  if (n_sub_matches < 0)
+  if (n_sub_matches < 2) {
+    cislog_error("parse_header_entry: Could not find match to %s in %s.",
+		 regex_text, head);
+    if (sind != NULL) free(sind);
+    if (eind != NULL) free(eind);
     return -1;
+  }
   // Extract substring
   int value_size = eind[1] - sind[1];
   if (value_size > valsiz) {
     cislog_error("parse_header_entry: Value is larger than buffer.\n");
+    if (sind != NULL) free(sind);
+    if (eind != NULL) free(eind);
     return -1;
   }
   memcpy(value, head + sind[1], value_size);
   value[value_size] = '\0';
+  if (sind != NULL) free(sind);
+  if (eind != NULL) free(eind);
   return value_size;
 };
 
@@ -233,6 +242,7 @@ comm_head_t parse_comm_header(const char *buf, const int bufsiz) {
   int sind, eind;
   int ret = find_match(re_head, buf, &sind, &eind);
   if (ret < 0) {
+    cislog_error("parse_comm_header: could not find header in '%s'", buf);
     out.valid = 0;
     return out;
   } else if (ret == 0) {
