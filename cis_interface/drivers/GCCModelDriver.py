@@ -3,7 +3,7 @@ import time
 from cis_interface import platform
 from cis_interface.communication import _default_comm
 from cis_interface.tools import (
-    _zmq_installed, _ipc_installed, popen_nobuffer, print_encoded)
+    _zmq_installed, _ipc_installed, locate_path, popen_nobuffer, print_encoded)
 from cis_interface.drivers.ModelDriver import ModelDriver
 
 
@@ -23,8 +23,18 @@ if platform._is_win:
     _linker_flags += [_regex_win32[1], '/LIBPATH:"%s"' % _regex_win32[0]]
 if _zmq_installed:
     if platform._is_win:
-        _linker_flags += ["czmq.lib", "zmq.lib"]
-        # LIBPATH?
+        _zmq_dirs = dict()
+        for l in ["zmq", "czmq"]:
+            for ext in ["h", "lib"]:
+                f = "%s.%s" % (l, ext)
+                p = locate_path(f)
+                if not p:
+                    raise Exception("Could not locate %s." % f)
+                _zmq_dirs[f] = os.path.dirname(p)
+                if ext == "h":
+                    _compile_flags.append("-I%s" % _zmq_dirs[f])
+                elif ext == "lib":
+                    _linker_flags += [f, '/LIBPATH:"%s"' % _zmq_dirs[f]]
     else:
         _linker_flags += ["-lczmq", "-lzmq"]
     _compile_flags += ["-DZMQINSTALLED"]
