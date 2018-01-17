@@ -435,7 +435,7 @@ public:
     @param[in] line character pointer to line that should be sent.
     @returns int 0 if send was succesfull. All other values indicate errors.
    */
-  int send_line(const char *line) { return send(line, strlen(line)); }
+  int send_line(const char *line) { return send(line, (int)strlen(line)); }
 
 };
 
@@ -473,7 +473,7 @@ public:
     @returns int Number of bytes read/received. Negative values indicate that
     there was either an error or the EOF message was received.
    */
-  int recv_line(char *line, const size_t n) { return recv(line, n); }
+  int recv_line(char *line, const size_t n) { return recv(line, (int)n); }
   
 };
 
