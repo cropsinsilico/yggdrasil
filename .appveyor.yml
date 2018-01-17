@@ -102,5 +102,4 @@ test_script:
   - "nosetests --nologcapture --with-coverage --cover-package=cis_interface -svx cis_interface/examples/tests/
 
 after_test:
-  - "coveralls"
   - "codecov"
