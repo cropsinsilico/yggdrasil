@@ -12,6 +12,10 @@
 #ifdef _WIN32
 #include "regex_win32.h"
 #include "stdint.h"  // Use local copy for MSVC support
+// Prevent windows.h from including winsock.h
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN
+#endif
 #include <windows.h>
 #include "getline_win32.h"
 #define getpid GetCurrentProcessId
