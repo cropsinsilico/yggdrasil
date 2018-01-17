@@ -67,14 +67,11 @@ install:
 
   # Install ZeroMQ
   - "ECHO %CD%"
-  # - "set ZMQ_LIB_DIR=C:\\projects\\build_libzmq\\lib\\Release"
-  # - "set CZMQ_LIB_DIR=C:\\projects\\build_czmq\\Release"
   - if "%INSTALLZMQ%" == "1" call "ci\\install-czmq-windows.bat"
   - "ECHO %CD%"
   - if "%INSTALLZMQ%" == "1" set PATH=%PATH%;%ZEROMQ_LIBRARY_DIR%;%CZMQ_LIBRARY_DIR%
-  # - if "%INSTALLZMQ%" == "1" set PATH=%PATH%;%ZMQ_LIB_DIR%;%CZMQ_LIB_DIR%
   - "ECHO %PATH%"
-  # - "ECHO %CZMQ_LIB_DIR%"
+  - "ECHO %ZEROMQ_LIBRARY_DIR"
   - "ECHO %CZMQ_LIBRARY_DIR%"
   - where zmq.lib
   - where czmq.lib
@@ -95,6 +92,11 @@ install:
   - echo %LIBSODIUM_SOURCEDIR%
 
 cache:
+  - '%APPVEYOR_BUILD_FOLDER%\libsodium'
+  - '%APPVEYOR_BUILD_FOLDER%\libzmq'
+  - '%APPVEYOR_BUILD_FOLDER%\build_libzmq'
+  - '%APPVEYOR_BUILD_FOLDER%\czmq'
+  - '%APPVEYOR_BUILD_FOLDER%\build_czmq'
   - '%LIBSODIUM_SOURCEDIR%'
   - '%LIBZMQ_SOURCEDIR%'
   - '%LIBZMQ_BUILDDIR%'
