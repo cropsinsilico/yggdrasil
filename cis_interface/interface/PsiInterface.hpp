@@ -1,13 +1,8 @@
 extern "C" {
-#include <sys/stat.h>        /* For mode constants */
-#include <sys/msg.h>
-#include <sys/sem.h>
-#include <sys/shm.h>
-#include <stdlib.h>
 #include "PsiInterface.h"
 };
-#include <string>
-#include <regex>
+// #include <string>
+// #include <regex>
 
 /*! @brief Flag for checking if PsiInterface.hpp has already been included.*/
 #ifndef CISINTERFACE_HPP_
