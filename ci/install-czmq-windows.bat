@@ -70,7 +70,6 @@ IF NOT EXIST %CZMQ_BUILDDIR% (
 set STOPTIME=%DATE% %TIME%
 @echo Stop  Time: %STOPTIME%
 @echo Start Time: %STARTTIME%
-ECHO %PATH%
 
 :: Set path variables
 :done

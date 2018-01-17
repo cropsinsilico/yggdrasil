@@ -66,14 +66,12 @@ install:
   - "pip install --upgrade setuptools"
 
   # Install ZeroMQ
-  - "ECHO %CD%"
   - if "%INSTALLZMQ%" == "1" call "ci\\install-czmq-windows.bat"
-  - "ECHO %CD%"
-  - "ECHO %PATH%"
-  - where zmq.lib
-  - where czmq.lib
-  - where zmq.h
-  - where czmq.h
+  # - "ECHO %PATH%"
+  # - where zmq.lib
+  # - where czmq.lib
+  # - where zmq.h
+  # - where czmq.h
 
   # Install & start RabbitMQ
   - "if %INSTALLRMQ% == 1 ci\\install-rmqserver-windows.bat"  

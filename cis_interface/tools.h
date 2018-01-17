@@ -18,6 +18,7 @@
 #endif
 #include <windows.h>
 #include "getline_win32.h"
+#include <process.h>
 #define cis_getpid _getpid
 // #ifndef getpid
 // #define getpid GetCurrentProcessId
