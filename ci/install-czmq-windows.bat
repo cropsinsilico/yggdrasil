@@ -1,4 +1,4 @@
-@setlocal ENABLEDELAYEDEXPANSION
+@setlocal
 
 :: validate environment
 if "%VSINSTALLDIR%" == "" @echo Error: Attempt to build without proper DevStudio environment.&@goto :done
@@ -74,7 +74,7 @@ ECHO %PATH%
 
 :: Set path variables
 :done
-@endlocal & set PATH=!PATH!;%ZEROMQ_LIBRARY_DIR%;%CZMQ_LIBRARY_DIR%;%ZEROMQ_INCLUDE_DIR%;%CZMQ_INCLUDE_DIR%
+@endlocal & set PATH=%PATH%;%ZEROMQ_LIBRARY_DIR%;%CZMQ_LIBRARY_DIR%;%ZEROMQ_INCLUDE_DIR%;%CZMQ_INCLUDE_DIR%
     :: set LIBSODIUM_SOURCEDIR=%LIBSODIUM_SOURCEDIR%
     :: set LIBZMQ_SOURCEDIR=%LIBZMQ_SOURCEDIR%
     :: set LIBZMQ_BUILDDIR=%LIBZMQ_BUILDDIR%
