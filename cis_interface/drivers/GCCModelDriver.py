@@ -212,8 +212,10 @@ class GCCModelDriver(ModelDriver):
         if platform._is_win:
             for i in range(len(self.src)):
                 self.src[i] = os.path.join(*(self.src[i].split('/')))
+        # Get pimary file
         self.cfile = self.src[0]
         src_base, src_ext = os.path.splitext(self.cfile)
+        # Select compiler
         if self.cc is None:
             if platform._is_win:
                 self.cc = 'cl'
@@ -222,6 +224,7 @@ class GCCModelDriver(ModelDriver):
                     self.cc = 'gcc'
                 else:
                     self.cc = 'g++'
+        # Create/fix executable
         if self.efile is None:
             if platform._is_win:
                 osuffix = '_%s.exe' % src_ext[1:]
