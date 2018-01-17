@@ -366,6 +366,8 @@ void ipc_install_error() {
 */
 static inline
 int free_ipc_comm(comm_t *x) {
+  // Prevent C4100 warning on windows by referencing param
+  x;
   ipc_install_error();
   return 1;
 };
@@ -377,6 +379,8 @@ int free_ipc_comm(comm_t *x) {
 */
 static inline
 int new_ipc_address(comm_t *comm) {
+  // Prevent C4100 warning on windows by referencing param
+  comm;
   ipc_install_error();
   return -1;
 };
@@ -388,6 +392,8 @@ int new_ipc_address(comm_t *comm) {
  */
 static inline
 int init_ipc_comm(comm_t *comm) {
+  // Prevent C4100 warning on windows by referencing param
+  comm;
   ipc_install_error();
   return -1;
 };
@@ -399,6 +405,8 @@ int init_ipc_comm(comm_t *comm) {
  */
 static inline
 int ipc_comm_nmsg(const comm_t x) {
+  // Prevent C4100 warning on windows by referencing param
+  x;
   ipc_install_error();
   return -1;
 };
@@ -414,6 +422,10 @@ int ipc_comm_nmsg(const comm_t x) {
  */
 static inline
 int ipc_comm_send(const comm_t x, const char *data, const int len) {
+  // Prevent C4100 warning on windows by referencing param
+  x;
+  data;
+  len;
   ipc_install_error();
   return -1;
 };
@@ -433,6 +445,11 @@ int ipc_comm_send(const comm_t x, const char *data, const int len) {
 static inline
 int ipc_comm_recv(const comm_t x, char **data, const int len,
 		  const int allow_realloc) {
+  // Prevent C4100 warning on windows by referencing param
+  x;
+  data;
+  len;
+  allow_realloc;
   ipc_install_error();
   return -1;
 };

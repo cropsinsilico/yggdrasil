@@ -108,6 +108,8 @@ int free_ascii_table_comm(comm_t *x) {
  */
 static inline
 int ascii_table_comm_nmsg(const comm_t x) {
+  // Prevent C4100 warning on windows by referencing param
+  x;
   // TODO: Count lines in table.
   return 0;
 };
@@ -125,6 +127,8 @@ static inline
 int ascii_table_comm_send(const comm_t x, const char *data, const int len) {
   if (is_eof(data))
     return 0;
+  // Prevent C4100 warning on windows by referencing param
+  len;
   asciiTable_t *table = (asciiTable_t*)x.handle;
   return at_writeline_full(table[0], data);
 };

@@ -33,6 +33,8 @@ int serialize_ascii_table(const seri_t s, char *buf, const int buf_siz, va_list 
 static inline
 int deserialize_ascii_table(const seri_t s, const char *buf, const int buf_siz,
 			    va_list ap) {
+  // Prevent C4100 warning on windows by referencing param
+  buf_siz;
   asciiTable_t *table = (asciiTable_t*)s.info;
   int ret = at_vbytes_to_row(*table, buf, ap);
   return ret;

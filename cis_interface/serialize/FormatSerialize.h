@@ -37,8 +37,10 @@ int serialize_format(const seri_t s, char *buf, const int buf_siz, va_list ap) {
  */
 static inline
 int deserialize_format(const seri_t s, const char *buf, const int buf_siz, va_list ap) {
-  char *fmt0 = (char*)s.info;
+  // Prevent C4100 warning on windows by referencing param
+  buf_siz;
   // Simplify format
+  char *fmt0 = (char*)s.info;
   char fmt[PSI_MSG_MAX];
   strcpy(fmt, fmt0);
   int sret = simplify_formats(fmt, PSI_MSG_MAX);
