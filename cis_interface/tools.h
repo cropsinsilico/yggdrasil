@@ -18,15 +18,17 @@
 #endif
 #include <windows.h>
 #include "getline_win32.h"
-#ifndef getpid
-#define getpid GetCurrentProcessId
-#endif
+#define cis_getpid _getpid
+// #ifndef getpid
+// #define getpid GetCurrentProcessId
+// #endif
 #define sleep(tsec) Sleep(1000*tsec)
 #define usleep(usec) Sleep(usec/1000)
 #else
 #include "regex_posix.h"
 #include <stdint.h>
 #include <unistd.h>
+#define cis_getpid getpid
 #endif
 
 /*! @brief Maximum message size. */
@@ -73,7 +75,7 @@
  */
 static inline
 void cisLog(const char* prefix, const char* fmt, va_list ap) {
-  fprintf(stdout, "%s: %d: ", prefix, getpid());
+  fprintf(stdout, "%s: %d: ", prefix, cis_getpid());
   vfprintf(stdout, fmt, ap);
   fprintf(stdout, "\n");
 };
