@@ -180,7 +180,7 @@ int regex_replace_nosub(char *buf, const size_t len_buf,
   while (1) {
     if ((nreplace > 0) && (creplace >= nreplace)) {
       printf("regex_replace_nosub: Maximum of %d replacements reached\n",
-      	     creplace);
+      	     (int)creplace);
       break;
     }
     int nomatch = regexec(&r, p, ngroups, m, 0);
@@ -265,7 +265,7 @@ int get_subrefs(const char *buf, size_t **refs) {
     // Substring
     igrp_len = m[1].rm_eo - m[1].rm_so;
     if (igrp_len > max_grp) {
-      printf("Number longer than %d digits unlikely.\n", max_grp);
+      printf("Number longer than %d digits unlikely.\n", (int)max_grp);
       free(m);
       free(ref_bytes);
       regfree(&r);
@@ -276,7 +276,8 @@ int get_subrefs(const char *buf, size_t **refs) {
     // Extract ref number
     iref = atoi(igrp);
     if (iref > max_ref) {
-      printf("Reference to substr %d exceeds limit (%d)\n", iref, max_ref);
+      printf("Reference to substr %d exceeds limit (%d)\n",
+	     (int)iref, (int)max_ref);
       free(m);
       free(ref_bytes);
       regfree(&r);
@@ -345,7 +346,7 @@ int regex_replace_sub(char *buf, const size_t len_buf,
   while (1) {
     if ((nreplace > 0) && (creplace >= nreplace)) {
       printf("regex_replace_nosub: Maximum of %d replacements reached\n",
-	     creplace);
+	     (int)creplace);
       break;
     }
     int nomatch = regexec(&r, p, ngroups, m, 0);
@@ -368,10 +369,10 @@ int regex_replace_sub(char *buf, const size_t len_buf,
       i = refs[j];
       strcpy(igrp, p + m[i].rm_so);
       igrp[m[i].rm_eo - m[i].rm_so] = 0; // terminate
-      sprintf(re_sub, "\\$%d", i);
+      sprintf(re_sub, "\\$%d", (int)i);
       ret = regex_replace_nosub(rp_sub, 2*len_buf, re_sub, igrp, 0);
       if (ret < 0) {
-	printf("regex_replace_sub: Error replacing substring $%d.\n", i);
+	printf("regex_replace_sub: Error replacing substring $%d.\n", (int)i);
 	free(m);
 	regfree(&r);
 	return -1;

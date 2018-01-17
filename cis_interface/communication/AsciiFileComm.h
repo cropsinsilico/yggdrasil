@@ -70,7 +70,9 @@ int free_ascii_file_comm(comm_t *x) {
 static inline
 int ascii_file_comm_nmsg(const comm_t x) {
   // Prevent C4100 warning on windows by referencing param
+#ifdef _WIN32
   x;
+#endif
   // TODO: Count lines in file.
   return 0;
 };
@@ -89,7 +91,9 @@ int ascii_file_comm_send(const comm_t x, const char *data, const size_t len) {
   if (is_eof(data))
     return 0;
   // Prevent C4100 warning on windows by referencing param
+#ifdef _WIN32
   len;
+#endif
   asciiFile_t *file = (asciiFile_t*)x.handle;
   return af_writeline_full(file[0], data);
 };
@@ -110,7 +114,9 @@ static inline
 int ascii_file_comm_recv(const comm_t x, char **data, size_t len,
 			 const int allow_realloc) {
   // Prevent C4100 warning on windows by referencing param
+#ifdef _WIN32
   allow_realloc;
+#endif
   asciiFile_t *file = (asciiFile_t*)x.handle;
   return af_readline_full(file[0], data, (size_t*)(&len));
 };

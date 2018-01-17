@@ -164,7 +164,7 @@ int format_comm_header(const comm_head_t head, char *buf, const size_t bufsiz) {
   }
   // Size entry
   char size_str[100];
-  sprintf(size_str, "%d", head.size);
+  sprintf(size_str, "%d", (int)(head.size));
   ret = format_header_entry(buf + pos, "size", size_str, bufsiz - pos);
   if (ret < 0) {
     cislog_error("Adding size entry would exceed buffer size\n");

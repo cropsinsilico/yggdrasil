@@ -122,7 +122,7 @@ int regex_replace_nosub(char *buf, const size_t len_buf,
     while (1) {
       if ((nreplace > 0) && (creplace >= nreplace)) {
 	printf("regex_replace_nosub: Maximum of %d replacements reached\n",
-	       creplace);
+	       (int)creplace);
 	break;
       }
       const char *first = buf + cur_pos;
@@ -190,7 +190,7 @@ int get_subrefs(const char *buf, size_t **refs) {
 	break;
       }
       // Lone $ without digit
-      /* printf("so = %d, eo = %d\n", m[1].rm_so, m[1].rm_eo); */
+      /* printf("so = %d, eo = %d\n", (int)m[1].rm_so, (int)m[1].rm_eo); */
       if (m.size() == 1) {
 	first += m.position() + m.length();
 	continue;
@@ -198,7 +198,7 @@ int get_subrefs(const char *buf, size_t **refs) {
       // Substring
       igrp_len = m.length(1);
       if (igrp_len > max_grp) {
-	printf("Number longer than %d digits unlikely.\n", max_grp);
+	printf("Number longer than %d digits unlikely.\n", (int)max_grp);
 	free(ref_bytes);
 	return -1;
       }
@@ -207,7 +207,8 @@ int get_subrefs(const char *buf, size_t **refs) {
       // Extract ref number
       iref = atoi(igrp);
       if (iref > max_ref) {
-	printf("Reference to substr %d exceeds limit (%d)\n", iref, max_ref);
+	printf("Reference to substr %d exceeds limit (%d)\n",
+	       (int)iref, (int)max_ref);
 	free(ref_bytes);
 	return -1;
       }
@@ -215,7 +216,7 @@ int get_subrefs(const char *buf, size_t **refs) {
       first += m.position() + m.length();
     }
     // Get unique refs
-    size_t nref = 0;
+    int nref = 0;
     for (i = 0; i <= max_ref; i++) {
       if (ref_bytes[i])
 	nref++;
@@ -265,12 +266,13 @@ int regex_replace_sub(char *buf, const size_t len_buf,
     size_t cur_pos = 0;
     size_t cur_siz = strlen(buf);
     size_t creplace = 0;
-    size_t i, j;
+    size_t i;
+    int j;
     int ret = 0;
     while (1) {
       if ((nreplace > 0) && (creplace >= nreplace)) {
 	printf("regex_replace_nosub: Maximum of %d replacements reached\n",
-	       creplace);
+	       (int)creplace);
 	break;
       }
       const char *first = buf + cur_pos;
@@ -293,10 +295,10 @@ int regex_replace_sub(char *buf, const size_t len_buf,
 	i = refs[j];
 	strcpy(igrp, buf + cur_pos + m.position(i));
 	igrp[m.length(i)] = '\0'; // terminate
-	sprintf(re_sub, "\\$%d", i);
+	sprintf(re_sub, "\\$%d", (int)i);
 	ret = regex_replace_nosub(rp_sub, 2*len_buf, re_sub, igrp, 0);
 	if (ret < 0) {
-	  printf("regex_replace_sub: Error replacing substring $%d.\n", i);
+	  printf("regex_replace_sub: Error replacing substring $%d.\n", (int)i);
 	  free(refs);
 	  free(rp_sub);
 	  free(re_sub);

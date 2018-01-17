@@ -118,7 +118,7 @@ int at_readline_full_realloc(const asciiTable_t t, char **buf,
     }
     com = af_is_comment(t.f, line);
   }
-  if (ret > len_buf) {
+  if (ret > (int)len_buf) {
     if (allow_realloc) {
       printf("at_readline_full_realloc: reallocating buffer from %d to %d bytes.\n",
 	     (int)len_buf, ret + 1);
@@ -485,7 +485,7 @@ int at_vbytes_to_array(const asciiTable_t t, const char *data,
   if ((data_siz % t.row_siz) != 0) {
     printf("Data: %s\n", data);
     printf("Data size (%d) not an even number of rows (row size is %d)\n",
-	   data_siz, t.row_siz);
+	   (int)data_siz, t.row_siz);
     return -1;
   }
   // Loop through
@@ -527,9 +527,9 @@ static inline
 int at_varray_to_bytes(const asciiTable_t t, char *data, const size_t data_siz, va_list ap) {
   int nrows = va_arg(ap, int);
   int msg_siz = nrows*t.row_siz;
-  if (msg_siz > data_siz) {
+  if (msg_siz > (int)data_siz) {
     printf("at_varray_to_bytes: Message size (%d bytes) will exceed allocated buffer (%d bytes).\n",
-	   msg_siz, data_siz);
+	   msg_siz, (int)data_siz);
     return msg_siz;
   }
   // Loop through

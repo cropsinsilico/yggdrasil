@@ -281,10 +281,10 @@ int ipc_comm_recv(const comm_t x, char **data, const size_t len,
     }
   }
   if (ret > 0) {
-    if ((ret + 1) > len) {
+    if ((ret + 1) > (int)len) {
       if (allow_realloc) {
 	cislog_debug("ipc_comm_recv(%s): reallocating buffer from %d to %d bytes.\n",
-		     x.name, len, ret + 1);
+		     x.name, (int)len, ret + 1);
 	(*data) = (char*)realloc(*data, ret + 1);
       } else {
 	cislog_error("ipc_comm_recv(%s): buffer (%d bytes) is not large enough for message (%d bytes)",
@@ -367,7 +367,9 @@ void ipc_install_error() {
 static inline
 int free_ipc_comm(comm_t *x) {
   // Prevent C4100 warning on windows by referencing param
+#ifdef _WIN32
   x;
+#endif
   ipc_install_error();
   return 1;
 };
@@ -380,7 +382,9 @@ int free_ipc_comm(comm_t *x) {
 static inline
 int new_ipc_address(comm_t *comm) {
   // Prevent C4100 warning on windows by referencing param
+#ifdef _WIN32
   comm;
+#endif
   ipc_install_error();
   return -1;
 };
@@ -393,7 +397,9 @@ int new_ipc_address(comm_t *comm) {
 static inline
 int init_ipc_comm(comm_t *comm) {
   // Prevent C4100 warning on windows by referencing param
+#ifdef _WIN32
   comm;
+#endif
   ipc_install_error();
   return -1;
 };
@@ -406,7 +412,9 @@ int init_ipc_comm(comm_t *comm) {
 static inline
 int ipc_comm_nmsg(const comm_t x) {
   // Prevent C4100 warning on windows by referencing param
+#ifdef _WIN32
   x;
+#endif
   ipc_install_error();
   return -1;
 };
@@ -423,9 +431,11 @@ int ipc_comm_nmsg(const comm_t x) {
 static inline
 int ipc_comm_send(const comm_t x, const char *data, const size_t len) {
   // Prevent C4100 warning on windows by referencing param
+#ifdef _WIN32
   x;
   data;
   len;
+#endif
   ipc_install_error();
   return -1;
 };
@@ -446,10 +456,12 @@ static inline
 int ipc_comm_recv(const comm_t x, char **data, const size_t len,
 		  const int allow_realloc) {
   // Prevent C4100 warning on windows by referencing param
+#ifdef _WIN32
   x;
   data;
   len;
   allow_realloc;
+#endif
   ipc_install_error();
   return -1;
 };

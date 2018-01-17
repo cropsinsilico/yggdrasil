@@ -38,7 +38,9 @@ int serialize_format(const seri_t s, char *buf, const size_t buf_siz, va_list ap
 static inline
 int deserialize_format(const seri_t s, const char *buf, const size_t buf_siz, va_list ap) {
   // Prevent C4100 warning on windows by referencing param
+#ifdef _WIN32
   buf_siz;
+#endif
   // Simplify format
   char *fmt0 = (char*)s.info;
   char fmt[PSI_MSG_MAX];

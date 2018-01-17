@@ -34,7 +34,9 @@ static inline
 int deserialize_ascii_table(const seri_t s, const char *buf, const size_t buf_siz,
 			    va_list ap) {
   // Prevent C4100 warning on windows by referencing param
+#ifdef _WIN32
   buf_siz;
+#endif
   asciiTable_t *table = (asciiTable_t*)s.info;
   int ret = at_vbytes_to_row(*table, buf, ap);
   return ret;

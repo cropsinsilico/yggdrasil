@@ -38,7 +38,7 @@ int serialize(const seri_t s, char **buf, const size_t buf_siz,
   else {
     cislog_error("serialize: Unsupported seri_type %d", t);
   }
-  if (ret > buf_siz) {
+  if (ret > (int)buf_siz) {
     if (allow_realloc) {
       *buf = (char*)realloc(*buf, ret+1); 
       ret = serialize(s, buf, ret+1, 0, ap2);

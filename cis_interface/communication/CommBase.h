@@ -119,7 +119,9 @@ comm_t* init_comm_base(const char *name, const char *direction,
 static inline
 int free_comm_base(comm_t *x) {
   // Prevent C4100 warning on windows by referencing param
+#ifdef _WIN32
   x;
+#endif
   return 0;
 };
 
@@ -135,9 +137,11 @@ int free_comm_base(comm_t *x) {
 static inline
 int comm_base_send(const comm_t x, const char *data, const size_t len) {
   // Prevent C4100 warning on windows by referencing param
+#ifdef _WIN32
   x;
   data;
   len;
+#endif
   // Make sure you arn't sending a message that is too big
   if (len > CIS_MSG_MAX) {
     cislog_error("comm_base_send(%s): message too large for single packet (CIS_MSG_MAX=%d, len=%d)",
