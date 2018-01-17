@@ -324,8 +324,7 @@ static inline
 int comm_send_multipart(const comm_t x, const char *data, const size_t len) {
   char headbuf[BUFSIZ];
   int headlen = 0, ret;
-  comm_t xmulti;
-  xmulti.valid = 0;
+  comm_t xmulti = empty_comm_base();
   // Get header
   comm_head_t head = comm_send_multipart_header(x, len);
   if (head.valid == 0) {

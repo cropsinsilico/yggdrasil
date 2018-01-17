@@ -5,7 +5,8 @@
 #define CISCOMMBASE_H_
 
 /*! @brief Communicator types. */
-enum comm_enum { IPC_COMM, ZMQ_COMM, RPC_COMM, SERVER_COMM, CLIENT_COMM,
+enum comm_enum { NULL_COMM, IPC_COMM, ZMQ_COMM,
+		 RPC_COMM, SERVER_COMM, CLIENT_COMM,
 		 ASCII_FILE_COMM, ASCII_TABLE_COMM, ASCII_TABLE_ARRAY_COMM };
 typedef enum comm_enum comm_type;
 #define COMM_NAME_SIZE 100
@@ -28,6 +29,26 @@ typedef struct comm_t {
   int always_send_header; //!< 1 if comm should always send a header.
   int index_in_register; //!< Index of the comm in the comm register.
 } comm_t;
+
+
+/*!
+  @brief Initialize an empty comm base without malloc.
+  @returns comm_t NULL comm object.
+ */
+static inline
+comm_t empty_comm_base() {
+  comm_t ret;
+  ret.type = NULL_COMM;
+  ret.address[0] = '\0';
+  ret.direction[0] = '\0';
+  ret.valid = 0;
+  ret.handle = NULL;
+  ret.info = NULL;
+  ret.maxMsgSize = 0;
+  ret.always_send_header = 0;
+  ret.index_in_register = -1;
+  return ret;
+};
 
 /*!
   @brief Initialize a basic communicator with address info.
