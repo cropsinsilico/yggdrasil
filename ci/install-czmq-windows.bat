@@ -1,4 +1,4 @@
-@setlocal
+@setlocal ENABLEDELAYEDEXPANSION
 
 :: validate environment
 if "%VSINSTALLDIR%" == "" @echo Error: Attempt to build without proper DevStudio environment.&@goto :done
