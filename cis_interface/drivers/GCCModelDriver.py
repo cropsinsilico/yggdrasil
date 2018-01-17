@@ -1,5 +1,4 @@
 import os
-import time
 from cis_interface import platform
 from cis_interface.communication import _default_comm
 from cis_interface.tools import (
