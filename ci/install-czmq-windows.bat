@@ -47,7 +47,7 @@ IF NOT EXIST %LIBZMQ_BUILDDIR% (
     ECHO Building zmq...
     ls %LIBZMQ_BUILDDIR%
     type libzmq.vcxproj
-    msbuild /v:minimal /p:Configuration=StaticRelease /p:Platform=%PLATFORM% libzmq.vcxproj
+    msbuild /v:minimal /p:Configuration=Release /p:Platform=%PLATFORM% libzmq.vcxproj
     ECHO Copying zmq lib...
     move "%ZEROMQ_LIBRARY_DIR%\libzmq-*lib" "%ZEROMQ_LIBRARY_DIR%\zmq.lib"
 )
@@ -70,7 +70,7 @@ IF NOT EXIST %CZMQ_BUILDDIR% (
     ls %CZMQ_BUILDDIR%
     type czmq.vcxproj
     ECHO Building czmq...
-    msbuild /v:minimal /p:Configuration=StaticRelease /p:Platform=%PLATFORM% czmq.vcxproj
+    msbuild /v:minimal /p:Configuration=Release /p:Platform=%PLATFORM% czmq.vcxproj
 )
 
 :: Finalize and print stop time
