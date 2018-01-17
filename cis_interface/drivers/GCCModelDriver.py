@@ -179,7 +179,7 @@ class GCCModelDriver(ModelDriver):
                 self.src.append(a)
             elif a.startswith('-l') or a.startswith('-L') or is_link:
                 if a.startswith('/out:'):
-                    self.efile = a.split('/out:')[-1]
+                    self.efile = a[5:]
                 elif a.startswith('-l') or a.startswith('-L') and platform._is_win:
                     a1 = '/LIBPATH:"%s"' % a[2:]
                     if a1 not in self.ldflags:
@@ -208,11 +208,11 @@ class GCCModelDriver(ModelDriver):
                                "provided arguments.")
         self.cfile = self.src[0]
         src_base, src_ext = os.path.splitext(self.cfile)
-        if (len(self.src) > 1) and platform._is_win:
-            for s in self.src[1:]:
-                o = os.path.splitext(os.path.basename(s))[0] + '.obj'
-                if o not in self.ldflags:
-                    self.ldflags.append(o)
+        # if (len(self.src) > 1) and platform._is_win:
+        #     for s in self.src[1:]:
+        #         o = os.path.splitext(os.path.basename(s))[0] + '.obj'
+        #         if o not in self.ldflags:
+        #             self.ldflags.append(o)
         if self.cc is None:
             if platform._is_win:
                 self.cc = 'cl'

@@ -66,6 +66,7 @@ install:
   - "pip install --upgrade setuptools"
 
   # Install ZeroMQ
+  - "ECHO %PLATFORM%"
   - if "%INSTALLZMQ%" == "1" call "ci\\install-czmq-windows.bat"
   # - "ECHO %PATH%"
   # - where zmq.lib
@@ -87,13 +88,11 @@ install:
 
 cache:
   - '%LOCALAPPDATA%\pip\Cache'
-  - libsodium
-  - libzmq
-  - build_libzmq
-  - czmq
-  - build_czmq
-  # -> ci\install-czmq_windows.bat'
-  # -> ci\install-czmq_windows.bat'
+  - libsodium    -> ci\install-czmq_windows.bat
+  - libzmq       -> ci\install-czmq_windows.bat
+  - build_libzmq -> ci\install-czmq_windows.bat
+  - czmq         -> ci\install-czmq_windows.bat
+  - build_czmq   -> ci\install-czmq_windows.bat
 
 # Not a .NET project
 build: false
