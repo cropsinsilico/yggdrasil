@@ -102,9 +102,7 @@ cache:
   - '%LIBZMQ_BUILDDIR%'
   - '%CZMQ_SOURCEDIR%'
   - '%CZMQ_BUILDDIR%'
-  # - '%ZMQ_LIB_DIR%'
   # -> ci\install-czmq_windows.bat'
-  # - '%CZMQ_LIB_DIR%'
   # -> ci\install-czmq_windows.bat'
   - '%LOCALAPPDATA%\pip\Cache'
 
