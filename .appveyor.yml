@@ -69,7 +69,6 @@ install:
   - "ECHO %CD%"
   - if "%INSTALLZMQ%" == "1" call "ci\\install-czmq-windows.bat"
   - "ECHO %CD%"
-  - if "%INSTALLZMQ%" == "1" set PATH=%PATH%;%ZEROMQ_LIBRARY_DIR%;%CZMQ_LIBRARY_DIR%
   - "ECHO %PATH%"
   - "ECHO %ZEROMQ_LIBRARY_DIR"
   - "ECHO %CZMQ_LIBRARY_DIR%"
