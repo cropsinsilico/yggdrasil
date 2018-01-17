@@ -104,11 +104,11 @@ cisInput_t cisInput(const char *name){
   message is larger, it will not be sent.
   @param[in] cisQ cisOutput_t structure that queue should be sent to.
   @param[in] data character pointer to message that should be sent.
-  @param[in] len int length of message to be sent.
+  @param[in] len size_t length of message to be sent.
   @returns int 0 if send succesfull, -1 if send unsuccessful.
  */
 static inline
-int cis_send(const cisOutput_t cisQ, const char *data, const int len) {
+int cis_send(const cisOutput_t cisQ, const char *data, const size_t len) {
   return comm_send(cisQ, data, len);
 };
 
@@ -128,12 +128,12 @@ int cis_send_eof(const cisOutput_t cisQ) {
   @param[in] cisQ cisOutput_t structure that message should be sent to.
   @param[out] data character pointer to allocated buffer where the message
   should be saved.
-  @param[in] len const int length of the allocated message buffer in bytes.
+  @param[in] len const size_t length of the allocated message buffer in bytes.
   @returns int -1 if message could not be received. Length of the received
   message if message was received.
  */
 static inline
-int cis_recv(const cisInput_t cisQ, char *data, const int len){
+int cis_recv(const cisInput_t cisQ, char *data, const size_t len){
   return comm_recv(cisQ, data, len);
 };
 
@@ -145,11 +145,11 @@ int cis_recv(const cisInput_t cisQ, char *data, const int len){
   cis_recv_nolimit for communication to make sense.
   @param[in] cisQ cisOutput_t structure that message should be sent to.
   @param[in] data character pointer to message that should be sent.
-  @param[in] len int length of message to be sent.
+  @param[in] len size_t length of message to be sent.
   @returns int 0 if send succesfull, -1 if send unsuccessful.
  */
 static inline
-int cis_send_nolimit(const cisOutput_t cisQ, const char *data, const int len){
+int cis_send_nolimit(const cisOutput_t cisQ, const char *data, const size_t len){
   return comm_send_nolimit(cisQ, data, len);
 };
 
@@ -172,12 +172,12 @@ int cis_send_nolimit_eof(const cisOutput_t cisQ) {
   @param[out] data character pointer to pointer for allocated buffer where the
   message should be stored. A pointer to a pointer is used so that the buffer
   may be reallocated as necessary for the incoming message.
-  @param[in] len0 int length of the initial allocated message buffer in bytes.
+  @param[in] len0 size_t length of the initial allocated message buffer in bytes.
   @returns int -1 if message could not be received. Length of the received
   message if message was received.
  */
 static inline
-int cis_recv_nolimit(const cisInput_t cisQ, char **data, const int len0){
+int cis_recv_nolimit(const cisInput_t cisQ, char **data, const size_t len0){
   return comm_recv_nolimit(cisQ, data, len0);
 };
 
@@ -776,7 +776,7 @@ comm_t cisAsciiTableOutput(const char *name, const char *format_str,
   comm_t out = init_comm(name, "send", type, (void*)format_str);
   // For connection, send format and initialize serializer
   if (dst_type != 0) {
-    int ret = comm_send(out, format_str, (int)strlen(format_str));
+    int ret = comm_send(out, format_str, strlen(format_str));
     if (ret < 0) {
       cislog_error("cisAsciiTableOutput: Failed to send format string.\n");
       out.valid = 0;

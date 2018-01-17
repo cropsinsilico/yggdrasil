@@ -12,14 +12,14 @@
   @param[in] s seri_t Structure sepcifying how to serialize arguments.
   @param[in] buf character pointer to pointer to memory where serialized message
   should be stored.
-  @param[in] buf_siz int Size of memory allocated to buf.
+  @param[in] buf_siz size_t Size of memory allocated to buf.
   @param[in] allow_realloc int If 1, buf will be realloced if it is not big
   enough to hold the serialized emssage. If 0, an error will be returned.
   @param[in] ap va_list Arguments to be formatted.
   returns: int The length of the serialized message or -1 if there is an error.
  */
 static inline
-int serialize(const seri_t s, char **buf, const int buf_siz,
+int serialize(const seri_t s, char **buf, const size_t buf_siz,
 	      const int allow_realloc, va_list ap) {
   seri_type t = s.type;
   int ret = -1;
@@ -58,12 +58,12 @@ int serialize(const seri_t s, char **buf, const int buf_siz,
   @brief Deserialize message to populate arguments.
   @param[in] s seri_t Structure sepcifying how to deserialize message.
   @param[in] buf character pointer to serialized message.
-  @param[in] buf_siz int Size of buf.
+  @param[in] buf_siz size_t Size of buf.
   @param[in] ap va_list Arguments to be parsed from message.
   returns: int The number of populated arguments. -1 indicates an error.
  */
 static inline
-int deserialize(const seri_t s, const char *buf, const int buf_siz, va_list ap) {
+int deserialize(const seri_t s, const char *buf, const size_t buf_siz, va_list ap) {
   seri_type t = s.type;
   int ret = -1;
   if (t == DIRECT_SERI)

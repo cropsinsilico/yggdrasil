@@ -57,11 +57,11 @@ public:
     See cis_recv in PsiInterface.h for additional details.
     @param[out] data character pointer to allocated buffer where the message
     should be saved.
-    @param[in] len int length of the allocated message buffer in bytes.
+    @param[in] len size_t length of the allocated message buffer in bytes.
     @returns int -1 if message could not be received. Length of the received
     message if message was received.
    */
-  int recv(char *data, const int len) { return cis_recv(_pi, data, len); }
+  int recv(char *data, const size_t len) { return cis_recv(_pi, data, len); }
 
   /*!
     @brief Receive and parse a message shorter than CIS_MSG_MAX from the input
@@ -91,11 +91,11 @@ public:
     See cis_recv_nolimit in PsiInterface.h for additional details.
     @param[out] data character pointer to allocated buffer where the message
     should be saved.
-    @param[in] len int length of the allocated message buffer in bytes.
+    @param[in] len size_t length of the allocated message buffer in bytes.
     @returns int -1 if message could not be received. Length of the received
     message if message was received.
    */
-  int recv_nolimit(char **data, const int len) {
+  int recv_nolimit(char **data, const size_t len) {
     return cis_recv_nolimit(_pi, data, len);
   }
   
@@ -176,10 +176,10 @@ public:
     If the message is larger than CIS_MSG_MAX an error code will be returned.
     See cis_send in PsiInterface.h for details.
     @param[in] data character pointer to message that should be sent.
-    @param[in] len int length of message to be sent.
+    @param[in] len size_t length of message to be sent.
     @returns int 0 if send succesfull, -1 if send unsuccessful.
   */
-  int send(const char *data, const int len) {
+  int send(const char *data, const size_t len) {
     return cis_send(_pi, data, len);
   }
 
@@ -208,10 +208,10 @@ public:
     @brief Send a message larger than CIS_MSG_MAX to the output queue.
     See cis_send_nolimit in PsiInterface.h for details.
     @param[in] data character pointer to message that should be sent.
-    @param[in] len int length of message to be sent.
+    @param[in] len size_t length of message to be sent.
     @returns int 0 if send succesfull, -1 if send unsuccessful.
   */
-  int send_nolimit(const char *data, const int len) {
+  int send_nolimit(const char *data, const size_t len) {
     return cis_send_nolimit(_pi, data, len);
   }
   
@@ -435,7 +435,7 @@ public:
     @param[in] line character pointer to line that should be sent.
     @returns int 0 if send was succesfull. All other values indicate errors.
    */
-  int send_line(const char *line) { return send(line, (int)strlen(line)); }
+  int send_line(const char *line) { return send(line, strlen(line)); }
 
 };
 
@@ -473,7 +473,7 @@ public:
     @returns int Number of bytes read/received. Negative values indicate that
     there was either an error or the EOF message was received.
    */
-  int recv_line(char *line, const size_t n) { return recv(line, (int)n); }
+  int recv_line(char *line, const size_t n) { return recv(line, n); }
   
 };
 
@@ -559,11 +559,11 @@ public:
   //   @brief Recv a nolimit message from a table input queue.
   //   @param[in] data character pointer to pointer to memory where received
   //   message should be stored. It does not need to be allocated, only defined.
-  //   @param[in] len int length of allocated buffer.
+  //   @param[in] len size_t length of allocated buffer.
   //   @returns int -1 if message could not be received. Length of the received
   //   message if message was received.
   //  */
-  // int recv(char **data, const int len) {
+  // int recv(char **data, const size_t len) {
   //   return cis_recv_nolimit(_pi, data, len);
   // }
   

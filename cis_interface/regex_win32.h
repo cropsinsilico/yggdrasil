@@ -10,16 +10,16 @@
 
 EXTERNC int count_matches(const char *regex_text, const char *to_match);
 EXTERNC int find_matches(const char *regex_text, const char *to_match,
-			 int **sind, int **eind);
+			 size_t **sind, size_t **eind);
 EXTERNC int find_match(const char *regex_text, const char *to_match,
-		       int *sind, int *eind);
-EXTERNC int regex_replace_nosub(char *buf, const int len_buf,
+		       size_t *sind, size_t *eind);
+EXTERNC int regex_replace_nosub(char *buf, const size_t len_buf,
 				const char *re, const char *rp,
-				const int nreplace);
-EXTERNC int get_subrefs(const char *buf, int **refs);
-EXTERNC int regex_replace_sub(char *buf, const int len_buf,
+				const size_t nreplace);
+EXTERNC int get_subrefs(const char *buf, size_t **refs);
+EXTERNC int regex_replace_sub(char *buf, const size_t len_buf,
 			      const char *re, const char *rp,
-			      const int nreplace);
+			      const size_t nreplace);
 
 #undef EXTERNC
 #endif /*REGEX_WIN32_H_*/

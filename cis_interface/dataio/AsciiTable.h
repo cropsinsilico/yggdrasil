@@ -44,13 +44,13 @@ int count_formats(const char* fmt_str) {
 /*!
   @brief Remove extra format characters that confusing sscanf.
   @param[in] fmt_str character pointer to string that should be modified.
-  @param[in] fmt_len constant int, length of the fmt_str buffer.
+  @param[in] fmt_len constant size_t, length of the fmt_str buffer.
   @return int -1 on failure if the regex could not be compiled or the buffer 
   is not big enough to contain the result. If succesful, the new length of buf
   is returned.
  */
 static inline
-int simplify_formats(char *fmt_str, const int fmt_len) {
+int simplify_formats(char *fmt_str, const size_t fmt_len) {
   const char * fmt_regex1 = "%([[:digit:]]+\\$)?[+-]?([ 0]|\'.{1})?-?[[:digit:]]*(\\.[[:digit:]]+)?([lhjztL]*)([eEfFgG])";
   int ret = regex_replace_sub(fmt_str, fmt_len, fmt_regex1,
 			      "%$4$5", 0);
@@ -195,14 +195,14 @@ int at_vbytes_to_row(const asciiTable_t t, const char* line, va_list ap) {
   @brief Format arguments to form a line.
   @param[in] t constant asciiTable_t table structure.
   @param[out] buf Pointer to memory where the formated row should be stored.
-  @param[in] buf_siz int Size of buf. If the formatted message will exceed
+  @param[in] buf_siz size_t Size of buf. If the formatted message will exceed
   the size of the buffer, an error will be returned.
   @param[in] ap va_list Variables that should be formatted using the format
   string to create a line in the table.
   @return int On success, the number of characters written. -1 on failure.
  */
 static inline
-int at_vrow_to_bytes(const asciiTable_t t, char *buf, const int buf_siz, va_list ap) {
+int at_vrow_to_bytes(const asciiTable_t t, char *buf, const size_t buf_siz, va_list ap) {
   int ret = vsnprintf(buf, buf_siz, t.format_str, ap);
   return ret;
 };
@@ -397,7 +397,8 @@ int at_set_format_typ(asciiTable_t *t) {
   }
   // Loop over string
   icol = 0;
-  int mres, sind, eind;
+  int mres;
+  size_t sind, eind;
   char *re_fmt = (char*)malloc(fmt_len*sizeof(char));
   sprintf(re_fmt, "%%[^%s%s]+[%s%s]",
 	  (*t).column, (*t).f.newline, (*t).column, (*t).f.newline);
@@ -471,16 +472,16 @@ int at_set_format_typ(asciiTable_t *t) {
   @param[in] t constant asciiTable_t table structure.
   @param[in] data constant character pointer to memory containing data that
   should be parsed.
-  @param[in] data_siz constant int Size of data in bytes.
+  @param[in] data_siz constant size_t Size of data in bytes.
   @param[out] ap va_list Pointers to pointers to memory where columns should
   be stored.
   @return int Number of rows read on success, -1 on failure.
  */
 static inline
 int at_vbytes_to_array(const asciiTable_t t, const char *data,
-		       const int data_siz, va_list ap) {
+		       const size_t data_siz, va_list ap) {
   // check size of array
-  /* int data_siz = strlen(data); */
+  /* size_t data_siz = strlen(data); */
   if ((data_siz % t.row_siz) != 0) {
     printf("Data: %s\n", data);
     printf("Data size (%d) not an even number of rows (row size is %d)\n",
@@ -488,7 +489,7 @@ int at_vbytes_to_array(const asciiTable_t t, const char *data,
     return -1;
   }
   // Loop through
-  int nrows = data_siz / t.row_siz;
+  int nrows = (int)data_siz / t.row_siz;
   int cur_pos = 0, col_siz;
   int i;
   for (i = 0; i < t.ncols; i++) {
@@ -523,7 +524,7 @@ int at_vbytes_to_array(const asciiTable_t t, const char *data,
   not be written to data and data should be resized first.
  */
 static inline
-int at_varray_to_bytes(const asciiTable_t t, char *data, const int data_siz, va_list ap) {
+int at_varray_to_bytes(const asciiTable_t t, char *data, const size_t data_siz, va_list ap) {
   int nrows = va_arg(ap, int);
   int msg_siz = nrows*t.row_siz;
   if (msg_siz > data_siz) {
@@ -549,13 +550,13 @@ int at_varray_to_bytes(const asciiTable_t t, char *data, const int data_siz, va_
   @param[in] t constant asciiTable_t table structure.
   @param[in] data constant character pointer to memory containing data that
   should be parsed.
-  @param[in] data_siz constant int Size of data in bytes.
+  @param[in] data_siz constant size_t Size of data in bytes.
   @param[out] ... Pointers to pointers to memory where columns should
   be stored.
   @return int Number of rows read on success, -1 on failure.
  */
 static inline
-int at_bytes_to_array(const asciiTable_t t, char *data, int data_siz, ...) {
+int at_bytes_to_array(const asciiTable_t t, char *data, size_t data_siz, ...) {
   va_list ap;
   va_start(ap, data_siz);
   int ret = at_vbytes_to_array(t, data, data_siz, ap);
@@ -575,7 +576,7 @@ int at_bytes_to_array(const asciiTable_t t, char *data, int data_siz, ...) {
   not be written to data and data should be resized first.
  */
 static inline
-int at_array_to_bytes(const asciiTable_t t, char *data, const int data_siz, ...) {
+int at_array_to_bytes(const asciiTable_t t, char *data, const size_t data_siz, ...) {
   va_list ap;
   va_start(ap, data);
   int ret = at_varray_to_bytes(t, data, data_siz, ap);

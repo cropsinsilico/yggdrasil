@@ -219,11 +219,11 @@ int ipc_comm_nmsg(const comm_t x) {
   message is larger, it will not be sent.
   @param[in] x comm_t structure that comm should be sent to.
   @param[in] data character pointer to message that should be sent.
-  @param[in] len int length of message to be sent.
+  @param[in] len size_t length of message to be sent.
   @returns int 0 if send succesfull, -1 if send unsuccessful.
  */
 static inline
-int ipc_comm_send(const comm_t x, const char *data, const int len) {
+int ipc_comm_send(const comm_t x, const char *data, const size_t len) {
   cislog_debug("ipc_comm_send(%s): %d bytes", x.name, len);
   if (comm_base_send(x, data, len) == -1)
     return -1;
@@ -256,14 +256,14 @@ int ipc_comm_send(const comm_t x, const char *data, const int len) {
   @param[in] x comm_t structure that message should be sent to.
   @param[out] data char ** pointer to allocated buffer where the message
   should be saved. This should be a malloc'd buffer if allow_realloc is 1.
-  @param[in] len const int length of the allocated message buffer in bytes.
+  @param[in] len const size_t length of the allocated message buffer in bytes.
   @param[in] allow_realloc const int If 1, the buffer will be realloced if it
   is not large enought. Otherwise an error will be returned.
   @returns int -1 if message could not be received. Length of the received
   message if message was received.
  */
 static inline
-int ipc_comm_recv(const comm_t x, char **data, const int len,
+int ipc_comm_recv(const comm_t x, char **data, const size_t len,
 		  const int allow_realloc) {
   cislog_debug("ipc_comm_recv(%s)", x.name);
   msgbuf_t t;
@@ -311,14 +311,14 @@ int ipc_comm_recv(const comm_t x, char **data, const int len,
   ipc_comm_recv_nolimit for communication to make sense.
   @param[in] x comm_t structure that message should be sent to.
   @param[in] data character pointer to message that should be sent.
-  @param[in] len int length of message to be sent.
+  @param[in] len size_t length of message to be sent.
   @returns int 0 if send succesfull, -1 if send unsuccessful.
  */
 static inline
-int ipc_comm_send_nolimit(const comm_t x, const char *data, const int len){
+int ipc_comm_send_nolimit(const comm_t x, const char *data, const size_t len){
   cislog_debug("ipc_comm_send_nolimit(%s): %d bytes", x.name, len);
   int ret = -1;
-  int msgsiz = 0;
+  size_t msgsiz = 0;
   char msg[CIS_MSG_MAX];
   sprintf(msg, "%ld", (long)(len));
   ret = ipc_comm_send(x, msg, strlen(msg));
@@ -326,7 +326,7 @@ int ipc_comm_send_nolimit(const comm_t x, const char *data, const int len){
     cislog_debug("ipc_comm_send_nolimit(%s): sending size of payload failed.", x.name);
     return ret;
   }
-  int prev = 0;
+  size_t prev = 0;
   while (prev < len) {
     if ((len - prev) > CIS_MSG_MAX)
       msgsiz = CIS_MSG_MAX;
@@ -335,7 +335,7 @@ int ipc_comm_send_nolimit(const comm_t x, const char *data, const int len){
     ret = ipc_comm_send(x, data + prev, msgsiz);
     if (ret != 0) {
       cislog_debug("ipc_comm_send_nolimit(%s): send interupted at %d of %d bytes.",
-		   x.name, prev, len);
+		   x.name, (int)prev, (int)len);
       break;
     }
     prev += msgsiz;
@@ -417,11 +417,11 @@ int ipc_comm_nmsg(const comm_t x) {
   message is larger, it will not be sent.
   @param[in] x comm_t structure that comm should be sent to.
   @param[in] data character pointer to message that should be sent.
-  @param[in] len int length of message to be sent.
+  @param[in] len size_t length of message to be sent.
   @returns int 0 if send succesfull, -1 if send unsuccessful.
  */
 static inline
-int ipc_comm_send(const comm_t x, const char *data, const int len) {
+int ipc_comm_send(const comm_t x, const char *data, const size_t len) {
   // Prevent C4100 warning on windows by referencing param
   x;
   data;
@@ -436,14 +436,14 @@ int ipc_comm_send(const comm_t x, const char *data, const int len) {
   @param[in] x comm_t structure that message should be sent to.
   @param[out] data char ** pointer to allocated buffer where the message
   should be saved. This should be a malloc'd buffer if allow_realloc is 1.
-  @param[in] len const int length of the allocated message buffer in bytes.
+  @param[in] len const size_t length of the allocated message buffer in bytes.
   @param[in] allow_realloc const int If 1, the buffer will be realloced if it
   is not large enought. Otherwise an error will be returned.
   @returns int -1 if message could not be received. Length of the received
   message if message was received.
  */
 static inline
-int ipc_comm_recv(const comm_t x, char **data, const int len,
+int ipc_comm_recv(const comm_t x, char **data, const size_t len,
 		  const int allow_realloc) {
   // Prevent C4100 warning on windows by referencing param
   x;

@@ -141,7 +141,7 @@ int free_client_comm(comm_t *x) {
   if (x->handle != NULL) {
     comm_t *handle = (comm_t*)(x->handle);
     char buf[CIS_MSG_MAX] = CIS_MSG_EOF;
-    default_comm_send(*handle, buf, (int)strlen(buf));
+    default_comm_send(*handle, buf, strlen(buf));
     free((char*)(handle->serializer.info));
     free_default_comm(handle);
     free(x->handle);
@@ -203,11 +203,11 @@ comm_head_t client_response_header(comm_t x, comm_head_t head) {
   @brief Send a message to the comm.
   @param[in] x comm_t structure that comm should be sent to.
   @param[in] data character pointer to message that should be sent.
-  @param[in] len int length of message to be sent.
+  @param[in] len size_t length of message to be sent.
   @returns int 0 if send succesfull, -1 if send unsuccessful.
  */
 static inline
-int client_comm_send(comm_t x, const char *data, const int len) {
+int client_comm_send(comm_t x, const char *data, const size_t len) {
   int ret;
   cislog_debug("client_comm_send(%s): %d bytes", x.name, len);
   if (x.handle == NULL) {
@@ -231,14 +231,14 @@ int client_comm_send(comm_t x, const char *data, const int len) {
   @param[in] x comm_t structure that message should be sent to.
   @param[out] data char ** pointer to allocated buffer where the message
   should be saved. This should be a malloc'd buffer if allow_realloc is 1.
-  @param[in] len const int length of the allocated message buffer in bytes.
+  @param[in] len const size_t length of the allocated message buffer in bytes.
   @param[in] allow_realloc const int If 1, the buffer will be realloced if it
   is not large enought. Otherwise an error will be returned.
   @returns int -1 if message could not be received. Length of the received
   message if message was received.
  */
 static inline
-int client_comm_recv(comm_t x, char **data, const int len, const int allow_realloc) {
+int client_comm_recv(comm_t x, char **data, const size_t len, const int allow_realloc) {
   cislog_debug("client_comm_recv(%s)", x.name);
   if ((x.info == NULL) || (get_client_response_count(x) == 0)) {
     cislog_error("client_comm_recv(%s): no response comm registered", x.name);

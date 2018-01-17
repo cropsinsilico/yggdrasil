@@ -264,11 +264,11 @@ int comm_nmsg(const comm_t x) {
   message is larger, it will not be sent.
   @param[in] x comm_t structure that comm should be sent to.
   @param[in] data character pointer to message that should be sent.
-  @param[in] len int length of message to be sent.
+  @param[in] len size_t length of message to be sent.
   @returns int 0 if send succesfull, -1 if send unsuccessful.
  */
 static inline
-int comm_send_single(const comm_t x, const char *data, const int len) {
+int comm_send_single(const comm_t x, const char *data, const size_t len) {
   int ret = -1;
   comm_type t = x.type;
   if (t == IPC_COMM)
@@ -295,12 +295,12 @@ int comm_send_single(const comm_t x, const char *data, const int len) {
 /*!
   @brief Create header for multipart message.
   @param[in] x comm_t structure that header will be sent to.
-  @param[in] len int Size of message body.
+  @param[in] len size_t Size of message body.
   @param[out] comm_head_t Header info that should be sent before the message
   body.
 */
 static inline
-comm_head_t comm_send_multipart_header(const comm_t x, const int len) {
+comm_head_t comm_send_multipart_header(const comm_t x, const size_t len) {
   comm_head_t head = init_header(len, NULL, NULL);
   sprintf(head.id, "%d", rand());
   head.multipart = 1;
@@ -317,11 +317,11 @@ comm_head_t comm_send_multipart_header(const comm_t x, const int len) {
   @brief Send a large message in multiple parts via a new comm.
   @param[in] x comm_t Structure that message should be sent to.
   @param[in] data const char * Message that should be sent.
-  @param[in] len int Size of data.
+  @param[in] len size_t Size of data.
   @returns: int 0 if send successfull, -1 if send unsuccessful.
 */
 static inline
-int comm_send_multipart(const comm_t x, const char *data, const int len) {
+int comm_send_multipart(const comm_t x, const char *data, const size_t len) {
   char headbuf[BUFSIZ];
   int headlen, ret;
   comm_t xmulti;
@@ -338,10 +338,10 @@ int comm_send_multipart(const comm_t x, const char *data, const int len) {
       cislog_error("comm_send_multipart: Failed to format header.");
       return -1;
     }
-    if ((headlen + len) < x.maxMsgSize) {
+    if (((size_t)headlen + len) < x.maxMsgSize) {
       head.multipart = 0;
       memcpy(headbuf + headlen, data, len);
-      headlen += len;
+      headlen += (int)len;
       headbuf[headlen] = '\0';
     }
   }
@@ -374,8 +374,8 @@ int comm_send_multipart(const comm_t x, const char *data, const int len) {
     return ret;
   }
   // Send multipart
-  int msgsiz;
-  int prev = 0;
+  size_t msgsiz;
+  size_t prev = 0;
   while (prev < head.size) {
     if ((head.size - prev) > xmulti.maxMsgSize)
       msgsiz = xmulti.maxMsgSize;
@@ -405,11 +405,11 @@ int comm_send_multipart(const comm_t x, const char *data, const int len) {
   message is larger, it will not be sent.
   @param[in] x comm_t structure that comm should be sent to.
   @param[in] data character pointer to message that should be sent.
-  @param[in] len int length of message to be sent.
+  @param[in] len size_t length of message to be sent.
   @returns int 0 if send succesfull, -1 if send unsuccessful.
  */
 static inline
-int comm_send(const comm_t x, const char *data, const int len) {
+int comm_send(const comm_t x, const char *data, const size_t len) {
   int ret = -1;
   if (((len > x.maxMsgSize) && (x.maxMsgSize > 0)) ||
       ((x.always_send_header) && (!(is_eof(data))))) {
@@ -427,7 +427,7 @@ int comm_send(const comm_t x, const char *data, const int len) {
 static inline
 int comm_send_eof(const comm_t x) {
   char buf[2048] = CIS_MSG_EOF;
-  int ret = comm_send(x, buf, (int)strlen(buf));
+  int ret = comm_send(x, buf, strlen(buf));
   return ret;
 };
 
@@ -437,14 +437,14 @@ int comm_send_eof(const comm_t x) {
   @param[in] x comm_t structure that message should be sent to.
   @param[out] data char ** pointer to allocated buffer where the message
   should be saved. This should be a malloc'd buffer if allow_realloc is 1.
-  @param[in] len const int length of the allocated message buffer in bytes.
+  @param[in] len const size_t length of the allocated message buffer in bytes.
   @param[in] allow_realloc const int If 1, the buffer will be realloced if it
   is not large enought. Otherwise an error will be returned.
   @returns int -1 if message could not be received, otherwise the length of
   the received message.
  */
 static inline
-int comm_recv_single(const comm_t x, char **data, const int len,
+int comm_recv_single(const comm_t x, char **data, const size_t len,
 		     const int allow_realloc) {
   comm_type t = x.type;
   int ret = -1;
@@ -472,15 +472,15 @@ int comm_recv_single(const comm_t x, char **data, const int len,
   @brief Receive a message in multiple parts.
   @param[in] x comm_t Comm that message should be recieved from.
   @param[in] data char ** Pointer to buffer where message should be stored.
-  @param[in] len int Size of data buffer.
-  @param[in] headlen int
+  @param[in] len size_t Size of data buffer.
+  @param[in] headlen size_t Size of header in data buffer.
   @param[in] allow_realloc int If 1, data will be realloced if the incoming
   message is larger than the buffer. Otherwise, an error will be returned.
   @returns int -1 if unsucessful, size of message received otherwise.
 */
 static inline
-int comm_recv_multipart(const comm_t x, char **data, const int len,
-			const int headlen, const int allow_realloc) {
+int comm_recv_multipart(const comm_t x, char **data, const size_t len,
+			const size_t headlen, const int allow_realloc) {
   int ret;
   comm_head_t head = parse_comm_header(*data, headlen);
   if (!(head.valid)) {
@@ -502,8 +502,8 @@ int comm_recv_multipart(const comm_t x, char **data, const int len,
 	return -1;
       }
       // Receive parts of message
-      int prev = head.bodysiz;
-      int msgsiz = 0;
+      size_t prev = head.bodysiz;
+      size_t msgsiz = 0;
       // Reallocate data if necessary
       if ((head.size + 1) > len) {
 	if (allow_realloc) {
@@ -551,12 +551,12 @@ int comm_recv_multipart(const comm_t x, char **data, const int len,
   @param[in] x comm_t structure that message should be sent to.
   @param[out] data character pointer to allocated buffer where the
   message should be saved.
-  @param[in] len const int length of the allocated message buffer in bytes.
+  @param[in] len const size_t length of the allocated message buffer in bytes.
   @returns int -1 if message could not be received and -2 if EOF is received.
   Length of the received message otherwise.
  */
 static inline
-int comm_recv(const comm_t x, char *data, const int len) {
+int comm_recv(const comm_t x, char *data, const size_t len) {
   int ret = comm_recv_single(x, &data, len, 0);
   if (ret > 0) {
     if (is_eof(data)) {
@@ -574,12 +574,12 @@ int comm_recv(const comm_t x, char *data, const int len) {
   @param[in] x comm_t structure that message should be sent to.
   @param[out] data character pointer to pointer to allocated buffer where the
   message should be saved.
-  @param[in] len const int length of the allocated message buffer in bytes.
+  @param[in] len const size_t length of the allocated message buffer in bytes.
   @returns int -1 if message could not be received and -2 if EOF is received.
   Length of the received message otherwise.
  */
 static inline
-int comm_recv_realloc(const comm_t x, char **data, const int len) {
+int comm_recv_realloc(const comm_t x, char **data, const size_t len) {
   int ret = comm_recv_single(x, data, len, 1);
   if (ret > 0) {
     if (is_eof(*data)) {
@@ -595,7 +595,7 @@ int comm_recv_realloc(const comm_t x, char **data, const int len) {
 
 /*! @brief alias for comm_send. */
 static inline
-int comm_send_nolimit(const comm_t x, const char *data, const int len) {
+int comm_send_nolimit(const comm_t x, const char *data, const size_t len) {
   return comm_send(x, data, len);
 };
 
@@ -607,7 +607,7 @@ int comm_send_nolimit(const comm_t x, const char *data, const int len) {
 static inline
 int comm_send_nolimit_eof(const comm_t x) {
   char buf[2048] = CIS_MSG_EOF;
-  int ret = comm_send_nolimit(x, buf, (int)strlen(buf));
+  int ret = comm_send_nolimit(x, buf, strlen(buf));
   return ret;
 };
 
@@ -620,12 +620,12 @@ int comm_send_nolimit_eof(const comm_t x) {
   @param[out] data character pointer to pointer for allocated buffer where the
   message should be stored. A pointer to a pointer is used so that the buffer
   may be reallocated as necessary for the incoming message.
-  @param[in] len int length of the initial allocated message buffer in bytes.
+  @param[in] len size_t length of the initial allocated message buffer in bytes.
   @returns int -1 if message could not be received and -2 if EOF is received.
   Length of the received message otherwise.
  */
 static inline
-int comm_recv_nolimit(const comm_t x, char **data, const int len) {
+int comm_recv_nolimit(const comm_t x, char **data, const size_t len) {
   return comm_recv_realloc(x, data, len);
 };
 

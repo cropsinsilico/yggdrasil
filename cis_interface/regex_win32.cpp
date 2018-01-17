@@ -37,21 +37,21 @@ int count_matches(const char *regex_text, const char *to_match) {
   compiled into a regex.
   @param[in] to_match constant character pointer to string that should be
   checked for matches.
-  @param[out] sind int ** indices of where matches begin.
-  @param[out] eind int ** indices of where matches ends.
+  @param[out] sind size_t ** indices of where matches begin.
+  @param[out] eind size_t ** indices of where matches ends.
   @return int Number of matches/submatches found. -1 is returned if the regex
   could not be compiled.
 */
 int find_matches(const char *regex_text, const char *to_match,
-		 int **sind, int **eind) {
+		 size_t **sind, size_t **eind) {
   try {
     std::regex r(regex_text);
     std::cmatch m;
     int ret = 0;
     if (regex_search(to_match, to_match + strlen(to_match), m, r)) {
       ret += m.size();
-      *sind = (int*)realloc(*sind, ret*sizeof(int));
-      *eind = (int*)realloc(*eind, ret*sizeof(int));
+      *sind = (size_t*)realloc(*sind, ret*sizeof(size_t));
+      *eind = (size_t*)realloc(*eind, ret*sizeof(size_t));
       int i;
       for (i = 0; i < ret; i++) {
 	(*sind)[i] = m.position(i);
@@ -71,13 +71,13 @@ int find_matches(const char *regex_text, const char *to_match,
   compiled into a regex.
   @param[in] to_match constant character pointer to string that should be
   checked for matches.
-  @param[out] sind int index where match begins.
-  @param[out] eind int index where match ends.
+  @param[out] sind size_t index where match begins.
+  @param[out] eind size_t index where match ends.
   @return int Number of matches found. -1 is returned if the regex could not be
   compiled.
 */
 int find_match(const char *regex_text, const char *to_match,
-	       int *sind, int *eind) {
+	       size_t *sind, size_t *eind) {
   try {
     std::regex r(regex_text);
     std::cmatch m;
@@ -98,26 +98,26 @@ int find_match(const char *regex_text, const char *to_match,
   @brief Make a replacement of regex matches, ignoring captured substrings.
   @param[in,out] buf Characer pointer to buffer that replacements should be
   made to.
-  @param[in] len_buf const int length of buf.
+  @param[in] len_buf const size_t length of buf.
   @param[in] re Constant character pointer to regex string.
   @param[in] rp Constant character pointer to the replacement text.
-  @param[in] nreplace Constant int number of replacements to make. If 0, all
+  @param[in] nreplace Constant size_t number of replacements to make. If 0, all
   matches are replaced.
   @return int -1 on failure if the regex could not be compiled or the buffer 
   is not big enough to contain the result. If succesful, the new length of buf
   is returned.
  */
-int regex_replace_nosub(char *buf, const int len_buf,
+int regex_replace_nosub(char *buf, const size_t len_buf,
 			const char *re, const char *rp,
-			const int nreplace) {
+			const size_t nreplace) {
   try {
     std::regex r(re);
     int ret = 0;
-    int len_rp = strlen(rp);
-    int len_m, rem_s, rem_l, delta_siz;
-    int cur_pos = 0;
-    int cur_siz = strlen(buf);
-    int creplace = 0;
+    size_t len_rp = strlen(rp);
+    size_t len_m, rem_s, rem_l, delta_siz;
+    size_t cur_pos = 0;
+    size_t cur_siz = strlen(buf);
+    size_t creplace = 0;
     std::cmatch m;
     while (1) {
       if ((nreplace > 0) && (creplace >= nreplace)) {
@@ -166,23 +166,23 @@ int regex_replace_nosub(char *buf, const int len_buf,
   returned. (Should be freed by calling program.)
   @return int Number of refs found. -1 indicates an error.
 */
-int get_subrefs(const char *buf, int **refs) {
+int get_subrefs(const char *buf, size_t **refs) {
   // Compile
   try {
     // TODO: check this on windows regex
     std::regex r("\\$([[:digit:]])");
     // Prepare "bitmap"
-    const int max_ref = 10; //99;
-    int i;
+    const size_t max_ref = 10; //99;
+    size_t i;
     uint8_t *ref_bytes = (uint8_t*)malloc((max_ref + 1)*sizeof(uint8_t));
     for (i = 0; i <= max_ref; i++)
       ref_bytes[i] = 0;
     // Locate matches
     std::cmatch m;
-    const int max_grp = 2;  // Digits in max_ref
-    int igrp_len;
+    const size_t max_grp = 2;  // Digits in max_ref
+    size_t igrp_len;
     char igrp[max_grp];
-    int iref;
+    size_t iref;
     const char *first = buf;
     const char *last = buf + strlen(buf);
     while (1) {
@@ -215,13 +215,13 @@ int get_subrefs(const char *buf, int **refs) {
       first += m.position() + m.length();
     }
     // Get unique refs
-    int nref = 0;
+    size_t nref = 0;
     for (i = 0; i <= max_ref; i++) {
       if (ref_bytes[i])
 	nref++;
     }
-    *refs = (int*)realloc(*refs, nref*sizeof(int));
-    int ir;
+    *refs = (size_t*)realloc(*refs, nref*sizeof(size_t));
+    size_t ir;
     for (i = 0, ir = 0; i <= max_ref; i++) {
       if (ref_bytes[i]) {
 	(*refs)[ir] = i;
@@ -241,18 +241,18 @@ int get_subrefs(const char *buf, int **refs) {
   @brief Make a replacement of regex matches, allowing for captured substrings.
   @param[in,out] buf Characer pointer to buffer that replacements should be
   made to.
-  @param[in] len_buf const int length of buf.
+  @param[in] len_buf const size_t length of buf.
   @param[in] re Constant character pointer to regex string.
   @param[in] rp Constant character pointer to the replacement text.
-  @param[in] nreplace Constant int number of replacements to make. If 0, all
+  @param[in] nreplace Constant size_t number of replacements to make. If 0, all
   matches are replaced.
   @return int -1 on failure if the regex could not be compiled or the buffer 
   is not big enough to contain the result. If succesful, the new length of buf
   is returned.
  */
-int regex_replace_sub(char *buf, const int len_buf,
+int regex_replace_sub(char *buf, const size_t len_buf,
 		      const char *re, const char *rp,
-		      const int nreplace) {
+		      const size_t nreplace) {
   // Compile
   try {
     std::regex r(re);
@@ -261,11 +261,11 @@ int regex_replace_sub(char *buf, const int len_buf,
     char *rp_sub = (char*)malloc(2*len_buf*sizeof(char));
     char *re_sub = (char*)malloc(len_buf*sizeof(char));
     char *igrp = (char*)malloc(len_buf*sizeof(char));
-    int len_m, rem_s, rem_l, delta_siz, len_rp;
-    int cur_pos = 0;
-    int cur_siz = strlen(buf);
-    int creplace = 0;
-    int i, j;
+    size_t len_m, rem_s, rem_l, delta_siz, len_rp;
+    size_t cur_pos = 0;
+    size_t cur_siz = strlen(buf);
+    size_t creplace = 0;
+    size_t i, j;
     int ret = 0;
     while (1) {
       if ((nreplace > 0) && (creplace >= nreplace)) {
@@ -280,7 +280,7 @@ int regex_replace_sub(char *buf, const int len_buf,
 	break;
       }
       // Get list of subrefs
-      int *refs = NULL;
+      size_t *refs = NULL;
       int nref = get_subrefs(rp, &refs);
       if (nref < 0) {
 	printf("Error gettings subrefs\n");

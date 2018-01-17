@@ -24,7 +24,7 @@ typedef struct comm_t {
   void *handle; //!< Pointer to handle for comm.
   void *info; //!< Pointer to any extra info comm requires.
   seri_t serializer; //!< Serializer for comm messages.
-  int maxMsgSize; //!< The maximum message size.
+  size_t maxMsgSize; //!< The maximum message size.
   int always_send_header; //!< 1 if comm should always send a header.
   int index_in_register; //!< Index of the comm in the comm register.
 } comm_t;
@@ -129,11 +129,11 @@ int free_comm_base(comm_t *x) {
   message is larger, it will not be sent.
   @param[in] x comm_t structure that comm should be sent to.
   @param[in] data character pointer to message that should be sent.
-  @param[in] len int length of message to be sent.
+  @param[in] len size_t length of message to be sent.
   @returns int 0 if send succesfull, -1 if send unsuccessful.
  */
 static inline
-int comm_base_send(const comm_t x, const char *data, const int len) {
+int comm_base_send(const comm_t x, const char *data, const size_t len) {
   // Prevent C4100 warning on windows by referencing param
   x;
   data;

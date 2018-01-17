@@ -177,11 +177,11 @@ int zmq_comm_nmsg(const comm_t x) {
   message is larger, it will not be sent.
   @param[in] x comm_t structure that comm should be sent to.
   @param[in] data character pointer to message that should be sent.
-  @param[in] len int length of message to be sent.
+  @param[in] len size_t length of message to be sent.
   @returns int 0 if send succesfull, -1 if send unsuccessful.
  */
 static inline
-int zmq_comm_send(const comm_t x, const char *data, const int len) {
+int zmq_comm_send(const comm_t x, const char *data, const size_t len) {
   cislog_debug("zmq_comm_send(%s): %d bytes", x.name, len);
   if (comm_base_send(x, data, len) == -1)
     return -1;
@@ -200,14 +200,14 @@ int zmq_comm_send(const comm_t x, const char *data, const int len) {
   @param[in] x comm_t structure that message should be sent to.
   @param[out] data char ** pointer to allocated buffer where the message
   should be saved. This should be a malloc'd buffer if allow_realloc is 1.
-  @param[in] len const int length of the allocated message buffer in bytes.
+  @param[in] len const size_t length of the allocated message buffer in bytes.
   @param[in] allow_realloc const int If 1, the buffer will be realloced if it
   is not large enought. Otherwise an error will be returned.
   @returns int -1 if message could not be received. Length of the received
   message if message was received.
  */
 static inline
-int zmq_comm_recv(const comm_t x, char **data, const int len,
+int zmq_comm_recv(const comm_t x, char **data, const size_t len,
 		  const int allow_realloc) {
   cislog_debug("zmq_comm_recv(%s)", x.name);
   zsock_t *s = (zsock_t*)(x.handle);
@@ -216,7 +216,7 @@ int zmq_comm_recv(const comm_t x, char **data, const int len,
     cislog_debug("zmq_comm_recv(%s): did not receive", x.name);
     return -1;
   }
-  int len_recv = (int)zframe_size(out);
+  size_t len_recv = zframe_size(out);
   /* printf("(C) received %d bytes from %s\n", len_recv, x.address); */
   if ((len_recv + 1) > len) {
     if (allow_realloc) {
@@ -298,11 +298,11 @@ int zmq_comm_nmsg(const comm_t x) {
   message is larger, it will not be sent.
   @param[in] x comm_t structure that comm should be sent to.
   @param[in] data character pointer to message that should be sent.
-  @param[in] len int length of message to be sent.
+  @param[in] len size_t length of message to be sent.
   @returns int 0 if send succesfull, -1 if send unsuccessful.
  */
 static inline
-int zmq_comm_send(const comm_t x, const char *data, const int len) {
+int zmq_comm_send(const comm_t x, const char *data, const size_t len) {
   zmq_install_error();
   return -1;
 };
@@ -313,14 +313,14 @@ int zmq_comm_send(const comm_t x, const char *data, const int len) {
   @param[in] x comm_t structure that message should be sent to.
   @param[out] data char ** pointer to allocated buffer where the message
   should be saved. This should be a malloc'd buffer if allow_realloc is 1.
-  @param[in] len const int length of the allocated message buffer in bytes.
+  @param[in] len const size_t length of the allocated message buffer in bytes.
   @param[in] allow_realloc const int If 1, the buffer will be realloced if it
   is not large enought. Otherwise an error will be returned.
   @returns int -1 if message could not be received. Length of the received
   message if message was received.
  */
 static inline
-int zmq_comm_recv(const comm_t x, char **data, const int len,
+int zmq_comm_recv(const comm_t x, char **data, const size_t len,
 		  const int allow_realloc) {
   zmq_install_error();
   return -1;

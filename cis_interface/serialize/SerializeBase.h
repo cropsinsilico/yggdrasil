@@ -23,19 +23,19 @@ typedef struct seri_t {
   @param[in] s seri_t Structure sepcifying how to serialize arguments.
   @param[in] buf character pointer to memory where serialized message should be
   stored.
-  @param[in] buf_siz int Size of memory allocated to buf.
+  @param[in] buf_siz size_t Size of memory allocated to buf.
   @param[in] allow_realloc int If 1, buf will be realloced if it is not big
   enough to hold the serialized emssage. If 0, an error will be returned.
   @param[in] ap va_list Arguments to be formatted.
   returns: int The length of the serialized message or -1 if there is an error. 
  */
 static inline
-int serialize_direct(const seri_t s, char *buf, const int buf_siz, va_list ap) {
+int serialize_direct(const seri_t s, char *buf, const size_t buf_siz, va_list ap) {
   if (s.type != DIRECT_SERI)
     return -1;
   char *msg = va_arg(ap, char*);
   int ret = (int)strlen(msg);
-  if ((ret + 1) < buf_siz)
+  if ((ret + 1) < (int)buf_siz)
     strcpy(buf, msg);
   return ret;
 };
@@ -44,12 +44,12 @@ int serialize_direct(const seri_t s, char *buf, const int buf_siz, va_list ap) {
   @brief Deserialize message to populate arguments.
   @param[in] s seri_t Structure sepcifying how to deserialize message.
   @param[in] buf character pointer to serialized message.
-  @param[in] buf_siz int Size of buf.
+  @param[in] buf_siz size_t Size of buf.
   @param[in] ap va_list Arguments to be parsed from message.
   returns: int The number of populated arguments. -1 indicates an error.
  */
 static inline
-int deserialize_direct(const seri_t s, const char *buf, const int buf_siz,
+int deserialize_direct(const seri_t s, const char *buf, const size_t buf_siz,
 		       va_list ap) {
   if (s.type != DIRECT_SERI)
     return -1;
