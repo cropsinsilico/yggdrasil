@@ -126,7 +126,7 @@ int new_ipc_address(comm_t *comm) {
   // TODO: small chance of reusing same number
   int key = 0;
   if (!(_ipc_rand_seeded)) {
-    srand((unsigned long)comm); //time(NULL));
+    srand(ptr2seed(comm));
     _ipc_rand_seeded = 1;
   }
   while (key == 0) {

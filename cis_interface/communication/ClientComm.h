@@ -20,7 +20,6 @@ static inline
 int new_client_address(comm_t *comm) {
   if (!(_client_rand_seeded)) {
     srand(ptr2seed(comm));
-    /* srand((unsigned long)comm); */
     _client_rand_seeded = 1;
   }
   comm->type = _default_comm;
@@ -35,7 +34,7 @@ int new_client_address(comm_t *comm) {
 static inline
 int init_client_comm(comm_t *comm) {
   if (!(_client_rand_seeded)) {
-    srand((unsigned long)comm);
+    srand(ptr2seed(comm));
     _client_rand_seeded = 1;
   }
   int ret;
@@ -142,7 +141,7 @@ int free_client_comm(comm_t *x) {
   if (x->handle != NULL) {
     comm_t *handle = (comm_t*)(x->handle);
     char buf[CIS_MSG_MAX] = CIS_MSG_EOF;
-    default_comm_send(*handle, buf, strlen(buf));
+    default_comm_send(*handle, buf, (int)strlen(buf));
     free((char*)(handle->serializer.info));
     free_default_comm(handle);
     free(x->handle);

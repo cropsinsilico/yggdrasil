@@ -30,7 +30,7 @@ int new_zmq_address(comm_t *comm) {
     // TODO: small chance of reusing same number
     int key = 0;
     if (!(_zmq_rand_seeded)) {
-      srand((unsigned long)comm); //time(NULL));
+      srand(ptr2seed(comm));
       _zmq_rand_seeded = 1;
     }
     while (key == 0) key = rand();
