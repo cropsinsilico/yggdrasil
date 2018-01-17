@@ -21,7 +21,6 @@ if platform._is_win:
     _regex_win32 = os.path.split(_regex_win32_lib)
     _compile_flags += ["-D_CRT_SECURE_NO_WARNINGS", "-I" + _regex_win32[0]]
     _linker_flags += [_regex_win32[1], '/LIBPATH:"%s"' % _regex_win32[0]]
-    _linker_flags += ["/VERBOSE"]
 if _zmq_installed:
     if platform._is_win:
         _zmq_dirs = dict()
@@ -208,11 +207,6 @@ class GCCModelDriver(ModelDriver):
                                "provided arguments.")
         self.cfile = self.src[0]
         src_base, src_ext = os.path.splitext(self.cfile)
-        # if (len(self.src) > 1) and platform._is_win:
-        #     for s in self.src[1:]:
-        #         o = os.path.splitext(os.path.basename(s))[0] + '.obj'
-        #         if o not in self.ldflags:
-        #             self.ldflags.append(o)
         if self.cc is None:
             if platform._is_win:
                 self.cc = 'cl'

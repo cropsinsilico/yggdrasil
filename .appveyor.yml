@@ -43,18 +43,13 @@ install:
   - "SET VSINSTALLDIR=%ProgramFiles(x86)%\\Microsoft Visual Studio %MSVCVER%.0\\"
   - "SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%"
   - "SET MPLBACKEND=agg"
-  # - "SET ZMQINSTALLDIR=C:\\projects"
   - "SET ZMQINSTALLDIR=%APPVEYOR_BUILD_FOLDER%"
 
   # Setup Visual C++ toolset
   # TODO: Generic case. This is specific to 64bit VS 2015/2017 (14.0/16.0)
-  - "ECHO Platform=%PLATFORM%"
-  - if "%MSVCVER%" == "14" if /I "%PLATFORM%" == "x64" echo True
   - if "%MSVCVER%" == "16" if /I "%PLATFORM%" == "x64" call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars64.bat"
   - if "%MSVCVER%" == "14" if /I "%PLATFORM%" == "x64" call "C:\Program Files\Microsoft SDKs\Windows\v7.1\Bin\SetEnv.cmd" /x64 /release
   - if "%MSVCVER%" == "14" if /I "%PLATFORM%" == "x64" call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" amd64
-  - "ECHO Platform=%PLATFORM%"
-  - if "%MSVCVER%" == "14" if /I "%PLATFORM%" == "x64" echo True
 
   # Create a conda environment
   - "conda update -q --yes conda"
@@ -70,7 +65,6 @@ install:
   - "pip install --upgrade setuptools"
 
   # Install ZeroMQ
-  - "ECHO %PLATFORM%"
   - if "%INSTALLZMQ%" == "1" call "ci\\install-czmq-windows.bat"
   # - "ECHO %PATH%"
   # - where zmq.lib

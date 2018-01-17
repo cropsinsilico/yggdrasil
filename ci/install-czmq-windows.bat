@@ -12,7 +12,6 @@ set STARTTIME=%DATE% %TIME%
 
 :: uses the environment from the DevStudio CMD window to figure out which version to build
 set VSVER=%VSINSTALLDIR:~-5,2%
-echo VSVER=%VSVER%
 set DIRVER=%VSVER%
 if %VSVER% gtr 10 set /a DIRVER = DIRVER + 1
 set CMAKE_GENERATOR=Visual Studio %VSVER% 20%DIRVER%
@@ -58,8 +57,6 @@ IF NOT EXIST %LIBZMQ_BUILDDIR% (
     ECHO CMake libzmq...
     cmake -D CMAKE_INCLUDE_PATH="%LIBSODIUM_INCLUDE_DIR%"  -D CMAKE_LIBRARY_PATH="%LIBSODIUM_LIBRARY_DIR%" -D CMAKE_CXX_FLAGS_RELEASE="/MT" -D CMAKE_CXX_FLAGS_DEBUG="/MTd" -G "%CMAKE_GENERATOR%" %LIBZMQ_SOURCEDIR%
     ECHO Building libzmq...
-    ls %LIBZMQ_BUILDDIR%
-    type libzmq.vcxproj
     msbuild /v:minimal /p:Configuration=%CONFIGURATION% libzmq.vcxproj
     ECHO Copying zmq lib...
     move "%ZEROMQ_LIBRARY_DIR%\libzmq-*lib" "%ZEROMQ_LIBRARY_DIR%\zmq.lib"
@@ -80,12 +77,8 @@ IF NOT EXIST %CZMQ_BUILDDIR% (
     cd %CZMQ_BUILDDIR%
     ECHO CMake czmq...
     cmake -G "%CMAKE_GENERATOR%" -D CMAKE_INCLUDE_PATH="%ZEROMQ_INCLUDE_DIR%;%LIBSODIUM_INCLUDE_DIR%" -D CMAKE_LIBRARY_PATH="%ZEROMQ_LIBRARY_DIR%;%LIBSODIUM_LIBRARY_DIR%" -D CMAKE_C_FLAGS_RELEASE="/MT" -D CMAKE_CXX_FLAGS_RELEASE="/MT" -D CMAKE_C_FLAGS_DEBUG="/MTd" %CZMQ_SOURCEDIR%
-    ls %CZMQ_BUILDDIR%
-    type czmq.vcxproj
     ECHO Building czmq...
     msbuild /v:minimal /p:Configuration=%CONFIGURATION% czmq.vcxproj
-    :: move?
-    ls %CZMQ_LIBRARY_DIR%
 )
 
 :: Finalize and print stop time
