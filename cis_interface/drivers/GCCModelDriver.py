@@ -58,11 +58,9 @@ def build_regex_win32():
     comp_process = popen_nobuffer(cmd, cwd=_regex_win32_dir)
     output, err = comp_process.communicate()
     exit_code = comp_process.returncode
-    if output:
+    if exit_code != 0:  # pragma: debug
         print(' '.join(cmd))
         print_encoded(output, end="")
-    if exit_code != 0:  # pragma: debug
-        time.sleep(10)
         raise RuntimeError("Could not create regex_win32.obj")
     assert(os.path.isfile(_regex_win32_obj))
     # Create library
@@ -70,11 +68,9 @@ def build_regex_win32():
     comp_process = popen_nobuffer(cmd, cwd=_regex_win32_dir)
     output, err = comp_process.communicate()
     exit_code = comp_process.returncode
-    if output:
+    if exit_code != 0:  # pragma: debug
         print(' '.join(cmd))
         print_encoded(output, end="")
-    if exit_code != 0:  # pragma: debug
-        time.sleep(10)
         raise RuntimeError("Could not build regex_win32.lib")
     assert(os.path.isfile(_regex_win32_lib))
 
@@ -140,10 +136,8 @@ class GCCModelDriver(ModelDriver):
             self.error('%s', ' '.join(compile_args))
             self.print_encoded(output, end="")
             raise RuntimeError("Compilation failed with code %d." % exit_code)
-        print(os.getcwd(), self.efile)
-        print(self.args)
         assert(os.path.isfile(self.efile))
-        self.print_encoded(output, end="")
+        # self.print_encoded(output, end="")
         self.compiled = True
         self.debug('Compiled executable with %s', self.cc)
 

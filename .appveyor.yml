@@ -102,8 +102,8 @@ before_test:
   - "flake8 cis_interface"
 
 test_script:
-  - "cisrun cis_interface/examples/SaM/SaM_c.yml"
-  # - "nosetests --nologcapture --with-coverage --cover-package=cis_interface -svx cis_interface/examples/tests/"
+  # - "cisrun cis_interface/examples/SaM/SaM_c.yml"
+  - "nosetests --nologcapture --with-coverage --cover-package=cis_interface -svx cis_interface/examples/tests/test_SaM.py"
 
 after_test:
   - "codecov"
