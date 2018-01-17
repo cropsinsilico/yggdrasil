@@ -179,7 +179,11 @@ class GCCModelDriver(ModelDriver):
             elif a.startswith('-l') or a.startswith('-L') or is_link:
                 if a.startswith('/out:'):
                     self.efile = a.split('/out:')[-1]
-                if a not in self.ldflags:
+                elif a.startswith('-l') or a.startswith('-L') and platform._is_win:
+                    a1 = '/LIBPATH:"%s"' % a[2:]
+                    if a1 not in self.ldflags:
+                        self.ldflags.append(a1)
+                elif a not in self.ldflags:
                     self.ldflags.append(a)
             elif a == '-o':
                 # Next argument should be the name of the executable
@@ -187,7 +191,7 @@ class GCCModelDriver(ModelDriver):
             elif a == '/link':
                 # Following arguments should be linker options
                 is_link = True
-            elif a.startswith('-'):
+            elif a.startswith('-') or (platform._is_win and a.startswith('/')):
                 if a not in self.ccflags:
                     self.ccflags.append(a)
             else:
@@ -203,6 +207,11 @@ class GCCModelDriver(ModelDriver):
                                "provided arguments.")
         self.cfile = self.src[0]
         src_base, src_ext = os.path.splitext(self.cfile)
+        if (len(self.src) > 1) and platform._is_win:
+            obj = []
+            for s in self.src[1:]:
+                obj.append(os.path.splitext(s)[0] + '.obj')
+            self.ldflags += obj
         if self.cc is None:
             if platform._is_win:
                 self.cc = 'cl'
@@ -213,7 +222,7 @@ class GCCModelDriver(ModelDriver):
                     self.cc = 'g++'
         if self.efile is None:
             if platform._is_win:
-                osuffix = '_%s.exe'
+                osuffix = '_%s.exe' % src_ext[1:]
             else:
                 osuffix = '_%s.out' % src_ext[1:]
             self.efile = src_base + osuffix
