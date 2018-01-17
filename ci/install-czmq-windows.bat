@@ -17,13 +17,14 @@ set DIRVER=%VSVER%
 if %VSVER% gtr 10 set /a DIRVER = DIRVER + 1
 set CMAKE_GENERATOR=Visual Studio %VSVER% 20%DIRVER%
 if "%PLATFORM%"=="x64" set "CMAKE_GENERATOR=%CMAKE_GENERATOR% Win64"
-set MSVCVERSION="v%VSVER%0"
-set MSVCYEAR="vs20%DIRVER%"
+set MSVCVERSION=v%VSVER%0
+set MSVCYEAR=vs20%DIRVER%
 choco install make -y
 
 :: Print info about build
 echo Generator=%CMAKE_GENERATOR%
 echo Platform=%PLATFORM%
+echo Configuration=%CONFIGURATION%
 
 :: Install Libsodium
 :: if libsodium is on disk, the Windows build of libzmq will automatically use it
