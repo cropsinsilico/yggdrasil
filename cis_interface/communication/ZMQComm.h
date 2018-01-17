@@ -216,7 +216,7 @@ int zmq_comm_recv(const comm_t x, char **data, const int len,
     cislog_debug("zmq_comm_recv(%s): did not receive", x.name);
     return -1;
   }
-  int len_recv = zframe_size(out);
+  int len_recv = (int)zframe_size(out);
   /* printf("(C) received %d bytes from %s\n", len_recv, x.address); */
   if ((len_recv + 1) > len) {
     if (allow_realloc) {
