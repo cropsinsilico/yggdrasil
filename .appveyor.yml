@@ -89,10 +89,10 @@ install:
 cache:
   - '%LOCALAPPDATA%\pip\Cache'
   - libsodium    -> ci\install-czmq_windows.bat
-  - libzmq       -> ci\install-czmq_windows.bat
-  - build_libzmq -> ci\install-czmq_windows.bat
-  - czmq         -> ci\install-czmq_windows.bat
-  - build_czmq   -> ci\install-czmq_windows.bat
+  # - libzmq       -> ci\install-czmq_windows.bat
+  # - build_libzmq -> ci\install-czmq_windows.bat
+  # - czmq         -> ci\install-czmq_windows.bat
+  # - build_czmq   -> ci\install-czmq_windows.bat
 
 # Not a .NET project
 build: false
