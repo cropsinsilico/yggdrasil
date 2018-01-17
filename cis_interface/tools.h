@@ -18,7 +18,9 @@
 #endif
 #include <windows.h>
 #include "getline_win32.h"
+#ifndef getpid
 #define getpid GetCurrentProcessId
+#endif
 #define sleep(tsec) Sleep(1000*tsec)
 #define usleep(usec) Sleep(usec/1000)
 #else
