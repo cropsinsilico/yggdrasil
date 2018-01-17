@@ -91,19 +91,24 @@ install:
   - echo %LIBSODIUM_SOURCEDIR%
 
 cache:
-  - '%APPVEYOR_BUILD_FOLDER%\libsodium'
-  - '%APPVEYOR_BUILD_FOLDER%\libzmq'
-  - '%APPVEYOR_BUILD_FOLDER%\build_libzmq'
-  - '%APPVEYOR_BUILD_FOLDER%\czmq'
-  - '%APPVEYOR_BUILD_FOLDER%\build_czmq'
-  - '%LIBSODIUM_SOURCEDIR%'
-  - '%LIBZMQ_SOURCEDIR%'
-  - '%LIBZMQ_BUILDDIR%'
-  - '%CZMQ_SOURCEDIR%'
-  - '%CZMQ_BUILDDIR%'
-  # -> ci\install-czmq_windows.bat'
-  # -> ci\install-czmq_windows.bat'
   - '%LOCALAPPDATA%\pip\Cache'
+  - libsodium
+  - libzmq
+  - build_libzmq
+  - czmq
+  - build_czmq
+  # - '%APPVEYOR_BUILD_FOLDER%\libsodium'
+  # - '%APPVEYOR_BUILD_FOLDER%\libzmq'
+  # - '%APPVEYOR_BUILD_FOLDER%\build_libzmq'
+  # - '%APPVEYOR_BUILD_FOLDER%\czmq'
+  # - '%APPVEYOR_BUILD_FOLDER%\build_czmq'
+  # - '%LIBSODIUM_SOURCEDIR%'
+  # - '%LIBZMQ_SOURCEDIR%'
+  # - '%LIBZMQ_BUILDDIR%'
+  # - '%CZMQ_SOURCEDIR%'
+  # - '%CZMQ_BUILDDIR%'
+  # -> ci\install-czmq_windows.bat'
+  # -> ci\install-czmq_windows.bat'
 
 # Not a .NET project
 build: false
