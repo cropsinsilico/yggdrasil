@@ -776,7 +776,7 @@ comm_t cisAsciiTableOutput(const char *name, const char *format_str,
   comm_t out = init_comm(name, "send", type, (void*)format_str);
   // For connection, send format and initialize serializer
   if (dst_type != 0) {
-    int ret = comm_send(out, format_str, strlen(format_str));
+    int ret = comm_send(out, format_str, (int)strlen(format_str));
     if (ret < 0) {
       cislog_error("cisAsciiTableOutput: Failed to send format string.\n");
       out.valid = 0;

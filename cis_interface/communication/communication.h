@@ -92,7 +92,7 @@ int register_comm(comm_t *x) {
     cislog_error("register_comm(%s): Failed to realloc the comm list.", x->name);
     return -1;
   }
-  x->index_in_register = ncomms2clean;
+  x->index_in_register = (int)ncomms2clean;
   vcomms2clean[ncomms2clean++] = (void*)x;
   return 0;
 };
@@ -427,7 +427,7 @@ int comm_send(const comm_t x, const char *data, const int len) {
 static inline
 int comm_send_eof(const comm_t x) {
   char buf[2048] = CIS_MSG_EOF;
-  int ret = comm_send(x, buf, strlen(buf));
+  int ret = comm_send(x, buf, (int)strlen(buf));
   return ret;
 };
 
@@ -607,7 +607,7 @@ int comm_send_nolimit(const comm_t x, const char *data, const int len) {
 static inline
 int comm_send_nolimit_eof(const comm_t x) {
   char buf[2048] = CIS_MSG_EOF;
-  int ret = comm_send_nolimit(x, buf, strlen(buf));
+  int ret = comm_send_nolimit(x, buf, (int)strlen(buf));
   return ret;
 };
 

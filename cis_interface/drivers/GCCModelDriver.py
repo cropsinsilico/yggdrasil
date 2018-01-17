@@ -210,7 +210,7 @@ class GCCModelDriver(ModelDriver):
         if (len(self.src) > 1) and platform._is_win:
             obj = []
             for s in self.src[1:]:
-                obj.append(os.path.splitext(s)[0] + '.obj')
+                obj.append(os.path.splitext(os.path.basename(s))[0] + '.obj')
             self.ldflags += obj
         if self.cc is None:
             if platform._is_win:
