@@ -20,9 +20,6 @@
 #include "getline_win32.h"
 #include <process.h>
 #define cis_getpid _getpid
-// #ifndef getpid
-// #define getpid GetCurrentProcessId
-// #endif
 #define sleep(tsec) Sleep(1000*tsec)
 #define usleep(usec) Sleep(usec/1000)
 #else
@@ -49,6 +46,19 @@
 #ifdef PSI_DEBUG
 #define CIS_DEBUG PSI_DEBUG
 #endif
+
+
+/*!
+  @brief Get an unsigned long seed from the least significant 32bits of a pointer.
+  @param[in] ptr Pointer that should be turned into a seed.
+  @return Unsigned long seed.
+ */
+static inline
+unsigned long ptr2seed(void *ptr) {
+  uint64_t v = (uint64_t)ptr;
+  unsigned long seed = (unsigned long)(v & 0xFFFFFFFFLL);
+  return seed;
+};
 
 
 //==============================================================================

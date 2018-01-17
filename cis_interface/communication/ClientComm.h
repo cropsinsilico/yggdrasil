@@ -19,7 +19,8 @@ static unsigned _client_rand_seeded = 0;
 static inline
 int new_client_address(comm_t *comm) {
   if (!(_client_rand_seeded)) {
-    srand((unsigned long)comm);
+    srand(ptr2seed(comm));
+    /* srand((unsigned long)comm); */
     _client_rand_seeded = 1;
   }
   comm->type = _default_comm;
