@@ -70,8 +70,6 @@ install:
   - if "%INSTALLZMQ%" == "1" call "ci\\install-czmq-windows.bat"
   - "ECHO %CD%"
   - "ECHO %PATH%"
-  - "ECHO %ZEROMQ_LIBRARY_DIR"
-  - "ECHO %CZMQ_LIBRARY_DIR%"
   - where zmq.lib
   - where czmq.lib
   - where zmq.h
@@ -88,7 +86,6 @@ install:
 
   # Install cis_interface
   - "pip install -e ."
-  - echo %LIBSODIUM_SOURCEDIR%
 
 cache:
   - '%LOCALAPPDATA%\pip\Cache'
@@ -97,16 +94,6 @@ cache:
   - build_libzmq
   - czmq
   - build_czmq
-  # - '%APPVEYOR_BUILD_FOLDER%\libsodium'
-  # - '%APPVEYOR_BUILD_FOLDER%\libzmq'
-  # - '%APPVEYOR_BUILD_FOLDER%\build_libzmq'
-  # - '%APPVEYOR_BUILD_FOLDER%\czmq'
-  # - '%APPVEYOR_BUILD_FOLDER%\build_czmq'
-  # - '%LIBSODIUM_SOURCEDIR%'
-  # - '%LIBZMQ_SOURCEDIR%'
-  # - '%LIBZMQ_BUILDDIR%'
-  # - '%CZMQ_SOURCEDIR%'
-  # - '%CZMQ_BUILDDIR%'
   # -> ci\install-czmq_windows.bat'
   # -> ci\install-czmq_windows.bat'
 
