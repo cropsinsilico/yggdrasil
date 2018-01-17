@@ -140,9 +140,10 @@ class GCCModelDriver(ModelDriver):
             self.error('%s', ' '.join(compile_args))
             self.print_encoded(output, end="")
             raise RuntimeError("Compilation failed with code %d." % exit_code)
-        self.print_encoded(output, end="")
         print(os.getcwd(), self.efile)
+        print(self.args)
         assert(os.path.isfile(self.efile))
+        self.print_encoded(output, end="")
         self.compiled = True
         self.debug('Compiled executable with %s', self.cc)
 
