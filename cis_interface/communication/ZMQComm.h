@@ -1,13 +1,12 @@
-#ifdef ZMQINSTALLED
-#include <czmq.h>
-#endif /*ZMQINSTALLED*/
-#include <CommBase.h>
-
 /*! @brief Flag for checking if this header has already been included. */
 #ifndef CISZMQCOMM_H_
 #define CISZMQCOMM_H_
 
+#include <CommBase.h>
+
 #ifdef ZMQINSTALLED
+
+#include <czmq.h>
 
 static unsigned _zmq_rand_seeded = 0;
 static unsigned _cisSocketsCreated = 0;
