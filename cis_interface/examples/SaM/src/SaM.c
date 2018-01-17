@@ -5,7 +5,7 @@
 #define BSIZE 8192 // the max
 
 
-int main(int argc, char *argv[]){
+int main() {
     int ret;
     char adata[BSIZE];
     char bdata[BSIZE];

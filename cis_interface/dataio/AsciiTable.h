@@ -422,7 +422,11 @@ int at_set_format_typ(asciiTable_t *t) {
       mres = regex_replace_sub(ifmt, fmt_len,
 			       "%(\\.)?([[:digit:]]*)s(.*)", "$2", 0);
       (*t).format_siz[icol] = atoi(ifmt);
+#ifdef _WIN32
+    } else if (find_match("(%.*[fFeEgG]){2}j", ifmt, &sind, &eind)) {
+#else
     } else if (find_match("(\%.*[fFeEgG]){2}j", ifmt, &sind, &eind)) {
+#endif
       /* (*t).format_typ[icol] = AT_COMPLEX; */
       (*t).format_typ[icol] = AT_DOUBLE;
       icol++;

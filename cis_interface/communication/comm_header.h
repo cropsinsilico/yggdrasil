@@ -129,7 +129,7 @@ int parse_header_entry(const char *head, const char *key, char *value,
   value[value_size] = '\0';
   if (sind != NULL) free(sind);
   if (eind != NULL) free(eind);
-  return value_size;
+  return (int)value_size;
 };
 
 
@@ -223,7 +223,7 @@ int format_comm_header(const comm_head_t head, char *buf, const size_t bufsiz) {
   /*   memcpy(buf, head.body, head.bodysiz); */
   /*   buf[pos] = '\0'; */
   /* } */
-  return pos;
+  return (int)pos;
 };
 
 /*!

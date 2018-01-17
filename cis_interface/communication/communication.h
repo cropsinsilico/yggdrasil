@@ -323,8 +323,9 @@ comm_head_t comm_send_multipart_header(const comm_t x, const size_t len) {
 static inline
 int comm_send_multipart(const comm_t x, const char *data, const size_t len) {
   char headbuf[BUFSIZ];
-  int headlen, ret;
+  int headlen = 0, ret;
   comm_t xmulti;
+  xmulti.valid = 0;
   // Get header
   comm_head_t head = comm_send_multipart_header(x, len);
   if (head.valid == 0) {
@@ -493,7 +494,7 @@ int comm_recv_multipart(const comm_t x, char **data, const size_t len,
       (*data)[head.bodysiz] = '\0';
       // Return early if header contained entire message
       if (head.size == head.bodysiz) {
-	return head.bodysiz;
+	return (int)(head.bodysiz);
       }
       // Get address for new comm
       comm_t xmulti = new_comm(head.address, "recv", x.type, NULL);
@@ -535,11 +536,11 @@ int comm_recv_multipart(const comm_t x, char **data, const size_t len,
       }
       if (ret > 0) {
 	cislog_debug("comm_recv_multipart(%s): %d bytes completed", x.name, prev);
-	ret = prev;
+	ret = (int)prev;
       }
       free_comm(&xmulti);
     } else {
-      ret = headlen;
+      ret = (int)headlen;
     }
   }
   return ret;
