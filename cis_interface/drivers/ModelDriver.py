@@ -131,7 +131,7 @@ class ModelDriver(Driver):
                 line = out.readline()
                 if len(line) == 0:
                     self.debug("Empty line from stdout")
-                    # break
+                    break
                 else:
                     queue.put(line)
         except BaseException:  # pragma: debug
