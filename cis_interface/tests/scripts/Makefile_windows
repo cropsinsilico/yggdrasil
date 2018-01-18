@@ -21,7 +21,7 @@ $(ODIR)\%.o: %.c $(DEPS)
 	$(CC) /c %< -Fo$@ $(CFLAGS)
 
 gcc_model: $(OBJ)
-	$(LINK) /OUT:$@.exe $^ $(LIBS)
+	$(LINK) /OUT:$@.exe $** $(LIBS)
 
 clean:
 	rm -f $(ODIR)\\\*.o \*~ gcc_model.exe $(IDIR)\*\~ 
