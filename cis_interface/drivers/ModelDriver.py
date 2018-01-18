@@ -90,6 +90,7 @@ class ModelDriver(Driver):
             valgrind_flags = []
         self.valgrind_flags = valgrind_flags
         self.env_copy = ['LANG', 'PATH', 'USER']
+        self._exit_line = backwards.unicode2bytes('EXIT')
         # print(os.environ.keys())
         for k in self.env_copy:
             if k in os.environ:
@@ -141,7 +142,7 @@ class ModelDriver(Driver):
         except BaseException:  # pragma: debug
             self.error("Error getting output")
             raise
-        queue.put(backwards.unicode2bytes(''))
+        queue.put(self._exit_line)
         out.close()
 
     def run(self):
@@ -151,6 +152,7 @@ class ModelDriver(Driver):
         self.run_setup()
         flag = True
         self.debug("Beginning loop")
+        self._count = 0
         while self._running and (self.process is not None) and flag:
             flag = self.run_loop()
         self.run_finalize()
@@ -167,7 +169,7 @@ class ModelDriver(Driver):
             self.sleep()
             return True
         else:
-            if len(line) == 0:
+            if (line == self._exit_line):
                 self.debug("No more output")
                 return False
             self.print_encoded(line, end="")
