@@ -92,7 +92,11 @@ class MakeModelDriver(ModelDriver):
         """
         curdir = os.getcwd()
         os.chdir(self.makedir)
-        make_args = [self.make_command, '-f', self.makefile, target]
+        if self.make_command == 'nmake':
+            make_opts = ['/F', '/NOLOGO']
+        else:
+            make_opts = ['-f']
+        make_args = [self.make_command] + make_opts + [self.makefile, target]
         self.debug(' '.join(make_args))
         if not os.path.isfile(self.makefile):
             raise IOError("Makefile %s not found" % self.makefile)
