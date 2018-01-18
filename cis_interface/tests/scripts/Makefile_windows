@@ -18,11 +18,11 @@ OBJ = $(ODIR)\$(_OBJ: = $(ODIR)\)
 .PHONY: all
 all: gcc_model
 
-$(ODIR)\%.o: %.c $(DEPS)
-	$(CC) /c %< -Fo$@ $(CFLAGS)
-
 gcc_model: $(OBJ)
 	$(LINK) /OUT:$@.exe $** $(LIBS)
+
+$(ODIR)\%.o: %.c $(DEPS)
+	$(CC) /c %< -Fo$@ $(CFLAGS)
 
 clean:
 	rm -f $(ODIR)\\\*.o \*~ gcc_model.exe $(IDIR)\*\~ 
