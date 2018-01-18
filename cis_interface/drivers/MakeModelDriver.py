@@ -93,7 +93,7 @@ class MakeModelDriver(ModelDriver):
         curdir = os.getcwd()
         os.chdir(self.makedir)
         if self.make_command == 'nmake':
-            make_opts = ['/F', '/NOLOGO']
+            make_opts = ['/NOLOGO', '/F']
         else:
             make_opts = ['-f']
         make_args = [self.make_command] + make_opts + [self.makefile, target]
