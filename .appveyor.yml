@@ -103,8 +103,9 @@ before_test:
 
 test_script:
   # - "cisrun cis_interface/examples/SaM/SaM_c.yml"
-  # - "nosetests --nologcapture --with-coverage --cover-package=cis_interface -svx cis_interface/examples/tests/test_SaM.py"
+  - "nosetests --nologcapture --with-coverage --cover-package=cis_interface -svx cis_interface/examples/tests/test_SaM.py"
   - "nosetests --nologcapture --with-coverage --cover-package=cis_interface -svx cis_interface/drivers/tests/"
+
 
 after_test:
   - "codecov"
