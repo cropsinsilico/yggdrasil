@@ -20,7 +20,7 @@ all: gcc_model
 gcc_model: $(OBJ)
 	$(LINK) /OUT:$@.exe $** $(LIBS)
 
-{$SDIR}.c{$ODIR}.o:
+{$(SDIR)}.c{$(ODIR)}.o:
 	$(CC) /c $< -Fo$@ $(CFLAGS)
 
 clean:
