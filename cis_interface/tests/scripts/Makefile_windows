@@ -10,7 +10,6 @@ LIBS = $(CISLDFLAGS)
 
 _DEPS = hellofunc.h
 DEPS = $(IDIR)\$(_DEPS: = $(IDIR)\)
-echo DEPS=%DEPS%
 
 _OBJ = gcc_model.o hellofunc.o
 OBJ = $(ODIR)\$(_OBJ: = $(ODIR)\)
