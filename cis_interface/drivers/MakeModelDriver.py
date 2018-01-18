@@ -1,5 +1,5 @@
 import os
-from cis_interface import tools
+from cis_interface import tools, platform
 from cis_interface.drivers.ModelDriver import ModelDriver
 from cis_interface.drivers import GCCModelDriver
 
@@ -32,7 +32,7 @@ class MakeModelDriver(ModelDriver):
         args (str, list): Executable that should be created (make target) and
             any arguments for the executable.
         make_command (str, optional): Command that should be used for make.
-            Defaults to 'make'
+            Defaults to 'make' on linux/osx and 'nmake' on windows.
         makefile (str, optional): Path to make file either relative to makedir
             or absolute. Defaults to Makefile.
         makedir (str, optional): Directory where make should be invoked from
@@ -49,11 +49,16 @@ class MakeModelDriver(ModelDriver):
         makefile (str): Path to make file either relative to makedir or absolute.
 
     """
-    def __init__(self, name, args, make_command='make', makedir=None,
+    def __init__(self, name, args, make_command=None, makedir=None,
                  makefile=None, **kwargs):
         super(MakeModelDriver, self).__init__(name, args, **kwargs)
         self.debug()
         self.compiled = False
+        if make_command is None:
+            if platform._is_win:
+                make_command = 'nmake'
+            else:
+                make_command = 'make'
         self.target = self.args[0]
         if makedir is None:
             if (makefile is not None) and os.path.isabs(makefile):
