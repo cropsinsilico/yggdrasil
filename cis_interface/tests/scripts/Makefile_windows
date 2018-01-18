@@ -9,10 +9,10 @@ LDIR = .
 LIBS = $(CISLDFLAGS)
 
 _DEPS = hellofunc.h
-DEPS = $(IDIR)\\$(_DEPS: = $(IDIR)\\)
+DEPS = $(IDIR)\$(_DEPS: = $(IDIR)\)
 
 _OBJ = gcc_model.o hellofunc.o
-OBJ = $(ODIR)\\$(_OBJ: = $(ODIR)\\)
+OBJ = $(ODIR)\$(_OBJ: = $(ODIR)\)
 
 .PHONY: all
 all: gcc_model
