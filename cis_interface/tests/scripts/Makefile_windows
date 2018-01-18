@@ -18,10 +18,10 @@ OBJ = $(patsubst %,$(ODIR)\\%,$(_OBJ))
 all: gcc_model
 
 $(ODIR)\%.o: %.c $(DEPS)
-	$(CC) /c /Fo$@ $< $(CFLAGS)
+	$(CC) /c %< /Fo$@ $(CFLAGS)
 
 gcc_model: $(OBJ)
-	$(LINK) /OUT:$@.exe $^ $(CFLAGS) $(LIBS)
+	$(LINK) /OUT:$@.exe $^ $(LIBS)
 
 clean:
 	rm -f $(ODIR)\\\*.o \*~ gcc_model.exe $(IDIR)\*\~ 

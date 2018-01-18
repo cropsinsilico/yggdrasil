@@ -1,6 +1,7 @@
 
 # Copies of test input files
 cis_interface/tests/scripts/gcc_model.out
+cis_interface/tests/scripts/Makefile
 
 # Intermediate docs
 README.rst
