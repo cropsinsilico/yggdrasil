@@ -215,6 +215,7 @@ comm_t new_comm(char *address, const char *direction, const comm_type t,
 static inline
 comm_t init_comm(const char *name, const char *direction, const comm_type t,
 		 void *seri_info) {
+  printf("here\n");
   cislog_debug("init_comm: Initializing comm.");
   comm_t *ret = init_comm_base(name, direction, t, seri_info);
   int flag = init_comm_type(ret);
