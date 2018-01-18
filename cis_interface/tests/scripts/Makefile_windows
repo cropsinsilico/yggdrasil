@@ -1,11 +1,12 @@
 IDIR = .
-CC = gcc
+CC = cl.exe
+LINK = link.exe
 CFLAGS = -I$(IDIR) $(CISCCFLAGS)
 
 ODIR = .
 LDIR = .
 
-LIBS = -lm $(CISLDFLAGS)
+LIBS = $(CISLDFLAGS)
 
 _DEPS = hellofunc.h
 DEPS = $(patsubst %,$(IDIR)/%,$(_DEPS))
@@ -13,14 +14,14 @@ DEPS = $(patsubst %,$(IDIR)/%,$(_DEPS))
 _OBJ = gcc_model.o hellofunc.o
 OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 
+.PHONY: all
+all: gcc_model
 
 $(ODIR)/%.o: %.c $(DEPS)
-	$(CC) -c -o $@ $< $(CFLAGS)
+	$(CC) /c /Fo$@ $< $(CFLAGS)
 
 gcc_model: $(OBJ)
-	$(CC) -o $@ $^ $(CFLAGS) $(LIBS)
-
-.PHONY: clean
+	$(LINK) /OUT:$@.exe $^ $(CFLAGS) $(LIBS)
 
 clean:
-	rm -f $(ODIR)/*.o *~ gcc_model $(INCDIR)/*~ 
+	del $(ODIR)/*.o *~ gcc_model.exe $(IDIR)/*~ 

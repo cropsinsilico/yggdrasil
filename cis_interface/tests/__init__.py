@@ -1,5 +1,6 @@
 """Testing things."""
 import os
+import shutil
 import uuid
 import importlib
 import unittest
@@ -10,7 +11,7 @@ from cis_interface.config import cis_cfg, cfg_logging
 from cis_interface.tools import CIS_MSG_MAX as maxMsgSize
 from cis_interface.backwards import pickle, BytesIO
 from cis_interface.dataio.AsciiTable import AsciiTable
-from cis_interface import backwards
+from cis_interface import backwards, platform
 
 # Test data
 data_dir = os.path.join(os.path.dirname(__file__), 'data')
@@ -46,6 +47,13 @@ yaml_list = [
     ('python', 'python_model.yml'),
     ('error', 'error_model.yml')]
 yamls = {k: os.path.join(yaml_dir, v) for k, v in yaml_list}
+
+# Makefile
+if platform._is_win:
+    makefile0 = os.path.join(script_dir, "Makefile_windows")
+else:
+    makefile0 = os.path.join(script_dir, "Makefile_linux")
+shutil.copy(makefile0, os.path.join(script_dir, "Makefile"))
 
 
 class CisTest(unittest.TestCase):
