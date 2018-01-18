@@ -23,5 +23,10 @@ gcc_model: $(OBJ)
 {$(SDIR)}.c{$(ODIR)}.o:
 	$(CC) /c $< -Fo$@ $(CFLAGS)
 
+{$(SDIR)}.cpp{$(ODIR)}.o:
+	$(CC) /c $< -Fo$@ $(CFLAGS)
+
+($OBJ) :
+
 clean:
 	rm -f $(ODIR)\\\*.o \*~ gcc_model.exe $(IDIR)\*\~ 
