@@ -160,6 +160,7 @@ int init_comm_type(comm_t *x) {
     cislog_error("init_comm_type: Unsupported comm_type %d", t);
     flag = -1;
   }
+  cislog_debug("init_comm_type(%s): Done", x->name);
   return flag;
 };
 
@@ -214,18 +215,20 @@ comm_t new_comm(char *address, const char *direction, const comm_type t,
 static inline
 comm_t init_comm(const char *name, const char *direction, const comm_type t,
 		 void *seri_info) {
+  cislog_debug("init_comm: Initializing comm.");
   comm_t *ret = init_comm_base(name, direction, t, seri_info);
   int flag = init_comm_type(ret);
   if (flag < 0) {
-    cislog_error("init_comm: Could not initialize comm.");
+    cislog_error("init_comm(%s): Could not initialize comm.", name);
     ret->valid = 0;
   } else {
     flag = register_comm(ret);
     if (flag < 0) {
-      cislog_error("init_comm: Failed to register new comm.");
+      cislog_error("init_comm(%s): Failed to register new comm.", name);
       ret->valid = 0;
     }
   }
+  cislog_debug("init_comm(%s): Initialized comm.", ret->name);
   return ret[0];
 };
 
