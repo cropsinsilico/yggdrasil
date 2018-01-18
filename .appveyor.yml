@@ -102,9 +102,7 @@ before_test:
   - "flake8 cis_interface"
 
 test_script:
-  # - "cisrun cis_interface/examples/SaM/SaM_c.yml"
   # - "nosetests --nologcapture --with-coverage --cover-package=cis_interface -svx cis_interface/examples/tests/test_gs_lesson3.py"
-  # - "nosetests --nologcapture --with-coverage --cover-package=cis_interface -svx cis_interface/interface/tests/"
   - "nosetests --nologcapture --with-coverage --cover-package=cis_interface -svx cis_interface/drivers/tests/test_MakeModelDriver.py"
 
 
