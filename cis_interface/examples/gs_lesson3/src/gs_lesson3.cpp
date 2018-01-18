@@ -2,6 +2,8 @@
 // Include methods for input/output channels
 #include "PsiInterface.hpp"
 
+#define BUFSIZ 1000
+
 int main(int argc, char *argv[]) {
   // Initialize input/output channels
   PsiInput in_channel("input");
@@ -9,8 +11,7 @@ int main(int argc, char *argv[]) {
 
   // Declare resulting variables and create buffer for received message
   int flag = 1;
-  const int bufsiz = 1000;
-  char buf[bufsiz];
+  char buf[BUFSIZ];
 
   // Loop until there is no longer input or the queues are closed
   while (flag >= 0) {
@@ -18,7 +19,7 @@ int main(int argc, char *argv[]) {
     // Receive input from input channel
     // If there is an error or the queue is closed, the flag will be negative
     // Otherwise, it is the size of the received message
-    flag = in_channel.recv(buf, bufsiz);
+    flag = in_channel.recv(buf, BUFSIZ);
     if (flag < 0) {
       std::cout << "No more input." << std::endl;
       break;
