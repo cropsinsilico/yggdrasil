@@ -1,10 +1,10 @@
-IDIR = $(MAKEDIR)
+IDIR = .
 CC = cl.exe
 LINK = link.exe
 CFLAGS = /I$(IDIR) $(CISCCFLAGS)
 
-ODIR = $(MAKEDIR)
-LDIR = $(MAKEDIR)
+SDIR = .
+ODIR = .
 
 LIBS = $(CISLDFLAGS)
 
@@ -20,7 +20,7 @@ all: gcc_model
 gcc_model: $(OBJ)
 	$(LINK) /OUT:$@.exe $** $(LIBS)
 
-$(ODIR)\%.o: %.c $(DEPS)
+{$SDIR}.c{$ODIR}.o: $(DEPS)
 	$(CC) /c $< -Fo$@ $(CFLAGS)
 
 clean:
