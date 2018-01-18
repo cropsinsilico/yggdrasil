@@ -1,15 +1,16 @@
-IDIR = .
+IDIR = $(MAKEDIR)
 CC = cl.exe
 LINK = link.exe
 CFLAGS = /I$(IDIR) $(CISCCFLAGS)
 
-ODIR = .
-LDIR = .
+ODIR = $(MAKEDIR)
+LDIR = $(MAKEDIR)
 
 LIBS = $(CISLDFLAGS)
 
 _DEPS = hellofunc.h
 DEPS = $(IDIR)\$(_DEPS: = $(IDIR)\)
+echo DEPS=%DEPS%
 
 _OBJ = gcc_model.o hellofunc.o
 OBJ = $(ODIR)\$(_OBJ: = $(ODIR)\)
@@ -17,7 +18,7 @@ OBJ = $(ODIR)\$(_OBJ: = $(ODIR)\)
 .PHONY: all
 all: gcc_model
 
-$(ODIR)\\%.o: %.c $(DEPS)
+$(ODIR)\%.o: %.c $(DEPS)
 	$(CC) /c %< -Fo$@ $(CFLAGS)
 
 gcc_model: $(OBJ)
