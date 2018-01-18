@@ -8,20 +8,18 @@ ODIR = .
 
 LIBS = $(CISLDFLAGS)
 
-_DEPS = hellofunc.h
-DEPS = $(IDIR)\$(_DEPS: = $(IDIR)\)
+DEPS = $(IDIR)\hellofunc.h
 
-_OBJ = gcc_model.o hellofunc.o
-OBJ = $(ODIR)\$(_OBJ: = $(ODIR)\)
+OBJ = $(ODIR)\gcc_model.o $(ODIR)\hellofunc.o
 
 .PHONY: all
 all: gcc_model
 
 gcc_model: $(OBJ)
-	@echo $(OBJ)
 	$(LINK) /OUT:$@.exe $** $(LIBS)
 
 {$(SDIR)}.c{$(ODIR)}.o:
+	@echo $(OBJ)
 	$(CC) /c $< -Fo$@ $(CFLAGS)
 
 {$(SDIR)}.cpp{$(ODIR)}.o:
