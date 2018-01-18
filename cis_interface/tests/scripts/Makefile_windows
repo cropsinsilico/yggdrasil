@@ -17,7 +17,7 @@ OBJ = $(ODIR)\$(_OBJ: = $(ODIR)\)
 .PHONY: all
 all: gcc_model
 
-$(ODIR)\%.o: %.c $(DEPS)
+$(ODIR)\\%.o: %.c $(DEPS)
 	$(CC) /c %< -Fo$@ $(CFLAGS)
 
 gcc_model: $(OBJ)
