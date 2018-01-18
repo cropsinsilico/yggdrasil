@@ -130,8 +130,10 @@ class ModelDriver(Driver):
             while self.process is not None:
                 line = out.readline()
                 if len(line) == 0:
-                    break
-                queue.put(line)
+                    self.debug("Empty line from stdout")
+                    # break
+                else:
+                    queue.put(line)
         except BaseException:  # pragma: debug
             self.error("Error getting output")
             raise
