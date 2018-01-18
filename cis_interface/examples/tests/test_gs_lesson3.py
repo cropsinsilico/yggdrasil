@@ -1,4 +1,5 @@
 import os
+import time
 import nose.tools as nt
 from cis_interface.examples.tests import TestExample
 
@@ -22,6 +23,7 @@ class TestExampleGS3(TestExample):
 
     def check_result(self):
         r"""Assert that contents of input/output files are identical."""
+        time.sleep(10)
         assert(os.path.isfile(self.input_file))
         assert(os.path.isfile(self.output_file))
         with open(self.input_file, 'r') as fd:

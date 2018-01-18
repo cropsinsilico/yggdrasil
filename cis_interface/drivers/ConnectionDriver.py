@@ -299,6 +299,9 @@ class ConnectionDriver(Driver):
         T = self.start_timeout(self.timeout_send_1st)
         flag = self._send_message(*args, **kwargs)
         self.ocomm.suppress_special_debug = True
+        if not flag:
+            self.debug("1st send failed, will keep trying for %f s in silence.",
+                       float(self.timeout_send_1st))
         while (not T.is_out) and (not flag) and self.ocomm.is_open:
             flag = self._send_message(*args, **kwargs)
             if not flag:
