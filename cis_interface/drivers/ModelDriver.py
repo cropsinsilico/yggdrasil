@@ -2,6 +2,7 @@
 # This should not be used directly by modelers
 #
 import os
+import sys
 import copy
 from pprint import pformat
 from cis_interface import backwards, platform, tools
@@ -170,6 +171,7 @@ class ModelDriver(Driver):
                 self.debug("No more output")
                 return False
             self.print_encoded(line, end="")
+            sys.stdout.flush()
         return True
 
     def run_finalize(self):
