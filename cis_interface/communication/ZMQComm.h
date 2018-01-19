@@ -99,35 +99,35 @@ int init_zmq_comm(comm_t *comm) {
     cislog_error("init_zmq_address: Could not initialize empty socket.");
     return -1;
   }
-  zsock_set_linger(s, 100);
-  /* int port = zsock_bind(s, comm->address); */
-  /* if (port == -1) { */
-  /*   cislog_error("init_zmq_address: Could not bind socket to address = %s", */
+  /* zsock_set_linger(s, 100); */
+  /* /\* int port = zsock_bind(s, comm->address); *\/ */
+  /* /\* if (port == -1) { *\/ */
+  /* /\*   cislog_error("init_zmq_address: Could not bind socket to address = %s", *\/ */
+  /* /\* 		 comm->address); *\/ */
+  /* /\*   return -1; *\/ */
+  /* /\* } *\/ */
+  /* /\* if (strlen(comm->name) == 0) *\/ */
+  /* /\*  sprintf(comm->name, "tempinitZMQ-%d", port); *\/ */
+  /* /\* if (0) { *\/ */
+  /* /\* if (strcmp(comm->direction, "send") == 0) { *\/ */
+  /* /\*   ret = zsock_bind(s, "%s", comm->address); *\/ */
+  /* /\*   if (ret == -1) { *\/ */
+  /* /\*     cislog_error("new_zmq_address: Could not bind socket to address = %s", *\/ */
+  /* /\* 		   comm->address); *\/ */
+  /* /\*     return ret; *\/ */
+  /* /\*   } *\/ */
+  /* /\* } else { *\/ */
+  /* ret = zsock_connect(s, "%s", comm->address); */
+  /* if (ret == -1) { */
+  /*   cislog_error("new_zmq_address: Could not connect socket to address = %s", */
   /* 		 comm->address); */
-  /*   return -1; */
+  /*   return ret; */
   /* } */
+  /* /\* } *\/ */
   /* if (strlen(comm->name) == 0) */
-  /*  sprintf(comm->name, "tempinitZMQ-%d", port); */
-  /* if (0) { */
-  /* if (strcmp(comm->direction, "send") == 0) { */
-  /*   ret = zsock_bind(s, "%s", comm->address); */
-  /*   if (ret == -1) { */
-  /*     cislog_error("new_zmq_address: Could not bind socket to address = %s", */
-  /* 		   comm->address); */
-  /*     return ret; */
-  /*   } */
-  /* } else { */
-  ret = zsock_connect(s, "%s", comm->address);
-  if (ret == -1) {
-    cislog_error("new_zmq_address: Could not connect socket to address = %s",
-		 comm->address);
-    return ret;
-  }
-  /* } */
-  if (strlen(comm->name) == 0)
-    sprintf(comm->name, "tempinitZMQ-%s", comm->address);
-  // Asign to void pointer
-  comm->handle = (void*)s;
+  /*   sprintf(comm->name, "tempinitZMQ-%s", comm->address); */
+  /* // Asign to void pointer */
+  /* comm->handle = (void*)s; */
   return 0;
 };
 

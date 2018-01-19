@@ -160,7 +160,7 @@ int init_comm_type(comm_t *x) {
     cislog_error("init_comm_type: Unsupported comm_type %d", t);
     flag = -1;
   }
-  cislog_debug("init_comm_type(%s): Done", x->name);
+  cislog_debug("init_comm_type(%s): Done, flag = %d", x->name, flag);
   return flag;
 };
 
