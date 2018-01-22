@@ -34,12 +34,17 @@ set LIBSODIUM_INCLUDE_DIR=%LIBSODIUM_SOURCEDIR%\src\libsodium\include
 set LIBSODIUM_LIBRARY_DIR=%LIBSODIUM_SOURCEDIR%\bin\%PLATFORM%\%CONFIGURATION%\%MSVCVERSION%\dynamic
 IF NOT EXIST %LIBSODIUM_SOURCEDIR% (
     git clone --depth 1 -b stable https://github.com/jedisct1/libsodium.git %LIBSODIUM_SOURCEDIR%
-    ECHO Building libsodium...
-    msbuild /v:minimal /p:Configuration=%CONFIGURATION%DLL %LIBSODIUM_SOURCEDIR%\builds\msvc\%MSVCYEAR%\libsodium\libsodium.vcxproj
-    ECHO Copying sodium lib...
-    move "%LIBSODIUM_LIBRARY_DIR%\libsodium.lib" "%LIBSODIUM_LIBRARY_DIR%\sodium.lib"
-    :: cd %LIBSODIUM_BUILDDIR%
-    :: CALL buildbase.bat ..\vs20%DIRVER%\libsodium.sln %VSVER%
+
+    cd %LIBSODIUM_SOURCEDIR%\builds\msvc\build
+    buildall.bat
+    cd ..\..\..\..
+
+    :: ECHO Building libsodium...
+    :: msbuild /v:minimal /p:Configuration=%CONFIGURATION%DLL %LIBSODIUM_SOURCEDIR%\builds\msvc\%MSVCYEAR%\libsodium\libsodium.vcxproj
+    :: ECHO Copying sodium lib...
+    :: move "%LIBSODIUM_LIBRARY_DIR%\libsodium.lib" "%LIBSODIUM_LIBRARY_DIR%\sodium.lib"
+    :: :: cd %LIBSODIUM_BUILDDIR%
+    :: :: CALL buildbase.bat ..\vs20%DIRVER%\libsodium.sln %VSVER%
 )
 
 :: Install libzmq
@@ -49,17 +54,24 @@ set LIBZMQ_BUILDDIR=%ZMQINSTALLDIR%\build_libzmq
 set ZEROMQ_INCLUDE_DIR=%LIBZMQ_SOURCEDIR%\include
 set ZEROMQ_LIBRARY_DIR=%LIBZMQ_BUILDDIR%\lib\%CONFIGURATION%
 IF NOT EXIST %LIBZMQ_SOURCEDIR% (
+    ECHO Cloning libzmq...
     git clone --depth 1 git://github.com/zeromq/libzmq.git %LIBZMQ_SOURCEDIR%
 )
 IF NOT EXIST %LIBZMQ_BUILDDIR% (
-    md %LIBZMQ_BUILDDIR%
-    cd %LIBZMQ_BUILDDIR%
-    ECHO CMake libzmq...
-    cmake -D CMAKE_INCLUDE_PATH="%LIBSODIUM_INCLUDE_DIR%"  -D CMAKE_LIBRARY_PATH="%LIBSODIUM_LIBRARY_DIR%" -D CMAKE_CXX_FLAGS_RELEASE="/MT" -D CMAKE_CXX_FLAGS_DEBUG="/MTd" -G "%CMAKE_GENERATOR%" %LIBZMQ_SOURCEDIR%
-    ECHO Building libzmq...
-    msbuild /v:minimal /p:Configuration=%CONFIGURATION% libzmq.vcxproj
-    ECHO Copying zmq lib...
-    move "%ZEROMQ_LIBRARY_DIR%\libzmq-*lib" "%ZEROMQ_LIBRARY_DIR%\zmq.lib"
+    cd %LIBZMQ_SOURCEDIR%\builds\msvc
+    configure.bat
+    cd build
+    buildall.bat
+    cd ..\..\..\..
+
+    :: md %LIBZMQ_BUILDDIR%
+    :: cd %LIBZMQ_BUILDDIR%
+    :: ECHO CMake libzmq...
+    :: cmake -D CMAKE_INCLUDE_PATH="%LIBSODIUM_INCLUDE_DIR%"  -D CMAKE_LIBRARY_PATH="%LIBSODIUM_LIBRARY_DIR%" -D CMAKE_CXX_FLAGS_RELEASE="/MT" -D CMAKE_CXX_FLAGS_DEBUG="/MTd" -G "%CMAKE_GENERATOR%" %LIBZMQ_SOURCEDIR%
+    :: ECHO Building libzmq...
+    :: msbuild /v:minimal /p:Configuration=%CONFIGURATION% libzmq.vcxproj
+    :: ECHO Copying zmq lib...
+    :: move "%ZEROMQ_LIBRARY_DIR%\libzmq-*lib" "%ZEROMQ_LIBRARY_DIR%\zmq.lib"
 )
 
 :: Install czmq
@@ -73,12 +85,18 @@ IF NOT EXIST %CZMQ_SOURCEDIR% (
     git clone git://github.com/zeromq/czmq.git %CZMQ_SOURCEDIR%
 )
 IF NOT EXIST %CZMQ_BUILDDIR% (
-    md %CZMQ_BUILDDIR%
-    cd %CZMQ_BUILDDIR%
-    ECHO CMake czmq...
-    cmake -G "%CMAKE_GENERATOR%" -D CMAKE_INCLUDE_PATH="%ZEROMQ_INCLUDE_DIR%;%LIBSODIUM_INCLUDE_DIR%" -D CMAKE_LIBRARY_PATH="%ZEROMQ_LIBRARY_DIR%;%LIBSODIUM_LIBRARY_DIR%" -D CMAKE_C_FLAGS_RELEASE="/MT" -D CMAKE_CXX_FLAGS_RELEASE="/MT" -D CMAKE_C_FLAGS_DEBUG="/MTd" %CZMQ_SOURCEDIR%
-    ECHO Building czmq...
-    msbuild /v:minimal /p:Configuration=%CONFIGURATION% czmq.vcxproj
+    cd %CZMQ_SOURCEDIR%\builds\msvc
+    configure.bat
+    cd %MSVCYEAR%
+    build.bat
+    cd ..\..\..\..
+
+    :: md %CZMQ_BUILDDIR%
+    :: cd %CZMQ_BUILDDIR%
+    :: ECHO CMake czmq...
+    :: cmake -G "%CMAKE_GENERATOR%" -D CMAKE_INCLUDE_PATH="%ZEROMQ_INCLUDE_DIR%;%LIBSODIUM_INCLUDE_DIR%" -D CMAKE_LIBRARY_PATH="%ZEROMQ_LIBRARY_DIR%;%LIBSODIUM_LIBRARY_DIR%" -D CMAKE_C_FLAGS_RELEASE="/MT" -D CMAKE_CXX_FLAGS_RELEASE="/MT" -D CMAKE_C_FLAGS_DEBUG="/MTd" %CZMQ_SOURCEDIR%
+    :: ECHO Building czmq...
+    :: msbuild /v:minimal /p:Configuration=%CONFIGURATION% czmq.vcxproj
 )
 
 :: Finalize and print stop time
