@@ -129,16 +129,16 @@ class ModelDriver(Driver):
     def enqueue_output(self, out, queue):
         r"""Method to call in thread to keep passing output to queue."""
         try:
-            for line in iter(out.readline, backwards.unicode2bytes('')):
-                self.debug("Queuing output: %s", line)
-                queue.put(line)
-            # while self.process is not None:
-            #     line = out.readline()
-            #     if len(line) == 0:
-            #         self.debug("Empty line from stdout")
-            #         break
-            #     else:
-            #         queue.put(line)
+            # for line in iter(out.readline, backwards.unicode2bytes('')):
+            #     self.debug("Queuing output: %s", line)
+            #     queue.put(line)
+            while self.process is not None:
+                line = out.readline()
+                if len(line) == 0:
+                    self.debug("Empty line from stdout")
+                    break
+                else:
+                    queue.put(line)
         except BaseException:  # pragma: debug
             self.error("Error getting output")
             raise
