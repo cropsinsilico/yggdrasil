@@ -82,6 +82,8 @@ IF NOT EXIST %CZMQ_BUILDDIR% (
     ECHO Building czmq...
     ls
     msbuild /v:minimal /p:Configuration=%CONFIGURATION% czmq.vcxproj
+    msbuild /v:minimal /p:Configuration=%CONFIGURATION% czmq_selftest.vcxproj
+    ls
 )
 
 :: Finalize and print stop time

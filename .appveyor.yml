@@ -102,9 +102,10 @@ before_test:
   - "flake8 cis_interface"
 
 test_script:
+  - "czmq_selftest.exe"
   - "ciscc cis_interface/examples/gs_lesson3/src/gs_lesson3.c"
-  - "devenv /debugexe 'C:\\projects\\cis-interface\\cis_interface\\examples\\gs_lesson3\\src\\gs_lesson3_c'"
-  - "cdb.exe C:\\projects\\cis-interface\\cis_interface\\examples\\gs_lesson3\\src\\gs_lesson3_c"
+  # - "devenv /debugexe 'C:\\projects\\cis-interface\\cis_interface\\examples\\gs_lesson3\\src\\gs_lesson3_c'"
+  # - "cdb.exe C:\\projects\\cis-interface\\cis_interface\\examples\\gs_lesson3\\src\\gs_lesson3_c"
   - "C:\\projects\\cis-interface\\cis_interface\\examples\\gs_lesson3\\src\\gs_lesson3_c"
   # - "nosetests --nologcapture --with-coverage --cover-package=cis_interface -svx cis_interface/examples/tests/test_gs_lesson3.py"
   # - "nosetests --nologcapture --with-coverage --cover-package=cis_interface -svx cis_interface/tests/"
