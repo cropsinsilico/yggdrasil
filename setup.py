@@ -138,6 +138,7 @@ setup(
     ],
     entry_points = {
         'console_scripts': ['cisrun=cis_interface.command_line:cisrun',
+                            'ciscc=cis_interface.command_line:ciscc',
                             'cisccflags=cis_interface.command_line:cc_flags',
                             'cisldflags=cis_interface.command_line:ld_flags'],
     },

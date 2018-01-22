@@ -1,4 +1,5 @@
 #!/usr/bin/python
+import os
 import sys
 import traceback
 from cis_interface import runner
@@ -6,7 +7,8 @@ from cis_interface.drivers import GCCModelDriver
 
 
 def cisrun():
-    prog = sys.argv[0].split('/')[-1]
+    r"""Start a run."""
+    prog = sys.argv[0].split(os.path.sep())[-1]
     models = sys.argv[1:]
     cisRunner = runner.get_runner(models, cis_debug_prefix=prog)
     try:
@@ -16,6 +18,14 @@ def cisrun():
         cisRunner.pprint("cisrun exception: %s" % type(ex))
         print(traceback.format_exc())
     print('')
+
+
+def ciscc():
+    r"""Compile C/C++ program."""
+    # prog = sys.argv[0].split(os.path.sep())[-1]
+    src = sys.argv[1:]
+    out = GCCModelDriver.do_compile(src)
+    print("executable: %s" % out)
 
 
 def cc_flags():

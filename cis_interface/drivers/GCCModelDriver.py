@@ -78,6 +78,87 @@ if platform._is_win and (not os.path.isfile(_regex_win32_lib)):
     build_regex_win32()
 
 
+def do_compile(src, out=None, cc=None, ccflags=None, ldflags=None,
+               working_dir=None):
+    r"""Compile a C/C++ program with necessary interface libraries.
+
+    Args:
+        src (list): List of source files.
+        out (str, optional): Path where compile executable should be saved.
+            Defaults to name of source file without extension on linux/osx and
+            with .exe extension on windows.
+        cc (str, optional): Compiler command. Defaults to gcc/g++ on linux/osx
+            and cl on windows.
+        ccflags (list, optional): Compiler flags. Defaults to [].
+        ldflags (list, optional): Linker flags. Defaults to [].
+        working_dir (str, optional): Working directory that input file paths are
+            relative to. Defaults to current working directory.
+
+    Returns:
+        str: Full path to the compiled executable.
+
+    """
+    if working_dir is None:
+        working_dir = os.getcwd()
+    if ccflags is None:
+        ccflags = []
+    if ldflags is None:
+        ldflags = []
+    # Change format for path (windows compat of examples)
+    if platform._is_win:
+        for i in range(len(src)):
+            src[i] = os.path.join(*(src[i].split('/')))
+    # Get primary file
+    cfile = src[0]
+    src_base, src_ext = os.path.splitext(cfile)
+    # Select compiler
+    if cc is None:
+        if platform._is_win:
+            cc = 'cl'
+        else:
+            if src_ext in ['.c']:
+                cc = 'gcc'
+            else:
+                cc = 'g++'
+    # Create/fix executable
+    if out is None:
+        if platform._is_win:
+            osuffix = '_%s.exe' % src_ext[1:]
+        else:
+            osuffix = '_%s.out' % src_ext[1:]
+        out = src_base + osuffix
+    if not os.path.isabs(out):
+        out = os.path.normpath(os.path.join(working_dir, out))
+    # Get flag specifying standard library
+    if '++' in cc and (not platform._is_win):
+        std_flag = None
+        for a in ccflags:
+            if a.startswith('-std='):
+                std_flag = a
+                break
+        if std_flag is None:
+            ccflags.append('-std=c++11')
+    # Construct compile arguments
+    compile_args = [cc]
+    if not platform._is_win:
+        compile_args += ["-o", out]
+    compile_args += src + ccflags
+    if platform._is_win:
+        compile_args += ['/link', '/out:%s' % out]
+    compile_args += ldflags
+    if os.path.isfile(out):
+        os.remove(out)
+    # Compile
+    comp_process = popen_nobuffer(compile_args)
+    output, err = comp_process.communicate()
+    exit_code = comp_process.returncode
+    print_encoded(output, end="")
+    if exit_code != 0:  # pragma: debug
+        raise RuntimeError("Compilation failed with code %d." % exit_code)
+    assert(os.path.isfile(out))
+    return out
+
+
 class GCCModelDriver(ModelDriver):
     r"""Class for running gcc compiled drivers.
 
@@ -111,32 +192,38 @@ class GCCModelDriver(ModelDriver):
         self.cc = cc
         # Prepare arguments to compile the file
         self.parse_arguments(args)
-        compile_args = [self.cc]
-        if not platform._is_win:
-            compile_args += ["-o", self.efile]
-        compile_args += self.src + self.ccflags
-        if platform._is_win:
-            compile_args += ['/link', '/out:%s' % self.efile]
-        compile_args += self.ldflags
-        if os.path.isfile(self.efile):
-            os.remove(self.efile)
-        if platform._is_win:
-            self.args = [os.path.splitext(self.efile)[0]]
-        else:
-            self.args = [os.path.join(".", self.efile)]
-        self.args += self.run_args
-        self.compiled = True
         self.debug("Compiling")
-        comp_process = popen_nobuffer(compile_args)
-        output, err = comp_process.communicate()
-        exit_code = comp_process.returncode
-        if exit_code != 0:  # pragma: debug
-            self.compiled = False
-            self.error('%s', ' '.join(compile_args))
-            self.print_encoded(output, end="")
-            raise RuntimeError("Compilation failed with code %d." % exit_code)
+        self.efile = do_compile(self.src, out=self.efile, cc=self.cc,
+                                ccflags=self.ccflags, ldflags=self.ldflags,
+                                working_dir=self.workingDir)
         assert(os.path.isfile(self.efile))
-        # self.print_encoded(output, end="")
+        self.debug("Compiled")
+        # compile_args = [self.cc]
+        # if not platform._is_win:
+        #     compile_args += ["-o", self.efile]
+        # compile_args += self.src + self.ccflags
+        # if platform._is_win:
+        #     compile_args += ['/link', '/out:%s' % self.efile]
+        # compile_args += self.ldflags
+        # if os.path.isfile(self.efile):
+        #     os.remove(self.efile)
+        # if platform._is_win:
+        #     self.args = [os.path.splitext(self.efile)[0]]
+        # else:
+        #     self.args = [os.path.join(".", self.efile)]
+        # self.args += self.run_args
+        # self.compiled = True
+        # self.debug("Compiling")
+        # comp_process = popen_nobuffer(compile_args)
+        # output, err = comp_process.communicate()
+        # exit_code = comp_process.returncode
+        # if exit_code != 0:  # pragma: debug
+        #     self.compiled = False
+        #     self.error('%s', ' '.join(compile_args))
+        #     self.print_encoded(output, end="")
+        #     raise RuntimeError("Compilation failed with code %d." % exit_code)
+        # assert(os.path.isfile(self.efile))
+        # # self.print_encoded(output, end="")
         self.compiled = True
         self.debug('Compiled executable with %s', self.cc)
 
@@ -202,40 +289,40 @@ class GCCModelDriver(ModelDriver):
         if len(self.src) == 0:
             raise RuntimeError("Could not locate a source file in the " +
                                "provided arguments.")
-        # Change format for path (windows compat of examples)
-        if platform._is_win:
-            for i in range(len(self.src)):
-                self.src[i] = os.path.join(*(self.src[i].split('/')))
-        # Get pimary file
-        self.cfile = self.src[0]
-        src_base, src_ext = os.path.splitext(self.cfile)
-        # Select compiler
-        if self.cc is None:
-            if platform._is_win:
-                self.cc = 'cl'
-            else:
-                if src_ext in '.c':
-                    self.cc = 'gcc'
-                else:
-                    self.cc = 'g++'
-        # Create/fix executable
-        if self.efile is None:
-            if platform._is_win:
-                osuffix = '_%s.exe' % src_ext[1:]
-            else:
-                osuffix = '_%s.out' % src_ext[1:]
-            self.efile = src_base + osuffix
-        if not os.path.isabs(self.efile):
-            self.efile = os.path.normpath(os.path.join(self.workingDir, self.efile))
-        # Get flag specifying standard library
-        if '++' in self.cc and (not platform._is_win):
-            std_flag = None
-            for a in self.ccflags:
-                if a.startswith('-std='):
-                    std_flag = a
-                    break
-            if std_flag is None:
-                self.ccflags.append('-std=c++11')
+        # # Change format for path (windows compat of examples)
+        # if platform._is_win:
+        #     for i in range(len(self.src)):
+        #         self.src[i] = os.path.join(*(self.src[i].split('/')))
+        # # Get pimary file
+        # self.cfile = self.src[0]
+        # src_base, src_ext = os.path.splitext(self.cfile)
+        # # Select compiler
+        # if self.cc is None:
+        #     if platform._is_win:
+        #         self.cc = 'cl'
+        #     else:
+        #         if src_ext in '.c':
+        #             self.cc = 'gcc'
+        #         else:
+        #             self.cc = 'g++'
+        # # Create/fix executable
+        # if self.efile is None:
+        #     if platform._is_win:
+        #         osuffix = '_%s.exe' % src_ext[1:]
+        #     else:
+        #         osuffix = '_%s.out' % src_ext[1:]
+        #     self.efile = src_base + osuffix
+        # if not os.path.isabs(self.efile):
+        #     self.efile = os.path.normpath(os.path.join(self.workingDir, self.efile))
+        # # Get flag specifying standard library
+        # if '++' in self.cc and (not platform._is_win):
+        #     std_flag = None
+        #     for a in self.ccflags:
+        #         if a.startswith('-std='):
+        #             std_flag = a
+        #             break
+        #     if std_flag is None:
+        #         self.ccflags.append('-std=c++11')
         
     def run(self):
         r"""Run the compiled executable if it exists."""
