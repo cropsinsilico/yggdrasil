@@ -62,24 +62,21 @@ IF NOT EXIST %LIBZMQ_SOURCEDIR% (
 )
 IF NOT EXIST %LIBZMQ_BUILDDIR% (
 
-    :: Version quoted in README
-    cd %LIBZMQ_SOURCEDIR%\builds\msvc
-    ECHO Configuring libzmq...
-    configure.bat
-    cd build
-    ECHO Building libzmq...
-    buildall.bat
-    cd ..\..\..\..
-
-    :: :: Version based on .appveyor.yml
-    :: md %LIBZMQ_BUILDDIR%
-    :: cd %LIBZMQ_BUILDDIR%
-    :: ECHO CMake libzmq...
-    :: cmake -D CMAKE_INCLUDE_PATH="%LIBSODIUM_INCLUDE_DIR%"  -D CMAKE_LIBRARY_PATH="%LIBSODIUM_LIBRARY_DIR%" -D CMAKE_CXX_FLAGS_RELEASE="/MT" -D CMAKE_CXX_FLAGS_DEBUG="/MTd" -G "%CMAKE_GENERATOR%" %LIBZMQ_SOURCEDIR%
+    :: :: Version quoted in README
+    :: cd %LIBZMQ_SOURCEDIR%\builds\msvc\build
     :: ECHO Building libzmq...
-    :: msbuild /v:minimal /p:Configuration=%CONFIGURATION% libzmq.vcxproj
-    :: ECHO Copying zmq lib...
-    :: move "%ZEROMQ_LIBRARY_DIR%\libzmq-*lib" "%ZEROMQ_LIBRARY_DIR%\zmq.lib"
+    :: build.bat
+    :: cd ..\..\..\..
+
+    :: Version based on .appveyor.yml
+    md %LIBZMQ_BUILDDIR%
+    cd %LIBZMQ_BUILDDIR%
+    ECHO CMake libzmq...
+    cmake -D CMAKE_INCLUDE_PATH="%LIBSODIUM_INCLUDE_DIR%"  -D CMAKE_LIBRARY_PATH="%LIBSODIUM_LIBRARY_DIR%" -D CMAKE_CXX_FLAGS_RELEASE="/MT" -D CMAKE_CXX_FLAGS_DEBUG="/MTd" -G "%CMAKE_GENERATOR%" %LIBZMQ_SOURCEDIR%
+    ECHO Building libzmq...
+    msbuild /v:minimal /p:Configuration=%CONFIGURATION% libzmq.vcxproj
+    ECHO Copying zmq lib...
+    move "%ZEROMQ_LIBRARY_DIR%\libzmq-*lib" "%ZEROMQ_LIBRARY_DIR%\zmq.lib"
 )
 
 :: Install czmq
@@ -94,22 +91,23 @@ IF NOT EXIST %CZMQ_SOURCEDIR% (
 )
 IF NOT EXIST %CZMQ_BUILDDIR% (
 
-    :: Version quoted in README
-    cd %CZMQ_SOURCEDIR%\builds\msvc
-    ECHO Configuring czmq...
-    configure.bat
-    cd %MSVCYEAR%
-    ECHO Building czmq...
-    build.bat
-    cd ..\..\..\..
-
-    :: :: Version based on .appveyor.yml
-    :: md %CZMQ_BUILDDIR%
-    :: cd %CZMQ_BUILDDIR%
-    :: ECHO CMake czmq...
-    :: cmake -G "%CMAKE_GENERATOR%" -D CMAKE_INCLUDE_PATH="%ZEROMQ_INCLUDE_DIR%;%LIBSODIUM_INCLUDE_DIR%" -D CMAKE_LIBRARY_PATH="%ZEROMQ_LIBRARY_DIR%;%LIBSODIUM_LIBRARY_DIR%" -D CMAKE_C_FLAGS_RELEASE="/MT" -D CMAKE_CXX_FLAGS_RELEASE="/MT" -D CMAKE_C_FLAGS_DEBUG="/MTd" %CZMQ_SOURCEDIR%
+    :: :: Version quoted in README
+    :: cd %CZMQ_SOURCEDIR%\builds\msvc
+    :: ECHO Configuring czmq...
+    :: configure.bat
+    :: cd %MSVCYEAR%
     :: ECHO Building czmq...
-    :: msbuild /v:minimal /p:Configuration=%CONFIGURATION% czmq.vcxproj
+    :: build.bat
+    :: cd ..\..\..\..
+
+    :: Version based on .appveyor.yml
+    md %CZMQ_BUILDDIR%
+    cd %CZMQ_BUILDDIR%
+    ECHO CMake czmq...
+    cmake -G "%CMAKE_GENERATOR%" -D CMAKE_INCLUDE_PATH="%ZEROMQ_INCLUDE_DIR%;%LIBSODIUM_INCLUDE_DIR%" -D CMAKE_LIBRARY_PATH="%ZEROMQ_LIBRARY_DIR%;%LIBSODIUM_LIBRARY_DIR%" -D CMAKE_C_FLAGS_RELEASE="/MT" -D CMAKE_CXX_FLAGS_RELEASE="/MT" -D CMAKE_C_FLAGS_DEBUG="/MTd" %CZMQ_SOURCEDIR%
+    ECHO Building czmq...
+    ls
+    msbuild /v:minimal /p:Configuration=%CONFIGURATION% czmq.vcxproj
 )
 
 :: Finalize and print stop time
