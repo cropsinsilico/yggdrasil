@@ -33,15 +33,8 @@ set LIBSODIUM_BUILDDIR=%LIBSODIUM_SOURCEDIR%\builds\msvc\build
 set LIBSODIUM_INCLUDE_DIR=%LIBSODIUM_SOURCEDIR%\src\libsodium\include
 set LIBSODIUM_LIBRARY_DIR=%LIBSODIUM_SOURCEDIR%\bin\%PLATFORM%\%CONFIGURATION%\%MSVCVERSION%\dynamic
 IF NOT EXIST %LIBSODIUM_SOURCEDIR% (
+    ECHO Cloning libsodium...
     git clone --depth 1 -b stable https://github.com/jedisct1/libsodium.git %LIBSODIUM_SOURCEDIR%
-
-    :: :: Version quoted in README
-    :: cd %LIBSODIUM_SOURCEDIR%\builds\msvc\build
-    :: ECHO Building libsodium...
-    :: buildall.bat
-    :: cd ..\..\..\..
-
-    :: Version based on .appveyor.yml
     ECHO Building libsodium...
     msbuild /v:minimal /p:Configuration=%CONFIGURATION%DLL %LIBSODIUM_SOURCEDIR%\builds\msvc\%MSVCYEAR%\libsodium\libsodium.vcxproj
     ECHO Copying sodium lib...
@@ -61,14 +54,6 @@ IF NOT EXIST %LIBZMQ_SOURCEDIR% (
     git clone --depth 1 git://github.com/zeromq/libzmq.git %LIBZMQ_SOURCEDIR%
 )
 IF NOT EXIST %LIBZMQ_BUILDDIR% (
-
-    :: :: Version quoted in README
-    :: cd %LIBZMQ_SOURCEDIR%\builds\msvc\build
-    :: ECHO Building libzmq...
-    :: build.bat
-    :: cd ..\..\..\..
-
-    :: Version based on .appveyor.yml
     md %LIBZMQ_BUILDDIR%
     cd %LIBZMQ_BUILDDIR%
     ECHO CMake libzmq...
@@ -90,17 +75,6 @@ IF NOT EXIST %CZMQ_SOURCEDIR% (
     git clone git://github.com/zeromq/czmq.git %CZMQ_SOURCEDIR%
 )
 IF NOT EXIST %CZMQ_BUILDDIR% (
-
-    :: :: Version quoted in README
-    :: cd %CZMQ_SOURCEDIR%\builds\msvc
-    :: ECHO Configuring czmq...
-    :: configure.bat
-    :: cd %MSVCYEAR%
-    :: ECHO Building czmq...
-    :: build.bat
-    :: cd ..\..\..\..
-
-    :: Version based on .appveyor.yml
     md %CZMQ_BUILDDIR%
     cd %CZMQ_BUILDDIR%
     ECHO CMake czmq...
