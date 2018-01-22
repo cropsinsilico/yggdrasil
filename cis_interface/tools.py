@@ -47,7 +47,6 @@ def is_zmq_installed():
         bool: True if both libraries are installed, False otherwise.
 
     """
-    print("!!!!!!!!!!!!!!!!!!!!IS_ZMQ_INSTALLED")
     # Check existence of files
     check_files = ['zmq.h', 'czmq.h']
     if platform._is_win:
