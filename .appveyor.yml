@@ -48,7 +48,7 @@ install:
   # Setup Visual C++ toolset
   # TODO: Generic case. This is specific to 64bit VS 2015/2017 (14.0/16.0)
   - if "%MSVCVER%" == "16" if /I "%PLATFORM%" == "x64" call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars64.bat"
-  - if "%MSVCVER%" == "14" if /I "%PLATFORM%" == "x64" call "C:\Program Files\Microsoft SDKs\Windows\v7.1\Bin\SetEnv.cmd" /x64 /release
+  - if "%MSVCVER%" == "14" if /I "%PLATFORM%" == "x64" call "C:\Program Files\Microsoft SDKs\Windows\v7.1\Bin\SetEnv.cmd" /x64 /debug
   - if "%MSVCVER%" == "14" if /I "%PLATFORM%" == "x64" call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" amd64
 
   # Create a conda environment
@@ -89,11 +89,11 @@ install:
 
 cache:
   - '%LOCALAPPDATA%\pip\Cache'
-  - libsodium    -> ci\install-czmq_windows.bat
-  - libzmq       -> ci\install-czmq_windows.bat
-  - build_libzmq -> ci\install-czmq_windows.bat
-  - czmq         -> ci\install-czmq_windows.bat
-  - build_czmq   -> ci\install-czmq_windows.bat
+  # - libsodium    -> ci\install-czmq_windows.bat
+  # - libzmq       -> ci\install-czmq_windows.bat
+  # - build_libzmq -> ci\install-czmq_windows.bat
+  # - czmq         -> ci\install-czmq_windows.bat
+  # - build_czmq   -> ci\install-czmq_windows.bat
 
 # Not a .NET project
 build: false
