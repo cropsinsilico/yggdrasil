@@ -103,7 +103,7 @@ before_test:
 
 test_script:
   - "ciscc cis_interface/examples/gs_lesson3/src/gs_lesson3.c"
-  - "C:\projects\cis-interface\cis_interface\examples\gs_lesson3\src\gs_lesson3_c"
+  - "C:\\projects\\cis-interface\\cis_interface\\examples\\gs_lesson3\\src\\gs_lesson3_c"
   # - "nosetests --nologcapture --with-coverage --cover-package=cis_interface -svx cis_interface/examples/tests/test_gs_lesson3.py"
   # - "nosetests --nologcapture --with-coverage --cover-package=cis_interface -svx cis_interface/tests/"
 
