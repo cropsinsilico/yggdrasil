@@ -15,16 +15,18 @@ def test_is_ipc_installed():
 
 def test_popen_nobuffer():
     r"""Test open of process without buffer."""
+    ans = os.getcwd() + '\n'
+    # ans = backwards.unicode2bytes(os.getcwd() + '\n')
     # Test w/o shell
     args = ['pwd']
     p = tools.popen_nobuffer(args)
     out, err = p.communicate()
-    nt.assert_equal(out, backwards.unicode2bytes(os.getcwd() + '\n'))
+    nt.assert_equal(out, ans)
     # Test w/ shell
     args = 'pwd'
     p = tools.popen_nobuffer(args, shell=True)
     out, err = p.communicate()
-    nt.assert_equal(out, backwards.unicode2bytes(os.getcwd() + '\n'))
+    nt.assert_equal(out, ans)
 
 
 def test_eval_kwarg():
