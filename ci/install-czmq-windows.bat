@@ -1,24 +1,25 @@
 @setlocal
 
 :: validate environment
-if "%VSINSTALLDIR%" == "" @echo Error: Attempt to build without proper DevStudio environment.&@goto :done
+if "%MSVCVER%" == "" @echo Error: Attempt to build without proper DevStudio environment.&@goto :done
+:: if "%VSINSTALLDIR%" == "" @echo Error: Attempt to build without proper DevStudio environment.&@goto :done
 if "%ZMQINSTALLDIR%" == "" set ZMQINSTALLDIR=C:\projects
 if "%PLATFORM%" == "" set PLATFORM=x64
-if "%CONFIGURATION" == "" set CONFIGURATION=Release
+if "%CONFIGURATION%" == "" set CONFIGURATION=Debug
 
 :: record starting time
 set STARTTIME=%DATE% %TIME%
 @echo Start Time: %STARTTIME%
 
 :: uses the environment from the DevStudio CMD window to figure out which version to build
-set VSVER=%VSINSTALLDIR:~-5,2%
+:: set VSVER=%VSINSTALLDIR:~-5,2%
+set VSVER=%MSVCVER%
 set DIRVER=%VSVER%
 if %VSVER% gtr 10 set /a DIRVER = DIRVER + 1
 set CMAKE_GENERATOR=Visual Studio %VSVER% 20%DIRVER%
 if /I "%PLATFORM%"=="x64" set "CMAKE_GENERATOR=%CMAKE_GENERATOR% Win64"
 set MSVCVERSION=v%VSVER%0
 set MSVCYEAR=vs20%DIRVER%
-choco install make -y
 
 :: Print info about build
 echo Generator=%CMAKE_GENERATOR%
@@ -35,6 +36,8 @@ set LIBSODIUM_LIBRARY_DIR=%LIBSODIUM_SOURCEDIR%\bin\%PLATFORM%\%CONFIGURATION%\%
 IF NOT EXIST %LIBSODIUM_SOURCEDIR% (
     ECHO Cloning libsodium...
     git clone --depth 1 -b stable https://github.com/jedisct1/libsodium.git %LIBSODIUM_SOURCEDIR%
+)
+IF NOT EXIST %LIBSODIUM_LIBRARY_DIR% (
     ECHO Building libsodium...
     msbuild /v:minimal /p:Configuration=%CONFIGURATION%DLL %LIBSODIUM_SOURCEDIR%\builds\msvc\%MSVCYEAR%\libsodium\libsodium.vcxproj
     ECHO Copying sodium lib...
@@ -80,11 +83,13 @@ IF NOT EXIST %CZMQ_BUILDDIR% (
     ECHO CMake czmq...
     cmake -G "%CMAKE_GENERATOR%" -D CMAKE_INCLUDE_PATH="%ZEROMQ_INCLUDE_DIR%;%LIBSODIUM_INCLUDE_DIR%" -D CMAKE_LIBRARY_PATH="%ZEROMQ_LIBRARY_DIR%;%LIBSODIUM_LIBRARY_DIR%" -D CMAKE_C_FLAGS_RELEASE="/MT" -D CMAKE_CXX_FLAGS_RELEASE="/MT" -D CMAKE_C_FLAGS_DEBUG="/MTd" %CZMQ_SOURCEDIR%
     ECHO Building czmq...
-    ls
     msbuild /v:minimal /p:Configuration=%CONFIGURATION% czmq.vcxproj
     msbuild /v:minimal /p:Configuration=%CONFIGURATION% czmq_selftest.vcxproj
-    ls
 )
+cd "%CZMQ_BUILDDIR%\%Configuration%"
+copy "%LIBZMQ_BUILDDIR%\bin\%Configuration%\libzmq-*dll" .
+cd "%CZMQ_BUILDDIR%"
+ctest -C "%Configuration%" -V
 
 :: Finalize and print stop time
 set STOPTIME=%DATE% %TIME%

@@ -64,6 +64,9 @@ install:
   - "pip install --upgrade wheel"
   - "pip install --upgrade setuptools"
 
+  # Install make
+  - "choco install make -y"
+
   # Install ZeroMQ
   - if "%INSTALLZMQ%" == "1" call "ci\\install-czmq-windows.bat"
   # - "ECHO %PATH%"
