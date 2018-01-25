@@ -1,6 +1,6 @@
 import os
 import nose.tools as nt
-from cis_interface import tools, backwards
+from cis_interface import tools  # , backwards
 
 
 def test_is_zmq_installed():
