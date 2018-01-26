@@ -73,6 +73,9 @@ void clean_comms(void) {
     }
   }
   free(vcomms2clean);
+#if defined(_WIN32) && defined(ZMQINSTALLED) && defined(__cplusplus)
+  zsys_shutdown();
+#endif
 };
 
 /*!
