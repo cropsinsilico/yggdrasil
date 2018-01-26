@@ -20,6 +20,10 @@ tmp/
 # Temporary file copies
 *~
 *.dSYM/
+*.obj
+*.ilk
+*.pdb
+*.lib
 
 # Compiled things - not managed
 *.pyc

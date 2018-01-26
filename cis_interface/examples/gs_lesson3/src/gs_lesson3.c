@@ -6,8 +6,6 @@
 
 int main(int argc, char *argv[]) {
   // Initialize input/output channels
-  setbuf(stdout, NULL);
-  printf("in gs_lesson4\n");
   psiInput_t in_channel = psiInput("input");
   psiOutput_t out_channel = psiOutput("output");
 
