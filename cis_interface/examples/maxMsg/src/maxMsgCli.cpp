@@ -1,8 +1,5 @@
 #include "PsiInterface.hpp"
 #include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <signal.h>
 
 
 void rand_str(char *dest, size_t length) {

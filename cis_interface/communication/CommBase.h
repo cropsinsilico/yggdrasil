@@ -129,7 +129,7 @@ comm_t* init_comm_base(const char *name, const char *direction,
 		 full_name);
     ret->valid = 0;
   }
-  cislog_error("init_comm_base(%s): Done", ret->name);
+  cislog_debug("init_comm_base(%s): Done", ret->name);
   return ret;
 };
 

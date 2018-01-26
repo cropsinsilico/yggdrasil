@@ -536,12 +536,14 @@ public:
 		     const int src_type = 1) :
     CisAsciiFileInput(cisAsciiTableInput(name, as_array, src_type)) {
     char *fmt = ((asciiTable_t*)(pi().serializer.info))->format_str;
+    // printf("format = %s\n", fmt);
     // For input, remove precision from floats to avoid confusing vsscanf
     // C version
-    // int ret = simplify_formats(fmt, CIS_MSG_MAX);
-    const char re[CIS_MSG_MAX] = "%([[:digit:]]+\\$)?[+-]?([ 0]|'.{1})?-?[[:digit:]]*(\\.[[:digit:]]+)?([lhjztL])*([eEfFgG])";
-    int ret = regex_replace_sub(fmt, CIS_MSG_MAX,
-    				re, "%$4$5", 0);
+    int ret = simplify_formats(fmt, CIS_MSG_MAX);
+    // const char re[CIS_MSG_MAX] = "%([[:digit:]]+\\$)?[+-]?([ 0]|'.{1})?-?[[:digit:]]*(\\.[[:digit:]]+)?([lhjztL])*([eEfFgG])";
+    // int ret = regex_replace_sub(fmt, CIS_MSG_MAX,
+    // 				re, "%$4$5", 0);
+    // printf("format = %s\n", fmt);
     if (ret < 0)
       printf("CisAsciiTableInput(%s): could not fix format\n", name);
 

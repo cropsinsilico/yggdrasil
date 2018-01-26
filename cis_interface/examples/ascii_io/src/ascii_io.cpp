@@ -15,7 +15,7 @@ int main(int argc,char *argv[]){
   // Input & output from a table row by row
   PsiAsciiTableInput TableInput("inputCPP_table");
   PsiAsciiTableOutput TableOutput("outputCPP_table",
-				  "%5s\t%ld\t%3.1f\t%3.1lf%+3.1lfj\n");
+                                  "%5s\t%ld\t%3.1f\t%3.1lf%+3.1lfj\n");
   // Input & output from a table as an array
   PsiAsciiTableInput ArrayInput("inputCPP_array", 1);
   PsiAsciiTableOutput ArrayOutput("outputCPP_array",

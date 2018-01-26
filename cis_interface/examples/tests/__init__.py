@@ -18,7 +18,7 @@ class TestExample(unittest.TestCase):
         self.env = {}
         self.runner = None
         self._old_loglevel = None
-        self.debug_flag = True
+        self.debug_flag = False
         super(TestExample, self).__init__(*args, **kwargs)
 
     def debug_log(self):  # pragma: debug

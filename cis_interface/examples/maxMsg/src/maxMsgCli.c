@@ -1,8 +1,5 @@
 #include "PsiInterface.h"
 #include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <signal.h>
 
 
 void rand_str(char *dest, size_t length) {
@@ -10,7 +7,7 @@ void rand_str(char *dest, size_t length) {
     "abcdefghijklmnopqrstuvwxyz"
     "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
   while (length-- > 0) {
-    size_t index = (double) rand() / RAND_MAX * (sizeof charset - 1);
+    size_t index = (size_t)((double) rand() / RAND_MAX * (sizeof charset - 1));
     *dest++ = charset[index];
   }
   *dest = '\0';
@@ -29,7 +26,7 @@ int main(int argc, char *argv[]) {
     
   // Create a max message
   rand_str(output, PSI_MSG_MAX - 1);
-  output[PSI_MSG_MAX] == '\0';
+  output[PSI_MSG_MAX] = '\0';
     
   // Call RPC server
   if (rpcCall(rpc, output, &input) < 0) {

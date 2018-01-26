@@ -1,9 +1,6 @@
 
 #include "PsiInterface.hpp"
 #include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <signal.h>
 
 
 int count_lines(const char* str, const char* substr) {

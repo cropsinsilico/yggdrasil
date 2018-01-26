@@ -52,6 +52,8 @@ int count_formats(const char* fmt_str) {
 static inline
 int simplify_formats(char *fmt_str, const size_t fmt_len) {
   const char * fmt_regex1 = "%([[:digit:]]+\\$)?[+-]?([ 0]|\'.{1})?-?[[:digit:]]*(\\.[[:digit:]]+)?([lhjztL]*)([eEfFgG])";
+  // "%([[:digit:]]+\\$)?[+-]?([ 0]|\'.{1})?-?[[:digit:]]*(\\.[[:digit:]]+)?([lhjztL]*)([eEfFgG])";
+  // "%([[:digit:]]+\\$)?[+-]?([ 0]|'.{1})?-?[[:digit:]]*(\\.[[:digit:]]+)?([lhjztL])*([eEfFgG])";
   int ret = regex_replace_sub(fmt_str, fmt_len, fmt_regex1,
 			      "%$4$5", 0);
   if (ret > 0) {
