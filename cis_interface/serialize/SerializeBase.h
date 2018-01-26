@@ -26,14 +26,18 @@ typedef struct seri_t {
   @param[in] buf_siz size_t Size of memory allocated to buf.
   @param[in] allow_realloc int If 1, buf will be realloced if it is not big
   enough to hold the serialized emssage. If 0, an error will be returned.
+  @param[out] args_used int Number of arguments formatted.
   @param[in] ap va_list Arguments to be formatted.
   returns: int The length of the serialized message or -1 if there is an error. 
  */
 static inline
-int serialize_direct(const seri_t s, char *buf, const size_t buf_siz, va_list ap) {
+int serialize_direct(const seri_t s, char *buf, const size_t buf_siz,
+        int *args_used, va_list ap) {
+  args_used[0] = 0;
   if (s.type != DIRECT_SERI)
     return -1;
   char *msg = va_arg(ap, char*);
+  args_used[0] = 1;
   int ret = (int)strlen(msg);
   if ((ret + 1) < (int)buf_siz)
     strcpy(buf, msg);

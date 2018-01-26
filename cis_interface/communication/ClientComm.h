@@ -33,11 +33,11 @@ int new_client_address(comm_t *comm) {
  */
 static inline
 int init_client_comm(comm_t *comm) {
+  int ret = 0;
   if (!(_client_rand_seeded)) {
     srand(ptr2seed(comm));
     _client_rand_seeded = 1;
   }
-  int ret;
   // Called to create temp comm for send/recv
   if ((strlen(comm->name) == 0) && (strlen(comm->address) > 0)) {
     comm->type = _default_comm;
@@ -55,11 +55,12 @@ int init_client_comm(comm_t *comm) {
   }
   ret = init_default_comm(handle);
   strcpy(comm->address, handle->address);
+  comm->handle = (void*)handle;
+  // Keep track of response comms
   int *ncomm = (int*)malloc(sizeof(int));
   ncomm[0] = 0;
   handle->info = (void*)ncomm;
   strcpy(comm->direction, "send");
-  comm->handle = (void*)handle;
   comm->always_send_header = 1;
   comm_t ***info = (comm_t***)malloc(sizeof(comm_t**));
   info[0] = NULL;
@@ -127,9 +128,11 @@ int free_client_comm(comm_t *x) {
       int ncomm = get_client_response_count(*x);
       int i;
       for (i = 0; i < ncomm; i++) {
-	free((char*)(info[0][i]->serializer.info));
-	free_default_comm(info[0][i]);
-	free(info[0][i]);
+        if (info[0][i] != NULL) {
+          free((char*)(info[0][i]->serializer.info));
+          free_default_comm(info[0][i]);
+          free(info[0][i]);
+        }
       }
       free(*info);
       info[0] = NULL;
@@ -140,7 +143,7 @@ int free_client_comm(comm_t *x) {
   free_client_response_count(x);
   if (x->handle != NULL) {
     comm_t *handle = (comm_t*)(x->handle);
-    char buf[CIS_MSG_MAX] = CIS_MSG_EOF;
+    char buf[100] = CIS_MSG_EOF;
     default_comm_send(*handle, buf, strlen(buf));
     free((char*)(handle->serializer.info));
     free_default_comm(handle);
@@ -148,8 +151,8 @@ int free_client_comm(comm_t *x) {
     x->handle = NULL;
   }
   // TODO: Why is the pointer invalid?
-  /* printf("serializer: %s\n", (char*)(x->serializer.info)); */
-  /* free((char*)(x->serializer.info)); */
+  // printf("serializer: %s\n", (char*)(x->serializer.info));
+  // free((char*)(x->serializer.info));
   return 0;
 };
 

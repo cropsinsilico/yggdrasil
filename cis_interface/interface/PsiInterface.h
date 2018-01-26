@@ -512,7 +512,7 @@ int rpcSend(const cisRpc_t rpc, ...){
   success.
 */
 static inline
-int rpcRecv(const cisRpc_t rpc, ...){
+int rpcRecv(const cisRpc_t rpc, ...) {
   va_list ap;
   va_start(ap, rpc);
   int ret = vrpcRecv(rpc, ap);
@@ -535,22 +535,33 @@ int rpcRecv(const cisRpc_t rpc, ...){
  */
 static inline
 int vrpcCall(const cisRpc_t rpc, va_list ap) {
-  int ret;
+  int sret, rret;
+
+  // Create copy for receiving
+  va_list op;
+  va_copy(op, ap);
   
   // pack the args and call
-  ret = vcommSend_nolimit(rpc, ap);
-  if (ret < 0) {
-    printf("vrpcCall: vcisSend_nolimit error: ret %d: %s\n", ret, strerror(errno));
+  sret = vcommSend_nolimit(rpc, ap);
+  if (sret < 0) {
+    cislog_error("vrpcCall: vcisSend_nolimit error: ret %d: %s", sret, strerror(errno));
     return -1;
   }
 
+  // Advance through sent arguments
+  cislog_debug("vrpcCall: Used %d arguments in send", sret);
+  int i;
+  for (i = 0; i < sret; i++) {
+    va_arg(op, void*);
+  }
+
   // unpack the messages into the remaining variable arguments
-  va_list op;
-  va_copy(op, ap);
-  ret = vcommRecv_nolimit(rpc, op);
+  // va_list op;
+  // va_copy(op, ap);
+  rret = vcommRecv_nolimit(rpc, op);
   va_end(op);
   
-  return ret;
+  return rret;
 };
 
 /*!

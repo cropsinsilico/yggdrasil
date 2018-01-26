@@ -42,7 +42,8 @@
 
 /*! @brief Define old style names for compatibility. */
 #define PSI_MSG_MAX CIS_MSG_MAX
-#define PSI_MSG_EOF CIS_MSG_MAX
+#define PSI_MSG_BUF CIS_MSG_BUF
+#define PSI_MSG_EOF CIS_MSG_EOF
 #ifdef PSI_DEBUG
 #define CIS_DEBUG PSI_DEBUG
 #endif

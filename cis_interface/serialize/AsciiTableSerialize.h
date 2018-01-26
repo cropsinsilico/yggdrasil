@@ -12,12 +12,15 @@
   @param[out] buf character pointer to pointer to memory where serialized message
   should be stored.
   @param[in] buf_siz size_t Size of memory allocated to buf.
+  @param[out] args_used int Number of arguments formatted.
   @param[in] ap va_list Arguments to be formatted.
   returns: int The length of the serialized message or -1 if there is an error.
  */
 static inline
-int serialize_ascii_table(const seri_t s, char *buf, const size_t buf_siz, va_list ap) {
+int serialize_ascii_table(const seri_t s, char *buf, const size_t buf_siz,
+          int *args_used, va_list ap) {
   asciiTable_t *table = (asciiTable_t*)s.info;
+  args_used[0] = table->ncols;
   int ret = at_vrow_to_bytes(*table, buf, buf_siz, ap);
   return ret;
 };
@@ -48,6 +51,7 @@ int deserialize_ascii_table(const seri_t s, const char *buf, const size_t buf_si
   @param[out] buf character pointer to pointer to memory where serialized message
   should be stored.
   @param[in] buf_siz size_t Size of memory allocated to buf.
+  @param[out] args_used int Number of arguments formatted.
   @param[in] ap va_list Arguments to be formatted. These should be pointers to
   arrays, one for each column in the table. The first argument should be the number
   of rows in each column.
@@ -55,8 +59,9 @@ int deserialize_ascii_table(const seri_t s, const char *buf, const size_t buf_si
  */
 static inline
 int serialize_ascii_table_array(const seri_t s, char *buf, const size_t buf_siz,
-				va_list ap) {
+				int *args_used, va_list ap) {
   asciiTable_t *table = (asciiTable_t*)s.info;
+  args_used[0] = table->ncols + 1;
   int ret = at_varray_to_bytes(*table, buf, buf_siz, ap);
   return ret;
 };

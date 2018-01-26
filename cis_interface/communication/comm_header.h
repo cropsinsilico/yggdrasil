@@ -111,7 +111,7 @@ int parse_header_entry(const char *head, const char *key, char *value,
   int n_sub_matches = find_matches(regex_text, head, &sind, &eind);
   // Loop until string done
   if (n_sub_matches < 2) {
-    cislog_error("parse_header_entry: Could not find match to %s in %s.",
+    cislog_debug("parse_header_entry: Could not find match to %s in %s.",
 		 regex_text, head);
     if (sind != NULL) free(sind);
     if (eind != NULL) free(eind);
@@ -267,6 +267,7 @@ comm_head_t parse_comm_header(const char *buf, const size_t bufsiz) {
     char size_str[COMMBUFFSIZ];
     ret = parse_header_entry(head, "size", size_str, COMMBUFFSIZ);
     if (ret < 0) {
+      cislog_error("parse_comm_header: could not find size in header");
       out.valid = 0;
       free(head);
       return out;

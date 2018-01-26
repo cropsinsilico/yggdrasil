@@ -9,7 +9,6 @@ ex_dict = {'gs_lesson1': ('python', 'matlab', 'c', 'cpp'),
            'hello': ('python', 'matlab', 'c', 'cpp'),
            'model_error': ('python', 'matlab', 'c', 'cpp'),
            'SaM': ('python', 'matlab', 'c', 'cpp', 'all', 'all_nomatlab'),
-           # 'ascii_io': ('cpp',),
            'ascii_io': ('python', 'matlab', 'c', 'cpp', 'all', 'all_nomatlab'),
            'rpcFib': ('python', 'matlab', 'c', 'cpp', 'all', 'all_nomatlab'),
            'maxMsg': ('c',)}

@@ -15,12 +15,13 @@
   @param[in] buf_siz size_t Size of memory allocated to buf.
   @param[in] allow_realloc int If 1, buf will be realloced if it is not big
   enough to hold the serialized emssage. If 0, an error will be returned.
+  @param[out] args_used int Number of arguments formatted.
   @param[in] ap va_list Arguments to be formatted.
   returns: int The length of the serialized message or -1 if there is an error.
  */
 static inline
 int serialize(const seri_t s, char **buf, const size_t buf_siz,
-	      const int allow_realloc, va_list ap) {
+	      const int allow_realloc, int *args_used, va_list ap) {
   seri_type t = s.type;
   int ret = -1;
   va_list ap2;
@@ -28,20 +29,20 @@ int serialize(const seri_t s, char **buf, const size_t buf_siz,
     va_copy(ap2, ap);
   }
   if (t == DIRECT_SERI)
-    ret = serialize_direct(s, *buf, buf_siz, ap);
+    ret = serialize_direct(s, *buf, buf_siz, args_used, ap);
   else if (t == FORMAT_SERI)
-    ret = serialize_format(s, *buf, buf_siz, ap);
+    ret = serialize_format(s, *buf, buf_siz, args_used, ap);
   else if (t == ASCII_TABLE_SERI)
-    ret = serialize_ascii_table(s, *buf, buf_siz, ap);
+    ret = serialize_ascii_table(s, *buf, buf_siz, args_used, ap);
   else if (t == ASCII_TABLE_ARRAY_SERI)
-    ret = serialize_ascii_table_array(s, *buf, buf_siz, ap);
+    ret = serialize_ascii_table_array(s, *buf, buf_siz, args_used, ap);
   else {
     cislog_error("serialize: Unsupported seri_type %d", t);
   }
   if (ret > (int)buf_siz) {
     if (allow_realloc) {
       *buf = (char*)realloc(*buf, ret+1); 
-      ret = serialize(s, buf, ret+1, 0, ap2);
+      ret = serialize(s, buf, ret+1, 0, args_used, ap2);
     } else {
       cislog_error("serialize: encoded message too large for the buffer. (buf_siz=%d, len=%d)",
 		   buf_siz, ret);

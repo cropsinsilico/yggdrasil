@@ -27,7 +27,7 @@ int new_server_address(comm_t *comm) {
  */
 static inline
 int init_server_comm(comm_t *comm) {
-  int ret;
+  int ret = 0;
   // Called to create temp comm for send/recv
   if ((strlen(comm->name) == 0) && (strlen(comm->address) > 0)) {
     comm->type = _default_comm;
@@ -36,7 +36,7 @@ int init_server_comm(comm_t *comm) {
   // Called to initialize/create server comm
   char *seri_in = (char*)malloc(strlen(comm->direction) + 1);
   strcpy(seri_in, comm->direction);
-  /* printf("init_server_comm(%s): seri: %s\n", comm->name, seri_in); */
+  // printf("init_server_comm(%s): seri: %s\n", comm->name, seri_in);
   comm_t *handle;
   if (strlen(comm->name) == 0) {
     handle = new_comm_base(comm->address, "recv", _default_comm, (void*)seri_in);
@@ -46,8 +46,8 @@ int init_server_comm(comm_t *comm) {
   }
   ret = init_default_comm(handle);
   strcpy(comm->address, handle->address);
-  /* printf("init_server_comm: name = %s, type=%d, address = %s\n", */
-  /* 	 handle->name, handle->type, handle->address); */
+  // printf("init_server_comm: name = %s, type=%d, address = %s\n",
+  // 	 handle->name, handle->type, handle->address);
   strcpy(comm->direction, "recv");
   comm->handle = (void*)handle;
   comm->always_send_header = 0;

@@ -6,7 +6,7 @@ void rand_str(char *dest, size_t length) {
   char charset[] = "0123456789"
     "abcdefghijklmnopqrstuvwxyz"
     "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-  while (length-- > 0) {
+  while (length-- > 1) {
     size_t index = (size_t)((double) rand() / RAND_MAX * (sizeof charset - 1));
     *dest++ = charset[index];
   }
@@ -16,26 +16,30 @@ void rand_str(char *dest, size_t length) {
 
 int main(int argc, char *argv[]) {
 
-  printf("maxMsgCli(C): Hello PSI_MSG_MAX is %d.\n", PSI_MSG_MAX);
+  //char output[PSI_MSG_BUF];
+  //char input[PSI_MSG_BUF];
+  size_t msg_size = 400;
+  char *output = (char*)malloc(msg_size);
+  char *input = (char*)malloc(msg_size);
 
-  char output[PSI_MSG_MAX];
-  char input[PSI_MSG_MAX];
+  printf("maxMsgCli(C): Hello message size is %d.\n", (int)msg_size);
   
   // Create a max message, send/recv and verify
   psiRpc_t rpc = psiRpcClient("maxMsgSrv_maxMsgCli", "%s", "%s");
     
   // Create a max message
-  rand_str(output, PSI_MSG_MAX - 1);
-  output[PSI_MSG_MAX] = '\0';
+  rand_str(output, msg_size);
+  printf("maxMsgCli(C): sending %.10s...\n", output);
     
   // Call RPC server
-  if (rpcCall(rpc, output, &input) < 0) {
+  if (rpcCall(rpc, output, input) < 0) {
     printf("maxMsgCli(C): RPC ERROR\n");
     return -1;
   }
+  printf("maxMsgCli(C): received %.10s...\n", input);
 
   // Check to see if response matches
-  if (memcmp(output, input, PSI_MSG_MAX)) {
+  if (memcmp(output, input, msg_size)) {
     printf("maxMsgCli(C): ERROR: input/output do not match\n");
     return -1;
   } else {
@@ -43,7 +47,6 @@ int main(int argc, char *argv[]) {
   }
 
   // All done, free and say goodbye
-  psi_free(&rpc);
   printf("maxMsgCli(C): Goodbye!\n");
   return 0;
 }

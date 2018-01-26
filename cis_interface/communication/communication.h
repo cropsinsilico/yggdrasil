@@ -73,6 +73,7 @@ void clean_comms(void) {
     }
   }
   free(vcomms2clean);
+  ncomms2clean = 0;
 #if defined(_WIN32) && defined(ZMQINSTALLED) // && defined(__cplusplus)
   zsys_shutdown();
 #endif
@@ -642,7 +643,8 @@ int comm_recv_nolimit(const comm_t x, char **data, const size_t len) {
   CIS_MSG_MAX or cannot be encoded, it will not be sent.  
   @param[in] x comm_t structure for comm that message should be sent to.
   @param[in] ap va_list arguments to be formatted into a message using sprintf.
-  @returns int 0 if send succesfull, -1 if send unsuccessful.
+  @returns int Number of arguments formatted if send succesfull, -1 if send
+  unsuccessful.
  */
 static inline
 int vcommSend(const comm_t x, va_list ap) {
@@ -652,7 +654,8 @@ int vcommSend(const comm_t x, va_list ap) {
     comm_t *handle = (comm_t*)(x.handle);
     serializer = handle->serializer;
   }
-  int ret = serialize(serializer, &buf, CIS_MSG_BUF, 1, ap);
+  int args_used = 0;
+  int ret = serialize(serializer, &buf, CIS_MSG_BUF, 1, &args_used, ap);
   if (ret < 0) {
     cislog_error("vcommSend(%s): serialization error", x.name);
     free(buf);
@@ -661,7 +664,11 @@ int vcommSend(const comm_t x, va_list ap) {
   ret = comm_send(x, buf, ret);
   cislog_debug("vcommSend(%s): comm_send returns %d", x.name, ret);
   free(buf);
-  return ret;
+  if (ret < 0) {
+    return ret;
+  } else {
+    return args_used;
+  }
 };
 
 /*!
@@ -682,7 +689,7 @@ int vcommRecv(const comm_t x, va_list ap) {
   char *buf = (char*)malloc(CIS_MSG_BUF);
   int ret = comm_recv_nolimit(x, &buf, CIS_MSG_BUF);
   if (ret < 0) {
-    /* cislog_error("vcommRecv(%s): Error receiving.", x.name); */
+    // cislog_error("vcommRecv(%s): Error receiving.", x.name);
     free(buf);
     return ret;
   }

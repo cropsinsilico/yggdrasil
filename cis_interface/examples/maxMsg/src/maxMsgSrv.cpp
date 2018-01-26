@@ -6,7 +6,8 @@ int main(int argc, char *argv[]) {
 
     printf("maxMsgSrv(CPP): Hello!\n");
     PsiRpcServer rpc("maxMsgSrv", "%s", "%s");
-    char input[PSI_MSG_MAX];
+    char *input = (char*)malloc(100);
+    //char input[PSI_MSG_MAX];
     
     while (1) {
       int ret = rpc.recv(1, &input);
