@@ -24,6 +24,7 @@ tmp/
 *.ilk
 *.pdb
 *.lib
+*.exe
 
 # Compiled things - not managed
 *.pyc

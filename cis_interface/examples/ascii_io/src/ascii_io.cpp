@@ -3,9 +3,10 @@
 // Include interface methods
 #include "PsiInterface.hpp"
 
+#define BSIZE 8192 // the max
+
 
 int main(int argc,char *argv[]){
-  const uint BSIZE = 8192; // the max
   int ret;
 
   // Input & output to an ASCII file line by line

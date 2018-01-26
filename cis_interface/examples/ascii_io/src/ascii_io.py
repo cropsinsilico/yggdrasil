@@ -52,7 +52,7 @@ if __name__ == '__main__':
         if ret:
             # If the receive was succesful, send the values to output.
             # Formatting is taken care of on the output driver side.
-            print("Table: %s, %d, %3.1f, %s" % line)
+            print(("Table: %s, %d, %3.1f, %s" % line).encode("utf-8"))
             ret = out_table.send_row(*line)
             if not ret:
                 print("ascii_io(P): ERROR SENDING ROW")
