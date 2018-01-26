@@ -5,3 +5,8 @@ import sys
 _is_osx = (sys.platform == 'darwin')
 _is_linux = ('linux' in sys.platform)
 _is_win = (sys.platform in ['win32', 'cygwin'])
+
+if _is_win:
+	_newline = '\r\n'
+else:
+	_newline = '\n'

@@ -525,6 +525,7 @@ class AsciiTable(AsciiFile):
                     if line.startswith(self.comment):
                         sline = line.lstrip(self.comment)
                         sline = sline.lstrip(backwards.unicode2bytes(' '))
+                        sline = sline.rstrip(backwards.unicode2bytes(platform._newline))
                         fmts = sline.split(self.column)
                         is_fmt = [f.startswith(_fmt_char) for f in fmts]
                         if sum(is_fmt) == len(fmts):

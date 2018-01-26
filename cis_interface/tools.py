@@ -9,6 +9,7 @@ import time
 import signal
 import yaml
 import pystache
+import warnings
 from cis_interface.backwards import sio
 import subprocess
 from cis_interface import platform
@@ -51,8 +52,10 @@ def is_zmq_installed():
     check_files = ['zmq.h', 'czmq.h']
     if platform._is_win:
         check_files += ['zmq.lib', 'czmq.lib']
+        check_files += ['libzmq-*dll', 'libczmq.dll']
     for f in check_files:
         if not locate_path(f):
+            warnings.warn("Could not locate ZeroMQ headers/libraries on PATH")
             return False
     # Check validity of compile flags
     if platform._is_win:
