@@ -26,7 +26,10 @@ class TestModelParam(parent.TestParam):
     def __init__(self, *args, **kwargs):
         super(TestModelParam, self).__init__(*args, **kwargs)
         self.driver = 'ModelDriver'
-        self.args = ['sleep', '0.1']
+        if platform._is_win:
+            self.args = ['timeout', '0']
+        else:
+            self.args = ['sleep', '0.1']
         self.attr_list += ['args', 'process', 'is_server', 'client_of']
         
 

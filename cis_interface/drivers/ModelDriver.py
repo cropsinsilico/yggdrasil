@@ -116,6 +116,7 @@ class ModelDriver(Driver):
             pre_args += ['valgrind'] + self.valgrind_flags
         env = copy.deepcopy(self.env)
         env.update(os.environ)
+        print(pre_args + self.args)
         self.process = tools.popen_nobuffer(pre_args + self.args, env=env,
                                             cwd=self.workingDir,
                                             preexec_fn=preexec)
