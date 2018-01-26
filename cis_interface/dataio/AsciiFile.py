@@ -1,5 +1,5 @@
 import os
-from cis_interface import backwards, platform
+from cis_interface import backwards
 
 
 _default_args = {'comment': '#',

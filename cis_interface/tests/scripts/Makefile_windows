@@ -28,4 +28,4 @@ gcc_model: $(OBJ)
 ($OBJ) :
 
 clean:
-	rm -f $(ODIR)\\\*.o \*~ gcc_model.exe $(IDIR)\*\~ 
+	del $(ODIR)\*.o *~ gcc_model.exe $(IDIR)\*~ 

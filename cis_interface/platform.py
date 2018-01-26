@@ -7,6 +7,6 @@ _is_linux = ('linux' in sys.platform)
 _is_win = (sys.platform in ['win32', 'cygwin'])
 
 if _is_win:
-	_newline = '\r\n'
+    _newline = '\r\n'
 else:
-	_newline = '\n'
+    _newline = '\n'
