@@ -18,7 +18,7 @@ int main(int argc, char *argv[]) {
 
   //char output[PSI_MSG_BUF];
   //char input[PSI_MSG_BUF];
-  size_t msg_size = 400;
+  size_t msg_size = PSI_MSG_BUF;
   char *output = (char*)malloc(msg_size);
   char *input = (char*)malloc(msg_size);
 
@@ -34,6 +34,8 @@ int main(int argc, char *argv[]) {
   // Call RPC server
   if (rpcCall(rpc, output, input) < 0) {
     printf("maxMsgCli(C): RPC ERROR\n");
+    free(output);
+    free(input);
     return -1;
   }
   printf("maxMsgCli(C): received %.10s...\n", input);
@@ -41,6 +43,8 @@ int main(int argc, char *argv[]) {
   // Check to see if response matches
   if (memcmp(output, input, msg_size)) {
     printf("maxMsgCli(C): ERROR: input/output do not match\n");
+    free(output);
+    free(input);
     return -1;
   } else {
     printf("maxMsgCli(C): CONFIRM\n");
@@ -48,6 +52,8 @@ int main(int argc, char *argv[]) {
 
   // All done, free and say goodbye
   printf("maxMsgCli(C): Goodbye!\n");
+  free(output);
+  free(input);
   return 0;
 }
 
