@@ -35,6 +35,10 @@ int init_server_comm(comm_t *comm) {
   }
   // Called to initialize/create server comm
   char *seri_in = (char*)malloc(strlen(comm->direction) + 1);
+  if (seri_in == NULL) {
+    cislog_error("init_server_comm: Failed to malloc seri_in.");
+    return -1;
+  }
   strcpy(seri_in, comm->direction);
   // printf("init_server_comm(%s): seri: %s\n", comm->name, seri_in);
   comm_t *handle;
@@ -52,6 +56,10 @@ int init_server_comm(comm_t *comm) {
   comm->handle = (void*)handle;
   comm->always_send_header = 0;
   comm_t **info = (comm_t**)malloc(sizeof(comm_t*));
+  if (info == NULL) {
+    cislog_error("init_server_comm: Failed to malloc info.");
+    return -1;
+  }
   info[0] = NULL;
   comm->info = (void*)info;
   return ret;
@@ -166,6 +174,10 @@ int server_comm_recv(comm_t x, char **data, const size_t len, const int allow_re
   }
   strcpy(x.address, head.id);
   char *seri_copy = (char*)malloc(strlen((char*)(x.serializer.info)) + 1);
+  if (seri_copy == NULL) {
+    cislog_error("server_comm_recv(%s): Failed to malloc seri_copy.");
+    return -1;
+  }
   strcpy(seri_copy, (char*)(x.serializer.info));
   comm_t **res_comm = (comm_t**)(x.info);
   res_comm[0] = new_comm_base(head.response_address, "send", _default_comm,

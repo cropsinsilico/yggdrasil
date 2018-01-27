@@ -141,6 +141,10 @@ int new_ipc_address(comm_t *comm) {
   }
   sprintf(comm->address, "%d", key);
   int *fid = (int*)malloc(sizeof(int));
+  if (fid == NULL) {
+    cislog_error("new_ipc_address: Could not malloc queue fid.");
+    return -1;
+  }
   fid[0] = msgget(key, (IPC_CREAT | 0777));
   if (fid[0] < 0) {
       cislog_error("new_ipc_address: msgget(%d, %d) ret(%d), errno(%d): %s",
@@ -172,6 +176,10 @@ int init_ipc_comm(comm_t *comm) {
   add_channel(*comm);
   int qkey = atoi(comm->address);
   int *fid = (int *)malloc(sizeof(int));
+  if (fid == NULL) {
+    cislog_error("init_ipc_comm: Could not malloc queue fid.");
+    return -1;
+  }
   fid[0] = msgget(qkey, 0600);
   comm->handle = (void*)fid;
   return 0;
@@ -286,6 +294,10 @@ int ipc_comm_recv(const comm_t x, char **data, const size_t len,
 	cislog_debug("ipc_comm_recv(%s): reallocating buffer from %d to %d bytes.\n",
 		     x.name, (int)len, ret + 1);
 	(*data) = (char*)realloc(*data, ret + 1);
+	if (*data == NULL) {
+	  cislog_error("ipc_comm_recv(%s): failed to realloc buffer.", x.name);
+	  ret = -1;
+	}
       } else {
 	cislog_error("ipc_comm_recv(%s): buffer (%d bytes) is not large enough for message (%d bytes)",
 		     x.name, len, ret);

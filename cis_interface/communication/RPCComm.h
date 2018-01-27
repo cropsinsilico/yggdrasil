@@ -39,6 +39,10 @@ int init_rpc_comm(comm_t *comm) {
   comm->info = (void*)info;
   // Output comm
   char *seri_out = (char*)malloc(strlen(comm->direction) + 1);
+  if (seri_out == NULL) {
+    cislog_error("init_rpc_comm(%s): Failed to malloc seri_out.");
+    return -1;
+  }
   strcpy(seri_out, comm->direction);
   comm_t *handle = init_comm_base(comm->name, "send", _default_comm,
 				  (void*)seri_out);

@@ -21,6 +21,10 @@ int init_ascii_file_comm(comm_t *comm) {
   comm->type = ASCII_FILE_COMM;
   strcpy(comm->address, comm->name);
   asciiFile_t *handle = (asciiFile_t*)malloc(sizeof(asciiFile_t));
+  if (handle == NULL) {
+    cislog_error("init_ascii_file_comm: Failed to malloc asciiFile handle.");
+    return -1;
+  }
   if (strcmp(comm->direction, "send") == 0)
     handle[0] = asciiFile(comm->address, "w", NULL, NULL);
   else

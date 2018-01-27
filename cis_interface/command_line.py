@@ -8,7 +8,7 @@ from cis_interface.drivers import GCCModelDriver
 
 def cisrun():
     r"""Start a run."""
-    prog = sys.argv[0].split(os.path.sep())[-1]
+    prog = sys.argv[0].split(os.path.sep)[-1]
     models = sys.argv[1:]
     cisRunner = runner.get_runner(models, cis_debug_prefix=prog)
     try:
@@ -22,7 +22,7 @@ def cisrun():
 
 def ciscc():
     r"""Compile C/C++ program."""
-    # prog = sys.argv[0].split(os.path.sep())[-1]
+    # prog = sys.argv[0].split(os.path.sep)[-1]
     src = sys.argv[1:]
     out = GCCModelDriver.do_compile(src)
     print("executable: %s" % out)

@@ -22,6 +22,11 @@ int init_ascii_table_comm(comm_t *comm) {
   // Initialize table as handle
   char *fmt = (char*)(comm->serializer.info);
   asciiTable_t *handle = (asciiTable_t*)malloc(sizeof(asciiTable_t));
+  if (handle == NULL) {
+    cislog_error("init_ascii_table_comm: Failed to malloc asciiTable handle.");
+    comm->valid = 0;
+    return -1;
+  }
   if (strcmp(comm->direction, "send") == 0)
     handle[0] = asciiTable(comm->address, "w", fmt,
 			   NULL, NULL, NULL);
@@ -34,7 +39,7 @@ int init_ascii_table_comm(comm_t *comm) {
   if (flag != 0) {
     cislog_error("init_ascii_table_comm: Could not open %s", comm->name);
     comm->valid = 0;
-    return -1;;
+    return -1;
   }
   // Write format to file if "send"
   if (strcmp(comm->direction, "send") == 0)

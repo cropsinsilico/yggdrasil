@@ -45,6 +45,10 @@ int init_client_comm(comm_t *comm) {
   }
   // Called to initialize/create client comm
   char *seri_out = (char*)malloc(strlen(comm->direction) + 1);
+  if (seri_out == NULL) {
+    cislog_error("init_client_comm: Failed to malloc output serializer.");
+    return -1;
+  }
   strcpy(seri_out, comm->direction);
   comm_t *handle;
   if (strlen(comm->name) == 0) {
@@ -58,11 +62,19 @@ int init_client_comm(comm_t *comm) {
   comm->handle = (void*)handle;
   // Keep track of response comms
   int *ncomm = (int*)malloc(sizeof(int));
+  if (ncomm == NULL) {
+    cislog_error("init_client_comm: Failed to malloc ncomm.");
+    return -1;
+  }
   ncomm[0] = 0;
   handle->info = (void*)ncomm;
   strcpy(comm->direction, "send");
   comm->always_send_header = 1;
   comm_t ***info = (comm_t***)malloc(sizeof(comm_t**));
+  if (info == NULL) {
+    cislog_error("init_client_comm: Failed to malloc info.");
+    return -1;
+  }
   info[0] = NULL;
   comm->info = (void*)info;
   return ret;
@@ -181,7 +193,17 @@ comm_head_t client_response_header(comm_t x, comm_head_t head) {
   int ncomm = get_client_response_count(x);
   comm_t ***res_comm = (comm_t***)(x.info);
   res_comm[0] = (comm_t**)realloc(res_comm[0], sizeof(comm_t*)*(ncomm + 1));
+  if (res_comm[0] == NULL) {
+    cislog_error("client_response_header: Failed to realloc response comm.");
+    head.valid = 0;
+    return head;
+  }
   char *seri_copy = (char*)malloc(strlen((char*)(x.serializer.info)) + 1);
+  if (seri_copy == NULL) {
+    cislog_error("client_response_header: Failed to malloc copy of serializer info.");
+    head.valid = 0;
+    return head;
+  }
   strcpy(seri_copy, (char*)(x.serializer.info));
   res_comm[0][ncomm] = new_comm_base(NULL, "recv", _default_comm, seri_copy);
   int ret = new_default_address(res_comm[0][ncomm]);

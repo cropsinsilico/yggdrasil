@@ -63,6 +63,10 @@ static inline
 comm_t* new_comm_base(char *address, const char *direction, const comm_type t,
 		      void *seri_info) {
   comm_t* ret = (comm_t*)malloc(sizeof(comm_t));
+  if (ret == NULL) {
+    cislog_error("new_comm_base: Failed to malloc comm.");
+    return ret;
+  }
   ret->type = t;
   ret->valid = 1;
   ret->name[0] = '\0';
@@ -119,6 +123,9 @@ comm_t* init_comm_base(const char *name, const char *direction,
     address = getenv(full_name);
   }
   comm_t *ret = new_comm_base(address, direction, t, seri_info);
+  if (ret == NULL) {
+    return ret;
+  }
   if (name == NULL) {
     ret->name[0] = '\0';
     ret->valid = 0;

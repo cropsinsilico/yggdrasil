@@ -192,7 +192,8 @@ def popen_nobuffer(args, **kwargs):
     kwargs.setdefault('bufsize', 0)
     kwargs.setdefault('stdout', subprocess.PIPE)
     kwargs.setdefault('stderr', subprocess.STDOUT)
-    kwargs.setdefault('universal_newlines', True)
+    if platform._is_win:
+        kwargs.setdefault('universal_newlines', True)
     out = subprocess.Popen(args, **kwargs)
     return out
 
@@ -210,10 +211,13 @@ def print_encoded(msg, *args, **kwargs):
     try:
         print(backwards.bytes2unicode(msg), *args, **kwargs)
     except UnicodeEncodeError:  # pragma: debug
-        logging.error("sys.stdout.encoding = %s, cannot print unicode",
+        logging.debug("sys.stdout.encoding = %s, cannot print unicode",
                       sys.stdout.encoding)
         kwargs.pop('end', None)
-        print(msg, *args, **kwargs)
+        try:
+            print(msg, *args, **kwargs)
+        except UnicodeEncodeError:  # pragma: debug 
+            print(backwards.unicode2bytes(msg), *args, **kwargs)
 
 
 class TimeOut(object):

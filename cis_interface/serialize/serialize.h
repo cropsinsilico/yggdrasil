@@ -42,7 +42,12 @@ int serialize(const seri_t s, char **buf, const size_t buf_siz,
   if (ret > (int)buf_siz) {
     if (allow_realloc) {
       *buf = (char*)realloc(*buf, ret+1); 
-      ret = serialize(s, buf, ret+1, 0, args_used, ap2);
+      if (*buf == NULL) {
+	cislog_error("serialize: Failed to realloc buffer.");
+	ret = -1;
+      } else {
+	ret = serialize(s, buf, ret+1, 0, args_used, ap2);
+      }
     } else {
       cislog_error("serialize: encoded message too large for the buffer. (buf_siz=%d, len=%d)",
 		   buf_siz, ret);

@@ -2,6 +2,7 @@ from __future__ import print_function
 import sys
 # Import necessary connection interfaces
 from cis_interface import backwards
+from cis_interface.tools import print_encoded
 from cis_interface.interface.PsiInterface import (
     PsiAsciiFileInput, PsiAsciiFileOutput,
     PsiAsciiTableInput, PsiAsciiTableOutput)
@@ -20,7 +21,7 @@ if __name__ == '__main__':
     in_array = PsiAsciiTableInput('inputPy_array', as_array=True)
     out_array = PsiAsciiTableOutput('outputPy_array',
                                     '%5s\t%ld\t%3.1f\t%3.1lf%+3.1lfj\n',
-                                    as_array=True)
+                                     as_array=True)
 
     # Read lines from ASCII text file until end of file is reached.
     # As each line is received, it is then sent to the output ASCII file.
@@ -31,7 +32,7 @@ if __name__ == '__main__':
         (ret, line) = in_file.recv_line()
         if ret:
             # If the receive was succesful, send the line to output
-            print("File: %s" % backwards.bytes2unicode(line), end='')
+            print("File: %s" % line)
             ret = out_file.send_line(line)
             if not ret:
                 print("ascii_io(P): ERROR SENDING LINE")
@@ -52,7 +53,8 @@ if __name__ == '__main__':
         if ret:
             # If the receive was succesful, send the values to output.
             # Formatting is taken care of on the output driver side.
-            print(("Table: %s, %d, %3.1f, %s" % line).encode("utf-8"))
+            print_encoded("Table: %s, %d, %3.1f, %s" % line)
+            # print("Table: %s, %d, %3.1f, %s" % line)
             ret = out_table.send_row(*line)
             if not ret:
                 print("ascii_io(P): ERROR SENDING ROW")

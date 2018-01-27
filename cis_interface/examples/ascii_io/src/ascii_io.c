@@ -35,7 +35,7 @@ int main(int argc,char *argv[]){
       // If the receive was succesful, send the line to output
       printf("File: %s", line);
       ret = psiSend(FileOutput, line);
-      if (ret != 0) {
+      if (ret < 0) {
 	printf("ascii_io(C): ERROR SENDING LINE\n");
 	break;
       }
@@ -65,7 +65,7 @@ int main(int argc,char *argv[]){
       printf("Table: %.5s, %ld, %3.1f, %g%+gj\n",
 	     name, number, value, comp_real, comp_imag);
       ret = psiSend(TableOutput, name, number, value, comp_real, comp_imag);
-      if (ret != 0) {
+      if (ret < 0) {
 	printf("ascii_io(C): ERROR SENDING ROW\n");
 	break;
       }
@@ -101,7 +101,7 @@ int main(int argc,char *argv[]){
     // output driver side.
     ret = psiSend(ArrayOutput, ret, name_arr, number_arr, value_arr,
 		  comp_real_arr, comp_imag_arr);
-    if (ret != 0)
+    if (ret < 0)
       printf("ascii_io(C): ERROR SENDING ARRAY\n");
   }
   
@@ -112,5 +112,5 @@ int main(int argc,char *argv[]){
   if (comp_real_arr) free(comp_real_arr);
   if (comp_imag_arr) free(comp_imag_arr);
 
-  return ret;
+  return 0;
 }

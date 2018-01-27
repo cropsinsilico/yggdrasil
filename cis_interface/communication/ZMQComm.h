@@ -223,9 +223,15 @@ int zmq_comm_recv(const comm_t x, char **data, const size_t len,
       cislog_debug("zmq_comm_recv(%s): reallocating buffer from %d to %d bytes.\n",
 		   x.name, len, len_recv + 1);
       (*data) = (char*)realloc(*data, len_recv + 1);
+      if (*data == NULL) {
+	cislog_error("zmq_comm_recv(%s): failed to realloc buffer.", x.name);
+	zframe_destroy(&out);
+	return -1;
+      }
     } else {
       cislog_error("zmq_comm_recv(%s): buffer (%d bytes) is not large enough for message (%d bytes)",
 		   x.name, len, len_recv);
+      zframe_destroy(&out);
       return -((int)len_recv + 1);
     }
   }

@@ -515,7 +515,13 @@ int comm_recv_multipart(const comm_t x, char **data, const size_t len,
       if ((head.size + 1) > len) {
 	if (allow_realloc) {
 	  *data = (char*)realloc(*data, head.size + 1);
-	} else {
+	  if (*data == NULL) {
+	    cislog_error("comm_recv_multipart(%s): Failed to realloc buffer",
+			 x.name);
+	    free_comm(&xmulti);
+	    return -1;
+	  }
+ 	} else {
 	  cislog_error("comm_recv_multipart(%s): buffer is not large enough",
 		       x.name);
 	  free_comm(&xmulti);
@@ -648,14 +654,20 @@ int comm_recv_nolimit(const comm_t x, char **data, const size_t len) {
  */
 static inline
 int vcommSend(const comm_t x, va_list ap) {
-  char *buf = (char*)malloc(CIS_MSG_BUF);
+  size_t buf_siz = CIS_MSG_BUF;
+  /* char *buf = NULL; */
+  char *buf = (char*)malloc(buf_siz);
+  if (buf == NULL) {
+    cislog_error("vcommSend(%s): Failed to alloc buffer", x.name);
+    return -1;
+  }
   seri_t serializer = x.serializer;
   if (x.type == CLIENT_COMM) {
     comm_t *handle = (comm_t*)(x.handle);
     serializer = handle->serializer;
   }
   int args_used = 0;
-  int ret = serialize(serializer, &buf, CIS_MSG_BUF, 1, &args_used, ap);
+  int ret = serialize(serializer, &buf, buf_siz, 1, &args_used, ap);
   if (ret < 0) {
     cislog_error("vcommSend(%s): serialization error", x.name);
     free(buf);
@@ -686,8 +698,14 @@ int vcommSend(const comm_t x, va_list ap) {
 static inline
 int vcommRecv(const comm_t x, va_list ap) {
   // Receive message
-  char *buf = (char*)malloc(CIS_MSG_BUF);
-  int ret = comm_recv_nolimit(x, &buf, CIS_MSG_BUF);
+  size_t buf_siz = CIS_MSG_BUF;
+  /* char *buf = NULL; */
+  char *buf = (char*)malloc(buf_siz);
+  if (buf == NULL) {
+    cislog_error("vcommSend(%s): Failed to alloc buffer", x.name);
+    return -1;
+  }
+  int ret = comm_recv_nolimit(x, &buf, buf_siz);
   if (ret < 0) {
     // cislog_error("vcommRecv(%s): Error receiving.", x.name);
     free(buf);

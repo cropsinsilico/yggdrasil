@@ -5,6 +5,8 @@
 #ifndef ASCIITABLE_H_
 #define ASCIITABLE_H_
 
+#define FMT_LEN 100
+
 /*! @brief Enumerated types to be used for interpreting formats. */
 enum fmt_types { AT_STRING, AT_FLOAT, AT_DOUBLE, AT_COMPLEX,
 		 AT_SHORTSHORT, AT_SHORT, AT_INT, AT_LONG, AT_LONGLONG,
@@ -112,6 +114,10 @@ int at_readline_full_realloc(const asciiTable_t t, char **buf,
   int ret = 0, com = 1;
   size_t nread = LINE_SIZE_MAX;
   char *line = (char*)malloc(nread);
+  if (line == NULL) {
+    cislog_error("at_readline_full_realloc: Failed to malloc line.");
+    return -1;
+  }
   while ((ret >= 0) && (com == 1)) {
     ret = af_readline_full(t.f, &line, &nread);
     if (ret < 0) {
@@ -122,12 +128,17 @@ int at_readline_full_realloc(const asciiTable_t t, char **buf,
   }
   if (ret > (int)len_buf) {
     if (allow_realloc) {
-      printf("at_readline_full_realloc: reallocating buffer from %d to %d bytes.\n",
-	     (int)len_buf, ret + 1);
+      cislog_debug("at_readline_full_realloc: reallocating buffer from %d to %d bytes.",
+		   (int)len_buf, ret + 1);
       (*buf) = (char*)realloc(*buf, ret + 1);
+      if (*buf == NULL) {
+	cislog_error("at_readline_full_realloc: Failed to realloc buffer.");
+	free(line);
+	return -1;
+      }
     } else {
-      printf("at_readline_full_realloc: line (%d bytes) is larger than destination buffer (%d bytes)\n",
-	     ret, (int)len_buf);
+      cislog_error("at_readline_full_realloc: line (%d bytes) is larger than destination buffer (%d bytes)",
+		   ret, (int)len_buf);
       ret = -1;
       free(line);
       return ret;
@@ -180,14 +191,14 @@ int at_vbytes_to_row(const asciiTable_t t, const char* line, va_list ap) {
   strcpy(fmt, t.format_str);
   int sret = simplify_formats(fmt, LINE_SIZE_MAX);
   if (sret < 0) {
-    printf("at_vbytes_to_row: simplify_formats returned %d\n", sret);
+    cislog_debug("at_vbytes_to_row: simplify_formats returned %d", sret);
     return -1;
   }
   // Interpret line
   int ret = vsscanf(line, fmt, ap);
   if (ret != t.ncols) {
-    printf("at_vbytes_to_row: %d arguments filled, but %d were expected\n",
-	   sret, t.ncols);
+    cislog_error("at_vbytes_to_row: %d arguments filled, but %d were expected",
+		 sret, t.ncols);
     ret = -1;
   }
   return ret;
@@ -222,6 +233,10 @@ int at_vreadline(const asciiTable_t t, va_list ap) {
   // Read lines until there's one that's not a comment
   size_t nread = LINE_SIZE_MAX;
   char *line = (char*)malloc(nread);
+  if (line == NULL) {
+    cislog_error("at_vreadline: Failed to malloc line.");
+    return -1;
+  }
   ret = at_readline_full(t, line, nread);
   if (ret < 0) {
     free(line);
@@ -310,6 +325,10 @@ int at_discover_format_str(asciiTable_t *t) {
     return ret;
   size_t nread = LINE_SIZE_MAX;
   char *line = (char*)malloc(nread);
+  if (line == NULL) {
+    cislog_error("at_discover_format_str: Failed to malloc line.");
+    return -1;
+  }
   ret = -1;
   while (getline(&line, &nread, (*t).f.fd) >= 0) {
     if (af_is_comment((*t).f, line) == 1) {
@@ -369,7 +388,7 @@ int at_set_format_siz(asciiTable_t *t) {
     else if (typ == AT_UINT) siz = sizeof(unsigned int);
     else siz = -1;
     if (siz < 0) {
-      printf("ERROR setting size for column %d with type %d\n", i, typ);
+      cislog_error("at_set_format_siz: Could not set size for column %d with type %d", i, typ);
       return -1;
     }
     (*t).format_siz[i] = siz;
@@ -388,10 +407,13 @@ static inline
 int at_set_format_typ(asciiTable_t *t) {
   (*t).format_typ = (int*)malloc((*t).ncols*sizeof(int));
   (*t).format_siz = (int*)malloc((*t).ncols*sizeof(int));
+  if (((*t).format_typ == NULL) || ((*t).format_siz == NULL)) {
+    cislog_error("at_set_format_typ: Failed to alloc format_typ/format_siz");
+    return -1;
+  }
   size_t beg = 0, end;
   int icol = 0;
-  const char fmt_len = 100;
-  char *ifmt = (char*)malloc(fmt_len*sizeof(char));
+  char ifmt[FMT_LEN];
   // Initialize
   for (icol = 0; icol < (*t).ncols; icol++) {
     (*t).format_typ[icol] = -1;
@@ -401,15 +423,13 @@ int at_set_format_typ(asciiTable_t *t) {
   icol = 0;
   int mres;
   size_t sind, eind;
-  char *re_fmt = (char*)malloc(fmt_len*sizeof(char));
+  char re_fmt[FMT_LEN];
   sprintf(re_fmt, "%%[^%s%s]+[%s%s]",
 	  (*t).column, (*t).f.newline, (*t).column, (*t).f.newline);
   while (beg < strlen((*t).format_str)) {
     mres = find_match(re_fmt, (*t).format_str + beg, &sind, &eind);
     if (mres < 0) {
-      printf("ERROR: find_match returned %d\n", mres);
-      free(ifmt);
-      free(re_fmt);
+      cislog_error("at_set_format_typ: find_match returned %d", mres);
       return -1;
     } else if (mres == 0) {
       beg++;
@@ -421,7 +441,7 @@ int at_set_format_typ(asciiTable_t *t) {
     ifmt[end-beg] = '\0';
     if (find_match("%.*s", ifmt, &sind, &eind)) {
       (*t).format_typ[icol] = AT_STRING;
-      mres = regex_replace_sub(ifmt, fmt_len,
+      mres = regex_replace_sub(ifmt, FMT_LEN,
 			       "%(\\.)?([[:digit:]]*)s(.*)", "$2", 0);
       (*t).format_siz[icol] = atoi(ifmt);
 #ifdef _WIN32
@@ -460,16 +480,12 @@ int at_set_format_typ(asciiTable_t *t) {
     } else if (find_match("%.*[uoxX]", ifmt, &sind, &eind)) {
       (*t).format_typ[icol] = AT_UINT;
     } else {
-      printf("ERROR: Could not parse format string: %s\n", ifmt);
-      free(ifmt);
-      free(re_fmt);
+      cislog_error("at_set_format_typ: Could not parse format string: %s", ifmt);
       return -1;
     }
     beg = end;
     icol++;
   }
-  free(ifmt);
-  free(re_fmt);
   return at_set_format_siz(t);
 };
 
@@ -489,8 +505,8 @@ int at_vbytes_to_array(const asciiTable_t t, const char *data,
   // check size of array
   /* size_t data_siz = strlen(data); */
   if ((data_siz % t.row_siz) != 0) {
-    printf("Data: %s\n", data);
-    printf("Data size (%d) not an even number of rows (row size is %d)\n",
+    cislog_error("at_vbytes_to_array: Data: %s", data);
+    cislog_error("at_vbytes_to_array: Data size (%d) not an even number of rows (row size is %d)",
 	   (int)data_siz, t.row_siz);
     return -1;
   }
@@ -502,7 +518,11 @@ int at_vbytes_to_array(const asciiTable_t t, const char *data,
     char **temp;
     temp = va_arg(ap, char**);
     col_siz = nrows*t.format_siz[i];
-    *temp = (char*)malloc(col_siz);
+    *temp = (char*)realloc(*temp, col_siz);
+    if (*temp == NULL) {
+      cislog_error("at_vbytes_to_array: Failed to realloc temp var.");
+      return -1;
+    }
     // C order memory
     /* for (int j = 0; j < nrows; j++) { */
     /*   memcpy(*temp + j*t.format_siz[i], data + j*t.row_siz + cur_pos, t.format_siz[i]); */
@@ -534,8 +554,8 @@ int at_varray_to_bytes(const asciiTable_t t, char *data, const size_t data_siz, 
   int nrows = va_arg(ap, int);
   int msg_siz = nrows*t.row_siz;
   if (msg_siz > (int)data_siz) {
-    printf("at_varray_to_bytes: Message size (%d bytes) will exceed allocated buffer (%d bytes).\n",
-	   msg_siz, (int)data_siz);
+    cislog_debug("at_varray_to_bytes: Message size (%d bytes) will exceed allocated buffer (%d bytes).",
+		 msg_siz, (int)data_siz);
     return msg_siz;
   }
   // Loop through
