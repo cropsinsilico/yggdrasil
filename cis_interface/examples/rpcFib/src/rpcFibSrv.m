@@ -33,8 +33,10 @@ function rpcFibSrv(sleeptime)
 
     % Sleep and then send response back
     pause(sleeptime);
-    rpc.rpcSend(input{1}, result);
-    
+    flag = rpc.rpcSend(input{1}, result);
+    if (~flag);
+      fprintf('rpcFibSrv(M): ERROR sending');
+    end
   end
 
   disp('Goodbye from Matlab rpcFibSrv');

@@ -56,7 +56,7 @@ int main(int argc, char *argv[]) {
     sprintf(logmsg, "fib(%2d<-) = %-2d<-\n", fibNo, fib);
     printf("%s", logmsg);
     ret = psi_send(log, logmsg, strlen(logmsg));
-    if (ret != 0) {
+    if (ret < 0) {
       printf("rpcFibCli(C): SEND ERROR\n");
       free(logmsg);
       exit(-1);

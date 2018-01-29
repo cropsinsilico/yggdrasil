@@ -18,7 +18,7 @@ int main(int argc, char *argv[]) {
 
     //char output[PSI_MSG_BUF];
     //char input[PSI_MSG_BUF];
-    size_t msg_size = 10;
+    size_t msg_size = PSI_MSG_BUF;
     char *output = (char*)malloc(msg_size);
     char *input = (char*)malloc(msg_size);
   
@@ -32,7 +32,7 @@ int main(int argc, char *argv[]) {
     printf("maxMsgCli(CPP): sending %.10s...\n", output);
     
     // Call RPC server
-    if (rpc.call(2, output, &input) < 0) {
+    if (rpc.call(2, output, input) < 0) {
       printf("maxMsgCli(CPP): RPC ERROR\n");
       free(output);
       free(input);

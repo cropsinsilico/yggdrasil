@@ -14,7 +14,7 @@ typedef enum seri_enum seri_type;
 */
 typedef struct seri_t {
   seri_type type; //!< Serializer type.
-  void *info; //!< Pointer to any extra info serializer requires.
+  const void *info; //!< Pointer to any extra info serializer requires.
 } seri_t;
 
 

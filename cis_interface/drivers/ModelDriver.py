@@ -181,6 +181,7 @@ class ModelDriver(Driver):
         r"""Actions to perform after run_loop has finished. Mainly checking
         if there was an error and then handling it."""
         self.debug()
+        self.sleep()
         self.kill_process()
 
     def wait_process(self, timeout=None):
@@ -191,13 +192,17 @@ class ModelDriver(Driver):
                 Defaults to None and is infinite.
 
         """
-        self.process.poll()
-        T = self.start_timeout(timeout)
-        while ((not T.is_out) and
-               (self.process.returncode is None)):  # pragma: debug
-            self.sleep()
+        try:
             self.process.poll()
-        self.stop_timeout()
+            T = self.start_timeout(timeout)
+            while ((not T.is_out) and
+                   (self.process.returncode is None)):  # pragma: debug
+                self.sleep()
+                self.process.poll()
+            self.stop_timeout()
+        except AttributeError:
+            if self.process is not None:
+                raise
 
     def kill_process(self):
         r"""Kill the process running the model, checking return code."""

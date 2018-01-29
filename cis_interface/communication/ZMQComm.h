@@ -220,7 +220,7 @@ int zmq_comm_recv(const comm_t x, char **data, const size_t len,
   /* printf("(C) received %d bytes from %s\n", len_recv, x.address); */
   if ((len_recv + 1) > len) {
     if (allow_realloc) {
-      cislog_debug("zmq_comm_recv(%s): reallocating buffer from %d to %d bytes.\n",
+      cislog_debug("zmq_comm_recv(%s): reallocating buffer from %d to %d bytes.",
 		   x.name, len, len_recv + 1);
       (*data) = (char*)realloc(*data, len_recv + 1);
       if (*data == NULL) {

@@ -18,7 +18,7 @@ int main(int argc, char *argv[]) {
   for (i = 1; i <= iterations; i++) {
     printf("rpcFibCliPar(C): fib(->%-2d) ::: \n", i);
     ret = rpcSend(rpc, i);
-    if (ret != 0) {
+    if (ret < 0) {
       printf("rpcFibCliPar(C): SEND FAILED\n");
       exit(-1);
     }

@@ -218,7 +218,7 @@ comm_t new_comm(char *address, const char *direction, const comm_type t,
  */
 static inline
 comm_t init_comm(const char *name, const char *direction, const comm_type t,
-		 void *seri_info) {
+		 const void *seri_info) {
   cislog_debug("init_comm: Initializing comm.");
   comm_t *ret = init_comm_base(name, direction, t, seri_info);
   int flag = init_comm_type(ret);
@@ -573,7 +573,7 @@ int comm_recv(const comm_t x, char *data, const size_t len) {
   int ret = comm_recv_single(x, &data, len, 0);
   if (ret > 0) {
     if (is_eof(data)) {
-      cislog_debug("comm_recv(%s): EOF received.\n", x.name);
+      cislog_debug("comm_recv(%s): EOF received.", x.name);
       ret = -2;
     } else {
       ret = comm_recv_multipart(x, &data, len, ret, 0);
@@ -596,7 +596,7 @@ int comm_recv_realloc(const comm_t x, char **data, const size_t len) {
   int ret = comm_recv_single(x, data, len, 1);
   if (ret > 0) {
     if (is_eof(*data)) {
-      cislog_debug("comm_recv_realloc(%s): EOF received.\n", x.name);
+      cislog_debug("comm_recv_realloc(%s): EOF received.", x.name);
       ret = -2;
     } else {
       ret = comm_recv_multipart(x, data, len, ret, 1);

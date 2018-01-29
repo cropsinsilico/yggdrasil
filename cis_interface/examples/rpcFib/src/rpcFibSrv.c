@@ -38,6 +38,10 @@ int main(int argc, char *argv[]) {
     if (timeSleep) 
       sleep(timeSleep);
     int flag = rpcSend(rpc, input, result);
+    if (flag < 0) {
+      printf("rpcFibSrv(C): ERROR sending\n");
+      break;
+    }
   }
 
   printf("Goodbye from C rpcFibSrv\n");

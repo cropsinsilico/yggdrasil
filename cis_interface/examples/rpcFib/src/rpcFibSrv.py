@@ -36,7 +36,10 @@ def fibServer(args):
 
         # Sleep and then send response back
         time.sleep(float(sleeptime))
-        rpc.rpcSend(arg, result)
+        flag = rpc.rpcSend(arg, result)
+        if not flag:
+            print('rpcFibSrv(P): ERROR sending')
+            break
 
     print('Goodbye from Python rpcFibSrv')
     sys.exit(0)

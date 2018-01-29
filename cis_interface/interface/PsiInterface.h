@@ -410,7 +410,7 @@ int cisRecv_nolimit(const cisInput_t cisQ, ...) {
   @return cisRpc_t structure with provided info.
  */
 static inline 
-cisRpc_t cisRpc(const char *name, char *outFormat, char *inFormat) {
+cisRpc_t cisRpc(const char *name, const char *outFormat, const char *inFormat) {
   return init_comm(name, outFormat, RPC_COMM, inFormat);
 };
 
@@ -425,7 +425,7 @@ cisRpc_t cisRpc(const char *name, char *outFormat, char *inFormat) {
   @return cisRpc_t structure with provided info.
  */
 static inline
-comm_t cisRpcClient(const char *name, char *outFormat, char *inFormat){
+comm_t cisRpcClient(const char *name, const char *outFormat, const char *inFormat){
   return init_comm(name, outFormat, CLIENT_COMM, inFormat);
 };
 
@@ -440,7 +440,7 @@ comm_t cisRpcClient(const char *name, char *outFormat, char *inFormat){
   @return cisRpc_t structure with provided info.
  */
 static inline
-comm_t cisRpcServer(const char *name, char *inFormat, char *outFormat){
+comm_t cisRpcServer(const char *name, const char *inFormat, const char *outFormat){
   return init_comm(name, inFormat, SERVER_COMM, outFormat);
 };
 

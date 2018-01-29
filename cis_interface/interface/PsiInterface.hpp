@@ -265,7 +265,7 @@ public:
     @param[in] inFormat character pointer to format that should be used for
     parsing input.
    */
-  CisRpc(const char *name, char *outFormat, char *inFormat) :
+  CisRpc(const char *name, const char *outFormat, const char *inFormat) :
     _pi(cisRpc(name, outFormat, inFormat)) {}
 
   /*! @brief Empty constructor for inheritance. */
@@ -342,7 +342,7 @@ public:
     @param[in] outFormat character pointer to format that should be used for
     formatting output.
    */
-  CisRpcServer(const char *name, char *inFormat, char *outFormat) :
+  CisRpcServer(const char *name, const char *inFormat, const char *outFormat) :
     CisRpc(cisRpcServer(name, inFormat, outFormat)) {}
 
   /*!
@@ -373,7 +373,7 @@ public:
     @param[in] inFormat character pointer to format that should be used for
     parsing input.
    */
-  CisRpcClient(const char *name, char *outFormat, char *inFormat) :
+  CisRpcClient(const char *name, const char *outFormat, const char *inFormat) :
     CisRpc(cisRpcClient(name, outFormat, inFormat)) {}
 
   /*!

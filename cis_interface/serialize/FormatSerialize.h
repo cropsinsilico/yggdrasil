@@ -18,7 +18,7 @@
  */
 static inline
 int serialize_format(const seri_t s, char *buf, const size_t buf_siz,
-        int *args_used, va_list ap) {
+		     int *args_used, va_list ap) {
   args_used[0] = 0;
   char *fmt = (char*)s.info;
   int ret = vsnprintf(buf, buf_siz, fmt, ap);
@@ -41,7 +41,8 @@ int serialize_format(const seri_t s, char *buf, const size_t buf_siz,
   returns: int The number of populated arguments. -1 indicates an error.
  */
 static inline
-int deserialize_format(const seri_t s, const char *buf, const size_t buf_siz, va_list ap) {
+int deserialize_format(const seri_t s, const char *buf, const size_t buf_siz,
+		       va_list ap) {
   // Prevent C4100 warning on windows by referencing param
 #ifdef _WIN32
   buf_siz;

@@ -61,7 +61,7 @@ comm_t empty_comm_base() {
 */
 static inline
 comm_t* new_comm_base(char *address, const char *direction, const comm_type t,
-		      void *seri_info) {
+		      const void *seri_info) {
   comm_t* ret = (comm_t*)malloc(sizeof(comm_t));
   if (ret == NULL) {
     cislog_error("new_comm_base: Failed to malloc comm.");
@@ -109,7 +109,7 @@ comm_t* new_comm_base(char *address, const char *direction, const comm_type t,
  */
 static inline
 comm_t* init_comm_base(const char *name, const char *direction,
-		      const comm_type t, void *seri_info) {
+		       const comm_type t, const void *seri_info) {
   char full_name[COMM_NAME_SIZE];
   char *address = NULL;
   if (name != NULL) {

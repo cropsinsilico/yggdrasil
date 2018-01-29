@@ -53,7 +53,7 @@ int main(int argc, char *argv[]) {
     sprintf(logmsg, "fib(%2d<-) = %-2d<-\n", fibNo, fib);
     printf(logmsg);
     ret = log.send(logmsg, strlen(logmsg));
-    if (ret != 0) {
+    if (ret < 0) {
       printf("rpcFibCli(CPP): SEND ERROR\n");
       free(logmsg);
       return -1;
