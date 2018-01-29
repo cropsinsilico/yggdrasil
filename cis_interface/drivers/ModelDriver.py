@@ -14,15 +14,6 @@ except ImportError:
     from queue import Queue, Empty  # python 3.x
 
 
-if platform._is_win:
-    # TODO: Signal fowarding on Windows
-    preexec = None
-else:
-    def preexec():  # pragma: no cover
-        # Don't forward signals - used to ignore signals
-        os.setpgrp()
-
-
 class ModelDriver(Driver):
     r"""Base class form Model drivers.
 
@@ -119,7 +110,7 @@ class ModelDriver(Driver):
         print(pre_args + self.args)
         self.process = tools.popen_nobuffer(pre_args + self.args, env=env,
                                             cwd=self.workingDir,
-                                            preexec_fn=preexec)
+                                            forward_signals=False)
         # Start thread to queue output
         self.queue = Queue()
         self.queue_thread = Thread(target=self.enqueue_output,
@@ -139,7 +130,7 @@ class ModelDriver(Driver):
                     self.debug("Empty line from stdout")
                     break
                 else:
-                    queue.put(line)
+                    queue.put(line.decode('utf-8'))
         except BaseException:  # pragma: debug
             self.error("Error getting output")
             raise
