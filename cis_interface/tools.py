@@ -216,7 +216,7 @@ def print_encoded(msg, *args, **kwargs):
         kwargs.pop('end', None)
         try:
             print(msg, *args, **kwargs)
-        except UnicodeEncodeError:  # pragma: debug 
+        except UnicodeEncodeError:  # pragma: debug
             print(backwards.unicode2bytes(msg), *args, **kwargs)
 
 
