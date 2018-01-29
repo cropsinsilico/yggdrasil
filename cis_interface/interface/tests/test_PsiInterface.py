@@ -2,7 +2,7 @@ import os
 import numpy as np
 import nose.tools as nt
 from cis_interface.interface import PsiInterface
-from cis_interface.tools import PSI_MSG_EOF, PSI_MSG_MAX
+from cis_interface.tools import PSI_MSG_EOF, PSI_MSG_MAX, PSI_MSG_BUF
 from cis_interface.drivers import (
     import_driver, InputCommDriver, OutputCommDriver)
 from cis_interface.tests import CisTest, IOInfo
@@ -16,6 +16,11 @@ def test_maxMsgSize():
 def test_eof_msg():
     r"""Test eof message signal."""
     nt.assert_equal(PsiInterface.eof_msg(), PSI_MSG_EOF)
+
+
+def test_bufMsgSize():
+    r"""Test buf message size."""
+    nt.assert_equal(PsiInterface.bufMsgSize(), PSI_MSG_BUF)
 
 
 def test_PsiMatlab_class():

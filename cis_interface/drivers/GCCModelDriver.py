@@ -106,7 +106,7 @@ def do_compile(src, out=None, cc=None, ccflags=None, ldflags=None,
         ldflags = []
     ldflags0 = _linker_flags
     if platform._is_win:
-        ccflags0 = ['/W4', '/Zi']
+        ccflags0 = ['/W4', '/Zi', "/EHsc"]
     else:
         ccflags0 = ['-g', '-Wall']
     ccflags0 += _compile_flags

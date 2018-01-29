@@ -536,6 +536,7 @@ int rpcRecv(const cisRpc_t rpc, ...) {
 static inline
 int vrpcCall(const cisRpc_t rpc, va_list ap) {
   int sret, rret;
+  rret = 0;
 
   // Create copy for receiving
   va_list op;

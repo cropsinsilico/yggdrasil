@@ -84,9 +84,11 @@ if _zmq_installed:
 else:
     CIS_MSG_MAX = 1024 * 2
 CIS_MSG_EOF = backwards.unicode2bytes("EOF!!!")
+CIS_MSG_BUF = 1024 * 2
 
 PSI_MSG_MAX = CIS_MSG_MAX
 PSI_MSG_EOF = CIS_MSG_EOF
+PSI_MSG_BUF = CIS_MSG_BUF
 
 
 # https://stackoverflow.com/questions/35772001/

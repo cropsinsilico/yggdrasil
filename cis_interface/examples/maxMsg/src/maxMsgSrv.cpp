@@ -14,7 +14,11 @@ int main(int argc, char *argv[]) {
       if (ret < 0)
 	break;
       printf("maxMsgSrv(CPP): rpcRecv returned %d, input %.10s...\n", ret, input);
-      rpc.send(1, input);
+      ret = rpc.send(1, input);
+      if (ret < 0) {
+        printf("maxMsgSrv(CPP): SEND ERROR");
+        break;
+      }
     }
 
     printf("maxMsgSrv(CPP): Goodbye!\n");

@@ -1,5 +1,5 @@
 from cis_interface import backwards
-from cis_interface.tools import PSI_MSG_EOF, PSI_MSG_MAX
+from cis_interface.tools import PSI_MSG_EOF, PSI_MSG_MAX, PSI_MSG_BUF
 from cis_interface.communication import (
     DefaultComm, RPCComm, ServerComm, ClientComm,
     AsciiFileComm, AsciiTableComm, PickleFileComm)
@@ -11,6 +11,11 @@ from cis_interface.serialize import (
 def maxMsgSize():
     r"""int: The maximum message size."""
     return PSI_MSG_MAX
+
+
+def bufMsgSize():
+    r"""int: Buffer size for average message."""
+    return PSI_MSG_BUF
 
 
 def eof_msg():

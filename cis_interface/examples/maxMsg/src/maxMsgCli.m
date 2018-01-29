@@ -4,14 +4,14 @@ charset = ['0123456789', ...
 	   'ABCDEFGHIJKLMNOPQRSTUVWXYZ'];
 
 
-PSI_MSG_MAX = PsiInterface('PSI_MSG_MAX');
-fprintf('maxMsgCli(M): Hello PSI_MSG_MAX is %d.\n', PSI_MSG_MAX);
+msg_size = PsiInterface('PSI_MSG_BUF');
+fprintf('maxMsgCli(M): Hello message size is %d.\n', msg_size);
 
 % Create a max message, send/recv and verify
 rpc = PsiInterface('PsiRpcClient', 'maxMsgSrv_maxMsgCli', '%s', '%s');
 
 % Create a max message
-output = randsample(charset, PSI_MSG_MAX-1, true);
+output = randsample(charset, msg_size-1, true);
 
 % Call RPC server
 input = rpc.rpcCall(output);

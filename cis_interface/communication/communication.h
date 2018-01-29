@@ -220,6 +220,8 @@ static inline
 comm_t init_comm(const char *name, const char *direction, const comm_type t,
 		 const void *seri_info) {
   cislog_debug("init_comm: Initializing comm.");
+  SetErrorMode(SEM_FAILCRITICALERRORS | SEM_NOGPFAULTERRORBOX);
+  _set_abort_behavior(0,_WRITE_ABORT_MSG);
   comm_t *ret = init_comm_base(name, direction, t, seri_info);
   int flag = init_comm_type(ret);
   if (flag < 0) {
@@ -329,8 +331,9 @@ comm_head_t comm_send_multipart_header(const comm_t x, const size_t len) {
 */
 static inline
 int comm_send_multipart(const comm_t x, const char *data, const size_t len) {
-  char headbuf[BUFSIZ];
-  int headlen = 0, ret;
+  //char headbuf[CIS_MSG_BUF];
+  int headbuf_len = CIS_MSG_BUF;
+  int headlen = 0, ret = -1;
   comm_t xmulti = empty_comm_base();
   // Get header
   comm_head_t head = comm_send_multipart_header(x, len);
@@ -338,14 +341,28 @@ int comm_send_multipart(const comm_t x, const char *data, const size_t len) {
     cislog_error("comm_send_multipart: Invalid header generated.");
     return -1;
   }
+  char *headbuf = (char*)malloc(headbuf_len);
+  if (headbuf == NULL) {
+    cislog_error("comm_send_multipart: Failed to malloc headbuf.");
+    return -1;
+  }
   // Try to send body in header
   if (len < x.maxMsgSize) {
-    headlen = format_comm_header(head, headbuf, BUFSIZ);
+    headlen = format_comm_header(head, headbuf, headbuf_len);
     if (headlen < 0) {
       cislog_error("comm_send_multipart: Failed to format header.");
+      free(headbuf);
       return -1;
     }
     if (((size_t)headlen + len) < x.maxMsgSize) {
+      if (((size_t)headlen + len + 1) > headbuf_len) {
+        headbuf = (char*)realloc(headbuf, headlen + len + 1);
+        if (headbuf == NULL) {
+          cislog_error("comm_send_multipart: Failed to realloc headbuf.");
+          return -1;          
+        }
+        headbuf_len = headlen + len + 1;
+      }
       head.multipart = 0;
       memcpy(headbuf + headlen, data, len);
       headlen += (int)len;
@@ -361,7 +378,7 @@ int comm_send_multipart(const comm_t x, const char *data, const size_t len) {
       return -1;
     }
     strcpy(head.address, xmulti.address);
-    headlen = format_comm_header(head, headbuf, BUFSIZ);
+    headlen = format_comm_header(head, headbuf, headbuf_len);
     if (headlen < 0) {
       cislog_error("comm_send_multipart: Failed to format header.");
       free_comm(&xmulti);
@@ -655,7 +672,7 @@ int comm_recv_nolimit(const comm_t x, char **data, const size_t len) {
 static inline
 int vcommSend(const comm_t x, va_list ap) {
   size_t buf_siz = CIS_MSG_BUF;
-  /* char *buf = NULL; */
+  // char *buf = NULL;
   char *buf = (char*)malloc(buf_siz);
   if (buf == NULL) {
     cislog_error("vcommSend(%s): Failed to alloc buffer", x.name);
@@ -681,6 +698,7 @@ int vcommSend(const comm_t x, va_list ap) {
   } else {
     return args_used;
   }
+  return -1;
 };
 
 /*!
