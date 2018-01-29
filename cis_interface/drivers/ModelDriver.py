@@ -123,7 +123,7 @@ class ModelDriver(Driver):
         try:
             # for line in iter(out.readline, backwards.unicode2bytes('')):
             #     self.debug("Queuing output: %s", line)
-            #     queue.put(line)
+            #     queue.put(line.decode('utf-8'))
             while self.process is not None:
                 line = out.readline()
                 if len(line) == 0:

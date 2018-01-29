@@ -1,5 +1,4 @@
 import os
-import shutil
 import nose.tools as nt
 from cis_interface import tools, platform  # , backwards
 
@@ -16,7 +15,7 @@ def test_is_ipc_installed():
 
 def test_popen_nobuffer():
     r"""Test open of process without buffer."""
-    ans = os.getcwd() # + '\n'
+    ans = os.getcwd()  # + '\n'
     # ans = backwards.unicode2bytes(ans)
     # Test w/o shell
     if platform._is_win:
