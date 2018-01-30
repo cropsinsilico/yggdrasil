@@ -604,7 +604,7 @@ int at_bytes_to_array(const asciiTable_t t, char *data, size_t data_siz, ...) {
 static inline
 int at_array_to_bytes(const asciiTable_t t, char *data, const size_t data_siz, ...) {
   va_list ap;
-  va_start(ap, data);
+  va_start(ap, data_siz);
   int ret = at_varray_to_bytes(t, data, data_siz, ap);
   va_end(ap);
   return ret;

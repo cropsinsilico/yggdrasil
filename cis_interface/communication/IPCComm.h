@@ -147,8 +147,8 @@ int new_ipc_address(comm_t *comm) {
   }
   fid[0] = msgget(key, (IPC_CREAT | 0777));
   if (fid[0] < 0) {
-      cislog_error("new_ipc_address: msgget(%d, %d) ret(%d), errno(%d): %s",
-		   IPC_PRIVATE, IPC_CREAT, fid[0], errno, strerror(errno));
+      cislog_error("new_ipc_address: msgget(%d, %d | 0777) ret(%d), errno(%d): %s",
+		   key, IPC_CREAT, fid[0], errno, strerror(errno));
       return -1;
   }
   comm->handle = (void*)fid;
@@ -181,6 +181,11 @@ int init_ipc_comm(comm_t *comm) {
     return -1;
   }
   fid[0] = msgget(qkey, 0600);
+  if (fid[0] < 0) {
+      cislog_error("init_ipc_address: msgget(%d, 0600) ret(%d), errno(%d): %s",
+       qkey, fid[0], errno, strerror(errno));
+      return -1;
+  }
   comm->handle = (void*)fid;
   return 0;
 };
