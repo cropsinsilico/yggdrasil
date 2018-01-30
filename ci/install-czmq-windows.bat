@@ -85,8 +85,8 @@ IF NOT EXIST %CZMQ_BUILDDIR% (
     ECHO Building czmq...
     msbuild /v:minimal /p:Configuration=%CONFIGURATION% czmq.vcxproj
     msbuild /v:minimal /p:Configuration=%CONFIGURATION% czmq_selftest.vcxproj
-    cd "%CZMQ_BUILDDIR%\%Configuration%"
-    copy "%LIBZMQ_BUILDDIR%\bin\%Configuration%\libzmq-*dll" .
+    cd "%CZMQ_LIBRARY_DIR%"
+    copy "%ZEROMQ_LIBRARY_DIR%\libzmq-*dll" .
     :: cd "%CZMQ_BUILDDIR%"
     :: ctest -C "%Configuration%" -V
 )
