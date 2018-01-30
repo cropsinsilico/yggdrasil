@@ -99,3 +99,4 @@ set STOPTIME=%DATE% %TIME%
 :: Set path variables
 :done
 @endlocal & set PATH=%PATH%;%ZEROMQ_LIBRARY_DIR%;%CZMQ_LIBRARY_DIR%;%ZEROMQ_INCLUDE_DIR%;%CZMQ_INCLUDE_DIR%
+echo PATH = %PATH%
