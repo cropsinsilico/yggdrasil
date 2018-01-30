@@ -9,7 +9,9 @@ from cis_interface.examples import yamls as ex_yamls
 def test_get_runner():
     r"""Use get_runner to start a run."""
     cr = runner.get_runner([ex_yamls['hello']['python']])
+    cr.debug_log()
     cr.run()
+    cr.reset_log()
 
 
 # def test_runner_error():
@@ -65,7 +67,7 @@ class TestCisRunner(object):
         r"""Test createInputDriver and createOutputDriver."""
         yml = {'name': 'fake_IODriver',
                'args': 'fake_channel',
-               'driver': 'RMQInputDriver',
+               'driver': 'InputCommDriver',
                'workingDir': os.getcwd(),
                'kwargs': {}}
         nt.assert_raises(Exception, self.runner.createInputDriver, yml)

@@ -14,6 +14,7 @@ from cis_interface.backwards import sio
 import subprocess
 from cis_interface import platform
 from cis_interface import backwards
+from cis_interface.config import cis_cfg, cfg_logging
 
 
 def locate_path(fname):
@@ -310,6 +311,21 @@ class CisClass(object):
         self.sched_out = None
         self.suppress_special_debug = False
         self.logger = logging.getLogger(self.__module__)
+        self._old_loglevel = None
+        self.debug_flag = False
+
+    def debug_log(self):  # pragma: debug
+        r"""Turn on debugging."""
+        self._old_loglevel = cis_cfg.get('debug', 'psi')
+        cis_cfg.set('debug', 'psi', 'DEBUG')
+        cfg_logging()
+
+    def reset_log(self):  # pragma: debug
+        r"""Resetting logging to prior value."""
+        if self._old_loglevel is not None:
+            cis_cfg.set('debug', 'psi', self._old_loglevel)
+            cfg_logging()
+            self._old_loglevel = None
 
     def print_encoded(self, msg, *args, **kwargs):
         r"""Print bytes to stdout, encoding if possible.
