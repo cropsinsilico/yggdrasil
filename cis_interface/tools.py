@@ -29,7 +29,7 @@ def locate_path(fname):
         return False
     if out.isspace():
         return False
-    return backwards.bytes2unicode(out).split("\n")[0]
+    return backwards.bytes2unicode(out.splitlines()[0])
 
 
 def is_ipc_installed():
