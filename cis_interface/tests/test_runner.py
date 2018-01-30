@@ -67,9 +67,9 @@ class TestCisRunner(object):
         r"""Test createInputDriver and createOutputDriver."""
         yml = {'name': 'fake_IODriver',
                'args': 'fake_channel',
-               'driver': 'InputCommDriver',
+               'driver': 'InputDriver',
                'workingDir': os.getcwd(),
                'kwargs': {}}
         nt.assert_raises(Exception, self.runner.createInputDriver, yml)
-        yml['driver'] = 'RMQOutputDriver'
+        yml['driver'] = 'OutputDriver'
         nt.assert_raises(Exception, self.runner.createOutputDriver, yml)
