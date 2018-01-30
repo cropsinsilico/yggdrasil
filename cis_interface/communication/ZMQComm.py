@@ -474,10 +474,14 @@ class ZMQComm(CommBase.CommBase):
 
     def register_socket(self):
         r"""Register a socket."""
+        self.debug('Registering socket: type = %s, address = %s',
+                   self.socket_type_name, self.address)
         register_socket(self.socket_type_name, self.address)
 
     def unregister_socket(self):
         r"""Unregister a socket."""
+        self.debug('Unegistering socket: type = %s, address = %s',
+                   self.socket_type_name, self.address)
         unregister_socket(self.socket_type_name, self.address)
         
     def bind(self):
@@ -535,6 +539,7 @@ class ZMQComm(CommBase.CommBase):
             self.socket.unbind(self.address)
             self.unregister_socket()
             self._bound = False
+        self.debug('Unbound socket')
 
     def disconnect(self):
         r"""Disconnect from address."""
@@ -543,6 +548,7 @@ class ZMQComm(CommBase.CommBase):
             self.socket.disconnect(self.address)
             self.unregister_socket()
             self._connected = False
+        self.debug('Disconnected socket')
 
     def open(self):
         r"""Open connection by binding/connect to the specified socket."""

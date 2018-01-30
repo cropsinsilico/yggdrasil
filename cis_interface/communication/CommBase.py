@@ -245,11 +245,12 @@ class CommBase(CisClass):
                 done such that a recently sent message has time to be received.
 
         """
-        self.debug("Cleaning up work comms")
+        self.debug("Cleaning up %d work comms", len(self._work_comms))
         if not wait_for_send:
             keys = [k for k in self._work_comms.keys()]
             for c in keys:
                 self.remove_work_comm(c)
+        self.debug("Finished cleaning up work comms")
 
     @property
     def is_open(self):
