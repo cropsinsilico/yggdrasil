@@ -21,7 +21,9 @@ def locate_path(fname):
     r"""Find the full path to a file using where on Windows."""
     try:
         if platform._is_win:
-            out = subprocess.check_output(["where", fname])
+            out = subprocess.check_output(["dir", fname, "/s/b"], shell=True,
+                                          cwd=os.path.abspath(os.sep))
+            # out = subprocess.check_output(["where", fname])
         else:
             out = subprocess.check_output(["find", "/", "-xdev", "-name",
                                            fname, "2>/dev/null"])
@@ -31,7 +33,9 @@ def locate_path(fname):
         return False
     if out.isspace():
         return False
-    return backwards.bytes2unicode(out.splitlines()[0])
+    out = out.decode('utf-8').splitlines()
+    # out = backwards.bytes2unicode(out.splitlines()[0])
+    return out
 
 
 def is_ipc_installed():

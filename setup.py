@@ -42,12 +42,18 @@ if cov_installed and IS_WINDOWS:
     # Function to fine paths
     def locate(fname):
         try:
-            out = subprocess.check_output(["where", fname])
+            out = subprocess.check_output(["dir", fname, "/s/b"], shell=True,
+                                          cwd=os.path.abspath(os.sep))
+            # out = subprocess.check_output(["where", fname])
         except subprocess.CalledProcessError:
             return False
         if out.isspace():
             return False
-        return out.splitlines()[0].decode('utf-8')
+        matches = out.splitlines()
+        if len(matches) > 1:
+            warnings.warn("More than one (%d) match to %s" % (len(matches), fname))
+            return False
+        return matches[0].decode('utf-8')
     # Open config file
     cp = HandyConfigParser("")
     cp.read(usr_config_file)

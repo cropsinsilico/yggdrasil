@@ -191,7 +191,7 @@ class ModelDriver(Driver):
                 self.sleep()
                 self.process.poll()
             self.stop_timeout()
-        except AttributeError:
+        except AttributeError:  # pragma: debug
             if self.process is not None:
                 raise
 

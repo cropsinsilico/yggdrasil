@@ -72,7 +72,7 @@ class FileComm(CommBase.CommBase):
             try:
                 self.fd.flush()
                 os.fsync(self.fd.fileno())
-            except OSError:
+            except OSError:  # pragma: debug
                 pass
             self.fd.close()
         self.fd = None
