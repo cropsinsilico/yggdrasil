@@ -23,8 +23,10 @@ def locate_path(fname):
         if platform._is_win:
             out = subprocess.check_output(["where", fname])
         else:
-            out = subprocess.check_output(["locate", "-b", "--regex",
-                                           "^%s" % fname])
+            out = subprocess.check_output(["find", "/", "-xdev", "-name",
+                                           fname, "2>/dev/null"])
+            # out = subprocess.check_output(["locate", "-b", "--regex",
+            #                                "^%s" % fname])
     except subprocess.CalledProcessError:
         return False
     if out.isspace():
@@ -50,31 +52,35 @@ def is_zmq_installed():
 
     """
     # Check existence of files
-    check_files = ['zmq.h', 'czmq.h']
+    # check_files = ['zmq.h', 'czmq.h']
+    # if platform._is_win:
+    #     check_files += ['zmq.lib', 'czmq.lib']
+    #     check_files += ['libzmq-*dll', 'libczmq.dll']
+    # for f in check_files:
+    #     if not locate_path(f):
+    #         warnings.warn("Could not locate ZeroMQ headers/libraries on PATH")
+    #         return False
+    # Check existence of config paths for windows
     if platform._is_win:
-        check_files += ['zmq.lib', 'czmq.lib']
-        check_files += ['libzmq-*dll', 'libczmq.dll']
-    for f in check_files:
-        if not locate_path(f):
-            warnings.warn("Could not locate ZeroMQ headers/libraries on PATH")
-            return False
-    # Check validity of compile flags
-    if platform._is_win:
-        cc = 'cl'
+        opts = ['libzmq_include', 'libzmq_static', 'libzmq_dynamic',
+                'czmq_include', 'czmq_static', 'czmq_dynamic']
+        for o in opts:
+            if not cis_cfg.get('windows', o, None):
+                warnings.warn("Config option %s not set." % o)
+                return False
         return True
     else:
-        cc = 'gcc'
-    process = subprocess.Popen([cc, '-lzmq', '-lczmq'],
-                               stdout=subprocess.PIPE,
-                               stderr=subprocess.PIPE)
-    outs, errs = process.communicate()
-    # Python 3
-    # try:
-    #     outs, errs = process.communicate(timeout=15)
-    # except subprocess.TimeoutExpired:
-    #     process.kill()
-    #     outs, errs = process.communicate()
-    return (backwards.unicode2bytes('zmq') not in errs)
+        process = subprocess.Popen(['gcc', '-lzmq', '-lczmq'],
+                                   stdout=subprocess.PIPE,
+                                   stderr=subprocess.PIPE)
+        outs, errs = process.communicate()
+        # Python 3
+        # try:
+        #     outs, errs = process.communicate(timeout=15)
+        # except subprocess.TimeoutExpired:
+        #     process.kill()
+        #     outs, errs = process.communicate()
+        return (backwards.unicode2bytes('zmq') not in errs)
 
 
 _ipc_installed = is_ipc_installed()

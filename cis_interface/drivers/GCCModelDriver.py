@@ -1,8 +1,9 @@
 import os
 from cis_interface import platform
+from cis_interface.config import cis_cfg
 from cis_interface.communication import _default_comm
 from cis_interface.tools import (
-    _zmq_installed, _ipc_installed, locate_path, popen_nobuffer, print_encoded)
+    _zmq_installed, _ipc_installed, popen_nobuffer, print_encoded)
 from cis_interface.drivers.ModelDriver import ModelDriver
 
 
@@ -23,17 +24,26 @@ if platform._is_win:
 if _zmq_installed:
     if platform._is_win:
         _zmq_dirs = dict()
-        for l in ["zmq", "czmq"]:
-            for ext in ["h", "lib"]:
-                f = "%s.%s" % (l, ext)
-                p = locate_path(f)
-                if not p:
-                    raise Exception("Could not locate %s." % f)
-                _zmq_dirs[f] = os.path.dirname(p)
-                if ext == "h":
-                    _compile_flags.append("-I%s" % _zmq_dirs[f])
-                elif ext == "lib":
-                    _linker_flags += [f, '/LIBPATH:"%s"' % _zmq_dirs[f]]
+        for l in ["libzmq", "czmq"]:
+            plib = cis_cfg.get('windows', '%s_static' % l, False)
+            pinc = cis_cfg.get('windows', '%s_include' % l, False)
+            if not (plib and pinc):
+                raise Exception("Could not locate %s .lib and .h files." % l)
+            pinc_d = os.path.dirname(pinc)
+            plib_d, plib_f = os.path.split(plib)
+            _compile_flags.append("-I%s" % pinc_d)
+            _linker_flags += [plib_f, '/LIBPATH:"%s"' % plib_d]
+        # for l in ["zmq", "czmq"]:
+        #     for ext in ["h", "lib"]:
+        #         f = "%s.%s" % (l, ext)
+        #         p = locate_path(f)
+        #         if not p:
+        #             raise Exception("Could not locate %s." % f)
+        #         _zmq_dirs[f] = os.path.dirname(p)
+        #         if ext == "h":
+        #             _compile_flags.append("-I%s" % _zmq_dirs[f])
+        #         elif ext == "lib":
+        #             _linker_flags += [f, '/LIBPATH:"%s"' % _zmq_dirs[f]]
     else:
         _linker_flags += ["-lczmq", "-lzmq"]
     _compile_flags += ["-DZMQINSTALLED"]

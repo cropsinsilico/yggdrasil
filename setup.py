@@ -24,7 +24,7 @@ def_config_file = os.path.join(os.path.dirname(__file__),
 if not os.path.isfile(usr_config_file):
     shutil.copy(def_config_file, usr_config_file)
 
-# Set coverage options in .coveragerc
+# Import config parser
 cov_installed = False
 try:
     from ConfigParser import RawConfigParser as HandyConfigParser
@@ -35,6 +35,45 @@ except ImportError:
         cov_installed = True
     except ImportError:
         pass
+
+# Set paths in config file
+if cov_installed and IS_WINDOWS:
+    import subprocess
+    # Function to fine paths
+    def locate(fname):
+        try:
+            out = subprocess.check_output(["where", fname])
+        except subprocess.CalledProcessError:
+            return False
+        if out.isspace():
+            return False
+        return out.splitlines()[0].decode('utf-8')
+    # Open config file
+    cp = HandyConfigParser("")
+    cp.read(usr_config_file)
+    if not cp.has_section('windows'):
+        cp.add_section('windows')
+    # Find paths
+    clibs = {'libzmq_include': 'zmq.h', 
+             'libzmq_static': 'zmq.lib',
+             'libzmq_dynamic': 'libzmq-*dll',
+             'czmq_include': 'czmq.h',
+             'czmq_static': 'czmq.lib',
+             'czmq_dynamic': 'libczmq.dll'}
+    for opt, fname in clibs.items():
+        if not cp.has_option('windows', opt):
+            fpath = locate(fname)
+            if fpath:
+                print('located %s: %s' % (fname, fpath))
+                cp.set('windows', opt, fpath)
+            else:
+                warnings.warn("Could not locate %s. Please set %s option in %s to correct path."
+                              % (fname, opt, usr_config_file))
+    with open(usr_config_file, 'w') as fd:
+        cp.write(fd)
+
+
+# Set coverage options in .coveragerc
 if cov_installed:
     # Read options
     covrc = '.coveragerc'
