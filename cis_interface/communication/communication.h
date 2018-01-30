@@ -357,13 +357,13 @@ int comm_send_multipart(const comm_t x, const char *data, const size_t len) {
       return -1;
     }
     if (((size_t)headlen + len) < x.maxMsgSize) {
-      if (((size_t)headlen + len + 1) > headbuf_len) {
-        headbuf = (char*)realloc(headbuf, headlen + len + 1);
+      if (((size_t)headlen + len + 1) > (size_t)headbuf_len) {
+        headbuf = (char*)realloc(headbuf, (size_t)headlen + len + 1);
         if (headbuf == NULL) {
           cislog_error("comm_send_multipart: Failed to realloc headbuf.");
           return -1;          
         }
-        headbuf_len = headlen + len + 1;
+        headbuf_len = headlen + (int)len + 1;
       }
       head.multipart = 0;
       memcpy(headbuf + headlen, data, len);
@@ -700,7 +700,6 @@ int vcommSend(const comm_t x, va_list ap) {
   } else {
     return args_used;
   }
-  return -1;
 };
 
 /*!

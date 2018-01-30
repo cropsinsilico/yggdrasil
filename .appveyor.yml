@@ -111,7 +111,9 @@ test_script:
   # - "cdb.exe C:\\projects\\cis-interface\\cis_interface\\examples\\gs_lesson3\\src\\gs_lesson3_c"
   # - "C:\\projects\\cis-interface\\cis_interface\\examples\\gs_lesson3\\src\\gs_lesson3_c"
   # - "nosetests --nologcapture --with-coverage --cover-package=cis_interface -svx cis_interface/examples/tests/test_gs_lesson3.py"
-  - "nosetests --nologcapture --with-coverage --cover-package=cis_interface -svx cis_interface"
+  # - "nosetests --nologcapture --with-coverage --cover-package=cis_interface -svx cis_interface"
+  - "nosetests --with-coverage --cover-package=cis_interface -svx cis_interface/tests/"
+  - "nosetests --with-coverage --cover-package=cis_interface -svx cis_interface"
 
 
 after_test:
