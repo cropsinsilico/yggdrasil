@@ -110,25 +110,20 @@ def kill(pid, signum):
         if (((signum in sigmap) and (thread.name == 'MainThread') and
              callable(handler) and (pid == 0))):
             event = threading.Event()
-            print(handler)
 
             def handler_set_event(signum, frame):
-                print('handler')
                 event.set()
                 return handler(signum, frame)
 
             signal.signal(signum, handler_set_event)
             try:
-                print('before kill')
                 os.kill(pid, sigmap[signum])
                 # busy wait because we can't block in the main
                 # thread, else the signal handler can't execute.
                 while not event.is_set():
                     pass
-                print('set event')
             finally:
                 signal.signal(signum, handler)
-                print('after kill')
         else:
             os.kill(pid, sigmap.get(signum, signum))
     else:
@@ -205,6 +200,7 @@ def popen_nobuffer(args, forward_signals=True, **kwargs):
     kwargs.setdefault('stderr', subprocess.STDOUT)
     if not forward_signals:
         if platform._is_win:
+            kwargs.setdefault('preexec_fn', None)
             kwargs.setdefault('creationflags', subprocess.CREATE_NEW_PROCESS_GROUP)
         else:
             kwargs.setdefault('preexec_fn', os.setpgrp)

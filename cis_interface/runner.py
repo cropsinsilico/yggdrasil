@@ -237,9 +237,6 @@ class CisRunner(CisClass):
             signal_handler = self.signal_handler
         signal.signal(signal.SIGTERM, signal_handler)
         signal.signal(signal.SIGINT, signal_handler)
-        # if platform._is_win:
-        #     signal.signal(signal.CTRL_C_EVENT, signal_handler)
-        #     signal.signal(signal.CTRL_BREAK_EVENT, signal_handler)
         if not platform._is_win:
             signal.siginterrupt(signal.SIGTERM, False)
             signal.siginterrupt(signal.SIGINT, False)
@@ -443,7 +440,6 @@ class CisRunner(CisClass):
                 d.join(0.1)
                 if not d.is_alive():
                     dead.append(drv['name'])
-            print("Dead drivers: ", dead)
         for d in self.modeldrivers.values():
             if d['instance'].errors:
                 self.error_flag = True
