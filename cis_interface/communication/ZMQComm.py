@@ -583,13 +583,14 @@ class ZMQComm(CommBase.CommBase):
         if self.socket.closed:
             self.debug("Socket already closed: %s", self.address)
         else:
-            self.debug("Closing socket %s", self.address)
             if self.socket_action == 'bind':
                 self.unbind()
             elif self.socket_action == 'connect':
                 self.disconnect()
+            self.debug("Closing socket %s", self.address)
             if wait_for_send:
                 linger = 100
+                self.debug("Waiting %d ms for send to close comm", linger)
             else:
                 linger = 0
             self.socket.close(linger=linger)
