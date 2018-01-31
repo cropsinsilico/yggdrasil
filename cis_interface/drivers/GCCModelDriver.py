@@ -165,12 +165,12 @@ def do_compile(src, out=None, cc=None, ccflags=None, ldflags=None,
     if os.path.isfile(out):
         os.remove(out)
     # Compile
-    print(compile_args)
     comp_process = popen_nobuffer(compile_args)
     output, err = comp_process.communicate()
     exit_code = comp_process.returncode
-    print_encoded(output, end="")
     if exit_code != 0:  # pragma: debug
+        print(' '.join(compile_args))
+        print_encoded(output, end="")
         raise RuntimeError("Compilation failed with code %d." % exit_code)
     assert(os.path.isfile(out))
     return out
@@ -289,8 +289,16 @@ class GCCModelDriver(ModelDriver):
         else:  # pragma: debug
             self.error("Error compiling.")
 
+    def remove_products(self):
+        products = [self.efile]
+        if platform._is_win:
+            base = os.path.splitext(self.efile)[0]
+            products = [base + ext for ext in ['.ilk', '.pdb', '.obj']]
+        for p in products:
+            if os.path.isfile(p):
+                os.remove(p)
+
     def cleanup(self):
         r"""Remove compile executable."""
-        if os.path.isfile(self.efile):
-            os.remove(self.efile)
+        self.remove_products()
         super(GCCModelDriver, self).cleanup()
