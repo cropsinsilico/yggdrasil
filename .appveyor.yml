@@ -91,7 +91,7 @@ install:
   - "pip install -e ."
 
 cache:
-  # - '%LOCALAPPDATA%\pip\Cache' -> setup.py
+  - '%LOCALAPPDATA%\pip\Cache' -> setup.py
   - libsodium    -> ci\install-czmq_windows.bat
   - libzmq       -> ci\install-czmq_windows.bat
   - build_libzmq -> ci\install-czmq_windows.bat
