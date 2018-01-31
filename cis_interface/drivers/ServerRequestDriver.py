@@ -141,6 +141,7 @@ class ServerRequestDriver(ConnectionDriver):
                 self.debug("New client signed on.")
                 self.nclients += 1
                 msg = ''
+                return msg
         return super(ServerRequestDriver, self).on_message(msg)
     
     def send_message(self, *args, **kwargs):

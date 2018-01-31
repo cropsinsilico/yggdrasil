@@ -12,10 +12,8 @@ def test_get_runner():
     namespace = "test_get_runner_%s" % str(uuid.uuid4)
     cr = runner.get_runner([ex_yamls['hello']['python']],
                            namespace=namespace)
-    cr.debug_log()
     cr.run()
     cr.sleep()
-    cr.reset_log()
 
 
 # def test_runner_error():

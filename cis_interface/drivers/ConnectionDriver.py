@@ -1,5 +1,6 @@
 """Module for funneling messages from one comm to another."""
 import os
+import importlib
 from cis_interface import backwards
 from cis_interface.communication import new_comm
 from cis_interface.drivers.Driver import Driver
@@ -12,6 +13,12 @@ class ConnectionDriver(Driver):
         name (str): Name that should be used to set names of input/output comms.
         icomm_kws (dict, optional): Keyword arguments for the input communicator.
         ocomm_kws (dict, optional): Keyword arguments for the output communicator.
+        translator (str, func, optional): Function or string specifying function
+            that should be used to translate messages from the input communicator
+            before passing them to the output communicator. If a string the
+            format should be "<package.module>:<function>" so that <function> can
+            be imported from <package>. Defaults to None and messages are passed
+            directly.
         timeout_send_1st (float, optional): Time in seconds that should be waited
             before giving up on the first send. Defaults to self.timeout.
         **kwargs: Additonal keyword arguments are passed to the parent class.
@@ -25,17 +32,39 @@ class ConnectionDriver(Driver):
         nproc (int): Number of messages processed.
         nsent (int): Number of messages sent.
         state (str): Descriptor of last action taken.
+        translator (func): Function that will be used to translate messages from
+            the input communicator before passing them to the output communicator.
         timeout_send_1st (float): Time in seconds that should be waited before
             giving up on the first send.
 
     """
     def __init__(self, name, icomm_kws=None, ocomm_kws=None,
-                 timeout_send_1st=None, **kwargs):
+                 translator=None, timeout_send_1st=None, **kwargs):
         super(ConnectionDriver, self).__init__(name, **kwargs)
         if icomm_kws is None:
             icomm_kws = dict()
         if ocomm_kws is None:
             ocomm_kws = dict()
+        # Translator
+        if isinstance(translator, str):
+            pkg_mod = translator.split(':')
+            if len(pkg_mod) == 1:
+                fun = None
+                mod = pkg_mod[0]
+            elif len(pkg_mod) == 2:
+                mod, fun = pkg_mod[:]
+            else:
+                raise ValueError("Could not parse translator string: %s" % translator)
+            modobj = importlib.import_module(mod)
+            if fun is None:
+                translator = modobj
+            else:
+                if not hasattr(modobj, fun):
+                    raise AttributeError("Module %s has no funciton %s" % (
+                        modobj, fun))
+                translator = getattr(modobj, fun)
+        if (translator is not None) and (not hasattr(translator, '__call__')):
+            raise ValueError("Translator %s not callable." % translator)
         # Input communicator
         self.debug("Creating input comm")
         icomm_kws['direction'] = 'recv'
@@ -64,6 +93,7 @@ class ConnectionDriver(Driver):
         self.timeout_send_1st = timeout_send_1st
         self._first_send_done = False
         self._comm_closed = False
+        self.translator = translator
         self.nrecv = 0
         self.nproc = 0
         self.nsent = 0
@@ -265,7 +295,10 @@ class ConnectionDriver(Driver):
             bytes, str: Processed message.
 
         """
-        return msg
+        if self.translator is None:
+            return msg
+        else:
+            return self.translator(msg)
 
     def _send_message(self, *args, **kwargs):
         r"""Send a single message.

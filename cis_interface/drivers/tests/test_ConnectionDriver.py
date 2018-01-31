@@ -3,6 +3,7 @@ import nose.tools as nt
 from cis_interface.tests import IOInfo, MagicTestError
 from cis_interface.drivers import import_driver
 from cis_interface.drivers.tests import test_Driver as parent
+from cis_interface.drivers.ConnectionDriver import ConnectionDriver
 from cis_interface.communication import (
     get_comm_class, new_comm, _default_comm)
 
@@ -15,7 +16,7 @@ class TestConnectionParam(parent.TestParam, IOInfo):
         self.driver = 'ConnectionDriver'
         self.comm_name = _default_comm
         self.attr_list += ['icomm_kws', 'ocomm_kws', 'icomm', 'ocomm',
-                           'nrecv', 'nproc', 'nsent', 'state']
+                           'nrecv', 'nproc', 'nsent', 'state', 'translator']
         self.timeout = 1.0
         self.icomm_name = self.comm_name
         self.ocomm_name = self.comm_name
@@ -186,12 +187,7 @@ class TestConnectionDriverNoStart(TestConnectionParam, parent.TestDriverNoStart)
 
 
 class TestConnectionDriver(TestConnectionParam, parent.TestDriver):
-    r"""Test class for the ConnectionDriver class.
-
-    Attributes (in addition to parent class's):
-        -
-
-    """
+    r"""Test class for the ConnectionDriver class."""
 
     def setup(self, *args, **kwargs):
         r"""Initialize comm object pair."""
@@ -249,3 +245,33 @@ class TestConnectionDriver(TestConnectionParam, parent.TestDriver):
         r"""Assertions to make after terminating the driver instance."""
         super(TestConnectionDriver, self).assert_after_terminate()
         assert(self.instance.is_comm_closed)
+
+
+def direct_translate(msg):
+    r"""Test translator that just returns passed message."""
+    return msg
+
+
+invalid_translate = True
+
+
+class TestConnectionDriverTranslate(TestConnectionDriver):
+    r"""Test class for the ConnectionDriver class with translator."""
+
+    @property
+    def inst_kwargs(self):
+        r"""dict: Keyword arguments for tested class."""
+        out = super(TestConnectionDriverTranslate, self).inst_kwargs
+        out['translator'] = '%s:direct_translate' % __name__
+        return out
+
+
+def test_ConnectionDriverTranslate_errors():
+    r"""Test that errors are raised for invalid translators."""
+    nt.assert_raises(ValueError, ConnectionDriver, 'test',
+                     translator='invalid:invalid:invalid')
+    nt.assert_raises(AttributeError, ConnectionDriver, 'test',
+                     translator='%s:noexist_translate' % __name__)
+    assert(not hasattr(invalid_translate, '__call__'))
+    nt.assert_raises(ValueError, ConnectionDriver, 'test',
+                     translator='%s:invalid_translate' % __name__)
