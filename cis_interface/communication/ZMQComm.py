@@ -480,7 +480,7 @@ class ZMQComm(CommBase.CommBase):
 
     def unregister_socket(self):
         r"""Unregister a socket."""
-        self.debug('Unegistering socket: type = %s, address = %s',
+        self.debug('Unregistering socket: type = %s, address = %s',
                    self.socket_type_name, self.address)
         unregister_socket(self.socket_type_name, self.address)
         
