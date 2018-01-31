@@ -24,7 +24,7 @@ def test_get_runner():
 #     cr.run()
 
 
-if True:
+if False:
     def test_runner_interrupt():
         r"""Start a runner then stop it with a keyboard interrupt."""
         cr = runner.get_runner([ex_yamls['hello']['python']])
