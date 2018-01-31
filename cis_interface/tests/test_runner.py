@@ -11,6 +11,7 @@ def test_get_runner():
     cr = runner.get_runner([ex_yamls['hello']['python']])
     cr.debug_log()
     cr.run()
+    cr.sleep()
     cr.reset_log()
 
 

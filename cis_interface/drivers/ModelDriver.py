@@ -172,7 +172,7 @@ class ModelDriver(Driver):
         r"""Actions to perform after run_loop has finished. Mainly checking
         if there was an error and then handling it."""
         self.debug()
-        # self.sleep()
+        self.sleep()
         self.kill_process()
 
     def wait_process(self, timeout=None):
