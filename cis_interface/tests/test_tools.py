@@ -8,6 +8,7 @@ def test_locate_path():
     # Search for current file
     fname = os.path.basename(__file__)
     fpath = tools.locate_path(fname)
+    assert(fpath)
     assert(__file__ in fpath)
     # nt.assert_equal(__file__, fpath)
     # Search for invalid file

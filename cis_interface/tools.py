@@ -25,8 +25,10 @@ def locate_path(fname):
                                           cwd=os.path.abspath(os.sep))
             # out = subprocess.check_output(["where", fname])
         else:
-            out = subprocess.check_output(["find", "/", "-xdev", "-name",
-                                           fname, "2>/dev/null"])
+            # find . -name "filetofind" 2>&1 | grep -v 'permission denied'
+            out = subprocess.check_output(["find", "/", "-name",
+                                           '"%s"' % fname, "2>&1", "|",
+                                           "grep", "-v", "'permission denied'"])
             # out = subprocess.check_output(["locate", "-b", "--regex",
             #                                "^%s" % fname])
     except subprocess.CalledProcessError:

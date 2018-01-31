@@ -27,7 +27,7 @@ if _zmq_installed:
         for l in ["libzmq", "czmq"]:
             plib = cis_cfg.get('windows', '%s_static' % l, False)
             pinc = cis_cfg.get('windows', '%s_include' % l, False)
-            if not (plib and pinc):
+            if not (plib and pinc):  # pragma: debug
                 raise Exception("Could not locate %s .lib and .h files." % l)
             pinc_d = os.path.dirname(pinc)
             plib_d, plib_f = os.path.split(plib)
@@ -108,11 +108,11 @@ def do_compile(src, out=None, cc=None, ccflags=None, ldflags=None,
         str: Full path to the compiled executable.
 
     """
-    if working_dir is None:
+    if working_dir is None:  # pragma: no cover
         working_dir = os.getcwd()
-    if ccflags is None:
+    if ccflags is None:  # pragma: no cover
         ccflags = []
-    if ldflags is None:
+    if ldflags is None:  # pragma: no cover
         ldflags = []
     ldflags0 = _linker_flags
     if platform._is_win:
