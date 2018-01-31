@@ -172,8 +172,8 @@ class ModelDriver(Driver):
         r"""Actions to perform after run_loop has finished. Mainly checking
         if there was an error and then handling it."""
         self.debug()
-        self.sleep()
-        self.kill_process()
+        # self.sleep()
+        # self.kill_process()
 
     def wait_process(self, timeout=None):
         r"""Wait for some amount of time for the process to finish.
@@ -208,8 +208,11 @@ class ModelDriver(Driver):
                     self.error("Return code is None, killing model process")
                     try:
                         self.process.kill()
+                        self.debug("Waiting %f s for process to be killed",
+                                   self.timeout)
                         self.wait_process(self.timeout)
-                    except OSError:  # pragma: debug
+                    except BaseException:  # pragma: debug
+                        # except OSError:  # pragma: debug
                         self.error("Error killing model process")
                 # Check return code
                 assert(self.process.returncode is not None)
