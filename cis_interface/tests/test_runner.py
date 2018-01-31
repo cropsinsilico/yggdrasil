@@ -1,6 +1,7 @@
 import os
 import nose.tools as nt
 import signal
+import uuid
 from cis_interface import runner, tools
 # from cis_interface.tests import yamls as sc_yamls
 from cis_interface.examples import yamls as ex_yamls
@@ -8,7 +9,9 @@ from cis_interface.examples import yamls as ex_yamls
 
 def test_get_runner():
     r"""Use get_runner to start a run."""
-    cr = runner.get_runner([ex_yamls['hello']['python']])
+    namespace = "test_get_runner_%s" % str(uuid.uuid4)
+    cr = runner.get_runner([ex_yamls['hello']['python']],
+                           namespace=namespace)
     cr.debug_log()
     cr.run()
     cr.sleep()
