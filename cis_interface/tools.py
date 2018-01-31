@@ -26,8 +26,7 @@ def locate_path(fname, basedir=os.path.abspath(os.sep)):
             # out = subprocess.check_output(["where", fname])
         else:
             # find . -name "filetofind" 2>&1 | grep -v 'permission denied'
-            out = subprocess.check_output(["find", basedir, "-name",
-                                           '"%s"' % fname])  # ,
+            out = subprocess.check_output(["find", basedir, "-name", fname])  # ,
             # "2>&1", "|", "grep", "-v", "'permission denied'"])
             # out = subprocess.check_output(["locate", "-b", "--regex",
             #                                "^%s" % fname])
