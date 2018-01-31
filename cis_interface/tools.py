@@ -17,16 +17,16 @@ from cis_interface import backwards
 from cis_interface.config import cis_cfg, cfg_logging
 
 
-def locate_path(fname):
+def locate_path(fname, basedir=os.path.abspath(os.sep)):
     r"""Find the full path to a file using where on Windows."""
     try:
         if platform._is_win:
             out = subprocess.check_output(["dir", fname, "/s/b"], shell=True,
-                                          cwd=os.path.abspath(os.sep))
+                                          cwd=basedir)
             # out = subprocess.check_output(["where", fname])
         else:
             # find . -name "filetofind" 2>&1 | grep -v 'permission denied'
-            out = subprocess.check_output(["find", "/", "-name",
+            out = subprocess.check_output(["find", basedir, "-name",
                                            '"%s"' % fname])  # ,
             # "2>&1", "|", "grep", "-v", "'permission denied'"])
             # out = subprocess.check_output(["locate", "-b", "--regex",

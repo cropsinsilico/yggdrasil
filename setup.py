@@ -1,5 +1,6 @@
 import os
 import sys
+import pprint
 import shutil
 import warnings
 from setuptools import setup, find_packages
@@ -40,20 +41,26 @@ except ImportError:
 if cov_installed and IS_WINDOWS:
     import subprocess
     # Function to fine paths
-    def locate(fname):
+    def locate(fname, brute_force=False):
         try:
-            out = subprocess.check_output(["dir", fname, "/s/b"], shell=True,
-                                          cwd=os.path.abspath(os.sep))
-            # out = subprocess.check_output(["where", fname])
+            if brute_force:
+                out = subprocess.check_output(["dir", fname, "/s/b"], shell=True,
+                                              cwd=os.path.abspath(os.sep))
+            else:
+                out = subprocess.check_output(["where", fname])
         except subprocess.CalledProcessError:
+            if not brute_force:
+                return locate(fname, brute_force=True)
             return False
         if out.isspace():
             return False
         matches = out.splitlines()
+        first = matches[0].decode('utf-8')
         if len(matches) > 1:
-            warnings.warn("More than one (%d) match to %s" % (len(matches), fname))
-            return False
-        return matches[0].decode('utf-8')
+            pprint.pprint(matches)
+            warnings.warn("More than one (%d) match to %s. Using first match (%s)" % (
+                len(matches), fname, first))
+        return first
     # Open config file
     cp = HandyConfigParser("")
     cp.read(usr_config_file)

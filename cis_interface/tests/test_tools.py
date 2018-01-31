@@ -6,14 +6,15 @@ from cis_interface import tools, platform  # , backwards
 def test_locate_path():
     r"""Test file location."""
     # Search for current file
-    fname = os.path.basename(__file__)
-    fpath = tools.locate_path(fname)
+    fdir, fname = os.path.split(__file__)
+    basedir = os.path.dirname(fdir)
+    fpath = tools.locate_path(fname, basedir=basedir)
     assert(fpath)
     assert(__file__ in fpath)
     # nt.assert_equal(__file__, fpath)
     # Search for invalid file
     fname = 'invalid_file.ext'
-    fpath = tools.locate_path(fname)
+    fpath = tools.locate_path(fname, basedir=basedir)
     assert(not fpath)
 
 

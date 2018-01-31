@@ -21,7 +21,6 @@ exclude_lines =
 	if 0:
 	if False:
 	if __name__ == .__main__.:
-	pragma: windows
 	pragma: Python 2
 	pragma: matlab
 
