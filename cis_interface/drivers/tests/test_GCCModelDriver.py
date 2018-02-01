@@ -1,5 +1,6 @@
 import os
 import nose.tools as nt
+from cis_interface import platform
 from cis_interface.tests import scripts
 import cis_interface.drivers.tests.test_ModelDriver as parent
 from cis_interface.drivers.GCCModelDriver import GCCModelDriver
@@ -19,7 +20,10 @@ class TestGCCModelParam(parent.TestModelParam):
         self.attr_list += ['compiled']
         src = scripts['c']
         script_dir = os.path.dirname(src[0])
-        self.args = src + ['1', '-I' + script_dir, '-L' + script_dir]
+        if platform._is_win:
+            self.args = src + ['1', '-I' + script_dir, '/link', '-L' + script_dir]
+        else:
+            self.args = src + ['1', '-I' + script_dir, '-L' + script_dir]
 
         
 class TestGCCModelDriverNoStart(TestGCCModelParam,
@@ -31,8 +35,12 @@ class TestGCCModelDriverNoStart(TestGCCModelParam,
         super(TestGCCModelDriverNoStart, self).__init__(*args, **kwargs)
         src = scripts['cpp']
         script_dir = os.path.dirname(src[0])
-        self.args = src + ['1', '-I' + script_dir, '-L' + script_dir,
-                           '-o', 'test_exe']
+        if platform._is_win:
+            self.args = src + ['1', '/link', '-I' + script_dir, '-L' + script_dir,
+                               '/out:test_exe']
+        else:
+            self.args = src + ['1', '-I' + script_dir, '-L' + script_dir,
+                               '-o', 'test_exe']
     
     # Done in driver, but driver not started
     def teardown(self):

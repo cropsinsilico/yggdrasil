@@ -15,7 +15,7 @@ class ConnectionDriver(Driver):
         ocomm_kws (dict, optional): Keyword arguments for the output communicator.
         translator (str, func, optional): Function or string specifying function
             that should be used to translate messages from the input communicator
-            before passing them to the output communicator. If a string the
+            before passing them to the output communicator. If a string, the
             format should be "<package.module>:<function>" so that <function> can
             be imported from <package>. Defaults to None and messages are passed
             directly.
@@ -48,21 +48,15 @@ class ConnectionDriver(Driver):
         # Translator
         if isinstance(translator, str):
             pkg_mod = translator.split(':')
-            if len(pkg_mod) == 1:
-                fun = None
-                mod = pkg_mod[0]
-            elif len(pkg_mod) == 2:
+            if len(pkg_mod) == 2:
                 mod, fun = pkg_mod[:]
             else:
                 raise ValueError("Could not parse translator string: %s" % translator)
             modobj = importlib.import_module(mod)
-            if fun is None:
-                translator = modobj
-            else:
-                if not hasattr(modobj, fun):
-                    raise AttributeError("Module %s has no funciton %s" % (
-                        modobj, fun))
-                translator = getattr(modobj, fun)
+            if not hasattr(modobj, fun):
+                raise AttributeError("Module %s has no funciton %s" % (
+                    modobj, fun))
+            translator = getattr(modobj, fun)
         if (translator is not None) and (not hasattr(translator, '__call__')):
             raise ValueError("Translator %s not callable." % translator)
         # Input communicator

@@ -241,10 +241,10 @@ class GCCModelDriver(ModelDriver):
         for a in args:
             if os.path.splitext(a)[1] in ['.c', '.cpp', '.cc']:
                 self.src.append(a)
-            elif a.startswith('-l') or a.startswith('-L') or is_link:
-                if a.startswith('/out:'):
+            elif a.lower().startswith('-l') or is_link:
+                if a.lower().startswith('/out:'):
                     self.efile = a[5:]
-                elif a.startswith('-l') or a.startswith('-L') and platform._is_win:
+                elif a.lower().startswith('-l') and platform._is_win:
                     a1 = '/LIBPATH:"%s"' % a[2:]
                     if a1 not in self.ldflags:
                         self.ldflags.append(a1)
@@ -253,7 +253,7 @@ class GCCModelDriver(ModelDriver):
             elif a == '-o':
                 # Next argument should be the name of the executable
                 is_object = True
-            elif a == '/link':
+            elif a.lower() == '/link':
                 # Following arguments should be linker options
                 is_link = True
             elif a.startswith('-') or (platform._is_win and a.startswith('/')):
