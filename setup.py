@@ -22,6 +22,7 @@ except:
 usr_config_file = os.path.expanduser(os.path.join('~', '.cis_interface.cfg'))
 def_config_file = os.path.join(os.path.dirname(__file__),
                                'cis_interface', 'defaults.cfg')
+print('USER CONFIG FILE:', usr_config_file)
 if not os.path.isfile(usr_config_file):
     shutil.copy(def_config_file, usr_config_file)
 
@@ -69,10 +70,10 @@ if cov_installed and IS_WINDOWS:
     # Find paths
     clibs = {'libzmq_include': 'zmq.h', 
              'libzmq_static': 'zmq.lib',
-             'libzmq_dynamic': 'libzmq-*dll',
+             # 'libzmq_dynamic': 'libzmq-*dll',
              'czmq_include': 'czmq.h',
-             'czmq_static': 'czmq.lib',
-             'czmq_dynamic': 'libczmq.dll'}
+             'czmq_static': 'czmq.lib']  # ,
+             # 'czmq_dynamic': 'libczmq.dll'}
     for opt, fname in clibs.items():
         if not cp.has_option('windows', opt):
             fpath = locate(fname)

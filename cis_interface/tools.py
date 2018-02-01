@@ -67,8 +67,8 @@ def is_zmq_installed():
     #         return False
     # Check existence of config paths for windows
     if platform._is_win:
-        opts = ['libzmq_include', 'libzmq_static', 'libzmq_dynamic',
-                'czmq_include', 'czmq_static', 'czmq_dynamic']
+        opts = ['libzmq_include', 'libzmq_static',  # 'libzmq_dynamic',
+                'czmq_include', 'czmq_static']  # , 'czmq_dynamic']
         for o in opts:
             if not cis_cfg.get('windows', o, None):
                 warnings.warn("Config option %s not set." % o)
