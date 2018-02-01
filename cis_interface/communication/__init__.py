@@ -1,8 +1,11 @@
+import os
 import importlib
 from cis_interface.tools import _zmq_installed, _ipc_installed
 
 
-if _zmq_installed:
+if 'CIS_DEFAULT_COMM' in os.environ:
+    _default_comm = os.environ['CIS_DEFAULT_COMM']
+elif _zmq_installed:
     _default_comm = 'ZMQComm'
 elif _ipc_installed:
     _default_comm = 'IPCComm'

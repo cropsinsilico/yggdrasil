@@ -10,7 +10,7 @@ models:
 
     outputs:
       - name: output_pipe
-        driver: {{PIPE_MSG_TYPE}}OutputDriver
+        driver: OutputDriver
         args: timed_pipe
 
   - name: timed_pipe_dst
@@ -19,11 +19,11 @@ models:
 
     inputs:
       - name: input_pipe
-        driver: {{PIPE_MSG_TYPE}}InputDriver
+        driver: InputDriver
         args: timed_pipe
 
     outputs:
       - name: output_file
-        driver: AsciiFileInputDriver
+        driver: AsciiFileOutputDriver
         args: output_timed_pipe.txt
         in_temp: True

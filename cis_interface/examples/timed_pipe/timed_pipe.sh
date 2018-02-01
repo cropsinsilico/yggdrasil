@@ -4,7 +4,7 @@ export PSI_DEBUG="INFO"
 export PSI_NAMESPACE="timed_pipe"
 export PIPE_MSG_COUNT=1
 export PIPE_MSG_SIZE=1024
-export PIPE_MSG_TYPE="ZMQ"
+export CIS_DEFAULT_COMM="ZMQ"
 
 yaml= 
 
