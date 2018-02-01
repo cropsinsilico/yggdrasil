@@ -13,9 +13,7 @@ def test_get_runner():
     cr = runner.get_runner([ex_yamls['hello']['python']],
                            namespace=namespace)
     cr.run()
-    cr.debug_log()
     cr.sleep()
-    cr.reset_log()
 
 
 # def test_runner_error():
@@ -24,15 +22,16 @@ def test_get_runner():
 #     cr.run()
 
 
-if False:
-    def test_runner_interrupt():
-        r"""Start a runner then stop it with a keyboard interrupt."""
-        cr = runner.get_runner([ex_yamls['hello']['python']])
-        cr.loadDrivers()
-        cr.startDrivers()
-        cr.set_signal_handler()
-        tools.kill(os.getpid(), signal.SIGINT)
-        tools.kill(os.getpid(), signal.SIGINT)
+def test_zrunner_interrupt():
+    r"""Start a runner then stop it with a keyboard interrupt."""
+    cr = runner.get_runner([ex_yamls['hello']['python']])
+    cr.debug_log()
+    cr.loadDrivers()
+    cr.startDrivers()
+    cr.set_signal_handler()
+    cr.reset_log()
+    tools.kill(os.getpid(), signal.SIGINT)
+    tools.kill(os.getpid(), signal.SIGINT)
 
 
 def test_runner_terminate():
