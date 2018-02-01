@@ -22,16 +22,16 @@ def test_get_runner():
 #     cr.run()
 
 
-def test_zrunner_interrupt():
+def test_Arunner_interrupt():
     r"""Start a runner then stop it with a keyboard interrupt."""
     cr = runner.get_runner([ex_yamls['hello']['python']])
     cr.debug_log()
     cr.loadDrivers()
     cr.startDrivers()
     cr.set_signal_handler()
+    tools.kill(os.getpid(), signal.SIGINT)
+    tools.kill(os.getpid(), signal.SIGINT)
     cr.reset_log()
-    tools.kill(os.getpid(), signal.SIGINT)
-    tools.kill(os.getpid(), signal.SIGINT)
 
 
 def test_runner_terminate():
