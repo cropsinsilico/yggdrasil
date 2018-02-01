@@ -548,12 +548,13 @@ class CisRunner(CisClass):
         for drv in drivers:
             if 'instance' in drv:
                 driver = drv['instance']
-                self.debug("Stopping %s", drv['name'])
-                if force_stop or self.error_flag:
-                    driver.terminate()
-                else:
-                    driver.stop()
-                self.debug("Stop(%s) returns", drv['name'])
+                if driver.is_alive():
+                    self.debug("Stopping %s", drv['name'])
+                    if force_stop or self.error_flag:
+                        driver.terminate()
+                    else:
+                        driver.stop()
+                    self.debug("Stop(%s) returns", drv['name'])
         self.debug('Channel Stops DONE')
         for drv in drivers:
             if 'instance' in drv:
