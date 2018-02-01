@@ -89,7 +89,6 @@ install:
 
   # Install cis_interface allowing pip to resolve requirements
   - "pip install -e ."
-  - "echo %LOCALAPPDATA%"
 
 cache:
   - '%LOCALAPPDATA%\pip\Cache -> setup.py'
