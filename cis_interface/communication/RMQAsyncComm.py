@@ -217,7 +217,11 @@ class RMQAsyncComm(RMQComm):
             return (False, None)
         if self.n_msg == 0:
             # self.debug(".recv(): No buffered messages.")
-            return (True, self.empty_msg)
+            out = (True, self.empty_msg)
+        else:
+            with self.lock:
+                out = (True, self._buffered_messages.pop(0))
+        return out
 
     def on_message(self, ch, method, props, body):
         r"""Buffer received messages."""
