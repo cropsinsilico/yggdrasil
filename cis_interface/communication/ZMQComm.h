@@ -216,13 +216,13 @@ int zmq_comm_recv(const comm_t x, char **data, const size_t len,
     cislog_debug("zmq_comm_recv(%s): did not receive", x.name);
     return -1;
   }
-  size_t len_recv = zframe_size(out);
+  size_t len_recv = zframe_size(out) + 1;
   /* printf("(C) received %d bytes from %s\n", len_recv, x.address); */
-  if ((len_recv + 1) > len) {
+  if (len_recv > len) {
     if (allow_realloc) {
       cislog_debug("zmq_comm_recv(%s): reallocating buffer from %d to %d bytes.",
-		   x.name, len, len_recv + 1);
-      (*data) = (char*)realloc(*data, len_recv + 1);
+		   x.name, len, len_recv);
+      (*data) = (char*)realloc(*data, len_recv);
       if (*data == NULL) {
 	cislog_error("zmq_comm_recv(%s): failed to realloc buffer.", x.name);
 	zframe_destroy(&out);
@@ -232,14 +232,15 @@ int zmq_comm_recv(const comm_t x, char **data, const size_t len,
       cislog_error("zmq_comm_recv(%s): buffer (%d bytes) is not large enough for message (%d bytes)",
 		   x.name, len, len_recv);
       zframe_destroy(&out);
-      return -((int)len_recv + 1);
+      return -((int)(len_recv - 1));
     }
   }
-  memcpy(*data, zframe_data(out), len_recv + 1);
-  (*data)[len_recv] = '\0';
+  memcpy(*data, zframe_data(out), len_recv);
+  (*data)[len_recv-1] = '\0';
   zframe_destroy(&out);
-  cislog_debug("zmq_comm_recv(%s): returning %d", x.name, len_recv);
-  return (int)len_recv;
+  int ret = (int)len_recv - 1;
+  cislog_debug("zmq_comm_recv(%s): returning %d", x.name, ret);
+  return ret;
 };
 
 

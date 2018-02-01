@@ -117,12 +117,12 @@ int ascii_file_comm_send(const comm_t x, const char *data, const size_t len) {
 static inline
 int ascii_file_comm_recv(const comm_t x, char **data, size_t len,
 			 const int allow_realloc) {
-  // Prevent C4100 warning on windows by referencing param
-#ifdef _WIN32
-  allow_realloc;
-#endif
   asciiFile_t *file = (asciiFile_t*)x.handle;
-  return af_readline_full(file[0], data, (size_t*)(&len));
+  if (allow_realloc) {
+    return af_readline_full(file[0], data, (size_t*)(&len));
+  } else {
+    return af_readline_full_norealloc(file[0], data[0], len);
+  }
 };
 
 /*!

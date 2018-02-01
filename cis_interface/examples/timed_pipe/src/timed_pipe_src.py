@@ -20,9 +20,11 @@ def run(args):
         if not ret:
             print('pipe_src(P): SEND ERROR ON MSG %d' % i)
             sys.exit(-1)
+    outq.send_eof()
 
     print('Goodbye from Python source')
     sys.exit(0)
     
+
 if __name__ == '__main__':
-    return run(sys.argv[1:])
+    run(sys.argv[1:])

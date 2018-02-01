@@ -5,8 +5,8 @@ models:
     driver: PythonModelDriver
     args:
       - ./src/timed_pipe_src.py
-      - {{PIPE_MSG_COUNT}}
-      - {{PIPE_MSG_SIZE}}
+      - "{{PIPE_MSG_COUNT}}"
+      - "{{PIPE_MSG_SIZE}}"
 
     outputs:
       - name: output_pipe
@@ -23,7 +23,7 @@ models:
         args: timed_pipe
 
     outputs:
-      - name: file_output
+      - name: output_file
         driver: AsciiFileOutputDriver
         args: output_timed_pipe.txt
         in_temp: True

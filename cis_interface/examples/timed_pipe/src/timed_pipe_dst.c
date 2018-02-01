@@ -10,7 +10,7 @@ int main() {
 
   // Ins/outs matching with the the model yaml
   psiInput_t inq = psiInput("input_pipe");
-  psiOutput_t outf = psiOutput("output_pipe");
+  psiOutput_t outf = psiOutput("output_file");
   printf("pipe_dst(C): Created I/O channels\n");
 
   // Continue receiving input from the queue
@@ -21,11 +21,11 @@ int main() {
       printf("pipe_dst(C): Input channel closed\n");
       break;
     }
-    if (ret > bufsiz) {
+    if (ret > (bufsiz - 1)) {
       printf("pipe_dst(CPP): Buffer increased to %d bytes\n", bufsiz);
-      bufsiz = ret;
+      bufsiz = ret + 1;
     }
-    ret = psi_send_nolimit(outf, buf, bufsiz);
+    ret = psi_send_nolimit(outf, buf, ret);
     if (ret < 0) {
       printf("pipe_dst(C): END ERROR ON MSG %d\n", count);
       free(buf);

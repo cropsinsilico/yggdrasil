@@ -21,11 +21,11 @@ int main() {
       printf("pipe_dst(CPP): Input channel closed\n");
       break;
     }
-    if (ret > bufsiz) {
+    if (ret > (bufsiz - 1)) {
       printf("pipe_dst(CPP): Buffer increased to %d bytes\n", bufsiz);
-      bufsiz = ret;
+      bufsiz = ret + 1;
     }
-    ret = outf.send_nolimit(buf, bufsiz);
+    ret = outf.send_nolimit(buf, ret);
     if (ret < 0) {
       printf("pipe_dst(CPP): END ERROR ON MSG %d\n", count);
       free(buf);

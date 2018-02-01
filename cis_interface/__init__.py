@@ -13,12 +13,6 @@ from cis_interface import examples
 from cis_interface import runner
 
 
-# Set paths so that c headers are located
-# TODO: Only the CIS_INCLUDE environment variable should be used
-# cis_base = os.path.dirname(__file__)
-# cis_include = os.path.join(cis_base, 'interface')
-# os.environ['CIS_BASE'] = cis_base
-# os.environ['CIS_INCLUDE'] = cis_include
 # This is required to fix crash on Windows in case of Ctrl+C
 # https://github.com/ContinuumIO/anaconda-issues/issues/905#issuecomment-232498034
 if platform._is_win:

@@ -56,15 +56,6 @@ def is_zmq_installed():
         bool: True if both libraries are installed, False otherwise.
 
     """
-    # Check existence of files
-    # check_files = ['zmq.h', 'czmq.h']
-    # if platform._is_win:
-    #     check_files += ['zmq.lib', 'czmq.lib']
-    #     check_files += ['libzmq-*dll', 'libczmq.dll']
-    # for f in check_files:
-    #     if not locate_path(f):
-    #         warnings.warn("Could not locate ZeroMQ headers/libraries on PATH")
-    #         return False
     # Check existence of config paths for windows
     if platform._is_win:
         opts = ['libzmq_include', 'libzmq_static',  # 'libzmq_dynamic',

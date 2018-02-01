@@ -5,8 +5,8 @@ models:
     driver: PythonModelDriver
     args:
       - ./src/timed_pipe_src.py
-      - {{PIPE_MSG_COUNT}}
-      - {{PIPE_MSG_SIZE}}
+      - "{{PIPE_MSG_COUNT}}"
+      - "{{PIPE_MSG_SIZE}}"
 
     outputs:
       - name: output_pipe

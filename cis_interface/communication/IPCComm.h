@@ -282,6 +282,7 @@ int ipc_comm_recv(const comm_t x, char **data, const size_t len,
   msgbuf_t t;
   t.mtype = 1;
   int ret = -1;
+  int len_recv = -1;
   while (1) {
     ret = msgrcv(((int*)x.handle)[0], &t, len, 0, IPC_NOWAIT);
     if (ret == -1 && errno == ENOMSG) {
@@ -293,29 +294,30 @@ int ipc_comm_recv(const comm_t x, char **data, const size_t len,
       break;
     }
   }
-  if (ret > 0) {
-    if ((ret + 1) > (int)len) {
-      if (allow_realloc) {
-	cislog_debug("ipc_comm_recv(%s): reallocating buffer from %d to %d bytes.\n",
-		     x.name, (int)len, ret + 1);
-	(*data) = (char*)realloc(*data, ret + 1);
-	if (*data == NULL) {
-	  cislog_error("ipc_comm_recv(%s): failed to realloc buffer.", x.name);
-	  ret = -1;
-	}
-      } else {
-	cislog_error("ipc_comm_recv(%s): buffer (%d bytes) is not large enough for message (%d bytes)",
-		     x.name, len, ret);
-	ret = -ret;
-      }
-    }
-    memcpy(*data, t.data, ret);
-    (*data)[ret] = '\0';
-  } else {
+  if (ret <= 0) {
     cislog_debug("ipc_comm_recv: msgrecv(%d, %p, %d, 0, IPC_NOWAIT: %s",
-		 (int*)x.handle, &t, len, strerror(errno));
-    ret = -1;
+		 (int*)x.handle, &t, (int)len, strerror(errno));
+    return -1;
   }
+  len_recv = ret + 1;
+  if (len_recv > (int)len) {
+    if (allow_realloc) {
+      cislog_debug("ipc_comm_recv(%s): reallocating buffer from %d to %d bytes.\n",
+		   x.name, (int)len, len_recv);
+      (*data) = (char*)realloc(*data, len_recv);
+      if (*data == NULL) {
+	cislog_error("ipc_comm_recv(%s): failed to realloc buffer.", x.name);
+	return -1;
+      }
+    } else {
+      cislog_error("ipc_comm_recv(%s): buffer (%d bytes) is not large enough for message (%d bytes)",
+		   x.name, len, len_recv);
+      return -(len_recv - 1);
+    }
+  }
+  memcpy(*data, t.data, len_recv);
+  (*data)[len_recv - 1] = '\0';
+  ret = len_recv - 1;
   cislog_debug("ipc_comm_recv(%s): returns %d bytes\n", x.name, ret);
   return ret;
 };

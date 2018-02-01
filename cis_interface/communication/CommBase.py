@@ -616,7 +616,7 @@ class CommBase(CisClass):
             else:
                 self.special_debug('Failed to send %d bytes', len(msg_s))
         except BaseException:
-            print(args, kwargs)
+            # print(args, kwargs)
             self.exception('.send(): Failed to send.')
             return False
         return ret

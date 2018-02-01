@@ -5,6 +5,9 @@ from cis_interface.tools import _zmq_installed, _ipc_installed
 
 if 'CIS_DEFAULT_COMM' in os.environ:
     _default_comm = os.environ['CIS_DEFAULT_COMM']
+    if _default_comm not in ['ZMQComm', 'IPCComm', 'RMQComm']:  # pragma: debug
+        raise Exception('Unrecognized default comm %s set by CIS_DEFAULT_COMM' % (
+            _default_comm))
 elif _zmq_installed:
     _default_comm = 'ZMQComm'
 elif _ipc_installed:

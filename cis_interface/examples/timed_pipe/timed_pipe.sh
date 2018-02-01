@@ -2,9 +2,9 @@
 
 export PSI_DEBUG="INFO"
 export PSI_NAMESPACE="timed_pipe"
-export PIPE_MSG_COUNT=1
-export PIPE_MSG_SIZE=1024
-export CIS_DEFAULT_COMM="ZMQ"
+export PIPE_MSG_COUNT=50
+export PIPE_MSG_SIZE=10
+export CIS_DEFAULT_COMM="IPCComm"
 
 yaml= 
 
@@ -36,7 +36,7 @@ case $1 in
 	;;
 esac
 
-cisrun $yaml
+time cisrun $yaml
 
-outfile="${TMPDIR}output_timed_pipe.txt"
-cat $outfile
+# outfile="${TMPDIR}output_timed_pipe.txt"
+# cat $outfile

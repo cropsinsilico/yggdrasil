@@ -80,7 +80,29 @@ int af_is_comment(const asciiFile_t t, const char *line) {
 };
 
 /*!
-  @brief Read a single line from the file.
+  @brief Read a single line from the file without realloc.
+  @param[in] t constant asciiFile_t file structure.
+  @param[out] line constant character pointer to buffer where the
+  read line should be stored. If line is not large enough to hold the read line,
+  an error will be returned.
+  @param[in] n Size of allocated buffer.
+  @return int On success, the number of characters read, -1 on failure.
+ */
+static inline
+int af_readline_full_norealloc(const asciiFile_t t, char *line, size_t n) {
+  if (af_is_open(t) == 1) {
+    if (fgets(line, n, t.fd) == NULL) {
+      return -1;
+    }
+    int nread = (int)strlen(line);
+    if ((nread < (n - 1)) || (line[nread - 1] == '\n') || (feof(t.fd)))
+      return nread;
+  }
+  return -1;
+};
+
+/*!
+  @brief Read a single line from the file with realloc.
   @param[in] t constant asciiFile_t file structure.
   @param[out] line constant character pointer to pointer to buffer where the
   read line should be stored. If line is not large enough to hold the read line,
