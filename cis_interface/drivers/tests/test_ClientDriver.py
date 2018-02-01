@@ -114,11 +114,6 @@ class TestClientDriver(TestClientParam, parent.TestConnectionDriver):
         # Send a message to local output
         flag = self.send_comm.send(msg_send)
         assert(flag)
-        # Wait for message to be routed
-        # T = self.instance.start_timeout(self.timeout)
-        # while ((not T.is_out) and (self.recv_comm.n_msg == 0)):
-        #     self.instance.sleep()
-        # self.instance.stop_timeout()
         # Receive on server side, then send back
         flag, srv_msg = self.recv_comm.recv(timeout=self.route_timeout)
         assert(flag)

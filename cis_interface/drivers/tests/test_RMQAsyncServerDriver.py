@@ -13,6 +13,7 @@ class TestRMQAsyncServerParam(parent.TestServerParam):
         self.client_comm = 'RMQAsyncComm'
         self.icomm_name = self.client_comm
         self.timeout = 10.0
+        self.route_timeout = 60.0
 
     
 @unittest.skipIf(not _rmq_server_running, "RMQ Server not running")
