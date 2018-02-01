@@ -1,0 +1,29 @@
+---
+
+models:
+  - name: timed_pipe_src
+    driver: PythonModelDriver
+    args:
+      - ./src/timed_pipe_src.py
+      - {{PIPE_MSG_COUNT}}
+      - {{PIPE_MSG_SIZE}}
+
+    outputs:
+      - name: output_pipe
+        driver: {{PIPE_MSG_TYPE}}OutputDriver
+        args: timed_pipe
+
+  - name: timed_pipe_dst
+    driver: GCCModelDriver
+    args: ./src/timed_pipe_dst.cpp
+
+    inputs:
+      - name: input_pipe
+        driver: {{PIPE_MSG_TYPE}}InputDriver
+        args: timed_pipe
+
+    outputs:
+      - name: file_output
+        driver: AsciiFileInputDriver
+        args: output_timed_pipe.txt
+        in_temp: True
