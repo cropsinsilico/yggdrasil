@@ -24,7 +24,8 @@ if platform._is_win:
 if _zmq_installed:
     if platform._is_win:
         _zmq_dirs = dict()
-        for l in ["libzmq", "czmq"]:
+        for l in ["czmq"]:
+            # for l in ["libzmq", "czmq"]:
             plib = cis_cfg.get('windows', '%s_static' % l, False)
             pinc = cis_cfg.get('windows', '%s_include' % l, False)
             if not (plib and pinc):  # pragma: debug

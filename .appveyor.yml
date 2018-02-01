@@ -106,7 +106,7 @@ before_test:
 
 test_script:
   # - "nosetests --nologcapture --with-coverage --cover-package=cis_interface -svx cis_interface/examples/tests/"
-  - "nosetests --with-coverage --cover-package=cis_interface -svx cis_interface"
+  - "nosetests --with-coverage --cover-package=cis_interface -svx cis_interface/drivers/tests/test_GCCModelDriver.py"
 
 
 after_test:
