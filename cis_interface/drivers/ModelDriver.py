@@ -133,6 +133,7 @@ class ModelDriver(Driver):
                     queue.put(line.decode('utf-8'))
         except BaseException:  # pragma: debug
             self.error("Error getting output")
+            queue.put(self._exit_line)
             raise
         queue.put(self._exit_line)
         out.close()
@@ -144,7 +145,6 @@ class ModelDriver(Driver):
         self.run_setup()
         flag = True
         self.debug("Beginning loop")
-        self._count = 0
         while self._running and (self.process is not None) and flag:
             flag = self.run_loop()
         self.run_finalize()

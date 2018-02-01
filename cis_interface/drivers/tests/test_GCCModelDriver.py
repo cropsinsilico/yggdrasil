@@ -36,8 +36,8 @@ class TestGCCModelDriverNoStart(TestGCCModelParam,
         src = scripts['cpp']
         script_dir = os.path.dirname(src[0])
         if platform._is_win:
-            self.args = src + ['1', '/link', '-I' + script_dir, '-L' + script_dir,
-                               '/out:test_exe']
+            self.args = src + ['1', '-I' + script_dir, '/link', '-L' + script_dir,
+                               '/out:test_exe.exe']
         else:
             self.args = src + ['1', '-I' + script_dir, '-L' + script_dir,
                                '-o', 'test_exe']
