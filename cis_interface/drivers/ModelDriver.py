@@ -172,7 +172,7 @@ class ModelDriver(Driver):
         r"""Actions to perform after run_loop has finished. Mainly checking
         if there was an error and then handling it."""
         self.debug()
-        self.sleep()
+        self.wait_process(self.timeout)
         self.kill_process()
 
     def wait_process(self, timeout=None):
@@ -185,12 +185,12 @@ class ModelDriver(Driver):
         """
         try:
             self.process.poll()
-            T = self.start_timeout(timeout)
+            T = self.start_timeout(timeout, key_level=1)
             while ((not T.is_out) and
                    (self.process.returncode is None)):  # pragma: debug
                 self.sleep()
                 self.process.poll()
-            self.stop_timeout()
+            self.stop_timeout(key_level=1)
         except AttributeError:  # pragma: debug
             if self.process is not None:
                 raise

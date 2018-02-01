@@ -423,13 +423,35 @@ class CisClass(object):
     @property
     def timeout_key(self):
         r"""str: Key identifying calling object and method."""
+        # stack = inspect.stack()
+        # fcn = stack[2][3]
+        # cls = os.path.splitext(os.path.basename(stack[2][1]))[0]
+        # key = '%s(%s).%s' % (cls, self.name, fcn)
+        # return key
+        return self.get_timeout_key()
+
+    def get_timeout_key(self, key_level=0):
+        r"""Return a key for a given level in the stack, relative to the
+        function calling get_timeout_key.
+
+        Args:
+            key_level (int, optional): Positive integer indicating the level of
+                the calling class and function/method that should be used to
+                key the timeout. 0 is the class and function/method that is 2
+                steps higher in the stack. Higher values use classes and
+                function/methods further up in the stack. Defaults to 0.
+
+        Returns:
+            str: Key identifying calling object and method.
+
+        """
         stack = inspect.stack()
-        fcn = stack[2][3]
-        cls = os.path.splitext(os.path.basename(stack[2][1]))[0]
+        fcn = stack[key_level + 2][3]
+        cls = os.path.splitext(os.path.basename(stack[key_level + 2][1]))[0]
         key = '%s(%s).%s' % (cls, self.name, fcn)
         return key
 
-    def start_timeout(self, t=None, key=None):
+    def start_timeout(self, t=None, key=None, key_level=0):
         r"""Start a timeout for the calling function/method.
 
         Args:
@@ -438,7 +460,12 @@ class CisClass(object):
                 'timeout' is used.
             key (str, optional): Key that should be associated with the timeout
                 that is created. Defaults to None and is set by the calling
-                class and function/method (See `timeout_key`).
+                class and function/method (See `get_timeout_key`).
+            key_level (int, optional): Positive integer indicating the level of
+                the calling class and function/method that should be used to
+                key the timeout. 0 is the class and function/method that called
+                start_timeout. Higher values use classes and function/methods
+                further up in the stack. Defaults to 0.
 
         Raises:
             KeyError: If the key already exists.
@@ -447,19 +474,24 @@ class CisClass(object):
         if t is None:
             t = self.timeout
         if key is None:
-            key = self.timeout_key
+            key = self.get_timeout_key(key_level=key_level)
         if key in self._timeouts:
             raise KeyError("Timeout already registered for %s" % key)
         self._timeouts[key] = TimeOut(t)
         return self._timeouts[key]
 
-    def check_timeout(self, key=None):
+    def check_timeout(self, key=None, key_level=0):
         r"""Check timeout for the calling function/method.
 
         Args:
             key (str, optional): Key for timeout that should be checked.
                 Defaults to None and is set by the calling class and
                 function/method (See `timeout_key`).
+            key_level (int, optional): Positive integer indicating the level of
+                the calling class and function/method that should be used to
+                key the timeout. 0 is the class and function/method that called
+                start_timeout. Higher values use classes and function/methods
+                further up in the stack. Defaults to 0.
 
         Raises:
             KeyError: If there is not a timeout registered for the specified
@@ -467,19 +499,24 @@ class CisClass(object):
 
         """
         if key is None:
-            key = self.timeout_key
+            key = self.get_timeout_key(key_level=key_level)
         if key not in self._timeouts:
             raise KeyError("No timeout registered for %s" % key)
         t = self._timeouts[key]
         return t.is_out
         
-    def stop_timeout(self, key=None):
+    def stop_timeout(self, key=None, key_level=0):
         r"""Stop a timeout for the calling function method.
 
         Args:
             key (str, optional): Key for timeout that should be stopped.
                 Defaults to None and is set by the calling class and
                 function/method (See `timeout_key`).
+            key_level (int, optional): Positive integer indicating the level of
+                the calling class and function/method that should be used to
+                key the timeout. 0 is the class and function/method that called
+                start_timeout. Higher values use classes and function/methods
+                further up in the stack. Defaults to 0.
 
         Raises:
             KeyError: If there is not a timeout registered for the specified
@@ -487,7 +524,7 @@ class CisClass(object):
 
         """
         if key is None:
-            key = self.timeout_key
+            key = self.get_timeout_key(key_level=key_level)
         if key not in self._timeouts:
             raise KeyError("No timeout registered for %s" % key)
         t = self._timeouts[key]
