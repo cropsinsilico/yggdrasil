@@ -52,6 +52,7 @@ loc_config_file = os.path.join(os.getcwd(), config_file)
 assert(os.path.isfile(def_config_file))
 files = [def_config_file, usr_config_file, loc_config_file]
 cis_cfg.read(files)
+print("USRCFG:", usr_config_file)
 
 
 # Set associated environment variables

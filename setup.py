@@ -72,7 +72,7 @@ if cov_installed and IS_WINDOWS:
              'libzmq_static': 'zmq.lib',
              # 'libzmq_dynamic': 'libzmq-*dll',
              'czmq_include': 'czmq.h',
-             'czmq_static': 'czmq.lib']  # ,
+             'czmq_static': 'czmq.lib'}  # ,
              # 'czmq_dynamic': 'libczmq.dll'}
     for opt, fname in clibs.items():
         if not cp.has_option('windows', opt):
