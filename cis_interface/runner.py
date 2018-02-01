@@ -235,9 +235,6 @@ class CisRunner(CisClass):
         """
         if signal_handler is None:
             signal_handler = self.signal_handler
-        # https://github.com/ContinuumIO/anaconda-issues/issues/905#issuecomment-232498034
-        if platform._is_win:
-            os.environ['FOR_DISABLE_CONSOLE_CTRL_HANDLER'] = '1'
         signal.signal(signal.SIGTERM, signal_handler)
         signal.signal(signal.SIGINT, signal_handler)
         if not platform._is_win:

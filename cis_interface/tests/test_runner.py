@@ -31,6 +31,9 @@ def test_Arunner_interrupt():
     cr.set_signal_handler()
     tools.kill(os.getpid(), signal.SIGINT)
     tools.kill(os.getpid(), signal.SIGINT)
+    cr.waitModels()
+    cr.closeChannels()
+    cr.cleanup()
     cr.reset_log()
 
 

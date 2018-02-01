@@ -15,16 +15,14 @@ from cis_interface import runner
 
 # Set paths so that c headers are located
 # TODO: Only the CIS_INCLUDE environment variable should be used
-cis_base = os.path.dirname(__file__)
-cis_include = os.path.join(cis_base, 'interface')
-os.environ['CIS_BASE'] = cis_base
-os.environ['CIS_INCLUDE'] = cis_include
-# path = os.environ.get('PATH', cis_include)
-# cpath = os.environ.get('CPATH', cis_include)
-# if cis_include not in path:
-#     os.environ['PATH'] = cis_include + ':' + path
-# if cis_include not in cpath:
-#     os.environ['CPATH'] = cis_include + ':' + cpath
+# cis_base = os.path.dirname(__file__)
+# cis_include = os.path.join(cis_base, 'interface')
+# os.environ['CIS_BASE'] = cis_base
+# os.environ['CIS_INCLUDE'] = cis_include
+# This is required to fix crash on Windows in case of Ctrl+C
+# https://github.com/ContinuumIO/anaconda-issues/issues/905#issuecomment-232498034
+if platform._is_win:
+    os.environ['FOR_DISABLE_CONSOLE_CTRL_HANDLER'] = '1'
 
 
 __all__ = ['backwards', 'platform', 'config', 'tools',
