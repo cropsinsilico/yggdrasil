@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include "PsiInterface.hpp"
 
-#define BSIZE 8192 // the max
+#define BSIZE 100
 
 
 int main() {
