@@ -3,7 +3,7 @@ from logging import warn
 import threading
 from subprocess import Popen, PIPE
 from cis_interface import platform
-from cis_interface.tools import CIS_MSG_MAX
+from cis_interface.tools import get_CIS_MSG_MAX
 from cis_interface.tools import _ipc_installed as _ipc_installed0
 from cis_interface.communication import CommBase
 try:
@@ -31,7 +31,7 @@ def get_queue(qid=None):
     """
     if _ipc_installed:
         global _registered_queues
-        kwargs = dict(max_message_size=CIS_MSG_MAX)
+        kwargs = dict(max_message_size=get_CIS_MSG_MAX())
         if qid is None:
             kwargs['flags'] = sysv_ipc.IPC_CREX
         mq = sysv_ipc.MessageQueue(qid, **kwargs)

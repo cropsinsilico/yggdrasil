@@ -14,10 +14,9 @@ def setup_environ(compile_flags=[], linker_flags=[]):
             should be set. Defaults to [].
 
     """
-    os.environ['CISCCFLAGS'] = ' '.join(
-        compile_flags + GCCModelDriver._compile_flags)
-    os.environ['CISLDFLAGS'] = ' '.join(
-        linker_flags + GCCModelDriver._linker_flags)
+    _compile_flags, _linker_flags = GCCModelDriver.get_flags()
+    os.environ['CISCCFLAGS'] = ' '.join(compile_flags + _compile_flags)
+    os.environ['CISLDFLAGS'] = ' '.join(linker_flags + _linker_flags)
 
 
 class MakeModelDriver(ModelDriver):

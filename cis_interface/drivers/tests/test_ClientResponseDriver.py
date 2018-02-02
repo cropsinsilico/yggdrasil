@@ -1,4 +1,4 @@
-from cis_interface.communication import _default_comm
+from cis_interface import tools
 import cis_interface.drivers.tests.test_ConnectionDriver as parent
 
 
@@ -10,8 +10,8 @@ class TestClientResponseParam(parent.TestConnectionParam):
         self.driver = 'ClientResponseDriver'
         self.args = None
         self.attr_list += ['comm', 'msg_id', 'response_address']
-        self.comm_name = _default_comm
-        self.server_comm = _default_comm
+        self.comm_name = tools.get_default_comm()
+        self.server_comm = tools.get_default_comm()
         self.icomm_name = self.server_comm
         self.ocomm_name = self.comm_name
 

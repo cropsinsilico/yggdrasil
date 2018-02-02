@@ -40,7 +40,7 @@ class ClientRequestDriver(ConnectionDriver):
             model_request_name + '_SERVER' if not set.
         comm (str, optional): The comm class that should be used to
             communicate with the server request driver. Defaults to
-            _default_comm.
+            tools.get_default_comm().
         comm_address (str, optional): Address for the server request driver.
             Defaults to None and a new address is generated.
         **kwargs: Additional keyword arguments are passed to parent class.

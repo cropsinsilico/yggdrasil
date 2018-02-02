@@ -1,9 +1,8 @@
 import os
 from cis_interface import platform
 from cis_interface.config import cis_cfg
-from cis_interface.communication import _default_comm
 from cis_interface.tools import (
-    _zmq_installed, _ipc_installed, popen_nobuffer, print_encoded)
+    _zmq_installed, _ipc_installed, get_default_comm, popen_nobuffer, print_encoded)
 from cis_interface.drivers.ModelDriver import ModelDriver
 
 
@@ -15,33 +14,72 @@ _incl_comm = os.path.join(_top_dir, 'communication')
 _regex_win32_lib = os.path.join(_top_dir, 'regex_win32.lib')
 
 
-_linker_flags = []
-_compile_flags = []
-if platform._is_win:
-    _regex_win32 = os.path.split(_regex_win32_lib)
-    _compile_flags += ["/nologo", "-D_CRT_SECURE_NO_WARNINGS", "-I" + _regex_win32[0]]
-    _linker_flags += [_regex_win32[1], '/LIBPATH:"%s"' % _regex_win32[0]]
-if _zmq_installed:
+def get_zmq_flags():
+    r"""Get the necessary flags for compiling & linking with zmq libraries.
+
+    Returns:
+        tuple(list, list): compile and linker flags.
+
+    """
+    _compile_flags = []
+    _linker_flags = []
+    if _zmq_installed:
+        if platform._is_win:
+            for l in ["libzmq", "czmq"]:
+                plib = cis_cfg.get('windows', '%s_static' % l, False)
+                pinc = cis_cfg.get('windows', '%s_include' % l, False)
+                if not (plib and pinc):  # pragma: debug
+                    raise Exception("Could not locate %s .lib and .h files." % l)
+                pinc_d = os.path.dirname(pinc)
+                plib_d, plib_f = os.path.split(plib)
+                _compile_flags.append("-I%s" % pinc_d)
+                _linker_flags += [plib_f, '/LIBPATH:"%s"' % plib_d]
+        else:
+            _linker_flags += ["-lczmq", "-lzmq"]
+        _compile_flags += ["-DZMQINSTALLED"]
+    return _compile_flags, _linker_flags
+
+
+def get_ipc_flags():
+    r"""Get the necessary flags for compiling & linking with ipc libraries.
+
+    Returns:
+        tuple(list, list): compile and linker flags.
+
+    """
+    _compile_flags = []
+    _linker_flags = []
+    if _ipc_installed:
+        _compile_flags += ["-DIPCINSTALLED"]
+    return _compile_flags, _linker_flags
+
+
+def get_flags():
+    r"""Get the necessary flags for compiling & linking with CiS libraries.
+
+    Returns:
+        tuple(list, list): compile and linker flags.
+
+    """
+    _compile_flags = []
+    _linker_flags = []
     if platform._is_win:
-        _zmq_dirs = dict()
-        for l in ["libzmq", "czmq"]:
-            plib = cis_cfg.get('windows', '%s_static' % l, False)
-            pinc = cis_cfg.get('windows', '%s_include' % l, False)
-            if not (plib and pinc):  # pragma: debug
-                raise Exception("Could not locate %s .lib and .h files." % l)
-            pinc_d = os.path.dirname(pinc)
-            plib_d, plib_f = os.path.split(plib)
-            _compile_flags.append("-I%s" % pinc_d)
-            _linker_flags += [plib_f, '/LIBPATH:"%s"' % plib_d]
-    else:
-        _linker_flags += ["-lczmq", "-lzmq"]
-    _compile_flags += ["-DZMQINSTALLED"]
-if _ipc_installed:
-    _compile_flags += ["-DIPCINSTALLED"]
-for x in [_incl_interface, _incl_io, _incl_comm, _incl_seri]:
-    _compile_flags += ["-I" + x]
-if _default_comm == 'IPCComm':
-    _compile_flags += ["-DIPCDEF"]
+        _regex_win32 = os.path.split(_regex_win32_lib)
+        _compile_flags += ["/nologo", "-D_CRT_SECURE_NO_WARNINGS", "-I" + _regex_win32[0]]
+        _linker_flags += [_regex_win32[1], '/LIBPATH:"%s"' % _regex_win32[0]]
+    if _zmq_installed:
+        zmq_flags = get_zmq_flags()
+        _compile_flags += zmq_flags[0]
+        _compile_flags += zmq_flags[1]
+    if _ipc_installed:
+        ipc_flags = get_ipc_flags()
+        _compile_flags += ipc_flags[0]
+        _compile_flags += ipc_flags[1]
+    for x in [_incl_interface, _incl_io, _incl_comm, _incl_seri]:
+        _compile_flags += ["-I" + x]
+    if get_default_comm() == 'IPCComm':
+        _compile_flags += ["-DIPCDEF"]
+    return _compile_flags, _linker_flags
 
 
 def build_regex_win32():
@@ -103,6 +141,7 @@ def do_compile(src, out=None, cc=None, ccflags=None, ldflags=None,
         ccflags = []
     if ldflags is None:  # pragma: no cover
         ldflags = []
+    _compile_flags, _linker_flags = get_flags()
     ldflags0 = _linker_flags
     if platform._is_win:
         ccflags0 = ['/W4', '/Zi', "/EHsc"]

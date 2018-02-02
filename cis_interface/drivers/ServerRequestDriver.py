@@ -14,14 +14,15 @@ class ServerRequestDriver(ConnectionDriver):
             used to receive requests from the client request driver. Defaults to
             model_request_name + '_SERVER' if not set.
         comm (str, optional): The comm class that should be used to
-            communicate with the client request driver. Defaults to _default_comm.
+            communicate with the client request driver. Defaults to
+            tools.get_default_comm().
         comm_address (str, optional): Address for the client request driver.
             Defaults to None and a new address is generated.
         **kwargs: Additional keyword arguments are passed to parent class.
 
     Attributes:
         comm (str): The comm class that should be used to communicate
-            with the server driver. Defaults to _default_comm.
+            with the server driver. Defaults to tools.get_default_comm().
         comm_address (str): Address for the client request driver.
         response_drivers (list): Response drivers created for each request.
         nclients (int): Number of clients signed on.

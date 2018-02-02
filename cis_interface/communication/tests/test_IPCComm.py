@@ -41,11 +41,11 @@ def test_ipcrm():
 def test_ipcrm_queues():
     r"""Test removal of ipc queues."""
     IPCComm.ipcrm_queues()
-    assert(len(IPCComm.ipc_queues()) == 0)
+    nt.assert_equal(len(IPCComm.ipc_queues()), 0)
     mq = IPCComm.get_queue()
-    assert(len(IPCComm.ipc_queues()) == 1)
+    nt.assert_equal(len(IPCComm.ipc_queues()), 1)
     IPCComm.ipcrm_queues(str(mq.key))
-    assert(len(IPCComm.ipc_queues()) == 0)
+    nt.assert_equal(len(IPCComm.ipc_queues()), 0)
 
     
 @unittest.skipIf(not _ipc_installed, "IPC library not installed")

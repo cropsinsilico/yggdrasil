@@ -8,7 +8,7 @@ import numpy as np
 from scipy.io import savemat, loadmat
 import nose.tools as nt
 from cis_interface.config import cis_cfg, cfg_logging
-from cis_interface.tools import CIS_MSG_MAX as maxMsgSize
+from cis_interface.tools import get_CIS_MSG_MAX
 from cis_interface.backwards import pickle, BytesIO
 from cis_interface.dataio.AsciiTable import AsciiTable
 from cis_interface import backwards, platform
@@ -338,7 +338,7 @@ class IOInfo(object):
     @property
     def maxMsgSize(self):
         r"""int: Maximum message size."""
-        return maxMsgSize
+        return get_CIS_MSG_MAX()
 
     @property
     def msg_short(self):

@@ -284,7 +284,7 @@ int ipc_comm_recv(const comm_t x, char **data, const size_t len,
   int ret = -1;
   int len_recv = -1;
   while (1) {
-    ret = msgrcv(((int*)x.handle)[0], &t, len, 0, IPC_NOWAIT);
+    ret = msgrcv(((int*)x.handle)[0], &t, CIS_MSG_MAX, 0, IPC_NOWAIT);
     if (ret == -1 && errno == ENOMSG) {
       cislog_debug("ipc_comm_recv(%s): no input, sleep", x.name);
       usleep(250*1000);
@@ -296,7 +296,7 @@ int ipc_comm_recv(const comm_t x, char **data, const size_t len,
   }
   if (ret <= 0) {
     cislog_debug("ipc_comm_recv: msgrecv(%d, %p, %d, 0, IPC_NOWAIT: %s",
-		 (int*)x.handle, &t, (int)len, strerror(errno));
+		 (int*)x.handle, &t, (int)CIS_MSG_MAX, strerror(errno));
     return -1;
   }
   len_recv = ret + 1;

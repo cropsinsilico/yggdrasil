@@ -10,14 +10,14 @@ class ServerResponseDriver(ConnectionDriver):
             responses to the client response driver.
         comm (str, optional): The comm class that should be used to
             communicate with the server resposne driver. Defaults to
-            _default_comm.
+            tools.get_default_comm().
         msg_id (str, optional): ID associate with the request message this
             driver was created to respond to. Defaults to new unique ID.
         **kwargs: Additional keyword arguments are passed to parent class.
 
     Attributes:
         comm (str): The comm class that should be used to communicate
-            with the server driver. Defaults to _default_comm.
+            with the server driver. Defaults to tools.get_default_comm().
         msg_id (str): ID associate with the request message this driver was
             created to respond to.
 

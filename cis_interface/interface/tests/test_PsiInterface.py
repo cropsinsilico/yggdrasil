@@ -2,25 +2,28 @@ import os
 import numpy as np
 import nose.tools as nt
 from cis_interface.interface import PsiInterface
-from cis_interface.tools import PSI_MSG_EOF, PSI_MSG_MAX, PSI_MSG_BUF
+from cis_interface.tools import CIS_MSG_EOF, get_CIS_MSG_MAX, CIS_MSG_BUF
 from cis_interface.drivers import (
     import_driver, InputCommDriver, OutputCommDriver)
 from cis_interface.tests import CisTest, IOInfo
 
 
+CIS_MSG_MAX = get_CIS_MSG_MAX()
+
+
 def test_maxMsgSize():
     r"""Test max message size."""
-    nt.assert_equal(PsiInterface.maxMsgSize(), PSI_MSG_MAX)
+    nt.assert_equal(PsiInterface.maxMsgSize(), CIS_MSG_MAX)
 
 
 def test_eof_msg():
     r"""Test eof message signal."""
-    nt.assert_equal(PsiInterface.eof_msg(), PSI_MSG_EOF)
+    nt.assert_equal(PsiInterface.eof_msg(), CIS_MSG_EOF)
 
 
 def test_bufMsgSize():
     r"""Test buf message size."""
-    nt.assert_equal(PsiInterface.bufMsgSize(), PSI_MSG_BUF)
+    nt.assert_equal(PsiInterface.bufMsgSize(), CIS_MSG_BUF)
 
 
 def test_PsiMatlab_class():
@@ -42,8 +45,8 @@ def test_PsiMatlab_class():
 
 def test_PsiMatlab_variables():
     r"""Test Matlab interface for variables."""
-    nt.assert_equal(PsiInterface.PsiMatlab('PSI_MSG_MAX'), PSI_MSG_MAX)
-    nt.assert_equal(PsiInterface.PsiMatlab('PSI_MSG_EOF'), PSI_MSG_EOF)
+    nt.assert_equal(PsiInterface.PsiMatlab('PSI_MSG_MAX'), CIS_MSG_MAX)
+    nt.assert_equal(PsiInterface.PsiMatlab('PSI_MSG_EOF'), CIS_MSG_EOF)
 
 
 # @nt.nottest

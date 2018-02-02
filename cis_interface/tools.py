@@ -81,17 +81,37 @@ def is_zmq_installed():
 
 _ipc_installed = is_ipc_installed()
 _zmq_installed = is_zmq_installed()
-# OS X limit is 2kb
-if _zmq_installed:
-    CIS_MSG_MAX = 2**20
-else:
-    CIS_MSG_MAX = 1024 * 2
+if not (_ipc_installed or _zmq_installed):  # pragma: debug
+    raise Exception('Neither ZMQ or IPC installed.')
 CIS_MSG_EOF = backwards.unicode2bytes("EOF!!!")
 CIS_MSG_BUF = 1024 * 2
 
-PSI_MSG_MAX = CIS_MSG_MAX
-PSI_MSG_EOF = CIS_MSG_EOF
-PSI_MSG_BUF = CIS_MSG_BUF
+
+def get_default_comm():
+    r"""Get the default comm that should be used for message passing."""
+    if 'CIS_DEFAULT_COMM' in os.environ:
+        _default_comm = os.environ['CIS_DEFAULT_COMM']
+        if _default_comm not in ['ZMQComm', 'IPCComm', 'RMQComm']:  # pragma: debug
+            raise Exception('Unrecognized default comm %s set by CIS_DEFAULT_COMM' % (
+                _default_comm))
+    elif _zmq_installed:
+        _default_comm = 'ZMQComm'
+    elif _ipc_installed:
+        _default_comm = 'IPCComm'
+    else:  # pragma: debug
+        raise Exception('Neither ZMQ or IPC installed.')
+    return _default_comm
+
+
+def get_CIS_MSG_MAX():
+    r"""Get the maximum message size for the default comm."""
+    _default_comm = get_default_comm()
+    if _default_comm == 'IPCComm':
+        CIS_MSG_MAX = 2**20
+    else:
+        # OS X limit is 2kb
+        CIS_MSG_MAX = 1024 * 2
+    return CIS_MSG_MAX
 
 
 # https://stackoverflow.com/questions/35772001/

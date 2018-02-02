@@ -1,7 +1,6 @@
 import nose.tools as nt
-from cis_interface.communication import _default_comm
 import cis_interface.drivers.tests.test_ConnectionDriver as parent
-from cis_interface import runner
+from cis_interface import runner, tools
 
 
 class TestServerParam(parent.TestConnectionParam):
@@ -18,8 +17,8 @@ class TestServerParam(parent.TestConnectionParam):
         self.route_timeout = 2 * self.timeout
         # self.sleeptime = 0.5
         # self.timeout = 10.0
-        self.comm_name = _default_comm
-        self.client_comm = _default_comm
+        self.comm_name = tools.get_default_comm()
+        self.client_comm = tools.get_default_comm()
         self.icomm_name = self.client_comm
         self.ocomm_name = self.comm_name
             

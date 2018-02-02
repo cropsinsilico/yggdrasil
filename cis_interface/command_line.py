@@ -36,7 +36,7 @@ def cc_flags():
         list: The necessary compiler flags and preprocessor definitions.
 
     """
-    return ' '.join(GCCModelDriver._compile_flags)
+    return ' '.join(GCCModelDriver.get_flags()[0])
 
 
 def ld_flags():
@@ -47,7 +47,7 @@ def ld_flags():
         list: The necessary library linking flags.
 
     """
-    return ' '.join(GCCModelDriver._linker_flags)
+    return ' '.join(GCCModelDriver.get_flags()[1])
 
 
 if __name__ == '__main__':

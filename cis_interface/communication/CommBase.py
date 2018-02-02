@@ -1,11 +1,11 @@
 import os
 import uuid
-from cis_interface import backwards
-from cis_interface.tools import CisClass, CIS_MSG_MAX, CIS_MSG_EOF
+from cis_interface import backwards, tools
+from cis_interface.tools import CisClass, get_CIS_MSG_MAX, CIS_MSG_EOF
 from cis_interface.serialize.DefaultSerialize import DefaultSerialize
 from cis_interface.serialize.DefaultDeserialize import DefaultDeserialize
 from cis_interface.communication import (
-    new_comm, get_comm, get_comm_class, _default_comm)
+    new_comm, get_comm, get_comm_class)
 
 
 CIS_MSG_HEAD = backwards.unicode2bytes('CIS_MSG_HEAD')
@@ -167,7 +167,7 @@ class CommBase(CisClass):
     @property
     def maxMsgSize(self):
         r"""int: Maximum size of a single message that should be sent."""
-        return CIS_MSG_MAX
+        return get_CIS_MSG_MAX()
 
     @property
     def empty_msg(self):
@@ -360,7 +360,7 @@ class CommBase(CisClass):
         kws = self.get_work_comm_kwargs
         kws.update(**kwargs)
         if work_comm_name is None:
-            cls = kws.get("comm", _default_comm)
+            cls = kws.get("comm", tools.get_default_comm())
             work_comm_name = 'temp_%s_%s.%s' % (
                 cls, kws['direction'], header['id'])
         c = get_comm(work_comm_name, address=header['address'], **kws)
@@ -385,7 +385,7 @@ class CommBase(CisClass):
         kws = self.create_work_comm_kwargs
         kws.update(**kwargs)
         if work_comm_name is None:
-            cls = kws.get("comm", _default_comm)
+            cls = kws.get("comm", tools.get_default_comm())
             work_comm_name = 'temp_%s_%s.%s' % (
                 cls, kws['direction'], header['id'])
         c = new_comm(work_comm_name, **kws)

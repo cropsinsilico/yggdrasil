@@ -1,19 +1,5 @@
-import os
 import importlib
-from cis_interface.tools import _zmq_installed, _ipc_installed
-
-
-if 'CIS_DEFAULT_COMM' in os.environ:
-    _default_comm = os.environ['CIS_DEFAULT_COMM']
-    if _default_comm not in ['ZMQComm', 'IPCComm', 'RMQComm']:  # pragma: debug
-        raise Exception('Unrecognized default comm %s set by CIS_DEFAULT_COMM' % (
-            _default_comm))
-elif _zmq_installed:
-    _default_comm = 'ZMQComm'
-elif _ipc_installed:
-    _default_comm = 'IPCComm'
-else:  # pragma: debug
-    raise Exception('Neither ZMQ or IPC installed.')
+from cis_interface import tools
 
 
 def get_comm_class(comm=None):
@@ -21,14 +7,14 @@ def get_comm_class(comm=None):
 
     Args:
         comm (str, optional): Name of communicator class. Defaults to
-            _default_comm if not provided.
+            tools.get_default_comm() if not provided.
 
     Returns:
         class: Communicator class.
 
     """
     if comm is None:
-        comm = _default_comm
+        comm = tools.get_default_comm()
     mod = importlib.import_module('cis_interface.communication.%s' % comm)
     comm_cls = getattr(mod, comm)
     return comm_cls
@@ -49,7 +35,7 @@ def get_comm(name, comm=None, new_comm_class=None, **kwargs):
 
     """
     if comm is None:
-        comm = _default_comm
+        comm = tools.get_default_comm()
     if new_comm_class is not None:
         comm = new_comm_class
     comm_cls = get_comm_class(comm)
@@ -71,9 +57,9 @@ def new_comm(name, comm=None, **kwargs):
 
     """
     if comm is None:
-        comm = _default_comm
+        comm = tools.get_default_comm()
     # elif comm == 'ErrorComm':
-    #     comm = kwargs.get('base_comm', _default_comm)
+    #     comm = kwargs.get('base_comm', tools.get_default_comm())
     #     kwargs['new_comm_class'] = 'ErrorComm'
     comm_cls = get_comm_class(comm)
     return comm_cls.new_comm(name, **kwargs)

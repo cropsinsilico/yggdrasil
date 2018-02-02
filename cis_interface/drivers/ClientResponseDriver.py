@@ -10,7 +10,7 @@ class ClientResponseDriver(ConnectionDriver):
             client model to receive responses.
         comm (str, optional): The comm class that should be used to
             communicate with the server response driver. Defaults to
-            _default_comm.
+            tools.get_default_comm().
         msg_id (str, optional): ID associate with the request message this
             driver was created to respond to. Defaults to new unique ID.
         **kwargs: Additional keyword arguments are passed to parent class.
