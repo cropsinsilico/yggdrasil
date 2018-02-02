@@ -127,12 +127,12 @@ def kill(pid, signum):
     if platform._is_win:
         sigmap = {signal.SIGINT: signal.CTRL_C_EVENT,
                   signal.SIGBREAK: signal.CTRL_BREAK_EVENT}
-        if True:
+        if False:
             import win32api
             ret = win32api.GenerateConsoleCtrlEvent(sigmap[signum], pid)
             print("Generated Ctrl+C")
             return ret
-        if signum in sigmap and pid == os.getpid():
+        if signum in sigmap and pid == os.getpid() and False:
             # we don't know if the current process is a
             # process group leader, so just broadcast
             # to all processes attached to this console.
