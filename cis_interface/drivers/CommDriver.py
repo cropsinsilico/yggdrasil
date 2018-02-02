@@ -115,15 +115,11 @@ class CommDriver(Driver):
         super(CommDriver, self).graceful_stop()
         self.debug('Returning')
 
-    def terminate(self):
-        r"""Stop the CommDriver, removing the queue."""
-        if self._terminated:
-            self.debug('Driver already terminated.')
-            return
+    def do_terminate(self):
+        r"""Stop the CommDriver by closing the comm."""
         self.debug()
         self.close_comm()
-        super(CommDriver, self).terminate()
-        self.debug('Returning')
+        super(CommDriver, self).do_terminate()
 
     def cleanup(self):
         r"""Ensure that the queues are removed."""

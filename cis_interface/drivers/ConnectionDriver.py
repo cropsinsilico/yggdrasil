@@ -202,15 +202,11 @@ class ConnectionDriver(Driver):
     #     self.close_comm()
     #     super(ConnectionDriver, self).on_model_exit()
 
-    def terminate(self):
-        r"""Stop the driver, closing the communicators."""
-        if self._terminated:
-            self.debug('Driver already terminated.')
-            return
+    def do_terminate(self):
+        r"""Stop the driver by closing the communicators."""
         self.debug()
         self.close_comm()
-        super(ConnectionDriver, self).terminate()
-        self.debug('Returning')
+        super(ConnectionDriver, self).do_terminate()
 
     def cleanup(self):
         r"""Ensure that the communicators are closed."""

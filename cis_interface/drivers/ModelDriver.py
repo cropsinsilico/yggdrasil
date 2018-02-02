@@ -211,7 +211,8 @@ class ModelDriver(Driver):
                         self.debug("Waiting %f s for process to be killed",
                                    self.timeout)
                         self.wait_process(self.timeout)
-                    except BaseException:  # pragma: debug
+                    except OSError:  # pragma: debug
+                        # except BaseException:  # pragma: debug
                         # except OSError:  # pragma: debug
                         self.error("Error killing model process")
                 # Check return code
@@ -221,11 +222,8 @@ class ModelDriver(Driver):
                                str(self.process.returncode))
             self.process = None
 
-    def terminate(self):
+    def do_terminate(self):
         r"""Terminate the process running the model."""
-        if self._terminated:
-            self.debug('Driver already terminated.')
-            return
         self.debug()
         self.kill_process()
-        super(ModelDriver, self).terminate()
+        super(ModelDriver, self).do_terminate()

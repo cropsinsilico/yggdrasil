@@ -1,4 +1,4 @@
-from threading import Thread, RLock
+from threading import Thread, RLock, Event
 import os
 from cis_interface.config import cis_cfg
 from cis_interface.tools import CisClass
@@ -53,6 +53,7 @@ class Driver(CisClass, Thread):
         self._thread_initialized = True
         self.debug()
         self.name = name
+        self.terminate_event = Event()
         # if cis_cfg.get('debug', 'psi') == 'DEBUG':
         #     self.sleeptime = 1.0
         # Set defaults
@@ -71,7 +72,6 @@ class Driver(CisClass, Thread):
         self.namespace = namespace
         self.rank = rank
         self._term_meth = "terminate"
-        self._terminated = False
         self.lock = RLock()
 
     def run(self):
@@ -85,7 +85,7 @@ class Driver(CisClass, Thread):
 
     def stop(self):
         r"""Stop the driver."""
-        if self._terminated:
+        if self.terminate_event.is_set():
             self.debug('Driver already terminated.')
             return
         self.debug()
@@ -97,14 +97,19 @@ class Driver(CisClass, Thread):
         r"""Gracefully stop the driver."""
         self.debug()
 
+    def do_terminate(self):
+        r"""Actions that should stop the driver."""
+        self.debug('Returning')
+
     def terminate(self):
         r"""Stop the driver, without attempting to allow it to finish."""
-        if self._terminated:
+        if self.terminate_event.is_set():
             self.debug('Driver already terminated.')
             return
+        self.do_terminate()
         self.debug()
         self.on_exit()
-        self._terminated = True
+        self.terminate_event.set()
         self.wait(self.timeout)
         assert(not self.is_alive())
         self.debug('Returning')

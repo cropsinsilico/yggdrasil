@@ -277,9 +277,6 @@ class MatlabModelDriver(ModelDriver):
 
     def terminate(self):
         r"""Terminate the driver, including the matlab engine."""
-        if self._terminated:
-            self.debug('Driver already terminated.')
-            return
         super(MatlabModelDriver, self).terminate()
         with self.lock:
             self.cleanup()
