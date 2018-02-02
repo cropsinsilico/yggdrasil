@@ -132,7 +132,7 @@ def kill(pid, signum):
             ret = win32api.GenerateConsoleCtrlEvent(sigmap[signum], pid)
             print("Generated signal", sigmap[signum])
             return ret
-        if True:
+        if False:
             import ctypes
             ret = ctypes.windll.kernel32.GenerateConsoleCtrlEvent(sigmap[signum], pid)
             print("Generated signal", sigmap[signum])
@@ -147,7 +147,7 @@ def kill(pid, signum):
         # work around the synchronization problem when calling
         # kill from the main thread.
         if (((signum in sigmap) and (thread.name == 'MainThread') and
-             callable(handler) and (pid == 0))):
+             callable(handler) and (pid == os.getpid()))):  # (pid == 0))):
             event = threading.Event()
 
             def handler_set_event(signum, frame):
