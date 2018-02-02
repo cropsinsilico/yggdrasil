@@ -81,7 +81,7 @@ class Driver(CisClass, Thread):
     @property
     def is_valid(self):
         r"""bool: True if the driver is functional."""
-        return True
+        return (not self.terminate_event.is_set())
 
     def stop(self):
         r"""Stop the driver."""
