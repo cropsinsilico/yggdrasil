@@ -17,7 +17,7 @@ class TestGCCModelParam(parent.TestModelParam):
     def __init__(self, *args, **kwargs):
         super(TestGCCModelParam, self).__init__(*args, **kwargs)
         self.driver = 'GCCModelDriver'
-        self.attr_list += ['compiled']
+        self.attr_list += []
         src = scripts['c']
         script_dir = os.path.dirname(src[0])
         if platform._is_win:

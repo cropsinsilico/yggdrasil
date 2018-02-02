@@ -62,6 +62,8 @@ class ModelDriver(Driver):
             self.args = args
         self._running = False
         self.process = None
+        self.queue = Queue()
+        self.queue_thread = None
         self.is_server = is_server
         self.client_of = client_of
         self.event_process_kill_called = Event()
@@ -114,7 +116,6 @@ class ModelDriver(Driver):
                                             cwd=self.workingDir,
                                             forward_signals=False)
         # Start thread to queue output
-        self.queue = Queue()
         self.queue_thread = Thread(target=self.enqueue_output,
                                    args=(self.process.stdout, self.queue))
         self.queue_thread.daemon = True

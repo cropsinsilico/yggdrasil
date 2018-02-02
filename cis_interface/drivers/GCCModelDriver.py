@@ -248,7 +248,6 @@ class GCCModelDriver(ModelDriver):
         else:
             self.args = [os.path.join(".", self.efile)]
         self.args += self.run_args
-        self.compiled = True
         self.debug('Compiled executable with %s', self.cc)
 
     def parse_arguments(self, args):
@@ -310,13 +309,6 @@ class GCCModelDriver(ModelDriver):
             raise RuntimeError("Could not locate a source file in the " +
                                "provided arguments.")
         
-    def run(self):
-        r"""Run the compiled executable if it exists."""
-        if self.compiled:
-            super(GCCModelDriver, self).run()
-        else:  # pragma: debug
-            self.error("Error compiling.")
-
     def remove_products(self):
         products = [self.efile]
         if platform._is_win:
