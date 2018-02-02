@@ -30,7 +30,7 @@ environment:
 
   matrix:
     - platform: x64
-      PYTHON_VERSION: "3.6"
+      PYTHON_VERSION: "2.7"
       INSTALLRMQ: 0
     - platform: x64
       PYTHON_VERSION: "2.7"
@@ -106,7 +106,7 @@ before_test:
   - "flake8 cis_interface"
 
 test_script:
-  - "nosetests --nologcapture --with-coverage --cover-package=cis_interface -svx cis_interface/tests/test_runner.py"
+  # - "nosetests --nologcapture --with-coverage --cover-package=cis_interface -svx cis_interface/tests/test_runner.py"
   - "nosetests --with-coverage --cover-package=cis_interface -svx cis_interface"
 
 

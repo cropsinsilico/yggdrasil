@@ -185,6 +185,10 @@ def sleep(interval):
                 import errno
                 if e.errno != errno.EINTR:
                     raise
+            except InterruptedError:
+                import errno
+                print(e.errno)
+                print(e)
             interval -= time.time() - t
             if interval <= 0:
                 break
