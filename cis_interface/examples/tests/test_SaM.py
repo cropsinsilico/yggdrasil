@@ -32,6 +32,7 @@ class TestExampleSaM(TestExample):
     
     def check_result(self):
         r"""Assert that contents of input/output files are identical."""
+        self.runner.sleep(1)
         assert(os.path.isfile(self.output_file))
         with open(self.output_file, 'r') as fd:
             ocont = fd.read()
