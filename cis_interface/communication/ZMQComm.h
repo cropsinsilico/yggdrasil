@@ -43,11 +43,11 @@ int new_zmq_address(comm_t *comm) {
   }
   // Bind
   zsock_t *s = zsock_new(ZMQ_PAIR);
-  zsock_set_linger(s, 100);
   if (s == NULL) {
     cislog_error("new_zmq_address: Could not initialize empty socket.");
     return -1;
   }
+  zsock_set_linger(s, 100);
   int port = zsock_bind(s, "%s", address);
   if (port == -1) {
     cislog_error("new_zmq_address: Could not bind socket to address = %s",
@@ -140,7 +140,8 @@ static inline
 int free_zmq_comm(comm_t *x) {
   if (x->handle != NULL) {
     zsock_t *s = (zsock_t*)(x->handle);
-    zsock_destroy(&s);
+    if (s != NULL)
+      zsock_destroy(&s);
     x->handle = NULL;
   }
   return 0;
@@ -187,9 +188,18 @@ int zmq_comm_send(const comm_t x, const char *data, const size_t len) {
     return -1;
   /* printf("(C) sending %d bytes to %s\n", len, x.address); */
   zsock_t *s = (zsock_t*)(x.handle);
+  if (s == NULL) {
+    cislog_error("zmq_comm_send(%s): socket handle is NULL", x.name);
+    return -1;
+  }
   zframe_t *f = zframe_new(data, len);
-  int ret = zframe_send(&f, s, 0);
-  zframe_destroy(&f);
+  int ret = -1;
+  if (f == NULL) {
+    cislog_error("zmq_comm_send(%s): frame handle is NULL", x.name);
+  } else {
+    ret = zframe_send(&f, s, 0);
+    zframe_destroy(&f);
+  } 
   cislog_debug("zmq_comm_send(%s): returning %d", x.name, ret);
   return ret;
 };
@@ -211,6 +221,10 @@ int zmq_comm_recv(const comm_t x, char **data, const size_t len,
 		  const int allow_realloc) {
   cislog_debug("zmq_comm_recv(%s)", x.name);
   zsock_t *s = (zsock_t*)(x.handle);
+  if (s == NULL) {
+    cislog_error("zmq_comm_recv(%s): socket handle is NULL", x.name);
+    return -1;
+  }
   zframe_t *out = zframe_recv(s);
   if (out == NULL) {
     cislog_debug("zmq_comm_recv(%s): did not receive", x.name);

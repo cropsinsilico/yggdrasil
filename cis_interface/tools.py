@@ -107,10 +107,10 @@ def get_CIS_MSG_MAX():
     r"""Get the maximum message size for the default comm."""
     _default_comm = get_default_comm()
     if _default_comm == 'IPCComm':
-        CIS_MSG_MAX = 2**20
-    else:
         # OS X limit is 2kb
         CIS_MSG_MAX = 1024 * 2
+    else:
+        CIS_MSG_MAX = 2**20
     return CIS_MSG_MAX
 
 

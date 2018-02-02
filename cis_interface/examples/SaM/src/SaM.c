@@ -45,10 +45,5 @@ int main() {
     }
     printf("SaM(C): Sent to output\n");
 
-    // Clean up I/O channels
-    psi_free(&in1);
-    psi_free(&in2);
-    psi_free(&out1);
-
     return 0;
 }

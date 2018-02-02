@@ -14,8 +14,10 @@ class TestClientParam(parent.TestConnectionParam):
                            'request_name', 'request_address']
         # Increased to allow forwarding between IPC comms on OSX
         self.timeout = 5.0
-        self.route_timeout = 3 * self.timeout
-        self.debug_flag = True
+        self.route_timeout = 2 * self.timeout
+        # if tools.get_default_comm() == "IPCComm":
+        #    self.route_timeout = 120.0
+        # self.debug_flag = True
         # self.sleeptime = 0.5
         # self.timeout = 10.0
         self.comm_name = tools.get_default_comm()
