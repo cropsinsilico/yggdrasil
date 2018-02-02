@@ -127,7 +127,7 @@ def kill(pid, signum):
     if platform._is_win:
         sigmap = {signal.SIGINT: signal.CTRL_C_EVENT,
                   signal.SIGBREAK: signal.CTRL_BREAK_EVENT}
-        if False:
+        if True:
             import win32api
             ret = win32api.GenerateConsoleCtrlEvent(sigmap[signum], pid)
             print("Generated Ctrl+C")
