@@ -70,11 +70,11 @@ def get_flags():
     if _zmq_installed:
         zmq_flags = get_zmq_flags()
         _compile_flags += zmq_flags[0]
-        _compile_flags += zmq_flags[1]
+        _linker_flags += zmq_flags[1]
     if _ipc_installed:
         ipc_flags = get_ipc_flags()
         _compile_flags += ipc_flags[0]
-        _compile_flags += ipc_flags[1]
+        _linker_flags += ipc_flags[1]
     for x in [_incl_interface, _incl_io, _incl_comm, _incl_seri]:
         _compile_flags += ["-I" + x]
     if get_default_comm() == 'IPCComm':
