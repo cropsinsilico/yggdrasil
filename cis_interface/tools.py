@@ -166,7 +166,7 @@ def sleep(interval):
         interval (float): Time in seconds that process should sleep.
 
     """
-    if platform._is_win and not backwards.PY2:
+    if platform._is_win and backwards.PY2:
         while True:
             try:
                 t = time.time()
