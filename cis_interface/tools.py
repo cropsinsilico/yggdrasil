@@ -147,7 +147,7 @@ def kill(pid, signum):
         # work around the synchronization problem when calling
         # kill from the main thread.
         if (((signum in sigmap) and (thread.name == 'MainThread') and
-             callable(handler) and (pid == os.getpid()))):  # (pid == 0))):
+             callable(handler) and ((pid == os.getpid()) or (pid == 0)))):
             event = threading.Event()
 
             def handler_set_event(signum, frame):
