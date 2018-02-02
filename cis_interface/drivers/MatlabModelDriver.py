@@ -281,14 +281,14 @@ class MatlabModelDriver(ModelDriver):
         with self.lock:
             self.cleanup()
 
-    def run(self):
-        r"""Run the matlab script in the matlab engine."""
-        if _matlab_installed:  # pragma: matlab
-            self.debug('Running %s from %s', self.args[0], os.getcwd())
-            super(MatlabModelDriver, self).run()
-            self.debug("Run done")
-        else:  # pragma: no matlab
-            self.error("Matlab not installed. Could not run model.")
+    # def run(self):
+    #     r"""Run the matlab script in the matlab engine."""
+    #     if _matlab_installed:  # pragma: matlab
+    #         self.debug('Running %s from %s', self.args[0], os.getcwd())
+    #         super(MatlabModelDriver, self).run()
+    #         self.debug("Run done")
+    #     else:  # pragma: no matlab
+    #         self.error("Matlab not installed. Could not run model.")
 
     def start_setup(self):
         r"""Actions to perform before the run loop."""
@@ -315,13 +315,14 @@ class MatlabModelDriver(ModelDriver):
                 self.debug('MatlabProcess running model.')
         else:  # pragma: no matlab
             self.error("Matlab not installed. Could not run setup.")
+            self.event_process_started.clear()
+            self.event_process_exit.set()
 
     def run_loop(self):  # pragma: matlab
         r"""Loop to check if model is still running and forward output."""
         self.process.print_output()
         if self.process.is_done():
+            self.event_process_exit.set()
             self.process.future.result()
             self.process.print_output()
-            return False
         self.sleep()
-        return True

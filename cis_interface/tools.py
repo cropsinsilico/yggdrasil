@@ -230,7 +230,54 @@ def eval_kwarg(x):
     return x
 
 
-def popen_nobuffer(args, forward_signals=True, **kwargs):
+class CisPopen(subprocess.Popen):
+    r"""Uses Popen to open a process without a buffer. If not already set,
+    the keyword arguments 'bufsize', 'stdout', and 'stderr' are set to
+    0, subprocess.PIPE, and subprocess.STDOUT respectively. This sets the
+    output stream to unbuffered and directs both stdout and stderr to the
+    stdout pipe. In addition this class overrides Popen.kill() to allow
+    processes to be killed with CTRL_C_EVENT on windows.
+
+    Args:
+        args (list, str): Shell command or list of arguments that should be
+            run.
+        forward_signals (bool, optional): If True, flags will be set such
+            that signals received by the spawning process will be forwarded
+            to the child process. If False, the signals will not be forwarded.
+            Defaults to True.
+        **kwargs: Additional keywords arguments are passed to Popen.
+
+    """
+    def __init__(self, cmd_args, forward_signals=True, *args, **kwargs):
+        # stdbuf only for linux
+        if platform._is_linux:
+            stdbuf_args = ['stdbuf', '-o0', '-e0']
+            if isinstance(cmd_args, str):
+                cmd_args = ' '.join(stdbuf_args + [cmd_args])
+            else:
+                cmd_args = stdbuf_args + cmd_args
+        kwargs.setdefault('bufsize', 0)
+        kwargs.setdefault('stdout', subprocess.PIPE)
+        kwargs.setdefault('stderr', subprocess.STDOUT)
+        if not forward_signals:
+            if platform._is_win:
+                kwargs.setdefault('preexec_fn', None)
+                kwargs.setdefault('creationflags', subprocess.CREATE_NEW_PROCESS_GROUP)
+            else:
+                kwargs.setdefault('preexec_fn', os.setpgrp)
+        # if platform._is_win:
+        #     kwargs.setdefault('universal_newlines', True)
+        super(CisPopen, self).__init__(cmd_args, *args, **kwargs)
+
+    def kill(self, *args, **kwargs):
+        r"""On windows using CTRL_C_EVENT to kill the process."""
+        if platform._is_win:
+            self.send_signal(signal.CTRL_C_EVENT)
+        else:
+            super(CisPopen, self).kill(*args, **kwargs)
+
+
+def popen_nobuffer(*args, **kwargs):
     r"""Uses Popen to open a process without a buffer. If not already set,
     the keyword arguments 'bufsize', 'stdout', and 'stderr' are set to
     0, subprocess.PIPE, and subprocess.STDOUT respectively. This sets the
@@ -247,29 +294,10 @@ def popen_nobuffer(args, forward_signals=True, **kwargs):
         **kwargs: Additional keywords arguments are passed to Popen.
 
     Returns:
-        subprocess.Process: Process that was started.
+        CisPopen: Process that was started.
 
     """
-    # stdbuf only for linux
-    if platform._is_linux:
-        stdbuf_args = ['stdbuf', '-o0', '-e0']
-        if isinstance(args, str):
-            args = ' '.join(stdbuf_args + [args])
-        else:
-            args = stdbuf_args + args
-    kwargs.setdefault('bufsize', 0)
-    kwargs.setdefault('stdout', subprocess.PIPE)
-    kwargs.setdefault('stderr', subprocess.STDOUT)
-    if not forward_signals:
-        if platform._is_win:
-            kwargs.setdefault('preexec_fn', None)
-            kwargs.setdefault('creationflags', subprocess.CREATE_NEW_PROCESS_GROUP)
-        else:
-            kwargs.setdefault('preexec_fn', os.setpgrp)
-    # if platform._is_win:
-    #     kwargs.setdefault('universal_newlines', True)
-    out = subprocess.Popen(args, **kwargs)
-    return out
+    return CisPopen(*args, **kwargs)
 
 
 def print_encoded(msg, *args, **kwargs):
