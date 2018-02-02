@@ -30,7 +30,7 @@ environment:
 
   matrix:
     - platform: x64
-      PYTHON_VERSION: "2.7"
+      PYTHON_VERSION: "3.6"
       INSTALLRMQ: 0
     - platform: x64
       PYTHON_VERSION: "2.7"
