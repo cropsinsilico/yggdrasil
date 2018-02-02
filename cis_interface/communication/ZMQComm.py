@@ -1,10 +1,9 @@
 import uuid
-import time
 import zmq
 import threading
 from cis_interface import backwards
 from cis_interface.communication import CommBase
-from cis_interface.tools import CisClass, _zmq_installed
+from cis_interface.tools import CisClass, _zmq_installed, sleep
 
 
 _registered_sockets = dict()
@@ -165,7 +164,7 @@ def bind_socket(socket, address, retry_timeout=-1):
         if (e.errno != 98) or (retry_timeout < 0):
             raise e
         else:
-            time.sleep(retry_timeout)
+            sleep(retry_timeout)
             address = bind_socket(socket, address)
     return address
 

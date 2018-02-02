@@ -117,7 +117,13 @@ def get_CIS_MSG_MAX():
 # https://stackoverflow.com/questions/35772001/
 # how-to-handle-the-signal-in-python-on-windows-machine
 def kill(pid, signum):
-    r"""Kill process by mapping signal number."""
+    r"""Kill process by mapping signal number.
+
+    Args:
+        pid (int): Process ID.
+        signum (int): Signal that should be sent.
+
+    """
     if platform._is_win:
         sigmap = {signal.SIGINT: signal.CTRL_C_EVENT,
                   signal.SIGBREAK: signal.CTRL_BREAK_EVENT}
@@ -151,6 +157,29 @@ def kill(pid, signum):
             os.kill(pid, sigmap.get(signum, signum))
     else:
         os.kill(pid, signum)
+
+
+def sleep(interval):
+    r"""Sleep for a specified number of seconds.
+
+    Args:
+        interval (float): Time in seconds that process should sleep.
+
+    """
+    if platform._is_win and not backwards.PY2:
+        while True:
+            try:
+                t = time.time()
+                time.sleep(interval)
+            except IOError as e:
+                import errno
+                if e.errno != errno.EINTR:
+                    raise
+            interval -= time.time() - t
+            if interval <= 0:
+                break
+    else:
+        time.sleep(interval)
 
 
 def parse_yaml(fname):
@@ -429,7 +458,7 @@ class CisClass(object):
         """
         if t is None:
             t = self.sleeptime
-        time.sleep(t)
+        sleep(t)
 
     @property
     def timeout_key(self):

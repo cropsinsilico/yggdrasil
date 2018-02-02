@@ -1,4 +1,3 @@
-import time
 import subprocess
 from logging import debug, warn
 from datetime import datetime
@@ -13,7 +12,7 @@ except ImportError:  # pragma: no matlab
     _matlab_installed = False
 from cis_interface.drivers.ModelDriver import ModelDriver
 from cis_interface import backwards
-from cis_interface.tools import TimeOut
+from cis_interface.tools import TimeOut, sleep
 
 
 _top_dir = os.path.normpath(os.path.join(os.path.dirname(__file__), '../'))
@@ -43,7 +42,7 @@ def start_matlab():
             while ((len(set(matlab.engine.find_matlab()) - old_matlab) == 0) and
                    not T.is_out):
                 debug('Waiting for matlab engine to start')
-                time.sleep(1)  # Usually 3 seconds
+                sleep(1)  # Usually 3 seconds
         except KeyboardInterrupt:  # pragma: debug
             args = ['screen', '-X', '-S', screen_session, 'quit']
             subprocess.call(' '.join(args), shell=True)
@@ -90,7 +89,7 @@ def stop_matlab(screen_session, matlab_engine, matlab_session):
             while ((matlab_session in matlab.engine.find_matlab()) and
                    not T.is_out):
                 debug("Waiting for matlab engine to exit")
-                time.sleep(1)
+                sleep(1)
             if (matlab_session in matlab.engine.find_matlab()):  # pragma: debug
                 raise Exception("stp[_matlab timed out at %f s" % T.elapsed)
     # else:  # pragma: no matlab

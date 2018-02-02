@@ -1,7 +1,7 @@
 from __future__ import print_function
 import sys
-import time
 from cis_interface.interface.PsiInterface import PsiRpcServer
+from cis_interface.tools import sleep
 
 
 def fibServer(args):
@@ -35,7 +35,7 @@ def fibServer(args):
         print(' ::: ->(%2d %2d)' % (arg, result))
 
         # Sleep and then send response back
-        time.sleep(float(sleeptime))
+        sleep(float(sleeptime))
         flag = rpc.rpcSend(arg, result)
         if not flag:
             print('rpcFibSrv(P): ERROR sending')

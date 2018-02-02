@@ -1,6 +1,6 @@
 r"""This package provides a framework for integrating models across languages
 such that they can be run simultaneously, passing input back and forth."""
-import os
+# import os
 from cis_interface import backwards
 from cis_interface import platform
 from cis_interface import config
