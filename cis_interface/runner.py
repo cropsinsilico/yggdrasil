@@ -242,10 +242,11 @@ class CisRunner(CisClass):
             signal.siginterrupt(signal.SIGTERM, False)
             signal.siginterrupt(signal.SIGINT, False)
         else:
-            import ctypes
-            handler = ctypes.WINFUNCTYPE(ctypes.c_int,
-                                         ctypes.c_uint)(signal_handler)
-            ctypes.windll.kernel32.SetConsoleCtrlHandler(handler, True)
+            if False:
+                import ctypes
+                handler = ctypes.WINFUNCTYPE(ctypes.c_int,
+                                             ctypes.c_uint)(signal_handler)
+                ctypes.windll.kernel32.SetConsoleCtrlHandler(handler, True)
 
     def run(self, signal_handler=None):
         r"""Run all of the models and wait for them to exit."""

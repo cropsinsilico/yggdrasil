@@ -28,6 +28,7 @@ class RMQAsyncComm(RMQComm):
         self.lock = RLock()
         self.thread = Thread(name=name, target=self.run_thread)
         self.thread.setDaemon(True)
+        self.thread.daemon = True
         self._thread_started = False
         self._opening = False
         self._closing = False

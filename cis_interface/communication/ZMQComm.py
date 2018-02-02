@@ -205,6 +205,7 @@ class ZMQProxy(threading.Thread, CisClass):
         for k in ['protocol', 'host', 'port']:
             cli_param[k] = kwargs.pop(k, srv_param[k])
         super(ZMQProxy, self).__init__(**kwargs)
+        self.daemon = True
         context = context or zmq.Context.instance()
         # Create new address for the frontend
         if cli_param['protocol'] in ['inproc', 'ipc']:

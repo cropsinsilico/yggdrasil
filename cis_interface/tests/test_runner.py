@@ -33,7 +33,7 @@ def test_Arunner_interrupt():
     cr.set_signal_handler()
     print("calling interrupt", os.getpid())
     tools.kill(os.getpid(), signal.SIGINT)
-    # tools.kill(os.getpid(), signal.SIGINT)
+    tools.kill(os.getpid(), signal.SIGINT)
     print("after interrupt")
     tools.sleep(5)
     cr.waitModels()
