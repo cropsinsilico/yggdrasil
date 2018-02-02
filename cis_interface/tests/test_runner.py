@@ -24,11 +24,15 @@ def test_get_runner():
 
 def test_Arunner_interrupt():
     r"""Start a runner then stop it with a keyboard interrupt."""
+    print("starting interrupt")
+    tools.sleep(5)
     cr = runner.get_runner([ex_yamls['hello']['python']])
     cr.debug_log()
     cr.loadDrivers()
     cr.startDrivers()
     cr.set_signal_handler()
+    print("calling interrupt")
+    tools.sleep(5)
     tools.kill(os.getpid(), signal.SIGINT)
     tools.kill(os.getpid(), signal.SIGINT)
     cr.waitModels()

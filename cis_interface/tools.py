@@ -253,7 +253,7 @@ def popen_nobuffer(args, forward_signals=True, **kwargs):
     if not forward_signals:
         if platform._is_win:
             kwargs.setdefault('preexec_fn', None)
-            # kwargs.setdefault('creationflags', subprocess.CREATE_NEW_PROCESS_GROUP)
+            kwargs.setdefault('creationflags', subprocess.CREATE_NEW_PROCESS_GROUP)
         else:
             kwargs.setdefault('preexec_fn', os.setpgrp)
     # if platform._is_win:
