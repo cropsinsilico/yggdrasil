@@ -22,19 +22,19 @@ int main() {
       break;
     }
     if (ret > (bufsiz - 1)) {
-      printf("pipe_dst(CPP): Buffer increased to %d bytes\n", bufsiz);
       bufsiz = ret + 1;
+      printf("pipe_dst(C): Buffer increased to %d bytes\n", bufsiz);
     }
     ret = psi_send_nolimit(outf, buf, ret);
     if (ret < 0) {
-      printf("pipe_dst(C): END ERROR ON MSG %d\n", count);
+      printf("pipe_dst(C): SEND ERROR ON MSG %d\n", count);
       free(buf);
       return -1;
     }
     count++;
   }
 
-  printf("Goodbye from C destination. Received %d messages\n", count);
+  printf("Goodbye from C destination. Received %d messages.\n", count);
 
   free(buf);
   return 0;

@@ -22,6 +22,6 @@ while (1);
   count = count + 1;
 end;
 
-fprintf('Goodbye from Matlab destination. Received %d messages\n', count);
+fprintf('Goodbye from Matlab destination. Received %d messages.\n', count);
 
 exit(0);

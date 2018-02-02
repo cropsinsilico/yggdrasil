@@ -15,8 +15,7 @@ class TestExampleTimedPipeZMQ(TestExample):
         self.name = 'timed_pipe'
         self.env = {'CIS_DEFAULT_COMM': 'ZMQComm',
                     'PIPE_MSG_COUNT': '10',
-                    'PIPE_MSG_SIZE': '10'}
-        # 'PIPE_MSG_SIZE': '1024'}
+                    'PIPE_MSG_SIZE': '1024'}
         self.debug_flag = True
 
     def teardown(self, *args, **kwargs):

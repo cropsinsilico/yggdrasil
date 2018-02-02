@@ -38,6 +38,8 @@ class CommBase(CisClass):
             that are sent/received. Defaults to None.
         dont_open (bool, optional): If True, the connection will not be opened.
             Defaults to False.
+        is_interface (bool, optional): Set to True if this comm is a Python
+            interface binding. Defaults to False.
         recv_timeout (float, optional): Time that should be waited for an
             incoming message before returning None. Defaults to 0 (no wait). A
             value of False indicates that recv should block.
@@ -76,6 +78,7 @@ class CommBase(CisClass):
         meth_serialize (obj): Callable object that takes any object as
             input and returns a serialized set of bytes. This will be used
             to encode sent messages.
+        is_interface (bool): True if this comm is a Python interface binding.
         recv_timeout (float): Time that should be waited for an incoming
             message before returning None.
         close_on_eof_recv (bool): If True, the comm will be closed when it
@@ -100,7 +103,8 @@ class CommBase(CisClass):
     """
     def __init__(self, name, address=None, direction='send',
                  deserialize=None, serialize=None, format_str=None,
-                 dont_open=False, recv_timeout=0.0, close_on_eof_recv=True,
+                 dont_open=False, is_interface=False,
+                 recv_timeout=0.0, close_on_eof_recv=True,
                  single_use=False, reverse_names=False, no_suffix=False,
                  is_client=False, is_response_client=False,
                  is_server=False, is_response_server=False,
@@ -133,6 +137,7 @@ class CommBase(CisClass):
         self.is_response_client = is_response_client
         self.is_response_server = is_response_server
         self.is_server = is_server
+        self.is_interface = is_interface
         self.recv_timeout = recv_timeout
         self.close_on_eof_recv = close_on_eof_recv
         self._last_header = None

@@ -15,15 +15,20 @@ def run(args):
 
     # Send test message multiple times
     test_msg = '0' * msg_size
+    count = 0
     for i in range(msg_count):
         ret = outq.send(test_msg)
         if not ret:
             print('pipe_src(P): SEND ERROR ON MSG %d' % i)
-            sys.exit(-1)
-    outq.send_eof()
+            break
+        count += 1
+    ret = outq.send_eof()
+    if not ret:
+        print('pipe_src(P): SEND ERROR ON EOF')
 
-    print('Goodbye from Python source')
-    sys.exit(0)
+    print('Goodbye from Python source. Sent %d messages.' % count)
+
+    return 0
     
 
 if __name__ == '__main__':

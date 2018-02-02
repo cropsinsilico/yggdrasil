@@ -24,7 +24,7 @@ def run():
             sys.exit(-1)
         count += 1
 
-    print('Goodbye from Python destination. Received %d messages' % count)
+    print('Goodbye from Python destination. Received %d messages.' % count)
 
     
 if __name__ == '__main__':

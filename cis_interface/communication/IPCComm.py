@@ -413,10 +413,14 @@ class IPCComm(CommBase.CommBase):
         """
         if not self.is_open:  # pragma: debug
             return False
+        block = False
+        if self.is_interface:
+            no_backlog = True
+            block = True
         try:
             if no_backlog or len(self.backlog_send) == 0:
                 self.debug('Sending %d bytes', len(payload))
-                self.q.send(payload, block=False)
+                self.q.send(payload, block=block)
             else:  # pragma: debug
                 raise sysv_ipc.BusyError(
                     'Backlogged messages must be sent first')

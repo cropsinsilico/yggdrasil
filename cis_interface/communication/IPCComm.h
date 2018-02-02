@@ -58,7 +58,7 @@ int check_channels(comm_t comm) {
   }
   // Fail if > _cisTrackChannels channels used
   if (_cisChannelsUsed >= _cisTrackChannels) {
-    cislog_error("Too many channels in use, max: %d\n", _cisTrackChannels);
+    cislog_error("Too many channels in use, max: %d", _cisTrackChannels);
     return -1;
   }
   return 0;
@@ -249,7 +249,7 @@ int ipc_comm_send(const comm_t x, const char *data, const size_t len) {
     ret = msgsnd(handle, &t, len, IPC_NOWAIT);
     cislog_debug("ipc_comm_send(%s): msgsnd returned %d", x.name, ret);
     if (ret == 0) break;
-    if (ret == EAGAIN) {
+    if ((ret == -1) && (errno == EAGAIN)) {
       cislog_debug("ipc_comm_send(%s): msgsnd, sleep", x.name);
       usleep(250*1000);
     } else {
@@ -302,7 +302,7 @@ int ipc_comm_recv(const comm_t x, char **data, const size_t len,
   len_recv = ret + 1;
   if (len_recv > (int)len) {
     if (allow_realloc) {
-      cislog_debug("ipc_comm_recv(%s): reallocating buffer from %d to %d bytes.\n",
+      cislog_debug("ipc_comm_recv(%s): reallocating buffer from %d to %d bytes.",
 		   x.name, (int)len, len_recv);
       (*data) = (char*)realloc(*data, len_recv);
       if (*data == NULL) {
@@ -318,7 +318,7 @@ int ipc_comm_recv(const comm_t x, char **data, const size_t len,
   memcpy(*data, t.data, len_recv);
   (*data)[len_recv - 1] = '\0';
   ret = len_recv - 1;
-  cislog_debug("ipc_comm_recv(%s): returns %d bytes\n", x.name, ret);
+  cislog_debug("ipc_comm_recv(%s): returns %d bytes", x.name, ret);
   return ret;
 };
 
