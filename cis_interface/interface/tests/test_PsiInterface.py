@@ -633,6 +633,7 @@ class TestPsiPickleInput(TestBase):
         self.instance.stop_timeout()
         msg_flag, res = self.instance.recv(timeout=self.timeout)
         assert(msg_flag)
+        assert(len(res) > 0)
         self.assert_equal_data_dict(res)
 
 
