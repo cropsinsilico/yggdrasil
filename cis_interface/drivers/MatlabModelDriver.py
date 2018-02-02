@@ -135,7 +135,7 @@ class MatlabProcess(object):  # pragma: matlab
 
     def poll(self, *args, **kwargs):
         r"""Fake poll."""
-        pass
+        return self.return_code
 
     @property
     def stdout_line(self):

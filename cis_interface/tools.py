@@ -108,10 +108,13 @@ def get_CIS_MSG_MAX():
     _default_comm = get_default_comm()
     if _default_comm == 'IPCComm':
         # OS X limit is 2kb
-        CIS_MSG_MAX = 1024 * 2
+        out = 1024 * 2
     else:
-        CIS_MSG_MAX = 2**20
-    return CIS_MSG_MAX
+        out = 2**20
+    return out
+
+
+CIS_MSG_MAX = get_CIS_MSG_MAX()
 
 
 # https://stackoverflow.com/questions/35772001/
@@ -252,7 +255,7 @@ class CisPopen(subprocess.Popen):
         **kwargs: Additional keywords arguments are passed to Popen.
 
     """
-    def __init__(self, cmd_args, forward_signals=True, *args, **kwargs):
+    def __init__(self, cmd_args, forward_signals=True, **kwargs):
         # stdbuf only for linux
         if platform._is_linux:
             stdbuf_args = ['stdbuf', '-o0', '-e0']
@@ -271,7 +274,7 @@ class CisPopen(subprocess.Popen):
                 kwargs.setdefault('preexec_fn', os.setpgrp)
         # if platform._is_win:
         #     kwargs.setdefault('universal_newlines', True)
-        super(CisPopen, self).__init__(cmd_args, *args, **kwargs)
+        super(CisPopen, self).__init__(cmd_args, **kwargs)
 
     def kill(self, *args, **kwargs):
         r"""On windows using CTRL_BREAK_EVENT to kill the process."""

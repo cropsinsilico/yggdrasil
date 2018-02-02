@@ -92,7 +92,7 @@ class ModelDriver(Driver):
 
     def start(self, no_popen=False):
         r"""Start subprocess before monitoring."""
-        if (not no_popen) and (not self.event_process_kill_complete.set()):
+        if (not no_popen) and (not self.event_process_kill_complete.is_set()):
             self.event_process_started.set()
             self.start_setup()
         super(ModelDriver, self).start()
@@ -123,7 +123,6 @@ class ModelDriver(Driver):
     def enqueue_output(self, out, queue):
         r"""Method to call in thread to keep passing output to queue."""
         try:
-            self.process.poll()
             while ((not self.process_complete) and
                    (not self.event_process_kill_complete.is_set())):
                 line = out.readline()
@@ -146,7 +145,7 @@ class ModelDriver(Driver):
         self.run_setup()
         self.debug("Beginning loop")
         while ((not self.event_process_exit.is_set()) and
-               (not self.event_process_kill_complete.is_set())):
+               (not self.event_process_kill_called.is_set())):
             self.run_loop()
         self.run_finalize()
 
@@ -183,7 +182,7 @@ class ModelDriver(Driver):
         has not started."""
         if self.process is None:
             return True
-        return (self.process.returncode is not None)
+        return (self.process.poll() is not None)
 
     def wait_process(self, timeout=None):
         r"""Wait for some amount of time for the process to finish.
@@ -197,12 +196,10 @@ class ModelDriver(Driver):
 
         """
         if not self.event_process_started.is_set():
-            return
-        self.process.poll()
+            return True
         T = self.start_timeout(timeout, key_level=1)
         while ((not T.is_out) and (not self.process_complete)):  # pragma: debug
             self.sleep()
-            self.process.poll()
         self.stop_timeout(key_level=1)
         return self.process_complete
 

@@ -1,16 +1,10 @@
-from cis_interface import backwards
-from cis_interface.tools import CIS_MSG_EOF, get_CIS_MSG_MAX, CIS_MSG_BUF
-from cis_interface.communication import (
-    DefaultComm, RPCComm, ServerComm, ClientComm,
-    AsciiFileComm, AsciiTableComm, PickleFileComm)
-from cis_interface.serialize import (
-    AsciiTableSerialize, AsciiTableDeserialize,
-    PickleSerialize, PickleDeserialize)
+from cis_interface import backwards, tools
+from cis_interface.communication import DefaultComm
 
 
-PSI_MSG_MAX = get_CIS_MSG_MAX()
-PSI_MSG_EOF = CIS_MSG_EOF
-PSI_MSG_BUF = CIS_MSG_BUF
+PSI_MSG_MAX = tools.CIS_MSG_MAX
+PSI_MSG_EOF = tools.CIS_MSG_EOF
+PSI_MSG_BUF = tools.CIS_MSG_BUF
 
 
 def maxMsgSize():
@@ -108,6 +102,7 @@ def PsiRpc(outname, outfmt, inname, infmt, matlab=False):
         DefaultComm: Communication object.
         
     """
+    from cis_interface.communication import RPCComm
     if matlab:  # pragma: matlab
         infmt = backwards.decode_escape(infmt)
         outfmt = backwards.decode_escape(outfmt)
@@ -140,6 +135,7 @@ def PsiRpcServer(name, infmt='%s', outfmt='%s', matlab=False):
         ServerComm: Communication object.
         
     """
+    from cis_interface.communication import ServerComm
     if matlab:  # pragma: matlab
         infmt = backwards.decode_escape(infmt)
         outfmt = backwards.decode_escape(outfmt)
@@ -166,6 +162,7 @@ def PsiRpcClient(name, outfmt='%s', infmt='%s', matlab=False):
         ClientComm: Communication object.
         
     """
+    from cis_interface.communication import ClientComm
     if matlab:  # pragma: matlab
         infmt = backwards.decode_escape(infmt)
         outfmt = backwards.decode_escape(outfmt)
@@ -194,6 +191,7 @@ def PsiAsciiFileInput(name, src_type=1, matlab=False, **kwargs):
         DefaultComm: Communication object.
         
     """
+    from cis_interface.communication import AsciiFileComm
     if src_type == 0:
         base = AsciiFileComm.AsciiFileComm
         kwargs.setdefault('address', name)
@@ -219,7 +217,7 @@ def PsiAsciiFileOutput(name, dst_type=1, matlab=False, **kwargs):
         DefaultComm: Communication object.
         
     """
-    
+    from cis_interface.communication import AsciiFileComm
     if dst_type == 0:
         base = AsciiFileComm.AsciiFileComm
         kwargs.setdefault('address', name)
@@ -249,7 +247,8 @@ def PsiAsciiTableInput(name, as_array=False, src_type=1, matlab=False, **kwargs)
         DefaultComm: Communication object.
         
     """
-
+    from cis_interface.communication import AsciiTableComm
+    from cis_interface.serialize import AsciiTableDeserialize
     if src_type == 0:
         base = AsciiTableComm.AsciiTableComm
         kwargs.setdefault('address', name)
@@ -293,7 +292,8 @@ def PsiAsciiTableOutput(name, fmt, as_array=False, dst_type=1, matlab=False,
         DefaultComm: Communication object.
         
     """
-
+    from cis_interface.communication import AsciiTableComm
+    from cis_interface.serialize import AsciiTableSerialize
     if dst_type == 0:
         base = AsciiTableComm.AsciiTableComm
         kwargs.setdefault('address', name)
@@ -334,6 +334,8 @@ def PsiPickleInput(name, src_type=1, matlab=False, **kwargs):
         DefaultComm: Communication object.
         
     """
+    from cis_interface.communication import PickleFileComm
+    from cis_interface.serialize import PickleDeserialize
     if src_type == 0:
         base = PickleFileComm.PickleFileComm
         kwargs.setdefault('address', name)
@@ -360,6 +362,8 @@ def PsiPickleOutput(name, dst_type=1, matlab=False, **kwargs):
         DefaultComm: Communication object.
         
     """
+    from cis_interface.communication import PickleFileComm
+    from cis_interface.serialize import PickleSerialize
     if dst_type == 0:
         base = PickleFileComm.PickleFileComm
         kwargs.setdefault('address', name)
