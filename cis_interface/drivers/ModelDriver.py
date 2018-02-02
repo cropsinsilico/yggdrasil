@@ -1,13 +1,10 @@
-#
-# This should not be used directly by modelers
-#
 import os
 import sys
 import copy
 from pprint import pformat
 from cis_interface import backwards, platform, tools
 from cis_interface.drivers.Driver import Driver
-from threading import Thread
+from threading import Thread, Event
 try:
     from Queue import Queue, Empty
 except ImportError:
@@ -67,6 +64,10 @@ class ModelDriver(Driver):
         self.process = None
         self.is_server = is_server
         self.client_of = client_of
+        self.event_process_kill_called = Event()
+        self.event_process_kill_complete = Event()
+        self.event_process_started = Event()
+        self.event_process_exit = Event()
         # Strace/valgrind
         if with_strace and with_valgrind:
             raise RuntimeError("Trying to run with strace and valgrind.")
@@ -89,7 +90,8 @@ class ModelDriver(Driver):
 
     def start(self, no_popen=False):
         r"""Start subprocess before monitoring."""
-        if not no_popen:
+        if (not no_popen) and (not self.event_process_kill_complete.set()):
+            self.event_process_started.set()
             self._running = True
             self.start_setup()
         super(ModelDriver, self).start()
@@ -124,7 +126,10 @@ class ModelDriver(Driver):
             # for line in iter(out.readline, backwards.unicode2bytes('')):
             #     self.debug("Queuing output: %s", line)
             #     queue.put(line.decode('utf-8'))
-            while self.process is not None:
+            self.process.poll()
+            while ((self.process.returncode is None) and
+                   (not self.event_process_kill_complete.is_set())):
+                # while self.process is not None:
                 line = out.readline()
                 if len(line) == 0:
                     self.debug("Empty line from stdout")
@@ -133,8 +138,10 @@ class ModelDriver(Driver):
                     queue.put(line.decode('utf-8'))
         except BaseException:  # pragma: debug
             self.error("Error getting output")
+            self.event_process_exit.set()
             queue.put(self._exit_line)
             raise
+        self.event_process_exit.set()
         queue.put(self._exit_line)
         out.close()
 
@@ -145,7 +152,9 @@ class ModelDriver(Driver):
         self.run_setup()
         flag = True
         self.debug("Beginning loop")
-        while self._running and (self.process is not None) and flag:
+        while ((not self.event_process_exit.is_set()) and
+               (not self.event_process_kill_complete.is_set())):
+            # while self._running and (self.process is not None) and flag:
             flag = self.run_loop()
         self.run_finalize()
 
@@ -183,21 +192,30 @@ class ModelDriver(Driver):
                 Defaults to None and is infinite.
 
         """
-        try:
-            self.process.poll()
-            T = self.start_timeout(timeout, key_level=1)
-            while ((not T.is_out) and
-                   (self.process.returncode is None)):  # pragma: debug
-                self.sleep()
+        if self.event_process_started.is_set():
+            try:
                 self.process.poll()
-            self.stop_timeout(key_level=1)
-        except AttributeError:  # pragma: debug
-            if self.process is not None:
-                raise
+                T = self.start_timeout(timeout, key_level=1)
+                while ((not T.is_out) and
+                       (self.process.returncode is None)):  # pragma: debug
+                    self.sleep()
+                    self.process.poll()
+                self.stop_timeout(key_level=1)
+            except AttributeError:  # pragma: debug
+                if self.process is not None:
+                    raise
 
     def kill_process(self):
         r"""Kill the process running the model, checking return code."""
-        self.debug()
+        if not self.event_process_started.is_set():
+            self.debug('Process was never started.')
+            self.event_process_exit.set()
+            self.event_process_kill_called.set()
+            self.event_process_kill_complete.set()
+        if self.event_process_kill_called.is_set():
+            self.debug('Process has already been killed.')
+            return
+        self.event_process_kill_called.set()
         with self.lock:
             self.debug()
             self._running = False
@@ -220,6 +238,7 @@ class ModelDriver(Driver):
                 if self.process.returncode != 0:
                     self.error("return code of %s indicates model error.",
                                str(self.process.returncode))
+            self.event_process_kill_complete.set()
             self.process = None
 
     def do_terminate(self):
