@@ -185,10 +185,10 @@ def sleep(interval):
                 import errno
                 if e.errno != errno.EINTR:
                     raise
-            except InterruptedError:
-                import errno
-                print(e.errno)
-                print(e)
+            # except InterruptedError:
+            #     import errno
+            #     print(e.errno)
+            #     print(e)
             interval -= time.time() - t
             if interval <= 0:
                 break
@@ -240,7 +240,7 @@ class CisPopen(subprocess.Popen):
     0, subprocess.PIPE, and subprocess.STDOUT respectively. This sets the
     output stream to unbuffered and directs both stdout and stderr to the
     stdout pipe. In addition this class overrides Popen.kill() to allow
-    processes to be killed with CTRL_C_EVENT on windows.
+    processes to be killed with CTRL_BREAK_EVENT on windows.
 
     Args:
         args (list, str): Shell command or list of arguments that should be
@@ -274,9 +274,9 @@ class CisPopen(subprocess.Popen):
         super(CisPopen, self).__init__(cmd_args, *args, **kwargs)
 
     def kill(self, *args, **kwargs):
-        r"""On windows using CTRL_C_EVENT to kill the process."""
+        r"""On windows using CTRL_BREAK_EVENT to kill the process."""
         if platform._is_win:
-            self.send_signal(signal.CTRL_C_EVENT)
+            self.send_signal(signal.CTRL_BREAK_EVENT)
         else:
             super(CisPopen, self).kill(*args, **kwargs)
 

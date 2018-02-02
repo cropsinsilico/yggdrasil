@@ -236,12 +236,13 @@ class CisRunner(CisClass):
         """
         if signal_handler is None:
             signal_handler = self.signal_handler
-        signal.signal(signal.SIGTERM, signal_handler)
         signal.signal(signal.SIGINT, signal_handler)
         if not platform._is_win:
+            signal.signal(signal.SIGTERM, signal_handler)
             signal.siginterrupt(signal.SIGTERM, False)
             signal.siginterrupt(signal.SIGINT, False)
         else:
+            signal.signal(signal.SIGBREAK, signal_handler)
             if False:
                 import ctypes
                 handler = ctypes.WINFUNCTYPE(ctypes.c_int,
