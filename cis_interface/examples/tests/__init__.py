@@ -30,10 +30,6 @@ class TestExample(unittest.TestCase, tools.CisClass):
 
     def teardown(self, *args, **kwargs):
         r"""Teardown to perform after test."""
-        if (self.yaml is not None) and (self.output_files is not None):
-            for fout in self.output_files:
-                if os.path.isfile(fout):
-                    os.remove(fout)
         self.reset_log()
         self.reset_encoding()
 
@@ -155,6 +151,7 @@ class TestExample(unittest.TestCase, tools.CisClass):
                 warnings.warn("Could not locate example %s in language %s." %
                               (self.name, self.language))
         else:
+            self.cleanup()
             os.environ.update(self.env)
             self.runner = runner.get_runner(self.yaml, namespace=self.namespace)
             self.runner.run()
@@ -163,6 +160,14 @@ class TestExample(unittest.TestCase, tools.CisClass):
             else:
                 assert(not self.runner.error_flag)
             self.check_results()
+            self.cleanup()
+
+    def cleanup(self):
+        r"""Cleanup files created during the test."""
+        if (self.yaml is not None) and (self.output_files is not None):
+            for fout in self.output_files:
+                if os.path.isfile(fout):
+                    os.remove(fout)
 
     def test_all(self):
         r"""Test the version of the example that uses all languages."""
