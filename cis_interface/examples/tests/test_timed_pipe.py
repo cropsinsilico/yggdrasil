@@ -1,7 +1,5 @@
 import os
-import nose.tools as nt
 import unittest
-import tempfile
 from cis_interface.tools import _zmq_installed, _ipc_installed
 from cis_interface.examples.tests import TestExample
 
@@ -16,7 +14,7 @@ class TestExampleTimedPipeZMQ(TestExample):
         self.env = {'CIS_DEFAULT_COMM': 'ZMQComm',
                     'PIPE_MSG_COUNT': '10',
                     'PIPE_MSG_SIZE': '1024'}
-        self.debug_flag = True
+        # self.debug_flag = True
 
     def teardown(self, *args, **kwargs):
         r"""Ensure that environment variable not set after test."""
@@ -25,23 +23,16 @@ class TestExampleTimedPipeZMQ(TestExample):
             del os.environ['CIS_DEFAULT_COMM']
 
     @property
-    def result(self):
+    def results(self):
         r"""Result that should be found in output files."""
         siz = int(self.env['PIPE_MSG_COUNT']) * int(self.env['PIPE_MSG_SIZE'])
         res = '0' * siz
-        return res
+        return [res]
 
     @property
-    def output_file(self):
+    def output_files(self):
         r"""Output file."""
-        return os.path.join(tempfile.gettempdir(), 'output_timed_pipe.txt')
-    
-    def check_result(self):
-        r"""Assert that contents of input/output files are identical."""
-        assert(os.path.isfile(self.output_file))
-        with open(self.output_file, 'r') as fd:
-            ocont = fd.read()
-        nt.assert_equal(ocont, self.result)
+        return [os.path.join(self.tempdir, 'output_timed_pipe.txt')]
 
 
 @unittest.skipIf(not _ipc_installed, "IPC library not installed")

@@ -408,6 +408,7 @@ class CisClass(object):
         self.suppress_special_debug = False
         self.logger = logging.getLogger(self.__module__)
         self._old_loglevel = None
+        self._old_encoding = None
         self.debug_flag = False
 
     def debug_log(self):  # pragma: debug
@@ -422,6 +423,19 @@ class CisClass(object):
             cis_cfg.set('debug', 'psi', self._old_loglevel)
             cfg_logging()
             self._old_loglevel = None
+
+    def set_utf8_encoding(self):
+        r"""Set the encoding to utf-8 if it is not already."""
+        old_lang = os.environ.get('LANG', '')
+        if 'UTF-8' not in old_lang:  # pragma: debug
+            self._old_encoding = old_lang
+            os.environ['LANG'] = 'en_US.UTF-8'
+            
+    def reset_encoding(self):
+        r"""Reset the encoding to the original value before the test."""
+        if self._old_encoding is not None:  # pragma: debug
+            os.environ['LANG'] = self._old_encoding
+            self._old_encoding = None
 
     def print_encoded(self, msg, *args, **kwargs):
         r"""Print bytes to stdout, encoding if possible.
