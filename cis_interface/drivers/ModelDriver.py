@@ -145,7 +145,7 @@ class ModelDriver(Driver):
         self.run_setup()
         self.debug("Beginning loop")
         while ((not self.event_process_exit.is_set()) and
-               (not self.event_process_kill_called.is_set())):
+               (not self.event_process_kill_complete.is_set())):
             self.run_loop()
         self.run_finalize()
 

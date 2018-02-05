@@ -508,7 +508,7 @@ class CommBase(CisClass):
             flag = self._send(*args, **kwargs)
             if flag or (self.is_closed):
                 break
-            self.sleep()
+            # self.sleep()
         self.stop_timeout()
         self.suppress_special_debug = False
         self._first_send_done = True
@@ -737,8 +737,8 @@ class CommBase(CisClass):
                 ret = False
                 break
             data = data + payload[1]
-            if len(payload[1]) == 0:
-                self.sleep()
+            # if len(payload[1]) == 0:
+            #     self.sleep()
         payload = (ret, data)
         self.debug("Read %d bytes", len(data))
         return payload

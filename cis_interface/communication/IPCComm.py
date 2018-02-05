@@ -279,7 +279,7 @@ class IPCComm(CommBase.CommBase):
             self._bound = False
         self.backlog_closed_event.set()
         self.backlog_send_ready.set()
-        # self.backlog_recv_ready.set()
+        self.backlog_recv_ready.set()
         super(IPCComm, self).close(wait_for_send=wait_for_send)
             
     @property
@@ -505,14 +505,12 @@ class IPCComm(CommBase.CommBase):
             # Sleep until there is a message
             if timeout is None:
                 timeout = self.recv_timeout
-            Tout = self.start_timeout(timeout)
-            while ((not self.backlog_recv_ready.is_set()) and
-                   self.is_open and (not Tout.is_out)):
-                # self.debug("No data, sleeping")
-                self.sleep()
-            self.stop_timeout()
+            if timeout is False:
+                self.backlog_recv_ready.wait()
+            else:
+                self.backlog_recv_ready.wait(timeout)
             # Return False if the queue is closed
-            if self.is_closed:  # pragma: debug
+            if self.is_closed or self.backlog_closed_event.is_set():  # pragma: debug
                 self.debug("Queue closed")
                 return (False, self.empty_msg)
             # Return True, '' if there are no messages
