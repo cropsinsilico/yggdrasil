@@ -378,6 +378,8 @@ class ZMQComm(CommBase.CommBase):
         self.socket_type = getattr(zmq, socket_type)
         self.socket_action = socket_action
         self.socket = self.context.socket(self.socket_type)
+        if self.is_interface and self.direction == 'send':
+            self.socket.set(zmq.LINGER, 100)
         self.topic_filter = backwards.unicode2bytes(topic_filter)
         if dealer_identity is None:
             dealer_identity = str(uuid.uuid4())
@@ -593,6 +595,8 @@ class ZMQComm(CommBase.CommBase):
 
         """
         self.debug("self.socket.closed = %s", str(self.socket.closed))
+        if self.is_interface and self.direction == 'send':
+            wait_for_send = True
         if self.socket.closed:
             self.debug("Socket already closed: %s", self.address)
         else:

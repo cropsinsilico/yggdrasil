@@ -251,10 +251,11 @@ class CommBase(CisClass):
 
         """
         self.debug("Cleaning up %d work comms", len(self._work_comms))
-        if not wait_for_send:
-            keys = [k for k in self._work_comms.keys()]
-            for c in keys:
-                self.remove_work_comm(c)
+        if self.is_interface and self.direction == 'send':
+            wait_for_send = True
+        keys = [k for k in self._work_comms.keys()]
+        for c in keys:
+            self.remove_work_comm(c, wait_for_send=wait_for_send)
         self.debug("Finished cleaning up work comms")
 
     @property
@@ -412,20 +413,22 @@ class CommBase(CisClass):
             raise KeyError("Comm already registered with key %s." % key)
         self._work_comms[key] = comm
 
-    def remove_work_comm(self, key, dont_close=False):
+    def remove_work_comm(self, key, dont_close=False, wait_for_send=False):
         r"""Close and remove a work comm.
 
         Args:
             key (str): Key of comm that should be removed.
             dont_close (bool, optional): If True, the comm will be removed
                 from the list, but it won't be closed. Defaults to False.
+            wait_for_send (bool, optional): If True, close will be delayed or
+                done such that a recently sent message has time to be received.
 
         """
         if key not in self._work_comms:
             return
         if not dont_close:
             c = self._work_comms.pop(key)
-            c.close()
+            c.close(wait_for_send=wait_for_send)
 
     # HEADER
     def get_header(self, msg, no_address=False, **kwargs):

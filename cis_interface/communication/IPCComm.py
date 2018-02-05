@@ -260,12 +260,21 @@ class IPCComm(CommBase.CommBase):
                 until the queue is empty. Defaults to False.
 
         """
+        if self.is_interface and self.direction == 'send':
+            wait_for_send = True
         if self._bound and not self.is_open:
             try:
                 self.open_after_bind()
             except sysv_ipc.ExistentialError:  # pragma: debug
                 self.q = None
                 self._bound = False
+        # Wait for backlog to be processed
+        if wait_for_send:
+            Tout = self.start_timeout()
+            while (not Tout.is_out) and self.backlog_send_ready.is_set():
+                self.verbose_debug("Waiting for backlogged messages to be queued.")
+                self.sleep()
+            self.stop_timeout()
         if self.is_open and not wait_for_send:
             # if wait_for_send:
             #     while self.n_msg_queued > 0:
@@ -277,6 +286,7 @@ class IPCComm(CommBase.CommBase):
                 pass
             self.q = None
             self._bound = False
+        # Set events so that threads stop blocking and register close
         self.backlog_closed_event.set()
         self.backlog_send_ready.set()
         self.backlog_recv_ready.set()
