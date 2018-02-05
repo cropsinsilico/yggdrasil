@@ -379,7 +379,7 @@ class ZMQComm(CommBase.CommBase):
         self.socket_action = socket_action
         self.socket = self.context.socket(self.socket_type)
         if self.is_interface and self.direction == 'send':
-            self.socket.set(zmq.LINGER, 1000 * self.timeout)
+            self.socket.set(zmq.LINGER, int(1000 * self.timeout))
         self.topic_filter = backwards.unicode2bytes(topic_filter)
         if dealer_identity is None:
             dealer_identity = str(uuid.uuid4())
