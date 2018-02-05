@@ -13,13 +13,13 @@ class TestExample(unittest.TestCase, tools.CisClass):
     r"""Base class for running examples."""
 
     def __init__(self, *args, **kwargs):
+        tools.CisClass.__init__(self, None)
         self.language = None
         self.uuid = str(uuid.uuid4())
         self.env = {}
         self.runner = None
         self.expects_error = False
         self.debug_flag = True
-        tools.CisClass.__init__(self, None)
         super(TestExample, self).__init__(*args, **kwargs)
 
     def setup(self, *args, **kwargs):
