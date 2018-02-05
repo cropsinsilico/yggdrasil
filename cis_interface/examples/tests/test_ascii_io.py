@@ -63,7 +63,7 @@ class TestExampleAsciiIO(TestExample):
         assert(os.path.isfile(self.input_file))
         assert(os.path.isfile(self.input_table))
         assert(os.path.isfile(self.output_array))
-        with open(self.input_file, 'rb') as fd:
+        with open(self.input_file, 'r') as fd:
             icont = fd.read()
         iATT = AsciiTable(self.input_table, 'r')
         iATA = AsciiTable(self.input_array, 'r')
