@@ -151,7 +151,6 @@ class TestExample(unittest.TestCase, tools.CisClass):
                 warnings.warn("Could not locate example %s in language %s." %
                               (self.name, self.language))
         else:
-            self.cleanup()
             os.environ.update(self.env)
             self.runner = runner.get_runner(self.yaml, namespace=self.namespace)
             self.runner.run()
