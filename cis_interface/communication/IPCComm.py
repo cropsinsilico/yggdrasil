@@ -269,7 +269,7 @@ class IPCComm(CommBase.CommBase):
                 self.q = None
                 self._bound = False
         # Wait for backlog to be processed
-        if wait_for_send:
+        if wait_for_send and self.is_open and (not self.backlog_closed_event.is_set()):
             Tout = self.start_timeout()
             while (not Tout.is_out) and self.backlog_send_ready.is_set():
                 self.verbose_debug("Waiting for backlogged messages to be queued.")
