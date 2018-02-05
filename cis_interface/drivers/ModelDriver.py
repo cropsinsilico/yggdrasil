@@ -254,6 +254,12 @@ class ModelDriver(Driver):
                                str(self.process.returncode))
             self.event_process_kill_complete.set()
 
+    def graceful_stop(self):
+        r"""Gracefully stop the driver."""
+        self.debug()
+        self.wait_process(self.timeout)
+        super(ModelDriver, self).graceful_stop()
+
     def do_terminate(self):
         r"""Terminate the process running the model."""
         self.debug()

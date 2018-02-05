@@ -17,6 +17,7 @@ class TestExample(unittest.TestCase, tools.CisClass):
         self.uuid = str(uuid.uuid4())
         self.env = {}
         self.runner = None
+        self.expects_error = False
         # self.debug_flag = False
         tools.CisClass.__init__(self, None)
         super(TestExample, self).__init__(*args, **kwargs)
@@ -157,7 +158,10 @@ class TestExample(unittest.TestCase, tools.CisClass):
             os.environ.update(self.env)
             self.runner = runner.get_runner(self.yaml, namespace=self.namespace)
             self.runner.run()
-            self.runner.sleep()
+            if self.expects_error:
+                assert(self.runner.error_flag)
+            else:
+                assert(not self.runner.error_flag)
             self.check_results()
 
     def test_all(self):
