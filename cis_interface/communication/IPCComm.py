@@ -284,8 +284,8 @@ class IPCComm(CommBase.CommBase):
                 remove_queue(self.q)
             except (KeyError, sysv_ipc.ExistentialError):
                 pass
-            self.q = None
-            self._bound = False
+        self.q = None
+        self._bound = False
         # Set events so that threads stop blocking and register close
         self.backlog_closed_event.set()
         self.backlog_send_ready.set()
