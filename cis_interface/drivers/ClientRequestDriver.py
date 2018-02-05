@@ -124,19 +124,13 @@ class ClientRequestDriver(ConnectionDriver):
             self.response_drivers = []
         super(ClientRequestDriver, self).terminate(*args, **kwargs)
 
-    def on_model_exit(self):
-        r"""Close RPC comm when model exits."""
-        with self.lock:
-            self.icomm.close()
-        super(ClientRequestDriver, self).on_model_exit()
-
     def before_loop(self):
         r"""Send client sign on to server response driver."""
         super(ClientRequestDriver, self).before_loop()
         # self.sleep()  # Help ensure that the server is connected
         super(ClientRequestDriver, self).send_message(CIS_CLIENT_INI)
 
-    def after_loop(self):
+    def after_loop(self, dont_send_eof=False):
         r"""After client model signs off. Sent EOF to server."""
         with self.lock:
             self.debug()
@@ -145,8 +139,9 @@ class ClientRequestDriver(ConnectionDriver):
                 self.icomm._last_header = dict()
             if self.icomm._last_header.get('response_address', None) != CIS_CLIENT_EOF:
                 self.icomm._last_header['response_address'] = CIS_CLIENT_EOF
-                self.ocomm.send_eof()
-        super(ClientRequestDriver, self).after_loop()
+            else:
+                dont_send_eof = True
+        super(ClientRequestDriver, self).after_loop(dont_send_eof=dont_send_eof)
     
     def on_eof(self):
         r"""On EOF, set response_address to EOF, then send it along."""

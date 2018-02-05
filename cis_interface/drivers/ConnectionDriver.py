@@ -178,6 +178,22 @@ class ConnectionDriver(Driver):
             raise Exception("Connection never finished opening.")
         super(ConnectionDriver, self).start()
 
+    def drain_input(self, timeout=None):
+        r"""Wait for the input comm to be empty.
+
+        Args:
+            timeout (float, optional): Max time that should be waited. Defaults
+                to None and is set to attribute timeout.
+            **kwargs: Additional keyword arguments are passed to the parent
+                class's graceful_stop method.
+
+        """
+        T = self.start_timeout(timeout)
+        while (self.n_msg > 0) and (not T.is_out):  # pragma: debug
+            self.debug('Draining %d messages', self.n_msg)
+            self.sleep()
+        self.stop_timeout()
+
     def graceful_stop(self, timeout=None, **kwargs):
         r"""Stop the driver, first waiting for the input comm to be empty.
 
@@ -189,18 +205,20 @@ class ConnectionDriver(Driver):
 
         """
         self.debug()
-        T = self.start_timeout(timeout)
-        while (self.n_msg > 0) and (not T.is_out):  # pragma: debug
-            self.debug('Draining %d messages', self.n_msg)
-            self.sleep()
-        self.stop_timeout()
+        self.drain_input(timeout=timeout)
         super(ConnectionDriver, self).graceful_stop()
         self.debug('Returning')
 
-    # def on_model_exit(self):
-    #     r"""Close the comms."""
-    #     self.close_comm()
-    #     super(ConnectionDriver, self).on_model_exit()
+    def on_model_exit(self):
+        r"""Drain input and then close it."""
+        self.debug()
+        self.drain_input()
+        if self.n_msg > 0:
+            self.error("%d messages could not be drained from the input comm.",
+                       self.n_msg)
+        with self.lock:
+            self.icomm.close()
+        super(ConnectionDriver, self).on_model_exit()
 
     def do_terminate(self):
         r"""Stop the driver by closing the communicators."""
@@ -237,9 +255,12 @@ class ConnectionDriver(Driver):
         self.open_comm()
         self.sleep()  # Help ensure senders/receivers connected before messages
 
-    def after_loop(self):
+    def after_loop(self, dont_send_eof=False):
         r"""Actions to perform after sending messages."""
-        pass
+        with self.lock:
+            self.icomm.close()
+        if not dont_send_eof:
+            self.send_message(self.ocomm.eof_msg)
 
     def recv_message(self, **kwargs):
         r"""Get a new message to send.

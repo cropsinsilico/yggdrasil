@@ -38,10 +38,6 @@ int main(int argc, char *argv[]) {
 
   }
 
-  // Free input/output channels
-  psi_free(&in_channel);
-  psi_free(&out_channel);
-  
   return 0;
 }
 
