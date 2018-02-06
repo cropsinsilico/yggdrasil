@@ -235,25 +235,18 @@ class RMQComm(CommBase.CommBase):
             self._is_open = True
             self._bound = False
 
-    def close(self, wait_for_send=False):
-        r"""Close connection.
-
-        Args:
-            wait_for_send (bool, optional): If True, the connection will be
-                closed such that pending messages can still be received. Defaults
-                to False.
-
-        """
+    def close(self):
+        r"""Close connection."""
         self._is_open = False
         self._bound = False
-        if not wait_for_send:
+        if not self.linger_on_close:
             self.close_queue()
         self.close_channel()
         self.close_connection()
         self.unregister_connection()
         self.connection = None
         self.channel = None
-        super(RMQComm, self).close(wait_for_send=wait_for_send)
+        super(RMQComm, self).close()
 
     def close_queue(self):
         r"""Close the queue if the channel exists."""

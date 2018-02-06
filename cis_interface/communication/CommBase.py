@@ -46,6 +46,8 @@ class CommBase(CisClass):
         close_on_eof_recv (bool, optional): If True, the comm will be closed
             when it receives an end-of-file messages. Otherwise, it will remain
             open. Defaults to True.
+        linger_on_close (bool, optional): If True, the comm will linger at close
+            to wait for messages to be sent. Defaults to False.
         single_use (bool, optional): If True, the comm will only be used to
             send/recv a single message. Defaults to False.
         reverse_names (bool, optional): If True, the suffix added to the comm
@@ -83,6 +85,8 @@ class CommBase(CisClass):
             message before returning None.
         close_on_eof_recv (bool): If True, the comm will be closed when it
             receives an end-of-file messages. Otherwise, it will remain open.
+        linger_on_close (bool): If True, the comm will linger at close to
+            wait for messages to be sent.
         single_use (bool): If True, the comm will only be used to send/recv a
             single message.
         is_client (bool): If True, the comm is one of many potential clients
@@ -104,7 +108,7 @@ class CommBase(CisClass):
     def __init__(self, name, address=None, direction='send',
                  deserialize=None, serialize=None, format_str=None,
                  dont_open=False, is_interface=False,
-                 recv_timeout=0.0, close_on_eof_recv=True,
+                 recv_timeout=0.0, close_on_eof_recv=True, linger_on_close=False,
                  single_use=False, reverse_names=False, no_suffix=False,
                  is_client=False, is_response_client=False,
                  is_server=False, is_response_server=False,
@@ -140,6 +144,11 @@ class CommBase(CisClass):
         self.is_interface = is_interface
         self.recv_timeout = recv_timeout
         self.close_on_eof_recv = close_on_eof_recv
+        self.linger_on_close = linger_on_close
+        if self.direction == 'recv':
+            self.linger_on_close = False
+        # if self.is_interface and self.direction == 'send':
+        #     self.linger_on_close = True
         self._last_header = None
         self._work_comms = {}
         self.single_use = single_use
@@ -242,20 +251,12 @@ class CommBase(CisClass):
         r"""Open the connection."""
         pass
 
-    def close(self, wait_for_send=False):
-        r"""Close the connection.
-
-        Args:
-            wait_for_send (bool, optional): If True, close will be delayed or
-                done such that a recently sent message has time to be received.
-
-        """
+    def close(self):
+        r"""Close the connection."""
         self.debug("Cleaning up %d work comms", len(self._work_comms))
-        if self.is_interface and self.direction == 'send':
-            wait_for_send = True
         keys = [k for k in self._work_comms.keys()]
         for c in keys:
-            self.remove_work_comm(c, wait_for_send=wait_for_send)
+            self.remove_work_comm(c)
         self.debug("Finished cleaning up work comms")
 
     @property
@@ -343,6 +344,7 @@ class CommBase(CisClass):
         r"""dict: Keyword arguments for a new work comm."""
         return dict(comm=self.comm_class, direction='send',
                     recv_timeout=self.recv_timeout,
+                    linger_on_close=self.linger_on_close,
                     single_use=True)
 
     def get_work_comm(self, header, work_comm_name=None, **kwargs):
@@ -413,22 +415,20 @@ class CommBase(CisClass):
             raise KeyError("Comm already registered with key %s." % key)
         self._work_comms[key] = comm
 
-    def remove_work_comm(self, key, dont_close=False, wait_for_send=False):
+    def remove_work_comm(self, key, dont_close=False):
         r"""Close and remove a work comm.
 
         Args:
             key (str): Key of comm that should be removed.
             dont_close (bool, optional): If True, the comm will be removed
                 from the list, but it won't be closed. Defaults to False.
-            wait_for_send (bool, optional): If True, close will be delayed or
-                done such that a recently sent message has time to be received.
 
         """
         if key not in self._work_comms:
             return
         if not dont_close:
             c = self._work_comms.pop(key)
-            c.close(wait_for_send=wait_for_send)
+            c.close()
 
     # HEADER
     def get_header(self, msg, no_address=False, **kwargs):
@@ -511,7 +511,7 @@ class CommBase(CisClass):
             flag = self._send(*args, **kwargs)
             if flag or (self.is_closed):
                 break
-            # self.sleep()
+            self.sleep()
         self.stop_timeout()
         self.suppress_special_debug = False
         self._first_send_done = True
@@ -740,8 +740,8 @@ class CommBase(CisClass):
                 ret = False
                 break
             data = data + payload[1]
-            # if len(payload[1]) == 0:
-            #     self.sleep()
+            if len(payload[1]) == 0:
+                self.sleep()
         payload = (ret, data)
         self.debug("Read %d bytes", len(data))
         return payload

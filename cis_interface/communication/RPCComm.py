@@ -200,15 +200,12 @@ class RPCComm(CommBase.CommBase):
             self.close()
             raise e
 
-    def close(self, skip_base=False, wait_for_send=False):
+    def close(self, skip_base=False):
         r"""Close the connection.
         
         Args:
             skip_base (bool, optional): If True, close for the parent class will
                 not be called. Defaults to False.
-            wait_for_send (bool, optional): If True, the output comm will be
-                closed such that any pending messages can be sent/received.
-                Defaults to False.
 
         """
         ie = None
@@ -220,7 +217,7 @@ class RPCComm(CommBase.CommBase):
             ie = e
         try:
             if getattr(self, 'ocomm', None) is not None:
-                self.ocomm.close(wait_for_send=wait_for_send)
+                self.ocomm.close()
         except BaseException as e:
             oe = e
         if ie:

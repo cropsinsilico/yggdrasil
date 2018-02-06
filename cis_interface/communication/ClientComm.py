@@ -101,19 +101,12 @@ class ClientComm(CommBase.CommBase):
         super(ClientComm, self).open()
         self.ocomm.open()
 
-    def close(self, wait_for_send=False):
-        r"""Close the connection.
-
-        Args:
-            wait_for_send (bool, optional): If True, the output comm will
-                close such that any pending messages can be sent/received.
-                Defaults to False.
-
-        """
-        self.ocomm.close(wait_for_send=wait_for_send)
+    def close(self):
+        r"""Close the connection."""
+        self.ocomm.close()
         for k in self.icomm_order:
-            self.icomm[k].close(wait_for_send=wait_for_send)
-        super(ClientComm, self).close(wait_for_send=wait_for_send)
+            self.icomm[k].close()
+        super(ClientComm, self).close()
 
     @property
     def is_open(self):

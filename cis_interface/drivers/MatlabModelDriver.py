@@ -304,14 +304,14 @@ class MatlabModelDriver(ModelDriver):
                 self.debug('MatlabProcess running model.')
         else:  # pragma: no matlab
             self.error("Matlab not installed. Could not run setup.")
-            self.start_event.clear()
-            self.terminate_event.set()
+            self.unset_started_flag()
+            self.set_terminated_flag()
 
     def run_loop(self):  # pragma: matlab
         r"""Loop to check if model is still running and forward output."""
         self.process.print_output()
         if self.process.is_done():
-            self.terminate_event.set()
+            self.set_terminated_flag()
             self.process.future.result()
             self.process.print_output()
         self.sleep()

@@ -225,16 +225,17 @@ class ZMQProxy(tools.CisThreadLoop):
 
     def client_recv(self):
         r"""Receive single message from the client."""
-        if not self.terminate_event.is_set():
-            return self.cli_socket.recv_multipart()
-        else:  # pragma: debug
-            None
+        with self.lock:
+            if not self.was_terminated:
+                return self.cli_socket.recv_multipart()
+            else:  # pragma: debug
+                return None
 
     def server_send(self, msg):
         r"""Send single message to the server."""
         if msg is None:  # pragma: debug
             return
-        while not self.terminate_event.is_set():
+        while not self.was_terminated:
             try:
                 self.srv_socket.send(msg, zmq.NOBLOCK)
                 # self.srv_socket.send_multipart(msg, zmq.NOBLOCK)
@@ -245,8 +246,9 @@ class ZMQProxy(tools.CisThreadLoop):
     def poll(self):
         # socks = dict(self.poller.poll())
         # return (socks.get(self.cli_socket) == zmq.POLLIN)
-        if self.terminate_event.is_set():  # pragma: debug
-            return False
+        with self.lock:
+            if self.was_terminated:  # pragma: debug
+                return False
         out = self.cli_socket.poll(timeout=1, flags=zmq.POLLIN)
         return (out == zmq.POLLIN)
 
@@ -353,7 +355,7 @@ class ZMQComm(CommBase.CommBase):
         self.socket_type = getattr(zmq, socket_type)
         self.socket_action = socket_action
         self.socket = self.context.socket(self.socket_type)
-        if self.is_interface and self.direction == 'send':
+        if self.linger_on_close:
             self.socket.set(zmq.LINGER, int(1000 * self.timeout))
         self.topic_filter = backwards.unicode2bytes(topic_filter)
         if dealer_identity is None:
@@ -560,18 +562,9 @@ class ZMQComm(CommBase.CommBase):
                 self.socket.setsockopt(zmq.SUBSCRIBE, self.topic_filter)
             self._openned = True
 
-    def close(self, wait_for_send=False):
-        r"""Close connection.
-
-        Args:
-            wait_for_send (bool, optional): If True, linger will be set to
-                100 on close to ensure that the message is routed. Defaults
-                to False.
-
-        """
+    def close(self):
+        r"""Close connection."""
         self.debug("self.socket.closed = %s", str(self.socket.closed))
-        if self.is_interface and self.direction == 'send':
-            wait_for_send = True
         if self.socket.closed:
             self.debug("Socket already closed: %s", self.address)
         else:
@@ -580,7 +573,7 @@ class ZMQComm(CommBase.CommBase):
             elif self.socket_action == 'connect':
                 self.disconnect()
             self.debug("Closing socket %s", self.address)
-            if wait_for_send:
+            if self.linger_on_close:
                 linger = 100
                 self.debug("Waiting %d ms for send to close comm", linger)
             else:
@@ -598,7 +591,7 @@ class ZMQComm(CommBase.CommBase):
         if self.is_client and self._client_proxy:
             self.debug("Closing client proxy")
             self.close_client_proxy()
-        super(ZMQComm, self).close(wait_for_send=wait_for_send)
+        super(ZMQComm, self).close()
 
     def get_client_proxy(self, srv_address):
         r"""Create a new client proxy for the specified address."""

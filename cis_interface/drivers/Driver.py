@@ -75,11 +75,11 @@ class Driver(tools.CisThread):
     @property
     def is_valid(self):
         r"""bool: True if the driver is functional."""
-        return (not self.terminate_event.is_set())
+        return (not self.was_terminated)
 
     def stop(self):
         r"""Stop the driver."""
-        if self.terminate_event.is_set():
+        if self.was_terminated:
             self.debug('Driver already terminated.')
             return
         self.debug()
@@ -97,7 +97,7 @@ class Driver(tools.CisThread):
 
     def terminate(self):
         r"""Stop the driver, without attempting to allow it to finish."""
-        if self.terminate_event.is_set():
+        if self.was_terminated:
             self.debug('Driver already terminated.')
             return
         self.do_terminate()

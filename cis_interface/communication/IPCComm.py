@@ -252,16 +252,8 @@ class IPCComm(CommBase.CommBase):
             self.backlog_thread.start()
             self.debug("qid: %s", self.q.key)
             
-    def close(self, wait_for_send=False):
-        r"""Close the connection.
-
-        Args:
-            wait_for_send (bool, optional): If True, the thread will block
-                until the queue is empty. Defaults to False.
-
-        """
-        if self.is_interface and self.direction == 'send':
-            wait_for_send = True
+    def close(self):
+        r"""Close the connection."""
         if self._bound and not self.is_open:
             try:
                 self.open_after_bind()
@@ -269,14 +261,15 @@ class IPCComm(CommBase.CommBase):
                 self.q = None
                 self._bound = False
         # Wait for backlog to be processed
-        if wait_for_send and self.is_open and (not self.backlog_closed_event.is_set()):
+        if ((self.linger_on_close and self.is_open and
+             (not self.backlog_closed_event.is_set()))):
             Tout = self.start_timeout()
             while (not Tout.is_out) and self.backlog_send_ready.is_set():
                 self.verbose_debug("Waiting for backlogged messages to be queued.")
                 self.sleep()
             self.stop_timeout()
-        if self.is_open and not wait_for_send:
-            # if wait_for_send:
+        if self.is_open and not self.linger_on_close:
+            # if self.linger_on_close:
             #     while self.n_msg_queued > 0:
             #         self.verbose_debug("Waiting for messages to be dequeued.")
             #         self.sleep()
@@ -290,7 +283,7 @@ class IPCComm(CommBase.CommBase):
         self.backlog_closed_event.set()
         self.backlog_send_ready.set()
         self.backlog_recv_ready.set()
-        super(IPCComm, self).close(wait_for_send=wait_for_send)
+        super(IPCComm, self).close()
             
     @property
     def is_open(self):

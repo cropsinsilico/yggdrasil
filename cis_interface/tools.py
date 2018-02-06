@@ -770,14 +770,48 @@ class CisThread(threading.Thread, CisClass):
         self.lock = threading.RLock()
         self.start_event = threading.Event()
         self.terminate_event = threading.Event()
+        self.start_flag = False
+        self.terminate_flag = False
         self.setDaemon(True)
         self.daemon = True
+
+    def set_started_flag(self):
+        r"""Set the started flag for the thread to True."""
+        # self.start_event.set()
+        self.start_flag = True
+
+    def set_terminated_flag(self):
+        r"""Set the terminated flag for the thread to True."""
+        # self.terminate_event.set()
+        self.terminate_flag = True
+
+    def unset_started_flag(self):
+        r"""Set the started flag for the thread to False."""
+        # self.start_event.clear()
+        self.start_flag = False
+
+    def unset_terminated_flag(self):
+        r"""Set the terminated flag for the thread to False."""
+        # self.terminate_event.clear()
+        self.terminated_flag = False
+
+    @property
+    def was_started(self):
+        r"""bool: True if the thread was started. False otherwise."""
+        # return self.start_event.is_set()
+        return self.start_flag
+
+    @property
+    def was_terminated(self):
+        r"""bool: True if the thread was terminated. False otherwise."""
+        # return self.terminate_event.is_set()
+        return self.terminate_flag
 
     def start(self, *args, **kwargs):
         r"""Start thread and print info."""
         self.debug()
-        if not self.terminate_event.is_set():
-            self.start_event.set()
+        if not self.was_terminated:
+            self.set_started_flag()
             self.before_start()
         super(CisThread, self).start(*args, **kwargs)
 
@@ -813,7 +847,8 @@ class CisThread(threading.Thread, CisClass):
 
         """
         self.debug()
-        self.terminate_event.set()
+        with self.lock:
+            self.set_terminated_flag()
         if not no_wait:
             # if self.is_alive():
             #     self.join(self.timeout)
@@ -835,7 +870,7 @@ class CisThreadLoop(CisThread):
         if self._target:
             self._target(*self._args, **self._kwargs)
         else:
-            self.terminate_event.set()
+            self.set_terminated_flag()
 
     def after_loop(self):
         r"""Actions performed after the loop."""
@@ -846,8 +881,11 @@ class CisThreadLoop(CisThread):
         self.debug("Starting loop")
         self.before_loop()
         try:
-            while not self.terminate_event.is_set():
+            while not self.was_terminated:
                 self.run_loop()
+        except:
+            self.set_terminated_flag()
+            raise
         finally:
             for k in ['_target', '_args', '_kwargs']:
                 if hasattr(self, k):

@@ -63,7 +63,7 @@ class ClientResponseDriver(ConnectionDriver):
         with self.lock:
             self.debug()
             self.icomm.close()
-            self.ocomm.close(wait_for_send=True)
+            self.ocomm.close()
         super(ClientResponseDriver, self).after_loop(dont_send_eof=True)
         
     def send_message(self, *args, **kwargs):

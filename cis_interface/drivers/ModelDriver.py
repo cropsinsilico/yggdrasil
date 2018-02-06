@@ -91,7 +91,7 @@ class ModelDriver(Driver):
     # def start(self, no_popen=False):
     #     r"""Start subprocess before monitoring."""
     #     if (not no_popen) and (not self.event_process_kill_complete.is_set()):
-    #         self.start_event.set()
+    #         self.set_started_flag()
     #         self.before_start()
     #     super(ModelDriver, self).start()
 
@@ -120,17 +120,13 @@ class ModelDriver(Driver):
 
     def enqueue_output_loop(self):
         r"""Keep passing lines to queue."""
-        try:
-            line = self.process.stdout.readline()
-            if len(line) == 0:
-                self.debug("Empty line from stdout")
-                self.queue_thread.terminate_event.set()
-            else:
-                self.queue.put(line.decode('utf-8'))
-        except BaseException:  # pragma: debug
-            self.error("Error getting output")
-            self.queue_thread.terminate_event.set()
-            raise
+        line = self.process.stdout.readline()
+        if len(line) == 0:
+            self.debug("Empty line from stdout")
+            self.queue_thread.set_terminated_flag()
+            self.queue.put(self._exit_line)
+        else:
+            self.queue.put(line.decode('utf-8'))
 
     def enqueue_output(self, out, queue):
         r"""Method to call in thread to keep passing output to queue."""
@@ -156,9 +152,9 @@ class ModelDriver(Driver):
                    self.args, os.getcwd(), self.workingDir, pformat(self.env))
         self.before_loop()
         self.debug("Beginning loop")
-        # while ((not self.terminate_event.is_set()) and
+        # while ((not self.was_terminated) and
         #        (not self.event_process_kill_complete.is_set())):
-        while (not self.terminate_event.is_set()):
+        while (not self.was_terminated):
             self.run_loop()
         self.after_loop()
 
@@ -172,15 +168,16 @@ class ModelDriver(Driver):
         try:
             line = self.queue.get_nowait()
         except Empty:
-            if self.queue_thread.terminate_event.is_set():
-                self.debug("No more output")
-                self.terminate_event.set()
-            # self.sleep()
+            # if self.queue_thread.was_terminated:
+            #     self.debug("No more output")
+            #     self.set_terminated_flag()
+            # This sleep is necessary to allow changes in queue without lock
+            self.sleep()
             return
         else:
-            if (line == self._exit_line) or (self.queue_thread.terminate_event.is_set()):
+            if (line == self._exit_line):
                 self.debug("No more output")
-                self.terminate_event.set()
+                self.set_terminated_flag()
             else:
                 self.print_encoded(line, end="")
                 sys.stdout.flush()
@@ -211,7 +208,7 @@ class ModelDriver(Driver):
             bool: True if the process completed. False otherwise.
 
         """
-        if not self.start_event.is_set():
+        if not self.was_started:
             return True
         T = self.start_timeout(timeout, key_level=1)
         while ((not T.is_out) and (not self.process_complete)):  # pragma: debug
@@ -221,9 +218,9 @@ class ModelDriver(Driver):
 
     def kill_process(self):
         r"""Kill the process running the model, checking return code."""
-        if not self.start_event.is_set():
+        if not self.was_started:
             self.debug('Process was never started.')
-            self.terminate_event.set()
+            self.set_terminated_flag()
             self.event_process_kill_called.set()
             self.event_process_kill_complete.set()
         if self.event_process_kill_called.is_set():
