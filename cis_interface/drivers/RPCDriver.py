@@ -80,13 +80,6 @@ class RPCDriver(Driver):
         self.ocomm.terminate()
         super(RPCDriver, self).do_terminate()
 
-    def on_exit(self):
-        r"""Actions to perform when the driver is finished."""
-        self.debug()
-        self.icomm.on_exit()
-        self.ocomm.on_exit()
-        super(RPCDriver, self).on_exit()
-
     def on_model_exit(self):
         r"""Actions to perform when the associated model driver is finished."""
         self.debug()

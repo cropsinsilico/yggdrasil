@@ -270,17 +270,6 @@ class MatlabModelDriver(ModelDriver):
         self.mlengine = None
         super(MatlabModelDriver, self).cleanup()
 
-    def on_exit(self):
-        r"""Cleanup Matlab session and engine on exit."""
-        self.cleanup()
-        super(MatlabModelDriver, self).on_exit()
-
-    def terminate(self):
-        r"""Terminate the driver, including the matlab engine."""
-        super(MatlabModelDriver, self).terminate()
-        with self.lock:
-            self.cleanup()
-
     # def run(self):
     #     r"""Run the matlab script in the matlab engine."""
     #     if _matlab_installed:  # pragma: matlab
@@ -290,7 +279,7 @@ class MatlabModelDriver(ModelDriver):
     #     else:  # pragma: no matlab
     #         self.error("Matlab not installed. Could not run model.")
 
-    def start_setup(self):
+    def before_start(self):
         r"""Actions to perform before the run loop."""
         if _matlab_installed:  # pragma: matlab
             name = os.path.splitext(os.path.basename(self.args[0]))[0]
@@ -315,14 +304,21 @@ class MatlabModelDriver(ModelDriver):
                 self.debug('MatlabProcess running model.')
         else:  # pragma: no matlab
             self.error("Matlab not installed. Could not run setup.")
-            self.event_process_started.clear()
-            self.event_process_exit.set()
+            self.start_event.clear()
+            self.terminate_event.set()
 
     def run_loop(self):  # pragma: matlab
         r"""Loop to check if model is still running and forward output."""
         self.process.print_output()
         if self.process.is_done():
-            self.event_process_exit.set()
+            self.terminate_event.set()
             self.process.future.result()
             self.process.print_output()
         self.sleep()
+
+    def after_loop(self):
+        r"""Actions to perform after run_loop has finished. Mainly checking
+        if there was an error and then handling it."""
+        super(MatlabModelDriver, self).after_loop()
+        with self.lock:
+            self.cleanup()

@@ -32,7 +32,6 @@ class TestModelParam(parent.TestParam):
             self.args = ['sleep', '0.1']
         self.attr_list += ['args', 'process', 'queue', 'queue_thread',
                            'is_server', 'client_of',
-                           'event_process_started', 'event_process_exit',
                            'event_process_kill_called', 'event_process_kill_complete']
         
 

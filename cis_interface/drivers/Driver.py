@@ -102,13 +102,8 @@ class Driver(tools.CisThread):
             return
         self.do_terminate()
         self.debug()
-        self.on_exit()
         super(Driver, self).terminate()
         self.debug('Returning')
-
-    def on_exit(self):
-        r"""Processes that should be run when the driver exits."""
-        self.debug()
 
     def on_model_exit(self):
         r"""Processes that should be run when an associated model exits."""

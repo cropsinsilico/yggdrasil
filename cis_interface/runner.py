@@ -458,19 +458,6 @@ class CisRunner(CisClass):
             self.terminate()
         self.debug('Returning')
 
-    def do_exits(self, driver):
-        r"""Perform basic exits for a driver.
-
-        Args:
-            model (dict): Dictionary of driver parameters.
-
-        """
-        self.debug(driver['name'])
-        # Stop the driver and join the thread
-        driver['instance'].on_exit()
-        driver['instance'].join()
-        self.debug("%s join finished", driver['name'])
-
     def do_model_exits(self, model):
         r"""Perform exists for IO drivers associated with a model.
 
@@ -479,13 +466,11 @@ class CisRunner(CisClass):
                 associated IO drivers.
 
         """
-        self.do_exits(model)
         # Stop associated server if not more clients
         for srv_name in model.get('client_of', []):
             # Stop client IO driver
             iod = self.outputdrivers["%s_%s" % (srv_name, model['name'])]
             iod['instance'].on_model_exit()
-            self.do_exits(iod)
             # Remove this client from list for server
             srv = self.modeldrivers[srv_name]
             srv['clients'].remove(model['name'])
@@ -493,7 +478,6 @@ class CisRunner(CisClass):
             if len(srv['clients']) == 0:
                 iod = self.inputdrivers[srv_name]
                 iod['instance'].on_model_exit()
-                self.do_exits(iod)
                 srv['instance'].stop()
                 # self.do_model_exits(srv)
         # Stop associated IO drivers
