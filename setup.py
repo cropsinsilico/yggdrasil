@@ -149,7 +149,7 @@ except (ImportError, IOError):
         raise IOError("Could not find README.rst or README.md")
 
 # Create requirements list based on platform
-requirements = ["numpy", "scipy", "pyyaml", "pystache", "nose"]
+requirements = ["numpy", "scipy", "pyyaml", "pystache", "nose", "psutil"]
 optional_requirements = ["pika", "astropy"]
 if IS_WINDOWS:
     requirements.append("zmq")
