@@ -849,5 +849,8 @@ class CisThreadLoop(CisThread):
             while not self.terminate_event.is_set():
                 self.run_loop()
         finally:
-            del self._target, self._args, self._kwargs
+            for k in ['_target', '_args', '_kwargs']:
+                if hasattr(self, k):
+                    delattr(self, k)
+            # del self._target, self._args, self._kwargs
         self.after_loop()
