@@ -168,9 +168,13 @@ class ModelDriver(Driver):
     def run_loop(self):
         r"""Loop to check if model is still running and forward output."""
         # Continue reading until there is not any output
+        
         try:
             line = self.queue.get_nowait()
         except Empty:
+            if self.queue_thread.terminate_event.is_set():
+                self.debug("No more output")
+                self.terminate_event.set()
             # self.sleep()
             return
         else:
