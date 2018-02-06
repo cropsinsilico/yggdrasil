@@ -215,7 +215,7 @@ class CisRunner(CisClass):
             self.debug("Terminating models and closing all channels")
             self.terminate()
             self.pprint(80 * '*')
-            self.sleep(5)
+            # self.sleep(5)
             return 1
         else:
             self.pprint('* %76s *' % 'Interrupted: Displaying channel summary')

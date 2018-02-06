@@ -1,4 +1,6 @@
 import os
+import threading
+import psutil
 import nose.tools as nt
 from cis_interface.tools import CisClass
 from cis_interface.tests import CisTest
@@ -104,6 +106,8 @@ class TestParam(CisTest):
             x.stop_timeout()
             ncurr_comm = self.comm_count
         nt.assert_less_equal(ncurr_comm, self.nprev_comm)
+        nt.assert_equal(threading.active_count(), 1)
+        nt.assert_equal(len(psutil.Process().children(recursive=True)), 0)
 
     @property
     def name(self):

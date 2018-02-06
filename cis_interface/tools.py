@@ -745,3 +745,86 @@ class CisClass(object):
         """
         self.errors.append(repr(e))
         raise e
+
+
+class CisThread(threading.Thread, CisClass):
+    r"""Thread for CiS that tracks when the thread is started and joined.
+
+    Attributes:
+        lock (threading.RLock): Lock for accessing the sockets from multiple
+            threads.
+        terminate_event (threading.Event): Event indicating that the thread
+            should be terminated. The target must exit when this is set.
+
+    """
+    def __init__(self, name=None, **kwargs):
+        thread_kwargs = dict(name=name)
+        for k in ['group', 'target', 'args', 'kwargs']:
+            if k in kwargs:
+                thread_kwargs[k] = kwargs.pop(k)
+        super(CisThread, self).__init__(**thread_kwargs)
+        CisClass.__init__(self, self.name, **kwargs)
+        self.debug()
+        self.lock = threading.RLock()
+        self.terminate_event = threading.Event()
+        self.setDaemon(True)
+        self.daemon = True
+
+    def start(self, *args, **kwargs):
+        r"""Start thread and print info."""
+        self.debug()
+        super(CisThread, self).start(*args, **kwargs)
+
+    def wait(self, timeout=None):
+        r"""Wait until thread finish to return using sleeps rather than
+        blocking.
+
+        Args:
+            timeout (float, optional): Maximum time that should be waited for
+                the driver to finish. Defaults to None and is infinite.
+
+        """
+        T = self.start_timeout(timeout)
+        while self.is_alive() and not T.is_out:
+            self.debug('Waiting for thread to finish...')
+            self.sleep()
+        self.stop_timeout()
+
+    def terminate(self, no_wait=False):
+        r"""Set the terminate event and wait for the thread to stop.
+
+        Args:
+            no_wait (bool, optional): If True, terminate will not block until
+                the thread stops. Defaults to False and blocks.
+
+        Raises:
+            AssertionError: If no_wait is False and the thread has not stopped
+                after the timeout.
+
+        """
+        self.debug()
+        self.terminate_event.set()
+        if not no_wait:
+            self.wait(timeout=self.timeout)
+            assert(not self.is_alive())
+
+
+class CisThreadLoop(CisThread):
+    r"""Thread that will run a loop until the terminate event is called."""
+    def __init__(self, *args, **kwargs):
+        super(CisThreadLoop, self).__init__(*args, **kwargs)
+
+    def run_loop(self, *args, **kwargs):
+        r"""Actions performed on each loop iteration."""
+        super(CisThreadLoop, self).run(*args, **kwargs)
+
+    def after_loop(self):
+        r"""Actions performed after the loop."""
+        self.debug()
+
+    def run(self, *args, **kwargs):
+        r"""Continue running until terminate event set."""
+        self.debug("Starting loop")
+        while not self.terminate_event.is_set():
+            self.run_loop()
+        self.after_loop()

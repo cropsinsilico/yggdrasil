@@ -4,7 +4,7 @@ import copy
 from pprint import pformat
 from cis_interface import backwards, platform, tools
 from cis_interface.drivers.Driver import Driver
-from threading import Thread, Event
+from threading import Event
 try:
     from Queue import Queue, Empty
 except ImportError:
@@ -115,9 +115,8 @@ class ModelDriver(Driver):
                                       cwd=self.workingDir,
                                       forward_signals=False)
         # Start thread to queue output
-        self.queue_thread = Thread(target=self.enqueue_output,
-                                   args=(self.process.stdout, self.queue))
-        self.queue_thread.daemon = True
+        self.queue_thread = tools.CisThread(target=self.enqueue_output,
+                                            args=(self.process.stdout, self.queue))
         self.queue_thread.start()
 
     def enqueue_output(self, out, queue):
@@ -253,6 +252,8 @@ class ModelDriver(Driver):
                     self.error("return code of %s indicates model error.",
                                str(self.process.returncode))
             self.event_process_kill_complete.set()
+            self.queue_thread.join()
+            assert(not self.queue_thread.is_alive())
 
     def graceful_stop(self):
         r"""Gracefully stop the driver."""

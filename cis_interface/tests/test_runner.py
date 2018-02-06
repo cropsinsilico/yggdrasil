@@ -25,7 +25,7 @@ def test_get_runner():
 def test_Arunner_interrupt():
     r"""Start a runner then stop it with a keyboard interrupt."""
     print("starting interrupt")
-    tools.sleep(5)
+    # tools.sleep(5)
     cr = runner.get_runner([ex_yamls['hello']['python']])
     cr.debug_log()
     cr.loadDrivers()
@@ -35,10 +35,9 @@ def test_Arunner_interrupt():
     tools.kill(os.getpid(), signal.SIGINT)
     tools.kill(os.getpid(), signal.SIGINT)
     print("after interrupt")
-    tools.sleep(5)
-    cr.waitModels()
-    cr.closeChannels()
-    cr.cleanup()
+    # cr.waitModels()
+    # cr.closeChannels()
+    # cr.cleanup()
     cr.reset_log()
 
 

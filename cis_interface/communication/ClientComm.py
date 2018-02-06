@@ -112,8 +112,8 @@ class ClientComm(CommBase.CommBase):
         """
         self.ocomm.close(wait_for_send=wait_for_send)
         for k in self.icomm_order:
-            self.icomm[k].close()
-        super(ClientComm, self).close()
+            self.icomm[k].close(wait_for_send=wait_for_send)
+        super(ClientComm, self).close(wait_for_send=wait_for_send)
 
     @property
     def is_open(self):

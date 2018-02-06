@@ -2,13 +2,11 @@ import sys
 from logging import warn
 import threading
 from subprocess import Popen, PIPE
-from cis_interface import platform
-from cis_interface.tools import get_CIS_MSG_MAX
-from cis_interface.tools import _ipc_installed as _ipc_installed0
+from cis_interface import platform, tools
 from cis_interface.communication import CommBase
 try:
     import sysv_ipc
-    _ipc_installed = _ipc_installed0
+    _ipc_installed = tools._ipc_installed
 except ImportError:
     warn("Could not import sysv_ipc. " +
          "IPC support will be disabled.")
@@ -31,7 +29,7 @@ def get_queue(qid=None):
     """
     if _ipc_installed:
         global _registered_queues
-        kwargs = dict(max_message_size=get_CIS_MSG_MAX())
+        kwargs = dict(max_message_size=tools.get_CIS_MSG_MAX())
         if qid is None:
             kwargs['flags'] = sysv_ipc.IPC_CREX
         mq = sysv_ipc.MessageQueue(qid, **kwargs)
@@ -180,10 +178,14 @@ class IPCComm(CommBase.CommBase):
         
     Attributes:
         q (:class:`sysv_ipc.MessageQueue`): Message queue.
-        backlog_thread (threading.Thread): Thread that will handle sending
+        backlog_thread (tools.CisThread): Thread that will handle sending
             or receiving backlogged messages.
-        backlog_lock (threading.RLock): Lock for handling access of backlogs
-            between threads.
+        backlog_closed_event (threading.Event): Event set when the comm is
+            closed.
+        backlog_send_ready (threading.Event): Event set when there is a
+            message in the send backlog.
+        backlog_recv_ready (threading.Event): Event set when there is a
+            message in the recv backlog.
         
     """
     def __init__(self, name, dont_open=False, **kwargs):
@@ -193,11 +195,9 @@ class IPCComm(CommBase.CommBase):
         self._backlog_recv = []
         self._backlog_send = []
         if self.direction == 'recv':
-            self.backlog_thread = threading.Thread(target=self.run_backlog_recv)
+            self.backlog_thread = tools.CisThread(target=self.run_backlog_recv)
         else:
-            self.backlog_thread = threading.Thread(target=self.run_backlog_send)
-        self.backlog_thread.daemon = True
-        self.backlog_lock = threading.RLock()
+            self.backlog_thread = tools.CisThread(target=self.run_backlog_send)
         self.backlog_closed_event = threading.Event()
         self.backlog_send_ready = threading.Event()
         self.backlog_recv_ready = threading.Event()
@@ -326,13 +326,13 @@ class IPCComm(CommBase.CommBase):
     @property
     def backlog_recv(self):
         r"""list: Messages that have been received."""
-        with self.backlog_lock:
+        with self.backlog_thread.lock:
             return self._backlog_recv
 
     @property
     def backlog_send(self):
         r"""list: Messages that should be sent."""
-        with self.backlog_lock:
+        with self.backlog_thread.lock:
             return self._backlog_send
 
     def add_backlog_recv(self, msg):
@@ -342,7 +342,7 @@ class IPCComm(CommBase.CommBase):
             msg (str): Received message that should be backlogged.
 
         """
-        with self.backlog_lock:
+        with self.backlog_thread.lock:
             self.debug("Added %d bytes to recv backlog.", len(msg))
             self._backlog_recv.append(msg)
             self.backlog_recv_ready.set()
@@ -354,7 +354,7 @@ class IPCComm(CommBase.CommBase):
             msg (str): Message that should be backlogged for sending.
 
         """
-        with self.backlog_lock:
+        with self.backlog_thread.lock:
             self.debug("Added %d bytes to send backlog.", len(msg))
             self._backlog_send.append(msg)
             self.backlog_send_ready.set()
@@ -366,7 +366,7 @@ class IPCComm(CommBase.CommBase):
             str: First backlogged recv message.
 
         """
-        with self.backlog_lock:
+        with self.backlog_thread.lock:
             msg = self._backlog_recv.pop(0)
             self.debug("Popped %d bytes from recv backlog.", len(msg))
             if len(self._backlog_recv) == 0:
@@ -380,7 +380,7 @@ class IPCComm(CommBase.CommBase):
             str: First backlogged send message.
 
         """
-        with self.backlog_lock:
+        with self.backlog_thread.lock:
             msg = self._backlog_send.pop(0)
             self.debug("Popped %d bytes from send backlog.", len(msg))
             if len(self._backlog_send) == 0:
@@ -534,7 +534,7 @@ class IPCComm(CommBase.CommBase):
 
     def purge(self):
         r"""Purge all messages from the comm."""
-        with self.backlog_lock:
+        with self.backlog_thread.lock:
             self.backlog_recv_ready.clear()
             self.backlog_send_ready.clear()
             self._backlog_recv = []

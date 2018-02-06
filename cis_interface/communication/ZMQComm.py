@@ -1,9 +1,7 @@
 import uuid
 import zmq
-import threading
-from cis_interface import backwards
+from cis_interface import backwards, tools
 from cis_interface.communication import CommBase
-from cis_interface.tools import CisClass, _zmq_installed, sleep
 
 
 _registered_sockets = dict()
@@ -164,12 +162,12 @@ def bind_socket(socket, address, retry_timeout=-1):
         if (e.errno != 98) or (retry_timeout < 0):
             raise e
         else:
-            sleep(retry_timeout)
+            tools.sleep(retry_timeout)
             address = bind_socket(socket, address)
     return address
 
     
-class ZMQProxy(threading.Thread, CisClass):
+class ZMQProxy(tools.CisThreadLoop):
     r"""Start a proxy in a new thread for a server address. A client-side
     address will be randomly generated.
 
@@ -187,8 +185,6 @@ class ZMQProxy(threading.Thread, CisClass):
         **kwargs: Additional keyword arguments are passed to the parent class.
 
     Attributes:
-        lock (threading.RLock): Lock for accessing the sockets from multiple
-            threads.
         srv_address (str): Address that faces the server(s).
         cli_address (str): Address that faces the client(s).
         context (zmq.Context): ZeroMQ context that will be used.
@@ -198,14 +194,12 @@ class ZMQProxy(threading.Thread, CisClass):
 
     """
     def __init__(self, srv_address, context=None, retry_timeout=-1, **kwargs):
-        self.lock = threading.RLock()
         # Get parameters
         srv_param = parse_address(srv_address)
         cli_param = dict()
         for k in ['protocol', 'host', 'port']:
             cli_param[k] = kwargs.pop(k, srv_param[k])
         super(ZMQProxy, self).__init__(**kwargs)
-        self.daemon = True
         context = context or zmq.Context.instance()
         # Create new address for the frontend
         if cli_param['protocol'] in ['inproc', 'ipc']:
@@ -226,27 +220,24 @@ class ZMQProxy(threading.Thread, CisClass):
         # self.poller = zmq.Poller()
         # self.poller.register(frontend, zmq.POLLIN)
         self.cli_count = 0
-        self._running = False
-        # Cis class init
-        CisClass.__init__(self, 'ZMQProxy.%s' % srv_address, **kwargs)
+        # Set name
+        self.name = 'ZMQProxy.%s' % srv_address
 
     def client_recv(self):
         r"""Receive single message from the client."""
-        with self.lock:
-            if self._running:
-                return self.cli_socket.recv_multipart()
-            else:  # pragma: debug
-                None
+        if not self.terminate_event.is_set():
+            return self.cli_socket.recv_multipart()
+        else:  # pragma: debug
+            None
 
     def server_send(self, msg):
         r"""Send single message to the server."""
         if msg is None:  # pragma: debug
             return
-        while self._running:
+        while not self.terminate_event.is_set():
             try:
-                with self.lock:
-                    self.srv_socket.send(msg, zmq.NOBLOCK)
-                    # self.srv_socket.send_multipart(msg, zmq.NOBLOCK)
+                self.srv_socket.send(msg, zmq.NOBLOCK)
+                # self.srv_socket.send_multipart(msg, zmq.NOBLOCK)
                 break
             except zmq.ZMQError:
                 self.sleep(0.0001)
@@ -254,36 +245,25 @@ class ZMQProxy(threading.Thread, CisClass):
     def poll(self):
         # socks = dict(self.poller.poll())
         # return (socks.get(self.cli_socket) == zmq.POLLIN)
-        with self.lock:
-            if not self._running:  # pragma: debug
-                return False
+        if self.terminate_event.is_set():  # pragma: debug
+            return False
         out = self.cli_socket.poll(timeout=1, flags=zmq.POLLIN)
         return (out == zmq.POLLIN)
 
-    def run(self):
-        r"""Run the proxy, handling errors on exit."""
-        self._running = True
-        self.debug('Proxy forwarding messages from %s to %s',
-                   self.cli_address, self.srv_address)
-        try:
-            # This version does explicit checking of polls
-            while self._running:
-                if self.poll():
-                    message = self.client_recv()
-                    # print('fowarding', message)
-                    if message is not None:
-                        self.debug('Forwarding message of size %d from %s',
-                                   len(message[1]), message[0])
-                        self.server_send(message[1])
-                    # For multipart
-                    # self.server_send(message)
-            # This version does fowarding in a black box
-            # zmq.proxy(self.cli_socket, self.srv_socket)
-        except zmq.ZMQError:  # pragma: debug
-            # print('proxy stopped')
-            self.debug('Proxy fowarding stopped.')
-            raise
+    def run_loop(self):
+        r"""Forward messages from client to server."""
+        if self.poll():
+            message = self.client_recv()
+            # print('fowarding', message)
+            if message is not None:
+                self.debug('Forwarding message of size %d from %s',
+                           len(message[1]), message[0])
+                self.server_send(message[1])
+
+    def after_loop(self):
+        r"""Close sockets after the loop finishes."""
         self.close_sockets()
+        super(ZMQProxy, self).after_loop()
 
     def close_sockets(self):
         r"""Close the sockets."""
@@ -296,11 +276,6 @@ class ZMQProxy(threading.Thread, CisClass):
             self.srv_socket = None
         unregister_socket('ROUTER', self.cli_address)
         unregister_socket('DEALER', self.srv_address)
-
-    def terminate(self):
-        r"""Stop the proxy."""
-        with self.lock:
-            self._running = False
 
 
 class ZMQComm(CommBase.CommBase):
@@ -398,7 +373,7 @@ class ZMQComm(CommBase.CommBase):
     @classmethod
     def is_installed(cls):
         r"""bool: Is the comm installed."""
-        return _zmq_installed
+        return tools._zmq_installed
 
     @property
     def maxMsgSize(self):
@@ -652,8 +627,6 @@ class ZMQComm(CommBase.CommBase):
         if _registered_servers[self._client_proxy.srv_address].cli_count <= 0:
             self.debug("Shutting down server proxy")
             self._client_proxy.terminate()
-            self._client_proxy.join()
-            assert(not self._client_proxy.is_alive())
             if self._client_proxy.srv_address in _registered_servers:
                 del _registered_servers[self._client_proxy.srv_address]
         self._client_proxy = None

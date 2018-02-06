@@ -1,6 +1,5 @@
 import pika
-from threading import Thread, RLock
-from cis_interface import backwards
+from cis_interface import backwards, tools
 from cis_interface.communication.RMQComm import RMQComm
 
 
@@ -18,17 +17,12 @@ class RMQAsyncComm(RMQComm):
     Attributes:
         times_connected (int): Number of times that this connections has been
             established.
-        lock (threading.RLock): Lock to ensure safe access of variables used by
-            the ioloop thread.
-        thread (threading.Thread): Thread used to run IO loop.
+        thread (tools.CisThread): Thread used to run IO loop.
 
     """
     def __init__(self, name, **kwargs):
         self.times_connected = 0
-        self.lock = RLock()
-        self.thread = Thread(name=name, target=self.run_thread)
-        self.thread.setDaemon(True)
-        self.thread.daemon = True
+        self.thread = tools.CisThread(name=name, target=self.run_thread)
         self._thread_started = False
         self._opening = False
         self._closing = False
@@ -38,15 +32,15 @@ class RMQAsyncComm(RMQComm):
 
     def run_thread(self):
         r"""Connect to the connection and begin the IO loop."""
-        self.debug("::run")
+        self.debug()
         self.connect()
         self.connection.ioloop.start()
-        self.debug("::run returns")
+        self.debug("returning")
 
     def bind(self):
         r"""Declare queue to get random new queue."""
         # Start ioloop in a new thread
-        with self.lock:
+        with self.thread.lock:
             # Don't bind if already closing
             if self.is_open or self._close_called:  # pragma: debug
                 return
@@ -90,9 +84,9 @@ class RMQAsyncComm(RMQComm):
                 to False.
 
         """
-        with self.lock:
+        with self.thread.lock:
             self._close_called = True
-        with self.lock:
+        with self.thread.lock:
             if self._closing:  # pragma: debug
                 return  # Don't close more than once
         # Wait for connection to finish opening to close it
@@ -102,7 +96,7 @@ class RMQAsyncComm(RMQComm):
         self.stop_timeout(key=self.timeout_key + '_opening')
         # Close by cancelling consumption
         if self.is_open or self._bound:
-            with self.lock:
+            with self.thread.lock:
                 self._closing = True
                 self._is_open = False
                 self._bound = False
@@ -123,45 +117,40 @@ class RMQAsyncComm(RMQComm):
         self.stop_timeout(key=self.timeout_key + '_closing')
         if self._closing:  # pragma: debug
             self.force_close()
-        try:
-            self.thread.join(self.timeout)
-            if self.thread.isAlive():  # pragma: debug
-                raise RuntimeError("Thread still running.")
-        except AttributeError:  # pragma: debug
-            if self.thread is not None:
-                raise
-        self.thread = None
+        self.thread.join(self.timeout)
+        if self.thread.isAlive():  # pragma: debug
+            raise RuntimeError("Thread still running.")
         # Close workers
-        with self.lock:
+        with self.thread.lock:
             super(RMQAsyncComm, self).close(wait_for_send=wait_for_send)
 
     @property
     def n_msg(self):
         r"""int: Number of messages in the queue."""
         out = 0
-        with self.lock:
+        with self.thread.lock:
             out = len(self._buffered_messages)
         return out
 
     # Access work comms with lock
     def get_work_comm(self, *args, **kwargs):
         r"""Alias for parent class that wraps method in Lock."""
-        with self.lock:
+        with self.thread.lock:
             return super(RMQAsyncComm, self).get_work_comm(*args, **kwargs)
 
     def create_work_comm(self, *args, **kwargs):
         r"""Alias for parent class that wraps method in Lock."""
-        with self.lock:
+        with self.thread.lock:
             return super(RMQAsyncComm, self).create_work_comm(*args, **kwargs)
 
     def add_work_comm(self, *args, **kwargs):
         r"""Alias for parent class that wraps method in Lock."""
-        with self.lock:
+        with self.thread.lock:
             return super(RMQAsyncComm, self).add_work_comm(*args, **kwargs)
 
     def remove_work_comm(self, *args, **kwargs):
         r"""Alias for parent class that wraps method in Lock."""
-        with self.lock:
+        with self.thread.lock:
             return super(RMQAsyncComm, self).remove_work_comm(*args, **kwargs)
 
     def _send(self, msg, exchange=None, routing_key=None, **kwargs):
@@ -180,7 +169,7 @@ class RMQAsyncComm(RMQComm):
             bool: Success or failure of send.
 
         """
-        with self.lock:
+        with self.thread.lock:
             if self.is_closed:  # pragma: debug
                 return False
             out = super(RMQAsyncComm, self)._send(msg, exchange=exchange,
@@ -210,7 +199,7 @@ class RMQAsyncComm(RMQComm):
             self.sleep()
         self.stop_timeout()
         if self.n_msg != 0:
-            with self.lock:
+            with self.thread.lock:
                 out = (True, self._buffered_messages.pop(0))
             return out
         if self.is_closed:  # pragma: debug
@@ -220,7 +209,7 @@ class RMQAsyncComm(RMQComm):
             # self.debug(".recv(): No buffered messages.")
             out = (True, self.empty_msg)
         else:
-            with self.lock:
+            with self.thread.lock:
                 out = (True, self._buffered_messages.pop(0))
         return out
 
@@ -228,7 +217,7 @@ class RMQAsyncComm(RMQComm):
         r"""Buffer received messages."""
         if self.direction == 'send':  # pragma: debug
             raise Exception("Send comm received a message.")
-        with self.lock:
+        with self.thread.lock:
             self._buffered_messages.append(backwards.unicode2bytes(body))
         ch.basic_ack(delivery_tag=method.delivery_tag)
 
@@ -260,7 +249,7 @@ class RMQAsyncComm(RMQComm):
         r"""Actions that must be taken when the connection is closed. Set the
         channel to None. If the connection is meant to be closing, stop the
         IO loop. Otherwise, wait 5 seconds and try to reconnect."""
-        with self.lock:
+        with self.thread.lock:
             self.debug('::on_connection_closed code %d %s', reply_code,
                        reply_text)
             if self._closing or reply_code == 200:
@@ -276,7 +265,7 @@ class RMQAsyncComm(RMQComm):
         r"""Try to re-establish a connection and resume a new IO loop."""
         self.debug('::reconnect()')
         # This is the old connection IOLoop instance, stop its ioloop
-        with self.lock:
+        with self.thread.lock:
             self.connection.ioloop.stop()
             if not self._closing:
                 # Create a new connection
@@ -288,7 +277,7 @@ class RMQAsyncComm(RMQComm):
     @property
     def channel_open(self):
         r"""bool: True if connection ready for messages, False otherwise."""
-        with self.lock:
+        with self.thread.lock:
             if self.channel is None or self.connection is None:
                 return False
             if self.channel.is_open:
@@ -300,7 +289,7 @@ class RMQAsyncComm(RMQComm):
     def channel_stable(self):
         r"""bool: True if the connection ready for messages and not about to
         close. False otherwise."""
-        with self.lock:
+        with self.thread.lock:
             return (self.channel_open and (not self._closing) and
                     (not self._opening))
         
@@ -320,7 +309,7 @@ class RMQAsyncComm(RMQComm):
     def on_channel_closed(self, channel, reply_code, reply_text):
         r"""Actions to perform when the channel is closed. Close the
         connection."""
-        with self.lock:
+        with self.thread.lock:
             self.debug('::channel %i was closed: (%s) %s',
                        channel, reply_code, reply_text)
             channel.connection.close()
@@ -363,7 +352,7 @@ class RMQAsyncComm(RMQComm):
         r"""Actions to perform once the queue is succesfully declared. Bind
         the queue."""
         self.debug('::Binding')
-        with self.lock:
+        with self.thread.lock:
             if not self.queue:
                 self.address += method_frame.method.queue
         self.channel.queue_bind(self.on_bindok,
@@ -380,7 +369,7 @@ class RMQAsyncComm(RMQComm):
         if self.direction == 'recv':
             self.consumer_tag = self.channel.basic_consume(self.on_message,
                                                            queue=self.queue)
-        with self.lock:
+        with self.thread.lock:
             self._opening = False
 
     # GENERAL
@@ -388,7 +377,7 @@ class RMQAsyncComm(RMQComm):
         r"""Actions to perform after succesfully cancelling consumption. Closes
         the channel."""
         self.debug('::on_cancelok()')
-        with self.lock:
+        with self.thread.lock:
             self.close_queue()
             self.close_channel()
 
@@ -400,7 +389,7 @@ class RMQAsyncComm(RMQComm):
 
     def force_close(self):  # pragma: debug
         r"""Force stop by removing the queue and stopping the IO loop."""
-        with self.lock:
+        with self.thread.lock:
             self.close_queue()
             self.close_connection()
             self.channel = None
@@ -409,7 +398,7 @@ class RMQAsyncComm(RMQComm):
 
     def purge(self):
         r"""Remove all messages from the associated queue."""
-        with self.lock:
+        with self.thread.lock:
             self._buffered_messages = []
             if not self.channel_stable:  # pragma: debug
                 return
