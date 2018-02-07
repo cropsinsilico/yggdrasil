@@ -867,7 +867,7 @@ class CisThreadLoop(CisThread):
 
     def run_loop(self, *args, **kwargs):
         r"""Actions performed on each loop iteration."""
-        if self._target:
+        if getattr(self, '_target', None):
             self._target(*self._args, **self._kwargs)
         else:
             self.set_terminated_flag()
