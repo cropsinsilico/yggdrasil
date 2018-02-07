@@ -883,7 +883,7 @@ class CisThreadLoop(CisThread):
         try:
             while not self.was_terminated:
                 self.run_loop()
-        except:
+        except BaseException:  # pragma: debug
             self.set_terminated_flag()
             raise
         finally:
