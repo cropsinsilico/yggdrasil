@@ -235,7 +235,7 @@ class RMQComm(CommBase.CommBase):
             self._is_open = True
             self._bound = False
 
-    def close(self):
+    def _close(self):
         r"""Close connection."""
         self._is_open = False
         self._bound = False
@@ -246,7 +246,7 @@ class RMQComm(CommBase.CommBase):
         self.unregister_connection()
         self.connection = None
         self.channel = None
-        super(RMQComm, self).close()
+        super(RMQComm, self)._close()
 
     def close_queue(self):
         r"""Close the queue if the channel exists."""

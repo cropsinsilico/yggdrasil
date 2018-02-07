@@ -17,7 +17,7 @@ class TestClientParam(parent.TestConnectionParam):
         self.route_timeout = 2 * self.timeout
         # if tools.get_default_comm() == "IPCComm":
         #    self.route_timeout = 120.0
-        # self.debug_flag = True
+        self.debug_flag = True
         # self.sleeptime = 0.5
         # self.timeout = 10.0
         self.comm_name = tools.get_default_comm()
@@ -129,5 +129,4 @@ class TestClientDriver(TestClientParam, parent.TestConnectionDriver):
 
     def test_send_recv_nolimit(self):
         r"""Test routing of a large message between client and server."""
-        print(len(self.msg_long))
         self.test_send_recv(msg_send=self.msg_long)

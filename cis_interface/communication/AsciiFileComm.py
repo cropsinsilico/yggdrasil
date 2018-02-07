@@ -55,7 +55,7 @@ class AsciiFileComm(FileComm):
         r"""Open the file."""
         self.file.open()
 
-    def _close(self):
+    def _file_close(self):
         r"""Close the file."""
         self.file.close()
 

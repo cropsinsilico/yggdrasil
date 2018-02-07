@@ -97,12 +97,12 @@ class ServerComm(CommBase.CommBase):
         super(ServerComm, self).open()
         self.icomm.open()
 
-    def close(self):
+    def _close(self):
         r"""Close the connection."""
         self.icomm.close()
         if self.ocomm is not None:
             self.ocomm.close()
-        super(ServerComm, self).close()
+        super(ServerComm, self)._close()
 
     @property
     def is_open(self):

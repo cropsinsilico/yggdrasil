@@ -833,11 +833,11 @@ class CisThread(threading.Thread, CisClass):
                 the driver to finish. Defaults to None and is infinite.
 
         """
-        T = self.start_timeout(timeout, key_level=1)
+        T = self.start_timeout(timeout)
         while self.is_alive() and not T.is_out:
             self.debug('Waiting for thread to finish...')
             self.sleep()
-        self.stop_timeout(key_level=1)
+        self.stop_timeout()
 
     def terminate(self, no_wait=False):
         r"""Set the terminate event and wait for the thread to stop.
@@ -852,6 +852,9 @@ class CisThread(threading.Thread, CisClass):
 
         """
         self.debug()
+        if self.was_terminated:
+            self.debug('Driver already terminated.')
+            return
         with self.lock:
             self.set_terminated_flag()
         if not no_wait:

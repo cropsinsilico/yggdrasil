@@ -256,18 +256,27 @@ class CommBase(CisClass):
         r"""Open the connection."""
         pass
 
-    def close(self):
+    def _close(self):
         r"""Close the connection."""
-        self.debug("Cleaning up %d work comms", len(self._work_comms))
-        keys = [k for k in self._work_comms.keys()]
-        for c in keys:
-            self.remove_work_comm(c)
-        self.debug("Finished cleaning up work comms")
+        pass
+
+    def close(self, skip_base=False):
+        r"""Close the connection."""
+        if not skip_base:
+            if self.linger_on_close and self.is_open and (self._n_sent > 0):
+                self.drain_messages(direction="send")
+        self._close()
+        if not skip_base:
+            self.debug("Cleaning up %d work comms", len(self._work_comms))
+            keys = [k for k in self._work_comms.keys()]
+            for c in keys:
+                self.remove_work_comm(c)
+            self.debug("Finished cleaning up work comms")
 
     def linger_close(self):
         r"""If self.linger_on_close, wait for messages to drain. Then close."""
-        if self.linger_on_close and self.is_open and (self._n_sent > 0):
-            self.drain_messages(direction="send")
+        # if self.linger_on_close and self.is_open and (self._n_sent > 0):
+        #     self.drain_messages(direction="send")
         self.close()
 
     @property

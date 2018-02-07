@@ -67,7 +67,7 @@ class FileComm(CommBase.CommBase):
             else:
                 self.fd = open(self.address, 'wb')
 
-    def _close(self):
+    def _file_close(self):
         if self.is_open:
             try:
                 self.fd.flush()
@@ -85,13 +85,13 @@ class FileComm(CommBase.CommBase):
             _N_FILES += 1
         self._open()
 
-    def close(self, *args, **kwargs):
+    def _close(self, *args, **kwargs):
         r"""Close the file."""
         global _N_FILES
         if self.is_open:
             _N_FILES -= 1
-        self._close()
-        super(FileComm, self).close(*args, **kwargs)
+        self._file_close()
+        super(FileComm, self)._close(*args, **kwargs)
 
     def remove_file(self):
         r"""Remove the file."""

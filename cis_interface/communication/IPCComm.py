@@ -180,8 +180,6 @@ class IPCComm(CommBase.CommBase):
         q (:class:`sysv_ipc.MessageQueue`): Message queue.
         backlog_thread (tools.CisThread): Thread that will handle sending
             or receiving backlogged messages.
-        backlog_closed_event (threading.Event): Event set when the comm is
-            closed.
         backlog_send_ready (threading.Event): Event set when there is a
             message in the send backlog.
         backlog_recv_ready (threading.Event): Event set when there is a
@@ -200,7 +198,6 @@ class IPCComm(CommBase.CommBase):
         else:
             self.backlog_thread = tools.CisThreadLoop(target=self.run_backlog_send,
                                                       name=self.name + 'SendBacklog')
-        self.backlog_closed_event = threading.Event()
         self.backlog_send_ready = threading.Event()
         self.backlog_recv_ready = threading.Event()
         if dont_open:
@@ -254,7 +251,7 @@ class IPCComm(CommBase.CommBase):
             self.debug("qid: %s", self.q.key)
             self.backlog_thread.start()
             
-    def close(self):
+    def _close(self):
         r"""Close the connection."""
         if self._bound and not self.is_open:
             try:
@@ -271,11 +268,10 @@ class IPCComm(CommBase.CommBase):
         self.q = None
         self._bound = False
         # Set events so that threads stop blocking and register close
-        self.backlog_thread.terminate()
-        self.backlog_closed_event.set()
+        self.backlog_thread.set_terminated_flag()
         self.backlog_send_ready.set()
         self.backlog_recv_ready.set()
-        super(IPCComm, self).close()
+        super(IPCComm, self)._close()
             
     @property
     def is_open(self):

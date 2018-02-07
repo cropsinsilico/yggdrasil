@@ -561,7 +561,7 @@ class ZMQComm(CommBase.CommBase):
                 self.socket.setsockopt(zmq.SUBSCRIBE, self.topic_filter)
             self._openned = True
 
-    def close(self):
+    def _close(self):
         r"""Close connection."""
         self.debug("self.socket.closed = %s", str(self.socket.closed))
         if self.socket.closed:
@@ -587,7 +587,7 @@ class ZMQComm(CommBase.CommBase):
         if self.is_client and self._client_proxy:
             self.debug("Closing client proxy")
             self.close_client_proxy()
-        super(ZMQComm, self).close()
+        super(ZMQComm, self)._close()
 
     def get_client_proxy(self, srv_address):
         r"""Create a new client proxy for the specified address."""

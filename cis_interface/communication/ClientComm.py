@@ -101,12 +101,12 @@ class ClientComm(CommBase.CommBase):
         super(ClientComm, self).open()
         self.ocomm.open()
 
-    def close(self):
+    def _close(self):
         r"""Close the connection."""
         self.ocomm.close()
         for k in self.icomm_order:
             self.icomm[k].close()
-        super(ClientComm, self).close()
+        super(ClientComm, self)._close()
 
     @property
     def is_open(self):
