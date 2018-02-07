@@ -222,8 +222,8 @@ class ConnectionDriver(Driver):
 
         """
         self.debug()
-        self.drain_input(timeout=timeout)
-        self.drain_output(timeout=timeout)
+        # self.drain_input(timeout=timeout)
+        # self.drain_output(timeout=timeout)
         super(ConnectionDriver, self).graceful_stop()
         self.debug('Returning')
 

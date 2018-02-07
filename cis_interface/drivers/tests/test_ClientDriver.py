@@ -129,4 +129,5 @@ class TestClientDriver(TestClientParam, parent.TestConnectionDriver):
 
     def test_send_recv_nolimit(self):
         r"""Test routing of a large message between client and server."""
+        print(len(self.msg_long))
         self.test_send_recv(msg_send=self.msg_long)
