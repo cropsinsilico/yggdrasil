@@ -262,6 +262,8 @@ class ConnectionDriver(Driver):
         if send_eof:
             self.debug("Sending EOF")
             self.send_message(self.ocomm.eof_msg)
+        else:
+            self.ocomm.close()
 
     def recv_message(self, **kwargs):
         r"""Get a new message to send.
