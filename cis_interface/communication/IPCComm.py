@@ -264,7 +264,7 @@ class IPCComm(CommBase.CommBase):
         if ((self.linger_on_close and self.is_open and
              (not self.backlog_closed_event.is_set()))):
             Tout = self.start_timeout()
-            while (not Tout.is_out) and self.backlog_send_ready.is_set() and self.is_open:
+            while (not Tout.is_out) and self.backlog_send_ready.is_set():
                 self.verbose_debug("Waiting for backlogged messages to be queued.")
                 self.sleep()
             self.stop_timeout()
