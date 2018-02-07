@@ -295,7 +295,7 @@ int ipc_comm_recv(const comm_t x, char **data, const size_t len,
     }
   }
   if (ret <= 0) {
-    cislog_debug("ipc_comm_recv: msgrecv(%d, %p, %d, 0, IPC_NOWAIT: %s",
+    cislog_debug("ipc_comm_recv: msgrecv(%d, %p, %d, 0, IPC_NOWAIT): %s",
 		 (int*)x.handle, &t, (int)CIS_MSG_MAX, strerror(errno));
     return -1;
   }

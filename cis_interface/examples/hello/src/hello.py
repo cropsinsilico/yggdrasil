@@ -26,6 +26,7 @@ def runhello():
         print('hello(P): ERROR QUEUE SEND')
         sys.exit(-1)
     print('hello(P): Sent to outq')
+    outq.send_eof()
 
     # Receive input form the input queue
     ret, buf = inq.recv()

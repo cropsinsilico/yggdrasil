@@ -9,7 +9,7 @@ from itertools import chain
 import socket
 from cis_interface.tools import CisClass, parse_yaml
 from cis_interface.config import cis_cfg, cfg_environment
-from cis_interface import drivers, platform
+from cis_interface import platform
 from cis_interface.drivers import create_driver
 
 
@@ -363,6 +363,7 @@ class CisRunner(CisClass):
             object: An instance of the specified driver.
 
         """
+        from cis_interface.drivers import FileOutputDriver
         if yml['args'] in self._inputchannels:
             yml['kwargs'].setdefault('comm_env', {})
             yml['kwargs']['comm_env'] = self._inputchannels[
@@ -371,7 +372,7 @@ class CisRunner(CisClass):
         if yml['args'] not in self._inputchannels:
             try:
                 assert(issubclass(drv.__class__,
-                                  drivers.FileOutputDriver.FileOutputDriver))
+                                  FileOutputDriver.FileOutputDriver))
             except AssertionError:
                 raise Exception(("Output driver %s is not a subclass of " +
                                  "FileOutputDriver and there is not a " +
@@ -438,7 +439,8 @@ class CisRunner(CisClass):
                     break
                 d.join(1)
                 if not d.is_alive():
-                    self.do_model_exits(drv)
+                    if not d.errors:
+                        self.do_model_exits(drv)
                     running.remove(drv)
                 else:
                     self.info('%s still running', drv['name'])

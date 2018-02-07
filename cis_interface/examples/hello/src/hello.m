@@ -24,6 +24,7 @@ if (~ret);
   exit(-1);
 end
 disp('hello(M): Sent to outq');
+outq.send_eof()
 
 % Receive input form the input queue
 res = inq.recv();

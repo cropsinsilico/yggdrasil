@@ -142,12 +142,16 @@ class ClientRequestDriver(ConnectionDriver):
                 send_eof = True
         super(ClientRequestDriver, self).after_loop(send_eof=send_eof)
     
+    def on_model_exit(self):
+        r"""Drain input and then close it."""
+        super(ClientRequestDriver, self).on_model_exit(close_input=True)
+    
     def on_eof(self):
         r"""On EOF, set response_address to EOF, then send it along."""
         with self.lock:
             self.icomm._last_header['response_address'] = CIS_CLIENT_EOF
         return super(ClientRequestDriver, self).on_eof()
-    
+
     def send_message(self, *args, **kwargs):
         r"""Start a response driver for a request message and send message with
         header.

@@ -107,6 +107,10 @@ class ServerRequestDriver(ConnectionDriver):
                 send_eof = True
         super(ServerRequestDriver, self).after_loop(send_eof=send_eof)
     
+    def on_model_exit(self):
+        r"""Drain input and then close it."""
+        super(ServerRequestDriver, self).on_model_exit(close_input=True)
+    
     def on_eof(self):
         r"""On EOF, decrement number of clients. Only send EOF if the number
         of clients drops to 0."""

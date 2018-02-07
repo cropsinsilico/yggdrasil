@@ -82,6 +82,9 @@ class ConnectionDriver(Driver):
         self.ocomm_kws = ocomm_kws
         self.env[self.ocomm.name] = self.ocomm.address
         # Attributes
+        self._is_input = ('Input' in str(self.__class__))
+        self._is_output = ('Output' in str(self.__class__))
+        self._eof_sent = False
         if timeout_send_1st is None:
             timeout_send_1st = self.timeout
         self.timeout_send_1st = timeout_send_1st
@@ -189,10 +192,33 @@ class ConnectionDriver(Driver):
 
         """
         T = self.start_timeout(timeout)
-        while (self.n_msg > 0) and (not T.is_out):  # pragma: debug
+        while ((self.n_msg > 0) and (not T.is_out) and
+               (not self.was_terminated)):  # pragma: debug
             self.debug('Draining %d messages', self.n_msg)
             self.sleep()
         self.stop_timeout()
+        if self.n_msg > 0:
+            self.error("%d messages could not be drained from the input comm.",
+                       self.n_msg)
+
+    def drain_output(self, timeout=None):
+        r"""Wait for the output comm to be empty.
+
+        Args:
+            timeout (float, optional): Max time that should be waited. Defaults
+                to None and is set to attribute timeout.
+            **kwargs: Additional keyword arguments are passed to the parent
+                class's graceful_stop method.
+
+        """
+        T = self.start_timeout(timeout)
+        while (self.ocomm.n_msg > 0) and (not T.is_out):  # pragma: debug
+            self.debug('Draining %d messages', self.ocomm.n_msg)
+            self.sleep()
+        self.stop_timeout()
+        if self.ocomm.n_msg > 0:
+            self.error("%d messages could not be drained from the output comm.",
+                       self.ocomm.n_msg)
 
     def graceful_stop(self, timeout=None, **kwargs):
         r"""Stop the driver, first waiting for the input comm to be empty.
@@ -206,18 +232,18 @@ class ConnectionDriver(Driver):
         """
         self.debug()
         self.drain_input(timeout=timeout)
+        self.drain_output(timeout=timeout)
         super(ConnectionDriver, self).graceful_stop()
         self.debug('Returning')
 
-    def on_model_exit(self):
+    def on_model_exit(self, close_input=False):
         r"""Drain input and then close it."""
         self.debug()
-        self.drain_input()
-        if self.n_msg > 0:
-            self.error("%d messages could not be drained from the input comm.",
-                       self.n_msg)
-        with self.lock:
-            self.icomm.close()
+        if close_input or self._is_output:
+            self.drain_input()
+            with self.lock:
+                self.icomm.close()
+            self.info()
         super(ConnectionDriver, self).on_model_exit()
 
     def do_terminate(self):
@@ -255,15 +281,28 @@ class ConnectionDriver(Driver):
         self.open_comm()
         self.sleep()  # Help ensure senders/receivers connected before messages
 
-    def after_loop(self, send_eof=False):
+    def after_loop(self, send_eof=None):
         r"""Actions to perform after sending messages."""
+        # Close input comm in case loop did not
         with self.lock:
             self.icomm.close()
+        # Send EOF for output drivers in case the model did not
+        if send_eof is None:
+            if self._is_input:
+                send_eof = False
+            elif self._is_output:
+                send_eof = True
+            else:
+                send_eof = False
         if send_eof:
-            self.debug("Sending EOF")
-            self.send_message(self.ocomm.eof_msg)
-        else:
-            self.ocomm.close()
+            self.send_eof()
+        # Close output comm after waiting for output to be processed
+        self.drain_output()
+        if self.ocomm.n_msg > 0:
+            self.error("%d messages could not be drained from the output comm.",
+                       self.ocomm.n_msg)
+        self.ocomm.linger_on_close = True
+        self.close_comm()
 
     def recv_message(self, **kwargs):
         r"""Get a new message to send.
@@ -296,7 +335,7 @@ class ConnectionDriver(Driver):
 
         """
         self.debug('EOF received')
-        self.send_message(self.ocomm.eof_msg)
+        self.send_eof()
         return False
 
     def on_message(self, msg):
@@ -356,7 +395,26 @@ class ConnectionDriver(Driver):
         self.stop_timeout()
         self.ocomm.suppress_special_debug = False
         self._first_send_done = True
+        if not flag:
+            self.error("1st send failed.")
+        else:
+            self.debug("1st send succeded")
         return flag
+
+    def send_eof(self):
+        r"""Send EOF message.
+
+        Returns:
+            bool: Success or failure of send.
+
+        """
+        self.debug()
+        if not self._eof_sent:
+            out = self.send_message(self.ocomm.eof_msg)
+            self._eof_sent = True
+        else:
+            out = False
+        return out
 
     def send_message(self, *args, **kwargs):
         r"""Send a single message.

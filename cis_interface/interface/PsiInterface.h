@@ -859,6 +859,7 @@ comm_t cisAsciiTableInput(const char *name, const int as_array, const int src_ty
 #define psiOutputFmt cisOutputFmt
 #define psi_send cis_send
 #define psi_recv cis_recv
+#define psi_send_eof cis_send_eof
 #define psi_send_nolimit cis_send_nolimit
 #define psi_recv_nolimit cis_recv_nolimit
 #define vpsiSend vcisSend

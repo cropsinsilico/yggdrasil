@@ -34,6 +34,7 @@ int main(int argc, char *argv[]) {
     return -1;
   }
   printf("hello(CPP): Sent to outq\n");
+  outq.send_eof();
 
   // Receive input from queue
   ret = inq.recv(buf, BSIZE);

@@ -264,15 +264,17 @@ class IPCComm(CommBase.CommBase):
         if ((self.linger_on_close and self.is_open and
              (not self.backlog_closed_event.is_set()))):
             Tout = self.start_timeout()
-            while (not Tout.is_out) and self.backlog_send_ready.is_set():
+            while (not Tout.is_out) and self.backlog_send_ready.is_set() and self.is_open:
                 self.verbose_debug("Waiting for backlogged messages to be queued.")
                 self.sleep()
             self.stop_timeout()
+        # Wait for queue to be drained
+        # if self.linger_on_close:
+        #     while self.n_msg_queued > 0 and self.is_open:
+        #         self.verbose_debug("Waiting for messages to be dequeued.")
+        #         self.sleep()
+        # Remove the queue
         if self.is_open and not self.linger_on_close:
-            # if self.linger_on_close:
-            #     while self.n_msg_queued > 0:
-            #         self.verbose_debug("Waiting for messages to be dequeued.")
-            #         self.sleep()
             try:
                 remove_queue(self.q)
             except (KeyError, sysv_ipc.ExistentialError):
@@ -306,7 +308,10 @@ class IPCComm(CommBase.CommBase):
     def n_msg_backlogged(self):
         r"""int: Number of backlogged messages."""
         if self.is_open:
-            return len(self.backlog_recv)
+            if self.direction == "recv":
+                return len(self.backlog_recv)
+            else:
+                return len(self.backlog_send)
         else:
             return 0
 

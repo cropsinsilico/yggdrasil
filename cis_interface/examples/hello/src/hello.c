@@ -32,6 +32,7 @@ int main(int argc, char *argv[]) {
     return -1;
   }
   printf("hello(C): Sent to outq\n");
+  psi_send_eof(outq);
 
   // Receive input form the input queue
   ret = psi_recv(inq, buf, BSIZE);
