@@ -759,13 +759,18 @@ class CisThread(threading.Thread, CisClass):
             should be terminated. The target must exit when this is set.
 
     """
-    def __init__(self, name=None, **kwargs):
-        thread_kwargs = dict(name=name)
-        for k in ['group', 'target', 'args', 'kwargs']:
-            if k in kwargs:
-                thread_kwargs[k] = kwargs.pop(k)
+    def __init__(self, name=None, target=None, args=(), kwargs=None, **cis_kwargs):
+        if kwargs is None:
+            kwargs = {}
+        thread_kwargs = dict(name=name, target=target, args=args, kwargs=kwargs)
+        for k in ['group']:  # , 'target', 'args', 'kwargs']:
+            if k in cis_kwargs:
+                thread_kwargs[k] = cis_kwargs.pop(k)
         super(CisThread, self).__init__(**thread_kwargs)
-        CisClass.__init__(self, self.name, **kwargs)
+        CisClass.__init__(self, self.name, **cis_kwargs)
+        self._cis_target = target
+        self._cis_args = args
+        self._cis_kwargs = kwargs
         self.debug()
         self.lock = threading.RLock()
         self.start_event = threading.Event()
@@ -867,8 +872,8 @@ class CisThreadLoop(CisThread):
 
     def run_loop(self, *args, **kwargs):
         r"""Actions performed on each loop iteration."""
-        if getattr(self, '_target', None):
-            self._target(*self._args, **self._kwargs)
+        if self._cis_target:
+            self._cis_target(*self._cis_args, **self._cis_kwargs)
         else:
             self.set_terminated_flag()
 
@@ -887,8 +892,8 @@ class CisThreadLoop(CisThread):
             self.set_terminated_flag()
             raise
         finally:
-            for k in ['_target', '_args', '_kwargs']:
+            for k in ['_cis_target', '_cis_args', '_cis_kwargs']:
                 if hasattr(self, k):
                     delattr(self, k)
-            # del self._target, self._args, self._kwargs
+            # del self._cis_target, self._cis_args, self._cis_kwargs
         self.after_loop()
