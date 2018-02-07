@@ -633,7 +633,10 @@ class ZMQComm(CommBase.CommBase):
     def n_msg(self):
         r"""int: 1 if there is 1 or more messages waiting. 0 otherwise."""
         if self.is_open:
-            out = self.socket.poll(timeout=1, flags=zmq.POLLIN)  # |zmq.POLLOUT)
+            try:
+                out = self.socket.poll(timeout=1, flags=zmq.POLLIN)  # |zmq.POLLOUT)
+            except zmq.ZMQError:  # pragma: debug
+                out = 0
             if out == zmq.POLLIN:
                 return 1
             # elif out == zmq.POLLOUT:
