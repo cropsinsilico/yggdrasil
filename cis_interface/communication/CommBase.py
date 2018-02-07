@@ -1,5 +1,6 @@
 import os
 import uuid
+import atexit
 from cis_interface import backwards, tools
 from cis_interface.tools import CisClass, get_CIS_MSG_MAX, CIS_MSG_EOF
 from cis_interface.serialize.DefaultSerialize import DefaultSerialize
@@ -145,17 +146,21 @@ class CommBase(CisClass):
         self.recv_timeout = recv_timeout
         self.close_on_eof_recv = close_on_eof_recv
         self.linger_on_close = linger_on_close
-        if self.direction == 'recv':
-            self.linger_on_close = False
-        if self.is_interface and self.direction == 'send':
+        if self.is_interface:
             self.linger_on_close = True
         self._last_header = None
         self._work_comms = {}
         self.single_use = single_use
         self._used = False
         self._first_send_done = False
+        self._n_sent = 0
+        self._n_recv = 0
+        self._last_send = None
+        self._last_recv = None
+        self._timeout_drain = self.timeout
         if not dont_open:
             self.open()
+        atexit.register(self.linger_close)
 
     @classmethod
     def _determine_suffix(cls, no_suffix=False, reverse_names=False,
@@ -259,6 +264,12 @@ class CommBase(CisClass):
             self.remove_work_comm(c)
         self.debug("Finished cleaning up work comms")
 
+    def linger_close(self):
+        r"""If self.linger_on_close, wait for messages to drain. Then close."""
+        if self.linger_on_close and self.is_open and (self._n_sent > 0):
+            self.drain_messages(direction="send")
+        self.close()
+
     @property
     def is_open(self):
         r"""bool: True if the connection is open."""
@@ -272,6 +283,19 @@ class CommBase(CisClass):
     @property
     def n_msg(self):
         r"""int: The number of messages in the connection."""
+        if self.direction == 'recv':
+            return self.n_msg_recv
+        else:
+            return self.n_msg_send
+
+    @property
+    def n_msg_recv(self):
+        r"""int: The number of incoming messages in the connection."""
+        return 0
+
+    @property
+    def n_msg_send(self):
+        r"""int: The number of outgoing messages in the connection."""
         return 0
 
     @property
@@ -499,6 +523,9 @@ class CommBase(CisClass):
             out = self._send_1st(*args, **kwargs)
         else:
             out = self._send(*args, **kwargs)
+        if out:
+            self._n_sent += 1
+            self._last_send = backwards.clock_time()
         return out
     
     def _send_1st(self, *args, **kwargs):
@@ -507,7 +534,6 @@ class CommBase(CisClass):
         flag = self._send(*args, **kwargs)
         self.suppress_special_debug = True
         while (not T.is_out) and (self.is_open) and (not flag):
-            # print('send 1st', self.name, self.__class__, self.is_open)
             flag = self._send(*args, **kwargs)
             if flag or (self.is_closed):
                 break
@@ -624,7 +650,6 @@ class CommBase(CisClass):
             else:
                 self.special_debug('Failed to send %d bytes', len(msg_s))
         except BaseException:
-            # print(args, kwargs)
             self.exception('.send(): Failed to send.')
             return False
         return ret
@@ -713,6 +738,14 @@ class CommBase(CisClass):
         return self.send_eof(*args, **kwargs)
 
     # RECV METHODS
+    def _safe_recv(self, *args, **kwargs):
+        r"""Save receive that does things for all comm classes."""
+        out = self._recv(*args, **kwargs)
+        if out[0]:
+            self._n_recv += 1
+            self._last_recv = backwards.clock_time()
+        return out
+
     def _recv(self, *args, **kwargs):
         r"""Raw recv. Should be overridden by inheriting class."""
         raise NotImplementedError("_recv method needs implemented.")
@@ -733,7 +766,7 @@ class CommBase(CisClass):
         data = self.empty_msg
         ret = True
         while len(data) < leng_exp:
-            payload = self._recv(**kwargs)
+            payload = self._safe_recv(**kwargs)
             if not payload[0]:  # pragma: debug
                 self.debug("Read interupted at %d of %d bytes.",
                            len(data), leng_exp)
@@ -868,7 +901,7 @@ class CommBase(CisClass):
                 header information.
 
         """
-        flag, s_msg = self._recv(*args, **kwargs)
+        flag, s_msg = self._safe_recv(*args, **kwargs)
         if not flag:
             return flag, dict(body=s_msg, size=0)
         info = self.parse_header(s_msg)
@@ -878,9 +911,27 @@ class CommBase(CisClass):
         r"""Alias for recv."""
         return self.recv(*args, **kwargs)
 
+    def drain_messages(self, direction='send', timeout=None):
+        r"""Sleep while waiting for messages to be drained."""
+        if timeout is None:
+            timeout = self._timeout_drain
+        Tout = self.start_timeout(timeout)
+        if direction == 'send':
+            while (not Tout.is_out) and (self.n_msg_send > 0):
+                self.verbose_debug("Draining messages.")
+                self.sleep()
+        else:
+            while (not Tout.is_out) and (self.n_msg_recv > 0):
+                self.verbose_debug("Draining messages.")
+                self.sleep()
+        self.stop_timeout()
+
     def purge(self):
         r"""Purge all messages from the comm."""
-        pass
+        self._n_sent = 0
+        self._n_recv = 0
+        self._last_send = None
+        self._last_recv = None
 
     # ALIASES
     def send_line(self, *args, **kwargs):

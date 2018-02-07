@@ -238,9 +238,14 @@ class RPCComm(CommBase.CommBase):
     #     return self.icomm.is_closed and self.ocomm.is_closed
 
     @property
-    def n_msg(self):
-        r"""int: The number of messages in the connection."""
+    def n_msg_recv(self):
+        r"""int: The number of messages in the input comm."""
         return self.icomm.n_msg
+
+    @property
+    def n_msg_send(self):
+        r"""int: The number of messages in the output comm."""
+        return self.ocomm.n_msg
 
     # SEND METHODS
     def send(self, *args, **kwargs):
@@ -304,6 +309,10 @@ class RPCComm(CommBase.CommBase):
     def rpcCall(self, *args, **kwargs):
         r"""Alias for RPCComm.call"""
         return self.call(*args, **kwargs)
+
+    def drain_messages(self):
+        r"""Sleep while waiting for messages to be drained."""
+        self.ocomm.drain_messages()
 
     def purge(self):
         r"""Purge input and output comms."""

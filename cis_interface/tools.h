@@ -39,6 +39,8 @@
 #define CIS_MSG_EOF "EOF!!!"
 /*! @brief Resonable size for buffer. */
 #define CIS_MSG_BUF 2048
+/*! @brief Sleep time in micro-seconds */
+#define CIS_SLEEP_TIME 250000
 
 /*! @brief Define old style names for compatibility. */
 #define PSI_MSG_MAX CIS_MSG_MAX

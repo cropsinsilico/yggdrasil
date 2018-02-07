@@ -5,6 +5,7 @@ export PSI_NAMESPACE="timed_pipe"
 export PIPE_MSG_COUNT=50
 export PIPE_MSG_SIZE=10
 export CIS_DEFAULT_COMM="IPCComm"
+# export CIS_DEFAULT_COMM="ZMQComm"
 
 yaml= 
 

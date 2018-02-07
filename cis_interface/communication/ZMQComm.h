@@ -11,6 +11,7 @@
 static unsigned _zmq_rand_seeded = 0;
 static unsigned _cisSocketsCreated = 0;
 static int _last_port = 49152;
+static double _wait_send_t = 0.0001;
 
 /*!
   @brief Create a new socket.
@@ -155,19 +156,28 @@ int free_zmq_comm(comm_t *x) {
 static inline
 int zmq_comm_nmsg(const comm_t x) {
   int out = 0;
-  if (x.handle != NULL) {
-    zsock_t *s = (zsock_t*)(x.handle);
-    zpoller_t *poller = zpoller_new(s);
-    if (poller == NULL) {
-      cislog_error("zmq_comm_nmsg: Could not create poller");
-      return -1;
+  if (strcmp(x.direction, "recv") == 0) {
+    if (x.handle != NULL) {
+      zsock_t *s = (zsock_t*)(x.handle);
+      zpoller_t *poller = zpoller_new(s);
+      if (poller == NULL) {
+	cislog_error("zmq_comm_nmsg: Could not create poller");
+	return -1;
+      }
+      void *p = zpoller_wait(poller, 1);
+      if (p == NULL)
+	out = 0;
+      else
+	out = 1;
+      zpoller_destroy(&poller);
     }
-    void *p = zpoller_wait(poller, 1);
-    if (p == NULL)
+  } else if (x.last_send[0] != 0) {
+    clock_t now = clock();
+    double elapsed = (double)(now - x.last_send[0]) / CLOCKS_PER_SEC;
+    if (elapsed > _wait_send_t)
       out = 0;
     else
       out = 1;
-    zpoller_destroy(&poller);
   }
   return out;
 };

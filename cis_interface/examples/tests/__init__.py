@@ -19,7 +19,7 @@ class TestExample(unittest.TestCase, tools.CisClass):
         self.env = {}
         self.runner = None
         self.expects_error = False
-        self.debug_flag = True
+        # self.debug_flag = True
         super(TestExample, self).__init__(*args, **kwargs)
 
     def setup(self, *args, **kwargs):

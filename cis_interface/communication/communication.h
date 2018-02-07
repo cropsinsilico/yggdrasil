@@ -23,6 +23,8 @@ static size_t clean_registered = 0;
 // Forward declaration of eof
 static inline
 int comm_send_eof(const comm_t x);
+static inline
+int comm_nmsg(const comm_t x);
 
 /*!
   @brief Perform deallocation for generic communicator.
@@ -32,8 +34,12 @@ int comm_send_eof(const comm_t x);
 static inline
 int free_comm(comm_t *x) {
   comm_type t = x->type;
-  if ((strcmp(x->direction, "send") == 0) && (t != CLIENT_COMM))
+  // Send EOF for output comms and then wait for messages to be recv'd
+  if ((strcmp(x->direction, "send") == 0) && (t != CLIENT_COMM)) {
     comm_send_eof(*x);
+    while (comm_nmsg(*x) > 0)
+      usleep(CIS_SLEEP_TIME);
+  }
   int ret = 1;
   if (t == IPC_COMM)
     ret = free_ipc_comm(x);
@@ -298,6 +304,9 @@ int comm_send_single(const comm_t x, const char *data, const size_t len) {
     ret = ascii_table_comm_send(x, data, len);
   else {
     cislog_error("comm_send_single: Unsupported comm_type %d", t);
+  }
+  if (ret >= 0) {
+    x.last_send[0] = clock();
   }
   return ret;
 };

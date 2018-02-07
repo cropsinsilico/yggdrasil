@@ -116,9 +116,9 @@ class FileComm(CommBase.CommBase):
         return endpos - curpos
 
     @property
-    def n_msg(self):
+    def n_msg_recv(self):
         r"""int: The number of messages in the file."""
-        if self.is_closed or self.direction == 'send':
+        if self.is_closed:
             return 0
         curpos = self.fd.tell()
         out = 0

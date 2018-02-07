@@ -129,7 +129,7 @@ class ConnectionDriver(Driver):
     def n_msg(self):
         r"""int: Number of messages waiting in input communicator."""
         with self.lock:
-            return self.icomm.n_msg
+            return self.icomm.n_msg_recv
 
     def open_comm(self):
         r"""Open the communicators."""
@@ -191,15 +191,10 @@ class ConnectionDriver(Driver):
                 class's graceful_stop method.
 
         """
-        T = self.start_timeout(timeout)
-        while ((self.n_msg > 0) and (not T.is_out) and
-               (not self.was_terminated)):  # pragma: debug
-            self.debug('Draining %d messages', self.n_msg)
-            self.sleep()
-        self.stop_timeout()
-        if self.n_msg > 0:
+        self.icomm.drain_messages(direction="recv", timeout=timeout)
+        if self.icomm.n_msg_recv > 0:
             self.error("%d messages could not be drained from the input comm.",
-                       self.n_msg)
+                       self.icomm.n_msg_recv)
 
     def drain_output(self, timeout=None):
         r"""Wait for the output comm to be empty.
@@ -211,14 +206,10 @@ class ConnectionDriver(Driver):
                 class's graceful_stop method.
 
         """
-        T = self.start_timeout(timeout)
-        while (self.ocomm.n_msg > 0) and (not T.is_out):  # pragma: debug
-            self.debug('Draining %d messages', self.ocomm.n_msg)
-            self.sleep()
-        self.stop_timeout()
-        if self.ocomm.n_msg > 0:
+        self.ocomm.drain_messages(direction="send", timeout=timeout)
+        if self.ocomm.n_msg_send > 0:
             self.error("%d messages could not be drained from the output comm.",
-                       self.ocomm.n_msg)
+                       self.ocomm.n_msg_send)
 
     def graceful_stop(self, timeout=None, **kwargs):
         r"""Stop the driver, first waiting for the input comm to be empty.
@@ -243,7 +234,6 @@ class ConnectionDriver(Driver):
             self.drain_input()
             with self.lock:
                 self.icomm.close()
-            self.info()
         super(ConnectionDriver, self).on_model_exit()
 
     def do_terminate(self):
@@ -267,7 +257,7 @@ class ConnectionDriver(Driver):
 
         """
         msg = beg_msg
-        msg += '%-30s' % (self.__module__ + '(' + self.name + ')')
+        msg += '%-30s' % (self.__module__ + '(' + self.name + '): ')
         msg += '%-30s' % ('last action: ' + self.state)
         msg += '%-15s' % (str(self.nrecv) + ' received, ')
         msg += '%-15s' % (str(self.nproc) + ' processed, ')
@@ -299,9 +289,6 @@ class ConnectionDriver(Driver):
             self.send_eof()
         # Close output comm after waiting for output to be processed
         self.drain_output()
-        if self.ocomm.n_msg > 0:
-            self.error("%d messages could not be drained from the output comm.",
-                       self.ocomm.n_msg)
         self.ocomm.linger_on_close = True
         self.close_comm()
 
@@ -484,5 +471,5 @@ class ConnectionDriver(Driver):
             self.debug('Sent message to %s.', self.ocomm.address)
         # Perform post-loop follow up
         self.after_loop()
-        self.debug('Received %d messages, processed %d, sent %d.',
-                   self.nrecv, self.nproc, self.nsent)
+        self.info('Received %d messages, processed %d, sent %d.',
+                  self.nrecv, self.nproc, self.nsent)

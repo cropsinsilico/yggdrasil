@@ -119,9 +119,9 @@ class ClientComm(CommBase.CommBase):
         return self.ocomm.is_closed
 
     @property
-    def n_msg(self):
+    def n_msg_send(self):
         r"""int: The number of messages in the connection."""
-        return self.ocomm.n_msg
+        return self.ocomm.n_msg_send
 
     # RESPONSE COMM
     def create_response_comm(self):
@@ -223,6 +223,10 @@ class ClientComm(CommBase.CommBase):
         r"""Alias for RPCComm.call"""
         return self.call(*args, **kwargs)
     
+    def drain_messages(self):
+        r"""Sleep while waiting for messages to be drained."""
+        self.ocomm.drain_messages()
+
     # def purge(self):
     #     r"""Purge input and output comms."""
     #     self.ocomm.purge()

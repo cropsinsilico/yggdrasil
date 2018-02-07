@@ -260,21 +260,8 @@ class IPCComm(CommBase.CommBase):
             except sysv_ipc.ExistentialError:  # pragma: debug
                 self.q = None
                 self._bound = False
-        # Wait for backlog to be processed
-        if ((self.linger_on_close and self.is_open and
-             (not self.backlog_closed_event.is_set()))):
-            Tout = self.start_timeout()
-            while (not Tout.is_out) and self.backlog_send_ready.is_set():
-                self.verbose_debug("Waiting for backlogged messages to be queued.")
-                self.sleep()
-            self.stop_timeout()
-        # Wait for queue to be drained
-        # if self.linger_on_close:
-        #     while self.n_msg_queued > 0 and self.is_open:
-        #         self.verbose_debug("Waiting for messages to be dequeued.")
-        #         self.sleep()
         # Remove the queue
-        if self.is_open and not self.linger_on_close:
+        if self.is_open:
             try:
                 remove_queue(self.q)
             except (KeyError, sysv_ipc.ExistentialError):
@@ -299,7 +286,7 @@ class IPCComm(CommBase.CommBase):
             try:
                 return self.q.current_messages
             except sysv_ipc.ExistentialError:  # pragma: debug
-                self.close()
+                # self.close()
                 return 0
         else:
             return 0
@@ -316,10 +303,15 @@ class IPCComm(CommBase.CommBase):
             return 0
 
     @property
-    def n_msg(self):
-        r"""int: Number of messages in the queue and backlogged."""
-        return self.n_msg_backlogged
+    def n_msg_recv(self):
+        r"""int: Number of messages in the receive backlog."""
         # return self.n_msg_queued + self.n_msg_backlogged
+        return len(self.backlog_recv) + self.n_msg_queued
+
+    @property
+    def n_msg_send(self):
+        r"""int: Number of messages in the send backlog."""
+        return len(self.backlog_send) + self.n_msg_queued
 
     @property
     def backlog_recv(self):
@@ -529,6 +521,29 @@ class IPCComm(CommBase.CommBase):
             # if len(self.backlog_recv) > 0:
             self.debug('Returning backlogged received message')
             return (True, self.pop_backlog_recv())
+
+    def drain_messages(self, direction='send', timeout=None):
+        r"""Sleep while waiting for messages to be drained from backlog and queues."""
+        if direction == 'send':
+            self.drain_backlog(direction=direction, timeout=timeout)
+            self.drain_queue(timeout=timeout)
+        else:
+            self.drain_queue(timeout=timeout)
+            self.drain_backlog(direction=direction, timeout=timeout)
+
+    def drain_backlog(self, direction='send', timeout=None):
+        r"""Sleep while waiting for messages to be drained from the backlog."""
+        super(IPCComm, self).drain_messages(direction=direction, timeout=timeout)
+
+    def drain_queue(self, timeout=None):
+        r"""Sleep while waiting for messages to be drained from the queue."""
+        if timeout is None:
+            timeout = self._timeout_drain
+        Tout = self.start_timeout(timeout)
+        while (not Tout.is_out) and (self.n_msg_queued > 0):
+            self.verbose_debug("Draining queued messages.")
+            self.sleep()
+        self.stop_timeout()
 
     def purge(self):
         r"""Purge all messages from the comm."""

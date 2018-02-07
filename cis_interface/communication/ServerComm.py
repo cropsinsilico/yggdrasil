@@ -115,7 +115,7 @@ class ServerComm(CommBase.CommBase):
         return self.icomm.is_closed
 
     @property
-    def n_msg(self):
+    def n_msg_recv(self):
         r"""int: The number of messages in the connection."""
         return self.icomm.n_msg
 
@@ -189,6 +189,10 @@ class ServerComm(CommBase.CommBase):
         r"""Alias for RPCComm.recv"""
         return self.recv(*args, **kwargs)
     
+    def drain_messages(self):
+        r"""Sleep while waiting for messages to be drained."""
+        pass
+
     def purge(self):
         r"""Purge input and output comms."""
         self.icomm.purge()

@@ -217,6 +217,10 @@ int free_ipc_comm(comm_t *x) {
 static inline
 int ipc_comm_nmsg(const comm_t x) {
   struct msqid_ds buf;
+  if (x.handle == NULL) {
+    cislog_error("ipc_comm_nmsg: Queue handle is NULL.");
+    return -1;
+  }
   int rc = msgctl(((int*)x.handle)[0], IPC_STAT, &buf);
   if (rc != 0) {
     cislog_error("ipc_comm_nmsg: Could not access queue.");
@@ -251,7 +255,7 @@ int ipc_comm_send(const comm_t x, const char *data, const size_t len) {
     if (ret == 0) break;
     if ((ret == -1) && (errno == EAGAIN)) {
       cislog_debug("ipc_comm_send(%s): msgsnd, sleep", x.name);
-      usleep(250*1000);
+      usleep(CIS_SLEEP_TIME);
     } else {
       cislog_error("ipc_comm_send:  msgsend(%d, %p, %d, IPC_NOWAIT) ret(%d), errno(%d): %s",
 		   (int*)x.handle, &t, len, ret, errno, strerror(errno));
@@ -287,7 +291,7 @@ int ipc_comm_recv(const comm_t x, char **data, const size_t len,
     ret = msgrcv(((int*)x.handle)[0], &t, CIS_MSG_MAX, 0, IPC_NOWAIT);
     if (ret == -1 && errno == ENOMSG) {
       cislog_debug("ipc_comm_recv(%s): no input, sleep", x.name);
-      usleep(250*1000);
+      usleep(CIS_SLEEP_TIME);
     } else {
       cislog_debug("ipc_comm_recv(%s): received input: %d bytes, ret=%d",
 		   x.name, strlen(t.data), ret);

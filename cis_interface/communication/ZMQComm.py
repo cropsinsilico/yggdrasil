@@ -19,6 +19,7 @@ _socket_protocols = ['tcp', 'inproc', 'ipc', 'udp', 'pgm', 'epgm']
 _flag_zmq_filter = backwards.unicode2bytes('_ZMQFILTER_')
 _default_socket_type = 4
 _default_protocol = 'tcp'
+_wait_send_t = 0.0001
 
 
 def register_socket(socket_type_name, address):
@@ -256,7 +257,6 @@ class ZMQProxy(tools.CisThreadLoop):
         r"""Forward messages from client to server."""
         if self.poll():
             message = self.client_recv()
-            # print('fowarding', message)
             if message is not None:
                 self.debug('Forwarding message of size %d from %s',
                            len(message[1]), message[0])
@@ -355,8 +355,6 @@ class ZMQComm(CommBase.CommBase):
         self.socket_type = getattr(zmq, socket_type)
         self.socket_action = socket_action
         self.socket = self.context.socket(self.socket_type)
-        if self.linger_on_close:
-            self.socket.set(zmq.LINGER, int(1000 * self.timeout))
         self.topic_filter = backwards.unicode2bytes(topic_filter)
         if dealer_identity is None:
             dealer_identity = str(uuid.uuid4())
@@ -501,6 +499,7 @@ class ZMQComm(CommBase.CommBase):
                     self.error(("There is already a 'PAIR' socket sending " +
                                 "to %s. Maybe you meant to create a recv " +
                                 "PAIR?") % self.address)
+                self._bound = False
                 raise e
             self.debug('Bound %s socket to %s.',
                        self.socket_type_name, self.address)
@@ -527,7 +526,7 @@ class ZMQComm(CommBase.CommBase):
     def unbind(self):
         r"""Unbind from address."""
         if self._bound:
-            self.debug('Unbinding from %s' % self.address)
+            self.info('Unbinding from %s' % self.address)
             self.socket.unbind(self.address)
             self.unregister_socket()
             self._bound = False
@@ -567,18 +566,15 @@ class ZMQComm(CommBase.CommBase):
         self.debug("self.socket.closed = %s", str(self.socket.closed))
         if self.socket.closed:
             self.debug("Socket already closed: %s", self.address)
+            self._bound = False
+            self._connected = False
         else:
             if self.socket_action == 'bind':
                 self.unbind()
             elif self.socket_action == 'connect':
                 self.disconnect()
             self.debug("Closing socket %s", self.address)
-            if self.linger_on_close:
-                linger = int(1000 * self.timeout)
-                self.debug("Waiting %d ms for send to close comm", linger)
-            else:
-                linger = 0
-            self.socket.close(linger=linger)
+            self.socket.close()
         # Ensure socket not still open
         self._openned = False
         self.unregister_socket()
@@ -629,20 +625,48 @@ class ZMQComm(CommBase.CommBase):
         r"""bool: True if the socket is open."""
         return (self._openned and not self.socket.closed)
 
-    @property
-    def n_msg(self):
-        r"""int: 1 if there is 1 or more messages waiting. 0 otherwise."""
+    def is_message(self, flags):
+        r"""Poll the socket for a message.
+
+        Args:
+            flags (int): ZMQ poll flags.
+
+        Returns:
+            bool: True if there is a message matching the flags, False otherwise.
+
+        """
         if self.is_open:
             try:
-                out = self.socket.poll(timeout=1, flags=zmq.POLLIN)  # |zmq.POLLOUT)
+                out = self.socket.poll(timeout=1, flags=flags)
             except zmq.ZMQError:  # pragma: debug
                 out = 0
-            if out == zmq.POLLIN:
-                return 1
-            # elif out == zmq.POLLOUT:
-            #     return 1
+            if out == 0:
+                return False
             else:
+                return True
+        return False
+        
+    @property
+    def n_msg(self):
+        r"""int: The number of messages in the connection."""
+        return self.n_msg_recv
+
+    @property
+    def n_msg_recv(self):
+        r"""int: 1 if there is 1 or more incoming messages waiting. 0 otherwise."""
+        if self.is_open:
+            return int(self.is_message(zmq.POLLIN))
+        return 0
+
+    @property
+    def n_msg_send(self):
+        r"""int: 1 if there is 1 or more outgoing messages waiting. 0 otherwise."""
+        if self.is_open and (self._n_sent > 0) and (self._last_send is not None):
+            elapsed = backwards.clock_time() - self._last_send
+            if (not self.is_message(zmq.POLLOUT)) or (elapsed > _wait_send_t):
                 return 0
+            else:
+                return 1
         return 0
 
     @property
@@ -723,7 +747,6 @@ class ZMQComm(CommBase.CommBase):
             total_msg = topic + _flag_zmq_filter + msg
         else:
             total_msg = msg
-        # print('(python) sending %d bytes to %s' % (len(total_msg), self.address))
         kwargs.setdefault('flags', zmq.NOBLOCK)
         try:
             if self.socket_type_name == 'ROUTER':
@@ -807,7 +830,6 @@ class ZMQComm(CommBase.CommBase):
         except zmq.ZMQError:  # pragma: debug
             self.exception("Error receiving")
             return (False, self.empty_msg)
-        # print('(python) received %d bytes from %s' % (len(total_msg), self.address))
         if self.socket_type_name == 'SUB':
             topic, msg = total_msg.split(_flag_zmq_filter)
             assert(topic == self.topic_filter)
@@ -817,6 +839,6 @@ class ZMQComm(CommBase.CommBase):
 
     def purge(self):
         r"""Purge all messages from the comm."""
-        while self.n_msg > 0:
+        while self.n_msg_recv > 0:
             self.socket.recv()
         super(ZMQComm, self).purge()

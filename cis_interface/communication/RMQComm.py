@@ -298,7 +298,7 @@ class RMQComm(CommBase.CommBase):
         return self._is_open
         
     @property
-    def n_msg(self):
+    def n_msg_recv(self):
         r"""int: Number of messages in the queue."""
         out = 0
         if self.is_open:
@@ -311,6 +311,11 @@ class RMQComm(CommBase.CommBase):
                 self.close()
                 out = 0
         return out
+
+    @property
+    def n_msg_send(self):
+        r"""int: Number of messages in the queue."""
+        return self.n_msg_recv
 
     @property
     def get_work_comm_kwargs(self):

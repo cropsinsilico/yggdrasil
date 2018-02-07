@@ -95,7 +95,7 @@ int af_readline_full_norealloc(const asciiFile_t t, char *line, size_t n) {
       return -1;
     }
     int nread = (int)strlen(line);
-    if ((nread < (n - 1)) || (line[nread - 1] == '\n') || (feof(t.fd)))
+    if ((nread < ((int)n - 1)) || (line[nread - 1] == '\n') || (feof(t.fd)))
       return nread;
   }
   return -1;

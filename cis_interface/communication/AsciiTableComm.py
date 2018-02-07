@@ -61,7 +61,7 @@ class AsciiTableComm(AsciiFileComm):
         return kwargs
 
     @property
-    def n_msg(self):
+    def n_msg_recv(self):
         r"""int: The number of messages in the file."""
         if ((self.is_open and self.direction == 'recv' and self.as_array and
              not self.array_was_read)):
@@ -70,7 +70,7 @@ class AsciiTableComm(AsciiFileComm):
             else:
                 out = 0
         else:
-            out = super(AsciiTableComm, self).n_msg
+            out = super(AsciiTableComm, self).n_msg_recv
         return out
 
     def _send(self, msg):

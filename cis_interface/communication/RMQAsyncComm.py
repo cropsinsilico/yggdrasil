@@ -110,7 +110,8 @@ class RMQAsyncComm(RMQComm):
         self.stop_timeout(key=self.timeout_key + '_closing')
         if self._closing:  # pragma: debug
             self.force_close()
-        self.thread.join(self.timeout)
+        if self.thread.is_alive():
+            self.thread.join(self.timeout)
         if self.thread.isAlive():  # pragma: debug
             raise RuntimeError("Thread still running.")
         # Close workers
@@ -118,12 +119,17 @@ class RMQAsyncComm(RMQComm):
             super(RMQAsyncComm, self).close()
 
     @property
-    def n_msg(self):
+    def n_msg_recv(self):
         r"""int: Number of messages in the queue."""
         out = 0
         with self.thread.lock:
             out = len(self._buffered_messages)
         return out
+
+    @property
+    def n_msg_send(self):
+        r"""int: Number of messages in the queue."""
+        return self.n_msg_recv
 
     # Access work comms with lock
     def get_work_comm(self, *args, **kwargs):

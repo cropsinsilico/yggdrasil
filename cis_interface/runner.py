@@ -2,14 +2,13 @@
 import sys
 import logging
 import os
-import time
 import signal
 from pprint import pformat
 from itertools import chain
 import socket
 from cis_interface.tools import CisClass, parse_yaml
 from cis_interface.config import cis_cfg, cfg_environment
-from cis_interface import platform
+from cis_interface import platform, backwards
 from cis_interface.drivers import create_driver
 
 
@@ -201,7 +200,7 @@ class CisRunner(CisClass):
     def signal_handler(self, sig, frame):
         r"""Terminate all drivers on interrrupt."""
         self.debug("Interrupt with signal %d", sig)
-        now = time.time()
+        now = backwards.clock_time()
         elapsed = now - self.interrupt_time
         self.debug('Elapsed time since last interrupt: %d s', elapsed)
         self.interrupt_time = now
