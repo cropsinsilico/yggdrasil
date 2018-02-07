@@ -574,7 +574,7 @@ class ZMQComm(CommBase.CommBase):
                 self.disconnect()
             self.debug("Closing socket %s", self.address)
             if self.linger_on_close:
-                linger = 100
+                linger = int(1000 * self.timeout)
                 self.debug("Waiting %d ms for send to close comm", linger)
             else:
                 linger = 0
