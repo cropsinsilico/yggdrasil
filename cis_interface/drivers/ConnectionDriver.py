@@ -283,6 +283,7 @@ class ConnectionDriver(Driver):
 
     def after_loop(self, send_eof=None):
         r"""Actions to perform after sending messages."""
+        self.debug()
         # Close input comm in case loop did not
         with self.lock:
             self.icomm.close()

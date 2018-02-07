@@ -147,8 +147,8 @@ class CommBase(CisClass):
         self.linger_on_close = linger_on_close
         if self.direction == 'recv':
             self.linger_on_close = False
-        # if self.is_interface and self.direction == 'send':
-        #     self.linger_on_close = True
+        if self.is_interface and self.direction == 'send':
+            self.linger_on_close = True
         self._last_header = None
         self._work_comms = {}
         self.single_use = single_use
