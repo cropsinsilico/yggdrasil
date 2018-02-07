@@ -187,7 +187,7 @@ class ModelDriver(Driver):
         if there was an error and then handling it."""
         self.debug()
         # self.wait_process(self.timeout)
-        self.process.stdout.close()
+        # self.process.stdout.close()
         self.kill_process()
 
     @property
