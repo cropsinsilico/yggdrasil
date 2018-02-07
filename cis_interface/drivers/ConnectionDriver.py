@@ -255,11 +255,12 @@ class ConnectionDriver(Driver):
         self.open_comm()
         self.sleep()  # Help ensure senders/receivers connected before messages
 
-    def after_loop(self, dont_send_eof=False):
+    def after_loop(self, send_eof=False):
         r"""Actions to perform after sending messages."""
         with self.lock:
             self.icomm.close()
-        if not dont_send_eof:
+        if send_eof:
+            self.debug("Sending EOF")
             self.send_message(self.ocomm.eof_msg)
 
     def recv_message(self, **kwargs):

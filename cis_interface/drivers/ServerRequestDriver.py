@@ -96,7 +96,7 @@ class ServerRequestDriver(ConnectionDriver):
             self.response_drivers = []
         super(ServerRequestDriver, self).terminate(*args, **kwargs)
 
-    def after_loop(self, dont_send_eof=False):
+    def after_loop(self, send_eof=False):
         r"""After server model signs off."""
         self.debug("after_loop()")
         with self.lock:
@@ -104,9 +104,8 @@ class ServerRequestDriver(ConnectionDriver):
                 self.icomm._last_header = dict()
             if self.icomm._last_header.get('response_address', None) != CIS_CLIENT_EOF:
                 self.icomm._last_header['response_address'] = CIS_CLIENT_EOF
-            else:
-                dont_send_eof = True
-        super(ServerRequestDriver, self).after_loop(dont_send_eof=dont_send_eof)
+                send_eof = True
+        super(ServerRequestDriver, self).after_loop(send_eof=send_eof)
     
     def on_eof(self):
         r"""On EOF, decrement number of clients. Only send EOF if the number

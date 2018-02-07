@@ -64,7 +64,7 @@ class ClientResponseDriver(ConnectionDriver):
             self.debug()
             self.icomm.close()
             self.ocomm.close()
-        super(ClientResponseDriver, self).after_loop(dont_send_eof=True)
+        super(ClientResponseDriver, self).after_loop()
         
     def send_message(self, *args, **kwargs):
         r"""Close the input comm once message sent.

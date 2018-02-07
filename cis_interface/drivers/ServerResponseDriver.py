@@ -71,7 +71,7 @@ class ServerResponseDriver(ConnectionDriver):
 
     def after_loop(self):
         r"""Send EOF to the client response driver."""
-        super(ServerResponseDriver, self).after_loop(dont_send_eof=True)
+        super(ServerResponseDriver, self).after_loop()
         
     def send_message(self, *args, **kwargs):
         r"""Set comm to used and then send the message.
