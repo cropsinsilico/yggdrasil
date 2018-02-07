@@ -526,7 +526,7 @@ class ZMQComm(CommBase.CommBase):
     def unbind(self):
         r"""Unbind from address."""
         if self._bound:
-            self.info('Unbinding from %s' % self.address)
+            self.debug('Unbinding from %s' % self.address)
             self.socket.unbind(self.address)
             self.unregister_socket()
             self._bound = False
