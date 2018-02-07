@@ -249,8 +249,8 @@ class IPCComm(CommBase.CommBase):
             if not self._bound:
                 self.bind()
             self.open_after_bind()
-            self.backlog_thread.start()
             self.debug("qid: %s", self.q.key)
+            self.backlog_thread.start()
             
     def close(self):
         r"""Close the connection."""
