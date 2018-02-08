@@ -260,9 +260,9 @@ class CommBase(CisClass):
         r"""Close the connection."""
         pass
 
-    def close(self, skip_base=False):
+    def close(self, skip_base=False, skip_linger=False):
         r"""Close the connection."""
-        if not skip_base:
+        if (not skip_base) and (not skip_linger):
             if self.linger_on_close and self.is_open and (self._n_sent > 0):
                 self.drain_messages(direction="send")
         self._close()

@@ -22,6 +22,7 @@ def test_get_runner():
 #     cr.run()
 
 
+@unittest.skipIf(platform._is_win, "Signal processing not sorted on windows")
 def test_Arunner_interrupt():
     r"""Start a runner then stop it with a keyboard interrupt."""
     print("starting interrupt")
