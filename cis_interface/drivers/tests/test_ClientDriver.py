@@ -15,16 +15,12 @@ class TestClientParam(parent.TestConnectionParam):
         # Increased to allow forwarding between IPC comms on OSX
         self.timeout = 5.0
         self.route_timeout = 2 * self.timeout
-        # if tools.get_default_comm() == "IPCComm":
-        #    self.route_timeout = 120.0
-        self.debug_flag = True
-        # self.sleeptime = 0.5
-        # self.timeout = 10.0
+        # self.debug_flag = True
         self.comm_name = tools.get_default_comm()
         self.server_comm = tools.get_default_comm()
         self.icomm_name = self.comm_name
         self.ocomm_name = self.server_comm
-            
+
     @property
     def send_comm_kwargs(self):
         r"""dict: Keyword arguments for send comm."""

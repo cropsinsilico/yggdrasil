@@ -103,6 +103,7 @@ class ClientComm(CommBase.CommBase):
 
     def _close(self):
         r"""Close the connection."""
+        self.ocomm.linger_on_close = self.linger_on_close
         self.ocomm.close()
         for k in self.icomm_order:
             self.icomm[k].close()

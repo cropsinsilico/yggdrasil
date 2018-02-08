@@ -370,6 +370,7 @@ class CommBase(CisClass):
         r"""dict: Keyword arguments for an existing work comm."""
         return dict(comm=self.comm_class, direction='recv',
                     recv_timeout=self.recv_timeout,
+                    linger_on_close=self.linger_on_close,
                     single_use=True)
 
     @property
@@ -461,6 +462,7 @@ class CommBase(CisClass):
             return
         if not dont_close:
             c = self._work_comms.pop(key)
+            c.linger_on_close = self.linger_on_close
             c.close()
 
     # HEADER

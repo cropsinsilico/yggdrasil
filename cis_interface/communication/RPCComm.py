@@ -213,6 +213,7 @@ class RPCComm(CommBase.CommBase):
             ie = e
         try:
             if getattr(self, 'ocomm', None) is not None:
+                self.ocomm.linger_on_close = self.linger_on_close
                 self.ocomm.close()
         except BaseException as e:
             oe = e
