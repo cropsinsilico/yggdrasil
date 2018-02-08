@@ -288,9 +288,10 @@ class ConnectionDriver(Driver):
         if send_eof:
             self.send_eof()
         # Close output comm after waiting for output to be processed
-        if close_output:
-            self.drain_output()
-            self.ocomm.close(linger=True)
+        with self.lock:
+            if close_output:
+                self.drain_output()
+                self.ocomm.close(linger=True)
 
     def recv_message(self, **kwargs):
         r"""Get a new message to send.
