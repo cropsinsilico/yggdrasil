@@ -1,5 +1,6 @@
 #!/bin/bash
 
+_old_default=$CIS_DEFAULT_COMM
 export PSI_DEBUG="INFO"
 export PSI_NAMESPACE="timed_pipe"
 export PIPE_MSG_COUNT=50
@@ -41,3 +42,4 @@ time cisrun $yaml
 
 # outfile="${TMPDIR}output_timed_pipe.txt"
 # cat $outfile
+export CIS_DEFAULT_COMM=$_old_default

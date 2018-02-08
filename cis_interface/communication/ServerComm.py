@@ -123,7 +123,7 @@ class ServerComm(CommBase.CommBase):
     @property
     def n_msg_recv(self):
         r"""int: The number of messages in the connection."""
-        return self.icomm.n_msg
+        return self.icomm.n_msg_recv
 
     # RESPONSE COMM
     def create_response_comm(self):
