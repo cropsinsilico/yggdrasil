@@ -41,7 +41,7 @@ int main(int argc, char *argv[]) {
     printf("maxMsgCli(CPP): received %.10s...\n", input);
 
     // Check to see if response matches
-    if (memcmp(output, input, msg_size)) {
+    if (strncmp(output, input, msg_size)) {
         printf("maxMsgCli(CPP): ERROR: input/output do not match\n");
         free(output);
         free(input);
