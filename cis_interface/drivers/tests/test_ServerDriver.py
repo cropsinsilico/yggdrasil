@@ -1,3 +1,4 @@
+import uuid
 import nose.tools as nt
 import cis_interface.drivers.tests.test_ConnectionDriver as parent
 from cis_interface import runner, tools
@@ -67,8 +68,7 @@ class TestServerParam(parent.TestConnectionParam):
     def create_client(self, comm_address=None):
         r"""Create a new ClientDriver instance."""
         inst = runner.create_driver(
-            'ClientDriver', 'test_model_request.' + self.uuid,
-            # request_name='test_request.' + self.uuid,
+            'ClientDriver', 'test_model_request.' + str(uuid.uuid4()),
             comm=self.client_comm,
             comm_address=comm_address,
             namespace=self.namespace, workingDir=self.workingDir,

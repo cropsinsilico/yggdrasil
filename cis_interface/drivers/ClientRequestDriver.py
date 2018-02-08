@@ -130,17 +130,10 @@ class ClientRequestDriver(ConnectionDriver):
         # self.sleep()  # Help ensure that the server is connected
         super(ClientRequestDriver, self).send_message(CIS_CLIENT_INI)
 
-    def after_loop(self, send_eof=False):
+    def after_loop(self, send_eof=True, close_output=False):
         r"""After client model signs off. Sent EOF to server."""
-        with self.lock:
-            self.debug()
-            self.icomm.close()
-            if self.icomm._last_header is None:
-                self.icomm._last_header = dict()
-            if self.icomm._last_header.get('response_address', None) != CIS_CLIENT_EOF:
-                self.icomm._last_header['response_address'] = CIS_CLIENT_EOF
-                send_eof = True
-        super(ClientRequestDriver, self).after_loop(send_eof=send_eof)
+        super(ClientRequestDriver, self).after_loop(send_eof=send_eof,
+                                                    close_output=close_output)
     
     def on_model_exit(self):
         r"""Drain input and then close it."""
@@ -148,9 +141,20 @@ class ClientRequestDriver(ConnectionDriver):
     
     def on_eof(self):
         r"""On EOF, set response_address to EOF, then send it along."""
-        with self.lock:
-            self.icomm._last_header['response_address'] = CIS_CLIENT_EOF
         return super(ClientRequestDriver, self).on_eof()
+
+    def send_eof(self):
+        r"""Send EOF message.
+
+        Returns:
+            bool: Success or failure of send.
+
+        """
+        with self.lock:
+            if self.icomm._last_header is None:  # pragma: debug
+                self.icomm._last_header = dict()
+            self.icomm._last_header['response_address'] = CIS_CLIENT_EOF
+        return super(ClientRequestDriver, self).send_eof()
 
     def send_message(self, *args, **kwargs):
         r"""Start a response driver for a request message and send message with

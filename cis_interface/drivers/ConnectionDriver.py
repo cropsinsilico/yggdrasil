@@ -271,7 +271,7 @@ class ConnectionDriver(Driver):
         self.open_comm()
         self.sleep()  # Help ensure senders/receivers connected before messages
 
-    def after_loop(self, send_eof=None):
+    def after_loop(self, send_eof=None, close_output=True):
         r"""Actions to perform after sending messages."""
         self.debug()
         # Close input comm in case loop did not
@@ -288,9 +288,11 @@ class ConnectionDriver(Driver):
         if send_eof:
             self.send_eof()
         # Close output comm after waiting for output to be processed
-        self.drain_output()
-        self.ocomm.linger_on_close = True
-        self.close_comm()
+        if close_output:
+            self.drain_output()
+            self.ocomm.linger_on_close = True
+            self.ocomm.close()
+        # self.close_comm()
 
     def recv_message(self, **kwargs):
         r"""Get a new message to send.

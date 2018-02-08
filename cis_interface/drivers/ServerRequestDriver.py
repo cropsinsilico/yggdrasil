@@ -96,15 +96,15 @@ class ServerRequestDriver(ConnectionDriver):
             self.response_drivers = []
         super(ServerRequestDriver, self).terminate(*args, **kwargs)
 
-    def after_loop(self, send_eof=False):
+    def after_loop(self, send_eof=True):
         r"""After server model signs off."""
-        self.debug("after_loop()")
-        with self.lock:
-            if self.icomm._last_header is None:  # pragma: debug
-                self.icomm._last_header = dict()
-            if self.icomm._last_header.get('response_address', None) != CIS_CLIENT_EOF:
-                self.icomm._last_header['response_address'] = CIS_CLIENT_EOF
-                send_eof = True
+        # self.debug("after_loop()")
+        # with self.lock:
+        #     if self.icomm._last_header is None:  # pragma: debug
+        #         self.icomm._last_header = dict()
+        #     if self.icomm._last_header.get('response_address', None) != CIS_CLIENT_EOF:
+        #         self.icomm._last_header['response_address'] = CIS_CLIENT_EOF
+        #         send_eof = True
         super(ServerRequestDriver, self).after_loop(send_eof=send_eof)
     
     def on_model_exit(self):
@@ -119,7 +119,6 @@ class ServerRequestDriver(ConnectionDriver):
             self.nclients -= 1
             if self.nclients == 0:
                 self.debug("All clients have signed off.")
-                self.icomm._last_header['response_address'] = CIS_CLIENT_EOF
                 return super(ServerRequestDriver, self).on_eof()
         return ''
 
@@ -141,6 +140,21 @@ class ServerRequestDriver(ConnectionDriver):
                 return msg
         return super(ServerRequestDriver, self).on_message(msg)
     
+    def send_eof(self):
+        r"""Send EOF message.
+
+        Returns:
+            bool: Success or failure of send.
+
+        """
+        with self.lock:
+            if self.icomm._last_header is None:  # pragma: debug
+                self.icomm._last_header = dict()
+            self.icomm._last_header['response_address'] = CIS_CLIENT_EOF
+            # if self.icomm._last_header.get('response_address', None) != CIS_CLIENT_EOF:
+            #     self.icomm._last_header['response_address'] = CIS_CLIENT_EOF
+        return super(ServerRequestDriver, self).send_eof()
+
     def send_message(self, *args, **kwargs):
         r"""Send a single message.
 
