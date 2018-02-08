@@ -101,13 +101,18 @@ class ClientComm(CommBase.CommBase):
         super(ClientComm, self).open()
         self.ocomm.open()
 
-    def _close(self):
-        r"""Close the connection."""
-        self.ocomm.linger_on_close = self.linger_on_close
-        self.ocomm.close()
+    def _close(self, linger=False):
+        r"""Close the connection.
+
+        Args:
+            linger (bool, optional): If True, drain messages before closing the
+                comm. Defaults to False.
+
+        """
+        self.ocomm.close(linger=linger)
         for k in self.icomm_order:
             self.icomm[k].close()
-        super(ClientComm, self)._close()
+        super(ClientComm, self)._close(linger=linger)
 
     @property
     def is_open(self):

@@ -47,8 +47,6 @@ class CommBase(CisClass):
         close_on_eof_recv (bool, optional): If True, the comm will be closed
             when it receives an end-of-file messages. Otherwise, it will remain
             open. Defaults to True.
-        linger_on_close (bool, optional): If True, the comm will linger at close
-            to wait for messages to be sent. Defaults to False.
         single_use (bool, optional): If True, the comm will only be used to
             send/recv a single message. Defaults to False.
         reverse_names (bool, optional): If True, the suffix added to the comm
@@ -86,8 +84,6 @@ class CommBase(CisClass):
             message before returning None.
         close_on_eof_recv (bool): If True, the comm will be closed when it
             receives an end-of-file messages. Otherwise, it will remain open.
-        linger_on_close (bool): If True, the comm will linger at close to
-            wait for messages to be sent.
         single_use (bool): If True, the comm will only be used to send/recv a
             single message.
         is_client (bool): If True, the comm is one of many potential clients
@@ -109,7 +105,7 @@ class CommBase(CisClass):
     def __init__(self, name, address=None, direction='send',
                  deserialize=None, serialize=None, format_str=None,
                  dont_open=False, is_interface=False,
-                 recv_timeout=0.0, close_on_eof_recv=True, linger_on_close=False,
+                 recv_timeout=0.0, close_on_eof_recv=True,
                  single_use=False, reverse_names=False, no_suffix=False,
                  is_client=False, is_response_client=False,
                  is_server=False, is_response_server=False,
@@ -145,9 +141,6 @@ class CommBase(CisClass):
         self.is_interface = is_interface
         self.recv_timeout = recv_timeout
         self.close_on_eof_recv = close_on_eof_recv
-        self.linger_on_close = linger_on_close
-        if self.is_interface:
-            self.linger_on_close = True
         self._last_header = None
         self._work_comms = {}
         self.single_use = single_use
@@ -256,28 +249,36 @@ class CommBase(CisClass):
         r"""Open the connection."""
         pass
 
-    def _close(self):
+    def _close(self, *args, **kwargs):
         r"""Close the connection."""
         pass
 
-    def close(self, skip_base=False, skip_linger=False):
-        r"""Close the connection."""
-        if (not skip_base) and (not skip_linger):
-            if self.linger_on_close and self.is_open and (self._n_sent > 0):
+    def close(self, skip_base=False, linger=False):
+        r"""Close the connection.
+
+        Args:
+            skip_base (bool, optional): If True, don't drain messages or remove
+                work comms.
+            linger (bool, optional): If True, drain messages before closing the
+                comm. Defaults to False.
+
+        """
+        if (not skip_base):
+            if self.is_interface:
+                linger = True
+            if linger and self.is_open and (self._n_sent > 0):
                 self.drain_messages(direction="send")
-        self._close()
+        self._close(linger=linger)
         if not skip_base:
             self.debug("Cleaning up %d work comms", len(self._work_comms))
             keys = [k for k in self._work_comms.keys()]
             for c in keys:
-                self.remove_work_comm(c)
+                self.remove_work_comm(c, linger=linger)
             self.debug("Finished cleaning up work comms")
 
     def linger_close(self):
         r"""If self.linger_on_close, wait for messages to drain. Then close."""
-        # if self.linger_on_close and self.is_open and (self._n_sent > 0):
-        #     self.drain_messages(direction="send")
-        self.close()
+        self.close(linger=True)
 
     @property
     def is_open(self):
@@ -370,7 +371,6 @@ class CommBase(CisClass):
         r"""dict: Keyword arguments for an existing work comm."""
         return dict(comm=self.comm_class, direction='recv',
                     recv_timeout=self.recv_timeout,
-                    linger_on_close=self.linger_on_close,
                     single_use=True)
 
     @property
@@ -378,7 +378,6 @@ class CommBase(CisClass):
         r"""dict: Keyword arguments for a new work comm."""
         return dict(comm=self.comm_class, direction='send',
                     recv_timeout=self.recv_timeout,
-                    linger_on_close=self.linger_on_close,
                     single_use=True)
 
     def get_work_comm(self, header, work_comm_name=None, **kwargs):
@@ -449,21 +448,22 @@ class CommBase(CisClass):
             raise KeyError("Comm already registered with key %s." % key)
         self._work_comms[key] = comm
 
-    def remove_work_comm(self, key, dont_close=False):
+    def remove_work_comm(self, key, dont_close=False, linger=False):
         r"""Close and remove a work comm.
 
         Args:
             key (str): Key of comm that should be removed.
             dont_close (bool, optional): If True, the comm will be removed
                 from the list, but it won't be closed. Defaults to False.
+            linger (bool, optional): If True, drain messages before closing the
+                comm. Defaults to False.
 
         """
         if key not in self._work_comms:
             return
         if not dont_close:
             c = self._work_comms.pop(key)
-            c.linger_on_close = self.linger_on_close
-            c.close()
+            c.close(linger=linger)
 
     # HEADER
     def get_header(self, msg, no_address=False, **kwargs):

@@ -159,12 +159,7 @@ class TestParam(CisTest):
 
 
 class TestDriver(TestParam):
-    r"""Test runner for basic Driver class.
-
-    Attributes (in addition to parameter class):
-        -
-
-    """
+    r"""Test runner for basic Driver class."""
 
     def assert_before_stop(self):
         r"""Assertions to make before stopping the driver instance."""

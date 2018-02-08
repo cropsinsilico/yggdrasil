@@ -74,7 +74,6 @@ class RPCComm(CommBase.CommBase):
                 super(RPCComm, self).__init__(name, address=address, comm=comm,
                                               dont_open=True, **kwargs)
             except BaseException as e:
-                self.linger_on_close = False
                 self.close(skip_base=True)
                 raise e
         self.icomm.recv_timeout = self.recv_timeout
@@ -89,7 +88,6 @@ class RPCComm(CommBase.CommBase):
             self.icomm = get_comm(icomm_name, **icomm_kwargs)
             self.ocomm = get_comm(ocomm_name, **ocomm_kwargs)
         except BaseException:
-            self.linger_on_close = False
             self.close(skip_base=True)
             raise
 
@@ -202,8 +200,14 @@ class RPCComm(CommBase.CommBase):
             self.close()
             raise e
 
-    def _close(self):
-        r"""Close the connection."""
+    def _close(self, linger=False):
+        r"""Close the connection.
+
+        Args:
+            linger (bool, optional): If True, drain messages before closing the
+                comm. Defaults to False.
+
+        """
         ie = None
         oe = None
         try:
@@ -213,14 +217,14 @@ class RPCComm(CommBase.CommBase):
             ie = e
         try:
             if getattr(self, 'ocomm', None) is not None:
-                self.ocomm.linger_on_close = self.linger_on_close
-                self.ocomm.close()
+                self.ocomm.close(linger=linger)
         except BaseException as e:
             oe = e
         if ie:
             raise ie
         if oe:
             raise oe
+        super(RPCComm, self)._close(linger=linger)
 
     @property
     def is_open(self):

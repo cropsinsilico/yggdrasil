@@ -251,8 +251,14 @@ class IPCComm(CommBase.CommBase):
             self.debug("qid: %s", self.q.key)
             self.backlog_thread.start()
             
-    def _close(self):
-        r"""Close the connection."""
+    def _close(self, linger=False):
+        r"""Close the connection.
+
+        Args:
+            linger (bool, optional): If True, drain messages before closing the
+                comm. Defaults to False.
+
+        """
         if self._bound and not self.is_open:
             try:
                 self.open_after_bind()
@@ -271,7 +277,7 @@ class IPCComm(CommBase.CommBase):
         self.backlog_thread.set_terminated_flag()
         self.backlog_send_ready.set()
         self.backlog_recv_ready.set()
-        super(IPCComm, self)._close()
+        super(IPCComm, self)._close(linger=linger)
             
     @property
     def is_open(self):

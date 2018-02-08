@@ -75,8 +75,14 @@ class RMQAsyncComm(RMQComm):
             self.sleep()
         self.stop_timeout()
 
-    def _close(self):
-        r"""Close connection."""
+    def _close(self, linger=False):
+        r"""Close the connection.
+
+        Args:
+            linger (bool, optional): If True, drain messages before closing the
+                comm. Defaults to False.
+
+        """
         with self.thread.lock:
             self._close_called = True
         with self.thread.lock:
@@ -116,7 +122,7 @@ class RMQAsyncComm(RMQComm):
             raise RuntimeError("Thread still running.")
         # Close workers
         with self.thread.lock:
-            super(RMQAsyncComm, self)._close()
+            super(RMQAsyncComm, self)._close(linger=linger)
 
     @property
     def n_msg_recv(self):
