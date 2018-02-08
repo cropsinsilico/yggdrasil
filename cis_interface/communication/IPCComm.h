@@ -223,8 +223,8 @@ int ipc_comm_nmsg(const comm_t x) {
   }
   int rc = msgctl(((int*)x.handle)[0], IPC_STAT, &buf);
   if (rc != 0) {
-    cislog_error("ipc_comm_nmsg: Could not access queue.");
-    return -1;
+    /* cislog_error("ipc_comm_nmsg: Could not access queue."); */
+    return 0;
   }
   int ret = buf.msg_qnum;
   return ret;

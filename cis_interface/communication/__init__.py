@@ -65,7 +65,9 @@ def new_comm(name, comm=None, **kwargs):
     return comm_cls.new_comm(name, **kwargs)
 
 
-DefaultComm = get_comm_class()
+def DefaultComm(*args, **kwargs):
+    r"""Construct a comm object of the default type."""
+    return get_comm_class()(*args, **kwargs)
 
 
 __all__ = ['new_comm', 'get_comm', 'get_comm_class']
