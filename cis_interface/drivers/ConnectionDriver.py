@@ -276,6 +276,9 @@ class ConnectionDriver(Driver):
         self.debug()
         # Close input comm in case loop did not
         with self.lock:
+            if self._comm_closed:
+                self.debug("After loop aborted as comms were already closed.")
+                return
             self.icomm.close()
         # Send EOF for output drivers in case the model did not
         if send_eof is None:
