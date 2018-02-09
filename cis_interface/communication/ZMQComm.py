@@ -534,7 +534,7 @@ class ZMQComm(CommBase.CommBase):
             self.debug('Unbinding from %s' % self.address)
             try:
                 self.socket.unbind(self.address)
-            except ZMQError:
+            except zmq.ZMQError:
                 pass
             self.unregister_socket()
             self._bound = False
@@ -546,7 +546,7 @@ class ZMQComm(CommBase.CommBase):
             self.debug('Disconnecting from %s' % self.address)
             try:
                 self.socket.disconnect(self.address)
-            except ZMQError:
+            except zmq.ZMQError:
                 pass
             self.unregister_socket()
             self._connected = False
