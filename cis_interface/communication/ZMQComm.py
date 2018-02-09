@@ -593,6 +593,8 @@ class ZMQComm(CommBase.CommBase):
             self.debug("Closing socket %s", self.address)
             if linger:
                 self.socket.close(linger=-1)
+            else:
+                self.socket.close()
         # Ensure socket not still open
         self._openned = False
         self.unregister_socket()
