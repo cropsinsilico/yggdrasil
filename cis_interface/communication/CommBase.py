@@ -156,6 +156,8 @@ class CommBase(CisClass):
             self.open()
         if self.is_interface and (self.direction == 'send'):
             atexit.register(self.interface_close)
+        else:
+            atexit.register(self.close)
         self._closing_event = threading.Event()
         self._closing_thread = tools.CisThread(target=self.linger_close)
         self._eof_sent = threading.Event()
@@ -269,8 +271,10 @@ class CommBase(CisClass):
 
         """
         if (not skip_base):
-            if linger and self.is_open:  # and (self._n_sent > 0):
-                self.drain_messages()  # direction="send")
+            if linger and self.is_open:
+                self.drain_messages()
+            else:
+                self._closing_thread.set_terminated_flag()
         self._close(linger=linger)
         if not skip_base:
             self.debug("Cleaning up %d work comms", len(self._work_comms))
@@ -285,7 +289,8 @@ class CommBase(CisClass):
             if (((not self._closing_thread.was_started) and
                  (not self._closing_thread.was_terminated))):
                 self._closing_thread.start()
-        self._closing_thread.join()
+        if self._closing_thread.was_started:
+            self._closing_thread.join()
 
     def linger_close(self):
         r"""If self.linger_on_close, wait for messages to drain. Then close."""
