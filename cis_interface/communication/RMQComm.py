@@ -408,7 +408,7 @@ class RMQComm(CommBase.CommBase):
         if timeout is None:
             timeout = self.recv_timeout
         Tout = self.start_timeout(timeout)
-        while self.n_msg == 0 and self.is_open and (not Tout.is_out):
+        while self.n_msg_recv == 0 and self.is_open and (not Tout.is_out):
             self.sleep()
         self.stop_timeout()
         if self.is_closed:
