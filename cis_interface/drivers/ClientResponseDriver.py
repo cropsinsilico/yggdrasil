@@ -59,9 +59,8 @@ class ClientResponseDriver(ConnectionDriver):
         return self.icomm.address
 
     def after_loop(self):
-        r"""Send EOF to the client response driver."""
-        super(ClientResponseDriver, self).after_loop(send_eof=False,
-                                                     close_output=False)
+        r"""Don't send anything to the client."""
+        super(ClientResponseDriver, self).after_loop(send_eof=False)
         
     def send_message(self, *args, **kwargs):
         r"""Close the input comm once message sent.

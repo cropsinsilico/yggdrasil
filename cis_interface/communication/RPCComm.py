@@ -309,9 +309,12 @@ class RPCComm(CommBase.CommBase):
         r"""Alias for RPCComm.call"""
         return self.call(*args, **kwargs)
 
-    def drain_messages(self):
+    def drain_messages(self, direction='send'):
         r"""Sleep while waiting for messages to be drained."""
-        self.ocomm.drain_messages()
+        if direction == 'send':
+            self.ocomm.drain_messages(direction=direction)
+        else:
+            self.icomm.drain_messages(direction=direction)
 
     def purge(self):
         r"""Purge input and output comms."""

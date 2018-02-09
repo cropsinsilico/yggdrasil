@@ -35,6 +35,7 @@ class ServerComm(CommBase.CommBase):
         self.response_kwargs.setdefault('recv_timeout', self.icomm.recv_timeout)
         super(ServerComm, self).__init__(self.icomm.name, dont_open=dont_open,
                                          recv_timeout=self.icomm.recv_timeout,
+                                         is_interface=self.icomm.is_interface,
                                          direction='recv', no_suffix=True,
                                          address=self.icomm.address)
 
@@ -195,9 +196,10 @@ class ServerComm(CommBase.CommBase):
         r"""Alias for RPCComm.recv"""
         return self.recv(*args, **kwargs)
     
-    def drain_messages(self):
+    def drain_messages(self, direction='recv'):
         r"""Sleep while waiting for messages to be drained."""
-        pass
+        if direction == 'recv':
+            self.icomm.drain_messages(direction='recv')
 
     def purge(self):
         r"""Purge input and output comms."""

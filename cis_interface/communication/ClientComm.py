@@ -39,6 +39,7 @@ class ClientComm(CommBase.CommBase):
         self.response_kwargs.setdefault('recv_timeout', self.ocomm.recv_timeout)
         super(ClientComm, self).__init__(self.ocomm.name, dont_open=dont_open,
                                          recv_timeout=self.ocomm.recv_timeout,
+                                         is_interface=self.ocomm.is_interface,
                                          direction='send', no_suffix=True,
                                          address=self.ocomm.address)
 
@@ -229,9 +230,10 @@ class ClientComm(CommBase.CommBase):
         r"""Alias for RPCComm.call"""
         return self.call(*args, **kwargs)
     
-    def drain_messages(self):
+    def drain_messages(self, direction='send', timeout=None):
         r"""Sleep while waiting for messages to be drained."""
-        self.ocomm.drain_messages()
+        if direction == 'send':
+            self.ocomm.drain_messages(direction='send', timeout=timeout)
 
     # def purge(self):
     #     r"""Purge input and output comms."""

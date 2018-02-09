@@ -478,7 +478,7 @@ class CisRunner(CisClass):
             # Stop server if there are not any more clients
             if len(srv['clients']) == 0:
                 iod = self.inputdrivers[srv_name]
-                iod['instance'].on_model_exit()
+                iod['instance'].on_client_exit()
                 srv['instance'].stop()
                 # self.do_model_exits(srv)
         # Stop associated IO drivers

@@ -78,6 +78,7 @@ class ClientRequestDriver(ConnectionDriver):
         self.comm = comm
         self.comm_address = self.ocomm.opp_address
         self._block_response = False
+        self._is_output = True
 
     @property
     def last_header(self):
@@ -124,20 +125,27 @@ class ClientRequestDriver(ConnectionDriver):
             self.response_drivers = []
         super(ClientRequestDriver, self).terminate(*args, **kwargs)
 
+    def printStatus(self, *args, **kwargs):
+        r"""Also print response drivers."""
+        super(ClientRequestDriver, self).printStatus(*args, **kwargs)
+        for x in self.response_drivers:
+            x.printStatus(*args, **kwargs)
+
     def before_loop(self):
         r"""Send client sign on to server response driver."""
         super(ClientRequestDriver, self).before_loop()
         # self.sleep()  # Help ensure that the server is connected
         super(ClientRequestDriver, self).send_message(CIS_CLIENT_INI)
 
-    def after_loop(self, send_eof=True, close_output=False):
+    def after_loop(self):
         r"""After client model signs off. Sent EOF to server."""
-        super(ClientRequestDriver, self).after_loop(send_eof=send_eof,
-                                                    close_output=close_output)
+        # Don't close output as other clients may be using it
+        super(ClientRequestDriver, self).after_loop(dont_close_output=True)
     
     def on_model_exit(self):
         r"""Drain input and then close it."""
-        super(ClientRequestDriver, self).on_model_exit(close_input=True)
+        self.icomm.close()  # Cannot respond to messages, so discard them
+        super(ClientRequestDriver, self).on_model_exit()
     
     def on_eof(self):
         r"""On EOF, set response_address to EOF, then send it along."""

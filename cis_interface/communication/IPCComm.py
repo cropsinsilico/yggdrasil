@@ -530,28 +530,28 @@ class IPCComm(CommBase.CommBase):
             self.debug('Returning backlogged received message')
             return (True, self.pop_backlog_recv())
 
-    def drain_messages(self, direction='send', timeout=None):
-        r"""Sleep while waiting for messages to be drained from backlog and queues."""
-        if direction == 'send':
-            self.drain_backlog(direction=direction, timeout=timeout)
-            self.drain_queue(timeout=timeout)
-        else:
-            self.drain_queue(timeout=timeout)
-            self.drain_backlog(direction=direction, timeout=timeout)
+    # def drain_messages(self, direction='send', timeout=None):
+    #     r"""Sleep while waiting for messages to be drained from backlog and queues."""
+    #     if direction == 'send':
+    #         self.drain_backlog(direction=direction, timeout=timeout)
+    #         self.drain_queue(timeout=timeout)
+    #     else:
+    #         self.drain_queue(timeout=timeout)
+    #         self.drain_backlog(direction=direction, timeout=timeout)
 
-    def drain_backlog(self, direction='send', timeout=None):
-        r"""Sleep while waiting for messages to be drained from the backlog."""
-        super(IPCComm, self).drain_messages(direction=direction, timeout=timeout)
+    # def drain_backlog(self, direction='send', timeout=None):
+    #     r"""Sleep while waiting for messages to be drained from the backlog."""
+    #     super(IPCComm, self).drain_messages(direction=direction, timeout=timeout)
 
-    def drain_queue(self, timeout=None):
-        r"""Sleep while waiting for messages to be drained from the queue."""
-        if timeout is None:
-            timeout = self._timeout_drain
-        Tout = self.start_timeout(timeout)
-        while (not Tout.is_out) and (self.n_msg_queued > 0):
-            self.verbose_debug("Draining queued messages.")
-            self.sleep()
-        self.stop_timeout()
+    # def drain_queue(self, timeout=None):
+    #     r"""Sleep while waiting for messages to be drained from the queue."""
+    #     if timeout is None:
+    #         timeout = self._timeout_drain
+    #     Tout = self.start_timeout(timeout)
+    #     while (not Tout.is_out) and (self.n_msg_queued > 0):
+    #         self.verbose_debug("Draining queued messages.")
+    #         self.sleep()
+    #     self.stop_timeout()
 
     def purge(self):
         r"""Purge all messages from the comm."""

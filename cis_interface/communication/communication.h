@@ -37,8 +37,11 @@ int free_comm(comm_t *x) {
   // Send EOF for output comms and then wait for messages to be recv'd
   if ((strcmp(x->direction, "send") == 0) && (t != CLIENT_COMM)) {
     comm_send_eof(*x);
-    while (comm_nmsg(*x) > 0)
+    while (comm_nmsg(*x) > 0) {
+      cislog_debug("free_comm(%s): draining %d messages",
+		   x->name, comm_nmsg(*x));
       usleep(CIS_SLEEP_TIME);
+    }
   }
   int ret = 1;
   if (t == IPC_COMM)
@@ -306,7 +309,10 @@ int comm_send_single(const comm_t x, const char *data, const size_t len) {
     cislog_error("comm_send_single: Unsupported comm_type %d", t);
   }
   if (ret >= 0) {
-    x.last_send[0] = clock();
+    time(x.last_send);
+    /* time_t now; */
+    /* time(&now); */
+    /* x.last_send[0] = now; */
   }
   return ret;
 };
@@ -461,8 +467,18 @@ int comm_send(const comm_t x, const char *data, const size_t len) {
 */
 static inline
 int comm_send_eof(const comm_t x) {
-  char buf[2048] = CIS_MSG_EOF;
-  int ret = comm_send(x, buf, strlen(buf));
+  int ret = -1;
+  if (x.sent_eof == NULL) {
+    cislog_error("comm_send_eof(%s): sent_eof not initialized.", x.name);
+    return ret;
+  }
+  if (x.sent_eof[0] == 0) {
+    char buf[2048] = CIS_MSG_EOF;
+    ret = comm_send(x, buf, strlen(buf));
+    x.sent_eof[0] = 1;
+  } else {
+    cislog_error("comm_send_eof(%s): EOF already sent", x.name);
+  }
   return ret;
 };
 
@@ -647,8 +663,18 @@ int comm_send_nolimit(const comm_t x, const char *data, const size_t len) {
 */
 static inline
 int comm_send_nolimit_eof(const comm_t x) {
-  char buf[2048] = CIS_MSG_EOF;
-  int ret = comm_send_nolimit(x, buf, strlen(buf));
+  int ret = -1;
+  if (x.sent_eof == NULL) {
+    cislog_error("comm_send_nolimit_eof(%s): sent_eof not initialized.", x.name);
+    return ret;
+  }
+  if (x.sent_eof[0] == 0) {
+    char buf[2048] = CIS_MSG_EOF;
+    ret = comm_send_nolimit(x, buf, strlen(buf));
+    x.sent_eof[0] = 1;
+  } else {
+    cislog_error("comm_send_nolimit_eof(%s): EOF already sent", x.name);
+  }
   return ret;
 };
 

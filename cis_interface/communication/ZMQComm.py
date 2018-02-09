@@ -19,7 +19,7 @@ _socket_protocols = ['tcp', 'inproc', 'ipc', 'udp', 'pgm', 'epgm']
 _flag_zmq_filter = backwards.unicode2bytes('_ZMQFILTER_')
 _default_socket_type = 4
 _default_protocol = 'tcp'
-_wait_send_t = 0.0001
+_wait_send_t = 0  # 0.0001
 
 
 def register_socket(socket_type_name, address):
@@ -336,16 +336,21 @@ class ZMQComm(CommBase.CommBase):
             elif self.direction == 'send':
                 socket_type = _socket_send_types[_default_socket_type]
         if not (self.is_client or self.is_server):
-            if socket_type in ['PULL', 'SUB', 'REQ', 'DEALER']:
-                self.direction = 'recv'  # connect
-            elif socket_type in ['PUSH', 'PUB', 'REP', 'ROUTER']:
-                self.direction = 'send'  # bind
+            if socket_type in ['PULL', 'SUB', 'REP', 'DEALER', 'ROUTER']:
+                self.direction = 'recv'
+            elif socket_type in ['PUSH', 'PUB', 'REQ']:
+                self.direction = 'send'
         if socket_action is None:
             if self.port in ['inproc', 'ipc']:
-                if self.direction == 'recv':
+                if socket_type in ['PULL', 'SUB', 'REQ', 'DEALER']:
                     socket_action = 'connect'
-                elif self.direction == 'send':
+                elif socket_type in ['PUSH', 'PUB', 'REP', 'ROUTER']:
                     socket_action = 'bind'
+                else:
+                    if self.direction == 'recv':
+                        socket_action = 'connect'
+                    elif self.direction == 'send':
+                        socket_action = 'bind'
             elif self.port is None:
                 socket_action = 'bind'
             else:
@@ -527,7 +532,10 @@ class ZMQComm(CommBase.CommBase):
         r"""Unbind from address."""
         if self._bound:
             self.debug('Unbinding from %s' % self.address)
-            self.socket.unbind(self.address)
+            try:
+                self.socket.unbind(self.address)
+            except ZMQError:
+                pass
             self.unregister_socket()
             self._bound = False
         self.debug('Unbound socket')
@@ -536,7 +544,10 @@ class ZMQComm(CommBase.CommBase):
         r"""Disconnect from address."""
         if self._connected:
             self.debug('Disconnecting from %s' % self.address)
-            self.socket.disconnect(self.address)
+            try:
+                self.socket.disconnect(self.address)
+            except ZMQError:
+                pass
             self.unregister_socket()
             self._connected = False
         self.debug('Disconnected socket')
@@ -580,15 +591,11 @@ class ZMQComm(CommBase.CommBase):
             elif self.socket_action == 'connect':
                 self.disconnect()
             self.debug("Closing socket %s", self.address)
-            self.socket.close()
+            if linger:
+                self.socket.close(linger=-1)
         # Ensure socket not still open
         self._openned = False
         self.unregister_socket()
-        # if self.is_open or self._bound or self._connected:
-        #     self.debug("Closing socket %s", self.address)
-        #     self.socket.close()  # linger=1000*self.sleeptime)
-        #     self._openned = False
-        #     self.unregister_socket()
         # Close proxy
         if self.is_client and self._client_proxy:
             self.debug("Closing client proxy")
@@ -652,11 +659,6 @@ class ZMQComm(CommBase.CommBase):
                 return True
         return False
         
-    @property
-    def n_msg(self):
-        r"""int: The number of messages in the connection."""
-        return self.n_msg_recv
-
     @property
     def n_msg_recv(self):
         r"""int: 1 if there is 1 or more incoming messages waiting. 0 otherwise."""

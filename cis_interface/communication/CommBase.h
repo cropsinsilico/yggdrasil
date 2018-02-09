@@ -28,7 +28,8 @@ typedef struct comm_t {
   size_t maxMsgSize; //!< The maximum message size.
   int always_send_header; //!< 1 if comm should always send a header.
   int index_in_register; //!< Index of the comm in the comm register.
-  clock_t *last_send; //!< Clock output at time of last send.
+  time_t *last_send; //!< Clock output at time of last send.
+  int *sent_eof; //!< Flag specifying if EOF has been sent
 } comm_t;
 
 
@@ -49,6 +50,7 @@ comm_t empty_comm_base() {
   ret.always_send_header = 0;
   ret.index_in_register = -1;
   ret.last_send = NULL;
+  ret.sent_eof = NULL;
   return ret;
 };
 
@@ -94,8 +96,10 @@ comm_t* new_comm_base(char *address, const char *direction, const comm_type t,
   ret->maxMsgSize = CIS_MSG_MAX;
   ret->always_send_header = 0;
   ret->index_in_register = -1;
-  ret->last_send = (clock_t*)malloc(sizeof(clock_t));
+  ret->last_send = (time_t*)malloc(sizeof(time_t));
   ret->last_send[0] = 0;
+  ret->sent_eof = (int*)malloc(sizeof(int));
+  ret->sent_eof[0] = 0;
   return ret;
 };
 
@@ -154,6 +158,10 @@ int free_comm_base(comm_t *x) {
   if (x->last_send != NULL) {
     free(x->last_send);
     x->last_send = NULL;
+  }
+  if (x->sent_eof != NULL) {
+    free(x->sent_eof);
+    x->sent_eof = NULL;
   }
 /*   // Prevent C4100 warning on windows by referencing param */
 /* #ifdef _WIN32 */

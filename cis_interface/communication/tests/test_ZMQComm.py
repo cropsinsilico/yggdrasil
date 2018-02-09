@@ -239,7 +239,6 @@ class TestZMQCommROUTER(TestZMQComm):
         r"""Test router receipt of message from the dealer with an identity."""
         self.do_send_recv(reverse_comms=True, send_kwargs=dict(
             identity=self.recv_instance.dealer_identity))
-        # print(self.instance._recv_identities)
 
     def test_send_recv_nolimit(self):
         r"""Disabled send/recv of large message."""

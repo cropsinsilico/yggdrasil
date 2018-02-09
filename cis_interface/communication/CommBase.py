@@ -1,6 +1,7 @@
 import os
 import uuid
 import atexit
+import threading
 from cis_interface import backwards, tools
 from cis_interface.tools import CisClass, get_CIS_MSG_MAX, CIS_MSG_EOF
 from cis_interface.serialize.DefaultSerialize import DefaultSerialize
@@ -153,7 +154,11 @@ class CommBase(CisClass):
         self._timeout_drain = self.timeout
         if not dont_open:
             self.open()
-        atexit.register(self.linger_close)
+        if self.is_interface and (self.direction == 'send'):
+            atexit.register(self.interface_close)
+        self._closing_event = threading.Event()
+        self._closing_thread = tools.CisThread(target=self.linger_close)
+        self._eof_sent = threading.Event()
 
     @classmethod
     def _determine_suffix(cls, no_suffix=False, reverse_names=False,
@@ -264,10 +269,8 @@ class CommBase(CisClass):
 
         """
         if (not skip_base):
-            if self.is_interface:
-                linger = True
-            if linger and self.is_open and (self._n_sent > 0):
-                self.drain_messages(direction="send")
+            if linger and self.is_open:  # and (self._n_sent > 0):
+                self.drain_messages()  # direction="send")
         self._close(linger=linger)
         if not skip_base:
             self.debug("Cleaning up %d work comms", len(self._work_comms))
@@ -276,9 +279,22 @@ class CommBase(CisClass):
                 self.remove_work_comm(c, linger=linger)
             self.debug("Finished cleaning up work comms")
 
+    def close_on_empty(self):
+        r"""In a new thread, close the comm when it is empty."""
+        with self._closing_thread.lock:
+            if (((not self._closing_thread.was_started) and
+                 (not self._closing_thread.was_terminated))):
+                self._closing_thread.start()
+        self._closing_thread.join()
+
     def linger_close(self):
         r"""If self.linger_on_close, wait for messages to drain. Then close."""
         self.close(linger=True)
+
+    def interface_close(self):
+        r"""Close operations for interface send comms."""
+        self.send_eof()
+        self.linger_close()
 
     @property
     def is_open(self):
@@ -742,7 +758,10 @@ class CommBase(CisClass):
             bool: Success or failure of send.
 
         """
-        return self.send(self.eof_msg, *args, **kwargs)
+        if not self._eof_sent.is_set():
+            self._eof_sent.set()
+            return self.send(self.eof_msg, *args, **kwargs)
+        return False
         
     def send_nolimit_eof(self, *args, **kwargs):
         r"""Alias for send_eof."""
@@ -784,8 +803,8 @@ class CommBase(CisClass):
                 ret = False
                 break
             data = data + payload[1]
-            if len(payload[1]) == 0:
-                self.sleep()
+            # if len(payload[1]) == 0:
+            #     self.sleep()
         payload = (ret, data)
         self.debug("Read %d bytes", len(data))
         return payload
@@ -922,19 +941,33 @@ class CommBase(CisClass):
         r"""Alias for recv."""
         return self.recv(*args, **kwargs)
 
-    def drain_messages(self, direction='send', timeout=None):
+    def drain_messages(self, direction=None, timeout=None):
         r"""Sleep while waiting for messages to be drained."""
+        if direction is None:
+            direction = self.direction
+        if direction == 'send':
+            self.drain_messages_send(timeout=timeout)
+        else:
+            self.drain_messages_recv(timeout=timeout)
+
+    def drain_messages_recv(self, timeout=None):
+        r"""Sleep while waiting for recv messages to be drained."""
         if timeout is None:
             timeout = self._timeout_drain
         Tout = self.start_timeout(timeout)
-        if direction == 'send':
-            while (not Tout.is_out) and (self.n_msg_send > 0):
-                self.verbose_debug("Draining messages.")
-                self.sleep()
-        else:
-            while (not Tout.is_out) and (self.n_msg_recv > 0):
-                self.verbose_debug("Draining messages.")
-                self.sleep()
+        while (not Tout.is_out) and (self.n_msg_recv > 0) and self.is_open:
+            self.verbose_debug("Draining recv messages.")
+            self.sleep()
+        self.stop_timeout()
+
+    def drain_messages_send(self, timeout=None):
+        r"""Sleep while waiting for send messages to be drained."""
+        if timeout is None:
+            timeout = self._timeout_drain
+        Tout = self.start_timeout(timeout)
+        while (not Tout.is_out) and (self.n_msg_send > 0) and self.is_open:
+            self.verbose_debug("Draining send messages.")
+            self.sleep()
         self.stop_timeout()
 
     def purge(self):

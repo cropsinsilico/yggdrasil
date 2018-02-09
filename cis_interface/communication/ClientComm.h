@@ -157,6 +157,7 @@ int free_client_comm(comm_t *x) {
     comm_t *handle = (comm_t*)(x->handle);
     char buf[100] = CIS_MSG_EOF;
     default_comm_send(*handle, buf, strlen(buf));
+    handle->sent_eof[0] = 1;
     free((char*)(handle->serializer.info));
     free_default_comm(handle);
     free(x->handle);

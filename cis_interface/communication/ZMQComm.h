@@ -11,7 +11,7 @@
 static unsigned _zmq_rand_seeded = 0;
 static unsigned _cisSocketsCreated = 0;
 static int _last_port = 49152;
-static double _wait_send_t = 0.0001;
+static double _wait_send_t = 0;  // 0.0001;
 
 /*!
   @brief Create a new socket.
@@ -48,7 +48,10 @@ int new_zmq_address(comm_t *comm) {
     cislog_error("new_zmq_address: Could not initialize empty socket.");
     return -1;
   }
-  zsock_set_linger(s, 100);
+  if (strcmp(comm->direction, "send") == 0) {
+    zsock_set_linger(s, -1);
+  }
+  // zsock_set_linger(s, 100);
   int port = zsock_bind(s, "%s", address);
   if (port == -1) {
     cislog_error("new_zmq_address: Could not bind socket to address = %s",
@@ -159,21 +162,28 @@ int zmq_comm_nmsg(const comm_t x) {
   if (strcmp(x.direction, "recv") == 0) {
     if (x.handle != NULL) {
       zsock_t *s = (zsock_t*)(x.handle);
-      zpoller_t *poller = zpoller_new(s);
+      zpoller_t *poller = zpoller_new(s, NULL);
       if (poller == NULL) {
 	cislog_error("zmq_comm_nmsg: Could not create poller");
 	return -1;
       }
       void *p = zpoller_wait(poller, 1);
-      if (p == NULL)
-	out = 0;
-      else
+      if (p == NULL) {
+	if (zpoller_terminated(poller)) {
+	  cislog_error("zmq_comm_nmsg: Poller interrupted");
+	  out = -1;
+	} else {
+	  out = 0;
+	}
+      } else {
 	out = 1;
+      }
       zpoller_destroy(&poller);
     }
   } else if (x.last_send[0] != 0) {
-    clock_t now = clock();
-    double elapsed = (double)(now - x.last_send[0]) / CLOCKS_PER_SEC;
+    time_t now;
+    time(&now);
+    double elapsed = difftime(now, x.last_send[0]);
     if (elapsed > _wait_send_t)
       out = 0;
     else
@@ -234,6 +244,15 @@ int zmq_comm_recv(const comm_t x, char **data, const size_t len,
   if (s == NULL) {
     cislog_error("zmq_comm_recv(%s): socket handle is NULL", x.name);
     return -1;
+  }
+  while (1) {
+    int nmsg = zmq_comm_nmsg(x);
+    if (nmsg < 0) return -1;
+    else if (nmsg > 0) break;
+    else {
+      cislog_debug("zmq_comm_recv(%s): no messages, sleep", x.name);
+      usleep(CIS_SLEEP_TIME);
+    }
   }
   zframe_t *out = zframe_recv(s);
   if (out == NULL) {

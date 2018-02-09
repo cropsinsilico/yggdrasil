@@ -1,3 +1,4 @@
+import threading
 from cis_interface.drivers.ConnectionDriver import ConnectionDriver
 from cis_interface.drivers.ServerResponseDriver import ServerResponseDriver
 from cis_interface.drivers.ClientRequestDriver import (
@@ -56,6 +57,8 @@ class ServerRequestDriver(ConnectionDriver):
         self.comm = comm
         self.comm_address = self.icomm.address  # opp_address
         self._block_response = False
+        self._clients_exited = threading.Event()
+        self._is_input = True
 
     @property
     def last_header(self):
@@ -96,30 +99,32 @@ class ServerRequestDriver(ConnectionDriver):
             self.response_drivers = []
         super(ServerRequestDriver, self).terminate(*args, **kwargs)
 
-    def after_loop(self, send_eof=True):
-        r"""After server model signs off."""
-        # self.debug("after_loop()")
-        # with self.lock:
-        #     if self.icomm._last_header is None:  # pragma: debug
-        #         self.icomm._last_header = dict()
-        #     if self.icomm._last_header.get('response_address', None) != CIS_CLIENT_EOF:
-        #         self.icomm._last_header['response_address'] = CIS_CLIENT_EOF
-        #         send_eof = True
-        super(ServerRequestDriver, self).after_loop(send_eof=send_eof)
-    
-    def on_model_exit(self):
-        r"""Drain input and then close it."""
-        super(ServerRequestDriver, self).on_model_exit(close_input=True)
+    def printStatus(self, *args, **kwargs):
+        r"""Also print response drivers."""
+        super(ServerRequestDriver, self).printStatus(*args, **kwargs)
+        for x in self.response_drivers:
+            x.printStatus(*args, **kwargs)
+
+    def on_client_exit(self):
+        r"""Close input comm to stop the loop."""
+        self.debug()
+        with self.lock:
+            if self._clients_exited.is_set():
+                return
+            self._clients_exited.set()
+            self.icomm.close()
+            self.send_eof()
     
     def on_eof(self):
         r"""On EOF, decrement number of clients. Only send EOF if the number
         of clients drops to 0."""
-        self.debug("Client signed off.")
         with self.lock:
             self.nclients -= 1
+            self.debug("Client signed off. nclients = %d", self.nclients)
             if self.nclients == 0:
                 self.debug("All clients have signed off.")
-                return super(ServerRequestDriver, self).on_eof()
+                self.on_client_exit()
+                return False
         return ''
 
     def on_message(self, msg):
@@ -151,8 +156,6 @@ class ServerRequestDriver(ConnectionDriver):
             if self.icomm._last_header is None:  # pragma: debug
                 self.icomm._last_header = dict()
             self.icomm._last_header['response_address'] = CIS_CLIENT_EOF
-            # if self.icomm._last_header.get('response_address', None) != CIS_CLIENT_EOF:
-            #     self.icomm._last_header['response_address'] = CIS_CLIENT_EOF
         return super(ServerRequestDriver, self).send_eof()
 
     def send_message(self, *args, **kwargs):
