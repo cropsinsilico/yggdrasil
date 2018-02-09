@@ -274,7 +274,7 @@ class IPCComm(CommBase.CommBase):
         self.q = None
         self._bound = False
         # Set events so that threads stop blocking and register close
-        self.backlog_thread.set_terminated_flag()
+        self.backlog_thread.set_break_flag()
         self.backlog_send_ready.set()
         self.backlog_recv_ready.set()
         super(IPCComm, self)._close(linger=linger)
@@ -386,20 +386,20 @@ class IPCComm(CommBase.CommBase):
         r"""Continue trying to send buffered messages."""
         flag = self.backlog_send_ready.wait(self.sleeptime)
         if not self.is_open:
-            self.backlog_thread.set_terminated_flag()
+            self.backlog_thread.set_break_flag()
             return
         if flag:
             if not self.send_backlog():
-                self.backlog_thread.set_terminated_flag()
+                self.backlog_thread.set_break_flag()
 
     def run_backlog_recv(self):
         r"""Continue buffering received messages."""
         if not self.is_open:
-            self.backlog_thread.set_terminated_flag()
+            self.backlog_thread.set_break_flag()
             return
         flag = self.recv_backlog()
         if not flag:
-            self.backlog_thread.set_terminated_flag()
+            self.backlog_thread.set_break_flag()
 
     def send_backlog(self):
         r"""Send a message from the send backlog to the queue."""
@@ -518,7 +518,7 @@ class IPCComm(CommBase.CommBase):
             else:
                 self.backlog_recv_ready.wait(timeout)
             # Return False if the queue is closed
-            if self.is_closed or self.backlog_thread.was_terminated:  # pragma: debug
+            if self.is_closed or self.backlog_thread.was_break:  # pragma: debug
                 self.debug("Queue closed")
                 return (False, self.empty_msg)
             # Return True, '' if there are no messages

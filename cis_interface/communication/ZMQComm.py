@@ -227,7 +227,7 @@ class ZMQProxy(tools.CisThreadLoop):
     def client_recv(self):
         r"""Receive single message from the client."""
         with self.lock:
-            if not self.was_terminated:
+            if not self.was_break:
                 return self.cli_socket.recv_multipart()
             else:  # pragma: debug
                 return None
@@ -236,7 +236,7 @@ class ZMQProxy(tools.CisThreadLoop):
         r"""Send single message to the server."""
         if msg is None:  # pragma: debug
             return
-        while not self.was_terminated:
+        while not self.was_break:
             try:
                 self.srv_socket.send(msg, zmq.NOBLOCK)
                 # self.srv_socket.send_multipart(msg, zmq.NOBLOCK)
@@ -248,7 +248,7 @@ class ZMQProxy(tools.CisThreadLoop):
         # socks = dict(self.poller.poll())
         # return (socks.get(self.cli_socket) == zmq.POLLIN)
         with self.lock:
-            if self.was_terminated:  # pragma: debug
+            if self.was_break:  # pragma: debug
                 return False
         out = self.cli_socket.poll(timeout=1, flags=zmq.POLLIN)
         return (out == zmq.POLLIN)

@@ -3,12 +3,7 @@ import cis_interface.drivers.tests.test_FileInputDriver as parent
 
 
 class TestAsciiFileInputParam(parent.TestFileInputParam):
-    r"""Test parameters for AsciiFileInputDriver.
-
-    Attributes (in addition to the parent class):
-        -
-
-    """
+    r"""Test parameters for AsciiFileInputDriver."""
 
     def __init__(self, *args, **kwargs):
         super(TestAsciiFileInputParam, self).__init__(*args, **kwargs)
@@ -19,23 +14,13 @@ class TestAsciiFileInputParam(parent.TestFileInputParam):
 
 class TestAsciiFileInputDriverNoStart(TestAsciiFileInputParam,
                                       parent.TestFileInputDriverNoStart):
-    r"""Test runner for AsciiFileInputDriver without start.
-
-    Attributes (in addition to the parent class):
-        -
-
-    """
+    r"""Test runner for AsciiFileInputDriver without start."""
     pass
 
     
 class TestAsciiFileInputDriver(TestAsciiFileInputParam,
                                parent.TestFileInputDriver):
-    r"""Test runner for AsciiFileInputDriver.
-
-    Attributes (in addition to the parent class):
-        -
-
-    """
+    r"""Test runner for AsciiFileInputDriver."""
 
     def assert_before_stop(self):
         r"""Assertions to make before stopping the driver instance."""

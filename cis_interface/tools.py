@@ -10,6 +10,7 @@ import signal
 import yaml
 import pystache
 import warnings
+import atexit
 from cis_interface.backwards import sio
 import subprocess
 from cis_interface import platform
@@ -779,6 +780,7 @@ class CisThread(threading.Thread, CisClass):
         self.terminate_flag = False
         self.setDaemon(True)
         self.daemon = True
+        atexit.register(self.atexit)
 
     def set_started_flag(self):
         r"""Set the started flag for the thread to True."""
@@ -852,10 +854,10 @@ class CisThread(threading.Thread, CisClass):
 
         """
         self.debug()
-        if self.was_terminated:
-            self.debug('Driver already terminated.')
-            return
         with self.lock:
+            if self.was_terminated:
+                self.debug('Driver already terminated.')
+                return
             self.set_terminated_flag()
         if not no_wait:
             # if self.is_alive():
@@ -863,11 +865,30 @@ class CisThread(threading.Thread, CisClass):
             self.wait(timeout=self.timeout)
             assert(not self.is_alive())
 
+    def atexit(self):
+        r"""Actions performed when python exits."""
+        if self.is_alive():
+            self.info()
+
 
 class CisThreadLoop(CisThread):
     r"""Thread that will run a loop until the terminate event is called."""
     def __init__(self, *args, **kwargs):
         super(CisThreadLoop, self).__init__(*args, **kwargs)
+        self.break_flag = False
+
+    def set_break_flag(self):
+        r"""Set the break flag for the thread to True."""
+        self.break_flag = True
+
+    def unset_break_flag(self):
+        r"""Set the break flag for the thread to False."""
+        self.break_flag = False
+
+    @property
+    def was_break(self):
+        r"""bool: True if the break flag was set."""
+        return self.break_flag
 
     def before_loop(self):
         r"""Actions performed before the loop."""
@@ -878,7 +899,7 @@ class CisThreadLoop(CisThread):
         if self._cis_target:
             self._cis_target(*self._cis_args, **self._cis_kwargs)
         else:
-            self.set_terminated_flag()
+            self.set_break_flag()
 
     def after_loop(self):
         r"""Actions performed after the loop."""
@@ -889,10 +910,11 @@ class CisThreadLoop(CisThread):
         self.debug("Starting loop")
         self.before_loop()
         try:
-            while not self.was_terminated:
+            while (not self.was_break):
                 self.run_loop()
+            self.set_break_flag()
         except BaseException:  # pragma: debug
-            self.set_terminated_flag()
+            self.set_break_flag()
             raise
         finally:
             for k in ['_cis_target', '_cis_args', '_cis_kwargs']:
@@ -900,3 +922,8 @@ class CisThreadLoop(CisThread):
                     delattr(self, k)
             # del self._cis_target, self._cis_args, self._cis_kwargs
         self.after_loop()
+
+    def terminate(self, *args, **kwargs):
+        r"""Also set break flag."""
+        self.set_break_flag()
+        super(CisThreadLoop, self).terminate(*args, **kwargs)

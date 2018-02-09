@@ -77,7 +77,6 @@ class MakeModelDriver(ModelDriver):
         # Compile in a new process
         self.debug("Making target.")
         self.make_target(self.target)
-        self.compiled = True
 
     def make_target(self, target):
         r"""Run the make command to make the target.
@@ -107,13 +106,6 @@ class MakeModelDriver(ModelDriver):
             self.error(output)
             raise RuntimeError("Make failed with code %d." % exit_code)
         self.debug('Make complete')
-
-    def run(self):
-        r"""Run the compiled executable if it exists."""
-        if self.compiled:
-            super(MakeModelDriver, self).run()
-        else:  # pragma: debug
-            self.error("Error compiling.")
 
     def cleanup(self):
         r"""Remove compile executable."""

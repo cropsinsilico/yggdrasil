@@ -238,8 +238,14 @@ class ConnectionDriver(Driver):
 
     def before_loop(self):
         r"""Actions to perform prior to sending messages."""
-        self.open_comm()
-        self.sleep()  # Help ensure senders/receivers connected before messages
+        try:
+            self.open_comm()
+            self.sleep()  # Help ensure senders/receivers connected before messages
+            self.debug('Running in %s, is_valid = %s', os.getcwd(), str(self.is_valid))
+        except BaseException:  # pragma: debug
+            self.exception('Could not prep for loop.')
+            self.close_comm()
+            self.set_break_flag()
 
     def after_loop(self, send_eof=None, dont_close_output=False):
         r"""Actions to perform after sending messages."""
@@ -391,54 +397,49 @@ class ConnectionDriver(Driver):
             flag = self._send_1st_message(*args, **kwargs)
         return flag
 
-    def run(self):
+    def run_loop(self):
         r"""Run the driver. Continue looping over messages until there are not
         any left or the communication channel is closed.
         """
-        self.debug('Running in %s', os.getcwd())
-        try:
-            self.before_loop()
-        except BaseException:  # pragma: debug
-            self.exception('Could not prep for loop.')
-            self.close_comm()
+        if not self.is_valid:
+            self.set_break_flag()
             return
-        while self.is_valid:
-            # Receive a message
-            self.state = 'receiving'
-            msg = self.recv_message()
-            if msg is False:
-                self.debug('No more messages')
-                break
-            if isinstance(msg, backwards.bytes_type) and len(msg) == 0:
-                self.state = 'waiting'
-                self.verbose_debug(':run: Waiting for next message.')
-                self.sleep()
-                continue
-            self.nrecv += 1
-            self.state = 'received'
-            self.debug('Received message that is %d bytes from %s.',
-                       len(msg), self.icomm.address)
-            # Process message
-            self.state = 'processing'
-            msg = self.on_message(msg)
-            if msg is False:  # pragma: debug
-                self.debug('Could not process message.')
-                break
-            elif len(msg) == 0:
-                self.debug('Message skipped.')
-                continue
-            self.nproc += 1
-            self.state = 'processed'
-            self.debug('Processed message.')
-            # Send a message
-            self.state = 'sending'
-            ret = self.send_message(msg)
-            if ret is False:
-                self.debug('Could not send message.')
-                break
-            self.nsent += 1
-            self.state = 'sent'
-            self.debug('Sent message to %s.', self.ocomm.address)
-        # Perform post-loop follow up
-        self.after_loop()
-        # self.printStatus()
+        # Receive a message
+        self.state = 'receiving'
+        msg = self.recv_message()
+        if msg is False:
+            self.debug('No more messages')
+            self.set_break_flag()
+            return
+        if isinstance(msg, backwards.bytes_type) and len(msg) == 0:
+            self.state = 'waiting'
+            self.verbose_debug(':run: Waiting for next message.')
+            self.sleep()
+            return
+        self.nrecv += 1
+        self.state = 'received'
+        self.debug('Received message that is %d bytes from %s.',
+                   len(msg), self.icomm.address)
+        # Process message
+        self.state = 'processing'
+        msg = self.on_message(msg)
+        if msg is False:  # pragma: debug
+            self.debug('Could not process message.')
+            self.set_break_flag()
+            return
+        elif len(msg) == 0:
+            self.debug('Message skipped.')
+            return
+        self.nproc += 1
+        self.state = 'processed'
+        self.debug('Processed message.')
+        # Send a message
+        self.state = 'sending'
+        ret = self.send_message(msg)
+        if ret is False:
+            self.debug('Could not send message.')
+            self.set_break_flag()
+            return
+        self.nsent += 1
+        self.state = 'sent'
+        self.debug('Sent message to %s.', self.ocomm.address)

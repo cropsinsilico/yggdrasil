@@ -114,8 +114,6 @@ class ModelDriver(Driver):
                                       forward_signals=False)
         # Start thread to queue output
         self.queue_thread = tools.CisThreadLoop(target=self.enqueue_output_loop)
-        # self.queue_thread = tools.CisThread(target=self.enqueue_output,
-        #                                     args=(self.process.stdout, self.queue))
         self.queue_thread.start()
 
     def enqueue_output_loop(self):
@@ -123,43 +121,15 @@ class ModelDriver(Driver):
         line = self.process.stdout.readline()
         if len(line) == 0:
             self.debug("Empty line from stdout")
-            self.queue_thread.set_terminated_flag()
+            self.queue_thread.set_break_flag()
             self.queue.put(self._exit_line)
         else:
             self.queue.put(line.decode('utf-8'))
 
-    def enqueue_output(self, out, queue):
-        r"""Method to call in thread to keep passing output to queue."""
-        try:
-            while ((not self.process_complete) and
-                   (not self.event_process_kill_complete.is_set())):
-                line = out.readline()
-                if len(line) == 0:
-                    self.debug("Empty line from stdout")
-                    break
-                else:
-                    queue.put(line.decode('utf-8'))
-        except BaseException:  # pragma: debug
-            self.error("Error getting output")
-            queue.put(self._exit_line)
-            raise
-        queue.put(self._exit_line)
-        out.close()
-
-    def run(self):
-        r"""Run the model on a new process, receiving output from."""
+    def before_loop(self):
+        r"""Actions before loop."""
         self.debug('Running %s from %s with cwd %s and env %s',
                    self.args, os.getcwd(), self.workingDir, pformat(self.env))
-        self.before_loop()
-        self.debug("Beginning loop")
-        # while ((not self.was_terminated) and
-        #        (not self.event_process_kill_complete.is_set())):
-        while (not self.was_terminated):
-            self.run_loop()
-        self.after_loop()
-
-    def before_loop(self):
-        pass
 
     def run_loop(self):
         r"""Loop to check if model is still running and forward output."""
@@ -168,16 +138,16 @@ class ModelDriver(Driver):
         try:
             line = self.queue.get_nowait()
         except Empty:
-            # if self.queue_thread.was_terminated:
+            # if self.queue_thread.was_break:
             #     self.debug("No more output")
-            #     self.set_terminated_flag()
+            #     self.set_break_flag()
             # This sleep is necessary to allow changes in queue without lock
             self.sleep()
             return
         else:
             if (line == self._exit_line):
                 self.debug("No more output")
-                self.set_terminated_flag()
+                self.set_break_flag()
             else:
                 self.print_encoded(line, end="")
                 sys.stdout.flush()
@@ -221,7 +191,7 @@ class ModelDriver(Driver):
         r"""Kill the process running the model, checking return code."""
         if not self.was_started:
             self.debug('Process was never started.')
-            self.set_terminated_flag()
+            self.set_break_flag()
             self.event_process_kill_called.set()
             self.event_process_kill_complete.set()
         if self.event_process_kill_called.is_set():

@@ -3,7 +3,7 @@ from cis_interface.config import cis_cfg
 from cis_interface import tools
 
 
-class Driver(tools.CisThread):
+class Driver(tools.CisThreadLoop):
     r"""Base class for all drivers.
 
     Args:
@@ -68,14 +68,10 @@ class Driver(tools.CisThread):
         self.rank = rank
         self._term_meth = "terminate"
 
-    def run(self):
-        r"""Run something in a seperate thread."""
-        self.debug()
-
     @property
     def is_valid(self):
         r"""bool: True if the driver is functional."""
-        return (not self.was_terminated)
+        return True  # (not self.was_break)
 
     def stop(self):
         r"""Stop the driver."""
@@ -102,7 +98,7 @@ class Driver(tools.CisThread):
             return
         self.do_terminate()
         self.debug()
-        super(Driver, self).terminate()
+        super(Driver, self).terminate(no_wait=True)
         self.debug('Returning')
 
     def on_model_exit(self):
