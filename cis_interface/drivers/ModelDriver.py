@@ -216,7 +216,7 @@ class ModelDriver(Driver):
                 self.error("return code of %s indicates model error.",
                            str(self.process.returncode))
             self.event_process_kill_complete.set()
-            self.queue_thread.join()
+            self.queue_thread.wait(self.timeout)
             assert(not self.queue_thread.is_alive())
 
     def graceful_stop(self):

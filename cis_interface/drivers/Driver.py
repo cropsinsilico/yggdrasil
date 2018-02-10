@@ -71,7 +71,7 @@ class Driver(tools.CisThreadLoop):
     @property
     def is_valid(self):
         r"""bool: True if the driver is functional."""
-        return True  # (not self.was_break)
+        return True
 
     def stop(self):
         r"""Stop the driver."""
@@ -98,7 +98,7 @@ class Driver(tools.CisThreadLoop):
             return
         self.do_terminate()
         self.debug()
-        super(Driver, self).terminate(no_wait=True)
+        super(Driver, self).terminate()
         self.debug('Returning')
 
     def on_model_exit(self):

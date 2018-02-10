@@ -826,7 +826,7 @@ class CisThread(threading.Thread, CisClass):
         r"""Actions to perform on the main thread before starting the thread."""
         self.debug()
 
-    def wait(self, timeout=None):
+    def wait(self, timeout=None, key=None):
         r"""Wait until thread finish to return using sleeps rather than
         blocking.
 
@@ -835,11 +835,11 @@ class CisThread(threading.Thread, CisClass):
                 the driver to finish. Defaults to None and is infinite.
 
         """
-        T = self.start_timeout(timeout)
+        T = self.start_timeout(timeout, key_level=1, key=key)
         while self.is_alive() and not T.is_out:
             self.debug('Waiting for thread to finish...')
             self.sleep()
-        self.stop_timeout()
+        self.stop_timeout(key_level=1, key=key)
 
     def terminate(self, no_wait=False):
         r"""Set the terminate event and wait for the thread to stop.
@@ -869,6 +869,7 @@ class CisThread(threading.Thread, CisClass):
         r"""Actions performed when python exits."""
         if self.is_alive():
             self.info()
+            self.set_break_flag()
 
 
 class CisThreadLoop(CisThread):

@@ -290,7 +290,7 @@ class CommBase(CisClass):
                  (not self._closing_thread.was_terminated))):
                 self._closing_thread.start()
         if self._closing_thread.was_started:
-            self._closing_thread.join()
+            self._closing_thread.wait(key=str(uuid.uuid4()))
 
     def linger_close(self):
         r"""If self.linger_on_close, wait for messages to drain. Then close."""
