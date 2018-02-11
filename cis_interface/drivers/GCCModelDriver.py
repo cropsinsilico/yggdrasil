@@ -310,6 +310,9 @@ class GCCModelDriver(ModelDriver):
                                "provided arguments.")
         
     def remove_products(self):
+        r"""Delete products produced during the compilation process."""
+        if self.efile is None:
+            return
         products = [self.efile]
         if platform._is_win:
             base = os.path.splitext(self.efile)[0]
