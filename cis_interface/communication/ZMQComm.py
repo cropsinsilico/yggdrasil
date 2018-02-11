@@ -49,7 +49,8 @@ def unregister_socket(socket_type_name, address, linger=0):
     global _registered_sockets
     key = '%s_%s' % (socket_type_name, address)
     if key in _registered_sockets:
-        _registered_sockets[key].close(linger=linger)
+        if not _registered_sockets[key].closed:
+            _registered_sockets[key].close(linger=linger)
         del _registered_sockets[key]
 
         
@@ -534,7 +535,7 @@ class ZMQComm(CommBase.CommBase):
         if self._connected:
             self.register_socket()
 
-    def unbind(self):
+    def unbind(self, linger=0):
         r"""Unbind from address."""
         if self._bound:
             self.debug('Unbinding from %s' % self.address)
@@ -542,11 +543,11 @@ class ZMQComm(CommBase.CommBase):
                 self.socket.unbind(self.address)
             except zmq.ZMQError:
                 pass
-            self.unregister_socket()
+            self.unregister_socket(linger=linger)
             self._bound = False
         self.debug('Unbound socket')
 
-    def disconnect(self):
+    def disconnect(self, linger=0):
         r"""Disconnect from address."""
         if self._connected:
             self.debug('Disconnecting from %s' % self.address)
@@ -554,7 +555,7 @@ class ZMQComm(CommBase.CommBase):
                 self.socket.disconnect(self.address)
             except zmq.ZMQError:
                 pass
-            self.unregister_socket()
+            self.unregister_socket(linger=linger)
             self._connected = False
         self.debug('Disconnected socket')
 
@@ -593,13 +594,16 @@ class ZMQComm(CommBase.CommBase):
             self._bound = False
             self._connected = False
         else:
-            if self.socket_action == 'bind':
-                self.unbind()
-            elif self.socket_action == 'connect':
-                self.disconnect()
-            self.debug("Closing socket %s", self.address)
             if linger:
-                linger_time = 60 * 1000
+                if self.is_interface:
+                    linger_time = -1
+                else:
+                    linger_time = 60 * 1000
+            if self.socket_action == 'bind':
+                self.unbind(linger=linger_time)
+            elif self.socket_action == 'connect':
+                self.disconnect(linger=linger_time)
+            self.debug("Closing socket %s", self.address)
         # Ensure socket not still open
         self._openned = False
         self.unregister_socket(linger=linger_time)
