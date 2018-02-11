@@ -23,11 +23,13 @@ class CommServer(tools.CisThreadLoop):
         cli_count (int): Number of clients that have connected to this server.
 
     """
-    def __init__(self, srv_address, **kwargs):
+    def __init__(self, srv_address, cli_address=None, **kwargs):
         global _registered_servers
         self.cli_count = 0
+        if cli_address is None:
+            cli_address = srv_address
         self.srv_address = srv_address
-        self.cli_address = srv_address
+        self.cli_address = cli_address
         super(CommServer, self).__init__('CommServer.%s' % srv_address, **kwargs)
         _registered_servers[self.srv_address] = self
 

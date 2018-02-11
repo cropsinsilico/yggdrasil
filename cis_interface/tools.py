@@ -72,7 +72,8 @@ def check_sockets():
     logging.info("%d sockets closed." % count)
 
 
-atexit.register(check_sockets)
+if not os.environ.get('CIS_SUBPROCESS', False):
+    atexit.register(check_sockets)
 atexit.register(check_threads)
 atexit.register(check_locks)
 

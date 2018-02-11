@@ -22,21 +22,6 @@ _default_protocol = 'tcp'
 _wait_send_t = 0  # 0.0001
 
 
-# def close_global_context():
-#     r"""Close the global context."""
-#     print("closing")
-#     ctx = zmq.Context.instance()
-#     ctx.term()
-#     # ctx.destroy(linger=0)
-#     print("closed")
-
-
-# import atexit
-# import os
-# if not os.environ.get('CIS_SUBPROCESS', False):
-#     atexit.register(close_global_context)
-
-
 def register_socket(socket_type_name, address, socket):
     r"""Register a socket.
 
@@ -237,7 +222,7 @@ class ZMQProxy(CommBase.CommServer):
         # self.poller = zmq.Poller()
         # self.poller.register(frontend, zmq.POLLIN)
         # Set name
-        super(ZMQProxy, self).__init__(self.srv_address, **kwargs)
+        super(ZMQProxy, self).__init__(self.srv_address, self.cli_address, **kwargs)
         self.name = 'ZMQProxy.%s' % srv_address
 
     def client_recv(self):
