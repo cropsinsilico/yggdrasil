@@ -199,6 +199,8 @@ class IPCComm(CommBase.CommBase):
         else:
             self.backlog_thread = tools.CisThreadLoop(target=self.run_backlog_send,
                                                       name=self.name + 'SendBacklog')
+            if self.is_interface:
+                self.backlog_thread.on_main_terminated = self.on_main_terminated
         self.backlog_send_ready = threading.Event()
         self.backlog_recv_ready = threading.Event()
         self.backlog_open = False  # threading.Event()
@@ -206,6 +208,10 @@ class IPCComm(CommBase.CommBase):
             self.bind()
         else:
             self.open()
+
+    def on_main_terminated(self):
+        self.backlog_thread._1st_main_terminated = True
+        self.close_on_empty(no_wait=True)
 
     @classmethod
     def is_installed(cls):
