@@ -83,6 +83,7 @@ class CisRunner(CisClass):
         self.interrupt_time = 0
         self._inputchannels = {}
         self._outputchannels = {}
+        self._old_handlers = {}
         self.error_flag = False
         # Setup logging
         # if cis_debug_prefix is None:
@@ -223,6 +224,12 @@ class CisRunner(CisClass):
             self.printStatus()
             self.pprint(80 * '*')
         self.debug('%d returns', sig)
+
+    def _swap_handler(self, signum, signal_handler):
+        self._old_handlers[signum] = signal.getsignal(signum)
+        signal.signal(signum, signal_handler)
+        if not platform._is_win:
+            signal.siginterrupt(signum, False)
         
     def set_signal_handler(self, signal_handler=None):
         r"""Set the signal handler.
@@ -235,18 +242,21 @@ class CisRunner(CisClass):
         """
         if signal_handler is None:
             signal_handler = self.signal_handler
-        signal.signal(signal.SIGINT, signal_handler)
+        self._swap_handler(signal.SIGINT, signal_handler)
         if not platform._is_win:
-            signal.signal(signal.SIGTERM, signal_handler)
-            signal.siginterrupt(signal.SIGTERM, False)
-            signal.siginterrupt(signal.SIGINT, False)
+            self._swap_handler(signal.SIGTERM, signal_handler)
         else:
-            signal.signal(signal.SIGBREAK, signal_handler)
+            self._swap_handler(signal.SIGBREAK, signal_handler)
             if False:
                 import ctypes
                 handler = ctypes.WINFUNCTYPE(ctypes.c_int,
                                              ctypes.c_uint)(signal_handler)
                 ctypes.windll.kernel32.SetConsoleCtrlHandler(handler, True)
+
+    def reset_signal_handler(self):
+        r"""Reset signal handlers to old ones."""
+        for k, v in self._old_handlers.items():
+            signal.signal(k, v)
 
     def run(self, signal_handler=None):
         r"""Run all of the models and wait for them to exit."""
@@ -254,6 +264,7 @@ class CisRunner(CisClass):
         self.startDrivers()
         self.set_signal_handler(signal_handler)
         self.waitModels()
+        self.reset_signal_handler()
         self.closeChannels()
         self.cleanup()
 

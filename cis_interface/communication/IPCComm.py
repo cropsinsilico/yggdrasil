@@ -1,4 +1,5 @@
 import sys
+import uuid
 from logging import warn
 import threading
 from subprocess import Popen, PIPE
@@ -200,6 +201,7 @@ class IPCComm(CommBase.CommBase):
                                                       name=self.name + 'SendBacklog')
         self.backlog_send_ready = threading.Event()
         self.backlog_recv_ready = threading.Event()
+        self.backlog_open = False  # threading.Event()
         if dont_open:
             self.bind()
         else:
@@ -209,6 +211,11 @@ class IPCComm(CommBase.CommBase):
     def is_installed(cls):
         r"""bool: Is the comm installed."""
         return _ipc_installed
+
+    def atexit(self, *args, **kwargs):
+        if self.backlog_thread.is_alive():
+            self.info("is_alive = %s", self.backlog_thread.is_alive())
+        super(IPCComm, self).atexit(*args, **kwargs)
 
     @property
     def maxMsgSize(self):
@@ -244,13 +251,49 @@ class IPCComm(CommBase.CommBase):
     def open(self):
         r"""Open the connection by connecting to the queue."""
         super(IPCComm, self).open()
-        if not self.is_open:
+        self._open_queue()
+        self._open_backlog()
+
+    def _open_queue(self):
+        r"""Open the queue."""
+        if not self.is_open_queue:
             if not self._bound:
                 self.bind()
             self.open_after_bind()
             self.debug("qid: %s", self.q.key)
+
+    def _open_backlog(self):
+        r"""Open the backlog."""
+        if not self.is_open_backlog:
+            self.backlog_open = True
             self.backlog_thread.start()
-            
+
+    def _close_queue(self, skip_remove=False):
+        r"""Close the queue."""
+        if self._bound and (self.q is None):
+            try:
+                self.open_after_bind()
+            except sysv_ipc.ExistentialError:  # pragma: debug
+                self.q = None
+                self._bound = False
+        # Remove the queue
+        if (self.q is not None) and (not skip_remove):
+            try:
+                remove_queue(self.q)
+            except (KeyError, sysv_ipc.ExistentialError):
+                pass
+        self.q = None
+        self._bound = False
+
+    def _close_backlog(self, wait=False):
+        r"""Close the backlog thread."""
+        self.backlog_open = False
+        self.backlog_thread.set_break_flag()
+        self.backlog_send_ready.set()
+        self.backlog_recv_ready.set()
+        if wait:
+            self.backlog_thread.wait(key=str(uuid.uuid4()))
+
     def _close(self, linger=False):
         r"""Close the connection.
 
@@ -259,64 +302,67 @@ class IPCComm(CommBase.CommBase):
                 comm. Defaults to False.
 
         """
-        if self._bound and not self.is_open:
-            try:
-                self.open_after_bind()
-            except sysv_ipc.ExistentialError:  # pragma: debug
-                self.q = None
-                self._bound = False
-        # Remove the queue
-        if self.is_open:
-            try:
-                remove_queue(self.q)
-            except (KeyError, sysv_ipc.ExistentialError):
-                pass
-        self.q = None
-        self._bound = False
-        # Set events so that threads stop blocking and register close
-        self.backlog_thread.set_break_flag()
-        self.backlog_send_ready.set()
-        self.backlog_recv_ready.set()
+        self._close_queue(skip_remove=linger)
+        self._close_backlog(wait=True)
         super(IPCComm, self)._close(linger=linger)
-            
+
     @property
     def is_open(self):
         r"""bool: True if the queue is not None."""
-        return (self.q is not None)
+        return self.is_open_queue or self.is_open_backlog
+
+    @property
+    def is_open_queue(self):
+        r"""bool: True if the queue is not None."""
+        if self.q is None:
+            return False
+        try:
+            self.q.current_messages
+        except sysv_ipc.ExistentialError:  # pragma: debug
+            self._close_queue()
+            return False
+        return True
+
+    @property
+    def is_open_backlog(self):
+        r"""bool: True if the backlog thread is running."""
+        return self.backlog_open
 
     @property
     def n_msg_queued(self):
         r"""int: Number of messages in the queue."""
-        if self.is_open:
+        if self.is_open_queue:
             try:
                 return self.q.current_messages
             except sysv_ipc.ExistentialError:  # pragma: debug
-                # self.close()
+                self._close_queue()
                 return 0
         else:
             return 0
         
     @property
-    def n_msg_backlogged(self):
-        r"""int: Number of backlogged messages."""
-        if self.is_open:
-            if self.direction == "recv":
-                return len(self.backlog_recv)
-            else:
-                return len(self.backlog_send)
-        else:
-            return 0
-
-    @property
     def n_msg_recv(self):
         r"""int: Number of messages in the receive backlog."""
-        # return self.n_msg_queued + self.n_msg_backlogged
-        return len(self.backlog_recv) + self.n_msg_queued
+        if self.is_open_backlog:
+            return len(self.backlog_recv)
+        return 0
 
     @property
     def n_msg_send(self):
         r"""int: Number of messages in the send backlog."""
-        return len(self.backlog_send) + self.n_msg_queued
+        if self.is_open_backlog:
+            return len(self.backlog_send)
+        return 0
+
+    # @property
+    # def n_msg_recv_drain(self):
+    #     r"""int: Number of messages in the receive backlog and queue."""
+    #     return self.n_msg_queued + self.n_msg_recv
+
+    # @property
+    # def n_msg_send_drain(self):
+    #     r"""int: Number of messages in the send backlog and queue."""
+    #     return self.n_msg_queued + self.n_msg_send
 
     @property
     def backlog_recv(self):
@@ -384,22 +430,28 @@ class IPCComm(CommBase.CommBase):
 
     def run_backlog_send(self):
         r"""Continue trying to send buffered messages."""
-        flag = self.backlog_send_ready.wait(self.sleeptime)
-        if not self.is_open:
-            self.backlog_thread.set_break_flag()
+        # flag = self.backlog_send_ready.wait(self.sleeptime)
+        if not self.is_open_backlog:
+            self._close_backlog()
             return
-        if flag:
-            if not self.send_backlog():
-                self.backlog_thread.set_break_flag()
+        # if flag:
+        if not self.send_backlog():
+            self._close_backlog()
+            return
+        self.sleep()
 
     def run_backlog_recv(self):
         r"""Continue buffering received messages."""
-        if not self.is_open:
+        if self.backlog_thread.main_terminated:
+            self.close()
+        if not self.is_open_backlog:
+            self._close_backlog()
+            return
+        if not self.recv_backlog():
+            # Stop the thread, but don't close the backlog
             self.backlog_thread.set_break_flag()
             return
-        flag = self.recv_backlog()
-        if not flag:
-            self.backlog_thread.set_break_flag()
+        self.sleep()
 
     def send_backlog(self):
         r"""Send a message from the send backlog to the queue."""
@@ -438,7 +490,7 @@ class IPCComm(CommBase.CommBase):
             bool: Success or failure of sending the message.
 
         """
-        if not self.is_open:  # pragma: debug
+        if not self.is_open_queue:  # pragma: debug
             return False
         block = False
         if self.is_interface:
@@ -461,7 +513,7 @@ class IPCComm(CommBase.CommBase):
                 self.debug('%d bytes backlogged', len(payload))
         except OSError:  # pragma: debug
             self.debug("Send failed")
-            self.close()
+            self._close_queue()
             return False
         except AttributeError:  # pragma: debug
             if self.is_closed:
@@ -501,7 +553,7 @@ class IPCComm(CommBase.CommBase):
                 self.debug("Received %d bytes", len(data))
             except sysv_ipc.ExistentialError:  # pragma: debug
                 self.debug("sysv_ipc.ExistentialError: closing")
-                self.close()
+                self._close_queue()
                 return (False, self.empty_msg)
             except AttributeError:  # pragma: debug
                 if self.is_closed:

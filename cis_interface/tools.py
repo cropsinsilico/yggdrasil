@@ -18,6 +18,43 @@ from cis_interface import backwards
 from cis_interface.config import cis_cfg, cfg_logging
 
 
+_thread_registry = {}
+_lock_registry = {}
+
+
+def check_threads():
+    r"""Check for threads that are still running."""
+    global _thread_registry
+    logging.info("Checking %d threads" % len(_thread_registry))
+    for k, v in _thread_registry.items():
+        if v.is_alive():
+            logging.error("Thread is alive: %s" % k)
+    logging.info("%d threads running" % threading.active_count())
+    for t in threading.enumerate():
+        logging.info("%s thread running" % t.name)
+    # if not os.environ.get('CIS_SUBPROCESS', False):
+    #     import pdb; pdb.set_trace()
+
+
+def check_locks():
+    r"""Check for locks in lock registry that are locked."""
+    global _lock_registry
+    logging.info("Checking %d locks" % len(_lock_registry))
+    for k, v in _lock_registry.items():
+        res = v.acquire(False)
+        if res:
+            v.release()
+        else:
+            logging.error("Lock could not be acquired: %s" % k)
+    logging.info("%d threads running" % threading.active_count())
+    for t in threading.enumerate():
+        logging.info("%s thread running" % t.name)
+
+
+atexit.register(check_threads)
+atexit.register(check_locks)
+
+
 def locate_path(fname, basedir=os.path.abspath(os.sep)):
     r"""Find the full path to a file using where on Windows."""
     try:
@@ -360,6 +397,17 @@ class TimeOut(object):
         if self.max_time is False:
             return False
         return (self.elapsed > self.max_time)
+
+
+def single_use_method(func):
+    r"""Decorator for marking functions that should only be called once."""
+    def wrapper(*args, **kwargs):
+        if getattr(func, '_single_use_method_called', False):
+            return
+        else:
+            func._single_use_method_called = True
+            return func(*args, **kwargs)
+    return wrapper
 
 
 class CisClass(object):
@@ -760,7 +808,9 @@ class CisThread(threading.Thread, CisClass):
             should be terminated. The target must exit when this is set.
 
     """
-    def __init__(self, name=None, target=None, args=(), kwargs=None, **cis_kwargs):
+    def __init__(self, name=None, target=None, args=(), kwargs=None,
+                 daemon=False, **cis_kwargs):
+        global _lock_registry
         if kwargs is None:
             kwargs = {}
         thread_kwargs = dict(name=name, target=target, args=args, kwargs=kwargs)
@@ -778,9 +828,17 @@ class CisThread(threading.Thread, CisClass):
         self.terminate_event = threading.Event()
         self.start_flag = False
         self.terminate_flag = False
-        self.setDaemon(True)
-        self.daemon = True
-        atexit.register(self.atexit)
+        if daemon:
+            self.setDaemon(True)
+            self.daemon = True
+        _thread_registry[self.name] = self
+        _lock_registry[self.name] = self.lock
+        # atexit.register(self.atexit)
+
+    @property
+    def main_terminated(self):
+        r"""bool: True if the main thread has terminated."""
+        return (not threading.main_thread().is_alive())
 
     def set_started_flag(self):
         r"""Set the started flag for the thread to True."""
@@ -822,6 +880,18 @@ class CisThread(threading.Thread, CisClass):
             self.before_start()
         super(CisThread, self).start(*args, **kwargs)
 
+    def run(self, *args, **kwargs):
+        r"""Continue running until terminate event set."""
+        self.debug("Starting method")
+        try:
+            super(CisThread, self).run(*args, **kwargs)
+        except BaseException:  # pragma: debug
+            self.exception("THREAD ERROR")
+        finally:
+            for k in ['_cis_target', '_cis_args', '_cis_kwargs']:
+                if hasattr(self, k):
+                    delattr(self, k)
+
     def before_start(self):
         r"""Actions to perform on the main thread before starting the thread."""
         self.debug()
@@ -833,11 +903,13 @@ class CisThread(threading.Thread, CisClass):
         Args:
             timeout (float, optional): Maximum time that should be waited for
                 the driver to finish. Defaults to None and is infinite.
+            key (str, optional): Key that should be used to register the timeout.
+                Defaults to None and is set based on the stack trace.
 
         """
         T = self.start_timeout(timeout, key_level=1, key=key)
         while self.is_alive() and not T.is_out:
-            self.debug('Waiting for thread to finish...')
+            self.verbose_debug('Waiting for thread to finish...')
             self.sleep()
         self.stop_timeout(key_level=1, key=key)
 
@@ -868,7 +940,6 @@ class CisThread(threading.Thread, CisClass):
     def atexit(self):
         r"""Actions performed when python exits."""
         if self.is_alive():
-            self.info()
             self.set_break_flag()
 
 
@@ -877,6 +948,12 @@ class CisThreadLoop(CisThread):
     def __init__(self, *args, **kwargs):
         super(CisThreadLoop, self).__init__(*args, **kwargs)
         self.break_flag = False
+        self._1st_main_terminated = False
+
+    def on_main_terminated(self):
+        r"""Actions performed when 1st main terminated."""
+        self._1st_main_terminated = True
+        self.set_break_flag()
 
     def set_break_flag(self):
         r"""Set the break flag for the thread to True."""
@@ -909,20 +986,22 @@ class CisThreadLoop(CisThread):
     def run(self, *args, **kwargs):
         r"""Continue running until terminate event set."""
         self.debug("Starting loop")
-        self.before_loop()
         try:
+            self.before_loop()
             while (not self.was_break):
-                self.run_loop()
+                if self.main_terminated and (not self._1st_main_terminated):
+                    self.on_main_terminated()
+                else:
+                    self.run_loop()
             self.set_break_flag()
+            self.after_loop()
         except BaseException:  # pragma: debug
+            self.exception("THREAD ERROR")
             self.set_break_flag()
-            raise
         finally:
             for k in ['_cis_target', '_cis_args', '_cis_kwargs']:
                 if hasattr(self, k):
                     delattr(self, k)
-            # del self._cis_target, self._cis_args, self._cis_kwargs
-        self.after_loop()
 
     def terminate(self, *args, **kwargs):
         r"""Also set break flag."""

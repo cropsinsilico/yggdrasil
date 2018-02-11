@@ -154,13 +154,11 @@ class CommBase(CisClass):
         self._timeout_drain = self.timeout
         if not dont_open:
             self.open()
-        if self.is_interface and (self.direction == 'send'):
-            atexit.register(self.interface_close)
-        else:
-            atexit.register(self.close)
         self._closing_event = threading.Event()
         self._closing_thread = tools.CisThread(target=self.linger_close)
         self._eof_sent = threading.Event()
+        if self.is_interface:
+            atexit.register(self.atexit)
 
     @classmethod
     def _determine_suffix(cls, no_suffix=False, reverse_names=False,
@@ -283,20 +281,31 @@ class CommBase(CisClass):
                 self.remove_work_comm(c, linger=linger)
             self.debug("Finished cleaning up work comms")
 
-    def close_on_empty(self):
+    def close_on_empty(self, no_wait=False):
         r"""In a new thread, close the comm when it is empty."""
         with self._closing_thread.lock:
             if (((not self._closing_thread.was_started) and
                  (not self._closing_thread.was_terminated))):
                 self._closing_thread.start()
-        if self._closing_thread.was_started:
+        if self._closing_thread.was_started and (not no_wait):
             self._closing_thread.wait(key=str(uuid.uuid4()))
 
     def linger_close(self):
-        r"""If self.linger_on_close, wait for messages to drain. Then close."""
+        r"""Wait for messages to drain, then close."""
         self.close(linger=True)
 
-    def interface_close(self):
+    def background_atexit(self):
+        r"""Close operations in background."""
+        self.atexit(no_wait=True)
+
+    def atexit(self, no_wait=False):
+        r"""Close operations."""
+        if self.is_interface and (self.direction == 'send'):
+            self.interface_close(no_wait=no_wait)
+        else:
+            self.close()
+
+    def interface_close(self, no_wait=False):
         r"""Close operations for interface send comms."""
         self.send_eof()
         self.linger_close()
@@ -328,6 +337,16 @@ class CommBase(CisClass):
     def n_msg_send(self):
         r"""int: The number of outgoing messages in the connection."""
         return 0
+
+    @property
+    def n_msg_recv_drain(self):
+        r"""int: The number of incoming messages in the connection to drain."""
+        return self.n_msg_recv
+
+    @property
+    def n_msg_send_drain(self):
+        r"""int: The number of outgoing messages in the connection to drain."""
+        return self.n_msg_send
 
     @property
     def eof_msg(self):
@@ -960,7 +979,7 @@ class CommBase(CisClass):
         if timeout is None:
             timeout = self._timeout_drain
         Tout = self.start_timeout(timeout)
-        while (not Tout.is_out) and (self.n_msg_recv > 0) and self.is_open:
+        while (not Tout.is_out) and (self.n_msg_recv_drain > 0) and self.is_open:
             self.verbose_debug("Draining recv messages.")
             self.sleep()
         self.stop_timeout()
@@ -970,7 +989,7 @@ class CommBase(CisClass):
         if timeout is None:
             timeout = self._timeout_drain
         Tout = self.start_timeout(timeout)
-        while (not Tout.is_out) and (self.n_msg_send > 0) and self.is_open:
+        while (not Tout.is_out) and (self.n_msg_send_drain > 0) and self.is_open:
             self.verbose_debug("Draining send messages.")
             self.sleep()
         self.stop_timeout()

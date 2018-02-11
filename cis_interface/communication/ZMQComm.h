@@ -49,9 +49,10 @@ int new_zmq_address(comm_t *comm) {
     return -1;
   }
   if (strcmp(comm->direction, "send") == 0) {
-    zsock_set_linger(s, -1);
+    zsock_set_linger(s, 60 * 1000);
+  } else {
+    zsock_set_linger(s, 0);
   }
-  // zsock_set_linger(s, 100);
   int port = zsock_bind(s, "%s", address);
   if (port == -1) {
     cislog_error("new_zmq_address: Could not bind socket to address = %s",
@@ -67,22 +68,6 @@ int new_zmq_address(comm_t *comm) {
   strcpy(comm->address, address);
   if (strlen(comm->name) == 0)
     sprintf(comm->name, "tempnewZMQ-%d", port);
-  // Unbind and connect if this is a recv socket
-  // int ret;
-  /* if (strcmp(comm->direction, "recv") == 0) { */
-  /*   ret = zsock_unbind(s, "%s", comm->address); */
-  /*   printf("unbound from %s (ret = %d)\n", comm->address, ret); */
-  /*   if (ret == -1) { */
-  /*     cislog_error("new_zmq_address: Could not unbind socket for connect."); */
-  /*     return ret; */
-  /*   } */
-  /*   ret = zsock_connect(s, "%s", comm->address); */
-  /*   if (ret == -1) { */
-  /*     cislog_error("new_zmq_address: Could not connect socket to address = %s", */
-  /* 		   address); */
-  /*     return ret; */
-  /*   } */
-  /* } */
   comm->handle = (void*)s;
   _cisSocketsCreated++;
   return 0;
@@ -103,31 +88,17 @@ int init_zmq_comm(comm_t *comm) {
     cislog_error("init_zmq_address: Could not initialize empty socket.");
     return -1;
   }
-  zsock_set_linger(s, 100);
-  /* int port = zsock_bind(s, comm->address); */
-  /* if (port == -1) { */
-  /*   cislog_error("init_zmq_address: Could not bind socket to address = %s", */
-  /* 		 comm->address); */
-  /*   return -1; */
-  /* } */
-  /* if (strlen(comm->name) == 0) */
-  /*  sprintf(comm->name, "tempinitZMQ-%d", port); */
-  /* if (0) { */
-  /* if (strcmp(comm->direction, "send") == 0) { */
-  /*   ret = zsock_bind(s, "%s", comm->address); */
-  /*   if (ret == -1) { */
-  /*     cislog_error("new_zmq_address: Could not bind socket to address = %s", */
-  /* 		   comm->address); */
-  /*     return ret; */
-  /*   } */
-  /* } else { */
+  if (strcmp(comm->direction, "send") == 0) {
+    zsock_set_linger(s, 60 * 1000);
+  } else {
+    zsock_set_linger(s, 0);
+  }
   ret = zsock_connect(s, "%s", comm->address);
   if (ret == -1) {
     cislog_error("new_zmq_address: Could not connect socket to address = %s",
   		 comm->address);
     return ret;
   }
-  /* } */
   if (strlen(comm->name) == 0)
     sprintf(comm->name, "tempinitZMQ-%s", comm->address);
   // Asign to void pointer

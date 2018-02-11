@@ -265,9 +265,8 @@ class ConnectionDriver(Driver):
         if send_eof:
             self.send_eof()
         # Close output comm after waiting for output to be processed
-        with self.lock:
-            if not dont_close_output:
-                self.ocomm.close_on_empty()
+        if not dont_close_output:
+            self.ocomm.close_on_empty()
 
     def recv_message(self, **kwargs):
         r"""Get a new message to send.
@@ -391,6 +390,7 @@ class ConnectionDriver(Driver):
             bool: Success or failure of send.
 
         """
+        self.debug()
         if self._first_send_done:
             flag = self._send_message(*args, **kwargs)
         else:

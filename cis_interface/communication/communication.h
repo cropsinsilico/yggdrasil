@@ -83,7 +83,7 @@ void clean_comms(void) {
   }
   free(vcomms2clean);
   ncomms2clean = 0;
-#if defined(_WIN32) && defined(ZMQINSTALLED) // && defined(__cplusplus)
+#if defined(_WIN32) && defined(ZMQINSTALLED)
   zsys_shutdown();
 #endif
 };

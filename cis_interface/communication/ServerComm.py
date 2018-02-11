@@ -142,7 +142,7 @@ class ServerComm(CommBase.CommBase):
     def remove_response_comm(self):
         r"""Remove response comm."""
         self.icomm._last_header = None
-        # self.ocomm.close()
+        self.ocomm.close_on_empty()
         self.ocomm = None
 
     # SEND METHODS

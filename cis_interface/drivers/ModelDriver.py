@@ -108,6 +108,7 @@ class ModelDriver(Driver):
             pre_args += ['valgrind'] + self.valgrind_flags
         env = copy.deepcopy(self.env)
         env.update(os.environ)
+        env['CIS_SUBPROCESS'] = "True"
         # print(pre_args + self.args)
         self.process = tools.CisPopen(pre_args + self.args, env=env,
                                       cwd=self.workingDir,
@@ -118,7 +119,14 @@ class ModelDriver(Driver):
 
     def enqueue_output_loop(self):
         r"""Keep passing lines to queue."""
-        line = self.process.stdout.readline()
+        if self.process_complete:
+            self.debug("Process complete")
+            self.queue_thread.set_break_flag()
+            self.queue.put(self._exit_line)
+        try:
+            line = self.process.stdout.readline()
+        except ValueError:
+            line = ""
         if len(line) == 0:
             self.debug("Empty line from stdout")
             self.queue_thread.set_break_flag()
@@ -134,7 +142,6 @@ class ModelDriver(Driver):
     def run_loop(self):
         r"""Loop to check if model is still running and forward output."""
         # Continue reading until there is not any output
-        
         try:
             line = self.queue.get_nowait()
         except Empty:
@@ -143,6 +150,8 @@ class ModelDriver(Driver):
             #     self.set_break_flag()
             # This sleep is necessary to allow changes in queue without lock
             self.sleep()
+            if self.process_complete:
+                self.process.stdout.close()
             return
         else:
             if (line == self._exit_line):
@@ -156,7 +165,7 @@ class ModelDriver(Driver):
         r"""Actions to perform after run_loop has finished. Mainly checking
         if there was an error and then handling it."""
         self.debug()
-        # self.wait_process(self.timeout)
+        self.wait_process(self.timeout)
         # self.process.stdout.close()
         self.kill_process()
 
@@ -168,12 +177,14 @@ class ModelDriver(Driver):
             return True
         return (self.process.poll() is not None)
 
-    def wait_process(self, timeout=None):
+    def wait_process(self, timeout=None, key=None):
         r"""Wait for some amount of time for the process to finish.
 
         Args:
             timeout (float, optional): Time (in seconds) that should be waited.
                 Defaults to None and is infinite.
+            key (str, optional): Key that should be used to register the timeout.
+                Defaults to None and set based on the stack trace.
 
         Returns:
             bool: True if the process completed. False otherwise.
@@ -181,10 +192,10 @@ class ModelDriver(Driver):
         """
         if not self.was_started:
             return True
-        T = self.start_timeout(timeout, key_level=1)
+        T = self.start_timeout(timeout, key_level=1, key=key)
         while ((not T.is_out) and (not self.process_complete)):  # pragma: debug
             self.sleep()
-        self.stop_timeout(key_level=1)
+        self.stop_timeout(key_level=1, key=key)
         return self.process_complete
 
     def kill_process(self):

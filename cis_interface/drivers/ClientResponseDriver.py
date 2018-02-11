@@ -60,8 +60,7 @@ class ClientResponseDriver(ConnectionDriver):
 
     def after_loop(self):
         r"""Don't send anything to the client."""
-        super(ClientResponseDriver, self).after_loop(send_eof=False,
-                                                     dont_close_output=False)
+        super(ClientResponseDriver, self).after_loop(send_eof=False)
         
     def send_message(self, *args, **kwargs):
         r"""Close the input comm once message sent.

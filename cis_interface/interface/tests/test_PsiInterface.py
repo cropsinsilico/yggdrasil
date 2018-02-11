@@ -1,10 +1,11 @@
 import os
 import numpy as np
 import nose.tools as nt
+import unittest
 from cis_interface.interface import PsiInterface
 from cis_interface.tools import CIS_MSG_EOF, get_CIS_MSG_MAX, CIS_MSG_BUF
 from cis_interface.drivers import (
-    import_driver, InputCommDriver, OutputCommDriver)
+    import_driver, InputCommDriver, OutputCommDriver, MatlabModelDriver)
 from cis_interface.tests import CisTest, IOInfo
 
 
@@ -26,6 +27,7 @@ def test_bufMsgSize():
     nt.assert_equal(PsiInterface.bufMsgSize(), CIS_MSG_BUF)
 
 
+@unittest.skipIf(not MatlabModelDriver._matlab_installed, "Matlab not installed.")
 def test_PsiMatlab_class():
     r"""Test Matlab interface for classes."""
     name = 'test'
@@ -43,6 +45,7 @@ def test_PsiMatlab_class():
     drv.terminate()
 
 
+@unittest.skipIf(not MatlabModelDriver._matlab_installed, "Matlab not installed.")
 def test_PsiMatlab_variables():
     r"""Test Matlab interface for variables."""
     nt.assert_equal(PsiInterface.PsiMatlab('PSI_MSG_MAX'), CIS_MSG_MAX)
@@ -93,7 +96,7 @@ class TestBase(CisTest, IOInfo):
     def teardown(self):
         r"""Stop the driver."""
         if not self._skip_start:
-            self.driver.stop()
+            self.driver.terminate()
         super(TestBase, self).teardown()
 
     def remove_instance(self, inst):

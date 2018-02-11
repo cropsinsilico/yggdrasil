@@ -19,7 +19,22 @@ _socket_protocols = ['tcp', 'inproc', 'ipc', 'udp', 'pgm', 'epgm']
 _flag_zmq_filter = backwards.unicode2bytes('_ZMQFILTER_')
 _default_socket_type = 4
 _default_protocol = 'tcp'
-_wait_send_t = 0  # 0.0001
+_wait_send_t = 0.0001
+
+
+# def close_global_context():
+#     r"""Close the global context."""
+#     print("closing")
+#     # ctx = zmq.Context.instance()
+#     # ctx.term()
+#     # ctx.destroy(linger=0)
+#     print("closed")
+
+
+# import atexit
+# import os
+# if not os.environ.get('CIS_SUBPROCESS', False):
+#     atexit.register(close_global_context)
 
 
 def register_socket(socket_type_name, address):
@@ -271,10 +286,10 @@ class ZMQProxy(tools.CisThreadLoop):
         r"""Close the sockets."""
         self.debug('Closing sockets')
         if self.cli_socket:
-            self.cli_socket.close()
+            self.cli_socket.close(linger=0)
             self.cli_socket = None
         if self.srv_socket:
-            self.srv_socket.close()
+            self.srv_socket.close(linger=0)
             self.srv_socket = None
         unregister_socket('ROUTER', self.cli_address)
         unregister_socket('DEALER', self.srv_address)
@@ -592,9 +607,9 @@ class ZMQComm(CommBase.CommBase):
                 self.disconnect()
             self.debug("Closing socket %s", self.address)
             if linger:
-                self.socket.close(linger=-1)
+                self.socket.close(linger=60 * 1000)
             else:
-                self.socket.close()
+                self.socket.close(linger=0)
         # Ensure socket not still open
         self._openned = False
         self.unregister_socket()

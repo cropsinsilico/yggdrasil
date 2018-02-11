@@ -37,6 +37,7 @@ def test_Arunner_interrupt():
     tools.kill(os.getpid(), signal.SIGINT)
     tools.kill(os.getpid(), signal.SIGINT)
     print("after interrupt")
+    cr.reset_signal_handler()
     # cr.waitModels()
     # cr.closeChannels()
     # cr.cleanup()
