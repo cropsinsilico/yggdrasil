@@ -104,8 +104,3 @@ class Driver(tools.CisThreadLoop):
     def on_model_exit(self):
         r"""Processes that should be run when an associated model exits."""
         self.debug()
-
-    def cleanup(self):
-        r"""Processes that should be run to clean up a driver that is not
-        running."""
-        self.debug()

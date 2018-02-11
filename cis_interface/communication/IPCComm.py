@@ -203,25 +203,21 @@ class IPCComm(CommBase.CommBase):
                 self.backlog_thread.on_main_terminated = self.on_main_terminated
         self.backlog_send_ready = threading.Event()
         self.backlog_recv_ready = threading.Event()
-        self.backlog_open = False  # threading.Event()
+        self.backlog_open = False
         if dont_open:
             self.bind()
         else:
             self.open()
 
     def on_main_terminated(self):
-        self.backlog_thread._1st_main_terminated = True
+        r"""Actions taken on the backlog thread when the main thread stops."""
+        self.backlog_thread.on_main_terminated(dont_break=True)
         self.close_on_empty(no_wait=True)
-
+        
     @classmethod
     def is_installed(cls):
         r"""bool: Is the comm installed."""
         return _ipc_installed
-
-    def atexit(self, *args, **kwargs):
-        if self.backlog_thread.is_alive():
-            self.info("is_alive = %s", self.backlog_thread.is_alive())
-        super(IPCComm, self).atexit(*args, **kwargs)
 
     @property
     def maxMsgSize(self):

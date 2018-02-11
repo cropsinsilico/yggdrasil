@@ -29,6 +29,7 @@ class CommDriver(Driver):
         self.numSent = 0
         self.numReceived = 0
         kwargs.setdefault('reverse_names', True)
+        self.comm = None
         self.comm = new_comm(name, dont_open=True, **kwargs)
         self.comm_name = self.comm.comm_class
         for k, v in self.comm.opp_comms.items():
@@ -75,8 +76,9 @@ class CommDriver(Driver):
     def close_comm(self):
         r"""Close the queue."""
         self.debug()
-        with self.lock:
-            self.comm.close()
+        if self.comm is not None:
+            with self.lock:
+                self.comm.close()
         self.debug('Returning')
 
     def start(self):

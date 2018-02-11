@@ -13,6 +13,38 @@ from cis_interface.communication import (
 CIS_MSG_HEAD = backwards.unicode2bytes('CIS_MSG_HEAD')
 HEAD_VAL_SEP = backwards.unicode2bytes(':CIS:')
 HEAD_KEY_SEP = backwards.unicode2bytes(',')
+_registered_servers = dict()
+
+
+class CommServer(tools.CisThreadLoop):
+    r"""Basic server objec to keep track of clients.
+
+    Attributes:
+        cli_count (int): Number of clients that have connected to this server.
+
+    """
+    def __init__(self, srv_address, **kwargs):
+        global _registered_servers
+        self.cli_count = 0
+        self.srv_address = srv_address
+        super(CommServer, self).__init__('CommServer.%s' % srv_address, **kwargs)
+        _registered_servers[self.srv_address] = self
+
+    def add_client(self):
+        r"""Increment the client count."""
+        global _registered_servers
+        self.debug("Adding client to server")
+        _registered_servers[self.srv_address].cli_count += 1
+
+    def remove_client(self):
+        r"""Decrement the client count, closing the server if all clients done."""
+        global _registered_servers
+        self.debug("Removing client from server")
+        _registered_servers[self.srv_address].cli_count -= 1
+        if _registered_servers[self.srv_address].cli_count <= 0:
+            self.debug("Shutting down server")
+            self.terminate()
+            _registered_servers.pop(self.srv_address)
 
     
 class CommBase(CisClass):
@@ -91,7 +123,7 @@ class CommBase(CisClass):
             that will be sending messages to one or more servers.
         is_response_client (bool): If True, the comm is a client-side response
             comm.
-        is_server (bool): If True, the commis one of many potential servers
+        is_server (bool): If True, the comm is one of many potential servers
             that will be receiving messages from one or more clients.
         is_response_server (bool): If True, the comm is a server-side response
             comm.
@@ -139,6 +171,7 @@ class CommBase(CisClass):
         self.is_response_client = is_response_client
         self.is_response_server = is_response_server
         self.is_server = is_server
+        self._server = None
         self.is_interface = is_interface
         self.recv_timeout = recv_timeout
         self.close_on_eof_recv = close_on_eof_recv
@@ -273,8 +306,12 @@ class CommBase(CisClass):
                 self.drain_messages()
             else:
                 self._closing_thread.set_terminated_flag()
+                linger = False
         self._close(linger=linger)
         if not skip_base:
+            if self.is_client:
+                self.debug("Signing off from server")
+                self.signoff_from_server()
             self.debug("Cleaning up %d work comms", len(self._work_comms))
             keys = [k for k in self._work_comms.keys()]
             for c in keys:
@@ -404,6 +441,53 @@ class CommBase(CisClass):
         if not isinstance(msg, backwards.bytes_type):  # pragma: debug
             raise TypeError("Deserialize method expects bytes type.")
         return self.meth_deserialize(msg)
+
+    # CLIENT/SERVER METHODS
+    def server_exists(self, srv_address):
+        r"""Determine if a server exists.
+
+        Args:
+            srv_address (str): Address of server comm.
+
+        Returns:
+            bool: True if a server with the provided address exists, False
+                otherwise.
+
+        """
+        global _registered_servers
+        return (srv_address in _registered_servers)
+
+    def new_server(self, srv_address):
+        r"""Create a new server.
+
+        Args:
+            srv_address (str): Address of server comm.
+
+        """
+        return CommServer(srv_address)
+
+    def signon_to_server(self, srv_address):
+        r"""Add a client to an existing server or create one.
+
+        Args:
+            srv_address (str): Address of server comm.
+
+        """
+        global _registered_servers
+        if self._server is None:
+            if not self.server_exists(srv_address):
+                self.debug("Creating new server")
+                self._server = self.new_server(srv_address)
+                self._server.start()
+            else:
+                self._server = _registered_servers[srv_address]
+            self._server.add_client()
+
+    def signoff_from_server(self):
+        r"""Remove a client from the server."""
+        if self._server is not None:
+            self._server.remove_client()
+            self._server = None
 
     # TEMP COMMS
     @property

@@ -69,7 +69,8 @@ class MakeModelDriver(ModelDriver):
         self.make_command = make_command
         self.makedir = makedir
         self.makefile = makefile
-        self.args[0] = os.path.join(self.makedir, self.target)
+        self.target_file = os.path.join(self.makedir, self.target)
+        self.args[0] = self.target_file
         # Set environment variables
         self.debug("Setting environment variables.")
         compile_flags = ['-DCIS_DEBUG=%d' % self.logger.getEffectiveLevel()]
@@ -97,6 +98,7 @@ class MakeModelDriver(ModelDriver):
         make_args = [self.make_command] + make_opts + [self.makefile, target]
         self.debug(' '.join(make_args))
         if not os.path.isfile(self.makefile):
+            os.chdir(curdir)
             raise IOError("Makefile %s not found" % self.makefile)
         comp_process = tools.popen_nobuffer(make_args)
         output, err = comp_process.communicate()
@@ -109,5 +111,6 @@ class MakeModelDriver(ModelDriver):
 
     def cleanup(self):
         r"""Remove compile executable."""
-        self.make_target('clean')
+        if (self.target_file is not None) and os.path.isfile(self.target_file):
+            self.make_target('clean')
         super(MakeModelDriver, self).cleanup()

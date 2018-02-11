@@ -5,7 +5,7 @@ from cis_interface.communication import CommBase
 
 
 _registered_sockets = dict()
-_registered_servers = dict()
+_created_sockets = dict()
 
 
 _socket_type_pairs = [('PUSH', 'PULL'),
@@ -19,14 +19,14 @@ _socket_protocols = ['tcp', 'inproc', 'ipc', 'udp', 'pgm', 'epgm']
 _flag_zmq_filter = backwards.unicode2bytes('_ZMQFILTER_')
 _default_socket_type = 4
 _default_protocol = 'tcp'
-_wait_send_t = 0.0001
+_wait_send_t = 0  # 0.0001
 
 
 # def close_global_context():
 #     r"""Close the global context."""
 #     print("closing")
-#     # ctx = zmq.Context.instance()
-#     # ctx.term()
+#     ctx = zmq.Context.instance()
+#     ctx.term()
 #     # ctx.destroy(linger=0)
 #     print("closed")
 
@@ -37,17 +37,18 @@ _wait_send_t = 0.0001
 #     atexit.register(close_global_context)
 
 
-def register_socket(socket_type_name, address):
+def register_socket(socket_type_name, address, socket):
     r"""Register a socket.
 
     Args:
         socket_type_name (str): Name of the socket type.
         address (str): Socket address.
+        socket (zmq.Socket): Socket object.
 
     """
     global _registered_sockets
     key = '%s_%s' % (socket_type_name, address)
-    _registered_sockets[key] = address
+    _registered_sockets[key] = socket
 
     
 def unregister_socket(socket_type_name, address):
@@ -61,6 +62,7 @@ def unregister_socket(socket_type_name, address):
     global _registered_sockets
     key = '%s_%s' % (socket_type_name, address)
     if key in _registered_sockets:
+        _registered_sockets[key].close()
         del _registered_sockets[key]
 
         
@@ -183,7 +185,7 @@ def bind_socket(socket, address, retry_timeout=-1):
     return address
 
     
-class ZMQProxy(tools.CisThreadLoop):
+class ZMQProxy(CommBase.CommServer):
     r"""Start a proxy in a new thread for a server address. A client-side
     address will be randomly generated.
 
@@ -215,28 +217,27 @@ class ZMQProxy(tools.CisThreadLoop):
         cli_param = dict()
         for k in ['protocol', 'host', 'port']:
             cli_param[k] = kwargs.pop(k, srv_param[k])
-        super(ZMQProxy, self).__init__(**kwargs)
         context = context or zmq.Context.instance()
         # Create new address for the frontend
         if cli_param['protocol'] in ['inproc', 'ipc']:
             cli_param['host'] = str(uuid.uuid4())
         cli_address = format_address(cli_param['protocol'], cli_param['host'])
-        frontend = context.socket(zmq.ROUTER)
-        self.cli_address = bind_socket(frontend, cli_address,
+        self.cli_socket = context.socket(zmq.ROUTER)
+        self.cli_address = bind_socket(self.cli_socket, cli_address,
                                        retry_timeout=retry_timeout)
-        self.cli_socket = frontend
-        register_socket('ROUTER', self.cli_address)
+        self.cli_socket.setsockopt(zmq.LINGER, 0)
+        register_socket('ROUTER_server', self.cli_address, self.cli_socket)
         # Bind backend
-        backend = context.socket(zmq.DEALER)
-        self.srv_address = bind_socket(backend, srv_address,
+        self.srv_socket = context.socket(zmq.DEALER)
+        self.srv_socket.setsockopt(zmq.LINGER, 0)
+        self.srv_address = bind_socket(self.srv_socket, srv_address,
                                        retry_timeout=retry_timeout)
-        self.srv_socket = backend
-        register_socket('DEALER', self.srv_address)
+        register_socket('DEALER', self.srv_address, self.srv_socket)
         # Set up poller
         # self.poller = zmq.Poller()
         # self.poller.register(frontend, zmq.POLLIN)
-        self.cli_count = 0
         # Set name
+        super(ZMQProxy, self).__init__(self.srv_address, **kwargs)
         self.name = 'ZMQProxy.%s' % srv_address
 
     def client_recv(self):
@@ -282,16 +283,20 @@ class ZMQProxy(tools.CisThreadLoop):
         self.close_sockets()
         super(ZMQProxy, self).after_loop()
 
+    def cleanup(self):
+        r"""Clean up sockets on exit."""
+        self.close_sockets()
+
     def close_sockets(self):
         r"""Close the sockets."""
         self.debug('Closing sockets')
         if self.cli_socket:
-            self.cli_socket.close(linger=0)
+            self.cli_socket.close()
             self.cli_socket = None
         if self.srv_socket:
-            self.srv_socket.close(linger=0)
+            self.srv_socket.close()
             self.srv_socket = None
-        unregister_socket('ROUTER', self.cli_address)
+        unregister_socket('ROUTER_server', self.cli_address)
         unregister_socket('DEALER', self.srv_address)
 
 
@@ -383,7 +388,6 @@ class ZMQComm(CommBase.CommBase):
         self._bound = False
         self._connected = False
         self._recv_identities = set([])
-        self._client_proxy = None
         # Reserve/set port by binding
         if not dont_open:
             self.open()
@@ -463,9 +467,9 @@ class ZMQComm(CommBase.CommBase):
     def opp_address(self):
         r"""str: Address for opposite comm."""
         if self.is_client:
-            if self._client_proxy is None:  # pragma: debug
+            if self._server is None:  # pragma: debug
                 raise Exception("The client proxy does not yet have an address.")
-            return self._client_proxy.srv_address
+            return self._server.srv_address
         else:
             return self.address
 
@@ -491,7 +495,7 @@ class ZMQComm(CommBase.CommBase):
         r"""Register a socket."""
         self.debug('Registering socket: type = %s, address = %s',
                    self.socket_type_name, self.address)
-        register_socket(self.socket_type_name, self.address)
+        register_socket(self.socket_type_name, self.address, self.socket)
 
     def unregister_socket(self):
         r"""Unregister a socket."""
@@ -504,8 +508,9 @@ class ZMQComm(CommBase.CommBase):
         if self.is_open or self._bound or self._connected:  # pragma: debug
             return
         # Do client things
-        if self.is_client and not self._client_proxy:
-            self.address = self.get_client_proxy(self.address)
+        if self.is_client:
+            self.signon_to_server(self.address)
+            self.address = self._server.cli_address
         # Bind to reserve port if that is this sockets action
         if (self.socket_action == 'bind') or (self.port is None):
             self._bound = True
@@ -613,42 +618,33 @@ class ZMQComm(CommBase.CommBase):
         # Ensure socket not still open
         self._openned = False
         self.unregister_socket()
-        # Close proxy
-        if self.is_client and self._client_proxy:
-            self.debug("Closing client proxy")
-            self.close_client_proxy()
         super(ZMQComm, self)._close(linger=linger)
 
-    def get_client_proxy(self, srv_address):
-        r"""Create a new client proxy for the specified address."""
-        global _registered_servers
-        srv_param = parse_address(srv_address)
-        if (srv_address not in _registered_servers) or (srv_param['port'] is None):
-            self.debug("Creating new server proxy")
-            proxy = ZMQProxy(srv_address, context=self.context,
-                             retry_timeout=2 * self.sleeptime)
-            proxy.start()
-            srv_address = proxy.srv_address
-            _registered_servers[srv_address] = proxy
-        self.debug("Adding client to server proxy")
-        _registered_servers[srv_address].cli_count += 1
-        self._client_proxy = _registered_servers[srv_address]
-        return self._client_proxy.cli_address
+    def server_exists(self, srv_address):
+        r"""Determine if a server exists.
 
-    def close_client_proxy(self):
-        r"""Sign-off from client proxy, closing the additional sockets if there
-        are not more clients."""
-        global _registered_servers
-        self.debug("Removing client from server proxy")
-        # self._client_proxy.cli_count -= 1
-        # if self._client_proxy.cli_count <= 0:
-        _registered_servers[self._client_proxy.srv_address].cli_count -= 1
-        if _registered_servers[self._client_proxy.srv_address].cli_count <= 0:
-            self.debug("Shutting down server proxy")
-            self._client_proxy.terminate()
-            if self._client_proxy.srv_address in _registered_servers:
-                del _registered_servers[self._client_proxy.srv_address]
-        self._client_proxy = None
+        Args:
+            srv_address (str): Address of server comm.
+
+        Returns:
+            bool: True if a server with the provided address exists, False
+                otherwise.
+
+        """
+        srv_param = parse_address(srv_address)
+        if srv_param['port'] is None:
+            return False
+        return super(ZMQComm, self).server_exists(srv_address)
+
+    def new_server(self, srv_address):
+        r"""Create a new server.
+
+        Args:
+            srv_address (str): Address of server comm.
+
+        """
+        return ZMQProxy(srv_address, context=self.context,
+                        retry_timeout=2 * self.sleeptime)
 
     @property
     def is_open(self):

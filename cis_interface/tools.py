@@ -61,6 +61,18 @@ def check_locks():
         logging.info("%s thread running" % t.name)
 
 
+def check_sockets():
+    r"""Check registered sockets."""
+    from cis_interface.communication.ZMQComm import _registered_sockets
+    count = 0
+    for v in _registered_sockets.values():
+        if not v.closed:
+            v.close(linger=0)
+            count += 1
+    logging.info("%d sockets closed." % count)
+
+
+atexit.register(check_sockets)
 atexit.register(check_threads)
 atexit.register(check_locks)
 
@@ -413,6 +425,7 @@ def single_use_method(func):
     r"""Decorator for marking functions that should only be called once."""
     def wrapper(*args, **kwargs):
         if getattr(func, '_single_use_method_called', False):
+            logging.info("METHOD %s ALREADY CALLED" % func)
             return
         else:
             func._single_use_method_called = True
@@ -843,7 +856,7 @@ class CisThread(threading.Thread, CisClass):
             self.daemon = True
         _thread_registry[self.name] = self
         _lock_registry[self.name] = self.lock
-        # atexit.register(self.atexit)
+        atexit.register(self.atexit)
 
     @property
     def main_terminated(self):
@@ -906,6 +919,10 @@ class CisThread(threading.Thread, CisClass):
         r"""Actions to perform on the main thread before starting the thread."""
         self.debug()
 
+    def cleanup(self):
+        r"""Actions to perform to clean up the thread after it has stopped."""
+        self.debug()
+
     def wait(self, timeout=None, key=None):
         r"""Wait until thread finish to return using sleeps rather than
         blocking.
@@ -950,20 +967,28 @@ class CisThread(threading.Thread, CisClass):
     def atexit(self):
         r"""Actions performed when python exits."""
         if self.is_alive():
-            self.set_break_flag()
+            self.info('Thread alive at exit')
+        self.cleanup()
 
 
 class CisThreadLoop(CisThread):
     r"""Thread that will run a loop until the terminate event is called."""
     def __init__(self, *args, **kwargs):
         super(CisThreadLoop, self).__init__(*args, **kwargs)
-        self.break_flag = False
         self._1st_main_terminated = False
+        self.break_flag = False
 
-    def on_main_terminated(self):
-        r"""Actions performed when 1st main terminated."""
+    def on_main_terminated(self, dont_break=False):
+        r"""Actions performed when 1st main terminated.
+
+        Args:
+            dont_break (bool, optional): If True, the break flag won't be set.
+                Defaults to False.
+
+        """
         self._1st_main_terminated = True
-        self.set_break_flag()
+        if not dont_break:
+            self.set_break_flag()
 
     def set_break_flag(self):
         r"""Set the break flag for the thread to True."""
@@ -1004,7 +1029,6 @@ class CisThreadLoop(CisThread):
                 else:
                     self.run_loop()
             self.set_break_flag()
-            self.after_loop()
         except BaseException:  # pragma: debug
             self.exception("THREAD ERROR")
             self.set_break_flag()
@@ -1012,6 +1036,10 @@ class CisThreadLoop(CisThread):
             for k in ['_cis_target', '_cis_args', '_cis_kwargs']:
                 if hasattr(self, k):
                     delattr(self, k)
+        try:
+            self.after_loop()
+        except BaseException:  # pragma: debug
+            self.exception("AFTER LOOP ERROR")
 
     def terminate(self, *args, **kwargs):
         r"""Also set break flag."""
