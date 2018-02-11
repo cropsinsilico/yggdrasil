@@ -20,6 +20,16 @@ from cis_interface.config import cis_cfg, cfg_logging
 
 _thread_registry = {}
 _lock_registry = {}
+try:
+    _main_thread = threading.main_thread()
+except AttributeError:
+    _main_thread = None
+    for i in threading.enumerate():
+        if (i.name == "MainThread"):
+            _main_thread = i
+            break
+    if _main_thread is None:  # pragma: debug
+        raise RuntimeError("Could not located MainThread")
 
 
 def check_threads():
@@ -838,7 +848,7 @@ class CisThread(threading.Thread, CisClass):
     @property
     def main_terminated(self):
         r"""bool: True if the main thread has terminated."""
-        return (not threading.main_thread().is_alive())
+        return (not _main_thread.is_alive())
 
     def set_started_flag(self):
         r"""Set the started flag for the thread to True."""

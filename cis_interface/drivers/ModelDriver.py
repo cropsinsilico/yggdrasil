@@ -150,8 +150,6 @@ class ModelDriver(Driver):
             #     self.set_break_flag()
             # This sleep is necessary to allow changes in queue without lock
             self.sleep()
-            if self.process_complete:
-                self.process.stdout.close()
             return
         else:
             if (line == self._exit_line):
