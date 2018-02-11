@@ -27,6 +27,7 @@ class CommServer(tools.CisThreadLoop):
         global _registered_servers
         self.cli_count = 0
         self.srv_address = srv_address
+        self.cli_address = srv_address
         super(CommServer, self).__init__('CommServer.%s' % srv_address, **kwargs)
         _registered_servers[self.srv_address] = self
 
@@ -466,22 +467,18 @@ class CommBase(CisClass):
         """
         return CommServer(srv_address)
 
-    def signon_to_server(self, srv_address):
-        r"""Add a client to an existing server or create one.
-
-        Args:
-            srv_address (str): Address of server comm.
-
-        """
+    def signon_to_server(self):
+        r"""Add a client to an existing server or create one."""
         global _registered_servers
         if self._server is None:
-            if not self.server_exists(srv_address):
+            if not self.server_exists(self.address):
                 self.debug("Creating new server")
-                self._server = self.new_server(srv_address)
+                self._server = self.new_server(self.address)
                 self._server.start()
             else:
-                self._server = _registered_servers[srv_address]
+                self._server = _registered_servers[self.address]
             self._server.add_client()
+            self.address = self._server.cli_address
 
     def signoff_from_server(self):
         r"""Remove a client from the server."""

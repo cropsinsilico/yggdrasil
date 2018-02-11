@@ -244,6 +244,8 @@ class IPCComm(CommBase.CommBase):
             self._bound = True
             q = get_queue()
             self.address = str(q.key)
+        if self.is_client:
+            self.signon_to_server()
 
     def open_after_bind(self):
         r"""Open the connection by getting the queue from the bound address."""

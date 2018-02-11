@@ -232,7 +232,7 @@ class ZMQProxy(CommBase.CommServer):
         self.srv_socket.setsockopt(zmq.LINGER, 0)
         self.srv_address = bind_socket(self.srv_socket, srv_address,
                                        retry_timeout=retry_timeout)
-        register_socket('DEALER', self.srv_address, self.srv_socket)
+        register_socket('DEALER_server', self.srv_address, self.srv_socket)
         # Set up poller
         # self.poller = zmq.Poller()
         # self.poller.register(frontend, zmq.POLLIN)
@@ -297,7 +297,7 @@ class ZMQProxy(CommBase.CommServer):
             self.srv_socket.close()
             self.srv_socket = None
         unregister_socket('ROUTER_server', self.cli_address)
-        unregister_socket('DEALER', self.srv_address)
+        unregister_socket('DEALER_server', self.srv_address)
 
 
 class ZMQComm(CommBase.CommBase):
@@ -509,8 +509,7 @@ class ZMQComm(CommBase.CommBase):
             return
         # Do client things
         if self.is_client:
-            self.signon_to_server(self.address)
-            self.address = self._server.cli_address
+            self.signon_to_server()
         # Bind to reserve port if that is this sockets action
         if (self.socket_action == 'bind') or (self.port is None):
             self._bound = True
