@@ -36,18 +36,20 @@ def register_socket(socket_type_name, address, socket):
     _registered_sockets[key] = socket
 
     
-def unregister_socket(socket_type_name, address):
+def unregister_socket(socket_type_name, address, linger=0):
     r"""Unregister a socket.
 
     Args:
         socket_type_name (str): Name of the socket type.
         address (str): Socket address.
+        linger (int, optional): Time in milliseconds that socket should
+            linger on close. Defaults to 0.
 
     """
     global _registered_sockets
     key = '%s_%s' % (socket_type_name, address)
     if key in _registered_sockets:
-        _registered_sockets[key].close()
+        _registered_sockets[key].close(linger=linger)
         del _registered_sockets[key]
 
         
@@ -482,11 +484,11 @@ class ZMQComm(CommBase.CommBase):
                    self.socket_type_name, self.address)
         register_socket(self.socket_type_name, self.address, self.socket)
 
-    def unregister_socket(self):
+    def unregister_socket(self, linger=0):
         r"""Unregister a socket."""
         self.debug('Unregistering socket: type = %s, address = %s',
                    self.socket_type_name, self.address)
-        unregister_socket(self.socket_type_name, self.address)
+        unregister_socket(self.socket_type_name, self.address, linger=linger)
         
     def bind(self):
         r"""Bind to address, getting random port as necessary."""
@@ -584,6 +586,7 @@ class ZMQComm(CommBase.CommBase):
                 comm. Defaults to False.
 
         """
+        linger_time = 0
         self.debug("self.socket.closed = %s", str(self.socket.closed))
         if self.socket.closed:
             self.debug("Socket already closed: %s", self.address)
@@ -596,12 +599,10 @@ class ZMQComm(CommBase.CommBase):
                 self.disconnect()
             self.debug("Closing socket %s", self.address)
             if linger:
-                self.socket.close(linger=60 * 1000)
-            else:
-                self.socket.close(linger=0)
+                linger_time = 60 * 1000
         # Ensure socket not still open
         self._openned = False
-        self.unregister_socket()
+        self.unregister_socket(linger=linger_time)
         super(ZMQComm, self)._close(linger=linger)
 
     def server_exists(self, srv_address):
