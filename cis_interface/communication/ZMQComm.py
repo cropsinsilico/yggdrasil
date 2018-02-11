@@ -599,10 +599,11 @@ class ZMQComm(CommBase.CommBase):
                     linger_time = -1
                 else:
                     linger_time = 60 * 1000
-            if self.socket_action == 'bind':
-                self.unbind(linger=linger_time)
-            elif self.socket_action == 'connect':
-                self.disconnect(linger=linger_time)
+            else:
+                if self.socket_action == 'bind':
+                    self.unbind(linger=linger_time)
+                elif self.socket_action == 'connect':
+                    self.disconnect(linger=linger_time)
             self.debug("Closing socket %s", self.address)
         # Ensure socket not still open
         self._openned = False
