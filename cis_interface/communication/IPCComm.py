@@ -21,7 +21,7 @@ def cleanup_comms():
     r"""Close registered queues."""
     global _registered_queues
     count = 0
-    for v in _registered_queues:
+    for v in _registered_queues.values():
         try:
             v.remove()
             count = 0
