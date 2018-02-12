@@ -265,7 +265,7 @@ class ConnectionDriver(Driver):
         if send_eof:
             self.send_eof()
         # Close output comm after waiting for output to be processed
-        if not dont_close_output:
+        if not dont_close_output and not self._is_input:
             self.ocomm.close_on_empty()
 
     def recv_message(self, **kwargs):

@@ -163,13 +163,15 @@ class ClientComm(CommBase.CommBase):
             obj: Output from output comm send method.
 
         """
+        msg = args[0]
         # if self.is_closed:
         #     self.debug("send(): Connection closed.")
         #     return False
-        kwargs['send_header'] = True
-        kwargs['header_kwargs'] = self.create_response_comm()
+        if msg != self.eof_msg:
+            kwargs['send_header'] = True
+            kwargs['header_kwargs'] = self.create_response_comm()
         out = self.ocomm.send(*args, **kwargs)
-        if not out:
+        if (not out) and (msg != self.eof_msg):
             self.remove_response_comm()
         return out
 

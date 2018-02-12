@@ -630,10 +630,16 @@ class ZMQComm(CommBase.CommBase):
             self._connected = False
         else:
             if linger:
-                if self.is_interface:
-                    linger_time = -1
-                else:
-                    linger_time = 60 * 1000
+                if self.direction == 'send':
+                    if self.is_interface:
+                        linger_time = -1
+                    else:
+                        # linger_time = None
+                        linger_time = 60 * 1000
+                # if self.is_interface:
+                #     linger_time = -1
+                # else:
+                #     linger_time = 60 * 1000
             else:
                 if self.socket_action == 'bind':
                     self.unbind(linger=linger_time)
@@ -642,7 +648,8 @@ class ZMQComm(CommBase.CommBase):
             self.debug("Closing socket %s", self.address)
         # Ensure socket not still open
         self._openned = False
-        self.unregister_socket(linger=linger_time)
+        if linger_time is not None:
+            self.unregister_socket(linger=linger_time)
         super(ZMQComm, self)._close(linger=linger)
 
     def server_exists(self, srv_address):
