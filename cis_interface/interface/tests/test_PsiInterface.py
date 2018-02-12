@@ -101,6 +101,7 @@ class TestBase(CisTest, IOInfo):
 
     def remove_instance(self, inst):
         r"""Remove an instance."""
+        inst.is_interface = False
         inst.close()
         assert(inst.is_closed)
         super(TestBase, self).remove_instance(inst)
