@@ -113,9 +113,9 @@ class ClientRequestDriver(ConnectionDriver):
         r"""str: The address of the channel used to send requests to the server
         request driver."""
         return self.ocomm.opp_address
-    
-    def terminate(self, *args, **kwargs):
-        r"""Stop response drivers."""
+
+    def close_response_drivers(self):
+        r"""Close response driver."""
         # To force response server to connect after response client has stopped
         # self.sleep(0.5)
         with self.lock:
@@ -123,6 +123,10 @@ class ClientRequestDriver(ConnectionDriver):
             for x in self.response_drivers:
                 x.terminate()
             self.response_drivers = []
+    
+    def terminate(self, *args, **kwargs):
+        r"""Stop response drivers."""
+        self.close_response_drivers()
         super(ClientRequestDriver, self).terminate(*args, **kwargs)
 
     def printStatus(self, *args, **kwargs):
@@ -140,7 +144,8 @@ class ClientRequestDriver(ConnectionDriver):
     def after_loop(self):
         r"""After client model signs off. Sent EOF to server."""
         # Don't close output as other clients may be using it
-        super(ClientRequestDriver, self).after_loop(dont_close_output=True)
+        self.close_response_drivers()
+        super(ClientRequestDriver, self).after_loop()  # dont_close_output=True)
     
     def on_model_exit(self):
         r"""Drain input and then close it."""

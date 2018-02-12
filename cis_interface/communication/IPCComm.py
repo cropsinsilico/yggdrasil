@@ -168,6 +168,20 @@ def ipcrm_queues(queue_keys=None):
         warn("IPC not installed. ipcrm cannot be run.")
 
 
+class IPCServer(CommBase.CommServer):
+    r"""IPC server object for cleaning up server queue."""
+
+    def terminate(self, *args, **kwargs):
+        global _registered_queues
+        if self.srv_address in _registered_queues:
+            q = get_queue(int(self.srv_address))
+            try:
+                remove_queue(q)
+            except (KeyError, sysv_ipc.ExistentialError):
+                pass
+        super(IPCServer, self).terminate(*args, **kwargs)
+
+
 class IPCComm(CommBase.CommBase):
     r"""Class for handling I/O via IPC message queues.
 
@@ -211,7 +225,7 @@ class IPCComm(CommBase.CommBase):
 
     def on_main_terminated(self):
         r"""Actions taken on the backlog thread when the main thread stops."""
-        self.backlog_thread.on_main_terminated(dont_break=True)
+        self._1st_main_terminated = True
         self.close_on_empty(no_wait=True)
         
     @classmethod
@@ -281,7 +295,7 @@ class IPCComm(CommBase.CommBase):
                 self.q = None
                 self._bound = False
         # Remove the queue
-        if (self.q is not None) and (not skip_remove):
+        if (self.q is not None) and (not skip_remove) and (not self.is_client):
             try:
                 remove_queue(self.q)
             except (KeyError, sysv_ipc.ExistentialError):
@@ -309,6 +323,15 @@ class IPCComm(CommBase.CommBase):
         self._close_queue(skip_remove=linger)
         self._close_backlog(wait=True)
         super(IPCComm, self)._close(linger=linger)
+
+    def new_server(self, srv_address):
+        r"""Create a new server.
+
+        Args:
+            srv_address (str): Address of server comm.
+
+        """
+        return IPCServer(srv_address)
 
     @property
     def is_open(self):

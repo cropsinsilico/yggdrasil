@@ -634,8 +634,8 @@ class ZMQComm(CommBase.CommBase):
                     if self.is_interface:
                         linger_time = -1
                     else:
-                        # linger_time = None
-                        linger_time = 60 * 1000
+                        linger_time = None
+                        # linger_time = 60 * 1000
                 # if self.is_interface:
                 #     linger_time = -1
                 # else:

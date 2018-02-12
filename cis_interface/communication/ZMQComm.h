@@ -49,7 +49,7 @@ int new_zmq_address(comm_t *comm) {
     return -1;
   }
   if (strcmp(comm->direction, "send") == 0) {
-    zsock_set_linger(s, 60 * 1000);
+    zsock_set_linger(s, -1); // 60 * 1000);
   } else {
     zsock_set_linger(s, 0);
   }
@@ -89,7 +89,7 @@ int init_zmq_comm(comm_t *comm) {
     return -1;
   }
   if (strcmp(comm->direction, "send") == 0) {
-    zsock_set_linger(s, 60 * 1000);
+    zsock_set_linger(s, -1);  // 60 * 1000);
   } else {
     zsock_set_linger(s, 0);
   }
