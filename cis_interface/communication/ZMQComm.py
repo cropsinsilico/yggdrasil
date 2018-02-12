@@ -376,6 +376,8 @@ class ZMQComm(CommBase.CommBase):
         self._bound = False
         self._connected = False
         self._recv_identities = set([])
+        # self.open_reply_thread = tools.CisThread(target=self.open_reply_socket)
+        # self.close_reply_thread = tools.CisThread(target=self.close_reply_socket)
         # Reserve/set port by binding
         if not dont_open:
             self.open()
@@ -577,7 +579,39 @@ class ZMQComm(CommBase.CommBase):
             # Set topic filter
             if self.socket_type_name == 'SUB':
                 self.socket.setsockopt(zmq.SUBSCRIBE, self.topic_filter)
+            # self.open_reply_thread.start()
             self._openned = True
+
+    # def open_reply_socket(self):
+    #     r"""Open pair connection for sending/receiving confirmation."""
+    #     self.info()
+    #     if self.direction == 'send':
+    #         self.reply_socket = self.context.socket(zmq.REP)
+    #         address = format_address(_default_protocol, 'localhost')
+    #         address = bind_socket(self.reply_socket, address)
+    #         print(address, self.socket_type_name)
+    #         self.socket.send(backwards.unicode2bytes(address))
+    #     else:
+    #         self.reply_socket = self.context.socket(zmq.REQ)
+    #         address = self.socket.recv()
+    #         self.reply_socket.connect(address)
+    #     # TODO: handle case of non-bidirectional socket types
+    #     self.info("Reply socket open")
+
+    # def close_reply_socket(self):
+    #     r"""Close reply socket."""
+    #     if self.direction == 'send':
+    #         msg = self.reply_socket.recv()
+    #         self.info("Received %s" % msg)
+    #         self.reply_socket.send(msg)
+    #         self.reply_socket.close(linger=1000)
+    #     else:
+    #         self.reply_socket.send(self.eof_msg)
+    #         msg = self.reply_socket.recv()
+    #         assert(msg == self.eof_msg)
+    #         self.reply_socket.close(linger=0)
+    #     self.info("Reply socket closed.")
+    #     self.socket.close(linger=0)
 
     def _close(self, linger=False):
         r"""Close the connection.
@@ -588,6 +622,7 @@ class ZMQComm(CommBase.CommBase):
 
         """
         linger_time = 0
+        # self.close_reply_socket()
         self.debug("self.socket.closed = %s", str(self.socket.closed))
         if self.socket.closed:
             self.debug("Socket already closed: %s", self.address)
@@ -710,27 +745,6 @@ class ZMQComm(CommBase.CommBase):
         self.sched_task(0, workcomm._send_multipart, args=args, kwargs=kwargs)
         return True
 
-    # def _send_multipart(self, msg, **kwargs):
-    #     r"""Send a message larger than maxMsgSize in multiple parts.
-
-    #     Args:
-    #         msg (str): Message to send.
-    #         **kwargs: Additional keyword arguments are passed to _send.
-
-    #     Returns:
-    #         bool: Success or failure of sending the message.
-
-    #     """
-    #     # flag, _ = self._recv(timeout=self.recv_timeout)
-    #     flag, _ = self._recv(timeout=False, flags=0)
-    #     if not flag:  # pragma: debug
-    #         return flag
-    #     flag = self._send(_)
-    #     if not flag:
-    #         return flag
-    #     flag = super(ZMQComm, self)._send_multipart(msg, **kwargs)
-    #     return flag
-
     def _send(self, msg, topic='', identity=None, **kwargs):
         r"""Send a message.
 
@@ -747,6 +761,7 @@ class ZMQComm(CommBase.CommBase):
             bool: Success or failure of send.
 
         """
+        # self.open_reply_thread.join()
         if self.is_closed:  # pragma: debug
             self.error("Socket closed")
             return False
@@ -773,33 +788,6 @@ class ZMQComm(CommBase.CommBase):
             return False
         return True
 
-    # def _recv_multipart(self, *args, **kwargs):
-    #     r"""Receive a message sent in multiple parts.
-
-    #     Args:
-    #         *args: All arguments are passed to parent _recv_multipart.
-    #         **kwargs: All keyword arguments are passed to parent _recv_multipart.
-
-    #     Returns:
-    #         tuple (bool, str): The success or failure of receiving a message
-    #             and the complete message received.
-
-    #     """
-    #     data = backwards.unicode2bytes('CISHANDSHAKE')
-    #     nodata = self.empty_msg
-    #     flag = self._send(data)
-    #     if not flag:  # pragma: debug
-    #         return False, nodata
-    #     flag, msg = self._recv(timeout=False, flags=0)
-    #     if not flag:  # pragma: debug
-    #         return False, nodata
-    #     if msg != data:
-    #         return False, nodata
-    #     # kwargs['flags'] = 0
-    #     # kwargs['timeout'] = self.timeout
-    #     out = super(ZMQComm, self)._recv_multipart(*args, **kwargs)
-    #     return out
-    
     def _recv(self, timeout=None, **kwargs):
         r"""Receive a message from the ZMQ socket.
 
@@ -813,6 +801,7 @@ class ZMQComm(CommBase.CommBase):
                 message.
 
         """
+        # self.open_reply_thread.join()
         # Return False if the socket is closed
         if self.is_closed:  # pragma: debug
             self.error("Socket closed")
