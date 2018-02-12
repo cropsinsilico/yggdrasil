@@ -63,12 +63,8 @@ def check_locks():
 
 def check_sockets():
     r"""Check registered sockets."""
-    from cis_interface.communication.ZMQComm import _registered_sockets
-    count = 0
-    for v in _registered_sockets.values():
-        if not v.closed:
-            v.close(linger=0)
-            count += 1
+    from cis_interface.communication.ZMQComm import cleanup_comms
+    count = cleanup_comms()
     logging.info("%d sockets closed." % count)
 
 

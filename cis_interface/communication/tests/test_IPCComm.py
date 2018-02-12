@@ -56,6 +56,10 @@ class TestIPCComm(parent.TestCommBase):
         self.comm = 'IPCComm'
         self.attr_list += ['q']
 
+    def cleanup_comms(self):
+        r"""Cleanup all comms."""
+        IPCComm.cleanup_comms()
+
 
 @unittest.skipIf(_ipc_installed, "IPC library installed")
 def test_not_running():

@@ -22,6 +22,18 @@ _default_protocol = 'tcp'
 _wait_send_t = 0  # 0.0001
 
 
+def cleanup_comms():
+    r"""Close registered sockets."""
+    global _registered_sockets
+    count = 0
+    for v in _registered_sockets.values():
+        if not v.closed:
+            v.close(linger=0)
+            count += 1
+    _registered_sockets = dict()
+    return count
+
+
 def register_socket(socket_type_name, address, socket):
     r"""Register a socket.
 

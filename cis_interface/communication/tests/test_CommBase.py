@@ -1,7 +1,7 @@
 import os
 import uuid
 import nose.tools as nt
-from cis_interface.tools import CisClass
+from cis_interface.tools import CisClass, get_default_comm
 from cis_interface.tests import CisTest, IOInfo
 from cis_interface.communication import new_comm, get_comm_class
 
@@ -107,6 +107,18 @@ class TestCommBase(CisTest, IOInfo):
             x.sleep()
         x.stop_timeout()
         nt.assert_equal(self.comm_count, self.nprev_comm)
+        self.cleanup_comms()
+
+    def cleanup_comms(self):
+        r"""Cleanup all comms."""
+        default = get_default_comm()
+        if default == "IPCComm":
+            from cis_interface.communication.IPCComm import cleanup_comms
+        elif default == "ZMQComm":
+            from cis_interface.communication.ZMQComm import cleanup_comms
+        else:  # pragma: debug
+            raise Exception("No cleanup for %s" % default)
+        cleanup_comms()
 
     # def create_instance(self):
     #     r"""Create a new instance of the class."""

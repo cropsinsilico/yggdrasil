@@ -1,6 +1,6 @@
 import sys
 import uuid
-from logging import warn
+import logging
 import threading
 from subprocess import Popen, PIPE
 from cis_interface import platform, tools
@@ -9,12 +9,27 @@ try:
     import sysv_ipc
     _ipc_installed = tools._ipc_installed
 except ImportError:
-    warn("Could not import sysv_ipc. " +
-         "IPC support will be disabled.")
+    logging.warn("Could not import sysv_ipc. " +
+                 "IPC support will be disabled.")
     sysv_ipc = None
     _ipc_installed = False
 
 _registered_queues = {}
+
+
+def cleanup_comms():
+    r"""Close registered queues."""
+    global _registered_queues
+    count = 0
+    for v in _registered_queues:
+        try:
+            v.remove()
+            count = 0
+        except sysv_ipc.ExistentialError:
+            pass
+    _registered_queues = dict()
+    # logging.info("%d queues closed." % count)
+    return count
 
 
 def get_queue(qid=None):
@@ -39,7 +54,7 @@ def get_queue(qid=None):
             _registered_queues[key] = mq
         return mq
     else:
-        warn("IPC not installed. Queue cannot be returned.")
+        logging.warn("IPC not installed. Queue cannot be returned.")
         return None
 
 
@@ -83,7 +98,7 @@ def ipcs(options=[]):
             raise Exception("Error on spawned process. See output.")
         return output.decode('utf-8')
     else:
-        warn("IPC not installed. ipcs cannot be run.")
+        logging.warn("IPC not installed. ipcs cannot be run.")
         return ''
 
 
@@ -146,7 +161,7 @@ def ipcrm(options=[]):
         if not output.isspace():
             print(output.decode('utf-8'))
     else:
-        warn("IPC not installed. ipcrm cannot be run.")
+        logging.warn("IPC not installed. ipcrm cannot be run.")
 
 
 def ipcrm_queues(queue_keys=None):
@@ -165,7 +180,7 @@ def ipcrm_queues(queue_keys=None):
         for q in queue_keys:
             ipcrm(["-Q %s" % q])
     else:
-        warn("IPC not installed. ipcrm cannot be run.")
+        logging.warn("IPC not installed. ipcrm cannot be run.")
 
 
 class IPCServer(CommBase.CommServer):
