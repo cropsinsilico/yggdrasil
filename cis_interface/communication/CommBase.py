@@ -317,6 +317,8 @@ class CommBase(CisClass):
                 linger = False
         self._close(linger=linger)
         if not skip_base:
+            self._n_sent = 0
+            self._n_recv = 0
             if self.is_client:
                 self.debug("Signing off from server")
                 self.signoff_from_server()

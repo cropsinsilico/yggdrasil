@@ -18,6 +18,8 @@ from cis_interface import backwards
 from cis_interface.config import cis_cfg, cfg_logging
 
 
+_stack_in_log = False
+_stack_in_timeout = False
 _thread_registry = {}
 _lock_registry = {}
 try:
@@ -393,17 +395,21 @@ class TimeOut(object):
         max_time (float, bbol): Maximum period of time that should elapse before
             'is_out' returns True. If False, 'is_out' will never return True.
             Providing 0 indicates that 'is_out' should immediately return True.
+        key (str, optional): Key that was used to register the timeout. Defaults
+            to None.
 
     Attributes:
         max_time (float): Maximum period of time that should elapsed before
             'is_out' returns True.
         start_time (float): Result of time.time() at start.
+        key (str): Key that was used to register the timeout.
 
     """
 
-    def __init__(self, max_time):
+    def __init__(self, max_time, key=None):
         self.max_time = max_time
         self.start_time = backwards.clock_time()
+        self.key = key
 
     @property
     def elapsed(self):
@@ -553,12 +559,15 @@ class CisClass(object):
     @property
     def logger_prefix(self):
         r"""Prefix to add to logger messages."""
-        stack = inspect.stack()
-        the_class = os.path.splitext(os.path.basename(
-            stack[2][0].f_globals["__file__"]))[0]
-        the_line = stack[2][2]
-        the_func = stack[2][3]
-        return '%s(%s).%s[%d]: ' % (the_class, self.name, the_func, the_line)
+        if _stack_in_log:  # pragma: no cover
+            stack = inspect.stack()
+            the_class = os.path.splitext(os.path.basename(
+                stack[2][0].f_globals["__file__"]))[0]
+            the_line = stack[2][2]
+            the_func = stack[2][3]
+            return '%s(%s).%s[%d]: ' % (the_class, self.name, the_func, the_line)
+        else:
+            return ''
 
     def as_str(self, obj):
         r"""Return str version of object if it is not already a string.
@@ -613,10 +622,12 @@ class CisClass(object):
             str: Key identifying calling object and method.
 
         """
-        stack = inspect.stack()
-        fcn = stack[key_level + 2][3]
-        cls = os.path.splitext(os.path.basename(stack[key_level + 2][1]))[0]
-        key = '%s(%s).%s' % (cls, self.name, fcn)
+        # stack = inspect.stack()
+        # fcn = stack[key_level + 2][3]
+        # cls = os.path.splitext(os.path.basename(stack[key_level + 2][1]))[0]
+        # key = '%s(%s).%s' % (cls, self.name, fcn)
+        key = '%s(%s).%s' % (str(self.__class__).split("'")[1], self.name,
+                             threading.current_thread().name)
         return key
 
     def start_timeout(self, t=None, key=None, key_level=0):
@@ -645,7 +656,7 @@ class CisClass(object):
             key = self.get_timeout_key(key_level=key_level)
         if key in self._timeouts:
             raise KeyError("Timeout already registered for %s" % key)
-        self._timeouts[key] = TimeOut(t)
+        self._timeouts[key] = TimeOut(t, key=key)
         return self._timeouts[key]
 
     def check_timeout(self, key=None, key_level=0):
