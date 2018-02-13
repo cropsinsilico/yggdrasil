@@ -222,10 +222,10 @@ class TestZMQCommPUB(TestZMQComm):
         pass
 
 
-class TestZMQCommREP(TestZMQComm):
+class TestZMQCommREQ(TestZMQComm):
     r"""Test for ZMQComm communication class with REP/REQ socket."""
     def __init__(self, *args, **kwargs):
-        super(TestZMQCommREP, self).__init__(*args, **kwargs)
+        super(TestZMQCommREQ, self).__init__(*args, **kwargs)
         self.socket_type = 'REQ'
 
     def test_send_recv_nolimit(self):

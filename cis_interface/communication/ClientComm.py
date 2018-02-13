@@ -41,6 +41,7 @@ class ClientComm(CommBase.CommBase):
                                          recv_timeout=self.ocomm.recv_timeout,
                                          is_interface=self.ocomm.is_interface,
                                          direction='send', no_suffix=True,
+                                         is_composite=True,
                                          address=self.ocomm.address)
 
     @classmethod

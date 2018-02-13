@@ -99,6 +99,8 @@ class CommBase(CisClass):
             Defaults to False.
         is_response_server (bool, optional): If True, the comm is a server-side
             response comm. Defaults to False.
+        is_composite (bool, optional): If True, the comm is composite of other
+            comms. Defaults to False.
         comm (str, optional): The comm that should be created. This only serves
             as a check that the correct class is being created. Defaults to None.
         **kwargs: Additional keywords arguments are passed to parent class.
@@ -130,6 +132,7 @@ class CommBase(CisClass):
             that will be receiving messages from one or more clients.
         is_response_server (bool): If True, the comm is a server-side response
             comm.
+        is_composite (bool): If True, the comm is composite of other comms.
 
     Raises:
         RuntimeError: If the comm class is not installed.
@@ -145,6 +148,7 @@ class CommBase(CisClass):
                  single_use=False, reverse_names=False, no_suffix=False,
                  is_client=False, is_response_client=False,
                  is_server=False, is_response_server=False,
+                 is_composite=False,
                  comm=None, **kwargs):
         if comm is not None:
             assert(comm == self.comm_class)
@@ -174,6 +178,7 @@ class CommBase(CisClass):
         self.is_response_client = is_response_client
         self.is_response_server = is_response_server
         self.is_server = is_server
+        self.is_composite = is_composite
         self._server = None
         self.is_interface = is_interface
         self.recv_timeout = recv_timeout

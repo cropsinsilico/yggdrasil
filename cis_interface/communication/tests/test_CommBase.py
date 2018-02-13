@@ -255,8 +255,8 @@ class TestCommBase(CisTest, IOInfo):
             send_args = tuple()
         else:
             send_args = (msg_send,)
-        nt.assert_equal(self.send_instance.n_msg, 0)
-        nt.assert_equal(self.recv_instance.n_msg, 0)
+        nt.assert_equal(self.send_instance.n_msg_send, 0)
+        nt.assert_equal(self.recv_instance.n_msg_recv, 0)
         if reverse_comms:
             send_instance = self.recv_instance
             recv_instance = self.send_instance
@@ -271,7 +271,8 @@ class TestCommBase(CisTest, IOInfo):
             assert(not flag)
             flag, msg_recv = frecv_meth(**recv_kwargs)
             assert(not flag)
-            nt.assert_raises(NotImplementedError, self.recv_instance._send, self.test_msg)
+            nt.assert_raises(NotImplementedError, self.recv_instance._send,
+                             self.test_msg)
             nt.assert_raises(NotImplementedError, self.recv_instance._recv)
         else:
             flag = fsend_meth(*send_args, **send_kwargs)
@@ -282,12 +283,13 @@ class TestCommBase(CisTest, IOInfo):
                 assert(flag)
             if not is_eof:
                 T = recv_instance.start_timeout(self.timeout)
-                while (not T.is_out) and (recv_instance.n_msg == 0):  # pragma: debug
+                while ((not T.is_out) and
+                       (recv_instance.n_msg_recv == 0)):  # pragma: debug
                     recv_instance.sleep()
                 recv_instance.stop_timeout()
-                assert(recv_instance.n_msg >= 1)
+                assert(recv_instance.n_msg_recv >= 1)
                 # IPC nolimit sends multiple messages
-                # nt.assert_equal(recv_instance.n_msg, 1)
+                # nt.assert_equal(recv_instance.n_msg_recv, 1)
             flag, msg_recv = frecv_meth(timeout=self.timeout, **recv_kwargs)
             if is_eof and close_on_recv_eof:
                 assert(not flag)
@@ -295,8 +297,12 @@ class TestCommBase(CisTest, IOInfo):
             else:
                 assert(flag)
             nt.assert_equal(msg_recv, msg_send)
-        nt.assert_equal(self.send_instance.n_msg, 0)
-        nt.assert_equal(self.recv_instance.n_msg, 0)
+        T = send_instance.start_timeout(self.timeout)
+        while (not T.is_out) and (send_instance.n_msg_send != 0):  # pragma: debug
+            send_instance.sleep()
+        send_instance.stop_timeout()
+        nt.assert_equal(send_instance.n_msg_send, 0)
+        nt.assert_equal(recv_instance.n_msg_recv, 0)
 
     def test_recv_nomsg(self):
         r"""Test recieve when there is no waiting message."""
