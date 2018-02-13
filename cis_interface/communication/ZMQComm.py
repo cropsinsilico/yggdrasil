@@ -782,7 +782,7 @@ class ZMQComm(CommBase.CommBase):
                     return
                 elif msg == self.eof_msg:
                     self._reply_thread.set_break_flag()
-                    self.deubg("EOF RECV'D")
+                    self.debug("EOF RECV'D")
                     return
                 self._n_reply_sent += 1
                 if self._n_sent == self._n_reply_sent:
