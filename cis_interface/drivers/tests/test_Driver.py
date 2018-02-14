@@ -149,8 +149,10 @@ class TestParam(CisTest):
 
     def remove_instance(self, inst):
         r"""Remove an instance."""
+        print('terminate', inst.was_terminated)
         if not inst.was_terminated:
             inst.terminate()
+        print('is_alive', inst.is_alive())
         if inst.is_alive():  # pragma: debug
             inst.join()
         inst.cleanup()

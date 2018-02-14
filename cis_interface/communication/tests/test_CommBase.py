@@ -282,8 +282,9 @@ class TestCommBase(CisTest, IOInfo):
             else:
                 assert(flag)
             if not is_eof:
+                # if (not is_eof) and (not close_on_recv_eof):
                 T = recv_instance.start_timeout(self.timeout)
-                while ((not T.is_out) and
+                while ((not T.is_out) and (not recv_instance.is_closed) and
                        (recv_instance.n_msg_recv == 0)):  # pragma: debug
                     recv_instance.sleep()
                 recv_instance.stop_timeout()

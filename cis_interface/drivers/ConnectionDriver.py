@@ -157,11 +157,13 @@ class ConnectionDriver(Driver):
             try:
                 if getattr(self, 'icomm', None) is not None:
                     self.icomm.close()
+                    self.info("closed input")
             except BaseException as e:
                 ie = e
             try:
                 if getattr(self, 'ocomm', None) is not None:
                     self.ocomm.close()
+                    self.info("closed output")
             except BaseException as e:
                 oe = e
             if ie:

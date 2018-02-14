@@ -406,6 +406,7 @@ class ZMQComm(CommBase.CommBase):
         self._do_reply_recv = threading.Event()
         self._reply_address_exch = threading.Event()
         self._timeout_reply_address = None
+        self._open_reply_complete = threading.Event()
         self.open_reply_thread = tools.CisThreadLoop(target=self.open_reply_socket,
                                                      daemon=True)
         if self.direction == 'send':
@@ -624,6 +625,26 @@ class ZMQComm(CommBase.CommBase):
             #     self.open_reply_thread.join()
             self._openned = True
 
+    def resolve_open_reply(self, timeout=None):
+        r"""Resolve the opening socket."""
+        if timeout is None:
+            if self.direction == 'send':
+                timeout = 0
+            else:
+                timeout = self.timeout
+        if self.open_reply_thread.is_alive():
+            if self._reply_address_exch.is_set():
+                return True
+            else:
+                if timeout is False:
+                    self._reply_address_exch.wait()
+                    # self.open_reply_thread.join()
+                else:
+                    self._reply_address_exch.wait(timeout)
+                    # self.open_reply_thread.join(timeout)
+                return self._reply_address_exch.is_set()
+        return True
+
     def open_reply_socket_send(self):
         r"""Open pair connection for receiving confirmation of send."""
         # Create socket
@@ -634,7 +655,12 @@ class ZMQComm(CommBase.CommBase):
                                                   self.reply_address_send)
         # Keep trying to send the address
         if not self._reply_address_exch.is_set():
-            out = self.socket.poll(timeout=1, flags=zmq.POLLOUT)
+            try:
+                out = self.socket.poll(timeout=1, flags=zmq.POLLOUT)
+            except zmq.ZMQError:
+                self.open_reply_thread.set_break_flag()
+                self.error("COMM CLOSED DURING OPEN")
+                return
             if out == 0:
                 return
             if self.socket_type == zmq.ROUTER:
@@ -657,6 +683,7 @@ class ZMQComm(CommBase.CommBase):
                 self.error("REQ QUEUE NOT CLEARED")
                 return
             self.socket.recv(flags=zmq.NOBLOCK)
+        self._open_reply_complete.set()
 
     def open_reply_socket_recv(self):
         r"""Open pair conenction for sending confirmation of recv."""
@@ -667,18 +694,22 @@ class ZMQComm(CommBase.CommBase):
         if not self._reply_address_exch.is_set():
             if self._timeout_reply_address is None:
                 self._timeout_reply_address = self.start_timeout(10 * self.sleeptime)
-            out = self.socket.poll(timeout=1,
-                                   flags=zmq.POLLIN)
-            if out == 0:
-                if not (self.is_response_client or self.is_response_server):
-                    if self._timeout_reply_address.is_out:
-                        self.open_reply_thread.set_break_flag()
-                        self.error("NO REPLY ADDRESS")
-                        self.stop_timeout()
+            try:
+                out = self.socket.poll(timeout=1, flags=zmq.POLLIN)
+                if out == 0:
+                    if not (self.is_response_client or self.is_response_server):
+                        if self._timeout_reply_address.is_out:
+                            self.open_reply_thread.set_break_flag()
+                            self.error("NO REPLY ADDRESS")
+                            self.stop_timeout()
+                    return
+                self.stop_timeout()
+                self.reply_address_recv = self.socket.recv(flags=zmq.NOBLOCK)
+                self.reply_socket_recv.connect(self.reply_address_recv)
+            except zmq.ZMQError:
+                self.open_reply_thread.set_break_flag()
+                self.error("COMM CLOSED DURING OPEN")
                 return
-            self.stop_timeout()
-            self.reply_address_recv = self.socket.recv(flags=zmq.NOBLOCK)
-            self.reply_socket_recv.connect(self.reply_address_recv)
             self._reply_address_exch.set()
         # Try handshake
         flag = self._reply_handshake_recv(self.reply_msg)
@@ -691,6 +722,7 @@ class ZMQComm(CommBase.CommBase):
         elif self.socket_type in [zmq.SUB, zmq.DEALER]:
             while self.socket.poll(timeout=1, flags=zmq.POLLIN):
                 self.socket.recv(flags=zmq.NOBLOCK)
+        self._open_reply_complete.set()
 
     def open_reply_socket(self):
         r"""Open pair connection for sending/receiving confirmation."""
@@ -704,10 +736,11 @@ class ZMQComm(CommBase.CommBase):
                 check_socket = self.reply_socket_send
             else:
                 check_socket = self.reply_socket_recv
-            if check_socket is not None:
-                self.debug("Reply socket open (direction = %s, send closed = %s)",
+            if check_socket is not None and (not check_socket.closed):
+                self.debug("Reply socket open (direction = %s, closed = %s)",
                            self.direction, str(check_socket.closed))
-                self._reply_thread.start()
+                if self._open_reply_complete.is_set():
+                    self._reply_thread.start()
         else:
             self.sleep()
 
@@ -728,6 +761,7 @@ class ZMQComm(CommBase.CommBase):
         with self._reply_thread.lock:
             if self.reply_socket_send.closed:
                 self._reply_thread.set_break_flag()
+                self.open_reply_thread.set_break_flag()
                 self.debug("SOCKET CLOSED")
                 return False
             out = self.reply_socket_send.poll(timeout=1, flags=zmq.POLLIN)
@@ -745,6 +779,7 @@ class ZMQComm(CommBase.CommBase):
             with self._reply_thread.lock:
                 if self.reply_socket_recv.closed:
                     self._reply_thread.set_break_flag()
+                    self.open_reply_thread.set_break_flag()
                     self.debug("SOCKET CLOSED")
                     return False
                 out = self.reply_socket_recv.poll(timeout=1,
@@ -815,8 +850,8 @@ class ZMQComm(CommBase.CommBase):
         r"""Close reply socket on send side."""
         # Assumes reply already routed
         self._reply_thread.set_break_flag()
-        # if self._reply_thread.is_alive():
-        #     self._reply_thread.join()
+        if self._reply_thread.is_alive():
+            self._reply_thread.join()
         with self._reply_thread.lock:
             self.reply_socket_send.close(linger=0)
        
@@ -828,25 +863,28 @@ class ZMQComm(CommBase.CommBase):
         self.stop_timeout()
         self._reply_thread.set_break_flag()
         self._do_reply_recv.set()
-        # if self._reply_thread.is_alive():
-        #     self._reply_thread.join()
+        if self._reply_thread.is_alive():
+            self._reply_thread.join()
+        self._do_reply_recv.clear()
         with self._reply_thread.lock:
             self._reply_handshake_recv(self.eof_msg)
             self.reply_socket_recv.close(linger=self.zmq_sleeptime)
 
     def close_reply_socket(self):
         r"""Close reply socket."""
+        self.info('close reply socket')
         if self._reply_sockets_closed:
             return  # Don't close more than once
-        self.open_reply_thread.set_break_flag()
         if self.open_reply_thread.is_alive():
             self.open_reply_thread.join(self.sleeptime)
+        self.open_reply_thread.set_break_flag()
         if (self.reply_socket_send is not None) and (not self.reply_socket_send.closed):
             self.close_reply_socket_send()
         if (self.reply_socket_recv is not None) and (not self.reply_socket_recv.closed):
             self.close_reply_socket_recv()
         self._reply_sockets_closed = True
-        self.debug("Reply socket closed (direction = %s).", self.direction)
+        self._reply_thread.set_break_flag()
+        self.info("Reply socket closed (direction = %s).", self.direction)
 
     def _close(self, linger=False):
         r"""Close the connection.
@@ -888,6 +926,7 @@ class ZMQComm(CommBase.CommBase):
         if not self.socket.closed:
             self.socket.close(linger=linger_time)
         super(ZMQComm, self)._close(linger=linger)
+        self.info('closed')
 
     def server_exists(self, srv_address):
         r"""Determine if a server exists.
@@ -944,17 +983,16 @@ class ZMQComm(CommBase.CommBase):
     @property
     def n_msg_recv(self):
         r"""int: 1 if there is 1 or more incoming messages waiting. 0 otherwise."""
-        if self.open_reply_thread.is_alive():
-            self.open_reply_thread.join()
         if self.is_open:
-            return int(self.is_message(zmq.POLLIN))
+            if not self.resolve_open_reply():  # timeout=0):
+                return 0
+            else:
+                return int(self.is_message(zmq.POLLIN))
         return 0
 
     @property
     def n_msg_send(self):
         r"""int: 1 if there is 1 or more outgoing messages waiting. 0 otherwise."""
-        if self.open_reply_thread.is_alive():
-            self.open_reply_thread.join()
         if self.is_open and self.direction == 'send':
             # Only on send because no req/rep confirmation for opp direction
             return (self._n_sent - self.n_reply_sent)
@@ -1012,8 +1050,9 @@ class ZMQComm(CommBase.CommBase):
             bool: Success or failure of send.
 
         """
-        if self.open_reply_thread.is_alive():
-            self.open_reply_thread.join()
+        if not self.resolve_open_reply():
+            self.error("Socket still opening")
+            return False
         if self.is_closed:  # pragma: debug
             self.error("Socket closed")
             return False
@@ -1054,8 +1093,10 @@ class ZMQComm(CommBase.CommBase):
                 message.
 
         """
-        if self.open_reply_thread.is_alive():
-            self.open_reply_thread.join()
+        # Resolve open
+        if not self.resolve_open_reply(timeout=timeout):
+            self.error("Socket still opening")
+            return (True, self.empty_msg)
         # Return False if the socket is closed
         if self.is_closed:  # pragma: debug
             self.error("Socket closed")
