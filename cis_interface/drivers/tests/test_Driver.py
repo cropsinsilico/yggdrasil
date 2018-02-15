@@ -133,6 +133,7 @@ class TestParam(CisTest):
         nt.assert_less_equal(ncurr_comm, self.nprev_comm)
         nt.assert_less_equal(ncurr_thread, self.nprev_thread)
         # nt.assert_equal(len(psutil.Process().children(recursive=True)), 0)
+        self.cleanup_comms()
 
     @property
     def name(self):

@@ -643,13 +643,15 @@ class ZMQComm(CommBase.CommBase):
                 self.reply_socket_send = self.context.socket(zmq.REP)
                 address = format_address(_default_protocol, 'localhost')
                 address = bind_socket(self.reply_socket_send, address)
-                self.reply_socket_address = backwards.unicode2bytes(address)
+                self.reply_socket_address = address
                 self.debug("new send address: %s", address)
             if not self._reply_thread.was_started:
                 self._reply_thread.start()
-            new_msg = backwards.unicode2bytes(':%s:%s:%s:%s') % (
-                _reply_msg, self.reply_socket_address,
-                _reply_msg, msg)
+            new_msg = backwards.format_bytes(
+                backwards.unicode2bytes(':%s:%s:%s:'), (
+                    _reply_msg, self.reply_socket_address,
+                    _reply_msg))
+            new_msg += msg
         return new_msg
         
     def check_reply_socket_recv(self, msg):
@@ -665,7 +667,8 @@ class ZMQComm(CommBase.CommBase):
         if self.direction == 'send':
             return msg
         with self._reply_thread.lock:
-            prefix = backwards.unicode2bytes(':%s:') % _reply_msg
+            prefix = backwards.format_bytes(
+                backwards.unicode2bytes(':%s:'), (_reply_msg,))
             if msg.startswith(prefix):
                 _, address, new_msg = msg.split(prefix)
                 if address not in self.reply_socket_recv:

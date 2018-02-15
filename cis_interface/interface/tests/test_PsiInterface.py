@@ -98,6 +98,7 @@ class TestBase(CisTest, IOInfo):
         if not self._skip_start:
             self.driver.terminate()
         super(TestBase, self).teardown()
+        self.cleanup_comms()
 
     def remove_instance(self, inst):
         r"""Remove an instance."""

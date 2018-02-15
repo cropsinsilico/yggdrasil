@@ -8,7 +8,7 @@ import numpy as np
 from scipy.io import savemat, loadmat
 import nose.tools as nt
 from cis_interface.config import cis_cfg, cfg_logging
-from cis_interface.tools import get_CIS_MSG_MAX
+from cis_interface.tools import get_CIS_MSG_MAX, get_default_comm
 from cis_interface.backwards import pickle, BytesIO
 from cis_interface.dataio.AsciiTable import AsciiTable
 from cis_interface import backwards, platform
@@ -122,6 +122,17 @@ class CisTest(unittest.TestCase):
             delattr(self, '_instance')
         self._teardown_complete = True
         self.reset_log()
+
+    def cleanup_comms(self):
+        r"""Cleanup all comms."""
+        default = get_default_comm()
+        if default == "IPCComm":
+            from cis_interface.communication.IPCComm import cleanup_comms
+        elif default == "ZMQComm":
+            from cis_interface.communication.ZMQComm import cleanup_comms
+        else:  # pragma: debug
+            raise Exception("No cleanup for %s" % default)
+        cleanup_comms()
 
     @property
     def description_prefix(self):
