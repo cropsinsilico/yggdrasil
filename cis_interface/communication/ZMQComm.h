@@ -508,8 +508,8 @@ int zmq_comm_nmsg(const comm_t x) {
     /* } */
     zmq_reply_t *zrep = (zmq_reply_t*)(x.reply);
     if (zrep != NULL) {
-      cislog_info("zmq_comm_nmsg(%s): nmsg = %d, nrep = %d",
-		  x.name, zrep->n_msg, zrep->n_rep);
+      cislog_debug("zmq_comm_nmsg(%s): nmsg = %d, nrep = %d",
+		   x.name, zrep->n_msg, zrep->n_rep);
       out = zrep->n_msg - zrep->n_rep;
     }
   }
