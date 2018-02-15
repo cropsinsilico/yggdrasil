@@ -643,7 +643,7 @@ class ZMQComm(CommBase.CommBase):
                 self.reply_socket_send = self.context.socket(zmq.REP)
                 address = format_address(_default_protocol, 'localhost')
                 address = bind_socket(self.reply_socket_send, address)
-                self.reply_socket_address = address
+                self.reply_socket_address = backwards.unicode2bytes(address)
                 self.debug("new send address: %s", address)
             if not self._reply_thread.was_started:
                 self._reply_thread.start()

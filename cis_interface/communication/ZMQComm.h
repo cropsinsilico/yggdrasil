@@ -14,6 +14,7 @@ static int _last_port = 49152;
 static double _wait_send_t = 0;  // 0.0001;
 static char _reply_msg[100] = "CIS_REPLY";
 static char _purge_msg[100] = "CIS_PURGE";
+static int _zmq_sleeptime = 10000;
 
 /*! 
   @brief Struct to store info for reply.
@@ -190,6 +191,7 @@ int do_reply_recv(const comm_t *comm, const int isock, const char *msg) {
   if (strcmp(msg, CIS_MSG_EOF) == 0) {
     zrep->n_msg = 0;
     zrep->n_rep = 0;
+    zsock_set_linger(s, _zmq_sleeptime);
     return 0;
   }
   // Receive

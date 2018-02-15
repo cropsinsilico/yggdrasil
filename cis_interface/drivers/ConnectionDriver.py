@@ -192,11 +192,15 @@ class ConnectionDriver(Driver):
 
         """
         self.debug()
-        with self.lock:
-            self._comm_closed = True
+        # with self.lock:
+        #     self._comm_closed = True
+        self.printStatus()
         self.icomm.close_on_empty()
-        self.ocomm.close()
-        # self.ocomm.close_on_empty()
+        if self._is_output:
+            self.ocomm.close_on_empty()
+        else:
+            self.ocomm.close()
+        self.printStatus()
         super(ConnectionDriver, self).graceful_stop()
         self.debug('Returning')
 
