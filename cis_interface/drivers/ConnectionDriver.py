@@ -157,13 +157,11 @@ class ConnectionDriver(Driver):
             try:
                 if getattr(self, 'icomm', None) is not None:
                     self.icomm.close()
-                    self.info("closed input")
             except BaseException as e:
                 ie = e
             try:
                 if getattr(self, 'ocomm', None) is not None:
                     self.ocomm.close()
-                    self.info("closed output")
             except BaseException as e:
                 oe = e
             if ie:
@@ -194,8 +192,11 @@ class ConnectionDriver(Driver):
 
         """
         self.debug()
+        with self.lock:
+            self._comm_closed = True
         self.icomm.close_on_empty()
-        self.ocomm.close_on_empty()
+        self.ocomm.close()
+        # self.ocomm.close_on_empty()
         super(ConnectionDriver, self).graceful_stop()
         self.debug('Returning')
 
@@ -267,8 +268,8 @@ class ConnectionDriver(Driver):
         if send_eof:
             self.send_eof()
         # Close output comm after waiting for output to be processed
-        if not dont_close_output and not self._is_input:
-            self.ocomm.close_on_empty()
+        # if not dont_close_output and not self._is_input:
+        #     self.ocomm.close_on_empty()
 
     def recv_message(self, **kwargs):
         r"""Get a new message to send.
@@ -302,6 +303,7 @@ class ConnectionDriver(Driver):
         """
         self.debug('EOF received')
         self.send_eof()
+        self.icomm.close_on_empty()
         return False
 
     def on_message(self, msg):

@@ -88,6 +88,11 @@ class TestRPCDriver(TestRPCParam, parent.TestDriver, IOInfo):
         assert(msg_flag)
         nt.assert_equal(msg_recv, self.msg_short)
         nt.assert_equal(self.recv_comm.n_msg, 0)
+        # Wait as ZMQ comm takes a while to know message was sent
+        Tout = self.instance.start_timeout()
+        while (not Tout.is_out) and (self.instance.n_msg_out > 0):
+            self.instance.sleep()
+        self.instance.stop_timeout()
         nt.assert_equal(self.instance.n_msg_out, 0)
 
     def test_send_recv_nolimit(self):

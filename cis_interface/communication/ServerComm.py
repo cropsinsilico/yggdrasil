@@ -37,7 +37,6 @@ class ServerComm(CommBase.CommBase):
                                          recv_timeout=self.icomm.recv_timeout,
                                          is_interface=self.icomm.is_interface,
                                          direction='recv', no_suffix=True,
-                                         is_composite=True,
                                          address=self.icomm.address)
 
     @classmethod

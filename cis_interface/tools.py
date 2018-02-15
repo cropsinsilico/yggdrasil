@@ -622,12 +622,14 @@ class CisClass(object):
             str: Key identifying calling object and method.
 
         """
-        # stack = inspect.stack()
-        # fcn = stack[key_level + 2][3]
-        # cls = os.path.splitext(os.path.basename(stack[key_level + 2][1]))[0]
-        # key = '%s(%s).%s' % (cls, self.name, fcn)
-        key = '%s(%s).%s' % (str(self.__class__).split("'")[1], self.name,
-                             threading.current_thread().name)
+        if _stack_in_timeout:  # pragma: debug
+            stack = inspect.stack()
+            fcn = stack[key_level + 2][3]
+            cls = os.path.splitext(os.path.basename(stack[key_level + 2][1]))[0]
+            key = '%s(%s).%s' % (cls, self.name, fcn)
+        else:
+            key = '%s(%s).%s' % (str(self.__class__).split("'")[1], self.name,
+                                 threading.current_thread().name)
         return key
 
     def start_timeout(self, t=None, key=None, key_level=0):
@@ -684,7 +686,7 @@ class CisClass(object):
         t = self._timeouts[key]
         return t.is_out
         
-    def stop_timeout(self, key=None, key_level=0):
+    def stop_timeout(self, key=None, key_level=0, quiet=False):
         r"""Stop a timeout for the calling function method.
 
         Args:
@@ -696,6 +698,8 @@ class CisClass(object):
                 key the timeout. 0 is the class and function/method that called
                 start_timeout. Higher values use classes and function/methods
                 further up in the stack. Defaults to 0.
+            quiet (bool, optional): If True, error message on timeout exceeded
+                will be debug log. Defaults to False.
 
         Raises:
             KeyError: If there is not a timeout registered for the specified
@@ -708,8 +712,12 @@ class CisClass(object):
             raise KeyError("No timeout registered for %s" % key)
         t = self._timeouts[key]
         if t.is_out and t.max_time > 0:
-            self.error("Timeout for %s at %5.2f s" % (key, t.elapsed))
-            print("Stopped %s at %f/%f" % (key, t.elapsed, t.max_time))
+            if quiet:
+                self.debug("Timeout for %s at %5.2f/%5.2f s" % (
+                    key, t.elapsed, t.max_time))
+            else:
+                self.error("Timeout for %s at %5.2f/%5.2f s" % (
+                    key, t.elapsed, t.max_time))
         del self._timeouts[key]
 
     def display(self, fmt_str='', *args):

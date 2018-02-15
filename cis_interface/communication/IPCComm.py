@@ -222,14 +222,14 @@ class IPCComm(CommBase.CommBase):
         self._bound = False
         self._backlog_recv = []
         self._backlog_send = []
-        if self.direction == 'recv':
-            self.backlog_thread = tools.CisThreadLoop(target=self.run_backlog_recv,
-                                                      name=self.name + 'RecvBacklog')
-        else:
+        if self.direction == 'send':
             self.backlog_thread = tools.CisThreadLoop(target=self.run_backlog_send,
                                                       name=self.name + 'SendBacklog')
             if self.is_interface:
                 self.backlog_thread.on_main_terminated = self.on_main_terminated
+        else:
+            self.backlog_thread = tools.CisThreadLoop(target=self.run_backlog_recv,
+                                                      name=self.name + 'RecvBacklog')
         self.backlog_send_ready = threading.Event()
         self.backlog_recv_ready = threading.Event()
         self.backlog_open = False
@@ -240,7 +240,8 @@ class IPCComm(CommBase.CommBase):
 
     def on_main_terminated(self):
         r"""Actions taken on the backlog thread when the main thread stops."""
-        self._1st_main_terminated = True
+        self.backlog_thread._1st_main_terminated = True
+        self.send_eof()
         self.close_on_empty(no_wait=True)
         
     @classmethod
@@ -396,15 +397,15 @@ class IPCComm(CommBase.CommBase):
             return len(self.backlog_send)
         return 0
 
-    # @property
-    # def n_msg_recv_drain(self):
-    #     r"""int: Number of messages in the receive backlog and queue."""
-    #     return self.n_msg_queued + self.n_msg_recv
+    @property
+    def n_msg_recv_drain(self):
+        r"""int: Number of messages in the receive backlog and queue."""
+        return self.n_msg_queued + self.n_msg_recv
 
-    # @property
-    # def n_msg_send_drain(self):
-    #     r"""int: Number of messages in the send backlog and queue."""
-    #     return self.n_msg_queued + self.n_msg_send
+    @property
+    def n_msg_send_drain(self):
+        r"""int: Number of messages in the send backlog and queue."""
+        return self.n_msg_queued + self.n_msg_send
 
     @property
     def backlog_recv(self):

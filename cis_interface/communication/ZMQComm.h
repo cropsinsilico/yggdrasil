@@ -12,6 +12,346 @@ static unsigned _zmq_rand_seeded = 0;
 static unsigned _cisSocketsCreated = 0;
 static int _last_port = 49152;
 static double _wait_send_t = 0;  // 0.0001;
+static char _reply_msg[100] = "CIS_REPLY";
+static char _purge_msg[100] = "CIS_PURGE";
+
+/*! 
+  @brief Struct to store info for reply.
+*/
+typedef struct zmq_reply_t {
+  int nsockets; 
+  zsock_t **sockets;
+  char **addresses;
+  int n_msg;
+  int n_rep;
+} zmq_reply_t;
+
+
+/*!
+  @brief Free a reply structure.
+  @param[in] x zmq_reply_t * Structure to free.
+  @returns int 0 if successfull, -1 otherwise.
+ */
+static inline
+int free_zmq_reply(zmq_reply_t *x) {
+  int i = 0;
+  if (x != NULL) {
+    if (x->sockets != NULL) {
+      for (i = 0; i < x->nsockets; i++) {
+	if (x->sockets[i] != NULL) {
+	  zsock_destroy(&(x->sockets[i]));
+	  x->sockets[i] = NULL;
+	}
+      }
+      free(x->sockets);
+    }
+    if (x->addresses != NULL) {
+      for (i = 0; i < x->nsockets; i++) {
+	if (x->addresses[i] != NULL) {
+	  free(x->addresses[i]);
+	  x->addresses[i] = NULL;
+	}
+      }
+      free(x->addresses);
+    }
+    x->nsockets = 0;
+    free(x);
+    x = NULL;
+  }
+  return 0;
+}
+
+/*!
+  @brief Add empty reply structure information to comm.
+  @param[in] comm comm_t * Comm to initialize reply for.
+  @returns int 0 if successfull, -1 otherwise.
+ */
+static inline
+int init_zmq_reply(comm_t *comm) {
+  zmq_reply_t *zrep = (zmq_reply_t*)malloc(sizeof(zmq_reply_t));
+  if (zrep == NULL) {
+    cislog_error("init_zmq_reply(%s): Failed to malloc reply.", comm->name);
+    return -1;
+  }
+  zrep->nsockets = 0;
+  zrep->sockets = NULL;
+  zrep->addresses = NULL;
+  zrep->n_msg = 0;
+  zrep->n_rep = 0;
+  comm->reply = (void*)zrep;
+  return 0;
+};
+
+/*!
+  @brief Locate matching reply socket.
+  @param[in] comm comm_t* Comm that should be checked for matching reply socket.
+  @param[in] address char* Address that should be matched against.
+  @returns int Index of matched socket, -1 if no match, -2 if error.
+ */
+static inline
+int find_reply_socket(const comm_t *comm, const char *address) {
+  int ret = -1;
+  // Get reply
+  zmq_reply_t *zrep = (zmq_reply_t*)(comm->reply);
+  if (zrep == NULL) {
+    cislog_error("find_reply_socket(%s): Reply structure not initialized.", comm->name);
+    return -2;
+  }
+  int i = 0;
+  for (i = 0; i < zrep->nsockets; i++) {
+    if (strcmp(zrep->addresses[i], address) == 0) {
+      ret = i;
+      break;
+    }
+  }
+  return ret;
+};
+
+/*!
+  @brief Request confirmation from receiving socket.
+  @param[in] comm comm_t* Comm structure to do reply for.
+  @returns int 0 if successfule, -1 otherwise.
+ */
+static inline
+int do_reply_send(const comm_t *comm) {
+  // Get reply
+  zmq_reply_t *zrep = (zmq_reply_t*)(comm->reply);
+  if (zrep == NULL) {
+    cislog_error("do_reply_send(%s): Reply structure not initialized.", comm->name);
+    return -1;
+  }
+  zrep->n_msg++;
+  zsock_t *s = (zsock_t*)(zrep->sockets[0]);
+  if (s == NULL) {
+    cislog_error("do_reply_send(%s): Socket is NULL.", comm->name);
+    return -1;
+  }
+  // Receive
+  zframe_t *msg = zframe_recv(s);
+  if (msg == NULL) {
+    cislog_error("do_reply_send(%s): did not receive", comm->name);
+    return -1;
+  }
+  char *msg_data = (char*)zframe_data(msg);
+  // Check for EOF
+  if (strcmp(msg_data, CIS_MSG_EOF) == 0) {
+    cislog_debug("do_reply_send(%s): EOF received", comm->name);
+    zrep->n_msg = 0;
+    zrep->n_rep = 0;
+    return -1;
+  }
+  // Send
+  int ret = zframe_send(&msg, s, ZFRAME_REUSE); // noblock?
+  // Check for purge or EOF
+  if (strcmp(msg_data, _purge_msg) == 0) {
+    cislog_debug("do_reply_send(%s): PURGE received", comm->name);
+    zrep->n_msg = 0;
+    zrep->n_rep = 0;
+    ret = do_reply_send(comm);
+  } else {
+    zrep->n_rep++;
+  }
+  zframe_destroy(&msg);
+  return ret;
+};
+
+/*!
+  @brief Send confirmation to sending socket.
+  @param[in] comm comm_t* Comm structure to do reply for.
+  @param[in] isock int Index of socket that reply should be done for.
+  @param[in] msg char* Mesage to send/recv.
+  @returns int 0 if successfule, -1 otherwise.
+ */
+static inline
+int do_reply_recv(const comm_t *comm, const int isock, const char *msg) {
+  // Get reply
+  zmq_reply_t *zrep = (zmq_reply_t*)(comm->reply);
+  if (zrep == NULL) {
+    cislog_error("do_reply_recv(%s): Reply structure not initialized.", comm->name);
+    return -1;
+  }
+  zsock_t *s = (zsock_t*)(zrep->sockets[isock]);
+  if (s == NULL) {
+    cislog_error("do_reply_recv(%s): Socket is NULL.", comm->name);
+    return -1;
+  }
+  zframe_t *msg_send = zframe_new(msg, strlen(msg));
+  if (msg_send == NULL) {
+    cislog_error("do_reply_recv(%s): Error creating frame.", comm->name);
+    return -1;
+  }
+  // Send
+  int ret = zframe_send(&msg_send, s, 0); // noblock?
+  zframe_destroy(&msg_send);
+  if (ret < 0) {
+    cislog_error("do_reply_recv(%s): Error sending confirmation.", comm->name);
+    return -1;
+  }
+  if (strcmp(msg, CIS_MSG_EOF) == 0) {
+    zrep->n_msg = 0;
+    zrep->n_rep = 0;
+    return 0;
+  }
+  // Receive
+  zframe_t *msg_recv = zframe_recv(s);
+  if (msg_recv == NULL) {
+    cislog_error("do_reply_recv(%s): did not receive", comm->name);
+    return -1;
+  }
+  zframe_destroy(&msg_recv);
+  zrep->n_rep++;
+  return 0;
+};
+
+/*!
+  @brief Add information about reply socket to outgoing message.
+  @param[in] comm comm_t* Comm that confirmation is for.
+  @param[in] data char* Message that reply info should be added to.
+  @param[in] len int Length of the outgoing message.
+  @returns char* Message with reply information added.
+ */
+static inline
+char* check_reply_send(const comm_t *comm, const char *data, const int len,
+		       int *new_len) {
+  char *out = NULL;
+  new_len[0] = len;
+  // Get reply
+  zmq_reply_t *zrep = (zmq_reply_t*)(comm->reply);
+  if (zrep == NULL) {
+    cislog_error("check_reply_send(%s): Reply structure not initialized.", comm->name);
+    return out;
+  }
+  // Create socket
+  if (zrep->nsockets == 0) {
+    zrep->sockets = (zsock_t**)malloc(sizeof(zsock_t*));
+    if (zrep->sockets == NULL) {
+      cislog_error("check_reply_send(%s): Error mallocing sockets.", comm->name);
+      return out;
+    }
+    zrep->nsockets = 1;
+    zrep->sockets[0] = zsock_new(ZMQ_REP);
+    if (zrep->sockets[0] == NULL) {
+      cislog_error("check_reply_send(%s): Could not initialize empty socket.",
+		   comm->name);
+      return out;
+    }
+    char protocol[50] = "tcp";
+    char host[50] = "localhost";
+    if (strcmp(host, "localhost") == 0)
+      strcpy(host, "127.0.0.1");
+    char address[100];
+    sprintf(address, "%s://%s:*[%d-]", protocol, host, _last_port + 1);
+    int port = zsock_bind(zrep->sockets[0], "%s", address);
+    if (port == -1) {
+      cislog_error("check_reply_send(%s): Could not bind socket to address = %s",
+		   comm->name, address);
+      return out;
+    }
+    _last_port = port;
+    sprintf(address, "%s://%s:%d", protocol, host, port);
+    zrep->addresses = (char**)malloc(sizeof(char*));
+    zrep->addresses[0] = (char*)malloc((strlen(address) + 1)*sizeof(char));
+    strcpy(zrep->addresses[0], address);
+  }
+  // Add address to new message
+  out = (char*)malloc(2*(strlen(_reply_msg) + 2) +
+		      strlen(zrep->addresses[0]) + len + 1);
+  sprintf(out, ":%s:%s:%s:", _reply_msg, zrep->addresses[0], _reply_msg);
+  new_len[0] = len + strlen(out);
+  memcpy(out + strlen(out), data, len);
+  out[new_len[0]] = '\0';
+  return out;
+};
+
+
+/*!
+  @brief Get reply information from message.
+  @param[in] comm comm_* Comm structure for incoming message.
+  @param[in, out] data char* Received message containing reply info that will be
+  removed on return.
+  @param[in] len size_t Length of received message.
+  @returns int Length of message without the reply info. -1 if there is an error.
+ */
+static inline
+int check_reply_recv(const comm_t *comm, char *data, const size_t len) {
+  int new_len = len;
+  int ret = 0;
+  // Get reply
+  zmq_reply_t *zrep = (zmq_reply_t*)(comm->reply);
+  if (zrep == NULL) {
+    cislog_error("check_reply_recv(%s): Reply structure not initialized.", comm->name);
+    return -1;
+  }
+  zrep->n_msg++;
+  // Extract address
+  char re_reply[500];
+  sprintf(re_reply, ":%s:(.*):%s:", _reply_msg, _reply_msg);
+  size_t sind, eind;
+  ret = find_match(re_reply, data, &sind, &eind);
+  if (ret <= 0) {
+    cislog_error("check_reply_recv(%s): Error parsing reply header in '%s'",
+		 comm->name, data);
+    return -1;
+  }
+  size_t headsiz = (eind-sind);
+  new_len = (int)(len - headsiz);
+  char address[100];
+  headsiz -= (2*(strlen(_reply_msg) + 2));
+  memcpy(address, data + sind + strlen(_reply_msg) + 2, headsiz);
+  address[headsiz] = '\0';
+  memmove(data, data + eind, new_len);
+  data[new_len] = '\0';
+  // Match address and create if it dosn't exist
+  int isock = find_reply_socket(comm, address);
+  if (isock < 0) {
+    if (isock == -2) {
+      cislog_error("check_reply_recv(%s): Error locating socket.", comm->name);
+      return -1;
+    }
+    // Realloc arrays
+    zrep->sockets = (zsock_t**)realloc(zrep->sockets,
+				       sizeof(zsock_t*)*(zrep->nsockets + 1));
+    if (zrep->sockets == NULL) {
+      cislog_error("check_reply_recv(%s): Error reallocing sockets.", comm->name);
+      return -1;
+    }
+    zrep->addresses = (char**)realloc(zrep->addresses,
+				      sizeof(char*)*(zrep->nsockets + 1));
+    if (zrep->addresses == NULL) {
+      cislog_error("check_reply_recv(%s): Error reallocing addresses.", comm->name);
+      return -1;
+    }
+    // Create new socket
+    isock = zrep->nsockets;
+    zrep->nsockets++;
+    zrep->sockets[isock] = zsock_new(ZMQ_REQ);
+    if (zrep->sockets[isock] == NULL) {
+      cislog_error("check_reply_recv(%s): Could not initialize empty socket.",
+		   comm->name);
+      return -1;
+    }
+    zrep->addresses[isock] = (char*)malloc(sizeof(char)*(strlen(address) + 1));
+    if (zrep->addresses[isock] == NULL) {
+      cislog_error("check_reply_recv(%s): Could not realloc new address.",
+		   comm->name);
+      return -1;
+    }
+    strcpy(zrep->addresses[isock], address);
+    ret = zsock_connect(zrep->sockets[isock], "%s", address);
+    if (ret < 0) {
+      cislog_error("check_reply_recv(%s): Could not connect to socket.",
+		   comm->name);
+      return -1;
+    }
+  }
+  // Confirm message receipt
+  ret = do_reply_recv(comm, isock, _reply_msg);
+  if (ret < 0) {
+    cislog_error("check_reply_recv(%s): Error during reply.", comm->name);
+    return -1;
+  }
+  return new_len;
+};
 
 /*!
   @brief Create a new socket.
@@ -48,11 +388,7 @@ int new_zmq_address(comm_t *comm) {
     cislog_error("new_zmq_address: Could not initialize empty socket.");
     return -1;
   }
-  if (strcmp(comm->direction, "send") == 0) {
-    zsock_set_linger(s, -1); // 60 * 1000);
-  } else {
-    zsock_set_linger(s, 0);
-  }
+  zsock_set_linger(s, 0);
   int port = zsock_bind(s, "%s", address);
   if (port == -1) {
     cislog_error("new_zmq_address: Could not bind socket to address = %s",
@@ -70,7 +406,9 @@ int new_zmq_address(comm_t *comm) {
     sprintf(comm->name, "tempnewZMQ-%d", port);
   comm->handle = (void*)s;
   _cisSocketsCreated++;
-  return 0;
+  // Init reply
+  int ret = init_zmq_reply(comm);
+  return ret;
 };
 
 /*!
@@ -88,11 +426,7 @@ int init_zmq_comm(comm_t *comm) {
     cislog_error("init_zmq_address: Could not initialize empty socket.");
     return -1;
   }
-  if (strcmp(comm->direction, "send") == 0) {
-    zsock_set_linger(s, -1);  // 60 * 1000);
-  } else {
-    zsock_set_linger(s, 0);
-  }
+  zsock_set_linger(s, 0);
   ret = zsock_connect(s, "%s", comm->address);
   if (ret == -1) {
     cislog_error("new_zmq_address: Could not connect socket to address = %s",
@@ -103,7 +437,8 @@ int init_zmq_comm(comm_t *comm) {
     sprintf(comm->name, "tempinitZMQ-%s", comm->address);
   // Asign to void pointer
   comm->handle = (void*)s;
-  return 0;
+  ret = init_zmq_reply(comm);
+  return ret;
 };
 
 /*!
@@ -119,7 +454,17 @@ int free_zmq_comm(comm_t *x) {
       zsock_destroy(&s);
     x->handle = NULL;
   }
-  return 0;
+  zmq_reply_t *zrep = (zmq_reply_t*)(x->reply);
+  if (zrep != NULL) {
+    if (strcmp(x->direction, "recv") == 0) {
+      int i = 0;
+      for (i = 0; i < zrep->nsockets; i++) {
+	do_reply_recv(x, i, CIS_MSG_EOF);
+      }
+    }
+  }
+  int ret = free_zmq_reply((zmq_reply_t*)(x->reply));
+  return ret;
 };
 
 /*!
@@ -151,14 +496,22 @@ int zmq_comm_nmsg(const comm_t x) {
       }
       zpoller_destroy(&poller);
     }
-  } else if (x.last_send[0] != 0) {
-    time_t now;
-    time(&now);
-    double elapsed = difftime(now, x.last_send[0]);
-    if (elapsed > _wait_send_t)
-      out = 0;
-    else
-      out = 1;
+  } else {
+    /* if (x.last_send[0] != 0) { */
+    /*   time_t now; */
+    /*   time(&now); */
+    /*   double elapsed = difftime(now, x.last_send[0]); */
+    /*   if (elapsed > _wait_send_t) */
+    /* 	out = 0; */
+    /*   else */
+    /* 	out = 1; */
+    /* } */
+    zmq_reply_t *zrep = (zmq_reply_t*)(x.reply);
+    if (zrep != NULL) {
+      cislog_info("zmq_comm_nmsg(%s): nmsg = %d, nrep = %d",
+		  x.name, zrep->n_msg, zrep->n_rep);
+      out = zrep->n_msg - zrep->n_rep;
+    }
   }
   return out;
 };
@@ -183,15 +536,26 @@ int zmq_comm_send(const comm_t x, const char *data, const size_t len) {
     cislog_error("zmq_comm_send(%s): socket handle is NULL", x.name);
     return -1;
   }
-  zframe_t *f = zframe_new(data, len);
+  int new_len = 0;
+  char *new_data = check_reply_send(&x, data, len, &new_len);
+  if (new_data == NULL) {
+    cislog_error("zmq_comm_send(%s): Adding reply address failed.", x.name);
+    return -1;
+  }
+  zframe_t *f = zframe_new(new_data, new_len);
   int ret = -1;
   if (f == NULL) {
     cislog_error("zmq_comm_send(%s): frame handle is NULL", x.name);
   } else {
     ret = zframe_send(&f, s, 0);
     zframe_destroy(&f);
-  } 
+  }
+  // Get reply
+  if (ret >= 0) {
+    ret = do_reply_send(&x);
+  }
   cislog_debug("zmq_comm_send(%s): returning %d", x.name, ret);
+  free(new_data);
   return ret;
 };
 
@@ -253,6 +617,7 @@ int zmq_comm_recv(const comm_t x, char **data, const size_t len,
   (*data)[len_recv-1] = '\0';
   zframe_destroy(&out);
   int ret = (int)len_recv - 1;
+  ret = check_reply_recv(&x, *data, (size_t)ret);
   cislog_debug("zmq_comm_recv(%s): returning %d", x.name, ret);
   return ret;
 };

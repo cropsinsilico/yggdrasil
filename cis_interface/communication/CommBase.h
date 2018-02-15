@@ -30,6 +30,7 @@ typedef struct comm_t {
   int index_in_register; //!< Index of the comm in the comm register.
   time_t *last_send; //!< Clock output at time of last send.
   int *sent_eof; //!< Flag specifying if EOF has been sent
+  void *reply; //!< Reply information.
 } comm_t;
 
 

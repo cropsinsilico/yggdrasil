@@ -32,6 +32,7 @@ class ClientResponseDriver(ConnectionDriver):
         icomm_kws = kwargs.get('icomm_kws', {})
         icomm_kws['comm'] = comm
         icomm_kws['name'] = response_name
+        icomm_kws['is_response_client'] = True
         kwargs['icomm_kws'] = icomm_kws
         # Output communicator
         ocomm_kws = kwargs.get('ocomm_kws', {})
@@ -61,7 +62,6 @@ class ClientResponseDriver(ConnectionDriver):
     def after_loop(self):
         r"""Don't send anything to the client."""
         super(ClientResponseDriver, self).after_loop(send_eof=False)
-        # dont_close_output=True)
         
     def send_message(self, *args, **kwargs):
         r"""Close the input comm once message sent.

@@ -56,7 +56,7 @@ class RPCComm(CommBase.CommBase):
         kwargs['no_suffix'] = True
         if (name in os.environ) or (address is not None):
             super(RPCComm, self).__init__(name, address=address, comm=comm,
-                                          dont_open=True, is_composite=True,
+                                          dont_open=True,
                                           **kwargs)
             ikwargs.setdefault(
                 'address', self.address.split(_rpc_address_split)[0])
@@ -73,7 +73,7 @@ class RPCComm(CommBase.CommBase):
             # Close before raising the error
             try:
                 super(RPCComm, self).__init__(name, address=address, comm=comm,
-                                              dont_open=True, is_composite=True,
+                                              dont_open=True,
                                               **kwargs)
             except BaseException as e:
                 self.close(skip_base=True)

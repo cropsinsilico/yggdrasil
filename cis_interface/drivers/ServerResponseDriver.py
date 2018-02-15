@@ -31,6 +31,7 @@ class ServerResponseDriver(ConnectionDriver):
         icomm_kws = kwargs.get('icomm_kws', {})
         icomm_kws['comm'] = None
         icomm_kws['name'] = 'server_model_response.' + msg_id
+        icomm_kws['is_response_server'] = True
         kwargs['icomm_kws'] = icomm_kws
         # Output communicator to client response driver
         ocomm_kws = kwargs.get('ocomm_kws', {})
@@ -71,8 +72,7 @@ class ServerResponseDriver(ConnectionDriver):
 
     def after_loop(self):
         r"""Don't send EOF or close output, client will close it."""
-        super(ServerResponseDriver, self).after_loop(send_eof=False,
-                                                     dont_close_output=True)
+        super(ServerResponseDriver, self).after_loop(send_eof=False)
         
     def send_message(self, *args, **kwargs):
         r"""Set comm to used and then send the message.
