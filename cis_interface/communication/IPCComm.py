@@ -336,8 +336,8 @@ class IPCComm(CommBase.CommBase):
                 comm. Defaults to False.
 
         """
-        self._close_queue(skip_remove=linger)
         self._close_backlog(wait=True)
+        self._close_queue()  # skip_remove=linger)
         super(IPCComm, self)._close(linger=linger)
 
     def new_server(self, srv_address):
