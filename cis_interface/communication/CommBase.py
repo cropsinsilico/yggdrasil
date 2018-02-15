@@ -353,7 +353,8 @@ class CommBase(CisClass):
 
     def interface_close(self, no_wait=False):
         r"""Close operations for interface send comms."""
-        self.send_eof()
+        if not self.is_response_server:
+            self.send_eof()
         self.linger_close()
 
     @property
@@ -792,6 +793,9 @@ class CommBase(CisClass):
         except BaseException:
             self.exception('.send(): Failed to send.')
             return False
+        if self.single_use and self._used:
+            self.info()
+            self.close_on_empty(no_wait=True)
         return ret
 
     def send_multipart(self, msg, send_header=False, header_kwargs=None,

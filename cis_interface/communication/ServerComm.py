@@ -126,6 +126,11 @@ class ServerComm(CommBase.CommBase):
         r"""int: The number of messages in the connection."""
         return self.icomm.n_msg_recv
 
+    @property
+    def n_msg_recv_drain(self):
+        r"""int: The number of messages in the connection to drain."""
+        return self.icomm.n_msg_recv_drain
+
     # RESPONSE COMM
     def create_response_comm(self):
         r"""Create a response comm based on information from the last header."""
@@ -135,14 +140,14 @@ class ServerComm(CommBase.CommBase):
             raise RuntimeError("Last header does not contain response address.")
         comm_kwargs = dict(address=self.icomm._last_header['response_address'],
                            direction='send', is_response_server=True,
-                           **self.response_kwargs)
+                           single_use=True, **self.response_kwargs)
         self.ocomm = get_comm(self.name + '.server_response_comm',
                               **comm_kwargs)
 
     def remove_response_comm(self):
         r"""Remove response comm."""
         self.icomm._last_header = None
-        # self.ocomm.close_on_empty()
+        # self.ocomm.close_on_empty(no_wait=True)
         self.ocomm = None
 
     # SEND METHODS
@@ -196,11 +201,6 @@ class ServerComm(CommBase.CommBase):
         r"""Alias for RPCComm.recv"""
         return self.recv(*args, **kwargs)
     
-    def drain_messages(self, direction='recv'):
-        r"""Sleep while waiting for messages to be drained."""
-        if direction == 'recv':
-            self.icomm.drain_messages(direction='recv')
-
     def purge(self):
         r"""Purge input and output comms."""
         self.icomm.purge()

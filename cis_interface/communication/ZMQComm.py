@@ -424,7 +424,8 @@ class ZMQComm(CommBase.CommBase):
     def on_main_terminated(self):
         r"""Actions taken on the backlog thread when the main thread stops."""
         self._reply_thread._1st_main_terminated = True
-        self.send_eof()
+        if not self.is_response_server:
+            self.send_eof()
         self.close_on_empty(no_wait=True)
 
     @classmethod

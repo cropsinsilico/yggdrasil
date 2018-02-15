@@ -550,11 +550,17 @@ int zmq_comm_send(const comm_t x, const char *data, const size_t len) {
     cislog_error("zmq_comm_send(%s): frame handle is NULL", x.name);
   } else {
     ret = zframe_send(&f, s, 0);
+    if (ret < 0) {
+      cislog_error("zmq_comm_send(%s): Error in zframe_send", x.name);
+    }
     zframe_destroy(&f);
   }
   // Get reply
   if (ret >= 0) {
     ret = do_reply_send(&x);
+    if (ret < 0) {
+      cislog_error("zmq_comm_send(%s): Error in do_reply_send", x.name);
+    }
   }
   cislog_debug("zmq_comm_send(%s): returning %d", x.name, ret);
   free(new_data);

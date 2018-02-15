@@ -134,7 +134,7 @@ class ClientComm(CommBase.CommBase):
     def create_response_comm(self):
         r"""Create a response comm based on information from the last header."""
         comm_kwargs = dict(direction='recv', is_response_client=True,
-                           **self.response_kwargs)
+                           single_use=True, **self.response_kwargs)
         header = dict(request_id=str(uuid.uuid4()))
         if header['request_id'] in self.icomm:  # pragma: debug
             raise ValueError("Request ID %s already in use." % header['request_id'])
