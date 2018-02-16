@@ -41,42 +41,13 @@ class ClientResponseDriver(ConnectionDriver):
         if model_response_address is not None:
             ocomm_kws['address'] = model_response_address
         kwargs['ocomm_kws'] = ocomm_kws
+        # Overall keywords
+        kwargs['single_use'] = True
         super(ClientResponseDriver, self).__init__(response_name, **kwargs)
-        assert(not hasattr(self, 'comm'))
         self.comm = comm
         self.msg_id = msg_id
-        self._unused = True
-
-    @property
-    def is_valid(self):
-        r"""bool: Returns True if the connection is unused and the parent class
-        is valid."""
-        with self.lock:
-            return (super(ClientResponseDriver, self).is_valid and self._unused)
 
     @property
     def response_address(self):
         r"""str: Address of response comm."""
         return self.icomm.address
-
-    def after_loop(self):
-        r"""Don't send anything to the client."""
-        super(ClientResponseDriver, self).after_loop(send_eof=False)
-        
-    def send_message(self, *args, **kwargs):
-        r"""Close the input comm once message sent.
-
-        Args:
-            *args: Arguments are passed to parent class send_message.
-            *kwargs: Keyword arguments are passed to parent class send_message.
-
-        Return:
-            bool: Success or failure of send.
-
-        """
-        with self.lock:
-            self._unused = False
-        out = super(ClientResponseDriver, self).send_message(*args, **kwargs)
-        with self.lock:
-            self.icomm.close()
-        return out

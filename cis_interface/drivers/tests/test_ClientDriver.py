@@ -63,8 +63,7 @@ class TestClientParam(parent.TestConnectionParam):
     def create_server(self, comm_address=None):
         r"""Create a new ServerDriver instance."""
         inst = runner.create_driver(
-            'ServerDriver', 'test_model_request.' + self.uuid,
-            # request_name='test_request.' + self.uuid,
+            'ServerDriver', 'TestServerRequestDriver.' + self.uuid,
             comm=self.server_comm,
             comm_address=comm_address,
             namespace=self.namespace, workingDir=self.workingDir,

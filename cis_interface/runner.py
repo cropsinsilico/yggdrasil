@@ -1,7 +1,7 @@
 """This module provides tools for running models using cis_interface."""
 import sys
 import logging
-import atexit
+# import atexit
 import os
 import signal
 from pprint import pformat
@@ -99,7 +99,7 @@ class CisRunner(CisClass):
             self.parseModelYaml(modelYml)
         # print(pformat(self.inputdrivers), pformat(self.outputdrivers),
         #       pformat(self.modeldrivers))
-        atexit.register(self.cleanup)
+        # atexit.register(self.cleanup)
 
     def parseModelYaml(self, modelYml):
         r"""Parse supplied yaml, adding yamldir and doing mustache replace.

@@ -16,11 +16,13 @@ class ConnectionDriver(Driver):
         translator (str, func, optional): Function or string specifying function
             that should be used to translate messages from the input communicator
             before passing them to the output communicator. If a string, the
-            format should be "<package.module>:<function>" so that <function> can
-            be imported from <package>. Defaults to None and messages are passed
-            directly.
-        timeout_send_1st (float, optional): Time in seconds that should be waited
-            before giving up on the first send. Defaults to self.timeout.
+            format should be "<package.module>:<function>" so that <function>
+            can be imported from <package>. Defaults to None and messages are
+            passed directly.
+        timeout_send_1st (float, optional): Time in seconds that should be
+            waited before giving up on the first send. Defaults to self.timeout.
+        single_use (bool, optional): If True, the driver will be stopped after
+            one loop. Defaults to False.
         **kwargs: Additonal keyword arguments are passed to the parent class.
 
     Attributes:
@@ -36,10 +38,13 @@ class ConnectionDriver(Driver):
             the input communicator before passing them to the output communicator.
         timeout_send_1st (float): Time in seconds that should be waited before
             giving up on the first send.
+        single_use (bool): If True, the driver will be stopped after one
+            loop.
 
     """
     def __init__(self, name, icomm_kws=None, ocomm_kws=None,
-                 translator=None, timeout_send_1st=None, **kwargs):
+                 translator=None, timeout_send_1st=None, single_use=False,
+                 **kwargs):
         super(ConnectionDriver, self).__init__(name, **kwargs)
         if icomm_kws is None:
             icomm_kws = dict()
@@ -64,6 +69,7 @@ class ConnectionDriver(Driver):
         icomm_kws['direction'] = 'recv'
         icomm_kws['dont_open'] = True
         icomm_kws['reverse_names'] = True
+        icomm_kws['close_on_eof_recv'] = False
         icomm_name = icomm_kws.pop('name', name)
         self.icomm = new_comm(icomm_name, **icomm_kws)
         self.icomm_kws = icomm_kws
@@ -87,10 +93,13 @@ class ConnectionDriver(Driver):
         self._eof_sent = False
         if timeout_send_1st is None:
             timeout_send_1st = self.timeout
+        self.translator = translator
+        self.single_use = single_use
         self.timeout_send_1st = timeout_send_1st
         self._first_send_done = False
         self._comm_closed = False
-        self.translator = translator
+        self._used = False
+        self._skip_after_loop = False
         self.nrecv = 0
         self.nproc = 0
         self.nsent = 0
@@ -110,7 +119,8 @@ class ConnectionDriver(Driver):
         r"""bool: Returns True if the connection is open and the parent class
         is valid."""
         with self.lock:
-            return (super(ConnectionDriver, self).is_valid and self.is_comm_open)
+            return (super(ConnectionDriver, self).is_valid and
+                    self.is_comm_open and not (self.single_use and self._used))
 
     @property
     def is_comm_open(self):
@@ -151,6 +161,7 @@ class ConnectionDriver(Driver):
         self.debug()
         with self.lock:
             self._comm_closed = True
+            self._skip_after_loop = True
             # Capture errors for both comms
             ie = None
             oe = None
@@ -192,14 +203,15 @@ class ConnectionDriver(Driver):
 
         """
         self.debug()
-        # with self.lock:
-        #     self._comm_closed = True
+        with self.lock:
+            self._skip_after_loop = True
         self.printStatus()
-        self.icomm.close_on_empty()
-        if self._is_output:
-            self.ocomm.close_on_empty()
-        else:
-            self.ocomm.close()
+        self.icomm.close_on_empty(locks=self.lock)
+        self.ocomm.close()
+        # if self._is_output:
+        #     self.ocomm.close_on_empty(locks=self.lock)
+        # else:
+        #     self.ocomm.close()
         self.printStatus()
         super(ConnectionDriver, self).graceful_stop()
         self.debug('Returning')
@@ -210,7 +222,7 @@ class ConnectionDriver(Driver):
         if self._is_input:
             self.ocomm.close()
         if self._is_output:
-            self.icomm.close_on_empty()
+            self.icomm.close_on_empty(locks=self.lock)
         super(ConnectionDriver, self).on_model_exit()
 
     def do_terminate(self):
@@ -259,18 +271,19 @@ class ConnectionDriver(Driver):
         self.debug()
         # Close input comm in case loop did not
         with self.lock:
-            if self._comm_closed:
-                self.debug("After loop aborted as comms were already closed.")
+            if self._skip_after_loop:
+                self.debug("After loop skipped.")
                 return
             self.icomm.close()
         # Send EOF in case the model didn't
-        if send_eof is None:
-            if self._is_input or self._is_output:
-                send_eof = True
-            else:
-                send_eof = False
-        if send_eof:
-            self.send_eof()
+        if not self.single_use:
+            if send_eof is None:
+                if self._is_input or self._is_output:
+                    send_eof = True
+                else:
+                    send_eof = False
+            if send_eof:
+                self.send_eof()
         # Close output comm after waiting for output to be processed
         # if not dont_close_output and not self._is_input:
         #     self.ocomm.close_on_empty()
@@ -307,7 +320,7 @@ class ConnectionDriver(Driver):
         """
         self.debug('EOF received')
         self.send_eof()
-        self.icomm.close_on_empty()
+        self.icomm.close_on_empty(locks=self.lock)
         return False
 
     def on_message(self, msg):
@@ -399,6 +412,8 @@ class ConnectionDriver(Driver):
 
         """
         self.debug()
+        with self.lock:
+            self._used = True
         if self._first_send_done:
             flag = self._send_message(*args, **kwargs)
         else:

@@ -139,18 +139,22 @@ int do_reply_send(const comm_t *comm) {
     cislog_debug("do_reply_send(%s): EOF received", comm->name);
     zrep->n_msg = 0;
     zrep->n_rep = 0;
-    return -1;
+    return 0;
   }
   // Send
   int ret = zframe_send(&msg, s, ZFRAME_REUSE); // noblock?
   // Check for purge or EOF
-  if (strcmp(msg_data, _purge_msg) == 0) {
-    cislog_debug("do_reply_send(%s): PURGE received", comm->name);
-    zrep->n_msg = 0;
-    zrep->n_rep = 0;
-    ret = do_reply_send(comm);
+  if (ret < 0) {
+    cislog_error("do_reply_send(%s): Error sending reply frame.", comm->name);
   } else {
-    zrep->n_rep++;
+    if (strcmp(msg_data, _purge_msg) == 0) {
+      cislog_debug("do_reply_send(%s): PURGE received", comm->name);
+      zrep->n_msg = 0;
+      zrep->n_rep = 0;
+      ret = do_reply_send(comm);
+    } else {
+      zrep->n_rep++;
+    }
   }
   zframe_destroy(&msg);
   return ret;

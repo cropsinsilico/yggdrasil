@@ -20,6 +20,9 @@ from cis_interface.config import cis_cfg, cfg_logging
 
 _stack_in_log = False
 _stack_in_timeout = False
+if logging.getLogger("cis_interface").getEffectiveLevel() <= logging.DEBUG:
+    _stack_in_log = True
+    _stack_in_timeout = True
 _thread_registry = {}
 _lock_registry = {}
 try:
@@ -867,6 +870,7 @@ class CisThread(threading.Thread, CisClass):
         self.terminate_event = threading.Event()
         self.start_flag = False
         self.terminate_flag = False
+        self._cleanup_called = False
         if daemon:
             self.setDaemon(True)
             self.daemon = True
@@ -937,7 +941,7 @@ class CisThread(threading.Thread, CisClass):
 
     def cleanup(self):
         r"""Actions to perform to clean up the thread after it has stopped."""
-        self.debug()
+        self._cleanup_called = True
 
     def wait(self, timeout=None, key=None):
         r"""Wait until thread finish to return using sleeps rather than
@@ -984,7 +988,8 @@ class CisThread(threading.Thread, CisClass):
         r"""Actions performed when python exits."""
         if self.is_alive():
             self.info('Thread alive at exit')
-        self.cleanup()
+            if not self._cleanup_called:
+                self.cleanup()
 
 
 class CisThreadLoop(CisThread):

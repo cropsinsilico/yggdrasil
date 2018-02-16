@@ -408,13 +408,13 @@ class ZMQComm(CommBase.CommBase):
         if self.direction == 'send':
             self._handshake_done = threading.Event()
             self._reply_thread = tools.CisThreadLoop(target=self._reply_send,
-                                                     daemon=False, name=self.name)
+                                                     name=self.name + '.ReplyThread')
             if self.is_interface:
                 self._reply_thread.on_main_terminated = self.on_main_terminated
         else:
             self._handshake_done = {}
             self._reply_thread = tools.CisThreadLoop(target=self._reply_recv,
-                                                     daemon=False, name=self.name)
+                                                     name=self.name + '.ReplyThread')
         # Reserve/set port by binding
         if not dont_open:
             self.open()
@@ -529,13 +529,15 @@ class ZMQComm(CommBase.CommBase):
         r"""Register a socket."""
         self.debug('Registering socket: type = %s, address = %s',
                    self.socket_type_name, self.address)
-        register_socket(self.socket_type_name, self.address, self.socket)
+        with self._closing_thread.lock:
+            register_socket(self.socket_type_name, self.address, self.socket)
 
     def unregister_socket(self, linger=0):
         r"""Unregister a socket."""
         self.debug('Unregistering socket: type = %s, address = %s',
                    self.socket_type_name, self.address)
-        unregister_socket(self.socket_type_name, self.address, linger=linger)
+        with self._closing_thread.lock:
+            unregister_socket(self.socket_type_name, self.address, linger=linger)
         
     def bind(self):
         r"""Bind to address, getting random port as necessary."""
@@ -789,7 +791,7 @@ class ZMQComm(CommBase.CommBase):
         # Sleep outside lock
         self._do_reply_recv_master.wait(self.sleeptime)
 
-    def close_reply_socket_send(self, linger=False):
+    def close_reply_socket_send(self):
         r"""Close reply socket on send side."""
         # Assumes reply already routed
         # Break the loop
@@ -801,7 +803,7 @@ class ZMQComm(CommBase.CommBase):
             if (self.reply_socket_send is not None):
                 self.reply_socket_send.close(linger=0)
        
-    def close_reply_socket_recv(self, linger=False):
+    def close_reply_socket_recv(self):
         r"""Close reply socket on recv side."""
         # Wait for replies to be sent
         Tout = self.start_timeout(self.sleeptime)
@@ -824,16 +826,16 @@ class ZMQComm(CommBase.CommBase):
                 self._reply_handshake_recv(self.eof_msg, k)
                 socket.close(linger=self.zmq_sleeptime)
 
-    def close_reply_socket(self, linger=False):
+    def close_reply_socket(self):
         r"""Close reply socket."""
         self.debug('close reply socket (direction = %s)', self.direction)
         if self._reply_sockets_closed:
             self.debug('already closed')
             return  # Don't close more than once
         if self.direction == 'send':
-            self.close_reply_socket_send(linger=linger)
+            self.close_reply_socket_send()
         else:
-            self.close_reply_socket_recv(linger=linger)
+            self.close_reply_socket_recv()
         self._reply_sockets_closed = True
         self._reply_thread.set_break_flag()
         self.debug("Reply socket closed (direction = %s).", self.direction)
@@ -846,25 +848,21 @@ class ZMQComm(CommBase.CommBase):
                 comm. Defaults to False.
 
         """
-        linger_time = 0
-        self.close_reply_socket(linger=linger)
+        self.close_reply_socket()
         self.debug("self.socket.closed = %s", str(self.socket.closed))
         if self.socket.closed:
-            self.debug("Socket already closed: %s", self.address)
             self._bound = False
             self._connected = False
-        else:
-            #     if self.socket_action == 'bind':
-            #         self.unbind(linger=linger_time)
-            #     elif self.socket_action == 'connect':
-            #         self.disconnect(linger=linger_time)
-            self.debug("Closing socket %s", self.address)
+        # else:
+        #     if self.socket_action == 'bind':
+        #         self.unbind()
+        #     elif self.socket_action == 'connect':
+        #         self.disconnect()
         # Ensure socket not still open
         self._openned = False
-        if linger_time is not None:
-            self.unregister_socket(linger=linger_time)
+        self.unregister_socket(linger=0)
         if not self.socket.closed:
-            self.socket.close(linger=linger_time)
+            self.socket.close(linger=0)
         super(ZMQComm, self)._close(linger=linger)
 
     def server_exists(self, srv_address):
@@ -896,7 +894,8 @@ class ZMQComm(CommBase.CommBase):
     @property
     def is_open(self):
         r"""bool: True if the socket is open."""
-        return (self._openned and not self.socket.closed)
+        with self._closing_thread.lock:
+            return (self._openned and not self.socket.closed)
 
     def is_message(self, flags):
         r"""Poll the socket for a message.
@@ -908,11 +907,12 @@ class ZMQComm(CommBase.CommBase):
             bool: True if there is a message matching the flags, False otherwise.
 
         """
-        if self.is_open:
-            try:
-                out = self.socket.poll(timeout=1, flags=flags)
-            except zmq.ZMQError:  # pragma: debug
-                out = 0
+        with self._closing_thread.lock:
+            if self.is_open:
+                try:
+                    out = self.socket.poll(timeout=1, flags=flags)
+                except zmq.ZMQError:  # pragma: debug
+                    out = 0
             if out == 0:
                 return False
             else:
@@ -1065,22 +1065,23 @@ class ZMQComm(CommBase.CommBase):
 
     def purge(self):
         r"""Purge all messages from the comm."""
-        with self._reply_thread.lock:
-            if self.direction == 'recv':
-                while self.n_msg_recv > 0:
-                    msg = self.socket.recv(flags=zmq.NOBLOCK)
-                    self.check_reply_socket_recv(msg)
-                for k in self.reply_socket_recv.keys():
-                    self._do_reply_recv[k].clear()
-                    self._n_reply_recv[k] = 0
-                    self._n_recv_zmq[k] = 0
-                    if self.is_open:
-                        flag = self._reply_handshake_recv(_purge_msg, k)
-                        assert(flag)
-                self._do_reply_recv_master.clear()
-            else:
-                # Can't purge output on unidirection sockets
-                self._do_reply_send.clear()
-                self._n_reply_send = 0
-                self._n_sent = 0
+        with self._closing_thread.lock:
+            with self._reply_thread.lock:
+                if self.direction == 'recv':
+                    while self.n_msg_recv > 0:
+                        msg = self.socket.recv(flags=zmq.NOBLOCK)
+                        self.check_reply_socket_recv(msg)
+                    for k in self.reply_socket_recv.keys():
+                        self._do_reply_recv[k].clear()
+                        self._n_reply_recv[k] = 0
+                        self._n_recv_zmq[k] = 0
+                        if self.is_open:
+                            flag = self._reply_handshake_recv(_purge_msg, k)
+                            assert(flag)
+                    self._do_reply_recv_master.clear()
+                else:
+                    # Can't purge output on unidirection sockets
+                    self._do_reply_send.clear()
+                    self._n_reply_send = 0
+                    self._n_sent = 0
         super(ZMQComm, self).purge()

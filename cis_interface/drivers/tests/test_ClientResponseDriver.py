@@ -47,11 +47,11 @@ class TestClientResponseDriver(TestClientResponseParam,
     def test_send_recv(self):
         r"""Test sending/receiving small message."""
         super(TestClientResponseDriver, self).test_send_recv()
-        assert(not self.instance._unused)
+        assert(self.instance._used)
         assert(not self.instance.is_valid)
 
     def test_send_recv_nolimit(self):
         r"""Test sending/receiving large message."""
         super(TestClientResponseDriver, self).test_send_recv_nolimit()
-        assert(not self.instance._unused)
+        assert(self.instance._used)
         assert(not self.instance.is_valid)

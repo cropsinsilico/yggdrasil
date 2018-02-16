@@ -36,11 +36,13 @@ int free_comm(comm_t *x) {
   comm_type t = x->type;
   // Send EOF for output comms and then wait for messages to be recv'd
   if ((strcmp(x->direction, "send") == 0) && (t != CLIENT_COMM)) {
-    comm_send_eof(*x);
-    while (comm_nmsg(*x) > 0) {
-      cislog_debug("free_comm(%s): draining %d messages",
-		   x->name, comm_nmsg(*x));
-      usleep(CIS_SLEEP_TIME);
+    if (_cis_error_flag == 0) {
+      comm_send_eof(*x);
+      while (comm_nmsg(*x) > 0) {
+	cislog_debug("free_comm(%s): draining %d messages",
+		     x->name, comm_nmsg(*x));
+	usleep(CIS_SLEEP_TIME);
+      }
     }
   }
   int ret = 1;

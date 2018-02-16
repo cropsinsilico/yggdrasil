@@ -289,33 +289,35 @@ class RMQComm(CommBase.CommBase):
     @property
     def is_open(self):
         r"""bool: True if the connection and channel are open."""
-        if self.channel is None or self.connection is None:
-            return False
-        if self.connection.is_open:
-            if self.connection.is_closing:  # pragma: debug
+        with self._closing_thread.lock:
+            if self.channel is None or self.connection is None:
                 return False
-        else:  # pragma: debug
-            return False
-        if self.channel.is_open:
-            if self.channel.is_closing:  # pragma: debug
+            if self.connection.is_open:
+                if self.connection.is_closing:  # pragma: debug
+                    return False
+            else:  # pragma: debug
                 return False
-        else:  # pragma: debug
-            return False
-        return self._is_open
+            if self.channel.is_open:
+                if self.channel.is_closing:  # pragma: debug
+                    return False
+            else:  # pragma: debug
+                return False
+            return self._is_open
         
     @property
     def n_msg_recv(self):
         r"""int: Number of messages in the queue."""
         out = 0
-        if self.is_open:
-            try:
-                res = self.channel.queue_declare(queue=self.queue,
-                                                 auto_delete=True,
-                                                 passive=True)
-                out = res.method.message_count
-            except pika.exceptions.ChannelClosed:
-                self.close()
-                out = 0
+        with self._closing_thread.lock:
+            if self.is_open:
+                try:
+                    res = self.channel.queue_declare(queue=self.queue,
+                                                     auto_delete=True,
+                                                     passive=True)
+                    out = res.method.message_count
+                except pika.exceptions.ChannelClosed:
+                    self.close()
+                    out = 0
         return out
 
     @property
@@ -429,6 +431,7 @@ class RMQComm(CommBase.CommBase):
 
     def purge(self):
         r"""Remove all messages from the associated queue."""
-        if self.channel:
-            self.channel.queue_purge(queue=self.queue)
+        with self._closing_thread.lock:
+            if self.channel:
+                self.channel.queue_purge(queue=self.queue)
         super(RMQComm, self).purge()

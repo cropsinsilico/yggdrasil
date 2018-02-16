@@ -49,6 +49,7 @@
 #ifdef PSI_DEBUG
 #define CIS_DEBUG PSI_DEBUG
 #endif
+static int _cis_error_flag = 0;
 
 
 /*!
@@ -137,6 +138,7 @@ void cisError(const char* fmt, ...) {
   va_start(ap, fmt);
   cisLog("ERROR", fmt, ap);
   va_end(ap);
+  _cis_error_flag = 1;
 };
   
 #ifdef CIS_DEBUG

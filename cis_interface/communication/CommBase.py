@@ -194,8 +194,10 @@ class CommBase(CisClass):
         #     self._timeout_drain = self.timeout
         if not dont_open:
             self.open()
+        self._closing_locks = []
         self._closing_event = threading.Event()
-        self._closing_thread = tools.CisThread(target=self.linger_close)
+        self._closing_thread = tools.CisThread(target=self.linger_close,
+                                               name=self.name + '.ClosingThread')
         self._eof_sent = threading.Event()
         if self.is_interface:
             atexit.register(self.atexit)
@@ -298,7 +300,15 @@ class CommBase(CisClass):
         r"""Close the connection."""
         pass
 
-    def close(self, skip_base=False, linger=False):
+    def add_closing_locks(self, locks):
+        r"""Add locks to list of locks that should be acquired before closing."""
+        with self._closing_thread.lock:
+            if isinstance(locks, list):
+                self._closing_locks += locks
+            else:
+                self._closing_locks.append(locks)
+            
+    def close(self, skip_base=False, linger=False, locks=None):
         r"""Close the connection.
 
         Args:
@@ -306,6 +316,8 @@ class CommBase(CisClass):
                 work comms.
             linger (bool, optional): If True, drain messages before closing the
                 comm. Defaults to False.
+            locks (list, optional): Locks that should be acquired before closing
+                closing. Defaults to [].
 
         """
         if (not skip_base):
@@ -314,31 +326,60 @@ class CommBase(CisClass):
             else:
                 self._closing_thread.set_terminated_flag()
                 linger = False
-        self._close(linger=linger)
-        if not skip_base:
-            self._n_sent = 0
-            self._n_recv = 0
-            if self.is_client:
-                self.debug("Signing off from server")
-                self.signoff_from_server()
-            self.debug("Cleaning up %d work comms", len(self._work_comms))
-            keys = [k for k in self._work_comms.keys()]
-            for c in keys:
-                self.remove_work_comm(c, linger=linger)
-            self.debug("Finished cleaning up work comms")
-
-    def close_on_empty(self, no_wait=False):
-        r"""In a new thread, close the comm when it is empty."""
+        if skip_base:
+            self._close(linger=linger)
+            return
         with self._closing_thread.lock:
+            if locks is not None:
+                self.add_closing_locks(locks)
+            for lock in self._closing_locks:
+                lock.acquire()
+            self._close(linger=linger)
+            if not skip_base:
+                self._n_sent = 0
+                self._n_recv = 0
+                if self.is_client:
+                    self.debug("Signing off from server")
+                    self.signoff_from_server()
+                if len(self._work_comms) > 0:
+                    self.debug("Cleaning up %d work comms", len(self._work_comms))
+                    keys = [k for k in self._work_comms.keys()]
+                    for c in keys:
+                        self.remove_work_comm(c, linger=linger)
+                    self.debug("Finished cleaning up work comms")
+            for lock in self._closing_locks:
+                lock.release()
+        self.debug("done")
+
+    def close_on_empty(self, no_wait=False, locks=None, timeout=None):
+        r"""In a new thread, close the comm when it is empty.
+
+        Args:
+            no_wait (bool, optional): If True, don't wait for closing thread
+                to stop.
+            locks (list, optional): Locks that should be acquired before closing
+                closing. Defaults to [].
+            timeout (float, optional): Time that should be waited for the comm
+                to close. Defaults to None and is set to self.timeout. If False,
+                this will block until the comm is closed.
+
+        """
+        _started_thread = False
+        with self._closing_thread.lock:
+            if locks is not None:
+                self.add_closing_locks(locks)
             if (((not self._closing_thread.was_started) and
                  (not self._closing_thread.was_terminated))):
                 self._closing_thread.start()
+                _started_thread = True
         if self._closing_thread.was_started and (not no_wait):
-            self._closing_thread.wait(key=str(uuid.uuid4()))
+            self._closing_thread.wait(key=str(uuid.uuid4()), timeout=timeout)
+            if _started_thread and not self._closing_thread.was_terminated:
+                self.close()
 
-    def linger_close(self):
+    def linger_close(self, locks=None):
         r"""Wait for messages to drain, then close."""
-        self.close(linger=True)
+        self.close(linger=True, locks=locks)
 
     def background_atexit(self):
         r"""Close operations in background."""
@@ -351,11 +392,11 @@ class CommBase(CisClass):
         else:
             self.close()
 
-    def interface_close(self, no_wait=False):
+    def interface_close(self, no_wait=False, locks=None):
         r"""Close operations for interface send comms."""
         if not self.is_response_server:
             self.send_eof()
-        self.linger_close()
+        self.linger_close(locks=locks)
 
     @property
     def is_open(self):
@@ -663,7 +704,10 @@ class CommBase(CisClass):
         if not self._first_send_done:
             out = self._send_1st(*args, **kwargs)
         else:
-            out = self._send(*args, **kwargs)
+            with self._closing_thread.lock:
+                if self.is_closed:
+                    return False
+                out = self._send(*args, **kwargs)
         if out:
             self._n_sent += 1
             self._last_send = backwards.clock_time()
@@ -672,10 +716,16 @@ class CommBase(CisClass):
     def _send_1st(self, *args, **kwargs):
         r"""Send first message until it succeeds."""
         T = self.start_timeout()
-        flag = self._send(*args, **kwargs)
+        with self._closing_thread.lock:
+            if self.is_closed:
+                return False
+            flag = self._send(*args, **kwargs)
         self.suppress_special_debug = True
         while (not T.is_out) and (self.is_open) and (not flag):
-            flag = self._send(*args, **kwargs)
+            with self._closing_thread.lock:
+                if not self.is_open:
+                    break
+                flag = self._send(*args, **kwargs)
             if flag or (self.is_closed):
                 break
             self.sleep()
@@ -887,7 +937,10 @@ class CommBase(CisClass):
     # RECV METHODS
     def _safe_recv(self, *args, **kwargs):
         r"""Save receive that does things for all comm classes."""
-        out = self._recv(*args, **kwargs)
+        with self._closing_thread.lock:
+            if self.is_closed:
+                return (False, self.empty_msg)
+            out = self._recv(*args, **kwargs)
         if out[0]:
             self._n_recv += 1
             self._last_recv = backwards.clock_time()
