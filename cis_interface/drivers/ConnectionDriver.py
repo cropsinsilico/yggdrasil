@@ -83,9 +83,9 @@ class ConnectionDriver(Driver):
         ocomm_name = ocomm_kws.pop('name', name)
         try:
             self.ocomm = new_comm(ocomm_name, **ocomm_kws)
-        except BaseException as e:
+        except BaseException:
             self.icomm.close()
-            raise e
+            raise
         self.ocomm_kws = ocomm_kws
         self.env[self.ocomm.name] = self.ocomm.address
         # Attributes
