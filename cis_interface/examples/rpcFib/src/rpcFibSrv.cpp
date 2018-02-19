@@ -15,6 +15,7 @@ int main(int argc, char *argv[]) {
   // by all clients that have connected).
   int input;
   while (1) {
+    printf("rpcFibSrv(CPP): receiving...\n");
     int ret = rpc.recv(1, &input);
     if (ret < 0) {
       printf("rpcFibSrv(CPP): end of input\n");

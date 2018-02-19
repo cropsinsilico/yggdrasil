@@ -120,16 +120,15 @@ class ModelDriver(Driver):
 
     def enqueue_output_loop(self):
         r"""Keep passing lines to queue."""
-        # if self.process_complete:
-        #     self.debug("Process complete")
-        #     self.queue_thread.set_break_flag()
-        #     self.queue.put(self._exit_line)
-        #     return
+        if self.process_complete:
+            self.debug("Process complete")
+            self.queue_thread.set_break_flag()
+            self.queue.put(self._exit_line)
+            return
         try:
             line = self.process.stdout.readline()
         except ValueError:
             line = ""
-        sys.stdout.flush()
         if len(line) == 0:
             self.debug("Empty line from stdout")
             self.queue_thread.set_break_flag()
