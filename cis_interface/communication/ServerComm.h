@@ -127,6 +127,7 @@ int server_comm_send(const comm_t x, const char *data, const size_t len) {
     return -1;
   }
   int ret = default_comm_send((*res_comm)[0], data, len);
+  // Wait for msg to be received?
   free((char*)(res_comm[0]->serializer.info));
   free_default_comm(res_comm[0]);
   free(res_comm[0]);

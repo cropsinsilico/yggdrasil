@@ -160,6 +160,7 @@ int do_reply_send(const comm_t *comm) {
     return 0;
   }
   // Send
+  zsock_set_linger(s, _zmq_sleeptime);
   int ret = zframe_send(&msg, s, ZFRAME_REUSE); // noblock?
   // Check for purge or EOF
   if (ret < 0) {
