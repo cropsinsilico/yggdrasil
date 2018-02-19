@@ -230,7 +230,7 @@ class ModelDriver(Driver):
             self.queue_thread.wait(self.timeout)
             if self.queue_thread.is_alive():
                 self.queue_thread.set_break_flag()
-                self.process.stdout.close()
+                # self.process.stdout.close()
                 self.error("Queue thread was not terminated.")
                 self.queue_thread.wait(self.timeout)
             assert(not self.queue_thread.is_alive())
