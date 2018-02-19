@@ -407,26 +407,17 @@ class ZMQComm(CommBase.CommBase):
         self._do_reply_recv = {}
         if self.direction == 'send':
             self._handshake_done = threading.Event()
-            self._reply_thread = tools.CisThreadLoop(target=self._reply_send,
-                                                     name=self.name + '.ReplyThread')
-            if self.is_interface:
-                self._reply_thread.on_main_terminated = self.on_main_terminated
+            self._reply_thread = CommBase.CommThreadLoop(
+                self, target=self._reply_send, suffix='ReplyThread')
         else:
             self._handshake_done = {}
-            self._reply_thread = tools.CisThreadLoop(target=self._reply_recv,
-                                                     name=self.name + '.ReplyThread')
+            self._reply_thread = CommBase.CommThreadLoop(
+                self, target=self._reply_recv, suffix='ReplyThread')
         # Reserve/set port by binding
         if not dont_open:
             self.open()
         else:
             self.bind()
-
-    def on_main_terminated(self):
-        r"""Actions taken on the backlog thread when the main thread stops."""
-        self._reply_thread._1st_main_terminated = True
-        if not self.is_response_server:
-            self.send_eof()
-        self.close_on_empty(no_wait=True)
 
     @classmethod
     def is_installed(cls):
@@ -913,6 +904,8 @@ class ZMQComm(CommBase.CommBase):
                     out = self.socket.poll(timeout=1, flags=flags)
                 except zmq.ZMQError:  # pragma: debug
                     out = 0
+            else:
+                out = 0
             if out == 0:
                 return False
             else:

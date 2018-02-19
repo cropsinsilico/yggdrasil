@@ -33,6 +33,7 @@ class ConnectionDriver(Driver):
         nrecv (int): Number of messages received.
         nproc (int): Number of messages processed.
         nsent (int): Number of messages sent.
+        nskip (int): Number of messages skipped.
         state (str): Descriptor of last action taken.
         translator (func): Function that will be used to translate messages from
             the input communicator before passing them to the output communicator.
@@ -103,6 +104,7 @@ class ConnectionDriver(Driver):
         self.nrecv = 0
         self.nproc = 0
         self.nsent = 0
+        self.nskip = 0
         self.state = 'started'
         self.debug()
         self.debug(80 * '=')
@@ -113,6 +115,16 @@ class ConnectionDriver(Driver):
         self.debug('    output: name = %s, address = %s',
                    self.ocomm.name, self.ocomm.address)
         self.debug(80 * '=')
+
+    def wait_for_route(self, timeout=None):
+        r"""Wait until messages have been routed."""
+        if timeout is None:
+            timeout = self.timeout
+        T = self.start_timeout(timeout)
+        while (not T.is_out) and (self.nrecv != (self.nsent + self.nskip)):
+            self.sleep()
+        self.stop_timeout()
+        return (self.nrecv == (self.nsent + self.nskip))
 
     @property
     def is_valid(self):
@@ -206,12 +218,11 @@ class ConnectionDriver(Driver):
         with self.lock:
             self._skip_after_loop = True
         self.printStatus()
-        self.icomm.close_on_empty(locks=self.lock)
-        self.ocomm.close()
-        # if self._is_output:
-        #     self.ocomm.close_on_empty(locks=self.lock)
-        # else:
-        #     self.ocomm.close()
+        if timeout is None:
+            timeout = self.timeout
+        self.icomm.drain_messages(timeout=timeout)
+        self.wait_for_route(timeout=timeout)
+        self.close_comm()
         self.printStatus()
         super(ConnectionDriver, self).graceful_stop()
         self.debug('Returning')
@@ -220,9 +231,12 @@ class ConnectionDriver(Driver):
         r"""Drain input and then close it."""
         self.debug()
         if self._is_input:
-            self.ocomm.close()
+            with self.lock:
+                self.ocomm.close()
         if self._is_output:
-            self.icomm.close_on_empty(locks=self.lock)
+            self.icomm.drain_messages()
+            with self.lock:
+                self.icomm.close()
         super(ConnectionDriver, self).on_model_exit()
 
     def do_terminate(self):
@@ -250,6 +264,7 @@ class ConnectionDriver(Driver):
         msg += '%-30s' % ('last action: ' + self.state)
         msg += '%-15s' % (str(self.nrecv) + ' received, ')
         msg += '%-15s' % (str(self.nproc) + ' processed, ')
+        msg += '%-15s' % (str(self.nskip) + ' skipped, ')
         msg += '%-15s' % (str(self.nsent) + ' sent, ')
         msg += '%-15s' % (str(self.n_msg) + ' ready')
         msg += end_msg
@@ -319,8 +334,10 @@ class ConnectionDriver(Driver):
 
         """
         self.debug('EOF received')
-        self.send_eof()
-        self.icomm.close_on_empty(locks=self.lock)
+        with self.lock:
+            self.send_eof()
+            self.icomm.drain_messages()
+            self.icomm.close()
         return False
 
     def on_message(self, msg):
@@ -452,6 +469,7 @@ class ConnectionDriver(Driver):
             return
         elif len(msg) == 0:
             self.debug('Message skipped.')
+            self.nskip += 1
             return
         self.nproc += 1
         self.state = 'processed'

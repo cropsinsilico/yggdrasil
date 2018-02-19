@@ -16,8 +16,41 @@ HEAD_KEY_SEP = backwards.unicode2bytes(',')
 _registered_servers = dict()
 
 
+class CommThreadLoop(tools.CisThreadLoop):
+    r"""Thread loop for comms to ensure cleanup.
+
+    Args:
+        comm (CommBase): Comm class that thread is for.
+        name (str, optional): Name for the thread. If not provided, one is
+            created by combining the comm name and the provided suffix.
+        suffix (str, optional): Suffix that should be added to comm name to name
+            the thread. Defaults to 'CommThread'.
+        **kwargs: Additional keyword arguments are passed to the parent class.
+
+    Attributes:
+        comm (CommBase): Comm class that thread is for.
+
+    """
+    def __init__(self, comm, name=None, suffix=None, **kwargs):
+        self.comm = comm
+        if suffix is None:
+            suffix = 'CommThread'
+        if name is None:
+            name = '%s.%s' % (comm.name, suffix)
+        super(CommThreadLoop, self).__init__(name=name, **kwargs)
+
+    def on_main_terminated(self):
+        r"""Actions taken on the backlog thread when the main thread stops."""
+        if self.comm.direction == 'send' and self.comm.is_interface:
+            self._1st_main_terminated = True
+            self.comm.send_eof()
+            self.comm.close_in_thread(no_wait=True)
+        else:
+            super(CommThreadLoop, self).on_main_terminated()
+
+
 class CommServer(tools.CisThreadLoop):
-    r"""Basic server objec to keep track of clients.
+    r"""Basic server object to keep track of clients.
 
     Attributes:
         cli_count (int): Number of clients that have connected to this server.
@@ -192,15 +225,17 @@ class CommBase(CisClass):
         #     self._timeout_drain = False
         # else:
         #     self._timeout_drain = self.timeout
-        if not dont_open:
-            self.open()
         self._closing_locks = []
         self._closing_event = threading.Event()
         self._closing_thread = tools.CisThread(target=self.linger_close,
                                                name=self.name + '.ClosingThread')
         self._eof_sent = threading.Event()
+        if self.is_response_client or self.is_response_server:
+            self._eof_sent.set()  # Don't send EOF, these are single use
         if self.is_interface:
             atexit.register(self.atexit)
+        if not dont_open:
+            self.open()
 
     @classmethod
     def _determine_suffix(cls, no_suffix=False, reverse_names=False,
@@ -351,7 +386,7 @@ class CommBase(CisClass):
                 lock.release()
         self.debug("done")
 
-    def close_on_empty(self, no_wait=False, locks=None, timeout=None):
+    def close_in_thread(self, no_wait=False, locks=None, timeout=None):
         r"""In a new thread, close the comm when it is empty.
 
         Args:
@@ -394,8 +429,7 @@ class CommBase(CisClass):
 
     def interface_close(self, no_wait=False, locks=None):
         r"""Close operations for interface send comms."""
-        if not self.is_response_server:
-            self.send_eof()
+        self.send_eof()
         self.linger_close(locks=locks)
 
     @property
@@ -845,7 +879,7 @@ class CommBase(CisClass):
             return False
         if self.single_use and self._used:
             self.info()
-            self.close_on_empty(no_wait=True)
+            # self.close_on_empty(no_wait=True)
         return ret
 
     def send_multipart(self, msg, send_header=False, header_kwargs=None,

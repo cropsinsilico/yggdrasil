@@ -127,6 +127,24 @@ int do_reply_send(const comm_t *comm) {
     cislog_error("do_reply_send(%s): Socket is NULL.", comm->name);
     return -1;
   }
+  // Poll
+  zpoller_t *poller = zpoller_new(s, NULL);
+  if (poller == NULL) {
+    cislog_error("do_reply_send(%s): Could not create poller", comm->name);
+    return -1;
+  }
+  void *p = zpoller_wait(poller, -1);
+  zpoller_destroy(&poller);
+  if (p == NULL) {
+    if (zpoller_terminated(poller)) {
+      cislog_error("do_reply_send(%s): Poller interrupted", comm->name);
+    } else if (zpoller_expired(poller)) {
+      cislog_error("do_reply_send(%s): Poller expired", comm->name);
+    } else {
+      cislog_error("do_reply_send(%s): Poller failed", comm->name);
+    }
+    return -1;
+  }
   // Receive
   zframe_t *msg = zframe_recv(s);
   if (msg == NULL) {

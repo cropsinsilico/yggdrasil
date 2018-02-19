@@ -149,7 +149,8 @@ class ClientRequestDriver(ConnectionDriver):
     
     def on_model_exit(self):
         r"""Drain input and then close it."""
-        self.icomm.close()  # Cannot respond to messages, so discard them
+        with self.lock:
+            self.icomm.close()  # Cannot respond to messages, so discard them
         super(ClientRequestDriver, self).on_model_exit()
     
     def on_eof(self):

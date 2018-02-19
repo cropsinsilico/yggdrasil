@@ -223,13 +223,11 @@ class IPCComm(CommBase.CommBase):
         self._backlog_recv = []
         self._backlog_send = []
         if self.direction == 'send':
-            self.backlog_thread = tools.CisThreadLoop(target=self.run_backlog_send,
-                                                      name=self.name + 'SendBacklog')
-            if self.is_interface:
-                self.backlog_thread.on_main_terminated = self.on_main_terminated
+            self.backlog_thread = CommBase.CommThreadLoop(
+                self, target=self.run_backlog_send, suffix='SendBacklog')
         else:
-            self.backlog_thread = tools.CisThreadLoop(target=self.run_backlog_recv,
-                                                      name=self.name + 'RecvBacklog')
+            self.backlog_thread = CommBase.CommThreadLoop(
+                self, target=self.run_backlog_recv, suffix='RecvBacklog')
         self.backlog_send_ready = threading.Event()
         self.backlog_recv_ready = threading.Event()
         self.backlog_open = False
@@ -238,12 +236,6 @@ class IPCComm(CommBase.CommBase):
         else:
             self.open()
 
-    def on_main_terminated(self):
-        r"""Actions taken on the backlog thread when the main thread stops."""
-        self.backlog_thread._1st_main_terminated = True
-        self.send_eof()
-        self.close_on_empty(no_wait=True)
-        
     @classmethod
     def is_installed(cls):
         r"""bool: Is the comm installed."""

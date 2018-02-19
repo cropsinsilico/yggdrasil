@@ -33,6 +33,7 @@ class ServerComm(CommBase.CommBase):
         self.ocomm = None
         self.response_kwargs.setdefault('comm', self.icomm.comm_class)
         self.response_kwargs.setdefault('recv_timeout', self.icomm.recv_timeout)
+        self._used_response_comms = dict()
         super(ServerComm, self).__init__(self.icomm.name, dont_open=dont_open,
                                          recv_timeout=self.icomm.recv_timeout,
                                          is_interface=self.icomm.is_interface,
@@ -109,6 +110,8 @@ class ServerComm(CommBase.CommBase):
         self.icomm.close()
         if self.ocomm is not None:
             self.ocomm.close(linger=linger)
+        for ocomm in self._used_response_comms.values():
+            ocomm.close()
         super(ServerComm, self)._close(linger=linger)
 
     @property
@@ -148,6 +151,7 @@ class ServerComm(CommBase.CommBase):
         r"""Remove response comm."""
         self.icomm._last_header = None
         # self.ocomm.close_on_empty(no_wait=True)
+        self._used_response_comms[self.ocomm.name] = self.ocomm
         self.ocomm = None
 
     # SEND METHODS
