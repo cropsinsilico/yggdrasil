@@ -792,7 +792,7 @@ class ZMQComm(CommBase.CommBase):
             self._reply_thread.join()
         with self._reply_thread.lock:
             if (self.reply_socket_send is not None):
-                self.reply_socket_send.close(linger=0)
+                self.reply_socket_send.close(linger=self.zmq_sleeptime)
        
     def close_reply_socket_recv(self):
         r"""Close reply socket on recv side."""
