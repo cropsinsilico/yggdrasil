@@ -1,6 +1,13 @@
-import pika
 from cis_interface.communication import CommBase
 from cis_interface.config import cis_cfg
+try:
+    import pika
+    _rmq_installed = True
+except ImportError:
+    logging.warn("Could not import pika. " +
+                 "RabbitMQ support will be disabled.")
+    pika = None
+    _rmq_installed = False
 
 
 _N_CONNECTIONS = 0
@@ -29,6 +36,8 @@ def check_rmq_server(url=None, **kwargs):
             otherwise.
 
     """
+    if not _rmq_installed:
+        return False
     if url is not None:
         parameters = pika.URLParameters(url)
     else:
@@ -166,6 +175,11 @@ class RMQComm(CommBase.CommBase):
                 user, password, host, port, virtual_host)
             kwargs['address'] = _rmq_param_sep.join([url, exchange, queue])
         return args, kwargs
+
+    @classmethod
+    def is_installed(cls):
+        r"""bool: Is the comm installed."""
+        return _rmq_server_running
 
     def opp_comm_kwargs(self):
         r"""Get keyword arguments to initialize communication with opposite

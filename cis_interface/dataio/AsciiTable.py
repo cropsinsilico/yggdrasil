@@ -20,8 +20,8 @@ try:
         _use_astropy = False
 except ImportError:  # pragma: no cover
     apy_ascii, apy_Table = None, None
-    print("astropy is not installed, reading/writing as an array will be " +
-          "disabled. astropy can be installed using 'pip install astropy'.")
+    # print("astropy is not installed, reading/writing as an array will be " +
+    #       "disabled. astropy can be installed using 'pip install astropy'.")
     _use_astropy = False
 
 

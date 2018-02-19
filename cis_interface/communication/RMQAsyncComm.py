@@ -1,7 +1,10 @@
-import pika
 import threading
 from cis_interface import backwards, tools
-from cis_interface.communication.RMQComm import RMQComm
+from cis_interface.communication.RMQComm import RMQComm, _rmq_installed
+if _rmq_installed:
+    import pika
+else:
+    pika = False
 
 
 class RMQAsyncComm(RMQComm):
