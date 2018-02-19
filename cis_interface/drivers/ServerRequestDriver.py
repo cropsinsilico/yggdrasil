@@ -132,7 +132,7 @@ class ServerRequestDriver(ConnectionDriver):
             self.nclients -= 1
             self.debug("Client signed off. nclients = %d", self.nclients)
             if self.nclients == 0:
-                self.debug("All clients have signed off.")
+                self.info("All clients have signed off.")
                 self.on_client_exit()
                 return False
         return ''

@@ -55,7 +55,7 @@ class ModelDriver(Driver):
                  with_strace=False, strace_flags=None,
                  with_valgrind=False, valgrind_flags=None,
                  **kwargs):
-        super(ModelDriver, self).__init__(name, **kwargs)
+        super(ModelDriver, self).__init__(name, daemon=True, **kwargs)
         self.debug(str(args))
         if isinstance(args, str):
             self.args = [args]
@@ -114,19 +114,22 @@ class ModelDriver(Driver):
                                       cwd=self.workingDir,
                                       forward_signals=False)
         # Start thread to queue output
-        self.queue_thread = tools.CisThreadLoop(target=self.enqueue_output_loop)
+        self.queue_thread = tools.CisThreadLoop(target=self.enqueue_output_loop,
+                                                daemon=True)
         self.queue_thread.start()
 
     def enqueue_output_loop(self):
         r"""Keep passing lines to queue."""
-        if self.process_complete:
-            self.debug("Process complete")
-            self.queue_thread.set_break_flag()
-            self.queue.put(self._exit_line)
+        # if self.process_complete:
+        #     self.debug("Process complete")
+        #     self.queue_thread.set_break_flag()
+        #     self.queue.put(self._exit_line)
+        #     return
         try:
             line = self.process.stdout.readline()
         except ValueError:
             line = ""
+        sys.stdout.flush()
         if len(line) == 0:
             self.debug("Empty line from stdout")
             self.queue_thread.set_break_flag()

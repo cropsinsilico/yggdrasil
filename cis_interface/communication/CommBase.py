@@ -3,7 +3,7 @@ import uuid
 import atexit
 import threading
 from cis_interface import backwards, tools
-from cis_interface.tools import CisClass, get_CIS_MSG_MAX, CIS_MSG_EOF
+from cis_interface.tools import get_CIS_MSG_MAX, CIS_MSG_EOF
 from cis_interface.serialize.DefaultSerialize import DefaultSerialize
 from cis_interface.serialize.DefaultDeserialize import DefaultDeserialize
 from cis_interface.communication import (
@@ -41,6 +41,7 @@ class CommThreadLoop(tools.CisThreadLoop):
 
     def on_main_terminated(self):
         r"""Actions taken on the backlog thread when the main thread stops."""
+        self.info()
         if self.comm.direction == 'send' and self.comm.is_interface:
             self._1st_main_terminated = True
             self.comm.send_eof()
@@ -83,7 +84,7 @@ class CommServer(tools.CisThreadLoop):
             _registered_servers.pop(self.srv_address)
 
     
-class CommBase(CisClass):
+class CommBase(tools.CisClass):
     r"""Class for handling I/O.
 
     Args:
@@ -232,7 +233,7 @@ class CommBase(CisClass):
         self._eof_sent = threading.Event()
         if self.is_response_client or self.is_response_server:
             self._eof_sent.set()  # Don't send EOF, these are single use
-        if self.is_interface:
+        if self.is_interface and self.direction != 'recv':
             atexit.register(self.atexit)
         if not dont_open:
             self.open()

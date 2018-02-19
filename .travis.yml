@@ -12,6 +12,7 @@ env:
     MPLBACKEND=agg
     INSTALLZMQ=1
     INSTALLRMQ=0
+    INSTALLAPY=0
 
 # services:
 #   - rabbitmq
@@ -21,7 +22,7 @@ matrix:
     - python: 2.7
       env: NUMPY=numpy==1.10.4 MATPLOTLIB=matplotlib==1.5.3 INSTALLZMQ=0 INSTALLRMQ=0
     - python: 2.7
-      env: INSTALLRMQ=1
+      env: INSTALLRMQ=1 INSTALLAPY=1
     - python: 3.4
     - python: 3.5
     - python: 3.6
@@ -64,6 +65,12 @@ before_install:
        sudo apt-get install strace valgrind
     fi
 
+    # Install AstroPy
+    if [[ $INSTALLRMQ == '1' ]]; then
+       echo Installing AstroPy...;
+       pip install astropy
+    fi
+
     # Install ZeroMQ
     if [[ $INSTALLZMQ == '1' ]]; then
        echo Installing ZeroMQ...;
@@ -77,6 +84,7 @@ before_install:
     # Install RabbitMQ & Start a server
     if [[ $INSTALLRMQ == '1' ]]; then
        echo Installing RabbitMQ...;
+       pip install pika
        if [[ $TRAVIS_OS_NAME == 'osx' ]]; then
           sh ci/install-rmqserver-osx.sh
        else
@@ -104,7 +112,7 @@ install:
     # Install dependencies
     pip install $NUMPY $MATPLOTLIB
     pip install nose coverage coveralls codecov flake8
-    pip install pystache pyyaml astropy scipy pika zmq sysv_ipc
+    # pip install pystache pyyaml scipy zmq sysv_ipc
     # Install cis_interface
     pip install -e .
     

@@ -149,15 +149,17 @@ except (ImportError, IOError):
         raise IOError("Could not find README.rst or README.md")
 
 # Create requirements list based on platform
-requirements = ["numpy", "scipy", "pyyaml", "pystache", "nose", "psutil"]
+requirements = ["numpy", "scipy", "pyyaml", "pystache", "nose", "psutil", "zmq"]
 optional_requirements = ["pika", "astropy"]
 if IS_WINDOWS:
-    requirements.append("zmq")
+    pass
+    # requirements.append("zmq")
 else:
-    optional_requirements.append("zmq")
-    optional_requirements.append("sysv_ipc")
+    # optional_requirements.append("zmq")
+    # optional_requirements.append("sysv_ipc")
+    requirements.append("sysv_ipc")
 # TODO: Test without optional requirements
-requirements += optional_requirements
+# requirements += optional_requirements
     
 setup(
     name="cis_interface",

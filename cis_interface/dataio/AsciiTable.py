@@ -5,16 +5,18 @@ from cis_interface.dataio.AsciiFile import AsciiFile
 from cis_interface import backwards, platform
 from numpy.compat import asbytes
 try:
-    from astropy.io import ascii as apy_ascii
-    from astropy.table import Table as apy_Table
-    _use_astropy = True
-    from astropy.io.ascii import TableOutputter, convert_numpy
-    apy_tableout = TableOutputter()
-    apy_tableout.default_converters = [convert_numpy(np.int),
-                                       convert_numpy(np.float),
-                                       convert_numpy(np.str),
-                                       convert_numpy(np.complex)]
-    if not backwards.PY2:  # pragma: Python 3
+    if backwards.PY2:  # pragma: Python 2
+        from astropy.io import ascii as apy_ascii
+        from astropy.table import Table as apy_Table
+        _use_astropy = True
+        from astropy.io.ascii import TableOutputter, convert_numpy
+        apy_tableout = TableOutputter()
+        apy_tableout.default_converters = [convert_numpy(np.int),
+                                           convert_numpy(np.float),
+                                           convert_numpy(np.str),
+                                           convert_numpy(np.complex)]
+    else:  # pragma: Python 3
+        apy_ascii, apy_Table = None, None
         _use_astropy = False
 except ImportError:  # pragma: no cover
     apy_ascii, apy_Table = None, None

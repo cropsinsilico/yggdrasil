@@ -334,6 +334,7 @@ class ConnectionDriver(Driver):
 
         """
         self.debug('EOF received')
+        self.state = 'eof'
         with self.lock:
             self.send_eof()
             self.icomm.drain_messages()
