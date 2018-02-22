@@ -40,43 +40,49 @@ except AttributeError:
 def check_threads():
     r"""Check for threads that are still running."""
     global _thread_registry
-    logging.info("Checking %d threads" % len(_thread_registry))
+    # logging.info("Checking %d threads" % len(_thread_registry))
     for k, v in _thread_registry.items():
         if v.is_alive():
             logging.error("Thread is alive: %s" % k)
-    logging.info("%d threads running" % threading.active_count())
-    for t in threading.enumerate():
-        logging.info("%s thread running" % t.name)
-    # if not os.environ.get('CIS_SUBPROCESS', False):
-    #     import pdb; pdb.set_trace()
+    if threading.active_count() > 1:
+        logging.info("%d threads running" % threading.active_count())
+        for t in threading.enumerate():
+            logging.info("%s thread running" % t.name)
 
 
 def check_locks():
     r"""Check for locks in lock registry that are locked."""
     global _lock_registry
-    logging.info("Checking %d locks" % len(_lock_registry))
+    # logging.info("Checking %d locks" % len(_lock_registry))
     for k, v in _lock_registry.items():
         res = v.acquire(False)
         if res:
             v.release()
         else:
             logging.error("Lock could not be acquired: %s" % k)
-    logging.info("%d threads running" % threading.active_count())
-    for t in threading.enumerate():
-        logging.info("%s thread running" % t.name)
 
 
 def check_sockets():
     r"""Check registered sockets."""
     from cis_interface.communication.ZMQComm import cleanup_comms
     count = cleanup_comms()
-    logging.info("%d sockets closed." % count)
+    if count > 0:
+        logging.info("%d sockets closed." % count)
 
 
-if not os.environ.get('CIS_SUBPROCESS', False):
-    atexit.register(check_sockets)
-atexit.register(check_threads)
-atexit.register(check_locks)
+def cis_atexit():
+    r"""Things to do at exit."""
+    check_locks()
+    check_threads()
+    if not os.environ.get('CIS_SUBPROCESS', False):
+        check_sockets()
+    if backwards.PY34:
+        # Print empty line to ensure close
+        print('', end='')
+        sys.stdout.flush()
+
+
+atexit.register(cis_atexit)
 
 
 def locate_path(fname, basedir=os.path.abspath(os.sep)):

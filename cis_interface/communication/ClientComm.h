@@ -213,6 +213,8 @@ comm_head_t client_response_header(comm_t x, comm_head_t head) {
     head.valid = 0;
     return head;
   }
+  res_comm[0][ncomm]->sent_eof[0] = 1;
+  res_comm[0][ncomm]->recv_eof[0] = 1;
   inc_client_response_count(x);
   ncomm = get_client_response_count(x);
   cislog_debug("client_comm_send(%s): Created response comm number %d",
@@ -244,6 +246,7 @@ int client_comm_send(comm_t x, const char *data, const size_t len) {
     // Send EOF message without header
     comm_t *req_comm = (comm_t*)(x.handle);
     ret = default_comm_send(*req_comm, data, len);
+    req_comm->sent_eof[0] = 1;
     return ret;
   }
   // Send message with header

@@ -28,6 +28,14 @@ typedef struct zmq_reply_t {
 } zmq_reply_t;
 
 
+// Forward declarations
+static inline
+int zmq_comm_nmsg(const comm_t x);
+static inline
+int zmq_comm_recv(const comm_t x, char **data, const size_t len,
+		  const int allow_realloc);
+
+
 /*!
   @brief Free a reply structure.
   @param[in] x zmq_reply_t * Structure to free.
@@ -111,7 +119,7 @@ int find_reply_socket(const comm_t *comm, const char *address) {
 /*!
   @brief Request confirmation from receiving socket.
   @param[in] comm comm_t* Comm structure to do reply for.
-  @returns int 0 if successfule, -1 otherwise.
+  @returns int 0 if successful, -2 on EOF, -1 otherwise.
  */
 static inline
 int do_reply_send(const comm_t *comm) {
@@ -128,6 +136,8 @@ int do_reply_send(const comm_t *comm) {
     return -1;
   }
   // Poll
+  cislog_debug("do_reply_send(%s): address=%s, begin", comm->name,
+  	       zrep->addresses[0]);
   zpoller_t *poller = zpoller_new(s, NULL);
   if (poller == NULL) {
     cislog_error("do_reply_send(%s): Could not create poller", comm->name);
@@ -153,20 +163,23 @@ int do_reply_send(const comm_t *comm) {
   }
   char *msg_data = (char*)zframe_data(msg);
   // Check for EOF
+  int is_purge = 0;
   if (strcmp(msg_data, CIS_MSG_EOF) == 0) {
     cislog_debug("do_reply_send(%s): EOF received", comm->name);
     zrep->n_msg = 0;
     zrep->n_rep = 0;
-    return 0;
+    return -2;
+  } else if (strcmp(msg_data, _purge_msg) == 0) {
+    is_purge = 1;
   }
   // Send
   zsock_set_linger(s, _zmq_sleeptime);
-  int ret = zframe_send(&msg, s, ZFRAME_REUSE); // noblock?
+  int ret = zframe_send(&msg, s, 0);
   // Check for purge or EOF
   if (ret < 0) {
     cislog_error("do_reply_send(%s): Error sending reply frame.", comm->name);
   } else {
-    if (strcmp(msg_data, _purge_msg) == 0) {
+    if (is_purge == 1) {
       cislog_debug("do_reply_send(%s): PURGE received", comm->name);
       zrep->n_msg = 0;
       zrep->n_rep = 0;
@@ -175,7 +188,8 @@ int do_reply_send(const comm_t *comm) {
       zrep->n_rep++;
     }
   }
-  zframe_destroy(&msg);
+  cislog_debug("do_reply_send(%s): address=%s, end", comm->name,
+	       zrep->addresses[0]);
   return ret;
 };
 
@@ -199,14 +213,15 @@ int do_reply_recv(const comm_t *comm, const int isock, const char *msg) {
     cislog_error("do_reply_recv(%s): Socket is NULL.", comm->name);
     return -1;
   }
+  cislog_debug("do_reply_recv(%s): address=%s, begin", comm->name,
+	       zrep->addresses[isock]);
   zframe_t *msg_send = zframe_new(msg, strlen(msg));
   if (msg_send == NULL) {
     cislog_error("do_reply_recv(%s): Error creating frame.", comm->name);
     return -1;
   }
   // Send
-  int ret = zframe_send(&msg_send, s, 0); // noblock?
-  zframe_destroy(&msg_send);
+  int ret = zframe_send(&msg_send, s, 0);
   if (ret < 0) {
     cislog_error("do_reply_recv(%s): Error sending confirmation.", comm->name);
     return -1;
@@ -215,7 +230,7 @@ int do_reply_recv(const comm_t *comm, const int isock, const char *msg) {
     zrep->n_msg = 0;
     zrep->n_rep = 0;
     zsock_set_linger(s, _zmq_sleeptime);
-    return 0;
+    return -2;
   }
   // Receive
   zframe_t *msg_recv = zframe_recv(s);
@@ -225,6 +240,8 @@ int do_reply_recv(const comm_t *comm, const int isock, const char *msg) {
   }
   zframe_destroy(&msg_recv);
   zrep->n_rep++;
+  cislog_debug("do_reply_recv(%s): address=%s, end", comm->name,
+	       zrep->addresses[isock]);
   return 0;
 };
 
@@ -473,22 +490,42 @@ int init_zmq_comm(comm_t *comm) {
 */
 static inline
 int free_zmq_comm(comm_t *x) {
+  int i = 0;
+  int ret = 0;
+  // Drain input
+  if (strcmp(x->direction, "recv") == 0) {
+    size_t data_len = 100;
+    char *data = (char*)malloc(data_len);
+    while (zmq_comm_nmsg(*x) > 0) {
+      ret = zmq_comm_recv(*x, &data, data_len, 1);
+      if (ret < 0) {
+	if (ret == -2) {
+	  x->recv_eof[0] = 1;
+	}
+	break;
+      }
+    }
+    free(data);
+  }
+  // Do EOF send/recv
+  zmq_reply_t *zrep = (zmq_reply_t*)(x->reply);
+  if (zrep != NULL) {
+    if (strcmp(x->direction, "recv") == 0) {
+      if (x->recv_eof[0] == 0) {
+	for (i = 0; i < zrep->nsockets; i++) {
+	  ret = do_reply_recv(x, i, CIS_MSG_EOF);
+	}
+      }
+    }
+    // Free reply
+    ret = free_zmq_reply(zrep);
+  }
   if (x->handle != NULL) {
     zsock_t *s = (zsock_t*)(x->handle);
     if (s != NULL)
       zsock_destroy(&s);
     x->handle = NULL;
   }
-  zmq_reply_t *zrep = (zmq_reply_t*)(x->reply);
-  if (zrep != NULL) {
-    if (strcmp(x->direction, "recv") == 0) {
-      int i = 0;
-      for (i = 0; i < zrep->nsockets; i++) {
-	do_reply_recv(x, i, CIS_MSG_EOF);
-      }
-    }
-  }
-  int ret = free_zmq_reply((zmq_reply_t*)(x->reply));
   return ret;
 };
 
@@ -555,7 +592,6 @@ int zmq_comm_send(const comm_t x, const char *data, const size_t len) {
   cislog_debug("zmq_comm_send(%s): %d bytes", x.name, len);
   if (comm_base_send(x, data, len) == -1)
     return -1;
-  /* printf("(C) sending %d bytes to %s\n", len, x.address); */
   zsock_t *s = (zsock_t*)(x.handle);
   if (s == NULL) {
     cislog_error("zmq_comm_send(%s): socket handle is NULL", x.name);
@@ -576,13 +612,16 @@ int zmq_comm_send(const comm_t x, const char *data, const size_t len) {
     if (ret < 0) {
       cislog_error("zmq_comm_send(%s): Error in zframe_send", x.name);
     }
-    zframe_destroy(&f);
   }
   // Get reply
   if (ret >= 0) {
     ret = do_reply_send(&x);
     if (ret < 0) {
-      cislog_error("zmq_comm_send(%s): Error in do_reply_send", x.name);
+      if (ret == -2) {
+	cislog_error("zmq_comm_send(%s): EOF received", x.name);
+      } else {
+	cislog_error("zmq_comm_send(%s): Error in do_reply_send", x.name);
+      }
     }
   }
   cislog_debug("zmq_comm_send(%s): returning %d", x.name, ret);
@@ -626,7 +665,6 @@ int zmq_comm_recv(const comm_t x, char **data, const size_t len,
     return -1;
   }
   size_t len_recv = zframe_size(out) + 1;
-  /* printf("(C) received %d bytes from %s\n", len_recv, x.address); */
   if (len_recv > len) {
     if (allow_realloc) {
       cislog_debug("zmq_comm_recv(%s): reallocating buffer from %d to %d bytes.",

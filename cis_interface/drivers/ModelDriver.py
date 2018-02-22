@@ -55,7 +55,7 @@ class ModelDriver(Driver):
                  with_strace=False, strace_flags=None,
                  with_valgrind=False, valgrind_flags=None,
                  **kwargs):
-        super(ModelDriver, self).__init__(name, daemon=True, **kwargs)
+        super(ModelDriver, self).__init__(name, **kwargs)
         self.debug(str(args))
         if isinstance(args, str):
             self.args = [args]
@@ -88,13 +88,6 @@ class ModelDriver(Driver):
             if k in os.environ:
                 self.env[k] = os.environ[k]
 
-    # def start(self, no_popen=False):
-    #     r"""Start subprocess before monitoring."""
-    #     if (not no_popen) and (not self.event_process_kill_complete.is_set()):
-    #         self.set_started_flag()
-    #         self.before_start()
-    #     super(ModelDriver, self).start()
-
     def before_start(self):
         r"""Actions to perform before the run starts."""
         pre_args = []
@@ -114,8 +107,7 @@ class ModelDriver(Driver):
                                       cwd=self.workingDir,
                                       forward_signals=False)
         # Start thread to queue output
-        self.queue_thread = tools.CisThreadLoop(target=self.enqueue_output_loop,
-                                                daemon=True)
+        self.queue_thread = tools.CisThreadLoop(target=self.enqueue_output_loop)
         self.queue_thread.start()
 
     def enqueue_output_loop(self):
@@ -130,9 +122,10 @@ class ModelDriver(Driver):
         except ValueError:
             line = ""
         if len(line) == 0:
-            self.debug("Empty line from stdout")
+            # self.info("%s: Empty line from stdout" % self.name)
             self.queue_thread.set_break_flag()
             self.queue.put(self._exit_line)
+            self.process.stdout.close()
         else:
             self.queue.put(line.decode('utf-8'))
 
@@ -165,8 +158,9 @@ class ModelDriver(Driver):
         r"""Actions to perform after run_loop has finished. Mainly checking
         if there was an error and then handling it."""
         self.debug()
+        self.queue_thread.set_break_flag()
+        self.process.stdout.close()
         self.wait_process(self.timeout)
-        # self.process.stdout.close()
         self.kill_process()
 
     @property
@@ -221,7 +215,7 @@ class ModelDriver(Driver):
                 except OSError:  # pragma: debug
                     # except BaseException:  # pragma: debug
                     # except OSError:  # pragma: debug
-                    self.error("Error killing model process")
+                    self.exception("Error killing model process")
             assert(self.process_complete)
             if self.process.returncode != 0:
                 self.error("return code of %s indicates model error.",

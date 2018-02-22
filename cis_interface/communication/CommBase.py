@@ -41,11 +41,13 @@ class CommThreadLoop(tools.CisThreadLoop):
 
     def on_main_terminated(self):
         r"""Actions taken on the backlog thread when the main thread stops."""
-        self.info()
+        self.debug()
         if self.comm.direction == 'send' and self.comm.is_interface:
             self._1st_main_terminated = True
             self.comm.send_eof()
             self.comm.close_in_thread(no_wait=True)
+            self.debug("Close in thread, closed = %s, nmsg = %d",
+                       self.comm.is_closed, self.comm.n_msg)
         else:
             super(CommThreadLoop, self).on_main_terminated()
 
@@ -70,8 +72,8 @@ class CommServer(tools.CisThreadLoop):
     def add_client(self):
         r"""Increment the client count."""
         global _registered_servers
-        self.debug("Adding client to server")
         _registered_servers[self.srv_address].cli_count += 1
+        self.debug("Added client to server: nclients = %d", self.cli_count)
 
     def remove_client(self):
         r"""Decrement the client count, closing the server if all clients done."""
@@ -117,6 +119,9 @@ class CommBase(tools.CisClass):
         close_on_eof_recv (bool, optional): If True, the comm will be closed
             when it receives an end-of-file messages. Otherwise, it will remain
             open. Defaults to True.
+        close_on_eof_send (bool, optional): If True, the comm will be closed
+            after it sends an end-of-file messages. Otherwise, it will remain
+            open. Defaults to True.
         single_use (bool, optional): If True, the comm will only be used to
             send/recv a single message. Defaults to False.
         reverse_names (bool, optional): If True, the suffix added to the comm
@@ -154,6 +159,8 @@ class CommBase(tools.CisClass):
             message before returning None.
         close_on_eof_recv (bool): If True, the comm will be closed when it
             receives an end-of-file messages. Otherwise, it will remain open.
+        close_on_eof_send (bool): If True, the comm will be closed after it
+            sends an end-of-file messages. Otherwise, it will remain open.
         single_use (bool): If True, the comm will only be used to send/recv a
             single message.
         is_client (bool): If True, the comm is one of many potential clients
@@ -174,8 +181,8 @@ class CommBase(tools.CisClass):
     """
     def __init__(self, name, address=None, direction='send',
                  deserialize=None, serialize=None, format_str=None,
-                 dont_open=False, is_interface=False,
-                 recv_timeout=0.0, close_on_eof_recv=True,
+                 dont_open=False, is_interface=False, recv_timeout=0.0,
+                 close_on_eof_recv=True, close_on_eof_send=True,
                  single_use=False, reverse_names=False, no_suffix=False,
                  is_client=False, is_response_client=False,
                  is_server=False, is_response_server=False,
@@ -212,6 +219,7 @@ class CommBase(tools.CisClass):
         self.is_interface = is_interface
         self.recv_timeout = recv_timeout
         self.close_on_eof_recv = close_on_eof_recv
+        self.close_on_eof_send = close_on_eof_send
         self._last_header = None
         self._work_comms = {}
         self.single_use = single_use
@@ -226,14 +234,17 @@ class CommBase(tools.CisClass):
         #     self._timeout_drain = False
         # else:
         #     self._timeout_drain = self.timeout
-        self._closing_locks = []
         self._closing_event = threading.Event()
         self._closing_thread = tools.CisThread(target=self.linger_close,
                                                name=self.name + '.ClosingThread')
+        self._eof_recv = threading.Event()
         self._eof_sent = threading.Event()
+        if self.single_use:
+            self._eof_recv.set()
+            self._eof_sent.set()
         if self.is_response_client or self.is_response_server:
             self._eof_sent.set()  # Don't send EOF, these are single use
-        if self.is_interface and self.direction != 'recv':
+        if self.is_interface:  # and self.direction != 'recv':
             atexit.register(self.atexit)
         if not dont_open:
             self.open()
@@ -336,14 +347,6 @@ class CommBase(tools.CisClass):
         r"""Close the connection."""
         pass
 
-    def add_closing_locks(self, locks):
-        r"""Add locks to list of locks that should be acquired before closing."""
-        with self._closing_thread.lock:
-            if isinstance(locks, list):
-                self._closing_locks += locks
-            else:
-                self._closing_locks.append(locks)
-            
     def close(self, skip_base=False, linger=False, locks=None):
         r"""Close the connection.
 
@@ -357,6 +360,7 @@ class CommBase(tools.CisClass):
 
         """
         if (not skip_base):
+            self.debug()
             if linger and self.is_open:
                 self.drain_messages()
             else:
@@ -366,10 +370,6 @@ class CommBase(tools.CisClass):
             self._close(linger=linger)
             return
         with self._closing_thread.lock:
-            if locks is not None:
-                self.add_closing_locks(locks)
-            for lock in self._closing_locks:
-                lock.acquire()
             self._close(linger=linger)
             if not skip_base:
                 self._n_sent = 0
@@ -383,8 +383,6 @@ class CommBase(tools.CisClass):
                     for c in keys:
                         self.remove_work_comm(c, linger=linger)
                     self.debug("Finished cleaning up work comms")
-            for lock in self._closing_locks:
-                lock.release()
         self.debug("done")
 
     def close_in_thread(self, no_wait=False, locks=None, timeout=None):
@@ -402,8 +400,6 @@ class CommBase(tools.CisClass):
         """
         _started_thread = False
         with self._closing_thread.lock:
-            if locks is not None:
-                self.add_closing_locks(locks)
             if (((not self._closing_thread.was_started) and
                  (not self._closing_thread.was_terminated))):
                 self._closing_thread.start()
@@ -417,18 +413,18 @@ class CommBase(tools.CisClass):
         r"""Wait for messages to drain, then close."""
         self.close(linger=True, locks=locks)
 
-    def background_atexit(self):
-        r"""Close operations in background."""
-        self.atexit(no_wait=True)
-
-    def atexit(self, no_wait=False):
+    def atexit(self):
         r"""Close operations."""
+        self.debug('atexit begins')
         if self.is_interface and (self.direction == 'send'):
-            self.interface_close(no_wait=no_wait)
+            self.interface_close()
         else:
             self.close()
+        self.debug('atexit finished: closed=%s, n_msg=%d, close_alive=%s',
+                   self.is_closed, self.n_msg,
+                   self._closing_thread.is_alive())
 
-    def interface_close(self, no_wait=False, locks=None):
+    def interface_close(self, locks=None):
         r"""Close operations for interface send comms."""
         self.send_eof()
         self.linger_close(locks=locks)
@@ -568,6 +564,7 @@ class CommBase(tools.CisClass):
     def signoff_from_server(self):
         r"""Remove a client from the server."""
         if self._server is not None:
+            self.debug("Signing off")
             self._server.remove_client()
             self._server = None
 
@@ -824,6 +821,11 @@ class CommBase(tools.CisClass):
             bool: True if EOF message should be sent, False otherwise.
 
         """
+        with self._closing_thread.lock:
+            if not self._eof_sent.is_set():
+                self._eof_sent.set()
+            else:
+                return False
         return True
 
     def on_send(self, msg):
@@ -879,8 +881,10 @@ class CommBase(tools.CisClass):
             self.exception('.send(): Failed to send.')
             return False
         if self.single_use and self._used:
-            self.info()
+            self.debug()
             # self.close_on_empty(no_wait=True)
+        if ret and self._eof_sent.is_set() and self.close_on_eof_send:
+            self.close_in_thread(no_wait=True, timeout=False)
         return ret
 
     def send_multipart(self, msg, send_header=False, header_kwargs=None,
@@ -960,10 +964,12 @@ class CommBase(tools.CisClass):
             bool: Success or failure of send.
 
         """
-        if not self._eof_sent.is_set():
-            self._eof_sent.set()
-            return self.send(self.eof_msg, *args, **kwargs)
-        return False
+        return self.send(self.eof_msg, *args, **kwargs)
+        # with self._closing_thread.lock:
+        #     if not self._eof_sent.is_set():
+        #         self._eof_sent.set()
+        #         return self.send(self.eof_msg, *args, **kwargs)
+        # return False
         
     def send_nolimit_eof(self, *args, **kwargs):
         r"""Alias for send_eof."""
@@ -1039,7 +1045,10 @@ class CommBase(tools.CisClass):
             bool: Flag that should be returned for EOF.
 
         """
+        self.debug("Received EOF")
+        self._eof_recv.set()
         if self.close_on_eof_recv:
+            self.drain_messages(timeout=False)
             self.close()
             return False
         else:
@@ -1148,6 +1157,7 @@ class CommBase(tools.CisClass):
 
     def drain_messages(self, direction=None, timeout=None):
         r"""Sleep while waiting for messages to be drained."""
+        self.debug()
         if direction is None:
             direction = self.direction
         if direction == 'send':
@@ -1157,6 +1167,7 @@ class CommBase(tools.CisClass):
 
     def drain_messages_recv(self, timeout=None):
         r"""Sleep while waiting for recv messages to be drained."""
+        self.debug()
         if timeout is None:
             timeout = self._timeout_drain
         Tout = self.start_timeout(timeout)
@@ -1167,6 +1178,7 @@ class CommBase(tools.CisClass):
 
     def drain_messages_send(self, timeout=None):
         r"""Sleep while waiting for send messages to be drained."""
+        self.debug()
         if timeout is None:
             timeout = self._timeout_drain
         Tout = self.start_timeout(timeout)

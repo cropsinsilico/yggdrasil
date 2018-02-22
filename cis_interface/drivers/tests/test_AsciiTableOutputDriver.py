@@ -1,14 +1,8 @@
 import cis_interface.drivers.tests.test_AsciiFileOutputDriver as parent
-import cis_interface.drivers.tests.test_FileOutputDriver as super_parent
 
 
 class TestAsciiTableOutputParam(parent.TestAsciiFileOutputParam):
-    r"""Test parameters for AsciiTableOutputDriver.
-
-    Attributes (in addition to parent class's):
-        -
-
-    """
+    r"""Test parameters for AsciiTableOutputDriver."""
 
     def __init__(self, *args, **kwargs):
         super(TestAsciiTableOutputParam, self).__init__(*args, **kwargs)
@@ -20,27 +14,16 @@ class TestAsciiTableOutputParam(parent.TestAsciiFileOutputParam):
 
 class TestAsciiTableOutputDriverNoStart(TestAsciiTableOutputParam,
                                         parent.TestAsciiFileOutputDriverNoStart):
-    r"""Test runner for AsciiTableOutputDriver without start.
-
-    Attributes (in addition to parent class's):
-        -
-
-    """
+    r"""Test runner for AsciiTableOutputDriver without start."""
     pass
     
 
 class TestAsciiTableOutputDriver(TestAsciiTableOutputParam,
                                  parent.TestAsciiFileOutputDriver):
-    r"""Test runner for AsciiTableOutputDriver.
+    r"""Test runner for AsciiTableOutputDriver."""
 
-    Attributes (in addition to parent class's):
-        -
-
-    """
-
-    def setup(self):
-        r"""Create a driver instance and start the driver."""
-        super(super_parent.TestFileOutputDriver, self).setup()
+    def send_file_contents(self):
+        r"""Send file contents to driver."""
         self.send_comm.send_nolimit(self.fmt_str)
         for line in self.file_lines:
             self.send_comm.send_nolimit(line)
@@ -57,9 +40,8 @@ class TestAsciiTableOutputDriver_Array(TestAsciiTableOutputParam,
         self.inst_kwargs['column_names'] = 'None'
         self.inst_kwargs['use_astropy'] = 'False'
 
-    def setup(self):
-        r"""Create a driver instance and start the driver."""
-        super(super_parent.TestFileOutputDriver, self).setup()
+    def send_file_contents(self):
+        r"""Send file contents to driver."""
         self.send_comm.send_nolimit(self.fmt_str)
         self.send_comm.send_nolimit(self.file_bytes)
         self.send_comm.send_nolimit_eof()

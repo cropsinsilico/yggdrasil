@@ -43,6 +43,8 @@ int free_comm(comm_t *x) {
 		     x->name, comm_nmsg(*x));
 	usleep(CIS_SLEEP_TIME);
       }
+    } else {
+      cislog_error("free_comm(%s): Error registered", x->name);
     }
   }
   int ret = 1;
@@ -88,6 +90,8 @@ void clean_comms(void) {
 #if defined(_WIN32) && defined(ZMQINSTALLED)
   zsys_shutdown();
 #endif
+  cislog_debug("atexit done");
+  /* printf(""); */
 };
 
 /*!
@@ -396,6 +400,8 @@ int comm_send_multipart(const comm_t x, const char *data, const size_t len) {
       cislog_error("comm_send_multipart: Failed to initialize a new comm.");
       return -1;
     }
+    xmulti.sent_eof[0] = 1;
+    xmulti.recv_eof[0] = 1;
     strcpy(head.address, xmulti.address);
     headlen = format_comm_header(head, headbuf, headbuf_len);
     if (headlen < 0) {
@@ -454,11 +460,28 @@ int comm_send_multipart(const comm_t x, const char *data, const size_t len) {
 static inline
 int comm_send(const comm_t x, const char *data, const size_t len) {
   int ret = -1;
+  if (x.sent_eof == NULL) {
+    cislog_error("comm_send(%s): sent_eof not initialized.", x.name);
+    return ret;
+  }
+  int sending_eof = 0;
+  if (is_eof(data)) {
+    if (x.sent_eof[0] == 0) {
+      x.sent_eof[0] = 1;
+      sending_eof = 1;
+    } else {
+      cislog_error("comm_send(%s): EOF already sent", x.name);
+      return ret;
+    }
+  }
   if (((len > x.maxMsgSize) && (x.maxMsgSize > 0)) ||
       ((x.always_send_header) && (!(is_eof(data))))) {
     return comm_send_multipart(x, data, len);
   }
   ret = comm_send_single(x, data, len);
+  if (sending_eof) {
+    cislog_debug("comm_send(%s): sent EOF, ret = %d", x.name, ret);
+  }
   return ret;
 };
 
@@ -470,17 +493,8 @@ int comm_send(const comm_t x, const char *data, const size_t len) {
 static inline
 int comm_send_eof(const comm_t x) {
   int ret = -1;
-  if (x.sent_eof == NULL) {
-    cislog_error("comm_send_eof(%s): sent_eof not initialized.", x.name);
-    return ret;
-  }
-  if (x.sent_eof[0] == 0) {
-    char buf[2048] = CIS_MSG_EOF;
-    ret = comm_send(x, buf, strlen(buf));
-    x.sent_eof[0] = 1;
-  } else {
-    cislog_error("comm_send_eof(%s): EOF already sent", x.name);
-  }
+  char buf[100] = CIS_MSG_EOF;
+  ret = comm_send(x, buf, strlen(buf));
   return ret;
 };
 
@@ -554,6 +568,8 @@ int comm_recv_multipart(const comm_t x, char **data, const size_t len,
 	cislog_error("comm_recv_multipart: Failed to initialize a new comm.");
 	return -1;
       }
+      xmulti.sent_eof[0] = 1;
+      xmulti.recv_eof[0] = 1;
       // Receive parts of message
       size_t prev = head.bodysiz;
       size_t msgsiz = 0;
@@ -620,6 +636,7 @@ int comm_recv(const comm_t x, char *data, const size_t len) {
   if (ret > 0) {
     if (is_eof(data)) {
       cislog_debug("comm_recv(%s): EOF received.", x.name);
+      x.recv_eof[0] = 1;
       ret = -2;
     } else {
       ret = comm_recv_multipart(x, &data, len, ret, 0);
@@ -643,6 +660,7 @@ int comm_recv_realloc(const comm_t x, char **data, const size_t len) {
   if (ret > 0) {
     if (is_eof(*data)) {
       cislog_debug("comm_recv_realloc(%s): EOF received.", x.name);
+      x.recv_eof[0] = 1;
       ret = -2;
     } else {
       ret = comm_recv_multipart(x, data, len, ret, 1);

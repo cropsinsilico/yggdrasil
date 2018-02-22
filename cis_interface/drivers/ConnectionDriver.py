@@ -1,6 +1,7 @@
 """Module for funneling messages from one comm to another."""
 import os
 import importlib
+import threading
 from cis_interface import backwards
 from cis_interface.communication import new_comm
 from cis_interface.drivers.Driver import Driver
@@ -98,6 +99,7 @@ class ConnectionDriver(Driver):
         self.single_use = single_use
         self.timeout_send_1st = timeout_send_1st
         self._first_send_done = False
+        self._comm_opened = threading.Event()
         self._comm_closed = False
         self._used = False
         self._skip_after_loop = False
@@ -106,6 +108,7 @@ class ConnectionDriver(Driver):
         self.nsent = 0
         self.nskip = 0
         self.state = 'started'
+        self.close_state = ''
         self.debug()
         self.debug(80 * '=')
         self.debug('class = %s', self.__class__)
@@ -163,9 +166,10 @@ class ConnectionDriver(Driver):
             try:
                 self.icomm.open()
                 self.ocomm.open()
-            except BaseException as e:
+            except BaseException:
                 self.close_comm()
-                raise e
+                raise
+            self._comm_opened.set()
         self.debug('Returning')
 
     def close_comm(self):
@@ -216,32 +220,39 @@ class ConnectionDriver(Driver):
         """
         self.debug()
         with self.lock:
+            self.set_close_state('stop')
             self._skip_after_loop = True
         self.printStatus()
         if timeout is None:
             timeout = self.timeout
-        self.icomm.drain_messages(timeout=timeout)
+        self.drain_input(timeout=timeout)
         self.wait_for_route(timeout=timeout)
-        self.close_comm()
+        self.drain_output(timeout=timeout)
         self.printStatus()
         super(ConnectionDriver, self).graceful_stop()
         self.debug('Returning')
 
     def on_model_exit(self):
         r"""Drain input and then close it."""
+        # self.info("%s: on_model_exit", self.name)
         self.debug()
+        self.set_close_state('model exit')
         if self._is_input:
+            self.drain_input(timeout=self.timeout)
             with self.lock:
+                self.icomm.close()
                 self.ocomm.close()
         if self._is_output:
-            self.icomm.drain_messages()
+            self.drain_input(timeout=self.timeout)
             with self.lock:
                 self.icomm.close()
         super(ConnectionDriver, self).on_model_exit()
 
     def do_terminate(self):
         r"""Stop the driver by closing the communicators."""
+        # self.info('%s: do_terminate', self.name)
         self.debug()
+        self.set_close_state('terminate')
         self.close_comm()
         super(ConnectionDriver, self).do_terminate()
 
@@ -266,12 +277,37 @@ class ConnectionDriver(Driver):
         msg += '%-15s' % (str(self.nproc) + ' processed, ')
         msg += '%-15s' % (str(self.nskip) + ' skipped, ')
         msg += '%-15s' % (str(self.nsent) + ' sent, ')
-        msg += '%-15s' % (str(self.n_msg) + ' ready')
+        msg += '%-20s' % (str(self.icomm.n_msg) + ' ready to recv')
+        msg += '%-20s' % (str(self.ocomm.n_msg) + ' ready to send')
+        with self.lock:
+            if self.close_state:
+                msg += '%-30s' % ('close state: ' + self.close_state)
         msg += end_msg
         print(msg)
 
+    def drain_input(self, timeout=None):
+        r"""Drain messages from input comm."""
+        T = self.start_timeout(timeout)
+        while not T.is_out:
+            with self.lock:
+                if (not self.icomm.is_open) or (self.icomm.n_msg_recv_drain == 0):
+                    break
+            self.sleep()
+        self.stop_timeout()
+
+    def drain_output(self, timeout=None):
+        r"""Drain messages from output comm."""
+        T = self.start_timeout(timeout)
+        while not T.is_out:
+            with self.lock:
+                if (not self.ocomm.is_open) or (self.ocomm.n_msg_send_drain == 0):
+                    break
+            self.sleep()
+        self.stop_timeout()
+
     def before_loop(self):
         r"""Actions to perform prior to sending messages."""
+        self.state = 'before loop'
         try:
             self.open_comm()
             self.sleep()  # Help ensure senders/receivers connected before messages
@@ -285,7 +321,9 @@ class ConnectionDriver(Driver):
         r"""Actions to perform after sending messages."""
         self.state = 'after loop'
         self.debug()
+        # self.info('%s: after loop', self.name)
         # Close input comm in case loop did not
+        # self.drain_input(timeout=False)
         with self.lock:
             if self._skip_after_loop:
                 self.debug("After loop skipped.")
@@ -302,7 +340,7 @@ class ConnectionDriver(Driver):
                 self.send_eof()
         # Close output comm after waiting for output to be processed
         # if not dont_close_output and not self._is_input:
-        #     self.ocomm.close_on_empty()
+        #     self.ocomm.close_in_thread()
 
     def recv_message(self, **kwargs):
         r"""Get a new message to send.
@@ -338,7 +376,9 @@ class ConnectionDriver(Driver):
         self.state = 'eof'
         with self.lock:
             self.send_eof()
-            self.icomm.drain_messages()
+        self.drain_input(timeout=False)
+        with self.lock:
+            self.set_close_state('eof')
             self.icomm.close()
         return False
 
@@ -412,11 +452,11 @@ class ConnectionDriver(Driver):
             bool: Success or failure of send.
 
         """
-        self.debug()
         with self.lock:
             if self._eof_sent:
                 return False
             self._eof_sent = True
+        self.debug()
         return self.send_message(self.ocomm.eof_msg)
 
     def send_message(self, *args, **kwargs):
@@ -437,13 +477,29 @@ class ConnectionDriver(Driver):
             flag = self._send_message(*args, **kwargs)
         else:
             flag = self._send_1st_message(*args, **kwargs)
+        # if self.single_use:
+        #     with self.lock:
+        #         self.info('used')
+        #         self.icomm.drain_messages()
+        #         self.icomm.close()
         return flag
+
+    def set_close_state(self, state):
+        r"""Set the close state if its not already set."""
+        with self.lock:
+            if not self.close_state:
+                self.close_state = state
 
     def run_loop(self):
         r"""Run the driver. Continue looping over messages until there are not
         any left or the communication channel is closed.
         """
+        self.state = 'in loop'
         if not self.is_valid:
+            self.debug("Breaking loop")
+            self.set_close_state('invalid')
+            # self.info("%s: breaking loop, input=%s, output=%s", self.name,
+            #           self.icomm.is_open, self.ocomm.is_open)
             self.set_break_flag()
             return
         # Receive a message
@@ -452,6 +508,7 @@ class ConnectionDriver(Driver):
         if msg is False:
             self.debug('No more messages')
             self.set_break_flag()
+            self.set_close_state('receiving')
             return
         if isinstance(msg, backwards.bytes_type) and len(msg) == 0:
             self.state = 'waiting'
@@ -466,8 +523,9 @@ class ConnectionDriver(Driver):
         self.state = 'processing'
         msg = self.on_message(msg)
         if msg is False:  # pragma: debug
-            self.debug('Could not process message.')
+            self.error('Could not process message.')
             self.set_break_flag()
+            self.set_close_state('processing')
             return
         elif len(msg) == 0:
             self.debug('Message skipped.')
@@ -480,8 +538,9 @@ class ConnectionDriver(Driver):
         self.state = 'sending'
         ret = self.send_message(msg)
         if ret is False:
-            self.debug('Could not send message.')
+            self.error('Could not send message.')
             self.set_break_flag()
+            self.set_close_state('sending')
             return
         self.nsent += 1
         self.state = 'sent'

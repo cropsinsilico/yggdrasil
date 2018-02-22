@@ -70,6 +70,7 @@ class ClientRequestDriver(ConnectionDriver):
             ocomm_kws['address'] = comm_address
         ocomm_kws['no_suffix'] = True
         ocomm_kws['is_client'] = True
+        ocomm_kws['close_on_eof_send'] = False
         kwargs['ocomm_kws'] = ocomm_kws
         # Parent and attributes
         super(ClientRequestDriver, self).__init__(model_request_name, **kwargs)
@@ -139,24 +140,16 @@ class ClientRequestDriver(ConnectionDriver):
         r"""Send client sign on to server response driver."""
         super(ClientRequestDriver, self).before_loop()
         # self.sleep()  # Help ensure that the server is connected
+        self.debug("Sending client sign on")
         super(ClientRequestDriver, self).send_message(CIS_CLIENT_INI)
+        # self.info("%s: before loop complete", self.name)
 
     def after_loop(self):
         r"""After client model signs off. Sent EOF to server."""
         # Don't close output as other clients may be using it
         self.close_response_drivers()
-        super(ClientRequestDriver, self).after_loop()  # dont_close_output=True)
+        super(ClientRequestDriver, self).after_loop()
     
-    def on_model_exit(self):
-        r"""Drain input and then close it."""
-        with self.lock:
-            self.icomm.close()  # Cannot respond to messages, so discard them
-        super(ClientRequestDriver, self).on_model_exit()
-    
-    def on_eof(self):
-        r"""On EOF, set response_address to EOF, then send it along."""
-        return super(ClientRequestDriver, self).on_eof()
-
     def send_eof(self):
         r"""Send EOF message.
 

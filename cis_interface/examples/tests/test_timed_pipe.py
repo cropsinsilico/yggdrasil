@@ -16,12 +16,6 @@ class TestExampleTimedPipeZMQ(TestExample):
                     'PIPE_MSG_SIZE': '1024'}
         # self.debug_flag = True
 
-    def teardown(self, *args, **kwargs):
-        r"""Ensure that environment variable not set after test."""
-        super(TestExampleTimedPipeZMQ, self).teardown(*args, **kwargs)
-        if 'CIS_DEFAULT_COMM' in os.environ:
-            del os.environ['CIS_DEFAULT_COMM']
-
     @property
     def results(self):
         r"""Result that should be found in output files."""

@@ -19,11 +19,13 @@ class TestExample(unittest.TestCase, tools.CisClass):
         self.env = {}
         self.runner = None
         self.expects_error = False
+        self._old_default_comm = None
         # self.debug_flag = True
         super(TestExample, self).__init__(*args, **kwargs)
 
     def setup(self, *args, **kwargs):
         r"""Setup to perform before test."""
+        self._old_default_comm = os.environ.get('CIS_DEFAULT_COMM', None)
         self.set_utf8_encoding()
         if self.debug_flag:  # pragma: debug
             self.debug_log()
@@ -32,6 +34,11 @@ class TestExample(unittest.TestCase, tools.CisClass):
         r"""Teardown to perform after test."""
         self.reset_log()
         self.reset_encoding()
+        if self._old_default_comm is None:
+            if 'CIS_DEFAULT_COMM' in os.environ:
+                del os.environ['CIS_DEFAULT_COMM']
+        else:
+            os.environ['CIS_DEFAULT_COMM'] = self._old_default_comm
 
     def shortDescription(self):
         r"""Prefix first line of doc string with driver."""

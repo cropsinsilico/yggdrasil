@@ -15,6 +15,7 @@ def fibServer(args):
     # Continue receiving requests until error occurs (the connection is closed
     # by all clients that have connected).
     while True:
+        print('rpcFibSrv(P): receiving...')
         retval, rpc_in = rpc.rpcRecv()
         if not retval:
             print('rpcFibSrv(P): end of input')

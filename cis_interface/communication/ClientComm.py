@@ -102,18 +102,15 @@ class ClientComm(CommBase.CommBase):
         super(ClientComm, self).open()
         self.ocomm.open()
 
-    def _close(self, linger=False):
-        r"""Close the connection.
-
-        Args:
-            linger (bool, optional): If True, drain messages before closing the
-                comm. Defaults to False.
-
-        """
-        self.ocomm.close(linger=linger)
+    def close(self, *args, **kwargs):
+        r"""Close the connection."""
+        self.ocomm.close(*args, **kwargs)
         for k in self.icomm_order:
             self.icomm[k].close()
-        super(ClientComm, self)._close(linger=linger)
+
+    def close_in_thread(self, *args, **kwargs):
+        r"""In a new thread, close the comm when it is empty."""
+        self.ocomm.close_in_thread(*args, **kwargs)
 
     @property
     def is_open(self):
@@ -129,6 +126,11 @@ class ClientComm(CommBase.CommBase):
     def n_msg_send(self):
         r"""int: The number of messages in the connection."""
         return self.ocomm.n_msg_send
+
+    @property
+    def n_msg_send_drain(self):
+        r"""int: The number of outgoing messages in the connection to drain."""
+        return self.ocomm.n_msg_send_drain
 
     # RESPONSE COMM
     def create_response_comm(self):

@@ -30,6 +30,7 @@ typedef struct comm_t {
   int index_in_register; //!< Index of the comm in the comm register.
   time_t *last_send; //!< Clock output at time of last send.
   int *sent_eof; //!< Flag specifying if EOF has been sent
+  int *recv_eof; //!< Flag specifying if EOF has been received.
   void *reply; //!< Reply information.
 } comm_t;
 
@@ -52,6 +53,7 @@ comm_t empty_comm_base() {
   ret.index_in_register = -1;
   ret.last_send = NULL;
   ret.sent_eof = NULL;
+  ret.recv_eof = NULL;
   return ret;
 };
 
@@ -100,7 +102,9 @@ comm_t* new_comm_base(char *address, const char *direction, const comm_type t,
   ret->last_send = (time_t*)malloc(sizeof(time_t));
   ret->last_send[0] = 0;
   ret->sent_eof = (int*)malloc(sizeof(int));
+  ret->recv_eof = (int*)malloc(sizeof(int));
   ret->sent_eof[0] = 0;
+  ret->recv_eof[0] = 0;
   return ret;
 };
 
@@ -163,6 +167,10 @@ int free_comm_base(comm_t *x) {
   if (x->sent_eof != NULL) {
     free(x->sent_eof);
     x->sent_eof = NULL;
+  }
+  if (x->recv_eof != NULL) {
+    free(x->recv_eof);
+    x->recv_eof = NULL;
   }
 /*   // Prevent C4100 warning on windows by referencing param */
 /* #ifdef _WIN32 */

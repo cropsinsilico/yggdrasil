@@ -160,6 +160,7 @@ int server_comm_recv(comm_t x, char **data, const size_t len, const int allow_re
   }
   // Return EOF
   if (is_eof(*data)) {
+    req_comm->recv_eof[0] = 1;
     return ret;
   }
   // Initialize new comm from received address
@@ -190,6 +191,8 @@ int server_comm_recv(comm_t x, char **data, const size_t len, const int allow_re
     cislog_error("server_comm_recv(%s): Could not initialize response comm.", x.name);
     return newret;
   }
+  res_comm[0]->sent_eof[0] = 1;
+  res_comm[0]->recv_eof[0] = 1;
   return ret;
 };
 

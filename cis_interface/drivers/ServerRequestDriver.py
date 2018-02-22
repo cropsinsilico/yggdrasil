@@ -1,4 +1,3 @@
-import threading
 from cis_interface.drivers.ConnectionDriver import ConnectionDriver
 from cis_interface.drivers.ServerResponseDriver import ServerResponseDriver
 from cis_interface.drivers.ClientRequestDriver import (
@@ -57,7 +56,6 @@ class ServerRequestDriver(ConnectionDriver):
         self.comm = comm
         self.comm_address = self.icomm.address  # opp_address
         self._block_response = False
-        self._clients_exited = threading.Event()
         self._is_input = True
 
     @property
@@ -118,12 +116,7 @@ class ServerRequestDriver(ConnectionDriver):
     def on_client_exit(self):
         r"""Close input comm to stop the loop."""
         self.debug()
-        with self.lock:
-            if self._clients_exited.is_set():
-                return
-            self._clients_exited.set()
-            self.icomm.close()
-            self.send_eof()
+        self.stop()
     
     def on_eof(self):
         r"""On EOF, decrement number of clients. Only send EOF if the number
@@ -132,9 +125,8 @@ class ServerRequestDriver(ConnectionDriver):
             self.nclients -= 1
             self.debug("Client signed off. nclients = %d", self.nclients)
             if self.nclients == 0:
-                self.info("All clients have signed off.")
-                self.on_client_exit()
-                return False
+                self.debug("All clients have signed off.")
+                return super(ServerRequestDriver, self).on_eof()
         return ''
 
     def on_message(self, msg):

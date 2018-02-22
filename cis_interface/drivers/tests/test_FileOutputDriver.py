@@ -50,11 +50,17 @@ class TestFileOutputDriverNoStart(TestFileOutputParam,
 class TestFileOutputDriver(TestFileOutputParam, parent.TestConnectionDriver):
     r"""Test runner for FileOutputDriver."""
 
+    def send_file_contents(self):
+        r"""Send file contents to driver."""
+        self.send_comm.send(self.file_contents)
+        self.send_comm.send_eof()
+
     def setup(self):
         r"""Create a driver instance and start the driver."""
         super(TestFileOutputDriver, self).setup()
-        self.send_comm.send(self.file_contents)
-        self.send_comm.send_eof()
+        # self.instance._comm_opened.wait(self.timeout)
+        # print(self.instance._comm_opened.is_set())
+        self.send_file_contents()
 
     def teardown(self):
         r"""Remove the instance, stoppping it."""
@@ -62,6 +68,10 @@ class TestFileOutputDriver(TestFileOutputParam, parent.TestConnectionDriver):
         super(TestFileOutputDriver, self).teardown()
         if os.path.isfile(filename):  # pragma: debug
             os.remove(filename)
+
+    # def run_before_stop(self):
+    #     r"""Commands to run while the instance is running."""
+    #     self.send_file_contents()
 
     def assert_before_stop(self):
         r"""Assertions to make before stopping the driver instance."""
@@ -88,9 +98,9 @@ class TestFileOutputDriver(TestFileOutputParam, parent.TestConnectionDriver):
         pass
     
     def test_send_recv(self):
-        r"""Test sending/receiving small message."""
+        r"""Disabled: Test sending/receiving small message."""
         pass
 
     def test_send_recv_nolimit(self):
-        r"""Test sending/receiving large message."""
+        r"""Disabled: Test sending/receiving large message."""
         pass

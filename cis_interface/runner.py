@@ -493,7 +493,6 @@ class CisRunner(CisClass):
                 iod = self.inputdrivers[srv_name]
                 iod['instance'].on_client_exit()
                 srv['instance'].stop()
-                # self.do_model_exits(srv)
         # Stop associated IO drivers
         for drv in self.io_drivers(model['name']):
             if not drv['instance'].is_alive():
