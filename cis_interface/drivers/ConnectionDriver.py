@@ -109,7 +109,7 @@ class ConnectionDriver(Driver):
         self.nskip = 0
         self.state = 'started'
         self.close_state = ''
-        self.debug()
+        self.debug('')
         self.debug(80 * '=')
         self.debug('class = %s', self.__class__)
         # self.debug('    env: %s', str(self.env))
@@ -158,7 +158,7 @@ class ConnectionDriver(Driver):
 
     def open_comm(self):
         r"""Open the communicators."""
-        self.debug()
+        self.debug('')
         with self.lock:
             if self._comm_closed:
                 self.debug('Aborted as comm closed')
@@ -174,7 +174,7 @@ class ConnectionDriver(Driver):
 
     def close_comm(self):
         r"""Close the communicators."""
-        self.debug()
+        self.debug('')
         with self.lock:
             self._comm_closed = True
             self._skip_after_loop = True
@@ -218,7 +218,7 @@ class ConnectionDriver(Driver):
                 class's graceful_stop method.
 
         """
-        self.debug()
+        self.debug('')
         with self.lock:
             self.set_close_state('stop')
             self._skip_after_loop = True
@@ -235,7 +235,7 @@ class ConnectionDriver(Driver):
     def on_model_exit(self):
         r"""Drain input and then close it."""
         # self.info("%s: on_model_exit", self.name)
-        self.debug()
+        self.debug('')
         self.set_close_state('model exit')
         if self._is_input:
             self.drain_input(timeout=self.timeout)
@@ -251,14 +251,14 @@ class ConnectionDriver(Driver):
     def do_terminate(self):
         r"""Stop the driver by closing the communicators."""
         # self.info('%s: do_terminate', self.name)
-        self.debug()
+        self.debug('')
         self.set_close_state('terminate')
         self.close_comm()
         super(ConnectionDriver, self).do_terminate()
 
     def cleanup(self):
         r"""Ensure that the communicators are closed."""
-        self.debug()
+        self.debug('')
         self.close_comm()
         super(ConnectionDriver, self).cleanup()
 
@@ -320,7 +320,7 @@ class ConnectionDriver(Driver):
     def after_loop(self, send_eof=None, dont_close_output=False):
         r"""Actions to perform after sending messages."""
         self.state = 'after loop'
-        self.debug()
+        self.debug('')
         # self.info('%s: after loop', self.name)
         # Close input comm in case loop did not
         # self.drain_input(timeout=False)
@@ -339,6 +339,8 @@ class ConnectionDriver(Driver):
             if send_eof:
                 self.send_eof()
         # Close output comm after waiting for output to be processed
+        # self.drain_output(timeout=False)
+        # self.ocomm.close()
         # if not dont_close_output and not self._is_input:
         #     self.ocomm.close_in_thread()
 
@@ -456,7 +458,7 @@ class ConnectionDriver(Driver):
             if self._eof_sent:
                 return False
             self._eof_sent = True
-        self.debug()
+        self.debug('')
         return self.send_message(self.ocomm.eof_msg)
 
     def send_message(self, *args, **kwargs):
@@ -470,7 +472,7 @@ class ConnectionDriver(Driver):
             bool: Success or failure of send.
 
         """
-        self.debug()
+        self.debug('')
         with self.lock:
             self._used = True
         if self._first_send_done:

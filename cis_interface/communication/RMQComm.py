@@ -5,8 +5,8 @@ try:
     import pika
     _rmq_installed = True
 except ImportError:
-    logging.warn("Could not import pika. " +
-                 "RabbitMQ support will be disabled.")
+    logging.warning("Could not import pika. " +
+                    "RabbitMQ support will be disabled.")
     pika = None
     _rmq_installed = False
 
@@ -63,6 +63,16 @@ def check_rmq_server(url=None, **kwargs):
 
 
 _rmq_server_running = check_rmq_server()
+
+
+class RMQServer(CommBase.CommServer):
+    r"""RMQ server object for cleaning up server connections."""
+
+    def terminate(self, *args, **kwargs):
+        global _registered_connections
+        if self.srv_address in _registered_connections:
+            del _registered_connections[self.srv_address]
+        super(RMQServer, self).terminate(*args, **kwargs)
 
 
 class RMQComm(CommBase.CommBase):
@@ -221,6 +231,8 @@ class RMQComm(CommBase.CommBase):
                                 # routing_key=self.routing_key,
                                 queue=self.queue)
         self.register_connection(res)
+        if self.is_client:
+            self.signon_to_server()
 
     def register_connection(self, res):
         r"""Add connection to list of registered connections.
@@ -264,14 +276,15 @@ class RMQComm(CommBase.CommBase):
             self.close_queue()
         self.close_channel()
         self.close_connection()
-        self.unregister_connection()
+        if not self.is_client:
+            self.unregister_connection()
         self.connection = None
         self.channel = None
         super(RMQComm, self)._close(linger=linger)
 
     def close_queue(self):
         r"""Close the queue if the channel exists."""
-        if self.channel:
+        if self.channel and (not self.is_client):
             try:
                 self.channel.queue_unbind(queue=self.queue,
                                           exchange=self.exchange)
@@ -301,6 +314,15 @@ class RMQComm(CommBase.CommBase):
                 pass
         self.connection = None
 
+    def new_server(self, srv_address):
+        r"""Create a new server.
+
+        Args:
+            srv_address (str): Address of server comm.
+
+        """
+        return RMQServer(srv_address)
+
     @property
     def is_open(self):
         r"""bool: True if the connection and channel are open."""
@@ -319,6 +341,20 @@ class RMQComm(CommBase.CommBase):
                 return False
             return self._is_open
         
+    @property
+    def messages_confirmed_recv(self):
+        r"""bool: True if all received messages have been confirmed."""
+        if self.is_open:
+            return (self.n_msg_recv == 0)
+        return super(RMQComm, self).messages_confirmed_recv
+
+    @property
+    def messages_confirmed_send(self):
+        r"""bool: True if all sent messages have been confirmed."""
+        if self.is_open:
+            return (self.n_msg_send == 0)
+        return super(RMQComm, self).messages_confirmed_send
+
     @property
     def n_msg_recv(self):
         r"""int: Number of messages in the queue."""

@@ -37,6 +37,7 @@ class FileComm(CommBase.CommBase):
             raise ValueError("read_meth '%s' not supported." % read_meth)
         self.read_meth = read_meth
         self.append = append
+        kwargs.setdefault('close_on_eof_send', True)
         super(FileComm, self).__init__(name, **kwargs)
         if in_temp:
             self.address = os.path.join(tempfile.gettempdir(), self.address)
@@ -136,9 +137,10 @@ class FileComm(CommBase.CommBase):
             bool: False so that message not sent.
 
         """
+        flag = super(FileComm, self).on_send_eof()
         self.fd.flush()
-        self.close()
-        return False
+        # self.close()
+        return flag
 
     def _send(self, msg):
         r"""Write message to a file.
@@ -150,7 +152,8 @@ class FileComm(CommBase.CommBase):
             bool: Success or failure of writing to the file.
 
         """
-        self.fd.write(msg)
+        if msg != self.eof_msg:
+            self.fd.write(msg)
         self.fd.flush()
         return True
 

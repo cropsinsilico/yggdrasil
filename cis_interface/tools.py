@@ -20,8 +20,9 @@ from cis_interface.config import cis_cfg, cfg_logging
 
 _stack_in_log = False
 _stack_in_timeout = False
-if logging.getLogger("cis_interface").getEffectiveLevel() <= logging.DEBUG:
-    _stack_in_log = True
+if ((logging.getLogger("cis_interface").getEffectiveLevel() <=
+     logging.DEBUG)):  # pragma: debug
+    _stack_in_log = False
     _stack_in_timeout = True
 _thread_registry = {}
 _lock_registry = {}
@@ -445,7 +446,7 @@ def single_use_method(func):
     return wrapper
 
 
-class CisClass(object):
+class CisClass(logging.LoggerAdapter):
     r"""Base class for CiS classes.
 
     Args:
@@ -490,10 +491,18 @@ class CisClass(object):
         self.extra_kwargs = kwargs
         self.sched_out = None
         self.suppress_special_debug = False
-        self.logger = logging.getLogger(self.__module__)
+        # self.logger = logging.getLogger(self.__module__)
+        # self.logger.basicConfig(
+        #     format=("%(levelname)s:%(module)s" +
+        #             # "(%s)" % self.name +
+        #             ".%(funcName)s[%(lineno)d]:%(message)s"))
         self._old_loglevel = None
         self._old_encoding = None
         self.debug_flag = False
+        class_name = str(self.__class__).split("'")[1].split('.')[-1]
+        super(CisClass, self).__init__(logging.getLogger(self.__module__),
+                                       {'cis_name': self.name,
+                                        'cis_class': class_name})
 
     def debug_log(self):  # pragma: debug
         r"""Turn on debugging."""
@@ -521,6 +530,85 @@ class CisClass(object):
             os.environ['LANG'] = self._old_encoding
             self._old_encoding = None
 
+    def as_str(self, obj):
+        r"""Return str version of object if it is not already a string.
+
+        Args:
+            obj (object): Object that should be turned into a string.
+
+        Returns:
+            str: String version of provided object.
+
+        """
+        if not isinstance(obj, str):
+            obj_str = str(obj)
+        else:
+            obj_str = obj
+        return obj_str
+
+    def process(self, msg, kwargs):
+        r"""Process logging message."""
+        if _stack_in_log:  # pragma: no cover
+            stack = inspect.stack()
+            the_class = os.path.splitext(os.path.basename(
+                stack[2][0].f_globals["__file__"]))[0]
+            the_line = stack[2][2]
+            the_func = stack[2][3]
+            prefix = '%s(%s).%s[%d]' % (the_class, self.name, the_func, the_line)
+        else:
+            prefix = '%s(%s)' % (self.extra['cis_class'], self.name)
+        new_msg = '%s: %s' % (prefix, self.as_str(msg))
+        return new_msg, kwargs
+
+    def display(self, msg='', *args, **kwargs):
+        r"""Print a message, no log."""
+        msg, kwargs = self.process(msg, kwargs)
+        print(msg % args)
+
+    def verbose_debug(self, *args, **kwargs):
+        r"""Log a verbose debug level message."""
+        return self.log(9, *args, **kwargs)
+        
+    def dummy_log(self, *args, **kwargs):
+        pass
+
+    @property
+    def special_debug(self):
+        r"""Log debug level message contingent of supression flag."""
+        if not self.suppress_special_debug:
+            return self.debug
+        else:
+            return self.dummy_log
+
+    @property
+    def error(self):
+        r"""Log an error level message."""
+        self.errors.append('ERROR')
+        return super(CisClass, self).error
+
+    @property
+    def exception(self):
+        r"""Log an exception level message."""
+        exc_info = sys.exc_info()
+        if exc_info is not None and exc_info != (None, None, None):
+            self.errors.append('ERROR')
+            return super(CisClass, self).exception
+        else:
+            return self.error
+
+    def raise_error(self, e):
+        r"""Raise an exception, logging it first.
+
+        Args:
+            e (Exception): Exception to raise.
+
+        Raises:
+            The provided exception.
+
+        """
+        self.errors.append(repr(e))
+        raise e
+
     def print_encoded(self, msg, *args, **kwargs):
         r"""Print bytes to stdout, encoding if possible.
 
@@ -535,7 +623,7 @@ class CisClass(object):
 
     def printStatus(self):
         r"""Print the class status."""
-        self.logger.error('%s(%s): state:', self.__module__, self.name)
+        self.info('%s(%s): state:', self.__module__, self.name)
 
     def _task_with_output(self, func, *args, **kwargs):
         self.sched_out = func(*args, **kwargs)
@@ -565,35 +653,6 @@ class CisClass(object):
             tobj = threading.Timer(t, func, args=args, kwargs=kwargs)
         tobj.start()
 
-    @property
-    def logger_prefix(self):
-        r"""Prefix to add to logger messages."""
-        if _stack_in_log:  # pragma: no cover
-            stack = inspect.stack()
-            the_class = os.path.splitext(os.path.basename(
-                stack[2][0].f_globals["__file__"]))[0]
-            the_line = stack[2][2]
-            the_func = stack[2][3]
-            return '%s(%s).%s[%d]: ' % (the_class, self.name, the_func, the_line)
-        else:
-            return ''
-
-    def as_str(self, obj):
-        r"""Return str version of object if it is not already a string.
-
-        Args:
-            obj (object): Object that should be turned into a string.
-
-        Returns:
-            str: String version of provided object.
-
-        """
-        if not isinstance(obj, str):
-            obj_str = str(obj)
-        else:
-            obj_str = obj
-        return obj_str
-            
     def sleep(self, t=None):
         r"""Have the class sleep for some period of time.
 
@@ -609,11 +668,6 @@ class CisClass(object):
     @property
     def timeout_key(self):
         r"""str: Key identifying calling object and method."""
-        # stack = inspect.stack()
-        # fcn = stack[2][3]
-        # cls = os.path.splitext(os.path.basename(stack[2][1]))[0]
-        # key = '%s(%s).%s' % (cls, self.name, fcn)
-        # return key
         return self.get_timeout_key()
 
     def get_timeout_key(self, key_level=0):
@@ -635,7 +689,8 @@ class CisClass(object):
             stack = inspect.stack()
             fcn = stack[key_level + 2][3]
             cls = os.path.splitext(os.path.basename(stack[key_level + 2][1]))[0]
-            key = '%s(%s).%s' % (cls, self.name, fcn)
+            key = '%s(%s).%s.%s' % (cls, self.name, fcn,
+                                    threading.current_thread().name)
         else:
             key = '%s(%s).%s' % (str(self.__class__).split("'")[1], self.name,
                                  threading.current_thread().name)
@@ -729,120 +784,6 @@ class CisClass(object):
                     key, t.elapsed, t.max_time))
         del self._timeouts[key]
 
-    def display(self, fmt_str='', *args):
-        r"""Log a message at level 1000 that is prepended with the class
-        and name. These messages will always be printed.
-
-        Args:
-            fmt_str (str, optional): Format string.
-            \*args: Additional arguments are formated using the format string.
-
-        """
-        print(self.logger_prefix + self.as_str(fmt_str) % args)
-
-    def info(self, fmt_str='', *args):
-        r"""Log an info message that is prepended with the class and name.
-
-        Args:
-            fmt_str (str, optional): Format string.
-            \*args: Additional arguments are formated using the format string.
-
-        """
-        self.logger.info(self.logger_prefix + self.as_str(fmt_str), *args)
-
-    def debug(self, fmt_str='', *args):
-        r"""Log a debug message that is prepended with the class and name.
-
-        Args:
-            fmt_str (str, optional): Format string.
-            \*args: Additional arguments are formated using the format string.
-
-        """
-        self.logger.debug(self.logger_prefix + self.as_str(fmt_str), *args)
-
-    def special_debug(self, fmt_str='', *args):
-        r"""Log a debug message that is prepended with the class and name, but
-        only if self.suppress_special_debug is not True.
-
-        Args:
-            fmt_str (str, optional): Format string.
-            \*args: Additional arguments are formated using the format string.
-
-        """
-        if not self.suppress_special_debug:
-            self.logger.debug(self.logger_prefix + self.as_str(fmt_str), *args)
-
-    def verbose_debug(self, fmt_str='', *args):
-        r"""Log a verbose debug message that is prepended with the class and name.
-
-        Args:
-            fmt_str (str, optional): Format string.
-            \*args: Additional arguments are formated using the format string.
-
-        """
-        self.logger.log(9, self.logger_prefix + self.as_str(fmt_str), *args)
-        
-    def critical(self, fmt_str='', *args):
-        r"""Log a critical message that is prepended with the class and name.
-
-        Args:
-            fmt_str (str, optional): Format string.
-            \*args: Additional arguments are formated using the format string.
-
-        """
-        self.logger.critical(self.logger_prefix + self.as_str(fmt_str), *args)
-
-    def warn(self, fmt_str='', *args):
-        r"""Log a warning message that is prepended with the class and name.
-
-        Args:
-            fmt_str (str, optional): Format string.
-            \*args: Additional arguments are formated using the format string.
-
-        """
-        self.logger.warn(self.logger_prefix + self.as_str(fmt_str), *args)
-
-    def error(self, fmt_str='', *args):
-        r"""Log an error message that is prepended with the class and name.
-
-        Args:
-            fmt_str (str, optional): Format string.
-            \*args: Additional arguments are formated using the format string.
-
-        """
-        fmt_str = self.as_str(fmt_str)
-        self.logger.error(self.logger_prefix + fmt_str, *args)
-        self.errors.append((self.logger_prefix + fmt_str) % args)
-
-    def exception(self, fmt_str='', *args):
-        r"""Log an exception message that is prepended with the class name.
-
-        Args:
-            fmt_str (str, optional): Format string.
-            \*args: Additional arguments are formated using the format string.
-
-        """
-        fmt_str = self.as_str(fmt_str)
-        exc_info = sys.exc_info()
-        if exc_info is not None and exc_info != (None, None, None):
-            self.logger.exception(self.logger_prefix + fmt_str, *args)
-        else:
-            self.logger.error(self.logger_prefix + fmt_str, *args)
-        self.errors.append((self.logger_prefix + fmt_str) % args)
-
-    def raise_error(self, e):
-        r"""Raise an exception, logging it first.
-
-        Args:
-            e (Exception): Exception to raise.
-
-        Raises:
-            The provided exception.
-
-        """
-        self.errors.append(repr(e))
-        raise e
-
 
 class CisThread(threading.Thread, CisClass):
     r"""Thread for CiS that tracks when the thread is started and joined.
@@ -870,7 +811,7 @@ class CisThread(threading.Thread, CisClass):
         self._cis_target = target
         self._cis_args = args
         self._cis_kwargs = kwargs
-        self.debug()
+        self.debug('')
         self.lock = threading.RLock()
         self.start_event = threading.Event()
         self.terminate_event = threading.Event()
@@ -923,7 +864,7 @@ class CisThread(threading.Thread, CisClass):
 
     def start(self, *args, **kwargs):
         r"""Start thread and print info."""
-        self.debug()
+        self.debug('')
         if not self.was_terminated:
             self.set_started_flag()
             self.before_start()
@@ -943,7 +884,7 @@ class CisThread(threading.Thread, CisClass):
 
     def before_start(self):
         r"""Actions to perform on the main thread before starting the thread."""
-        self.debug()
+        self.debug('')
 
     def cleanup(self):
         r"""Actions to perform to clean up the thread after it has stopped."""
@@ -978,7 +919,7 @@ class CisThread(threading.Thread, CisClass):
                 after the timeout.
 
         """
-        self.debug()
+        self.debug('')
         with self.lock:
             if self.was_terminated:
                 self.debug('Driver already terminated.')
@@ -1032,7 +973,7 @@ class CisThreadLoop(CisThread):
 
     def before_loop(self):
         r"""Actions performed before the loop."""
-        self.debug()
+        self.debug('')
 
     def run_loop(self, *args, **kwargs):
         r"""Actions performed on each loop iteration."""
@@ -1043,7 +984,7 @@ class CisThreadLoop(CisThread):
 
     def after_loop(self):
         r"""Actions performed after the loop."""
-        self.debug()
+        self.debug('')
 
     def run(self, *args, **kwargs):
         r"""Continue running until terminate event set."""

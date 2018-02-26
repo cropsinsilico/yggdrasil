@@ -68,18 +68,6 @@ class TestFileComm(parent.TestCommBase):
         assert(self.recv_instance.is_closed)
         nt.assert_equal(self.recv_instance.remaining_bytes, 0)
 
-    def test_eof(self):
-        r"""Test send/recv of EOF message."""
-        self.do_send_recv(send_meth='send_eof', close_on_send_eof=True)
-
-    def test_eof_no_close(self):
-        r"""Disabled: Test send/recv of EOF message with no close."""
-        pass
-
-    def test_eof_nolimit(self):
-        r"""Test send/recv of EOF message through nolimit."""
-        self.do_send_recv(send_meth='send_nolimit_eof', close_on_send_eof=True)
-
     def test_recv_nomsg(self):
         r"""Test recieve when there is no waiting message."""
         flag, msg_recv = self.recv_instance.recv(timeout=self.sleeptime)

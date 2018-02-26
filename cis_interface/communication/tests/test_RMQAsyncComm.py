@@ -11,7 +11,7 @@ class TestRMQAsyncComm(parent.TestRMQComm):
     def __init__(self, *args, **kwargs):
         super(TestRMQAsyncComm, self).__init__(*args, **kwargs)
         self.comm = 'RMQAsyncComm'
-        self.attr_list += ['times_connected', 'thread']
+        self.attr_list += ['times_connected', 'rmq_thread', 'rmq_lock']
 
     def test_reconnect(self):
         r"""Test reconnect after unexpected disconnect."""

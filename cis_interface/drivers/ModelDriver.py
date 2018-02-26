@@ -61,7 +61,7 @@ class ModelDriver(Driver):
             self.args = [args]
         else:
             self.args = args
-        self.process = None
+        self.model_process = None
         self.queue = Queue()
         self.queue_thread = None
         self.is_server = is_server
@@ -103,29 +103,29 @@ class ModelDriver(Driver):
         env.update(os.environ)
         env['CIS_SUBPROCESS'] = "True"
         # print(pre_args + self.args)
-        self.process = tools.CisPopen(pre_args + self.args, env=env,
-                                      cwd=self.workingDir,
-                                      forward_signals=False)
+        self.model_process = tools.CisPopen(pre_args + self.args, env=env,
+                                            cwd=self.workingDir,
+                                            forward_signals=False)
         # Start thread to queue output
         self.queue_thread = tools.CisThreadLoop(target=self.enqueue_output_loop)
         self.queue_thread.start()
 
     def enqueue_output_loop(self):
         r"""Keep passing lines to queue."""
-        if self.process_complete:
+        if self.model_process_complete:
             self.debug("Process complete")
             self.queue_thread.set_break_flag()
             self.queue.put(self._exit_line)
             return
         try:
-            line = self.process.stdout.readline()
+            line = self.model_process.stdout.readline()
         except ValueError:
             line = ""
         if len(line) == 0:
             # self.info("%s: Empty line from stdout" % self.name)
             self.queue_thread.set_break_flag()
             self.queue.put(self._exit_line)
-            self.process.stdout.close()
+            self.model_process.stdout.close()
         else:
             self.queue.put(line.decode('utf-8'))
 
@@ -157,19 +157,19 @@ class ModelDriver(Driver):
     def after_loop(self):
         r"""Actions to perform after run_loop has finished. Mainly checking
         if there was an error and then handling it."""
-        self.debug()
+        self.debug('')
         self.queue_thread.set_break_flag()
-        self.process.stdout.close()
+        self.model_process.stdout.close()
         self.wait_process(self.timeout)
         self.kill_process()
 
     @property
-    def process_complete(self):
+    def model_process_complete(self):
         r"""bool: Has the process finished or not. Returns True if the process
         has not started."""
-        if self.process is None:
+        if self.model_process is None:
             return True
-        return (self.process.poll() is not None)
+        return (self.model_process.poll() is not None)
 
     def wait_process(self, timeout=None, key=None):
         r"""Wait for some amount of time for the process to finish.
@@ -187,10 +187,10 @@ class ModelDriver(Driver):
         if not self.was_started:
             return True
         T = self.start_timeout(timeout, key_level=1, key=key)
-        while ((not T.is_out) and (not self.process_complete)):  # pragma: debug
+        while ((not T.is_out) and (not self.model_process_complete)):  # pragma: debug
             self.sleep()
         self.stop_timeout(key_level=1, key=key)
-        return self.process_complete
+        return self.model_process_complete
 
     def kill_process(self):
         r"""Kill the process running the model, checking return code."""
@@ -204,11 +204,11 @@ class ModelDriver(Driver):
             return
         self.event_process_kill_called.set()
         with self.lock:
-            self.debug()
-            if not self.process_complete:  # pragma: debug
+            self.debug('')
+            if not self.model_process_complete:  # pragma: debug
                 self.error("Process is still running. Killing it.")
                 try:
-                    self.process.kill()
+                    self.model_process.kill()
                     self.debug("Waiting %f s for process to be killed",
                                self.timeout)
                     self.wait_process(self.timeout)
@@ -216,27 +216,30 @@ class ModelDriver(Driver):
                     # except BaseException:  # pragma: debug
                     # except OSError:  # pragma: debug
                     self.exception("Error killing model process")
-            assert(self.process_complete)
-            if self.process.returncode != 0:
+            assert(self.model_process_complete)
+            if self.model_process.returncode != 0:
                 self.error("return code of %s indicates model error.",
-                           str(self.process.returncode))
+                           str(self.model_process.returncode))
             self.event_process_kill_complete.set()
             self.queue_thread.wait(self.timeout)
             if self.queue_thread.is_alive():
                 self.queue_thread.set_break_flag()
-                # self.process.stdout.close()
+                try:
+                    self.model_process.stdout.close()
+                except BaseException:
+                    self.exception("Closing during action")
                 self.error("Queue thread was not terminated.")
                 self.queue_thread.wait(self.timeout)
             assert(not self.queue_thread.is_alive())
 
     def graceful_stop(self):
         r"""Gracefully stop the driver."""
-        self.debug()
+        self.debug('')
         self.wait_process(self.timeout)
         super(ModelDriver, self).graceful_stop()
 
     def do_terminate(self):
         r"""Terminate the process running the model."""
-        self.debug()
+        self.debug('')
         self.kill_process()
         super(ModelDriver, self).do_terminate()

@@ -233,7 +233,7 @@ class GCCModelDriver(ModelDriver):
 
     def __init__(self, name, args, cc=None, **kwargs):
         super(GCCModelDriver, self).__init__(name, args, **kwargs)
-        self.debug()
+        self.debug('')
         self.cc = cc
         # Prepare arguments to compile the file
         self.parse_arguments(args)

@@ -82,7 +82,8 @@ class AsciiFileComm(FileComm):
             bool: Success or failure of writing to the file.
 
         """
-        self.file.writeline_full(msg)
+        if msg != self.eof_msg:
+            self.file.writeline_full(msg)
         self.file.fd.flush()
         return True
 

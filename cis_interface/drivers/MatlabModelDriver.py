@@ -298,18 +298,18 @@ class MatlabModelDriver(ModelDriver):  # pragma: matlab
                 self.debug('Matlab engine not set. Stopping')
                 return
             self.debug('Starting MatlabProcess')
-            self.process = MatlabProcess(target=getattr(self.mlengine, name),
-                                         args=self.args[1:])
-            self.process.start()
+            self.model_process = MatlabProcess(target=getattr(self.mlengine, name),
+                                               args=self.args[1:])
+            self.model_process.start()
             self.debug('MatlabProcess running model.')
 
     def run_loop(self):
         r"""Loop to check if model is still running and forward output."""
-        self.process.print_output()
-        if self.process.is_done():
+        self.model_process.print_output()
+        if self.model_process.is_done():
             self.set_break_flag()
-            self.process.future.result()
-            self.process.print_output()
+            self.model_process.future.result()
+            self.model_process.print_output()
         self.sleep()
 
     def after_loop(self):

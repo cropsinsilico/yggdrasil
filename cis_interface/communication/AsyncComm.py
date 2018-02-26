@@ -1,9 +1,5 @@
-import sys
 import uuid
-import logging
 import threading
-from subprocess import Popen, PIPE
-from cis_interface import platform, tools
 from cis_interface.communication import CommBase
 
 
@@ -66,12 +62,13 @@ class AsyncComm(CommBase.CommBase):
             self.backlog_open = True
             self.backlog_thread.start()
 
-    def _close_direct(self):
+    def _close_direct(self, linger=False):
         r"""Close the comm directly."""
         pass
 
     def _close_backlog(self, wait=False):
         r"""Close the backlog thread."""
+        self.debug('')
         self.backlog_open = False
         self.backlog_thread.set_break_flag()
         self.backlog_send_ready.set()
@@ -87,6 +84,7 @@ class AsyncComm(CommBase.CommBase):
                 comm. Defaults to False.
 
         """
+        self.debug('')
         self._close_backlog(wait=True)
         self._close_direct()
         super(AsyncComm, self)._close(linger=linger)
@@ -107,22 +105,42 @@ class AsyncComm(CommBase.CommBase):
         return self.backlog_open
 
     @property
+    def n_msg_direct_recv(self):
+        r"""int: Number of messages currently being routed in recv."""
+        return 0
+
+    @property
+    def n_msg_direct_send(self):
+        r"""int: Number of messages currently being routed in send."""
+        return 0
+
+    @property
     def n_msg_direct(self):
         r"""int: Number of messages currently being routed."""
+        if self.direction == 'send':
+            return self.n_msg_direct_send
+        else:
+            return self.n_msg_direct_recv
         return 0
 
     @property
     def n_msg_recv(self):
         r"""int: Number of messages in the receive backlog."""
-        if self.is_open_backlog:
-            return len(self.backlog_recv)
+        if self.direction == 'recv':
+            if self.is_open_backlog:
+                return len(self.backlog_recv)
+        else:
+            return self.n_msg_direct_recv
         return 0
 
     @property
     def n_msg_send(self):
         r"""int: Number of messages in the send backlog."""
-        if self.is_open_backlog:
-            return len(self.backlog_send)
+        if self.direction == 'send':
+            if self.is_open_backlog:
+                return len(self.backlog_send)
+        else:
+            return self.n_msg_direct_send
         return 0
 
     @property
@@ -159,16 +177,18 @@ class AsyncComm(CommBase.CommBase):
             self._backlog_recv.append(msg)
             self.backlog_recv_ready.set()
 
-    def add_backlog_send(self, msg):
+    def add_backlog_send(self, msg, **kwargs):
         r"""Add a message to the backlog of messages to be sent.
 
         Args:
             msg (str): Message that should be backlogged for sending.
+            **kwargs: Additional keyword arguments are added along with
+                the message.
 
         """
         with self.backlog_thread.lock:
             self.debug("Added %d bytes to send backlog.", len(msg))
-            self._backlog_send.append(msg)
+            self._backlog_send.append((msg, kwargs))
             self.backlog_send_ready.set()
 
     def pop_backlog_recv(self):
@@ -189,15 +209,16 @@ class AsyncComm(CommBase.CommBase):
         r"""Pop a message from the front of the send backlog.
 
         Returns:
-            str: First backlogged send message.
+            tuple (str, dict): First backlogged send message and
+                keyword arguments.
 
         """
         with self.backlog_thread.lock:
-            msg = self._backlog_send.pop(0)
+            msg, kwargs = self._backlog_send.pop(0)
             self.debug("Popped %d bytes from send backlog.", len(msg))
             if len(self._backlog_send) == 0:
                 self.backlog_send_ready.clear()
-        return msg
+        return msg, kwargs
 
     def run_backlog_send(self):
         r"""Continue trying to send buffered messages."""
@@ -214,12 +235,17 @@ class AsyncComm(CommBase.CommBase):
     def run_backlog_recv(self):
         r"""Continue buffering received messages."""
         if self.backlog_thread.main_terminated:
+            self.debug("Main thread terminated")
+            self._close_backlog()
             self.close()
         if not self.is_open_backlog:
+            self.debug("Backlog closed")
             self._close_backlog()
             return
         if not self.recv_backlog():
             # Stop the thread, but don't close the backlog
+            self.debug("Stopping backlog recv thread")
+            # self._close_backlog()
             self.backlog_thread.set_break_flag()
             return
         self.sleep()
@@ -227,9 +253,11 @@ class AsyncComm(CommBase.CommBase):
     def send_backlog(self):
         r"""Send a message from the send backlog to the queue."""
         if len(self.backlog_send) == 0:
+            self.confirm_send()
             return True
         try:
-            flag = self._send_direct(self.backlog_send[0])
+            imsg, ikwargs = self.backlog_send[0]
+            flag = self._send_direct(imsg, **ikwargs)
             if flag:
                 self.pop_backlog_send()
         except AsyncTryAgain:  # pragma: debug
@@ -237,6 +265,7 @@ class AsyncComm(CommBase.CommBase):
         except BaseException:  # pragma: debug
             self.exception('Error sending backlogged message')
             flag = False
+        self.confirm_send()
         return flag
 
     def recv_backlog(self):
@@ -250,7 +279,16 @@ class AsyncComm(CommBase.CommBase):
         except BaseException:  # pragma: debug
             self.exception('Error receiving into backlog.')
             flag = False
+        self.confirm_recv()
         return flag
+
+    def confirm_send(self):
+        r"""Confirm that sent message was received."""
+        pass
+
+    def confirm_recv(self):
+        r"""Confirm that message was received."""
+        pass
 
     def _send_direct(self, payload):
         r"""Send a message to the comm directly.
@@ -278,7 +316,7 @@ class AsyncComm(CommBase.CommBase):
         """
         return (False, self.empty_msg)
 
-    def _send(self, payload, no_backlog=False):
+    def _send(self, payload, no_backlog=False, **kwargs):
         r"""Send a message to the backlog.
 
         Args:
@@ -295,10 +333,16 @@ class AsyncComm(CommBase.CommBase):
         """
         if not self.is_open_direct:  # pragma: debug
             return False
+        if self.direction == 'recv':
+            self.debug("Receive comm sending %d bytes direct.", len(payload))
+            return self._send_direct(payload, **kwargs)
         if no_backlog or not self.backlog_send_ready.is_set():
-            if self._send_direct(payload):
-                return True
-        self.add_backlog_send(payload)
+            try:
+                if self._send_direct(payload, **kwargs):
+                    return True
+            except AsyncTryAgain:
+                pass
+        self.add_backlog_send(payload, **kwargs)
         self.debug('%d bytes backlogged', len(payload))
         return True
 
@@ -319,10 +363,13 @@ class AsyncComm(CommBase.CommBase):
         """
         if timeout is None:
             timeout = self.recv_timeout
+        if self.direction == 'send':
+            self.debug("Send comm receiving direct.")
+            no_backlog = True
         # If no backlog, receive from queue
         if no_backlog:
             T = self.start_timeout(timeout)
-            while ((not T.is_out) and (self.n_msg_direct == 0) and
+            while ((not T.is_out) and (self.n_msg_direct_recv == 0) and
                    self.is_open_direct):
                 self.sleep()
             self.stop_timeout()

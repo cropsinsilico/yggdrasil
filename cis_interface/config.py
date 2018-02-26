@@ -78,11 +78,12 @@ def cfg_logging(cfg=None):
     """
     if cfg is None:
         cfg = cis_cfg
+    _LOG_FORMAT = "%(levelname)s:%(module)s.%(funcName)s[%(lineno)d]:%(message)s"
+    logging.basicConfig(level=logging.INFO, format=_LOG_FORMAT)
     logLevelCIS = eval('logging.%s' % cfg.get('debug', 'psi', 'NOTSET'))
     logLevelRMQ = eval('logging.%s' % cfg.get('debug', 'rmq', 'INFO'))
     logging.getLogger("cis_interface").setLevel(level=logLevelCIS)
     logging.getLogger("pika").setLevel(level=logLevelRMQ)
-    logging.basicConfig(level=logging.INFO)
         
 
 def cfg_environment(env=None, cfg=None):

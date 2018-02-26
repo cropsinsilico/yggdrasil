@@ -48,7 +48,7 @@ class Driver(tools.CisThreadLoop):
                             "Check multiple inheritance")
         super(Driver, self).__init__(name, **kwargs)
         self._thread_initialized = True
-        self.debug()
+        self.debug('')
         # if cis_cfg.get('debug', 'psi') == 'DEBUG':
         #     self.sleeptime = 1.0
         # Set defaults
@@ -78,14 +78,14 @@ class Driver(tools.CisThreadLoop):
         if self.was_terminated:
             self.debug('Driver already terminated.')
             return
-        self.debug()
+        self.debug('')
         self._term_meth = 'stop'
         self.graceful_stop()
         self.terminate()
 
     def graceful_stop(self):
         r"""Gracefully stop the driver."""
-        self.debug()
+        self.debug('')
 
     def do_terminate(self):
         r"""Actions that should stop the driver."""
@@ -97,10 +97,10 @@ class Driver(tools.CisThreadLoop):
             self.debug('Driver already terminated.')
             return
         self.do_terminate()
-        self.debug()
+        self.debug('')
         super(Driver, self).terminate()
         self.debug('Returning')
 
     def on_model_exit(self):
         r"""Processes that should be run when an associated model exits."""
-        self.debug()
+        self.debug('')

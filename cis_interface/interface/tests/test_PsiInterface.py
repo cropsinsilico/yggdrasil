@@ -398,7 +398,7 @@ class TestPsiAsciiFileInput_local(TestPsiAsciiFileInput):
         
 
 class TestPsiAsciiFileOutput(TestBase):
-    r"""Test output from an unformatted text file."""
+    r"""Test output to an unformatted text file."""
     def __init__(self, *args, **kwargs):
         super(TestPsiAsciiFileOutput, self).__init__(*args, **kwargs)
         self._cls = 'PsiAsciiFileOutput'

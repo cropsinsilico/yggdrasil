@@ -399,7 +399,7 @@ class CisRunner(CisClass):
     def loadDrivers(self):
         r"""Load all of the necessary drivers, doing the IO drivers first
         and adding IO driver environmental variables back tot he models."""
-        self.debug()
+        self.debug('')
         driver = dict(name='name')
         try:
             # Create input drivers
@@ -439,7 +439,7 @@ class CisRunner(CisClass):
     def waitModels(self):
         r"""Wait for all model drivers to finish. When a model finishes,
         join the thread and perform exits for associated IO drivers."""
-        self.debug()
+        self.debug('')
         running = [d for d in self.modeldrivers.values()]
         dead = []
         while (len(running) > 0) and (not self.error_flag):
@@ -508,7 +508,7 @@ class CisRunner(CisClass):
     
     def terminate(self):
         r"""Immediately stop all drivers, beginning with IO drivers."""
-        self.debug()
+        self.debug('')
         # self.closeChannels(force_stop=True)
         # self.debug('Stop models')
         for driver in self.all_drivers:
@@ -523,14 +523,14 @@ class CisRunner(CisClass):
 
     def cleanup(self):
         r"""Perform cleanup operations for all drivers."""
-        self.debug()
+        self.debug('')
         for driver in self.all_drivers:
             if 'instance' in driver:
                 driver['instance'].cleanup()
 
     def printStatus(self):
         r"""Print the status of all drivers, starting with the IO drivers."""
-        self.debug()
+        self.debug('')
         for driver in self.all_drivers:
             if 'instance' in driver:
                 driver['instance'].printStatus()
@@ -545,7 +545,7 @@ class CisRunner(CisClass):
                 will exit as quickly as possible. Defaults to False.
 
         """
-        self.debug()
+        self.debug('')
         drivers = [i for i in self.io_drivers()]
         for drv in drivers:
             if 'instance' in drv:

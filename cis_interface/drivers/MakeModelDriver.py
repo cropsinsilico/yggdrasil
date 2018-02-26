@@ -51,7 +51,7 @@ class MakeModelDriver(ModelDriver):
     def __init__(self, name, args, make_command=None, makedir=None,
                  makefile=None, **kwargs):
         super(MakeModelDriver, self).__init__(name, args, **kwargs)
-        self.debug()
+        self.debug('')
         self.compiled = False
         if make_command is None:
             if platform._is_win:

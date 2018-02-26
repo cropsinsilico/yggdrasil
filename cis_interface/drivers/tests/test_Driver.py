@@ -228,7 +228,7 @@ class TestDriverNoStart(TestParam):
         self.instance.debug(1)
         self.instance.verbose_debug(1)
         self.instance.critical(1)
-        self.instance.warn(1)
+        self.instance.warning(1)
         self.instance.error(1)
         self.instance.exception(1)
         try:

@@ -253,6 +253,7 @@ class TestCommBase(CisTest, IOInfo):
             send_instance = self.send_instance
             recv_instance = self.recv_instance
         recv_instance.close_on_eof_recv = close_on_recv_eof
+        send_instance.close_on_eof_send = close_on_send_eof
         fsend_meth = getattr(send_instance, send_meth)
         frecv_meth = getattr(recv_instance, recv_meth)
         if self.comm == 'CommBase':
@@ -265,11 +266,8 @@ class TestCommBase(CisTest, IOInfo):
             nt.assert_raises(NotImplementedError, self.recv_instance._recv)
         else:
             flag = fsend_meth(*send_args, **send_kwargs)
-            if is_eof and close_on_send_eof:
-                assert(not flag)
-                assert(send_instance.is_closed)
-            else:
-                assert(flag)
+            assert(flag)
+            # Wait for messages to be received
             if not is_eof:
                 T = recv_instance.start_timeout(self.timeout)
                 while ((not T.is_out) and (not recv_instance.is_closed) and
@@ -286,6 +284,14 @@ class TestCommBase(CisTest, IOInfo):
             else:
                 assert(flag)
             nt.assert_equal(msg_recv, msg_send)
+            # Wait for send to close
+            if is_eof and close_on_send_eof:
+                T = send_instance.start_timeout(self.timeout)
+                while (not T.is_out) and (not send_instance.is_closed):
+                    send_instance.sleep()
+                send_instance.stop_timeout()
+                assert(send_instance.is_closed)
+        # Make sure no messages outgoing
         T = send_instance.start_timeout(self.timeout)
         while (not T.is_out) and (send_instance.n_msg_send != 0):  # pragma: debug
             send_instance.sleep()

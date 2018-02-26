@@ -20,7 +20,7 @@ class RPCDriver(Driver):
     """
     def __init__(self, name, args=None, **kwargs):
         super(RPCDriver, self).__init__(name, **kwargs)
-        self.debug()
+        self.debug('')
         self.icomm = CommDriver(name, direction='recv', **kwargs)
         self.ocomm = CommDriver(name, direction='send', **kwargs)
         out = {}
@@ -54,7 +54,7 @@ class RPCDriver(Driver):
 
     def start(self):
         r"""Run the input/output comm drivers."""
-        self.debug()
+        self.debug('')
         self.icomm.start()
         self.ocomm.start()
         super(RPCDriver, self).run()
@@ -62,34 +62,34 @@ class RPCDriver(Driver):
 
     def graceful_stop(self):
         r"""Allow the IPC comms to terminate gracefully."""
-        self.debug()
+        self.debug('')
         self.icomm.graceful_stop()
         self.ocomm.graceful_stop()
         super(RPCDriver, self).graceful_stop()
 
     def close_comms(self):
         r"""Close the IPC comms."""
-        self.debug()
+        self.debug('')
         self.icomm.close_comm()
         self.ocomm.close_comm()
 
     def do_terminate(self):
         r"""Terminate input/output comm drivers."""
-        self.debug()
+        self.debug('')
         self.icomm.terminate()
         self.ocomm.terminate()
         super(RPCDriver, self).do_terminate()
 
     def on_model_exit(self):
         r"""Actions to perform when the associated model driver is finished."""
-        self.debug()
+        self.debug('')
         self.ocomm.on_model_exit()
         self.icomm.on_model_exit()
         super(RPCDriver, self).on_model_exit()
         
     def cleanup(self):
         r"""Perform cleanup for IPC drivers."""
-        self.debug()
+        self.debug('')
         self.icomm.cleanup()
         self.ocomm.cleanup()
         super(RPCDriver, self).cleanup()

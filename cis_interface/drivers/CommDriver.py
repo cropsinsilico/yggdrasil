@@ -24,7 +24,7 @@ class CommDriver(Driver):
     """
     def __init__(self, name, **kwargs):
         super(CommDriver, self).__init__(name, **kwargs)
-        self.debug()
+        self.debug('')
         self.state = 'Started'
         self.numSent = 0
         self.numReceived = 0
@@ -68,14 +68,14 @@ class CommDriver(Driver):
 
     def open_comm(self):
         r"""Open the queue."""
-        self.debug()
+        self.debug('')
         with self.lock:
             self.comm.open()
         self.debug('Returning')
         
     def close_comm(self):
         r"""Close the queue."""
-        self.debug()
+        self.debug('')
         if self.comm is not None:
             with self.lock:
                 self.comm.close()
@@ -104,7 +104,7 @@ class CommDriver(Driver):
                 class's graceful_stop method.
 
         """
-        self.debug()
+        self.debug('')
         T = self.start_timeout(timeout)
         try:
             while (self.n_msg > 0) and (not T.is_out):
@@ -119,13 +119,13 @@ class CommDriver(Driver):
 
     def do_terminate(self):
         r"""Stop the CommDriver by closing the comm."""
-        self.debug()
+        self.debug('')
         self.close_comm()
         super(CommDriver, self).do_terminate()
 
     def cleanup(self):
         r"""Ensure that the queues are removed."""
-        self.debug()
+        self.debug('')
         self.close_comm()
         super(CommDriver, self).cleanup()
 

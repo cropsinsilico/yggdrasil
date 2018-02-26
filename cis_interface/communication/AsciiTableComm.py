@@ -83,10 +83,11 @@ class AsciiTableComm(AsciiFileComm):
             bool: Success or failure of writing to the file.
 
         """
-        if self.as_array:
-            self.file.write_bytes(msg, order='F', append=True)
-        else:
-            self.file.writeline_full(msg, validate=True)
+        if msg != self.eof_msg:
+            if self.as_array:
+                self.file.write_bytes(msg, order='F', append=True)
+            else:
+                self.file.writeline_full(msg, validate=True)
         self.file.fd.flush()
         return True
 

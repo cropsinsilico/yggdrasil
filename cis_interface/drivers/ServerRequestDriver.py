@@ -97,7 +97,7 @@ class ServerRequestDriver(ConnectionDriver):
 
     def terminate(self, *args, **kwargs):
         r"""Stop response drivers."""
-        self.debug()
+        self.debug('')
         self.close_response_drivers()
         super(ServerRequestDriver, self).terminate(*args, **kwargs)
 
@@ -115,8 +115,8 @@ class ServerRequestDriver(ConnectionDriver):
 
     def on_client_exit(self):
         r"""Close input comm to stop the loop."""
-        self.debug()
-        self.stop()
+        self.debug('')
+        # self.stop()
     
     def on_eof(self):
         r"""On EOF, decrement number of clients. Only send EOF if the number
@@ -125,6 +125,7 @@ class ServerRequestDriver(ConnectionDriver):
             self.nclients -= 1
             self.debug("Client signed off. nclients = %d", self.nclients)
             if self.nclients == 0:
+                self.set_close_state('clients signed off')
                 self.debug("All clients have signed off.")
                 return super(ServerRequestDriver, self).on_eof()
         return ''
