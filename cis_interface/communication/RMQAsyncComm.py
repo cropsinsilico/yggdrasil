@@ -58,14 +58,9 @@ class RMQAsyncComm(RMQComm):
         self.connection.ioloop.start()
         self.debug("returning")
 
-    def bind(self):
-        r"""Declare queue to get random new queue."""
-        # Start ioloop in a new thread
+    def start_run_thread(self):
+        r"""Start the run thread and wait for it to finish."""
         with self.rmq_lock:
-            # Don't bind if already closing
-            if self.is_open or self._close_called:  # pragma: debug
-                return
-            self._bound = True
             self._opening = True
             self.rmq_thread.start()
         # Wait for connection to be established
@@ -83,6 +78,16 @@ class RMQAsyncComm(RMQComm):
             self.force_close()
             raise RuntimeError("Connection never finished opening " +
                                "(%f/%f timeout)." % (T.elapsed, T.max_time))
+
+    def bind(self):
+        r"""Declare queue to get random new queue."""
+        # Start ioloop in a new thread
+        with self.rmq_lock:
+            # Don't bind if already closing
+            if self.is_open or self._close_called:  # pragma: debug
+                return
+            self._bound = True
+        self.start_run_thread()
         # Register queue
         if not self.queue:  # pragma: debug
             self.error("Queue was not initialized.")
@@ -294,9 +299,10 @@ class RMQAsyncComm(RMQComm):
         # This is the old connection IOLoop instance, stop its ioloop
         with self.rmq_lock:
             self.connection.ioloop.stop()
+            self.rmq_thread.join()
             if not self._closing:
                 self.rmq_thread = self.new_run_thread()
-                self.rmq_thread.start()
+                self.start_run_thread()
                 # # Create a new connection
                 # self.connect()
                 # # There is now a new connection, needs a new ioloop to run

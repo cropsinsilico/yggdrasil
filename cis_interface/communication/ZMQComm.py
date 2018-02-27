@@ -771,7 +771,7 @@ class ZMQComm(AsyncComm.AsyncComm):
 
         """
         return ZMQProxy(srv_address, context=self.context,
-                        retry_timeout=2 * self.sleeptime)
+                        retry_timeout=4 * self.sleeptime)
 
     @property
     def is_open_direct(self):
