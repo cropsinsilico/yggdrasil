@@ -30,6 +30,7 @@ class RMQAsyncComm(RMQComm):
         self.rmq_thread = self.new_run_thread(name=name)
         self._opening = False
         self._closing = False
+        self._reconnecting = False
         self._close_called = False
         self._buffered_messages = []
         self._qres = 0
@@ -164,10 +165,17 @@ class RMQAsyncComm(RMQComm):
             with self._qres_lock:
                 if self._qres_event.is_set():
                     self._qres_event.clear()
-                    self.channel.queue_declare(self._set_qres,
-                                               queue=self.queue,
-                                               # , auto_delete=True,
-                                               passive=True)
+                    try:
+                        self.channel.queue_declare(self._set_qres,
+                                                   queue=self.queue,
+                                                   # , auto_delete=True,
+                                                   passive=True)
+                    except pika.exceptions.ChannelClosed:
+                        if not self._reconnecting:
+                            self._close_direct()
+                        else:
+                            self._qres = None
+                            self._qres_event.set()
             self._qres_event.wait()
             res = self._qres
         return res
@@ -291,22 +299,22 @@ class RMQAsyncComm(RMQComm):
             else:
                 self.warning('Connection closed, reopening in %f seconds: (%s) %s',
                              self.sleeptime, reply_code, reply_text)
+                self._reconnecting = True
                 connection.add_timeout(self.sleeptime, self.reconnect)
 
     def reconnect(self):
         r"""Try to re-establish a connection and resume a new IO loop."""
         self.debug('')
         # This is the old connection IOLoop instance, stop its ioloop
-        with self.rmq_lock:
-            self.connection.ioloop.stop()
-            self.rmq_thread.join()
-            if not self._closing:
-                self.rmq_thread = self.new_run_thread()
-                self.start_run_thread()
-                # # Create a new connection
-                # self.connect()
-                # # There is now a new connection, needs a new ioloop to run
-                # self.connection.ioloop.start()
+        # with self.rmq_lock:
+        self.connection.ioloop.stop()
+        if not self._closing:
+            # self.run_thread()
+            # Create a new connection
+            self.connect()
+            # There is now a new connection, needs a new ioloop to run
+            self._reconnecting = False
+            self.connection.ioloop.start()
 
     # CHANNEL
     @property
