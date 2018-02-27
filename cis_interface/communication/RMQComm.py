@@ -1,4 +1,4 @@
-from cis_interface.communication import CommBase
+from cis_interface.communication import CommBase, AsyncComm
 from cis_interface.config import cis_cfg
 import logging
 try:
@@ -75,7 +75,7 @@ class RMQServer(CommBase.CommServer):
         super(RMQServer, self).terminate(*args, **kwargs)
 
 
-class RMQComm(CommBase.CommBase):
+class RMQComm(AsyncComm.AsyncComm):
     r"""Class for handling basic RabbitMQ communications.
 
     Args:
@@ -253,16 +253,16 @@ class RMQComm(CommBase.CommBase):
             # raise KeyError("Connection not registered.")
         del _registered_connections[self.address]
     
-    def open(self):
+    def _open_direct(self):
         r"""Open connection and bind/connect to queue as necessary."""
-        super(RMQComm, self).open()
+        super(RMQComm, self)._open_direct()
         if not self.is_open:
             if not self._bound:
                 self.bind()
             self._is_open = True
             self._bound = False
 
-    def _close(self, linger=False):
+    def _close_direct(self, linger=False):
         r"""Close the connection.
 
         Args:
@@ -272,7 +272,7 @@ class RMQComm(CommBase.CommBase):
         """
         self._is_open = False
         self._bound = False
-        if not linger:
+        if self.direction == 'recv':
             self.close_queue()
         self.close_channel()
         self.close_connection()
@@ -280,12 +280,13 @@ class RMQComm(CommBase.CommBase):
             self.unregister_connection()
         self.connection = None
         self.channel = None
-        super(RMQComm, self)._close(linger=linger)
+        super(RMQComm, self)._close_direct(linger=linger)
 
     def close_queue(self):
         r"""Close the queue if the channel exists."""
         if self.channel and (not self.is_client):
             try:
+                self.n_msg_direct_recv
                 self.channel.queue_unbind(queue=self.queue,
                                           exchange=self.exchange)
                 self.channel.queue_delete(queue=self.queue)
@@ -310,6 +311,8 @@ class RMQComm(CommBase.CommBase):
         if self.connection:
             try:
                 self.connection.close()
+            except pika.exceptions.ChannelClosed:  # pragma: debug
+                pass
             except AttributeError:  # pragma: debug
                 pass
         self.connection = None
@@ -324,57 +327,50 @@ class RMQComm(CommBase.CommBase):
         return RMQServer(srv_address)
 
     @property
-    def is_open(self):
+    def is_open_direct(self):
         r"""bool: True if the connection and channel are open."""
-        with self._closing_thread.lock:
-            if self.channel is None or self.connection is None:
+        # with self._closing_thread.lock:
+        if self.channel is None or self.connection is None:
+            return False
+        if self.connection.is_open:
+            if self.connection.is_closing:  # pragma: debug
                 return False
-            if self.connection.is_open:
-                if self.connection.is_closing:  # pragma: debug
-                    return False
-            else:  # pragma: debug
+        else:  # pragma: debug
+            return False
+        if self.channel.is_open:
+            if self.channel.is_closing:  # pragma: debug
                 return False
-            if self.channel.is_open:
-                if self.channel.is_closing:  # pragma: debug
-                    return False
-            else:  # pragma: debug
-                return False
-            return self._is_open
+        else:  # pragma: debug
+            return False
+        return self._is_open
+
+    def get_queue_result(self):
+        r"""Get the fram from passive queue declare."""
+        res = None
+        if self.is_open_direct:
+            try:
+                res = self.channel.queue_declare(queue=self.queue,
+                                                 auto_delete=True,
+                                                 passive=True)
+            except pika.exceptions.ChannelClosed:
+                self._close_direct()
+        return res
         
     @property
-    def messages_confirmed_recv(self):
-        r"""bool: True if all received messages have been confirmed."""
-        if self.is_open:
-            return (self.n_msg_recv == 0)
-        return super(RMQComm, self).messages_confirmed_recv
-
-    @property
-    def messages_confirmed_send(self):
-        r"""bool: True if all sent messages have been confirmed."""
-        if self.is_open:
-            return (self.n_msg_send == 0)
-        return super(RMQComm, self).messages_confirmed_send
-
-    @property
-    def n_msg_recv(self):
+    def n_msg_direct_recv(self):
         r"""int: Number of messages in the queue."""
         out = 0
-        with self._closing_thread.lock:
-            if self.is_open:
-                try:
-                    res = self.channel.queue_declare(queue=self.queue,
-                                                     auto_delete=True,
-                                                     passive=True)
-                    out = res.method.message_count
-                except pika.exceptions.ChannelClosed:
-                    self.close()
-                    out = 0
+        # with self._closing_thread.lock:
+        if self.is_open_direct:
+            res = self.get_queue_result()
+            if res is not None:
+                out = res.method.message_count
         return out
 
     @property
-    def n_msg_send(self):
+    def n_msg_direct_send(self):
         r"""int: Number of messages in the queue."""
-        return self.n_msg_recv
+        return self.n_msg_direct_recv
 
     @property
     def get_work_comm_kwargs(self):
@@ -418,7 +414,7 @@ class RMQComm(CommBase.CommBase):
         # self.remove_work_comm(header['id'], dont_close=True)
         return out
     
-    def _send(self, msg, exchange=None, routing_key=None, **kwargs):
+    def _send_direct(self, msg, exchange=None, routing_key=None, **kwargs):
         r"""Send a message.
 
         Args:
@@ -438,46 +434,25 @@ class RMQComm(CommBase.CommBase):
             exchange = self.exchange
         if routing_key is None:
             routing_key = self.queue
-        try:
-            kwargs.setdefault('mandatory', True)
-            out = self.channel.basic_publish(exchange, routing_key, msg, **kwargs)
-        except pika.exceptions.AMQPError:  # pragma: debug
-            self.exception(".send(): Error")
-            raise
+        kwargs.setdefault('mandatory', True)
+        out = self.channel.basic_publish(exchange, routing_key, msg, **kwargs)
         return out
 
-    def _recv(self, timeout=None):
+    def _recv_direct(self):
         r"""Receive a message.
-
-        Args:
-            timeout (float, optional): Time in seconds to wait for a message.
-                Defaults to self.recv_timeout.
 
         Returns:
             tuple (bool, obj): Success or failure of receive and received
                 message.
 
         """
-        if timeout is None:
-            timeout = self.recv_timeout
-        Tout = self.start_timeout(timeout)
-        while self.n_msg_recv == 0 and self.is_open and (not Tout.is_out):
-            self.sleep()
-        self.stop_timeout()
-        if self.is_closed:
-            self.debug(".recv(): Connection closed.")
-            return (False, None)
-        try:
-            method_frame, props, msg = self.channel.basic_get(
-                queue=self.queue, no_ack=False)
-            if method_frame:
-                self.channel.basic_ack(method_frame.delivery_tag)
-            else:
-                self.debug(".recv(): No message")
-                msg = self.empty_msg
-        except pika.exceptions.AMQPError:  # pragma: debug
-            self.exception(".recv(): Error")
-            raise
+        method_frame, props, msg = self.channel.basic_get(
+            queue=self.queue, no_ack=False)
+        if method_frame:
+            self.channel.basic_ack(method_frame.delivery_tag)
+        else:
+            self.debug("No message")
+            msg = self.empty_msg
         return (True, msg)
 
     def purge(self):

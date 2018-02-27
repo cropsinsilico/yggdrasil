@@ -26,17 +26,30 @@ class RMQAsyncComm(RMQComm):
     """
     def __init__(self, name, **kwargs):
         self.times_connected = 0
-        self.rmq_thread = tools.CisThread(name=name, target=self.run_thread)
-        self.rmq_lock = self.rmq_thread.lock
+        self.rmq_thread_count = 0
+        self.rmq_thread = self.new_run_thread(name=name)
         self._opening = False
         self._closing = False
         self._close_called = False
         self._buffered_messages = []
-        self._nmsg = 0
-        self._nmsg_lock = threading.RLock()
-        self._nmsg_event = threading.Event()
-        self._nmsg_event.set()
+        self._qres = 0
+        self._qres_lock = threading.RLock()
+        self._qres_event = threading.Event()
+        self._qres_event.set()
         super(RMQAsyncComm, self).__init__(name, **kwargs)
+
+    @property
+    def rmq_lock(self):
+        r"""Lock associated with RMQ ioloop thread."""
+        return self.rmq_thread.lock
+
+    def new_run_thread(self, name=None):
+        r"""Get a new thread for running."""
+        if name is None:
+            name = self.name
+        self.rmq_thread_count += 1
+        return tools.CisThread(name=name + '.RMQThread%d' % self.rmq_thread_count,
+                               target=self.run_thread)
 
     def run_thread(self):
         r"""Connect to the connection and begin the IO loop."""
@@ -77,15 +90,15 @@ class RMQAsyncComm(RMQComm):
         if self.is_client:
             self.signon_to_server()
     
-    def open(self):
+    def _open_direct(self):
         r"""Open connection and bind/connect to queue as necessary."""
-        super(RMQAsyncComm, self).open()
+        super(RMQAsyncComm, self)._open_direct()
         T = self.start_timeout()
         while (not T.is_out) and self._opening:  # pragma: debug
             self.sleep()
         self.stop_timeout()
 
-    def _close(self, linger=False):
+    def _close_direct(self, linger=False):
         r"""Close the connection.
 
         Args:
@@ -132,35 +145,27 @@ class RMQAsyncComm(RMQComm):
             raise RuntimeError("Thread still running.")
         # Close workers
         with self.rmq_lock:
-            super(RMQAsyncComm, self)._close(linger=linger)
+            super(RMQAsyncComm, self)._close_direct(linger=linger)
 
-    def _set_nmsg(self, res):
+    def _set_qres(self, res):
         r"""Callback for getting message count."""
-        self._nmsg = res.method.message_count
-        self._nmsg_event.set()
+        self._qres = res
+        self._qres_event.set()
 
-    @property
-    def n_msg_recv(self):
-        r"""int: Number of messages in the queue."""
-        out = 0
-        with self.rmq_lock:
-            out = len(self._buffered_messages)
-        return out
-
-    @property
-    def n_msg_send(self):
-        r"""int: Number of messages in the queue."""
-        out = 0
-        if self.is_open:
-            with self._nmsg_lock:
-                if self._nmsg_event.set():
-                    self._nmsg_event.clear()
-                    self.channel.queue_declare(self._set_nmsg,
+    def get_queue_result(self):
+        r"""Get the fram from passive queue declare."""
+        res = None
+        if self.is_open_direct:
+            with self._qres_lock:
+                if self._qres_event.is_set():
+                    self._qres_event.clear()
+                    self.channel.queue_declare(self._set_qres,
                                                queue=self.queue,
-                                               auto_delete=True, passive=True)
-            self._nmsg_event.wait()
-            out = self._nmsg
-        return out
+                                               # , auto_delete=True,
+                                               passive=True)
+            self._qres_event.wait()
+            res = self._qres
+        return res
 
     # Access work comms with lock
     def get_work_comm(self, *args, **kwargs):
@@ -183,7 +188,7 @@ class RMQAsyncComm(RMQComm):
         with self.rmq_lock:
             return super(RMQAsyncComm, self).remove_work_comm(*args, **kwargs)
 
-    def _send(self, msg, exchange=None, routing_key=None, **kwargs):
+    def _send_direct(self, msg, exchange=None, routing_key=None, **kwargs):
         r"""Send a message.
 
         Args:
@@ -202,52 +207,43 @@ class RMQAsyncComm(RMQComm):
         with self.rmq_lock:
             if self.is_closed:  # pragma: debug
                 return False
-            out = super(RMQAsyncComm, self)._send(msg, exchange=exchange,
-                                                  routing_key=routing_key,
-                                                  **kwargs)
+            out = super(RMQAsyncComm, self)._send_direct(msg, exchange=exchange,
+                                                         routing_key=routing_key,
+                                                         **kwargs)
         # Basic publish returns None for asynchronous connection
         if out is None:
             out = True
         return out
 
-    def _recv(self, timeout=None):
+    def _recv_direct(self):
         r"""Receive a message.
-
-        Args:
-            timeout (float, optional): Time in seconds to wait for a message.
-                Defaults to self.recv_timeout.
 
         Returns:
             tuple (bool, obj): Success or failure of receive and received
                 message.
 
         """
-        if timeout is None:
-            timeout = self.recv_timeout
-        Tout = self.start_timeout(timeout)
-        while ((self.n_msg_recv == 0) and self.is_open and
-               (not Tout.is_out)):  # pragma: debug
-            self.sleep()
-        self.stop_timeout()
-        if self.n_msg_recv != 0:
-            with self.rmq_lock:
-                out = (True, self._buffered_messages.pop(0))
-            return out
-        if self.is_closed:  # pragma: debug
-            self.debug("Connection closed.")
-            return (False, None)
-        if self.n_msg_recv == 0:
-            # self.debug(".recv(): No buffered messages.")
-            out = (True, self.empty_msg)
-        else:
-            with self.rmq_lock:
-                out = (True, self._buffered_messages.pop(0))
-        return out
+        return (True, self.empty_msg)
+        # if self.n_msg_recv != 0:
+        #     with self.rmq_lock:
+        #         out = (True, self._buffered_messages.pop(0))
+        #     return out
+        # if self.is_closed:  # pragma: debug
+        #     self.debug("Connection closed.")
+        #     return (False, None)
+        # if self.n_msg_recv == 0:
+        #     # self.debug(".recv(): No buffered messages.")
+        #     out = (True, self.empty_msg)
+        # else:
+        #     with self.rmq_lock:
+        #         out = (True, self._buffered_messages.pop(0))
+        # return out
 
     def on_message(self, ch, method, props, body):
         r"""Buffer received messages."""
         if self.direction == 'send':  # pragma: debug
             raise Exception("Send comm received a message.")
+        self.add_backlog_recv(backwards.unicode2bytes(body))
         with self.rmq_lock:
             self._buffered_messages.append(backwards.unicode2bytes(body))
         ch.basic_ack(delivery_tag=method.delivery_tag)
@@ -299,10 +295,12 @@ class RMQAsyncComm(RMQComm):
         with self.rmq_lock:
             self.connection.ioloop.stop()
             if not self._closing:
-                # Create a new connection
-                self.connect()
-                # There is now a new connection, needs a new ioloop to run
-                self.connection.ioloop.start()
+                self.rmq_thread = self.new_run_thread()
+                self.rmq_thread.start()
+                # # Create a new connection
+                # self.connect()
+                # # There is now a new connection, needs a new ioloop to run
+                # self.connection.ioloop.start()
 
     # CHANNEL
     @property
@@ -376,8 +374,8 @@ class RMQAsyncComm(RMQComm):
         self.channel.queue_declare(self.on_queue_declareok,
                                    queue=self.queue,
                                    exclusive=exclusive,
-                                   passive=passive,
-                                   auto_delete=True)
+                                   # , auto_delete=True,
+                                   passive=passive)
 
     def on_queue_declareok(self, method_frame):
         r"""Actions to perform once the queue is succesfully declared. Bind

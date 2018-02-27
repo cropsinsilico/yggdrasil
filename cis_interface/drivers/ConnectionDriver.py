@@ -323,7 +323,7 @@ class ConnectionDriver(Driver):
         self.debug('')
         # self.info('%s: after loop', self.name)
         # Close input comm in case loop did not
-        # self.drain_input(timeout=False)
+        self.drain_input(timeout=False)
         with self.lock:
             if self._skip_after_loop:
                 self.debug("After loop skipped.")

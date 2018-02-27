@@ -124,34 +124,62 @@ class AsyncComm(CommBase.CommBase):
         return 0
 
     @property
+    def n_msg_backlog_recv(self):
+        r"""int: Number of messages in the receive backlog."""
+        if self.is_open_backlog:
+            return len(self.backlog_recv)
+        return 0
+
+    @property
+    def n_msg_backlog_send(self):
+        r"""int: Number of messages in the send backlog."""
+        if self.is_open_backlog:
+            return len(self.backlog_send)
+        return 0
+
+    @property
+    def n_msg_backlog(self):
+        r"""int: Number of messages in the backlog."""
+        if self.direction == 'recv':
+            return self.n_msg_backlog_recv
+        else:
+            return self.n_msg_backlog_send
+
+    @property
     def n_msg_recv(self):
         r"""int: Number of messages in the receive backlog."""
         if self.direction == 'recv':
-            if self.is_open_backlog:
-                return len(self.backlog_recv)
+            return self.n_msg_backlog_recv
         else:
             return self.n_msg_direct_recv
-        return 0
 
     @property
     def n_msg_send(self):
         r"""int: Number of messages in the send backlog."""
         if self.direction == 'send':
-            if self.is_open_backlog:
-                return len(self.backlog_send)
+            return self.n_msg_backlog_send
         else:
             return self.n_msg_direct_send
-        return 0
 
     @property
     def n_msg_recv_drain(self):
         r"""int: Number of messages in the receive backlog and direct comm."""
-        return self.n_msg_direct + self.n_msg_recv
+        return self.n_msg_direct_recv + self.n_msg_backlog_recv
 
     @property
     def n_msg_send_drain(self):
         r"""int: Number of messages in the send backlog and direct comm."""
-        return self.n_msg_direct + self.n_msg_send
+        return self.n_msg_direct_send + self.n_msg_backlog_send
+
+    @property
+    def is_confirmed_send(self):
+        r"""bool: True if all sent messages have been confirmed."""
+        return (self.n_msg_direct_send == 0)
+
+    @property
+    def is_confirmed_recv(self):
+        r"""bool: True if all received messages have been confirmed."""
+        return (self.n_msg_direct_recv == 0)
 
     @property
     def backlog_recv(self):
@@ -271,14 +299,21 @@ class AsyncComm(CommBase.CommBase):
     def recv_backlog(self):
         r"""Check for any messages in the queue and add them to the recv
         backlog."""
-        try:
-            flag, data = self._recv_direct(timeout=0)
-            if flag and data:
-                self.add_backlog_recv(data)
-                self.debug('Backlogged received message.')
-        except BaseException:  # pragma: debug
-            self.exception('Error receiving into backlog.')
+        if not self.is_open_direct:
+            self.debug("Direct comm closed.")
             flag = False
+        elif self.n_msg_direct_recv == 0:
+            self.verbose_debug("No messages waiting.")
+            flag = True
+        else:
+            try:
+                flag, data = self._recv_direct()
+                if flag and data:
+                    self.add_backlog_recv(data)
+                    self.debug('Backlogged received message.')
+            except BaseException:  # pragma: debug
+                self.exception('Error receiving into backlog.')
+                flag = False
         self.confirm_recv()
         return flag
 
@@ -302,12 +337,8 @@ class AsyncComm(CommBase.CommBase):
         """
         return False
 
-    def _recv_direct(self, timeout=None):
+    def _recv_direct(self):
         r"""Receive a message from the comm directly.
-
-        Args:
-            timeout (float, optional): Time in seconds to wait for a message.
-                Defaults to self.recv_timeout.
 
         Returns:
             tuple (bool, str): The success or failure of receiving a message
@@ -373,6 +404,12 @@ class AsyncComm(CommBase.CommBase):
                    self.is_open_direct):
                 self.sleep()
             self.stop_timeout()
+            if not self.is_open_direct:
+                self.debug("Comm closed")
+                return (False, self.empty_msg)
+            if self.n_msg_direct_recv == 0:
+                self.verbose_debug("No messages waiting.")
+                return (True, self.empty_msg)
             return self._recv_direct()
         # Sleep until there is a message
         T = self.start_timeout(timeout)
@@ -380,7 +417,7 @@ class AsyncComm(CommBase.CommBase):
             self.backlog_recv_ready.wait(self.sleeptime)
         self.stop_timeout()
         # Return False if the queue is closed
-        if self.is_closed or self.backlog_thread.was_break:  # pragma: debug
+        if (not self.is_open_backlog):  # pragma: debug
             self.debug("Backlog closed")
             return (False, self.empty_msg)
         # Return True, '' if there are no messages

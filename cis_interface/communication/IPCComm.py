@@ -364,26 +364,14 @@ class IPCComm(AsyncComm.AsyncComm):
             raise
         return True
 
-    def _recv_direct(self, timeout=None):
+    def _recv_direct(self):
         r"""Receive a message from the comm directly.
-
-        Args:
-            timeout (float, optional): Time in seconds to wait for a message.
-                Defaults to self.recv_timeout.
 
         Returns:
             tuple (bool, str): The success or failure of receiving a message
                 and the message received.
 
         """
-        # Return False if the queue is closed
-        if self.is_closed:  # pragma: debug
-            self.debug("Queue closed")
-            return (False, self.empty_msg)
-        # Return True, '' if there are no messages
-        if self.n_msg_direct == 0:
-            self.verbose_debug("No messages waiting.")
-            return (True, self.empty_msg)
         # Receive message
         self.debug("Message ready, reading it.")
         try:

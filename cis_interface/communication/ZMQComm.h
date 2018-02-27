@@ -510,13 +510,13 @@ int free_zmq_comm(comm_t *x) {
   // Do EOF send/recv
   zmq_reply_t *zrep = (zmq_reply_t*)(x->reply);
   if (zrep != NULL) {
-    if (strcmp(x->direction, "recv") == 0) {
-      if (x->recv_eof[0] == 0) {
-	for (i = 0; i < zrep->nsockets; i++) {
-	  ret = do_reply_recv(x, i, CIS_MSG_EOF);
-	}
-      }
-    }
+    /* if (strcmp(x->direction, "recv") == 0) { */
+    /*   if (x->recv_eof[0] == 0) { */
+    /* 	for (i = 0; i < zrep->nsockets; i++) { */
+    /* 	  ret = do_reply_recv(x, i, CIS_MSG_EOF); */
+    /* 	} */
+    /*   } */
+    /* } */
     // Free reply
     ret = free_zmq_reply(zrep);
   }

@@ -107,7 +107,8 @@ class ModelDriver(Driver):
                                             cwd=self.workingDir,
                                             forward_signals=False)
         # Start thread to queue output
-        self.queue_thread = tools.CisThreadLoop(target=self.enqueue_output_loop)
+        self.queue_thread = tools.CisThreadLoop(target=self.enqueue_output_loop,
+                                                name=self.name + '.EnqueueLoop')
         self.queue_thread.start()
 
     def enqueue_output_loop(self):

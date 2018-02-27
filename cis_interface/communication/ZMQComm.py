@@ -788,19 +788,14 @@ class ZMQComm(AsyncComm.AsyncComm):
             bool: True if there is a message matching the flags, False otherwise.
 
         """
-        with self._closing_thread.lock:
-            if self.is_open_direct:
-                try:
-                    out = self.socket.poll(timeout=1, flags=flags)
-                except zmq.ZMQError:  # pragma: debug
-                    out = 0
-            else:
-                out = 0
-            if out == 0:
-                return False
-            else:
-                return True
-        return False
+        out = 0
+        # with self._closing_thread.lock:
+        if self.is_open_direct:
+            try:
+                out = self.socket.poll(timeout=1, flags=flags)
+            except zmq.ZMQError:  # pragma: debug
+                pass
+        return bool(out)
         
     @property
     def n_msg_direct_recv(self):
@@ -815,6 +810,20 @@ class ZMQComm(AsyncComm.AsyncComm):
         if self.is_open_direct and (self.direction == 'send'):
             return (self._n_zmq_sent - self._n_reply_sent)
         return 0
+
+    @property
+    def is_confirmed_send(self):
+        r"""bool: True if all sent messages have been confirmed."""
+        if self.is_open_backlog:
+            return (self._n_zmq_sent == self._n_reply_sent)
+        return True
+
+    @property
+    def is_confirmed_recv(self):
+        r"""bool: True if all received messages have been confirmed."""
+        if self.is_open_backlog:
+            return (self._n_zmq_recv == self._n_reply_recv)
+        return True
 
     @property
     def get_work_comm_kwargs(self):
@@ -890,12 +899,10 @@ class ZMQComm(AsyncComm.AsyncComm):
                 return False
         return True
 
-    def _recv_direct(self, timeout=None, **kwargs):
+    def _recv_direct(self, **kwargs):
         r"""Receive a message from the ZMQ socket.
 
         Args:
-            timeout (float, optional): Time in seconds to wait for a message.
-                Defaults to self.recv_timeout.
             **kwargs: Additional keyword arguments are passed to socket send.
 
         Returns:
@@ -903,24 +910,21 @@ class ZMQComm(AsyncComm.AsyncComm):
                 message.
 
         """
-        # Return False if the socket is closed
-        if not self.is_open_direct:  # pragma: debug
-            self.error("Socket closed")
-            return (False, self.empty_msg)
-        # Poll until there is a message
-        if timeout is None:
-            timeout = self.recv_timeout
-        # self.sleep()
-        if timeout is not False:
-            if not self.is_open_direct:  # pragma: debug
-                return (False, None)
-            ret = self.socket.poll(timeout=max(1, 1000.0 * timeout))
-            if ret == 0:
-                self.verbose_debug("No messages waiting.")
-                return (True, self.empty_msg)
-            flags = zmq.NOBLOCK
-        else:
-            flags = 0
+        # # Poll until there is a message
+        # if timeout is None:
+        #     timeout = self.recv_timeout
+        # # self.sleep()
+        # if timeout is not False:
+        #     if not self.is_open_direct:  # pragma: debug
+        #         return (False, None)
+        #     ret = self.socket.poll(timeout=max(1, 1000.0 * timeout))
+        #     if ret == 0:
+        #         self.verbose_debug("No messages waiting.")
+        #         return (True, self.empty_msg)
+        #     flags = zmq.NOBLOCK
+        # else:
+        #     flags = 0
+        flags = zmq.NOBLOCK
         # Receive message
         try:
             if self.socket_type_name == 'ROUTER':
@@ -948,7 +952,8 @@ class ZMQComm(AsyncComm.AsyncComm):
             self.verbose_debug("Confirming %d/%d sent messages",
                                self._n_reply_sent, self._n_zmq_sent)
             if self._reply_handshake_send():
-                self.debug("Send confirmed")
+                self.debug("Send confirmed (%d/%d)",
+                           self._n_reply_sent, self._n_zmq_sent)
 
     def confirm_recv(self):
         r"""Confirm that message was received."""
@@ -957,7 +962,8 @@ class ZMQComm(AsyncComm.AsyncComm):
                 self.debug("Confirming %d/%d received messages",
                            self._n_reply_recv[k], self._n_zmq_recv[k])
                 if self._reply_handshake_recv(_reply_msg, k):
-                    self.debug("Recv confirmed")
+                    self.debug("Recv confirmed (%d/%d)",
+                               self._n_reply_recv[k], self._n_zmq_recv[k])
 
     # def purge(self):
     #     r"""Purge all messages from the comm."""

@@ -241,12 +241,12 @@ class RPCComm(CommBase.CommBase):
     @property
     def n_msg_recv(self):
         r"""int: The number of messages in the input comm."""
-        return self.icomm.n_msg
+        return self.icomm.n_msg_recv
 
     @property
     def n_msg_send(self):
         r"""int: The number of messages in the output comm."""
-        return self.ocomm.n_msg
+        return self.ocomm.n_msg_send
 
     # SEND METHODS
     def send(self, *args, **kwargs):
@@ -289,10 +289,13 @@ class RPCComm(CommBase.CommBase):
             obj: Output from input comm recv method.
 
         """
+        timeout = kwargs.pop('timeout', self.recv_timeout)
         flag = self.send(*args, **kwargs)
         if not flag:
+            self.debug("Send in call failed")
             return (False, backwards.unicode2bytes(''))
-        return self.recv(timeout=False)
+        self.debug("Sent")
+        return self.recv(timeout=timeout)
 
     def call_nolimit(self, *args, **kwargs):
         r"""Alias for call."""

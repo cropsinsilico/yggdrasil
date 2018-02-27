@@ -933,6 +933,7 @@ class CisThread(threading.Thread, CisClass):
 
     def atexit(self):
         r"""Actions performed when python exits."""
+        # self.debug('is_alive = %s', self.is_alive())
         if self.is_alive():
             self.info('Thread alive at exit')
             if not self._cleanup_called:
