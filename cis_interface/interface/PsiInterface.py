@@ -67,7 +67,7 @@ def PsiInput(name, format_str=None, matlab=False):
     if matlab and format_str is not None:  # pragma: matlab
         format_str = backwards.decode_escape(format_str)
     return DefaultComm(name, direction='recv', format_str=format_str,
-                       is_interface=True, recv_timeout=False)
+                       is_interface=True, recv_timeout=False, matlab=matlab)
     
 
 def PsiOutput(name, format_str=None, matlab=False):
@@ -88,7 +88,7 @@ def PsiOutput(name, format_str=None, matlab=False):
     if matlab and format_str is not None:  # pragma: matlab
         format_str = backwards.decode_escape(format_str)
     return DefaultComm(name, direction='send', format_str=format_str,
-                       is_interface=True, recv_timeout=False)
+                       is_interface=True, recv_timeout=False, matlab=matlab)
 
     
 def PsiRpc(outname, outfmt, inname, infmt, matlab=False):
@@ -121,7 +121,8 @@ def PsiRpc(outname, outfmt, inname, infmt, matlab=False):
     out = RPCComm.RPCComm(name,
                           icomm_kwargs=icomm_kwargs,
                           ocomm_kwargs=ocomm_kwargs,
-                          is_interface=True, recv_timeout=False)
+                          is_interface=True, recv_timeout=False,
+                          matlab=matlab)
     return out
 
 
@@ -147,7 +148,7 @@ def PsiRpcServer(name, infmt='%s', outfmt='%s', matlab=False):
     ocomm_kwargs = dict(format_str=outfmt)
     out = ServerComm.ServerComm(name, response_kwargs=ocomm_kwargs,
                                 is_interface=True, recv_timeout=False,
-                                **icomm_kwargs)
+                                matlab=matlab, **icomm_kwargs)
     return out
     
 
@@ -174,7 +175,7 @@ def PsiRpcClient(name, outfmt='%s', infmt='%s', matlab=False):
     ocomm_kwargs = dict(format_str=outfmt)
     out = ClientComm.ClientComm(name, response_kwargs=icomm_kwargs,
                                 is_interface=True, recv_timeout=False,
-                                **ocomm_kwargs)
+                                matlab=matlab, **ocomm_kwargs)
     return out
     
 
@@ -202,7 +203,8 @@ def PsiAsciiFileInput(name, src_type=1, matlab=False, **kwargs):
     else:
         base = DefaultComm
     kwargs.setdefault('direction', 'recv')
-    return base(name, is_interface=True, recv_timeout=False, **kwargs)
+    return base(name, is_interface=True, recv_timeout=False,
+                matlab=matlab, **kwargs)
 
 
 def PsiAsciiFileOutput(name, dst_type=1, matlab=False, **kwargs):
@@ -228,7 +230,8 @@ def PsiAsciiFileOutput(name, dst_type=1, matlab=False, **kwargs):
     else:
         base = DefaultComm
     kwargs.setdefault('direction', 'send')
-    return base(name, is_interface=True, recv_timeout=False, **kwargs)
+    return base(name, is_interface=True, recv_timeout=False,
+                matlab=matlab, **kwargs)
             
 
 # Specialized classes for ascii table IO
@@ -260,7 +263,8 @@ def PsiAsciiTableInput(name, as_array=False, src_type=1, matlab=False, **kwargs)
     kwargs.setdefault('direction', 'recv')
     if src_type == 0:
         kwargs['as_array'] = as_array
-    out = base(name, is_interface=True, recv_timeout=False, **kwargs)
+    out = base(name, is_interface=True, recv_timeout=False,
+               matlab=matlab, **kwargs)
     if src_type == 1:
         ret, format_str = out.recv(timeout=out.timeout)
         if not ret:  # pragma: debug
@@ -307,7 +311,8 @@ def PsiAsciiTableOutput(name, fmt, as_array=False, dst_type=1, matlab=False,
     if dst_type == 0:
         kwargs['as_array'] = as_array
         kwargs['format_str'] = fmt
-    out = base(name, is_interface=True, recv_timeout=False, **kwargs)
+    out = base(name, is_interface=True, recv_timeout=False,
+               matlab=matlab, **kwargs)
     if dst_type == 1:
         ret = out.send(backwards.decode_escape(fmt))
         if not ret:  # pragma: debug
@@ -319,6 +324,47 @@ def PsiAsciiTableOutput(name, fmt, as_array=False, dst_type=1, matlab=False,
         format_str=fmt, as_array=as_array)
     return out
     
+
+def PsiAsciiArrayOutput(name, fmt, dst_type=1, matlab=False, **kwargs):
+    r"""Get class for handling table-like formatted output.
+
+    Args:
+        name (str): The path to the local file where output should be saved
+            (if dst_type == 0) or the name of the message queue where the
+            output should be sent.
+        fmt (str): A C style format string specifying how each 'row' of output
+            should be formated. This should include the newline character.
+        dst_type (int, optional): If 0, output is sent to a local file.
+            Otherwise, the output is sent to a message queue. Defaults to 1.
+        **kwargs: Additional keyword arguments are passed to the base comm.
+
+    Returns:
+        DefaultComm: Communication object.
+        
+    """
+    return PsiAsciiTableOutput(name, fmt, as_array=True, dst_type=dst_type,
+                               matlab=matlab, **kwargs)
+
+
+def PsiAsciiArrayInput(name, src_type=1, matlab=False, **kwargs):
+    r"""Get class for handling table-like formatted input as arrays.
+
+    Args:
+        name (str): The path to the local file to read input from (if src_type
+            == 0) or the name of the message queue input should be received
+            from.
+        src_type (int, optional): If 0, input is read from a local file.
+            Otherwise, the input is received from a message queue. Defaults to
+            1.
+        **kwargs: Additional keyword arguments are passed to the base comm.
+
+    Returns:
+        DefaultComm: Communication object.
+        
+    """
+    return PsiAsciiTableInput(name, as_array=True, src_type=src_type,
+                              matlab=matlab, **kwargs)
+
 
 def PsiPickleInput(name, src_type=1, matlab=False, **kwargs):
     r"""Get class for handling pickled input.
@@ -343,7 +389,8 @@ def PsiPickleInput(name, src_type=1, matlab=False, **kwargs):
     else:
         base = DefaultComm
     kwargs.setdefault('direction', 'recv')
-    out = base(name, is_interface=True, recv_timeout=False, **kwargs)
+    out = base(name, is_interface=True, recv_timeout=False,
+               matlab=matlab, **kwargs)
     out.meth_deserialize = PickleDeserialize.PickleDeserialize()
     return out
 
@@ -370,6 +417,7 @@ def PsiPickleOutput(name, dst_type=1, matlab=False, **kwargs):
     else:
         base = DefaultComm
     kwargs.setdefault('direction', 'send')
-    out = base(name, is_interface=True, recv_timeout=False, **kwargs)
+    out = base(name, is_interface=True, recv_timeout=False,
+               matlab=matlab, **kwargs)
     out.meth_serialize = PickleSerialize.PickleSerialize()
     return out

@@ -204,7 +204,7 @@ def cformat2pyscanf(cfmt):
         raise TypeError("Input must be of type %s." % backwards.bytes_type)
     elif not cfmt.startswith(_fmt_char):
         raise ValueError("Provided C format string (%s) " % cfmt +
-                         "does not start with '%%'")
+                         "does not start with '%'")
     elif len(cfmt) == 1:
         raise ValueError("Provided C format string (%s) " % cfmt +
                          "does not contain type info")
@@ -303,7 +303,8 @@ class AsciiTable(AsciiFile):
     @property
     def fmts(self):
         r"""List of formats in format string."""
-        return self.format_str.split(self.newline)[0].split(self.column)
+        out = self.format_str.split(self.newline)[0].split(self.column)
+        return [f for f in out if f]
 
     @property
     def ncols(self):
@@ -530,6 +531,7 @@ class AsciiTable(AsciiFile):
                         sline = sline.replace(backwards.unicode2bytes(platform._newline),
                                               backwards.unicode2bytes(self.newline))
                         fmts = sline.split(self.column)
+                        fmts = [f for f in fmts if f]
                         is_fmt = [f.startswith(_fmt_char) for f in fmts]
                         if sum(is_fmt) == len(fmts):
                             out = sline

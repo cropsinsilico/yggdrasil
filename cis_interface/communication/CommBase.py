@@ -2,6 +2,8 @@ import os
 import uuid
 import atexit
 import threading
+import numpy as np
+import array
 from cis_interface import backwards, tools
 from cis_interface.tools import get_CIS_MSG_MAX, CIS_MSG_EOF
 from cis_interface.serialize.DefaultSerialize import DefaultSerialize
@@ -144,6 +146,8 @@ class CommBase(tools.CisClass):
             response comm. Defaults to False.
         comm (str, optional): The comm that should be created. This only serves
             as a check that the correct class is being created. Defaults to None.
+        matlab (bool, optional): True if the comm will be accessed by Matlab
+            code. Defaults to False.
         **kwargs: Additional keywords arguments are passed to parent class.
 
     Attributes:
@@ -175,6 +179,7 @@ class CommBase(tools.CisClass):
             that will be receiving messages from one or more clients.
         is_response_server (bool): If True, the comm is a server-side response
             comm.
+        matlab (bool): True if the comm will be accessed by Matlab code.
 
     Raises:
         RuntimeError: If the comm class is not installed.
@@ -190,7 +195,7 @@ class CommBase(tools.CisClass):
                  single_use=False, reverse_names=False, no_suffix=False,
                  is_client=False, is_response_client=False,
                  is_server=False, is_response_server=False,
-                 comm=None, **kwargs):
+                 comm=None, matlab=False, **kwargs):
         if comm is not None:
             assert(comm == self.comm_class)
         super(CommBase, self).__init__(name, **kwargs)
@@ -219,6 +224,7 @@ class CommBase(tools.CisClass):
         self.is_server = is_server
         self.is_response_client = is_response_client
         self.is_response_server = is_response_server
+        self.matlab = matlab
         self._server = None
         self.is_interface = is_interface
         self.recv_timeout = recv_timeout
@@ -1152,6 +1158,30 @@ class CommBase(tools.CisClass):
             msg = None
         if self.single_use and self._used:
             self.linger_close()
+        # Convert arrays to format easily parsed by matlab
+        if self.matlab and isinstance(msg, np.ndarray):
+            # TODO: Possibly call matlab type initializer before returning
+            sep_cols = False
+            dt0 = msg.dtype[0]
+            for i in range(len(msg.dtype)):
+                dt = msg.dtype[i]
+                if dt != dt0:
+                    sep_cols = True
+                    break
+            if len(msg.dtype) > 1:
+                new_msg = []
+                for k in msg.dtype.names:
+                    col = msg[k].tolist()
+                    if len(col) == 1:
+                        new_msg.append(col[0])
+                    else:
+                        new_msg.append(col)
+            else:
+                new_msg = msg.tolist()
+            if not sep_cols and dt0.kind in 'cbBuhHiIlLfd':
+                msg = array.array(dt0.kind, new_msg)
+            else:
+                msg = new_msg
         return (flag, msg)
 
     def recv_multipart(self, *args, **kwargs):

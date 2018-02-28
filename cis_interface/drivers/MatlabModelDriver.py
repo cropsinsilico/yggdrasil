@@ -11,7 +11,7 @@ except ImportError:  # pragma: no matlab
          "Matlab support will be disabled.")
     _matlab_installed = False
 from cis_interface.drivers.ModelDriver import ModelDriver
-from cis_interface import backwards
+from cis_interface import backwards, tools
 from cis_interface.tools import TimeOut, sleep
 
 
@@ -99,7 +99,7 @@ def stop_matlab(screen_session, matlab_engine, matlab_session):  # pragma: matla
             raise Exception("stp[_matlab timed out at %f s" % T.elapsed)
 
 
-class MatlabProcess(object):  # pragma: matlab
+class MatlabProcess(tools.CisClass):  # pragma: matlab
     r"""Add features to mimic subprocess.Popen while running Matlab function
     asynchronously.
 
@@ -125,7 +125,7 @@ class MatlabProcess(object):  # pragma: matlab
 
     """
 
-    def __init__(self, target, args, kwargs=None):
+    def __init__(self, target, args, kwargs=None, name=None):
         if not _matlab_installed:  # pragma: no matlab
             raise RuntimeError("Matlab is not installed.")
         if kwargs is None:
@@ -140,10 +140,11 @@ class MatlabProcess(object):  # pragma: matlab
         self.kwargs.update(nargout=0, async=True,
                            stdout=self.stdout, stderr=self.stderr)
         self.future = None
+        super(MatlabProcess, self).__init__(name)
 
     def poll(self, *args, **kwargs):
         r"""Fake poll."""
-        return self.return_code
+        return self.returncode
 
     @property
     def stdout_line(self):
@@ -180,23 +181,29 @@ class MatlabProcess(object):  # pragma: matlab
         r"""bool: Has start been called."""
         return (self.future is not None)
 
+    def is_cancelled(self):
+        r"""bool: Was the async call cancelled or not."""
+        if self.is_started():
+            return self.future.cancelled()
+        return False
+
     def is_done(self):
         r"""bool: Is the async call still running."""
         if self.is_started():
-            return self.future.done()
+            return self.future.done() or self.is_cancelled()
         return False
 
     def is_alive(self):
         r"""bool: Is the async call funning."""
         if self.is_started():
-            return (not self.future.done())
+            return (not self.is_done())
         return False
 
     @property
     def returncode(self):
         r"""int: Return code."""
         if self.is_done():
-            if self.stderr_line:
+            if self.stderr_line:  # or self.is_cancelled():
                 return -1
             else:
                 return 0
@@ -286,7 +293,8 @@ class MatlabModelDriver(ModelDriver):  # pragma: matlab
 
         # Add environment variables
         self.debug('Setting environment variables for Matlab engine.')
-        for k, v in self.env.items():
+        env = self.set_env()
+        for k, v in env.items():
             with self.lock:
                 if self.mlengine is None:  # pragma: debug
                     return
@@ -299,6 +307,7 @@ class MatlabModelDriver(ModelDriver):  # pragma: matlab
                 return
             self.debug('Starting MatlabProcess')
             self.model_process = MatlabProcess(target=getattr(self.mlengine, name),
+                                               name=self.name + '.MatlabProcess',
                                                args=self.args[1:])
             self.model_process.start()
             self.debug('MatlabProcess running model.')
@@ -308,7 +317,15 @@ class MatlabModelDriver(ModelDriver):  # pragma: matlab
         self.model_process.print_output()
         if self.model_process.is_done():
             self.set_break_flag()
-            self.model_process.future.result()
+            if not self.model_process.is_cancelled():
+                self.model_process.future.result()
+                self.model_process.print_output()
+            else:
+                try:
+                    self.model_process.future.result()
+                except matlab.engine.InterruptedError:
+                    pass
+            # self.model_process.print_output()
             self.model_process.print_output()
         self.sleep()
 
