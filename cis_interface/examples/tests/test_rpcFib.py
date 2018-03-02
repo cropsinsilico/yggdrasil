@@ -7,7 +7,7 @@ class TestExampleRpcFib(TestExample):
 
     def __init__(self, *args, **kwargs):
         super(TestExampleRpcFib, self).__init__(*args, **kwargs)
-        self.name = 'rpcFib'
+        self._name = 'rpcFib'
         self.env = {'FIB_ITERATIONS': '3',
                     'FIB_SERVER_SLEEP_SECONDS': '0.01'}
         # self.debug_flag = True

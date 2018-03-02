@@ -8,7 +8,7 @@ class TestExampleModelError(TestExample):
 
     def __init__(self, *args, **kwargs):
         super(TestExampleModelError, self).__init__(*args, **kwargs)
-        self.name = 'model_error'
+        self._name = 'model_error'
         self.expects_error = True
 
     @property

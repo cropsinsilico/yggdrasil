@@ -7,7 +7,7 @@ class TestExampleHello(TestExample):
 
     def __init__(self, *args, **kwargs):
         super(TestExampleHello, self).__init__(*args, **kwargs)
-        self.name = 'hello'
+        self._name = 'hello'
 
     @property
     def input_files(self):

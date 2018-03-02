@@ -7,7 +7,7 @@ class TestExampleGS3(TestExample):
 
     def __init__(self, *args, **kwargs):
         super(TestExampleGS3, self).__init__(*args, **kwargs)
-        self.name = 'gs_lesson3'
+        self._name = 'gs_lesson3'
 
     @property
     def input_files(self):

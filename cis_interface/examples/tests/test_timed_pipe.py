@@ -10,7 +10,7 @@ class TestExampleTimedPipeZMQ(TestExample):
 
     def __init__(self, *args, **kwargs):
         super(TestExampleTimedPipeZMQ, self).__init__(*args, **kwargs)
-        self.name = 'timed_pipe'
+        self._name = 'timed_pipe'
         self.env = {'CIS_DEFAULT_COMM': 'ZMQComm',
                     'PIPE_MSG_COUNT': '10',
                     'PIPE_MSG_SIZE': '1024'}
