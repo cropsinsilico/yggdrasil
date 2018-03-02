@@ -41,12 +41,7 @@ class TestRPCParam(parent.TestParam, IOInfo):
         
         
 class TestRPCDriverNoStart(TestRPCParam, parent.TestDriverNoStart, IOInfo):
-    r"""Test class for RPCDriver class without start.
-
-    Attributes (in addition to parent class's):
-        -
-
-    """
+    r"""Test class for RPCDriver class without start."""
     @property
     def send_comm_kwargs(self):
         r"""dict: Keyword arguments for send comm."""
@@ -63,12 +58,7 @@ class TestRPCDriverNoStart(TestRPCParam, parent.TestDriverNoStart, IOInfo):
 
 
 class TestRPCDriver(TestRPCParam, parent.TestDriver, IOInfo):
-    r"""Test class for RPCDriver class.
-
-    Attributes (in addition to parent class's):
-        -
-
-    """
+    r"""Test class for RPCDriver class."""
 
     def test_send_recv(self):
         r"""Test sending/receiving small message."""
@@ -90,7 +80,8 @@ class TestRPCDriver(TestRPCParam, parent.TestDriver, IOInfo):
         nt.assert_equal(self.recv_comm.n_msg, 0)
         # Wait as ZMQ comm takes a while to know message was sent
         Tout = self.instance.start_timeout()
-        while (not Tout.is_out) and (self.instance.n_msg_out > 0):
+        while ((not Tout.is_out) and
+               (self.instance.n_msg_out > 0)):  # pragma: debug
             self.instance.sleep()
         self.instance.stop_timeout()
         nt.assert_equal(self.instance.n_msg_out, 0)

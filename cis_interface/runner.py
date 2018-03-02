@@ -465,6 +465,7 @@ class CisRunner(CisClass):
                 if not d.is_alive():
                     if not d.errors:
                         self.do_model_exits(drv)
+                        self.do_client_exits(drv)
                     running.remove(drv)
                 else:
                     self.info('%s still running', drv['name'])
@@ -484,19 +485,15 @@ class CisRunner(CisClass):
             self.terminate()
         self.debug('Returning')
 
-    def do_model_exits(self, model):
-        r"""Perform exists for IO drivers associated with a model.
+    def do_client_exits(self, model):
+        r"""Perform exits for IO drivers associated with a client model.
 
         Args:
             model (dict): Dictionary of model parameters including any
                 associated IO drivers.
 
         """
-        # Stop associated server if not more clients
         for srv_name in model.get('client_of', []):
-            # Stop client IO driver
-            iod = self.outputdrivers["%s_%s" % (srv_name, model['name'])]
-            iod['instance'].on_model_exit()
             # Remove this client from list for server
             srv = self.modeldrivers[srv_name]
             srv['clients'].remove(model['name'])
@@ -505,7 +502,15 @@ class CisRunner(CisClass):
                 iod = self.inputdrivers[srv_name]
                 iod['instance'].on_client_exit()
                 srv['instance'].stop()
-        # Stop associated IO drivers
+
+    def do_model_exits(self, model):
+        r"""Perform exits for IO drivers associated with a model.
+
+        Args:
+            model (dict): Dictionary of model parameters including any
+                associated IO drivers.
+
+        """
         for drv in self.io_drivers(model['name']):
             if not drv['instance'].is_alive():
                 continue
@@ -562,7 +567,7 @@ class CisRunner(CisClass):
         for drv in drivers:
             if 'instance' in drv:
                 driver = drv['instance']
-                if driver.is_alive():
+                if driver.is_alive():  # pragma: debug
                     self.debug("Stopping %s", drv['name'])
                     if force_stop or self.error_flag:
                         driver.terminate()

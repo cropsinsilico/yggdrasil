@@ -190,7 +190,7 @@ class IPCServer(CommBase.CommServer):
             q = get_queue(int(self.srv_address))
             try:
                 remove_queue(q)
-            except (KeyError, sysv_ipc.ExistentialError):
+            except (KeyError, sysv_ipc.ExistentialError):  # pragma: debug
                 pass
         super(IPCServer, self).terminate(*args, **kwargs)
 
@@ -198,25 +198,17 @@ class IPCServer(CommBase.CommServer):
 class IPCComm(AsyncComm.AsyncComm):
     r"""Class for handling I/O via IPC message queues.
 
-    Args:
-        name (str): The name of the message queue.
-        dont_open (bool, optional): If True, the connection will not be opened.
-            Defaults to False.
-        **kwargs: Additional keyword arguments are passed to CommBase.
-        
     Attributes:
         q (:class:`sysv_ipc.MessageQueue`): Message queue.
         
     """
-    def __init__(self, name, dont_open=False, **kwargs):
-        super(IPCComm, self).__init__(name, dont_open=True, **kwargs)
-        self.q = None
-        self._bound = False
-        if dont_open:
-            self.bind()
-        else:
-            self.open()
 
+    def _init_before_open(self, **kwargs):
+        r"""Initialize empty queue and server class."""
+        self.q = None
+        self._server_class = IPCServer
+        super(IPCComm, self)._init_before_open(**kwargs)
+            
     @classmethod
     def is_installed(cls):
         r"""bool: Is the comm installed."""
@@ -242,13 +234,12 @@ class IPCComm(AsyncComm.AsyncComm):
 
     def bind(self):
         r"""Bind to random queue if address is generate."""
-        self._bound = False
-        if self.address == 'generate':
-            self._bound = True
-            q = get_queue()
-            self.address = str(q.key)
-        if self.is_client:
-            self.signon_to_server()
+        if not self._bound:
+            if self.address == 'generate':
+                self._bound = True
+                q = get_queue()
+                self.address = str(q.key)
+        super(IPCComm, self).bind()
 
     def open_after_bind(self):
         r"""Open the connection by getting the queue from the bound address."""
@@ -258,8 +249,7 @@ class IPCComm(AsyncComm.AsyncComm):
     def _open_direct(self):
         r"""Open the queue."""
         if not self.is_open_direct:
-            if not self._bound:
-                self.bind()
+            self.bind()
             self.open_after_bind()
             self.debug("qid: %s", self.q.key)
 
@@ -280,15 +270,6 @@ class IPCComm(AsyncComm.AsyncComm):
         self.q = None
         self._bound = False
 
-    def new_server(self, srv_address):
-        r"""Create a new server.
-
-        Args:
-            srv_address (str): Address of server comm.
-
-        """
-        return IPCServer(srv_address)
-
     @property
     def is_open_direct(self):
         r"""bool: True if the queue is not None."""
@@ -301,11 +282,13 @@ class IPCComm(AsyncComm.AsyncComm):
             return False
         return True
 
-    def confirm_send(self):
+    def confirm_send(self, noblock=False):
         r"""Confirm that sent message was received."""
+        if noblock:
+            return True
         return (self.n_msg_direct_send == 0)
 
-    def confirm_recv(self):
+    def confirm_recv(self, noblock=False):
         r"""Confirm that message was received."""
         return True
 

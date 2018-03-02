@@ -3,7 +3,7 @@ import nose.tools as nt
 from cis_interface.tools import _ipc_installed
 from cis_interface.communication import new_comm
 from cis_interface.communication import IPCComm
-from cis_interface.communication.tests import test_CommBase as parent
+from cis_interface.communication.tests import test_AsyncComm
 
 
 @unittest.skipIf(not _ipc_installed, "IPC library not installed")
@@ -49,7 +49,7 @@ def test_ipcrm_queues():
 
     
 @unittest.skipIf(not _ipc_installed, "IPC library not installed")
-class TestIPCComm(parent.TestCommBase):
+class TestIPCComm(test_AsyncComm.TestAsyncComm):
     r"""Test for IPCComm communication class."""
     def __init__(self, *args, **kwargs):
         super(TestIPCComm, self).__init__(*args, **kwargs)

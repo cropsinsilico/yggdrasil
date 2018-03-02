@@ -90,7 +90,7 @@ class TestCommBase(CisTest, IOInfo):
         self.send_instance = new_comm(self.name, **self.send_inst_kwargs)
         super(TestCommBase, self).setup(*args, **kwargs)
         # CommBase is dummy class that never opens
-        if self.comm == 'CommBase':
+        if self.comm in ['CommBase', 'AsyncComm']:
             assert(not self.send_instance.is_open)
             assert(not self.recv_instance.is_open)
         else:
@@ -207,7 +207,7 @@ class TestCommBase(CisTest, IOInfo):
         os.environ[recv_kwargs['work_comm_name']] = wc_send.opp_address
         wc_recv = self.instance.create_work_comm(header_recv, **recv_kwargs)
         # wc_recv = self.instance.get_work_comm(header_recv)
-        if self.comm == 'CommBase':
+        if self.comm in ['CommBase', 'AsyncComm']:
             flag = wc_send.send(self.test_msg)
             assert(not flag)
             flag, msg_recv = wc_recv.recv()
@@ -227,8 +227,9 @@ class TestCommBase(CisTest, IOInfo):
         self.instance.get_header(self.test_msg)
 
     def do_send_recv(self, send_meth='send', recv_meth='recv', msg_send=None,
+                     n_msg_send_meth='n_msg_send', n_msg_recv_meth='n_msg_recv',
                      reverse_comms=False, send_kwargs=None, recv_kwargs=None,
-                     close_on_send_eof=False, close_on_recv_eof=True):
+                     close_on_send_eof=None, close_on_recv_eof=None):
         r"""Generic send/recv of a message."""
         is_eof = ('eof' in send_meth)
         if msg_send is None:
@@ -244,26 +245,31 @@ class TestCommBase(CisTest, IOInfo):
             send_args = tuple()
         else:
             send_args = (msg_send,)
-        nt.assert_equal(self.send_instance.n_msg_send, 0)
-        nt.assert_equal(self.recv_instance.n_msg_recv, 0)
+        nt.assert_equal(getattr(self.send_instance, n_msg_send_meth), 0)
+        nt.assert_equal(getattr(self.recv_instance, n_msg_recv_meth), 0)
         if reverse_comms:
             send_instance = self.recv_instance
             recv_instance = self.send_instance
         else:
             send_instance = self.send_instance
             recv_instance = self.recv_instance
+        if close_on_recv_eof is None:
+            close_on_recv_eof = recv_instance.close_on_eof_recv
+        if close_on_send_eof is None:
+            close_on_send_eof = send_instance.close_on_eof_send
         recv_instance.close_on_eof_recv = close_on_recv_eof
         send_instance.close_on_eof_send = close_on_send_eof
         fsend_meth = getattr(send_instance, send_meth)
         frecv_meth = getattr(recv_instance, recv_meth)
-        if self.comm == 'CommBase':
+        if self.comm in ['CommBase', 'AsyncComm']:
             flag = fsend_meth(*send_args, **send_kwargs)
             assert(not flag)
             flag, msg_recv = frecv_meth(**recv_kwargs)
             assert(not flag)
-            nt.assert_raises(NotImplementedError, self.recv_instance._send,
-                             self.test_msg)
-            nt.assert_raises(NotImplementedError, self.recv_instance._recv)
+            if self.comm == 'CommBase':
+                nt.assert_raises(NotImplementedError, self.recv_instance._send,
+                                 self.test_msg)
+                nt.assert_raises(NotImplementedError, self.recv_instance._recv)
         else:
             flag = fsend_meth(*send_args, **send_kwargs)
             assert(flag)
@@ -271,10 +277,10 @@ class TestCommBase(CisTest, IOInfo):
             if not is_eof:
                 T = recv_instance.start_timeout(self.timeout)
                 while ((not T.is_out) and (not recv_instance.is_closed) and
-                       (recv_instance.n_msg_recv == 0)):  # pragma: debug
+                       (getattr(recv_instance, n_msg_recv_meth) == 0)):  # pragma: debug
                     recv_instance.sleep()
                 recv_instance.stop_timeout()
-                assert(recv_instance.n_msg_recv >= 1)
+                assert(getattr(recv_instance, n_msg_recv_meth) >= 1)
                 # IPC nolimit sends multiple messages
                 # nt.assert_equal(recv_instance.n_msg_recv, 1)
             flag, msg_recv = frecv_meth(timeout=self.timeout, **recv_kwargs)
@@ -293,16 +299,34 @@ class TestCommBase(CisTest, IOInfo):
                 assert(send_instance.is_closed)
         # Make sure no messages outgoing
         T = send_instance.start_timeout(self.timeout)
-        while (not T.is_out) and (send_instance.n_msg_send != 0):  # pragma: debug
+        while ((not T.is_out) and
+               (getattr(send_instance, n_msg_send_meth) != 0)):  # pragma: debug
             send_instance.sleep()
         send_instance.stop_timeout()
-        nt.assert_equal(send_instance.n_msg_send, 0)
-        nt.assert_equal(recv_instance.n_msg_recv, 0)
+        if not (is_eof or reverse_comms):
+            send_instance.wait_for_confirm(timeout=self.timeout)
+            recv_instance.wait_for_confirm(timeout=self.timeout)
+            assert(send_instance.is_confirmed)
+            assert(recv_instance.is_confirmed)
+        nt.assert_equal(getattr(send_instance, n_msg_send_meth), 0)
+        nt.assert_equal(getattr(recv_instance, n_msg_recv_meth), 0)
+
+    def test_drain_messages(self):
+        r"""Test waiting for messages to drain."""
+        self.send_instance.drain_messages(timeout=self.timeout)
+        nt.assert_equal(self.send_instance.n_msg_send_drain, 0)
+        if not self.recv_instance.is_file:
+            self.recv_instance.drain_messages(timeout=self.timeout)
+            nt.assert_equal(self.recv_instance.n_msg_recv_drain, 0)
+        nt.assert_raises(ValueError, self.send_instance.drain_messages,
+                         variable='n_msg_invalid')
+        nt.assert_raises(ValueError, self.recv_instance.drain_messages,
+                         variable='n_msg_invalid')
 
     def test_recv_nomsg(self):
         r"""Test recieve when there is no waiting message."""
         flag, msg_recv = self.recv_instance.recv(timeout=self.sleeptime)
-        if self.comm == 'CommBase':
+        if self.comm in ['CommBase', 'AsyncComm']:
             assert(not flag)
         else:
             assert(flag)
@@ -347,7 +371,7 @@ class TestCommBase(CisTest, IOInfo):
         nt.assert_equal(self.send_instance.n_msg, 0)
         nt.assert_equal(self.recv_instance.n_msg, 0)
         # Purge recv while open
-        if self.comm != 'CommBase':
+        if self.comm not in ['CommBase', 'AsyncComm']:
             flag = self.send_instance.send(self.msg_short)
             assert(flag)
             T = self.recv_instance.start_timeout()

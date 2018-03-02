@@ -362,6 +362,13 @@ def test_AsciiTable_array_bytes():
             assert_raises(ValueError, AF_in.array_to_bytes, np.zeros(nrows))
             assert_raises(ValueError, AF_in.array_to_bytes,
                           np.zeros((nrows, ncols - 1)))
+            list_of_arr = [in_arr[n] for n in in_arr.dtype.names]
+            list_of_arr[1] = list_of_arr[1][1:]
+            assert_raises(ValueError, AF_in.array_to_bytes, list_of_arr)
+            list_of_ele = [in_arr[i].tolist() for i in range(len(in_arr))]
+            list_of_ele[1] = list_of_ele[1][1:]
+            assert_raises(ValueError, AF_in.array_to_bytes, list_of_ele)
+            assert_raises(ValueError, AF_in.array_to_bytes, [np.zeros(0)])
             # Check direct conversion of bytes
             if order == 'C':
                 AF_out_err = AsciiTable.AsciiTable(
@@ -371,6 +378,16 @@ def test_AsciiTable_array_bytes():
                 assert_raises(ValueError, AF_out_err.bytes_to_array, err_byt,
                               order=order)
             in_bts = AF_in.array_to_bytes(order=order)
+            out_arr = AF_in.bytes_to_array(in_bts, order=order)
+            np.testing.assert_equal(out_arr, in_arr)
+            # Lists of arrays for each field
+            list_of_arr = [in_arr[n] for n in in_arr.dtype.names]
+            in_bts = AF_in.array_to_bytes(list_of_arr, order=order)
+            out_arr = AF_in.bytes_to_array(in_bts, order=order)
+            np.testing.assert_equal(out_arr, in_arr)
+            # Lists of element lists
+            list_of_ele = [in_arr[i].tolist() for i in range(len(in_arr))]
+            in_bts = AF_in.array_to_bytes(list_of_ele, order=order)
             out_arr = AF_in.bytes_to_array(in_bts, order=order)
             np.testing.assert_equal(out_arr, in_arr)
             # Write matrix

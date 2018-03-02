@@ -90,7 +90,7 @@ class TestExample(unittest.TestCase, tools.CisClass):
     #     return tools.parse_yaml(self.yaml)
 
     @property
-    def input_files(self):
+    def input_files(self):  # pragma: debug
         r"""list Input files for the run."""
         return None
 
@@ -102,7 +102,7 @@ class TestExample(unittest.TestCase, tools.CisClass):
     @property
     def results(self):
         r"""list: Results that should be found in the output files."""
-        if self.input_files is None:
+        if self.input_files is None:  # pragma: debug
             return None
         out = []
         for fname in self.input_files:
@@ -115,7 +115,7 @@ class TestExample(unittest.TestCase, tools.CisClass):
     def check_file_exists(self, fname):
         r"""Check that a file exists."""
         Tout = self.start_timeout()
-        while (not Tout.is_out) and (not os.path.isfile(fname)):
+        while (not Tout.is_out) and (not os.path.isfile(fname)):  # pragma: debug
             self.sleep()
         self.stop_timeout()
         assert(os.path.isfile(fname))
@@ -123,7 +123,8 @@ class TestExample(unittest.TestCase, tools.CisClass):
     def check_file_size(self, fname, fsize):
         r"""Check that file is the correct size."""
         Tout = self.start_timeout()
-        while (not Tout.is_out) and (os.stat(fname).st_size != fsize):
+        while ((not Tout.is_out) and
+               (os.stat(fname).st_size != fsize)):  # pragma: debug
             self.sleep()
         self.stop_timeout()
         nt.assert_equal(os.stat(fname).st_size, fsize)

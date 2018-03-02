@@ -124,7 +124,7 @@ class ModelDriver(Driver):
             return
         try:
             line = self.model_process.stdout.readline()
-        except ValueError:
+        except ValueError:  # pragma: debug
             line = ""
         if len(line) == 0:
             # self.info("%s: Empty line from stdout" % self.name)
@@ -173,7 +173,7 @@ class ModelDriver(Driver):
     def model_process_complete(self):
         r"""bool: Has the process finished or not. Returns True if the process
         has not started."""
-        if self.model_process is None:
+        if self.model_process is None:  # pragma: debug
             return True
         return (self.model_process.poll() is not None)
 
@@ -190,7 +190,7 @@ class ModelDriver(Driver):
             bool: True if the process completed. False otherwise.
 
         """
-        if not self.was_started:
+        if not self.was_started:  # pragma: debug
             return True
         T = self.start_timeout(timeout, key_level=1, key=key, key_suffix=key_suffix)
         while ((not T.is_out) and (not self.model_process_complete)):  # pragma: debug
@@ -229,7 +229,7 @@ class ModelDriver(Driver):
             self.event_process_kill_complete.set()
             if self.queue_thread is not None:
                 self.queue_thread.wait(self.timeout)
-                if self.queue_thread.is_alive():
+                if self.queue_thread.is_alive():  # pragma: debug
                     self.queue_thread.set_break_flag()
                     try:
                         self.model_process.stdout.close()

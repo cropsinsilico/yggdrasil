@@ -24,10 +24,12 @@ class RMQAsyncComm(RMQComm):
         rmq_thread (tools.CisThread): Thread used to run IO loop.
 
     """
-    def __init__(self, name, **kwargs):
+    
+    def _init_before_open(self, **kwargs):
+        r"""Initialize null variables and RMQ async thread."""
         self.times_connected = 0
         self.rmq_thread_count = 0
-        self.rmq_thread = self.new_run_thread(name=name)
+        self.rmq_thread = self.new_run_thread()
         self._opening = False
         self._closing = False
         self._reconnecting = False
@@ -37,7 +39,7 @@ class RMQAsyncComm(RMQComm):
         self._qres_lock = threading.RLock()
         self._qres_event = threading.Event()
         self._qres_event.set()
-        super(RMQAsyncComm, self).__init__(name, **kwargs)
+        super(RMQAsyncComm, self)._init_before_open(**kwargs)
 
     @property
     def rmq_lock(self):
@@ -62,6 +64,8 @@ class RMQAsyncComm(RMQComm):
     def start_run_thread(self):
         r"""Start the run thread and wait for it to finish."""
         with self.rmq_lock:
+            if self.rmq_thread.was_started:
+                return
             self._opening = True
             self.rmq_thread.start()
         # Wait for connection to be established
@@ -93,8 +97,7 @@ class RMQAsyncComm(RMQComm):
         if not self.queue:  # pragma: debug
             self.error("Queue was not initialized.")
         self.register_connection(self.queue)
-        if self.is_client:
-            self.signon_to_server()
+        super(RMQComm, self).bind()
     
     def _open_direct(self):
         r"""Open connection and bind/connect to queue as necessary."""
@@ -145,10 +148,10 @@ class RMQAsyncComm(RMQComm):
         self.stop_timeout(key=self.timeout_key + '_closing')
         if self._closing:  # pragma: debug
             self.force_close()
-        if self.rmq_thread.is_alive():
-            self.rmq_thread.join(self.timeout)
         if self.rmq_thread.is_alive():  # pragma: debug
-            raise RuntimeError("Thread still running.")
+            self.rmq_thread.join(self.timeout)
+            if self.rmq_thread.is_alive():
+                raise RuntimeError("Thread still running.")
         # Close workers
         with self.rmq_lock:
             super(RMQAsyncComm, self)._close_direct(linger=linger)
@@ -170,7 +173,7 @@ class RMQAsyncComm(RMQComm):
                                                    queue=self.queue,
                                                    # , auto_delete=True,
                                                    passive=True)
-                    except pika.exceptions.ChannelClosed:
+                    except pika.exceptions.ChannelClosed:  # pragma: debug
                         if not self._reconnecting:
                             self._close_direct()
                         else:
@@ -180,6 +183,11 @@ class RMQAsyncComm(RMQComm):
             res = self._qres
         return res
 
+    @property
+    def n_msg_direct_recv(self):
+        r"""int: Number of messages in the queue."""
+        return self.n_msg_backlog_recv
+        
     # Access work comms with lock
     def get_work_comm(self, *args, **kwargs):
         r"""Alias for parent class that wraps method in Lock."""

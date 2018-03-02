@@ -2,16 +2,17 @@ import unittest
 import nose.tools as nt
 from cis_interface.communication import new_comm
 from cis_interface.communication.RMQComm import _rmq_server_running
-from cis_interface.communication.tests import test_CommBase as parent
+from cis_interface.communication.tests import test_AsyncComm
 
 
 @unittest.skipIf(not _rmq_server_running, "RMQ Server not running")
-class TestRMQComm(parent.TestCommBase):
+class TestRMQComm(test_AsyncComm.TestAsyncComm):
     r"""Test for RMQComm communication class."""
     def __init__(self, *args, **kwargs):
         super(TestRMQComm, self).__init__(*args, **kwargs)
         self.comm = 'RMQComm'
         self.attr_list += ['connection', 'channel']
+        self.timeout = 10.0
 
     def test_double_open(self):
         r"""test that opening/binding twice dosn't cause errors."""

@@ -104,6 +104,7 @@ class ConnectionDriver(Driver):
         self._comm_closed = False
         self._used = False
         self._skip_after_loop = False
+        self._model_exited = False
         self.nrecv = 0
         self.nproc = 0
         self.nsent = 0
@@ -122,10 +123,9 @@ class ConnectionDriver(Driver):
 
     def wait_for_route(self, timeout=None):
         r"""Wait until messages have been routed."""
-        if timeout is None:
-            timeout = self.timeout
         T = self.start_timeout(timeout)
-        while (not T.is_out) and (self.nrecv != (self.nsent + self.nskip)):
+        while ((not T.is_out) and
+               (self.nrecv != (self.nsent + self.nskip))):  # pragma: debug
             self.sleep()
         self.stop_timeout()
         return (self.nrecv == (self.nsent + self.nskip))
@@ -223,13 +223,9 @@ class ConnectionDriver(Driver):
         with self.lock:
             self.set_close_state('stop')
             self._skip_after_loop = True
-        self.printStatus()
-        if timeout is None:
-            timeout = self.timeout
         self.drain_input(timeout=timeout)
         self.wait_for_route(timeout=timeout)
         self.drain_output(timeout=timeout)
-        self.printStatus()
         super(ConnectionDriver, self).graceful_stop()
         self.debug('Returning')
 
@@ -318,11 +314,10 @@ class ConnectionDriver(Driver):
             self.close_comm()
             self.set_break_flag()
 
-    def after_loop(self, send_eof=None, dont_close_output=False):
+    def after_loop(self):
         r"""Actions to perform after sending messages."""
         self.state = 'after loop'
         self.debug('')
-        # self.info('%s: after loop', self.name)
         # Close input comm in case loop did not
         self.drain_input(timeout=False)
         with self.lock:
@@ -332,18 +327,10 @@ class ConnectionDriver(Driver):
             self.icomm.close()
         # Send EOF in case the model didn't
         if not self.single_use:
-            if send_eof is None:
-                if self._is_input or self._is_output:
-                    send_eof = True
-                else:
-                    send_eof = False
-            if send_eof:
-                self.send_eof()
+            self.send_eof()
         # Close output comm after waiting for output to be processed
         # self.drain_output(timeout=False)
         # self.ocomm.close()
-        # if not dont_close_output and not self._is_input:
-        #     self.ocomm.close_in_thread()
 
     def recv_message(self, **kwargs):
         r"""Get a new message to send.
@@ -435,7 +422,8 @@ class ConnectionDriver(Driver):
         if not flag:
             self.debug("1st send failed, will keep trying for %f s in silence.",
                        float(self.timeout_send_1st))
-        while (not T.is_out) and (not flag) and self.ocomm.is_open:
+        while ((not T.is_out) and (not flag) and
+               self.ocomm.is_open):  # pragma: debug
             flag = self._send_message(*args, **kwargs)
             if not flag:
                 self.sleep()

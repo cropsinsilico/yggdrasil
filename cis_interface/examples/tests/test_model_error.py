@@ -23,5 +23,5 @@ class TestExampleModelError(TestExample):
         super(TestExampleModelError, self).cleanup()
         if self.core_dump is not None:
             fcore = glob.glob(self.core_dump)
-            for f in fcore:
+            for f in fcore:  # pragma: debug
                 os.remove(f)

@@ -4,7 +4,7 @@ import zmq
 from cis_interface import platform
 from cis_interface.tools import _zmq_installed, _ipc_installed
 from cis_interface.communication import new_comm
-from cis_interface.communication.tests import test_CommBase as parent
+from cis_interface.communication.tests import test_AsyncComm
 from cis_interface.communication import ZMQComm
 
 
@@ -56,7 +56,7 @@ def test_error_on_send_open_twice():
 
         
 @unittest.skipIf(not _zmq_installed, "ZMQ library not installed")
-class TestZMQComm(parent.TestCommBase):
+class TestZMQComm(test_AsyncComm.TestAsyncComm):
     r"""Test for ZMQComm communication class."""
     def __init__(self, *args, **kwargs):
         super(TestZMQComm, self).__init__(*args, **kwargs)

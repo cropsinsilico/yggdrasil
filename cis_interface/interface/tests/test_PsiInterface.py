@@ -489,11 +489,12 @@ class TestPsiAsciiTableInput_local(TestPsiAsciiTableInput):
         super(TestPsiAsciiTableInput_local, self).test_recv_line()
 
 
-class TestPsiAsciiTableInputArray(TestPsiAsciiTableInput):
+class TestPsiAsciiArrayInput(TestPsiAsciiTableInput):
     r"""Test input from an ASCII table."""
     def __init__(self, *args, **kwargs):
-        super(TestPsiAsciiTableInputArray, self).__init__(*args, **kwargs)
-        self._inst_kwargs = {'as_array': True}
+        super(TestPsiAsciiArrayInput, self).__init__(*args, **kwargs)
+        self._cls = 'PsiAsciiArrayInput'
+        self.driver_name = 'AsciiTableInputDriver'
         self._driver_kwargs = {'as_array': True}
 
     def test_recv_line(self):
@@ -505,16 +506,16 @@ class TestPsiAsciiTableInputArray(TestPsiAsciiTableInput):
         assert(not msg_flag)
 
 
-class TestPsiAsciiTableInputArray_local(TestPsiAsciiTableInputArray):
+class TestPsiAsciiArrayInput_local(TestPsiAsciiArrayInput):
     r"""Test input from an ASCII table."""
     def __init__(self, *args, **kwargs):
-        super(TestPsiAsciiTableInputArray_local, self).__init__(*args, **kwargs)
+        super(TestPsiAsciiArrayInput_local, self).__init__(*args, **kwargs)
         self._inst_args = [self.tempfile]
         self._inst_kwargs['src_type'] = 0  # local
 
     def test_recv_line(self):
         r"""Test receiving an array from a local table."""
-        super(TestPsiAsciiTableInputArray_local, self).test_recv_line()
+        super(TestPsiAsciiArrayInput_local, self).test_recv_line()
 
         
 class TestPsiAsciiTableOutput(TestPsiAsciiFileOutput):
@@ -566,11 +567,12 @@ class TestPsiAsciiTableOutput_local(TestPsiAsciiTableOutput):
         super(TestPsiAsciiTableOutput_local, self).test_send_line()
         
         
-class TestPsiAsciiTableOutputArray(TestPsiAsciiTableOutput):
+class TestPsiAsciiArrayOutput(TestPsiAsciiTableOutput):
     r"""Test input from an ASCII table."""
     def __init__(self, *args, **kwargs):
-        super(TestPsiAsciiTableOutputArray, self).__init__(*args, **kwargs)
-        self._inst_kwargs = {'as_array': True}
+        super(TestPsiAsciiArrayOutput, self).__init__(*args, **kwargs)
+        self._cls = 'PsiAsciiArrayOutput'
+        self.driver_name = 'AsciiTableOutputDriver'
         self._driver_kwargs = {'as_array': True}
 
     def test_send_line(self):
@@ -590,16 +592,16 @@ class TestPsiAsciiTableOutputArray(TestPsiAsciiTableOutput):
             nt.assert_equal(res, self.file_contents)
         
         
-class TestPsiAsciiTableOutputArray_local(TestPsiAsciiTableOutputArray):
+class TestPsiAsciiArrayOutput_local(TestPsiAsciiArrayOutput):
     r"""Test input from an ASCII table as array."""
     def __init__(self, *args, **kwargs):
-        super(TestPsiAsciiTableOutputArray_local, self).__init__(*args, **kwargs)
+        super(TestPsiAsciiArrayOutput_local, self).__init__(*args, **kwargs)
         self._inst_args = [self.tempfile, self.fmt_str]
         self._inst_kwargs['dst_type'] = 0  # local
 
     def test_send_line(self):
         r"""Test sending an array to a local table."""
-        super(TestPsiAsciiTableOutputArray_local, self).test_send_line()
+        super(TestPsiAsciiArrayOutput_local, self).test_send_line()
         
         
 class TestPsiPickleInput(TestBase):

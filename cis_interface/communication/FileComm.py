@@ -42,6 +42,7 @@ class FileComm(CommBase.CommBase):
         if in_temp:
             self.address = os.path.join(tempfile.gettempdir(), self.address)
         self.address = os.path.abspath(self.address)
+        self.is_file = True
 
     @property
     def maxMsgSize(self):

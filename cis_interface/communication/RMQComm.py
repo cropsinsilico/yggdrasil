@@ -78,12 +78,6 @@ class RMQServer(CommBase.CommServer):
 class RMQComm(AsyncComm.AsyncComm):
     r"""Class for handling basic RabbitMQ communications.
 
-    Args:
-        name (str): The environment variable where the comm address is stored.
-        dont_open (bool, optional): If True, the connection will not be opened.
-            Defaults to False.
-        **kwargs: Additional keyword arguments are passed to CommBase.
-
     Attributes:
         connection (:class:`pika.Connection`): RabbitMQ connection.
         channel (:class:`pika.Channel`): RabbitMQ channel.
@@ -92,8 +86,9 @@ class RMQComm(AsyncComm.AsyncComm):
         RuntimeError: If a connection cannot be established.
 
     """
-    def __init__(self, name, dont_open=False, **kwargs):
-        super(RMQComm, self).__init__(name, dont_open=True, **kwargs)
+    
+    def _init_before_open(self, **kwargs):
+        r"""Set null connection and channel."""
         self.connection = None
         self.channel = None
         self._is_open = False
@@ -101,11 +96,8 @@ class RMQComm(AsyncComm.AsyncComm):
         # Check that connection is possible
         if not check_rmq_server(self.url):
             raise RuntimeError("Could not connect to RabbitMQ server.")
-        # Reserve port by binding
-        if not dont_open:
-            self.open()
-        else:
-            self.bind()
+        self._server_class = RMQServer
+        super(RMQComm, self)._init_before_open(**kwargs)
 
     @classmethod
     def comm_count(cls):
@@ -231,8 +223,7 @@ class RMQComm(AsyncComm.AsyncComm):
                                 # routing_key=self.routing_key,
                                 queue=self.queue)
         self.register_connection(res)
-        if self.is_client:
-            self.signon_to_server()
+        super(RMQComm, self).bind()
 
     def register_connection(self, res):
         r"""Add connection to list of registered connections.
@@ -317,15 +308,6 @@ class RMQComm(AsyncComm.AsyncComm):
                 pass
         self.connection = None
 
-    def new_server(self, srv_address):
-        r"""Create a new server.
-
-        Args:
-            srv_address (str): Address of server comm.
-
-        """
-        return RMQServer(srv_address)
-
     @property
     def is_open_direct(self):
         r"""bool: True if the connection and channel are open."""
@@ -359,6 +341,11 @@ class RMQComm(AsyncComm.AsyncComm):
     @property
     def n_msg_direct_recv(self):
         r"""int: Number of messages in the queue."""
+        return self.n_msg_direct_send
+
+    @property
+    def n_msg_direct_send(self):
+        r"""int: Number of messages in the queue."""
         out = 0
         # with self._closing_thread.lock:
         if self.is_open_direct:
@@ -366,11 +353,6 @@ class RMQComm(AsyncComm.AsyncComm):
             if res is not None:
                 out = res.method.message_count
         return out
-
-    @property
-    def n_msg_direct_send(self):
-        r"""int: Number of messages in the queue."""
-        return self.n_msg_direct_recv
 
     @property
     def get_work_comm_kwargs(self):

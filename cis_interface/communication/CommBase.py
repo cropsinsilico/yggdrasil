@@ -42,7 +42,7 @@ class CommThreadLoop(tools.CisThreadLoop):
         #     kwargs['daemon'] = True
         super(CommThreadLoop, self).__init__(name=name, **kwargs)
 
-    def on_main_terminated(self):
+    def on_main_terminated(self):  # pragma: debug
         r"""Actions taken on the backlog thread when the main thread stops."""
         self.debug('')
         # for i in threading.enumerate():
@@ -179,6 +179,7 @@ class CommBase(tools.CisClass):
             that will be receiving messages from one or more clients.
         is_response_server (bool): If True, the comm is a server-side response
             comm.
+        is_file (bool): True if the comm accesses a file.
         matlab (bool): True if the comm will be accessed by Matlab code.
 
     Raises:
@@ -224,6 +225,7 @@ class CommBase(tools.CisClass):
         self.is_server = is_server
         self.is_response_client = is_response_client
         self.is_response_server = is_response_server
+        self.is_file = False
         self.matlab = matlab
         self._server = None
         self.is_interface = is_interface
@@ -237,9 +239,12 @@ class CommBase(tools.CisClass):
         self._first_send_done = False
         self._n_sent = 0
         self._n_recv = 0
+        self._bound = False
         self._last_send = None
         self._last_recv = None
         self._timeout_drain = False
+        self._server_class = CommServer
+        self._server_kwargs = {}
         # Add interface tag
         if self.is_interface:
             self._name += '_I'
@@ -260,11 +265,16 @@ class CommBase(tools.CisClass):
             self._eof_sent.set()  # Don't send EOF, these are single use
         if self.is_interface:
             atexit.register(self.atexit)
+        self._init_before_open(**kwargs)
         if dont_open:
-            pass
-            # self.bind()
+            self.bind()
         else:
             self.open()
+
+    def _init_before_open(self, **kwargs):
+        r"""Initialization steps that should be performed after base class, but
+        before the comm is opened."""
+        pass
 
     @classmethod
     def _determine_suffix(cls, no_suffix=False, reverse_names=False,
@@ -358,14 +368,12 @@ class CommBase(tools.CisClass):
 
     def bind(self):
         r"""Bind in place of open."""
-        pass
-        # if self.is_client:
-        #     self.signon_to_server()
+        if self.is_client:
+            self.signon_to_server()
 
     def open(self):
         r"""Open the connection."""
-        pass
-        # self.bind()
+        self.bind()
 
     def _close(self, *args, **kwargs):
         r"""Close the connection."""
@@ -419,7 +427,7 @@ class CommBase(tools.CisClass):
                 this will block until the comm is closed.
 
         """
-        if self.matlab:
+        if self.matlab:  # pragma: matlab
             self.linger_close()
             self._closing_thread.set_terminated_flag()
         self.debug("current_thread = %s", threading.current_thread().name)
@@ -428,11 +436,7 @@ class CommBase(tools.CisClass):
             _started_thread = True
         except RuntimeError:
             _started_thread = False
-        # _started_thread = False
-        # if (((not self._closing_thread.was_started) and
-        #      (not self._closing_thread.was_terminated))):
-        #     self._closing_thread.start()
-        if self._closing_thread.was_started and (not no_wait):
+        if self._closing_thread.was_started and (not no_wait):  # pragma: debug
             self._closing_thread.wait(key=str(uuid.uuid4()), timeout=timeout)
             if _started_thread and not self._closing_thread.was_terminated:
                 self.close()
@@ -451,7 +455,7 @@ class CommBase(tools.CisClass):
             self.wait_for_confirm(timeout=self._timeout_drain)
         self.debug("Finished")
 
-    def matlab_atexit(self):
+    def matlab_atexit(self):  # pragma: matlab
         r"""Close operations including draining receive."""
         if self.direction == 'recv':
             while self.recv(timeout=0)[0]:
@@ -460,7 +464,7 @@ class CommBase(tools.CisClass):
             self.comm.send_eof()
         self.linger_close()
 
-    def atexit(self):
+    def atexit(self):  # pragma: debug
         r"""Close operations."""
         self.debug('atexit begins')
         self.close()
@@ -497,36 +501,45 @@ class CommBase(tools.CisClass):
             return self.is_confirmed_send
 
     def wait_for_confirm(self, timeout=None, direction=None,
-                         active_confirm=False):
+                         active_confirm=False, noblock=False):
         r"""Sleep until all messages are confirmed."""
         self.debug('')
         if direction is None:
             direction = self.direction
         T = self.start_timeout(t=timeout, key_suffix='.wait_for_confirm')
+        flag = False
         while (not T.is_out) and (not getattr(self, 'is_confirmed_%s' % direction)):
             if active_confirm:
-                if self.confirm(direction=direction):
+                flag = self.confirm(direction=direction, noblock=noblock)
+                if flag:
                     break
             self.sleep()
         self.stop_timeout(key_suffix='.wait_for_confirm')
+        if not flag:
+            flag = getattr(self, 'is_confirmed_%s' % direction)
         self.debug('Done confirming')
+        return flag
 
-    def confirm(self, direction=None):
+    def confirm(self, direction=None, noblock=False):
         r"""Confirm message."""
         if direction is None:
             direction = self.direction
         if direction == 'send':
-            out = self.confirm_send()
+            out = self.confirm_send(noblock=noblock)
         else:
-            out = self.confirm_recv()
+            out = self.confirm_recv(noblock=noblock)
         return out
 
-    def confirm_send(self):
+    def confirm_send(self, noblock=False):
         r"""Confirm that sent message was received."""
+        if noblock:
+            return True
         return False
 
-    def confirm_recv(self):
+    def confirm_recv(self, noblock=False):
         r"""Confirm that message was received."""
+        if noblock:
+            return True
         return False
 
     @property
@@ -636,7 +649,7 @@ class CommBase(tools.CisClass):
             srv_address (str): Address of server comm.
 
         """
-        return CommServer(srv_address)
+        return self._server_class(srv_address, **self._server_kwargs)
 
     def signon_to_server(self):
         r"""Add a client to an existing server or create one."""
@@ -842,11 +855,11 @@ class CommBase(tools.CisClass):
         r"""Send first message until it succeeds."""
         T = self.start_timeout()
         with self._closing_thread.lock:
-            if self.is_closed:
+            if self.is_closed:  # pragma: debug
                 return False
             flag = self._send(*args, **kwargs)
         self.suppress_special_debug = True
-        while (not T.is_out) and (self.is_open) and (not flag):
+        while (not T.is_out) and (self.is_open) and (not flag):  # pragma: debug
             with self._closing_thread.lock:
                 if not self.is_open:
                     break
@@ -917,7 +930,7 @@ class CommBase(tools.CisClass):
         with self._closing_thread.lock:
             if not self._eof_sent.is_set():
                 self._eof_sent.set()
-            else:
+            else:  # pragma: debug
                 return False
         return True
 
@@ -960,7 +973,7 @@ class CommBase(tools.CisClass):
         flag, msg_s = self.on_send(args)
         if not flag:
             return False
-        if self.single_use and self._used:
+        if self.single_use and self._used:  # pragma: debug
             raise RuntimeError("This comm is single use and it was already used.")
         try:
             self.special_debug('Sending %d bytes', len(msg_s))
@@ -1257,7 +1270,7 @@ class CommBase(tools.CisClass):
         if timeout is None:
             timeout = self._timeout_drain
         if not hasattr(self, variable):
-            raise Exception("No attribute named '%s'" % variable)
+            raise ValueError("No attribute named '%s'" % variable)
         Tout = self.start_timeout(timeout)
         while (not Tout.is_out) and self.is_open:
             n_msg = getattr(self, variable)

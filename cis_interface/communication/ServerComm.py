@@ -205,6 +205,11 @@ class ServerComm(CommBase.CommBase):
         r"""Alias for RPCComm.recv"""
         return self.recv(*args, **kwargs)
     
+    def drain_messages(self, direction='recv', **kwargs):
+        r"""Sleep while waiting for messages to be drained."""
+        if direction == 'recv':
+            self.icomm.drain_messages(direction='recv', **kwargs)
+
     def purge(self):
         r"""Purge input and output comms."""
         self.icomm.purge()

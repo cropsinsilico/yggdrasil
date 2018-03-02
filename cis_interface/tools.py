@@ -38,7 +38,7 @@ except AttributeError:
         raise RuntimeError("Could not located MainThread")
 
 
-def check_threads():
+def check_threads():  # pragma: debug
     r"""Check for threads that are still running."""
     global _thread_registry
     # logging.info("Checking %d threads" % len(_thread_registry))
@@ -51,7 +51,7 @@ def check_threads():
             logging.info("%s thread running" % t.name)
 
 
-def check_locks():
+def check_locks():  # pragma: debug
     r"""Check for locks in lock registry that are locked."""
     global _lock_registry
     # logging.info("Checking %d locks" % len(_lock_registry))
@@ -63,7 +63,7 @@ def check_locks():
             logging.error("Lock could not be acquired: %s" % k)
 
 
-def check_sockets():
+def check_sockets():  # pragma: debug
     r"""Check registered sockets."""
     from cis_interface.communication.ZMQComm import cleanup_comms
     count = cleanup_comms()
@@ -71,7 +71,7 @@ def check_sockets():
         logging.info("%d sockets closed." % count)
 
 
-def cis_atexit():
+def cis_atexit():  # pragma: debug
     r"""Things to do at exit."""
     check_locks()
     check_threads()
@@ -99,9 +99,9 @@ def locate_path(fname, basedir=os.path.abspath(os.sep)):
             # "2>&1", "|", "grep", "-v", "'permission denied'"])
             # out = subprocess.check_output(["locate", "-b", "--regex",
             #                                "^%s" % fname])
-    except subprocess.CalledProcessError:
+    except subprocess.CalledProcessError:  # pragma: debug
         return False
-    if out.isspace():
+    if out.isspace():  # pragma: debug
         return False
     out = out.decode('utf-8').splitlines()
     # out = backwards.bytes2unicode(out.splitlines()[0])
@@ -434,16 +434,16 @@ class TimeOut(object):
         return (self.elapsed > self.max_time)
 
 
-def single_use_method(func):
-    r"""Decorator for marking functions that should only be called once."""
-    def wrapper(*args, **kwargs):
-        if getattr(func, '_single_use_method_called', False):
-            logging.info("METHOD %s ALREADY CALLED" % func)
-            return
-        else:
-            func._single_use_method_called = True
-            return func(*args, **kwargs)
-    return wrapper
+# def single_use_method(func):
+#     r"""Decorator for marking functions that should only be called once."""
+#     def wrapper(*args, **kwargs):
+#         if getattr(func, '_single_use_method_called', False):
+#             logging.info("METHOD %s ALREADY CALLED" % func)
+#             return
+#         else:
+#             func._single_use_method_called = True
+#             return func(*args, **kwargs)
+#     return wrapper
 
 
 class CisClass(logging.LoggerAdapter):
@@ -575,6 +575,7 @@ class CisClass(logging.LoggerAdapter):
         return self.log(9, *args, **kwargs)
         
     def dummy_log(self, *args, **kwargs):
+        r"""Dummy log function that dosn't do anything."""
         pass
 
     @property
@@ -811,14 +812,12 @@ class CisThread(threading.Thread, CisClass):
 
     """
     def __init__(self, name=None, target=None, args=(), kwargs=None,
-                 daemon=False, **cis_kwargs):
+                 daemon=False, group=None, **cis_kwargs):
         global _lock_registry
         if kwargs is None:
             kwargs = {}
-        thread_kwargs = dict(name=name, target=target, args=args, kwargs=kwargs)
-        for k in ['group']:  # , 'target', 'args', 'kwargs']:
-            if k in cis_kwargs:
-                thread_kwargs[k] = cis_kwargs.pop(k)
+        thread_kwargs = dict(name=name, target=target, group=group,
+                             args=args, kwargs=kwargs)
         super(CisThread, self).__init__(**thread_kwargs)
         CisClass.__init__(self, self.name, **cis_kwargs)
         self._cis_target = target
@@ -832,7 +831,7 @@ class CisThread(threading.Thread, CisClass):
         self.terminate_flag = False
         self._cleanup_called = False
         self._calling_thread = None
-        if daemon:
+        if daemon:  # pragma: debug
             self.setDaemon(True)
             self.daemon = True
         _thread_registry[self.name] = self
@@ -855,12 +854,12 @@ class CisThread(threading.Thread, CisClass):
         # self.terminate_event.set()
         self.terminate_flag = True
 
-    def unset_started_flag(self):
+    def unset_started_flag(self):  # pragma: debug
         r"""Set the started flag for the thread to False."""
         # self.start_event.clear()
         self.start_flag = False
 
-    def unset_terminated_flag(self):
+    def unset_terminated_flag(self):  # pragma: debug
         r"""Set the terminated flag for the thread to False."""
         # self.terminate_event.clear()
         self.terminated_flag = False
@@ -938,7 +937,7 @@ class CisThread(threading.Thread, CisClass):
         """
         self.debug('')
         with self.lock:
-            if self.was_terminated:
+            if self.was_terminated:  # pragma: debug
                 self.debug('Driver already terminated.')
                 return
             self.set_terminated_flag()
@@ -948,7 +947,7 @@ class CisThread(threading.Thread, CisClass):
             self.wait(timeout=self.timeout)
             assert(not self.is_alive())
 
-    def atexit(self):
+    def atexit(self):  # pragma: debug
         r"""Actions performed when python exits."""
         # self.debug('is_alive = %s', self.is_alive())
         if self.is_alive():
@@ -964,7 +963,7 @@ class CisThreadLoop(CisThread):
         self._1st_main_terminated = False
         self.break_flag = False
 
-    def on_main_terminated(self, dont_break=False):
+    def on_main_terminated(self, dont_break=False):  # pragma: debug
         r"""Actions performed when 1st main terminated.
 
         Args:
@@ -980,7 +979,7 @@ class CisThreadLoop(CisThread):
         r"""Set the break flag for the thread to True."""
         self.break_flag = True
 
-    def unset_break_flag(self):
+    def unset_break_flag(self):  # pragma: debug
         r"""Set the break flag for the thread to False."""
         self.break_flag = False
 
@@ -1010,7 +1009,8 @@ class CisThreadLoop(CisThread):
         try:
             self.before_loop()
             while (not self.was_break):
-                if self.main_terminated and (not self._1st_main_terminated):
+                if ((self.main_terminated and
+                     (not self._1st_main_terminated))):  # pragma: debug
                     self.on_main_terminated()
                 else:
                     self.run_loop()

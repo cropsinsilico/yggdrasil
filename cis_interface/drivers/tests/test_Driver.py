@@ -254,4 +254,4 @@ class TestDriverNoStart(TestParam):
         while not T.is_out:
             self.instance.sleep()
         assert(self.instance.check_timeout())
-        self.instance.stop_timeout()
+        self.instance.stop_timeout(quiet=True)

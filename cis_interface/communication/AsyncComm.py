@@ -21,8 +21,6 @@ class AsyncComm(CommBase.CommBase):
     Attributes:
         dont_backlog (bool): If True, the backlog will not be started and all
             messages will be sent/received directly to/from the comm.
-        backlog_thread (tools.CisThread): Thread that will handle sending
-            or receiving backlogged messages.
         backlog_send_ready (threading.Event): Event set when there is a
             message in the send backlog.
         backlog_recv_ready (threading.Event): Event set when there is a
@@ -58,7 +56,8 @@ class AsyncComm(CommBase.CommBase):
         r"""Open the connection by connecting to the queue."""
         super(AsyncComm, self).open()
         self._open_direct()
-        self._open_backlog()
+        if self.is_open_direct:
+            self._open_backlog()
 
     def _open_direct(self):
         r"""Open the comm directly."""
@@ -265,19 +264,17 @@ class AsyncComm(CommBase.CommBase):
 
     def run_backlog_send(self):
         r"""Continue trying to send buffered messages."""
-        # flag = self.backlog_send_ready.wait(self.sleeptime)
-        if not self.is_open_backlog:
+        if not self.is_open_backlog:  # pragma: debug
             self._close_backlog()
             return
-        # if flag:
-        if not self.send_backlog():
+        if not self.send_backlog():  # pragma: debug
             self._close_backlog()
             return
         self.sleep()
 
     def run_backlog_recv(self):
         r"""Continue buffering received messages."""
-        if self.backlog_thread.main_terminated:
+        if self.backlog_thread.main_terminated:  # pragma: debug
             self.debug("Main thread terminated")
             self._close_backlog()
             self.close()
@@ -354,7 +351,7 @@ class AsyncComm(CommBase.CommBase):
         """
         return (False, self.empty_msg)
 
-    def _send(self, payload, no_backlog=False, **kwargs):
+    def _send(self, payload, no_backlog=False, no_confirm=False, **kwargs):
         r"""Send a message to the backlog.
 
         Args:
@@ -363,7 +360,10 @@ class AsyncComm(CommBase.CommBase):
                 sent because the queue is full will be added to a list of
                 messages to be sent once the queue is no longer full. If True,
                 messages are not backlogged and an error will be raised if the
-                queue is full.
+                queue is full. Defaults to False.
+            no_confirm (bool, optional): If False and no_backlog is True, then
+                this will block until the sent message is confirmed. If True,
+                this will return without confirmation. Defaults to False.
 
         Returns:
             bool: Success or failure of sending the message.
@@ -381,10 +381,10 @@ class AsyncComm(CommBase.CommBase):
                 out = self._send_direct(payload, **kwargs)
                 if no_backlog:
                     if out and (self.direction == 'send'):
-                        self.wait_for_confirm(active_confirm=True,
-                                              timeout=False,
-                                              direction='send')
-                        return self.is_confirmed_send
+                        out = self.wait_for_confirm(active_confirm=True,
+                                                    timeout=False,
+                                                    noblock=no_confirm,
+                                                    direction='send')
                     return out
                 elif out:
                     return out
@@ -395,7 +395,7 @@ class AsyncComm(CommBase.CommBase):
         self.debug('%d bytes backlogged', len(payload))
         return True
 
-    def _recv(self, timeout=None, no_backlog=False):
+    def _recv(self, timeout=None, no_backlog=False, no_confirm=False):
         r"""Receive a message from the backlog.
 
         Args:
@@ -403,7 +403,10 @@ class AsyncComm(CommBase.CommBase):
                 Defaults to self.recv_timeout.
             no_backlog (bool, optional): If False and there are messages in the
                 receive backlog, they will be returned first. Otherwise the
-                queue is checked for a message.
+                queue is checked for a message. Defaults to False.
+            no_confirm (bool, optional): If False and no_backlog is True, then
+                this will block until the sent message is confirmed. If True,
+                this will return without confirmation. Defaults to False.
 
         Returns:
             tuple (bool, str): The success or failure of receiving a message
@@ -424,16 +427,17 @@ class AsyncComm(CommBase.CommBase):
                    self.is_open_direct):
                 self.sleep()
             self.stop_timeout()
-            if not self.is_open_direct:
+            if not self.is_open_direct:  # pragma: debug
                 self.debug("Comm closed")
                 return (False, self.empty_msg)
-            if self.n_msg_direct_recv == 0:
+            if self.n_msg_direct_recv == 0:  # pragma: debug
                 self.verbose_debug("No messages waiting.")
                 return (True, self.empty_msg)
             out = self._recv_direct()
             if out and (self.direction == 'recv'):
                 self.wait_for_confirm(active_confirm=True,
                                       timeout=False,
+                                      noblock=no_confirm,
                                       direction='recv')
             return out
         # Sleep until there is a message
