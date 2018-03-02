@@ -81,7 +81,7 @@ class ConnectionDriver(Driver):
         ocomm_kws['direction'] = 'send'
         ocomm_kws['dont_open'] = True
         ocomm_kws['reverse_names'] = True
-        ocomm_kws['close_on_eof_send'] = False
+        # ocomm_kws['close_on_eof_send'] = False
         ocomm_name = ocomm_kws.pop('name', name)
         try:
             self.ocomm = new_comm(ocomm_name, **ocomm_kws)
