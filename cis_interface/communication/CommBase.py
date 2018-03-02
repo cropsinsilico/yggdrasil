@@ -2,8 +2,6 @@ import os
 import uuid
 import atexit
 import threading
-import numpy as np
-import array
 from cis_interface import backwards, tools
 from cis_interface.tools import get_CIS_MSG_MAX, CIS_MSG_EOF
 from cis_interface.serialize.DefaultSerialize import DefaultSerialize
@@ -40,6 +38,8 @@ class CommThreadLoop(tools.CisThreadLoop):
             suffix = 'CommThread'
         if name is None:
             name = '%s.%s' % (comm.name, suffix)
+        # if comm.matlab:
+        #     kwargs['daemon'] = True
         super(CommThreadLoop, self).__init__(name=name, **kwargs)
 
     def on_main_terminated(self):
@@ -249,6 +249,7 @@ class CommBase(tools.CisClass):
         #     self._timeout_drain = self.timeout
         self._closing_event = threading.Event()
         self._closing_thread = tools.CisThread(target=self.linger_close,
+                                               # daemon=self.matlab,
                                                name=self.name + '.ClosingThread')
         self._eof_recv = threading.Event()
         self._eof_sent = threading.Event()
@@ -418,6 +419,9 @@ class CommBase(tools.CisClass):
                 this will block until the comm is closed.
 
         """
+        if self.matlab:
+            self.linger_close()
+            self._closing_thread.set_terminated_flag()
         self.debug("current_thread = %s", threading.current_thread().name)
         try:
             self._closing_thread.start()
@@ -446,6 +450,15 @@ class CommBase(tools.CisClass):
             self.drain_messages(variable='n_msg_send')
             self.wait_for_confirm(timeout=self._timeout_drain)
         self.debug("Finished")
+
+    def matlab_atexit(self):
+        r"""Close operations including draining receive."""
+        if self.direction == 'recv':
+            while self.recv(timeout=0)[0]:
+                self.sleep()
+        else:
+            self.comm.send_eof()
+        self.linger_close()
 
     def atexit(self):
         r"""Close operations."""
@@ -483,12 +496,38 @@ class CommBase(tools.CisClass):
         else:
             return self.is_confirmed_send
 
-    def wait_for_confirm(self, timeout=None):
+    def wait_for_confirm(self, timeout=None, direction=None,
+                         active_confirm=False):
         r"""Sleep until all messages are confirmed."""
-        T = self.start_timeout(t=timeout)
-        while (not T.is_out) and (not self.is_confirmed):
+        self.debug('')
+        if direction is None:
+            direction = self.direction
+        T = self.start_timeout(t=timeout, key_suffix='.wait_for_confirm')
+        while (not T.is_out) and (not getattr(self, 'is_confirmed_%s' % direction)):
+            if active_confirm:
+                if self.confirm(direction=direction):
+                    break
             self.sleep()
-        self.stop_timeout()
+        self.stop_timeout(key_suffix='.wait_for_confirm')
+        self.debug('Done confirming')
+
+    def confirm(self, direction=None):
+        r"""Confirm message."""
+        if direction is None:
+            direction = self.direction
+        if direction == 'send':
+            out = self.confirm_send()
+        else:
+            out = self.confirm_recv()
+        return out
+
+    def confirm_send(self):
+        r"""Confirm that sent message was received."""
+        return False
+
+    def confirm_recv(self):
+        r"""Confirm that message was received."""
+        return False
 
     @property
     def n_msg(self):
@@ -1149,7 +1188,7 @@ class CommBase(tools.CisClass):
             flag, s_msg = self.recv_multipart(*args, **kwargs)
             if flag and len(s_msg) > 0:
                 self.debug('%d bytes received', len(s_msg))
-        except Exception:
+        except BaseException:
             self.exception('Failed to recv.')
             return (False, None)
         if flag:
@@ -1158,30 +1197,6 @@ class CommBase(tools.CisClass):
             msg = None
         if self.single_use and self._used:
             self.linger_close()
-        # Convert arrays to format easily parsed by matlab
-        if self.matlab and isinstance(msg, np.ndarray):
-            # TODO: Possibly call matlab type initializer before returning
-            sep_cols = False
-            dt0 = msg.dtype[0]
-            for i in range(len(msg.dtype)):
-                dt = msg.dtype[i]
-                if dt != dt0:
-                    sep_cols = True
-                    break
-            if len(msg.dtype) > 1:
-                new_msg = []
-                for k in msg.dtype.names:
-                    col = msg[k].tolist()
-                    if len(col) == 1:
-                        new_msg.append(col[0])
-                    else:
-                        new_msg.append(col)
-            else:
-                new_msg = msg.tolist()
-            if not sep_cols and dt0.kind in 'cbBuhHiIlLfd':
-                msg = array.array(dt0.kind, new_msg)
-            else:
-                msg = new_msg
         return (flag, msg)
 
     def recv_multipart(self, *args, **kwargs):
@@ -1252,6 +1267,7 @@ class CommBase(tools.CisClass):
                                n_msg, variable)
             self.sleep()
         self.stop_timeout()
+        self.debug('Done draining')
 
     def purge(self):
         r"""Purge all messages from the comm."""

@@ -10,12 +10,11 @@ function rpcFibSrv(sleeptime)
   % Continue receiving requests until error occurs (the connection is closed
   % by all clients that have connected).
   while 1
-    input = rpc.rpcRecv();
-    if (~input{1});
+    [flag, input] = rpc.recv();
+    if (~flag);
       fprintf('rpcFibSrv(M): end of input');
       exit(0);
     end
-    input = input{2};
 
     % Compute fibonacci number
     fprintf('rpcFibSrv(M): <- input %d', input{1});
@@ -33,9 +32,10 @@ function rpcFibSrv(sleeptime)
 
     % Sleep and then send response back
     pause(sleeptime);
-    flag = rpc.rpcSend(input{1}, result);
+    flag = rpc.send(input{1}, result);
     if (~flag);
       fprintf('rpcFibSrv(M): ERROR sending');
+      exit(-1);
     end
   end
 

@@ -716,7 +716,9 @@ class AsciiTable(AsciiFile):
 
         Args:
             arr (np.ndarray, optional): Array to write to bytestring. If None
-                the array of table data is used.
+                the array of table data is used. This can also be a list of
+                arrays, one for each field in the table, or a list of lists,
+                one for each element containing the fields for that element.
             order (str, optional): Order that array should be written to the
                 bytestring. Defaults to 'C'.
 
@@ -724,25 +726,47 @@ class AsciiTable(AsciiFile):
             str: Bytestring.
 
         Raises:
-            TypeError: If the provided array is not a numpy array.
+            TypeError: If the provided array is not a numpy array, list, or tuple.
             ValueError: If the array is not the correct type.
+            ValueError: If there are not enough arrays in the input list.
+            ValueError: If any of the listed arrays doesn't have enough fields.
+            ValueError: If any of the listed arrays doesn't have enough elements.
 
         """
+        ntyp = len(self.dtype.names)
         if arr is None:
             arr = self.arr
-        if not isinstance(arr, np.ndarray):
-            raise TypeError("Provided array must be an array.")
-        if (arr.dtype != self.dtype):
-            if (arr.ndim != 2) or (arr.shape[1] != len(self.dtype)):
-                raise ValueError("Data types do not match.")
-            arr1 = np.empty(arr.shape[0], dtype=self.dtype)
-            for i, n in enumerate(self.dtype.names):
-                arr1[n] = arr[:, i]
+        if isinstance(arr, (list, tuple)):
+            if len(arr) == ntyp and isinstance(arr[0], np.ndarray):
+                nele = len(arr[0])
+                arr1 = np.empty(nele, dtype=self.dtype)
+                for i, n in enumerate(self.dtype.names):
+                    if len(arr[i]) != nele:
+                        raise ValueError("Field %s does not have enough elements." % n)
+                    arr1[n] = arr[i]
+            elif len(arr[0]) == ntyp:
+                nele = len(arr)
+                arr1 = np.empty(nele, dtype=self.dtype)
+                for i in range(nele):
+                    if len(arr1[i]) != ntyp:
+                        raise ValueError("Element %d does not have enough fields." % i)
+                    arr1[i] = np.array(arr1[i], self.dtype)
+            else:
+                raise ValueError("Not enough arrays for fields")
+        elif isinstance(arr, np.ndarray):
+            if (arr.dtype != self.dtype):
+                if (arr.ndim != 2) or (arr.shape[1] != ntyp):
+                    raise ValueError("Data types do not match.")
+                arr1 = np.empty(arr.shape[0], dtype=self.dtype)
+                for i, n in enumerate(self.dtype.names):
+                    arr1[n] = arr[:, i]
+            else:
+                arr1 = arr
         else:
-            arr1 = arr
+            raise TypeError("Provided array must be an array, list, or tuple.")
         if order == 'F':
             out = backwards.unicode2bytes('')
-            for i in range(len(arr1.dtype)):
+            for i in range(ntyp):
                 n = arr1.dtype.names[i]
                 if np.issubdtype(arr1.dtype[i], np.dtype('complex')):
                     out = out + arr1[n].real.tobytes()

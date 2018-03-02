@@ -9,9 +9,7 @@ while flag
 
   % Receive input from input channel 
   % If there is an error, the flag will be False.
-  res = in_channel.recv();
-  flag = res{1};
-  msg = res{2};
+  [flag, msg] = in_channel.recv();
   if (~flag)
     disp('No more input.');
     break

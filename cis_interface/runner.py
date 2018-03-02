@@ -429,7 +429,13 @@ class CisRunner(CisClass):
             for driver in self.all_drivers:
                 self.debug("Starting driver %s", driver['name'])
                 d = driver['instance']
-                d.start()
+                for n2 in driver.get('client_of', []):
+                    d2 = self.modeldrivers[n2]['instance']
+                    if not d2.was_started:
+                        self.debug("Starting server '%s' before client", d2.name)
+                        d2.start()
+                if not d.was_started:
+                    d.start()
         except BaseException:  # pragma: debug
             self.error("%s did not start", driver['name'])
             self.terminate()

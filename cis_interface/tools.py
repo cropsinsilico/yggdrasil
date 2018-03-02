@@ -670,7 +670,7 @@ class CisClass(logging.LoggerAdapter):
         r"""str: Key identifying calling object and method."""
         return self.get_timeout_key()
 
-    def get_timeout_key(self, key_level=0):
+    def get_timeout_key(self, key_level=0, key_suffix=None):
         r"""Return a key for a given level in the stack, relative to the
         function calling get_timeout_key.
 
@@ -680,6 +680,8 @@ class CisClass(logging.LoggerAdapter):
                 key the timeout. 0 is the class and function/method that is 2
                 steps higher in the stack. Higher values use classes and
                 function/methods further up in the stack. Defaults to 0.
+            key_suffix (str, optional): String that should be appended to the
+                end of the generated key. Defaults to None and is ignored.
 
         Returns:
             str: Key identifying calling object and method.
@@ -694,9 +696,11 @@ class CisClass(logging.LoggerAdapter):
         else:
             key = '%s(%s).%s' % (str(self.__class__).split("'")[1], self.name,
                                  threading.current_thread().name)
+        if key_suffix is not None:
+            key += key_suffix
         return key
 
-    def start_timeout(self, t=None, key=None, key_level=0):
+    def start_timeout(self, t=None, key=None, key_level=0, key_suffix=None):
         r"""Start a timeout for the calling function/method.
 
         Args:
@@ -711,6 +715,8 @@ class CisClass(logging.LoggerAdapter):
                 key the timeout. 0 is the class and function/method that called
                 start_timeout. Higher values use classes and function/methods
                 further up in the stack. Defaults to 0.
+            key_suffix (str, optional): String that should be appended to the
+                end of the generated key. Defaults to None and is ignored.
 
         Raises:
             KeyError: If the key already exists.
@@ -719,7 +725,7 @@ class CisClass(logging.LoggerAdapter):
         if t is None:
             t = self.timeout
         if key is None:
-            key = self.get_timeout_key(key_level=key_level)
+            key = self.get_timeout_key(key_level=key_level, key_suffix=key_suffix)
         if key in self._timeouts:
             raise KeyError("Timeout already registered for %s" % key)
         self._timeouts[key] = TimeOut(t, key=key)
@@ -750,7 +756,7 @@ class CisClass(logging.LoggerAdapter):
         t = self._timeouts[key]
         return t.is_out
         
-    def stop_timeout(self, key=None, key_level=0, quiet=False):
+    def stop_timeout(self, key=None, key_level=0, key_suffix=None, quiet=False):
         r"""Stop a timeout for the calling function method.
 
         Args:
@@ -762,6 +768,8 @@ class CisClass(logging.LoggerAdapter):
                 key the timeout. 0 is the class and function/method that called
                 start_timeout. Higher values use classes and function/methods
                 further up in the stack. Defaults to 0.
+            key_suffix (str, optional): String that should be appended to the
+                end of the generated key. Defaults to None and is ignored.
             quiet (bool, optional): If True, error message on timeout exceeded
                 will be debug log. Defaults to False.
 
@@ -771,7 +779,7 @@ class CisClass(logging.LoggerAdapter):
 
         """
         if key is None:
-            key = self.get_timeout_key(key_level=key_level)
+            key = self.get_timeout_key(key_level=key_level, key_suffix=key_suffix)
         if key not in self._timeouts:
             raise KeyError("No timeout registered for %s" % key)
         t = self._timeouts[key]
@@ -818,6 +826,7 @@ class CisThread(threading.Thread, CisClass):
         self.start_flag = False
         self.terminate_flag = False
         self._cleanup_called = False
+        self._calling_thread = None
         if daemon:
             self.setDaemon(True)
             self.daemon = True
@@ -829,6 +838,7 @@ class CisThread(threading.Thread, CisClass):
     def main_terminated(self):
         r"""bool: True if the main thread has terminated."""
         return (not _main_thread.is_alive())
+        # return (not self._calling_thread.is_alive())
 
     def set_started_flag(self):
         r"""Set the started flag for the thread to True."""
@@ -869,6 +879,8 @@ class CisThread(threading.Thread, CisClass):
             self.set_started_flag()
             self.before_start()
         super(CisThread, self).start(*args, **kwargs)
+        self._calling_thread = threading.current_thread()
+        # print("Thread = %s, Called by %s" % (self.name, self._calling_thread.name))
 
     def run(self, *args, **kwargs):
         r"""Continue running until terminate event set."""

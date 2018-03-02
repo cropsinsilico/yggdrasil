@@ -184,13 +184,19 @@ class MatlabProcess(tools.CisClass):  # pragma: matlab
     def is_cancelled(self):
         r"""bool: Was the async call cancelled or not."""
         if self.is_started():
-            return self.future.cancelled()
+            try:
+                return self.future.cancelled()
+            except BaseException:
+                return True
         return False
 
     def is_done(self):
         r"""bool: Is the async call still running."""
         if self.is_started():
-            return self.future.done() or self.is_cancelled()
+            try:
+                return self.future.done() or self.is_cancelled()
+            except BaseException:
+                return True
         return False
 
     def is_alive(self):
@@ -213,7 +219,10 @@ class MatlabProcess(tools.CisClass):  # pragma: matlab
     def kill(self, *args, **kwargs):
         r"""Cancel the async call."""
         if self.is_alive():
-            self.future.cancel()
+            try:
+                self.future.cancel()
+            except BaseException:
+                pass
         self.print_output()
 
 
@@ -248,6 +257,10 @@ class MatlabModelDriver(ModelDriver):  # pragma: matlab
         self.screen_session = None
         self.mlengine = None
         self.mlsession = None
+        self.fdir = os.path.dirname(os.path.abspath(self.args[0]))
+
+    def start_matlab(self):
+        r"""Start matlab session and connect to it."""
         # Connect to matlab, start if not running
         if len(matlab.engine.find_matlab()) == 0:
             self.debug("Starting a matlab shared engine")
@@ -267,10 +280,9 @@ class MatlabModelDriver(ModelDriver):  # pragma: matlab
                 self.error("Could not connect to matlab engine")
                 self.raise_error(e)
         # Add things to Matlab environment
-        fdir = os.path.dirname(os.path.abspath(self.args[0]))
         self.mlengine.addpath(_top_dir, nargout=0)
         self.mlengine.addpath(_incl_interface, nargout=0)
-        self.mlengine.addpath(fdir, nargout=0)
+        self.mlengine.addpath(self.fdir, nargout=0)
         self.debug("Connected to matlab")
 
     def cleanup(self):
@@ -289,7 +301,8 @@ class MatlabModelDriver(ModelDriver):  # pragma: matlab
 
     def before_start(self):
         r"""Actions to perform before the run loop."""
-        name = os.path.splitext(os.path.basename(self.args[0]))[0]
+        self.target_name = os.path.splitext(os.path.basename(self.args[0]))[0]
+        self.start_matlab()
 
         # Add environment variables
         self.debug('Setting environment variables for Matlab engine.')
@@ -305,10 +318,11 @@ class MatlabModelDriver(ModelDriver):  # pragma: matlab
             if self.mlengine is None:  # pragma: debug
                 self.debug('Matlab engine not set. Stopping')
                 return
+            self.model_process = MatlabProcess(
+                target=getattr(self.mlengine, self.target_name),
+                name=self.name + '.MatlabProcess',
+                args=self.args[1:])
             self.debug('Starting MatlabProcess')
-            self.model_process = MatlabProcess(target=getattr(self.mlengine, name),
-                                               name=self.name + '.MatlabProcess',
-                                               args=self.args[1:])
             self.model_process.start()
             self.debug('MatlabProcess running model.')
 
@@ -316,18 +330,15 @@ class MatlabModelDriver(ModelDriver):  # pragma: matlab
         r"""Loop to check if model is still running and forward output."""
         self.model_process.print_output()
         if self.model_process.is_done():
+            self.model_process.print_output()
             self.set_break_flag()
-            if not self.model_process.is_cancelled():
+            try:
                 self.model_process.future.result()
                 self.model_process.print_output()
-            else:
-                try:
-                    self.model_process.future.result()
-                except matlab.engine.InterruptedError:
-                    pass
-            # self.model_process.print_output()
-            self.model_process.print_output()
-        self.sleep()
+            except BaseException:
+                pass
+        else:
+            self.sleep()
 
     def after_loop(self):
         r"""Actions to perform after run_loop has finished. Mainly checking
