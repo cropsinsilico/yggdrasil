@@ -20,7 +20,7 @@ class TestGCCModelParam(parent.TestModelParam):
         self.attr_list += []
         src = scripts['c']
         script_dir = os.path.dirname(src[0])
-        if platform._is_win:
+        if platform._is_win:  # pragma: windows
             self.args = src + ['1', '-I' + script_dir, '/link', '-L' + script_dir]
         else:
             self.args = src + ['1', '-I' + script_dir, '-L' + script_dir]
@@ -35,7 +35,7 @@ class TestGCCModelDriverNoStart(TestGCCModelParam,
         super(TestGCCModelDriverNoStart, self).__init__(*args, **kwargs)
         src = scripts['cpp']
         script_dir = os.path.dirname(src[0])
-        if platform._is_win:
+        if platform._is_win:  # pragma: windows
             self.args = src + ['1', '-I' + script_dir, '/link', '-L' + script_dir,
                                '/out:test_exe.exe']
         else:

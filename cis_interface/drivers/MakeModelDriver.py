@@ -54,7 +54,7 @@ class MakeModelDriver(ModelDriver):
         self.debug('')
         self.compiled = False
         if make_command is None:
-            if platform._is_win:
+            if platform._is_win:  # pragma: windows
                 make_command = 'nmake'
             else:
                 make_command = 'make'
@@ -91,7 +91,7 @@ class MakeModelDriver(ModelDriver):
         """
         curdir = os.getcwd()
         os.chdir(self.makedir)
-        if self.make_command == 'nmake':
+        if self.make_command == 'nmake':  # pragma: windows
             make_opts = ['/NOLOGO', '/F']
         else:
             make_opts = ['-f']

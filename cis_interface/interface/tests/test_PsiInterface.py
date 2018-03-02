@@ -28,7 +28,7 @@ def test_bufMsgSize():
 
 
 @unittest.skipIf(not MatlabModelDriver._matlab_installed, "Matlab not installed.")
-def test_PsiMatlab_class():
+def test_PsiMatlab_class():  # pragma: matlab
     r"""Test Matlab interface for classes."""
     name = 'test'
     # Input

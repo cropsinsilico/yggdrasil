@@ -236,6 +236,10 @@ class TestDriverNoStart(TestParam):
         except Exception:
             self.instance.exception(1)
         self.instance.printStatus()
+        self.instance.special_debug(1)
+        self.instance.suppress_special_debug = True
+        self.instance.special_debug(1)
+        self.instance.suppress_special_debug = False
 
     def test_timeout(self):
         r"""Test functionality of timeout."""

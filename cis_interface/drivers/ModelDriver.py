@@ -71,7 +71,7 @@ class ModelDriver(Driver):
         # Strace/valgrind
         if with_strace and with_valgrind:
             raise RuntimeError("Trying to run with strace and valgrind.")
-        if (with_strace or with_valgrind) and platform._is_win:
+        if (with_strace or with_valgrind) and platform._is_win:  # pragma: windows
             raise RuntimeError("strace/valgrind options invalid on windows.")
         self.with_strace = with_strace
         if strace_flags is None:

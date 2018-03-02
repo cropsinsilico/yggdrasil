@@ -247,7 +247,7 @@ class CisRunner(CisClass):
         self._swap_handler(signal.SIGINT, signal_handler)
         if not platform._is_win:
             self._swap_handler(signal.SIGTERM, signal_handler)
-        else:
+        else:  # pragma: windows
             self._swap_handler(signal.SIGBREAK, signal_handler)
             if False:
                 import ctypes

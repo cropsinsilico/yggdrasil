@@ -38,7 +38,7 @@ map_nptype2cformat = [
     ('int8', '%hhd'), ('short', '%hd'), ('intc', '%d'),
     ('uint8', '%hhu'), ('ushort', '%hu'), ('uintc', '%u'),
     ('S', '%s'), ('S5', '%5s'), ('U', '%s'), ('U5', '%20s')]
-if platform._is_win:
+if platform._is_win:  # pragma: windows
     map_nptype2cformat.append(('int64', '%l64d'))
     map_nptype2cformat.append(('uint64', '%l64u'))
 else:
@@ -51,10 +51,10 @@ if np.dtype('int_') != np.dtype('intc'):
 else:
     map_nptype2cformat.append(('int_', '%d'))
 if np.dtype('int_') != np.dtype('longlong'):
-    if platform._is_win:
+    if platform._is_win:  # pragma: windows
         map_nptype2cformat.append(('longlong', '%l64d'))
         map_nptype2cformat.append(('ulonglong', '%l64u'))
-    else:
+    else:  # pragma: debug
         map_nptype2cformat.append(('longlong', '%lld'))
         map_nptype2cformat.append(('ulonglong', '%llu'))
 map_cformat2pyscanf = [(['%hhd', '%hd', '%d', '%ld', '%lld', '%l64d'], '%d'),

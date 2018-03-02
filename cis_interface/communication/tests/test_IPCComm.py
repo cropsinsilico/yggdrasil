@@ -62,7 +62,31 @@ class TestIPCComm(test_AsyncComm.TestAsyncComm):
 
 
 @unittest.skipIf(_ipc_installed, "IPC library installed")
-def test_not_running():
+def test_queue_not_installed():  # pragma: windows
+    r"""Test return of get_queue if IPC library is not installed."""
+    nt.assert_equal(IPCComm.get_queue(), None)
+
+
+@unittest.skipIf(_ipc_installed, "IPC library installed")
+def test_ipcs_not_isntalled():  # pragma: windows
+    r"""Test return of ipcs if IPC library is not installed."""
+    nt.assert_equal(IPCComm.ipcs(), '')
+
+    
+@unittest.skipIf(_ipc_installed, "IPC library installed")
+def test_ipcrm_not_isntalled():  # pragma: windows
+    r"""Test ipcrm if IPC library is not installed."""
+    IPCComm.ipcrm()
+
+    
+@unittest.skipIf(_ipc_installed, "IPC library installed")
+def test_ipcrm_queues_not_isntalled():  # pragma: windows
+    r"""Test ipcrm_queues if IPC library is not installed."""
+    IPCComm.ipcrm_queues()
+
+    
+@unittest.skipIf(_ipc_installed, "IPC library installed")
+def test_not_running():  # pragma: windows
     r"""Test raise of an error if a IPC library is not installed."""
     comm_kwargs = dict(comm='IPCComm', direction='send', reverse_names=True)
     nt.assert_raises(RuntimeError, new_comm, 'test', **comm_kwargs)

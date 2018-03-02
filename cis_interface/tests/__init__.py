@@ -49,7 +49,7 @@ yaml_list = [
 yamls = {k: os.path.join(yaml_dir, v) for k, v in yaml_list}
 
 # Makefile
-if platform._is_win:
+if platform._is_win:  # pragma: windows
     makefile0 = os.path.join(script_dir, "Makefile_windows")
 else:
     makefile0 = os.path.join(script_dir, "Makefile_linux")

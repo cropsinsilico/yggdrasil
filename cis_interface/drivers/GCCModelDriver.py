@@ -24,7 +24,7 @@ def get_zmq_flags():
     _compile_flags = []
     _linker_flags = []
     if _zmq_installed:
-        if platform._is_win:
+        if platform._is_win:  # pragma: windows
             for l in ["libzmq", "czmq"]:
                 plib = cis_cfg.get('windows', '%s_static' % l, False)
                 pinc = cis_cfg.get('windows', '%s_include' % l, False)
@@ -63,7 +63,7 @@ def get_flags():
     """
     _compile_flags = []
     _linker_flags = []
-    if platform._is_win:
+    if platform._is_win:  # pragma: windows
         _regex_win32 = os.path.split(_regex_win32_lib)
         _compile_flags += ["/nologo", "-D_CRT_SECURE_NO_WARNINGS", "-I" + _regex_win32[0]]
         _linker_flags += [_regex_win32[1], '/LIBPATH:"%s"' % _regex_win32[0]]
@@ -82,7 +82,7 @@ def get_flags():
     return _compile_flags, _linker_flags
 
 
-def build_regex_win32():
+def build_regex_win32():  # pragma: windows
     r"""Build the regex_win32 library."""
     _regex_win32_dir = os.path.dirname(_regex_win32_lib)
     _regex_win32_cpp = os.path.join(_regex_win32_dir, 'regex_win32.cpp')
@@ -111,7 +111,7 @@ def build_regex_win32():
     assert(os.path.isfile(_regex_win32_lib))
 
 
-if platform._is_win and (not os.path.isfile(_regex_win32_lib)):
+if platform._is_win and (not os.path.isfile(_regex_win32_lib)):  # pragma: windows
     build_regex_win32()
 
 
@@ -143,13 +143,13 @@ def do_compile(src, out=None, cc=None, ccflags=None, ldflags=None,
         ldflags = []
     _compile_flags, _linker_flags = get_flags()
     ldflags0 = _linker_flags
-    if platform._is_win:
+    if platform._is_win:  # pragma: windows
         ccflags0 = ['/W4', '/Zi', "/EHsc"]
     else:
         ccflags0 = ['-g', '-Wall']
     ccflags0 += _compile_flags
     # Change format for path (windows compat of examples)
-    if platform._is_win:
+    if platform._is_win:  # pragma: windows
         for i in range(len(src)):
             src[i] = os.path.join(*(src[i].split('/')))
     # Get primary file
@@ -157,7 +157,7 @@ def do_compile(src, out=None, cc=None, ccflags=None, ldflags=None,
     src_base, src_ext = os.path.splitext(cfile)
     # Select compiler
     if cc is None:
-        if platform._is_win:
+        if platform._is_win:  # pragma: windows
             cc = 'cl'
         else:
             if src_ext in ['.c']:
@@ -166,7 +166,7 @@ def do_compile(src, out=None, cc=None, ccflags=None, ldflags=None,
                 cc = 'g++'
     # Create/fix executable
     if out is None:
-        if platform._is_win:
+        if platform._is_win:  # pragma: windows
             osuffix = '_%s.exe' % src_ext[1:]
         else:
             osuffix = '_%s.out' % src_ext[1:]
@@ -187,7 +187,7 @@ def do_compile(src, out=None, cc=None, ccflags=None, ldflags=None,
     if not platform._is_win:
         compile_args += ["-o", out]
     compile_args += src + ccflags0 + ccflags
-    if platform._is_win:
+    if platform._is_win:  # pragma: windows
         compile_args += ['/link', '/out:%s' % out]
     compile_args += ldflags0 + ldflags
     if os.path.isfile(out):
@@ -243,7 +243,7 @@ class GCCModelDriver(ModelDriver):
                                 working_dir=self.workingDir)
         assert(os.path.isfile(self.efile))
         self.debug("Compiled %s", self.efile)
-        if platform._is_win:
+        if platform._is_win:  # pragma: windows
             self.args = [os.path.splitext(self.efile)[0]]
         else:
             self.args = [os.path.join(".", self.efile)]
@@ -280,9 +280,9 @@ class GCCModelDriver(ModelDriver):
             if os.path.splitext(a)[1] in ['.c', '.cpp', '.cc']:
                 self.src.append(a)
             elif a.lower().startswith('-l') or is_link:
-                if a.lower().startswith('/out:'):
+                if a.lower().startswith('/out:'):  # pragma: windows
                     self.efile = a[5:]
-                elif a.lower().startswith('-l') and platform._is_win:
+                elif a.lower().startswith('-l') and platform._is_win:  # pragma: windows
                     a1 = '/LIBPATH:"%s"' % a[2:]
                     if a1 not in self.ldflags:
                         self.ldflags.append(a1)
@@ -291,7 +291,7 @@ class GCCModelDriver(ModelDriver):
             elif a == '-o':
                 # Next argument should be the name of the executable
                 is_object = True
-            elif a.lower() == '/link':
+            elif a.lower() == '/link':  # pragma: windows
                 # Following arguments should be linker options
                 is_link = True
             elif a.startswith('-') or (platform._is_win and a.startswith('/')):
@@ -311,10 +311,10 @@ class GCCModelDriver(ModelDriver):
         
     def remove_products(self):
         r"""Delete products produced during the compilation process."""
-        if self.efile is None:
+        if self.efile is None:  # pragma: debug
             return
         products = [self.efile]
-        if platform._is_win:
+        if platform._is_win:  # pragma: windows
             base = os.path.splitext(self.efile)[0]
             products = [base + ext for ext in ['.ilk', '.pdb', '.obj']]
         for p in products:

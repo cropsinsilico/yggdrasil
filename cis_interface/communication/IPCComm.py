@@ -6,7 +6,7 @@ from cis_interface.communication import CommBase, AsyncComm
 try:
     import sysv_ipc
     _ipc_installed = tools._ipc_installed
-except ImportError:
+except ImportError:  # pragma: windows
     logging.warn("Could not import sysv_ipc. " +
                  "IPC support will be disabled.")
     sysv_ipc = None
@@ -51,8 +51,8 @@ def get_queue(qid=None):
         if key not in _registered_queues:
             _registered_queues[key] = mq
         return mq
-    else:
-        logging.warn("IPC not installed. Queue cannot be returned.")
+    else:  # pragma: windows
+        logging.warning("IPC not installed. Queue cannot be returned.")
         return None
 
 

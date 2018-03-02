@@ -26,7 +26,7 @@ def eof_msg():
     return PSI_MSG_EOF
 
 
-def PsiMatlab(_type, args=None):
+def PsiMatlab(_type, args=None):  # pragma: matlab
     r"""Short interface to identify functions called by Matlab.
 
     Args:

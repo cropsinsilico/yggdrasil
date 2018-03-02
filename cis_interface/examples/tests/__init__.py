@@ -37,7 +37,7 @@ class TestExample(unittest.TestCase, tools.CisClass):
         if self._old_default_comm is None:
             if 'CIS_DEFAULT_COMM' in os.environ:
                 del os.environ['CIS_DEFAULT_COMM']
-        else:
+        else:  # pragma: debug
             os.environ['CIS_DEFAULT_COMM'] = self._old_default_comm
 
     def shortDescription(self):

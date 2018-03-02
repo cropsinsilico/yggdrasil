@@ -12,7 +12,7 @@ def test_error_valgrind_strace():
 
 
 @unittest.skipIf(not platform._is_win, "Platform is not windows")
-def test_error_valgrind_strace_windows():
+def test_error_valgrind_strace_windows():  # pragma: windows
     r"""Test error if strace or valgrind called on windows."""
     nt.assert_raises(RuntimeError, ModelDriver, 'test', 'test',
                      with_strace=True)
@@ -26,7 +26,7 @@ class TestModelParam(parent.TestParam):
     def __init__(self, *args, **kwargs):
         super(TestModelParam, self).__init__(*args, **kwargs)
         self.driver = 'ModelDriver'
-        if platform._is_win:
+        if platform._is_win:  # pragma: windows
             self.args = ['timeout', '0']
         else:
             self.args = ['sleep', '0.1']

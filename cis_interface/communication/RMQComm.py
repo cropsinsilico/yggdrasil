@@ -57,7 +57,7 @@ def check_rmq_server(url=None, **kwargs):
         if not connection.is_open:  # pragma: debug
             return False
         connection.close()
-    except BaseException:
+    except BaseException:  # pragma: debug
         return False
     return True
 
@@ -94,7 +94,7 @@ class RMQComm(AsyncComm.AsyncComm):
         self._is_open = False
         self._bound = False
         # Check that connection is possible
-        if not check_rmq_server(self.url):
+        if not check_rmq_server(self.url):  # pragma: debug
             raise RuntimeError("Could not connect to RabbitMQ server.")
         self._server_class = RMQServer
         super(RMQComm, self)._init_before_open(**kwargs)
@@ -197,7 +197,7 @@ class RMQComm(AsyncComm.AsyncComm):
 
     def bind(self):
         r"""Declare queue to get random new queue."""
-        if self.is_open:
+        if self.is_open or self._bound:
             return
         self._bound = True
         parameters = pika.URLParameters(self.url)
@@ -248,8 +248,7 @@ class RMQComm(AsyncComm.AsyncComm):
         r"""Open connection and bind/connect to queue as necessary."""
         super(RMQComm, self)._open_direct()
         if not self.is_open:
-            if not self._bound:
-                self.bind()
+            self.bind()
             self._is_open = True
             self._bound = False
 
@@ -281,7 +280,7 @@ class RMQComm(AsyncComm.AsyncComm):
                 self.channel.queue_unbind(queue=self.queue,
                                           exchange=self.exchange)
                 self.channel.queue_delete(queue=self.queue)
-            except pika.exceptions.ChannelClosed:
+            except pika.exceptions.ChannelClosed:  # pragma: debug
                 pass
             except AttributeError:  # pragma: debug
                 if self.channel is not None:
@@ -293,7 +292,7 @@ class RMQComm(AsyncComm.AsyncComm):
             try:
                 self.channel.close()
             except (pika.exceptions.ChannelClosed,
-                    pika.exceptions.ChannelAlreadyClosing):
+                    pika.exceptions.ChannelAlreadyClosing):  # pragma: debug
                 pass
         self.channel = None
 
@@ -334,7 +333,7 @@ class RMQComm(AsyncComm.AsyncComm):
                 res = self.channel.queue_declare(queue=self.queue,
                                                  auto_delete=True,
                                                  passive=True)
-            except pika.exceptions.ChannelClosed:
+            except pika.exceptions.ChannelClosed:  # pragma: debug
                 self._close_direct()
         return res
         
@@ -432,7 +431,7 @@ class RMQComm(AsyncComm.AsyncComm):
             queue=self.queue, no_ack=False)
         if method_frame:
             self.channel.basic_ack(method_frame.delivery_tag)
-        else:
+        else:  # pragma: debug
             self.debug("No message")
             msg = self.empty_msg
         return (True, msg)

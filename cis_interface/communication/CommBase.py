@@ -32,10 +32,8 @@ class CommThreadLoop(tools.CisThreadLoop):
         comm (CommBase): Comm class that thread is for.
 
     """
-    def __init__(self, comm, name=None, suffix=None, **kwargs):
+    def __init__(self, comm, name=None, suffix='CommThread', **kwargs):
         self.comm = comm
-        if suffix is None:
-            suffix = 'CommThread'
         if name is None:
             name = '%s.%s' % (comm.name, suffix)
         # if comm.matlab:
@@ -843,7 +841,7 @@ class CommBase(tools.CisClass):
             out = self._send_1st(*args, **kwargs)
         else:
             with self._closing_thread.lock:
-                if self.is_closed:
+                if self.is_closed:  # pragma: debug
                     return False
                 out = self._send(*args, **kwargs)
         if out:

@@ -289,7 +289,7 @@ class ZMQProxy(CommBase.CommServer):
 
     def after_loop(self):
         r"""Close sockets after the loop finishes."""
-        self.close_sockets()
+        self.cleanup()
         super(ZMQProxy, self).after_loop()
 
     def cleanup(self):

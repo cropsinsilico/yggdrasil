@@ -211,6 +211,17 @@ class TestZMQCommPUSH(TestZMQComm):
         pass
 
     
+class TestZMQCommPUSH_INPROC(TestZMQCommINPROC):
+    r"""Test for ZMQComm communication class with INPROC PUSH/PULL socket."""
+    def __init__(self, *args, **kwargs):
+        super(TestZMQCommPUSH_INPROC, self).__init__(*args, **kwargs)
+        self.socket_type = 'PUSH'
+
+    def test_send_recv_nolimit(self):
+        r"""Disabled send/recv of large message."""
+        pass
+
+    
 class TestZMQCommPUB(TestZMQComm):
     r"""Test for ZMQComm communication class with PUB/SUB socket."""
     def __init__(self, *args, **kwargs):

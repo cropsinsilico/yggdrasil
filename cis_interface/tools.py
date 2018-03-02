@@ -89,7 +89,7 @@ atexit.register(cis_atexit)
 def locate_path(fname, basedir=os.path.abspath(os.sep)):
     r"""Find the full path to a file using where on Windows."""
     try:
-        if platform._is_win:
+        if platform._is_win:  # pragma: windows
             out = subprocess.check_output(["dir", fname, "/s/b"], shell=True,
                                           cwd=basedir)
             # out = subprocess.check_output(["where", fname])
@@ -126,7 +126,7 @@ def is_zmq_installed():
 
     """
     # Check existence of config paths for windows
-    if platform._is_win:
+    if platform._is_win:  # pragma: windows
         opts = ['libzmq_include', 'libzmq_static',  # 'libzmq_dynamic',
                 'czmq_include', 'czmq_static']  # , 'czmq_dynamic']
         for o in opts:
@@ -196,7 +196,7 @@ def kill(pid, signum):
         signum (int): Signal that should be sent.
 
     """
-    if platform._is_win:
+    if platform._is_win:  # pragma: windows
         sigmap = {signal.SIGINT: signal.CTRL_C_EVENT,
                   signal.SIGBREAK: signal.CTRL_BREAK_EVENT}
         if False:
@@ -248,7 +248,7 @@ def sleep(interval):
         interval (float): Time in seconds that process should sleep.
 
     """
-    if platform._is_win and backwards.PY2:
+    if platform._is_win and backwards.PY2:  # pragma: windows
         while True:
             try:
                 t = time.time()
@@ -336,18 +336,18 @@ class CisPopen(subprocess.Popen):
         kwargs.setdefault('stdout', subprocess.PIPE)
         kwargs.setdefault('stderr', subprocess.STDOUT)
         if not forward_signals:
-            if platform._is_win:
+            if platform._is_win:  # pragma: windows
                 kwargs.setdefault('preexec_fn', None)
                 kwargs.setdefault('creationflags', subprocess.CREATE_NEW_PROCESS_GROUP)
             else:
                 kwargs.setdefault('preexec_fn', os.setpgrp)
-        # if platform._is_win:
+        # if platform._is_win:  # pragma: windows
         #     kwargs.setdefault('universal_newlines', True)
         super(CisPopen, self).__init__(cmd_args, **kwargs)
 
     def kill(self, *args, **kwargs):
         r"""On windows using CTRL_BREAK_EVENT to kill the process."""
-        if platform._is_win:
+        if platform._is_win:  # pragma: windows
             self.send_signal(signal.CTRL_BREAK_EVENT)
         else:
             super(CisPopen, self).kill(*args, **kwargs)

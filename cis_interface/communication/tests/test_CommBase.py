@@ -308,6 +308,8 @@ class TestCommBase(CisTest, IOInfo):
             recv_instance.wait_for_confirm(timeout=self.timeout)
             assert(send_instance.is_confirmed)
             assert(recv_instance.is_confirmed)
+            send_instance.confirm(noblock=True)
+            recv_instance.confirm(noblock=True)
         nt.assert_equal(getattr(send_instance, n_msg_send_meth), 0)
         nt.assert_equal(getattr(recv_instance, n_msg_recv_meth), 0)
 

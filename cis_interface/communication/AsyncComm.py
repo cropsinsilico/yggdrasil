@@ -129,7 +129,6 @@ class AsyncComm(CommBase.CommBase):
             return self.n_msg_direct_send
         else:
             return self.n_msg_direct_recv
-        return 0
 
     @property
     def n_msg_backlog_recv(self):
@@ -329,7 +328,7 @@ class AsyncComm(CommBase.CommBase):
         self.confirm_recv()
         return flag
 
-    def _send_direct(self, payload):
+    def _send_direct(self, payload):  # pragma: debug
         r"""Send a message to the comm directly.
 
         Args:
@@ -341,7 +340,7 @@ class AsyncComm(CommBase.CommBase):
         """
         return False
 
-    def _recv_direct(self):
+    def _recv_direct(self):  # pragma: debug
         r"""Receive a message from the comm directly.
 
         Returns:
@@ -389,7 +388,7 @@ class AsyncComm(CommBase.CommBase):
                 elif out:
                     return out
             except AsyncTryAgain:
-                if no_backlog:
+                if no_backlog:  # pragma: debug
                     raise
         self.add_backlog_send(payload, **kwargs)
         self.debug('%d bytes backlogged', len(payload))

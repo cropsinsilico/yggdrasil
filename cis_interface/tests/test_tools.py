@@ -33,7 +33,7 @@ def test_popen_nobuffer():
     ans = os.getcwd()  # + '\n'
     # ans = backwards.unicode2bytes(ans)
     # Test w/o shell
-    if platform._is_win:
+    if platform._is_win:  # pragma: windows
         args = ['cmd', '/c', 'cd']
     else:
         args = ['pwd']
@@ -42,7 +42,7 @@ def test_popen_nobuffer():
     res = out.decode('utf-8').splitlines()[0]
     nt.assert_equal(res, ans)
     # Test w/ shell
-    if platform._is_win:
+    if platform._is_win:  # pragma: windows
         args = 'cd'
     else:
         args = 'pwd'
