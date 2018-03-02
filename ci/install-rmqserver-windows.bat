@@ -11,14 +11,14 @@ set STARTTIME=%DATE% %TIME%
 
 :: Setup environment
 IF /I "%PLATFORM%"=="x64" (
-   set ERLANGURL="http://erlang.org/download/otp_win64_20.2.exe"
+   set ERLANGURL=http://erlang.org/download/otp_win64_20.2.exe
 ) ELSE (
-   set ERLANGURL="http://erlang.org/download/otp_win32_20.2.exe"
+   set ERLANGURL=http://erlang.org/download/otp_win32_20.2.exe
 )
-set ERLANGEXE="C:\\Users\\appveyor\\erlang.exe"
-set ERLANGDIR="C:\\Users\\appveyor\\erlang"
-set RMQURL="https://github.com/rabbitmq/rabbitmq-server/releases/download/v3.7.3/rabbitmq-server-3.7.3.exe"
-set RMQEXE="C:\\Users\\appveyor\\rabbitmq-server-3.7.3.exe"
+set ERLANGEXE=C:\Users\appveyor\erlang.exe
+set ERLANGDIR=C:\Users\appveyor\erlang
+set RMQURL=https://github.com/rabbitmq/rabbitmq-server/releases/download/v3.7.3/rabbitmq-server-3.7.3.exe
+set RMQEXE=C:\Users\appveyor\rabbitmq-server-3.7.3.exe
 
 
 :: Download using powershell

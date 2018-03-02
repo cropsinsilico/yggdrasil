@@ -258,8 +258,8 @@ class ModelDriver(Driver):
         self.wait_process(self.timeout, key_suffix='.graceful_stop')
         super(ModelDriver, self).graceful_stop()
 
-    def do_terminate(self):
-        r"""Terminate the process running the model."""
-        self.debug('')
-        self.kill_process()
-        super(ModelDriver, self).do_terminate()
+    # def do_terminate(self):
+    #     r"""Terminate the process running the model."""
+    #     self.debug('')
+    #     self.kill_process()
+    #     super(ModelDriver, self).do_terminate()
