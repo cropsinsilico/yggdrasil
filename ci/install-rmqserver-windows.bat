@@ -26,14 +26,14 @@ set RMQEXE="C:\\Users\\appveyor\\rabbitmq-server-3.7.3.exe"
 
 :: Download & Install Erlang
 ECHO Downloading Erlang...
-powershell -Command "(New-Object Net.WebClient).DownloadFile('$env:ERLANGURL', '$env:ERLANGEXE')"
+powershell -Command "(New-Object Net.WebClient).DownloadFile($ERLANGURL, $ERLANGEXE)"
 :: powershell -Command "$webclient.DownloadFile('$env:ERLANGURL', '$env:ERLANGEXE')"
 ECHO Starting Erlang...
 start /B /WAIT %ERLANGEXE% /S /D=%ERLANGDIR%
 
 :: Download & Install RMQ
 ECHO Downloading RabbitMQ...
-powershell -Command "(New-Object Net.WebClient).DownloadFile('$env:RMQURL', '$env:RMQEXE')"
+powershell -Command "(New-Object Net.WebClient).DownloadFile($RMQURL, $RMQEXE)"
 :: powershell -Command "$webclient.DownloadFile('$env:RMQURL', '$env:RMQEXE')"
 ECHO Starting RabbitMQ...
 start /B /WAIT %RMQURL% /S
