@@ -1,4 +1,3 @@
-import numpy as np
 from cis_interface import backwards
 from cis_interface.serialize.DefaultSerialize import DefaultSerialize
 from cis_interface.dataio.AsciiTable import AsciiTable
@@ -38,7 +37,6 @@ class AsciiTableSerialize(DefaultSerialize):
 
         """
         if self.as_array:
-            assert(isinstance(args, np.ndarray))
             out = self.table.array_to_bytes(args, order='F')
         else:
             if not isinstance(args, (list, tuple)):

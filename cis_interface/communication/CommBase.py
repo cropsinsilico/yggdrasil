@@ -38,6 +38,8 @@ class CommThreadLoop(tools.CisThreadLoop):
             suffix = 'CommThread'
         if name is None:
             name = '%s.%s' % (comm.name, suffix)
+        # if comm.matlab:
+        #     kwargs['daemon'] = True
         super(CommThreadLoop, self).__init__(name=name, **kwargs)
 
     def on_main_terminated(self):
@@ -144,6 +146,8 @@ class CommBase(tools.CisClass):
             response comm. Defaults to False.
         comm (str, optional): The comm that should be created. This only serves
             as a check that the correct class is being created. Defaults to None.
+        matlab (bool, optional): True if the comm will be accessed by Matlab
+            code. Defaults to False.
         **kwargs: Additional keywords arguments are passed to parent class.
 
     Attributes:
@@ -175,6 +179,7 @@ class CommBase(tools.CisClass):
             that will be receiving messages from one or more clients.
         is_response_server (bool): If True, the comm is a server-side response
             comm.
+        matlab (bool): True if the comm will be accessed by Matlab code.
 
     Raises:
         RuntimeError: If the comm class is not installed.
@@ -190,7 +195,7 @@ class CommBase(tools.CisClass):
                  single_use=False, reverse_names=False, no_suffix=False,
                  is_client=False, is_response_client=False,
                  is_server=False, is_response_server=False,
-                 comm=None, **kwargs):
+                 comm=None, matlab=False, **kwargs):
         if comm is not None:
             assert(comm == self.comm_class)
         super(CommBase, self).__init__(name, **kwargs)
@@ -219,6 +224,7 @@ class CommBase(tools.CisClass):
         self.is_server = is_server
         self.is_response_client = is_response_client
         self.is_response_server = is_response_server
+        self.matlab = matlab
         self._server = None
         self.is_interface = is_interface
         self.recv_timeout = recv_timeout
@@ -243,6 +249,7 @@ class CommBase(tools.CisClass):
         #     self._timeout_drain = self.timeout
         self._closing_event = threading.Event()
         self._closing_thread = tools.CisThread(target=self.linger_close,
+                                               # daemon=self.matlab,
                                                name=self.name + '.ClosingThread')
         self._eof_recv = threading.Event()
         self._eof_sent = threading.Event()
@@ -412,6 +419,9 @@ class CommBase(tools.CisClass):
                 this will block until the comm is closed.
 
         """
+        if self.matlab:
+            self.linger_close()
+            self._closing_thread.set_terminated_flag()
         self.debug("current_thread = %s", threading.current_thread().name)
         try:
             self._closing_thread.start()
@@ -440,6 +450,15 @@ class CommBase(tools.CisClass):
             self.drain_messages(variable='n_msg_send')
             self.wait_for_confirm(timeout=self._timeout_drain)
         self.debug("Finished")
+
+    def matlab_atexit(self):
+        r"""Close operations including draining receive."""
+        if self.direction == 'recv':
+            while self.recv(timeout=0)[0]:
+                self.sleep()
+        else:
+            self.comm.send_eof()
+        self.linger_close()
 
     def atexit(self):
         r"""Close operations."""
@@ -477,12 +496,38 @@ class CommBase(tools.CisClass):
         else:
             return self.is_confirmed_send
 
-    def wait_for_confirm(self, timeout=None):
+    def wait_for_confirm(self, timeout=None, direction=None,
+                         active_confirm=False):
         r"""Sleep until all messages are confirmed."""
-        T = self.start_timeout(t=timeout)
-        while (not T.is_out) and (not self.is_confirmed):
+        self.debug('')
+        if direction is None:
+            direction = self.direction
+        T = self.start_timeout(t=timeout, key_suffix='.wait_for_confirm')
+        while (not T.is_out) and (not getattr(self, 'is_confirmed_%s' % direction)):
+            if active_confirm:
+                if self.confirm(direction=direction):
+                    break
             self.sleep()
-        self.stop_timeout()
+        self.stop_timeout(key_suffix='.wait_for_confirm')
+        self.debug('Done confirming')
+
+    def confirm(self, direction=None):
+        r"""Confirm message."""
+        if direction is None:
+            direction = self.direction
+        if direction == 'send':
+            out = self.confirm_send()
+        else:
+            out = self.confirm_recv()
+        return out
+
+    def confirm_send(self):
+        r"""Confirm that sent message was received."""
+        return False
+
+    def confirm_recv(self):
+        r"""Confirm that message was received."""
+        return False
 
     @property
     def n_msg(self):
@@ -1143,7 +1188,7 @@ class CommBase(tools.CisClass):
             flag, s_msg = self.recv_multipart(*args, **kwargs)
             if flag and len(s_msg) > 0:
                 self.debug('%d bytes received', len(s_msg))
-        except Exception:
+        except BaseException:
             self.exception('Failed to recv.')
             return (False, None)
         if flag:
@@ -1222,6 +1267,7 @@ class CommBase(tools.CisClass):
                                n_msg, variable)
             self.sleep()
         self.stop_timeout()
+        self.debug('Done draining')
 
     def purge(self):
         r"""Purge all messages from the comm."""

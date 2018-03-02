@@ -301,21 +301,13 @@ class IPCComm(AsyncComm.AsyncComm):
             return False
         return True
 
-    @property
-    def messages_confirmed_recv(self):
-        r"""bool: True if all received messages have been confirmed."""
-        with self.backlog_thread.lock:
-            if self.is_open and self.backlog_thread.is_alive():
-                return (self.n_msg_direct == 0)
-        return super(IPCComm, self).messages_confirmed_recv
+    def confirm_send(self):
+        r"""Confirm that sent message was received."""
+        return (self.n_msg_direct_send == 0)
 
-    @property
-    def messages_confirmed_send(self):
-        r"""bool: True if all sent messages have been confirmed."""
-        with self.backlog_thread.lock:
-            if self.is_open and self.backlog_thread.is_alive():
-                return (self.n_msg_direct == 0)
-        return super(IPCComm, self).messages_confirmed_send
+    def confirm_recv(self):
+        r"""Confirm that message was received."""
+        return True
 
     @property
     def n_msg_direct_send(self):

@@ -6,21 +6,21 @@ in_table = PsiInterface('PsiAsciiTableInput', 'inputM_table');
 out_table = PsiInterface('PsiAsciiTableOutput', 'outputM_table', ...
 			 '%5s\t%ld\t%3.1f\t%3.1lf%+3.1lfj\n');
 % Input & output from a table as an array
-in_array = PsiInterface('PsiAsciiTableInput', 'inputM_array', 1);
-out_array = PsiInterface('PsiAsciiTableOutput', 'outputM_array', ...
-			 '%5s\t%ld\t%3.1f\t%3.1lf%+3.1lfj\n', 1);
+in_array = PsiInterface('PsiAsciiArrayInput', 'inputM_array');
+out_array = PsiInterface('PsiAsciiArrayOutput', 'outputM_array', ...
+			 '%5s\t%ld\t%3.1f\t%3.1lf%+3.1lfj\n');
 
 % Read lines from ASCII text file until end of file is reached.
 % As each line is received, it is then sent to the output ASCII file.
-disp('ascii_io(M): Receiving/sending ASCII file.')
-res = py.tuple({logical(1), logical(1)});
-while res{1}
+disp('ascii_io(M): Receiving/sending ASCII file.');
+flag = true;
+while flag
   % Receive a single line
-  res = in_file.recv_line();
-  if res{1}
+  [flag, line] = in_file.recv();
+  if flag
     % If the receive was succesful, send the line to output
-    fprintf('File: %s', char(res{2}));
-    ret = out_file.send_line(res{2});
+    fprintf('File: %s', char(line));
+    ret = out_file.send(line);
     if (~ret);
       disp('ascii_io(M): ERROR SENDING LINE');
       break;
@@ -35,17 +35,16 @@ end;
 
 % Read rows from ASCII table until end of file is reached.
 % As each row is received, it is then sent to the output ASCII table
-res = py.tuple({logical(1), logical(1)});
-while res{1}
+flag = true;
+while flag
   % Receive a single row
-  res = in_table.recv_row();
-  if res{1}
+  [flag, line] = in_table.recv();
+  if flag
     % If the receive was succesful, send the values to output.
     % Formatting is taken care of on the output driver side.
-    line = res{2};
-    fprintf('Table: %s, %d, %3.1f, %3.1f%+3.1f\n', char(line{1}), ...
+    fprintf('Table: %s, %d, %3.1f, %3.1f%+3.1fi\n', char(line{1}), ...
 	    line{2}, line{3}, real(line{4}), imag(line{4}));
-    ret = out_table.send_row(res{2});
+    ret = out_table.send(line);
     if (~ret);
       disp('ascii_io(M): ERROR SENDING ROW');
       break;
@@ -59,24 +58,23 @@ while res{1}
 end;
 
 % Read entire array from ASCII table into an array
-res = in_array.recv_array();
-if (~res{1});
+[flag, arr] = in_array.recv();
+if (~flag);
   disp('ascii_io(M): ERROR RECVING ARRAY');
   exit(-1);
 end;
-arr = res{2};
-fprintf('Array: (%d rows)\n', arr.size);
+nr = size(arr, 1);
+fprintf('Array: (%d rows)\n', nr);
 % Print each line in the array
-for i = 1:arr.size
-  line = arr.item(i-1);
-  fprintf('%5s, %d, %3.1f, %3.1f%+3.1f\n', char(line{1}), line{2}, line{3}, ...
-	  real(line{4}), imag(line{4}));
+for i = 1:nr
+  fprintf('%5s, %d, %3.1f, %3.1f%+3.1fi\n', ...
+  	  char(arr{i,1}), arr{i,2}, arr{i,3}, ...
+  	  real(arr{i,4}), imag(arr{i,4}));
 end;
 % Send the array to output. Formatting is handled on the output driver side.
-ret = out_array.send_array(arr);
+ret = out_array.send(arr);
 if (~ret);
   disp('ascii_io(M): ERROR SENDING ARRAY');
 end;
-
 
 exit(0);

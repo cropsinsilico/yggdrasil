@@ -954,9 +954,13 @@ class ZMQComm(AsyncComm.AsyncComm):
             if self._reply_handshake_send():
                 self.debug("Send confirmed (%d/%d)",
                            self._n_reply_sent, self._n_zmq_sent)
+                return True
+            return False
+        return True
 
     def confirm_recv(self):
         r"""Confirm that message was received."""
+        flag = None
         for k in self.reply_socket_recv.keys():
             if self.is_open and (self._n_zmq_recv[k] != self._n_reply_recv[k]):
                 self.debug("Confirming %d/%d received messages",
@@ -964,7 +968,13 @@ class ZMQComm(AsyncComm.AsyncComm):
                 if self._reply_handshake_recv(_reply_msg, k):
                     self.debug("Recv confirmed (%d/%d)",
                                self._n_reply_recv[k], self._n_zmq_recv[k])
-
+                    flag = True
+                elif flag is None:
+                    flag = False
+        if flag is None:
+            flag = True
+        return flag
+            
     # def purge(self):
     #     r"""Purge all messages from the comm."""
     #     with self._closing_thread.lock:

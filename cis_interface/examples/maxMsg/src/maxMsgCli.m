@@ -14,14 +14,14 @@ rpc = PsiInterface('PsiRpcClient', 'maxMsgSrv_maxMsgCli', '%s', '%s');
 output = randsample(charset, msg_size-1, true);
 
 % Call RPC server
-input = rpc.rpcCall(output);
-if (~input{1})
+[flag, vars] = rpc.call(output);
+if (~flag)
   error('maxMsgCli(M): RPC ERROR');
   exit(-1);
 end
 
 % Check to see if response matches
-if (input{2}{1} ~= output)
+if (vars{1} ~= output)
   error('maxMsgCli(M): ERROR: input/output do not match');
   exit(-1);
 else

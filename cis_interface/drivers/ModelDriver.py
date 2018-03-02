@@ -88,8 +88,15 @@ class ModelDriver(Driver):
             if k in os.environ:
                 self.env[k] = os.environ[k]
 
+    def set_env(self):
+        env = copy.deepcopy(self.env)
+        env.update(os.environ)
+        env['CIS_SUBPROCESS'] = "True"
+        return env
+
     def before_start(self):
         r"""Actions to perform before the run starts."""
+        env = self.set_env()
         pre_args = []
         if self.with_strace:
             if platform._is_linux:
@@ -99,9 +106,6 @@ class ModelDriver(Driver):
             pre_args += [pre_cmd] + self.strace_flags
         elif self.with_valgrind:
             pre_args += ['valgrind'] + self.valgrind_flags
-        env = copy.deepcopy(self.env)
-        env.update(os.environ)
-        env['CIS_SUBPROCESS'] = "True"
         # print(pre_args + self.args)
         self.model_process = tools.CisPopen(pre_args + self.args, env=env,
                                             cwd=self.workingDir,
@@ -159,9 +163,10 @@ class ModelDriver(Driver):
         r"""Actions to perform after run_loop has finished. Mainly checking
         if there was an error and then handling it."""
         self.debug('')
-        self.queue_thread.set_break_flag()
-        self.model_process.stdout.close()
-        self.wait_process(self.timeout)
+        if self.queue_thread is not None:
+            self.queue_thread.set_break_flag()
+            self.model_process.stdout.close()
+        self.wait_process(self.timeout, key_suffix='.after_loop')
         self.kill_process()
 
     @property
@@ -172,7 +177,7 @@ class ModelDriver(Driver):
             return True
         return (self.model_process.poll() is not None)
 
-    def wait_process(self, timeout=None, key=None):
+    def wait_process(self, timeout=None, key=None, key_suffix=None):
         r"""Wait for some amount of time for the process to finish.
 
         Args:
@@ -187,10 +192,10 @@ class ModelDriver(Driver):
         """
         if not self.was_started:
             return True
-        T = self.start_timeout(timeout, key_level=1, key=key)
+        T = self.start_timeout(timeout, key_level=1, key=key, key_suffix=key_suffix)
         while ((not T.is_out) and (not self.model_process_complete)):  # pragma: debug
             self.sleep()
-        self.stop_timeout(key_level=1, key=key)
+        self.stop_timeout(key_level=1, key=key, key_suffix=key_suffix)
         return self.model_process_complete
 
     def kill_process(self):
@@ -212,7 +217,7 @@ class ModelDriver(Driver):
                     self.model_process.kill()
                     self.debug("Waiting %f s for process to be killed",
                                self.timeout)
-                    self.wait_process(self.timeout)
+                    self.wait_process(self.timeout, key_suffix='.kill_process')
                 except OSError:  # pragma: debug
                     # except BaseException:  # pragma: debug
                     # except OSError:  # pragma: debug
@@ -222,21 +227,22 @@ class ModelDriver(Driver):
                 self.error("return code of %s indicates model error.",
                            str(self.model_process.returncode))
             self.event_process_kill_complete.set()
-            self.queue_thread.wait(self.timeout)
-            if self.queue_thread.is_alive():
-                self.queue_thread.set_break_flag()
-                try:
-                    self.model_process.stdout.close()
-                except BaseException:
-                    self.exception("Closing during action")
-                self.error("Queue thread was not terminated.")
+            if self.queue_thread is not None:
                 self.queue_thread.wait(self.timeout)
-            assert(not self.queue_thread.is_alive())
+                if self.queue_thread.is_alive():
+                    self.queue_thread.set_break_flag()
+                    try:
+                        self.model_process.stdout.close()
+                    except BaseException:
+                        self.exception("Closing during action")
+                    self.error("Queue thread was not terminated.")
+                    self.queue_thread.wait(self.timeout)
+                assert(not self.queue_thread.is_alive())
 
     def graceful_stop(self):
         r"""Gracefully stop the driver."""
         self.debug('')
-        self.wait_process(self.timeout)
+        self.wait_process(self.timeout, key_suffix='.graceful_stop')
         super(ModelDriver, self).graceful_stop()
 
     def do_terminate(self):
