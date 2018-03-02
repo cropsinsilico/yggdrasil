@@ -124,13 +124,16 @@ class ModelDriver(Driver):
             return
         try:
             line = self.model_process.stdout.readline()
-        except ValueError:  # pragma: debug
+        except BaseException:  # pragma: debug
             line = ""
         if len(line) == 0:
             # self.info("%s: Empty line from stdout" % self.name)
             self.queue_thread.set_break_flag()
             self.queue.put(self._exit_line)
-            self.model_process.stdout.close()
+            try:
+                self.model_process.stdout.close()
+            except BaseException:  # pragma: debug
+                pass
         else:
             self.queue.put(line.decode('utf-8'))
 
@@ -164,8 +167,15 @@ class ModelDriver(Driver):
         if there was an error and then handling it."""
         self.debug('')
         if self.queue_thread is not None:
-            self.queue_thread.set_break_flag()
-            self.model_process.stdout.close()
+            if self.queue_thread.is_alive():
+                # Loop was broken from outside, kill the queueing thread
+                self.kill_process()
+                # self.queue_thread.set_break_flag()
+                # try:
+                #     self.model_process.stdout.close()
+                # except BaseException:  # pragma: debug
+                #     self.error("Close during concurrent operation")
+                return
         self.wait_process(self.timeout, key_suffix='.after_loop')
         self.kill_process()
 
@@ -228,15 +238,18 @@ class ModelDriver(Driver):
                            str(self.model_process.returncode))
             self.event_process_kill_complete.set()
             if self.queue_thread is not None:
-                self.queue_thread.wait(self.timeout)
+                if not self.was_break:
+                    # Wait for messages to be printed
+                    self.queue_thread.wait(self.timeout)
                 if self.queue_thread.is_alive():  # pragma: debug
                     self.queue_thread.set_break_flag()
+                    self.queue_thread.wait(self.timeout)
                     try:
                         self.model_process.stdout.close()
                     except BaseException:
-                        self.exception("Closing during action")
-                    self.error("Queue thread was not terminated.")
-                    self.queue_thread.wait(self.timeout)
+                        self.exception("Closed during concurrent action")
+                    if self.queue_thread.is_alive():  # pragma: debug
+                        self.error("Queue thread was not terminated.")
                 assert(not self.queue_thread.is_alive())
 
     def graceful_stop(self):

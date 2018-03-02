@@ -93,6 +93,7 @@ void cisLog(const char* prefix, const char* fmt, va_list ap) {
   fprintf(stdout, "%s: %d: ", prefix, cis_getpid());
   vfprintf(stdout, fmt, ap);
   fprintf(stdout, "\n");
+  fflush(stdout);
 };
 
 /*!

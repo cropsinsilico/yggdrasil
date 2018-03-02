@@ -124,12 +124,12 @@ class ClientRequestDriver(ConnectionDriver):
             for x in self.response_drivers:
                 x.terminate()
             self.response_drivers = []
-    
-    def terminate(self, *args, **kwargs):
-        r"""Stop response drivers."""
-        self.close_response_drivers()
-        super(ClientRequestDriver, self).terminate(*args, **kwargs)
 
+    def close_comm(self):
+        r"""Close response drivers."""
+        self.close_response_drivers()
+        super(ClientRequestDriver, self).close_comm()
+            
     def printStatus(self, *args, **kwargs):
         r"""Also print response drivers."""
         super(ClientRequestDriver, self).printStatus(*args, **kwargs)
@@ -144,11 +144,11 @@ class ClientRequestDriver(ConnectionDriver):
         super(ClientRequestDriver, self).send_message(CIS_CLIENT_INI)
         # self.info("%s: before loop complete", self.name)
 
-    def after_loop(self):
-        r"""After client model signs off. Sent EOF to server."""
-        # Don't close output as other clients may be using it
-        self.close_response_drivers()
-        super(ClientRequestDriver, self).after_loop()
+    # def after_loop(self):
+    #     r"""After client model signs off. Sent EOF to server."""
+    #     # Don't close output as other clients may be using it
+    #     self.close_response_drivers()
+    #     super(ClientRequestDriver, self).after_loop()
     
     def send_eof(self):
         r"""Send EOF message.
