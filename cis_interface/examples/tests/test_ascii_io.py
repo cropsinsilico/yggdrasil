@@ -9,7 +9,7 @@ class TestExampleAsciiIO(TestExample):
 
     def __init__(self, *args, **kwargs):
         super(TestExampleAsciiIO, self).__init__(*args, **kwargs)
-        self.name = 'ascii_io'
+        self._name = 'ascii_io'
 
     @property
     def input_file(self):

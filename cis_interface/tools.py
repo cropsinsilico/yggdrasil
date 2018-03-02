@@ -477,7 +477,7 @@ class CisClass(logging.LoggerAdapter):
     """
     def __init__(self, name, workingDir=None, timeout=60.0, sleeptime=0.01,
                  **kwargs):
-        self.name = name
+        self._name = name
         self.sleeptime = sleeptime
         self.longsleep = self.sleeptime * 10
         self.timeout = timeout
@@ -503,6 +503,11 @@ class CisClass(logging.LoggerAdapter):
         super(CisClass, self).__init__(logging.getLogger(self.__module__),
                                        {'cis_name': self.name,
                                         'cis_class': class_name})
+
+    @property
+    def name(self):
+        r"""Name of the class object."""
+        return self._name
 
     def debug_log(self):  # pragma: debug
         r"""Turn on debugging."""

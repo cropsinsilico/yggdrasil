@@ -200,7 +200,7 @@ class CommBase(tools.CisClass):
             no_suffix=no_suffix, reverse_names=reverse_names, direction=direction)
         self.name_base = name
         self.suffix = suffix
-        self.name = name + suffix
+        self._name = name + suffix
         if address is None:
             if self.name not in os.environ:
                 raise RuntimeError('Cannot see %s in env.' % self.name)
@@ -236,7 +236,7 @@ class CommBase(tools.CisClass):
         self._timeout_drain = False
         # Add interface tag
         if self.is_interface:
-            self.name += '_I'
+            self._name += '_I'
         # if self.is_interface:
         #     self._timeout_drain = False
         # else:

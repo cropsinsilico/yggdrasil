@@ -6,4 +6,4 @@ class TestExampleMaxMsg(TestExample):
 
     def __init__(self, *args, **kwargs):
         super(TestExampleMaxMsg, self).__init__(*args, **kwargs)
-        self.name = 'maxMsg'
+        self._name = 'maxMsg'

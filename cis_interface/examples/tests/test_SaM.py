@@ -8,7 +8,7 @@ class TestExampleSaM(TestExample):
 
     def __init__(self, *args, **kwargs):
         super(TestExampleSaM, self).__init__(*args, **kwargs)
-        self.name = 'SaM'
+        self._name = 'SaM'
 
     @property
     def results(self):
