@@ -23,8 +23,8 @@ set RMQEXE="C:\\Users\\appveyor\\rabbitmq-server-3.7.3.exe"
 
 :: Download using powershell
 ECHO Downloading Erlang and RabbitMQ...
-PowerShell.exe -NoProfile -ExecutionPolicy Bypass -Command "& '%~install-rmqserver-windows.ps1'"
-:: PowerShell.exe -NoProfile -Command "& {Start-Process PowerShell.exe -ArgumentList '-NoProfile -ExecutionPolicy Bypass -File ""%~install-rmqserver-windows.ps1""' -Verb RunAs}"
+PowerShell.exe -NoProfile -ExecutionPolicy Bypass -Command "& '%~dpn0.ps1'"
+:: PowerShell.exe -NoProfile -Command "& {Start-Process PowerShell.exe -ArgumentList '-NoProfile -ExecutionPolicy Bypass -File ""%~dpn0.ps1""' -Verb RunAs}"
 
 :: Start web client
 :: powershell -Command "$webclient=New-Object System.Net.WebClient"
