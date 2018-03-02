@@ -21,19 +21,24 @@ set RMQURL="https://github.com/rabbitmq/rabbitmq-server/releases/download/v3.7.3
 set RMQEXE="C:\\Users\\appveyor\\rabbitmq-server-3.7.3.exe"
 
 
+:: Download using powershell
+ECHO Downloading Erlang and RabbitMQ...
+PowerShell.exe -NoProfile -ExecutionPolicy Bypass -Command "& '%~install-rmqserver-windows.ps1'"
+:: PowerShell.exe -NoProfile -Command "& {Start-Process PowerShell.exe -ArgumentList '-NoProfile -ExecutionPolicy Bypass -File ""%~install-rmqserver-windows.ps1""' -Verb RunAs}"
+
 :: Start web client
 :: powershell -Command "$webclient=New-Object System.Net.WebClient"
 
 :: Download & Install Erlang
-ECHO Downloading Erlang...
-powershell -Command "(New-Object Net.WebClient).DownloadFile($ERLANGURL, $ERLANGEXE)"
+:: ECHO Downloading Erlang...
+:: powershell -Command "(New-Object Net.WebClient).DownloadFile($ERLANGURL, $ERLANGEXE)"
 :: powershell -Command "$webclient.DownloadFile('$env:ERLANGURL', '$env:ERLANGEXE')"
 ECHO Starting Erlang...
 start /B /WAIT %ERLANGEXE% /S /D=%ERLANGDIR%
 
 :: Download & Install RMQ
-ECHO Downloading RabbitMQ...
-powershell -Command "(New-Object Net.WebClient).DownloadFile($RMQURL, $RMQEXE)"
+:: ECHO Downloading RabbitMQ...
+:: powershell -Command "(New-Object Net.WebClient).DownloadFile($RMQURL, $RMQEXE)"
 :: powershell -Command "$webclient.DownloadFile('$env:RMQURL', '$env:RMQEXE')"
 ECHO Starting RabbitMQ...
 start /B /WAIT %RMQURL% /S
