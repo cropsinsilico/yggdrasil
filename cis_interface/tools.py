@@ -248,7 +248,8 @@ def sleep(interval):
         interval (float): Time in seconds that process should sleep.
 
     """
-    if platform._is_win and backwards.PY2:  # pragma: windows
+    if platform._is_win:  # pragma: windows
+        # and backwards.PY2:  # pragma: windows
         while True:
             try:
                 t = time.time()
