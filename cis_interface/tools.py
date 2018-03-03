@@ -253,11 +253,11 @@ def sleep(interval):
             try:
                 t = time.time()
                 time.sleep(interval)
-            except IOError as e:
+            except IOError as e:  # pragma: debug
                 import errno
                 if e.errno != errno.EINTR:
                     raise
-            # except InterruptedError:
+            # except InterruptedError:  # pragma: debug
             #     import errno
             #     print(e.errno)
             #     print(e)

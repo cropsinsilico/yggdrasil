@@ -25,7 +25,7 @@ environment:
   global:
     PYTHON: "C:\\Miniconda3-x64"
     INSTALLZMQ: 1
-    INSTALLRMQ: 1
+    INSTALLRMQ: 0
     APPVEYOR_SAVE_CACHE_ON_ERROR: true
 
   erlang_download_url: "http://erlang.org/download/otp_win64_20.2.exe"
@@ -71,32 +71,24 @@ install:
   - "pip install --upgrade wheel"
   - "pip install --upgrade setuptools"
 
-  # Install make
-  # - "choco install make -y"
-
   # Install ZeroMQ
   - if "%INSTALLZMQ%" == "1" call "ci\\install-czmq-windows.bat"
-  # - "ECHO %PATH%"
-  # - where zmq.lib
-  # - where czmq.lib
-  # - where zmq.h
-  # - where czmq.h
 
   # Install & start RabbitMQ
-  - "if %INSTALLRMQ% == 1 pip install pika"
-  - ps: $webclient=New-Object System.Net.WebClient
-  - ECHO Downloading Erlang...
-  - ps: $webclient.DownloadFile("$env:erlang_download_url", "$env:erlang_exe_path")
-  - ECHO Starting Erlang...
-  - start /B /WAIT %erlang_exe_path% /S /D=%erlang_home_dir%
-  - set ERLANG_HOME=%erlang_home_dir%
-  - ECHO Downloading RabbitMQ...
-  - ps: $webclient.DownloadFile("$env:rabbitmq_installer_download_url", "$env:rabbitmq_installer_path")
-  - ECHO Installing and starting RabbitMQ with default config...
-  - start /B /WAIT %rabbitmq_installer_path% /S
-  - ps: (Get-Service -Name RabbitMQ).Status
   # - "if %INSTALLRMQ% == 1 ci\\install-rmqserver-windows.bat"  
   # - "if %INSTALLRMQ% == 1 ci\\start-rmqserver-windows.bat"  
+  - "if %INSTALLRMQ% == 1 pip install pika"
+  - ps: If ($INSTALLRMQ -eq 1) { $webclient=New-Object System.Net.WebClient }
+  - if "%INSTALLRMQ%" == "1" ECHO Downloading Erlang...
+  - ps: If ($INSTALLRMQ -eq 1) { $webclient.DownloadFile("$env:erlang_download_url", "$env:erlang_exe_path") }
+  - if "%INSTALLRMQ%" == "1" ECHO Starting Erlang...
+  - if "%INSTALLRMQ%" == "1" start /B /WAIT %erlang_exe_path% /S /D=%erlang_home_dir%
+  - if "%INSTALLRMQ%" == "1" set ERLANG_HOME=%erlang_home_dir%
+  - if "%INSTALLRMQ%" == "1" ECHO Downloading RabbitMQ...
+  - ps: If ($INSTALLRMQ -eq 1) { $webclient.DownloadFile("$env:rabbitmq_installer_download_url", "$env:rabbitmq_installer_path") }
+  - if "%INSTALLRMQ%" == "1" ECHO Installing and starting RabbitMQ with default config...
+  - if "%INSTALLRMQ%" == "1" start /B /WAIT %rabbitmq_installer_path% /S
+  - ps: If ($INSTALLRMQ -eq 1) { (Get-Service -Name RabbitMQ).Status }
 
   # Install testing dependencies
   - "pip install coverage coveralls codecov flake8 pypiwin32"
