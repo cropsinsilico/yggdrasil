@@ -244,11 +244,11 @@ class ModelDriver(Driver):
                     self.queue_thread.wait(self.timeout)
                     try:
                         self.model_process.stdout.close()
+                        self.queue_thread.wait(self.timeout)
                     except BaseException:  # pragma: debug
                         self.exception("Closed during concurrent action")
                     if self.queue_thread.is_alive():  # pragma: debug
                         self.error("Queue thread was not terminated.")
-                assert(not self.queue_thread.is_alive())
 
     def graceful_stop(self):
         r"""Gracefully stop the driver."""
