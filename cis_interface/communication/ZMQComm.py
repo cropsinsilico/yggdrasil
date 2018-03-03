@@ -1,6 +1,7 @@
 import uuid
 import zmq
 import threading
+import logging
 from cis_interface import backwards, tools
 from cis_interface.communication import CommBase, AsyncComm
 
@@ -186,8 +187,10 @@ def bind_socket(socket, address, retry_timeout=-1):
             address += ":%d" % port
     except zmq.ZMQError as e:
         if (e.errno != 98) or (retry_timeout < 0):
+            print(e.errno)
             raise e
         else:
+            logging.info("Retrying bind in %f s", retry_timeout)
             tools.sleep(retry_timeout)
             address = bind_socket(socket, address)
     return address
