@@ -107,7 +107,7 @@ class CommDriver(Driver):
         self.debug('')
         T = self.start_timeout(timeout)
         try:
-            while (self.n_msg > 0) and (not T.is_out):
+            while (self.n_msg > 0) and (not T.is_out):  # pragma: debug
                 if DEBUG_SLEEPS:
                     self.debug('Draining %d messages', self.n_msg)
                 self.sleep()

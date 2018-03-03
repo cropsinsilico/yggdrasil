@@ -83,6 +83,7 @@ install:
   # - where czmq.h
 
   # Install & start RabbitMQ
+  - "if %INSTALLRMQ% == 1 pip install pika"
   - ps: $webclient=New-Object System.Net.WebClient
   - ECHO Downloading Erlang...
   - ps: $webclient.DownloadFile("$env:erlang_download_url", "$env:erlang_exe_path")
