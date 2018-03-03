@@ -25,17 +25,24 @@ environment:
   global:
     PYTHON: "C:\\Miniconda3-x64"
     INSTALLZMQ: 1
-    INSTALLRMQ: 0
+    INSTALLRMQ: 1
     APPVEYOR_SAVE_CACHE_ON_ERROR: true
+
+  erlang_download_url: "http://erlang.org/download/otp_win64_20.2.exe"
+  erlang_exe_path: "C:\\Users\\appveyor\\erlang.exe"
+  erlang_home_dir: "C:\\Users\\appveyor\\erlang"
+
+  rabbitmq_installer_download_url: "https://github.com/rabbitmq/rabbitmq-server/releases/download/v3.7.3/rabbitmq-server-3.7.3.exe"
+  rabbitmq_installer_path: "C:\\Users\\appveyor\\rabbitmq-server-3.7.3.exe"
 
   matrix:
     - platform: x64
       PYTHON_VERSION: "2.7"
     - platform: x64
-      PYTHON_VERSION: "2.7"
-      INSTALLRMQ: 1
-    - platform: x64
       PYTHON_VERSION: "3.6"
+    # - platform: x64
+    #   PYTHON_VERSION: "2.7"
+    #   INSTALLRMQ: 1
 
 install:
   - "SET MSVCVER=%APPVEYOR_BUILD_WORKER_IMAGE:~-2,2%"
@@ -76,8 +83,19 @@ install:
   # - where czmq.h
 
   # Install & start RabbitMQ
-  - "if %INSTALLRMQ% == 1 ci\\install-rmqserver-windows.bat"  
-  - "if %INSTALLRMQ% == 1 ci\\start-rmqserver-windows.bat"  
+  - ps: $webclient=New-Object System.Net.WebClient
+  - ECHO Downloading Erlang...
+  - ps: $webclient.DownloadFile("$env:erlang_download_url", "$env:erlang_exe_path")
+  - ECHO Starting Erlang...
+  - start /B /WAIT %erlang_exe_path% /S /D=%erlang_home_dir%
+  - set ERLANG_HOME=%erlang_home_dir%
+  - ECHO Downloading RabbitMQ...
+  - ps: $webclient.DownloadFile("$env:rabbitmq_installer_download_url", "$env:rabbitmq_installer_path")
+  - ECHO Installing and starting RabbitMQ with default config...
+  - start /B /WAIT %rabbitmq_installer_path% /S
+  - ps: (Get-Service -Name RabbitMQ).Status
+  # - "if %INSTALLRMQ% == 1 ci\\install-rmqserver-windows.bat"  
+  # - "if %INSTALLRMQ% == 1 ci\\start-rmqserver-windows.bat"  
 
   # Install testing dependencies
   - "pip install coverage coveralls codecov flake8 pypiwin32"
