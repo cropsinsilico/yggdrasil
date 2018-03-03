@@ -210,12 +210,12 @@ class ModelDriver(Driver):
 
     def kill_process(self):
         r"""Kill the process running the model, checking return code."""
-        if not self.was_started:
+        if not self.was_started:  # pragma: debug
             self.debug('Process was never started.')
             self.set_break_flag()
             self.event_process_kill_called.set()
             self.event_process_kill_complete.set()
-        if self.event_process_kill_called.is_set():
+        if self.event_process_kill_called.is_set():  # pragma: debug
             self.debug('Process has already been killed.')
             return
         self.event_process_kill_called.set()
@@ -228,9 +228,7 @@ class ModelDriver(Driver):
                     self.debug("Waiting %f s for process to be killed",
                                self.timeout)
                     self.wait_process(self.timeout, key_suffix='.kill_process')
-                except OSError:  # pragma: debug
-                    # except BaseException:  # pragma: debug
-                    # except OSError:  # pragma: debug
+                except BaseException:  # pragma: debug
                     self.exception("Error killing model process")
             assert(self.model_process_complete)
             if self.model_process.returncode != 0:
@@ -238,7 +236,7 @@ class ModelDriver(Driver):
                            str(self.model_process.returncode))
             self.event_process_kill_complete.set()
             if self.queue_thread is not None:
-                if not self.was_break:
+                if not self.was_break:  # pragma: debug
                     # Wait for messages to be printed
                     self.queue_thread.wait(self.timeout)
                 if self.queue_thread.is_alive():  # pragma: debug
@@ -246,7 +244,7 @@ class ModelDriver(Driver):
                     self.queue_thread.wait(self.timeout)
                     try:
                         self.model_process.stdout.close()
-                    except BaseException:
+                    except BaseException:  # pragma: debug
                         self.exception("Closed during concurrent action")
                     if self.queue_thread.is_alive():  # pragma: debug
                         self.error("Queue thread was not terminated.")

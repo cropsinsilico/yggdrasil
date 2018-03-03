@@ -81,7 +81,7 @@ class CisTest(unittest.TestCase):
         self.attr_list = list()
         self._inst_args = list()
         self._inst_kwargs = dict()
-        self.timeout = 5.0
+        self.timeout = 10.0
         self.sleeptime = 0.01
         self._teardown_complete = False
         self._old_loglevel = None

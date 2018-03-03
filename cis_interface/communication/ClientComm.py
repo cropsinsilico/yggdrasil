@@ -102,15 +102,12 @@ class ClientComm(CommBase.CommBase):
         super(ClientComm, self).open()
         self.ocomm.open()
 
-    def close(self, *args, **kwargs):
+    def _close(self, *args, **kwargs):
         r"""Close the connection."""
         self.ocomm.close(*args, **kwargs)
         for k in self.icomm_order:
             self.icomm[k].close()
-
-    def close_in_thread(self, *args, **kwargs):
-        r"""In a new thread, close the comm when it is empty."""
-        self.ocomm.close_in_thread(*args, **kwargs)
+        super(ClientComm, self)._close(*args, **kwargs)
 
     @property
     def is_open(self):

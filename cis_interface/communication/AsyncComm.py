@@ -277,7 +277,7 @@ class AsyncComm(CommBase.CommBase):
             self.debug("Main thread terminated")
             self._close_backlog()
             self.close()
-        if not self.is_open_backlog:
+        if not self.is_open_backlog:  # pragma: debug
             self.debug("Backlog closed")
             self._close_backlog()
             return

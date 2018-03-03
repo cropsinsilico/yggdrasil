@@ -100,6 +100,11 @@ class TestServerComm(test_CommBase.TestCommBase):
         assert(flag)
         nt.assert_equal(msg_recv, self.msg_long)
 
+    def test_close_in_thread(self):
+        r"""Test close of comm in thread."""
+        self.send_instance.close_in_thread()
+        self.recv_instance.close_in_thread()
+
     # # This dosn't work for comms that are uni-directional
     # def test_purge_recv(self):
     #     r"""Test purging messages from the client comm."""

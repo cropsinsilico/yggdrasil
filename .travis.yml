@@ -66,7 +66,7 @@ before_install:
     fi
 
     # Install AstroPy
-    if [[ $INSTALLRMQ == '1' ]]; then
+    if [[ $INSTALLAPY == '1' ]]; then
        echo Installing AstroPy...;
        pip install astropy
     fi

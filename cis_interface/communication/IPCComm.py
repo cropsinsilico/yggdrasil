@@ -95,7 +95,7 @@ def ipcs(options=[]):
                 print(err.decode('utf-8'))
             raise Exception("Error on spawned process. See output.")
         return output.decode('utf-8')
-    else:
+    else:  # pragma: windows
         logging.warn("IPC not installed. ipcs cannot be run.")
         return ''
 
@@ -158,7 +158,7 @@ def ipcrm(options=[]):
             raise Exception("Error on spawned process. See output.")
         if not output.isspace():
             print(output.decode('utf-8'))
-    else:
+    else:  # pragma: windows
         logging.warn("IPC not installed. ipcrm cannot be run.")
 
 
@@ -177,7 +177,7 @@ def ipcrm_queues(queue_keys=None):
             queue_keys = [queue_keys]
         for q in queue_keys:
             ipcrm(["-Q %s" % q])
-    else:
+    else:  # pragma: windows
         logging.warn("IPC not installed. ipcrm cannot be run.")
 
 

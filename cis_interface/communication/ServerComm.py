@@ -99,20 +99,14 @@ class ServerComm(CommBase.CommBase):
         super(ServerComm, self).open()
         self.icomm.open()
 
-    def _close(self, linger=False):
-        r"""Close the connection.
-
-        Args:
-            linger (bool, optional): If True, drain messages before closing the
-                comm. Defaults to False.
-
-        """
-        self.icomm.close()
+    def _close(self, *args, **kwargs):
+        r"""Close the connection."""
+        self.icomm.close(*args, **kwargs)
         if self.ocomm is not None:
-            self.ocomm.close(linger=linger)
+            self.ocomm.close()
         for ocomm in self._used_response_comms.values():
             ocomm.close()
-        super(ServerComm, self)._close(linger=linger)
+        super(ServerComm, self)._close(*args, **kwargs)
 
     @property
     def is_open(self):

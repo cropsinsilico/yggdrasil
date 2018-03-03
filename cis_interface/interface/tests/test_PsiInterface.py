@@ -46,7 +46,7 @@ def test_PsiMatlab_class():  # pragma: matlab
 
 
 @unittest.skipIf(not MatlabModelDriver._matlab_installed, "Matlab not installed.")
-def test_PsiMatlab_variables():
+def test_PsiMatlab_variables():  # pragma: matlab
     r"""Test Matlab interface for variables."""
     nt.assert_equal(PsiInterface.PsiMatlab('PSI_MSG_MAX'), CIS_MSG_MAX)
     nt.assert_equal(PsiInterface.PsiMatlab('PSI_MSG_EOF'), CIS_MSG_EOF)
