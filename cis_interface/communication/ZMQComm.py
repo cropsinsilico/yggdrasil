@@ -348,6 +348,7 @@ class ZMQComm(AsyncComm.AsyncComm):
                           socket_action=None, topic_filter='',
                           dealer_identity=None, **kwargs):
         r"""Initialize defaults for socket type/action based on direction."""
+        self.socket_lock = threading.RLock()
         # Client/Server things
         if self.is_client:
             socket_type = 'DEALER'
@@ -528,53 +529,56 @@ class ZMQComm(AsyncComm.AsyncComm):
         if self.is_open or self._bound or self._connected:  # pragma: debug
             return
         # Bind to reserve port if that is this sockets action
-        if (self.socket_action == 'bind') or (self.port is None):
-            self._bound = True
-            self.debug('Binding %s socket to %s.',
-                       self.socket_type_name, self.address)
-            try:
-                self.address = bind_socket(self.socket, self.address,
-                                           retry_timeout=2 * self.sleeptime)
-            except zmq.ZMQError as e:
-                if (self.socket_type_name == 'PAIR') and (e.errno == 98):
-                    self.error(("There is already a 'PAIR' socket sending " +
-                                "to %s. Maybe you meant to create a recv " +
-                                "PAIR?") % self.address)
+        with self.socket_lock:
+            if (self.socket_action == 'bind') or (self.port is None):
+                self._bound = True
+                self.debug('Binding %s socket to %s.',
+                           self.socket_type_name, self.address)
+                try:
+                    self.address = bind_socket(self.socket, self.address,
+                                               retry_timeout=2 * self.sleeptime)
+                except zmq.ZMQError as e:
+                    if (self.socket_type_name == 'PAIR') and (e.errno == 98):
+                        self.error(("There is already a 'PAIR' socket sending " +
+                                    "to %s. Maybe you meant to create a recv " +
+                                    "PAIR?") % self.address)
+                    self._bound = False
+                    raise e
+                self.debug('Bound %s socket to %s.',
+                           self.socket_type_name, self.address)
+                # Unbind if action should be connect
+                if self.socket_action == 'connect':
+                    self.unbind()
+            else:
                 self._bound = False
-                raise e
-            self.debug('Bound %s socket to %s.',
-                       self.socket_type_name, self.address)
-            # Unbind if action should be connect
-            if self.socket_action == 'connect':
-                self.unbind()
-        else:
-            self._bound = False
-        if self._bound:
-            self.register_socket()
+            if self._bound:
+                self.register_socket()
 
     def connect(self):
         r"""Connect to address."""
         if self.is_open or self._bound or self._connected:  # pragma: debug
             return
-        if (self.socket_action == 'connect'):
-            self._connected = True
-            self.debug("Connecting %s socket to %s",
-                       self.socket_type_name, self.address)
-            self.socket.connect(self.address)
-        if self._connected:
-            self.register_socket()
+        with self.socket_lock:
+            if (self.socket_action == 'connect'):
+                self._connected = True
+                self.debug("Connecting %s socket to %s",
+                           self.socket_type_name, self.address)
+                self.socket.connect(self.address)
+            if self._connected:
+                self.register_socket()
 
     def unbind(self, linger=0):
         r"""Unbind from address."""
-        if self._bound:
-            self.debug('Unbinding from %s' % self.address)
-            try:
-                self.socket.unbind(self.address)
-            except zmq.ZMQError:  # pragma: debug
-                pass
-            self.unregister_socket(linger=linger)
-            self._bound = False
-        self.debug('Unbound socket')
+        with self.socket_lock:
+            if self._bound:
+                self.debug('Unbinding from %s' % self.address)
+                try:
+                    self.socket.unbind(self.address)
+                except zmq.ZMQError:  # pragma: debug
+                    pass
+                self.unregister_socket(linger=linger)
+                self._bound = False
+            self.debug('Unbound socket')
 
     # def disconnect(self, linger=0):
     #     r"""Disconnect from address."""
@@ -591,22 +595,23 @@ class ZMQComm(AsyncComm.AsyncComm):
     def _open_direct(self):
         r"""Open connection by binding/connect to the specified socket."""
         super(ZMQComm, self)._open_direct()
-        if not self.is_open_direct:
-            # Set dealer identity
-            if self.socket_type_name == 'DEALER':
-                self.socket.setsockopt(zmq.IDENTITY, self.dealer_identity)
-            # Bind/connect
-            if self.socket_action == 'bind':
-                self.bind()
-            elif self.socket_action == 'connect':
-                # Bind then unbind to get port as necessary
-                self.bind()
-                self.unbind()
-                self.connect()
-            # Set topic filter
-            if self.socket_type_name == 'SUB':
-                self.socket.setsockopt(zmq.SUBSCRIBE, self.topic_filter)
-            self._openned = True
+        with self.socket_lock:
+            if not self.is_open_direct:
+                # Set dealer identity
+                if self.socket_type_name == 'DEALER':
+                    self.socket.setsockopt(zmq.IDENTITY, self.dealer_identity)
+                # Bind/connect
+                if self.socket_action == 'bind':
+                    self.bind()
+                elif self.socket_action == 'connect':
+                    # Bind then unbind to get port as necessary
+                    self.bind()
+                    self.unbind()
+                    self.connect()
+                # Set topic filter
+                if self.socket_type_name == 'SUB':
+                    self.socket.setsockopt(zmq.SUBSCRIBE, self.topic_filter)
+                self._openned = True
 
     def check_reply_socket_send(self, msg):
         r"""Append reply socket address if it
@@ -723,20 +728,21 @@ class ZMQComm(AsyncComm.AsyncComm):
                 comm. Defaults to False.
 
         """
-        self.debug("self.socket.closed = %s", str(self.socket.closed))
-        if self.socket.closed:
-            self._bound = False
-            self._connected = False
-        # else:
-        #     if self.socket_action == 'bind':
-        #         self.unbind()
-        #     elif self.socket_action == 'connect':
-        #         self.disconnect()
-        # Ensure socket not still open
-        self._openned = False
-        self.unregister_socket(linger=0)
-        if not self.socket.closed:
-            self.socket.close(linger=0)
+        with self.socket_lock:
+            self.debug("self.socket.closed = %s", str(self.socket.closed))
+            if self.socket.closed:
+                self._bound = False
+                self._connected = False
+            # else:
+            #     if self.socket_action == 'bind':
+            #         self.unbind()
+            #     elif self.socket_action == 'connect':
+            #         self.disconnect()
+            # Ensure socket not still open
+            self._openned = False
+            self.unregister_socket(linger=0)
+            if not self.socket.closed:
+                self.socket.close(linger=0)
         super(ZMQComm, self)._close_direct(linger=linger)
 
     def _close_backlog(self, wait=False):
@@ -768,7 +774,8 @@ class ZMQComm(AsyncComm.AsyncComm):
     @property
     def is_open_direct(self):
         r"""bool: True if the socket is open."""
-        return (self._openned and not self.socket.closed)
+        with self.socket_lock:
+            return (self._openned and not self.socket.closed)
 
     def is_message(self, flags):
         r"""Poll the socket for a message.
@@ -782,11 +789,12 @@ class ZMQComm(AsyncComm.AsyncComm):
         """
         out = 0
         # with self._closing_thread.lock:
-        if self.is_open_direct:
-            try:
-                out = self.socket.poll(timeout=1, flags=flags)
-            except zmq.ZMQError:  # pragma: debug
-                pass
+        with self.socket_lock:
+            if self.is_open_direct:
+                try:
+                    out = self.socket.poll(timeout=1, flags=flags)
+                except zmq.ZMQError:  # pragma: debug
+                    pass
         return bool(out)
         
     @property
@@ -876,19 +884,23 @@ class ZMQComm(AsyncComm.AsyncComm):
             total_msg = msg
         total_msg = self.check_reply_socket_send(total_msg)
         kwargs.setdefault('flags', zmq.NOBLOCK)
-        try:
-            self.debug("Sending %d bytes to %s", len(total_msg), self.address)
-            if self.socket_type_name == 'ROUTER':
-                self.socket.send(identity, zmq.SNDMORE)
-            self.socket.send(total_msg, **kwargs)
-            self.debug("Sent %d bytes to %s", len(total_msg), self.address)
-            self._n_zmq_sent += 1
-        except zmq.ZMQError as e:  # pragma: debug
-            if e.errno == zmq.EAGAIN:
-                raise AsyncComm.AsyncTryAgain("Socket not yet available.")
-            else:
-                self.special_debug("Socket could not send. (errno=%d)", e.errno)
-                return False
+        with self.socket_lock:
+            try:
+                if self.socket.closed:  # pragma debug
+                    self.error("Socket closed")
+                    return False
+                self.debug("Sending %d bytes to %s", len(total_msg), self.address)
+                if self.socket_type_name == 'ROUTER':
+                    self.socket.send(identity, zmq.SNDMORE)
+                self.socket.send(total_msg, **kwargs)
+                self.debug("Sent %d bytes to %s", len(total_msg), self.address)
+                self._n_zmq_sent += 1
+            except zmq.ZMQError as e:  # pragma: debug
+                if e.errno == zmq.EAGAIN:
+                    raise AsyncComm.AsyncTryAgain("Socket not yet available.")
+                else:
+                    self.special_debug("Socket could not send. (errno=%d)", e.errno)
+                    return False
         return True
 
     def _recv_direct(self, **kwargs):
@@ -918,19 +930,22 @@ class ZMQComm(AsyncComm.AsyncComm):
         #     flags = 0
         flags = zmq.NOBLOCK
         # Receive message
-        try:
-            if self.socket.closed:
+        with self.socket_lock:
+            try:
+                if self.socket.closed:  # pragma: debug
+                    self.error("Socket closed")
+                    return (False, self.empty_msg)
+                if self.socket_type_name == 'ROUTER':
+                    identity = self.socket.recv(flags)
+                    self._recv_identities.add(identity)
+                kwargs.setdefault('flags', flags)
+                total_msg = self.socket.recv(**kwargs)
+            except zmq.ZMQError:  # pragma: debug
+                self.exception("Error receiving")
                 return (False, self.empty_msg)
-            if self.socket_type_name == 'ROUTER':
-                identity = self.socket.recv(flags)
-                self._recv_identities.add(identity)
-            kwargs.setdefault('flags', flags)
-            total_msg = self.socket.recv(**kwargs)
-            self.debug("Recv %d bytes from %s", len(total_msg), self.address)
-            total_msg, k = self.check_reply_socket_recv(total_msg)
-        except zmq.ZMQError:  # pragma: debug
-            self.exception("Error receiving")
-            return (False, self.empty_msg)
+        self.debug("Recv %d bytes from %s", len(total_msg), self.address)
+        # Interpret headers
+        total_msg, k = self.check_reply_socket_recv(total_msg)
         if self.socket_type_name == 'SUB':
             topic, msg = total_msg.split(_flag_zmq_filter)
             assert(topic == self.topic_filter)
