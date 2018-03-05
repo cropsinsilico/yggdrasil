@@ -76,6 +76,7 @@ int free_server_comm(comm_t *x) {
     comm_t *handle = (comm_t*)(x->handle);
     free((char*)(handle->serializer.info));
     free_default_comm(handle);
+    free_comm_base(handle);
     free(x->handle);
     x->handle = NULL;
   }
@@ -84,6 +85,7 @@ int free_server_comm(comm_t *x) {
     if (*info != NULL) {
       free((char*)(info[0]->serializer.info));
       free_default_comm(*info);
+      free_comm_base(*info);
       free(*info);
     }
     free(info);
@@ -130,6 +132,7 @@ int server_comm_send(const comm_t x, const char *data, const size_t len) {
   // Wait for msg to be received?
   free((char*)(res_comm[0]->serializer.info));
   free_default_comm(res_comm[0]);
+  free_comm_base(res_comm[0]);
   free(res_comm[0]);
   res_comm[0] = NULL;
   return ret;

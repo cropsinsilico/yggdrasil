@@ -87,7 +87,8 @@ void clean_comms(void) {
   }
   free(vcomms2clean);
   ncomms2clean = 0;
-#if defined(_WIN32) && defined(ZMQINSTALLED)
+#if defined(ZMQINSTALLED)
+  // #if defined(_WIN32) && defined(ZMQINSTALLED)
   zsys_shutdown();
 #endif
   cislog_debug("atexit done");
@@ -398,6 +399,7 @@ int comm_send_multipart(const comm_t x, const char *data, const size_t len) {
     xmulti = new_comm(NULL, "send", x.type, NULL);
     if (!(xmulti.valid)) {
       cislog_error("comm_send_multipart: Failed to initialize a new comm.");
+      free(headbuf);
       return -1;
     }
     xmulti.sent_eof[0] = 1;
@@ -406,6 +408,7 @@ int comm_send_multipart(const comm_t x, const char *data, const size_t len) {
     headlen = format_comm_header(head, headbuf, headbuf_len);
     if (headlen < 0) {
       cislog_error("comm_send_multipart: Failed to format header.");
+      free(headbuf);
       free_comm(&xmulti);
       return -1;
     }
@@ -416,10 +419,12 @@ int comm_send_multipart(const comm_t x, const char *data, const size_t len) {
     cislog_error("comm_send_multipart: Failed to send header.");
     if (head.multipart == 1)
       free_comm(&xmulti);
+    free(headbuf);
     return -1;
   }
   if (head.multipart == 0) {
     cislog_debug("comm_send_multipart(%s): %d bytes completed", x.name, head.size);
+    free(headbuf);
     return ret;
   }
   // Send multipart
@@ -444,6 +449,7 @@ int comm_send_multipart(const comm_t x, const char *data, const size_t len) {
     cislog_debug("comm_send_multipart(%s): %d bytes completed", x.name, head.size);
   // Free multipart
   free_comm(&xmulti);
+  free(headbuf);
   return ret;
 };
 

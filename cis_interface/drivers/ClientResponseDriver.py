@@ -23,11 +23,13 @@ class ClientResponseDriver(ConnectionDriver):
 
     """
 
-    def __init__(self, model_response_address,
+    def __init__(self, model_response_address, request_name=None,
                  comm=None, msg_id=None, **kwargs):
         if msg_id is None:
             msg_id = str(uuid.uuid4())
         response_name = 'ClientResponse.%s' % msg_id
+        if request_name is not None:
+            response_name = request_name + '.' + response_name
         # Input communicator
         icomm_kws = kwargs.get('icomm_kws', {})
         icomm_kws['comm'] = comm

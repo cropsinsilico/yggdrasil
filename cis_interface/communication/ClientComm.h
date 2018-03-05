@@ -143,6 +143,7 @@ int free_client_comm(comm_t *x) {
         if (info[0][i] != NULL) {
           free((char*)(info[0][i]->serializer.info));
           free_default_comm(info[0][i]);
+	  free_comm_base(info[0][i]);
           free(info[0][i]);
         }
       }
@@ -160,6 +161,7 @@ int free_client_comm(comm_t *x) {
     handle->sent_eof[0] = 1;
     free((char*)(handle->serializer.info));
     free_default_comm(handle);
+    free_comm_base(handle);
     free(x->handle);
     x->handle = NULL;
   }
@@ -209,7 +211,7 @@ comm_head_t client_response_header(comm_t x, comm_head_t head) {
   res_comm[0][ncomm] = new_comm_base(NULL, "recv", _default_comm, seri_copy);
   int ret = new_default_address(res_comm[0][ncomm]);
   if (ret < 0) {
-    cislog_error("client_comm_send(%s): could not create response comm", x.name);
+    cislog_error("client_response_header(%s): could not create response comm", x.name);
     head.valid = 0;
     return head;
   }
@@ -217,12 +219,12 @@ comm_head_t client_response_header(comm_t x, comm_head_t head) {
   res_comm[0][ncomm]->recv_eof[0] = 1;
   inc_client_response_count(x);
   ncomm = get_client_response_count(x);
-  cislog_debug("client_comm_send(%s): Created response comm number %d",
+  cislog_debug("client_response_header(%s): Created response comm number %d",
 	       x.name, ncomm);
   // Add address & request ID to header
   strcpy(head.response_address, res_comm[0][ncomm - 1]->address);
   sprintf(head.request_id, "%d", rand());
-  cislog_debug("client_comm_send(%s): response_address = %s, request_id = %s",
+  cislog_debug("client_response_header(%s): response_address = %s, request_id = %s",
 	       x.name, head.response_address, head.request_id);
   return head;
 };
@@ -285,6 +287,7 @@ int client_comm_recv(comm_t x, char **data, const size_t len, const int allow_re
 	       x.name, ret);
   free((char*)(res_comm[0][0]->serializer.info));
   free_default_comm(res_comm[0][0]);
+  free_comm_base(res_comm[0][0]);
   free(res_comm[0][0]);
   dec_client_response_count(x);
   int nresp = get_client_response_count(x);

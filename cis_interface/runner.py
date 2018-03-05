@@ -193,6 +193,8 @@ class CisRunner(CisClass):
             if k not in kws_ignore:
                 yaml['kwargs'][k] = yaml[k]
         yaml['workingDir'] = yamldir
+        if dtype == 'model':
+            yaml['kwargs']['model_index'] = len(dd)
         dd[yaml['name']] = yaml
 
     def pprint(self, *args):

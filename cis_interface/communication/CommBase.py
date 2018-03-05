@@ -982,12 +982,13 @@ class CommBase(tools.CisClass):
             else:
                 self.special_debug('Failed to send %d bytes', len(msg_s))
         except BaseException:
-            self.exception('.send(): Failed to send.')
+            self.exception('Failed to send.')
             return False
         if self.single_use and self._used:
-            self.debug('')
+            self.debug('Closing single use comm')
             self.close_in_thread(no_wait=True)
         elif ret and self._eof_sent.is_set() and self.close_on_eof_send:
+            self.debug('Close on send EOF')
             self.close_in_thread(no_wait=True, timeout=False)
         return ret
 

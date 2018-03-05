@@ -877,11 +877,11 @@ class ZMQComm(AsyncComm.AsyncComm):
         total_msg = self.check_reply_socket_send(total_msg)
         kwargs.setdefault('flags', zmq.NOBLOCK)
         try:
-            self.debug("Sending %d bytes", len(total_msg))
+            self.debug("Sending %d bytes to %s", len(total_msg), self.address)
             if self.socket_type_name == 'ROUTER':
                 self.socket.send(identity, zmq.SNDMORE)
             self.socket.send(total_msg, **kwargs)
-            self.debug("Sent %d bytes", len(total_msg))
+            self.debug("Sent %d bytes to %s", len(total_msg), self.address)
             self._n_zmq_sent += 1
         except zmq.ZMQError as e:  # pragma: debug
             if e.errno == zmq.EAGAIN:
@@ -924,6 +924,7 @@ class ZMQComm(AsyncComm.AsyncComm):
                 self._recv_identities.add(identity)
             kwargs.setdefault('flags', flags)
             total_msg = self.socket.recv(**kwargs)
+            self.debug("Recv %d bytes from %s", len(total_msg), self.address)
             total_msg, k = self.check_reply_socket_recv(total_msg)
         except zmq.ZMQError:  # pragma: debug
             self.exception("Error receiving")

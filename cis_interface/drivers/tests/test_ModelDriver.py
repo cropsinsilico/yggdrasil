@@ -32,7 +32,11 @@ class TestModelParam(parent.TestParam):
             self.args = ['sleep', '0.1']
         self.attr_list += ['args', 'process', 'queue', 'queue_thread',
                            'is_server', 'client_of',
-                           'event_process_kill_called', 'event_process_kill_complete']
+                           'event_process_kill_called',
+                           'event_process_kill_complete',
+                           'with_strace', 'strace_flags',
+                           'with_valgrind', 'valgrind_flags',
+                           'model_index']
         
 
 class TestModelDriverNoStart(TestModelParam, parent.TestDriverNoStart):

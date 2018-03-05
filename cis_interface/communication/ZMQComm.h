@@ -9,9 +9,10 @@
 #include <czmq.h>
 
 static unsigned _zmq_rand_seeded = 0;
+static unsigned _last_port_set = 0;
 static unsigned _cisSocketsCreated = 0;
 static int _last_port = 49152;
-static double _wait_send_t = 0;  // 0.0001;
+/* static double _wait_send_t = 0;  // 0.0001; */
 static char _reply_msg[100] = "CIS_REPLY";
 static char _purge_msg[100] = "CIS_PURGE";
 static int _zmq_sleeptime = 10000;
@@ -282,6 +283,12 @@ char* check_reply_send(const comm_t *comm, const char *data, const int len,
     if (strcmp(host, "localhost") == 0)
       strcpy(host, "127.0.0.1");
     char address[100];
+    if (_last_port_set == 0) {
+      cislog_debug("model_index = %s", getenv("CIS_MODEL_INDEX"));
+      _last_port = 49152 + 1000 * atoi(getenv("CIS_MODEL_INDEX"));
+      _last_port_set = 1;
+      cislog_debug("_last_port = %d", _last_port);
+    }
     sprintf(address, "%s://%s:*[%d-]", protocol, host, _last_port + 1);
     int port = zsock_bind(zrep->sockets[0], "%s", address);
     if (port == -1) {
@@ -421,7 +428,13 @@ int new_zmq_address(comm_t *comm) {
       sprintf(comm->name, "tempnewZMQ-%d", key);
     sprintf(address, "%s://%s", protocol, comm->name);
   } else {
-    sprintf(address, "%s://%s:*[%d-]", protocol, host, _last_port + 1);
+     if (_last_port_set == 0) {
+      cislog_debug("model_index = %s", getenv("CIS_MODEL_INDEX"));
+      _last_port = 49152 + 1000 * atoi(getenv("CIS_MODEL_INDEX"));
+      _last_port_set = 1;
+      cislog_debug("_last_port = %d", _last_port);
+    }
+   sprintf(address, "%s://%s:*[%d-]", protocol, host, _last_port + 1);
     /* strcat(address, ":!"); // For random port */
   }
   // Bind
@@ -444,6 +457,7 @@ int new_zmq_address(comm_t *comm) {
     sprintf(address, "%s://%s:%d", protocol, host, port);
   }
   strcpy(comm->address, address);
+  cislog_debug("new_zmq_address: Bound socket to %s", comm->address);
   if (strlen(comm->name) == 0)
     sprintf(comm->name, "tempnewZMQ-%d", port);
   comm->handle = (void*)s;
@@ -471,10 +485,11 @@ int init_zmq_comm(comm_t *comm) {
   zsock_set_linger(s, 0);
   ret = zsock_connect(s, "%s", comm->address);
   if (ret == -1) {
-    cislog_error("new_zmq_address: Could not connect socket to address = %s",
+    cislog_error("init_zmq_address: Could not connect socket to address = %s",
   		 comm->address);
     return ret;
   }
+  cislog_debug("init_zmq_address: Connected socket to %s", comm->address);
   if (strlen(comm->name) == 0)
     sprintf(comm->name, "tempinitZMQ-%s", comm->address);
   // Asign to void pointer
@@ -490,7 +505,6 @@ int init_zmq_comm(comm_t *comm) {
 */
 static inline
 int free_zmq_comm(comm_t *x) {
-  int i = 0;
   int ret = 0;
   // Drain input
   if (strcmp(x->direction, "recv") == 0) {
@@ -510,6 +524,7 @@ int free_zmq_comm(comm_t *x) {
   // Do EOF send/recv
   zmq_reply_t *zrep = (zmq_reply_t*)(x->reply);
   if (zrep != NULL) {
+    /* int i = 0; */
     /* if (strcmp(x->direction, "recv") == 0) { */
     /*   if (x->recv_eof[0] == 0) { */
     /* 	for (i = 0; i < zrep->nsockets; i++) { */
@@ -522,8 +537,10 @@ int free_zmq_comm(comm_t *x) {
   }
   if (x->handle != NULL) {
     zsock_t *s = (zsock_t*)(x->handle);
-    if (s != NULL)
+    if (s != NULL) {
+      cislog_debug("Destroying socket: %s", x->address);
       zsock_destroy(&s);
+    }
     x->handle = NULL;
   }
   return ret;

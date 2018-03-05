@@ -183,7 +183,8 @@ class ClientRequestDriver(ConnectionDriver):
                 if (not self.is_comm_open) or self._block_response:  # pragma: debug
                     return False
                 drv_args = [self.model_response_address]
-                drv_kwargs = dict(comm=self.comm, msg_id=self.request_id)
+                drv_kwargs = dict(comm=self.comm, msg_id=self.request_id,
+                                  request_name=self.name)
                 self.debug("Creating response comm: address = %s, request_id = %s",
                            self.model_response_address, self.request_id)
                 try:

@@ -183,7 +183,8 @@ class ServerRequestDriver(ConnectionDriver):
                     self.debug("Comm closed, not creating response driver.")
                     return False
                 drv_args = [self.response_address]
-                drv_kwargs = dict(comm=self.comm, msg_id=self.request_id)
+                drv_kwargs = dict(comm=self.comm, msg_id=self.request_id,
+                                  request_name=self.name)
                 try:
                     response_driver = ServerResponseDriver(*drv_args, **drv_kwargs)
                     self.response_drivers.append(response_driver)

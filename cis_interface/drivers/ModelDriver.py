@@ -30,6 +30,8 @@ class ModelDriver(Driver):
         with_valgrind (bool, optional): If True, the command is run with valgrind.
             Defaults to False.
         valgrind_flags (list, optional): Flags to pass to valgrind. Defaults to [].
+        model_index (int, optional): Index of model in list of models being run.
+            Defaults to 0.
         **kwargs: Additional keyword arguments are passed to parent class.
 
     Attributes:
@@ -45,6 +47,7 @@ class ModelDriver(Driver):
         strace_flags (list): Flags to pass to strace/dtrace.
         with_valgrind (bool): If True, the command is run with valgrind.
         valgrind_flags (list): Flags to pass to valgrind.
+        model_index (int): Index of model in list of models being run.
 
     Raises:
         RuntimeError: If both with_strace and with_valgrind are True.
@@ -54,7 +57,7 @@ class ModelDriver(Driver):
     def __init__(self, name, args, is_server=False, client_of=[],
                  with_strace=False, strace_flags=None,
                  with_valgrind=False, valgrind_flags=None,
-                 **kwargs):
+                 model_index=0, **kwargs):
         super(ModelDriver, self).__init__(name, **kwargs)
         self.debug(str(args))
         if isinstance(args, str):
@@ -79,8 +82,9 @@ class ModelDriver(Driver):
         self.strace_flags = strace_flags
         self.with_valgrind = with_valgrind
         if valgrind_flags is None:
-            valgrind_flags = []
+            valgrind_flags = ['--leak-check=full']  # '-v'
         self.valgrind_flags = valgrind_flags
+        self.model_index = model_index
         self.env_copy = ['LANG', 'PATH', 'USER']
         self._exit_line = backwards.unicode2bytes('EXIT')
         # print(os.environ.keys())
@@ -92,6 +96,7 @@ class ModelDriver(Driver):
         env = copy.deepcopy(self.env)
         env.update(os.environ)
         env['CIS_SUBPROCESS'] = "True"
+        env['CIS_MODEL_INDEX'] = str(self.model_index)
         return env
 
     def before_start(self):

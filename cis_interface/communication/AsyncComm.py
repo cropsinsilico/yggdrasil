@@ -298,6 +298,7 @@ class AsyncComm(CommBase.CommBase):
             imsg, ikwargs = self.backlog_send[0]
             flag = self._send_direct(imsg, **ikwargs)
             if flag:
+                self.debug("Sent %d bytes to %s", len(imsg), self.address)
                 self.pop_backlog_send()
         except AsyncTryAgain:  # pragma: debug
             flag = True
@@ -320,8 +321,8 @@ class AsyncComm(CommBase.CommBase):
             try:
                 flag, data = self._recv_direct()
                 if flag and data:
+                    self.debug("Recv %d bytes from %s", len(data), self.address)
                     self.add_backlog_recv(data)
-                    self.debug('Backlogged received message.')
             except BaseException:  # pragma: debug
                 self.exception('Error receiving into backlog.')
                 flag = False
