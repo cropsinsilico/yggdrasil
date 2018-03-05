@@ -153,8 +153,8 @@ class RMQAsyncComm(RMQComm):
             if self.rmq_thread.is_alive():
                 raise RuntimeError("Thread still running.")
         # Close workers
-        with self.rmq_lock:
-            super(RMQAsyncComm, self)._close_direct(linger=linger)
+        # with self.rmq_lock:
+        super(RMQAsyncComm, self)._close_direct(linger=linger)
 
     def _set_qres(self, res):
         r"""Callback for getting message count."""
@@ -186,32 +186,30 @@ class RMQAsyncComm(RMQComm):
     @property
     def n_msg_direct_recv(self):
         r"""int: Number of messages in the queue."""
-        with self.rmq_lock:
-            if self.is_open_direct:
-                return len(self._buffered_messages)
-        # return self.n_msg_backlog_recv
+        if self.is_open_direct:
+            return len(self._buffered_messages)
         return 0
         
     # Access work comms with lock
-    def get_work_comm(self, *args, **kwargs):
-        r"""Alias for parent class that wraps method in Lock."""
-        with self.rmq_lock:
-            return super(RMQAsyncComm, self).get_work_comm(*args, **kwargs)
+    # def get_work_comm(self, *args, **kwargs):
+    #     r"""Alias for parent class that wraps method in Lock."""
+    #     with self.rmq_lock:
+    #         return super(RMQAsyncComm, self).get_work_comm(*args, **kwargs)
 
-    def create_work_comm(self, *args, **kwargs):
-        r"""Alias for parent class that wraps method in Lock."""
-        with self.rmq_lock:
-            return super(RMQAsyncComm, self).create_work_comm(*args, **kwargs)
+    # def create_work_comm(self, *args, **kwargs):
+    #     r"""Alias for parent class that wraps method in Lock."""
+    #     with self.rmq_lock:
+    #         return super(RMQAsyncComm, self).create_work_comm(*args, **kwargs)
 
-    def add_work_comm(self, *args, **kwargs):
-        r"""Alias for parent class that wraps method in Lock."""
-        with self.rmq_lock:
-            return super(RMQAsyncComm, self).add_work_comm(*args, **kwargs)
+    # def add_work_comm(self, *args, **kwargs):
+    #     r"""Alias for parent class that wraps method in Lock."""
+    #     with self.rmq_lock:
+    #         return super(RMQAsyncComm, self).add_work_comm(*args, **kwargs)
 
-    def remove_work_comm(self, *args, **kwargs):
-        r"""Alias for parent class that wraps method in Lock."""
-        with self.rmq_lock:
-            return super(RMQAsyncComm, self).remove_work_comm(*args, **kwargs)
+    # def remove_work_comm(self, *args, **kwargs):
+    #     r"""Alias for parent class that wraps method in Lock."""
+    #     with self.rmq_lock:
+    #         return super(RMQAsyncComm, self).remove_work_comm(*args, **kwargs)
 
     def _send_direct(self, msg, exchange=None, routing_key=None, **kwargs):
         r"""Send a message.
