@@ -422,11 +422,11 @@ class AsyncComm(CommBase.CommBase):
             no_backlog = True
         # If no backlog, receive from queue
         if no_backlog:
-            T = self.start_timeout(timeout)
+            T = self.start_timeout(timeout, key_suffix='_recv:direct')
             while ((not T.is_out) and (self.n_msg_direct_recv == 0) and
                    self.is_open_direct):
                 self.sleep()
-            self.stop_timeout()
+            self.stop_timeout(key_suffix='_recv:direct')
             if not self.is_open_direct:  # pragma: debug
                 self.debug("Comm closed")
                 return (False, self.empty_msg)
@@ -441,10 +441,10 @@ class AsyncComm(CommBase.CommBase):
                                       direction='recv')
             return out
         # Sleep until there is a message
-        T = self.start_timeout(timeout)
+        T = self.start_timeout(timeout, key_suffix='_recv:backlog')
         while (not T.is_out) and (not self.backlog_recv_ready.is_set()):
             self.backlog_recv_ready.wait(self.sleeptime)
-        self.stop_timeout()
+        self.stop_timeout(key_suffix='_recv:backlog')
         # Return False if the queue is closed
         if (not self.is_open_backlog):  # pragma: debug
             self.debug("Backlog closed")

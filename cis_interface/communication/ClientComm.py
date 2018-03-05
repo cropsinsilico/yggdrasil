@@ -102,12 +102,12 @@ class ClientComm(CommBase.CommBase):
         super(ClientComm, self).open()
         self.ocomm.open()
 
-    def _close(self, *args, **kwargs):
+    def close(self, *args, **kwargs):
         r"""Close the connection."""
         self.ocomm.close(*args, **kwargs)
         for k in self.icomm_order:
             self.icomm[k].close()
-        super(ClientComm, self)._close(*args, **kwargs)
+        super(ClientComm, self).close(*args, **kwargs)
 
     @property
     def is_open(self):

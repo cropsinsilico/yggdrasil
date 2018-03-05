@@ -276,7 +276,6 @@ class RMQComm(AsyncComm.AsyncComm):
         r"""Close the queue if the channel exists."""
         if self.channel and (not self.is_client):
             try:
-                self.n_msg_direct_recv
                 self.channel.queue_unbind(queue=self.queue,
                                           exchange=self.exchange)
                 self.channel.queue_delete(queue=self.queue)

@@ -18,7 +18,7 @@ class TestConnectionParam(parent.TestParam, IOInfo):
         self.comm_name = tools.get_default_comm()
         self.attr_list += ['icomm_kws', 'ocomm_kws', 'icomm', 'ocomm',
                            'nrecv', 'nproc', 'nsent', 'state', 'translator']
-        self.timeout = 1.0
+        # self.timeout = 1.0
         self.icomm_name = self.comm_name
         self.ocomm_name = self.comm_name
         self._extra_instances = []

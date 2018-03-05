@@ -754,23 +754,26 @@ class CommBase(tools.CisClass):
             raise KeyError("Comm already registered with key %s." % key)
         self._work_comms[key] = comm
 
-    def remove_work_comm(self, key, dont_close=False, linger=False):
+    def remove_work_comm(self, key, in_thread=False, linger=False):
         r"""Close and remove a work comm.
 
         Args:
             key (str): Key of comm that should be removed.
-            dont_close (bool, optional): If True, the comm will be removed
-                from the list, but it won't be closed. Defaults to False.
+            in_thread (bool, optional): If True, close the work comm in a thread.
+                Defaults to False.
             linger (bool, optional): If True, drain messages before closing the
                 comm. Defaults to False.
 
         """
         if key not in self._work_comms:
             return
-        if not dont_close:
-            # c = self._work_comms[key]
-            c = self._work_comms.pop(key)
+        if in_thread:
+            # c = self._work_comms.pop(key)
+            c = self._work_comms[key]
             c.close_in_thread(no_wait=True)
+        else:
+            c = self._work_comms.pop(key)
+            c.close(linger=linger)
 
     # HEADER
     def get_header(self, msg, no_address=False, **kwargs):
@@ -851,11 +854,11 @@ class CommBase(tools.CisClass):
     
     def _send_1st(self, *args, **kwargs):
         r"""Send first message until it succeeds."""
-        T = self.start_timeout()
         with self._closing_thread.lock:
             if self.is_closed:  # pragma: debug
                 return False
             flag = self._send(*args, **kwargs)
+        T = self.start_timeout(key_suffix='._send_1st')
         self.suppress_special_debug = True
         while (not T.is_out) and (self.is_open) and (not flag):  # pragma: debug
             with self._closing_thread.lock:
@@ -865,7 +868,7 @@ class CommBase(tools.CisClass):
             if flag or (self.is_closed):
                 break
             self.sleep()
-        self.stop_timeout()
+        self.stop_timeout(key_suffix='._send_1st')
         self.suppress_special_debug = False
         self._first_send_done = True
         return flag
@@ -915,7 +918,7 @@ class CommBase(tools.CisClass):
         """
         workcomm = self.get_work_comm(header)
         ret = workcomm._send_multipart(msg, **kwargs)
-        self.remove_work_comm(header['id'])  # , dont_close=True)
+        self.remove_work_comm(header['id'], in_thread=True)
         return ret
             
     def on_send_eof(self):
@@ -986,7 +989,8 @@ class CommBase(tools.CisClass):
             return False
         if self.single_use and self._used:
             self.debug('Closing single use comm')
-            self.close_in_thread(no_wait=True)
+            self.linger_close()
+            # self.close_in_thread(no_wait=True)
         elif ret and self._eof_sent.is_set() and self.close_on_eof_send:
             self.debug('Close on send EOF')
             self.close_in_thread(no_wait=True, timeout=False)
@@ -1140,7 +1144,7 @@ class CommBase(tools.CisClass):
         workcomm = self.get_work_comm(info)
         leng_exp = int(float(info['size']))
         out = workcomm._recv_multipart(leng_exp, **kwargs)
-        self.remove_work_comm(info['id'])
+        self.remove_work_comm(info['id'], linger=True)
         return out
         
     def on_recv_eof(self):
@@ -1234,7 +1238,7 @@ class CommBase(tools.CisClass):
         if len(info['body']) == int(info['size']):
             return True, info['body']
         out = self._recv_multipart_worker(info, **kwargs)
-        self.remove_work_comm(info['id'])
+        self.remove_work_comm(info['id'], linger=True)
         return out
         
     def recv_header(self, *args, **kwargs):
@@ -1270,7 +1274,7 @@ class CommBase(tools.CisClass):
             timeout = self._timeout_drain
         if not hasattr(self, variable):
             raise ValueError("No attribute named '%s'" % variable)
-        Tout = self.start_timeout(timeout)
+        Tout = self.start_timeout(timeout, key_suffix='.drain_messages')
         while (not Tout.is_out) and self.is_open:
             n_msg = getattr(self, variable)
             if n_msg == 0:
@@ -1278,7 +1282,7 @@ class CommBase(tools.CisClass):
             self.verbose_debug("Draining %d %s messages.",
                                n_msg, variable)
             self.sleep()
-        self.stop_timeout()
+        self.stop_timeout(key_suffix='.drain_messages')
         self.debug('Done draining')
 
     def purge(self):

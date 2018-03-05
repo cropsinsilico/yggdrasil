@@ -186,7 +186,11 @@ class RMQAsyncComm(RMQComm):
     @property
     def n_msg_direct_recv(self):
         r"""int: Number of messages in the queue."""
-        return self.n_msg_backlog_recv
+        with self.rmq_lock:
+            if self.is_open_direct:
+                return len(self._buffered_messages)
+        # return self.n_msg_backlog_recv
+        return 0
         
     # Access work comms with lock
     def get_work_comm(self, *args, **kwargs):
@@ -244,6 +248,9 @@ class RMQAsyncComm(RMQComm):
                 message.
 
         """
+        with self.rmq_lock:
+            if self.n_msg_direct_recv != 0:
+                return (True, self._buffered_messages.pop(0))
         return (True, self.empty_msg)
         # if self.n_msg_recv != 0:
         #     with self.rmq_lock:
@@ -264,7 +271,7 @@ class RMQAsyncComm(RMQComm):
         r"""Buffer received messages."""
         if self.direction == 'send':  # pragma: debug
             raise Exception("Send comm received a message.")
-        self.add_backlog_recv(backwards.unicode2bytes(body))
+        # self.add_backlog_recv(backwards.unicode2bytes(body))
         with self.rmq_lock:
             self._buffered_messages.append(backwards.unicode2bytes(body))
         ch.basic_ack(delivery_tag=method.delivery_tag)
