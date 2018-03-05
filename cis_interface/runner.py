@@ -10,7 +10,7 @@ import socket
 from cis_interface.tools import CisClass, parse_yaml
 from cis_interface.config import cis_cfg, cfg_environment
 from cis_interface import platform, backwards
-from cis_interface.drivers import create_driver
+from cis_interface.drivers import create_driver, import_driver
 
 
 COLOR_TRACE = '\033[30;43;22m'
@@ -382,10 +382,10 @@ class CisRunner(CisClass):
             yml['kwargs'].setdefault('comm_env', {})
             yml['kwargs']['comm_env'] = self._inputchannels[
                 yml['args']]['instance'].comm_env
-        drv = self.createDriver(yml)
+        drv_cls = import_driver(yml['driver'])
         if yml['args'] not in self._inputchannels:
             try:
-                assert(issubclass(drv.__class__,
+                assert(issubclass(drv_cls,
                                   FileOutputDriver.FileOutputDriver))
             except AssertionError:
                 raise Exception(("Output driver %s is not a subclass of " +
@@ -396,6 +396,7 @@ class CisRunner(CisClass):
             
             # TODO: Add input comm environment variables somehow
             pass
+        drv = self.createDriver(yml)
         return drv
         
     def loadDrivers(self):

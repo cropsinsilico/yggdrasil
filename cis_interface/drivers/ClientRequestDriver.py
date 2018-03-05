@@ -120,6 +120,7 @@ class ClientRequestDriver(ConnectionDriver):
         # To force response server to connect after response client has stopped
         # self.sleep(0.5)
         with self.lock:
+            self.debug("Closing response drivers.")
             self._block_response = True
             for x in self.response_drivers:
                 x.terminate()
@@ -144,12 +145,6 @@ class ClientRequestDriver(ConnectionDriver):
         super(ClientRequestDriver, self).send_message(CIS_CLIENT_INI)
         # self.info("%s: before loop complete", self.name)
 
-    # def after_loop(self):
-    #     r"""After client model signs off. Sent EOF to server."""
-    #     # Don't close output as other clients may be using it
-    #     self.close_response_drivers()
-    #     super(ClientRequestDriver, self).after_loop()
-    
     def send_eof(self):
         r"""Send EOF message.
 

@@ -95,23 +95,16 @@ class ServerRequestDriver(ConnectionDriver):
                 x.terminate()
             self.response_drivers = []
 
-    def terminate(self, *args, **kwargs):
-        r"""Stop response drivers."""
-        self.debug('')
+    def close_comm(self):
+        r"""Close response drivers."""
         self.close_response_drivers()
-        super(ServerRequestDriver, self).terminate(*args, **kwargs)
+        super(ServerRequestDriver, self).close_comm()
 
     def printStatus(self, *args, **kwargs):
         r"""Also print response drivers."""
         super(ServerRequestDriver, self).printStatus(*args, **kwargs)
         for x in self.response_drivers:
             x.printStatus(*args, **kwargs)
-
-    def after_loop(self):
-        r"""After client model signs off. Sent EOF to server."""
-        # Don't close output as other clients may be using it
-        self.close_response_drivers()
-        super(ServerRequestDriver, self).after_loop()
 
     def on_client_exit(self):
         r"""Close input comm to stop the loop."""

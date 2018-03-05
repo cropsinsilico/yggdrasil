@@ -26,22 +26,25 @@ def test_get_runner():
 @unittest.skipIf(platform._is_win, "Signal processing not sorted on windows")
 def test_Arunner_interrupt():
     r"""Start a runner then stop it with a keyboard interrupt."""
-    print("starting interrupt")
-    # tools.sleep(5)
     cr = runner.get_runner([ex_yamls['hello']['python']])
-    cr.debug_log()
+    if platform._is_win:  # pragma: windows
+        print("starting interrupt")
+        cr.debug_log()
     cr.loadDrivers()
     cr.startDrivers()
     cr.set_signal_handler()
-    print("calling interrupt", os.getpid())
+    if platform._is_win:  # pragma: windows
+        print("calling interrupt", os.getpid())
     tools.kill(os.getpid(), signal.SIGINT)
     tools.kill(os.getpid(), signal.SIGINT)
-    print("after interrupt")
+    if platform._is_win:  # pragma: windows
+        print("after interrupt")
     cr.reset_signal_handler()
-    # cr.waitModels()
-    # cr.closeChannels()
-    # cr.cleanup()
-    cr.reset_log()
+    cr.waitModels()
+    cr.closeChannels()
+    cr.cleanup()
+    if platform._is_win:  # pragma: windows
+        cr.reset_log()
 
 
 def test_runner_terminate():

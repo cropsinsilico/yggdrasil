@@ -919,6 +919,8 @@ class ZMQComm(AsyncComm.AsyncComm):
         flags = zmq.NOBLOCK
         # Receive message
         try:
+            if self.socket.closed:
+                return (False, self.empty_msg)
             if self.socket_type_name == 'ROUTER':
                 identity = self.socket.recv(flags)
                 self._recv_identities.add(identity)
