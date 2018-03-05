@@ -137,7 +137,8 @@ class RMQAsyncComm(RMQComm):
                                                       consumer_tag=self.consumer_tag)
                         else:
                             self.channel.close()
-                    except pika.exceptions.ChannelClosed:  # pragma: debug
+                    except (pika.exceptions.ChannelClosed,
+                            pika.exceptions.ConnectionClosed):  # pragma: debug
                         self._closing = False
             if not self.is_client:
                 self.unregister_connection()
@@ -173,7 +174,8 @@ class RMQAsyncComm(RMQComm):
                                                    queue=self.queue,
                                                    # , auto_delete=True,
                                                    passive=True)
-                    except pika.exceptions.ChannelClosed:  # pragma: debug
+                    except (pika.exceptions.ChannelClosed,
+                            pika.exceptions.ConnectionClosed):  # pragma: debug
                         if not self._reconnecting:
                             self._close_direct()
                         else:

@@ -279,7 +279,8 @@ class RMQComm(AsyncComm.AsyncComm):
                 self.channel.queue_unbind(queue=self.queue,
                                           exchange=self.exchange)
                 self.channel.queue_delete(queue=self.queue)
-            except pika.exceptions.ChannelClosed:  # pragma: debug
+            except (pika.exceptions.ChannelClosed,
+                    pika.exceptions.ConnectionClosed):  # pragma: debug
                 pass
             except AttributeError:  # pragma: debug
                 if self.channel is not None:
@@ -291,6 +292,7 @@ class RMQComm(AsyncComm.AsyncComm):
             try:
                 self.channel.close()
             except (pika.exceptions.ChannelClosed,
+                    pika.exceptions.ConnectionClosed,
                     pika.exceptions.ChannelAlreadyClosing):  # pragma: debug
                 pass
         self.channel = None
@@ -300,7 +302,9 @@ class RMQComm(AsyncComm.AsyncComm):
         if self.connection:
             try:
                 self.connection.close()
-            except pika.exceptions.ChannelClosed:  # pragma: debug
+            except (pika.exceptions.ChannelClosed,
+                    pika.exceptions.ConnectionClosed,
+                    pika.exceptions.ChannelAlreadyClosing):  # pragma: debug
                 pass
             except AttributeError:  # pragma: debug
                 pass
@@ -332,7 +336,8 @@ class RMQComm(AsyncComm.AsyncComm):
                 res = self.channel.queue_declare(queue=self.queue,
                                                  auto_delete=True,
                                                  passive=True)
-            except pika.exceptions.ChannelClosed:  # pragma: debug
+            except (pika.exceptions.ChannelClosed,
+                    pika.exceptions.ConnectionClosed):  # pragma: debug
                 self._close_direct()
         return res
         
