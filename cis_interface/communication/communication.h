@@ -16,7 +16,7 @@
 #define CISCOMMUNICATION_H_
 
 /*! @brief Memory to keep track of comms to clean up at exit. */
-static void **vcomms2clean;
+static void **vcomms2clean = NULL;
 static size_t ncomms2clean = 0;
 static size_t clean_registered = 0;
 
@@ -107,7 +107,7 @@ void clean_comms(void) {
   ncomms2clean = 0;
 #if defined(ZMQINSTALLED)
   // #if defined(_WIN32) && defined(ZMQINSTALLED)
-  zsys_shutdown();
+  // zsys_shutdown();
 #endif
   cislog_debug("atexit done");
   /* printf(""); */
