@@ -68,7 +68,7 @@ int free_comm(comm_t *x) {
     return ret;
   /* comm_type t = x->type;
   // Send EOF for output comms and then wait for messages to be recv'd
-  if ((strcmp(x->direction, "send") == 0) && (t != CLIENT_COMM) && (x->valid)) {
+  if ((is_send(x->direction)) && (t != CLIENT_COMM) && (x->valid)) {
     if (_cis_error_flag == 0) {
       comm_send_eof(*x);
       while (comm_nmsg(*x) > 0) {

@@ -123,9 +123,9 @@ comm_t* init_comm_base(const char *name, const char *direction,
     strcpy(full_name, name);
     if (t != RPC_COMM) {
       if ((direction != NULL) && (strlen(direction) > 0)) {
-        if (strcmp(direction, "send") == 0)
+        if (is_send(direction))
           strcat(full_name, "_OUT");
-        else if (strcmp(direction, "recv") == 0)
+        else if (is_recv(direction))
           strcat(full_name, "_IN");
       }
     }

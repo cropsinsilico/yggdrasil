@@ -510,7 +510,7 @@ int free_zmq_comm(comm_t *x) {
   if (x == NULL)
     return ret;
   // Drain input
-  /* if ((strcmp(x->direction, "recv") == 0) && (x->valid == 1)) {
+  /* if ((is_recv(x->direction)) && (x->valid == 1)) {
     if (_cis_error_flag == 0) {
       size_t data_len = 100;
       char *data = (char*)malloc(data_len);
@@ -527,13 +527,13 @@ int free_zmq_comm(comm_t *x) {
     }
   } */
   // Free reply
-  if (x->reply != NULL) {
+  /* if (x->reply != NULL) {
     zmq_reply_t *zrep = (zmq_reply_t*)(x->reply);
     // Free reply
     ret = free_zmq_reply(zrep);
     free(x->reply);
     x->reply = NULL;
-  }
+  } */
   if (x->handle != NULL) {
     zsock_t *s = (zsock_t*)(x->handle);
     if (s != NULL) {
@@ -553,7 +553,7 @@ int free_zmq_comm(comm_t *x) {
 static inline
 int zmq_comm_nmsg(const comm_t x) {
   int out = 0;
-  if (strcmp(x.direction, "recv") == 0) {
+  if (is_recv(x.direction)) {
     if (x.handle != NULL) {
       zsock_t *s = (zsock_t*)(x.handle);
       zpoller_t *poller = zpoller_new(s, NULL);

@@ -167,18 +167,54 @@ void cisError(const char* fmt, ...) {
 #endif
 
 /*!
+  @brief Check if a character array matches a message and is non-zero length.
+  @param[in] pattern constant character pointer to string that should be checked.
+  @param[in] buf constant character pointer to string that should be checked.
+  @returns int 1 if buf matches pattern, 0 otherwise.
+ */
+static inline
+int not_empty_match(const char *pattern, const char *buf) {
+  if (buf == NULL)
+    return 0;
+  if (buf[0] == '\0')
+    return 0;
+  if (strcmp(buf, pattern) == 0) {
+    return 1;
+  } else {
+    return 0;
+  }
+};
+
+/*!
   @brief Check if a character array matches the internal EOF message.
   @param[in] buf constant character pointer to string that should be checked.
   @returns int 1 if buf is the EOF message, 0 otherwise.
  */
 static inline
 int is_eof(const char *buf) {
-  if (strcmp(buf, CIS_MSG_EOF) == 0) {
-    return 1;
-  } else {
-    return 0;
-  }
+  return not_empty_match(CIS_MSG_EOF, buf);
 };
+
+/*!
+  @brief Check if a character array matches "recv".
+  @param[in] buf constant character pointer to string that should be checked.
+  @returns int 1 if buf is the "recv" message, 0 otherwise.
+ */
+static inline
+int is_recv(const char *buf) {
+  return not_empty_match("recv", buf);
+};
+
+/*!
+  @brief Check if a character array matches "send".
+  @param[in] buf constant character pointer to string that should be checked.
+  @returns int 1 if buf is the "send" message, 0 otherwise.
+ */
+static inline
+int is_send(const char *buf) {
+  return not_empty_match("send", buf);
+};
+
 
 
 #endif /*CISTOOLS_H_*/
