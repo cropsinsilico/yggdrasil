@@ -64,6 +64,8 @@ int free_comm_type(comm_t *x) {
 static inline
 int free_comm(comm_t *x) {
   int ret = 0;
+  if (x == NULL)
+    return ret;
   /* comm_type t = x->type;
   // Send EOF for output comms and then wait for messages to be recv'd
   if ((strcmp(x->direction, "send") == 0) && (t != CLIENT_COMM) && (x->valid)) {
@@ -77,9 +79,9 @@ int free_comm(comm_t *x) {
     } else {
       cislog_error("free_comm(%s): Error registered", x->name);
     }
-  }
-  ret = 0;  // free_comm_type(x);
-  int idx = x->index_in_register; */
+  } */
+  ret = free_comm_type(x);
+  // int idx = x->index_in_register;
   free_comm_base(x);
   /* if (idx >= 0) {
     if (vcomms2clean[idx] != NULL) {
@@ -272,7 +274,6 @@ comm_t init_comm(const char *name, const char *direction, const comm_type t,
     cislog_error("init_comm(%s): Could not initialize base.", name);
     return empty_comm_base();
   }
-  return ret[0];
   /* int flag = init_comm_type(ret);
   if (flag < 0) {
     cislog_error("init_comm(%s): Could not initialize comm.", name);
@@ -284,8 +285,8 @@ comm_t init_comm(const char *name, const char *direction, const comm_type t,
       ret->valid = 0;
     }
   }
-  cislog_debug("init_comm(%s): Initialized comm.", name);
-  return ret[0];*/
+  cislog_debug("init_comm(%s): Initialized comm.", name); */
+  return ret[0];
 };
 
 /*!

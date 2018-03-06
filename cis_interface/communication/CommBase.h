@@ -161,6 +161,8 @@ comm_t* init_comm_base(const char *name, const char *direction,
 */
 static inline
 int free_comm_base(comm_t *x) {
+  if (x == NULL)
+    return 0;
   if (x->last_send != NULL) {
     free(x->last_send);
     x->last_send = NULL;

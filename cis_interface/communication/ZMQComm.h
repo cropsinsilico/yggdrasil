@@ -507,6 +507,8 @@ int init_zmq_comm(comm_t *comm) {
 static inline
 int free_zmq_comm(comm_t *x) {
   int ret = 0;
+  if (x == NULL)
+    return ret;
   // Drain input
   /* if ((strcmp(x->direction, "recv") == 0) && (x->valid == 1)) {
     if (_cis_error_flag == 0) {
@@ -523,7 +525,7 @@ int free_zmq_comm(comm_t *x) {
       }
       free(data);
     }
-  }
+  } */
   // Free reply
   if (x->reply != NULL) {
     zmq_reply_t *zrep = (zmq_reply_t*)(x->reply);
@@ -539,7 +541,7 @@ int free_zmq_comm(comm_t *x) {
       zsock_destroy(&s);
     }
     x->handle = NULL;
-  } */
+  }
   return ret;
 };
 
