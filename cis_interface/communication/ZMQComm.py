@@ -794,6 +794,7 @@ class ZMQComm(AsyncComm.AsyncComm):
                 try:
                     out = self.socket.poll(timeout=1, flags=flags)
                 except zmq.ZMQError:  # pragma: debug
+                    # self.exception('Error polling')
                     pass
         return bool(out)
         

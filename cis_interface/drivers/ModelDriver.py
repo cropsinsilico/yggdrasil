@@ -172,7 +172,9 @@ class ModelDriver(Driver):
         if there was an error and then handling it."""
         self.debug('')
         if self.queue_thread is not None:
+            self.queue_thread.join(self.sleeptime)
             if self.queue_thread.is_alive():
+                self.info("Queue thread still alive")
                 # Loop was broken from outside, kill the queueing thread
                 self.kill_process()
                 # self.queue_thread.set_break_flag()

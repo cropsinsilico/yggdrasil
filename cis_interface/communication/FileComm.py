@@ -1,5 +1,6 @@
 import os
 import tempfile
+from cis_interface import backwards, platform
 from cis_interface.communication import CommBase
 
 
@@ -104,7 +105,7 @@ class FileComm(CommBase.CommBase):
     @property
     def is_open(self):
         r"""bool: True if the connection is open."""
-        return (self.fd is not None)
+        return (self.fd is not None) and (not self.fd.closed)
 
     @property
     def remaining_bytes(self):
@@ -175,6 +176,9 @@ class FileComm(CommBase.CommBase):
             out = self.fd.readline()
         if len(out) == 0:
             out = self.eof_msg
+        else:
+            out = out.replace(backwards.unicode2bytes(platform._newline),
+                              backwards.unicode2bytes('\n'))
         return (True, out)
 
     def purge(self):

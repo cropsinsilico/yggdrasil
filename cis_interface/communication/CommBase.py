@@ -42,18 +42,18 @@ class CommThreadLoop(tools.CisThreadLoop):
 
     def on_main_terminated(self):  # pragma: debug
         r"""Actions taken on the backlog thread when the main thread stops."""
-        self.debug('')
         # for i in threading.enumerate():
         #     print(i.name)
         if self.comm.is_interface:
+            self.debug('_1st_main_terminated = %s', str(self._1st_main_terminated))
             if self.comm.direction == 'send':
                 self._1st_main_terminated = True
                 self.comm.send_eof()
                 self.comm.close_in_thread(no_wait=True)
                 self.debug("Close in thread, closed = %s, nmsg = %d",
                            self.comm.is_closed, self.comm.n_msg)
-            else:
-                super(CommThreadLoop, self).on_main_terminated()
+                return
+        super(CommThreadLoop, self).on_main_terminated()
 
 
 class CommServer(tools.CisThreadLoop):
@@ -768,7 +768,6 @@ class CommBase(tools.CisClass):
         if key not in self._work_comms:
             return
         if in_thread:
-            # c = self._work_comms.pop(key)
             c = self._work_comms[key]
             c.close_in_thread(no_wait=True)
         else:
@@ -918,7 +917,7 @@ class CommBase(tools.CisClass):
         """
         workcomm = self.get_work_comm(header)
         ret = workcomm._send_multipart(msg, **kwargs)
-        self.remove_work_comm(header['id'], in_thread=True)
+        # self.remove_work_comm(header['id'], in_thread=True)
         return ret
             
     def on_send_eof(self):
@@ -988,12 +987,13 @@ class CommBase(tools.CisClass):
             self.exception('Failed to send.')
             return False
         if self.single_use and self._used:
-            self.debug('Closing single use comm')
-            self.linger_close()
+            self.debug('Closing single use send comm [DISABLED]')
+            # self.linger_close()
             # self.close_in_thread(no_wait=True)
         elif ret and self._eof_sent.is_set() and self.close_on_eof_send:
             self.debug('Close on send EOF')
-            self.close_in_thread(no_wait=True, timeout=False)
+            self.linger_close()
+            # self.close_in_thread(no_wait=True, timeout=False)
         return ret
 
     def send_multipart(self, msg, send_header=False, header_kwargs=None,
@@ -1144,7 +1144,7 @@ class CommBase(tools.CisClass):
         workcomm = self.get_work_comm(info)
         leng_exp = int(float(info['size']))
         out = workcomm._recv_multipart(leng_exp, **kwargs)
-        self.remove_work_comm(info['id'], linger=True)
+        # self.remove_work_comm(info['id'], linger=True)
         return out
         
     def on_recv_eof(self):
@@ -1238,7 +1238,7 @@ class CommBase(tools.CisClass):
         if len(info['body']) == int(info['size']):
             return True, info['body']
         out = self._recv_multipart_worker(info, **kwargs)
-        self.remove_work_comm(info['id'], linger=True)
+        # self.remove_work_comm(info['id'], linger=True)
         return out
         
     def recv_header(self, *args, **kwargs):

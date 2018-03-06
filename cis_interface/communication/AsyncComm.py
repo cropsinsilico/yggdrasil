@@ -284,7 +284,6 @@ class AsyncComm(CommBase.CommBase):
         if not self.recv_backlog():
             # Stop the thread, but don't close the backlog
             self.debug("Stopping backlog recv thread")
-            # self._close_backlog()
             self.backlog_thread.set_break_flag()
             return
         self.sleep()

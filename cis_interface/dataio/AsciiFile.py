@@ -1,5 +1,5 @@
 import os
-from cis_interface import backwards
+from cis_interface import backwards, platform
 
 
 _default_args = {'comment': '#',
@@ -133,6 +133,8 @@ class AsciiFile(object):
         line = backwards.unicode2bytes(self.fd.readline())
         if len(line) == 0:
             return True, line
+        line = line.replace(backwards.unicode2bytes(platform._newline),
+                            backwards.unicode2bytes(self.newline))
         if line.startswith(self.comment):
             return False, None
         return False, line
