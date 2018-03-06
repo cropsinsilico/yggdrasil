@@ -129,7 +129,8 @@ class ModelDriver(Driver):
         #     return
         try:
             line = self.model_process.stdout.readline()
-        except BaseException:  # pragma: debug
+        except BaseException as e:  # pragma: debug
+            print(e)
             line = ""
         if len(line) == 0:
             # self.info("%s: Empty line from stdout" % self.name)
