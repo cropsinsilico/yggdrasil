@@ -78,38 +78,27 @@ comm_t* new_comm_base(char *address, const char *direction, const comm_type t,
     cislog_error("new_comm_base: Failed to malloc comm.");
     return ret;
   }
+  ret[0] = empty_comm_base();
   ret->type = t;
   ret->valid = 1;
-  ret->name[0] = '\0';
-  if (address == NULL)
-    ret->address[0] = '\0';
-  else
+  if (address != NULL)
     strcpy(ret->address, address);
   if (direction == NULL) {
-    ret->direction[0] = '\0';
     ret->valid = 0;
   } else {
     strcpy(ret->direction, direction);
   }
-  ret->handle = NULL;
-  ret->info = NULL;
-  if (seri_info == NULL) {
-    ret->serializer.type = DIRECT_SERI;
-    ret->serializer.info = seri_info;
-  } else {
+  if (seri_info != NULL) {
     ret->serializer.type = FORMAT_SERI;
     ret->serializer.info = seri_info;
   }
   ret->maxMsgSize = CIS_MSG_MAX;
-  ret->always_send_header = 0;
-  ret->index_in_register = -1;
   ret->last_send = (time_t*)malloc(sizeof(time_t));
   ret->last_send[0] = 0;
   ret->sent_eof = (int*)malloc(sizeof(int));
   ret->recv_eof = (int*)malloc(sizeof(int));
   ret->sent_eof[0] = 0;
   ret->recv_eof[0] = 0;
-  ret->reply = NULL;
   return ret;
 };
 
@@ -133,10 +122,12 @@ comm_t* init_comm_base(const char *name, const char *direction,
   if (name != NULL) {
     strcpy(full_name, name);
     if (t != RPC_COMM) {
-      if (strcmp(direction, "send") == 0)
-	strcat(full_name, "_OUT");
-      else if (strcmp(direction, "recv") == 0)
-	strcat(full_name, "_IN");
+      if ((direction != NULL) && (strlen(direction) > 0)) {
+        if (strcmp(direction, "send") == 0)
+          strcat(full_name, "_OUT");
+        else if (strcmp(direction, "recv") == 0)
+          strcat(full_name, "_IN");
+      }
     }
     address = getenv(full_name);
     /* if (address == NULL) {
@@ -151,7 +142,6 @@ comm_t* init_comm_base(const char *name, const char *direction,
     return ret;
   }
   if (name == NULL) {
-    ret->name[0] = '\0';
     ret->valid = 0;
   } else
     strcpy(ret->name, full_name);
