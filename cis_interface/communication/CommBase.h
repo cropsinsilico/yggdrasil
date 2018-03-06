@@ -48,6 +48,8 @@ comm_t empty_comm_base() {
   ret.valid = 0;
   ret.handle = NULL;
   ret.info = NULL;
+  ret.serializer.type = DIRECT_SERI;
+  ret.serializer.info = NULL;
   ret.maxMsgSize = 0;
   ret.always_send_header = 0;
   ret.index_in_register = -1;

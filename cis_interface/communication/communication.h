@@ -77,7 +77,7 @@ int free_comm(comm_t *x) {
       cislog_error("free_comm(%s): Error registered", x->name);
     }
   }
-  int ret = free_comm_type(x);
+  int ret = 0;  // free_comm_type(x);
   int idx = x->index_in_register;
   free_comm_base(x);
   if (idx >= 0) {
@@ -270,7 +270,7 @@ comm_t init_comm(const char *name, const char *direction, const comm_type t,
     cislog_error("init_comm(%s): Could not initialize base.", name);
     return empty_comm_base();
   }
-  int flag = init_comm_type(ret);
+  int flag = 0;  // init_comm_type(ret);
   if (flag < 0) {
     cislog_error("init_comm(%s): Could not initialize comm.", name);
     ret->valid = 0;
