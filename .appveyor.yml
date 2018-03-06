@@ -119,7 +119,7 @@ before_test:
 test_script:
   # - "nosetests --nologcapture --with-coverage --cover-package=cis_interface -svx cis_interface/tests/test_runner.py"
   - "cisrun cis_interface\\examples\\SaM\\SaM_all_nomatlab.yml"
-  - "nosetests -svx --nologcapture --with-coverage --cover-package=cis_interface cis_interface"
+  # - "nosetests -svx --nologcapture --with-coverage --cover-package=cis_interface cis_interface"
 
 
 after_test:
