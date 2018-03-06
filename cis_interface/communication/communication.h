@@ -68,8 +68,10 @@ int free_comm(comm_t *x) {
   int idx = x->index_in_register;
   free_comm_base(x);
   if (idx >= 0) {
-    free(vcomms2clean[idx]);
-    vcomms2clean[idx] = NULL;
+    if (vcomms2clean[idx] != NULL) {
+      free(vcomms2clean[idx]);
+      vcomms2clean[idx] = NULL;
+    }
   }
   return ret;
 };

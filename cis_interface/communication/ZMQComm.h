@@ -508,18 +508,20 @@ int free_zmq_comm(comm_t *x) {
   int ret = 0;
   // Drain input
   if (strcmp(x->direction, "recv") == 0) {
-    size_t data_len = 100;
-    char *data = (char*)malloc(data_len);
-    while (zmq_comm_nmsg(*x) > 0) {
-      ret = zmq_comm_recv(*x, &data, data_len, 1);
-      if (ret < 0) {
-	if (ret == -2) {
-	  x->recv_eof[0] = 1;
-	}
-	break;
+    if ((_cis_error_flag == 0) && (x->valid == 1)) {
+      size_t data_len = 100;
+      char *data = (char*)malloc(data_len);
+      while (zmq_comm_nmsg(*x) > 0) {
+        ret = zmq_comm_recv(*x, &data, data_len, 1);
+        if (ret < 0) {
+          if (ret == -2) {
+            x->recv_eof[0] = 1;
+            break;
+          }
+        }
       }
+      free(data);
     }
-    free(data);
   }
   // Do EOF send/recv
   zmq_reply_t *zrep = (zmq_reply_t*)(x->reply);
