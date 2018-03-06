@@ -54,6 +54,7 @@ comm_t empty_comm_base() {
   ret.last_send = NULL;
   ret.sent_eof = NULL;
   ret.recv_eof = NULL;
+  ret.reply = NULL;
   return ret;
 };
 
@@ -105,6 +106,7 @@ comm_t* new_comm_base(char *address, const char *direction, const comm_type t,
   ret->recv_eof = (int*)malloc(sizeof(int));
   ret->sent_eof[0] = 0;
   ret->recv_eof[0] = 0;
+  ret->reply = NULL;
   return ret;
 };
 
