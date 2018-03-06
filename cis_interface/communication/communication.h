@@ -265,6 +265,7 @@ comm_t init_comm(const char *name, const char *direction, const comm_type t,
   SetErrorMode(SEM_FAILCRITICALERRORS | SEM_NOGPFAULTERRORBOX);
   _set_abort_behavior(0,_WRITE_ABORT_MSG);
 #endif
+  return empty_comm_base(); /*
   comm_t *ret = init_comm_base(name, direction, t, seri_info);
   if (ret == NULL) {
     cislog_error("init_comm(%s): Could not initialize base.", name);
@@ -275,14 +276,14 @@ comm_t init_comm(const char *name, const char *direction, const comm_type t,
     cislog_error("init_comm(%s): Could not initialize comm.", name);
     ret->valid = 0;
   } else {
-    /* flag = register_comm(ret);
+    flag = register_comm(ret);
     if (flag < 0) {
       cislog_error("init_comm(%s): Failed to register new comm.", name);
       ret->valid = 0;
-    } */
+    }
   }
   cislog_debug("init_comm(%s): Initialized comm.", name);
-  return ret[0];
+  return ret[0];*/
 };
 
 /*!
