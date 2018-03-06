@@ -34,6 +34,8 @@ int comm_nmsg(const comm_t x);
 */
 static inline
 int free_comm_type(comm_t *x) {
+  cislog_info("free_comm_type: type = %d", x->type);
+  return 0;
   comm_type t = x->type;
   int ret = 1;
   if (t == IPC_COMM)
@@ -80,8 +82,7 @@ int free_comm(comm_t *x) {
       cislog_error("free_comm(%s): Error registered", x->name);
     }
   } */
-  cislog_info("free_comm: type = %d", x->type);
-  // ret = free_comm_type(x);
+  ret = free_comm_type(x);
   // int idx = x->index_in_register;
   free_comm_base(x);
   /* if (idx >= 0) {
