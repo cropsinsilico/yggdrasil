@@ -85,7 +85,10 @@ void clean_comms(void) {
       free_comm((comm_t*)(vcomms2clean[i]));
     }
   }
-  free(vcomms2clean);
+  if (vcomms2clean != NULL) {
+    free(vcomms2clean);
+    vcomms2clean = NULL;
+  }
   ncomms2clean = 0;
 #if defined(ZMQINSTALLED)
   // #if defined(_WIN32) && defined(ZMQINSTALLED)
@@ -237,8 +240,7 @@ comm_t init_comm(const char *name, const char *direction, const comm_type t,
 		 const void *seri_info) {
   cislog_debug("init_comm: Initializing comm.");
 #ifdef _WIN32
-  SetErrorMode(SEM_FAILCRITICALERRORS | SEM_NOGPFAULTERRORBOX);
-  _set_abort_behavior(0,_WRITE_ABORT_MSG);
+  //_set_abort_behavior(0,_WRITE_ABORT_MSG);
 #endif
   comm_t *ret = init_comm_base(name, direction, t, seri_info);
   int flag = init_comm_type(ret);
