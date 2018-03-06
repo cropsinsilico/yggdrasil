@@ -186,7 +186,7 @@ def bind_socket(socket, address, retry_timeout=-1):
             port = socket.bind_to_random_port(address)
             address += ":%d" % port
     except zmq.ZMQError as e:
-        if (e.errno != 98) or (retry_timeout < 0):
+        if (e.errno not in [48, 98]) or (retry_timeout < 0):
             print(e.errno)
             raise e
         else:
