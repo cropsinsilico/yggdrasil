@@ -485,6 +485,7 @@ int init_zmq_comm(comm_t *comm) {
   if (ret == -1) {
     cislog_error("init_zmq_address: Could not connect socket to address = %s",
   		 comm->address);
+    zsock_destroy(&s);
     return ret;
   }
   cislog_debug("init_zmq_address: Connected socket to %s", comm->address);
@@ -507,7 +508,7 @@ static inline
 int free_zmq_comm(comm_t *x) {
   int ret = 0;
   // Drain input
-  if ((strcmp(x->direction, "recv") == 0) && (x->valid == 1)) {
+  /* if ((strcmp(x->direction, "recv") == 0) && (x->valid == 1)) {
     if (_cis_error_flag == 0) {
       size_t data_len = 100;
       char *data = (char*)malloc(data_len);
@@ -538,7 +539,7 @@ int free_zmq_comm(comm_t *x) {
       zsock_destroy(&s);
     }
     x->handle = NULL;
-  }
+  } */
   return ret;
 };
 
