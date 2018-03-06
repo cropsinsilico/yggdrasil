@@ -102,13 +102,13 @@ install:
   - "pip install -e ."
 
 cache:
-  # - '%LOCALAPPDATA%\pip\Cache -> setup.py'
-  # - 'C:\Users\appveyor\.cis_interface.cfg -> setup.py'
+  - '%LOCALAPPDATA%\pip\Cache -> setup.py'
+  - 'C:\Users\appveyor\.cis_interface.cfg -> setup.py'
   - libsodium    -> ci\install-czmq_windows.bat
-  # - libzmq       -> ci\install-czmq_windows.bat
-  # - build_libzmq -> ci\install-czmq_windows.bat
-  # - czmq         -> ci\install-czmq_windows.bat
-  # - build_czmq   -> ci\install-czmq_windows.bat
+  - libzmq       -> ci\install-czmq_windows.bat
+  - build_libzmq -> ci\install-czmq_windows.bat
+  - czmq         -> ci\install-czmq_windows.bat
+  - build_czmq   -> ci\install-czmq_windows.bat
 
 # Not a .NET project
 build: false
