@@ -270,7 +270,7 @@ comm_t init_comm(const char *name, const char *direction, const comm_type t,
     cislog_error("init_comm(%s): Could not initialize base.", name);
     return empty_comm_base();
   }
-  int flag = 0;  // init_comm_type(ret);
+  int flag = init_comm_type(ret);
   if (flag < 0) {
     cislog_error("init_comm(%s): Could not initialize comm.", name);
     ret->valid = 0;
@@ -281,7 +281,7 @@ comm_t init_comm(const char *name, const char *direction, const comm_type t,
       ret->valid = 0;
     } */
   }
-  cislog_debug("init_comm(%s): Initialized comm.", ret->name);
+  cislog_debug("init_comm(%s): Initialized comm.", name);
   return ret[0];
 };
 
