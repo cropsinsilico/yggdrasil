@@ -112,10 +112,13 @@ class FileComm(CommBase.CommBase):
         r"""int: Remaining bytes in the file."""
         if self.is_closed or self.direction == 'send':
             return 0
-        curpos = self.fd.tell()
-        self.fd.seek(0, os.SEEK_END)
-        endpos = self.fd.tell()
-        self.fd.seek(curpos)
+        try:
+            curpos = self.fd.tell()
+            self.fd.seek(0, os.SEEK_END)
+            endpos = self.fd.tell()
+            self.fd.seek(curpos)
+        except ValueError:  # pragma: debug
+            return 0
         return endpos - curpos
 
     @property
@@ -123,13 +126,22 @@ class FileComm(CommBase.CommBase):
         r"""int: The number of messages in the file."""
         if self.is_closed:
             return 0
-        curpos = self.fd.tell()
-        out = 0
-        flag, msg = self._recv()
-        while len(msg) != 0 and msg != self.eof_msg:
-            out += 1
-            flag, msg = self._recv()
-        self.fd.seek(curpos)
+        if self.read_meth == 'read':
+            return int(self.remaining_bytes > 0)
+        elif self.read_meth == 'readline':
+            try:
+                curpos = self.fd.tell()
+                out = 0
+                flag, msg = self._recv()
+                while len(msg) != 0 and msg != self.eof_msg:
+                    out += 1
+                    flag, msg = self._recv()
+                self.fd.seek(curpos)
+            except ValueError:  # pragma: debug
+                out = 0
+        else:  # pragma: debug
+            self.error('Unsupported read_meth: %s', self.read_meth)
+            out = 0
         return out
 
     def on_send_eof(self):
@@ -174,6 +186,9 @@ class FileComm(CommBase.CommBase):
             out = self.fd.read()
         elif self.read_meth == 'readline':
             out = self.fd.readline()
+        else:  # pragma: debug
+            self.error('Unsupported read_meth: %s', self.read_meth)
+            out = ''
         if len(out) == 0:
             out = self.eof_msg
         else:
