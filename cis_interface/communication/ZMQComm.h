@@ -475,7 +475,7 @@ int init_zmq_comm(comm_t *comm) {
   int ret = -1;
   if (comm->valid == 0)
     return ret;
-  /* zsock_t *s = zsock_new(ZMQ_PAIR);
+  zsock_t *s = zsock_new(ZMQ_PAIR);
   if (s == NULL) {
     cislog_error("init_zmq_address: Could not initialize empty socket.");
     return -1;
@@ -493,9 +493,7 @@ int init_zmq_comm(comm_t *comm) {
     sprintf(comm->name, "tempinitZMQ-%s", comm->address);
   // Asign to void pointer
   comm->handle = (void*)s;
-  ret = init_zmq_reply(comm); */
-  comm->valid = 0;
-  ret = 0;
+  ret = init_zmq_reply(comm);
   return ret;
 };
 
@@ -510,7 +508,7 @@ int free_zmq_comm(comm_t *x) {
   if (x == NULL)
     return ret;
   // Drain input
-  /* if ((is_recv(x->direction)) && (x->valid == 1)) {
+  if ((is_recv(x->direction)) && (x->valid == 1)) {
     if (_cis_error_flag == 0) {
       size_t data_len = 100;
       char *data = (char*)malloc(data_len);
@@ -525,23 +523,23 @@ int free_zmq_comm(comm_t *x) {
       }
       free(data);
     }
-  } */
+  }
   // Free reply
-  /* if (x->reply != NULL) {
+  if (x->reply != NULL) {
     zmq_reply_t *zrep = (zmq_reply_t*)(x->reply);
     // Free reply
     ret = free_zmq_reply(zrep);
     free(x->reply);
     x->reply = NULL;
-  } */
-  /* if (x->handle != NULL) {
+  }
+  if (x->handle != NULL) {
     zsock_t *s = (zsock_t*)(x->handle);
     if (s != NULL) {
       cislog_debug("Destroying socket: %s", x->address);
       zsock_destroy(&s);
     }
     x->handle = NULL;
-  } */
+  }
   return ret;
 };
 

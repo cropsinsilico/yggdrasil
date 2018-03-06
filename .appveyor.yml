@@ -91,7 +91,7 @@ install:
   - ps: If ($INSTALLRMQ -eq 1) { (Get-Service -Name RabbitMQ).Status }
 
   # Install testing dependencies
-  - "pip install coverage coveralls codecov flake8 zmq"
+  - "pip install coverage coveralls codecov flake8"
 
   # Install dependencies using conda/pip
   # - "conda install --yes -c conda-forge numpy nose coverage coveralls codecov flake8"

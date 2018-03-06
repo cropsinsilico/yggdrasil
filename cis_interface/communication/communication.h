@@ -34,8 +34,6 @@ int comm_nmsg(const comm_t x);
 */
 static
 int free_comm_type(comm_t *x) {
-  cislog_info("free_comm_type: type = %d", x->type);
-  return 0;
   comm_type t = x->type;
   int ret = 1;
   if (t == IPC_COMM)
@@ -68,7 +66,7 @@ int free_comm(comm_t *x) {
   int ret = 0;
   if (x == NULL)
     return ret;
-  /* comm_type t = x->type;
+  comm_type t = x->type;
   // Send EOF for output comms and then wait for messages to be recv'd
   if ((is_send(x->direction)) && (t != CLIENT_COMM) && (x->valid)) {
     if (_cis_error_flag == 0) {
@@ -81,16 +79,16 @@ int free_comm(comm_t *x) {
     } else {
       cislog_error("free_comm(%s): Error registered", x->name);
     }
-  } */
+  }
   ret = free_comm_type(x);
-  // int idx = x->index_in_register;
+  int idx = x->index_in_register;
   free_comm_base(x);
-  /* if (idx >= 0) {
+  if (idx >= 0) {
     if (vcomms2clean[idx] != NULL) {
       free(vcomms2clean[idx]);
       vcomms2clean[idx] = NULL;
     }
-  } */
+  }
   return ret;
 };
 
@@ -112,7 +110,7 @@ void clean_comms(void) {
   ncomms2clean = 0;
 #if defined(ZMQINSTALLED)
   // #if defined(_WIN32) && defined(ZMQINSTALLED)
-  // zsys_shutdown();
+  zsys_shutdown();
 #endif
   cislog_debug("atexit done");
   /* printf(""); */
@@ -270,13 +268,12 @@ comm_t init_comm(const char *name, const char *direction, const comm_type t,
   SetErrorMode(SEM_FAILCRITICALERRORS | SEM_NOGPFAULTERRORBOX);
   _set_abort_behavior(0,_WRITE_ABORT_MSG);
 #endif
-  // return empty_comm_base();
   comm_t *ret = init_comm_base(name, direction, t, seri_info);
   if (ret == NULL) {
     cislog_error("init_comm(%s): Could not initialize base.", name);
     return empty_comm_base();
   }
-  /* int flag = init_comm_type(ret);
+  int flag = init_comm_type(ret);
   if (flag < 0) {
     cislog_error("init_comm(%s): Could not initialize comm.", name);
     ret->valid = 0;
@@ -287,7 +284,7 @@ comm_t init_comm(const char *name, const char *direction, const comm_type t,
       ret->valid = 0;
     }
   }
-  cislog_debug("init_comm(%s): Initialized comm.", name); */
+  cislog_debug("init_comm(%s): Initialized comm.", name);
   return ret[0];
 };
 

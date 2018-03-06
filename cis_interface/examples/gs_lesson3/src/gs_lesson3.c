@@ -6,13 +6,11 @@
 
 int main(int argc, char *argv[]) {
   // Initialize input/output channels
-  printf("Hello\n");
   psiInput_t in_channel = psiInput("input");
-  free_comm(&in_channel);
-  // psiOutput_t out_channel = psiOutput("output");
+  psiOutput_t out_channel = psiOutput("output");
 
   // Declare resulting variables and create buffer for received message
-/*  int flag = 1;
+  int flag = 1;
   char buf[MYBUFSIZ];
 
   // Loop until there is no longer input or the queues are closed
@@ -38,7 +36,7 @@ int main(int argc, char *argv[]) {
       break;
     }
 
-  }*/
+  }
 
   return 0;
 }

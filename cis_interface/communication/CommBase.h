@@ -130,11 +130,6 @@ comm_t* init_comm_base(const char *name, const char *direction,
       }
     }
     address = getenv(full_name);
-    /* if (address == NULL) {
-      // cislog_error("init_comm_base: Error getting address from environment (name = %s)",
-      // full_name);
-      return NULL;
-    } */
   }
   comm_t *ret = new_comm_base(address, direction, t, seri_info);
   if (ret == NULL) {

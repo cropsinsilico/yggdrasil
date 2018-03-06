@@ -51,6 +51,7 @@ ECHO Installing libzmq...
 set LIBZMQ_SOURCEDIR=%ZMQINSTALLDIR%\libzmq
 set LIBZMQ_BUILDDIR=%ZMQINSTALLDIR%\build_libzmq
 set ZEROMQ_INCLUDE_DIR=%LIBZMQ_SOURCEDIR%\include
+set ZEROMQ_DLL_DIR=%LIBZMQ_BUILDDIR%\bin\%CONFIGURATION%
 set ZEROMQ_LIBRARY_DIR=%LIBZMQ_BUILDDIR%\lib\%CONFIGURATION%
 IF NOT EXIST %LIBZMQ_SOURCEDIR% (
     ECHO Cloning libzmq...
@@ -65,6 +66,8 @@ IF NOT EXIST %LIBZMQ_BUILDDIR% (
     msbuild /v:minimal /p:Configuration=%CONFIGURATION% libzmq.vcxproj
     ECHO Copying zmq lib...
     move "%ZEROMQ_LIBRARY_DIR%\libzmq-*lib" "%ZEROMQ_LIBRARY_DIR%\zmq.lib"
+    cd %ZEROMQ_LIBRARY_DIR%
+    copy "%ZEROMQ_DLL_DIR%\libzmq-*dll" .
 )
 
 :: Install czmq
