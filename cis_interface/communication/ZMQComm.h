@@ -534,14 +534,14 @@ int free_zmq_comm(comm_t *x) {
     free(x->reply);
     x->reply = NULL;
   } */
-  if (x->handle != NULL) {
+  /* if (x->handle != NULL) {
     zsock_t *s = (zsock_t*)(x->handle);
     if (s != NULL) {
       cislog_debug("Destroying socket: %s", x->address);
       zsock_destroy(&s);
     }
     x->handle = NULL;
-  }
+  } */
   return ret;
 };
 
