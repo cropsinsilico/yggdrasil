@@ -118,7 +118,7 @@ before_test:
 
 test_script:
   # - "nosetests --nologcapture --with-coverage --cover-package=cis_interface -svx cis_interface/tests/test_runner.py"
-  - "cisrun cis_interface\\examples\\gs_lesson2\\gs_lesson2_c.yml"
+  - "cisrun cis_interface\\examples\\gs_lesson3\\gs_lesson3_c.yml"
   # - "nosetests -svx --nologcapture --with-coverage --cover-package=cis_interface cis_interface"
 
 
