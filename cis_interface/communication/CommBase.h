@@ -43,6 +43,7 @@ static inline
 comm_t empty_comm_base() {
   comm_t ret;
   ret.type = NULL_COMM;
+  ret.name[0] = '\0';
   ret.address[0] = '\0';
   ret.direction[0] = '\0';
   ret.valid = 0;
@@ -182,10 +183,6 @@ int free_comm_base(comm_t *x) {
     free(x->recv_eof);
     x->recv_eof = NULL;
   }
-/*   // Prevent C4100 warning on windows by referencing param */
-/* #ifdef _WIN32 */
-/*   x; */
-/* #endif */
   return 0;
 };
 

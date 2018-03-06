@@ -63,7 +63,8 @@ int free_comm_type(comm_t *x) {
 */
 static inline
 int free_comm(comm_t *x) {
-  comm_type t = x->type;
+  int ret = 0;
+  /* comm_type t = x->type;
   // Send EOF for output comms and then wait for messages to be recv'd
   if ((strcmp(x->direction, "send") == 0) && (t != CLIENT_COMM) && (x->valid)) {
     if (_cis_error_flag == 0) {
@@ -77,15 +78,15 @@ int free_comm(comm_t *x) {
       cislog_error("free_comm(%s): Error registered", x->name);
     }
   }
-  int ret = 0;  // free_comm_type(x);
-  int idx = x->index_in_register;
+  ret = 0;  // free_comm_type(x);
+  int idx = x->index_in_register; */
   free_comm_base(x);
-  if (idx >= 0) {
+  /* if (idx >= 0) {
     if (vcomms2clean[idx] != NULL) {
       free(vcomms2clean[idx]);
       vcomms2clean[idx] = NULL;
     }
-  }
+  } */
   return ret;
 };
 
