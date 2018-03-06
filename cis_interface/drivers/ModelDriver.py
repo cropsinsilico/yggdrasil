@@ -114,7 +114,8 @@ class ModelDriver(Driver):
         # print(pre_args + self.args)
         self.model_process = tools.CisPopen(pre_args + self.args, env=env,
                                             cwd=self.workingDir,
-                                            forward_signals=False)
+                                            forward_signals=False,
+                                            shell=platform._is_win)
         # Start thread to queue output
         self.queue_thread = tools.CisThreadLoop(target=self.enqueue_output_loop,
                                                 name=self.name + '.EnqueueLoop')
