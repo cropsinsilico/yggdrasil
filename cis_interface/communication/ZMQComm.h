@@ -65,8 +65,6 @@ int free_zmq_reply(zmq_reply_t *x) {
       free(x->addresses);
     }
     x->nsockets = 0;
-    free(x);
-    x = NULL;
   }
   return 0;
 }
@@ -474,9 +472,9 @@ int new_zmq_address(comm_t *comm) {
  */
 static inline
 int init_zmq_comm(comm_t *comm) {
-  int ret;
+  int ret = -1;
   if (comm->valid == 0)
-    return -1;
+    return ret;
   zsock_t *s = zsock_new(ZMQ_PAIR);
   if (s == NULL) {
     cislog_error("init_zmq_address: Could not initialize empty socket.");
@@ -536,6 +534,8 @@ int free_zmq_comm(comm_t *x) {
     /* } */
     // Free reply
     ret = free_zmq_reply(zrep);
+    free(x->reply);
+    x->reply = NULL;
   }
   if (x->handle != NULL) {
     zsock_t *s = (zsock_t*)(x->handle);

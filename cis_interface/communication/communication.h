@@ -26,27 +26,15 @@ int comm_send_eof(const comm_t x);
 static inline
 int comm_nmsg(const comm_t x);
 
+
 /*!
-  @brief Perform deallocation for generic communicator.
+  @brief Perform deallocation for type specific communicator.
   @param[in] x comm_t * Pointer to communicator to deallocate.
   @returns int 1 if there is an error, 0 otherwise.
 */
 static inline
-int free_comm(comm_t *x) {
+int free_comm_type(comm_t *x) {
   comm_type t = x->type;
-  // Send EOF for output comms and then wait for messages to be recv'd
-  if ((strcmp(x->direction, "send") == 0) && (t != CLIENT_COMM)) {
-    if (_cis_error_flag == 0) {
-      comm_send_eof(*x);
-      while (comm_nmsg(*x) > 0) {
-	cislog_debug("free_comm(%s): draining %d messages",
-		     x->name, comm_nmsg(*x));
-	usleep(CIS_SLEEP_TIME);
-      }
-    } else {
-      cislog_error("free_comm(%s): Error registered", x->name);
-    }
-  }
   int ret = 1;
   if (t == IPC_COMM)
     ret = free_ipc_comm(x);
@@ -65,6 +53,31 @@ int free_comm(comm_t *x) {
   else {
     cislog_error("free_comm: Unsupported comm_type %d", t);
   }
+  return ret;
+};
+
+/*!
+  @brief Perform deallocation for generic communicator.
+  @param[in] x comm_t * Pointer to communicator to deallocate.
+  @returns int 1 if there is an error, 0 otherwise.
+*/
+static inline
+int free_comm(comm_t *x) {
+  comm_type t = x->type;
+  // Send EOF for output comms and then wait for messages to be recv'd
+  if ((strcmp(x->direction, "send") == 0) && (t != CLIENT_COMM) && (x->valid)) {
+    if (_cis_error_flag == 0) {
+    comm_send_eof(*x);
+    while (comm_nmsg(*x) > 0) {
+	cislog_debug("free_comm(%s): draining %d messages",
+		     x->name, comm_nmsg(*x));
+	usleep(CIS_SLEEP_TIME);
+      }
+    } else {
+      cislog_error("free_comm(%s): Error registered", x->name);
+    }
+  }
+  int ret = free_comm_type(x);
   int idx = x->index_in_register;
   free_comm_base(x);
   if (idx >= 0) {
@@ -111,6 +124,9 @@ int register_comm(comm_t *x) {
   if (clean_registered == 0) {
     atexit(clean_comms);
     clean_registered = 1;
+  }
+  if (x == NULL) {
+    return 0;
   }
   vcomms2clean = (void**)realloc(vcomms2clean, sizeof(void*)*(ncomms2clean + 1));
   if (vcomms2clean == NULL) {
@@ -246,29 +262,33 @@ comm_t init_comm(const char *name, const char *direction, const comm_type t,
 		 const void *seri_info) {
   cislog_debug("init_comm: Initializing comm.");
 #ifdef _WIN32
-  //SetErrorMode(SEM_FAILCRITICALERRORS | SEM_NOGPFAULTERRORBOX);
-  //_set_abort_behavior(0,_WRITE_ABORT_MSG);
+  SetErrorMode(SEM_FAILCRITICALERRORS | SEM_NOGPFAULTERRORBOX);
+  _set_abort_behavior(0,_WRITE_ABORT_MSG);
 #endif
   comm_t *ret = init_comm_base(name, direction, t, seri_info);
   if (ret == NULL) {
     cislog_error("init_comm(%s): Could not initialize base.", name);
     return empty_comm_base();
   }
-  free_comm_base(ret);
-  return empty_comm_base();
-  /*int flag = init_comm_type(ret);
+  int flag = init_comm_type(ret);
   if (flag < 0) {
     cislog_error("init_comm(%s): Could not initialize comm.", name);
     ret->valid = 0;
   } else {
+    ret->valid = 0;
+    free_comm_type(ret);
+    free_comm_base(ret);
+    free(ret);
+    ret = NULL;
     flag = register_comm(ret);
     if (flag < 0) {
       cislog_error("init_comm(%s): Failed to register new comm.", name);
       ret->valid = 0;
     }
   }
-  cislog_debug("init_comm(%s): Initialized comm.", ret->name);
-  return ret[0];*/
+  // cislog_debug("init_comm(%s): Initialized comm.", ret->name);
+  // return ret[0];
+  return empty_comm_base();
 };
 
 /*!
