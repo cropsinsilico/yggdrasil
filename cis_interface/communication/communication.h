@@ -67,11 +67,11 @@ int free_comm(comm_t *x) {
   // Send EOF for output comms and then wait for messages to be recv'd
   if ((strcmp(x->direction, "send") == 0) && (t != CLIENT_COMM) && (x->valid)) {
     if (_cis_error_flag == 0) {
-    comm_send_eof(*x);
-    while (comm_nmsg(*x) > 0) {
-	cislog_debug("free_comm(%s): draining %d messages",
-		     x->name, comm_nmsg(*x));
-	usleep(CIS_SLEEP_TIME);
+      comm_send_eof(*x);
+      while (comm_nmsg(*x) > 0) {
+        cislog_debug("free_comm(%s): draining %d messages",
+          x->name, comm_nmsg(*x));
+        usleep(CIS_SLEEP_TIME);
       }
     } else {
       cislog_error("free_comm(%s): Error registered", x->name);
@@ -275,11 +275,11 @@ comm_t init_comm(const char *name, const char *direction, const comm_type t,
     cislog_error("init_comm(%s): Could not initialize comm.", name);
     ret->valid = 0;
   } else {
-    flag = register_comm(ret);
+    /* flag = register_comm(ret);
     if (flag < 0) {
       cislog_error("init_comm(%s): Failed to register new comm.", name);
       ret->valid = 0;
-    }
+    } */
   }
   cislog_debug("init_comm(%s): Initialized comm.", ret->name);
   return ret[0];
