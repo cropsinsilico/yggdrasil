@@ -306,7 +306,7 @@ char* check_reply_send(const comm_t *comm, const char *data, const int len,
   out = (char*)malloc(2*(strlen(_reply_msg) + 2) +
 		      strlen(zrep->addresses[0]) + len + 1);
   sprintf(out, ":%s:%s:%s:", _reply_msg, zrep->addresses[0], _reply_msg);
-  new_len[0] = len + strlen(out);
+  new_len[0] = len + (int)strlen(out);
   memcpy(out + strlen(out), data, len);
   out[new_len[0]] = '\0';
   return out;
@@ -323,7 +323,7 @@ char* check_reply_send(const comm_t *comm, const char *data, const int len,
  */
 static inline
 int check_reply_recv(const comm_t *comm, char *data, const size_t len) {
-  int new_len = len;
+  int new_len = (int)len;
   int ret = 0;
   // Get reply
   zmq_reply_t *zrep = (zmq_reply_t*)(comm->reply);
@@ -615,7 +615,7 @@ int zmq_comm_send(const comm_t x, const char *data, const size_t len) {
     return -1;
   }
   int new_len = 0;
-  char *new_data = check_reply_send(&x, data, len, &new_len);
+  char *new_data = check_reply_send(&x, data, (int)len, &new_len);
   if (new_data == NULL) {
     cislog_error("zmq_comm_send(%s): Adding reply address failed.", x.name);
     return -1;

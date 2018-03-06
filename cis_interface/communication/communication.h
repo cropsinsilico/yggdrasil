@@ -201,6 +201,10 @@ static inline
 comm_t new_comm(char *address, const char *direction, const comm_type t,
 		void *seri_info) {
   comm_t *ret = new_comm_base(address, direction, t, seri_info);
+  if (ret == NULL) {
+    cislog_error("new_comm: Could not initialize base.");
+    return empty_comm_base();
+  }
   int flag;
   if (address == NULL) {
     flag = new_comm_type(ret);
@@ -240,9 +244,14 @@ comm_t init_comm(const char *name, const char *direction, const comm_type t,
 		 const void *seri_info) {
   cislog_debug("init_comm: Initializing comm.");
 #ifdef _WIN32
+  //SetErrorMode(SEM_FAILCRITICALERRORS | SEM_NOGPFAULTERRORBOX);
   //_set_abort_behavior(0,_WRITE_ABORT_MSG);
 #endif
   comm_t *ret = init_comm_base(name, direction, t, seri_info);
+  if (ret == NULL) {
+    cislog_error("init_comm(%s): Could not initialize base.", name);
+    return empty_comm_base();
+  }
   int flag = init_comm_type(ret);
   if (flag < 0) {
     cislog_error("init_comm(%s): Could not initialize comm.", name);
@@ -265,8 +274,12 @@ comm_t init_comm(const char *name, const char *direction, const comm_type t,
  */
 static inline
 int comm_nmsg(const comm_t x) {
-  comm_type t = x.type;
   int ret = -1;
+  if (x.valid == 0) {
+    cislog_error("comm_nmsg: Invalid comm");
+    return ret;
+  }
+  comm_type t = x.type;
   if (t == IPC_COMM)
     ret = ipc_comm_nmsg(x);
   else if (t == ZMQ_COMM)
@@ -299,6 +312,10 @@ int comm_nmsg(const comm_t x) {
 static inline
 int comm_send_single(const comm_t x, const char *data, const size_t len) {
   int ret = -1;
+  if (x.valid == 0) {
+    cislog_error("comm_send_single: Invalid comm");
+    return ret;
+  }
   comm_type t = x.type;
   if (t == IPC_COMM)
     ret = ipc_comm_send(x, data, len);
@@ -360,6 +377,10 @@ int comm_send_multipart(const comm_t x, const char *data, const size_t len) {
   //char headbuf[CIS_MSG_BUF];
   int headbuf_len = CIS_MSG_BUF;
   int headlen = 0, ret = -1;
+  if (x.valid == 0) {
+    cislog_error("comm_send_multipart: Invalid comm");
+    return ret;
+  }
   comm_t xmulti = empty_comm_base();
   // Get header
   comm_head_t head = comm_send_multipart_header(x, len);
@@ -468,6 +489,10 @@ int comm_send_multipart(const comm_t x, const char *data, const size_t len) {
 static inline
 int comm_send(const comm_t x, const char *data, const size_t len) {
   int ret = -1;
+  if (x.valid == 0) {
+    cislog_error("comm_send: Invalid comm");
+    return ret;
+  }
   if (x.sent_eof == NULL) {
     cislog_error("comm_send(%s): sent_eof not initialized.", x.name);
     return ret;
@@ -521,8 +546,12 @@ int comm_send_eof(const comm_t x) {
 static inline
 int comm_recv_single(const comm_t x, char **data, const size_t len,
 		     const int allow_realloc) {
-  comm_type t = x.type;
   int ret = -1;
+  if (x.valid == 0) {
+    cislog_error("comm_recv_single: Invalid comm");
+    return ret;
+  }
+  comm_type t = x.type;
   if (t == IPC_COMM)
     ret = ipc_comm_recv(x, data, len, allow_realloc);
   else if (t == ZMQ_COMM)
@@ -556,7 +585,11 @@ int comm_recv_single(const comm_t x, char **data, const size_t len,
 static inline
 int comm_recv_multipart(const comm_t x, char **data, const size_t len,
 			const size_t headlen, const int allow_realloc) {
-  int ret;
+  int ret = -1;
+  if (x.valid == 0) {
+    cislog_error("comm_recv_multipart: Invalid comm");
+    return ret;
+  }
   comm_head_t head = parse_comm_header(*data, headlen);
   if (!(head.valid)) {
     cislog_error("comm_recv(%s): Error parsing header.", x.name);
@@ -640,7 +673,12 @@ int comm_recv_multipart(const comm_t x, char **data, const size_t len,
  */
 static inline
 int comm_recv(const comm_t x, char *data, const size_t len) {
-  int ret = comm_recv_single(x, &data, len, 0);
+  int ret = -1;
+  if (x.valid == 0) {
+    cislog_error("comm_send: Invalid comm");
+    return ret;
+  }
+  ret = comm_recv_single(x, &data, len, 0);
   if (ret > 0) {
     if (is_eof(data)) {
       cislog_debug("comm_recv(%s): EOF received.", x.name);
@@ -692,6 +730,10 @@ int comm_send_nolimit(const comm_t x, const char *data, const size_t len) {
 static inline
 int comm_send_nolimit_eof(const comm_t x) {
   int ret = -1;
+  if (x.valid == 0) {
+    cislog_error("comm_send_nolimit_eof: Invalid comm");
+    return ret;
+  }
   if (x.sent_eof == NULL) {
     cislog_error("comm_send_nolimit_eof(%s): sent_eof not initialized.", x.name);
     return ret;
@@ -736,6 +778,11 @@ int comm_recv_nolimit(const comm_t x, char **data, const size_t len) {
  */
 static inline
 int vcommSend(const comm_t x, va_list ap) {
+  int ret = -1;
+  if (x.valid == 0) {
+    cislog_error("vcommSend: Invalid comm");
+    return ret;
+  }
   size_t buf_siz = CIS_MSG_BUF;
   // char *buf = NULL;
   char *buf = (char*)malloc(buf_siz);
@@ -749,7 +796,7 @@ int vcommSend(const comm_t x, va_list ap) {
     serializer = handle->serializer;
   }
   int args_used = 0;
-  int ret = serialize(serializer, &buf, buf_siz, 1, &args_used, ap);
+  ret = serialize(serializer, &buf, buf_siz, 1, &args_used, ap);
   if (ret < 0) {
     cislog_error("vcommSend(%s): serialization error", x.name);
     free(buf);
@@ -779,6 +826,11 @@ int vcommSend(const comm_t x, va_list ap) {
  */
 static inline
 int vcommRecv(const comm_t x, va_list ap) {
+  int ret = -1;
+  if (x.valid == 0) {
+    cislog_error("vcommRecv: Invalid comm");
+    return ret;
+  }
   // Receive message
   size_t buf_siz = CIS_MSG_BUF;
   /* char *buf = NULL; */
@@ -787,7 +839,7 @@ int vcommRecv(const comm_t x, va_list ap) {
     cislog_error("vcommSend(%s): Failed to alloc buffer", x.name);
     return -1;
   }
-  int ret = comm_recv_nolimit(x, &buf, buf_siz);
+  ret = comm_recv_nolimit(x, &buf, buf_siz);
   if (ret < 0) {
     // cislog_error("vcommRecv(%s): Error receiving.", x.name);
     free(buf);

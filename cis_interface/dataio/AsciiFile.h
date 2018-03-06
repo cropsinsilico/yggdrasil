@@ -91,7 +91,7 @@ int af_is_comment(const asciiFile_t t, const char *line) {
 static inline
 int af_readline_full_norealloc(const asciiFile_t t, char *line, size_t n) {
   if (af_is_open(t) == 1) {
-    if (fgets(line, n, t.fd) == NULL) {
+    if (fgets(line, (int)n, t.fd) == NULL) {
       return -1;
     }
     int nread = (int)strlen(line);
