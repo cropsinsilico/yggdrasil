@@ -358,6 +358,16 @@ class RMQComm(AsyncComm.AsyncComm):
         return out
 
     @property
+    def is_confirmed_send(self):
+        r"""bool: True if all sent messages have been confirmed."""
+        return True
+
+    @property
+    def is_confirmed_recv(self):
+        r"""bool: True if all received messages have been confirmed."""
+        return True
+
+    @property
     def get_work_comm_kwargs(self):
         r"""dict: Keyword arguments for an existing work comm."""
         out = super(RMQComm, self).get_work_comm_kwargs

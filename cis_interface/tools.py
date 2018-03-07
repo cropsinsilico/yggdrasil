@@ -130,7 +130,7 @@ def is_zmq_installed():
         opts = ['libzmq_include', 'libzmq_static',  # 'libzmq_dynamic',
                 'czmq_include', 'czmq_static']  # , 'czmq_dynamic']
         for o in opts:
-            if not cis_cfg.get('windows', o, None):
+            if not cis_cfg.get('windows', o, None):  # pragma: debug
                 warnings.warn("Config option %s not set." % o)
                 return False
         return True

@@ -103,7 +103,8 @@ class TestCommBase(CisTest, IOInfo):
         super(TestCommBase, self).teardown(*args, **kwargs)
         x = CisClass(self.name, timeout=self.timeout, sleeptime=self.sleeptime)
         Tout = x.start_timeout()
-        while (not Tout.is_out) and (self.comm_count > self.nprev_comm):
+        while ((not Tout.is_out) and
+               (self.comm_count > self.nprev_comm)):  # pragma: debug
             x.sleep()
         x.stop_timeout()
         nt.assert_equal(self.comm_count, self.nprev_comm)
@@ -223,6 +224,7 @@ class TestCommBase(CisTest, IOInfo):
             nt.assert_raises(RuntimeError, wc_recv.recv)
         self.instance.remove_work_comm(header_send['id'])
         self.instance.remove_work_comm(header_recv['id'])
+        self.instance.remove_work_comm(header_recv['id'])
         # Create work comm that should be cleaned up on teardown
         self.instance.get_header(self.test_msg)
 
@@ -293,7 +295,7 @@ class TestCommBase(CisTest, IOInfo):
             # Wait for send to close
             if is_eof and close_on_send_eof:
                 T = send_instance.start_timeout(self.timeout)
-                while (not T.is_out) and (not send_instance.is_closed):
+                while (not T.is_out) and (not send_instance.is_closed):  # pragma: debug
                     send_instance.sleep()
                 send_instance.stop_timeout()
                 assert(send_instance.is_closed)

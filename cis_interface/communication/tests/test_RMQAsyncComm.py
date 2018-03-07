@@ -22,9 +22,9 @@ class TestRMQAsyncComm(parent.TestRMQComm):
             self.instance.sleep()
         self.instance.stop_timeout()
 
-    def test_send_recv_direct(self):
-        r"""Disabled: Test send/recv direct."""
-        pass
+    # def test_send_recv_direct(self):
+    #     r"""Disabled: Test send/recv direct."""
+    #     pass
         
 
 @unittest.skipIf(_rmq_server_running, "RMQ Server running")

@@ -432,7 +432,7 @@ class CommBase(tools.CisClass):
         try:
             self._closing_thread.start()
             _started_thread = True
-        except RuntimeError:
+        except RuntimeError:  # pragma: debug
             _started_thread = False
         if self._closing_thread.was_started and (not no_wait):  # pragma: debug
             self._closing_thread.wait(key=str(uuid.uuid4()), timeout=timeout)
@@ -767,12 +767,13 @@ class CommBase(tools.CisClass):
         """
         if key not in self._work_comms:
             return
-        if in_thread:
-            c = self._work_comms[key]
-            c.close_in_thread(no_wait=True)
-        else:
+        if not in_thread:
             c = self._work_comms.pop(key)
             c.close(linger=linger)
+        else:  # pragma: debug
+            # c = self._work_comms[key]
+            # c.close_in_thread(no_wait=True)
+            raise Exception("Closing in thread not recommended")
 
     # HEADER
     def get_header(self, msg, no_address=False, **kwargs):
@@ -1279,9 +1280,10 @@ class CommBase(tools.CisClass):
             n_msg = getattr(self, variable)
             if n_msg == 0:
                 break
-            self.verbose_debug("Draining %d %s messages.",
-                               n_msg, variable)
-            self.sleep()
+            else:  # pragma: debug
+                self.verbose_debug("Draining %d %s messages.",
+                                   n_msg, variable)
+                self.sleep()
         self.stop_timeout(key_suffix='.drain_messages')
         self.debug('Done draining')
 

@@ -187,7 +187,6 @@ def bind_socket(socket, address, retry_timeout=-1):
             address += ":%d" % port
     except zmq.ZMQError as e:
         if (e.errno not in [48, 98]) or (retry_timeout < 0):
-            print(e.errno)
             raise e
         else:
             logging.info("Retrying bind in %f s", retry_timeout)
@@ -887,7 +886,7 @@ class ZMQComm(AsyncComm.AsyncComm):
         kwargs.setdefault('flags', zmq.NOBLOCK)
         with self.socket_lock:
             try:
-                if self.socket.closed:  # pragma debug
+                if self.socket.closed:  # pragma: debug
                     self.error("Socket closed")
                     return False
                 self.debug("Sending %d bytes to %s", len(total_msg), self.address)
