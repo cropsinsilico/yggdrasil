@@ -4,7 +4,7 @@ from cis_interface import platform
 import os
 
 
-if platform._is_win:
+if platform._is_win:  # pragma: windows
     # This is required to fix crash on Windows in case of Ctrl+C
     # https://github.com/ContinuumIO/anaconda-issues/issues/905#issuecomment-232498034
     os.environ['FOR_DISABLE_CONSOLE_CTRL_HANDLER'] = 'T'
