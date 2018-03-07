@@ -196,7 +196,7 @@ def kill(pid, signum):
         signum (int): Signal that should be sent.
 
     """
-    if platform._is_win:  # pragma: windows
+    if platform._is_win:  # pragma: debug
         sigmap = {signal.SIGINT: signal.CTRL_C_EVENT,
                   signal.SIGBREAK: signal.CTRL_BREAK_EVENT}
         if signum in sigmap and pid == os.getpid():

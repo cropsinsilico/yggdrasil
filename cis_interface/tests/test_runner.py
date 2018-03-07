@@ -1,6 +1,6 @@
 import os
 import nose.tools as nt
-# import unittest
+import unittest
 import signal
 import uuid
 from cis_interface import runner, tools, platform
@@ -23,27 +23,23 @@ def test_get_runner():
 #     cr.run()
 
 
-# @unittest.skipIf(platform._is_win, "Signal processing not sorted on windows")
+# Spawning fake Ctrl-C works locally for windows, but causes hang on appveyor
+@unittest.skipIf(platform._is_win, "Signal processing not sorted on windows")
 def test_Arunner_interrupt():
     r"""Start a runner then stop it with a keyboard interrupt."""
     cr = runner.get_runner([ex_yamls['hello']['python']])
-    if platform._is_win:  # pragma: windows
-        print("starting interrupt")
+    if platform._is_win:  # pragma: debug
         cr.debug_log()
     cr.loadDrivers()
     cr.startDrivers()
     cr.set_signal_handler()
-    if platform._is_win:  # pragma: windows
-        tools.kill(os.getpid(), signal.SIGBREAK)
-        tools.kill(os.getpid(), signal.SIGBREAK)
-    else:
-        tools.kill(os.getpid(), signal.SIGINT)
-        tools.kill(os.getpid(), signal.SIGINT)
+    tools.kill(os.getpid(), signal.SIGINT)
+    tools.kill(os.getpid(), signal.SIGINT)
     cr.reset_signal_handler()
     cr.waitModels()
     cr.closeChannels()
     cr.cleanup()
-    if platform._is_win:  # pragma: windows
+    if platform._is_win:  # pragma: debug
         cr.reset_log()
 
 
