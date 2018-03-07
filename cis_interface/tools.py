@@ -199,17 +199,7 @@ def kill(pid, signum):
     if platform._is_win:  # pragma: windows
         sigmap = {signal.SIGINT: signal.CTRL_C_EVENT,
                   signal.SIGBREAK: signal.CTRL_BREAK_EVENT}
-        if False:
-            import win32api
-            ret = win32api.GenerateConsoleCtrlEvent(sigmap[signum], pid)
-            print("Generated signal", sigmap[signum])
-            return ret
-        if False:
-            import ctypes
-            ret = ctypes.windll.kernel32.GenerateConsoleCtrlEvent(sigmap[signum], pid)
-            print("Generated signal", sigmap[signum])
-            return ret
-        if signum in sigmap and pid == os.getpid() and False:
+        if signum in sigmap and pid == os.getpid():
             # we don't know if the current process is a
             # process group leader, so just broadcast
             # to all processes attached to this console.
@@ -228,13 +218,16 @@ def kill(pid, signum):
 
             signal.signal(signum, handler_set_event)
             try:
+                print("calling interrupt", pid)
                 os.kill(pid, sigmap[signum])
                 # busy wait because we can't block in the main
                 # thread, else the signal handler can't execute.
                 while not event.is_set():
                     pass
+                print("after interrupt")
             finally:
                 signal.signal(signum, handler)
+                print("in finally")
         else:
             os.kill(pid, sigmap.get(signum, signum))
     else:

@@ -251,11 +251,6 @@ class CisRunner(CisClass):
             self._swap_handler(signal.SIGTERM, signal_handler)
         else:  # pragma: windows
             self._swap_handler(signal.SIGBREAK, signal_handler)
-            if False:
-                import ctypes
-                handler = ctypes.WINFUNCTYPE(ctypes.c_int,
-                                             ctypes.c_uint)(signal_handler)
-                ctypes.windll.kernel32.SetConsoleCtrlHandler(handler, True)
 
     def reset_signal_handler(self):
         r"""Reset signal handlers to old ones."""

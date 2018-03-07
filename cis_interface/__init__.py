@@ -1,5 +1,15 @@
 r"""This package provides a framework for integrating models across languages
 such that they can be run simultaneously, passing input back and forth."""
+from cis_interface import platform
+import os
+
+
+if platform._is_win:
+    # This is required to fix crash on Windows in case of Ctrl+C
+    # https://github.com/ContinuumIO/anaconda-issues/issues/905#issuecomment-232498034
+    os.environ['FOR_DISABLE_CONSOLE_CTRL_HANDLER'] = 'T'
+
+
 # from cis_interface import backwards
 # from cis_interface import platform
 # from cis_interface import config

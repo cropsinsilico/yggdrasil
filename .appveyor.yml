@@ -117,9 +117,8 @@ before_test:
   - "flake8 cis_interface"
 
 test_script:
-  # - "nosetests --nologcapture --with-coverage --cover-package=cis_interface -svx cis_interface/tests/test_runner.py"
-  # - "cisrun cis_interface\\examples\\gs_lesson3\\gs_lesson3_c.yml"
-  - "nosetests -svx --nologcapture --with-coverage --cover-package=cis_interface cis_interface"
+  - "nosetests --nologcapture --with-coverage --cover-package=cis_interface -svx cis_interface/tests/test_runner.py"
+  # - "nosetests -svx --nologcapture --with-coverage --cover-package=cis_interface cis_interface"
 
 
 after_test:
