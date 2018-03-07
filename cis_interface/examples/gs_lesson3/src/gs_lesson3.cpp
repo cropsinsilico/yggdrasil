@@ -8,21 +8,34 @@ int main(int argc, char *argv[]) {
   PsiOutput out_channel("output");
 
   // Declare resulting variables and create buffer for received message
-  int flag;
+  int flag = 1;
   const int bufsiz = 1000;
   char buf[bufsiz];
 
-  // Receive input from input channel
-  // If there is an error, the flag will be negative
-  // Otherwise, it is the size of the received message
-  flag = in_channel.recv(buf, bufsiz);
+  // Loop until there is no longer input or the queues are closed
+  while (flag >= 0) {
+  
+    // Receive input from input channel
+    // If there is an error or the queue is closed, the flag will be negative
+    // Otherwise, it is the size of the received message
+    flag = in_channel.recv(buf, bufsiz);
+    if (flag < 0) {
+      std::cout << "No more input." << std::endl;
+      break;
+    }
+    
+    // Print received message
+    std::cout << buf << std::endl;
 
-  // Print received message
-  std::cout << buf << std::endl;
+    // Send output to output channel
+    // If there is an error, the flag will be negative
+    flag = out_channel.send(buf, flag);
+    if (flag < 0) {
+      std::cout << "Error sending output." << std::endl;
+      break;
+    }
 
-  // Send output to output channel
-  // If there is an error, the flag will be negative
-  flag = out_channel.send(buf, flag);
+  }
   
   return 0;
 }

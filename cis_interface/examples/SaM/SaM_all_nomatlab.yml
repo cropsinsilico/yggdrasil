@@ -50,5 +50,5 @@ models:
     outputs:
       - name: output_cpp
         driver: FileOutputDriver
-        args: /tmp/SaM_output.txt
-    
+        args: SaM_output.txt
+        in_temp: True

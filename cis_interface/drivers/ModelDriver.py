@@ -3,9 +3,8 @@
 #
 import os
 import copy
-import subprocess
 from pprint import pformat
-from cis_interface import backwards, platform
+from cis_interface import backwards, platform, tools
 from cis_interface.drivers.Driver import Driver
 from threading import Thread
 try:
@@ -100,7 +99,7 @@ class ModelDriver(Driver):
 
     def start_setup(self):
         r"""Actions to perform before the run starts."""
-        pre_args = ['stdbuf', '-o0', '-e0']
+        pre_args = []
         if self.with_strace:
             if platform._is_linux:
                 pre_cmd = 'strace'
@@ -111,12 +110,9 @@ class ModelDriver(Driver):
             pre_args += ['valgrind'] + self.valgrind_flags
         env = copy.deepcopy(self.env)
         # env.update(os.environ)
-        self.process = subprocess.Popen(
-            pre_args + self.args, bufsize=0,
-            # If PIPEs are used, communicate must be used below
-            # stdin=subprocess.PIPE, stderr=subprocess.PIPE,
-            stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
-            env=env, cwd=self.workingDir, preexec_fn=preexec)
+        self.process = tools.popen_nobuffer(pre_args + self.args, env=env,
+                                            cwd=self.workingDir,
+                                            preexec_fn=preexec)
         # Start thread to queue output
         self.queue = Queue()
         self.queue_thread = Thread(target=self.enqueue_output,

@@ -1,6 +1,6 @@
 #!/bin/sh
-sudo brew update
-sudo brew install git libtool pkg-config autoconf automake \
+brew update
+brew install git libtool pkg-config autoconf automake \
      cmake ossp-uuid pcre valgrind
 # sudo apt-get install -y \
 #      git-all build-essential libtool \

@@ -5,6 +5,7 @@ import warnings
 from setuptools import setup, find_packages
 PY_MAJOR_VERSION = sys.version_info[0]
 PY2 = (PY_MAJOR_VERSION == 2)
+IS_WINDOWS = (sys.platform in ['win32', 'cygwin'])
 
 cis_ver = "0.1.3"
     
@@ -56,6 +57,11 @@ if cov_installed:
         if new_rule in excl_list:
             excl_list.remove(new_rule)
         return excl_list
+    # Platform
+    if IS_WINDOWS:
+        excl_list = rm_excl_rule(excl_list, 'pragma: windows')
+    else:
+        excl_list = add_excl_rule(excl_list, 'pragma: windows')
     # Python version
     verlist = [2, 3]
     for v in verlist:

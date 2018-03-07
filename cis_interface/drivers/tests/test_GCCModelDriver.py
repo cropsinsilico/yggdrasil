@@ -11,12 +11,7 @@ def test_GCCModelDriver_errors():
 
 
 class TestGCCModelParam(parent.TestModelParam):
-    r"""Test parameters for GCCModelDriver.
-
-    Attributes (in addition to parent class's):
-        -
-
-    """
+    r"""Test parameters for GCCModelDriver."""
 
     def __init__(self, *args, **kwargs):
         super(TestGCCModelParam, self).__init__(*args, **kwargs)

@@ -13,6 +13,8 @@ class TestClientParam(parent.TestConnectionParam):
         self.args = None
         self.attr_list += ['comm', 'response_drivers',
                            'request_name', 'request_address']
+        # Increased to allow forwarding between IPC comms on OSX
+        self.timeout = 5.0
         # self.sleeptime = 0.5
         # self.timeout = 10.0
         self.comm_name = _default_comm

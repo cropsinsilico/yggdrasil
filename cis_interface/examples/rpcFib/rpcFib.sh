@@ -61,4 +61,5 @@ esac
 
 cisrun $yaml1 $yaml2 $yaml3
 
-cat /tmp/fibCli.txt
+outfile="${TMPDIR}fibCli.txt"
+cat $outfile

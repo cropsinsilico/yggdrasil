@@ -1,5 +1,6 @@
+import os
 import nose.tools as nt
-from cis_interface import tools
+from cis_interface import tools, backwards
 
 
 def test_is_zmq_installed():
@@ -10,6 +11,20 @@ def test_is_zmq_installed():
 def test_is_ipc_installed():
     r"""Test determination if ipc is installed or not."""
     tools.is_ipc_installed()
+
+
+def test_popen_nobuffer():
+    r"""Test open of process without buffer."""
+    # Test w/o shell
+    args = ['pwd']
+    p = tools.popen_nobuffer(args)
+    out, err = p.communicate()
+    nt.assert_equal(out, backwards.unicode2bytes(os.getcwd() + '\n'))
+    # Test w/ shell
+    args = 'pwd'
+    p = tools.popen_nobuffer(args, shell=True)
+    out, err = p.communicate()
+    nt.assert_equal(out, backwards.unicode2bytes(os.getcwd() + '\n'))
 
 
 def test_eval_kwarg():
