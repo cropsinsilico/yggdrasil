@@ -49,7 +49,7 @@ else:
 if np.dtype('int_') != np.dtype('intc'):
     map_nptype2cformat.append(('int_', '%ld'))
 else:
-    map_nptype2cformat.append(('int_', '%d'))
+    map_nptype2cformat.append(('int_', '%d'))  # pragma: windows
 if np.dtype('int_') != np.dtype('longlong'):
     if platform._is_win:  # pragma: windows
         map_nptype2cformat.append(('longlong', '%l64d'))

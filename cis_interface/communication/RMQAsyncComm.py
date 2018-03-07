@@ -249,9 +249,7 @@ class RMQAsyncComm(RMQComm):
 
         """
         with self.rmq_lock:
-            if self.n_msg_direct_recv != 0:
-                return (True, self._buffered_messages.pop(0))
-        return (True, self.empty_msg)
+            return (True, self._buffered_messages.pop(0))
         # if self.n_msg_recv != 0:
         #     with self.rmq_lock:
         #         out = (True, self._buffered_messages.pop(0))

@@ -189,7 +189,7 @@ def bind_socket(socket, address, retry_timeout=-1):
         if (e.errno not in [48, 98]) or (retry_timeout < 0):
             raise e
         else:
-            logging.info("Retrying bind in %f s", retry_timeout)
+            logging.debug("Retrying bind in %f s", retry_timeout)
             tools.sleep(retry_timeout)
             address = bind_socket(socket, address)
     return address
