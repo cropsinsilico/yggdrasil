@@ -1,7 +1,7 @@
 from __future__ import print_function
 import sys
-import time
 from cis_interface.interface.PsiInterface import PsiRpcServer
+from cis_interface.tools import sleep
 
 
 def fibServer(args):
@@ -15,6 +15,7 @@ def fibServer(args):
     # Continue receiving requests until error occurs (the connection is closed
     # by all clients that have connected).
     while True:
+        print('rpcFibSrv(P): receiving...')
         retval, rpc_in = rpc.rpcRecv()
         if not retval:
             print('rpcFibSrv(P): end of input')
@@ -35,8 +36,11 @@ def fibServer(args):
         print(' ::: ->(%2d %2d)' % (arg, result))
 
         # Sleep and then send response back
-        time.sleep(float(sleeptime))
-        rpc.rpcSend(arg, result)
+        sleep(float(sleeptime))
+        flag = rpc.rpcSend(arg, result)
+        if not flag:
+            print('rpcFibSrv(P): ERROR sending')
+            break
 
     print('Goodbye from Python rpcFibSrv')
     sys.exit(0)

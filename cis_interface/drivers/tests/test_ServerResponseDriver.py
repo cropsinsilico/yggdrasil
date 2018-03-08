@@ -1,4 +1,4 @@
-from cis_interface.communication import _default_comm
+from cis_interface import tools
 import cis_interface.drivers.tests.test_ConnectionDriver as parent
 
 
@@ -11,8 +11,8 @@ class TestServerResponseParam(parent.TestConnectionParam):
         self.args = None
         self.attr_list += ['comm', 'msg_id', 'model_response_name',
                            'model_response_address', 'response_address']
-        self.comm_name = _default_comm
-        self.server_comm = _default_comm
+        self.comm_name = tools.get_default_comm()
+        self.server_comm = tools.get_default_comm()
         self.icomm_name = self.comm_name
         self.ocomm_name = self.server_comm
 
@@ -48,11 +48,11 @@ class TestServerResponseDriver(TestServerResponseParam,
     def test_send_recv(self):
         r"""Test sending/receiving small message."""
         super(TestServerResponseDriver, self).test_send_recv()
-        assert(not self.instance._unused)
+        assert(self.instance._used)
         assert(not self.instance.is_valid)
 
     def test_send_recv_nolimit(self):
         r"""Test sending/receiving large message."""
         super(TestServerResponseDriver, self).test_send_recv_nolimit()
-        assert(not self.instance._unused)
+        assert(self.instance._used)
         assert(not self.instance.is_valid)

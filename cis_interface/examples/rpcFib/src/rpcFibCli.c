@@ -1,9 +1,6 @@
 
 #include "PsiInterface.h"
 #include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <signal.h>
 
 
 int count_lines(const char* str, const char* substr) {
@@ -27,10 +24,11 @@ int main(int argc, char *argv[]) {
   psiInput_t ymlfile = psiInput("yaml_in");
   psiRpc_t rpc = psiRpcClient("rpcFibSrv_rpcFibCli", "%d", "%d %d");
   psiOutput_t log = psiOutput("output_log");
+  int ret;
 
   // Read entire contents of yaml
   char *ycontent = (char*)malloc(PSI_MSG_MAX*sizeof(char));
-  int ret = psi_recv(ymlfile, ycontent, PSI_MSG_MAX);
+  ret = psi_recv(ymlfile, ycontent, PSI_MSG_MAX);
   if (ret < 0) {
     printf("rpcFibCli(C): RECV ERROR\n");
     free(ycontent);
@@ -59,7 +57,7 @@ int main(int argc, char *argv[]) {
     sprintf(logmsg, "fib(%2d<-) = %-2d<-\n", fibNo, fib);
     printf("%s", logmsg);
     ret = psi_send(log, logmsg, strlen(logmsg));
-    if (ret != 0) {
+    if (ret < 0) {
       printf("rpcFibCli(C): SEND ERROR\n");
       free(logmsg);
       exit(-1);

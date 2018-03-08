@@ -1,6 +1,21 @@
 import os
 import nose.tools as nt
-from cis_interface import tools, backwards
+from cis_interface import tools, platform  # , backwards
+
+
+def test_locate_path():
+    r"""Test file location."""
+    # Search for current file
+    fdir, fname = os.path.split(__file__)
+    basedir = os.path.dirname(fdir)
+    fpath = tools.locate_path(fname, basedir=basedir)
+    assert(fpath)
+    assert(__file__ in fpath)
+    # nt.assert_equal(__file__, fpath)
+    # Search for invalid file
+    fname = 'invalid_file.ext'
+    fpath = tools.locate_path(fname, basedir=basedir)
+    assert(not fpath)
 
 
 def test_is_zmq_installed():
@@ -15,16 +30,26 @@ def test_is_ipc_installed():
 
 def test_popen_nobuffer():
     r"""Test open of process without buffer."""
+    ans = os.getcwd()  # + '\n'
+    # ans = backwards.unicode2bytes(ans)
     # Test w/o shell
-    args = ['pwd']
+    if platform._is_win:  # pragma: windows
+        args = ['cmd', '/c', 'cd']
+    else:
+        args = ['pwd']
     p = tools.popen_nobuffer(args)
     out, err = p.communicate()
-    nt.assert_equal(out, backwards.unicode2bytes(os.getcwd() + '\n'))
+    res = out.decode('utf-8').splitlines()[0]
+    nt.assert_equal(res, ans)
     # Test w/ shell
-    args = 'pwd'
+    if platform._is_win:  # pragma: windows
+        args = 'cd'
+    else:
+        args = 'pwd'
     p = tools.popen_nobuffer(args, shell=True)
     out, err = p.communicate()
-    nt.assert_equal(out, backwards.unicode2bytes(os.getcwd() + '\n'))
+    res = out.decode('utf-8').splitlines()[0]
+    nt.assert_equal(res, ans)
 
 
 def test_eval_kwarg():

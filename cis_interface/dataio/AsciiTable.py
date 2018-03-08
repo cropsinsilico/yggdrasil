@@ -2,24 +2,26 @@ import numpy as np
 import copy
 # from cis_interface.interface.scanf import scanf
 from cis_interface.dataio.AsciiFile import AsciiFile
-from cis_interface import backwards
+from cis_interface import backwards, platform
 from numpy.compat import asbytes
 try:
-    from astropy.io import ascii as apy_ascii
-    from astropy.table import Table as apy_Table
-    _use_astropy = True
-    from astropy.io.ascii import TableOutputter, convert_numpy
-    apy_tableout = TableOutputter()
-    apy_tableout.default_converters = [convert_numpy(np.int),
-                                       convert_numpy(np.float),
-                                       convert_numpy(np.str),
-                                       convert_numpy(np.complex)]
-    if not backwards.PY2:  # pragma: Python 3
+    if backwards.PY2:  # pragma: Python 2
+        from astropy.io import ascii as apy_ascii
+        from astropy.table import Table as apy_Table
+        _use_astropy = True
+        from astropy.io.ascii import TableOutputter, convert_numpy
+        apy_tableout = TableOutputter()
+        apy_tableout.default_converters = [convert_numpy(np.int),
+                                           convert_numpy(np.float),
+                                           convert_numpy(np.str),
+                                           convert_numpy(np.complex)]
+    else:  # pragma: Python 3
+        apy_ascii, apy_Table = None, None
         _use_astropy = False
 except ImportError:  # pragma: no cover
     apy_ascii, apy_Table = None, None
-    print("astropy is not installed, reading/writing as an array will be " +
-          "disabled. astropy can be installed using 'pip install astropy'.")
+    # print("astropy is not installed, reading/writing as an array will be " +
+    #       "disabled. astropy can be installed using 'pip install astropy'.")
     _use_astropy = False
 
 
@@ -59,9 +61,17 @@ def nptype2cformat(nptype):
         cfmt = "%d"
     elif t == np.dtype("int_"):
         cfmt = "%ld"
-    elif t == np.dtype("longlong"):  # pragma: no cover
-        # If it is different than C long
-        cfmt = "%lld"
+    # elif t == np.dtype("int64"):
+    #     if platform._is_win:
+    #         cfmt = "%l64d"
+    #     else:  # pragma: no cover
+    #         cfmt = "%ld"
+    elif t == np.dtype("longlong"):
+        # On windows C long is 32bit and long long is 64bit
+        if platform._is_win:  # pragma: windows
+            cfmt = "%l64d"
+        else:  # pragma: no cover
+            cfmt = "%lld"
     elif t == np.dtype("uint8"):
         cfmt = "%hhu"
     elif t == np.dtype("ushort"):
@@ -69,9 +79,16 @@ def nptype2cformat(nptype):
     elif t == np.dtype("uintc"):
         cfmt = "%u"
     elif t == np.dtype("uint64"):  # Platform dependent
-        cfmt = "%lu"
+        if platform._is_win:  # pragma: windows
+            cfmt = "%l64u"
+        else:
+            cfmt = "%lu"
     elif t == np.dtype("ulonglong"):  # pragma: no cover
-        cfmt = "%llu"
+        # On windows C unsigned long is 32bit and unsigned long long is 64bit
+        if platform._is_win:  # pragma: windows
+            cfmt = "%l64u"
+        else:
+            cfmt = "%llu"
     elif np.issubdtype(t, np.dtype("S")):
         if t.itemsize is 0:
             cfmt = '%s'
@@ -137,7 +154,7 @@ def cformat2nptype(cfmt):
             out = 'int8'
         elif cfmt_str[-2] == 'h':  # short
             out = 'short'
-        elif 'll' in cfmt_str:
+        elif ('ll' in cfmt_str) or ('l64' in cfmt_str):
             out = 'longlong'  # long long
         elif cfmt_str[-2] == 'l':
             out = 'int_'  # long (broken in python)
@@ -148,7 +165,7 @@ def cformat2nptype(cfmt):
             out = 'uint8'
         elif cfmt_str[-2] == 'h':  # short
             out = 'ushort'
-        elif 'll' in cfmt_str:
+        elif ('ll' in cfmt_str) or ('l64' in cfmt_str):
             out = 'ulonglong'  # long long
         elif cfmt_str[-2] == 'l':
             out = 'uint64'  # long (broken in python)
@@ -187,7 +204,7 @@ def cformat2pyscanf(cfmt):
         raise TypeError("Input must be of type %s." % backwards.bytes_type)
     elif not cfmt.startswith(_fmt_char):
         raise ValueError("Provided C format string (%s) " % cfmt +
-                         "does not start with '%%'")
+                         "does not start with '%'")
     elif len(cfmt) == 1:
         raise ValueError("Provided C format string (%s) " % cfmt +
                          "does not contain type info")
@@ -201,6 +218,7 @@ def cformat2pyscanf(cfmt):
         out += cfmt_str[-1]
         out = out.replace('h', '')
         out = out.replace('l', '')
+        out = out.replace('64', '')
     return backwards.unicode2bytes(out)
 
 
@@ -285,7 +303,8 @@ class AsciiTable(AsciiFile):
     @property
     def fmts(self):
         r"""List of formats in format string."""
-        return self.format_str.split(self.newline)[0].split(self.column)
+        out = self.format_str.split(self.newline)[0].split(self.column)
+        return [f for f in out if f]
 
     @property
     def ncols(self):
@@ -509,7 +528,10 @@ class AsciiTable(AsciiFile):
                     if line.startswith(self.comment):
                         sline = line.lstrip(self.comment)
                         sline = sline.lstrip(backwards.unicode2bytes(' '))
+                        sline = sline.replace(backwards.unicode2bytes(platform._newline),
+                                              backwards.unicode2bytes(self.newline))
                         fmts = sline.split(self.column)
+                        fmts = [f for f in fmts if f]
                         is_fmt = [f.startswith(_fmt_char) for f in fmts]
                         if sum(is_fmt) == len(fmts):
                             out = sline
@@ -694,7 +716,9 @@ class AsciiTable(AsciiFile):
 
         Args:
             arr (np.ndarray, optional): Array to write to bytestring. If None
-                the array of table data is used.
+                the array of table data is used. This can also be a list of
+                arrays, one for each field in the table, or a list of lists,
+                one for each element containing the fields for that element.
             order (str, optional): Order that array should be written to the
                 bytestring. Defaults to 'C'.
 
@@ -702,25 +726,47 @@ class AsciiTable(AsciiFile):
             str: Bytestring.
 
         Raises:
-            TypeError: If the provided array is not a numpy array.
+            TypeError: If the provided array is not a numpy array, list, or tuple.
             ValueError: If the array is not the correct type.
+            ValueError: If there are not enough arrays in the input list.
+            ValueError: If any of the listed arrays doesn't have enough fields.
+            ValueError: If any of the listed arrays doesn't have enough elements.
 
         """
+        ntyp = len(self.dtype.names)
         if arr is None:
             arr = self.arr
-        if not isinstance(arr, np.ndarray):
-            raise TypeError("Provided array must be an array.")
-        if (arr.dtype != self.dtype):
-            if (arr.ndim != 2) or (arr.shape[1] != len(self.dtype)):
-                raise ValueError("Data types do not match.")
-            arr1 = np.empty(arr.shape[0], dtype=self.dtype)
-            for i, n in enumerate(self.dtype.names):
-                arr1[n] = arr[:, i]
+        if isinstance(arr, (list, tuple)):
+            if len(arr) == ntyp and isinstance(arr[0], np.ndarray):
+                nele = len(arr[0])
+                arr1 = np.empty(nele, dtype=self.dtype)
+                for i, n in enumerate(self.dtype.names):
+                    if len(arr[i]) != nele:
+                        raise ValueError("Field %s does not have enough elements." % n)
+                    arr1[n] = arr[i]
+            elif len(arr[0]) == ntyp:
+                nele = len(arr)
+                arr1 = np.empty(nele, dtype=self.dtype)
+                for i in range(nele):
+                    if len(arr[i]) != ntyp:
+                        raise ValueError("Element %d does not have enough fields." % i)
+                    arr1[i] = np.array(arr[i], self.dtype)
+            else:
+                raise ValueError("Not enough arrays for fields")
+        elif isinstance(arr, np.ndarray):
+            if (arr.dtype != self.dtype):
+                if (arr.ndim != 2) or (arr.shape[1] != ntyp):
+                    raise ValueError("Data types do not match.")
+                arr1 = np.empty(arr.shape[0], dtype=self.dtype)
+                for i, n in enumerate(self.dtype.names):
+                    arr1[n] = arr[:, i]
+            else:
+                arr1 = arr
         else:
-            arr1 = arr
+            raise TypeError("Provided array must be an array, list, or tuple.")
         if order == 'F':
             out = backwards.unicode2bytes('')
-            for i in range(len(arr1.dtype)):
+            for i in range(ntyp):
                 n = arr1.dtype.names[i]
                 if np.issubdtype(arr1.dtype[i], np.dtype('complex')):
                     out = out + arr1[n].real.tobytes()

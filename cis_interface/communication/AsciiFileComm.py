@@ -55,7 +55,7 @@ class AsciiFileComm(FileComm):
         r"""Open the file."""
         self.file.open()
 
-    def _close(self):
+    def _file_close(self):
         r"""Close the file."""
         self.file.close()
 
@@ -82,7 +82,8 @@ class AsciiFileComm(FileComm):
             bool: Success or failure of writing to the file.
 
         """
-        self.file.writeline_full(msg)
+        if msg != self.eof_msg:
+            self.file.writeline_full(msg)
         self.file.fd.flush()
         return True
 

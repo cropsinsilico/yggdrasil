@@ -16,24 +16,25 @@
 #define CISCOMMUNICATION_H_
 
 /*! @brief Memory to keep track of comms to clean up at exit. */
-static void **vcomms2clean;
+static void **vcomms2clean = NULL;
 static size_t ncomms2clean = 0;
 static size_t clean_registered = 0;
 
 // Forward declaration of eof
-static inline
+static
 int comm_send_eof(const comm_t x);
+static
+int comm_nmsg(const comm_t x);
+
 
 /*!
-  @brief Perform deallocation for generic communicator.
+  @brief Perform deallocation for type specific communicator.
   @param[in] x comm_t * Pointer to communicator to deallocate.
   @returns int 1 if there is an error, 0 otherwise.
 */
-static inline
-int free_comm(comm_t *x) {
+static
+int free_comm_type(comm_t *x) {
   comm_type t = x->type;
-  if ((strcmp(x->direction, "send") == 0) && (t != CLIENT_COMM))
-    comm_send_eof(*x);
   int ret = 1;
   if (t == IPC_COMM)
     ret = free_ipc_comm(x);
@@ -50,13 +51,43 @@ int free_comm(comm_t *x) {
   else if ((t == ASCII_TABLE_COMM) || (t == ASCII_TABLE_ARRAY_COMM))
     ret = free_ascii_table_comm(x);
   else {
-    cislog_error("free_comm: Unsupported comm_type %d", t);
+    cislog_error("free_comm_type: Unsupported comm_type %d", t);
   }
+  return ret;
+};
+
+/*!
+  @brief Perform deallocation for generic communicator.
+  @param[in] x comm_t * Pointer to communicator to deallocate.
+  @returns int 1 if there is an error, 0 otherwise.
+*/
+static
+int free_comm(comm_t *x) {
+  int ret = 0;
+  if (x == NULL)
+    return ret;
+  comm_type t = x->type;
+  // Send EOF for output comms and then wait for messages to be recv'd
+  if ((is_send(x->direction)) && (t != CLIENT_COMM) && (x->valid)) {
+    if (_cis_error_flag == 0) {
+      comm_send_eof(*x);
+      while (comm_nmsg(*x) > 0) {
+        cislog_debug("free_comm(%s): draining %d messages",
+          x->name, comm_nmsg(*x));
+        usleep(CIS_SLEEP_TIME);
+      }
+    } else {
+      cislog_error("free_comm(%s): Error registered", x->name);
+    }
+  }
+  ret = free_comm_type(x);
   int idx = x->index_in_register;
   free_comm_base(x);
   if (idx >= 0) {
-    free(vcomms2clean[idx]);
-    vcomms2clean[idx] = NULL;
+    if (vcomms2clean[idx] != NULL) {
+      free(vcomms2clean[idx]);
+      vcomms2clean[idx] = NULL;
+    }
   }
   return ret;
 };
@@ -64,7 +95,7 @@ int free_comm(comm_t *x) {
 /*!
   @brief Free comms created that were not freed.
 */
-static inline
+static
 void clean_comms(void) {
   size_t i;
   for (i = 0; i < ncomms2clean; i++) {
@@ -72,7 +103,17 @@ void clean_comms(void) {
       free_comm((comm_t*)(vcomms2clean[i]));
     }
   }
-  free(vcomms2clean);
+  if (vcomms2clean != NULL) {
+    free(vcomms2clean);
+    vcomms2clean = NULL;
+  }
+  ncomms2clean = 0;
+#if defined(ZMQINSTALLED)
+  // #if defined(_WIN32) && defined(ZMQINSTALLED)
+  zsys_shutdown();
+#endif
+  cislog_debug("atexit done");
+  /* printf(""); */
 };
 
 /*!
@@ -81,18 +122,21 @@ void clean_comms(void) {
   registered.
   @returns int -1 if there is an error, 0 otherwise.
  */
-static inline
+static
 int register_comm(comm_t *x) {
   if (clean_registered == 0) {
     atexit(clean_comms);
     clean_registered = 1;
+  }
+  if (x == NULL) {
+    return 0;
   }
   vcomms2clean = (void**)realloc(vcomms2clean, sizeof(void*)*(ncomms2clean + 1));
   if (vcomms2clean == NULL) {
     cislog_error("register_comm(%s): Failed to realloc the comm list.", x->name);
     return -1;
   }
-  x->index_in_register = ncomms2clean;
+  x->index_in_register = (int)ncomms2clean;
   vcomms2clean[ncomms2clean++] = (void*)x;
   return 0;
 };
@@ -103,7 +147,7 @@ int register_comm(comm_t *x) {
   new_base_comm;
   @returns int -1 if the comm could not be initialized.
  */
-static inline
+static
 int new_comm_type(comm_t *x) {
   comm_type t = x->type;
   int flag;
@@ -136,7 +180,7 @@ int new_comm_type(comm_t *x) {
   init_base_comm;
   @returns int -1 if the comm could not be initialized.
  */
-static inline
+static
 int init_comm_type(comm_t *x) {
   comm_type t = x->type;
   int flag;
@@ -160,6 +204,7 @@ int init_comm_type(comm_t *x) {
     cislog_error("init_comm_type: Unsupported comm_type %d", t);
     flag = -1;
   }
+  cislog_debug("init_comm_type(%s): Done, flag = %d", x->name, flag);
   return flag;
 };
 
@@ -173,10 +218,14 @@ int init_comm_type(comm_t *x) {
   @param[in] seri_info Pointer to info for the serializer (e.g. format string).
   @returns comm_t Comm structure.
  */
-static inline
+static
 comm_t new_comm(char *address, const char *direction, const comm_type t,
 		void *seri_info) {
   comm_t *ret = new_comm_base(address, direction, t, seri_info);
+  if (ret == NULL) {
+    cislog_error("new_comm: Could not initialize base.");
+    return empty_comm_base();
+  }
   int flag;
   if (address == NULL) {
     flag = new_comm_type(ret);
@@ -211,21 +260,31 @@ comm_t new_comm(char *address, const char *direction, const comm_type t,
   @param[in] seri_info Pointer to info for the serializer (e.g. format string).
   @returns comm_t Comm structure.
  */
-static inline
+static
 comm_t init_comm(const char *name, const char *direction, const comm_type t,
-		 void *seri_info) {
+		 const void *seri_info) {
+  cislog_debug("init_comm: Initializing comm.");
+#ifdef _WIN32
+  SetErrorMode(SEM_FAILCRITICALERRORS | SEM_NOGPFAULTERRORBOX);
+  _set_abort_behavior(0,_WRITE_ABORT_MSG);
+#endif
   comm_t *ret = init_comm_base(name, direction, t, seri_info);
+  if (ret == NULL) {
+    cislog_error("init_comm(%s): Could not initialize base.", name);
+    return empty_comm_base();
+  }
   int flag = init_comm_type(ret);
   if (flag < 0) {
-    cislog_error("init_comm: Could not initialize comm.");
+    cislog_error("init_comm(%s): Could not initialize comm.", name);
     ret->valid = 0;
   } else {
     flag = register_comm(ret);
     if (flag < 0) {
-      cislog_error("init_comm: Failed to register new comm.");
+      cislog_error("init_comm(%s): Failed to register new comm.", name);
       ret->valid = 0;
     }
   }
+  cislog_debug("init_comm(%s): Initialized comm.", name);
   return ret[0];
 };
 
@@ -234,10 +293,14 @@ comm_t init_comm(const char *name, const char *direction, const comm_type t,
   @param[in] comm_t Communicator to check.
   @returns int Number of messages.
  */
-static inline
+static
 int comm_nmsg(const comm_t x) {
-  comm_type t = x.type;
   int ret = -1;
+  if (x.valid == 0) {
+    cislog_error("comm_nmsg: Invalid comm");
+    return ret;
+  }
+  comm_type t = x.type;
   if (t == IPC_COMM)
     ret = ipc_comm_nmsg(x);
   else if (t == ZMQ_COMM)
@@ -264,12 +327,16 @@ int comm_nmsg(const comm_t x) {
   message is larger, it will not be sent.
   @param[in] x comm_t structure that comm should be sent to.
   @param[in] data character pointer to message that should be sent.
-  @param[in] len int length of message to be sent.
+  @param[in] len size_t length of message to be sent.
   @returns int 0 if send succesfull, -1 if send unsuccessful.
  */
-static inline
-int comm_send_single(const comm_t x, const char *data, const int len) {
+static
+int comm_send_single(const comm_t x, const char *data, const size_t len) {
   int ret = -1;
+  if (x.valid == 0) {
+    cislog_error("comm_send_single: Invalid comm");
+    return ret;
+  }
   comm_type t = x.type;
   if (t == IPC_COMM)
     ret = ipc_comm_send(x, data, len);
@@ -288,6 +355,12 @@ int comm_send_single(const comm_t x, const char *data, const int len) {
   else {
     cislog_error("comm_send_single: Unsupported comm_type %d", t);
   }
+  if (ret >= 0) {
+    time(x.last_send);
+    /* time_t now; */
+    /* time(&now); */
+    /* x.last_send[0] = now; */
+  }
   return ret;
 };
 
@@ -295,12 +368,12 @@ int comm_send_single(const comm_t x, const char *data, const int len) {
 /*!
   @brief Create header for multipart message.
   @param[in] x comm_t structure that header will be sent to.
-  @param[in] len int Size of message body.
+  @param[in] len size_t Size of message body.
   @param[out] comm_head_t Header info that should be sent before the message
   body.
 */
-static inline
-comm_head_t comm_send_multipart_header(const comm_t x, const int len) {
+static
+comm_head_t comm_send_multipart_header(const comm_t x, const size_t len) {
   comm_head_t head = init_header(len, NULL, NULL);
   sprintf(head.id, "%d", rand());
   head.multipart = 1;
@@ -317,31 +390,50 @@ comm_head_t comm_send_multipart_header(const comm_t x, const int len) {
   @brief Send a large message in multiple parts via a new comm.
   @param[in] x comm_t Structure that message should be sent to.
   @param[in] data const char * Message that should be sent.
-  @param[in] len int Size of data.
+  @param[in] len size_t Size of data.
   @returns: int 0 if send successfull, -1 if send unsuccessful.
 */
-static inline
-int comm_send_multipart(const comm_t x, const char *data, const int len) {
-  char headbuf[BUFSIZ];
-  int headlen, ret;
-  comm_t xmulti;
+static
+int comm_send_multipart(const comm_t x, const char *data, const size_t len) {
+  //char headbuf[CIS_MSG_BUF];
+  int headbuf_len = CIS_MSG_BUF;
+  int headlen = 0, ret = -1;
+  if (x.valid == 0) {
+    cislog_error("comm_send_multipart: Invalid comm");
+    return ret;
+  }
+  comm_t xmulti = empty_comm_base();
   // Get header
   comm_head_t head = comm_send_multipart_header(x, len);
   if (head.valid == 0) {
     cislog_error("comm_send_multipart: Invalid header generated.");
     return -1;
   }
+  char *headbuf = (char*)malloc(headbuf_len);
+  if (headbuf == NULL) {
+    cislog_error("comm_send_multipart: Failed to malloc headbuf.");
+    return -1;
+  }
   // Try to send body in header
   if (len < x.maxMsgSize) {
-    headlen = format_comm_header(head, headbuf, BUFSIZ);
+    headlen = format_comm_header(head, headbuf, headbuf_len);
     if (headlen < 0) {
       cislog_error("comm_send_multipart: Failed to format header.");
+      free(headbuf);
       return -1;
     }
-    if ((headlen + len) < x.maxMsgSize) {
+    if (((size_t)headlen + len) < x.maxMsgSize) {
+      if (((size_t)headlen + len + 1) > (size_t)headbuf_len) {
+        headbuf = (char*)realloc(headbuf, (size_t)headlen + len + 1);
+        if (headbuf == NULL) {
+          cislog_error("comm_send_multipart: Failed to realloc headbuf.");
+          return -1;          
+        }
+        headbuf_len = headlen + (int)len + 1;
+      }
       head.multipart = 0;
       memcpy(headbuf + headlen, data, len);
-      headlen += len;
+      headlen += (int)len;
       headbuf[headlen] = '\0';
     }
   }
@@ -351,12 +443,16 @@ int comm_send_multipart(const comm_t x, const char *data, const int len) {
     xmulti = new_comm(NULL, "send", x.type, NULL);
     if (!(xmulti.valid)) {
       cislog_error("comm_send_multipart: Failed to initialize a new comm.");
+      free(headbuf);
       return -1;
     }
+    xmulti.sent_eof[0] = 1;
+    xmulti.recv_eof[0] = 1;
     strcpy(head.address, xmulti.address);
-    headlen = format_comm_header(head, headbuf, BUFSIZ);
+    headlen = format_comm_header(head, headbuf, headbuf_len);
     if (headlen < 0) {
       cislog_error("comm_send_multipart: Failed to format header.");
+      free(headbuf);
       free_comm(&xmulti);
       return -1;
     }
@@ -367,15 +463,17 @@ int comm_send_multipart(const comm_t x, const char *data, const int len) {
     cislog_error("comm_send_multipart: Failed to send header.");
     if (head.multipart == 1)
       free_comm(&xmulti);
+    free(headbuf);
     return -1;
   }
   if (head.multipart == 0) {
     cislog_debug("comm_send_multipart(%s): %d bytes completed", x.name, head.size);
+    free(headbuf);
     return ret;
   }
   // Send multipart
-  int msgsiz;
-  int prev = 0;
+  size_t msgsiz;
+  size_t prev = 0;
   while (prev < head.size) {
     if ((head.size - prev) > xmulti.maxMsgSize)
       msgsiz = xmulti.maxMsgSize;
@@ -395,6 +493,7 @@ int comm_send_multipart(const comm_t x, const char *data, const int len) {
     cislog_debug("comm_send_multipart(%s): %d bytes completed", x.name, head.size);
   // Free multipart
   free_comm(&xmulti);
+  free(headbuf);
   return ret;
 };
 
@@ -405,17 +504,38 @@ int comm_send_multipart(const comm_t x, const char *data, const int len) {
   message is larger, it will not be sent.
   @param[in] x comm_t structure that comm should be sent to.
   @param[in] data character pointer to message that should be sent.
-  @param[in] len int length of message to be sent.
+  @param[in] len size_t length of message to be sent.
   @returns int 0 if send succesfull, -1 if send unsuccessful.
  */
-static inline
-int comm_send(const comm_t x, const char *data, const int len) {
+static
+int comm_send(const comm_t x, const char *data, const size_t len) {
   int ret = -1;
+  if (x.valid == 0) {
+    cislog_error("comm_send: Invalid comm");
+    return ret;
+  }
+  if (x.sent_eof == NULL) {
+    cislog_error("comm_send(%s): sent_eof not initialized.", x.name);
+    return ret;
+  }
+  int sending_eof = 0;
+  if (is_eof(data)) {
+    if (x.sent_eof[0] == 0) {
+      x.sent_eof[0] = 1;
+      sending_eof = 1;
+    } else {
+      cislog_error("comm_send(%s): EOF already sent", x.name);
+      return ret;
+    }
+  }
   if (((len > x.maxMsgSize) && (x.maxMsgSize > 0)) ||
       ((x.always_send_header) && (!(is_eof(data))))) {
     return comm_send_multipart(x, data, len);
   }
   ret = comm_send_single(x, data, len);
+  if (sending_eof) {
+    cislog_debug("comm_send(%s): sent EOF, ret = %d", x.name, ret);
+  }
   return ret;
 };
 
@@ -424,10 +544,11 @@ int comm_send(const comm_t x, const char *data, const int len) {
   @param[in] x comm_t structure that message should be sent to.
   @returns int 0 if send successfull, -1 otherwise.
 */
-static inline
+static
 int comm_send_eof(const comm_t x) {
-  char buf[2048] = CIS_MSG_EOF;
-  int ret = comm_send(x, buf, strlen(buf));
+  int ret = -1;
+  char buf[100] = CIS_MSG_EOF;
+  ret = comm_send(x, buf, strlen(buf));
   return ret;
 };
 
@@ -437,17 +558,21 @@ int comm_send_eof(const comm_t x) {
   @param[in] x comm_t structure that message should be sent to.
   @param[out] data char ** pointer to allocated buffer where the message
   should be saved. This should be a malloc'd buffer if allow_realloc is 1.
-  @param[in] len const int length of the allocated message buffer in bytes.
+  @param[in] len const size_t length of the allocated message buffer in bytes.
   @param[in] allow_realloc const int If 1, the buffer will be realloced if it
   is not large enought. Otherwise an error will be returned.
   @returns int -1 if message could not be received, otherwise the length of
   the received message.
  */
-static inline
-int comm_recv_single(const comm_t x, char **data, const int len,
+static
+int comm_recv_single(const comm_t x, char **data, const size_t len,
 		     const int allow_realloc) {
-  comm_type t = x.type;
   int ret = -1;
+  if (x.valid == 0) {
+    cislog_error("comm_recv_single: Invalid comm");
+    return ret;
+  }
+  comm_type t = x.type;
   if (t == IPC_COMM)
     ret = ipc_comm_recv(x, data, len, allow_realloc);
   else if (t == ZMQ_COMM)
@@ -472,16 +597,20 @@ int comm_recv_single(const comm_t x, char **data, const int len,
   @brief Receive a message in multiple parts.
   @param[in] x comm_t Comm that message should be recieved from.
   @param[in] data char ** Pointer to buffer where message should be stored.
-  @param[in] len int Size of data buffer.
-  @param[in] headlen int
+  @param[in] len size_t Size of data buffer.
+  @param[in] headlen size_t Size of header in data buffer.
   @param[in] allow_realloc int If 1, data will be realloced if the incoming
   message is larger than the buffer. Otherwise, an error will be returned.
   @returns int -1 if unsucessful, size of message received otherwise.
 */
-static inline
-int comm_recv_multipart(const comm_t x, char **data, const int len,
-			const int headlen, const int allow_realloc) {
-  int ret;
+static
+int comm_recv_multipart(const comm_t x, char **data, const size_t len,
+			const size_t headlen, const int allow_realloc) {
+  int ret = -1;
+  if (x.valid == 0) {
+    cislog_error("comm_recv_multipart: Invalid comm");
+    return ret;
+  }
   comm_head_t head = parse_comm_header(*data, headlen);
   if (!(head.valid)) {
     cislog_error("comm_recv(%s): Error parsing header.", x.name);
@@ -493,7 +622,7 @@ int comm_recv_multipart(const comm_t x, char **data, const int len,
       (*data)[head.bodysiz] = '\0';
       // Return early if header contained entire message
       if (head.size == head.bodysiz) {
-	return head.bodysiz;
+	return (int)(head.bodysiz);
       }
       // Get address for new comm
       comm_t xmulti = new_comm(head.address, "recv", x.type, NULL);
@@ -501,14 +630,22 @@ int comm_recv_multipart(const comm_t x, char **data, const int len,
 	cislog_error("comm_recv_multipart: Failed to initialize a new comm.");
 	return -1;
       }
+      xmulti.sent_eof[0] = 1;
+      xmulti.recv_eof[0] = 1;
       // Receive parts of message
-      int prev = head.bodysiz;
-      int msgsiz = 0;
+      size_t prev = head.bodysiz;
+      size_t msgsiz = 0;
       // Reallocate data if necessary
       if ((head.size + 1) > len) {
 	if (allow_realloc) {
 	  *data = (char*)realloc(*data, head.size + 1);
-	} else {
+	  if (*data == NULL) {
+	    cislog_error("comm_recv_multipart(%s): Failed to realloc buffer",
+			 x.name);
+	    free_comm(&xmulti);
+	    return -1;
+	  }
+ 	} else {
 	  cislog_error("comm_recv_multipart(%s): buffer is not large enough",
 		       x.name);
 	  free_comm(&xmulti);
@@ -535,11 +672,11 @@ int comm_recv_multipart(const comm_t x, char **data, const int len,
       }
       if (ret > 0) {
 	cislog_debug("comm_recv_multipart(%s): %d bytes completed", x.name, prev);
-	ret = prev;
+	ret = (int)prev;
       }
       free_comm(&xmulti);
     } else {
-      ret = headlen;
+      ret = (int)headlen;
     }
   }
   return ret;
@@ -551,16 +688,22 @@ int comm_recv_multipart(const comm_t x, char **data, const int len,
   @param[in] x comm_t structure that message should be sent to.
   @param[out] data character pointer to allocated buffer where the
   message should be saved.
-  @param[in] len const int length of the allocated message buffer in bytes.
+  @param[in] len const size_t length of the allocated message buffer in bytes.
   @returns int -1 if message could not be received and -2 if EOF is received.
   Length of the received message otherwise.
  */
-static inline
-int comm_recv(const comm_t x, char *data, const int len) {
-  int ret = comm_recv_single(x, &data, len, 0);
+static
+int comm_recv(const comm_t x, char *data, const size_t len) {
+  int ret = -1;
+  if (x.valid == 0) {
+    cislog_error("comm_send: Invalid comm");
+    return ret;
+  }
+  ret = comm_recv_single(x, &data, len, 0);
   if (ret > 0) {
     if (is_eof(data)) {
-      cislog_debug("comm_recv(%s): EOF received.\n", x.name);
+      cislog_debug("comm_recv(%s): EOF received.", x.name);
+      x.recv_eof[0] = 1;
       ret = -2;
     } else {
       ret = comm_recv_multipart(x, &data, len, ret, 0);
@@ -574,16 +717,17 @@ int comm_recv(const comm_t x, char *data, const int len) {
   @param[in] x comm_t structure that message should be sent to.
   @param[out] data character pointer to pointer to allocated buffer where the
   message should be saved.
-  @param[in] len const int length of the allocated message buffer in bytes.
+  @param[in] len const size_t length of the allocated message buffer in bytes.
   @returns int -1 if message could not be received and -2 if EOF is received.
   Length of the received message otherwise.
  */
-static inline
-int comm_recv_realloc(const comm_t x, char **data, const int len) {
+static
+int comm_recv_realloc(const comm_t x, char **data, const size_t len) {
   int ret = comm_recv_single(x, data, len, 1);
   if (ret > 0) {
     if (is_eof(*data)) {
-      cislog_debug("comm_recv_realloc(%s): EOF received.\n", x.name);
+      cislog_debug("comm_recv_realloc(%s): EOF received.", x.name);
+      x.recv_eof[0] = 1;
       ret = -2;
     } else {
       ret = comm_recv_multipart(x, data, len, ret, 1);
@@ -594,8 +738,8 @@ int comm_recv_realloc(const comm_t x, char **data, const int len) {
 
 
 /*! @brief alias for comm_send. */
-static inline
-int comm_send_nolimit(const comm_t x, const char *data, const int len) {
+static
+int comm_send_nolimit(const comm_t x, const char *data, const size_t len) {
   return comm_send(x, data, len);
 };
 
@@ -604,10 +748,24 @@ int comm_send_nolimit(const comm_t x, const char *data, const int len) {
   @param[in] x comm_t structure that message should be sent to.
   @returns int 0 if send successfull, -1 otherwise.
 */
-static inline
+static
 int comm_send_nolimit_eof(const comm_t x) {
-  char buf[2048] = CIS_MSG_EOF;
-  int ret = comm_send_nolimit(x, buf, strlen(buf));
+  int ret = -1;
+  if (x.valid == 0) {
+    cislog_error("comm_send_nolimit_eof: Invalid comm");
+    return ret;
+  }
+  if (x.sent_eof == NULL) {
+    cislog_error("comm_send_nolimit_eof(%s): sent_eof not initialized.", x.name);
+    return ret;
+  }
+  if (x.sent_eof[0] == 0) {
+    char buf[2048] = CIS_MSG_EOF;
+    ret = comm_send_nolimit(x, buf, strlen(buf));
+    x.sent_eof[0] = 1;
+  } else {
+    cislog_error("comm_send_nolimit_eof(%s): EOF already sent", x.name);
+  }
   return ret;
 };
 
@@ -620,12 +778,12 @@ int comm_send_nolimit_eof(const comm_t x) {
   @param[out] data character pointer to pointer for allocated buffer where the
   message should be stored. A pointer to a pointer is used so that the buffer
   may be reallocated as necessary for the incoming message.
-  @param[in] len int length of the initial allocated message buffer in bytes.
+  @param[in] len size_t length of the initial allocated message buffer in bytes.
   @returns int -1 if message could not be received and -2 if EOF is received.
   Length of the received message otherwise.
  */
-static inline
-int comm_recv_nolimit(const comm_t x, char **data, const int len) {
+static
+int comm_recv_nolimit(const comm_t x, char **data, const size_t len) {
   return comm_recv_realloc(x, data, len);
 };
 
@@ -636,17 +794,30 @@ int comm_recv_nolimit(const comm_t x, char **data, const int len) {
   CIS_MSG_MAX or cannot be encoded, it will not be sent.  
   @param[in] x comm_t structure for comm that message should be sent to.
   @param[in] ap va_list arguments to be formatted into a message using sprintf.
-  @returns int 0 if send succesfull, -1 if send unsuccessful.
+  @returns int Number of arguments formatted if send succesfull, -1 if send
+  unsuccessful.
  */
-static inline
+static
 int vcommSend(const comm_t x, va_list ap) {
-  char *buf = (char*)malloc(CIS_MSG_BUF);
+  int ret = -1;
+  if (x.valid == 0) {
+    cislog_error("vcommSend: Invalid comm");
+    return ret;
+  }
+  size_t buf_siz = CIS_MSG_BUF;
+  // char *buf = NULL;
+  char *buf = (char*)malloc(buf_siz);
+  if (buf == NULL) {
+    cislog_error("vcommSend(%s): Failed to alloc buffer", x.name);
+    return -1;
+  }
   seri_t serializer = x.serializer;
   if (x.type == CLIENT_COMM) {
     comm_t *handle = (comm_t*)(x.handle);
     serializer = handle->serializer;
   }
-  int ret = serialize(serializer, &buf, CIS_MSG_BUF, 1, ap);
+  int args_used = 0;
+  ret = serialize(serializer, &buf, buf_siz, 1, &args_used, ap);
   if (ret < 0) {
     cislog_error("vcommSend(%s): serialization error", x.name);
     free(buf);
@@ -655,7 +826,11 @@ int vcommSend(const comm_t x, va_list ap) {
   ret = comm_send(x, buf, ret);
   cislog_debug("vcommSend(%s): comm_send returns %d", x.name, ret);
   free(buf);
-  return ret;
+  if (ret < 0) {
+    return ret;
+  } else {
+    return args_used;
+  }
 };
 
 /*!
@@ -670,13 +845,24 @@ int vcommSend(const comm_t x, va_list ap) {
   Length of the received message if message was received and parsed. -2 is
   returned if EOF is received.
  */
-static inline
+static
 int vcommRecv(const comm_t x, va_list ap) {
+  int ret = -1;
+  if (x.valid == 0) {
+    cislog_error("vcommRecv: Invalid comm");
+    return ret;
+  }
   // Receive message
-  char *buf = (char*)malloc(CIS_MSG_BUF);
-  int ret = comm_recv_nolimit(x, &buf, CIS_MSG_BUF);
+  size_t buf_siz = CIS_MSG_BUF;
+  /* char *buf = NULL; */
+  char *buf = (char*)malloc(buf_siz);
+  if (buf == NULL) {
+    cislog_error("vcommSend(%s): Failed to alloc buffer", x.name);
+    return -1;
+  }
+  ret = comm_recv_nolimit(x, &buf, buf_siz);
   if (ret < 0) {
-    /* cislog_error("vcommRecv(%s): Error receiving.", x.name); */
+    // cislog_error("vcommRecv(%s): Error receiving.", x.name);
     free(buf);
     return ret;
   }

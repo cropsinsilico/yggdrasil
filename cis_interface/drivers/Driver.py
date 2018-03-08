@@ -1,10 +1,9 @@
-from threading import Thread, RLock
 import os
 from cis_interface.config import cis_cfg
-from cis_interface.tools import CisClass
+from cis_interface import tools
 
 
-class Driver(CisClass, Thread):
+class Driver(tools.CisThreadLoop):
     r"""Base class for all drivers.
 
     Args:
@@ -47,12 +46,9 @@ class Driver(CisClass, Thread):
         if getattr(self, '_thread_initialized', False):  # pragma: debug
             raise Exception("Thread already initialized. " +
                             "Check multiple inheritance")
-        Thread.__init__(self)
         super(Driver, self).__init__(name, **kwargs)
-        self.daemon = True
         self._thread_initialized = True
-        self.debug()
-        self.name = name
+        self.debug('')
         # if cis_cfg.get('debug', 'psi') == 'DEBUG':
         #     self.sleeptime = 1.0
         # Set defaults
@@ -71,12 +67,6 @@ class Driver(CisClass, Thread):
         self.namespace = namespace
         self.rank = rank
         self._term_meth = "terminate"
-        self._terminated = False
-        self.lock = RLock()
-
-    def run(self):
-        r"""Run something in a seperate thread."""
-        self.debug()
 
     @property
     def is_valid(self):
@@ -85,53 +75,32 @@ class Driver(CisClass, Thread):
 
     def stop(self):
         r"""Stop the driver."""
-        if self._terminated:
+        if self.was_terminated:
             self.debug('Driver already terminated.')
             return
-        self.debug()
+        self.debug('')
         self._term_meth = 'stop'
         self.graceful_stop()
         self.terminate()
 
     def graceful_stop(self):
         r"""Gracefully stop the driver."""
-        self.debug()
+        self.debug('')
+
+    def do_terminate(self):
+        r"""Actions that should stop the driver."""
+        self.debug('Returning')
 
     def terminate(self):
         r"""Stop the driver, without attempting to allow it to finish."""
-        if self._terminated:
+        if self.was_terminated:
             self.debug('Driver already terminated.')
             return
-        self.debug()
-        self.on_exit()
-        self._terminated = True
-        self.wait(self.timeout)
-        assert(not self.is_alive())
+        self.do_terminate()
+        self.debug('')
+        super(Driver, self).terminate()
         self.debug('Returning')
-
-    def on_exit(self):
-        r"""Processes that should be run when the driver exits."""
-        self.debug()
 
     def on_model_exit(self):
         r"""Processes that should be run when an associated model exits."""
-        self.debug()
-
-    def cleanup(self):
-        r"""Processes that should be run to clean up a driver that is not
-        running."""
-        self.debug()
-
-    def wait(self, timeout=None):
-        r"""Wait until model finish to return.
-
-        Args:
-            timeout (float, optional): Maximum time that should be waited for
-                the driver to finish. Defaults to None and is infinite.
-
-        """
-        T = self.start_timeout(timeout)
-        while self.is_alive() and not T.is_out:
-            self.debug('Waiting for driver to finish...')
-            self.sleep()
-        self.stop_timeout()
+        self.debug('')

@@ -1,13 +1,6 @@
 extern "C" {
-#include <sys/stat.h>        /* For mode constants */
-#include <sys/msg.h>
-#include <sys/sem.h>
-#include <sys/shm.h>
-#include <stdlib.h>
 #include "PsiInterface.h"
 };
-#include <string>
-#include <regex>
 
 /*! @brief Flag for checking if PsiInterface.hpp has already been included.*/
 #ifndef CISINTERFACE_HPP_
@@ -64,11 +57,11 @@ public:
     See cis_recv in PsiInterface.h for additional details.
     @param[out] data character pointer to allocated buffer where the message
     should be saved.
-    @param[in] len int length of the allocated message buffer in bytes.
+    @param[in] len size_t length of the allocated message buffer in bytes.
     @returns int -1 if message could not be received. Length of the received
     message if message was received.
    */
-  int recv(char *data, const int len) { return cis_recv(_pi, data, len); }
+  int recv(char *data, const size_t len) { return cis_recv(_pi, data, len); }
 
   /*!
     @brief Receive and parse a message shorter than CIS_MSG_MAX from the input
@@ -98,11 +91,11 @@ public:
     See cis_recv_nolimit in PsiInterface.h for additional details.
     @param[out] data character pointer to allocated buffer where the message
     should be saved.
-    @param[in] len int length of the allocated message buffer in bytes.
+    @param[in] len size_t length of the allocated message buffer in bytes.
     @returns int -1 if message could not be received. Length of the received
     message if message was received.
    */
-  int recv_nolimit(char **data, const int len) {
+  int recv_nolimit(char **data, const size_t len) {
     return cis_recv_nolimit(_pi, data, len);
   }
   
@@ -183,10 +176,10 @@ public:
     If the message is larger than CIS_MSG_MAX an error code will be returned.
     See cis_send in PsiInterface.h for details.
     @param[in] data character pointer to message that should be sent.
-    @param[in] len int length of message to be sent.
+    @param[in] len size_t length of message to be sent.
     @returns int 0 if send succesfull, -1 if send unsuccessful.
   */
-  int send(const char *data, const int len) {
+  int send(const char *data, const size_t len) {
     return cis_send(_pi, data, len);
   }
 
@@ -215,10 +208,10 @@ public:
     @brief Send a message larger than CIS_MSG_MAX to the output queue.
     See cis_send_nolimit in PsiInterface.h for details.
     @param[in] data character pointer to message that should be sent.
-    @param[in] len int length of message to be sent.
+    @param[in] len size_t length of message to be sent.
     @returns int 0 if send succesfull, -1 if send unsuccessful.
   */
-  int send_nolimit(const char *data, const int len) {
+  int send_nolimit(const char *data, const size_t len) {
     return cis_send_nolimit(_pi, data, len);
   }
   
@@ -272,7 +265,7 @@ public:
     @param[in] inFormat character pointer to format that should be used for
     parsing input.
    */
-  CisRpc(const char *name, char *outFormat, char *inFormat) :
+  CisRpc(const char *name, const char *outFormat, const char *inFormat) :
     _pi(cisRpc(name, outFormat, inFormat)) {}
 
   /*! @brief Empty constructor for inheritance. */
@@ -349,7 +342,7 @@ public:
     @param[in] outFormat character pointer to format that should be used for
     formatting output.
    */
-  CisRpcServer(const char *name, char *inFormat, char *outFormat) :
+  CisRpcServer(const char *name, const char *inFormat, const char *outFormat) :
     CisRpc(cisRpcServer(name, inFormat, outFormat)) {}
 
   /*!
@@ -380,7 +373,7 @@ public:
     @param[in] inFormat character pointer to format that should be used for
     parsing input.
    */
-  CisRpcClient(const char *name, char *outFormat, char *inFormat) :
+  CisRpcClient(const char *name, const char *outFormat, const char *inFormat) :
     CisRpc(cisRpcClient(name, outFormat, inFormat)) {}
 
   /*!
@@ -543,12 +536,14 @@ public:
 		     const int src_type = 1) :
     CisAsciiFileInput(cisAsciiTableInput(name, as_array, src_type)) {
     char *fmt = ((asciiTable_t*)(pi().serializer.info))->format_str;
+    // printf("format = %s\n", fmt);
     // For input, remove precision from floats to avoid confusing vsscanf
     // C version
-    // int ret = simplify_formats(fmt, CIS_MSG_MAX);
-    const char re[CIS_MSG_MAX] = "%([[:digit:]]+\\$)?[+-]?([ 0]|'.{1})?-?[[:digit:]]*(\\.[[:digit:]]+)?([lhjztL])*([eEfFgG])";
-    int ret = regex_replace_sub(fmt, CIS_MSG_MAX,
-    				re, "%$4$5", 0);
+    int ret = simplify_formats(fmt, CIS_MSG_MAX);
+    // const char re[CIS_MSG_MAX] = "%([[:digit:]]+\\$)?[+-]?([ 0]|'.{1})?-?[[:digit:]]*(\\.[[:digit:]]+)?([lhjztL])*([eEfFgG])";
+    // int ret = regex_replace_sub(fmt, CIS_MSG_MAX,
+    // 				re, "%$4$5", 0);
+    // printf("format = %s\n", fmt);
     if (ret < 0)
       printf("CisAsciiTableInput(%s): could not fix format\n", name);
 
@@ -566,11 +561,11 @@ public:
   //   @brief Recv a nolimit message from a table input queue.
   //   @param[in] data character pointer to pointer to memory where received
   //   message should be stored. It does not need to be allocated, only defined.
-  //   @param[in] len int length of allocated buffer.
+  //   @param[in] len size_t length of allocated buffer.
   //   @returns int -1 if message could not be received. Length of the received
   //   message if message was received.
   //  */
-  // int recv(char **data, const int len) {
+  // int recv(char **data, const size_t len) {
   //   return cis_recv_nolimit(_pi, data, len);
   // }
   

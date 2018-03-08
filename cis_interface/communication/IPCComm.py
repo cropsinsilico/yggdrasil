@@ -1,13 +1,33 @@
 import sys
-import sysv_ipc
-import threading
+import logging
 from subprocess import Popen, PIPE
-from cis_interface import platform
-from cis_interface.tools import CIS_MSG_MAX, is_ipc_installed
-from cis_interface.communication import CommBase
-
+from cis_interface import platform, tools
+from cis_interface.communication import CommBase, AsyncComm
+try:
+    import sysv_ipc
+    _ipc_installed = tools._ipc_installed
+except ImportError:  # pragma: windows
+    logging.warn("Could not import sysv_ipc. " +
+                 "IPC support will be disabled.")
+    sysv_ipc = None
+    _ipc_installed = False
 
 _registered_queues = {}
+
+
+def cleanup_comms():
+    r"""Close registered queues."""
+    global _registered_queues
+    count = 0
+    for v in _registered_queues.values():
+        try:
+            v.remove()
+            count = 0
+        except sysv_ipc.ExistentialError:
+            pass
+    _registered_queues = dict()
+    # logging.info("%d queues closed." % count)
+    return count
 
 
 def get_queue(qid=None):
@@ -21,15 +41,19 @@ def get_queue(qid=None):
         :class:`sysv_ipc.MessageQueue`: Message queue.
 
     """
-    global _registered_queues
-    kwargs = dict(max_message_size=CIS_MSG_MAX)
-    if qid is None:
-        kwargs['flags'] = sysv_ipc.IPC_CREX
-    mq = sysv_ipc.MessageQueue(qid, **kwargs)
-    key = str(mq.key)
-    if key not in _registered_queues:
-        _registered_queues[key] = mq
-    return mq
+    if _ipc_installed:
+        global _registered_queues
+        kwargs = dict(max_message_size=tools.get_CIS_MSG_MAX())
+        if qid is None:
+            kwargs['flags'] = sysv_ipc.IPC_CREX
+        mq = sysv_ipc.MessageQueue(qid, **kwargs)
+        key = str(mq.key)
+        if key not in _registered_queues:
+            _registered_queues[key] = mq
+        return mq
+    else:  # pragma: windows
+        logging.warning("IPC not installed. Queue cannot be returned.")
+        return None
 
 
 def remove_queue(mq):
@@ -58,18 +82,22 @@ def ipcs(options=[]):
             list.
 
     Returns:
-        list: Captured output.
+        str: Captured output.
 
     """
-    cmd = ' '.join(['ipcs'] + options)
-    p = Popen(cmd, stdin=PIPE, stdout=PIPE, stderr=PIPE, shell=True)
-    output, err = p.communicate()
-    exit_code = p.returncode
-    if exit_code != 0:  # pragma: debug
-        if not err.isspace():
-            print(err.decode('utf-8'))
-        raise Exception("Error on spawned process. See output.")
-    return output.decode('utf-8')
+    if _ipc_installed:
+        cmd = ' '.join(['ipcs'] + options)
+        p = Popen(cmd, stdin=PIPE, stdout=PIPE, stderr=PIPE, shell=True)
+        output, err = p.communicate()
+        exit_code = p.returncode
+        if exit_code != 0:  # pragma: debug
+            if not err.isspace():
+                print(err.decode('utf-8'))
+            raise Exception("Error on spawned process. See output.")
+        return output.decode('utf-8')
+    else:  # pragma: windows
+        logging.warn("IPC not installed. ipcs cannot be run.")
+        return ''
 
 
 def ipc_queues():
@@ -119,16 +147,19 @@ def ipcrm(options=[]):
             list.
 
     """
-    cmd = ' '.join(['ipcrm'] + options)
-    p = Popen(cmd, stdin=PIPE, stdout=PIPE, stderr=PIPE, shell=True)
-    output, err = p.communicate()
-    exit_code = p.returncode
-    if exit_code != 0:  # pragma: debug
-        if not err.isspace():
-            print(err.decode('utf-8'))
-        raise Exception("Error on spawned process. See output.")
-    if not output.isspace():
-        print(output.decode('utf-8'))
+    if _ipc_installed:
+        cmd = ' '.join(['ipcrm'] + options)
+        p = Popen(cmd, stdin=PIPE, stdout=PIPE, stderr=PIPE, shell=True)
+        output, err = p.communicate()
+        exit_code = p.returncode
+        if exit_code != 0:  # pragma: debug
+            if not err.isspace():
+                print(err.decode('utf-8'))
+            raise Exception("Error on spawned process. See output.")
+        if not output.isspace():
+            print(output.decode('utf-8'))
+    else:  # pragma: windows
+        logging.warn("IPC not installed. ipcrm cannot be run.")
 
 
 def ipcrm_queues(queue_keys=None):
@@ -139,49 +170,49 @@ def ipcrm_queues(queue_keys=None):
             be removed. Defaults to all existing queues.
 
     """
-    if queue_keys is None:
-        queue_keys = ipc_queues()
-    if isinstance(queue_keys, str):
-        queue_keys = [queue_keys]
-    for q in queue_keys:
-        ipcrm(["-Q %s" % q])
+    if _ipc_installed:
+        if queue_keys is None:
+            queue_keys = ipc_queues()
+        if isinstance(queue_keys, str):
+            queue_keys = [queue_keys]
+        for q in queue_keys:
+            ipcrm(["-Q %s" % q])
+    else:  # pragma: windows
+        logging.warn("IPC not installed. ipcrm cannot be run.")
 
 
-class IPCComm(CommBase.CommBase):
+class IPCServer(CommBase.CommServer):
+    r"""IPC server object for cleaning up server queue."""
+
+    def terminate(self, *args, **kwargs):
+        global _registered_queues
+        if self.srv_address in _registered_queues:
+            q = get_queue(int(self.srv_address))
+            try:
+                remove_queue(q)
+            except (KeyError, sysv_ipc.ExistentialError):  # pragma: debug
+                pass
+        super(IPCServer, self).terminate(*args, **kwargs)
+
+
+class IPCComm(AsyncComm.AsyncComm):
     r"""Class for handling I/O via IPC message queues.
 
-    Args:
-        name (str): The name of the message queue.
-        dont_open (bool, optional): If True, the connection will not be opened.
-            Defaults to False.
-        **kwargs: Additional keyword arguments are passed to CommBase.
-        
     Attributes:
         q (:class:`sysv_ipc.MessageQueue`): Message queue.
-        backlog_thread (threading.Thread): Thread that will handle sending
-            or receiving backlogged messages.
-        backlog_lock (threading.RLock): Lock for handling access of backlogs
-            between threads.
         
     """
-    def __init__(self, name, dont_open=False, **kwargs):
-        super(IPCComm, self).__init__(name, dont_open=True, **kwargs)
-        self.q = None
-        self._bound = False
-        self._backlog_recv = []
-        self._backlog_send = []
-        self.backlog_thread = threading.Thread(target=self.run_backlog)
-        self.backlog_thread.daemon = True
-        self.backlog_lock = threading.RLock()
-        if dont_open:
-            self.bind()
-        else:
-            self.open()
 
+    def _init_before_open(self, **kwargs):
+        r"""Initialize empty queue and server class."""
+        self.q = None
+        self._server_class = IPCServer
+        super(IPCComm, self)._init_before_open(**kwargs)
+            
     @classmethod
     def is_installed(cls):
         r"""bool: Is the comm installed."""
-        return is_ipc_installed()
+        return _ipc_installed
 
     @property
     def maxMsgSize(self):
@@ -203,282 +234,137 @@ class IPCComm(CommBase.CommBase):
 
     def bind(self):
         r"""Bind to random queue if address is generate."""
-        self._bound = False
-        if self.address == 'generate':
-            self._bound = True
-            q = get_queue()
-            self.address = str(q.key)
+        if not self._bound:
+            if self.address == 'generate':
+                self._bound = True
+                q = get_queue()
+                self.address = str(q.key)
+        super(IPCComm, self).bind()
 
     def open_after_bind(self):
         r"""Open the connection by getting the queue from the bound address."""
         qid = int(self.address)
         self.q = get_queue(qid)
 
-    def open(self):
-        r"""Open the connection by connecting to the queue."""
-        super(IPCComm, self).open()
-        if not self.is_open:
-            if not self._bound:
-                self.bind()
+    def _open_direct(self):
+        r"""Open the queue."""
+        if not self.is_open_direct:
+            self.bind()
             self.open_after_bind()
-            self.backlog_thread.start()
             self.debug("qid: %s", self.q.key)
-            
-    def close(self, wait_for_send=False):
-        r"""Close the connection.
 
-        Args:
-            wait_for_send (bool, optional): If True, the thread will block
-                until the queue is empty. Defaults to False.
-
-        """
-        if self._bound and not self.is_open:
+    def _close_direct(self, skip_remove=False):
+        r"""Close the queue."""
+        if self._bound and (self.q is None):
             try:
                 self.open_after_bind()
             except sysv_ipc.ExistentialError:  # pragma: debug
                 self.q = None
                 self._bound = False
-        if self.is_open and not wait_for_send:
-            # if wait_for_send:
-            #     while self.n_msg_queued > 0:
-            #         self.verbose_debug("Waiting for messages to be dequeued.")
-            #         self.sleep()
+        # Remove the queue
+        if (self.q is not None) and (not skip_remove) and (not self.is_client):
             try:
                 remove_queue(self.q)
             except (KeyError, sysv_ipc.ExistentialError):
                 pass
-            self.q = None
-            self._bound = False
-        super(IPCComm, self).close(wait_for_send=wait_for_send)
-            
-    @property
-    def is_open(self):
-        r"""bool: True if the queue is not None."""
-        return (self.q is not None)
+        self.q = None
+        self._bound = False
 
     @property
-    def n_msg_queued(self):
-        r"""int: Number of messages in the queue."""
-        if self.is_open:
+    def is_open_direct(self):
+        r"""bool: True if the queue is not None."""
+        if self.q is None:
+            return False
+        try:
+            self.q.current_messages
+        except sysv_ipc.ExistentialError:  # pragma: debug
+            self._close_direct()
+            return False
+        return True
+
+    def confirm_send(self, noblock=False):
+        r"""Confirm that sent message was received."""
+        if noblock:
+            return True
+        return (self.n_msg_direct_send == 0)
+
+    def confirm_recv(self, noblock=False):
+        r"""Confirm that message was received."""
+        return True
+
+    @property
+    def n_msg_direct_send(self):
+        r"""int: Number of messages in the queue to send."""
+        if self.is_open_direct:
             try:
                 return self.q.current_messages
             except sysv_ipc.ExistentialError:  # pragma: debug
-                self.close()
+                self._close_direct()
                 return 0
         else:
             return 0
         
     @property
-    def n_msg_backlogged(self):
-        r"""int: Number of backlogged messages."""
-        if self.is_open:
-            return len(self.backlog_recv)
-        else:
-            return 0
+    def n_msg_direct_recv(self):
+        r"""int: Number of messages in the queue to recv."""
+        return self.n_msg_direct_send
 
-    @property
-    def n_msg(self):
-        r"""int: Number of messages in the queue and backlogged."""
-        return self.n_msg_backlogged
-        # return self.n_msg_queued + self.n_msg_backlogged
-
-    @property
-    def backlog_recv(self):
-        r"""list: Messages that have been received."""
-        with self.backlog_lock:
-            return self._backlog_recv
-
-    @property
-    def backlog_send(self):
-        r"""list: Messages that should be sent."""
-        with self.backlog_lock:
-            return self._backlog_send
-
-    def add_backlog_recv(self, msg):
-        r"""Add a message to the backlog of received messages.
-
-        Args:
-            msg (str): Received message that should be backlogged.
-
-        """
-        with self.backlog_lock:
-            self.debug("Added %d bytes to recv backlog.", len(msg))
-            self._backlog_recv.append(msg)
-
-    def add_backlog_send(self, msg):
-        r"""Add a message to the backlog of messages to be sent.
-
-        Args:
-            msg (str): Message that should be backlogged for sending.
-
-        """
-        with self.backlog_lock:
-            self.debug("Added %d bytes to send backlog.", len(msg))
-            self._backlog_send.append(msg)
-
-    def pop_backlog_recv(self):
-        r"""Pop a message from the front of the recv backlog.
-
-        Returns:
-            str: First backlogged recv message.
-
-        """
-        with self.backlog_lock:
-            msg = self._backlog_recv.pop(0)
-            self.debug("Popped %d bytes from recv backlog.", len(msg))
-        return msg
-
-    def pop_backlog_send(self):
-        r"""Pop a message from the front of the send backlog.
-
-        Returns:
-            str: First backlogged send message.
-
-        """
-        with self.backlog_lock:
-            msg = self._backlog_send.pop(0)
-            self.debug("Popped %d bytes from send backlog.", len(msg))
-        return msg
-
-    def run_backlog(self):
-        r"""Continue checking for buffered messages to be sent/recveived."""
-        flag = True
-        while self.is_open and flag:
-            if self.direction == 'recv':
-                flag = self.recv_backlog()
-            else:
-                flag = self.send_backlog()
-            self.sleep()
-
-    def send_backlog(self):
-        r"""Send a message from the send backlog to the queue."""
-        if len(self.backlog_send) == 0:
-            return True
-        try:
-            flag = self._send(self.backlog_send[0], no_backlog=True)
-            if flag:
-                self.pop_backlog_send()
-        except sysv_ipc.BusyError:  # pragma: debug
-            self.debug('Queue full, failed to send backlogged message.')
-        return True
-
-    def recv_backlog(self):
-        r"""Check for any messages in the queue and add them to the recv
-        backlog."""
-        flag, data = self._recv(no_backlog=True)
-        if flag and data:
-            self.add_backlog_recv(data)
-            self.debug('Backlogged received message.')
-        return flag
-
-    def _send(self, payload, no_backlog=False):
-        r"""Send a message to the IPC queue.
+    def _send_direct(self, payload):
+        r"""Send a message to the comm directly.
 
         Args:
             payload (str): Message to send.
-            no_backlog (bool, optional): If False, any messages that can't be
-                sent because the queue is full will be added to a list of
-                messages to be sent once the queue is no longer full. If True,
-                messages are not backlogged and an error will be raised if the
-                queue is full.
 
         Returns:
             bool: Success or failure of sending the message.
 
         """
-        if not self.is_open:  # pragma: debug
+        if not self.is_open_direct:  # pragma: debug
             return False
         try:
-            if no_backlog or len(self.backlog_send) == 0:
-                self.debug('Sending %d bytes', len(payload))
-                self.q.send(payload, block=False)
-            else:  # pragma: debug
-                raise sysv_ipc.BusyError(
-                    'Backlogged messages must be sent first')
+            self.debug('Sending %d bytes', len(payload))
+            self.q.send(payload, block=False)
+            self.debug('Sent %d bytes', len(payload))
         except sysv_ipc.BusyError:
-            if no_backlog:
-                self.debug('Could not send %d bytes', len(payload))
-                return False
-            else:
-                self.add_backlog_send(payload)
-                self.debug('%d bytes backlogged', len(payload))
+            self.debug("IPC Queue Full")
+            raise AsyncComm.AsyncTryAgain
         except OSError:  # pragma: debug
             self.debug("Send failed")
-            self.close()
+            self._close_direct()
             return False
         except AttributeError:  # pragma: debug
             if self.is_closed:
+                self.debug("Comm closed")
                 return False
             raise
         return True
 
-    def _recv(self, timeout=None, no_backlog=False):
-        r"""Receive a message from the IPC queue.
-
-        Args:
-            timeout (float, optional): Time in seconds to wait for a message.
-                Defaults to self.recv_timeout.
-            no_backlog (bool, optional): If False and there are messages in the
-                receive backlog, they will be returned first. Otherwise the
-                queue is checked for a message.
+    def _recv_direct(self):
+        r"""Receive a message from the comm directly.
 
         Returns:
             tuple (bool, str): The success or failure of receiving a message
                 and the message received.
 
         """
-        # If no backlog, receive from queue
-        if no_backlog:
-            # Return False if the queue is closed
-            if self.is_closed:  # pragma: debug
+        # Receive message
+        self.debug("Message ready, reading it.")
+        try:
+            data, _ = self.q.receive()  # ignore ident
+            self.debug("Received %d bytes", len(data))
+        except sysv_ipc.ExistentialError:  # pragma: debug
+            self.debug("sysv_ipc.ExistentialError: closing")
+            self._close_direct()
+            return (False, self.empty_msg)
+        except AttributeError:  # pragma: debug
+            if self.is_closed:
                 self.debug("Queue closed")
                 return (False, self.empty_msg)
-            # Return True, '' if there are no messages
-            if self.n_msg_queued == 0:
-                self.verbose_debug("No messages waiting.")
-                return (True, self.empty_msg)
-            # Receive message
-            self.debug("Message ready, reading it.")
-            try:
-                data, _ = self.q.receive()  # ignore ident
-                self.debug("Received %d bytes", len(data))
-            except sysv_ipc.ExistentialError:  # pragma: debug
-                self.debug("sysv_ipc.ExistentialError: closing")
-                self.close()
-                return (False, self.empty_msg)
-            except AttributeError:  # pragma: debug
-                if self.is_closed:
-                    self.debug("Queue closed")
-                    return (False, self.empty_msg)
-                raise
-            return (True, data)
-        else:
-            # Sleep until there is a message
-            if timeout is None:
-                timeout = self.recv_timeout
-            Tout = self.start_timeout(timeout)
-            while self.n_msg_backlogged == 0 and self.is_open and (not Tout.is_out):
-                # self.debug("No data, sleeping")
-                self.sleep()
-            self.stop_timeout()
-            # Return False if the queue is closed
-            if self.is_closed:  # pragma: debug
-                self.debug("Queue closed")
-                return (False, self.empty_msg)
-            # Return True, '' if there are no messages
-            if self.n_msg_backlogged == 0:
-                self.verbose_debug("No messages waiting.")
-                return (True, self.empty_msg)
-            # Return backlogged message
-            # if len(self.backlog_recv) > 0:
-            self.debug('Returning backlogged received message')
-            return (True, self.pop_backlog_recv())
+            raise
+        return (True, data)
 
     def purge(self):
         r"""Purge all messages from the comm."""
-        with self.backlog_lock:
-            self._backlog_recv = []
-            self._backlog_send = []
-        while self.n_msg_queued > 0:  # pragma: debug
-            _, _ = self.q.receive()
         super(IPCComm, self).purge()
+        while self.n_msg_direct > 0:  # pragma: debug
+            _, _ = self.q.receive()

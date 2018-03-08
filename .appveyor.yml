@@ -14,6 +14,8 @@ branches:
 # Do not build on tags (GitHub and BitBucket)
 skip_tags: true
 
+os: Visual Studio 2015
+
 #---------------------------------#
 #    environment configuration    #
 #---------------------------------#
@@ -22,19 +24,40 @@ environment:
 
   global:
     PYTHON: "C:\\Miniconda3-x64"
+    INSTALLZMQ: 1
+    INSTALLRMQ: 0
+    APPVEYOR_SAVE_CACHE_ON_ERROR: true
+
+  erlang_download_url: "http://erlang.org/download/otp_win64_20.2.exe"
+  erlang_exe_path: "C:\\Users\\appveyor\\erlang.exe"
+  erlang_home_dir: "C:\\Users\\appveyor\\erlang"
+
+  rabbitmq_installer_download_url: "https://github.com/rabbitmq/rabbitmq-server/releases/download/v3.7.3/rabbitmq-server-3.7.3.exe"
+  rabbitmq_installer_path: "C:\\Users\\appveyor\\rabbitmq-server-3.7.3.exe"
 
   matrix:
-    - PYTHON_VERSION: "2.7"
-    - PYTHON_VERSION: "3.6"
-
-platform:
-  -x64
+    - platform: x64
+      PYTHON_VERSION: "2.7"
+      INSTALLZMQ: 0
+    - platform: x64
+      PYTHON_VERSION: "2.7"
+    - platform: x64
+      PYTHON_VERSION: "3.6"
 
 install:
+  - "SET MSVCVER=%APPVEYOR_BUILD_WORKER_IMAGE:~-2,2%"
+  - "if %MSVCVER% gtr 11 set /a MSVCVER = MSVCVER - 1"
+  - "SET VSINSTALLDIR=%ProgramFiles(x86)%\\Microsoft Visual Studio %MSVCVER%.0\\"
   - "SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%"
   - "SET MPLBACKEND=agg"
+  - "SET ZMQINSTALLDIR=%APPVEYOR_BUILD_FOLDER%"
 
-  # Install the build and runtime dependencies of the project.
+  # Setup Visual C++ toolset
+  # TODO: Generic case. This is specific to 64bit VS 2015/2017 (14.0/16.0)
+  - if "%MSVCVER%" == "16" if /I "%PLATFORM%" == "x64" call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars64.bat"
+  - if "%MSVCVER%" == "14" if /I "%PLATFORM%" == "x64" call "C:\Program Files\Microsoft SDKs\Windows\v7.1\Bin\SetEnv.cmd" /x64 /debug
+  - if "%MSVCVER%" == "14" if /I "%PLATFORM%" == "x64" call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" amd64
+
   # Create a conda environment
   - "conda update -q --yes conda"
   - "conda create -q --yes -n test python=%PYTHON_VERSION%"
@@ -43,20 +66,49 @@ install:
   # Check that we have the expected version of Python
   - "python --version"
 
+  # Upgrade pip and setuptools and wheel to get clean install
+  - "pip install --upgrade pip"
+  - "pip install --upgrade wheel"
+  - "pip install --upgrade setuptools"
+
   # Install ZeroMQ
-  - "ci/install-czmq-windows.bat"
+  - if "%INSTALLZMQ%" == "1" call "ci\\install-czmq-windows.bat"
 
   # Install & start RabbitMQ
-  - "ci/install-rmqserver-windows.bat"  
-  - "ci/start-rmqserver-windows.bat"  
+  # - "if %INSTALLRMQ% == 1 ci\\install-rmqserver-windows.bat"  
+  # - "if %INSTALLRMQ% == 1 ci\\start-rmqserver-windows.bat"  
+  - "if %INSTALLRMQ% == 1 pip install pika"
+  - ps: If ($INSTALLRMQ -eq 1) { $webclient=New-Object System.Net.WebClient }
+  - if "%INSTALLRMQ%" == "1" ECHO Downloading Erlang...
+  - ps: If ($INSTALLRMQ -eq 1) { $webclient.DownloadFile("$env:erlang_download_url", "$env:erlang_exe_path") }
+  - if "%INSTALLRMQ%" == "1" ECHO Starting Erlang...
+  - if "%INSTALLRMQ%" == "1" start /B /WAIT %erlang_exe_path% /S /D=%erlang_home_dir%
+  - if "%INSTALLRMQ%" == "1" set ERLANG_HOME=%erlang_home_dir%
+  - if "%INSTALLRMQ%" == "1" ECHO Downloading RabbitMQ...
+  - ps: If ($INSTALLRMQ -eq 1) { $webclient.DownloadFile("$env:rabbitmq_installer_download_url", "$env:rabbitmq_installer_path") }
+  - if "%INSTALLRMQ%" == "1" ECHO Installing and starting RabbitMQ with default config...
+  - if "%INSTALLRMQ%" == "1" start /B /WAIT %rabbitmq_installer_path% /S
+  - ps: If ($INSTALLRMQ -eq 1) { (Get-Service -Name RabbitMQ).Status }
 
-  # Install specified version of numpy and dependencies
-  - "conda install --yes -c conda-forge numpy nose coverage coveralls
-  flake8 setuptools pystache pika pyyaml astropy scipy zmq"
-  - "pip install sysv_ipc"
+  # Install testing dependencies
+  - "pip install coverage coveralls codecov flake8"
 
-  # Install cis_interface
+  # Install dependencies using conda/pip
+  # - "conda install --yes -c conda-forge numpy nose coverage coveralls codecov flake8"
+  # - "conda install --yes -c conda-forge pystache pyyaml astropy scipy pika"
+  # - "pip install zmq"
+
+  # Install cis_interface allowing pip to resolve requirements
   - "pip install -e ."
+
+cache:
+  - '%LOCALAPPDATA%\pip\Cache -> setup.py'
+  - 'C:\Users\appveyor\.cis_interface.cfg -> setup.py'
+  - libsodium    -> ci\install-czmq_windows.bat
+  - libzmq       -> ci\install-czmq_windows.bat
+  - build_libzmq -> ci\install-czmq_windows.bat
+  - czmq         -> ci\install-czmq_windows.bat
+  - build_czmq   -> ci\install-czmq_windows.bat
 
 # Not a .NET project
 build: false
@@ -65,7 +117,9 @@ before_test:
   - "flake8 cis_interface"
 
 test_script:
-  - "nosetests --nologcapture --with-coverage --cover-package=cis_interface -svx"
+  # - "nosetests --nologcapture --with-coverage --cover-package=cis_interface -svx cis_interface/tests/test_runner.py"
+  - "nosetests -svx --nologcapture --with-coverage --cover-package=cis_interface cis_interface"
+
 
 after_test:
-  - "coveralls"
+  - "codecov"

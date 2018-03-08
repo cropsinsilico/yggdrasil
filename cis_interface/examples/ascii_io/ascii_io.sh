@@ -39,6 +39,6 @@ esac
 
 cisrun $yaml
 
-cat /tmp/output_file.txt
-cat /tmp/output_table.txt
-cat /tmp/output_array.txt
+cat "${TMPDIR}output_file.txt"
+cat "${TMPDIR}output_table.txt"
+cat "${TMPDIR}output_array.txt"

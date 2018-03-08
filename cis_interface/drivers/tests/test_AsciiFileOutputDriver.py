@@ -36,9 +36,8 @@ class TestAsciiFileOutputDriver(TestAsciiFileOutputParam,
 
     """
 
-    def setup(self):
-        r"""Create a driver instance and start the driver."""
-        super(parent.TestFileOutputDriver, self).setup()
+    def send_file_contents(self):
+        r"""Send file contents to driver."""
         self.send_comm.send(self.fmt_str_line)
         for line in self.file_lines:
             self.send_comm.send(line)

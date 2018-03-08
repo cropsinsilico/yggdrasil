@@ -1,5 +1,6 @@
 import os
 import tempfile
+from cis_interface import backwards, platform
 from cis_interface.communication import CommBase
 
 
@@ -37,10 +38,12 @@ class FileComm(CommBase.CommBase):
             raise ValueError("read_meth '%s' not supported." % read_meth)
         self.read_meth = read_meth
         self.append = append
+        kwargs.setdefault('close_on_eof_send', True)
         super(FileComm, self).__init__(name, **kwargs)
         if in_temp:
             self.address = os.path.join(tempfile.gettempdir(), self.address)
         self.address = os.path.abspath(self.address)
+        self.is_file = True
 
     @property
     def maxMsgSize(self):
@@ -67,9 +70,13 @@ class FileComm(CommBase.CommBase):
             else:
                 self.fd = open(self.address, 'wb')
 
-    def _close(self):
+    def _file_close(self):
         if self.is_open:
-            os.fsync(self.fd.fileno())
+            try:
+                self.fd.flush()
+                os.fsync(self.fd.fileno())
+            except OSError:  # pragma: debug
+                pass
             self.fd.close()
         self.fd = None
 
@@ -81,13 +88,13 @@ class FileComm(CommBase.CommBase):
             _N_FILES += 1
         self._open()
 
-    def close(self, *args, **kwargs):
+    def _close(self, *args, **kwargs):
         r"""Close the file."""
         global _N_FILES
         if self.is_open:
             _N_FILES -= 1
-        self._close()
-        super(FileComm, self).close(*args, **kwargs)
+        self._file_close()
+        super(FileComm, self)._close(*args, **kwargs)
 
     def remove_file(self):
         r"""Remove the file."""
@@ -98,31 +105,43 @@ class FileComm(CommBase.CommBase):
     @property
     def is_open(self):
         r"""bool: True if the connection is open."""
-        return (self.fd is not None)
+        return (self.fd is not None) and (not self.fd.closed)
 
     @property
     def remaining_bytes(self):
         r"""int: Remaining bytes in the file."""
         if self.is_closed or self.direction == 'send':
             return 0
-        curpos = self.fd.tell()
-        self.fd.seek(0, os.SEEK_END)
-        endpos = self.fd.tell()
-        self.fd.seek(curpos)
+        try:
+            curpos = self.fd.tell()
+            self.fd.seek(0, os.SEEK_END)
+            endpos = self.fd.tell()
+            self.fd.seek(curpos)
+        except ValueError:  # pragma: debug
+            return 0
         return endpos - curpos
 
     @property
-    def n_msg(self):
+    def n_msg_recv(self):
         r"""int: The number of messages in the file."""
-        if self.is_closed or self.direction == 'send':
+        if self.is_closed:
             return 0
-        curpos = self.fd.tell()
-        out = 0
-        flag, msg = self._recv()
-        while len(msg) != 0 and msg != self.eof_msg:
-            out += 1
-            flag, msg = self._recv()
-        self.fd.seek(curpos)
+        if self.read_meth == 'read':
+            return int(self.remaining_bytes > 0)
+        elif self.read_meth == 'readline':
+            try:
+                curpos = self.fd.tell()
+                out = 0
+                flag, msg = self._recv()
+                while len(msg) != 0 and msg != self.eof_msg:
+                    out += 1
+                    flag, msg = self._recv()
+                self.fd.seek(curpos)
+            except ValueError:  # pragma: debug
+                out = 0
+        else:  # pragma: debug
+            self.error('Unsupported read_meth: %s', self.read_meth)
+            out = 0
         return out
 
     def on_send_eof(self):
@@ -132,9 +151,10 @@ class FileComm(CommBase.CommBase):
             bool: False so that message not sent.
 
         """
+        flag = super(FileComm, self).on_send_eof()
         self.fd.flush()
-        self.close()
-        return False
+        # self.close()
+        return flag
 
     def _send(self, msg):
         r"""Write message to a file.
@@ -146,7 +166,8 @@ class FileComm(CommBase.CommBase):
             bool: Success or failure of writing to the file.
 
         """
-        self.fd.write(msg)
+        if msg != self.eof_msg:
+            self.fd.write(msg)
         self.fd.flush()
         return True
 
@@ -165,8 +186,14 @@ class FileComm(CommBase.CommBase):
             out = self.fd.read()
         elif self.read_meth == 'readline':
             out = self.fd.readline()
+        else:  # pragma: debug
+            self.error('Unsupported read_meth: %s', self.read_meth)
+            out = ''
         if len(out) == 0:
             out = self.eof_msg
+        else:
+            out = out.replace(backwards.unicode2bytes(platform._newline),
+                              backwards.unicode2bytes('\n'))
         return (True, out)
 
     def purge(self):

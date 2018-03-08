@@ -56,7 +56,8 @@ class RPCComm(CommBase.CommBase):
         kwargs['no_suffix'] = True
         if (name in os.environ) or (address is not None):
             super(RPCComm, self).__init__(name, address=address, comm=comm,
-                                          dont_open=True, **kwargs)
+                                          dont_open=True,
+                                          **kwargs)
             ikwargs.setdefault(
                 'address', self.address.split(_rpc_address_split)[0])
             okwargs.setdefault(
@@ -72,7 +73,8 @@ class RPCComm(CommBase.CommBase):
             # Close before raising the error
             try:
                 super(RPCComm, self).__init__(name, address=address, comm=comm,
-                                              dont_open=True, **kwargs)
+                                              dont_open=True,
+                                              **kwargs)
             except BaseException as e:
                 self.close(skip_base=True)
                 raise e
@@ -200,15 +202,12 @@ class RPCComm(CommBase.CommBase):
             self.close()
             raise e
 
-    def close(self, skip_base=False, wait_for_send=False):
+    def _close(self, linger=False):
         r"""Close the connection.
-        
+
         Args:
-            skip_base (bool, optional): If True, close for the parent class will
-                not be called. Defaults to False.
-            wait_for_send (bool, optional): If True, the output comm will be
-                closed such that any pending messages can be sent/received.
-                Defaults to False.
+            linger (bool, optional): If True, drain messages before closing the
+                comm. Defaults to False.
 
         """
         ie = None
@@ -220,15 +219,14 @@ class RPCComm(CommBase.CommBase):
             ie = e
         try:
             if getattr(self, 'ocomm', None) is not None:
-                self.ocomm.close(wait_for_send=wait_for_send)
+                self.ocomm.close(linger=linger)
         except BaseException as e:
             oe = e
         if ie:
             raise ie
         if oe:
             raise oe
-        if not skip_base:
-            super(RPCComm, self).close()
+        super(RPCComm, self)._close(linger=linger)
 
     @property
     def is_open(self):
@@ -241,9 +239,14 @@ class RPCComm(CommBase.CommBase):
     #     return self.icomm.is_closed and self.ocomm.is_closed
 
     @property
-    def n_msg(self):
-        r"""int: The number of messages in the connection."""
-        return self.icomm.n_msg
+    def n_msg_recv(self):
+        r"""int: The number of messages in the input comm."""
+        return self.icomm.n_msg_recv
+
+    @property
+    def n_msg_send(self):
+        r"""int: The number of messages in the output comm."""
+        return self.ocomm.n_msg_send
 
     # SEND METHODS
     def send(self, *args, **kwargs):
@@ -286,10 +289,13 @@ class RPCComm(CommBase.CommBase):
             obj: Output from input comm recv method.
 
         """
+        timeout = kwargs.pop('timeout', self.recv_timeout)
         flag = self.send(*args, **kwargs)
         if not flag:
+            self.debug("Send in call failed")
             return (False, backwards.unicode2bytes(''))
-        return self.recv(timeout=False)
+        self.debug("Sent")
+        return self.recv(timeout=timeout)
 
     def call_nolimit(self, *args, **kwargs):
         r"""Alias for call."""
@@ -307,6 +313,15 @@ class RPCComm(CommBase.CommBase):
     def rpcCall(self, *args, **kwargs):
         r"""Alias for RPCComm.call"""
         return self.call(*args, **kwargs)
+
+    def drain_messages(self, direction=None, **kwargs):
+        r"""Sleep while waiting for messages to be drained."""
+        if direction is None:
+            direction = self.direction
+        if direction == 'send':
+            self.ocomm.drain_messages(direction=direction, **kwargs)
+        else:
+            self.icomm.drain_messages(direction=direction, **kwargs)
 
     def purge(self):
         r"""Purge input and output comms."""

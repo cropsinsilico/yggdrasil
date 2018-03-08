@@ -23,13 +23,16 @@ model:
   outputs:
     - name: outputM_file
       driver: AsciiFileOutputDriver
-      args: /tmp/output_file.txt
+      args: output_file.txt
+      in_temp: True
 
     - name: outputM_table
       driver: AsciiTableOutputDriver
-      args: /tmp/output_table.txt
+      args: output_table.txt
+      in_temp: True
 
     - name: outputM_array
       driver: AsciiTableOutputDriver
-      args: /tmp/output_array.txt
+      args: output_array.txt
       as_array: True
+      in_temp: True

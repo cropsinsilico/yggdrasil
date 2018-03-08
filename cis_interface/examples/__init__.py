@@ -11,7 +11,8 @@ ex_dict = {'gs_lesson1': ('python', 'matlab', 'c', 'cpp'),
            'SaM': ('python', 'matlab', 'c', 'cpp', 'all', 'all_nomatlab'),
            'ascii_io': ('python', 'matlab', 'c', 'cpp', 'all', 'all_nomatlab'),
            'rpcFib': ('python', 'matlab', 'c', 'cpp', 'all', 'all_nomatlab'),
-           'maxMsg': ('python', 'matlab', 'c', 'cpp', 'all', 'all_nomatlab')}
+           'maxMsg': ('python', 'matlab', 'c', 'cpp', 'all', 'all_nomatlab'),
+           'timed_pipe': ('python', 'matlab', 'c', 'cpp')}
 ext_map = {'python': '.py',
            'matlab': '.m',
            'c': '.c',

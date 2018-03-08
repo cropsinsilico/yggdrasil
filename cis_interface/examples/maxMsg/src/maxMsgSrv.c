@@ -1,26 +1,28 @@
 #include "PsiInterface.h"
 #include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <signal.h>
 
 
 int main(int argc, char *argv[]) {  
 
     printf("maxMsgSrv(C): Hello!\n");
     psiRpc_t rpc = psiRpcServer("maxMsgSrv", "%s", "%s");
-    char input[PSI_MSG_MAX];
+    char *input = (char*)malloc(PSI_MSG_BUF);
+    //char input[PSI_MSG_BUF];
 
     while (1) {
-      int ret = rpcRecv(rpc, &input);
+      int ret = rpcRecv(rpc, input);
       if (ret < 0)
-	break;
+        break;
       printf("maxMsgSrv(C): rpcRecv returned %d, input %.10s...\n", ret, input);
-      rpcSend(rpc, input);
+      ret = rpcSend(rpc, input);
+      if (ret < 0) {
+        printf("maxMsgSrv(C): SEND ERROR");
+        break;
+      }
     }
 
-    psi_free(&rpc);
     printf("maxMsgSrv(C): Goodbye!\n");
+    free(input);
     return 0;
 }
 

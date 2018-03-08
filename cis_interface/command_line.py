@@ -1,4 +1,5 @@
 #!/usr/bin/python
+import os
 import sys
 import traceback
 from cis_interface import runner
@@ -6,7 +7,8 @@ from cis_interface.drivers import GCCModelDriver
 
 
 def cisrun():
-    prog = sys.argv[0].split('/')[-1]
+    r"""Start a run."""
+    prog = sys.argv[0].split(os.path.sep)[-1]
     models = sys.argv[1:]
     cisRunner = runner.get_runner(models, cis_debug_prefix=prog)
     try:
@@ -18,6 +20,14 @@ def cisrun():
     print('')
 
 
+def ciscc():
+    r"""Compile C/C++ program."""
+    # prog = sys.argv[0].split(os.path.sep)[-1]
+    src = sys.argv[1:]
+    out = GCCModelDriver.do_compile(src)
+    print("executable: %s" % out)
+
+
 def cc_flags():
     r"""Get the compiler flags necessary for including the interface
     library in a C or C++ program.
@@ -26,7 +36,7 @@ def cc_flags():
         list: The necessary compiler flags and preprocessor definitions.
 
     """
-    return ' '.join(GCCModelDriver._compile_flags)
+    return ' '.join(GCCModelDriver.get_flags()[0])
 
 
 def ld_flags():
@@ -37,7 +47,7 @@ def ld_flags():
         list: The necessary library linking flags.
 
     """
-    return ' '.join(GCCModelDriver._linker_flags)
+    return ' '.join(GCCModelDriver.get_flags()[1])
 
 
 if __name__ == '__main__':

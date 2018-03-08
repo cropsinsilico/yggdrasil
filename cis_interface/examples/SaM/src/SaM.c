@@ -2,9 +2,10 @@
 #include <stdlib.h>
 #include "PsiInterface.h"
 
+#define BSIZE 100
 
-int main(int argc, char *argv[]){
-    const uint BSIZE = 8192; // the max
+
+int main() {
     int ret;
     char adata[BSIZE];
     char bdata[BSIZE];
@@ -43,11 +44,6 @@ int main(int argc, char *argv[]){
       return -1;
     }
     printf("SaM(C): Sent to output\n");
-
-    // Clean up I/O channels
-    psi_free(&in1);
-    psi_free(&in2);
-    psi_free(&out1);
 
     return 0;
 }

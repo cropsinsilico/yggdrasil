@@ -1,5 +1,5 @@
 import os
-from cis_interface import tools
+from cis_interface import tools, platform
 from cis_interface.drivers.ModelDriver import ModelDriver
 from cis_interface.drivers import GCCModelDriver
 
@@ -14,10 +14,9 @@ def setup_environ(compile_flags=[], linker_flags=[]):
             should be set. Defaults to [].
 
     """
-    os.environ['CISCCFLAGS'] = ' '.join(
-        compile_flags + GCCModelDriver._compile_flags)
-    os.environ['CISLDFLAGS'] = ' '.join(
-        linker_flags + GCCModelDriver._linker_flags)
+    _compile_flags, _linker_flags = GCCModelDriver.get_flags()
+    os.environ['CISCCFLAGS'] = ' '.join(compile_flags + _compile_flags)
+    os.environ['CISLDFLAGS'] = ' '.join(linker_flags + _linker_flags)
 
 
 class MakeModelDriver(ModelDriver):
@@ -32,7 +31,7 @@ class MakeModelDriver(ModelDriver):
         args (str, list): Executable that should be created (make target) and
             any arguments for the executable.
         make_command (str, optional): Command that should be used for make.
-            Defaults to 'make'
+            Defaults to 'make' on linux/osx and 'nmake' on windows.
         makefile (str, optional): Path to make file either relative to makedir
             or absolute. Defaults to Makefile.
         makedir (str, optional): Directory where make should be invoked from
@@ -48,12 +47,22 @@ class MakeModelDriver(ModelDriver):
         makedir (str): Directory where make should be invoked from.
         makefile (str): Path to make file either relative to makedir or absolute.
 
+    Raises:
+        RuntimeError: If neither the IPC or ZMQ C libraries are available.
+
     """
-    def __init__(self, name, args, make_command='make', makedir=None,
+    def __init__(self, name, args, make_command=None, makedir=None,
                  makefile=None, **kwargs):
         super(MakeModelDriver, self).__init__(name, args, **kwargs)
-        self.debug()
+        if not tools._c_library_avail:  # pragma: windows
+            raise RuntimeError("No library available for models written in C/C++.")
+        self.debug('')
         self.compiled = False
+        if make_command is None:
+            if platform._is_win:  # pragma: windows
+                make_command = 'nmake'
+            else:
+                make_command = 'make'
         self.target = self.args[0]
         if makedir is None:
             if (makefile is not None) and os.path.isabs(makefile):
@@ -65,7 +74,8 @@ class MakeModelDriver(ModelDriver):
         self.make_command = make_command
         self.makedir = makedir
         self.makefile = makefile
-        self.args[0] = os.path.join(self.makedir, self.target)
+        self.target_file = os.path.join(self.makedir, self.target)
+        self.args[0] = self.target_file
         # Set environment variables
         self.debug("Setting environment variables.")
         compile_flags = ['-DCIS_DEBUG=%d' % self.logger.getEffectiveLevel()]
@@ -73,7 +83,6 @@ class MakeModelDriver(ModelDriver):
         # Compile in a new process
         self.debug("Making target.")
         self.make_target(self.target)
-        self.compiled = True
 
     def make_target(self, target):
         r"""Run the make command to make the target.
@@ -87,9 +96,14 @@ class MakeModelDriver(ModelDriver):
         """
         curdir = os.getcwd()
         os.chdir(self.makedir)
-        make_args = [self.make_command, '-f', self.makefile, target]
+        if self.make_command == 'nmake':  # pragma: windows
+            make_opts = ['/NOLOGO', '/F']
+        else:
+            make_opts = ['-f']
+        make_args = [self.make_command] + make_opts + [self.makefile, target]
         self.debug(' '.join(make_args))
         if not os.path.isfile(self.makefile):
+            os.chdir(curdir)
             raise IOError("Makefile %s not found" % self.makefile)
         comp_process = tools.popen_nobuffer(make_args)
         output, err = comp_process.communicate()
@@ -100,14 +114,8 @@ class MakeModelDriver(ModelDriver):
             raise RuntimeError("Make failed with code %d." % exit_code)
         self.debug('Make complete')
 
-    def run(self):
-        r"""Run the compiled executable if it exists."""
-        if self.compiled:
-            super(MakeModelDriver, self).run()
-        else:  # pragma: debug
-            self.error("Error compiling.")
-
     def cleanup(self):
         r"""Remove compile executable."""
-        self.make_target('clean')
+        if (self.target_file is not None) and os.path.isfile(self.target_file):
+            self.make_target('clean')
         super(MakeModelDriver, self).cleanup()

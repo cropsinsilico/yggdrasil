@@ -2,11 +2,32 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
-#include <unistd.h>
 #include <errno.h>
+#include <time.h>
 
 #ifndef CISTOOLS_H_
 #define CISTOOLS_H_
+
+// Platform specific
+#ifdef _WIN32
+#include "regex_win32.h"
+#include "stdint.h"  // Use local copy for MSVC support
+// Prevent windows.h from including winsock.h
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN
+#endif
+#include <windows.h>
+#include "getline_win32.h"
+#include <process.h>
+#define cis_getpid _getpid
+#define sleep(tsec) Sleep(1000*tsec)
+#define usleep(usec) Sleep(usec/1000)
+#else
+#include "regex_posix.h"
+#include <stdint.h>
+#include <unistd.h>
+#define cis_getpid getpid
+#endif
 
 /*! @brief Maximum message size. */
 #ifdef IPCDEF
@@ -18,13 +39,30 @@
 #define CIS_MSG_EOF "EOF!!!"
 /*! @brief Resonable size for buffer. */
 #define CIS_MSG_BUF 2048
+/*! @brief Sleep time in micro-seconds */
+#define CIS_SLEEP_TIME 250000
 
 /*! @brief Define old style names for compatibility. */
 #define PSI_MSG_MAX CIS_MSG_MAX
-#define PSI_MSG_EOF CIS_MSG_MAX
+#define PSI_MSG_BUF CIS_MSG_BUF
+#define PSI_MSG_EOF CIS_MSG_EOF
 #ifdef PSI_DEBUG
 #define CIS_DEBUG PSI_DEBUG
 #endif
+static int _cis_error_flag = 0;
+
+
+/*!
+  @brief Get an unsigned long seed from the least significant 32bits of a pointer.
+  @param[in] ptr Pointer that should be turned into a seed.
+  @return Unsigned long seed.
+ */
+static inline
+unsigned long ptr2seed(void *ptr) {
+  uint64_t v = (uint64_t)ptr;
+  unsigned long seed = (unsigned long)(v & 0xFFFFFFFFLL);
+  return seed;
+};
 
 
 //==============================================================================
@@ -52,9 +90,10 @@
  */
 static inline
 void cisLog(const char* prefix, const char* fmt, va_list ap) {
-  fprintf(stdout, "%s: %d: ", prefix, getpid());
+  fprintf(stdout, "%s: %d: ", prefix, cis_getpid());
   vfprintf(stdout, fmt, ap);
   fprintf(stdout, "\n");
+  fflush(stdout);
 };
 
 /*!
@@ -100,6 +139,7 @@ void cisError(const char* fmt, ...) {
   va_start(ap, fmt);
   cisLog("ERROR", fmt, ap);
   va_end(ap);
+  _cis_error_flag = 1;
 };
   
 #ifdef CIS_DEBUG
@@ -127,18 +167,54 @@ void cisError(const char* fmt, ...) {
 #endif
 
 /*!
+  @brief Check if a character array matches a message and is non-zero length.
+  @param[in] pattern constant character pointer to string that should be checked.
+  @param[in] buf constant character pointer to string that should be checked.
+  @returns int 1 if buf matches pattern, 0 otherwise.
+ */
+static inline
+int not_empty_match(const char *pattern, const char *buf) {
+  if (buf == NULL)
+    return 0;
+  if (buf[0] == '\0')
+    return 0;
+  if (strcmp(buf, pattern) == 0) {
+    return 1;
+  } else {
+    return 0;
+  }
+};
+
+/*!
   @brief Check if a character array matches the internal EOF message.
   @param[in] buf constant character pointer to string that should be checked.
   @returns int 1 if buf is the EOF message, 0 otherwise.
  */
 static inline
 int is_eof(const char *buf) {
-  if (strcmp(buf, CIS_MSG_EOF) == 0) {
-    return 1;
-  } else {
-    return 0;
-  }
+  return not_empty_match(CIS_MSG_EOF, buf);
 };
+
+/*!
+  @brief Check if a character array matches "recv".
+  @param[in] buf constant character pointer to string that should be checked.
+  @returns int 1 if buf is the "recv" message, 0 otherwise.
+ */
+static inline
+int is_recv(const char *buf) {
+  return not_empty_match("recv", buf);
+};
+
+/*!
+  @brief Check if a character array matches "send".
+  @param[in] buf constant character pointer to string that should be checked.
+  @returns int 1 if buf is the "send" message, 0 otherwise.
+ */
+static inline
+int is_send(const char *buf) {
+  return not_empty_match("send", buf);
+};
+
 
 
 #endif /*CISTOOLS_H_*/

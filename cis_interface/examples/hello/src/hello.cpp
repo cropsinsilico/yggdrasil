@@ -3,10 +3,11 @@
 #include <iostream>
 using namespace std;
 
+#define BSIZE 512 // the max
+
 int main(int argc, char *argv[]) {
   int ret = 1;
-  const int bufsiz0 = 512;
-  char buf[bufsiz0];
+  char buf[BSIZE];
 
   cout << "Hello from C++\n";
   
@@ -18,7 +19,7 @@ int main(int argc, char *argv[]) {
   cout << "hello(CPP): Created I/O channels\n";
 
   // Receive input from the local file
-  ret = inf.recv(buf, bufsiz0);
+  ret = inf.recv(buf, BSIZE);
   if (ret < 0) {
     printf("hello(CPP): ERROR FILE RECV\n");
     return -1;
@@ -35,7 +36,7 @@ int main(int argc, char *argv[]) {
   printf("hello(CPP): Sent to outq\n");
 
   // Receive input from queue
-  ret = inq.recv(buf, bufsiz0);
+  ret = inq.recv(buf, BSIZE);
   if (ret < 0) {
     printf("hello(CPP): ERROR QUEUE RECV\n");
     return -1;

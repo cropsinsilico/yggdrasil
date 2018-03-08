@@ -39,6 +39,7 @@ class ClientComm(CommBase.CommBase):
         self.response_kwargs.setdefault('recv_timeout', self.ocomm.recv_timeout)
         super(ClientComm, self).__init__(self.ocomm.name, dont_open=dont_open,
                                          recv_timeout=self.ocomm.recv_timeout,
+                                         is_interface=self.ocomm.is_interface,
                                          direction='send', no_suffix=True,
                                          address=self.ocomm.address)
 
@@ -101,19 +102,12 @@ class ClientComm(CommBase.CommBase):
         super(ClientComm, self).open()
         self.ocomm.open()
 
-    def close(self, wait_for_send=False):
-        r"""Close the connection.
-
-        Args:
-            wait_for_send (bool, optional): If True, the output comm will
-                close such that any pending messages can be sent/received.
-                Defaults to False.
-
-        """
-        self.ocomm.close(wait_for_send=wait_for_send)
+    def close(self, *args, **kwargs):
+        r"""Close the connection."""
+        self.ocomm.close(*args, **kwargs)
         for k in self.icomm_order:
             self.icomm[k].close()
-        super(ClientComm, self).close()
+        super(ClientComm, self).close(*args, **kwargs)
 
     @property
     def is_open(self):
@@ -126,15 +120,20 @@ class ClientComm(CommBase.CommBase):
         return self.ocomm.is_closed
 
     @property
-    def n_msg(self):
+    def n_msg_send(self):
         r"""int: The number of messages in the connection."""
-        return self.ocomm.n_msg
+        return self.ocomm.n_msg_send
+
+    @property
+    def n_msg_send_drain(self):
+        r"""int: The number of outgoing messages in the connection to drain."""
+        return self.ocomm.n_msg_send_drain
 
     # RESPONSE COMM
     def create_response_comm(self):
         r"""Create a response comm based on information from the last header."""
         comm_kwargs = dict(direction='recv', is_response_client=True,
-                           **self.response_kwargs)
+                           single_use=True, **self.response_kwargs)
         header = dict(request_id=str(uuid.uuid4()))
         if header['request_id'] in self.icomm:  # pragma: debug
             raise ValueError("Request ID %s already in use." % header['request_id'])
@@ -163,13 +162,15 @@ class ClientComm(CommBase.CommBase):
             obj: Output from output comm send method.
 
         """
+        msg = args[0]
         # if self.is_closed:
         #     self.debug("send(): Connection closed.")
         #     return False
-        kwargs['send_header'] = True
-        kwargs['header_kwargs'] = self.create_response_comm()
+        if msg != self.eof_msg:
+            kwargs['send_header'] = True
+            kwargs['header_kwargs'] = self.create_response_comm()
         out = self.ocomm.send(*args, **kwargs)
-        if not out:
+        if (not out) and (msg != self.eof_msg):
             self.remove_response_comm()
         return out
 
@@ -230,6 +231,11 @@ class ClientComm(CommBase.CommBase):
         r"""Alias for RPCComm.call"""
         return self.call(*args, **kwargs)
     
+    def drain_messages(self, direction='send', **kwargs):
+        r"""Sleep while waiting for messages to be drained."""
+        if direction == 'send':
+            self.ocomm.drain_messages(direction='send', **kwargs)
+
     # def purge(self):
     #     r"""Purge input and output comms."""
     #     self.ocomm.purge()

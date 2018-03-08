@@ -1,7 +1,4 @@
-#include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdarg.h>
+#include <../tools.h>
 
 /*! @brief Flag for checking if AsciiFile.h has already been included.*/
 #ifndef ASCIIFILE_H_
@@ -83,7 +80,29 @@ int af_is_comment(const asciiFile_t t, const char *line) {
 };
 
 /*!
-  @brief Read a single line from the file.
+  @brief Read a single line from the file without realloc.
+  @param[in] t constant asciiFile_t file structure.
+  @param[out] line constant character pointer to buffer where the
+  read line should be stored. If line is not large enough to hold the read line,
+  an error will be returned.
+  @param[in] n Size of allocated buffer.
+  @return int On success, the number of characters read, -1 on failure.
+ */
+static inline
+int af_readline_full_norealloc(const asciiFile_t t, char *line, size_t n) {
+  if (af_is_open(t) == 1) {
+    if (fgets(line, (int)n, t.fd) == NULL) {
+      return -1;
+    }
+    int nread = (int)strlen(line);
+    if ((nread < ((int)n - 1)) || (line[nread - 1] == '\n') || (feof(t.fd)))
+      return nread;
+  }
+  return -1;
+};
+
+/*!
+  @brief Read a single line from the file with realloc.
   @param[in] t constant asciiFile_t file structure.
   @param[out] line constant character pointer to pointer to buffer where the
   read line should be stored. If line is not large enough to hold the read line,
@@ -95,7 +114,7 @@ int af_is_comment(const asciiFile_t t, const char *line) {
 static inline
 int af_readline_full(const asciiFile_t t, char **line, size_t *n) {
   if (af_is_open(t) == 1) {
-    return getline(line, n, t.fd);
+    return (int)getline(line, n, t.fd);
   }
   return -1;
 };
@@ -109,7 +128,7 @@ int af_readline_full(const asciiFile_t t, char **line, size_t *n) {
 static inline
 int af_writeline_full(const asciiFile_t t, const char *line) {
   if (af_is_open(t) == 1)
-    return fwrite(line, 1, strlen(line), t.fd);
+    return (int)fwrite(line, 1, strlen(line), t.fd);
   return -1;
 };
 

@@ -61,7 +61,7 @@ class AsciiTableComm(AsciiFileComm):
         return kwargs
 
     @property
-    def n_msg(self):
+    def n_msg_recv(self):
         r"""int: The number of messages in the file."""
         if ((self.is_open and self.direction == 'recv' and self.as_array and
              not self.array_was_read)):
@@ -70,7 +70,7 @@ class AsciiTableComm(AsciiFileComm):
             else:
                 out = 0
         else:
-            out = super(AsciiTableComm, self).n_msg
+            out = super(AsciiTableComm, self).n_msg_recv
         return out
 
     def _send(self, msg):
@@ -83,10 +83,11 @@ class AsciiTableComm(AsciiFileComm):
             bool: Success or failure of writing to the file.
 
         """
-        if self.as_array:
-            self.file.write_bytes(msg, order='F', append=True)
-        else:
-            self.file.writeline_full(msg, validate=True)
+        if msg != self.eof_msg:
+            if self.as_array:
+                self.file.write_bytes(msg, order='F', append=True)
+            else:
+                self.file.writeline_full(msg, validate=True)
         self.file.fd.flush()
         return True
 

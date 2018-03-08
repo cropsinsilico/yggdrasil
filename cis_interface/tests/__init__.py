@@ -1,5 +1,6 @@
 """Testing things."""
 import os
+import shutil
 import uuid
 import importlib
 import unittest
@@ -7,10 +8,10 @@ import numpy as np
 from scipy.io import savemat, loadmat
 import nose.tools as nt
 from cis_interface.config import cis_cfg, cfg_logging
-from cis_interface.tools import CIS_MSG_MAX as maxMsgSize
+from cis_interface.tools import get_CIS_MSG_MAX, get_default_comm
 from cis_interface.backwards import pickle, BytesIO
 from cis_interface.dataio.AsciiTable import AsciiTable
-from cis_interface import backwards
+from cis_interface import backwards, platform
 
 # Test data
 data_dir = os.path.join(os.path.dirname(__file__), 'data')
@@ -47,6 +48,13 @@ yaml_list = [
     ('error', 'error_model.yml')]
 yamls = {k: os.path.join(yaml_dir, v) for k, v in yaml_list}
 
+# Makefile
+if platform._is_win:  # pragma: windows
+    makefile0 = os.path.join(script_dir, "Makefile_windows")
+else:
+    makefile0 = os.path.join(script_dir, "Makefile_linux")
+shutil.copy(makefile0, os.path.join(script_dir, "Makefile"))
+
 
 class CisTest(unittest.TestCase):
     r"""Wrapper for unittest.TestCase that allows use of nose setup and
@@ -73,7 +81,7 @@ class CisTest(unittest.TestCase):
         self.attr_list = list()
         self._inst_args = list()
         self._inst_kwargs = dict()
-        self.timeout = 5.0
+        self.timeout = 10.0
         self.sleeptime = 0.01
         self._teardown_complete = False
         self._old_loglevel = None
@@ -114,6 +122,17 @@ class CisTest(unittest.TestCase):
             delattr(self, '_instance')
         self._teardown_complete = True
         self.reset_log()
+
+    def cleanup_comms(self):
+        r"""Cleanup all comms."""
+        default = get_default_comm()
+        if default == "IPCComm":
+            from cis_interface.communication.IPCComm import cleanup_comms
+        elif default == "ZMQComm":
+            from cis_interface.communication.ZMQComm import cleanup_comms
+        else:  # pragma: debug
+            raise Exception("No cleanup for %s" % default)
+        cleanup_comms()
 
     @property
     def description_prefix(self):
@@ -330,7 +349,7 @@ class IOInfo(object):
     @property
     def maxMsgSize(self):
         r"""int: Maximum message size."""
-        return maxMsgSize
+        return get_CIS_MSG_MAX()
 
     @property
     def msg_short(self):

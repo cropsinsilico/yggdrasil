@@ -1,4 +1,4 @@
-import time
+from cis_interface.tools import sleep
 
-time.sleep(1)
+sleep(1)
 print('Python model')

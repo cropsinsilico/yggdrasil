@@ -1,16 +1,16 @@
 """This module provides tools for running models using cis_interface."""
 import sys
 import logging
+# import atexit
 import os
-import time
 import signal
 from pprint import pformat
 from itertools import chain
 import socket
 from cis_interface.tools import CisClass, parse_yaml
 from cis_interface.config import cis_cfg, cfg_environment
-from cis_interface import drivers
-from cis_interface.drivers import create_driver
+from cis_interface import platform, backwards
+from cis_interface.drivers import create_driver, import_driver
 
 
 COLOR_TRACE = '\033[30;43;22m'
@@ -84,6 +84,7 @@ class CisRunner(CisClass):
         self.interrupt_time = 0
         self._inputchannels = {}
         self._outputchannels = {}
+        self._old_handlers = {}
         self.error_flag = False
         # Setup logging
         # if cis_debug_prefix is None:
@@ -98,6 +99,7 @@ class CisRunner(CisClass):
             self.parseModelYaml(modelYml)
         # print(pformat(self.inputdrivers), pformat(self.outputdrivers),
         #       pformat(self.modeldrivers))
+        # atexit.register(self.cleanup)
 
     def parseModelYaml(self, modelYml):
         r"""Parse supplied yaml, adding yamldir and doing mustache replace.
@@ -191,6 +193,8 @@ class CisRunner(CisClass):
             if k not in kws_ignore:
                 yaml['kwargs'][k] = yaml[k]
         yaml['workingDir'] = yamldir
+        if dtype == 'model':
+            yaml['kwargs']['model_index'] = len(dd)
         dd[yaml['name']] = yaml
 
     def pprint(self, *args):
@@ -201,7 +205,7 @@ class CisRunner(CisClass):
     def signal_handler(self, sig, frame):
         r"""Terminate all drivers on interrrupt."""
         self.debug("Interrupt with signal %d", sig)
-        now = time.time()
+        now = backwards.clock_time()
         elapsed = now - self.interrupt_time
         self.debug('Elapsed time since last interrupt: %d s', elapsed)
         self.interrupt_time = now
@@ -215,6 +219,7 @@ class CisRunner(CisClass):
             self.debug("Terminating models and closing all channels")
             self.terminate()
             self.pprint(80 * '*')
+            # self.sleep(5)
             return 1
         else:
             self.pprint('* %76s *' % 'Interrupted: Displaying channel summary')
@@ -223,6 +228,12 @@ class CisRunner(CisClass):
             self.printStatus()
             self.pprint(80 * '*')
         self.debug('%d returns', sig)
+
+    def _swap_handler(self, signum, signal_handler):
+        self._old_handlers[signum] = signal.getsignal(signum)
+        signal.signal(signum, signal_handler)
+        if not platform._is_win:
+            signal.siginterrupt(signum, False)
         
     def set_signal_handler(self, signal_handler=None):
         r"""Set the signal handler.
@@ -235,10 +246,16 @@ class CisRunner(CisClass):
         """
         if signal_handler is None:
             signal_handler = self.signal_handler
-        signal.signal(signal.SIGTERM, signal_handler)
-        signal.signal(signal.SIGINT, signal_handler)
-        signal.siginterrupt(signal.SIGTERM, False)
-        signal.siginterrupt(signal.SIGINT, False)
+        self._swap_handler(signal.SIGINT, signal_handler)
+        if not platform._is_win:
+            self._swap_handler(signal.SIGTERM, signal_handler)
+        else:  # pragma: windows
+            self._swap_handler(signal.SIGBREAK, signal_handler)
+
+    def reset_signal_handler(self):
+        r"""Reset signal handlers to old ones."""
+        for k, v in self._old_handlers.items():
+            signal.signal(k, v)
 
     def run(self, signal_handler=None):
         r"""Run all of the models and wait for them to exit."""
@@ -246,6 +263,7 @@ class CisRunner(CisClass):
         self.startDrivers()
         self.set_signal_handler(signal_handler)
         self.waitModels()
+        self.reset_signal_handler()
         self.closeChannels()
         self.cleanup()
 
@@ -354,15 +372,16 @@ class CisRunner(CisClass):
             object: An instance of the specified driver.
 
         """
+        from cis_interface.drivers import FileOutputDriver
         if yml['args'] in self._inputchannels:
             yml['kwargs'].setdefault('comm_env', {})
             yml['kwargs']['comm_env'] = self._inputchannels[
                 yml['args']]['instance'].comm_env
-        drv = self.createDriver(yml)
+        drv_cls = import_driver(yml['driver'])
         if yml['args'] not in self._inputchannels:
             try:
-                assert(issubclass(drv.__class__,
-                                  drivers.FileOutputDriver.FileOutputDriver))
+                assert(issubclass(drv_cls,
+                                  FileOutputDriver.FileOutputDriver))
             except AssertionError:
                 raise Exception(("Output driver %s is not a subclass of " +
                                  "FileOutputDriver and there is not a " +
@@ -372,12 +391,13 @@ class CisRunner(CisClass):
             
             # TODO: Add input comm environment variables somehow
             pass
+        drv = self.createDriver(yml)
         return drv
         
     def loadDrivers(self):
         r"""Load all of the necessary drivers, doing the IO drivers first
         and adding IO driver environmental variables back tot he models."""
-        self.debug()
+        self.debug('')
         driver = dict(name='name')
         try:
             # Create input drivers
@@ -404,10 +424,22 @@ class CisRunner(CisClass):
                       self.host, self.namespace, self.rank))
         driver = dict(name='name')
         try:
-            for driver in self.all_drivers:
+            for driver in self.io_drivers():
                 self.debug("Starting driver %s", driver['name'])
                 d = driver['instance']
-                d.start()
+                if not d.was_started:
+                    d.start()
+            # self.sleep(1)  # on windows comms can take a while start
+            for driver in self.modeldrivers.values():
+                self.debug("Starting driver %s", driver['name'])
+                d = driver['instance']
+                for n2 in driver.get('client_of', []):
+                    d2 = self.modeldrivers[n2]['instance']
+                    if not d2.was_started:
+                        self.debug("Starting server '%s' before client", d2.name)
+                        d2.start()
+                if not d.was_started:
+                    d.start()
         except BaseException:  # pragma: debug
             self.error("%s did not start", driver['name'])
             self.terminate()
@@ -417,7 +449,7 @@ class CisRunner(CisClass):
     def waitModels(self):
         r"""Wait for all model drivers to finish. When a model finishes,
         join the thread and perform exits for associated IO drivers."""
-        self.debug()
+        self.debug('')
         running = [d for d in self.modeldrivers.values()]
         dead = []
         while (len(running) > 0) and (not self.error_flag):
@@ -429,8 +461,10 @@ class CisRunner(CisClass):
                     break
                 d.join(1)
                 if not d.is_alive():
-                    self.do_model_exits(drv)
-                    running.remove(drv)
+                    if not d.errors:
+                        self.do_model_exits(drv)
+                        self.do_client_exits(drv)
+                        running.remove(drv)
                 else:
                     self.info('%s still running', drv['name'])
             dead = []
@@ -439,7 +473,6 @@ class CisRunner(CisClass):
                 d.join(0.1)
                 if not d.is_alive():
                     dead.append(drv['name'])
-            print("Dead drivers: ", dead)
         for d in self.modeldrivers.values():
             if d['instance'].errors:
                 self.error_flag = True
@@ -450,45 +483,32 @@ class CisRunner(CisClass):
             self.terminate()
         self.debug('Returning')
 
-    def do_exits(self, driver):
-        r"""Perform basic exits for a driver.
-
-        Args:
-            model (dict): Dictionary of driver parameters.
-
-        """
-        self.debug(driver['name'])
-        # Stop the driver and join the thread
-        driver['instance'].on_exit()
-        driver['instance'].join()
-        self.debug("%s join finished", driver['name'])
-
-    def do_model_exits(self, model):
-        r"""Perform exists for IO drivers associated with a model.
+    def do_client_exits(self, model):
+        r"""Perform exits for IO drivers associated with a client model.
 
         Args:
             model (dict): Dictionary of model parameters including any
                 associated IO drivers.
 
         """
-        self.do_exits(model)
-        # Stop associated server if not more clients
         for srv_name in model.get('client_of', []):
-            # Stop client IO driver
-            iod = self.outputdrivers["%s_%s" % (srv_name, model['name'])]
-            iod['instance'].on_model_exit()
-            self.do_exits(iod)
             # Remove this client from list for server
             srv = self.modeldrivers[srv_name]
             srv['clients'].remove(model['name'])
             # Stop server if there are not any more clients
             if len(srv['clients']) == 0:
                 iod = self.inputdrivers[srv_name]
-                iod['instance'].on_model_exit()
-                self.do_exits(iod)
+                iod['instance'].on_client_exit()
                 srv['instance'].stop()
-                # self.do_model_exits(srv)
-        # Stop associated IO drivers
+
+    def do_model_exits(self, model):
+        r"""Perform exits for IO drivers associated with a model.
+
+        Args:
+            model (dict): Dictionary of model parameters including any
+                associated IO drivers.
+
+        """
         for drv in self.io_drivers(model['name']):
             if not drv['instance'].is_alive():
                 continue
@@ -503,7 +523,7 @@ class CisRunner(CisClass):
     
     def terminate(self):
         r"""Immediately stop all drivers, beginning with IO drivers."""
-        self.debug()
+        self.debug('')
         # self.closeChannels(force_stop=True)
         # self.debug('Stop models')
         for driver in self.all_drivers:
@@ -518,14 +538,14 @@ class CisRunner(CisClass):
 
     def cleanup(self):
         r"""Perform cleanup operations for all drivers."""
-        self.debug()
+        self.debug('')
         for driver in self.all_drivers:
             if 'instance' in driver:
                 driver['instance'].cleanup()
 
     def printStatus(self):
         r"""Print the status of all drivers, starting with the IO drivers."""
-        self.debug()
+        self.debug('')
         for driver in self.all_drivers:
             if 'instance' in driver:
                 driver['instance'].printStatus()
@@ -540,17 +560,18 @@ class CisRunner(CisClass):
                 will exit as quickly as possible. Defaults to False.
 
         """
-        self.debug()
+        self.debug('')
         drivers = [i for i in self.io_drivers()]
         for drv in drivers:
             if 'instance' in drv:
                 driver = drv['instance']
-                self.debug("Stopping %s", drv['name'])
-                if force_stop or self.error_flag:
-                    driver.terminate()
-                else:
-                    driver.stop()
-                self.debug("Stop(%s) returns", drv['name'])
+                if driver.is_alive():  # pragma: debug
+                    self.debug("Stopping %s", drv['name'])
+                    if force_stop or self.error_flag:
+                        driver.terminate()
+                    else:
+                        driver.stop()
+                    self.debug("Stop(%s) returns", drv['name'])
         self.debug('Channel Stops DONE')
         for drv in drivers:
             if 'instance' in drv:

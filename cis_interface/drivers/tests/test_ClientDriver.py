@@ -1,7 +1,6 @@
 import nose.tools as nt
-from cis_interface.communication import _default_comm
 import cis_interface.drivers.tests.test_ConnectionDriver as parent
-from cis_interface import runner
+from cis_interface import runner, tools
 
 
 class TestClientParam(parent.TestConnectionParam):
@@ -14,14 +13,14 @@ class TestClientParam(parent.TestConnectionParam):
         self.attr_list += ['comm', 'response_drivers',
                            'request_name', 'request_address']
         # Increased to allow forwarding between IPC comms on OSX
-        self.timeout = 5.0
-        # self.sleeptime = 0.5
-        # self.timeout = 10.0
-        self.comm_name = _default_comm
-        self.server_comm = _default_comm
+        # self.timeout = 5.0
+        self.route_timeout = 2 * self.timeout
+        # self.debug_flag = True
+        self.comm_name = tools.get_default_comm()
+        self.server_comm = tools.get_default_comm()
         self.icomm_name = self.comm_name
         self.ocomm_name = self.server_comm
-            
+
     @property
     def send_comm_kwargs(self):
         r"""dict: Keyword arguments for send comm."""
@@ -64,8 +63,7 @@ class TestClientParam(parent.TestConnectionParam):
     def create_server(self, comm_address=None):
         r"""Create a new ServerDriver instance."""
         inst = runner.create_driver(
-            'ServerDriver', 'test_model_request.' + self.uuid,
-            # request_name='test_request.' + self.uuid,
+            'ServerDriver', 'TestServerRequestDriver.' + self.uuid,
             comm=self.server_comm,
             comm_address=comm_address,
             namespace=self.namespace, workingDir=self.workingDir,
@@ -113,19 +111,17 @@ class TestClientDriver(TestClientParam, parent.TestConnectionDriver):
         # Send a message to local output
         flag = self.send_comm.send(msg_send)
         assert(flag)
-        # Wait for message to be routed
-        T = self.instance.start_timeout(self.timeout)
-        while ((not T.is_out) and (self.recv_comm.n_msg == 0)):
-            self.instance.sleep()
-        self.instance.stop_timeout()
-        # Receive on server side, then send back
-        flag, srv_msg = self.recv_comm.recv(timeout=self.timeout)
+        # Receive on server side
+        flag, srv_msg = self.recv_comm.recv(timeout=self.route_timeout)
         assert(flag)
         nt.assert_equal(srv_msg, msg_send)
+        self.instance.printStatus()
+        self.srv_drv.printStatus()
+        # Send reply back to client
         flag = self.recv_comm.send(srv_msg)
         assert(flag)
         # Receive response on client side
-        flag, cli_msg = self.send_comm.recv(timeout=self.timeout)
+        flag, cli_msg = self.send_comm.recv(timeout=self.route_timeout)
         assert(flag)
         nt.assert_equal(cli_msg, msg_send)
 

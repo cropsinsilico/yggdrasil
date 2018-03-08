@@ -1,16 +1,3 @@
-#include <fcntl.h>           /* For O_* constants */
-#include <sys/stat.h>        /* For mode constants */
-#include <sys/msg.h>
-#include <sys/types.h>
-#include <sys/sem.h>
-#include <sys/shm.h>
-#include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdarg.h>
-#include <unistd.h>
-#include <errno.h>
-#include <regex.h>
 #include <../tools.h>
 #include <../communication/communication.h>
 #include <../dataio/AsciiFile.h>
@@ -117,11 +104,11 @@ cisInput_t cisInput(const char *name){
   message is larger, it will not be sent.
   @param[in] cisQ cisOutput_t structure that queue should be sent to.
   @param[in] data character pointer to message that should be sent.
-  @param[in] len int length of message to be sent.
+  @param[in] len size_t length of message to be sent.
   @returns int 0 if send succesfull, -1 if send unsuccessful.
  */
 static inline
-int cis_send(const cisOutput_t cisQ, const char *data, const int len) {
+int cis_send(const cisOutput_t cisQ, const char *data, const size_t len) {
   return comm_send(cisQ, data, len);
 };
 
@@ -141,12 +128,12 @@ int cis_send_eof(const cisOutput_t cisQ) {
   @param[in] cisQ cisOutput_t structure that message should be sent to.
   @param[out] data character pointer to allocated buffer where the message
   should be saved.
-  @param[in] len const int length of the allocated message buffer in bytes.
+  @param[in] len const size_t length of the allocated message buffer in bytes.
   @returns int -1 if message could not be received. Length of the received
   message if message was received.
  */
 static inline
-int cis_recv(const cisInput_t cisQ, char *data, const int len){
+int cis_recv(const cisInput_t cisQ, char *data, const size_t len){
   return comm_recv(cisQ, data, len);
 };
 
@@ -158,11 +145,11 @@ int cis_recv(const cisInput_t cisQ, char *data, const int len){
   cis_recv_nolimit for communication to make sense.
   @param[in] cisQ cisOutput_t structure that message should be sent to.
   @param[in] data character pointer to message that should be sent.
-  @param[in] len int length of message to be sent.
+  @param[in] len size_t length of message to be sent.
   @returns int 0 if send succesfull, -1 if send unsuccessful.
  */
 static inline
-int cis_send_nolimit(const cisOutput_t cisQ, const char *data, const int len){
+int cis_send_nolimit(const cisOutput_t cisQ, const char *data, const size_t len){
   return comm_send_nolimit(cisQ, data, len);
 };
 
@@ -185,12 +172,12 @@ int cis_send_nolimit_eof(const cisOutput_t cisQ) {
   @param[out] data character pointer to pointer for allocated buffer where the
   message should be stored. A pointer to a pointer is used so that the buffer
   may be reallocated as necessary for the incoming message.
-  @param[in] len0 int length of the initial allocated message buffer in bytes.
+  @param[in] len0 size_t length of the initial allocated message buffer in bytes.
   @returns int -1 if message could not be received. Length of the received
   message if message was received.
  */
 static inline
-int cis_recv_nolimit(const cisInput_t cisQ, char **data, const int len0){
+int cis_recv_nolimit(const cisInput_t cisQ, char **data, const size_t len0){
   return comm_recv_nolimit(cisQ, data, len0);
 };
 
@@ -423,7 +410,7 @@ int cisRecv_nolimit(const cisInput_t cisQ, ...) {
   @return cisRpc_t structure with provided info.
  */
 static inline 
-cisRpc_t cisRpc(const char *name, char *outFormat, char *inFormat) {
+cisRpc_t cisRpc(const char *name, const char *outFormat, const char *inFormat) {
   return init_comm(name, outFormat, RPC_COMM, inFormat);
 };
 
@@ -438,7 +425,7 @@ cisRpc_t cisRpc(const char *name, char *outFormat, char *inFormat) {
   @return cisRpc_t structure with provided info.
  */
 static inline
-comm_t cisRpcClient(const char *name, char *outFormat, char *inFormat){
+comm_t cisRpcClient(const char *name, const char *outFormat, const char *inFormat){
   return init_comm(name, outFormat, CLIENT_COMM, inFormat);
 };
 
@@ -453,7 +440,7 @@ comm_t cisRpcClient(const char *name, char *outFormat, char *inFormat){
   @return cisRpc_t structure with provided info.
  */
 static inline
-comm_t cisRpcServer(const char *name, char *inFormat, char *outFormat){
+comm_t cisRpcServer(const char *name, const char *inFormat, const char *outFormat){
   return init_comm(name, inFormat, SERVER_COMM, outFormat);
 };
 
@@ -525,7 +512,7 @@ int rpcSend(const cisRpc_t rpc, ...){
   success.
 */
 static inline
-int rpcRecv(const cisRpc_t rpc, ...){
+int rpcRecv(const cisRpc_t rpc, ...) {
   va_list ap;
   va_start(ap, rpc);
   int ret = vrpcRecv(rpc, ap);
@@ -548,22 +535,34 @@ int rpcRecv(const cisRpc_t rpc, ...){
  */
 static inline
 int vrpcCall(const cisRpc_t rpc, va_list ap) {
-  int ret;
+  int sret, rret;
+  rret = 0;
+
+  // Create copy for receiving
+  va_list op;
+  va_copy(op, ap);
   
   // pack the args and call
-  ret = vcommSend_nolimit(rpc, ap);
-  if (ret < 0) {
-    printf("vrpcCall: vcisSend_nolimit error: ret %d: %s\n", ret, strerror(errno));
+  sret = vcommSend_nolimit(rpc, ap);
+  if (sret < 0) {
+    cislog_error("vrpcCall: vcisSend_nolimit error: ret %d: %s", sret, strerror(errno));
     return -1;
   }
 
+  // Advance through sent arguments
+  cislog_debug("vrpcCall: Used %d arguments in send", sret);
+  int i;
+  for (i = 0; i < sret; i++) {
+    va_arg(op, void*);
+  }
+
   // unpack the messages into the remaining variable arguments
-  va_list op;
-  va_copy(op, ap);
-  ret = vcommRecv_nolimit(rpc, op);
+  // va_list op;
+  // va_copy(op, ap);
+  rret = vcommRecv_nolimit(rpc, op);
   va_end(op);
   
-  return ret;
+  return rret;
 };
 
 /*!
@@ -860,6 +859,7 @@ comm_t cisAsciiTableInput(const char *name, const int as_array, const int src_ty
 #define psiOutputFmt cisOutputFmt
 #define psi_send cis_send
 #define psi_recv cis_recv
+#define psi_send_eof cis_send_eof
 #define psi_send_nolimit cis_send_nolimit
 #define psi_recv_nolimit cis_recv_nolimit
 #define vpsiSend vcisSend

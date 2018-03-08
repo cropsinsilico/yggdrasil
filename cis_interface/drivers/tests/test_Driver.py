@@ -1,4 +1,6 @@
 import os
+import threading
+# import psutil
 import nose.tools as nt
 from cis_interface.tools import CisClass
 from cis_interface.tests import CisTest
@@ -69,31 +71,45 @@ class TestParam(CisTest):
         r"""int: Return the number of comms."""
         return get_comm_class().comm_count()
 
-    def setup(self, nprev_comm=None):
+    @property
+    def thread_count(self):
+        r"""int: Return the number of active threads."""
+        return threading.active_count()
+
+    def setup(self, nprev_comm=None, nprev_thread=None):
         r"""Create a driver instance and start the driver.
 
         Args:
             nprev_comm (int, optional): Number of previous comm channels.
                 If not provided, it is determined to be the present number of
                 default comms.
+            nprev_thread (int, optional): Number of previous threads.
+                If not provided, it is determined to be the present number of
+                threads.
 
         """
         if nprev_comm is None:
             nprev_comm = self.comm_count
+        if nprev_thread is None:
+            nprev_thread = self.thread_count
         self.nprev_comm = nprev_comm
+        self.nprev_thread = self.thread_count
         super(TestParam, self).setup()
         if not self.skip_start:
             self.instance.start()
 
-    def teardown(self, ncurr_comm=None):
+    def teardown(self, ncurr_comm=None, ncurr_thread=None):
         r"""Remove the instance, stoppping it.
 
         Args:
             ncurr_comm (int, optional): Number of current comms. If not
                 provided, it is determined to be the present number of comms.
+            ncurr_thread (int, optional): Number of current threads. If not
+                provided, it is determined to be the present number of threads.
 
         """
         super(TestParam, self).teardown()
+        # Give comms time to close
         if ncurr_comm is None:
             x = CisClass(self.name, timeout=self.timeout,
                          sleeptime=self.sleeptime)
@@ -103,7 +119,21 @@ class TestParam(CisTest):
                 x.sleep()
             x.stop_timeout()
             ncurr_comm = self.comm_count
+        # Give threads time to close
+        if ncurr_thread is None:
+            x = CisClass(self.name, timeout=self.timeout,
+                         sleeptime=self.sleeptime)
+            Tout = x.start_timeout()
+            while ((not Tout.is_out) and
+                   (self.thread_count > self.nprev_thread)):  # pragma: debug
+                x.sleep()
+            x.stop_timeout()
+            ncurr_thread = self.thread_count
+        # Check counts
         nt.assert_less_equal(ncurr_comm, self.nprev_comm)
+        nt.assert_less_equal(ncurr_thread, self.nprev_thread)
+        # nt.assert_equal(len(psutil.Process().children(recursive=True)), 0)
+        self.cleanup_comms()
 
     @property
     def name(self):
@@ -120,7 +150,7 @@ class TestParam(CisTest):
 
     def remove_instance(self, inst):
         r"""Remove an instance."""
-        if not inst._terminated:
+        if not inst.was_terminated:
             inst.terminate()
         if inst.is_alive():  # pragma: debug
             inst.join()
@@ -130,12 +160,7 @@ class TestParam(CisTest):
 
 
 class TestDriver(TestParam):
-    r"""Test runner for basic Driver class.
-
-    Attributes (in addition to parameter class):
-        -
-
-    """
+    r"""Test runner for basic Driver class."""
 
     def assert_before_stop(self):
         r"""Assertions to make before stopping the driver instance."""
@@ -203,7 +228,7 @@ class TestDriverNoStart(TestParam):
         self.instance.debug(1)
         self.instance.verbose_debug(1)
         self.instance.critical(1)
-        self.instance.warn(1)
+        self.instance.warning(1)
         self.instance.error(1)
         self.instance.exception(1)
         try:
@@ -211,6 +236,10 @@ class TestDriverNoStart(TestParam):
         except Exception:
             self.instance.exception(1)
         self.instance.printStatus()
+        self.instance.special_debug(1)
+        self.instance.suppress_special_debug = True
+        self.instance.special_debug(1)
+        self.instance.suppress_special_debug = False
 
     def test_timeout(self):
         r"""Test functionality of timeout."""
@@ -229,4 +258,4 @@ class TestDriverNoStart(TestParam):
         while not T.is_out:
             self.instance.sleep()
         assert(self.instance.check_timeout())
-        self.instance.stop_timeout()
+        self.instance.stop_timeout(quiet=True)

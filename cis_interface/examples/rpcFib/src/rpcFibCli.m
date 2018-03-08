@@ -11,9 +11,7 @@ function rpcFibCli(iterations)
   log = PsiInterface('PsiOutput', 'output_log');
 
   % Read entire contents of yaml
-  input = ymlfile.recv();
-  ret = input{1};
-  ycontent = char(input{2});
+  [ret, ycontent] = ymlfile.recv();
   if (~ret);
     disp('rpcFibCli(M): RECV ERROR');
     exit(-1);
@@ -25,9 +23,7 @@ function rpcFibCli(iterations)
     
     % Call the server and receive response
     fprintf('rpcFibCli(M):  fib(->%-2d) ::: ', i);
-    input = rpc.rpcCall(i);
-    ret = input{1};
-    fib = input{2};
+    [ret, fib] = rpc.call(i);
     if (~ret);
       disp('rpcFibCli(M): RPC CALL ERROR');
       exit(-1);

@@ -1,5 +1,6 @@
 IDIR = .
 CC = gcc
+LINK = gcc
 CFLAGS = -I$(IDIR) $(CISCCFLAGS)
 
 ODIR = .
@@ -13,14 +14,16 @@ DEPS = $(patsubst %,$(IDIR)/%,$(_DEPS))
 _OBJ = gcc_model.o hellofunc.o
 OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 
+.PHONY: all
+all: gcc_model
 
 $(ODIR)/%.o: %.c $(DEPS)
 	$(CC) -c -o $@ $< $(CFLAGS)
 
 gcc_model: $(OBJ)
-	$(CC) -o $@ $^ $(CFLAGS) $(LIBS)
+	$(LINK) -o $@ $^ $(CFLAGS) $(LIBS)
 
 .PHONY: clean
 
 clean:
-	rm -f $(ODIR)/*.o *~ gcc_model $(INCDIR)/*~ 
+	rm -f $(ODIR)/*.o *~ gcc_model $(IDIR)/*~ 

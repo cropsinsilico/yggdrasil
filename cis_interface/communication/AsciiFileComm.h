@@ -1,9 +1,3 @@
-#include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdarg.h>
-#include <unistd.h>
-#include <errno.h>
 #include <../tools.h>
 #include <CommBase.h>
 #include <../dataio/AsciiFile.h>
@@ -27,6 +21,10 @@ int init_ascii_file_comm(comm_t *comm) {
   comm->type = ASCII_FILE_COMM;
   strcpy(comm->address, comm->name);
   asciiFile_t *handle = (asciiFile_t*)malloc(sizeof(asciiFile_t));
+  if (handle == NULL) {
+    cislog_error("init_ascii_file_comm: Failed to malloc asciiFile handle.");
+    return -1;
+  }
   if (strcmp(comm->direction, "send") == 0)
     handle[0] = asciiFile(comm->address, "w", NULL, NULL);
   else
@@ -75,6 +73,10 @@ int free_ascii_file_comm(comm_t *x) {
  */
 static inline
 int ascii_file_comm_nmsg(const comm_t x) {
+  // Prevent C4100 warning on windows by referencing param
+#ifdef _WIN32
+  x;
+#endif
   // TODO: Count lines in file.
   return 0;
 };
@@ -85,13 +87,17 @@ int ascii_file_comm_nmsg(const comm_t x) {
   message is larger, it will not be sent.
   @param[in] x comm_t structure that comm should be sent to.
   @param[in] data character pointer to message that should be sent.
-  @param[in] len int length of message to be sent.
+  @param[in] len size_t length of message to be sent.
   @returns int 0 if send succesfull, 1 if send unsuccessful.
  */
 static inline
-int ascii_file_comm_send(const comm_t x, const char *data, const int len) {
+int ascii_file_comm_send(const comm_t x, const char *data, const size_t len) {
   if (is_eof(data))
     return 0;
+  // Prevent C4100 warning on windows by referencing param
+#ifdef _WIN32
+  len;
+#endif
   asciiFile_t *file = (asciiFile_t*)x.handle;
   return af_writeline_full(file[0], data);
 };
@@ -102,16 +108,21 @@ int ascii_file_comm_send(const comm_t x, const char *data, const int len) {
   @param[in] x comm_t structure that message should be sent to.
   @param[out] data char ** pointer to allocated buffer where the message
   should be saved. This should be a malloc'd buffer if allow_realloc is 1.
-  @param[in] len const int length of the allocated message buffer in bytes.
+  @param[in] len const size_t length of the allocated message buffer in bytes.
   @param[in] allow_realloc const int If 1, the buffer will be realloced if it
   is not large enought. Otherwise an error will be returned.
   @returns int -1 if message could not be received. Length of the received
   message if message was received.
  */
 static inline
-int ascii_file_comm_recv(const comm_t x, char **data, int len, const int allow_realloc) {
+int ascii_file_comm_recv(const comm_t x, char **data, size_t len,
+			 const int allow_realloc) {
   asciiFile_t *file = (asciiFile_t*)x.handle;
-  return af_readline_full(file[0], data, (size_t*)(&len));
+  if (allow_realloc) {
+    return af_readline_full(file[0], data, (size_t*)(&len));
+  } else {
+    return af_readline_full_norealloc(file[0], data[0], len);
+  }
 };
 
 /*!

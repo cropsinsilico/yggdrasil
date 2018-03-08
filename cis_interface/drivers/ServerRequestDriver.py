@@ -14,14 +14,15 @@ class ServerRequestDriver(ConnectionDriver):
             used to receive requests from the client request driver. Defaults to
             model_request_name + '_SERVER' if not set.
         comm (str, optional): The comm class that should be used to
-            communicate with the client request driver. Defaults to _default_comm.
+            communicate with the client request driver. Defaults to
+            tools.get_default_comm().
         comm_address (str, optional): Address for the client request driver.
             Defaults to None and a new address is generated.
         **kwargs: Additional keyword arguments are passed to parent class.
 
     Attributes:
         comm (str): The comm class that should be used to communicate
-            with the server driver. Defaults to _default_comm.
+            with the server driver. Defaults to tools.get_default_comm().
         comm_address (str): Address for the client request driver.
         response_drivers (list): Response drivers created for each request.
         nclients (int): Number of clients signed on.
@@ -55,6 +56,7 @@ class ServerRequestDriver(ConnectionDriver):
         self.comm = comm
         self.comm_address = self.icomm.address  # opp_address
         self._block_response = False
+        self._is_input = True
 
     @property
     def last_header(self):
@@ -84,45 +86,40 @@ class ServerRequestDriver(ConnectionDriver):
         to send responses."""
         return self.last_header['response_address']
 
-    def terminate(self, *args, **kwargs):
-        r"""Stop response drivers."""
-        self.debug()
+    def close_response_drivers(self):
+        r"""Close response drivers."""
         with self.lock:
             self.debug("Closing response drivers.")
             self._block_response = True
             for x in self.response_drivers:
                 x.terminate()
             self.response_drivers = []
-        super(ServerRequestDriver, self).terminate(*args, **kwargs)
 
-    def on_model_exit(self):
-        r"""Close RPC comm when model exits."""
-        self.debug("on_model_exit()")
-        with self.lock:
-            self.icomm.close()
-        super(ServerRequestDriver, self).on_model_exit()
+    def close_comm(self):
+        r"""Close response drivers."""
+        self.close_response_drivers()
+        super(ServerRequestDriver, self).close_comm()
 
-    def after_loop(self):
-        r"""After server model signs off."""
-        self.debug("after_loop()")
-        with self.lock:
-            self.icomm.close()
-            if self.icomm._last_header is None:  # pragma: debug
-                self.icomm._last_header = dict()
-            if self.icomm._last_header.get('response_address', None) != CIS_CLIENT_EOF:
-                self.icomm._last_header['response_address'] = CIS_CLIENT_EOF
-                self.ocomm.send_eof()
-        super(ServerRequestDriver, self).after_loop()
+    def printStatus(self, *args, **kwargs):
+        r"""Also print response drivers."""
+        super(ServerRequestDriver, self).printStatus(*args, **kwargs)
+        for x in self.response_drivers:
+            x.printStatus(*args, **kwargs)
+
+    def on_client_exit(self):
+        r"""Close input comm to stop the loop."""
+        self.debug('')
+        # self.stop()
     
     def on_eof(self):
         r"""On EOF, decrement number of clients. Only send EOF if the number
         of clients drops to 0."""
-        self.debug("Client signed off.")
         with self.lock:
             self.nclients -= 1
+            self.debug("Client signed off. nclients = %d", self.nclients)
             if self.nclients == 0:
+                self.set_close_state('clients signed off')
                 self.debug("All clients have signed off.")
-                self.icomm._last_header['response_address'] = CIS_CLIENT_EOF
                 return super(ServerRequestDriver, self).on_eof()
         return ''
 
@@ -141,8 +138,22 @@ class ServerRequestDriver(ConnectionDriver):
                 self.debug("New client signed on.")
                 self.nclients += 1
                 msg = ''
+                return msg
         return super(ServerRequestDriver, self).on_message(msg)
     
+    def send_eof(self):
+        r"""Send EOF message.
+
+        Returns:
+            bool: Success or failure of send.
+
+        """
+        with self.lock:
+            if self.icomm._last_header is None:  # pragma: debug
+                self.icomm._last_header = dict()
+            self.icomm._last_header['response_address'] = CIS_CLIENT_EOF
+        return super(ServerRequestDriver, self).send_eof()
+
     def send_message(self, *args, **kwargs):
         r"""Send a single message.
 
@@ -165,7 +176,8 @@ class ServerRequestDriver(ConnectionDriver):
                     self.debug("Comm closed, not creating response driver.")
                     return False
                 drv_args = [self.response_address]
-                drv_kwargs = dict(comm=self.comm, msg_id=self.request_id)
+                drv_kwargs = dict(comm=self.comm, msg_id=self.request_id,
+                                  request_name=self.name)
                 try:
                     response_driver = ServerResponseDriver(*drv_args, **drv_kwargs)
                     self.response_drivers.append(response_driver)

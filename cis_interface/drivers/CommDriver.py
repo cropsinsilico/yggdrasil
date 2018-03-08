@@ -24,11 +24,12 @@ class CommDriver(Driver):
     """
     def __init__(self, name, **kwargs):
         super(CommDriver, self).__init__(name, **kwargs)
-        self.debug()
+        self.debug('')
         self.state = 'Started'
         self.numSent = 0
         self.numReceived = 0
         kwargs.setdefault('reverse_names', True)
+        self.comm = None
         self.comm = new_comm(name, dont_open=True, **kwargs)
         self.comm_name = self.comm.comm_class
         for k, v in self.comm.opp_comms.items():
@@ -67,16 +68,17 @@ class CommDriver(Driver):
 
     def open_comm(self):
         r"""Open the queue."""
-        self.debug()
+        self.debug('')
         with self.lock:
             self.comm.open()
         self.debug('Returning')
         
     def close_comm(self):
         r"""Close the queue."""
-        self.debug()
-        with self.lock:
-            self.comm.close()
+        self.debug('')
+        if self.comm is not None:
+            with self.lock:
+                self.comm.close()
         self.debug('Returning')
 
     def start(self):
@@ -102,10 +104,10 @@ class CommDriver(Driver):
                 class's graceful_stop method.
 
         """
-        self.debug()
+        self.debug('')
         T = self.start_timeout(timeout)
         try:
-            while (self.n_msg > 0) and (not T.is_out):
+            while (self.n_msg > 0) and (not T.is_out):  # pragma: debug
                 if DEBUG_SLEEPS:
                     self.debug('Draining %d messages', self.n_msg)
                 self.sleep()
@@ -115,19 +117,15 @@ class CommDriver(Driver):
         super(CommDriver, self).graceful_stop()
         self.debug('Returning')
 
-    def terminate(self):
-        r"""Stop the CommDriver, removing the queue."""
-        if self._terminated:
-            self.debug('Driver already terminated.')
-            return
-        self.debug()
+    def do_terminate(self):
+        r"""Stop the CommDriver by closing the comm."""
+        self.debug('')
         self.close_comm()
-        super(CommDriver, self).terminate()
-        self.debug('Returning')
+        super(CommDriver, self).do_terminate()
 
     def cleanup(self):
         r"""Ensure that the queues are removed."""
-        self.debug()
+        self.debug('')
         self.close_comm()
         super(CommDriver, self).cleanup()
 

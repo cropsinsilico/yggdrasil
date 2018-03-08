@@ -1,9 +1,3 @@
-#include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdarg.h>
-#include <unistd.h>
-#include <errno.h>
 #include <../tools.h>
 #include <CommBase.h>
 #include <../dataio/AsciiTable.h>
@@ -28,6 +22,11 @@ int init_ascii_table_comm(comm_t *comm) {
   // Initialize table as handle
   char *fmt = (char*)(comm->serializer.info);
   asciiTable_t *handle = (asciiTable_t*)malloc(sizeof(asciiTable_t));
+  if (handle == NULL) {
+    cislog_error("init_ascii_table_comm: Failed to malloc asciiTable handle.");
+    comm->valid = 0;
+    return -1;
+  }
   if (strcmp(comm->direction, "send") == 0)
     handle[0] = asciiTable(comm->address, "w", fmt,
 			   NULL, NULL, NULL);
@@ -40,7 +39,7 @@ int init_ascii_table_comm(comm_t *comm) {
   if (flag != 0) {
     cislog_error("init_ascii_table_comm: Could not open %s", comm->name);
     comm->valid = 0;
-    return -1;;
+    return -1;
   }
   // Write format to file if "send"
   if (strcmp(comm->direction, "send") == 0)
@@ -114,6 +113,10 @@ int free_ascii_table_comm(comm_t *x) {
  */
 static inline
 int ascii_table_comm_nmsg(const comm_t x) {
+  // Prevent C4100 warning on windows by referencing param
+#ifdef _WIN32
+  x;
+#endif
   // TODO: Count lines in table.
   return 0;
 };
@@ -124,13 +127,17 @@ int ascii_table_comm_nmsg(const comm_t x) {
   message is larger, it will not be sent.
   @param[in] x comm_t structure that comm should be sent to.
   @param[in] data character pointer to message that should be sent.
-  @param[in] len int length of message to be sent.
+  @param[in] len size_t length of message to be sent.
   @returns int 0 if send succesfull, -1 if send unsuccessful.
  */
 static inline
-int ascii_table_comm_send(const comm_t x, const char *data, const int len) {
+int ascii_table_comm_send(const comm_t x, const char *data, const size_t len) {
   if (is_eof(data))
     return 0;
+  // Prevent C4100 warning on windows by referencing param
+#ifdef _WIN32
+  len;
+#endif
   asciiTable_t *table = (asciiTable_t*)x.handle;
   return at_writeline_full(table[0], data);
 };
@@ -141,14 +148,14 @@ int ascii_table_comm_send(const comm_t x, const char *data, const int len) {
   @param[in] x comm_t structure that message should be sent to.
   @param[out] data char ** pointer to allocated buffer where the message
   should be saved. This should be a malloc'd buffer if allow_realloc is 1.
-  @param[in] len const int length of the allocated message buffer in bytes.
+  @param[in] len const size_t length of the allocated message buffer in bytes.
   @param[in] allow_realloc const int If 1, the buffer will be realloced if it
   is not large enought. Otherwise an error will be returned.
   @returns int -1 if message could not be received. Length of the received
   message if message was received.
  */
 static inline
-int ascii_table_comm_recv(const comm_t x, char **data, const int len,
+int ascii_table_comm_recv(const comm_t x, char **data, const size_t len,
 			  const int allow_realloc) {
   asciiTable_t *table = (asciiTable_t*)x.handle;
   return at_readline_full_realloc(table[0], data, len, allow_realloc);

@@ -27,7 +27,7 @@ int new_server_address(comm_t *comm) {
  */
 static inline
 int init_server_comm(comm_t *comm) {
-  int ret;
+  int ret = 0;
   // Called to create temp comm for send/recv
   if ((strlen(comm->name) == 0) && (strlen(comm->address) > 0)) {
     comm->type = _default_comm;
@@ -35,8 +35,12 @@ int init_server_comm(comm_t *comm) {
   }
   // Called to initialize/create server comm
   char *seri_in = (char*)malloc(strlen(comm->direction) + 1);
+  if (seri_in == NULL) {
+    cislog_error("init_server_comm: Failed to malloc seri_in.");
+    return -1;
+  }
   strcpy(seri_in, comm->direction);
-  /* printf("init_server_comm(%s): seri: %s\n", comm->name, seri_in); */
+  // printf("init_server_comm(%s): seri: %s\n", comm->name, seri_in);
   comm_t *handle;
   if (strlen(comm->name) == 0) {
     handle = new_comm_base(comm->address, "recv", _default_comm, (void*)seri_in);
@@ -46,12 +50,16 @@ int init_server_comm(comm_t *comm) {
   }
   ret = init_default_comm(handle);
   strcpy(comm->address, handle->address);
-  /* printf("init_server_comm: name = %s, type=%d, address = %s\n", */
-  /* 	 handle->name, handle->type, handle->address); */
+  // printf("init_server_comm: name = %s, type=%d, address = %s\n",
+  // 	 handle->name, handle->type, handle->address);
   strcpy(comm->direction, "recv");
   comm->handle = (void*)handle;
   comm->always_send_header = 0;
   comm_t **info = (comm_t**)malloc(sizeof(comm_t*));
+  if (info == NULL) {
+    cislog_error("init_server_comm: Failed to malloc info.");
+    return -1;
+  }
   info[0] = NULL;
   comm->info = (void*)info;
   return ret;
@@ -68,6 +76,7 @@ int free_server_comm(comm_t *x) {
     comm_t *handle = (comm_t*)(x->handle);
     free((char*)(handle->serializer.info));
     free_default_comm(handle);
+    free_comm_base(handle);
     free(x->handle);
     x->handle = NULL;
   }
@@ -76,6 +85,7 @@ int free_server_comm(comm_t *x) {
     if (*info != NULL) {
       free((char*)(info[0]->serializer.info));
       free_default_comm(*info);
+      free_comm_base(*info);
       free(*info);
     }
     free(info);
@@ -103,11 +113,11 @@ int server_comm_nmsg(const comm_t x) {
   @brief Send a message to the comm.
   @param[in] x comm_t structure that comm should be sent to.
   @param[in] data character pointer to message that should be sent.
-  @param[in] len int length of message to be sent.
+  @param[in] len size_t length of message to be sent.
   @returns int 0 if send succesfull, -1 if send unsuccessful.
  */
 static inline
-int server_comm_send(const comm_t x, const char *data, const int len) {
+int server_comm_send(const comm_t x, const char *data, const size_t len) {
   cislog_debug("server_comm_send(%s): %d bytes", x.name, len);
   if (x.info == NULL) {
     cislog_error("server_comm_send(%s): no response comm registered", x.name);
@@ -119,8 +129,10 @@ int server_comm_send(const comm_t x, const char *data, const int len) {
     return -1;
   }
   int ret = default_comm_send((*res_comm)[0], data, len);
+  // Wait for msg to be received?
   free((char*)(res_comm[0]->serializer.info));
   free_default_comm(res_comm[0]);
+  free_comm_base(res_comm[0]);
   free(res_comm[0]);
   res_comm[0] = NULL;
   return ret;
@@ -131,14 +143,14 @@ int server_comm_send(const comm_t x, const char *data, const int len) {
   @param[in] x comm_t structure that message should be sent to.
   @param[out] data char ** pointer to allocated buffer where the message
   should be saved. This should be a malloc'd buffer if allow_realloc is 1.
-  @param[in] len const int length of the allocated message buffer in bytes.
+  @param[in] len const size_t length of the allocated message buffer in bytes.
   @param[in] allow_realloc const int If 1, the buffer will be realloced if it
   is not large enought. Otherwise an error will be returned.
   @returns int -1 if message could not be received. Length of the received
   message if message was received.
  */
 static inline
-int server_comm_recv(comm_t x, char **data, const int len, const int allow_realloc) {
+int server_comm_recv(comm_t x, char **data, const size_t len, const int allow_realloc) {
   cislog_debug("server_comm_recv(%s)", x.name);
   if (x.handle == NULL) {
     cislog_error("server_comm_recv(%s): no request comm registered", x.name);
@@ -151,6 +163,7 @@ int server_comm_recv(comm_t x, char **data, const int len, const int allow_reall
   }
   // Return EOF
   if (is_eof(*data)) {
+    req_comm->recv_eof[0] = 1;
     return ret;
   }
   // Initialize new comm from received address
@@ -166,6 +179,10 @@ int server_comm_recv(comm_t x, char **data, const int len, const int allow_reall
   }
   strcpy(x.address, head.id);
   char *seri_copy = (char*)malloc(strlen((char*)(x.serializer.info)) + 1);
+  if (seri_copy == NULL) {
+    cislog_error("server_comm_recv(%s): Failed to malloc seri_copy.");
+    return -1;
+  }
   strcpy(seri_copy, (char*)(x.serializer.info));
   comm_t **res_comm = (comm_t**)(x.info);
   res_comm[0] = new_comm_base(head.response_address, "send", _default_comm,
@@ -177,6 +194,8 @@ int server_comm_recv(comm_t x, char **data, const int len, const int allow_reall
     cislog_error("server_comm_recv(%s): Could not initialize response comm.", x.name);
     return newret;
   }
+  res_comm[0]->sent_eof[0] = 1;
+  res_comm[0]->recv_eof[0] = 1;
   return ret;
 };
 

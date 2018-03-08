@@ -49,4 +49,10 @@ class AsciiTableInputDriver(AsciiFileInputDriver):
     def before_loop(self):
         r"""Open the file and send the format string."""
         super(AsciiTableInputDriver, self).before_loop()
-        self.send_message(self.icomm.file.format_str)
+        if self.is_valid:
+            self.debug("Sending format string")
+            flag = self.send_message(self.icomm.file.format_str)
+            if not flag:  # pragma: debug
+                self.error("Failed to send format string.")
+                self.close_comm()
+                self.set_break_flag()

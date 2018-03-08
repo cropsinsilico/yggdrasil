@@ -33,8 +33,10 @@ class ServerComm(CommBase.CommBase):
         self.ocomm = None
         self.response_kwargs.setdefault('comm', self.icomm.comm_class)
         self.response_kwargs.setdefault('recv_timeout', self.icomm.recv_timeout)
+        self._used_response_comms = dict()
         super(ServerComm, self).__init__(self.icomm.name, dont_open=dont_open,
                                          recv_timeout=self.icomm.recv_timeout,
+                                         is_interface=self.icomm.is_interface,
                                          direction='recv', no_suffix=True,
                                          address=self.icomm.address)
 
@@ -97,19 +99,14 @@ class ServerComm(CommBase.CommBase):
         super(ServerComm, self).open()
         self.icomm.open()
 
-    def close(self, wait_for_send=False):
-        r"""Close the connection.
-
-        Args:
-            wait_for_send (bool, optional): If True, any existing response
-                comms will be closed such that any pending messages can be
-                send/received. Defaults to False.
-
-        """
-        self.icomm.close()
+    def close(self, *args, **kwargs):
+        r"""Close the connection."""
+        self.icomm.close(*args, **kwargs)
         if self.ocomm is not None:
-            self.ocomm.close(wait_for_send=wait_for_send)
-        super(ServerComm, self).close()
+            self.ocomm.close()
+        for ocomm in self._used_response_comms.values():
+            ocomm.close()
+        super(ServerComm, self).close(*args, **kwargs)
 
     @property
     def is_open(self):
@@ -122,9 +119,14 @@ class ServerComm(CommBase.CommBase):
         return self.icomm.is_closed
 
     @property
-    def n_msg(self):
+    def n_msg_recv(self):
         r"""int: The number of messages in the connection."""
-        return self.icomm.n_msg
+        return self.icomm.n_msg_recv
+
+    @property
+    def n_msg_recv_drain(self):
+        r"""int: The number of messages in the connection to drain."""
+        return self.icomm.n_msg_recv_drain
 
     # RESPONSE COMM
     def create_response_comm(self):
@@ -135,14 +137,15 @@ class ServerComm(CommBase.CommBase):
             raise RuntimeError("Last header does not contain response address.")
         comm_kwargs = dict(address=self.icomm._last_header['response_address'],
                            direction='send', is_response_server=True,
-                           **self.response_kwargs)
+                           single_use=True, **self.response_kwargs)
         self.ocomm = get_comm(self.name + '.server_response_comm',
                               **comm_kwargs)
 
     def remove_response_comm(self):
         r"""Remove response comm."""
         self.icomm._last_header = None
-        # self.ocomm.close()
+        # self.ocomm.close_on_empty(no_wait=True)
+        self._used_response_comms[self.ocomm.name] = self.ocomm
         self.ocomm = None
 
     # SEND METHODS
@@ -183,7 +186,7 @@ class ServerComm(CommBase.CommBase):
         #     self.debug("recv(): Connection closed.")
         #     return (False, None)
         flag, msg = self.icomm.recv(*args, **kwargs)
-        if flag and msg:
+        if flag and msg and (msg != self.eof_msg):
             self.create_response_comm()
         return flag, msg
 
@@ -196,6 +199,11 @@ class ServerComm(CommBase.CommBase):
         r"""Alias for RPCComm.recv"""
         return self.recv(*args, **kwargs)
     
+    def drain_messages(self, direction='recv', **kwargs):
+        r"""Sleep while waiting for messages to be drained."""
+        if direction == 'recv':
+            self.icomm.drain_messages(direction='recv', **kwargs)
+
     def purge(self):
         r"""Purge input and output comms."""
         self.icomm.purge()

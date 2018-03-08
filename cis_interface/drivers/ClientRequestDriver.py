@@ -40,7 +40,7 @@ class ClientRequestDriver(ConnectionDriver):
             model_request_name + '_SERVER' if not set.
         comm (str, optional): The comm class that should be used to
             communicate with the server request driver. Defaults to
-            _default_comm.
+            tools.get_default_comm().
         comm_address (str, optional): Address for the server request driver.
             Defaults to None and a new address is generated.
         **kwargs: Additional keyword arguments are passed to parent class.
@@ -70,6 +70,7 @@ class ClientRequestDriver(ConnectionDriver):
             ocomm_kws['address'] = comm_address
         ocomm_kws['no_suffix'] = True
         ocomm_kws['is_client'] = True
+        ocomm_kws['close_on_eof_send'] = False
         kwargs['ocomm_kws'] = ocomm_kws
         # Parent and attributes
         super(ClientRequestDriver, self).__init__(model_request_name, **kwargs)
@@ -78,6 +79,7 @@ class ClientRequestDriver(ConnectionDriver):
         self.comm = comm
         self.comm_address = self.ocomm.opp_address
         self._block_response = False
+        self._is_output = True
 
     @property
     def last_header(self):
@@ -112,48 +114,50 @@ class ClientRequestDriver(ConnectionDriver):
         r"""str: The address of the channel used to send requests to the server
         request driver."""
         return self.ocomm.opp_address
-    
-    def terminate(self, *args, **kwargs):
-        r"""Stop response drivers."""
+
+    def close_response_drivers(self):
+        r"""Close response driver."""
         # To force response server to connect after response client has stopped
         # self.sleep(0.5)
         with self.lock:
+            self.debug("Closing response drivers.")
             self._block_response = True
             for x in self.response_drivers:
                 x.terminate()
             self.response_drivers = []
-        super(ClientRequestDriver, self).terminate(*args, **kwargs)
 
-    def on_model_exit(self):
-        r"""Close RPC comm when model exits."""
-        with self.lock:
-            self.icomm.close()
-        super(ClientRequestDriver, self).on_model_exit()
+    def close_comm(self):
+        r"""Close response drivers."""
+        self.close_response_drivers()
+        super(ClientRequestDriver, self).close_comm()
+            
+    def printStatus(self, *args, **kwargs):
+        r"""Also print response drivers."""
+        super(ClientRequestDriver, self).printStatus(*args, **kwargs)
+        for x in self.response_drivers:
+            x.printStatus(*args, **kwargs)
 
     def before_loop(self):
         r"""Send client sign on to server response driver."""
         super(ClientRequestDriver, self).before_loop()
         # self.sleep()  # Help ensure that the server is connected
+        self.debug("Sending client sign on")
         super(ClientRequestDriver, self).send_message(CIS_CLIENT_INI)
+        # self.info("%s: before loop complete", self.name)
 
-    def after_loop(self):
-        r"""After client model signs off. Sent EOF to server."""
+    def send_eof(self):
+        r"""Send EOF message.
+
+        Returns:
+            bool: Success or failure of send.
+
+        """
         with self.lock:
-            self.debug()
-            self.icomm.close()
-            if self.icomm._last_header is None:
+            if self.icomm._last_header is None:  # pragma: debug
                 self.icomm._last_header = dict()
-            if self.icomm._last_header.get('response_address', None) != CIS_CLIENT_EOF:
-                self.icomm._last_header['response_address'] = CIS_CLIENT_EOF
-                self.ocomm.send_eof()
-        super(ClientRequestDriver, self).after_loop()
-    
-    def on_eof(self):
-        r"""On EOF, set response_address to EOF, then send it along."""
-        with self.lock:
             self.icomm._last_header['response_address'] = CIS_CLIENT_EOF
-        return super(ClientRequestDriver, self).on_eof()
-    
+        return super(ClientRequestDriver, self).send_eof()
+
     def send_message(self, *args, **kwargs):
         r"""Start a response driver for a request message and send message with
         header.
@@ -174,7 +178,8 @@ class ClientRequestDriver(ConnectionDriver):
                 if (not self.is_comm_open) or self._block_response:  # pragma: debug
                     return False
                 drv_args = [self.model_response_address]
-                drv_kwargs = dict(comm=self.comm, msg_id=self.request_id)
+                drv_kwargs = dict(comm=self.comm, msg_id=self.request_id,
+                                  request_name=self.name)
                 self.debug("Creating response comm: address = %s, request_id = %s",
                            self.model_response_address, self.request_id)
                 try:

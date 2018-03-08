@@ -2,9 +2,10 @@
 #include <stdlib.h>
 #include "PsiInterface.hpp"
 
+#define BSIZE 100
 
-int main(int argc, char *argv[]){
-    const uint BSIZE = 8192; // the max
+
+int main() {
     int ret;
     char adata[BSIZE];
     char bdata[BSIZE];

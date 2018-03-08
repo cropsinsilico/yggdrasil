@@ -5,10 +5,8 @@ from cis_interface.interface.PsiInterface import PsiInput, PsiOutput
 in_channel = PsiInput('input')
 out_channel = PsiOutput('output')
 
-flag = True
-
 # Loop until there is no longer input or the queues are closed
-while flag:
+while True:
     
     # Receive input from input channel
     # If there is an error, the flag will be False

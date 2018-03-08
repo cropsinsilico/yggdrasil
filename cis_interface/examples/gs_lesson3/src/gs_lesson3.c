@@ -2,6 +2,8 @@
 // Include methods for input/output channels
 #include "PsiInterface.h"
 
+#define MYBUFSIZ 1000
+
 int main(int argc, char *argv[]) {
   // Initialize input/output channels
   psiInput_t in_channel = psiInput("input");
@@ -9,8 +11,7 @@ int main(int argc, char *argv[]) {
 
   // Declare resulting variables and create buffer for received message
   int flag = 1;
-  const int bufsiz = 1000;
-  char buf[bufsiz];
+  char buf[MYBUFSIZ];
 
   // Loop until there is no longer input or the queues are closed
   while (flag >= 0) {
@@ -18,7 +19,7 @@ int main(int argc, char *argv[]) {
     // Receive input from input channel
     // If there is an error or the queue is closed, the flag will be negative
     // Otherwise, it is the size of the received message
-    flag = psi_recv(in_channel, buf, bufsiz);
+    flag = psi_recv(in_channel, buf, MYBUFSIZ);
     if (flag < 0) {
       printf("No more input.\n");
       break;
@@ -37,10 +38,6 @@ int main(int argc, char *argv[]) {
 
   }
 
-  // Free input/output channels
-  psi_free(&in_channel);
-  psi_free(&out_channel);
-  
   return 0;
 }
 

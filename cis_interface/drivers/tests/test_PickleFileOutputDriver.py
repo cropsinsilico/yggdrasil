@@ -26,9 +26,8 @@ class TestPickleFileOutputDriver(TestPickleFileOutputParam,
                                  parent.TestFileOutputDriver):
     r"""Test runner for PickleFileOutputDriver."""
 
-    def setup(self):
-        r"""Create a driver instance and start the driver."""
-        super(parent.TestFileOutputDriver, self).setup()
+    def send_file_contents(self):
+        r"""Send file contents to driver."""
         self.send_comm.send_nolimit(self.pickled_data)
         self.send_comm.send_eof()
 

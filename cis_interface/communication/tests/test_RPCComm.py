@@ -49,9 +49,12 @@ class TestRPCComm(test_CommBase.TestCommBase):
         r"""Test RPC call."""
         self.send_instance.sched_task(0.01, self.send_instance.send,
                                       args=[self.msg_short])
-        flag, msg_recv = self.recv_instance.call(self.msg_short)
+        flag, msg_recv = self.recv_instance.call(self.msg_short,
+                                                 timeout=self.timeout)
+        assert(flag)
         nt.assert_equal(msg_recv, self.msg_short)
-        flag, msg_recv = self.send_instance.recv()
+        flag, msg_recv = self.send_instance.recv(timeout=self.timeout)
+        assert(flag)
         nt.assert_equal(msg_recv, self.msg_short)
         self.recv_instance.close()
         flag, msg_recv = self.recv_instance.call(self.msg_short)
@@ -61,16 +64,18 @@ class TestRPCComm(test_CommBase.TestCommBase):
         r"""Test RPC call aliases."""
         self.send_instance.sched_task(0.01, self.send_instance.rpcSend,
                                       args=[self.msg_short])
-        flag, msg_recv = self.recv_instance.rpcCall(self.msg_short)
+        flag, msg_recv = self.recv_instance.rpcCall(self.msg_short,
+                                                    timeout=self.timeout)
         nt.assert_equal(msg_recv, self.msg_short)
-        flag, msg_recv = self.send_instance.rpcRecv()
+        flag, msg_recv = self.send_instance.rpcRecv(timeout=self.timeout)
         nt.assert_equal(msg_recv, self.msg_short)
 
     def test_call_nolimit(self):
         r"""Test RPC nolimit call."""
         self.send_instance.sched_task(0.01, self.send_instance.send_nolimit,
                                       args=[self.msg_long])
-        flag, msg_recv = self.recv_instance.call_nolimit(self.msg_long)
+        flag, msg_recv = self.recv_instance.call_nolimit(self.msg_long,
+                                                         timeout=self.timeout)
         nt.assert_equal(msg_recv, self.msg_long)
-        flag, msg_recv = self.send_instance.recv_nolimit()
+        flag, msg_recv = self.send_instance.recv_nolimit(timeout=self.timeout)
         nt.assert_equal(msg_recv, self.msg_long)

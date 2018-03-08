@@ -1,24 +1,34 @@
 import os
 import numpy as np
 import nose.tools as nt
+import unittest
 from cis_interface.interface import PsiInterface
-from cis_interface.tools import PSI_MSG_EOF, PSI_MSG_MAX
+from cis_interface.tools import CIS_MSG_EOF, get_CIS_MSG_MAX, CIS_MSG_BUF
 from cis_interface.drivers import (
-    import_driver, InputCommDriver, OutputCommDriver)
+    import_driver, InputCommDriver, OutputCommDriver, MatlabModelDriver)
 from cis_interface.tests import CisTest, IOInfo
+
+
+CIS_MSG_MAX = get_CIS_MSG_MAX()
 
 
 def test_maxMsgSize():
     r"""Test max message size."""
-    nt.assert_equal(PsiInterface.maxMsgSize(), PSI_MSG_MAX)
+    nt.assert_equal(PsiInterface.maxMsgSize(), CIS_MSG_MAX)
 
 
 def test_eof_msg():
     r"""Test eof message signal."""
-    nt.assert_equal(PsiInterface.eof_msg(), PSI_MSG_EOF)
+    nt.assert_equal(PsiInterface.eof_msg(), CIS_MSG_EOF)
 
 
-def test_PsiMatlab_class():
+def test_bufMsgSize():
+    r"""Test buf message size."""
+    nt.assert_equal(PsiInterface.bufMsgSize(), CIS_MSG_BUF)
+
+
+@unittest.skipIf(not MatlabModelDriver._matlab_installed, "Matlab not installed.")
+def test_PsiMatlab_class():  # pragma: matlab
     r"""Test Matlab interface for classes."""
     name = 'test'
     # Input
@@ -35,10 +45,11 @@ def test_PsiMatlab_class():
     drv.terminate()
 
 
-def test_PsiMatlab_variables():
+@unittest.skipIf(not MatlabModelDriver._matlab_installed, "Matlab not installed.")
+def test_PsiMatlab_variables():  # pragma: matlab
     r"""Test Matlab interface for variables."""
-    nt.assert_equal(PsiInterface.PsiMatlab('PSI_MSG_MAX'), PSI_MSG_MAX)
-    nt.assert_equal(PsiInterface.PsiMatlab('PSI_MSG_EOF'), PSI_MSG_EOF)
+    nt.assert_equal(PsiInterface.PsiMatlab('PSI_MSG_MAX'), CIS_MSG_MAX)
+    nt.assert_equal(PsiInterface.PsiMatlab('PSI_MSG_EOF'), CIS_MSG_EOF)
 
 
 # @nt.nottest
@@ -85,8 +96,16 @@ class TestBase(CisTest, IOInfo):
     def teardown(self):
         r"""Stop the driver."""
         if not self._skip_start:
-            self.driver.stop()
+            self.driver.terminate()
         super(TestBase, self).teardown()
+        self.cleanup_comms()
+
+    def remove_instance(self, inst):
+        r"""Remove an instance."""
+        inst.is_interface = False
+        inst.close()
+        assert(inst.is_closed)
+        super(TestBase, self).remove_instance(inst)
 
     
 class TestPsiInput(TestBase):
@@ -379,7 +398,7 @@ class TestPsiAsciiFileInput_local(TestPsiAsciiFileInput):
         
 
 class TestPsiAsciiFileOutput(TestBase):
-    r"""Test output from an unformatted text file."""
+    r"""Test output to an unformatted text file."""
     def __init__(self, *args, **kwargs):
         super(TestPsiAsciiFileOutput, self).__init__(*args, **kwargs)
         self._cls = 'PsiAsciiFileOutput'
@@ -470,11 +489,12 @@ class TestPsiAsciiTableInput_local(TestPsiAsciiTableInput):
         super(TestPsiAsciiTableInput_local, self).test_recv_line()
 
 
-class TestPsiAsciiTableInputArray(TestPsiAsciiTableInput):
+class TestPsiAsciiArrayInput(TestPsiAsciiTableInput):
     r"""Test input from an ASCII table."""
     def __init__(self, *args, **kwargs):
-        super(TestPsiAsciiTableInputArray, self).__init__(*args, **kwargs)
-        self._inst_kwargs = {'as_array': True}
+        super(TestPsiAsciiArrayInput, self).__init__(*args, **kwargs)
+        self._cls = 'PsiAsciiArrayInput'
+        self.driver_name = 'AsciiTableInputDriver'
         self._driver_kwargs = {'as_array': True}
 
     def test_recv_line(self):
@@ -486,16 +506,16 @@ class TestPsiAsciiTableInputArray(TestPsiAsciiTableInput):
         assert(not msg_flag)
 
 
-class TestPsiAsciiTableInputArray_local(TestPsiAsciiTableInputArray):
+class TestPsiAsciiArrayInput_local(TestPsiAsciiArrayInput):
     r"""Test input from an ASCII table."""
     def __init__(self, *args, **kwargs):
-        super(TestPsiAsciiTableInputArray_local, self).__init__(*args, **kwargs)
+        super(TestPsiAsciiArrayInput_local, self).__init__(*args, **kwargs)
         self._inst_args = [self.tempfile]
         self._inst_kwargs['src_type'] = 0  # local
 
     def test_recv_line(self):
         r"""Test receiving an array from a local table."""
-        super(TestPsiAsciiTableInputArray_local, self).test_recv_line()
+        super(TestPsiAsciiArrayInput_local, self).test_recv_line()
 
         
 class TestPsiAsciiTableOutput(TestPsiAsciiFileOutput):
@@ -547,11 +567,12 @@ class TestPsiAsciiTableOutput_local(TestPsiAsciiTableOutput):
         super(TestPsiAsciiTableOutput_local, self).test_send_line()
         
         
-class TestPsiAsciiTableOutputArray(TestPsiAsciiTableOutput):
+class TestPsiAsciiArrayOutput(TestPsiAsciiTableOutput):
     r"""Test input from an ASCII table."""
     def __init__(self, *args, **kwargs):
-        super(TestPsiAsciiTableOutputArray, self).__init__(*args, **kwargs)
-        self._inst_kwargs = {'as_array': True}
+        super(TestPsiAsciiArrayOutput, self).__init__(*args, **kwargs)
+        self._cls = 'PsiAsciiArrayOutput'
+        self.driver_name = 'AsciiTableOutputDriver'
         self._driver_kwargs = {'as_array': True}
 
     def test_send_line(self):
@@ -571,16 +592,16 @@ class TestPsiAsciiTableOutputArray(TestPsiAsciiTableOutput):
             nt.assert_equal(res, self.file_contents)
         
         
-class TestPsiAsciiTableOutputArray_local(TestPsiAsciiTableOutputArray):
+class TestPsiAsciiArrayOutput_local(TestPsiAsciiArrayOutput):
     r"""Test input from an ASCII table as array."""
     def __init__(self, *args, **kwargs):
-        super(TestPsiAsciiTableOutputArray_local, self).__init__(*args, **kwargs)
+        super(TestPsiAsciiArrayOutput_local, self).__init__(*args, **kwargs)
         self._inst_args = [self.tempfile, self.fmt_str]
         self._inst_kwargs['dst_type'] = 0  # local
 
     def test_send_line(self):
         r"""Test sending an array to a local table."""
-        super(TestPsiAsciiTableOutputArray_local, self).test_send_line()
+        super(TestPsiAsciiArrayOutput_local, self).test_send_line()
         
         
 class TestPsiPickleInput(TestBase):
@@ -619,6 +640,7 @@ class TestPsiPickleInput(TestBase):
         self.instance.stop_timeout()
         msg_flag, res = self.instance.recv(timeout=self.timeout)
         assert(msg_flag)
+        assert(len(res) > 0)
         self.assert_equal_data_dict(res)
 
 

@@ -70,14 +70,11 @@ class TestRPCCommDriverNoStart(TestRPCCommParam, parent.TestCommDriverNoStart):
         inst = self.get_fresh_error_instance('ocomm')
         inst.open_comm()
         inst.comm.ocomm.error_replace('close')
-        print('before error')
         nt.assert_raises(MagicTestError, inst.close_comm)
-        print('after error')
         assert(inst.comm.icomm.is_closed)
         inst.comm.ocomm.restore_all()
         inst.comm.ocomm.close()
         assert(inst.comm.ocomm.is_closed)
-        print('after test')
 
 
 class TestRPCCommDriver(TestRPCCommParam, parent.TestCommDriver):

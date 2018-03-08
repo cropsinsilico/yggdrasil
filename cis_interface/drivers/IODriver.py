@@ -14,7 +14,7 @@ class IODriver(CommDriver):
     """
     def __init__(self, name, suffix="", **kwargs):
         super(IODriver, self).__init__(name + suffix, **kwargs)
-        self.debug()
+        self.debug('')
 
     # @property
     # def n_ipc_msg(self):

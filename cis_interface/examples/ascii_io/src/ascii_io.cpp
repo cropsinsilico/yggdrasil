@@ -3,9 +3,10 @@
 // Include interface methods
 #include "PsiInterface.hpp"
 
+#define BSIZE 8192 // the max
+
 
 int main(int argc,char *argv[]){
-  const uint BSIZE = 8192; // the max
   int ret;
 
   // Input & output to an ASCII file line by line
@@ -14,7 +15,7 @@ int main(int argc,char *argv[]){
   // Input & output from a table row by row
   PsiAsciiTableInput TableInput("inputCPP_table");
   PsiAsciiTableOutput TableOutput("outputCPP_table",
-				  "%5s\t%ld\t%3.1f\t%3.1lf%+3.1lfj\n");
+                                  "%5s\t%ld\t%3.1f\t%3.1lf%+3.1lfj\n");
   // Input & output from a table as an array
   PsiAsciiTableInput ArrayInput("inputCPP_array", 1);
   PsiAsciiTableOutput ArrayOutput("outputCPP_array",
@@ -33,7 +34,7 @@ int main(int argc,char *argv[]){
       // If the receive was succesful, send the line to output
       printf("File: %s", line);
       ret = FileOutput.send_line(line);
-      if (ret != 0) {
+      if (ret < 0) {
 	printf("ascii_io(CPP): ERROR SENDING LINE\n");
 	break;
       }
@@ -63,7 +64,7 @@ int main(int argc,char *argv[]){
       printf("Table: %.5s, %d, %3.1f, %3.1lf%+3.1lfj\n", name, number, value,
 	     comp_real, comp_imag);
       ret = TableOutput.send(5, name, number, value, comp_real, comp_imag);
-      if (ret != 0) {
+      if (ret < 0) {
 	printf("ascii_io(CPP): ERROR SENDING ROW\n");
 	break;
       }
@@ -98,7 +99,7 @@ int main(int argc,char *argv[]){
     // output driver side.
     ret = ArrayOutput.send(5, ret, name_arr, number_arr, value_arr,
 			   comp_real_arr, comp_imag_arr);
-    if (ret != 0)
+    if (ret < 0)
       printf("ascii_io(CPP): ERROR SENDING ARRAY\n");
   }
   

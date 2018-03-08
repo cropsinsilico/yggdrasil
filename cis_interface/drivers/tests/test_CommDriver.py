@@ -4,8 +4,9 @@ import nose.tools as nt
 from cis_interface.tests import IOInfo, MagicTestError
 from cis_interface.drivers import import_driver
 from cis_interface.drivers.tests import test_Driver as parent
+from cis_interface import tools
 from cis_interface.communication import (
-    get_comm_class, new_comm, _default_comm)
+    get_comm_class, new_comm)
 
             
 class TestCommParam(parent.TestParam, IOInfo):
@@ -14,7 +15,7 @@ class TestCommParam(parent.TestParam, IOInfo):
         super(TestCommParam, self).__init__(*args, **kwargs)
         IOInfo.__init__(self)
         self.driver = 'CommDriver'
-        self.comm_name = _default_comm
+        self.comm_name = tools.get_default_comm()
         self.attr_list += ['state', 'numSent', 'numReceived', 'comm_name',
                            'comm']
         # self.timeout = 1.0

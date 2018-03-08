@@ -1,6 +1,5 @@
 import os
 import numpy as np
-import nose.tools as nt
 from cis_interface.examples.tests import TestExample
 from cis_interface.dataio.AsciiTable import AsciiTable
 
@@ -10,31 +9,7 @@ class TestExampleAsciiIO(TestExample):
 
     def __init__(self, *args, **kwargs):
         super(TestExampleAsciiIO, self).__init__(*args, **kwargs)
-        self.name = 'ascii_io'
-        self._old_encoding = None
-
-    def set_utf8_encoding(self):
-        r"""Set the encoding to utf-8 if it is not already."""
-        old_lang = os.environ.get('LANG', '')
-        if 'UTF-8' not in old_lang:  # pragma: debug
-            self._old_encoding = old_lang
-            os.environ['LANG'] = 'en_US.UTF-8'
-            
-    def reset_encoding(self):
-        r"""Reset the encoding to the original value before the test."""
-        if self._old_encoding is not None:  # pragma: debug
-            os.environ['LANG'] = self._old_encoding
-            self._old_encoding = None
-
-    def setup(self):
-        r"""Set encoding before setup."""
-        self.set_utf8_encoding()
-        super(TestExampleAsciiIO, self).setup()
-
-    def teardown(self):
-        r"""Reset encoding to previous value after teardown."""
-        super(TestExampleAsciiIO, self).teardown()
-        self.reset_encoding()
+        self._name = 'ascii_io'
 
     @property
     def input_file(self):
@@ -56,7 +31,7 @@ class TestExampleAsciiIO(TestExample):
         r"""str: Output file for the run."""
         for o, yml in self.runner.outputdrivers.items():
             if yml['driver'] == 'AsciiFileOutputDriver':
-                return yml['args']
+                return os.path.join(self.tempdir, yml['args'])
         raise Exception('Could not locate output file in yaml.')  # pragma: debug
 
     @property
@@ -65,7 +40,7 @@ class TestExampleAsciiIO(TestExample):
         for o, yml in self.runner.outputdrivers.items():
             if (((yml['driver'] == 'AsciiTableOutputDriver') and
                  (not yml.get('as_array', False)))):
-                return yml['args']
+                return os.path.join(self.tempdir, yml['args'])
         raise Exception('Could not locate output table in yaml.')  # pragma: debug
 
     @property
@@ -74,37 +49,29 @@ class TestExampleAsciiIO(TestExample):
         for o, yml in self.runner.outputdrivers.items():
             if (((yml['driver'] == 'AsciiTableOutputDriver') and
                  (yml.get('as_array', False)))):
-                return yml['args']
+                return os.path.join(self.tempdir, yml['args'])
         raise Exception('Could not locate output array in yaml.')  # pragma: debug
 
-    def check_file(self):
-        r"""Assert that contents of input/output ascii files are identical."""
+    @property
+    def output_files(self):
+        r"""list: Output files for the run."""
+        return [self.output_file, self.output_table, self.output_array]
+
+    @property
+    def results(self):
+        r"""list: Results that should be found in the output files."""
         assert(os.path.isfile(self.input_file))
-        assert(os.path.isfile(self.output_file))
-        with open(self.input_file, 'rb') as fd:
-            icont = fd.read()
-        with open(self.output_file, 'rb') as fd:
-            ocont = fd.read()
-        nt.assert_equal(icont, ocont)
-        
-    def check_table(self):
-        r"""Assert that contents of input/output ascii tables are identical."""
         assert(os.path.isfile(self.input_table))
-        assert(os.path.isfile(self.output_table))
-        iAT = AsciiTable(self.input_table, 'r')
-        oAT = AsciiTable(self.output_table, 'r', column_names=iAT.column_names)
-        np.testing.assert_equal(oAT.arr, iAT.arr)
-        
-    def check_array(self):
-        r"""Assert that contents of input/output ascii arrays are identical."""
-        assert(os.path.isfile(self.input_array))
         assert(os.path.isfile(self.output_array))
-        iAT = AsciiTable(self.input_array, 'r')
-        oAT = AsciiTable(self.output_array, 'r', column_names=iAT.column_names)
+        with open(self.input_file, 'r') as fd:
+            icont = fd.read()
+        iATT = AsciiTable(self.input_table, 'r')
+        iATA = AsciiTable(self.input_array, 'r')
+        return [icont,
+                (self.check_table, iATT),
+                (self.check_table, iATA)]
+
+    def check_table(self, fname, iAT):
+        r"""Assert that contents of input/output ascii tables are identical."""
+        oAT = AsciiTable(fname, 'r', column_names=iAT.column_names)
         np.testing.assert_equal(oAT.arr, iAT.arr)
-        
-    def check_result(self):
-        r"""Ensure output files are identical to input files."""
-        self.check_file()
-        self.check_table()
-        self.check_array()
