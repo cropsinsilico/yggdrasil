@@ -44,6 +44,10 @@ if cov_installed and IS_WINDOWS:
     def locate(fname, brute_force=False):
         try:
             if brute_force:
+                if os.environ.get('APPVEYOR_BUILD_FOLDER', False):
+                    warnings.warn("Brute force search disabled on appveyor.")
+                    return False
+                warnings.warn("Running brute force search for %s" % fname)
                 out = subprocess.check_output(["dir", fname, "/s/b"], shell=True,
                                               cwd=os.path.abspath(os.sep))
             else:

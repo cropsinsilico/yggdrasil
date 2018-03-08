@@ -161,7 +161,7 @@ _zmq_installed = is_zmq_installed()
 _zmq_installed_c = _zmq_installed
 if not (_ipc_installed or _zmq_installed):  # pragma: windows
     if is_zmq_installed(check_c=False):
-        logging.warning(("ZeroMQ C library not installed, but the Python package is." +
+        logging.warning(("ZeroMQ C library not installed, but the Python package is. " +
                          "Running C and C++ models will be disabled."))
         _zmq_installed = True
     else:  # pragma: debug
