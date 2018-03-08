@@ -2,7 +2,8 @@ import os
 from cis_interface import platform
 from cis_interface.config import cis_cfg
 from cis_interface.tools import (
-    _zmq_installed, _ipc_installed, get_default_comm, popen_nobuffer, print_encoded)
+    _zmq_installed_c, _ipc_installed, get_default_comm,
+    popen_nobuffer, print_encoded)
 from cis_interface.drivers.ModelDriver import ModelDriver
 
 
@@ -23,7 +24,7 @@ def get_zmq_flags():
     """
     _compile_flags = []
     _linker_flags = []
-    if _zmq_installed:
+    if _zmq_installed_c:
         if platform._is_win:  # pragma: windows
             for l in ["libzmq", "czmq"]:
                 plib = cis_cfg.get('windows', '%s_static' % l, False)
@@ -67,7 +68,7 @@ def get_flags():
         _regex_win32 = os.path.split(_regex_win32_lib)
         _compile_flags += ["/nologo", "-D_CRT_SECURE_NO_WARNINGS", "-I" + _regex_win32[0]]
         _linker_flags += [_regex_win32[1], '/LIBPATH:"%s"' % _regex_win32[0]]
-    if _zmq_installed:
+    if _zmq_installed_c:
         zmq_flags = get_zmq_flags()
         _compile_flags += zmq_flags[0]
         _linker_flags += zmq_flags[1]
@@ -79,6 +80,9 @@ def get_flags():
         _compile_flags += ["-I" + x]
     if get_default_comm() == 'IPCComm':
         _compile_flags += ["-DIPCDEF"]
+    elif (get_default_comm() == 'ZMQComm') and (not _zmq_installed_c):  # pragma: windows
+        raise Exception(("ZeroMQ C libraries are not installed and IPC libraries " +
+                         "are not available on Windows."))
     return _compile_flags, _linker_flags
 
 

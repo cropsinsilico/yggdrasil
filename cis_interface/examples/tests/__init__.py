@@ -176,6 +176,7 @@ class TestExample(unittest.TestCase, tools.CisClass):
                 if os.path.isfile(fout):
                     os.remove(fout)
 
+    @unittest.skipIf(not tools._c_library_avail, "C Library not installed")
     def test_all(self):
         r"""Test the version of the example that uses all languages."""
         self.language = 'all'
@@ -188,12 +189,14 @@ class TestExample(unittest.TestCase, tools.CisClass):
         self.run_example()
         self.language = None
 
+    @unittest.skipIf(not tools._c_library_avail, "C Library not installed")
     def test_c(self):
         r"""Test the C version of the example."""
         self.language = 'c'
         self.run_example()
         self.language = None
 
+    @unittest.skipIf(not tools._c_library_avail, "C Library not installed")
     def test_cpp(self):
         r"""Test the C++ version of the example."""
         self.language = 'cpp'

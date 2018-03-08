@@ -118,13 +118,21 @@ def is_ipc_installed():
     return (platform._is_linux or platform._is_osx)
 
 
-def is_zmq_installed():
+def is_zmq_installed(check_c=True):
     r"""Determine if the libczmq & libzmq libraries are installed.
 
     Returns:
         bool: True if both libraries are installed, False otherwise.
 
     """
+    # Check existence of zmq python package
+    try:
+        import zmq
+    except ImportError:
+        return False
+    assert(zmq)
+    if not check_c:  # pragma: windows
+        return True
     # Check existence of config paths for windows
     if platform._is_win:  # pragma: windows
         opts = ['libzmq_include', 'libzmq_static',  # 'libzmq_dynamic',
@@ -150,8 +158,16 @@ def is_zmq_installed():
 
 _ipc_installed = is_ipc_installed()
 _zmq_installed = is_zmq_installed()
-if not (_ipc_installed or _zmq_installed):  # pragma: debug
-    raise Exception('Neither ZMQ or IPC installed.')
+_zmq_installed_c = _zmq_installed
+if not (_ipc_installed or _zmq_installed):  # pragma: windows
+    if is_zmq_installed(check_c=False):
+        logging.warning(("ZeroMQ C library not installed, but the Python package is." +
+                         "Running C and C++ models will be disabled."))
+        _zmq_installed = True
+    else:  # pragma: debug
+        raise Exception('Neither ZMQ or IPC installed.')
+_c_library_avail = (_ipc_installed or _zmq_installed_c)
+
 CIS_MSG_EOF = backwards.unicode2bytes("EOF!!!")
 CIS_MSG_BUF = 1024 * 2
 
@@ -162,13 +178,15 @@ def get_default_comm():
         _default_comm = os.environ['CIS_DEFAULT_COMM']
         if _default_comm not in ['ZMQComm', 'IPCComm', 'RMQComm']:  # pragma: debug
             raise Exception('Unrecognized default comm %s set by CIS_DEFAULT_COMM' % (
-                _default_comm))
-    elif _zmq_installed:
+                            _default_comm))
+    elif _zmq_installed_c:
         _default_comm = 'ZMQComm'
     elif _ipc_installed:
         _default_comm = 'IPCComm'
+    elif _zmq_installed:
+        _default_comm = 'ZMQComm'
     else:  # pragma: debug
-        raise Exception('Neither ZMQ or IPC installed.')
+        raise Exception('Neither ZMQ nor IPC installed.')
     return _default_comm
 
 

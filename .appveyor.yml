@@ -38,11 +38,11 @@ environment:
   matrix:
     - platform: x64
       PYTHON_VERSION: "2.7"
+      INSTALLZMQ: 0
+    - platform: x64
+      PYTHON_VERSION: "2.7"
     - platform: x64
       PYTHON_VERSION: "3.6"
-    # - platform: x64
-    #   PYTHON_VERSION: "2.7"
-    #   INSTALLRMQ: 1
 
 install:
   - "SET MSVCVER=%APPVEYOR_BUILD_WORKER_IMAGE:~-2,2%"

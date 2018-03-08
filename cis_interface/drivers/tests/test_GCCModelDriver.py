@@ -1,16 +1,25 @@
 import os
 import nose.tools as nt
-from cis_interface import platform
+import unittest
+from cis_interface import platform, tools
 from cis_interface.tests import scripts
 import cis_interface.drivers.tests.test_ModelDriver as parent
 from cis_interface.drivers.GCCModelDriver import GCCModelDriver
 
 
+@unittest.skipIf(tools._c_library_avail, "C Library installed")
+def test_GCCModelDriver_no_C_library():  # pragma: windows
+    r"""Test GCCModelDriver error when C library not installed."""
+    nt.assert_raises(Exception, GCCModelDriver, scripts['c'])
+
+
+@unittest.skipIf(not tools._c_library_avail, "C Library not installed")
 def test_GCCModelDriver_errors():
     r"""Test GCCModelDriver errors."""
     nt.assert_raises(RuntimeError, GCCModelDriver, 'test', 'test.py')
 
 
+@unittest.skipIf(not tools._c_library_avail, "C Library not installed")
 class TestGCCModelParam(parent.TestModelParam):
     r"""Test parameters for GCCModelDriver."""
 
@@ -25,7 +34,8 @@ class TestGCCModelParam(parent.TestModelParam):
         else:
             self.args = src + ['1', '-I' + script_dir, '-L' + script_dir]
 
-        
+
+@unittest.skipIf(not tools._c_library_avail, "C Library not installed")
 class TestGCCModelDriverNoStart(TestGCCModelParam,
                                 parent.TestModelDriverNoStart):
     r"""Test runner for GCCModelDriver without start."""
@@ -49,6 +59,7 @@ class TestGCCModelDriverNoStart(TestGCCModelParam,
         super(TestGCCModelDriverNoStart, self).teardown()
 
 
+@unittest.skipIf(not tools._c_library_avail, "C Library not installed")
 class TestGCCModelDriverNoStart_std(TestGCCModelDriverNoStart):
     r"""Test runner for GCCModelDriver with std lib specified."""
 
@@ -57,6 +68,7 @@ class TestGCCModelDriverNoStart_std(TestGCCModelDriverNoStart):
         self.args.append('-std=c++11')
 
 
+@unittest.skipIf(not tools._c_library_avail, "C Library not installed")
 class TestGCCModelDriver(TestGCCModelParam, parent.TestModelDriver):
     r"""Test runner for GCCModelDriver."""
 

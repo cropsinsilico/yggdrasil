@@ -150,16 +150,9 @@ except (ImportError, IOError):
 
 # Create requirements list based on platform
 requirements = ["numpy", "scipy", "pyyaml", "pystache", "nose", "psutil", "zmq"]
-optional_requirements = ["pika", "astropy"]
-if IS_WINDOWS:
-    pass
-    # requirements.append("zmq")
-else:
-    # optional_requirements.append("zmq")
-    # optional_requirements.append("sysv_ipc")
+# optional_requirements = ["pika", "astropy"]
+if not IS_WINDOWS:
     requirements.append("sysv_ipc")
-# TODO: Test without optional requirements
-# requirements += optional_requirements
     
 setup(
     name="cis_interface",
