@@ -35,7 +35,7 @@ def test_get_flags():
 @unittest.skipIf(tools._c_library_avail, "C Library installed")
 def test_GCCModelDriver_no_C_library():  # pragma: windows
     r"""Test GCCModelDriver error when C library not installed."""
-    nt.assert_raises(RuntimeError, GCCModelDriver, scripts['c'])
+    nt.assert_raises(RuntimeError, GCCModelDriver, 'test', scripts['c'])
 
 
 @unittest.skipIf(not tools._c_library_avail, "C Library not installed")
