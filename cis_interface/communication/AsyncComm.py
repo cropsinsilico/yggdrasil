@@ -97,6 +97,11 @@ class AsyncComm(CommBase.CommBase):
         self._close_direct()
         super(AsyncComm, self)._close(linger=linger)
 
+    def stop_backlog(self):
+        r"""Stop the asynchronous backlog, turning this into a direct comm."""
+        self._close_backlog(wait=True)
+        self.dont_backlog = True
+
     @property
     def is_open(self):
         r"""bool: True if the backlog is open."""

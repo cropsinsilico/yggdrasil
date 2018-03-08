@@ -21,9 +21,7 @@ class TestAsyncComm(test_CommBase.TestCommBase):
         r"""Test send/recv direct."""
         self.send_instance.n_msg_backlog
         self.recv_instance.n_msg_backlog
-        self.send_instance.backlog_thread.set_break_flag()
-        self.recv_instance.backlog_thread.set_break_flag()
-        self.send_instance.dont_backlog = True
-        self.recv_instance.dont_backlog = True
-        self.do_send_recv(send_kwargs={'no_backlog': True, 'no_confirm': True},
-                          recv_kwargs={'no_backlog': True, 'no_confirm': True})
+        self.send_instance.stop_backlog()
+        self.recv_instance.stop_backlog()
+        self.do_send_recv(send_kwargs={'no_confirm': True},
+                          recv_kwargs={'no_confirm': True})
