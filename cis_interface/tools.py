@@ -128,7 +128,7 @@ def is_zmq_installed(check_c=True):
     # Check existence of zmq python package
     try:
         import zmq
-    except ImportError:
+    except ImportError:  # pragma: windows
         return False
     assert(zmq)
     if not check_c:  # pragma: windows
@@ -183,7 +183,7 @@ def get_default_comm():
         _default_comm = 'ZMQComm'
     elif _ipc_installed:
         _default_comm = 'IPCComm'
-    elif _zmq_installed:
+    elif _zmq_installed:  # pragma: windows
         _default_comm = 'ZMQComm'
     else:  # pragma: debug
         raise Exception('Neither ZMQ nor IPC installed.')
