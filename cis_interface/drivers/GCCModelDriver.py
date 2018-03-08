@@ -29,7 +29,7 @@ def get_zmq_flags():
             for l in ["libzmq", "czmq"]:
                 plib = cis_cfg.get('windows', '%s_static' % l, False)
                 pinc = cis_cfg.get('windows', '%s_include' % l, False)
-                if not (plib and pinc):  # pragma: debug
+                if not (plib and pinc):
                     raise Exception("Could not locate %s .lib and .h files." % l)
                 pinc_d = os.path.dirname(pinc)
                 plib_d, plib_f = os.path.split(plib)
@@ -62,6 +62,9 @@ def get_flags():
         tuple(list, list): compile and linker flags.
 
     """
+    if (get_default_comm() == 'ZMQComm') and (not _zmq_installed_c):  # pragma: windows
+        raise Exception(("ZeroMQ C libraries are not installed and IPC libraries " +
+                         "are not available on Windows."))
     _compile_flags = []
     _linker_flags = []
     if platform._is_win:  # pragma: windows
@@ -80,9 +83,6 @@ def get_flags():
         _compile_flags += ["-I" + x]
     if get_default_comm() == 'IPCComm':
         _compile_flags += ["-DIPCDEF"]
-    elif (get_default_comm() == 'ZMQComm') and (not _zmq_installed_c):  # pragma: windows
-        raise Exception(("ZeroMQ C libraries are not installed and IPC libraries " +
-                         "are not available on Windows."))
     return _compile_flags, _linker_flags
 
 

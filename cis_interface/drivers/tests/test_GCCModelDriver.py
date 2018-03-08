@@ -4,7 +4,40 @@ import unittest
 from cis_interface import platform, tools
 from cis_interface.tests import scripts
 import cis_interface.drivers.tests.test_ModelDriver as parent
-from cis_interface.drivers.GCCModelDriver import GCCModelDriver
+from cis_interface.drivers.GCCModelDriver import (
+    GCCModelDriver, get_zmq_flags, get_ipc_flags, get_flags)
+
+
+@unittest.skipIf(not tools._zmq_installed_c, "ZMQ C Library not installed")
+def test_get_zmq_flags():
+    r"""Test get_zmq_flags."""
+    get_zmq_flags()
+
+
+@unittest.skipIf(tools._zmq_installed_c, "ZMQ C Library installed")
+def test_get_zmq_flags_no_C_library():  # pragma: windows
+    r"""Test error from get_zmq_flags when C library not installed."""
+    nt.assert_raises(Exception, get_zmq_flags)
+
+
+def test_get_ipc_flags():
+    r"""Test get_ipc_flags."""
+    cc, ld = get_ipc_flags()
+    if not tools._ipc_installed:  # pragma: windows
+        nt.assert_equal(len(cc), 0)
+        nt.assert_equal(len(ld), 0)
+
+
+@unittest.skipIf(not tools._c_library_avail, "C library not installed")
+def test_get_flags():
+    r"""Test get_flags."""
+    get_flags()
+
+
+@unittest.skipIf(tools._c_library_avail, "C library installed")
+def test_get_flags_no_C_library():  # pragma: windows
+    r"""Test get_flags error when C library not installed."""
+    nt.assert_raises(Exception, get_flags)
 
 
 @unittest.skipIf(tools._c_library_avail, "C Library installed")

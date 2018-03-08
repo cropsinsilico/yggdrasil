@@ -128,7 +128,7 @@ def is_zmq_installed(check_c=True):
     # Check existence of zmq python package
     try:
         import zmq
-    except ImportError:  # pragma: windows
+    except ImportError:  # pragma: debug
         return False
     assert(zmq)
     if not check_c:  # pragma: windows
@@ -163,6 +163,7 @@ if not (_ipc_installed or _zmq_installed):  # pragma: windows
     if is_zmq_installed(check_c=False):
         logging.warning(("ZeroMQ C library not installed, but the Python package is. " +
                          "Running C and C++ models will be disabled."))
+        _zmq_installed_c = False
         _zmq_installed = True
     else:  # pragma: debug
         raise Exception('Neither ZMQ or IPC installed.')
