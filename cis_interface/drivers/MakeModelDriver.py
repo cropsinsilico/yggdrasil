@@ -47,10 +47,15 @@ class MakeModelDriver(ModelDriver):
         makedir (str): Directory where make should be invoked from.
         makefile (str): Path to make file either relative to makedir or absolute.
 
+    Raises:
+        RuntimeError: If neither the IPC or ZMQ C libraries are available.
+
     """
     def __init__(self, name, args, make_command=None, makedir=None,
                  makefile=None, **kwargs):
         super(MakeModelDriver, self).__init__(name, args, **kwargs)
+        if not tools._c_library_avail:  # pragma: windows
+            raise RuntimeError("No library available for models written in C/C++.")
         self.debug('')
         self.compiled = False
         if make_command is None:

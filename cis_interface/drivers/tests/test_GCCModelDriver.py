@@ -8,16 +8,12 @@ from cis_interface.drivers.GCCModelDriver import (
     GCCModelDriver, get_zmq_flags, get_ipc_flags, get_flags)
 
 
-@unittest.skipIf(not tools._zmq_installed_c, "ZMQ C Library not installed")
 def test_get_zmq_flags():
     r"""Test get_zmq_flags."""
-    get_zmq_flags()
-
-
-@unittest.skipIf(tools._zmq_installed_c, "ZMQ C Library installed")
-def test_get_zmq_flags_no_C_library():  # pragma: windows
-    r"""Test error from get_zmq_flags when C library not installed."""
-    nt.assert_raises(Exception, get_zmq_flags)
+    cc, ld = get_zmq_flags()
+    if not tools._zmq_installed_c:
+        nt.assert_equal(len(cc), 0)
+        nt.assert_equal(len(ld), 0)
 
 
 def test_get_ipc_flags():
@@ -28,22 +24,18 @@ def test_get_ipc_flags():
         nt.assert_equal(len(ld), 0)
 
 
-@unittest.skipIf(not tools._c_library_avail, "C library not installed")
 def test_get_flags():
     r"""Test get_flags."""
-    get_flags()
-
-
-@unittest.skipIf(tools._c_library_avail, "C library installed")
-def test_get_flags_no_C_library():  # pragma: windows
-    r"""Test get_flags error when C library not installed."""
-    nt.assert_raises(Exception, get_flags)
+    cc, ld = get_flags()
+    if not tools._c_library_avail:  # pragma: windows
+        nt.assert_equal(len(cc), 0)
+        nt.assert_equal(len(ld), 0)
 
 
 @unittest.skipIf(tools._c_library_avail, "C Library installed")
 def test_GCCModelDriver_no_C_library():  # pragma: windows
     r"""Test GCCModelDriver error when C library not installed."""
-    nt.assert_raises(Exception, GCCModelDriver, scripts['c'])
+    nt.assert_raises(RuntimeError, GCCModelDriver, scripts['c'])
 
 
 @unittest.skipIf(not tools._c_library_avail, "C Library not installed")

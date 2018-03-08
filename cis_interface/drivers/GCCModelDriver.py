@@ -1,9 +1,7 @@
 import os
-from cis_interface import platform
+import logging
+from cis_interface import platform, tools
 from cis_interface.config import cis_cfg
-from cis_interface.tools import (
-    _zmq_installed_c, _ipc_installed, get_default_comm,
-    popen_nobuffer, print_encoded)
 from cis_interface.drivers.ModelDriver import ModelDriver
 
 
@@ -24,12 +22,12 @@ def get_zmq_flags():
     """
     _compile_flags = []
     _linker_flags = []
-    if _zmq_installed_c:
+    if tools._zmq_installed_c:
         if platform._is_win:  # pragma: windows
             for l in ["libzmq", "czmq"]:
                 plib = cis_cfg.get('windows', '%s_static' % l, False)
                 pinc = cis_cfg.get('windows', '%s_include' % l, False)
-                if not (plib and pinc):
+                if not (plib and pinc):  # pragma: debug
                     raise Exception("Could not locate %s .lib and .h files." % l)
                 pinc_d = os.path.dirname(pinc)
                 plib_d, plib_f = os.path.split(plib)
@@ -50,7 +48,7 @@ def get_ipc_flags():
     """
     _compile_flags = []
     _linker_flags = []
-    if _ipc_installed:
+    if tools._ipc_installed:
         _compile_flags += ["-DIPCINSTALLED"]
     return _compile_flags, _linker_flags
 
@@ -62,26 +60,26 @@ def get_flags():
         tuple(list, list): compile and linker flags.
 
     """
-    if (get_default_comm() == 'ZMQComm') and (not _zmq_installed_c):  # pragma: windows
-        raise Exception(("ZeroMQ C libraries are not installed and IPC libraries " +
-                         "are not available on Windows."))
     _compile_flags = []
     _linker_flags = []
+    if not tools._c_library_avail:  # pragma: windows
+        logging.warning("No library installed for models written in C")
+        return _compile_flags, _linker_flags
     if platform._is_win:  # pragma: windows
         _regex_win32 = os.path.split(_regex_win32_lib)
         _compile_flags += ["/nologo", "-D_CRT_SECURE_NO_WARNINGS", "-I" + _regex_win32[0]]
         _linker_flags += [_regex_win32[1], '/LIBPATH:"%s"' % _regex_win32[0]]
-    if _zmq_installed_c:
+    if tools._zmq_installed_c:
         zmq_flags = get_zmq_flags()
         _compile_flags += zmq_flags[0]
         _linker_flags += zmq_flags[1]
-    if _ipc_installed:
+    if tools._ipc_installed:
         ipc_flags = get_ipc_flags()
         _compile_flags += ipc_flags[0]
         _linker_flags += ipc_flags[1]
     for x in [_incl_interface, _incl_io, _incl_comm, _incl_seri]:
         _compile_flags += ["-I" + x]
-    if get_default_comm() == 'IPCComm':
+    if tools.get_default_comm() == 'IPCComm':
         _compile_flags += ["-DIPCDEF"]
     return _compile_flags, _linker_flags
 
@@ -95,22 +93,22 @@ def build_regex_win32():  # pragma: windows
     cmd = ['cl', '/c', '/Zi', '/EHsc',
            '/I', '%s' % _regex_win32_dir, _regex_win32_cpp]
     # '/out:%s' % _regex_win32_obj,
-    comp_process = popen_nobuffer(cmd, cwd=_regex_win32_dir)
+    comp_process = tools.popen_nobuffer(cmd, cwd=_regex_win32_dir)
     output, err = comp_process.communicate()
     exit_code = comp_process.returncode
     if exit_code != 0:  # pragma: debug
         print(' '.join(cmd))
-        print_encoded(output, end="")
+        tools.print_encoded(output, end="")
         raise RuntimeError("Could not create regex_win32.obj")
     assert(os.path.isfile(_regex_win32_obj))
     # Create library
     cmd = ['lib', '/out:%s' % _regex_win32_lib, _regex_win32_obj]
-    comp_process = popen_nobuffer(cmd, cwd=_regex_win32_dir)
+    comp_process = tools.popen_nobuffer(cmd, cwd=_regex_win32_dir)
     output, err = comp_process.communicate()
     exit_code = comp_process.returncode
     if exit_code != 0:  # pragma: debug
         print(' '.join(cmd))
-        print_encoded(output, end="")
+        tools.print_encoded(output, end="")
         raise RuntimeError("Could not build regex_win32.lib")
     assert(os.path.isfile(_regex_win32_lib))
 
@@ -197,12 +195,12 @@ def do_compile(src, out=None, cc=None, ccflags=None, ldflags=None,
     if os.path.isfile(out):
         os.remove(out)
     # Compile
-    comp_process = popen_nobuffer(compile_args)
+    comp_process = tools.popen_nobuffer(compile_args)
     output, err = comp_process.communicate()
     exit_code = comp_process.returncode
     if exit_code != 0:  # pragma: debug
         print(' '.join(compile_args))
-        print_encoded(output, end="")
+        tools.print_encoded(output, end="")
         raise RuntimeError("Compilation failed with code %d." % exit_code)
     assert(os.path.isfile(out))
     return out
@@ -231,12 +229,15 @@ class GCCModelDriver(ModelDriver):
         efile (str): Compiled executable file.
 
     Raises:
+        RuntimeError: If neither the IPC or ZMQ C libraries are available.
         RuntimeError: If the compilation fails.
 
     """
 
     def __init__(self, name, args, cc=None, **kwargs):
         super(GCCModelDriver, self).__init__(name, args, **kwargs)
+        if not tools._c_library_avail:  # pragma: windows
+            raise RuntimeError("No library available for models written in C/C++.")
         self.debug('')
         self.cc = cc
         # Prepare arguments to compile the file

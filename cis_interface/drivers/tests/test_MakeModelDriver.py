@@ -10,7 +10,7 @@ from cis_interface.drivers.MakeModelDriver import MakeModelDriver
 @unittest.skipIf(tools._c_library_avail, "C Library installed")
 def test_MakeModelDriver_no_C_library():  # pragma: windows
     r"""Test MakeModelDriver error when C library not installed."""
-    nt.assert_raises(Exception, MakeModelDriver, scripts['make'])
+    nt.assert_raises(RuntimeError, MakeModelDriver, scripts['make'])
 
 
 @unittest.skipIf(not tools._c_library_avail, "C Library not installed")
