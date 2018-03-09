@@ -110,7 +110,8 @@ install:
     pip install --upgrade wheel
     pip install --upgrade setuptools
     # Install dependencies
-    pip install $NUMPY $MATPLOTLIB
+    pip install $NUMPY
+    # pip install $MATPLOTLIB
     pip install nose coverage coveralls codecov flake8
     # Install cis_interface
     pip install -e .
