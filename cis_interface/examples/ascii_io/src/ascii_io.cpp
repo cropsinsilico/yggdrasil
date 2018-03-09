@@ -3,9 +3,10 @@
 // Include interface methods
 #include "PsiInterface.hpp"
 
+#define BSIZE 8192 // the max
+
 
 int main(int argc,char *argv[]){
-  const uint BSIZE = 8192; // the max
   int ret;
 
   // Input & output to an ASCII file line by line
@@ -14,16 +15,17 @@ int main(int argc,char *argv[]){
   // Input & output from a table row by row
   PsiAsciiTableInput TableInput("inputCPP_table");
   PsiAsciiTableOutput TableOutput("outputCPP_table",
-				  "%5s\t%ld\t%3.1f\t%3.1lf%+3.1lfj\n");
+                                  "%5s\t%ld\t%3.1f\t%3.1lf%+3.1lfj\n");
   // Input & output from a table as an array
-  PsiAsciiTableInput ArrayInput("inputCPP_array");
+  PsiAsciiTableInput ArrayInput("inputCPP_array", 1);
   PsiAsciiTableOutput ArrayOutput("outputCPP_array",
-				  "%5s\t%ld\t%3.1f\t%3.1lf%+3.1lfj\n");
+				  "%5s\t%ld\t%3.1f\t%3.1lf%+3.1lfj\n", 1);
 
   // Read lines from ASCII text file until end of file is reached.
   // As each line is received, it is then sent to the output ASCII file.
   printf("ascii_io(CPP): Receiving/sending ASCII file.\n");
-  char line[LINE_SIZE_MAX];
+  char *line = (char*)malloc(LINE_SIZE_MAX);
+  // char line[LINE_SIZE_MAX];
   ret = 0;
   while (ret >= 0) {
     // Receive a single line
@@ -32,7 +34,7 @@ int main(int argc,char *argv[]){
       // If the receive was succesful, send the line to output
       printf("File: %s", line);
       ret = FileOutput.send_line(line);
-      if (ret != 0) {
+      if (ret < 0) {
 	printf("ascii_io(CPP): ERROR SENDING LINE\n");
 	break;
       }
@@ -40,9 +42,10 @@ int main(int argc,char *argv[]){
       // If the receive was not succesful, send the end-of-file message to
       // close the output file.
       printf("End of file input (CPP)\n");
-      FileOutput.send_eof();
+      // FileOutput.send_eof();
     }
   }
+  free(line);
 
   // Read rows from ASCII table until end of file is reached.
   // As each row is received, it is then sent to the output ASCII table
@@ -54,14 +57,14 @@ int main(int argc,char *argv[]){
   ret = 0;
   while (ret >= 0) {
     // Receive a single row with values stored in scalars declared locally
-    ret = TableInput.recv_row(5, &name, &number, &value, &comp_real, &comp_imag);
+    ret = TableInput.recv(5, &name, &number, &value, &comp_real, &comp_imag);
     if (ret >= 0) {
       // If the receive was succesful, send the values to output. Formatting
       // is taken care of on the output driver side.
       printf("Table: %.5s, %d, %3.1f, %3.1lf%+3.1lfj\n", name, number, value,
 	     comp_real, comp_imag);
-      ret = TableOutput.send_row(5, name, number, value, comp_real, comp_imag);
-      if (ret != 0) {
+      ret = TableOutput.send(5, name, number, value, comp_real, comp_imag);
+      if (ret < 0) {
 	printf("ascii_io(CPP): ERROR SENDING ROW\n");
 	break;
       }
@@ -69,7 +72,7 @@ int main(int argc,char *argv[]){
       // If the receive was not succesful, send the end-of-file message to
       // close the output file.
       printf("End of table input (CPP)\n");
-      TableOutput.send_eof();
+      // TableOutput.send_eof();
     }
   }
 
@@ -82,8 +85,8 @@ int main(int argc,char *argv[]){
   double *value_arr = NULL;
   double *comp_real_arr = NULL;
   double *comp_imag_arr = NULL;
-  ret = ArrayInput.recv_array(5, &name_arr, &number_arr, &value_arr,
-			      &comp_real_arr, &comp_imag_arr);
+  ret = ArrayInput.recv(5, &name_arr, &number_arr, &value_arr,
+			&comp_real_arr, &comp_imag_arr);
   if (ret < 0) {
     printf("ascii_io(CPP): ERROR RECVING ARRAY\n");
   } else {
@@ -94,9 +97,9 @@ int main(int argc,char *argv[]){
 	     value_arr[i], comp_real_arr[i], comp_imag_arr[i]);
     // Send the columns in the array to output. Formatting is handled on the
     // output driver side.
-    ret = ArrayOutput.send_array(5, ret, name_arr, number_arr, value_arr,
-				 comp_real_arr, comp_imag_arr);
-    if (ret != 0)
+    ret = ArrayOutput.send(5, ret, name_arr, number_arr, value_arr,
+			   comp_real_arr, comp_imag_arr);
+    if (ret < 0)
       printf("ascii_io(CPP): ERROR SENDING ARRAY\n");
   }
   

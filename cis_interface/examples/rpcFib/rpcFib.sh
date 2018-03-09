@@ -47,6 +47,12 @@ case $1 in
 	yaml2='rpcFibCli_cpp.yml'
 	yaml3='rpcFibCliPar_cpp.yml'
 	;;
+    -v | --valgrind )
+	echo "Running C with valgrind"
+	yaml1='rpcFibSrv_valgrind.yml'
+	yaml2='rpcFibCli_valgrind.yml'
+	yaml3='rpcFibCliPar_valgrind.yml'
+	;;
     * )
 	echo "Running ", $1
 	yaml=$1
@@ -55,4 +61,5 @@ esac
 
 cisrun $yaml1 $yaml2 $yaml3
 
-cat /tmp/fibCli.txt
+outfile="${TMPDIR}fibCli.txt"
+cat $outfile

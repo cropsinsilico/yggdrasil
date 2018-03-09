@@ -10,14 +10,15 @@ model:
       driver: FileInputDriver
       args: ./Input/input.txt
     - name: helloQueueIn
-      driver: RMQInputDriver
+      driver: InputDriver
       args: helloQueue
       onexit: on_model_exit
   
   outputs:
     - name: helloQueueOut
-      driver: RMQOutputDriver
+      driver: OutputDriver
       args: helloQueue
     - name: outFile
       driver: FileOutputDriver
-      args: /tmp/output_hello.txt
+      args: output_hello.txt
+      in_temp: True

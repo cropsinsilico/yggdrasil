@@ -1,71 +1,53 @@
 #!/usr/bin/python
+import os
 import sys
-import time
-from logging import debug
-import signal
 import traceback
 from cis_interface import runner
-
-
-cisRunner = None
-INTERRUPT_TIME = 0
-COLOR_TRACE = '\033[30;43;22m'
-COLOR_NORMAL = '\033[0m'
-
-
-# pretty pprint
-def pprint(*args):
-    s = ''.join(str(i) for i in args)
-    print(COLOR_TRACE + '{}' + COLOR_NORMAL.format(s))
-
-    
-def signal_handler(sigCaught, frame):  # pragma: no cover
-    global INTERRUPT_TIME, cisRunner
-    debug('CisRunner interrupted with signal %d', sigCaught)
-    now = time.time()
-    elapsed = now - INTERRUPT_TIME
-    debug('CisRunner.handler: elapsed since last interrupt: %d', elapsed)
-    INTERRUPT_TIME = now
-    if elapsed < 5:
-        pprint(' ')
-        pprint('*********************************************************')
-        pprint('*  Interrupted twice within 5 seconds:  shutting down   *')
-        pprint('*********************************************************')
-        # signal.siginterrupt(signal.SIGTERM, True)
-        # signal.siginterrupt(signal.SIGINT, True)
-        debug("CisRunner.closing all channels")
-        if cisRunner:
-            cisRunner.terminate()
-        return 1
-    else:
-        pprint('')
-        pprint('*********************************************************')
-        pprint('*  Interrupted: Displaying channel summary              *')
-        pprint('*  interrupt again (within 5 seconds) to exit           *')
-        pprint('*********************************************************')
-        if cisRunner:
-            cisRunner.printStatus()
-        pprint('*********************************************************')
-    debug('CisRunner handler(%d) returns', sigCaught)
-    return 0
+from cis_interface.drivers import GCCModelDriver
 
 
 def cisrun():
-    global cisRunner
+    r"""Start a run."""
+    prog = sys.argv[0].split(os.path.sep)[-1]
+    models = sys.argv[1:]
+    cisRunner = runner.get_runner(models, cis_debug_prefix=prog)
     try:
-        signal.signal(signal.SIGTERM, signal_handler)
-        signal.signal(signal.SIGINT, signal_handler)
-        signal.siginterrupt(signal.SIGTERM, False)
-        signal.siginterrupt(signal.SIGINT, False)
-        prog = sys.argv[0].split('/')[-1]
-        models = sys.argv[1:]
-        cisRunner = runner.get_runner(models, cis_debug_prefix=prog)
         cisRunner.run()
-        debug("cisRunner returns, exiting")
+        cisRunner.debug("runner returns, exiting")
     except Exception as ex:
-        pprint("cisrun: exception: %s" % type(ex))
+        cisRunner.pprint("cisrun exception: %s" % type(ex))
         print(traceback.format_exc())
     print('')
+
+
+def ciscc():
+    r"""Compile C/C++ program."""
+    # prog = sys.argv[0].split(os.path.sep)[-1]
+    src = sys.argv[1:]
+    out = GCCModelDriver.do_compile(src)
+    print("executable: %s" % out)
+
+
+def cc_flags():
+    r"""Get the compiler flags necessary for including the interface
+    library in a C or C++ program.
+
+    Returns:
+        list: The necessary compiler flags and preprocessor definitions.
+
+    """
+    return ' '.join(GCCModelDriver.get_flags()[0])
+
+
+def ld_flags():
+    r"""Get the linker flags necessary for calling functions/classes from
+    the interface library in a C or C++ program.
+
+    Returns:
+        list: The necessary library linking flags.
+
+    """
+    return ' '.join(GCCModelDriver.get_flags()[1])
 
 
 if __name__ == '__main__':

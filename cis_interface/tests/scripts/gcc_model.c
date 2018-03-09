@@ -1,8 +1,9 @@
-#include<stdio.h>
-#include <unistd.h>
+#include <stdio.h>
+#include <hellofunc.h>
+#include <PsiInterface.h>
 
 int main() {
   sleep(1);
-  printf("GCC Model\n");
+  myPrint("GCC Model");
   return 0;
 }

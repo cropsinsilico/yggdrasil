@@ -2,6 +2,7 @@
 # This should not be used directly by modelers
 #
 import os
+import sys
 from cis_interface.drivers.ModelDriver import ModelDriver
 
 
@@ -20,9 +21,6 @@ class PythonModelDriver(ModelDriver):
         \*\*kwargs: Additional keyword arguments are passed to parent class's
             __init__ method.
 
-    Attributes (in additon to parent class's):
-        -
-
     """
 
     def __init__(self, name, args, **kwargs):
@@ -30,4 +28,5 @@ class PythonModelDriver(ModelDriver):
         self.debug(args)
         
         if 'python' not in self.args[0] or self.args[0].endswith('.py'):
-            self.args = ['python'] + self.args
+            python_exec = sys.executable
+            self.args = [python_exec] + self.args

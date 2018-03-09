@@ -1,10 +1,12 @@
 import os
 import sys
+import pprint
 import shutil
 import warnings
 from setuptools import setup, find_packages
 PY_MAJOR_VERSION = sys.version_info[0]
 PY2 = (PY_MAJOR_VERSION == 2)
+IS_WINDOWS = (sys.platform in ['win32', 'cygwin'])
 
 cis_ver = "0.1.3"
     
@@ -23,7 +25,7 @@ def_config_file = os.path.join(os.path.dirname(__file__),
 if not os.path.isfile(usr_config_file):
     shutil.copy(def_config_file, usr_config_file)
 
-# Set coverage options in .coveragerc
+# Import config parser
 cov_installed = False
 try:
     from ConfigParser import RawConfigParser as HandyConfigParser
@@ -34,6 +36,59 @@ except ImportError:
         cov_installed = True
     except ImportError:
         pass
+
+# Set paths in config file
+if cov_installed and IS_WINDOWS:
+    import subprocess
+    # Function to fine paths
+    def locate(fname, brute_force=False):
+        try:
+            if brute_force:
+                if os.environ.get('APPVEYOR_BUILD_FOLDER', False):
+                    warnings.warn("Brute force search disabled on appveyor.")
+                    return False
+                warnings.warn("Running brute force search for %s" % fname)
+                out = subprocess.check_output(["dir", fname, "/s/b"], shell=True,
+                                              cwd=os.path.abspath(os.sep))
+            else:
+                out = subprocess.check_output(["where", fname])
+        except subprocess.CalledProcessError:
+            if not brute_force:
+                return locate(fname, brute_force=True)
+            return False
+        if out.isspace():
+            return False
+        matches = out.splitlines()
+        first = matches[0].decode('utf-8')
+        if len(matches) > 1:
+            pprint.pprint(matches)
+            warnings.warn("More than one (%d) match to %s. Using first match (%s)" % (
+                len(matches), fname, first))
+        return first
+    # Open config file
+    cp = HandyConfigParser("")
+    cp.read(usr_config_file)
+    if not cp.has_section('windows'):
+        cp.add_section('windows')
+    # Find paths
+    clibs = {'libzmq_include': 'zmq.h', 
+             'libzmq_static': 'zmq.lib',
+             'czmq_include': 'czmq.h',
+             'czmq_static': 'czmq.lib'}  # ,
+    for opt, fname in clibs.items():
+        if not cp.has_option('windows', opt):
+            fpath = locate(fname)
+            if fpath:
+                print('located %s: %s' % (fname, fpath))
+                cp.set('windows', opt, fpath)
+            else:
+                warnings.warn("Could not locate %s. Please set %s option in %s to correct path."
+                              % (fname, opt, usr_config_file))
+    with open(usr_config_file, 'w') as fd:
+        cp.write(fd)
+
+
+# Set coverage options in .coveragerc
 if cov_installed:
     # Read options
     covrc = '.coveragerc'
@@ -56,6 +111,11 @@ if cov_installed:
         if new_rule in excl_list:
             excl_list.remove(new_rule)
         return excl_list
+    # Platform
+    if IS_WINDOWS:
+        excl_list = rm_excl_rule(excl_list, 'pragma: windows')
+    else:
+        excl_list = add_excl_rule(excl_list, 'pragma: windows')
     # Python version
     verlist = [2, 3]
     for v in verlist:
@@ -91,6 +151,12 @@ except (ImportError, IOError):
             long_description = file.read()
     else:
         raise IOError("Could not find README.rst or README.md")
+
+# Create requirements list based on platform
+requirements = ["numpy", "scipy", "pyyaml", "pystache", "nose", "zmq"]
+# optional_requirements = ["pika", "astropy"]
+if not IS_WINDOWS:
+    requirements.append("sysv_ipc")
     
 setup(
     name="cis_interface",
@@ -105,7 +171,7 @@ setup(
     url="https://github.com/cropsinsilico/cis_interface",
     download_url = "https://github.com/cropsinsilico/cis_interface/archive/%s.tar.gz" % cis_ver,
     keywords=["plants", "simulation", "models", "framework"],
-    install_requires=["sysv_ipc", "pika", "pyyaml", "pystache", "scipy"],
+    install_requires=requirements,
     classifiers=[
         "Programming Language :: Python",
         "Programming Language :: C",
@@ -120,7 +186,10 @@ setup(
         "Development Status :: 3 - Alpha",
     ],
     entry_points = {
-        'console_scripts': ['cisrun=cis_interface.command_line:cisrun'],
+        'console_scripts': ['cisrun=cis_interface.command_line:cisrun',
+                            'ciscc=cis_interface.command_line:ciscc',
+                            'cisccflags=cis_interface.command_line:cc_flags',
+                            'cisldflags=cis_interface.command_line:ld_flags'],
     },
     license="BSD",
 )

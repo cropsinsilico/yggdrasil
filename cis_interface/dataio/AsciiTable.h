@@ -1,356 +1,16 @@
-#include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdarg.h>
-#include <stdint.h>
-#include <regex.h>
+#include <../tools.h>
 #include "AsciiFile.h"
 
 /*! @brief Flag for checking if AsciiTable.h has already been included.*/
 #ifndef ASCIITABLE_H_
 #define ASCIITABLE_H_
 
+#define FMT_LEN 100
+
 /*! @brief Enumerated types to be used for interpreting formats. */
-enum fmt_types { STRING, FLOAT, DOUBLE, COMPLEX,
-		 SHORTSHORT, SHORT, INT, LONG, LONGLONG,
-		 USHORTSHORT, USHORT, UINT, ULONG, ULONGLONG };
-
-/*!
-  @brief Create a regex from a character array.
-  Adapted from https://www.lemoda.net/c/unix-regex/
-  @param[out] r pointer to regex_t. Resutling regex expression.
-  @param[in] regex_text constant character pointer to text that should be
-  compiled.
-  @return static int Success or failure of compilation.
-*/
-static inline
-int compile_regex (regex_t * r, const char * regex_text)
-{
-  int status = regcomp (r, regex_text, REG_EXTENDED);//|REG_NEWLINE);
-  if (status != 0) {
-    char error_message[LINE_SIZE_MAX];
-    regerror (status, r, error_message, LINE_SIZE_MAX);
-    printf ("Regex error compiling '%s': %s\n",
-	    regex_text, error_message);
-    return 1;
-  }
-  return 0;
-};
-
-/*!
-  @brief Count the number of times a regular expression is matched in a string.
-  @param[in] regex_text constant character pointer to string that should be
-  compiled into a regex.
-  @param[in] to_match constant character pointer to string that should be
-  checked for matches.
-  @return int Number of matches found. -1 is returned if the regex could not be
-  compiled.
-*/
-static inline
-int count_matches(const char *regex_text, const char *to_match) {
-  int ret;
-  int n_match = 0;
-  regex_t r;
-  // Compile
-  ret = compile_regex(&r, regex_text);
-  if (ret)
-    return -1;
-  // Loop until string done
-  const char * p = to_match;
-  const int n_sub_matches = 10;
-  regmatch_t m[n_sub_matches];
-  while (1) {
-    int nomatch = regexec(&r, p, n_sub_matches, m, 0);
-    if (nomatch)
-      break;
-    n_match++;
-    p += m[0].rm_eo;
-  }
-  return n_match;
-};
-
-/*!
-  @brief Find first match to regex.
-  @param[in] regex_text constant character pointer to string that should be
-  compiled into a regex.
-  @param[in] to_match constant character pointer to string that should be
-  checked for matches.
-  @param[out] sind int index where match begins.
-  @param[out] eind int index where match ends.
-  @return int Number of matches found. -1 is returned if the regex could not be
-  compiled.
-*/
-static inline
-int find_match(const char *regex_text, const char *to_match,
-	       int *sind, int *eind) {
-  int ret;
-  int n_match = 0;
-  regex_t r;
-  // Compile
-  ret = compile_regex(&r, regex_text);
-  if (ret)
-    return -1;
-  // Loop until string done
-  const char * p = to_match;
-  const int n_sub_matches = 10;
-  regmatch_t m[n_sub_matches];
-  int nomatch = regexec(&r, p, n_sub_matches, m, 0);
-  if (!(nomatch)) {
-    *sind = m[0].rm_so;
-    *eind = m[0].rm_eo;
-    n_match++;
-  }
-  return n_match;
-};
-
-/*!
-  @brief Make a replacement of regex matches, ignoring captured substrings.
-  @param[in,out] buf Characer pointer to buffer that replacements should be
-  made to.
-  @param[in] len_buf const int length of buf.
-  @param[in] re Constant character pointer to regex string.
-  @param[in] rp Constant character pointer to the replacement text.
-  @param[in] nreplace Constant int number of replacements to make. If 0, all
-  matches are replaced.
-  @return int -1 on failure if the regex could not be compiled or the buffer 
-  is not big enough to contain the result. If succesful, the new length of buf
-  is returned.
- */
-static inline
-int regex_replace_nosub(char *buf, const int len_buf,
-			const char *re, const char *rp,
-			const int nreplace) {
-  /* printf("regex_replace_nosub(%s, %s, %s)\n", buf, re, rp); */
-  // Compile
-  regex_t r;
-  int ret = compile_regex(&r, re);
-  if (ret)
-    return -1;
-  // Loop making replacements
-  int len_rp = strlen(rp);
-  char * p = buf;
-  const int ngroups = r.re_nsub + 1;
-  regmatch_t *m = (regmatch_t*)malloc(ngroups * sizeof(regmatch_t));
-  int len_m, rem_s, rem_l, delta_siz;
-  int cur_pos = 0;
-  int cur_siz = strlen(buf);
-  int creplace = 0;
-  while (1) {
-    if ((nreplace > 0) && (creplace >= nreplace)) {
-      printf("regex_replace_nosub: Maximum of %d replacements reached\n",
-      	     creplace);
-      break;
-    }
-    int nomatch = regexec(&r, p, ngroups, m, 0);
-    if (nomatch) {
-      /* printf("regex_replace_nosub: nomatch for %s in %s\n", re, p); */
-      break;
-    }
-    // Ensure replacement will not exceed buffer
-    len_m = m[0].rm_eo - m[0].rm_so;
-    delta_siz = len_rp - len_m;
-    if ((cur_siz + delta_siz + 1) > len_buf) {
-      printf("regex_replace_nosub: Relacement will exceed buffer.\n");
-      cur_siz = -1;
-      break;
-    }
-    // Move trailing
-    rem_l = cur_siz - (cur_pos + m[0].rm_eo);
-    rem_s = m[0].rm_so + len_rp;
-    memmove(p + rem_s, p + m[0].rm_eo, rem_l + 1);
-    // Copy replacement
-    strncpy(p + m[0].rm_so, rp, len_rp);
-    // Advance
-    p += rem_s;
-    cur_pos += rem_s;
-    cur_siz += delta_siz;
-    creplace += 1;
-  }
-  /* printf("regex_replace_nosub() = %s\n", buf); */
-  free(m);
-  return cur_siz;
-};
-
-
-/*!
-  @brief Extract substring references from a string.
-  @param[in] buf Constant character pointer to buffer that references should be
-  extracted from.
-  @param[out] refs Pointer to pointer to memory where reference numbers should
-  be stored. This function will reallocate it to fit the number of references
-  returned. (Should be freed by calling program.)
-  @return int Number of refs found. -1 indicates an error.
-*/
-static inline
-int get_subrefs(const char *buf, int **refs) {
-  // Compile
-  regex_t r;
-  int ret = compile_regex(&r, "\\$([[:digit:]])");
-  if (ret)
-    return -1;
-  // Allocate;
-  const int ngroups = r.re_nsub + 1;
-  if (ngroups != 2) {
-    printf("ERROR: regex could not find subgroup\n");
-    return -1;
-  }
-  regmatch_t *m = (regmatch_t*)malloc(ngroups * sizeof(regmatch_t));
-  // Prepare "bitmap"
-  const int max_ref = 10; //99;
-  int i;
-  uint8_t *ref_bytes = (uint8_t*)malloc((max_ref + 1)*sizeof(uint8_t));
-  for (i = 0; i <= max_ref; i++)
-    ref_bytes[i] = 0;
-  // Locate matches
-  const char *p = buf;
-  const int max_grp = 2;  // Digits in max_ref
-  int igrp_len;
-  char igrp[max_grp];
-  int iref;
-  while (1) {
-    int nomatch = regexec(&r, p, ngroups, m, 0);
-    if (nomatch) {
-      break;
-    }
-    // Lone $ without digit
-    /* printf("so = %d, eo = %d\n", m[1].rm_so, m[1].rm_eo); */
-    if ((m[1].rm_so == -1) && (m[1].rm_eo == -1)) {
-      p += m[0].rm_eo;
-      continue;
-    }
-    // Substring
-    igrp_len = m[1].rm_eo - m[1].rm_so;
-    if (igrp_len > max_grp) {
-      printf("Number longer than %d digits unlikely.\n", max_grp);
-      free(m);
-      free(ref_bytes);
-      return -1;
-    }
-    strncpy(igrp, p + m[1].rm_so, igrp_len);
-    igrp[igrp_len] = 0;
-    // Extract ref number
-    iref = atoi(igrp);
-    if (iref > max_ref) {
-      printf("Reference to substr %d exceeds limit (%d)\n", iref, max_ref);
-      free(m);
-      free(ref_bytes);
-      return -1;
-    }
-    ref_bytes[iref] = 1;
-    p += m[0].rm_eo;
-  }
-  // Get unique refs
-  int nref = 0;
-  for (i = 0; i <= max_ref; i++) {
-    if (ref_bytes[i])
-      nref++;
-  }
-  *refs = (int*)realloc(*refs, nref*sizeof(int));
-  int ir;
-  for (i = 0, ir = 0; i <= max_ref; i++) {
-    if (ref_bytes[i]) {
-      (*refs)[ir] = i;
-      ir++;
-    }
-  }
-  free(m);
-  free(ref_bytes);
-  // printf("%d refs in %s\n", nref, buf);
-  return nref;
-}
-
-
-/*!
-  @brief Make a replacement of regex matches, allowing for captured substrings.
-  @param[in,out] buf Characer pointer to buffer that replacements should be
-  made to.
-  @param[in] len_buf const int length of buf.
-  @param[in] re Constant character pointer to regex string.
-  @param[in] rp Constant character pointer to the replacement text.
-  @param[in] nreplace Constant int number of replacements to make. If 0, all
-  matches are replaced.
-  @return int -1 on failure if the regex could not be compiled or the buffer 
-  is not big enough to contain the result. If succesful, the new length of buf
-  is returned.
- */
-static inline
-int regex_replace_sub(char *buf, const int len_buf,
-		      const char *re, const char *rp,
-		      const int nreplace) {
-  // Compile
-  regex_t r;
-  int ret = compile_regex(&r, re);
-  if (ret)
-    return -1;
-  // Loop making replacements
-  char * p = buf;
-  const int ngroups = r.re_nsub + 1;
-  regmatch_t *m = (regmatch_t*)malloc(ngroups * sizeof(regmatch_t));
-  char rp_sub[2*len_buf];
-  char re_sub[len_buf];
-  char igrp[len_buf];
-  int len_m, rem_s, rem_l, delta_siz, len_rp;
-  int cur_pos = 0;
-  int cur_siz = strlen(buf);
-  int creplace = 0;
-  int i, j;
-  while (1) {
-    if ((nreplace > 0) && (creplace >= nreplace)) {
-      printf("regex_replace_nosub: Maximum of %d replacements reached\n",
-	     creplace);
-      break;
-    }
-    int nomatch = regexec(&r, p, ngroups, m, 0);
-    if (nomatch) {
-      /* printf("regex_replace_sub: nomatch for %s in %s\n", re, p); */
-      break;
-    }
-    // Get list of subrefs
-    int *refs = NULL;
-    int nref = get_subrefs(rp, &refs);
-    if (nref < 0) {
-      printf("Error gettings subrefs\n");
-      cur_siz = -1;
-      break;
-    }
-    // For each subref complete replacements
-    strcpy(rp_sub, rp);
-    for (j = 0; j < nref; j++) {
-      i = refs[j];
-      strcpy(igrp, p + m[i].rm_so);
-      igrp[m[i].rm_eo - m[i].rm_so] = 0; // terminate
-      sprintf(re_sub, "\\$%d", i);
-      ret = regex_replace_nosub(rp_sub, 2*len_buf, re_sub, igrp, 0);
-      if (ret < 0) {
-	printf("regex_replace_sub: Error replacing substring $%d.\n", i);
-	free(m);
-	return -1;
-      }
-    }
-    // Ensure replacement will not exceed buffer
-    len_rp = ret;
-    len_m = m[0].rm_eo - m[0].rm_so;
-    delta_siz = len_rp - len_m;
-    if ((cur_siz + delta_siz + 1) > len_buf) {
-      printf("regex_replace_sub: Relacement will exceed buffer.\n");
-      cur_siz = -1;
-      break;
-    }
-    // Move trailing
-    rem_l = cur_siz - (cur_pos + m[0].rm_eo);
-    rem_s = m[0].rm_so + len_rp;
-    memmove(p + rem_s, p + m[0].rm_eo, rem_l + 1);
-    // Copy replacement
-    strncpy(p + m[0].rm_so, rp_sub, len_rp);
-    // Advance
-    p += m[0].rm_so + len_rp;
-    cur_pos += m[0].rm_so + len_rp;
-    cur_siz += delta_siz;
-    creplace += 1;
-  }
-  free(m);
-  return cur_siz;
-};
+enum fmt_types { AT_STRING, AT_FLOAT, AT_DOUBLE, AT_COMPLEX,
+		 AT_SHORTSHORT, AT_SHORT, AT_INT, AT_LONG, AT_LONGLONG,
+		 AT_USHORTSHORT, AT_USHORT, AT_UINT, AT_ULONG, AT_ULONGLONG };
 
 /*!
   @brief Count format specifiers for complex numbers.
@@ -386,14 +46,16 @@ int count_formats(const char* fmt_str) {
 /*!
   @brief Remove extra format characters that confusing sscanf.
   @param[in] fmt_str character pointer to string that should be modified.
-  @param[in] fmt_len constant int, length of the fmt_str buffer.
+  @param[in] fmt_len constant size_t, length of the fmt_str buffer.
   @return int -1 on failure if the regex could not be compiled or the buffer 
   is not big enough to contain the result. If succesful, the new length of buf
   is returned.
  */
 static inline
-int simplify_formats(char *fmt_str, const int fmt_len) {
+int simplify_formats(char *fmt_str, const size_t fmt_len) {
   const char * fmt_regex1 = "%([[:digit:]]+\\$)?[+-]?([ 0]|\'.{1})?-?[[:digit:]]*(\\.[[:digit:]]+)?([lhjztL]*)([eEfFgG])";
+  // "%([[:digit:]]+\\$)?[+-]?([ 0]|\'.{1})?-?[[:digit:]]*(\\.[[:digit:]]+)?([lhjztL]*)([eEfFgG])";
+  // "%([[:digit:]]+\\$)?[+-]?([ 0]|'.{1})?-?[[:digit:]]*(\\.[[:digit:]]+)?([lhjztL])*([eEfFgG])";
   int ret = regex_replace_sub(fmt_str, fmt_len, fmt_regex1,
 			      "%$4$5", 0);
   if (ret > 0) {
@@ -437,18 +99,25 @@ void at_close(asciiTable_t *t) {
 };
 
 /*!
-  @brief Read a line from the file and parse it.
+  @brief Read a line from the file until one is returned that is not a comment.
   @param[in] t constant asciiTable_t table structure.
-  @param[out] ap va_list Pointers to variables where parsed arguments should be
-  stored.
+  @param[out] buf pointer to memory where read line should be stored.
+  @param[in] len_buf Size of buffer where line should be stored.
+  @param[in] allow_realloc const int If 1, the buffer will be realloced if it
+  is not large enought. Otherwise an error will be returned.
   @return int On success, the number of characters read. -1 on failure.
  */
 static inline
-int at_vreadline(const asciiTable_t t, va_list ap) {
+int at_readline_full_realloc(const asciiTable_t t, char **buf,
+			     const size_t len_buf, const int allow_realloc) {
   // Read lines until there's one that's not a comment
   int ret = 0, com = 1;
   size_t nread = LINE_SIZE_MAX;
   char *line = (char*)malloc(nread);
+  if (line == NULL) {
+    cislog_error("at_readline_full_realloc: Failed to malloc line.");
+    return -1;
+  }
   while ((ret >= 0) && (com == 1)) {
     ret = af_readline_full(t.f, &line, &nread);
     if (ret < 0) {
@@ -457,22 +126,126 @@ int at_vreadline(const asciiTable_t t, va_list ap) {
     }
     com = af_is_comment(t.f, line);
   }
+  if (ret > (int)len_buf) {
+    if (allow_realloc) {
+      cislog_debug("at_readline_full_realloc: reallocating buffer from %d to %d bytes.",
+		   (int)len_buf, ret + 1);
+      (*buf) = (char*)realloc(*buf, ret + 1);
+      if (*buf == NULL) {
+	cislog_error("at_readline_full_realloc: Failed to realloc buffer.");
+	free(line);
+	return -1;
+      }
+    } else {
+      cislog_error("at_readline_full_realloc: line (%d bytes) is larger than destination buffer (%d bytes)",
+		   ret, (int)len_buf);
+      ret = -1;
+      free(line);
+      return ret;
+    }
+  }
+  strcpy(*buf, line);
+  free(line);
+  return ret;
+};
+
+/*!
+  @brief Read a line from the file until one is returned that is not a comment.
+  @param[in] t constant asciiTable_t table structure.
+  @param[out] buf pointer to memory where read line should be stored.
+  @param[in] len_buf Size of buffer where line should be stored. The the message
+  is larger than len_buf, an error will be returned.
+  @return int On success, the number of characters read. -1 on failure.
+ */
+static inline
+int at_readline_full(const asciiTable_t t, char *buf, const size_t len_buf) {
+  // Read but don't realloc buf
+  return at_readline_full_realloc(t, &buf, len_buf, 0);
+};
+
+/*!
+  @brief Write a line to the file.
+  @param[in] t constant asciiTable_t table structure.
+  @param[in] line Pointer to line that should be written.
+  @return int On success, the number of characters written. -1 on failure.
+ */
+static inline
+int at_writeline_full(const asciiTable_t t, const char* line) {
+  int ret;
+  ret = af_writeline_full(t.f, line);
+  return ret;
+};
+
+/*!
+  @brief Parse a line to get row columns.
+  @param[in] t constant asciiTable_t table structure.
+  @param[in] line Pointer to memory containing the line to be parsed.
+  @param[out] ap va_list Pointers to variables where parsed arguments should be
+  stored.
+  @return int On success, the number of arguments filled. -1 on failure.
+ */
+static inline
+int at_vbytes_to_row(const asciiTable_t t, const char* line, va_list ap) {
   // Simplify format for vsscanf
   char fmt[LINE_SIZE_MAX];
   strcpy(fmt, t.format_str);
   int sret = simplify_formats(fmt, LINE_SIZE_MAX);
   if (sret < 0) {
-    printf("at_vreadline: simplify_formats returned %d\n", sret);
-    free(line);
+    cislog_debug("at_vbytes_to_row: simplify_formats returned %d", sret);
     return -1;
   }
   // Interpret line
-  sret = vsscanf(line, fmt, ap);
-  if (sret != t.ncols) {
-    printf("at_vreadline: %d arguments filled, but %d were expected\n",
-	   sret, t.ncols);
+  int ret = vsscanf(line, fmt, ap);
+  if (ret != t.ncols) {
+    cislog_error("at_vbytes_to_row: %d arguments filled, but %d were expected",
+		 sret, t.ncols);
     ret = -1;
   }
+  return ret;
+};
+
+/*!
+  @brief Format arguments to form a line.
+  @param[in] t constant asciiTable_t table structure.
+  @param[out] buf Pointer to memory where the formated row should be stored.
+  @param[in] buf_siz size_t Size of buf. If the formatted message will exceed
+  the size of the buffer, an error will be returned.
+  @param[in] ap va_list Variables that should be formatted using the format
+  string to create a line in the table.
+  @return int On success, the number of characters written. -1 on failure.
+ */
+static inline
+int at_vrow_to_bytes(const asciiTable_t t, char *buf, const size_t buf_siz, va_list ap) {
+  int ret = vsnprintf(buf, buf_siz, t.format_str, ap);
+  return ret;
+};
+
+/*!
+  @brief Read a line from the file and parse it.
+  @param[in] t constant asciiTable_t table structure.
+  @param[out] ap va_list Pointers to variables where parsed arguments should be
+  stored.
+  @return int On success, the number of characters read. -1 on failure.
+ */
+static inline
+int at_vreadline(const asciiTable_t t, va_list ap) {
+  int ret;
+  // Read lines until there's one that's not a comment
+  size_t nread = LINE_SIZE_MAX;
+  char *line = (char*)malloc(nread);
+  if (line == NULL) {
+    cislog_error("at_vreadline: Failed to malloc line.");
+    return -1;
+  }
+  ret = at_readline_full(t, line, nread);
+  if (ret < 0) {
+    free(line);
+    return ret;
+  }
+  // Parse line
+  int sret = at_vbytes_to_row(t, line, ap);
+  if (sret < 0)
+    ret = -1;
   free(line);
   return ret;
 };
@@ -531,7 +304,7 @@ static inline
 int at_writeformat(const asciiTable_t t) {
   int ret;
   if (af_is_open(t.f) == 1) {
-    ret = fwrite(t.f.comment, 1, strlen(t.f.comment), t.f.fd);
+    ret = (int)fwrite(t.f.comment, 1, strlen(t.f.comment), t.f.fd);
     if (ret < 0)
       return ret;
   }
@@ -552,6 +325,10 @@ int at_discover_format_str(asciiTable_t *t) {
     return ret;
   size_t nread = LINE_SIZE_MAX;
   char *line = (char*)malloc(nread);
+  if (line == NULL) {
+    cislog_error("at_discover_format_str: Failed to malloc line.");
+    return -1;
+  }
   ret = -1;
   while (getline(&line, &nread, (*t).f.fd) >= 0) {
     if (af_is_comment((*t).f, line) == 1) {
@@ -595,23 +372,23 @@ int at_set_format_siz(asciiTable_t *t) {
   for (i = 0; i < (*t).ncols; i++) {
     typ = (*t).format_typ[i];
     siz = (*t).format_siz[i];
-    if (typ == STRING) siz = (*t).format_siz[i]; // TODO
-    else if (typ == FLOAT) siz = sizeof(float);
-    else if (typ == DOUBLE) siz = sizeof(double);
-    else if (typ == COMPLEX) siz = 2*sizeof(double);
-    else if (typ == SHORTSHORT) siz = sizeof(char);
-    else if (typ == SHORT) siz = sizeof(short);
-    else if (typ == LONGLONG) siz = sizeof(long long);
-    else if (typ == LONG) siz = sizeof(long);
-    else if (typ == INT) siz = sizeof(int);
-    else if (typ == USHORTSHORT) siz = sizeof(unsigned char);
-    else if (typ == USHORT) siz = sizeof(unsigned short);
-    else if (typ == ULONGLONG) siz = sizeof(unsigned long long);
-    else if (typ == ULONG) siz = sizeof(unsigned long);
-    else if (typ == UINT) siz = sizeof(unsigned int);
+    if (typ == AT_STRING) siz = (*t).format_siz[i]; // TODO
+    else if (typ == AT_FLOAT) siz = sizeof(float);
+    else if (typ == AT_DOUBLE) siz = sizeof(double);
+    else if (typ == AT_COMPLEX) siz = 2*sizeof(double);
+    else if (typ == AT_SHORTSHORT) siz = sizeof(char);
+    else if (typ == AT_SHORT) siz = sizeof(short);
+    else if (typ == AT_LONGLONG) siz = sizeof(long long);
+    else if (typ == AT_LONG) siz = sizeof(long);
+    else if (typ == AT_INT) siz = sizeof(int);
+    else if (typ == AT_USHORTSHORT) siz = sizeof(unsigned char);
+    else if (typ == AT_USHORT) siz = sizeof(unsigned short);
+    else if (typ == AT_ULONGLONG) siz = sizeof(unsigned long long);
+    else if (typ == AT_ULONG) siz = sizeof(unsigned long);
+    else if (typ == AT_UINT) siz = sizeof(unsigned int);
     else siz = -1;
     if (siz < 0) {
-      printf("ERROR setting size for column %d with type %d\n", i, typ);
+      cislog_error("at_set_format_siz: Could not set size for column %d with type %d", i, typ);
       return -1;
     }
     (*t).format_siz[i] = siz;
@@ -630,10 +407,13 @@ static inline
 int at_set_format_typ(asciiTable_t *t) {
   (*t).format_typ = (int*)malloc((*t).ncols*sizeof(int));
   (*t).format_siz = (int*)malloc((*t).ncols*sizeof(int));
+  if (((*t).format_typ == NULL) || ((*t).format_siz == NULL)) {
+    cislog_error("at_set_format_typ: Failed to alloc format_typ/format_siz");
+    return -1;
+  }
   size_t beg = 0, end;
   int icol = 0;
-  const char fmt_len = 100;
-  char ifmt[fmt_len];
+  char ifmt[FMT_LEN];
   // Initialize
   for (icol = 0; icol < (*t).ncols; icol++) {
     (*t).format_typ[icol] = -1;
@@ -641,14 +421,15 @@ int at_set_format_typ(asciiTable_t *t) {
   }
   // Loop over string
   icol = 0;
-  int mres, sind, eind;
-  char re_fmt[fmt_len];
+  int mres;
+  size_t sind, eind;
+  char re_fmt[FMT_LEN];
   sprintf(re_fmt, "%%[^%s%s]+[%s%s]",
 	  (*t).column, (*t).f.newline, (*t).column, (*t).f.newline);
   while (beg < strlen((*t).format_str)) {
     mres = find_match(re_fmt, (*t).format_str + beg, &sind, &eind);
     if (mres < 0) {
-      printf("ERROR: find_match returned %d\n", mres);
+      cislog_error("at_set_format_typ: find_match returned %d", mres);
       return -1;
     } else if (mres == 0) {
       beg++;
@@ -659,43 +440,47 @@ int at_set_format_typ(asciiTable_t *t) {
     strncpy(ifmt, &((*t).format_str)[beg], end-beg);
     ifmt[end-beg] = '\0';
     if (find_match("%.*s", ifmt, &sind, &eind)) {
-      (*t).format_typ[icol] = STRING;
-      mres = regex_replace_sub(ifmt, fmt_len,
+      (*t).format_typ[icol] = AT_STRING;
+      mres = regex_replace_sub(ifmt, FMT_LEN,
 			       "%(\\.)?([[:digit:]]*)s(.*)", "$2", 0);
       (*t).format_siz[icol] = atoi(ifmt);
+#ifdef _WIN32
+    } else if (find_match("(%.*[fFeEgG]){2}j", ifmt, &sind, &eind)) {
+#else
     } else if (find_match("(\%.*[fFeEgG]){2}j", ifmt, &sind, &eind)) {
-      /* (*t).format_typ[icol] = COMPLEX; */
-      (*t).format_typ[icol] = DOUBLE;
+#endif
+      /* (*t).format_typ[icol] = AT_COMPLEX; */
+      (*t).format_typ[icol] = AT_DOUBLE;
       icol++;
-      (*t).format_typ[icol] = DOUBLE;
+      (*t).format_typ[icol] = AT_DOUBLE;
     } else if (find_match("%.*[fFeEgG]", ifmt, &sind, &eind)) {
-      (*t).format_typ[icol] = DOUBLE;
+      (*t).format_typ[icol] = AT_DOUBLE;
     /* } else if (find_match("%.*l[fFeEgG]", ifmt, &sind, &eind)) { */
-    /*   (*t).format_typ[icol] = DOUBLE; */
+    /*   (*t).format_typ[icol] = AT_DOUBLE; */
     /* } else if (find_match("%.*[fFeEgG]", ifmt, &sind, &eind)) { */
-    /*   (*t).format_typ[icol] = FLOAT; */
+    /*   (*t).format_typ[icol] = AT_FLOAT; */
     } else if (find_match("%.*hh[id]", ifmt, &sind, &eind)) {
-      (*t).format_typ[icol] = SHORTSHORT;
+      (*t).format_typ[icol] = AT_SHORTSHORT;
     } else if (find_match("%.*h[id]", ifmt, &sind, &eind)) {
-      (*t).format_typ[icol] = SHORT;
+      (*t).format_typ[icol] = AT_SHORT;
     } else if (find_match("%.*ll[id]", ifmt, &sind, &eind)) {
-      (*t).format_typ[icol] = LONGLONG;
+      (*t).format_typ[icol] = AT_LONGLONG;
     } else if (find_match("%.*l[id]", ifmt, &sind, &eind)) {
-      (*t).format_typ[icol] = LONG;
+      (*t).format_typ[icol] = AT_LONG;
     } else if (find_match("%.*[id]", ifmt, &sind, &eind)) {
-      (*t).format_typ[icol] = INT;
+      (*t).format_typ[icol] = AT_INT;
     } else if (find_match("%.*hh[uoxX]", ifmt, &sind, &eind)) {
-      (*t).format_typ[icol] = USHORTSHORT;
+      (*t).format_typ[icol] = AT_USHORTSHORT;
     } else if (find_match("%.*h[uoxX]", ifmt, &sind, &eind)) {
-      (*t).format_typ[icol] = USHORT;
+      (*t).format_typ[icol] = AT_USHORT;
     } else if (find_match("%.*ll[uoxX]", ifmt, &sind, &eind)) {
-      (*t).format_typ[icol] = ULONGLONG;
+      (*t).format_typ[icol] = AT_ULONGLONG;
     } else if (find_match("%.*l[uoxX]", ifmt, &sind, &eind)) {
-      (*t).format_typ[icol] = ULONG;
+      (*t).format_typ[icol] = AT_ULONG;
     } else if (find_match("%.*[uoxX]", ifmt, &sind, &eind)) {
-      (*t).format_typ[icol] = UINT;
+      (*t).format_typ[icol] = AT_UINT;
     } else {
-      printf("ERROR: Could not parse format string: %s\n", ifmt);
+      cislog_error("at_set_format_typ: Could not parse format string: %s", ifmt);
       return -1;
     }
     beg = end;
@@ -709,30 +494,35 @@ int at_set_format_typ(asciiTable_t *t) {
   @param[in] t constant asciiTable_t table structure.
   @param[in] data constant character pointer to memory containing data that
   should be parsed.
-  @param[in] data_siz constant int Size of data in bytes.
+  @param[in] data_siz constant size_t Size of data in bytes.
   @param[out] ap va_list Pointers to pointers to memory where columns should
   be stored.
   @return int Number of rows read on success, -1 on failure.
  */
 static inline
 int at_vbytes_to_array(const asciiTable_t t, const char *data,
-		       const int data_siz, va_list ap) {
+		       const size_t data_siz, va_list ap) {
   // check size of array
-  /* int data_siz = strlen(data); */
+  /* size_t data_siz = strlen(data); */
   if ((data_siz % t.row_siz) != 0) {
-    printf("Data size (%d) not an even number of rows (row size is %d)\n",
-	   data_siz, t.row_siz);
+    cislog_error("at_vbytes_to_array: Data: %s", data);
+    cislog_error("at_vbytes_to_array: Data size (%d) not an even number of rows (row size is %d)",
+	   (int)data_siz, t.row_siz);
     return -1;
   }
   // Loop through
-  int nrows = data_siz / t.row_siz;
+  int nrows = (int)data_siz / t.row_siz;
   int cur_pos = 0, col_siz;
   int i;
   for (i = 0; i < t.ncols; i++) {
     char **temp;
     temp = va_arg(ap, char**);
     col_siz = nrows*t.format_siz[i];
-    *temp = (char*)malloc(col_siz);
+    *temp = (char*)realloc(*temp, col_siz);
+    if (*temp == NULL) {
+      cislog_error("at_vbytes_to_array: Failed to realloc temp var.");
+      return -1;
+    }
     // C order memory
     /* for (int j = 0; j < nrows; j++) { */
     /*   memcpy(*temp + j*t.format_siz[i], data + j*t.row_siz + cur_pos, t.format_siz[i]); */
@@ -751,15 +541,23 @@ int at_vbytes_to_array(const asciiTable_t t, const char *data,
 /*!
   @brief Encode a set of arrays as bytes.
   @param[in] t constant asciiTable_t table structure.
-  @param[out] data Pointer to pointer to memory where encoded arrays should be
-  stored. It does not need to be allocate, only declared.
-  @param[in] nrows int Number of rows in each column array.
-  @param[in] ap va_list Pointers to memory where column data is stored.
+  @param[out] data Pointer to memory where encoded arrays should be stored.
+  @param[in] data_siz Integer size of data.
+  @param[in] ap va_list Pointers to memory where column data is stored. The first
+  argument in this set should be an integer, the number of rows in each column
+  array.
+  @returns int Number of bytes written. If larger than data_siz, the message will
+  not be written to data and data should be resized first.
  */
 static inline
-int at_varray_to_bytes(const asciiTable_t t, char **data, int nrows, va_list ap) {
-  // Allocate
-  *data = (char*)realloc(*data, nrows*t.row_siz);
+int at_varray_to_bytes(const asciiTable_t t, char *data, const size_t data_siz, va_list ap) {
+  int nrows = va_arg(ap, int);
+  int msg_siz = nrows*t.row_siz;
+  if (msg_siz > (int)data_siz) {
+    cislog_debug("at_varray_to_bytes: Message size (%d bytes) will exceed allocated buffer (%d bytes).",
+		 msg_siz, (int)data_siz);
+    return msg_siz;
+  }
   // Loop through
   int cur_pos = 0, col_siz;
   char *temp;
@@ -767,7 +565,7 @@ int at_varray_to_bytes(const asciiTable_t t, char **data, int nrows, va_list ap)
   for (i = 0; i < t.ncols; i++) {
     col_siz = nrows*t.format_siz[i];
     temp = va_arg(ap, char*);
-    memcpy(*data+cur_pos, temp, col_siz);
+    memcpy(data+cur_pos, temp, col_siz);
     cur_pos += col_siz;
   }
   return cur_pos;
@@ -778,13 +576,13 @@ int at_varray_to_bytes(const asciiTable_t t, char **data, int nrows, va_list ap)
   @param[in] t constant asciiTable_t table structure.
   @param[in] data constant character pointer to memory containing data that
   should be parsed.
-  @param[in] data_siz constant int Size of data in bytes.
+  @param[in] data_siz constant size_t Size of data in bytes.
   @param[out] ... Pointers to pointers to memory where columns should
   be stored.
   @return int Number of rows read on success, -1 on failure.
  */
 static inline
-int at_bytes_to_array(const asciiTable_t t, char *data, int data_siz, ...) {
+int at_bytes_to_array(const asciiTable_t t, char *data, size_t data_siz, ...) {
   va_list ap;
   va_start(ap, data_siz);
   int ret = at_vbytes_to_array(t, data, data_siz, ap);
@@ -795,16 +593,19 @@ int at_bytes_to_array(const asciiTable_t t, char *data, int data_siz, ...) {
 /*!
   @brief Encode a set of arrays as bytes.
   @param[in] t constant asciiTable_t table structure.
-  @param[out] data Pointer to pointer to memory where encoded arrays should be
-  stored. It does not need to be allocate, only declared.
-  @param[in] nrows int Number of rows in each column array.
-  @param[in] ... Pointers to memory where column data is stored.
+  @param[out] data Pointer to memory where encoded arrays should be stored.
+  @param[in] data_siz Integer size of data.
+  @param[in] ... Pointers to memory where column data is stored. The first
+  argument in this set should be an integer, the number of rows in each column
+  array.
+  @returns int Number of bytes written. If larger than data_siz, the message will
+  not be written to data and data should be resized first.
  */
 static inline
-int at_array_to_bytes(const asciiTable_t t, char **data, int nrows, ...) {
+int at_array_to_bytes(const asciiTable_t t, char *data, const size_t data_siz, ...) {
   va_list ap;
-  va_start(ap, nrows);
-  int ret = at_varray_to_bytes(t, data, nrows, ap);
+  va_start(ap, data_siz);
+  int ret = at_varray_to_bytes(t, data, data_siz, ap);
   va_end(ap);
   return ret;
 };

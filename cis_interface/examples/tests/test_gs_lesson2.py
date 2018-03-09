@@ -6,4 +6,4 @@ class TestExampleGS2(TestExample):
 
     def __init__(self, *args, **kwargs):
         super(TestExampleGS2, self).__init__(*args, **kwargs)
-        self.name = 'gs_lesson2'
+        self._name = 'gs_lesson2'

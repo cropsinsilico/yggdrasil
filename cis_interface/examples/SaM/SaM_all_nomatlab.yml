@@ -15,7 +15,7 @@ models:
 
     outputs:
       - name: output_c
-        driver: RMQOutputDriver
+        driver: OutputDriver
         args: output_c
     
   - name: SaM_python
@@ -24,7 +24,7 @@ models:
 
     inputs:
       - name: input1_python
-        driver: RMQInputDriver
+        driver: InputDriver
         args: output_c
       - name: static_python
         driver: FileInputDriver
@@ -32,7 +32,7 @@ models:
 
     outputs:
       - name: output_python
-        driver: RMQOutputDriver
+        driver: OutputDriver
         args: output_python
 
   - name: SaM_cpp
@@ -41,7 +41,7 @@ models:
 
     inputs:
       - name: input1_cpp
-        driver: RMQInputDriver
+        driver: InputDriver
         args: output_python
       - name: static_cpp
         driver: FileInputDriver
@@ -50,5 +50,5 @@ models:
     outputs:
       - name: output_cpp
         driver: FileOutputDriver
-        args: /tmp/SaM_output.txt
-    
+        args: SaM_output.txt
+        in_temp: True

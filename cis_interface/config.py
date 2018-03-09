@@ -6,6 +6,7 @@ This module imports the configuration for cis_interface.
 
 """
 import os
+import logging
 from cis_interface.backwards import configparser
 
 
@@ -52,6 +53,7 @@ assert(os.path.isfile(def_config_file))
 files = [def_config_file, usr_config_file, loc_config_file]
 cis_cfg.read(files)
 
+
 # Set associated environment variables
 env_map = [('debug', 'psi', 'PSI_DEBUG'),
            ('debug', 'rmq', 'RMQ_DEBUG'),
@@ -64,6 +66,25 @@ env_map = [('debug', 'psi', 'PSI_DEBUG'),
            ('parallel', 'cluster', 'PSI_CLUSTER'),
            ]
 
+
+def cfg_logging(cfg=None):
+    r"""Set logging levels from config options.
+
+    Args:
+        cfg (:class:`cis_interface.config.CisConfigParser`, optional):
+            Config parser with options that should be used to update the
+            environment. Defaults to :data:`cis_interface.config.cis_cfg`.
+
+    """
+    if cfg is None:
+        cfg = cis_cfg
+    _LOG_FORMAT = "%(levelname)s:%(module)s.%(funcName)s[%(lineno)d]:%(message)s"
+    logging.basicConfig(level=logging.INFO, format=_LOG_FORMAT)
+    logLevelCIS = eval('logging.%s' % cfg.get('debug', 'psi', 'NOTSET'))
+    logLevelRMQ = eval('logging.%s' % cfg.get('debug', 'rmq', 'INFO'))
+    logging.getLogger("cis_interface").setLevel(level=logLevelCIS)
+    logging.getLogger("pika").setLevel(level=logLevelRMQ)
+        
 
 def cfg_environment(env=None, cfg=None):
     r"""Set environment variables based on config options.
@@ -81,10 +102,11 @@ def cfg_environment(env=None, cfg=None):
     if cfg is None:
         cfg = cis_cfg
     for s, o, e in env_map:
-        v = cis_cfg.get(s, o)
+        v = cfg.get(s, o)
         if v:
             env[e] = v
 
             
-# Do initial update of environment (legacy)
+# Do initial update of logging & environment (legacy)
+cfg_logging()
 cfg_environment()

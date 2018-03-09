@@ -1,9 +1,6 @@
 
 #include "PsiInterface.h"
 #include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <signal.h>
 
 
 int main(int argc, char *argv[]) {
@@ -18,6 +15,7 @@ int main(int argc, char *argv[]) {
   // by all clients that have connected).
   int input;
   while (1) {
+    printf("rpcFibSrv(C): receiving...\n");
     int ret = rpcRecv(rpc, &input);
     if (ret < 0) {
       printf("rpcFibSrv(C): end of input\n");
@@ -40,10 +38,14 @@ int main(int argc, char *argv[]) {
     // Sleep and then send response back
     if (timeSleep) 
       sleep(timeSleep);
-    rpcSend(rpc, input, result);
+    int flag = rpcSend(rpc, input, result);
+    if (flag < 0) {
+      printf("rpcFibSrv(C): ERROR sending\n");
+      break;
+    }
   }
 
   printf("Goodbye from C rpcFibSrv\n");
-  
+  return 0;
 }
 

@@ -11,7 +11,7 @@ function rpcFibCliPar(iterations)
   % Send all of the requests to the server
   for i = 1:iterations
     fprintf('rpcFibCliPar(M): fib(->%-2d) ::: \n', i);
-    ret = rpc.rpcSend(i);
+    ret = rpc.send(i);
     if (~ret);
       disp('rpcFibCliPar(M): SEND FAILED');
       exit(-1);
@@ -21,9 +21,7 @@ function rpcFibCliPar(iterations)
   % Receive responses for all requests that were sent
   for i = 1:iterations
     fprintf('rpcFibCliPar(M): fib(->%-2d) ::: ', i);
-    input = rpc.rpcRecv();
-    ret = input{1};
-    fib = input{2};
+    [ret, fib] = rpc.recv();
     if (~ret);
       disp('rpcFibCliPar(M): RECV FAILED')
       exit(-1);

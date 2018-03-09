@@ -1,9 +1,6 @@
 
 #include "PsiInterface.hpp"
 #include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <signal.h>
 
 
 int count_lines(const char* str, const char* substr) {
@@ -49,23 +46,22 @@ int main(int argc, char *argv[]) {
     if (ret < 0) {
       printf("rpcFibCli(CPP): RPC CALL ERROR\n");
       free(logmsg);
-      exit(-1);
+      return -1;
     }
 
     // Log result by sending it to the log connection
     sprintf(logmsg, "fib(%2d<-) = %-2d<-\n", fibNo, fib);
     printf(logmsg);
     ret = log.send(logmsg, strlen(logmsg));
-    if (ret != 0) {
+    if (ret < 0) {
       printf("rpcFibCli(CPP): SEND ERROR\n");
       free(logmsg);
-      exit(-1);
+      return -1;
     }
   }
 
   printf("Goodbye from C++ rpcFibCli\n");
   free(logmsg);
-  exit(0);
-    
+  return 0;
 }
 

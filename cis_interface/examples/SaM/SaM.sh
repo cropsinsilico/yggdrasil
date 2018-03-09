@@ -39,4 +39,5 @@ esac
 
 cisrun $yaml
 
-cat /tmp/SaM_output.txt
+outfile="${TMPDIR}SaM_output.txt"
+cat $outfile

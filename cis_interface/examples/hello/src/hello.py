@@ -36,7 +36,6 @@ def runhello():
 
     # Send output to a local file
     ret = outf.send(buf)
-    # import time; time.sleep(1)
     if not ret:
         print('hello(P): ERROR FILE SEND')
         sys.exit(-1)

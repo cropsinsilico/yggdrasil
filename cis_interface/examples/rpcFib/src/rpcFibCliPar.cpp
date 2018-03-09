@@ -1,9 +1,6 @@
 
 #include "PsiInterface.hpp"
 #include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <signal.h>
 
 
 int main(int argc, char *argv[]) {
@@ -20,9 +17,9 @@ int main(int argc, char *argv[]) {
   for (int i = 1; i <= iterations; i++) {
     printf("rpcFibCliPar(CPP): fib(->%-2d) ::: \n", i);
     ret = rpc.send(1, i);
-    if (ret != 0) {
+    if (ret < 0) {
       printf("rpcFibCliPar(CPP): SEND FAILED\n");
-      exit(-1);
+      return -1;
     }
   }
 
@@ -33,13 +30,12 @@ int main(int argc, char *argv[]) {
     ret = rpc.recv(2, &fibNo, &fib);
     if (ret < 0) {
       printf("rpcFibCliPar(CPP): RECV FAILED\n");
-      exit(-1);
+      return -1;
     }
     printf("rpcFibCliPar(CPP):  fib(%2d<-) = %-2d<-\n", fibNo, fib);
   }
 
   printf("Goodbye from C++ rpcFibCliPar\n");
-  exit(0);
-    
+  return 0;
 }
 

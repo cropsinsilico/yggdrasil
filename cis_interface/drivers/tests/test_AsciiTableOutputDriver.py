@@ -1,48 +1,33 @@
 import cis_interface.drivers.tests.test_AsciiFileOutputDriver as parent
-import cis_interface.drivers.tests.test_FileOutputDriver as super_parent
 
 
 class TestAsciiTableOutputParam(parent.TestAsciiFileOutputParam):
-    r"""Test parameters for AsciiTableOutputDriver.
-
-    Attributes (in addition to parent class's):
-        -
-
-    """
+    r"""Test parameters for AsciiTableOutputDriver."""
 
     def __init__(self, *args, **kwargs):
         super(TestAsciiTableOutputParam, self).__init__(*args, **kwargs)
         self.driver = 'AsciiTableOutputDriver'
-        self.attr_list = ['file', 'as_array']
+        self.inst_kwargs['column'] = '\t'
+        self.inst_kwargs['format_str'] = self.fmt_str
+        self.ocomm_name = 'AsciiTableComm'
         
 
 class TestAsciiTableOutputDriverNoStart(TestAsciiTableOutputParam,
                                         parent.TestAsciiFileOutputDriverNoStart):
-    r"""Test runner for AsciiTableOutputDriver without start.
-
-    Attributes (in addition to parent class's):
-        -
-
-    """
+    r"""Test runner for AsciiTableOutputDriver without start."""
     pass
     
 
 class TestAsciiTableOutputDriver(TestAsciiTableOutputParam,
                                  parent.TestAsciiFileOutputDriver):
-    r"""Test runner for AsciiTableOutputDriver.
+    r"""Test runner for AsciiTableOutputDriver."""
 
-    Attributes (in addition to parent class's):
-        -
-
-    """
-
-    def setup(self):
-        r"""Create a driver instance and start the driver."""
-        super(super_parent.TestFileOutputDriver, self).setup()
-        self.instance.ipc_send(self.fmt_str)
+    def send_file_contents(self):
+        r"""Send file contents to driver."""
+        self.send_comm.send_nolimit(self.fmt_str)
         for line in self.file_lines:
-            self.instance.ipc_send_nolimit(line)
-        self.instance.ipc_send_nolimit(self.instance.eof_msg)
+            self.send_comm.send_nolimit(line)
+        self.send_comm.send_nolimit_eof()
 
 
 class TestAsciiTableOutputDriver_Array(TestAsciiTableOutputParam,
@@ -51,12 +36,12 @@ class TestAsciiTableOutputDriver_Array(TestAsciiTableOutputParam,
 
     def __init__(self, *args, **kwargs):
         super(TestAsciiTableOutputDriver_Array, self).__init__(*args, **kwargs)
-        self.inst_kwargs['as_array'] = True
-        self.inst_kwargs['use_astropy'] = False
+        self.inst_kwargs['as_array'] = 'True'
+        self.inst_kwargs['column_names'] = 'None'
+        self.inst_kwargs['use_astropy'] = 'False'
 
-    def setup(self):
-        r"""Create a driver instance and start the driver."""
-        super(super_parent.TestFileOutputDriver, self).setup()
-        self.instance.ipc_send(self.fmt_str)
-        self.instance.ipc_send_nolimit(self.file_bytes)
-        self.instance.ipc_send_nolimit(self.instance.eof_msg)
+    def send_file_contents(self):
+        r"""Send file contents to driver."""
+        self.send_comm.send_nolimit(self.fmt_str)
+        self.send_comm.send_nolimit(self.file_bytes)
+        self.send_comm.send_nolimit_eof()

@@ -1,13 +1,11 @@
 #include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
 #include "PsiInterface.h"
 
+#define BSIZE 512 // the max
 
 int main(int argc, char *argv[]) {
   int ret = 0;
-  const int bufsiz0=8192;
-  char buf[bufsiz0];
+  char buf[BSIZE];
   
   printf("Hello from C\n");
 
@@ -17,9 +15,9 @@ int main(int argc, char *argv[]) {
   psiInput_t inq = psiInput("helloQueueIn");
   psiOutput_t outq = psiOutput("helloQueueOut");
   printf("hello(C): Created I/O channels\n");
-  
+
   // Receive input from a local file
-  ret = psi_recv(inf, buf, bufsiz0);
+  ret = psi_recv(inf, buf, BSIZE);
   if (ret < 0) {
     printf("hello(C): ERROR FILE RECV\n");
     return -1;
@@ -36,7 +34,7 @@ int main(int argc, char *argv[]) {
   printf("hello(C): Sent to outq\n");
 
   // Receive input form the input queue
-  ret = psi_recv(inq, buf, bufsiz0);
+  ret = psi_recv(inq, buf, BSIZE);
   if (ret < 0) {
     printf("hello(C): ERROR QUEUE RECV\n");
     return -1;
@@ -52,6 +50,12 @@ int main(int argc, char *argv[]) {
   }
   printf("hello(C): Sent to outf\n");
 
+  // Free input/output channels
+  psi_free(&inf);
+  psi_free(&outf);
+  psi_free(&inq);
+  psi_free(&outq);
+  
   printf("Goodbye from C\n");
   return 0;
 }

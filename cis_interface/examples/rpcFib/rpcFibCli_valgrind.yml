@@ -1,0 +1,25 @@
+---
+
+model:
+  name: rpcFibCli
+  driver: GCCModelDriver
+  args:
+    - ./src/rpcFibCli.c
+    - "{{ FIB_ITERATIONS }}"   # env_var passed as argument for number of loops
+  client_of: rpcFibSrv  # Creates an RPC client queue $(client_of)_$(name)
+  with_valgrind: True
+  valgrind_flags:
+    - --leak-check=full
+    - --show-leak-kinds=all
+    - -v
+
+  outputs:
+    - name: output_log
+      driver: FileOutputDriver
+      args: fibCli.txt
+      in_temp: True
+
+  inputs:
+    - name: yaml_in
+      driver: FileInputDriver
+      args: rpcFibCli_c.yml

@@ -1,5 +1,4 @@
 import os
-import nose.tools as nt
 from cis_interface.examples.tests import TestExample
 
 
@@ -8,24 +7,14 @@ class TestExampleGS3(TestExample):
 
     def __init__(self, *args, **kwargs):
         super(TestExampleGS3, self).__init__(*args, **kwargs)
-        self.name = 'gs_lesson3'
+        self._name = 'gs_lesson3'
 
     @property
-    def input_file(self):
+    def input_files(self):
         r"""Input file."""
-        return os.path.join(self.yamldir, 'Input', 'input.txt')
+        return [os.path.join(self.yamldir, 'Input', 'input.txt')]
 
     @property
-    def output_file(self):
+    def output_files(self):
         r"""Output file."""
-        return os.path.join(self.yamldir, 'output.txt')
-
-    def check_result(self):
-        r"""Assert that contents of input/output files are identical."""
-        assert(os.path.isfile(self.input_file))
-        assert(os.path.isfile(self.output_file))
-        with open(self.input_file, 'r') as fd:
-            icont = fd.read()
-        with open(self.output_file, 'r') as fd:
-            ocont = fd.read()
-        nt.assert_equal(icont, ocont)
+        return [os.path.join(self.yamldir, 'output.txt')]

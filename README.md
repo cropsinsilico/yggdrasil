@@ -1,5 +1,7 @@
 [![Build Status](https://travis-ci.org/cropsinsilico/cis_interface.svg?branch=master)](https://travis-ci.org/cropsinsilico/cis_interface)
+[![Build status](https://ci.appveyor.com/api/projects/status/y9du52gefaw4ees9/branch/master?svg=true)](https://ci.appveyor.com/project/langmm/cis-interface/branch/master)
 [![Coverage Status](https://coveralls.io/repos/github/cropsinsilico/cis_interface/badge.svg?branch=master)](https://coveralls.io/github/cropsinsilico/cis_interface?branch=master)
+[![codecov](https://codecov.io/gh/cropsinsilico/cis_interface/branch/master/graph/badge.svg)](https://codecov.io/gh/cropsinsilico/cis_interface)
 [![PEP8](https://img.shields.io/badge/code%20style-pep8-orange.svg)](https://www.python.org/dev/peps/pep-0008/)
 
 The CiS framework provides support for combining scientific models

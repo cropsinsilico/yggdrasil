@@ -17,4 +17,5 @@ model:
   outputs:
     - name: output_matlab
       driver: FileOutputDriver
-      args: /tmp/SaM_output.txt
+      args: SaM_output.txt
+      in_temp: True

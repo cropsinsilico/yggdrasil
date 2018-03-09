@@ -1,32 +1,47 @@
 r"""IO and Model drivers."""
-
-# from cis_interface.drivers import Driver
-
-# # Model drivers
-# from cis_interface.drivers import ModelDriver
-# from cis_interface.drivers import PythonModelDriver
-# from cis_interface.drivers import GCCModelDriver
-# from cis_interface.drivers import MatlabModelDriver
-
-# # IO drivers
-# from cis_interface.drivers import IODriver
-# from cis_interface.drivers import FileInputDriver
-# from cis_interface.drivers import FileOutputDriver
-# from cis_interface.drivers import AsciiFileInputDriver
-# from cis_interface.drivers import AsciiFileOutputDriver
-# from cis_interface.drivers import AsciiTableInputDriver
-# from cis_interface.drivers import AsciiTableOutputDriver
-# from cis_interface.drivers import RPCDriver
-# from cis_interface.drivers import RMQDriver
-# from cis_interface.drivers import RMQInputDriver
-# from cis_interface.drivers import RMQOutputDriver
-# from cis_interface.drivers import RMQClientDriver
-# from cis_interface.drivers import RMQServerDriver
+import importlib
 
 
-__all__ = ['Driver',
+def import_driver(driver):
+    r"""Dynamically import a driver based on a string.
+
+    Args:
+        driver (str): Name of the driver that should be imported.
+
+    """
+    drv = importlib.import_module('cis_interface.drivers.%s' % driver)
+    class_ = getattr(drv, driver)
+    return class_
+                    
+
+def create_driver(driver, name, args=None, **kwargs):
+    r"""Dynamically create a driver based on a string and other driver
+    properties.
+
+    Args:
+        driver (str): Name of the driver that should be created.
+        name (str): Name to give the driver.
+        args (object, optional): Second argument for drivers which take a
+            minimum of two arguments. If None, the driver is assumed to take a
+            minimum of one argument. Defaults to None.
+        **kwargs: Additional keyword arguments are passed to the driver
+            class.
+
+    Returns:
+        object: Instance of the requested driver.
+
+    """
+    class_ = import_driver(driver)
+    if args is None:
+        instance = class_(name, **kwargs)
+    else:
+        instance = class_(name, args, **kwargs)
+    return instance
+
+
+__all__ = ['import_driver', 'create_driver', 'Driver',
            'ModelDriver', 'PythonModelDriver', 'GCCModelDriver',
-           'MatlabModelDriver',
+           'MakeModelDriver', 'MatlabModelDriver',
            'IODriver', 'FileInputDriver', 'FileOutputDriver',
            'AsciiFileInputDriver', 'AsciiFileOutputDriver',
            'AsciiTableInputDriver', 'AsciiTableOutputDriver',

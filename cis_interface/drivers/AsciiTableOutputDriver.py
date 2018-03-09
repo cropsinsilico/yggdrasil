@@ -1,5 +1,4 @@
 from cis_interface.drivers.AsciiFileOutputDriver import AsciiFileOutputDriver
-from cis_interface.dataio.AsciiTable import AsciiTable
 from cis_interface.tools import eval_kwarg
 
 
@@ -29,68 +28,46 @@ class AsciiTableOutputDriver(AsciiFileOutputDriver):
             the end of a line. Default set by :class:`AsciiFile`.
         as_array (bool, optional): If True, the table contents are sent all at
             once as an array. Defaults to False.
-        \*\*kwargs: Additional keyword arguments are passed to parent class's
-            __init__ method.
+        timeout_recv_format (float, optional): Time in seconds that should be
+            waited before giving up on recieving the format string. Defaults to
+            60 s.
+        **kwargs: Additional keyword arguments are passed to parent class.
 
-    Attributes (in additon to parent class's):
-        file (:class:`AsciiTable.AsciiTable`): Associated special class for
-            ASCII table.
-        as_array (bool): If True, the table contents are received all at once
-            as an array. Defaults to False.
+    Attributes:
+        timeout_recv_format (float): Time in seconds that should be waited
+            before giving up on recieving the format string.
 
     """
-    def __init__(self, name, args, as_array=False, **kwargs):
+    def __init__(self, name, args, timeout_recv_format=None, **kwargs):
         file_keys = ['format_str', 'dtype', 'column_names', 'use_astropy',
-                     'column']
-        file_kwargs = {}
+                     'column', 'as_array']
+        # icomm_kws = kwargs.get('icomm_kws', {})
+        ocomm_kws = kwargs.get('ocomm_kws', {})
+        ocomm_kws.setdefault('comm', 'AsciiTableComm')
         for k in file_keys:
             if k in kwargs:
-                file_kwargs[k] = kwargs.pop(k)
-                if k in ['column_names', 'use_astropy']:
-                    file_kwargs[k] = eval_kwarg(file_kwargs[k])
-        super(AsciiTableOutputDriver, self).__init__(
-            name, args, skip_AsciiFile=True, **kwargs)
+                ocomm_kws[k] = kwargs.pop(k)
+                if k in ['column_names', 'use_astropy', 'as_array']:
+                    ocomm_kws[k] = eval_kwarg(ocomm_kws[k])
+        ocomm_kws.setdefault('format_str', 'temp')
+        kwargs['ocomm_kws'] = ocomm_kws
+        super(AsciiTableOutputDriver, self).__init__(name, args, **kwargs)
         self.debug('(%s)', args)
-        self.file_kwargs.update(**file_kwargs)
-        self.as_array = eval_kwarg(as_array)
-        self.file_kwargs.setdefault('format_str', '')
-        self.file = AsciiTable(self.args, 'w', **self.file_kwargs)
-        self.debug('(%s): done with init', args)
+        if timeout_recv_format is None:
+            timeout_recv_format = 60
+        self.timeout_recv_format = timeout_recv_format
 
-    def open_file(self):
-        r"""Open the file and write the format string.
-
-        Raises:
-            RuntimeError: If the format string cannot be received.
-
-        """
-        fmt = self.recv_wait()
-        if fmt is None:  # pragma: debug
-            raise RuntimeError('Did not receive format string')
-        with self.lock:
-            self.file.update_format_str(fmt)
-            self.file.open()
-            self.file.writeformat()
-
-    def file_recv(self):
-        r"""Receive a long message.
-
-        Returns:
-            str: Received message.
-
-        """
-        with self.lock:
-            return self.ipc_recv_nolimit()
-
-    def file_write(self, data):
-        r"""Write a table row or array to the file.
-
-        Args:
-            data (str): Message.
-
-        """
-        with self.lock:
-            if self.as_array:
-                self.file.write_bytes(data, order='F', append=True)
-            else:
-                self.file.writeline_full(data, validate=True)
+    def before_loop(self):
+        r"""Receive format string and then write it to the file."""
+        super(AsciiTableOutputDriver, self).before_loop()
+        if self.is_valid:
+            self.debug("Receiving format string.")
+            fmt = self.recv_message(timeout=self.timeout_recv_format)
+            if fmt:
+                with self.lock:
+                    self.ocomm.file.update_format_str(fmt)
+                    self.ocomm.file.writeformat()
+            else:  # pragma: debug
+                self.error("Failed to receive format string.")
+                self.close_comm()
+                self.set_break_flag()

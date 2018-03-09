@@ -1,6 +1,6 @@
 import sys
 import random
-from cis_interface.interface.PsiInterface import PsiRpcClient, PSI_MSG_MAX
+from cis_interface.interface.PsiInterface import PsiRpcClient, PSI_MSG_BUF
 
 
 def rand_str(length):
@@ -8,19 +8,21 @@ def rand_str(length):
                "abcdefghijklmnopqrstuvwxyz" +
                "ABCDEFGHIJKLMNOPQRSTUVWXYZ")
     out = ''
-    while (len(out) < length):
+    while (len(out) < (length - 1)):
         index = int(random.random() * len(charset))
         out += charset[index]
     return out
 
 
-print("maxMsgCli(P): Hello PSI_MSG_MAX is %d." % PSI_MSG_MAX)
+msg_size = PSI_MSG_BUF
+
+print("maxMsgCli(P): Hello message size %d." % msg_size)
 
 # Create a max message, send/recv and verify
 rpc = PsiRpcClient("maxMsgSrv_maxMsgCli", "%s", "%s")
 
 # Create a max message
-output = rand_str(PSI_MSG_MAX - 1)
+output = rand_str(msg_size)
 
 # Call RPC server
 ret, input = rpc.rpcCall(output)
