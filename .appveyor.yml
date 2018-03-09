@@ -4,8 +4,8 @@
 # branches to build
 branches:
   # whitelist
-  only:
-    - topic/windows
+  # only:
+  #   - topic/zmq
 
   # blacklist
   except:
