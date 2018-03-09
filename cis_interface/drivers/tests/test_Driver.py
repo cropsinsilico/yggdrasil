@@ -1,6 +1,5 @@
 import os
 import threading
-# import psutil
 import nose.tools as nt
 from cis_interface.tools import CisClass
 from cis_interface.tests import CisTest
@@ -132,7 +131,6 @@ class TestParam(CisTest):
         # Check counts
         nt.assert_less_equal(ncurr_comm, self.nprev_comm)
         nt.assert_less_equal(ncurr_thread, self.nprev_thread)
-        # nt.assert_equal(len(psutil.Process().children(recursive=True)), 0)
         self.cleanup_comms()
 
     @property
