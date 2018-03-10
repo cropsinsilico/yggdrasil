@@ -60,22 +60,6 @@ class TestCisRunner(object):
         self.runner = runner.CisRunner([ex_yamls['hello']['python']],
                                        'test_psi_run')
 
-    # def test_parseModelYaml(self):
-    #     r"""Test parseModelYaml."""
-    #     nt.assert_raises(IOError, self.runner.parseModelYaml, 'fake_yaml.yml')
-
-    # def test_add_driver(self):
-    #     r"""Test add_driver."""
-    #     nt.assert_raises(ValueError, self.runner.add_driver, 'fake_type', {}, '')
-    #     xname = list(self.runner.inputdrivers.keys())[0]
-    #     x = self.runner.inputdrivers[xname]
-    #     nt.assert_raises(ValueError, self.runner.add_driver, 'input', x,
-    #                      x['workingDir'])
-    #     x = self.runner.inputdrivers.pop(xname)
-    #     x['kwargs'] = {}
-    #     nt.assert_raises(RuntimeError, self.runner.add_driver, 'input', x,
-    #                      x['workingDir'])
-
     def test_createIODriver(self):
         r"""Test createInputDriver and createOutputDriver."""
         yml = {'name': 'fake_IODriver',
