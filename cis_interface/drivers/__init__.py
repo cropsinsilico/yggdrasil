@@ -2,19 +2,21 @@ r"""IO and Model drivers."""
 import importlib
 
 
-def import_driver(driver):
+def import_driver(driver=None):
     r"""Dynamically import a driver based on a string.
 
     Args:
         driver (str): Name of the driver that should be imported.
 
     """
+    if driver is None:
+        driver = 'Driver'
     drv = importlib.import_module('cis_interface.drivers.%s' % driver)
     class_ = getattr(drv, driver)
     return class_
                     
 
-def create_driver(driver, name, args=None, **kwargs):
+def create_driver(driver=None, name=None, args=None, **kwargs):
     r"""Dynamically create a driver based on a string and other driver
     properties.
 

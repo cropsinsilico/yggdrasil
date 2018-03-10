@@ -7,11 +7,8 @@ import sys
 import inspect
 import time
 import signal
-import yaml
-import pystache
 import warnings
 import atexit
-from cis_interface.backwards import sio
 import subprocess
 from cis_interface import platform
 from cis_interface import backwards
@@ -280,26 +277,6 @@ def sleep(interval):
         time.sleep(interval)
 
 
-def parse_yaml(fname):
-    r"""Parse a yaml file defining a run.
-
-    Args:
-        fname (str): Path to the yaml file.
-
-    Returns:
-        dict: Contents of yaml file.
-
-    """
-    # Open file and parse yaml
-    with open(fname, 'r') as f:
-        # Mustache replace vars
-        yamlparsed = f.read()
-        yamlparsed = pystache.render(
-            sio.StringIO(yamlparsed).getvalue(), dict(os.environ))
-        yamlparsed = yaml.safe_load(yamlparsed)
-    return yamlparsed
-
-    
 def eval_kwarg(x):
     r"""If x is a string, eval it. Otherwise just return it.
 

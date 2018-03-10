@@ -74,7 +74,8 @@ class CisTest(unittest.TestCase):
     """
 
     def __init__(self, *args, **kwargs):
-        self._description_prefix = kwargs.pop('description_prefix', '')
+        self._description_prefix = kwargs.pop('description_prefix',
+                                              str(self.__class__).split("'")[1])
         self._mod = None
         self._cls = None
         self.uuid = str(uuid.uuid4())
