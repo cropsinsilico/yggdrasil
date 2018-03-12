@@ -4,6 +4,12 @@ import nose.tools as nt
 from cis_interface.tools import CisClass
 from cis_interface.tests import CisTest
 from cis_interface.communication import get_comm_class
+from cis_interface import drivers
+
+
+def test_import_driver():
+    r"""Test creation of default driver."""
+    drivers.import_driver()
 
 
 class TestParam(CisTest):

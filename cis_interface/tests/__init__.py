@@ -147,9 +147,8 @@ class CisTest(unittest.TestCase):
         r"""Prefix first line of doc string."""
         out = super(CisTest, self).shortDescription()
         if self.description_prefix:
-            return '%s: %s' % (self.description_prefix, out)
-        else:
-            return out
+            out = '%s: %s' % (self.description_prefix, out)
+        return out
 
     @property
     def cls(self):
