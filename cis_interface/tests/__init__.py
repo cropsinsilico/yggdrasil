@@ -74,7 +74,8 @@ class CisTest(unittest.TestCase):
     """
 
     def __init__(self, *args, **kwargs):
-        self._description_prefix = kwargs.pop('description_prefix', '')
+        self._description_prefix = kwargs.pop('description_prefix',
+                                              str(self.__class__).split("'")[1])
         self._mod = None
         self._cls = None
         self.uuid = str(uuid.uuid4())
@@ -146,9 +147,8 @@ class CisTest(unittest.TestCase):
         r"""Prefix first line of doc string."""
         out = super(CisTest, self).shortDescription()
         if self.description_prefix:
-            return '%s: %s' % (self.description_prefix, out)
-        else:
-            return out
+            out = '%s: %s' % (self.description_prefix, out)
+        return out
 
     @property
     def cls(self):

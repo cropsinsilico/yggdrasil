@@ -7,9 +7,9 @@ import signal
 from pprint import pformat
 from itertools import chain
 import socket
-from cis_interface.tools import CisClass, parse_yaml
+from cis_interface.tools import CisClass
 from cis_interface.config import cis_cfg, cfg_environment
-from cis_interface import platform, backwards
+from cis_interface import platform, backwards, yamlfile
 from cis_interface.drivers import create_driver, import_driver
 
 
@@ -93,109 +93,17 @@ class CisRunner(CisClass):
         # Update environment based on config
         cfg_environment()
         # Parse yamls
-        if isinstance(modelYmls, str):
-            modelYmls = [modelYmls]
-        for modelYml in modelYmls:
-            self.parseModelYaml(modelYml)
+        drivers = yamlfile.parse_yaml(modelYmls)
+        self.inputdrivers = drivers['input']
+        self.outputdrivers = drivers['output']
+        self.modeldrivers = drivers['model']
+        for x in self.outputdrivers.values():
+            self._outputchannels[x['args']] = x
+        for x in self.inputdrivers.values():
+            self._inputchannels[x['args']] = x
         # print(pformat(self.inputdrivers), pformat(self.outputdrivers),
         #       pformat(self.modeldrivers))
         # atexit.register(self.cleanup)
-
-    def parseModelYaml(self, modelYml):
-        r"""Parse supplied yaml, adding yamldir and doing mustache replace.
-
-        Args:
-            modelYml (str): Path to yaml file containing model info.
-
-        Raises:
-            IOError: If the yaml file cannot be located.
-
-        """
-        yamlpath = os.path.realpath(modelYml)
-        yamldir = os.path.dirname(yamlpath)
-        if not os.path.isfile(yamlpath):
-            raise IOError("Unable locate yaml file %s" % yamlpath)
-        # Open file and parse yaml
-        self.info("Loading yaml %s", yamlpath)
-        yamlparsed = parse_yaml(yamlpath)
-        self.debug("After stache: %s", pformat(yamlparsed))
-        # Store parsed models
-        yml_models = yamlparsed.get('models', [])
-        if 'model' in yamlparsed:
-            yml_models.append(yamlparsed['model'])
-        for yml in yml_models:
-            self.add_driver('model', yml, yamldir)
-
-    def add_driver(self, dtype, yaml, yamldir):
-        r"""Add a driver to the appropriate driver dictionary with yamldir.
-
-        Args:
-            dtype (str): Driver type. Should be 'input', 'output',or 'model'.
-            yaml (dict): YAML dictionary for the driver.
-            yamldir (str): Full path to directory where the yaml is stored.
-
-        Raises:
-            ValueError: If dtype is not 'input', 'output',or 'model'.
-            ValueError: If the driver name already exists.
-
-        """
-        if dtype == 'input':
-            dd = self.inputdrivers
-            self._inputchannels[yaml['args']] = yaml
-        elif dtype == 'output':
-            dd = self.outputdrivers
-            self._outputchannels[yaml['args']] = yaml
-        elif dtype == 'model':
-            yaml.setdefault('inputs', [])
-            yaml.setdefault('outputs', [])
-            # Add server driver
-            if yaml.get('is_server', False):
-                srv = {'name': yaml['name'],
-                       'driver': 'ServerDriver',
-                       'args': yaml['name'] + '_SERVER'}
-                yaml['inputs'].append(srv)
-                yaml['clients'] = []
-            # Add client driver
-            if yaml.get('client_of', []):
-                srv_names = yaml['client_of']
-                if isinstance(srv_names, str):
-                    srv_names = [srv_names]
-                yaml['client_of'] = srv_names
-                for srv in srv_names:
-                    cli = {'name': '%s_%s' % (srv, yaml['name']),
-                           'driver': 'ClientDriver',
-                           'args': srv + '_SERVER'}
-                    yaml['outputs'].append(cli)
-            # Add I/O drivers for this model
-            for inp in yaml['inputs']:
-                inp['model_driver'] = yaml['name']
-                self.add_driver('input', inp, yamldir)
-            for inp in yaml['outputs']:
-                inp['model_driver'] = yaml['name']
-                self.add_driver('output', inp, yamldir)
-            dd = self.modeldrivers
-        else:
-            raise ValueError("%s is not a recognized driver type." % dtype)
-        # Check to make sure there arn't two drivers with the same name
-        if yaml['name'] in dd:
-            raise ValueError("%s is already a registered %s driver." % (
-                yaml['name'], dtype))
-        # Copy keywords
-        if 'kwargs' in yaml:
-            raise RuntimeError(("The yaml specs for driver %s includes the " +
-                                "keyword 'kwargs' which is reserved. " +
-                                "Please remove it.") % yaml['name'])
-        yaml['kwargs'] = {}
-        kws_ignore = ['name', 'driver', 'args', 'kwargs', 'onexit',
-                      'input', 'inputs', 'output', 'outputs', 'clients',
-                      'model_driver']
-        for k in yaml:
-            if k not in kws_ignore:
-                yaml['kwargs'][k] = yaml[k]
-        yaml['workingDir'] = yamldir
-        if dtype == 'model':
-            yaml['kwargs']['model_index'] = len(dd)
-        dd[yaml['name']] = yaml
 
     def pprint(self, *args):
         r"""Print with color."""
@@ -305,14 +213,10 @@ class CisRunner(CisClass):
         self.debug('Creating %s, a %s', yml['name'], yml['driver'])
         curpath = os.getcwd()
         if 'ClientDriver' in yml['driver']:
-            yml['kwargs'].setdefault('comm_address',
-                                     self.serverdrivers[yml['args']])
+            yml.setdefault('comm_address', self.serverdrivers[yml['args']])
         os.chdir(yml['workingDir'])
-        instance = create_driver(yml['driver'], yml['name'], yml['args'],
-                                 yml=yml, env=yml.get('env', {}),
-                                 namespace=self.namespace, rank=self.rank,
-                                 workingDir=yml['workingDir'],
-                                 **yml['kwargs'])
+        instance = create_driver(yml=yml, namespace=self.namespace,
+                                 rank=self.rank, **yml)
         yml['instance'] = instance
         os.chdir(curpath)
         if 'ServerDriver' in yml['driver']:
@@ -374,9 +278,11 @@ class CisRunner(CisClass):
         """
         from cis_interface.drivers import FileOutputDriver
         if yml['args'] in self._inputchannels:
-            yml['kwargs'].setdefault('comm_env', {})
-            yml['kwargs']['comm_env'] = self._inputchannels[
-                yml['args']]['instance'].comm_env
+            yml.setdefault('comm_env', {})
+            yml['comm_env'] = self._inputchannels[yml['args']]['instance'].comm_env
+            # yml['kwargs'].setdefault('comm_env', {})
+            # yml['kwargs']['comm_env'] = self._inputchannels[
+            #     yml['args']]['instance'].comm_env
         drv_cls = import_driver(yml['driver'])
         if yml['args'] not in self._inputchannels:
             try:
