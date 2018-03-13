@@ -13,7 +13,8 @@ cis_ver = "0.1.3"
 try:
     import matlab.engine
     matlab_installed = True
-except:
+except ImportError:
+    # TODO: Try to install matlab
     warnings.warn("Could not import matlab.engine. " +
                   "Matlab features will be disabled.")
     matlab_installed = False
