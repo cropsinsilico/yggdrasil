@@ -1,5 +1,5 @@
 import subprocess
-from logging import debug, warn
+from logging import debug, warning
 from datetime import datetime
 import os
 import weakref
@@ -7,8 +7,8 @@ try:  # pragma: matlab
     import matlab.engine
     _matlab_installed = True
 except ImportError:  # pragma: no matlab
-    warn("Could not import matlab.engine. " +
-         "Matlab support will be disabled.")
+    warning("Could not import matlab.engine. " +
+            "Matlab support will be disabled.")
     _matlab_installed = False
 from cis_interface.drivers.ModelDriver import ModelDriver
 from cis_interface import backwards, tools
@@ -19,6 +19,40 @@ _top_dir = os.path.normpath(os.path.join(os.path.dirname(__file__), '../'))
 _incl_interface = os.path.join(_top_dir, 'interface')
 _incl_io = os.path.join(_top_dir, 'io')
 
+
+def locate_matlabroot():  # pragma: matlab
+    r"""Find directory that servers as matlab root.
+
+    Returns:
+        str: Full path to matlabroot directory.
+
+    """
+    # if not _matlab_installed:  # pragma: no matlab
+    #     raise RuntimeError("Matlab is not installed.")
+    mtl_id = '=MATLABROOT='
+    cmd = "fprintf('" + mtl_id + "%s" + mtl_id + "', matlabroot); exit();"
+    mtl_cmd = ['matlab', '-nodisplay', '-nosplash', '-nodesktop', '-nojvm',
+               '-r', '%s' % cmd]
+    try:
+        mtl_proc = subprocess.check_output(mtl_cmd)
+    except subprocess.CalledProcessError:  # pragma: no matlab
+        raise RuntimeError("Could not run matlab.")
+    if mtl_id not in mtl_proc:  # pragma: debug
+        print(mtl_proc)
+        raise RuntimeError("Could not locate matlab root id (%s) in output." % mtl_id)
+    mtl_root = mtl_proc.split(mtl_id)[-2]
+    return mtl_root
+
+
+def install_matlab_engine():  # pragma: matlab
+    r"""Install the MATLAB engine API for Python."""
+    if not _matlab_installed:
+        mtl_root = locate_matlabroot()
+        mtl_setup = os.path.join(mtl_root, 'extern', 'engines', 'python')
+        cmd = 'python setup.py install'
+        result = subprocess.check_output(cmd, cwd=mtl_setup)
+        print(result)
+    
 
 def start_matlab():  # pragma: matlab
     r"""Start a Matlab shared engine session inside a detached screen
@@ -336,7 +370,8 @@ class MatlabModelDriver(ModelDriver):  # pragma: matlab
                 self.model_process.future.result()
                 self.model_process.print_output()
             except BaseException:
-                pass
+                self.model_process.print_output()
+                self.exception("Error running model.")
         else:
             self.sleep()
 
