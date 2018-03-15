@@ -14,7 +14,7 @@ function x_py = matlab2python(x_ml)
       x_py = py.str(x_ml);
     elseif isa(x_ml, 'char');
       try
-	x_py = py.str(x_ml, 'utf-8');
+	x_py = py.str(x_ml);
       catch
 	x_py = py.unicode(x_ml);
       end

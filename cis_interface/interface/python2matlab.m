@@ -4,7 +4,9 @@ function x_ml = python2matlab(x_py)
   elseif isa(x_py, 'py.double')
     x_ml = double(x_py);
   elseif isa(x_py, 'py.int')
-    x_ml = int(x_py);
+    x_ml = int64(x_py);
+  elseif isa(x_py, 'py.bytes')
+    x_ml = char(x_py.decode('utf-8'));
   elseif isa(x_py, 'py.string')
     x_ml = char(x_py);
   elseif isa(x_py, 'py.str')

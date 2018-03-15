@@ -4,6 +4,7 @@ import pprint
 import shutil
 import warnings
 import subprocess
+import tempfile
 from setuptools import setup, find_packages
 PY_MAJOR_VERSION = sys.version_info[0]
 PY2 = (PY_MAJOR_VERSION == 2)
@@ -27,6 +28,8 @@ def install_matlab():
                '-r', '%s' % cmd]
     try:
         mtl_proc = subprocess.check_output(mtl_cmd)
+        if PY_MAJOR_VERSION == 3:
+            mtl_proc = mtl_proc.decode("utf-8")
     except subprocess.CalledProcessError:
         return False
     if mtl_id not in mtl_proc:
@@ -34,9 +37,18 @@ def install_matlab():
     mtl_root = mtl_proc.split(mtl_id)[-2]
     # Install engine API
     mtl_setup = os.path.join(mtl_root, 'extern', 'engines', 'python')
-    cmd = 'python setup.py install'
+    blddir = os.path.join(tempfile.gettempdir(), 'matlab_python_api')
+    blddir = os.path.join(os.path.expanduser('~'), 'matlab_python_api')
+    if not os.path.isdir(blddir):
+        os.mkdir(blddir)
+    cmd = [sys.executable, 'setup.py',
+           'build', '--build-base=%s' % blddir,
+           'install']
+    print(cmd)
     try:
         result = subprocess.check_output(cmd, cwd=mtl_setup)
+        if PY_MAJOR_VERSION == 3:
+            result = result.decode("utf-8") 
         print(result)
     except subprocess.CalledProcessError:
         return False
@@ -49,7 +61,8 @@ else:
     warnings.warn("Could not import matlab.engine. " +
                   "Matlab features will be disabled.")
     matlab_installed = False
-        
+
+    
 # Create config file if one does not exist
 usr_config_file = os.path.expanduser(os.path.join('~', '.cis_interface.cfg'))
 def_config_file = os.path.join(os.path.dirname(__file__),
