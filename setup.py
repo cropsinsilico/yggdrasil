@@ -3,18 +3,49 @@ import sys
 import pprint
 import shutil
 import warnings
+import subprocess
 from setuptools import setup, find_packages
 PY_MAJOR_VERSION = sys.version_info[0]
 PY2 = (PY_MAJOR_VERSION == 2)
 IS_WINDOWS = (sys.platform in ['win32', 'cygwin'])
 
 cis_ver = "0.1.3"
-    
-try:
-    import matlab.engine
+
+
+def install_matlab():
+    r"""Attempt to install the MATLAB engine API for Python."""
+    # Check to see if its already installed
+    try:
+        import matlab.engine
+        return True
+    except ImportError:
+        pass
+    # Get location of matlab root
+    mtl_id = '=MATLABROOT='
+    cmd = "fprintf('" + mtl_id + "%s" + mtl_id + "', matlabroot); exit();"
+    mtl_cmd = ['matlab', '-nodisplay', '-nosplash', '-nodesktop', '-nojvm',
+               '-r', '%s' % cmd]
+    try:
+        mtl_proc = subprocess.check_output(mtl_cmd)
+    except subprocess.CalledProcessError:
+        return False
+    if mtl_id not in mtl_proc:
+        return False
+    mtl_root = mtl_proc.split(mtl_id)[-2]
+    # Install engine API
+    mtl_setup = os.path.join(mtl_root, 'extern', 'engines', 'python')
+    cmd = 'python setup.py install'
+    try:
+        result = subprocess.check_output(cmd, cwd=mtl_setup)
+        print(result)
+    except subprocess.CalledProcessError:
+        return False
+    return True
+
+
+if install_matlab():
     matlab_installed = True
-except ImportError:
-    # TODO: Try to install matlab
+else:
     warnings.warn("Could not import matlab.engine. " +
                   "Matlab features will be disabled.")
     matlab_installed = False

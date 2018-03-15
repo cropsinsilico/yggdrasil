@@ -750,7 +750,9 @@ class AsciiTable(AsciiFile):
                 for i in range(nele):
                     if len(arr[i]) != ntyp:
                         raise ValueError("Element %d does not have enough fields." % i)
-                    arr1[i] = np.array(arr[i], self.dtype)
+                    # arr1[i] = np.asarray(arr[i], self.dtype)
+                    for j in range(ntyp):
+                        arr1[i][j] = arr[i][j]
             else:
                 raise ValueError("Not enough arrays for fields")
         elif isinstance(arr, np.ndarray):

@@ -3,14 +3,22 @@ function x_py = matlab2python(x_ml)
     if isa(x_ml, 'complex');
       x_py = x_ml;
     elseif isa(x_ml, 'float');
-      x_py = py.float(x_ml);
+      if isreal(x_ml)
+	x_py = py.float(x_ml);
+      else
+	x_py = x_ml;
+      end
     elseif isa(x_ml, 'integer');
       x_py = py.int(x_ml);
     elseif isa(x_ml, 'string');
       x_py = py.str(x_ml);
     elseif isa(x_ml, 'char');
-      x_py = x_ml;
-      % x_py = py.str(x_ml);
+      try
+	x_py = py.str(x_ml, 'utf-8');
+      catch
+	x_py = py.unicode(x_ml);
+      end
+      x_py = x_py.encode('utf-8');
     elseif isa(x_ml, 'logical');
       x_py = py.bool(x_ml);
     elseif isa(x_ml, 'struct');
@@ -18,6 +26,7 @@ function x_py = matlab2python(x_ml)
     else;
       disp('Could not convert scalar matlab type to python type');
       disp(x_ml);
+      disp(class(x_ml));
       x_py = x_ml;
     end;
   elseif isvector(x_ml);
@@ -26,7 +35,7 @@ function x_py = matlab2python(x_ml)
     elseif isa(x_ml, 'char');
       x_py = py.str(x_ml);
     elseif isa(x_ml, 'cell');
-      for i = 1:size(x_ml, 1)
+      for i = 1:length(x_ml)
 	x_ml{i} = matlab2python(x_ml{i});
       end
       x_py = py.list(x_ml);

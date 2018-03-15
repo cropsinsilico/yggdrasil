@@ -51,6 +51,7 @@ def install_matlab_engine():  # pragma: matlab
         mtl_setup = os.path.join(mtl_root, 'extern', 'engines', 'python')
         cmd = 'python setup.py install'
         result = subprocess.check_output(cmd, cwd=mtl_setup)
+        print(result)
     
 
 def start_matlab():  # pragma: matlab
@@ -369,7 +370,8 @@ class MatlabModelDriver(ModelDriver):  # pragma: matlab
                 self.model_process.future.result()
                 self.model_process.print_output()
             except BaseException:
-                pass
+                self.model_process.print_output()
+                self.exception("Error running model.")
         else:
             self.sleep()
 
