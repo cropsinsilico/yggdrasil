@@ -30,21 +30,21 @@ def install_matlab():
         mtl_proc = subprocess.check_output(mtl_cmd)
         if PY_MAJOR_VERSION == 3:
             mtl_proc = mtl_proc.decode("utf-8")
-    except subprocess.CalledProcessError:
+    except BaseException:
         return False
     if mtl_id not in mtl_proc:
         return False
     mtl_root = mtl_proc.split(mtl_id)[-2]
     # Install engine API
     mtl_setup = os.path.join(mtl_root, 'extern', 'engines', 'python')
-    blddir = os.path.join(tempfile.gettempdir(), 'matlab_python_api')
+    if not os.path.isdir(mtl_setup):
+        return False
     blddir = os.path.join(os.path.expanduser('~'), 'matlab_python_api')
     if not os.path.isdir(blddir):
         os.mkdir(blddir)
     cmd = [sys.executable, 'setup.py',
            'build', '--build-base=%s' % blddir,
            'install']
-    print(cmd)
     try:
         result = subprocess.check_output(cmd, cwd=mtl_setup)
         if PY_MAJOR_VERSION == 3:
