@@ -1,4 +1,10 @@
-from cis_interface import backwards
+import uuid
+from cis_interface import backwards, tools
+
+
+CIS_MSG_HEAD = backwards.unicode2bytes('CIS_MSG_HEAD')
+HEAD_VAL_SEP = backwards.unicode2bytes(':CIS:')
+HEAD_KEY_SEP = backwards.unicode2bytes(',')
 
 
 class DefaultSerialize(object):
@@ -36,11 +42,17 @@ class DefaultSerialize(object):
                  func_deserialize=None):
         self.format_str = format_str
         self.as_array = as_array
-        self.func_serialize = func_serialize
-        self.func_deserialize = func_deserialize
+        if isinstance(func_serialize, DefaultSerialize):
+            self._func_serialize = func_serialize.serialize
+        else:
+            self._func_serialize = func_serialize
+        if isinstance(func_deserialize, DefaultSerialize):
+            self._func_deserialize = func_deserialize.deserialize
+        else:
+            self._func_deserialize = func_deserialize
 
-    def serialize(self, args):
-        r"""Serialize a message.
+    def func_serialize(self, args):
+        r"""Default method for serializing object into message.
 
         Args:
             args (obj): List of arguments to be formatted or a ready made message.
@@ -51,14 +63,11 @@ class DefaultSerialize(object):
         Raises:
             Exception: If there is no format string and more than one argument
                 is provided.
-            TypeError: If returned msg is not bytes type (str on Python 2).
-
 
         """
-        if self.func_serialize is not None:
-            out = self.func_serialize(args)
-            if not isinstance(out, backwards.bytes_type):
-                raise TypeError("Provided serialize function did not yield bytes type.")
+        if self._func_serialize is not None:
+            # Return directly to check and raise TypeError
+            return self._func_serialize(args)
         elif self.format_str is not None:
             out = backwards.bytes2unicode(self.format_str) % args
         else:
@@ -69,7 +78,57 @@ class DefaultSerialize(object):
                 out = args[0]
             else:
                 out = args
-        return backwards.unicode2bytes(out)
+        out = backwards.unicode2bytes(out)
+        return out
+
+    def func_deserialize(self, msg):
+        r"""Default method for deseserializing a message.
+
+        Args:
+            msg (str, bytes): Message to be deserialized.
+
+        Returns:
+            tuple(obj, dict): Deserialized message and header information.
+
+        """
+        if self._func_deserialize is not None:
+            out = self._func_deserialize(msg)
+        elif self.format_str is not None:
+            if len(msg) == 0:
+                out = tuple()
+            else:
+                out = backwards.scanf_bytes(self.format_str, msg)
+        else:
+            out = msg
+        return out
+        
+    def serialize(self, args, header_kwargs=None):
+        r"""Serialize a message.
+
+        Args:
+            args (obj): List of arguments to be formatted or a ready made message.
+            header_kwargs (dict, optional): Keyword arguments that should be
+                added to the header. Defaults to None and no header is added.
+
+        Returns:
+            bytes, str: Serialized message.
+
+        Raises:
+            TypeError: If returned msg is not bytes type (str on Python 2).
+
+
+        """
+        if args == tools.CIS_MSG_EOF:
+            return args
+        else:
+            out = self.func_serialize(args)
+            if not isinstance(out, backwards.bytes_type):
+                raise TypeError("Serialization function did not yield bytes type.")
+        if header_kwargs is not None:
+            header_kwargs.setdefault('size', len(out))
+            header_kwargs.setdefault('id', str(uuid.uuid4()))
+            out = self.format_header(header_kwargs) + out
+        return out
 
     def deserialize(self, msg):
         r"""Deserialize a message.
@@ -78,7 +137,7 @@ class DefaultSerialize(object):
             msg (str, bytes): Message to be deserialized.
 
         Returns:
-            obj: Deserialized message.
+            tuple(obj, dict): Deserialized message and header information.
 
         Raises:
             TypeError: If msg is not bytes type (str on Python 2).
@@ -86,15 +145,56 @@ class DefaultSerialize(object):
         """
         if not isinstance(msg, backwards.bytes_type):
             raise TypeError("Message to be deserialized is not bytes type.")
-        if len(msg) == 0:
-            if self.format_str is not None:
-                out = tuple()
-            else:
-                out = msg
-        elif self.func_deserialize is not None:
-            out = self.func_deserialize(msg)
-        elif self.format_str is not None:
-            out = backwards.scanf_bytes(self.format_str, msg)
+        header_info = self.parse_header(msg)
+        body = header_info.pop('body')
+        if len(body) < header_info['size']:
+            header_info['incomplete'] = True
+            return body, header_info
+        if body == tools.CIS_MSG_EOF:
+            header_info['eof'] = True
+            out = body
         else:
-            out = msg
+            out = self.func_deserialize(body)
+        return out, header_info
+
+    def format_header(self, header_info):
+        r"""Format header info to form a string that should prepend a message.
+
+        Args:
+            header_info (dict): Properties that should be incldued in the header.
+
+        Returns:
+            str: Message with header in front.
+
+        """
+        header = backwards.bytes2unicode(CIS_MSG_HEAD)
+        header += backwards.bytes2unicode(HEAD_KEY_SEP).join(
+            ['%s%s%s' % (backwards.bytes2unicode(k),
+                         backwards.bytes2unicode(HEAD_VAL_SEP),
+                         backwards.bytes2unicode(str(v))) for k, v in
+             header_info.items()])
+        header += backwards.bytes2unicode(CIS_MSG_HEAD)
+        return backwards.unicode2bytes(header)
+
+    def parse_header(self, msg):
+        r"""Extract header info from a message.
+
+        Args:
+            msg (str): Message to extract header from.
+
+        Returns:
+            dict: Message properties.
+
+        """
+        if CIS_MSG_HEAD not in msg:
+            out = dict(body=msg, size=len(msg))
+            return out
+        _, header, body = msg.split(CIS_MSG_HEAD)
+        out = dict(body=body)
+        for x in header.split(HEAD_KEY_SEP):
+            k, v = x.split(HEAD_VAL_SEP)
+            out[backwards.bytes2unicode(k)] = backwards.bytes2unicode(v)
+        for k in ['size']:
+            if k in out:
+                out[k] = int(float(out[k]))
         return out

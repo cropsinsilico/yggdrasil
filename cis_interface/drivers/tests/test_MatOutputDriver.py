@@ -23,7 +23,7 @@ class TestMatOutputDriver(TestMatOutputParam, parent.TestFileOutputDriver):
 
     def send_file_contents(self):
         r"""Send file contents to driver."""
-        self.send_comm.send(self.pickled_data)
+        self.send_comm.send(self.data_dict)
         self.send_comm.send_eof()
 
     def assert_after_stop(self):

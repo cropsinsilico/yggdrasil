@@ -6,7 +6,7 @@ class PickleSerialize(DefaultSerialize):
     r"""Class for serializing a python object into a bytes message by pickling.
     """
 
-    def serialize(self, args):
+    def func_serialize(self, args):
         r"""Serialize a message.
 
         Args:
@@ -19,7 +19,7 @@ class PickleSerialize(DefaultSerialize):
         out = backwards.pickle.dumps(args)
         return backwards.unicode2bytes(out)
 
-    def deserialize(self, msg):
+    def func_deserialize(self, msg):
         r"""Deserialize a message.
 
         Args:

@@ -7,10 +7,7 @@ class MatSerialize(DefaultSerialize):
     r"""Class for serializing a python object into a bytes message using the
     Matlab .mat format."""
     
-    def __init__(self, *args, **kwargs):
-        super(MatSerialize, self).__init__(*args, **kwargs)
-
-    def serialize(self, args):
+    def func_serialize(self, args):
         r"""Serialize a message.
 
         Args:
@@ -23,6 +20,8 @@ class MatSerialize(DefaultSerialize):
             TypeError: If args is not a dictionary.
 
         """
+        if isinstance(args, backwards.bytes_type) and (len(args) == 0):
+            return args
         if not isinstance(args, dict):
             raise TypeError('Object (type %s) is not a dictionary' %
                             type(args))
@@ -32,7 +31,7 @@ class MatSerialize(DefaultSerialize):
         fd.close()
         return out
 
-    def deserialize(self, msg):
+    def func_deserialize(self, msg):
         r"""Deserialize a message.
 
         Args:
