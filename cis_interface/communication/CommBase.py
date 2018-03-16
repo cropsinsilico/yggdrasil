@@ -5,7 +5,6 @@ import threading
 from cis_interface import backwards, tools
 from cis_interface.tools import get_CIS_MSG_MAX, CIS_MSG_EOF
 from cis_interface.serialize.DefaultSerialize import DefaultSerialize
-from cis_interface.serialize.DefaultDeserialize import DefaultDeserialize
 from cis_interface.communication import (
     new_comm, get_comm, get_comm_class)
 
@@ -102,6 +101,10 @@ class CommBase(tools.CisClass):
             through the connection. 'send' if the connection will send
             messages, 'recv' if the connecton will receive messages. Defaults
             to 'send'.
+        serializer (DefaultSerialize, optional): Class with serialize and
+            deserialize methods that should be used to process sent and received
+            messages. Defaults to None and is constructed using provided
+            deserialize, serialize, and format_str arguments.
         deserialize (obj, optional): Callable object that takes bytes as input
             and returnes deserialized version. This will be used to process
             received messages. Defaults to None and raw bytes will be returned
@@ -154,12 +157,8 @@ class CommBase(tools.CisClass):
         address (str): Communication info.
         direction (str): The direction that messages should flow through the
             connection.
-        meth_deserialize (obj): Callable object that takes bytes as input
-            and returnes deserialized version. This will be used to process
-            received messages.
-        meth_serialize (obj): Callable object that takes any object as
-            input and returns a serialized set of bytes. This will be used
-            to encode sent messages.
+        serializer (DefaultSerialize): Object that will be used to
+            serialize/deserialize messages to/from python objects.
         is_interface (bool): True if this comm is a Python interface binding.
         recv_timeout (float): Time that should be waited for an incoming
             message before returning None.
@@ -188,7 +187,7 @@ class CommBase(tools.CisClass):
 
     """
     def __init__(self, name, address=None, direction='send',
-                 deserialize=None, serialize=None, format_str=None,
+                 serializer=None, deserialize=None, serialize=None, format_str=None,
                  dont_open=False, is_interface=False, recv_timeout=0.0,
                  close_on_eof_recv=True, close_on_eof_send=False,
                  single_use=False, reverse_names=False, no_suffix=False,
@@ -212,13 +211,13 @@ class CommBase(tools.CisClass):
         else:
             self.address = address
         self.direction = direction
+        if serializer is not None:
+            self.serializer = serializer
+        else:
+            self.serializer = DefaultSerialize(format_str=format_str,
+                                               func_serialize=serialize,
+                                               func_deserialize=deserialize)
         self.format_str = format_str
-        if deserialize is None:
-            deserialize = DefaultDeserialize(format_str=self.format_str)
-        if serialize is None:
-            serialize = DefaultSerialize(format_str=self.format_str)
-        self.meth_deserialize = deserialize
-        self.meth_serialize = serialize
         self.is_client = is_client
         self.is_server = is_server
         self.is_response_client = is_response_client
@@ -356,8 +355,7 @@ class CommBase(tools.CisClass):
         """
         kwargs = {'comm': self.comm_class}
         kwargs['address'] = self.opp_address
-        kwargs['serialize'] = self.meth_serialize
-        kwargs['deserialize'] = self.meth_deserialize
+        kwargs['serializer'] = self.serializer
         if self.direction == 'send':
             kwargs['direction'] = 'recv'
         else:
@@ -590,23 +588,17 @@ class CommBase(tools.CisClass):
             prev = next
 
     def serialize(self, msg):
-        r"""Serialize a message by turning it to bytes using meth_serialize.
+        r"""Serialize a message by turning it to bytes using serializer.
 
         Args:
             msg (obj): Message to be serialized that can be parsed by
-                meth_serialize.
+                serializer.
 
         Returns:
             bytes, str: Serialized message.
 
-        Raises:
-            TypeError: If meth_serialize does not return bytes type.
-
         """
-        msg_s = self.meth_serialize(msg)
-        if not isinstance(msg_s, backwards.bytes_type):  # pragma: debug
-            raise TypeError("Serialize method did not yield bytes type.")
-        return msg_s
+        return self.serializer.serialize(msg)
 
     def deserialize(self, msg):
         r"""Deserialize message by passing it to meth_deserialize.
@@ -617,13 +609,8 @@ class CommBase(tools.CisClass):
         Returns:
             obj: Deserialized message.
 
-        Raises:
-            TypeError: If msg is not bytes type.
-
         """
-        if not isinstance(msg, backwards.bytes_type):  # pragma: debug
-            raise TypeError("Deserialize method expects bytes type.")
-        return self.meth_deserialize(msg)
+        return self.serializer.deserialize(msg)
 
     # CLIENT/SERVER METHODS
     def server_exists(self, srv_address):

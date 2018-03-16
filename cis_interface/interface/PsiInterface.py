@@ -2,8 +2,7 @@ from cis_interface import backwards, tools
 from cis_interface.communication import (
     DefaultComm, RPCComm, ServerComm, ClientComm)
 from cis_interface.serialize import (
-    AsciiTableSerialize, AsciiTableDeserialize,
-    PickleSerialize, PickleDeserialize)
+    AsciiTableSerialize, PickleSerialize)
 
 
 PSI_MSG_MAX = tools.CIS_MSG_MAX
@@ -272,7 +271,7 @@ def PsiAsciiTableInput(name, as_array=False, src_type=1, matlab=False, **kwargs)
                             'string from input.')
     else:
         format_str = out.file.format_str
-    out.meth_deserialize = AsciiTableDeserialize.AsciiTableDeserialize(
+    out.serializer = AsciiTableSerialize.AsciiTableSerialize(
         format_str=backwards.decode_escape(format_str),
         as_array=as_array)
     return out
@@ -320,7 +319,7 @@ def PsiAsciiTableOutput(name, fmt, as_array=False, dst_type=1, matlab=False,
                             'string to output.')
     else:
         out.file.writeformat()
-    out.meth_serialize = AsciiTableSerialize.AsciiTableSerialize(
+    out.serializer = AsciiTableSerialize.AsciiTableSerialize(
         format_str=fmt, as_array=as_array)
     return out
     
@@ -391,7 +390,7 @@ def PsiPickleInput(name, src_type=1, matlab=False, **kwargs):
     kwargs.setdefault('direction', 'recv')
     out = base(name, is_interface=True, recv_timeout=False,
                matlab=matlab, **kwargs)
-    out.meth_deserialize = PickleDeserialize.PickleDeserialize()
+    out.serializer = PickleSerialize.PickleSerialize()
     return out
 
 
@@ -419,5 +418,5 @@ def PsiPickleOutput(name, dst_type=1, matlab=False, **kwargs):
     kwargs.setdefault('direction', 'send')
     out = base(name, is_interface=True, recv_timeout=False,
                matlab=matlab, **kwargs)
-    out.meth_serialize = PickleSerialize.PickleSerialize()
+    out.serializer = PickleSerialize.PickleSerialize()
     return out
