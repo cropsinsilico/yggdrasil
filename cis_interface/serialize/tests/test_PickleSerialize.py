@@ -10,7 +10,12 @@ class TestPickleSerialize(TestDefaultSerialize):
         super(TestPickleSerialize, self).__init__(*args, **kwargs)
         self._cls = 'PickleSerialize'
 
-    def test_call(self):
-        r"""Test call without format string."""
-        out = self.instance(self.data_dict)
+    def test_serialize(self):
+        r"""Test serialize without format string."""
+        out = self.instance.serialize(self.data_dict)
         nt.assert_equal(out, self.pickled_data)
+
+    def test_deserialize(self):
+        r"""Test deserialize."""
+        out = self.instance.deserialize(self.pickled_data)
+        self.assert_equal_data_dict(out)

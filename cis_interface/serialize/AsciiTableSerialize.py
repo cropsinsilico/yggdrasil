@@ -7,25 +7,16 @@ class AsciiTableSerialize(DefaultSerialize):
     r"""Class for serialize table output into bytes messages comprising a
     formatted ASCII table.
 
-    Args:
-        format_str (str): Format of ASCII table in C scanf style.
-        as_array (bool, optional): If True, input must be a numpy array
-            and the output will be the serialized bytes of the array in
-            column major ('F') order. If False, input must be elements
-            of a table row. Defaults to False.
-
     Attributes:
-        format_str (str): Format of ASCII table in C scanf style.
-        as_array (bool): True or False depending if output will be serialized
-            array or row.
+        table (AsciiTable): Table object used for formating/parsing table
+            entries.
 
     """
-    def __init__(self, format_str, as_array=False):
-        self.format_str = format_str
-        self.as_array = as_array
-        self.table = AsciiTable('serialize', None, format_str=format_str)
+    def __init__(self, *args, **kwargs):
+        super(AsciiTableSerialize, self).__init__(*args, **kwargs)
+        self.table = AsciiTable('serialize', None, format_str=self.format_str)
 
-    def __call__(self, args):
+    def serialize(self, args):
         r"""Serialize a message.
 
         Args:
@@ -43,3 +34,21 @@ class AsciiTableSerialize(DefaultSerialize):
                 args = [args]
             out = self.table.format_line(*args)
         return backwards.unicode2bytes(out)
+
+    def deserialize(self, msg):
+        r"""Deserialize a message.
+
+        Args:
+            msg: Message to be deserialized.
+
+        Returns:
+            obj: Deserialized message.
+
+        """
+        if (len(msg) == 0):
+            out = tuple()
+        elif self.as_array:
+            out = self.table.bytes_to_array(msg, order='F')
+        else:
+            out = self.table.process_line(msg)
+        return out

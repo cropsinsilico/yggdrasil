@@ -1,4 +1,4 @@
-from scipy.io import savemat
+from scipy.io import savemat, loadmat
 from cis_interface import backwards
 from cis_interface.serialize.DefaultSerialize import DefaultSerialize
 
@@ -10,7 +10,7 @@ class MatSerialize(DefaultSerialize):
     def __init__(self, *args, **kwargs):
         super(MatSerialize, self).__init__(*args, **kwargs)
 
-    def __call__(self, args):
+    def serialize(self, args):
         r"""Serialize a message.
 
         Args:
@@ -29,5 +29,25 @@ class MatSerialize(DefaultSerialize):
         fd = backwards.BytesIO()
         savemat(fd, args)
         out = fd.getvalue()
+        fd.close()
+        return out
+
+    def deserialize(self, msg):
+        r"""Deserialize a message.
+
+        Args:
+            msg (str, bytes): Message to be deserialized.
+
+        Returns:
+            obj: Deserialized Python object.
+
+        """
+        if len(msg) == 0:
+            return dict()
+        fd = backwards.BytesIO(msg)
+        out = loadmat(fd, squeeze_me=False)
+        mat_keys = ['__header__', '__globals__', '__version__']
+        for k in mat_keys:
+            del out[k]
         fd.close()
         return out

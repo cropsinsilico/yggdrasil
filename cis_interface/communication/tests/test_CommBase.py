@@ -34,7 +34,7 @@ class TestCommBase(CisTestClassInfo):
         super(TestCommBase, self).__init__(*args, **kwargs)
         self.comm = 'CommBase'
         self.attr_list += ['name', 'address', 'direction', 'format_str',
-                           'meth_deserialize', 'meth_serialize', 'recv_timeout',
+                           'serializer', 'recv_timeout',
                            'close_on_eof_recv', 'opp_address', 'opp_comms',
                            'maxMsgSize']
 
