@@ -443,16 +443,19 @@ class IOInfo(object):
             del x[k]
         return x
 
-    def assert_equal_data_dict(self, x):
+    def assert_equal_data_dict(self, x, y=None):
         r"""Assert that the provided object is equivalent to data_dict.
 
         Args:
             x (obj): Object to check.
+            y (obj, optional): Object to check against. Defaults to self.data_dict.
 
         Raises:
             AssertionError: If the two are not equal.
 
         """
+        if y is None:
+            y = self.data_dict
         if isinstance(x, backwards.file_type):
             if x.name.endswith('.mat'):
                 x = self.load_mat(x)
@@ -466,13 +469,13 @@ class IOInfo(object):
                     x = pickle.load(fd)
         elif isinstance(x, backwards.bytes_type):
             x = pickle.loads(x)
-        nt.assert_equal(type(x), type(self.data_dict))
-        for k in self.data_dict:
+        nt.assert_equal(type(x), type(y))
+        for k in y:
             if k not in x:  # pragma: debug
                 raise AssertionError("Key %s expected, but not in result." % k)
-            np.testing.assert_array_equal(x[k], self.data_dict[k])
+            np.testing.assert_array_equal(x[k], y[k])
         for k in x:
-            if k not in self.data_dict:  # pragma: debug
+            if k not in y:  # pragma: debug
                 raise AssertionError("Key %s in result not expected." % k)
 
     @property

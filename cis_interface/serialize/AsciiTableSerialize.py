@@ -16,7 +16,7 @@ class AsciiTableSerialize(DefaultSerialize):
         super(AsciiTableSerialize, self).__init__(*args, **kwargs)
         self.table = AsciiTable('serialize', None, format_str=self.format_str)
 
-    def serialize(self, args):
+    def func_serialize(self, args):
         r"""Serialize a message.
 
         Args:
@@ -35,7 +35,7 @@ class AsciiTableSerialize(DefaultSerialize):
             out = self.table.format_line(*args)
         return backwards.unicode2bytes(out)
 
-    def deserialize(self, msg):
+    def func_deserialize(self, msg):
         r"""Deserialize a message.
 
         Args:
