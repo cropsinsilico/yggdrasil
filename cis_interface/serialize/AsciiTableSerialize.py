@@ -16,6 +16,15 @@ class AsciiTableSerialize(DefaultSerialize):
         super(AsciiTableSerialize, self).__init__(*args, **kwargs)
         self.table = AsciiTable('serialize', None, format_str=self.format_str)
 
+    @property
+    def serializer_type(self):
+        r"""int: Type of serializer."""
+        if self.as_array:
+            out = 2
+        else:
+            out = 3
+        return out
+        
     def func_serialize(self, args):
         r"""Serialize a message.
 

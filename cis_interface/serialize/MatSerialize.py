@@ -7,6 +7,11 @@ class MatSerialize(DefaultSerialize):
     r"""Class for serializing a python object into a bytes message using the
     Matlab .mat format."""
     
+    @property
+    def serializer_type(self):
+        r"""int: Type of serializer."""
+        return 5
+        
     def func_serialize(self, args):
         r"""Serialize a message.
 

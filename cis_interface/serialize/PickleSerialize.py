@@ -6,6 +6,11 @@ class PickleSerialize(DefaultSerialize):
     r"""Class for serializing a python object into a bytes message by pickling.
     """
 
+    @property
+    def serializer_type(self):
+        r"""int: Type of serializer."""
+        return 4
+        
     def func_serialize(self, args):
         r"""Serialize a message.
 
