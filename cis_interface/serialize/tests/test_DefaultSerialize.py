@@ -1,6 +1,6 @@
 import nose.tools as nt
 from cis_interface.tests import CisTestClassInfo
-from cis_interface import backwards, tools
+from cis_interface import backwards, tools, serialize
 
 
 class TestDefaultSerialize(CisTestClassInfo):
@@ -37,6 +37,25 @@ class TestDefaultSerialize(CisTestClassInfo):
             iout, ihead = self.instance.deserialize(msg)
             self.assert_result_equal(iout, iobj)
             nt.assert_equal(ihead, self.empty_head(msg))
+        
+    def test_serialize_sinfo(self):
+        r"""Test serialize/deserialize with serializer info."""
+        hout = self._header_info
+        hout.update(**self.instance.serializer_info)
+        temp_seri = serialize.DefaultSerialize.DefaultSerialize()
+        for iobj in self._objects:
+            msg = self.instance.serialize(iobj, header_kwargs=self._header_info,
+                                          add_serializer_info=True)
+            iout, ihead = self.instance.deserialize(msg)
+            self.assert_result_equal(iout, iobj)
+            nt.assert_equal(ihead, hout)
+            # Use info to reconstruct serializer
+            iout, ihead = temp_seri.deserialize(msg)
+            nt.assert_equal(ihead, hout)
+            new_seri = serialize.get_serializer(**ihead)
+            iout, ihead = new_seri.deserialize(msg)
+            self.assert_result_equal(iout, iobj)
+            nt.assert_equal(ihead, hout)
         
     def test_serialize_header(self):
         r"""Test serialize/deserialize with header."""
@@ -109,6 +128,10 @@ class TestDefaultSerialize_func(TestDefaultSerialize):
         x = eval(backwards.bytes2unicode(args))
         return x
 
+    def test_serialize_sinfo(self):
+        r"""Disabled: Test serialize/deserialize with serializer info."""
+        pass
+
 
 class TestDefaultSerialize_func_error(TestDefaultSerialize_func):
     r"""Test class for DefaultSerialize class with incorrect functions."""
@@ -130,4 +153,8 @@ class TestDefaultSerialize_func_error(TestDefaultSerialize_func):
 
     def test_serialize_header(self):
         r"""Disabled: Test serialize/deserialize with header."""
+        pass
+
+    def test_serialize_sinfo(self):
+        r"""Disabled: Test serialize/deserialize with serializer info."""
         pass

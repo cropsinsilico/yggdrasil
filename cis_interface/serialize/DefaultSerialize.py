@@ -39,7 +39,7 @@ class DefaultSerialize(object):
 
     """
     def __init__(self, format_str=None, as_array=False, func_serialize=None,
-                 func_deserialize=None):
+                 func_deserialize=None, **kwargs):
         self.format_str = format_str
         self.as_array = as_array
         if isinstance(func_serialize, DefaultSerialize):
@@ -50,6 +50,22 @@ class DefaultSerialize(object):
             self._func_deserialize = func_deserialize.deserialize
         else:
             self._func_deserialize = func_deserialize
+
+    @property
+    def serializer_class(self):
+        r"""str: String representation of the class."""
+        cls = str(self.__class__).split("'")
+        print(cls)
+        return cls
+
+    @property
+    def serializer_type(self):
+        r"""int: Type of serializer."""
+        if self.format_str is None:
+            out = 0
+        else:
+            out = 1
+        return out
 
     def func_serialize(self, args):
         r"""Default method for serializing object into message.
@@ -101,14 +117,27 @@ class DefaultSerialize(object):
         else:
             out = msg
         return out
+
+    @property
+    def serializer_info(self):
+        r"""dict: Information about serializer required to reconstruct it."""
+        out = dict(stype=self.serializer_type)
+        if self.format_str:
+            out['format_str'] = backwards.bytes2unicode(self.format_str)
+        if self.as_array:
+            out['as_array'] = int(self.as_array)
+        return out
         
-    def serialize(self, args, header_kwargs=None):
+    def serialize(self, args, header_kwargs=None, add_serializer_info=False):
         r"""Serialize a message.
 
         Args:
             args (obj): List of arguments to be formatted or a ready made message.
             header_kwargs (dict, optional): Keyword arguments that should be
                 added to the header. Defaults to None and no header is added.
+            add_serializer_info (bool, optional): If True, add enough information
+                about this serializer to the header that the message can be
+                recovered.
 
         Returns:
             bytes, str: Serialized message.
@@ -124,6 +153,10 @@ class DefaultSerialize(object):
             out = self.func_serialize(args)
             if not isinstance(out, backwards.bytes_type):
                 raise TypeError("Serialization function did not yield bytes type.")
+        if add_serializer_info:
+            if header_kwargs is None:
+                header_kwargs = dict()
+            header_kwargs.update(**self.serializer_info)
         if header_kwargs is not None:
             header_kwargs.setdefault('size', len(out))
             header_kwargs.setdefault('id', str(uuid.uuid4()))
@@ -194,7 +227,10 @@ class DefaultSerialize(object):
         for x in header.split(HEAD_KEY_SEP):
             k, v = x.split(HEAD_VAL_SEP)
             out[backwards.bytes2unicode(k)] = backwards.bytes2unicode(v)
-        for k in ['size']:
+        for k in ['size', 'as_array', 'stype']:
             if k in out:
                 out[k] = int(float(out[k]))
+        # for k in ['format_str']:
+        #     if k in out:
+        #         out[k] = backwards.unicode2bytes(out[k])
         return out
