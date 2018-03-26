@@ -49,7 +49,7 @@ int deserialize_format(const seri_t s, const char *buf, const size_t buf_siz,
 #endif
   // Simplify format
   char *fmt0 = (char*)s.info;
-  size_t fmt_siz = strlen(fmt0) + 1;
+  size_t fmt_siz = 2*strlen(fmt0) + 1;
   char *fmt = (char*)malloc(sizeof(char) * fmt_siz);
   if (fmt == NULL) {
     cislog_error("deserialize_format: Failed to allocate buffer for simplified format.");

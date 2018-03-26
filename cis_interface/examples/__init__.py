@@ -7,6 +7,7 @@ ex_dict = {'gs_lesson1': ('python', 'matlab', 'c', 'cpp'),
            'gs_lesson3': ('python', 'matlab', 'c', 'cpp'),
            'gs_lesson4': ('python', 'matlab', 'c', 'cpp'),
            'gs_lesson5': ('python', 'matlab', 'c', 'cpp'),
+           'formatted_io1': ('python', 'matlab', 'c', 'cpp'),
            'hello': ('python', 'matlab', 'c', 'cpp'),
            'model_error': ('python', 'matlab', 'c', 'cpp'),
            'SaM': ('python', 'matlab', 'c', 'cpp', 'all', 'all_nomatlab'),
@@ -70,7 +71,7 @@ for k, lang in ex_dict.items():
                                              '%s%s' % (k, ext_map[cli_l])),
                                 os.path.join(os.path.dirname(__file__), k, 'src',
                                              '%s%s' % (k, ext_map[srv_l]))]
-    elif k in ['gs_lesson4', 'gs_lesson5']:
+    elif k in ['gs_lesson4', 'gs_lesson5', 'formatted_io1']:
         for ilang in lang:
             yamls[k][ilang] = os.path.join(os.path.dirname(__file__), k,
                                            '%s_%s.yml' % (k, ilang))
