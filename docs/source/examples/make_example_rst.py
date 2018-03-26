@@ -19,8 +19,13 @@ def get_file(fname, local=False):
     else:
         return fname
 
+
 def get_rst_file(k, local=False):
     return get_file('%s.rst' % (k), local=local)
+
+
+def get_html_file(k, local=False):
+    return get_file('%s.html' % (k), local=local)
 
 
 def get_src_file(k, local=False):
@@ -77,7 +82,8 @@ def write_yml_ref(fd, k):
 
 
 def write_ref_link(fd, k):
-    fd.write("(`%s <%s>`__)\n" % ('Example in other languages', get_rst_file(k)))
+    fd.write("(`%s <%s>`__)\n" % ('Example in other languages',
+                                  os.path.join('examples', get_html_file(k))))
 
 
 def write_toc_file(fd, key_list):
@@ -121,6 +127,7 @@ def write_code_line(fd, s, upone=False, language='python'):
 
 
 def write_src(fd, k, l, upone=False):
+    fd.write("Model Code:\n\n")
     if isinstance(source[k][l], list):
         for s in source[k][l]:
             write_code_line(fd, s, upone=upone)
@@ -129,6 +136,7 @@ def write_src(fd, k, l, upone=False):
 
     
 def write_yml(fd, k, l, upone=False):
+    fd.write("Model YAML:\n\n")
     if isinstance(yamls[k][l], list):
         for y in yamls[k][l]:
             write_code_line(fd, y, upone=upone, language='yaml')

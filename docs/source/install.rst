@@ -55,7 +55,7 @@ the information for that server can either be provided to the
 RabbitMQ connection driver
 (See :class:`cis_interface.drivers.RMQDriver.RMQDriver`) or added
 to the cis_interface config file (See
-`Configuration Options <config.rst>`__ for information on setting
+:ref:`Configuration Options <config_rst>` for information on setting
 config options).
 
 Starting a local RabbitMQ Server is also relatively easy. Details on
