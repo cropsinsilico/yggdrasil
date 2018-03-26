@@ -290,7 +290,7 @@ comm_t init_comm(const char *name, const char *direction, const comm_type t,
 
 /*!
   @brief Get number of messages in the comm.
-  @param[in] comm_t Communicator to check.
+  @param[in] x comm_t Communicator to check.
   @returns int Number of messages.
  */
 static
@@ -369,7 +369,7 @@ int comm_send_single(const comm_t x, const char *data, const size_t len) {
   @brief Create header for multipart message.
   @param[in] x comm_t structure that header will be sent to.
   @param[in] len size_t Size of message body.
-  @param[out] comm_head_t Header info that should be sent before the message
+  @returns comm_head_t Header info that should be sent before the message
   body.
 */
 static

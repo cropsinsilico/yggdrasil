@@ -173,7 +173,7 @@ int free_client_comm(comm_t *x) {
 
 /*!
   @brief Get number of messages in the comm.
-  @param[in] comm_t Communicator to check.
+  @param[in] x comm_t Communicator to check.
   @returns int Number of messages. -1 indicates an error.
  */
 static inline
@@ -187,7 +187,7 @@ int client_comm_nmsg(const comm_t x) {
   @brief Create response comm and add info to header.
   @param[in] x comm_t structure that header will be sent to.
   @param[in] head comm_head_t Prexisting header structure.
-  @param[out] comm_head_t Header structure that includes the additional
+  @returns comm_head_t Header structure that includes the additional
   information about the response comm.
 */
 static inline

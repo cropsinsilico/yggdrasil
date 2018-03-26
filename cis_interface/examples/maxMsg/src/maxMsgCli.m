@@ -18,7 +18,7 @@ output = randsample(charset, msg_size-1, true);
 if (~flag)
   error('maxMsgCli(M): RPC ERROR');
   exit(-1);
-end
+end;
 
 % Check to see if response matches
 if (vars{1} ~= output)
@@ -26,7 +26,7 @@ if (vars{1} ~= output)
   exit(-1);
 else
   disp('maxMsgCli(M): CONFIRM');
-end
+end;
 
 % All done, say goodbye
 disp('maxMsgCli(M): Goodbye!');

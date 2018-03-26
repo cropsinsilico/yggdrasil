@@ -30,8 +30,6 @@ typedef struct comm_head_t {
   @param[in] address char* Address that should be used for remainder of 
   message following this header if it is a multipart message.
   @param[in] id char* Message ID.
-  @param[in] response_address char* Address that should be used to repond to
-  the message sent following this header.
   @returns comm_head_t Structure with provided information, char arrays
   correctly initialized to empty strings if NULLs provided.
  */

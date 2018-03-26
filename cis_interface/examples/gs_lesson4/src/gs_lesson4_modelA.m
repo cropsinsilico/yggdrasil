@@ -12,8 +12,8 @@ while flag
   [flag, msg] = in_channel.recv();
   if (~flag)
     disp('Model A: No more input.');
-    break
-  end
+    break;
+  end;
 
   % Print received message
   fprintf('Model A: %s\n', char(msg));
@@ -23,9 +23,9 @@ while flag
   flag = out_channel.send(msg);
   if (~flag)
     disp('Model A: Error sending output.');
-    break
-  end
+    break;
+  end;
   
-end
+end;
 
 exit(0);

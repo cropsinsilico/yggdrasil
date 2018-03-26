@@ -36,6 +36,9 @@ public:
    */
   CisInput(const char *name, char *fmt) : _pi(cisInputFmt(name, fmt)) {}
 
+  /*!
+    @brief Alias to allow freeing of underlying C struct at the class level.
+  */
   void _destroy_pi() { cis_free(&_pi); }
   
   /*!
@@ -155,6 +158,9 @@ public:
   /*! @brief Empty constructor for inheritance. */
   CisOutput(cisOutput_t x) : _pi(x) {}
   
+  /*!
+    @brief Alias to allow freeing of underlying C struct at the class level.
+  */
   void _destroy_pi() { cis_free(&_pi); }
   
   /*!
@@ -258,10 +264,9 @@ public:
 
   /*!
     @brief Constructor for CisRpc.
-    @param[in] outName constant character pointer name of the output queue.
+    @param[in] name constant character pointer name of the output queue.
     @param[in] outFormat character pointer to format that should be used for
     formatting output.
-    @param[in] inName constant character pointer to name of the input queue.
     @param[in] inFormat character pointer to format that should be used for
     parsing input.
    */
@@ -271,6 +276,9 @@ public:
   /*! @brief Empty constructor for inheritance. */
   CisRpc(cisRpc_t x) : _pi(x) {}
   
+  /*!
+    @brief Alias to allow freeing of underlying C struct at the class level.
+  */
   void _destroy_pi() { cis_free(&_pi); }
   
   /*!

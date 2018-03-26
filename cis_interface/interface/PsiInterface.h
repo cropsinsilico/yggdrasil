@@ -401,10 +401,9 @@ int cisRecv_nolimit(const cisInput_t cisQ, ...) {
 /*!
   @brief Constructor for RPC structure.
   Creates an instance of cisRpc_t with provided information.
-  @param[in] outName constant character pointer name of the output queue.
+  @param[in] name constant character pointer name of the output queue.
   @param[in] outFormat character pointer to format that should be used for
   formatting output.
-  @param[in] inName constant character pointer to name of the input queue.
   @param[in] inFormat character pointer to format that should be used for
   parsing input.
   @return cisRpc_t structure with provided info.

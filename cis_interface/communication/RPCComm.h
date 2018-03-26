@@ -82,7 +82,7 @@ int free_rpc_comm(comm_t *x) {
 
 /*!
   @brief Get number of messages in the comm.
-  @param[in] comm_t Communicator to check.
+  @param[in] x comm_t Communicator to check.
   @returns int Number of messages. -1 indicates an error.
  */
 static inline

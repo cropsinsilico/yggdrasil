@@ -12,14 +12,15 @@ except ImportError:
 
 
 class ModelDriver(Driver):
-    r"""Base class form Model drivers.
+    r"""Base class for Model drivers and for running executable based models.
 
     Args:
         name (str): Driver name.
         args (str or list): Argument(s) for running the model on the command
-            line.
+            line. This should be a complete command including the necessary
+            executable and command line arguments to that executable.
         is_server (bool, optional): If True, the model is assumed to be a server
-            and an instance of :class:`cis_interface.drivers.RMQServerDriver`
+            and an instance of :class:`cis_interface.drivers.ServerDriver`
             is started. Defaults to False.
         client_of (str, list, optional): The names of ne or more servers that
             this model is a client of. Defaults to empty list.
@@ -39,7 +40,7 @@ class ModelDriver(Driver):
         process (:class:`cis_interface.tools.CisPopen`): Process used to run
             the model.
         is_server (bool): If True, the model is assumed to be a server and an
-            instance of :class:`cis_interface.drivers.RMQServerDriver` is
+            instance of :class:`cis_interface.drivers.ServerDriver` is
             started.
         client_of (list): The names of server models that this model is a
             client of.
