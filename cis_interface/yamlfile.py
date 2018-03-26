@@ -247,7 +247,7 @@ def parse_connection(yml, yamldir, existing):
     out_name = yml.pop('output')
     # File input
     if in_name not in existing['output']:
-        if not os.path.isfile(in_name):
+        if not os.path.isfile(os.path.realpath(os.path.join(yamldir, in_name))):
             raise RuntimeError(("Input '%s' not found in any of the registered " +
                                 "model outputs and is not a file.") % in_name)
         if out_name not in existing['input']:
