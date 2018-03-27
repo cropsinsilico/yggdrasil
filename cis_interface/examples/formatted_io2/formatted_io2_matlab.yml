@@ -1,0 +1,22 @@
+models:
+  - name: matlab_modelA
+    driver: MatlabModelDriver
+    args: ./src/formatted_io2_modelA.m
+    inputs: inputA
+    outputs: outputA
+
+  - name: matlab_modelB
+    driver: MatlabModelDriver
+    args: ./src/formatted_io2_modelB.m
+    inputs: inputB
+    outputs: outputB
+
+connections:
+  - input: outputA  # Connection between model A output & model B input
+    output: inputB
+  - input: ./Input/input.txt  # Connection between file and model A input
+    output: inputA
+    read_meth: table
+  - input: outputB  # Connection between model B output and file
+    output: ./output.txt
+    write_meth: table
