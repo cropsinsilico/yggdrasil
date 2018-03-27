@@ -13,6 +13,7 @@ Welcome to cis_interface's documentation!
    includeme
    install
    getting_started
+   formatted_io
    config
    code
    examples/examples_toc

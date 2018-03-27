@@ -145,7 +145,8 @@ def write_yml(fd, k, l, upone=False):
 
         
 # rst_examples = source.keys()  # all examples
-rst_examples = ['gs_lesson%d' % x for x in range(1, 5)]
+rst_examples = ['gs_lesson%d' % x for x in range(1, 6)]
+rst_examples += ['formatted_io%d' % x for x in range(1, 4)]
 make_toc_file(rst_examples)
 for k in rst_examples:
     make_rst_file(k)

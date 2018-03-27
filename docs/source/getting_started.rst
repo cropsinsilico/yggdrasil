@@ -1,3 +1,5 @@
+.. _getting_started_rst:
+
 Getting started
 ===============
 
@@ -71,15 +73,14 @@ MatInputDriver           MatOutputDriver           Receive/send contents of Matl
 
 The above example shows the basic case of receiving raw messages from a channel, 
 but there are also interface functions which can process these raw messages to 
-extract variables.
-
-.. todo:: Link to example of formatted I/O
+extract variables. For examples of how to use formatted messages, see 
+:ref:`Formatted I/O <formatted_io_rst>`.
 
 .. todo:: Links to examples of each I/O driver
 
 	  
-Model-to-model communication
-----------------------------
+Model-to-model communication (with drivers)
+-------------------------------------------
 
 Models can also communicate with each other in the same fashion. In the example 
 below, model A receives input from a channel named 'inputA' and sends output to
@@ -99,4 +100,33 @@ are on the same system. However, these can be replaced with RMQ input and output
 drivers (RMQInputDriver/RMQOutputDriver), which allow for message passing
 when the models are not on the same machine.
 
-.. todo:: Connection drivers.
+
+Model-to-model communication (with connections)
+-----------------------------------------------
+
+Model communication can also be specified using connections. The same models 
+can be connected by specifying the connections between the models and files
+using entries in a ``connections`` section of the YAML. 
+
+.. include:: examples/gs_lesson5_yml.rst
+
+Instead of specifying the specific driver, the input/output channels are
+named in model entry in the YAML with any information about the format of 
+the messages (see :ref:`Formatted I/O <formated_io_rst>` and the connections
+between two channels or a channel and a file are specified as entries 
+in the ``connections`` section. When connecting to files, you may also 
+specify a ``read_meth`` or ``write_meth`` key in the connection entry 
+which says how the file should be read/written.
+
+===========    =================================================================
+Value          Description
+===========    =================================================================
+all            The entire file is read/written all at once.
+line           The file is read/written one line at a time.
+table          The file is an ASCII table that will be read/written one row
+               at a time.
+table_array    The file is an ASCII table that will be read/written all at
+               once.
+===========    =================================================================
+
+.. todo:: Link to example with translation at connection.
