@@ -1,0 +1,28 @@
+#!/bin/bash
+
+export PSI_DEBUG="INFO"
+export PSI_NAMESPACE="formatted_io3"
+
+yaml= 
+
+# ----------------Your Commands------------------- #
+case $1 in
+    "" | -p | --python )
+	echo "Running Python"
+	yaml='formatted_io3_python.yml'
+	;;
+    -m | --matlab )
+	echo "Running Matlab"
+	yaml='formatted_io3_matlab.yml'
+	;;
+    -c | --gcc )
+	echo "Running C"
+	yaml='formatted_io3_c.yml'
+	;;
+    --cpp | --g++)
+	echo "Running C++"
+	yaml='formatted_io3_cpp.yml'
+	;;
+esac
+
+cisrun $yaml
