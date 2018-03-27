@@ -1,4 +1,4 @@
-.. _formated_io_rst:
+.. _formatted_io_rst:
 
 Formatted I/O
 =============
@@ -11,7 +11,8 @@ Scalars
 -------
 
 The format of messages containing scalar variables (strings, integers, and 
-floating point numbers) can be specified using a C-style format string. In 
+floating point numbers) can be specified using a C-style format string 
+(See :ref:`C-Style Format Strings <c_style_format_strings_rst>` for details). In 
 the example below, the format string ``"%6s\t%d\t%f\n"`` indicates that each 
 message will contain a 6 character string, an integer, and a float. In addition 
 to providing a format string, the C API requires the use of different functions 
@@ -55,7 +56,7 @@ arguments of the table API classes/functions.
 .. include:: examples/formatted_io3_src.rst
 
 The YAML only differs in that ``read_meth: table_array`` and 
-``write_meth:: table_array`` for the connections to files to indicate that the files 
+``write_meth: table_array`` for the connections to files to indicate that the files 
 should be interpreted as tables and that the tables should be read/written in their 
 entirety as arrays.
 
