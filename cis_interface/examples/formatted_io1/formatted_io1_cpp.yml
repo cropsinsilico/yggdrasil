@@ -19,4 +19,4 @@ connections:
     read_meth: line
   - input: outputB  # Connection between model B output and file
     output: ./output.txt
-    read_meth: line
+    write_meth: line

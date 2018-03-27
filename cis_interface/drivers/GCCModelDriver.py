@@ -261,7 +261,7 @@ class GCCModelDriver(ModelDriver):
         executable. Arguments starting with '-L' or '-l' are treated as linker
         flags. Arguments starting with '-' are treated as compiler flags. Any
         arguments that do not fall into one of the categories will be treated
-        as a command line argument for the executable.
+        as command line arguments for the compiled executable.
 
         Args:
             args (list): List of arguments provided.
