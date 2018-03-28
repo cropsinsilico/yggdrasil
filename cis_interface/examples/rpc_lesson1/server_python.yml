@@ -1,0 +1,7 @@
+---
+
+model:
+  name: server
+  driver: PythonModelDriver
+  args: ./src/server.py
+  is_server: True  # Creates a RPC server queue called "server"

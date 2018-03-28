@@ -61,10 +61,11 @@ class ModelDriver(Driver):
                  model_index=0, **kwargs):
         super(ModelDriver, self).__init__(name, **kwargs)
         self.debug(str(args))
-        if isinstance(args, str):
-            self.args = [args]
-        else:
-            self.args = args
+        if not isinstance(args, list):
+            args = [args]
+        self.args = []
+        for a in args:
+            self.args.append(str(a))
         self.model_process = None
         self.queue = Queue()
         self.queue_thread = None

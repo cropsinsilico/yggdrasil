@@ -241,7 +241,7 @@ class GCCModelDriver(ModelDriver):
         self.debug('')
         self.cc = cc
         # Prepare arguments to compile the file
-        self.parse_arguments(args)
+        self.parse_arguments(self.args)
         self.debug("Compiling")
         self.efile = do_compile(self.src, out=self.efile, cc=self.cc,
                                 ccflags=self.ccflags, ldflags=self.ldflags,
@@ -282,7 +282,7 @@ class GCCModelDriver(ModelDriver):
         is_object = False
         is_link = False
         for a in args:
-            if os.path.splitext(a)[1] in ['.c', '.cpp', '.cc']:
+            if a.endswith('.c') or a.endswith('.cpp') or a.endswith('.cc'):
                 self.src.append(a)
             elif a.lower().startswith('-l') or is_link:
                 if a.lower().startswith('/out:'):  # pragma: windows
