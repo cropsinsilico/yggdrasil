@@ -11,6 +11,7 @@ ex_dict = {'gs_lesson1': ('python', 'matlab', 'c', 'cpp'),
            'formatted_io2': ('python', 'matlab', 'c', 'cpp'),
            'formatted_io3': ('python', 'matlab', 'c', 'cpp'),
            'rpc_lesson1': ('python', 'matlab', 'c', 'cpp'),
+           'rpc_lesson2': ('python', 'matlab', 'c', 'cpp'),
            'hello': ('python', 'matlab', 'c', 'cpp'),
            'model_error': ('python', 'matlab', 'c', 'cpp'),
            'SaM': ('python', 'matlab', 'c', 'cpp', 'all', 'all_nomatlab'),
@@ -72,7 +73,7 @@ for k, lang in ex_dict.items():
             yml_names = ['%s_%s.yml' % (k, ilang)]
             src_names = ['%s_modelA%s' % (k, ext_map[ilang]),
                          '%s_modelB%s' % (k, ext_map[ilang])]
-        elif k in ['rpc_lesson1']:
+        elif k in ['rpc_lesson1', 'rpc_lesson2']:
             yml_names = ['server_python.yml',
                          'client_%s.yml' % ilang]
             src_names = ['server.py', 'client%s' % ext_map[ilang]]
