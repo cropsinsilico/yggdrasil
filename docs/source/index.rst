@@ -14,11 +14,13 @@ Welcome to cis_interface's documentation!
    install
    getting_started
    formatted_io
+   server_client_io
    yaml
    config
+   units
+   c_format_strings
    io_drivers
    model_drivers
-   c_format_strings
    code
    examples/examples_toc
    

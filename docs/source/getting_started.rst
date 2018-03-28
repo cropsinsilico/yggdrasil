@@ -4,9 +4,6 @@ Getting started
 ===============
 
 
-Introduction
-------------
-
 The |cis_interface| runs user defined models and orchestrates asynchronous 
 communication between models using drivers that coordinate the different 
 components via threads. Model drivers run the models as seperate processes 
@@ -127,7 +124,7 @@ using entries in a ``connections`` section of the YAML.
 
 Instead of specifying the specific driver, the input/output channels are
 named in model entry in the YAML with any information about the format of 
-the messages (see :ref:`Formatted I/O <formated_io_rst>` and the connections
+the messages (see :ref:`Formatted I/O <formatted_io_rst>` and the connections
 between two channels or a channel and a file are specified as entries 
 in the ``connections`` section. When connecting to files, you may also 
 specify a ``read_meth`` or ``write_meth`` key in the connection entry 

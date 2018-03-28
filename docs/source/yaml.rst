@@ -1,7 +1,7 @@
-.. _yaml_rst
+.. _yaml_rst:
 
 YAML Files
-##########
+==========
 
 Models and communication between models during are specified by the user in one 
 or more YAML files. YAML files have a human readable structure that can be parsed 
