@@ -34,7 +34,7 @@ public:
     should be the argument to an input driver in the yaml specification file.
     @param[in] fmt character pointer to format string for parsing messages.
    */
-  CisInput(const char *name, char *fmt) : _pi(cisInputFmt(name, fmt)) {}
+  CisInput(const char *name, const char *fmt) : _pi(cisInputFmt(name, fmt)) {}
 
   /*!
     @brief Alias to allow freeing of underlying C struct at the class level.
@@ -153,7 +153,7 @@ public:
     should be the argument to an output driver in the yaml specification file.
     @param[in] fmt character pointer to format string for formatting variables.
    */
-  CisOutput(const char *name, char *fmt) : _pi(cisOutputFmt(name, fmt)) {}
+  CisOutput(const char *name, const char *fmt) : _pi(cisOutputFmt(name, fmt)) {}
 
   /*! @brief Empty constructor for inheritance. */
   CisOutput(cisOutput_t x) : _pi(x) {}
