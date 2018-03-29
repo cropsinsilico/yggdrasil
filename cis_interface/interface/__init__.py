@@ -1,8 +1,8 @@
 r"""Routines for interfacing with framework from Python/C/C++/Matlab."""
-from cis_interface.interface import PsiInterface
-from cis_interface.interface.PsiInterface import (
-    PSI_MSG_EOF, PsiInput, PsiOutput, PsiRpc)
+from cis_interface.interface import CisInterface
+from cis_interface.interface.CisInterface import (
+    CIS_MSG_EOF, CisInput, CisOutput, CisRpc)
 
 
-__all__ = ['PsiInterface', 'PsiInput', 'PsiOutput', 'PsiRpc',
-           'PSI_MSG_EOF']
+__all__ = ['CisInterface', 'CisInput', 'CisOutput', 'CisRpc',
+           'CIS_MSG_EOF']
