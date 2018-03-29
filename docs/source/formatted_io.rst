@@ -34,8 +34,8 @@ Tables by Row
 Tables can also be passed in a similar manner. For input from a table, the format
 string does not need to be provided and will be determined by the source of the 
 table. There are different API classes/functions for I/O from/to table channels 
-versus standard channels in each language. (e.g. ``PsiInput`` vs. 
-``PsiAsciiTableInput`` in Python)
+versus standard channels in each language. (e.g. ``CisInput`` vs. 
+``CisAsciiTableInput`` in Python)
 
 .. include:: examples/formatted_io2_src.rst
 

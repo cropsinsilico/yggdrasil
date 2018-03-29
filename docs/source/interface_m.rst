@@ -1,5 +1,5 @@
 Matlab Interface
 ================
 
-.. autodoxygenfile:: PsiInterface.m
+.. autodoxygenfile:: CisInterface.m
    :project: cis_interface

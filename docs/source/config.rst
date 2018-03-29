@@ -36,7 +36,7 @@ The debug options are:
 ======    =======    =================================================
 Option    Default    Description
 ======    =======    =================================================
-psi       INFO       Controls the level of messages printed by the
+cis       INFO       Controls the level of messages printed by the
                      |cis_interface| framework itself.
 rmq       WARNING    Controls the level of messages printed by
 		     RabbitMQ.
