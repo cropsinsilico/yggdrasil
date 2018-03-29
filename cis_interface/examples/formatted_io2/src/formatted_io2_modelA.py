@@ -1,10 +1,10 @@
 # Import classes for input/output channels
-from cis_interface.interface.PsiInterface import (
-    PsiAsciiTableInput, PsiAsciiTableOutput)
+from cis_interface.interface.CisInterface import (
+    CisAsciiTableInput, CisAsciiTableOutput)
 
 # Initialize input/output channels
-in_channel = PsiAsciiTableInput('inputA')
-out_channel = PsiAsciiTableOutput('outputA', '%6s\t%d\t%f\n')
+in_channel = CisAsciiTableInput('inputA')
+out_channel = CisAsciiTableOutput('outputA', '%6s\t%d\t%f\n')
 
 # Loop until there is no longer input or the queues are closed
 while True:

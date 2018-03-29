@@ -2,7 +2,7 @@
 
 disp('maxMsgSrv(M): Hello!');
 
-rpc = PsiInterface('PsiRpcServer', 'maxMsgSrv', '%s', '%s');
+rpc = CisInterface('CisRpcServer', 'maxMsgSrv', '%s', '%s');
 
 while (1)
   [flag, vars] = rpc.recv();

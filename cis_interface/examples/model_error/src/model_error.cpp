@@ -1,4 +1,4 @@
-#include <PsiInterface.hpp>
+#include <CisInterface.hpp>
 
 int main(int argc, char *argv[]) {
   // This must be set to prevent dialog box on windows for unhandled exception

@@ -2,23 +2,23 @@ from __future__ import print_function
 import sys
 # Import necessary connection interfaces
 from cis_interface.tools import print_encoded
-from cis_interface.interface.PsiInterface import (
-    PsiAsciiFileInput, PsiAsciiFileOutput,
-    PsiAsciiTableInput, PsiAsciiTableOutput)
+from cis_interface.interface.CisInterface import (
+    CisAsciiFileInput, CisAsciiFileOutput,
+    CisAsciiTableInput, CisAsciiTableOutput)
 
     
 if __name__ == '__main__':
 
     # Input & output to an ASCII file line by line
-    in_file = PsiAsciiFileInput('inputPy_file')
-    out_file = PsiAsciiFileOutput('outputPy_file')
+    in_file = CisAsciiFileInput('inputPy_file')
+    out_file = CisAsciiFileOutput('outputPy_file')
     # Input & output from a table row by row
-    in_table = PsiAsciiTableInput('inputPy_table')
-    out_table = PsiAsciiTableOutput('outputPy_table',
+    in_table = CisAsciiTableInput('inputPy_table')
+    out_table = CisAsciiTableOutput('outputPy_table',
                                     '%5s\t%ld\t%3.1f\t%3.1lf%+3.1lfj\n')
     # Input & output from a table as an array
-    in_array = PsiAsciiTableInput('inputPy_array', as_array=True)
-    out_array = PsiAsciiTableOutput('outputPy_array',
+    in_array = CisAsciiTableInput('inputPy_array', as_array=True)
+    out_array = CisAsciiTableOutput('outputPy_array',
                                     '%5s\t%ld\t%3.1f\t%3.1lf%+3.1lfj\n',
                                     as_array=True)
 

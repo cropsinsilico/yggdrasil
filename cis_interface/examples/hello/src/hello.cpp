@@ -1,4 +1,4 @@
-#include "PsiInterface.hpp"
+#include "CisInterface.hpp"
 #include <string>
 #include <iostream>
 using namespace std;
@@ -12,10 +12,10 @@ int main(int argc, char *argv[]) {
   cout << "Hello from C++\n";
   
   /* Matching with the the model yaml */
-  PsiInput inf("inFile"); 
-  PsiOutput outf("outFile");
-  PsiInput inq("helloQueueIn");
-  PsiOutput outq("helloQueueOut");
+  CisInput inf("inFile"); 
+  CisOutput outf("outFile");
+  CisInput inq("helloQueueIn");
+  CisOutput outq("helloQueueOut");
   cout << "hello(CPP): Created I/O channels\n";
 
   // Receive input from the local file

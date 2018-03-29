@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 // Include interface methods
-#include "PsiInterface.hpp"
+#include "CisInterface.hpp"
 
 #define BSIZE 8192 // the max
 
@@ -10,15 +10,15 @@ int main(int argc,char *argv[]){
   int ret;
 
   // Input & output to an ASCII file line by line
-  PsiAsciiFileInput FileInput("inputCPP_file");
-  PsiAsciiFileOutput FileOutput("outputCPP_file");
+  CisAsciiFileInput FileInput("inputCPP_file");
+  CisAsciiFileOutput FileOutput("outputCPP_file");
   // Input & output from a table row by row
-  PsiAsciiTableInput TableInput("inputCPP_table");
-  PsiAsciiTableOutput TableOutput("outputCPP_table",
+  CisAsciiTableInput TableInput("inputCPP_table");
+  CisAsciiTableOutput TableOutput("outputCPP_table",
                                   "%5s\t%ld\t%3.1f\t%3.1lf%+3.1lfj\n");
   // Input & output from a table as an array
-  PsiAsciiTableInput ArrayInput("inputCPP_array", 1);
-  PsiAsciiTableOutput ArrayOutput("outputCPP_array",
+  CisAsciiTableInput ArrayInput("inputCPP_array", 1);
+  CisAsciiTableOutput ArrayOutput("outputCPP_array",
 				  "%5s\t%ld\t%3.1f\t%3.1lf%+3.1lfj\n", 1);
 
   // Read lines from ASCII text file until end of file is reached.

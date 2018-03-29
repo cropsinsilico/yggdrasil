@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include "PsiInterface.h"
+#include "CisInterface.h"
 
 int main() {
   int ret = 0;
@@ -9,14 +9,14 @@ int main() {
   printf("Hello from C pipe_dst\n");
 
   // Ins/outs matching with the the model yaml
-  psiInput_t inq = psiInput("input_pipe");
-  psiOutput_t outf = psiOutput("output_file");
+  cisInput_t inq = cisInput("input_pipe");
+  cisOutput_t outf = cisOutput("output_file");
   printf("pipe_dst(C): Created I/O channels\n");
 
   // Continue receiving input from the queue
   int count = 0;
   while (1) {
-    ret = psi_recv_nolimit(inq, &buf, bufsiz);
+    ret = cis_recv_nolimit(inq, &buf, bufsiz);
     if (ret < 0) {
       printf("pipe_dst(C): Input channel closed\n");
       break;
@@ -25,7 +25,7 @@ int main() {
       bufsiz = ret + 1;
       printf("pipe_dst(C): Buffer increased to %d bytes\n", bufsiz);
     }
-    ret = psi_send_nolimit(outf, buf, ret);
+    ret = cis_send_nolimit(outf, buf, ret);
     if (ret < 0) {
       printf("pipe_dst(C): SEND ERROR ON MSG %d\n", count);
       free(buf);

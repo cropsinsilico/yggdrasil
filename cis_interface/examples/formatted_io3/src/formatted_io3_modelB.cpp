@@ -1,13 +1,13 @@
 #include <iostream>
 // Include methods for input/output channels
-#include "PsiInterface.hpp"
+#include "CisInterface.hpp"
 
 #define MYBUFSIZ 1000
 
 int main(int argc, char *argv[]) {
   // Initialize input/output channels
-  PsiAsciiTableInput in_channel("inputB", 1);
-  PsiAsciiTableOutput out_channel("outputB", "%6s\t%d\t%f\n", 1);
+  CisAsciiTableInput in_channel("inputB", 1);
+  CisAsciiTableOutput out_channel("outputB", "%6s\t%d\t%f\n", 1);
 
   // Declare resulting variables and create buffer for received message
   int flag = 1;

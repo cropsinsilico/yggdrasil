@@ -1,14 +1,14 @@
 from __future__ import print_function
 import sys
-from cis_interface.interface.PsiInterface import PsiInput, PsiOutput
+from cis_interface.interface.CisInterface import CisInput, CisOutput
 
 
 def run():
     print('Hello from Python pipe_dst')
 
     # Ins/outs matching with the the model yaml
-    inq = PsiInput('input_pipe')
-    outf = PsiOutput('output_file')
+    inq = CisInput('input_pipe')
+    outf = CisOutput('output_file')
     print("pipe_dst(P): Created I/O channels")
 
     # Continue receiving input from the queue

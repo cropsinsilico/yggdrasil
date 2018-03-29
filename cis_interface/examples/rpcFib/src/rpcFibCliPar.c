@@ -1,5 +1,5 @@
 
-#include "PsiInterface.h"
+#include "CisInterface.h"
 #include <stdio.h>
 
 
@@ -10,7 +10,7 @@ int main(int argc, char *argv[]) {
   
   // Create RPC connection with server
   // RPC client-side connection will be $(server_name)_$(client_name)
-  psiRpc_t rpc = psiRpcClient("rpcFibSrv_rpcFibCliPar", "%d", "%d %d");
+  cisRpc_t rpc = cisRpcClient("rpcFibSrv_rpcFibCliPar", "%d", "%d %d");
   
   // Send all of the requests to the server
   int i;

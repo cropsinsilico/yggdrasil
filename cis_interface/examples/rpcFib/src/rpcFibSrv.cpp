@@ -1,5 +1,5 @@
 
-#include "PsiInterface.hpp"
+#include "CisInterface.hpp"
 #include <stdio.h>
 
 
@@ -9,7 +9,7 @@ int main(int argc, char *argv[]) {
   printf("Hello from C++ rpcFibSrv: sleeptime = %f\n", timeSleep);
   
   // Create server-side rpc conneciton using model name
-  PsiRpcServer rpc("rpcFibSrv", "%d", "%d %d");
+  CisRpcServer rpc("rpcFibSrv", "%d", "%d %d");
 
   // Continue receiving requests until error occurs (the connection is closed
   // by all clients that have connected).

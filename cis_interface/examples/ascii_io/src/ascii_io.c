@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 // Include interface methods
-#include "PsiInterface.h"
+#include "CisInterface.h"
 
 #define BSIZE 8192 // the max
 
@@ -10,16 +10,16 @@ int main(int argc,char *argv[]){
   int ret;
 
   // Input & output to an ASCII file line by line
-  psiAsciiFileInput_t FileInput = psiAsciiFileInput("inputC_file", 1);
-  psiAsciiFileOutput_t FileOutput = psiAsciiFileOutput("outputC_file", 1);
+  cisAsciiFileInput_t FileInput = cisAsciiFileInput("inputC_file", 1);
+  cisAsciiFileOutput_t FileOutput = cisAsciiFileOutput("outputC_file", 1);
   // Input & output from a table row by row
-  psiAsciiTableInput_t TableInput = psiAsciiTableInput("inputC_table", 0, 1);
-  psiAsciiTableOutput_t TableOutput = psiAsciiTableOutput("outputC_table",
+  cisAsciiTableInput_t TableInput = cisAsciiTableInput("inputC_table", 0, 1);
+  cisAsciiTableOutput_t TableOutput = cisAsciiTableOutput("outputC_table",
 							  "%5s\t%ld\t%3.1f\t%3.1lf%+3.1lfj\n",
 							  0, 1);
   // Input & output from a table as an array
-  psiAsciiTableInput_t ArrayInput = psiAsciiTableInput("inputC_array", 1, 1);
-  psiAsciiTableOutput_t ArrayOutput = psiAsciiTableOutput("outputC_array",
+  cisAsciiTableInput_t ArrayInput = cisAsciiTableInput("inputC_array", 1, 1);
+  cisAsciiTableOutput_t ArrayOutput = cisAsciiTableOutput("outputC_array",
 							  "%5s\t%ld\t%3.1f\t%3.1lf%+3.1lfj\n",
 							  1, 1);
 
@@ -30,11 +30,11 @@ int main(int argc,char *argv[]){
   ret = 0;
   while (ret >= 0) {
     // Receive a single line
-    ret = psiRecv(FileInput, &line);
+    ret = cisRecv(FileInput, &line);
     if (ret >= 0) {
       // If the receive was succesful, send the line to output
       printf("File: %s", line);
-      ret = psiSend(FileOutput, line);
+      ret = cisSend(FileOutput, line);
       if (ret < 0) {
 	printf("ascii_io(C): ERROR SENDING LINE\n");
 	break;
@@ -57,14 +57,14 @@ int main(int argc,char *argv[]){
   ret = 0;
   while (ret >= 0) {
     // Receive a single row with values stored in scalars declared locally
-    ret = psiRecv(TableInput, &name, &number, &value, &comp_real, &comp_imag);
+    ret = cisRecv(TableInput, &name, &number, &value, &comp_real, &comp_imag);
 		      
     if (ret >= 0) {
       // If the receive was succesful, send the values to output. Formatting
       // is taken care of on the output driver side.
       printf("Table: %.5s, %ld, %3.1f, %g%+gj\n",
 	     name, number, value, comp_real, comp_imag);
-      ret = psiSend(TableOutput, name, number, value, comp_real, comp_imag);
+      ret = cisSend(TableOutput, name, number, value, comp_real, comp_imag);
       if (ret < 0) {
 	printf("ascii_io(C): ERROR SENDING ROW\n");
 	break;
@@ -85,7 +85,7 @@ int main(int argc,char *argv[]){
   double *value_arr = NULL;
   double *comp_real_arr = NULL;
   double *comp_imag_arr = NULL;
-  ret = psiRecv(ArrayInput, &name_arr, &number_arr, &value_arr,
+  ret = cisRecv(ArrayInput, &name_arr, &number_arr, &value_arr,
 		&comp_real_arr, &comp_imag_arr);
 		      
   if (ret < 0) {
@@ -99,7 +99,7 @@ int main(int argc,char *argv[]){
 	     value_arr[i], comp_real_arr[i], comp_imag_arr[i]);
     // Send the columns in the array to output. Formatting is handled on the
     // output driver side.
-    ret = psiSend(ArrayOutput, ret, name_arr, number_arr, value_arr,
+    ret = cisSend(ArrayOutput, ret, name_arr, number_arr, value_arr,
 		  comp_real_arr, comp_imag_arr);
     if (ret < 0)
       printf("ascii_io(C): ERROR SENDING ARRAY\n");

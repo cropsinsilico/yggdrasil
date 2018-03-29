@@ -1,6 +1,6 @@
 import sys
 import random
-from cis_interface.interface.PsiInterface import PsiRpcClient, PSI_MSG_BUF
+from cis_interface.interface.CisInterface import CisRpcClient, CIS_MSG_BUF
 
 
 def rand_str(length):
@@ -14,12 +14,12 @@ def rand_str(length):
     return out
 
 
-msg_size = PSI_MSG_BUF
+msg_size = CIS_MSG_BUF
 
 print("maxMsgCli(P): Hello message size %d." % msg_size)
 
 # Create a max message, send/recv and verify
-rpc = PsiRpcClient("maxMsgSrv_maxMsgCli", "%s", "%s")
+rpc = CisRpcClient("maxMsgSrv_maxMsgCli", "%s", "%s")
 
 # Create a max message
 output = rand_str(msg_size)

@@ -1,6 +1,6 @@
 from __future__ import print_function
 import sys
-from cis_interface.interface.PsiInterface import PsiRpcClient
+from cis_interface.interface.CisInterface import CisRpcClient
 
 
 def fibClient(args):
@@ -10,7 +10,7 @@ def fibClient(args):
 
     # Create RPC connection with server
     # RPC client-side connection will be $(server_name)_$(client_name)
-    rpc = PsiRpcClient("rpcFibSrv_rpcFibCliPar", "%d", "%d %d")
+    rpc = CisRpcClient("rpcFibSrv_rpcFibCliPar", "%d", "%d %d")
 
     # Send all of the requests to the server
     for i in range(1, iterations + 1):

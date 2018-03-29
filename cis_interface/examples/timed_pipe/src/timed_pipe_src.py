@@ -1,6 +1,6 @@
 from __future__ import print_function
 import sys
-from cis_interface.interface.PsiInterface import PsiOutput
+from cis_interface.interface.CisInterface import CisOutput
 
 
 def run(args):
@@ -10,7 +10,7 @@ def run(args):
         msg_count, msg_size))
 
     # Ins/outs matching with the the model yaml
-    outq = PsiOutput('output_pipe')
+    outq = CisOutput('output_pipe')
     print("pipe_src(P): Created I/O channels")
 
     # Send test message multiple times

@@ -1,6 +1,6 @@
 % Initialize input/output channels 
-in_channel = PsiInterface('PsiAsciiArrayInput', 'inputB');
-out_channel = PsiInterface('PsiAsciiArrayOutput', 'outputB', '%6s\t%d\t%f\n');
+in_channel = CisInterface('CisAsciiArrayInput', 'inputB');
+out_channel = CisInterface('CisAsciiArrayOutput', 'outputB', '%6s\t%d\t%f\n');
 
 flag = true;
 

@@ -1,4 +1,4 @@
-#include "PsiInterface.h"
+#include "CisInterface.h"
 #include <stdio.h>
 
 
@@ -16,16 +16,16 @@ void rand_str(char *dest, size_t length) {
 
 int main(int argc, char *argv[]) {
 
-  //char output[PSI_MSG_BUF];
-  //char input[PSI_MSG_BUF];
-  size_t msg_size = PSI_MSG_BUF;
+  //char output[CIS_MSG_BUF];
+  //char input[CIS_MSG_BUF];
+  size_t msg_size = CIS_MSG_BUF;
   char *output = (char*)malloc(msg_size);
   char *input = (char*)malloc(msg_size);
 
   printf("maxMsgCli(C): Hello message size is %d.\n", (int)msg_size);
   
   // Create a max message, send/recv and verify
-  psiRpc_t rpc = psiRpcClient("maxMsgSrv_maxMsgCli", "%s", "%s");
+  cisRpc_t rpc = cisRpcClient("maxMsgSrv_maxMsgCli", "%s", "%s");
     
   // Create a max message
   rand_str(output, msg_size);

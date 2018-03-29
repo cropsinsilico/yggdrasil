@@ -1,10 +1,10 @@
 disp('Hello from Matlab');
 
 % Ins/outs matching with the the model yaml
-inf = PsiInterface('PsiInput', 'inFile');
-outf = PsiInterface('PsiOutput', 'outFile');
-inq = PsiInterface('PsiInput', 'helloQueueIn');
-outq = PsiInterface('PsiOutput', 'helloQueueOut');
+inf = CisInterface('CisInput', 'inFile');
+outf = CisInterface('CisOutput', 'outFile');
+inq = CisInterface('CisInput', 'helloQueueIn');
+outq = CisInterface('CisOutput', 'helloQueueOut');
 disp('hello(M): Created I/O channels');
 
 % Receive input from a local file

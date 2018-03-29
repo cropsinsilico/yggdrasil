@@ -1,10 +1,10 @@
 # Import classes for input/output channels
-from cis_interface.interface.PsiInterface import (
-    PsiAsciiArrayInput, PsiAsciiArrayOutput)
+from cis_interface.interface.CisInterface import (
+    CisAsciiArrayInput, CisAsciiArrayOutput)
 
 # Initialize input/output channels
-in_channel = PsiAsciiArrayInput('inputB')
-out_channel = PsiAsciiArrayOutput('outputB', '%6s\t%d\t%f\n')
+in_channel = CisAsciiArrayInput('inputB')
+out_channel = CisAsciiArrayOutput('outputB', '%6s\t%d\t%f\n')
 
 # Loop until there is no longer input or the queues are closed
 while True:

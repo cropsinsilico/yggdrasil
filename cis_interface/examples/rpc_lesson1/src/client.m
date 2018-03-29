@@ -7,8 +7,8 @@ function client(iterations)
 
   % Set up connections matching yaml
   % RPC client-side connection will be $(server_name)_$(client_name)
-  rpc = PsiInterface('PsiRpcClient', 'server_client', '%d', '%d');
-  log = PsiInterface('PsiOutput', 'output_log', 'fib(%-2d) = %-2d\n');
+  rpc = CisInterface('CisRpcClient', 'server_client', '%d', '%d');
+  log = CisInterface('CisOutput', 'output_log', 'fib(%-2d) = %-2d\n');
 
   % Iterate over Fibonacci sequence
   for i = 1:iterations

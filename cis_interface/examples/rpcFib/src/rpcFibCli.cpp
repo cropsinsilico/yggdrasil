@@ -1,5 +1,5 @@
 
-#include "PsiInterface.hpp"
+#include "CisInterface.hpp"
 #include <stdio.h>
 
 
@@ -20,13 +20,13 @@ int main(int argc, char *argv[]) {
   
   // Set up connections matching yaml
   // RPC client-side connection will be $(server_name)_$(client_name)
-  PsiInput ymlfile("yaml_in");
-  PsiRpcClient rpc("rpcFibSrv_rpcFibCli", "%d", "%d %d");
-  PsiOutput log("output_log");
+  CisInput ymlfile("yaml_in");
+  CisRpcClient rpc("rpcFibSrv_rpcFibCli", "%d", "%d %d");
+  CisOutput log("output_log");
   
   // Read entire contents of yaml
-  char *ycontent = (char*)malloc(PSI_MSG_MAX*sizeof(char));
-  int ret = ymlfile.recv(ycontent, PSI_MSG_MAX);
+  char *ycontent = (char*)malloc(CIS_MSG_MAX*sizeof(char));
+  int ret = ymlfile.recv(ycontent, CIS_MSG_MAX);
   if (ret < 0) {
     printf("rpcFibCli(CPP): RECV ERROR\n");
     free(ycontent);
@@ -37,7 +37,7 @@ int main(int argc, char *argv[]) {
   
   int fib = -1;
   int fibNo = -1;
-  char *logmsg = (char*)malloc(PSI_MSG_MAX*sizeof(char));
+  char *logmsg = (char*)malloc(CIS_MSG_MAX*sizeof(char));
   for (int i = 1; i <= iterations; i++) {
     
     // Call the server and receive response
