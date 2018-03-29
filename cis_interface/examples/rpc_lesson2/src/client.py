@@ -17,9 +17,9 @@ def main(iterations, client_index):
     """
 
     exit_code = 0
-    print('Hello from Python client%d: iterations = %d ' % (
-            client_index, iterations))
-
+    print('Hello from Python client%d: iterations = %d ' % (client_index,
+                                                            iterations))
+    
     # Set up connections matching yaml
     # RPC client-side connection will be $(server_name)_$(client_name)
     rpc = PsiRpcClient("server_client%d" % client_index, "%d", "%d")

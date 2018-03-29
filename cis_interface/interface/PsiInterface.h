@@ -46,11 +46,11 @@
   and a format string that can be used to format arguments into outgoing 
   messages for the queue.   
   @param[in] name constant character pointer to name of queue.
-  @param[in] fmtString character pointer to format string.
+  @param[in] fmtString constant character pointer to format string.
   @returns cisOutput_t output queue structure.
  */
 static inline
-cisOutput_t cisOutputFmt(const char *name, char *fmtString){
+cisOutput_t cisOutputFmt(const char *name, const char *fmtString){
   cisOutput_t ret = init_comm(name, "send", _default_comm,
 			      (void*)fmtString);
   return ret;
@@ -66,7 +66,7 @@ cisOutput_t cisOutputFmt(const char *name, char *fmtString){
   @returns cisInput_t input queue structure.
  */
 static inline
-cisInput_t cisInputFmt(const char *name, char *fmtString){
+cisInput_t cisInputFmt(const char *name, const char *fmtString){
   cisInput_t ret = init_comm(name, "recv", _default_comm,
 			     (void*)fmtString);
   return ret;
