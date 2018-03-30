@@ -60,7 +60,6 @@ for old, new in alias_map:
     v = cis_cfg.get(*old)
     if v:
         cis_cfg.set(new[0], new[1], v)
-        
 
 
 # Set associated environment variables
