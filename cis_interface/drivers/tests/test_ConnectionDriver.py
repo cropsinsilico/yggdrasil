@@ -5,8 +5,7 @@ from cis_interface.tests import MagicTestError
 from cis_interface.drivers import import_driver
 from cis_interface.drivers.tests import test_Driver as parent
 from cis_interface.drivers.ConnectionDriver import ConnectionDriver
-from cis_interface.communication import (
-    get_comm_class, new_comm)
+from cis_interface.communication import new_comm
 
             
 class TestConnectionParam(parent.TestParam):
@@ -22,6 +21,12 @@ class TestConnectionParam(parent.TestParam):
         self.ocomm_name = self.comm_name
         self._extra_instances = []
     
+    @property
+    def cleanup_comm_classes(self):
+        r"""list: Comm classes that should be cleaned up following the test."""
+        comms = set([self.comm_name, self.icomm_name, self.ocomm_name])
+        return comms
+
     @property
     def send_comm_kwargs(self):
         r"""dict: Keyword arguments for send comm."""
@@ -40,17 +45,6 @@ class TestConnectionParam(parent.TestParam):
         out['ocomm_kws'] = {'comm': self.ocomm_name}
         return out
 
-    @property
-    def comm_count(self):
-        r"""int: Return the number of comms."""
-        out = 0
-        comms = set([self.comm_name, self.icomm_name, self.ocomm_name])
-        for x in comms:
-            cls = get_comm_class(x)
-            out += cls.comm_count()
-            # print(cls, cls.comm_count())
-        return out
-
     # @property
     # def comm_cls(self):
     #     r"""Connection class."""
@@ -58,7 +52,6 @@ class TestConnectionParam(parent.TestParam):
 
     def setup(self, *args, **kwargs):
         r"""Initialize comm object pair."""
-        kwargs.setdefault('nprev_comm', self.comm_count)
         super(TestConnectionParam, self).setup(*args, **kwargs)
         send_kws = self.send_comm_kwargs
         recv_kws = self.recv_comm_kwargs

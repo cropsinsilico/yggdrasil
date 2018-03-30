@@ -16,8 +16,6 @@ class TestParam(CisTestClassInfo):
         driver (str): Name of driver class.
         args (object): Driver arguments.
         namespace (str): PSI namespace to run drivers in.
-        nprev_comm (int): The number of communication queues, sockets, and
-            channel that exist when the driver instance is created.
 
     """
 
@@ -34,7 +32,6 @@ class TestParam(CisTestClassInfo):
                              'sleeptime': self.sleeptime,
                              # 'workingDir': self.workingDir,
                              'namespace': self.namespace}
-        self.nprev_comm = 0
         self.debug_flag = False
 
     @property
