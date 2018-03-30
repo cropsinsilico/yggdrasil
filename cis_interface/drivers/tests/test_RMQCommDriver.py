@@ -10,6 +10,7 @@ class TestRMQCommParam(parent.TestCommParam):
         super(TestRMQCommParam, self).__init__(*args, **kwargs)
         self.driver = 'RMQCommDriver'
         self.comm_name = 'RMQComm'
+        self._cleanup_comm_class = self.comm_name
     
 
 @unittest.skipIf(not _rmq_server_running, "RMQ Server not running")

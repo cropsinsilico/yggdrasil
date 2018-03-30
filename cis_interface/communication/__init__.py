@@ -70,4 +70,19 @@ def DefaultComm(*args, **kwargs):
     return get_comm_class()(*args, **kwargs)
 
 
-__all__ = ['new_comm', 'get_comm', 'get_comm_class']
+def cleanup_comms(comm=None):
+    r"""Call cleanup_comms for the appropriate communicator class.
+
+    Args:
+        comm (str, optional): Name of communicator class. Defaults to
+            tools.get_default_comm() if not provided.
+
+    Returns:
+        int: Number of comms closed.
+
+    """
+    return get_comm_class(comm).cleanup_comms()
+
+
+__all__ = ['new_comm', 'get_comm', 'get_comm_class', 'cleanup_comms',
+           'DefaultComm']

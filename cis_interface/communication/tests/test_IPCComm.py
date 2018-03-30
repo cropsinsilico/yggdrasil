@@ -2,7 +2,7 @@ import unittest
 import nose.tools as nt
 from cis_interface.tools import _ipc_installed
 from cis_interface.communication import new_comm
-from cis_interface.communication import IPCComm
+from cis_interface.communication import IPCComm, CommBase
 from cis_interface.communication.tests import test_AsyncComm
 
 
@@ -11,12 +11,12 @@ def test_queue():
     r"""Test creation/removal of queue."""
     mq = IPCComm.get_queue()
     key = str(mq.key)
-    assert(key in IPCComm._registered_queues)
-    IPCComm._registered_queues.pop(key)
+    assert(CommBase.is_registered('IPCComm', key))
+    CommBase.unregister_comm('IPCComm', key, dont_close=True)
     nt.assert_raises(KeyError, IPCComm.remove_queue, mq)
-    IPCComm._registered_queues[key] = mq
+    CommBase.register_comm('IPCComm', key, mq)
     IPCComm.remove_queue(mq)
-    assert(key not in IPCComm._registered_queues)
+    assert(not CommBase.is_registered('IPCComm', key))
 
 
 @unittest.skipIf(not _ipc_installed, "IPC library not installed")
@@ -55,10 +55,6 @@ class TestIPCComm(test_AsyncComm.TestAsyncComm):
         super(TestIPCComm, self).__init__(*args, **kwargs)
         self.comm = 'IPCComm'
         self.attr_list += ['q']
-
-    def cleanup_comms(self):
-        r"""Cleanup all comms."""
-        IPCComm.cleanup_comms()
 
 
 @unittest.skipIf(_ipc_installed, "IPC library installed")

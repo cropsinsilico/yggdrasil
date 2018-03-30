@@ -62,8 +62,8 @@ def check_locks():  # pragma: debug
 
 def check_sockets():  # pragma: debug
     r"""Check registered sockets."""
-    from cis_interface.communication.ZMQComm import cleanup_comms
-    count = cleanup_comms()
+    from cis_interface.communication import cleanup_comms
+    count = cleanup_comms('ZMQComm')
     if count > 0:
         logging.info("%d sockets closed." % count)
 

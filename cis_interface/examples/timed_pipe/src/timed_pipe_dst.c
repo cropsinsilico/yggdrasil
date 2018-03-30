@@ -2,6 +2,7 @@
 #include "CisInterface.h"
 
 int main() {
+  int exit_code = 0;
   int ret = 0;
   int bufsiz = 512;
   char *buf = (char*)malloc(bufsiz);
@@ -28,8 +29,8 @@ int main() {
     ret = cis_send_nolimit(outf, buf, ret);
     if (ret < 0) {
       printf("pipe_dst(C): SEND ERROR ON MSG %d\n", count);
-      free(buf);
-      return -1;
+      exit_code = -1;
+      break;
     }
     count++;
   }
@@ -37,6 +38,6 @@ int main() {
   printf("Goodbye from C destination. Received %d messages.\n", count);
 
   free(buf);
-  return 0;
+  return exit_code;
 }
 

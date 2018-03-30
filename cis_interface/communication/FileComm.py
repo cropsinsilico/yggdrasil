@@ -4,9 +4,6 @@ from cis_interface import backwards, platform
 from cis_interface.communication import CommBase
 
 
-_N_FILES = 0
-
-
 class FileComm(CommBase.CommBase):
     r"""Class for handling I/O from/to a file on disk.
 
@@ -30,16 +27,17 @@ class FileComm(CommBase.CommBase):
         ValueError: If the read_meth is not one of the supported values.
 
     """
-    def __init__(self, name, read_meth='read', append=False, in_temp=False,
-                 **kwargs):
-        if not hasattr(self, 'fd'):
-            self.fd = None
+    def _init_before_open(self, read_meth='read', append=False, in_temp=False,
+                          **kwargs):
+        r"""Get absolute path and set attributes."""
+        super(FileComm, self)._init_before_open(**kwargs)
+        if not hasattr(self, '_fd'):
+            self._fd = None
         if read_meth not in ['read', 'readline']:
             raise ValueError("read_meth '%s' not supported." % read_meth)
         self.read_meth = read_meth
         self.append = append
         kwargs.setdefault('close_on_eof_send', True)
-        super(FileComm, self).__init__(name, **kwargs)
         if in_temp:
             self.address = os.path.join(tempfile.gettempdir(), self.address)
         self.address = os.path.abspath(self.address)
@@ -51,9 +49,18 @@ class FileComm(CommBase.CommBase):
         return 0
 
     @classmethod
-    def comm_count(cls):
-        r"""int: Number of communication connections."""
-        return _N_FILES
+    def underlying_comm_class(self):
+        r"""str: Name of underlying communication class."""
+        return 'FileComm'
+
+    @classmethod
+    def close_registry_entry(cls, value):
+        r"""Close a registry entry."""
+        out = False
+        if not value.closed:
+            value.close()
+            out = True
+        return out
 
     @classmethod
     def new_comm_kwargs(cls, *args, **kwargs):
@@ -63,12 +70,12 @@ class FileComm(CommBase.CommBase):
 
     def _open(self):
         if self.direction == 'recv':
-            self.fd = open(self.address, 'rb')
+            self._fd = open(self.address, 'rb')
         else:
             if self.append:
-                self.fd = open(self.address, 'ab')
+                self._fd = open(self.address, 'ab')
             else:
-                self.fd = open(self.address, 'wb')
+                self._fd = open(self.address, 'wb')
 
     def _file_close(self):
         if self.is_open:
@@ -78,22 +85,18 @@ class FileComm(CommBase.CommBase):
             except OSError:  # pragma: debug
                 pass
             self.fd.close()
-        self.fd = None
+        self._fd = None
 
     def open(self):
         r"""Open the file."""
         super(FileComm, self).open()
-        global _N_FILES
-        if not self.is_open:
-            _N_FILES += 1
         self._open()
+        self.register_comm(self.address, self.fd)
 
     def _close(self, *args, **kwargs):
         r"""Close the file."""
-        global _N_FILES
-        if self.is_open:
-            _N_FILES -= 1
         self._file_close()
+        self.unregister_comm(self.address)
         super(FileComm, self)._close(*args, **kwargs)
 
     def remove_file(self):
@@ -106,6 +109,11 @@ class FileComm(CommBase.CommBase):
     def is_open(self):
         r"""bool: True if the connection is open."""
         return (self.fd is not None) and (not self.fd.closed)
+
+    @property
+    def fd(self):
+        r"""Associated file identifier."""
+        return self._fd
 
     @property
     def remaining_bytes(self):

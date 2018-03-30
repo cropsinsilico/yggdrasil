@@ -14,7 +14,7 @@ from cis_interface.tools import get_CIS_MSG_MAX, get_default_comm, CisClass
 from cis_interface.backwards import pickle, BytesIO
 from cis_interface.dataio.AsciiTable import AsciiTable
 from cis_interface import backwards, platform
-from cis_interface.communication import get_comm_class
+from cis_interface.communication import cleanup_comms, get_comm_class
 
 # Test data
 data_dir = os.path.join(os.path.dirname(__file__), 'data')
@@ -94,8 +94,11 @@ class CisTestBase(unittest.TestCase):
     @property
     def comm_count(self):
         r"""int: The number of comms."""
-        cls = get_comm_class()
-        return cls.comm_count()
+        out = 0
+        for k in self.cleanup_comm_classes:
+            cls = get_comm_class(k)
+            out += cls.comm_count()
+        return out
 
     @property
     def fd_count(self):
@@ -232,16 +235,15 @@ class CisTestBase(unittest.TestCase):
             os.environ['CIS_DEFAULT_COMM'] = self._old_default_comm
         self._first_test = False
 
+    @property
+    def cleanup_comm_classes(self):
+        r"""list: Comm classes that should be cleaned up following the test."""
+        return [get_default_comm()]
+
     def cleanup_comms(self):
         r"""Cleanup all comms."""
-        default = get_default_comm()
-        if default == "IPCComm":
-            from cis_interface.communication.IPCComm import cleanup_comms
-        elif default == "ZMQComm":
-            from cis_interface.communication.ZMQComm import cleanup_comms
-        else:  # pragma: debug
-            raise Exception("No cleanup for %s" % default)
-        cleanup_comms()
+        for k in self.cleanup_comm_classes:
+            cleanup_comms(k)
 
     @property
     def description_prefix(self):

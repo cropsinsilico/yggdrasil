@@ -12,23 +12,6 @@ except ImportError:  # pragma: windows
     sysv_ipc = None
     _ipc_installed = False
 
-_registered_queues = {}
-
-
-def cleanup_comms():
-    r"""Close registered queues."""
-    global _registered_queues
-    count = 0
-    for v in _registered_queues.values():
-        try:
-            v.remove()
-            count = 0
-        except sysv_ipc.ExistentialError:
-            pass
-    _registered_queues = dict()
-    # logging.info("%d queues closed." % count)
-    return count
-
 
 def get_queue(qid=None):
     r"""Create or return a sysv_ipc.MessageQueue and register it.
@@ -42,14 +25,12 @@ def get_queue(qid=None):
 
     """
     if _ipc_installed:
-        global _registered_queues
         kwargs = dict(max_message_size=tools.get_CIS_MSG_MAX())
         if qid is None:
             kwargs['flags'] = sysv_ipc.IPC_CREX
         mq = sysv_ipc.MessageQueue(qid, **kwargs)
         key = str(mq.key)
-        if key not in _registered_queues:
-            _registered_queues[key] = mq
+        CommBase.register_comm('IPCComm', key, mq)
         return mq
     else:  # pragma: windows
         logging.warning("IPC not installed. Queue cannot be returned.")
@@ -66,12 +47,10 @@ def remove_queue(mq):
         KeyError: If the provided queue is not registered.
 
     """
-    global _registered_queues
     key = str(mq.key)
-    if key not in _registered_queues:
+    if not CommBase.is_registered('IPCComm', key):
         raise KeyError("Queue not registered.")
-    _registered_queues.pop(key)
-    mq.remove()
+    CommBase.unregister_comm('IPCComm', key)
     
 
 def ipcs(options=[]):
@@ -185,8 +164,7 @@ class IPCServer(CommBase.CommServer):
     r"""IPC server object for cleaning up server queue."""
 
     def terminate(self, *args, **kwargs):
-        global _registered_queues
-        if self.srv_address in _registered_queues:
+        if CommBase.is_registered('IPCComm', self.srv_address):
             q = get_queue(int(self.srv_address))
             try:
                 remove_queue(q)
@@ -221,9 +199,19 @@ class IPCComm(AsyncComm.AsyncComm):
         return 2048
     
     @classmethod
-    def comm_count(cls):
-        r"""int: Total number of IPC queues started on this process."""
-        return len(_registered_queues)
+    def underlying_comm_class(self):
+        r"""str: Name of underlying communication class."""
+        return 'IPCComm'
+
+    @classmethod
+    def close_registry_entry(cls, value):
+        r"""Close a registry entry."""
+        try:
+            value.remove()
+            out = True
+        except sysv_ipc.ExistentialError:
+            out = False
+        return out
 
     @classmethod
     def new_comm_kwargs(cls, *args, **kwargs):

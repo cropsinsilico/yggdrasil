@@ -10,6 +10,7 @@ class TestZMQCommParam(parent.TestCommParam):
         super(TestZMQCommParam, self).__init__(*args, **kwargs)
         self.driver = 'ZMQCommDriver'
         self.comm_name = 'ZMQComm'
+        self._cleanup_comm_class = self.comm_name
     
 
 @unittest.skipIf(not _zmq_installed, "ZMQ library not installed")

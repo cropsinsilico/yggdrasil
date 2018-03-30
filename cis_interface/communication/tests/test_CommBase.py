@@ -22,6 +22,11 @@ class TestCommBase(CisTestClassInfo):
                            'maxMsgSize']
 
     @property
+    def cleanup_comm_classes(self):
+        r"""list: Comm classes that should be cleaned up following the test."""
+        return [self.comm]
+
+    @property
     def name(self):
         r"""str: Name of the test connection."""
         return 'Test%s_%s' % (self.cls, self.uuid)
@@ -125,7 +130,6 @@ class TestCommBase(CisTestClassInfo):
         recv_kwargs['comm'] = send_kwargs['comm']
         if recv:
             recv_kwargs.update(**err_kwargs)
-        print(recv_kwargs)
         recv_inst = new_comm(err_name, **recv_kwargs)
         return send_inst, recv_inst
 

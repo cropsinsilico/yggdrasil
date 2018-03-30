@@ -19,4 +19,6 @@ def ErrorComm(name, base_comm='CommBase', **kwargs):
 
     """
     base_class = get_comm_class(base_comm)
-    return ErrorClass(base_class, name, **kwargs)
+    out = ErrorClass(base_class, name, **kwargs)
+    out._comm_class = base_comm
+    return out
