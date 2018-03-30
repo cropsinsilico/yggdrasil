@@ -1,13 +1,12 @@
 import nose.tools as nt
-from cis_interface.tests import CisTest, IOInfo
+from cis_interface.tests import CisTestClassInfo
 
 
-class TestDefaultSerialize(CisTest, IOInfo):
+class TestDefaultSerialize(CisTestClassInfo):
     r"""Test class for DefaultSerialize class."""
 
     def __init__(self, *args, **kwargs):
         super(TestDefaultSerialize, self).__init__(*args, **kwargs)
-        IOInfo.__init__(self)
         self._cls = 'DefaultSerialize'
 
     @property

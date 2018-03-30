@@ -5,13 +5,16 @@ import uuid
 import importlib
 import unittest
 import numpy as np
+import threading
+import psutil
 from scipy.io import savemat, loadmat
 import nose.tools as nt
 from cis_interface.config import cis_cfg, cfg_logging
-from cis_interface.tools import get_CIS_MSG_MAX, get_default_comm
+from cis_interface.tools import get_CIS_MSG_MAX, get_default_comm, CisClass
 from cis_interface.backwards import pickle, BytesIO
 from cis_interface.dataio.AsciiTable import AsciiTable
 from cis_interface import backwards, platform
+from cis_interface.communication import get_comm_class
 
 # Test data
 data_dir = os.path.join(os.path.dirname(__file__), 'data')
@@ -56,7 +59,7 @@ else:
 shutil.copy(makefile0, os.path.join(script_dir, "Makefile"))
 
 
-class CisTest(unittest.TestCase):
+class CisTestBase(unittest.TestCase):
     r"""Wrapper for unittest.TestCase that allows use of nose setup and
     teardown methods along with description prefix.
 
@@ -76,18 +79,53 @@ class CisTest(unittest.TestCase):
     def __init__(self, *args, **kwargs):
         self._description_prefix = kwargs.pop('description_prefix',
                                               str(self.__class__).split("'")[1])
-        self._mod = None
-        self._cls = None
         self.uuid = str(uuid.uuid4())
         self.attr_list = list()
-        self._inst_args = list()
-        self._inst_kwargs = dict()
         self.timeout = 10.0
         self.sleeptime = 0.01
         self._teardown_complete = False
+        self._old_default_comm = None
         self._old_loglevel = None
+        self._old_encoding = None
         self.debug_flag = False
-        super(CisTest, self).__init__(*args, **kwargs)
+        self._first_test = True
+        super(CisTestBase, self).__init__(*args, **kwargs)
+
+    @property
+    def comm_count(self):
+        r"""int: The number of comms."""
+        cls = get_comm_class()
+        return cls.comm_count()
+
+    @property
+    def fd_count(self):
+        r"""int: The number of open file descriptors."""
+        proc = psutil.Process()
+        if platform._is_win:
+            out = proc.num_handles()
+        else:
+            out = proc.num_fds()
+        # print(proc.num_fds(), proc.num_threads(), len(proc.connections("all")),
+        #      len(proc.open_files()))
+        return out
+
+    @property
+    def thread_count(self):
+        r"""int: The number of active threads."""
+        return threading.active_count()
+
+    def set_utf8_encoding(self):
+        r"""Set the encoding to utf-8 if it is not already."""
+        old_lang = os.environ.get('LANG', '')
+        if 'UTF-8' not in old_lang:  # pragma: debug
+            self._old_encoding = old_lang
+            os.environ['LANG'] = 'en_US.UTF-8'
+            
+    def reset_encoding(self):
+        r"""Reset the encoding to the original value before the test."""
+        if self._old_encoding is not None:  # pragma: debug
+            os.environ['LANG'] = self._old_encoding
+            self._old_encoding = None
 
     def debug_log(self):  # pragma: debug
         r"""Turn on debugging."""
@@ -108,21 +146,91 @@ class CisTest(unittest.TestCase):
     def tearDown(self, *args, **kwargs):
         self.teardown(*args, **kwargs)
 
-    def setup(self, *args, **kwargs):
-        r"""Create an instance of the class."""
+    def setup(self, nprev_comm=None, nprev_thread=None, nprev_fd=None):
+        r"""Record the number of open comms, threads, and file descriptors.
+
+        Args:
+            nprev_comm (int, optional): Number of previous comm channels.
+                If not provided, it is determined to be the present number of
+                default comms.
+            nprev_thread (int, optional): Number of previous threads.
+                If not provided, it is determined to be the present number of
+                threads.
+            nprev_fd (int, optional): Number of previous open file descriptors.
+                If not provided, it is determined to be the present number of
+                open file descriptors.
+
+        """
+        self._old_default_comm = os.environ.get('CIS_DEFAULT_COMM', None)
+        self.set_utf8_encoding()
         if self.debug_flag:  # pragma: debug
             self.debug_log()
-        self._instance = self.create_instance()
+        if nprev_comm is None:
+            nprev_comm = self.comm_count
+        if nprev_thread is None:
+            nprev_thread = self.thread_count
+        if nprev_fd is None:
+            nprev_fd = self.fd_count
+        self.nprev_comm = nprev_comm
+        self.nprev_thread = nprev_thread
+        self.nprev_fd = nprev_fd
 
-    def teardown(self, *args, **kwargs):
-        r"""Remove the instance."""
-        if hasattr(self, '_instance'):
-            inst = self._instance
-            self._instance = None
-            self.remove_instance(inst)
-            delattr(self, '_instance')
+    def teardown(self, ncurr_comm=None, ncurr_thread=None, ncurr_fd=None):
+        r"""Check the number of open comms, threads, and file descriptors.
+
+        Args:
+            ncurr_comm (int, optional): Number of current comms. If not
+                provided, it is determined to be the present number of comms.
+            ncurr_thread (int, optional): Number of current threads. If not
+                provided, it is determined to be the present number of threads.
+            ncurr_fd (int, optional): Number of current open file descriptors.
+                If not provided, it is determined to be the present number of
+                open file descriptors.
+
+        """
         self._teardown_complete = True
+        x = CisClass('dummy', timeout=self.timeout, sleeptime=self.sleeptime)
+        # Give comms time to close
+        if ncurr_comm is None:
+            Tout = x.start_timeout()
+            while ((not Tout.is_out) and
+                   (self.comm_count > self.nprev_comm)):  # pragma: debug
+                x.sleep()
+            x.stop_timeout()
+            ncurr_comm = self.comm_count
+        nt.assert_less_equal(ncurr_comm, self.nprev_comm)
+        # Give threads time to close
+        if ncurr_thread is None:
+            Tout = x.start_timeout()
+            while ((not Tout.is_out) and
+                   (self.thread_count > self.nprev_thread)):  # pragma: debug
+                x.sleep()
+            x.stop_timeout()
+            ncurr_thread = self.thread_count
+        nt.assert_less_equal(ncurr_thread, self.nprev_thread)
+        # Give files time to close
+        self.cleanup_comms()
+        if ncurr_fd is None:
+            if not self._first_test:
+                Tout = x.start_timeout()
+                while ((not Tout.is_out) and
+                       (self.fd_count > self.nprev_fd)):  # pragma: debug
+                    x.sleep()
+                x.stop_timeout()
+            ncurr_fd = self.fd_count
+        fds_created = ncurr_fd - self.nprev_fd
+        # print("FDS CREATED: %d" % fds_created)
+        if not self._first_test:
+            nt.assert_equal(fds_created, 0)
+        # Reset the log, encoding, and default comm
         self.reset_log()
+        self.reset_encoding()
+        if self._old_default_comm is None:
+            if 'CIS_DEFAULT_COMM' in os.environ:
+                del os.environ['CIS_DEFAULT_COMM']
+        else:  # pragma: debug
+            os.environ['CIS_DEFAULT_COMM'] = self._old_default_comm
+        self._first_test = False
 
     def cleanup_comms(self):
         r"""Cleanup all comms."""
@@ -138,17 +246,52 @@ class CisTest(unittest.TestCase):
     @property
     def description_prefix(self):
         r"""String prefix to prepend docstr test message with."""
-        if self.cls is None:
-            return self._description_prefix
-        else:
-            return self.cls
+        return self._description_prefix
 
     def shortDescription(self):
         r"""Prefix first line of doc string."""
-        out = super(CisTest, self).shortDescription()
+        out = super(CisTestBase, self).shortDescription()
         if self.description_prefix:
             out = '%s: %s' % (self.description_prefix, out)
         return out
+
+    # @property
+    # def workingDir(self):
+    #     r"""str: Working directory."""
+    #     return os.path.dirname(__file__)
+
+
+class CisTestClass(CisTestBase):
+    r"""Test class for a CisClass."""
+
+    def __init__(self, *args, **kwargs):
+        self._mod = None
+        self._cls = None
+        self._inst_args = list()
+        self._inst_kwargs = dict()
+        super(CisTestClass, self).__init__(*args, **kwargs)
+
+    def setup(self, *args, **kwargs):
+        r"""Create an instance of the class."""
+        super(CisTestClass, self).setup(*args, **kwargs)
+        self._instance = self.create_instance()
+
+    def teardown(self, *args, **kwargs):
+        r"""Remove the instance."""
+        if hasattr(self, '_instance'):
+            inst = self._instance
+            self._instance = None
+            self.remove_instance(inst)
+            delattr(self, '_instance')
+        super(CisTestClass, self).teardown(*args, **kwargs)
+
+    @property
+    def description_prefix(self):
+        r"""String prefix to prepend docstr test message with."""
+        if self.cls is None:
+            return super(CisTestClass, self).description_prefix
+        else:
+            return self.cls
 
     @property
     def cls(self):
@@ -170,11 +313,6 @@ class CisTest(unittest.TestCase):
         r"""dict: Keyword arguments for creating a class instance."""
         out = self._inst_kwargs
         return out
-
-    @property
-    def workingDir(self):
-        r"""str: Working directory."""
-        return os.path.dirname(__file__)
 
     @property
     def import_cls(self):
@@ -384,6 +522,22 @@ class IOInfo(object):
             pickle.dump(self.data_dict, fd)
 
 
+# class CisTestBaseInfo(CisTestBase, IOInfo):
+#     r"""Test base with IOInfo available."""
+
+#     def __init__(self, *args, **kwargs):
+#         super(CisTestBaseInfo, self).__init__(*args, **kwargs)
+#         IOInfo.__init__(self)
+
+
+class CisTestClassInfo(CisTestClass, IOInfo):
+    r"""Test class for a CisClass with IOInfo available."""
+
+    def __init__(self, *args, **kwargs):
+        super(CisTestClassInfo, self).__init__(*args, **kwargs)
+        IOInfo.__init__(self)
+
+
 class MagicTestError(Exception):
     r"""Special exception for testing."""
     pass
@@ -469,4 +623,6 @@ def ErrorClass(base_class, *args, **kwargs):
     return ErrorClass(*args, **kwargs)
 
 
-__all__ = ['data', 'scripts', 'yamls', 'CisTest', 'IOInfo', 'ErrorClass']
+__all__ = ['data', 'scripts', 'yamls', 'IOInfo', 'ErrorClass',
+           'CisTestBase', 'CisTestClass',
+           'CisTestBaseInfo', 'CisTestClassInfo']

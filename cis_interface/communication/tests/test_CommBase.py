@@ -1,12 +1,11 @@
 import os
 import uuid
 import nose.tools as nt
-from cis_interface.tools import CisClass
-from cis_interface.tests import CisTest, IOInfo
+from cis_interface.tests import CisTestClassInfo
 from cis_interface.communication import new_comm, get_comm_class
 
 
-class TestCommBase(CisTest, IOInfo):
+class TestCommBase(CisTestClassInfo):
     r"""Tests for CommBase communication class.
 
     Attributes:
@@ -16,7 +15,6 @@ class TestCommBase(CisTest, IOInfo):
     """
     def __init__(self, *args, **kwargs):
         super(TestCommBase, self).__init__(*args, **kwargs)
-        IOInfo.__init__(self)
         self.comm = 'CommBase'
         self.attr_list += ['name', 'address', 'direction', 'format_str',
                            'meth_deserialize', 'meth_serialize', 'recv_timeout',
@@ -70,7 +68,7 @@ class TestCommBase(CisTest, IOInfo):
 
     @property
     def comm_count(self):
-        r"""int: Return the number of comms."""
+        r"""int: The number of comms."""
         out = 0
         comms = set([self.comm, self.send_inst_kwargs['comm']])
         for x in comms:
@@ -86,8 +84,10 @@ class TestCommBase(CisTest, IOInfo):
     def setup(self, *args, **kwargs):
         r"""Initialize comm object pair."""
         assert(self.is_installed)
-        self.nprev_comm = self.comm_count
-        self.send_instance = new_comm(self.name, **self.send_inst_kwargs)
+        send_inst_kwargs = self.send_inst_kwargs
+        kwargs.setdefault('nprev_comm', self.comm_count)
+        kwargs.setdefault('nprev_fd', self.fd_count)
+        self.send_instance = new_comm(self.name, **send_inst_kwargs)
         super(TestCommBase, self).setup(*args, **kwargs)
         # CommBase is dummy class that never opens
         if self.comm in ['CommBase', 'AsyncComm']:
@@ -101,14 +101,6 @@ class TestCommBase(CisTest, IOInfo):
         r"""Destroy comm object pair."""
         self.remove_instance(self.send_instance)
         super(TestCommBase, self).teardown(*args, **kwargs)
-        x = CisClass(self.name, timeout=self.timeout, sleeptime=self.sleeptime)
-        Tout = x.start_timeout()
-        while ((not Tout.is_out) and
-               (self.comm_count > self.nprev_comm)):  # pragma: debug
-            x.sleep()
-        x.stop_timeout()
-        nt.assert_equal(self.comm_count, self.nprev_comm)
-        self.cleanup_comms()
 
     # def create_instance(self):
     #     r"""Create a new instance of the class."""
@@ -123,12 +115,19 @@ class TestCommBase(CisTest, IOInfo):
 
     def get_fresh_error_instance(self, recv=False):
         r"""Get comm instance with ErrorClass parent class."""
-        kwargs = self.send_inst_kwargs
+        send_kwargs = self.send_inst_kwargs
+        err_kwargs = dict(base_comm=send_kwargs['comm'], new_comm_class='ErrorComm')
+        err_name = self.name + '_' + self.uuid
+        if not recv:
+            send_kwargs.update(**err_kwargs)
+        send_inst = new_comm(err_name, **send_kwargs)
+        recv_kwargs = send_inst.opp_comm_kwargs()
+        recv_kwargs['comm'] = send_kwargs['comm']
         if recv:
-            kwargs['direction'] = 'recv'
-        kwargs.update(base_comm=kwargs['comm'], new_comm_class='ErrorComm')
-        inst = new_comm(self.name + '_' + self.uuid, **kwargs)
-        return inst
+            recv_kwargs.update(**err_kwargs)
+        print(recv_kwargs)
+        recv_inst = new_comm(err_name, **recv_kwargs)
+        return send_inst, recv_inst
 
     def test_maxMsgSize(self):
         r"""Print maxMsgSize."""
@@ -142,22 +141,28 @@ class TestCommBase(CisTest, IOInfo):
 
     def test_error_send(self):
         r"""Test error on send."""
-        inst = self.get_fresh_error_instance()
-        inst._first_send_done = True
-        inst.error_replace('send_multipart')
-        flag = inst.send(self.msg_short)
+        send_inst, recv_inst = self.get_fresh_error_instance()
+        send_inst._first_send_done = True
+        send_inst.error_replace('send_multipart')
+        flag = send_inst.send(self.msg_short)
         assert(not flag)
-        inst.restore_all()
-        inst.close()
+        send_inst.restore_all()
+        send_inst.close()
+        recv_inst.close()
 
     def test_error_recv(self):
         r"""Test error on recv."""
-        inst = self.get_fresh_error_instance(recv=True)
-        inst.error_replace('recv_multipart')
-        flag, msg_recv = inst.recv()
+        self.fd_count
+        send_inst, recv_inst = self.get_fresh_error_instance(recv=True)
+        self.fd_count
+        recv_inst.error_replace('recv_multipart')
+        flag, msg_recv = recv_inst.recv()
+        self.fd_count
         assert(not flag)
-        inst.restore_all()
-        inst.close()
+        recv_inst.restore_all()
+        send_inst.close()
+        recv_inst.close()
+        self.fd_count
 
     def test_double_open(self):
         r"""Test that opening twice dosn't cause errors."""

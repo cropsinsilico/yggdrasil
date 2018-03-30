@@ -6,7 +6,7 @@ from cis_interface.interface import PsiInterface
 from cis_interface.tools import CIS_MSG_EOF, get_CIS_MSG_MAX, CIS_MSG_BUF
 from cis_interface.drivers import (
     import_driver, InputCommDriver, OutputCommDriver, MatlabModelDriver)
-from cis_interface.tests import CisTest, IOInfo
+from cis_interface.tests import CisTestClassInfo
 
 
 CIS_MSG_MAX = get_CIS_MSG_MAX()
@@ -53,11 +53,10 @@ def test_PsiMatlab_variables():  # pragma: matlab
 
 
 # @nt.nottest
-class TestBase(CisTest, IOInfo):
+class TestBase(CisTestClassInfo):
     r"""Test class for interface classes."""
     def __init__(self, *args, **kwargs):
         super(TestBase, self).__init__(*args, **kwargs)
-        IOInfo.__init__(self)
         self._mod = 'cis_interface.interface.PsiInterface'
         self.name = 'test' + self.uuid
         self.matlab = False
@@ -86,17 +85,23 @@ class TestBase(CisTest, IOInfo):
         
     def setup(self, skip_start=False):
         r"""Start driver and instance."""
+        nprev_comm = self.comm_count
+        nprev_thread = self.thread_count
+        nprev_fd = self.fd_count
         self.driver = self.driver_class(*self.driver_args, **self.driver_kwargs)
         if not skip_start:
             self.driver.start()
         os.environ.update(self.driver.env)
         self._skip_start = skip_start
-        super(TestBase, self).setup()
+        super(TestBase, self).setup(nprev_comm=nprev_comm,
+                                    nprev_thread=nprev_thread,
+                                    nprev_fd=nprev_fd)
 
     def teardown(self):
         r"""Stop the driver."""
         if not self._skip_start:
             self.driver.terminate()
+        self.driver.cleanup()
         super(TestBase, self).teardown()
         self.cleanup_comms()
 

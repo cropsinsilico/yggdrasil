@@ -1,7 +1,7 @@
 import uuid
 import nose.tools as nt
 from cis_interface import tools
-from cis_interface.tests import IOInfo, MagicTestError
+from cis_interface.tests import MagicTestError
 from cis_interface.drivers import import_driver
 from cis_interface.drivers.tests import test_Driver as parent
 from cis_interface.drivers.ConnectionDriver import ConnectionDriver
@@ -9,11 +9,10 @@ from cis_interface.communication import (
     get_comm_class, new_comm)
 
             
-class TestConnectionParam(parent.TestParam, IOInfo):
+class TestConnectionParam(parent.TestParam):
     r"""Test parameters for the ConnectionDriver class."""
     def __init__(self, *args, **kwargs):
         super(TestConnectionParam, self).__init__(*args, **kwargs)
-        IOInfo.__init__(self)
         self.driver = 'ConnectionDriver'
         self.comm_name = tools.get_default_comm()
         self.attr_list += ['icomm_kws', 'ocomm_kws', 'icomm', 'ocomm',

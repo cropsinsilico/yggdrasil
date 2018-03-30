@@ -1,15 +1,13 @@
 import nose.tools as nt
-from cis_interface.tests import IOInfo
 import cis_interface.drivers.tests.test_Driver as parent
 from cis_interface.communication import new_comm
 
 
-class TestRPCParam(parent.TestParam, IOInfo):
+class TestRPCParam(parent.TestParam):
     r"""Test parameters for RPCDriver class."""
 
     def __init__(self, *args, **kwargs):
         super(TestRPCParam, self).__init__(*args, **kwargs)
-        IOInfo.__init__(self)
         self.driver = 'RPCDriver'
         self.attr_list += ['icomm', 'ocomm']
 
@@ -40,7 +38,7 @@ class TestRPCParam(parent.TestParam, IOInfo):
         super(TestRPCParam, self).teardown(*args, **kwargs)
         
         
-class TestRPCDriverNoStart(TestRPCParam, parent.TestDriverNoStart, IOInfo):
+class TestRPCDriverNoStart(TestRPCParam, parent.TestDriverNoStart):
     r"""Test class for RPCDriver class without start."""
     @property
     def send_comm_kwargs(self):
@@ -57,7 +55,7 @@ class TestRPCDriverNoStart(TestRPCParam, parent.TestDriverNoStart, IOInfo):
         return out
 
 
-class TestRPCDriver(TestRPCParam, parent.TestDriver, IOInfo):
+class TestRPCDriver(TestRPCParam, parent.TestDriver):
     r"""Test class for RPCDriver class."""
 
     def test_send_recv(self):

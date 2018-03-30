@@ -2,7 +2,7 @@ import tempfile
 import os
 import nose.tools as nt
 from cis_interface import yamlfile
-from cis_interface.tests import CisTest
+from cis_interface.tests import CisTestClass
 _yaml_env = 'TEST_YAML_FILE'
 
 
@@ -17,7 +17,7 @@ def test_parse_component_error():
                      {}, 'invalid', 'invalid')
 
 
-class YamlTestBase(CisTest):
+class YamlTestBase(CisTestClass):
     r"""Test base for yamlfile."""
     _contents = tuple()
 

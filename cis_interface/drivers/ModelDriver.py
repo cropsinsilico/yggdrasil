@@ -140,10 +140,10 @@ class ModelDriver(Driver):
             self.queue_thread.set_break_flag()
             self.queue.put(self._exit_line)
             self.info("End of model output")
-            # try:
-            #     self.model_process.stdout.close()
-            # except BaseException:  # pragma: debug
-            #     pass
+            try:
+                self.model_process.stdout.close()
+            except BaseException:  # pragma: debug
+                pass
         else:
             self.queue.put(line.decode('utf-8'))
 

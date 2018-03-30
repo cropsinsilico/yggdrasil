@@ -1,9 +1,6 @@
 import os
-import threading
 import nose.tools as nt
-from cis_interface.tools import CisClass
-from cis_interface.tests import CisTest
-from cis_interface.communication import get_comm_class
+from cis_interface.tests import CisTestClassInfo
 from cis_interface import drivers
 
 
@@ -12,7 +9,7 @@ def test_import_driver():
     drivers.import_driver()
 
 
-class TestParam(CisTest):
+class TestParam(CisTestClassInfo):
     r"""Test parameters for basic Driver test class.
 
     Attributes:
@@ -39,6 +36,11 @@ class TestParam(CisTest):
                              'namespace': self.namespace}
         self.nprev_comm = 0
         self.debug_flag = False
+
+    @property
+    def workingDir(self):
+        r"""str: Working directory."""
+        return os.path.dirname(__file__)
 
     @property
     def skip_start(self):
@@ -71,73 +73,11 @@ class TestParam(CisTest):
         out['sleeptime'] = self.sleeptime
         return out
 
-    @property
-    def comm_count(self):
-        r"""int: Return the number of comms."""
-        return get_comm_class().comm_count()
-
-    @property
-    def thread_count(self):
-        r"""int: Return the number of active threads."""
-        return threading.active_count()
-
-    def setup(self, nprev_comm=None, nprev_thread=None):
-        r"""Create a driver instance and start the driver.
-
-        Args:
-            nprev_comm (int, optional): Number of previous comm channels.
-                If not provided, it is determined to be the present number of
-                default comms.
-            nprev_thread (int, optional): Number of previous threads.
-                If not provided, it is determined to be the present number of
-                threads.
-
-        """
-        if nprev_comm is None:
-            nprev_comm = self.comm_count
-        if nprev_thread is None:
-            nprev_thread = self.thread_count
-        self.nprev_comm = nprev_comm
-        self.nprev_thread = self.thread_count
-        super(TestParam, self).setup()
+    def setup(self, *args, **kwargs):
+        r"""Create a driver instance and start the driver."""
+        super(TestParam, self).setup(*args, **kwargs)
         if not self.skip_start:
             self.instance.start()
-
-    def teardown(self, ncurr_comm=None, ncurr_thread=None):
-        r"""Remove the instance, stoppping it.
-
-        Args:
-            ncurr_comm (int, optional): Number of current comms. If not
-                provided, it is determined to be the present number of comms.
-            ncurr_thread (int, optional): Number of current threads. If not
-                provided, it is determined to be the present number of threads.
-
-        """
-        super(TestParam, self).teardown()
-        # Give comms time to close
-        if ncurr_comm is None:
-            x = CisClass(self.name, timeout=self.timeout,
-                         sleeptime=self.sleeptime)
-            Tout = x.start_timeout()
-            while ((not Tout.is_out) and
-                   (self.comm_count > self.nprev_comm)):  # pragma: debug
-                x.sleep()
-            x.stop_timeout()
-            ncurr_comm = self.comm_count
-        # Give threads time to close
-        if ncurr_thread is None:
-            x = CisClass(self.name, timeout=self.timeout,
-                         sleeptime=self.sleeptime)
-            Tout = x.start_timeout()
-            while ((not Tout.is_out) and
-                   (self.thread_count > self.nprev_thread)):  # pragma: debug
-                x.sleep()
-            x.stop_timeout()
-            ncurr_thread = self.thread_count
-        # Check counts
-        nt.assert_less_equal(ncurr_comm, self.nprev_comm)
-        nt.assert_less_equal(ncurr_thread, self.nprev_thread)
-        self.cleanup_comms()
 
     @property
     def name(self):
