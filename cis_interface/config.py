@@ -54,6 +54,15 @@ files = [def_config_file, usr_config_file, loc_config_file]
 cis_cfg.read(files)
 
 
+# Aliases for old versions of config options
+alias_map = [(('debug', 'psi'), ('debug', 'cis'))]
+for old, new in alias_map:
+    v = cis_cfg.get(*old)
+    if v:
+        cis_cfg.set(new[0], new[1], v)
+        
+
+
 # Set associated environment variables
 env_map = [('debug', 'cis', 'CIS_DEBUG'),
            ('debug', 'rmq', 'RMQ_DEBUG'),
