@@ -91,14 +91,14 @@ class CisTest(unittest.TestCase):
 
     def debug_log(self):  # pragma: debug
         r"""Turn on debugging."""
-        self._old_loglevel = cis_cfg.get('debug', 'psi')
-        cis_cfg.set('debug', 'psi', 'DEBUG')
+        self._old_loglevel = cis_cfg.get('debug', 'cis')
+        cis_cfg.set('debug', 'cis', 'DEBUG')
         cfg_logging()
 
     def reset_log(self):  # pragma: debug
         r"""Resetting logging to prior value."""
         if self._old_loglevel is not None:
-            cis_cfg.set('debug', 'psi', self._old_loglevel)
+            cis_cfg.set('debug', 'cis', self._old_loglevel)
             cfg_logging()
             self._old_loglevel = None
 

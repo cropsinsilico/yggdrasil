@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <hellofunc.h>
-#include <PsiInterface.h>
+#include <CisInterface.h>
 
 int main() {
   sleep(1);

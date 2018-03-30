@@ -18,17 +18,17 @@ COLOR_NORMAL = '\033[0m'
 
 
 # def setup_cis_logging(prog, level=None):
-#     r"""Set the log lovel based on environment variable 'PSI_DEBUG'. If the
+#     r"""Set the log lovel based on environment variable 'CIS_DEBUG'. If the
 #     variable is not set, the log level is set to 'NOTSET'.
 
 #     Args:
 #         prog (str): Name to prepend log messages with.
 #         level (str, optional): String specifying the logging level. Defaults
-#             to None and the environment variable 'PSI_DEBUG' is used.
+#             to None and the environment variable 'CIS_DEBUG' is used.
 
 #     """
 #     if level is None:
-#         level = cis_cfg.get('debug', 'psi', 'NOTSET')
+#         level = cis_cfg.get('debug', 'cis', 'NOTSET')
 #     logLevel = eval('logging.' + level)
 #     logging.basicConfig(level=logLevel, stream=sys.stdout, format=COLOR_TRACE +
 #                         prog + ': %(message)s' + COLOR_NORMAL)
@@ -48,7 +48,7 @@ class CisRunner(CisClass):
         rank (int, optional): Rank of this set of models if run in parallel.
             Defaults to 0.
         cis_debug_level (str, optional): Level for CiS debug messages. Defaults
-            to environment variable 'PSI_DEBUG'.
+            to environment variable 'CIS_DEBUG'.
         rmq_debug_level (str, optional): Level for RabbitMQ debug messages.
             Defaults to environment variable 'RMQ_DEBUG'.
         cis_debug_prefix (str, optional): Prefix for CiS debug messages.
@@ -513,8 +513,8 @@ def get_runner(models, **kwargs):
         raise Exception('rmq:namespace not set in config file')
     rank = os.environ.get('PARALLEL_SEQ', '0')
     host = socket.gethostname()
-    os.environ['PSI_RANK'] = rank
-    os.environ['PSI_HOST'] = host
+    os.environ['CIS_RANK'] = rank
+    os.environ['CIS_HOST'] = host
     rank = int(rank)
     kwargs.update(rank=rank, host=host)
     # Run
