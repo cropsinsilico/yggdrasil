@@ -96,7 +96,7 @@ class RMQAsyncComm(RMQComm.RMQComm):
         # Register queue
         if not self.queue:  # pragma: debug
             self.error("Queue was not initialized.")
-        self.register_connection(self.address, (self.connection, self.channel))
+        self.register_comm(self.address, (self.connection, self.channel))
         super(RMQComm.RMQComm, self).bind()
     
     def _open_direct(self):
@@ -141,7 +141,7 @@ class RMQAsyncComm(RMQComm.RMQComm):
                             pika.exceptions.ConnectionClosed):  # pragma: debug
                         self._closing = False
             if not self.is_client:
-                self.unregister_connection(self.address)
+                self.unregister_comm(self.address)
         # Wait for connection to finish closing & then force if it dosn't
         T = self.start_timeout(key=self.timeout_key + '_closing')
         while (not T.is_out) and self._closing:
