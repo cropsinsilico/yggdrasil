@@ -27,6 +27,10 @@ class FileComm(CommBase.CommBase):
         ValueError: If the read_meth is not one of the supported values.
 
     """
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault('close_on_eof_send', True)
+        return super(FileComm, self).__init__(*args, **kwargs)
+
     def _init_before_open(self, read_meth='read', append=False, in_temp=False,
                           **kwargs):
         r"""Get absolute path and set attributes."""
@@ -37,7 +41,6 @@ class FileComm(CommBase.CommBase):
             raise ValueError("read_meth '%s' not supported." % read_meth)
         self.read_meth = read_meth
         self.append = append
-        kwargs.setdefault('close_on_eof_send', True)
         if in_temp:
             self.address = os.path.join(tempfile.gettempdir(), self.address)
         self.address = os.path.abspath(self.address)
