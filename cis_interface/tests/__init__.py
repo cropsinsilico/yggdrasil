@@ -84,6 +84,7 @@ class CisTestBase(unittest.TestCase):
         self.timeout = 10.0
         self.sleeptime = 0.01
         self._teardown_complete = False
+        self._new_default_comm = None
         self._old_default_comm = None
         self._old_loglevel = None
         self._old_encoding = None
@@ -165,6 +166,8 @@ class CisTestBase(unittest.TestCase):
 
         """
         self._old_default_comm = os.environ.get('CIS_DEFAULT_COMM', None)
+        if self._new_default_comm is not None:
+            os.environ['CIS_DEFAULT_COMM'] = self._new_default_comm
         self.set_utf8_encoding()
         if self.debug_flag:  # pragma: debug
             self.debug_log()

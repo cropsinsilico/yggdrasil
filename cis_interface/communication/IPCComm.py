@@ -164,12 +164,7 @@ class IPCServer(CommBase.CommServer):
     r"""IPC server object for cleaning up server queue."""
 
     def terminate(self, *args, **kwargs):
-        if CommBase.is_registered('IPCComm', self.srv_address):
-            q = get_queue(int(self.srv_address))
-            try:
-                remove_queue(q)
-            except (KeyError, sysv_ipc.ExistentialError):  # pragma: debug
-                pass
+        CommBase.unregister_comm('IPCComm', self.srv_address)
         super(IPCServer, self).terminate(*args, **kwargs)
 
 
@@ -209,7 +204,7 @@ class IPCComm(AsyncComm.AsyncComm):
         try:
             value.remove()
             out = True
-        except sysv_ipc.ExistentialError:
+        except sysv_ipc.ExistentialError:  # pragma: debug
             out = False
         return out
 
@@ -250,11 +245,8 @@ class IPCComm(AsyncComm.AsyncComm):
                 self.q = None
                 self._bound = False
         # Remove the queue
-        if (self.q is not None) and (not skip_remove) and (not self.is_client):
-            try:
-                remove_queue(self.q)
-            except (KeyError, sysv_ipc.ExistentialError):
-                pass
+        dont_close = (skip_remove or self.is_client)
+        self.unregister_comm(self.address, dont_close=dont_close)
         self.q = None
         self._bound = False
 

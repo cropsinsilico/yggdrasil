@@ -11,8 +11,8 @@ class TestExampleTimedPipeZMQ(TestExample):
     def __init__(self, *args, **kwargs):
         super(TestExampleTimedPipeZMQ, self).__init__(*args, **kwargs)
         self._name = 'timed_pipe'
-        self.env = {'CIS_DEFAULT_COMM': 'ZMQComm',
-                    'PIPE_MSG_COUNT': '10',
+        self._new_default_comm = 'ZMQComm'
+        self.env = {'PIPE_MSG_COUNT': '10',
                     'PIPE_MSG_SIZE': '1024'}
         # self.debug_flag = True
 
@@ -35,4 +35,4 @@ class TestExampleTimedPipeIPC(TestExampleTimedPipeZMQ):
 
     def __init__(self, *args, **kwargs):
         super(TestExampleTimedPipeIPC, self).__init__(*args, **kwargs)
-        self.env['CIS_DEFAULT_COMM'] = 'IPCComm'
+        self._new_default_comm = 'IPCComm'
