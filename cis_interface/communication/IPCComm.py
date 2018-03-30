@@ -246,7 +246,12 @@ class IPCComm(AsyncComm.AsyncComm):
                 self._bound = False
         # Remove the queue
         dont_close = (skip_remove or self.is_client)
-        self.unregister_comm(self.address, dont_close=dont_close)
+        if dont_close:
+            self.info("Not closing IPC comm.")
+        if (self.q is not None) and (not dont_close):
+            # Dont close for client because server will not be able
+            # to unregister the comm
+            self.unregister_comm(self.address, dont_close=dont_close)
         self.q = None
         self._bound = False
 
