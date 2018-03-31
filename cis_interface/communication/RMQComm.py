@@ -180,20 +180,6 @@ class RMQComm(AsyncComm.AsyncComm):
         r"""str: Name of underlying communication class."""
         return 'RMQComm'
 
-    @classmethod
-    def close_registry_entry(cls, value):
-        r"""Close a registry entry."""
-        out = True
-        try:
-            value[0].close()
-        except BaseException:
-            out = False
-        try:
-            value[1].close()
-        except BaseException:
-            out = False
-        return out
-
     def opp_comm_kwargs(self):
         r"""Get keyword arguments to initialize communication with opposite
         comm object.
