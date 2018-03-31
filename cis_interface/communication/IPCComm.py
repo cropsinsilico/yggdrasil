@@ -308,7 +308,7 @@ class IPCComm(AsyncComm.AsyncComm):
             self.debug('Sending %d bytes', len(payload))
             self.q.send(payload, block=False)
             self.debug('Sent %d bytes', len(payload))
-        except sysv_ipc.BusyError:
+        except sysv_ipc.BusyError:  # pragma: debug
             self.debug("IPC Queue Full")
             raise AsyncComm.AsyncTryAgain
         except OSError:  # pragma: debug

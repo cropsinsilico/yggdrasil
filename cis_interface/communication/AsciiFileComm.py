@@ -66,10 +66,7 @@ class AsciiFileComm(FileComm):
     @property
     def fd(self):
         r"""Associated file identifier."""
-        if self.file is None:
-            return None
-        else:
-            return self.file.fd
+        return self.file.fd
 
     def _send(self, msg):
         r"""Write message to a file.

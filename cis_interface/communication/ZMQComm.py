@@ -133,7 +133,7 @@ def bind_socket(socket, address, retry_timeout=-1):
         else:
             port = socket.bind_to_random_port(address)
             address += ":%d" % port
-    except zmq.ZMQError as e:
+    except zmq.ZMQError as e:  # pragma: debug
         if (e.errno not in [48, 98]) or (retry_timeout < 0):
             raise e
         else:
@@ -530,17 +530,17 @@ class ZMQComm(AsyncComm.AsyncComm):
                 self._bound = False
             self.debug('Unbound socket')
 
-    def disconnect(self, dont_close=False):
-        r"""Disconnect from address."""
-        if self._connected:
-            self.debug('Disconnecting from %s' % self.address)
-            try:
-                self.socket.disconnect(self.address)
-            except zmq.ZMQError:  # pragma: debug
-                pass
-            self.unregister_comm(self.registry_key, dont_close=dont_close)
-            self._connected = False
-        self.debug('Disconnected socket')
+    # def disconnect(self, dont_close=False):
+    #     r"""Disconnect from address."""
+    #     if self._connected:
+    #         self.debug('Disconnecting from %s' % self.address)
+    #         try:
+    #             self.socket.disconnect(self.address)
+    #         except zmq.ZMQError:  # pragma: debug
+    #             pass
+    #         self.unregister_comm(self.registry_key, dont_close=dont_close)
+    #         self._connected = False
+    #     self.debug('Disconnected socket')
 
     def _open_direct(self):
         r"""Open connection by binding/connect to the specified socket."""

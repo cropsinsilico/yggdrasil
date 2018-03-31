@@ -115,7 +115,7 @@ def cleanup_comms(comm_class, close_func=None):
             keys = [k for k in _registered_comms[comm_class].keys()]
             for k in keys:
                 flag = unregister_comm(comm_class, k)
-                if flag:
+                if flag:  # pragma: debug
                     count += 1
     return count
 
@@ -425,7 +425,7 @@ class CommBase(tools.CisClass):
     @classmethod
     def close_registry_entry(cls, value):
         r"""Close a registry entry."""
-        pass
+        return False
 
     @classmethod
     def cleanup_comms(cls):
@@ -669,15 +669,11 @@ class CommBase(tools.CisClass):
 
     def confirm_send(self, noblock=False):
         r"""Confirm that sent message was received."""
-        if noblock:
-            return True
-        return False
+        return noblock
 
     def confirm_recv(self, noblock=False):
         r"""Confirm that message was received."""
-        if noblock:
-            return True
-        return False
+        return noblock
 
     @property
     def n_msg(self):

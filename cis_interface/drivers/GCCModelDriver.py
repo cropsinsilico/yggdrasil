@@ -271,8 +271,6 @@ class GCCModelDriver(ModelDriver):
                 list.
 
         """
-        if isinstance(args, str):
-            args = [args]
         self.src = []
         self.ldflags = []
         self.ccflags = []

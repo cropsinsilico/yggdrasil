@@ -58,7 +58,7 @@ cis_cfg.read(files)
 alias_map = [(('debug', 'psi'), ('debug', 'cis'))]
 for old, new in alias_map:
     v = cis_cfg.get(*old)
-    if v:
+    if v:  # pragma: debug
         cis_cfg.set(new[0], new[1], v)
 
 
