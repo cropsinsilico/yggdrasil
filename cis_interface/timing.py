@@ -9,7 +9,10 @@ from cis_interface.drivers.MatlabModelDriver import _matlab_installed
 from cis_interface.tests import CisTestBase
 import matplotlib.pyplot as plt
 import matplotlib as mpl
-mpl.rcParams['lines.linewidth'] = 4
+_linewidth = 4
+mpl.rcParams['axes.linewidth'] = _linewidth
+mpl.rcParams['axes.labelweight'] = 'bold'
+mpl.rcParams['font.weight'] = 'bold'
 
 
 def get_source(lang, direction, name='timed_pipe'):
@@ -218,14 +221,16 @@ class TimedRun(CisTestBase, tools.CisClass):
             self.save_scalings()
         return self.data[self.name][(nmsg, msg_size)]
 
-    def plot_scaling(self, x, y, xname, axs=None, label=None, scaling='linear',
-                     plot_kws={}):
+    def plot_scaling(self, x, y, xname, yerr=None, axs=None, label=None,
+                     scaling='linear', plot_kws={}):
         r"""Plot scaling of run time with a variable.
 
         Args:
             x (list, np.ndarray): Variable that is being scaled.
             y (list, np.ndarray): Run times in seconds.
             xname (str): Name of x variable. This is used to label the x axis.
+            yerr (list, np.ndarray, optional): Error bars for the run times.
+                Defaults to None and error bars are not plotted.
             axs (matplotlib.Axes, optional): Axes object that line should be
                 added to. If not provided, one is created.
             label (str, optional): Label that should be used for the line.
@@ -239,16 +244,33 @@ class TimedRun(CisTestBase, tools.CisClass):
             matplotlib.Axes: Axes containing the plotted scaling.
 
         """
+        if isinstance(x, list):
+            x = np.array(x)
+        if isinstance(y, list):
+            y = np.array(y)
+        if isinstance(yerr, list):
+            yerr = np.array(yerr)
         if axs is None:
             fig, axs = plt.subplots()
             axs.set_xlabel(xname)
             axs.set_ylabel('Time (s)')
         # Plot
         if scaling == 'log':
-            # axs.loglog(x, y, label=label, **plot_kws)
-            axs.semilogx(x, y, label=label, **plot_kws)
+            if yerr is not None:
+                axs.set_xscale('log')
+                # Ensure that errors do not go into negative
+                ylower = np.maximum(1e-2, y - yerr)
+                yerr_lower = y - ylower
+                axs.errorbar(x, y, yerr=[yerr_lower, 2 * yerr],
+                             label=label, **plot_kws)
+            else:
+                # axs.loglog(x, y, label=label, **plot_kws)
+                axs.semilogx(x, y, label=label, **plot_kws)
         else:
-            axs.plot(x, y, label=label, **plot_kws)
+            if yerr is not None:
+                axs.errorbar(x, y, yerr=yerr, label=label, **plot_kws)
+            else:
+                axs.plot(x, y, label=label, **plot_kws)
         return axs
 
     def scaling_count(self, msg_size, counts=None, min_count=1, max_count=100,
@@ -394,37 +416,31 @@ def plot_scalings(nmsg=1, msg_size=1000, plotfile=None, show_plot=False,
     axs[0].set_xlabel('Message Count (size = %d)' % msg_size)
     axs[0].set_ylabel('Time (s)')
     axs[1].set_xlabel('Message Size (count = %d)' % nmsg)
-    # axs[1].set_ylabel('Time (s)')
     axs_width = 1.0  # 0.75
     axs_height = 0.85
-    chartBox = axs[0].get_position()
-    axs[0].set_position([chartBox.x0,
-                         chartBox.y0,  # + (1.0 - axs_height) * chartBox.height,
-                         chartBox.width * axs_width,
-                         chartBox.height * axs_height])
-    chartBox = axs[1].get_position()
-    axs[1].set_position([chartBox.x0,
-                         chartBox.y0,  # + (1.0 - axs_height) * chartBox.height,
-                         chartBox.width * axs_width,
-                         chartBox.height * axs_height])
+    box1 = axs[0].get_position()
+    pos1 = [box1.x0, box1.y0, axs_width * box1.width, axs_height * box1.height]
+    axs[0].set_position(pos1)
+    box2 = axs[1].get_position()
+    pos2 = [box2.x0, box2.y0, axs_width * box2.width, axs_height * box2.height]
+    axs[1].set_position(pos2)
+    box_leg = (1.0 + (pos2[0] - (pos1[0] + pos1[2])) / (2.0 * pos1[2]), 1.25)
     for l1 in lang_list:
         clr = colors[l1]
         for l2 in lang_list:
             sty = styles[l2]
-            plot_kws = {'color': clr, 'linestyle': sty, 'linewidth': 4}
+            plot_kws = {'color': clr, 'linestyle': sty, 'linewidth': _linewidth}
             x = TimedRun(l1, l2, scalings_file=scalings_file, name=test_name)
             label = '%s to %s' % (l1, l2)
             x1, y1, z1 = x.scaling_count(msg_size)
             x2, y2, z2 = x.scaling_size(nmsg)
-            x.plot_scaling(x1, y1, 'count', axs=axs[0],
-                           label=label,
+            x.plot_scaling(x1, y1, 'count', yerr=z1, axs=axs[0],
+                           label=label, plot_kws=plot_kws)
+            x.plot_scaling(x2, y2, 'size', yerr=z2, axs=axs[1],
+                           scaling='log', label=label,
                            plot_kws=plot_kws)
-            x.plot_scaling(x2, y2, 'size', axs=axs[1],
-                           scaling='log',
-                           label=label,
-                           plot_kws=plot_kws)
-    # axs[0].legend(bbox_to_anchor=(1.05, 1), loc=2)
-    axs[0].legend(bbox_to_anchor=(1.15, 1.25), loc='upper center', ncol=3)
+    legend = axs[0].legend(bbox_to_anchor=box_leg, loc='upper center', ncol=3)
+    legend.get_frame().set_linewidth(_linewidth)
     if show_plot:
         plt.show()
     plt.savefig(plotfile)

@@ -38,7 +38,10 @@ def test_scaling_size():
 
 def test_plot_scaling():
     x = timing.TimedRun('python', 'python')
-    x1, y1 = x.scaling_count(10, nsamples=1)
-    x.plot_scaling(x1, y1, 'count')
-    x2, y2 = x.scaling_size(1, nsamples=1)
-    x.plot_scaling(x2, y2, 'size', scaling='log')
+    x1, y1, z1 = x.scaling_count(10, nsamples=1)
+    axs = x.plot_scaling(x1, y1, 'count')
+    x.plot_scaling(x1, y1, 'count', axs=axs, yerr=z1)
+    x2, y2, z2 = x.scaling_size(1, nsamples=1)
+    axs = x.plot_scaling(x2, y2, 'size', scaling='log')
+    x.plot_scaling(x2, y2, 'size', scaling='log',
+                   axs=axs, yerr=z2)
