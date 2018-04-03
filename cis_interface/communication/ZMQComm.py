@@ -373,6 +373,12 @@ class ZMQComm(AsyncComm.AsyncComm):
         # too large for stack allocation in C so 2**20 will be used.
         return 2**20
 
+    @property
+    def msgBufSize(self):
+        r"""int: Size of buffer that should be reservered for info added to
+        messages."""
+        return 100
+
     @classmethod
     def underlying_comm_class(self):
         r"""str: Name of underlying communication class."""
@@ -797,22 +803,23 @@ class ZMQComm(AsyncComm.AsyncComm):
         out['socket_type'] = 'PAIR'
         out['context'] = self.context
         return out
-    
-    def _send_multipart_worker(self, msg, header, **kwargs):
-        r"""Send multipart message to the worker comm identified.
 
-        Args:
-            msg (str): Message to be sent.
-            header (dict): Message info including work comm address.
+    # This is only needed when base is not asynchronous
+    # def _send_multipart_worker(self, msg, header, **kwargs):
+    #     r"""Send multipart message to the worker comm identified.
 
-        Returns:
-            bool: Success or failure of sending the message.
+    #     Args:
+    #         msg (str): Message to be sent.
+    #         header (dict): Message info including work comm address.
 
-        """
-        workcomm = self.get_work_comm(header)
-        args = [msg]
-        self.sched_task(0, workcomm._send_multipart, args=args, kwargs=kwargs)
-        return True
+    #     Returns:
+    #         bool: Success or failure of sending the message.
+
+    #     """
+    #     workcomm = self.get_work_comm(header)
+    #     args = [msg]
+    #     self.sched_task(0, workcomm._send_multipart, args=args, kwargs=kwargs)
+    #     return True
 
     def _send_direct(self, msg, topic='', identity=None, **kwargs):
         r"""Send a message.

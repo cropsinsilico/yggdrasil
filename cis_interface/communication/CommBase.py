@@ -406,6 +406,12 @@ class CommBase(tools.CisClass):
         return get_CIS_MSG_MAX()
 
     @property
+    def msgBufSize(self):
+        r"""int: Size of buffer that should be reservered for info added to
+        messages."""
+        return 0
+
+    @property
     def empty_msg(self):
         r"""str: Empty message."""
         return backwards.unicode2bytes('')
@@ -720,7 +726,7 @@ class CommBase(tools.CisClass):
         """
         prev = 0
         while prev < len(msg):
-            next = min(prev + self.maxMsgSize, len(msg))
+            next = min(prev + self.maxMsgSize - self.msgBufSize, len(msg))
             yield msg[prev:next]
             prev = next
 
@@ -812,6 +818,7 @@ class CommBase(tools.CisClass):
         r"""dict: Keyword arguments for an existing work comm."""
         return dict(comm=self.comm_class, direction='recv',
                     recv_timeout=self.recv_timeout,
+                    is_interface=self.is_interface,
                     single_use=True)
 
     @property
@@ -819,6 +826,7 @@ class CommBase(tools.CisClass):
         r"""dict: Keyword arguments for a new work comm."""
         return dict(comm=self.comm_class, direction='send',
                     recv_timeout=self.recv_timeout,
+                    is_interface=self.is_interface,
                     single_use=True)
 
     def get_work_comm(self, header, work_comm_name=None, **kwargs):
@@ -843,8 +851,8 @@ class CommBase(tools.CisClass):
         kws.update(**kwargs)
         if work_comm_name is None:
             cls = kws.get("comm", tools.get_default_comm())
-            work_comm_name = 'temp_%s_%s.%s' % (
-                cls, kws['direction'], header['id'])
+            work_comm_name = '%s_temp_%s_%s.%s' % (
+                self.name, cls, kws['direction'], header['id'])
         c = get_comm(work_comm_name, address=header['address'], **kws)
         self.add_work_comm(header['id'], c)
         return c
@@ -868,8 +876,8 @@ class CommBase(tools.CisClass):
         kws.update(**kwargs)
         if work_comm_name is None:
             cls = kws.get("comm", tools.get_default_comm())
-            work_comm_name = 'temp_%s_%s.%s' % (
-                cls, kws['direction'], header['id'])
+            work_comm_name = '%s_temp_%s_%s.%s' % (
+                self.name, cls, kws['direction'], header['id'])
         c = new_comm(work_comm_name, **kws)
         self.add_work_comm(header['id'], c)
         return c
@@ -1152,7 +1160,7 @@ class CommBase(tools.CisClass):
             bool: Success or failure of send.
 
         """
-        if (not send_header) and ((len(msg) < self.maxMsgSize) or
+        if (not send_header) and ((len(msg) < (self.maxMsgSize - self.msgBufSize)) or
                                   (self.maxMsgSize == 0)):
             if self.is_closed:  # pragma: debug
                 self.error("Connection closed.")
@@ -1163,7 +1171,7 @@ class CommBase(tools.CisClass):
                 header_kwargs = dict()
             header = self.get_header(msg, no_address=True, **header_kwargs)
             header_msg = self.format_header(header)
-            if ((((len(header_msg) + len(msg)) < self.maxMsgSize) or
+            if ((((len(header_msg) + len(msg)) < (self.maxMsgSize - self.msgBufSize)) or
                  (self.maxMsgSize == 0))):
                 ret = self._safe_send(header_msg + msg)
             else:

@@ -415,6 +415,7 @@ int new_zmq_address(comm_t *comm) {
   char protocol[50] = "tcp";
   char host[50] = "localhost";
   char address[100];
+  comm->msgBufSize = 100;
   if (strcmp(host, "localhost") == 0)
     strcpy(host, "127.0.0.1");
   if ((strcmp(protocol, "inproc") == 0) ||
@@ -479,6 +480,7 @@ int init_zmq_comm(comm_t *comm) {
   int ret = -1;
   if (comm->valid == 0)
     return ret;
+  comm->msgBufSize = 100;
   zsock_t *s = zsock_new(ZMQ_PAIR);
   if (s == NULL) {
     cislog_error("init_zmq_address: Could not initialize empty socket.");
@@ -663,15 +665,16 @@ int zmq_comm_send(const comm_t x, const char *data, const size_t len) {
 static inline
 int zmq_comm_recv(const comm_t x, char **data, const size_t len,
 		  const int allow_realloc) {
+  int ret = -1;
   cislog_debug("zmq_comm_recv(%s)", x.name);
   zsock_t *s = (zsock_t*)(x.handle);
   if (s == NULL) {
     cislog_error("zmq_comm_recv(%s): socket handle is NULL", x.name);
-    return -1;
+    return ret;
   }
   while (1) {
     int nmsg = zmq_comm_nmsg(x);
-    if (nmsg < 0) return -1;
+    if (nmsg < 0) return ret;
     else if (nmsg > 0) break;
     else {
       cislog_debug("zmq_comm_recv(%s): no messages, sleep", x.name);
@@ -681,9 +684,19 @@ int zmq_comm_recv(const comm_t x, char **data, const size_t len,
   zframe_t *out = zframe_recv(s);
   if (out == NULL) {
     cislog_debug("zmq_comm_recv(%s): did not receive", x.name);
-    return -1;
+    return ret;
   }
-  size_t len_recv = zframe_size(out) + 1;
+  // Check reply
+  char *dummy = (char*)zframe_data(out);
+  ret = check_reply_recv(&x, dummy, zframe_size(out));
+  if (ret < 0) {
+    cislog_error("zmq_comm_recv(%s): failed to check for reply socket.", x.name);
+    zframe_destroy(&out);
+    return ret;
+  }
+  // Realloc
+  // size_t len_recv = zframe_size(out) + 1;
+  size_t len_recv = (size_t)ret + 1;
   if (len_recv > len) {
     if (allow_realloc) {
       cislog_debug("zmq_comm_recv(%s): reallocating buffer from %d to %d bytes.",
@@ -704,8 +717,8 @@ int zmq_comm_recv(const comm_t x, char **data, const size_t len,
   memcpy(*data, zframe_data(out), len_recv);
   (*data)[len_recv-1] = '\0';
   zframe_destroy(&out);
-  int ret = (int)len_recv - 1;
-  ret = check_reply_recv(&x, *data, (size_t)ret);
+  ret = (int)len_recv - 1;
+  // ret = check_reply_recv(&x, *data, (size_t)ret);
   cislog_debug("zmq_comm_recv(%s): returning %d", x.name, ret);
   return ret;
 };

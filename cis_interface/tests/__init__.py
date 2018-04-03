@@ -66,6 +66,8 @@ class CisTestBase(unittest.TestCase):
     Args:
         description_prefix (str, optional): String to prepend docstring
             test message with. Default to empty string.
+        skip_unittest (bool, optional): If True, the unittest parent
+            class will not be initialized. Defaults to False.
 
     Attributes:
         uuid (str): Random unique identifier.
@@ -90,7 +92,9 @@ class CisTestBase(unittest.TestCase):
         self._old_encoding = None
         self.debug_flag = False
         self._first_test = True
-        super(CisTestBase, self).__init__(*args, **kwargs)
+        skip_unittest = kwargs.pop('skip_unittest', False)
+        if not skip_unittest:
+            super(CisTestBase, self).__init__(*args, **kwargs)
 
     @property
     def comm_count(self):
@@ -264,6 +268,59 @@ class CisTestBase(unittest.TestCase):
     # def workingDir(self):
     #     r"""str: Working directory."""
     #     return os.path.dirname(__file__)
+
+    def check_file_exists(self, fname):
+        r"""Check that a file exists.
+
+        Args:
+            fname (str): Full path to the file that should be checked.
+
+        """
+        Tout = self.start_timeout()
+        while (not Tout.is_out) and (not os.path.isfile(fname)):  # pragma: debug
+            self.sleep()
+        self.stop_timeout()
+        assert(os.path.isfile(fname))
+
+    def check_file_size(self, fname, fsize):
+        r"""Check that file is the correct size.
+
+        Args:
+            fname (str): Full path to the file that should be checked.
+            fsize (int): Size that the file should be in bytes.
+
+        """
+        Tout = self.start_timeout()
+        while ((not Tout.is_out) and
+               (os.stat(fname).st_size != fsize)):  # pragma: debug
+            self.sleep()
+        self.stop_timeout()
+        nt.assert_equal(os.stat(fname).st_size, fsize)
+
+    def check_file_contents(self, fname, result):
+        r"""Check that the contents of a file are correct.
+
+        Args:
+            fname (str): Full path to the file that should be checked.
+            result (str): Contents of the file.
+
+        """
+        with open(fname, 'r') as fd:
+            ocont = fd.read()
+        nt.assert_equal(ocont, result)
+
+    def check_file(self, fname, result):
+        r"""Check that a file exists, is the correct size, and has the correct
+        contents.
+
+        Args:
+            fname (str): Full path to the file that should be checked.
+            result (str): Contents of the file.
+
+        """
+        self.check_file_exists(fname)
+        self.check_file_size(fname, len(result))
+        self.check_file_contents(fname, result)
 
 
 class CisTestClass(CisTestBase):
