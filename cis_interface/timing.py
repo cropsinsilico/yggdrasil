@@ -4,10 +4,12 @@ import yaml
 import tempfile
 import numpy as np
 import pickle
-import matplotlib.pyplot as plt
 from cis_interface import tools, runner, drivers, examples
 from cis_interface.drivers.MatlabModelDriver import _matlab_installed
 from cis_interface.tests import CisTestBase
+import matplotlib.pyplot as plt
+import matplotlib as mpl
+mpl.rcParams['lines.linewidth'] = 4
 
 
 def get_source(lang, direction, name='timed_pipe'):
@@ -45,7 +47,7 @@ class TimedRun(CisTestBase, tools.CisClass):
     def __init__(self, lang_src, lang_dst, name='timed_pipe',
                  scalings_file=None, **kwargs):
         if scalings_file is None:
-            scalings_file = os.path.join(os.getcwd(), 'scaling.dat')
+            scalings_file = os.path.join(os.getcwd(), 'scaling_%s.dat' % name)
         self._scalings_file = scalings_file
         self.program_name = name
         name = '%s_%s_%s' % (name, lang_src, lang_dst)
@@ -243,7 +245,8 @@ class TimedRun(CisTestBase, tools.CisClass):
             axs.set_ylabel('Time (s)')
         # Plot
         if scaling == 'log':
-            axs.loglog(x, y, label=label, **plot_kws)
+            # axs.loglog(x, y, label=label, **plot_kws)
+            axs.semilogx(x, y, label=label, **plot_kws)
         else:
             axs.plot(x, y, label=label, **plot_kws)
         return axs
@@ -355,7 +358,8 @@ class TimedRun(CisTestBase, tools.CisClass):
             pickle.dump(self.data, fd)
 
 
-def plot_scalings(nmsg=1, msg_size=1000, plotfile=None):  # pragma: debug
+def plot_scalings(nmsg=1, msg_size=1000, plotfile=None, show_plot=False,
+                  scalings_file=None, test_name='timed_pipe'):  # pragma: debug
     r"""Plot the scalings for the full matrix of language combinations. This
     can be time consuming.
 
@@ -365,12 +369,20 @@ def plot_scalings(nmsg=1, msg_size=1000, plotfile=None):  # pragma: debug
         msg_size (int, optional): Size of messages for scaling of message count.
             Defaults to 1000.
         plotfile (str, optional): Path to file where the figure should be saved.
-            If None, the figure will be displayed. Defaults to None.
+            If None, one will be created.
+        show_plot (bool, optional): If True, the plot will be displayed before
+            it is saved. Defaults to False.
+        scalings_file (str, optional): Path to the file containing scalings
+            data that should be updated and plotted. Defaults to None and is
+            created based on 'test_name'.
+
+    Returns:
+        str: Path where the figure was saved.
 
     """
-    fname = os.path.join(os.getcwd(), 'scaling_%d_%d.dat' % (nmsg, msg_size))
-    print(fname)
-    fig, axs = plt.subplots(2, 1, figsize=(10, 8))
+    if plotfile is None:
+        plotfile = os.path.join(os.getcwd(), 'scaling_%s.png' % test_name)
+    fig, axs = plt.subplots(1, 2, figsize=(16, 8), sharey=True)
     lang_list = ['python', 'c', 'cpp']
     if _matlab_installed:
         lang_list.append('matlab')
@@ -382,32 +394,38 @@ def plot_scalings(nmsg=1, msg_size=1000, plotfile=None):  # pragma: debug
     axs[0].set_xlabel('Message Count (size = %d)' % msg_size)
     axs[0].set_ylabel('Time (s)')
     axs[1].set_xlabel('Message Size (count = %d)' % nmsg)
-    axs[1].set_ylabel('Time (s)')
-    axs_width = 0.75
+    # axs[1].set_ylabel('Time (s)')
+    axs_width = 1.0  # 0.75
+    axs_height = 0.85
     chartBox = axs[0].get_position()
-    axs[0].set_position([chartBox.x0, chartBox.y0,
-                         chartBox.width * axs_width, chartBox.height])
+    axs[0].set_position([chartBox.x0,
+                         chartBox.y0,  # + (1.0 - axs_height) * chartBox.height,
+                         chartBox.width * axs_width,
+                         chartBox.height * axs_height])
     chartBox = axs[1].get_position()
-    axs[1].set_position([chartBox.x0, chartBox.y0,
-                         chartBox.width * axs_width, chartBox.height])
+    axs[1].set_position([chartBox.x0,
+                         chartBox.y0,  # + (1.0 - axs_height) * chartBox.height,
+                         chartBox.width * axs_width,
+                         chartBox.height * axs_height])
     for l1 in lang_list:
         clr = colors[l1]
         for l2 in lang_list:
             sty = styles[l2]
-            plot_kws = {'color': clr, 'linestyle': sty}
-            x = TimedRun(l1, l2, scalings_file=fname)
-            label = '%s_%s' % (l1, l2)
+            plot_kws = {'color': clr, 'linestyle': sty, 'linewidth': 4}
+            x = TimedRun(l1, l2, scalings_file=scalings_file, name=test_name)
+            label = '%s to %s' % (l1, l2)
             x1, y1, z1 = x.scaling_count(msg_size)
             x2, y2, z2 = x.scaling_size(nmsg)
             x.plot_scaling(x1, y1, 'count', axs=axs[0],
-                           label='%s_%s' % (l1, l2),
+                           label=label,
                            plot_kws=plot_kws)
             x.plot_scaling(x2, y2, 'size', axs=axs[1],
                            scaling='log',
                            label=label,
                            plot_kws=plot_kws)
-    axs[0].legend(bbox_to_anchor=(1.05, 1), loc=2)
-    if plotfile is None:
+    # axs[0].legend(bbox_to_anchor=(1.05, 1), loc=2)
+    axs[0].legend(bbox_to_anchor=(1.15, 1.25), loc='upper center', ncol=3)
+    if show_plot:
         plt.show()
-    else:
-        plt.savefig(plotfile)
+    plt.savefig(plotfile)
+    return plotfile
