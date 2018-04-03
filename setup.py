@@ -198,7 +198,8 @@ except (ImportError, IOError):
         raise IOError("Could not find README.rst or README.md")
 
 # Create requirements list based on platform
-requirements = ["numpy", "scipy", "pyyaml", "pystache", "nose", "zmq", "psutil"]
+requirements = ["numpy", "scipy", "pyyaml", "pystache", "nose", "zmq", "psutil",
+                "matplotlib"]
 # optional_requirements = ["pika", "astropy"]
 if not IS_WINDOWS:
     requirements.append("sysv_ipc")
