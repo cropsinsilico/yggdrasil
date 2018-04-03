@@ -3,8 +3,7 @@ import time
 import yaml
 import tempfile
 import numpy as np
-import pickle
-from cis_interface import tools, runner, drivers, examples
+from cis_interface import tools, runner, drivers, examples, backwards
 from cis_interface.drivers.MatlabModelDriver import _matlab_installed
 from cis_interface.tests import CisTestBase
 import matplotlib.pyplot as plt
@@ -368,16 +367,19 @@ class TimedRun(CisTestBase, tools.CisClass):
 
         """
         if os.path.isfile(self.scalings_file):
-            with open(self.scalings_file, 'r') as fd:
-                out = pickle.load(fd)
+            with open(self.scalings_file, 'rb') as fd:
+                if backwards.PY2:  # pragma: Python 2
+                    out = backwards.pickle.load(fd)
+                else:  # pragma: Python 3
+                    out = backwards.pickle.load(fd, encoding='latin1')
         else:
             out = {}
         return out
 
     def save_scalings(self):
         r"""Save scalings data to pickle file."""
-        with open(self.scalings_file, 'w') as fd:
-            pickle.dump(self.data, fd)
+        with open(self.scalings_file, 'wb') as fd:
+            backwards.pickle.dump(self.data, fd)
 
 
 def plot_scalings(nmsg=1, msg_size=1000, plotfile=None, show_plot=False,
