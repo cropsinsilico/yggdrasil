@@ -1,5 +1,5 @@
 import sys
-from cis_interface.interface.PsiInterface import PsiRpcServer
+from cis_interface.interface.CisInterface import CisRpcServer
 
 
 def get_fibonacci(n):
@@ -37,7 +37,7 @@ def main():
     print('Hello from Python server!')
 
     # Create server-side rpc conneciton using model name
-    rpc = PsiRpcServer("server", "%d", "%d")
+    rpc = CisRpcServer("server", "%d", "%d")
 
     # Continue receiving requests until the connection is closed when all
     # clients have disconnected.

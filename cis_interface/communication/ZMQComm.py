@@ -6,11 +6,6 @@ from cis_interface import backwards, tools
 from cis_interface.communication import CommBase, AsyncComm
 
 
-_register_socket_lock = threading.RLock()
-_registered_sockets = dict()
-_created_sockets = dict()
-
-
 _socket_type_pairs = [('PUSH', 'PULL'),
                       ('PUB', 'SUB'),
                       ('REP', 'REQ'),
@@ -25,54 +20,7 @@ _default_protocol = 'tcp'
 _wait_send_t = 0  # 0.0001
 _reply_msg = backwards.unicode2bytes('CIS_REPLY')
 _purge_msg = backwards.unicode2bytes('CIS_PURGE')
-
-
-def cleanup_comms():
-    r"""Close registered sockets."""
-    with _register_socket_lock:
-        global _registered_sockets
-        count = 0
-        for v in _registered_sockets.values():
-            if not v.closed:
-                v.close(linger=0)
-                count += 1
-        _registered_sockets = dict()
-        return count
-
-
-def register_socket(socket_type_name, address, socket):
-    r"""Register a socket.
-
-    Args:
-        socket_type_name (str): Name of the socket type.
-        address (str): Socket address.
-        socket (zmq.Socket): Socket object.
-
-    """
-    with _register_socket_lock:
-        global _registered_sockets
-        key = '%s_%s' % (socket_type_name, address)
-        _registered_sockets[key] = socket
-
-    
-def unregister_socket(socket_type_name, address, linger=0):
-    r"""Unregister a socket.
-
-    Args:
-        socket_type_name (str): Name of the socket type.
-        address (str): Socket address.
-        linger (int, optional): Time in milliseconds that socket should
-            linger on close. Defaults to 0.
-
-    """
-    with _register_socket_lock:
-        global _registered_sockets
-        key = '%s_%s' % (socket_type_name, address)
-        if key in _registered_sockets:
-            if not _registered_sockets[key].closed:
-                _registered_sockets[key].close(linger=linger)
-            _registered_sockets.pop(key)
-            # del _registered_sockets[key]
+_global_context = zmq.Context.instance()
 
         
 def get_socket_type_mate(t_in):
@@ -185,7 +133,7 @@ def bind_socket(socket, address, retry_timeout=-1):
         else:
             port = socket.bind_to_random_port(address)
             address += ":%d" % port
-    except zmq.ZMQError as e:
+    except zmq.ZMQError as e:  # pragma: debug
         if (e.errno not in [48, 98]) or (retry_timeout < 0):
             raise e
         else:
@@ -227,7 +175,7 @@ class ZMQProxy(CommBase.CommServer):
         cli_param = dict()
         for k in ['protocol', 'host', 'port']:
             cli_param[k] = kwargs.pop(k, srv_param[k])
-        context = context or zmq.Context.instance()
+        context = context or _global_context
         # Create new address for the frontend
         if cli_param['protocol'] in ['inproc', 'ipc']:
             cli_param['host'] = str(uuid.uuid4())
@@ -236,13 +184,15 @@ class ZMQProxy(CommBase.CommServer):
         self.cli_address = bind_socket(self.cli_socket, cli_address,
                                        retry_timeout=retry_timeout)
         self.cli_socket.setsockopt(zmq.LINGER, 0)
-        register_socket('ROUTER_server', self.cli_address, self.cli_socket)
+        CommBase.register_comm('ZMQComm', 'ROUTER_server_' + self.cli_address,
+                               self.cli_socket)
         # Bind backend
         self.srv_socket = context.socket(zmq.DEALER)
         self.srv_socket.setsockopt(zmq.LINGER, 0)
         self.srv_address = bind_socket(self.srv_socket, srv_address,
                                        retry_timeout=retry_timeout)
-        register_socket('DEALER_server', self.srv_address, self.srv_socket)
+        CommBase.register_comm('ZMQComm', 'DEALER_server_' + self.srv_address,
+                               self.srv_socket)
         # Set up poller
         # self.poller = zmq.Poller()
         # self.poller.register(frontend, zmq.POLLIN)
@@ -307,8 +257,8 @@ class ZMQProxy(CommBase.CommServer):
         if self.srv_socket:
             self.srv_socket.close()
             self.srv_socket = None
-        unregister_socket('ROUTER_server', self.cli_address)
-        unregister_socket('DEALER_server', self.srv_address)
+        CommBase.unregister_comm('ZMQComm', 'ROUTER_server_' + self.cli_address)
+        CommBase.unregister_comm('ZMQComm', 'DEALER_server_' + self.srv_address)
 
 
 class ZMQComm(AsyncComm.AsyncComm):
@@ -383,11 +333,12 @@ class ZMQComm(AsyncComm.AsyncComm):
                 socket_action = 'bind'
             else:
                 socket_action = 'connect'
-        self.context = context or zmq.Context.instance()
+        self.context = context or _global_context
         self.socket_type_name = socket_type
         self.socket_type = getattr(zmq, socket_type)
         self.socket_action = socket_action
         self.socket = self.context.socket(self.socket_type)
+        self.socket.setsockopt(zmq.LINGER, 0)
         self.topic_filter = backwards.unicode2bytes(topic_filter)
         if dealer_identity is None:
             dealer_identity = str(uuid.uuid4())
@@ -423,10 +374,18 @@ class ZMQComm(AsyncComm.AsyncComm):
         return 2**20
 
     @classmethod
-    def comm_count(cls):
-        r"""int: Number of sockets that have been opened on this process."""
-        with _register_socket_lock:
-            return len(_registered_sockets)
+    def underlying_comm_class(self):
+        r"""str: Name of underlying communication class."""
+        return 'ZMQComm'
+
+    @classmethod
+    def close_registry_entry(cls, value):
+        r"""Close a registry entry."""
+        out = False
+        if not value.closed:
+            value.close(linger=0)
+            out = True
+        return out
 
     @property
     def address_param(self):
@@ -506,22 +465,14 @@ class ZMQComm(AsyncComm.AsyncComm):
             kwargs['is_client'] = True
         if kwargs['socket_type'] in ['DEALER', 'ROUTER']:
             kwargs['dealer_identity'] = self.dealer_identity
+        kwargs['context'] = self.context
         return kwargs
 
-    def register_socket(self):
-        r"""Register a socket."""
-        self.debug('Registering socket: type = %s, address = %s',
-                   self.socket_type_name, self.address)
-        with self._closing_thread.lock:
-            register_socket(self.socket_type_name, self.address, self.socket)
+    @property
+    def registry_key(self):
+        r"""str: String used to register the socket."""
+        return '%s_%s_%s' % (self.socket_type_name, self.address, self.direction)
 
-    def unregister_socket(self, linger=0):
-        r"""Unregister a socket."""
-        self.debug('Unregistering socket: type = %s, address = %s',
-                   self.socket_type_name, self.address)
-        with self._closing_thread.lock:
-            unregister_socket(self.socket_type_name, self.address, linger=linger)
-        
     def bind(self):
         r"""Bind to address, getting random port as necessary."""
         super(ZMQComm, self).bind()
@@ -547,11 +498,11 @@ class ZMQComm(AsyncComm.AsyncComm):
                            self.socket_type_name, self.address)
                 # Unbind if action should be connect
                 if self.socket_action == 'connect':
-                    self.unbind()
+                    self.unbind(dont_close=True)
             else:
                 self._bound = False
             if self._bound:
-                self.register_socket()
+                self.register_comm(self.registry_key, self.socket)
 
     def connect(self):
         r"""Connect to address."""
@@ -564,9 +515,9 @@ class ZMQComm(AsyncComm.AsyncComm):
                            self.socket_type_name, self.address)
                 self.socket.connect(self.address)
             if self._connected:
-                self.register_socket()
+                self.register_comm(self.registry_key, self.socket)
 
-    def unbind(self, linger=0):
+    def unbind(self, dont_close=False):
         r"""Unbind from address."""
         with self.socket_lock:
             if self._bound:
@@ -575,11 +526,11 @@ class ZMQComm(AsyncComm.AsyncComm):
                     self.socket.unbind(self.address)
                 except zmq.ZMQError:  # pragma: debug
                     pass
-                self.unregister_socket(linger=linger)
+                self.unregister_comm(self.registry_key, dont_close=dont_close)
                 self._bound = False
             self.debug('Unbound socket')
 
-    # def disconnect(self, linger=0):
+    # def disconnect(self, dont_close=False):
     #     r"""Disconnect from address."""
     #     if self._connected:
     #         self.debug('Disconnecting from %s' % self.address)
@@ -587,7 +538,7 @@ class ZMQComm(AsyncComm.AsyncComm):
     #             self.socket.disconnect(self.address)
     #         except zmq.ZMQError:  # pragma: debug
     #             pass
-    #         self.unregister_socket(linger=linger)
+    #         self.unregister_comm(self.registry_key, dont_close=dont_close)
     #         self._connected = False
     #     self.debug('Disconnected socket')
 
@@ -605,7 +556,7 @@ class ZMQComm(AsyncComm.AsyncComm):
                 elif self.socket_action == 'connect':
                     # Bind then unbind to get port as necessary
                     self.bind()
-                    self.unbind()
+                    self.unbind(dont_close=True)
                     self.connect()
                 # Set topic filter
                 if self.socket_type_name == 'SUB':
@@ -628,8 +579,10 @@ class ZMQComm(AsyncComm.AsyncComm):
         # Create socket
         if self.reply_socket_send is None:
             self.reply_socket_send = self.context.socket(zmq.REP)
+            self.reply_socket_send.setsockopt(zmq.LINGER, 0)
             address = format_address(_default_protocol, 'localhost')
             address = bind_socket(self.reply_socket_send, address)
+            self.register_comm('REPLY_SEND_' + address, self.reply_socket_send)
             self.reply_socket_address = address
             self.debug("new send address: %s", address)
         new_msg = backwards.format_bytes(
@@ -657,7 +610,10 @@ class ZMQComm(AsyncComm.AsyncComm):
             _, address, new_msg = msg.split(prefix)
             if address not in self.reply_socket_recv:
                 self.reply_socket_recv[address] = self.context.socket(zmq.REQ)
+                self.reply_socket_recv[address].setsockopt(zmq.LINGER, 0)
                 self.reply_socket_recv[address].connect(address)
+                self.register_comm('REPLY_RECV_' + backwards.bytes2unicode(address),
+                                   self.reply_socket_recv[address])
                 self._n_reply_recv[address] = 0
                 self._n_zmq_recv[address] = 0
             self.debug("new recv address: %s", address)
@@ -732,16 +688,15 @@ class ZMQComm(AsyncComm.AsyncComm):
             if self.socket.closed:
                 self._bound = False
                 self._connected = False
-            # else:
-            #     if self.socket_action == 'bind':
-            #         self.unbind()
-            #     elif self.socket_action == 'connect':
-            #         self.disconnect()
             # Ensure socket not still open
             self._openned = False
-            self.unregister_socket(linger=0)
             if not self.socket.closed:
+                # if self._bound:
+                #     self.unbind()
+                # elif self._connected:
+                #     self.disconnect()
                 self.socket.close(linger=0)
+            self.unregister_comm(self.registry_key)
         super(ZMQComm, self)._close_direct(linger=linger)
 
     def _close_backlog(self, wait=False):
@@ -750,9 +705,11 @@ class ZMQComm(AsyncComm.AsyncComm):
         if self.direction == 'send':
             if (self.reply_socket_send is not None):
                 self.reply_socket_send.close(linger=self.zmq_sleeptime)
+                self.unregister_comm("REPLY_SEND_" + self.reply_socket_address)
         else:
             for k, socket in self.reply_socket_recv.items():
                 socket.close(linger=0)
+                self.unregister_comm("REPLY_RECV_" + backwards.bytes2unicode(k))
 
     def server_exists(self, srv_address):
         r"""Determine if a server exists.
@@ -830,6 +787,7 @@ class ZMQComm(AsyncComm.AsyncComm):
         r"""dict: Keyword arguments for an existing work comm."""
         out = super(ZMQComm, self).get_work_comm_kwargs
         out['socket_type'] = 'PAIR'
+        out['context'] = self.context
         return out
 
     @property
@@ -837,6 +795,7 @@ class ZMQComm(AsyncComm.AsyncComm):
         r"""dict: Keyword arguments for a new work comm."""
         out = super(ZMQComm, self).create_work_comm_kwargs
         out['socket_type'] = 'PAIR'
+        out['context'] = self.context
         return out
     
     def _send_multipart_worker(self, msg, header, **kwargs):

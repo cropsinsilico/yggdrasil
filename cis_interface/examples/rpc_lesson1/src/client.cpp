@@ -1,4 +1,4 @@
-#include "PsiInterface.hpp"
+#include "CisInterface.hpp"
 #include <stdio.h>
 
 
@@ -10,13 +10,13 @@ int main(int argc, char *argv[]) {
   
   // Set up connections matching yaml
   // RPC client-side connection will be $(server_name)_$(client_name)
-  PsiRpcClient rpc("server_client", "%d", "%d");
-  PsiOutput log("output_log", "fib(%-2d) = %-2d\n");
+  CisRpcClient rpc("server_client", "%d", "%d");
+  CisOutput log("output_log", "fib(%-2d) = %-2d\n");
   
   // Initialize variables
   int ret = 0;
   int fib = -1;
-  char *logmsg = (char*)malloc(PSI_MSG_MAX*sizeof(char));
+  char *logmsg = (char*)malloc(CIS_MSG_MAX*sizeof(char));
   int i;
 
   // Iterate over Fibonacci sequence

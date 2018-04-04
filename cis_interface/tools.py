@@ -62,8 +62,8 @@ def check_locks():  # pragma: debug
 
 def check_sockets():  # pragma: debug
     r"""Check registered sockets."""
-    from cis_interface.communication.ZMQComm import cleanup_comms
-    count = cleanup_comms()
+    from cis_interface.communication import cleanup_comms
+    count = cleanup_comms('ZMQComm')
     if count > 0:
         logging.info("%d sockets closed." % count)
 
@@ -500,29 +500,16 @@ class CisClass(logging.LoggerAdapter):
 
     def debug_log(self):  # pragma: debug
         r"""Turn on debugging."""
-        self._old_loglevel = cis_cfg.get('debug', 'psi')
-        cis_cfg.set('debug', 'psi', 'DEBUG')
+        self._old_loglevel = cis_cfg.get('debug', 'cis')
+        cis_cfg.set('debug', 'cis', 'DEBUG')
         cfg_logging()
 
     def reset_log(self):  # pragma: debug
         r"""Resetting logging to prior value."""
         if self._old_loglevel is not None:
-            cis_cfg.set('debug', 'psi', self._old_loglevel)
+            cis_cfg.set('debug', 'cis', self._old_loglevel)
             cfg_logging()
             self._old_loglevel = None
-
-    def set_utf8_encoding(self):
-        r"""Set the encoding to utf-8 if it is not already."""
-        old_lang = os.environ.get('LANG', '')
-        if 'UTF-8' not in old_lang:  # pragma: debug
-            self._old_encoding = old_lang
-            os.environ['LANG'] = 'en_US.UTF-8'
-            
-    def reset_encoding(self):
-        r"""Reset the encoding to the original value before the test."""
-        if self._old_encoding is not None:  # pragma: debug
-            os.environ['LANG'] = self._old_encoding
-            self._old_encoding = None
 
     def as_str(self, obj):
         r"""Return str version of object if it is not already a string.

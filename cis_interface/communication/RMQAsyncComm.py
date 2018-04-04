@@ -1,13 +1,13 @@
 import threading
 from cis_interface import backwards, tools
-from cis_interface.communication.RMQComm import RMQComm, _rmq_installed
-if _rmq_installed:
+from cis_interface.communication import RMQComm
+if RMQComm._rmq_installed:
     import pika
 else:
     pika = False
 
 
-class RMQAsyncComm(RMQComm):
+class RMQAsyncComm(RMQComm.RMQComm):
     r"""Class for handling asynchronous RabbitMQ communications. It is not
     recommended to use this class as it can leave hanging threads if not
     closed propertly. The normal RMQComm will cover most use cases.
@@ -96,8 +96,8 @@ class RMQAsyncComm(RMQComm):
         # Register queue
         if not self.queue:  # pragma: debug
             self.error("Queue was not initialized.")
-        self.register_connection(self.queue)
-        super(RMQComm, self).bind()
+        self.register_comm(self.address, (self.connection, self.channel))
+        super(RMQComm.RMQComm, self).bind()
     
     def _open_direct(self):
         r"""Open connection and bind/connect to queue as necessary."""
@@ -141,7 +141,7 @@ class RMQAsyncComm(RMQComm):
                             pika.exceptions.ConnectionClosed):  # pragma: debug
                         self._closing = False
             if not self.is_client:
-                self.unregister_connection()
+                self.unregister_comm(self.address)
         # Wait for connection to finish closing & then force if it dosn't
         T = self.start_timeout(key=self.timeout_key + '_closing')
         while (not T.is_out) and self._closing:

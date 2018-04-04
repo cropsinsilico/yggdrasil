@@ -1,4 +1,4 @@
-#include "PsiInterface.h"
+#include "CisInterface.h"
 #include <stdio.h>
 
 
@@ -16,13 +16,13 @@ int main(int argc, char *argv[]) {
   char log_name[100];
   sprintf(rpc_name, "server_client%d", client_index);
   sprintf(log_name, "output_log%d", client_index);
-  psiRpc_t rpc = psiRpcClient(rpc_name, "%d", "%d");
-  psiOutput_t log = psiOutputFmt(log_name, "fib(%-2d) = %-2d\n");
+  cisRpc_t rpc = cisRpcClient(rpc_name, "%d", "%d");
+  cisOutput_t log = cisOutputFmt(log_name, "fib(%-2d) = %-2d\n");
 
   // Initialize variables
   int ret = 0;
   int fib = -1;
-  char *logmsg = (char*)malloc(PSI_MSG_MAX*sizeof(char));
+  char *logmsg = (char*)malloc(CIS_MSG_MAX*sizeof(char));
   int i;
 
   // Iterate over Fibonacci sequence
@@ -39,7 +39,7 @@ int main(int argc, char *argv[]) {
     printf("client%d(C): Response fib(%d) = %d\n", client_index, i, fib);
 
     // Log result by sending it to the log connection
-    ret = psiSend(log, i, fib);
+    ret = cisSend(log, i, fib);
     if (ret < 0) {
       printf("client%d(C): SEND ERROR\n", client_index);
       exit_code = -1;

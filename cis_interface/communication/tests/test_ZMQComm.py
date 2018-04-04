@@ -71,10 +71,6 @@ class TestZMQComm(test_AsyncComm.TestAsyncComm):
         r"""String prefix to prepend docstr test message with."""
         return '%s(%s, %s)' % (self.comm, self.protocol, self.socket_type)
 
-    def cleanup_comms(self):
-        r"""Cleanup all comms."""
-        ZMQComm.cleanup_comms()
-
     # Unclear why this was modified
     # @property
     # def inst_kwargs(self):

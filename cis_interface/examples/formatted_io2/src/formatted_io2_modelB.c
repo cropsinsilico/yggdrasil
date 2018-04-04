@@ -1,13 +1,13 @@
 #include <stdio.h>
 // Include methods for input/output channels
-#include "PsiInterface.h"
+#include "CisInterface.h"
 
 #define MYBUFSIZ 1000
 
 int main(int argc, char *argv[]) {
   // Initialize input/output channels
-  psiAsciiTableInput_t in_channel = psiAsciiTableInput("inputB", 0, 1);
-  psiAsciiTableOutput_t out_channel = psiAsciiTableOutput("outputB", "%6s\t%d\t%f\n", 0, 1);
+  cisAsciiTableInput_t in_channel = cisAsciiTableInput("inputB", 0, 1);
+  cisAsciiTableOutput_t out_channel = cisAsciiTableOutput("outputB", "%6s\t%d\t%f\n", 0, 1);
 
   // Declare resulting variables and create buffer for received message
   int flag = 1;
@@ -21,7 +21,7 @@ int main(int argc, char *argv[]) {
     // Receive input from input channel
     // If there is an error, the flag will be negative
     // Otherwise, it is the size of the received message
-    flag = psiRecv(in_channel, &name, &count, &size);
+    flag = cisRecv(in_channel, &name, &count, &size);
     if (flag < 0) {
       printf("Model B: No more input.\n");
       break;
@@ -32,7 +32,7 @@ int main(int argc, char *argv[]) {
 
     // Send output to output channel
     // If there is an error, the flag will be negative
-    flag = psiSend(out_channel, name, count, size);
+    flag = cisSend(out_channel, name, count, size);
     if (flag < 0) {
       printf("Model B: Error sending output.\n");
       break;

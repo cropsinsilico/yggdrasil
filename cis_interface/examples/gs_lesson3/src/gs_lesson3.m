@@ -1,6 +1,6 @@
 % Initialize input/output channels 
-in_channel = PsiInterface('PsiInput', 'input');
-out_channel = PsiInterface('PsiOutput', 'output');
+in_channel = CisInterface('CisInput', 'input');
+out_channel = CisInterface('CisOutput', 'output');
 
 flag = true;
 

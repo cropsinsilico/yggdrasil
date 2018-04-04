@@ -22,11 +22,11 @@ disconnected.
 
 .. include:: examples/rpc_lesson1_src.rst
 
-The interface server-side API call (PsiRpcServer for Python), 
+The interface server-side API call (CisRpcServer for Python), 
 requires 3 input variables: the name of the server channel (this will be 
 the name of the server model), a format string for input to the server model, 
 and a format string for output from the server model. The client-side API call 
-(PsiRpcClient for Python), also requires 3 input variables: the name of the 
+(CisRpcClient for Python), also requires 3 input variables: the name of the 
 client channel (this is the name of the server model joined with the name of 
 the client model by an underscore, ``<server>_<client>``, a format string for 
 input to the server model, and a format string for output form the server 

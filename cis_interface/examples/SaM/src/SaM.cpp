@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "PsiInterface.hpp"
+#include "CisInterface.hpp"
 
 #define BSIZE 100
 
@@ -12,9 +12,9 @@ int main() {
     char outbuf[BSIZE];
 
     // Get input and output channels matching yaml
-    PsiInput in1("input1_cpp");
-    PsiInput in2("static_cpp");
-    PsiOutput out1("output_cpp");
+    CisInput in1("input1_cpp");
+    CisInput in2("static_cpp");
+    CisOutput out1("output_cpp");
     printf("SaM(CPP): Set up I/O channels\n");
 
     // Get input from input1 channel

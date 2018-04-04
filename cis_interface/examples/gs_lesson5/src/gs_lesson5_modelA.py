@@ -1,9 +1,9 @@
 # Import classes for input/output channels
-from cis_interface.interface.PsiInterface import PsiInput, PsiOutput
+from cis_interface.interface.CisInterface import CisInput, CisOutput
 
 # Initialize input/output channels
-in_channel = PsiInput('inputA')
-out_channel = PsiOutput('outputA')
+in_channel = CisInput('inputA')
+out_channel = CisOutput('outputA')
 
 # Loop until there is no longer input or the queues are closed
 while True:

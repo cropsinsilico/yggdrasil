@@ -2,7 +2,7 @@ import os
 import numpy as np
 import nose.tools as nt
 import unittest
-from cis_interface.interface import PsiInterface
+from cis_interface.interface import CisInterface
 from cis_interface.tools import CIS_MSG_EOF, get_CIS_MSG_MAX, CIS_MSG_BUF
 from cis_interface.drivers import (
     import_driver, InputCommDriver, OutputCommDriver, MatlabModelDriver)
@@ -14,42 +14,42 @@ CIS_MSG_MAX = get_CIS_MSG_MAX()
 
 def test_maxMsgSize():
     r"""Test max message size."""
-    nt.assert_equal(PsiInterface.maxMsgSize(), CIS_MSG_MAX)
+    nt.assert_equal(CisInterface.maxMsgSize(), CIS_MSG_MAX)
 
 
 def test_eof_msg():
     r"""Test eof message signal."""
-    nt.assert_equal(PsiInterface.eof_msg(), CIS_MSG_EOF)
+    nt.assert_equal(CisInterface.eof_msg(), CIS_MSG_EOF)
 
 
 def test_bufMsgSize():
     r"""Test buf message size."""
-    nt.assert_equal(PsiInterface.bufMsgSize(), CIS_MSG_BUF)
+    nt.assert_equal(CisInterface.bufMsgSize(), CIS_MSG_BUF)
 
 
 @unittest.skipIf(not MatlabModelDriver._matlab_installed, "Matlab not installed.")
-def test_PsiMatlab_class():  # pragma: matlab
+def test_CisMatlab_class():  # pragma: matlab
     r"""Test Matlab interface for classes."""
     name = 'test'
     # Input
     drv = InputCommDriver.InputCommDriver(name, direction='send')
     drv.start()
     os.environ.update(drv.env)
-    PsiInterface.PsiMatlab('PsiInput', (name, 'hello\\nhello'))
+    CisInterface.CisMatlab('CisInput', (name, 'hello\\nhello'))
     drv.terminate()
     # Output
     drv = OutputCommDriver.OutputCommDriver(name, direction='send')
     drv.start()
     os.environ.update(drv.env)
-    PsiInterface.PsiMatlab('PsiOutput', (name, 'hello\\nhello'))
+    CisInterface.CisMatlab('CisOutput', (name, 'hello\\nhello'))
     drv.terminate()
 
 
 @unittest.skipIf(not MatlabModelDriver._matlab_installed, "Matlab not installed.")
-def test_PsiMatlab_variables():  # pragma: matlab
+def test_CisMatlab_variables():  # pragma: matlab
     r"""Test Matlab interface for variables."""
-    nt.assert_equal(PsiInterface.PsiMatlab('PSI_MSG_MAX'), CIS_MSG_MAX)
-    nt.assert_equal(PsiInterface.PsiMatlab('PSI_MSG_EOF'), CIS_MSG_EOF)
+    nt.assert_equal(CisInterface.CisMatlab('CIS_MSG_MAX'), CIS_MSG_MAX)
+    nt.assert_equal(CisInterface.CisMatlab('CIS_MSG_EOF'), CIS_MSG_EOF)
 
 
 # @nt.nottest
@@ -57,7 +57,7 @@ class TestBase(CisTestClassInfo):
     r"""Test class for interface classes."""
     def __init__(self, *args, **kwargs):
         super(TestBase, self).__init__(*args, **kwargs)
-        self._mod = 'cis_interface.interface.PsiInterface'
+        self._mod = 'cis_interface.interface.CisInterface'
         self.name = 'test' + self.uuid
         self.matlab = False
         self.driver = None
@@ -113,16 +113,16 @@ class TestBase(CisTestClassInfo):
         super(TestBase, self).remove_instance(inst)
 
     
-class TestPsiInput(TestBase):
+class TestCisInput(TestBase):
     r"""Test basic input to python."""
     def __init__(self, *args, **kwargs):
-        super(TestPsiInput, self).__init__(*args, **kwargs)
-        self._cls = 'PsiInput'
+        super(TestCisInput, self).__init__(*args, **kwargs)
+        self._cls = 'CisInput'
         self.driver_name = 'InputCommDriver'
 
     def test_init(self):
         r"""Test error on init."""
-        nt.assert_raises(Exception, PsiInterface.PsiInput, 'error')
+        nt.assert_raises(Exception, CisInterface.CisInput, 'error')
 
     def test_recv(self):
         r"""Test receiving small message."""
@@ -140,23 +140,23 @@ class TestPsiInput(TestBase):
         nt.assert_equal(msg_recv, self.msg_long)
 
 
-class TestPsiInputMatlab(TestPsiInput):
+class TestCisInputMatlab(TestCisInput):
     r"""Test basic input to python as passed from matlab."""
     def __init__(self, *args, **kwargs):
-        super(TestPsiInputMatlab, self).__init__(*args, **kwargs)
+        super(TestCisInputMatlab, self).__init__(*args, **kwargs)
         self.matlab = True
 
 
-class TestPsiOutput(TestBase):
+class TestCisOutput(TestBase):
     r"""Test basic output to python."""
     def __init__(self, *args, **kwargs):
-        super(TestPsiOutput, self).__init__(*args, **kwargs)
-        self._cls = 'PsiOutput'
+        super(TestCisOutput, self).__init__(*args, **kwargs)
+        self._cls = 'CisOutput'
         self.driver_name = 'OutputCommDriver'
 
     def test_init(self):
         r"""Test error on init."""
-        nt.assert_raises(Exception, PsiInterface.PsiOutput, 'error')
+        nt.assert_raises(Exception, CisInterface.CisOutput, 'error')
 
     def test_send(self):
         r"""Test sending small message."""
@@ -175,18 +175,18 @@ class TestPsiOutput(TestBase):
         nt.assert_equal(msg_recv, self.msg_long)
 
 
-class TestPsiOutputMatlab(TestPsiOutput):
+class TestCisOutputMatlab(TestCisOutput):
     r"""Test basic output to python as passed from matlab."""
     def __init__(self, *args, **kwargs):
-        super(TestPsiOutputMatlab, self).__init__(*args, **kwargs)
+        super(TestCisOutputMatlab, self).__init__(*args, **kwargs)
         self.matlab = True
 
 
-class TestPsiRpc(TestBase):
+class TestCisRpc(TestBase):
     r"""Test basic RPC communication with Python."""
     def __init__(self, *args, **kwargs):
-        super(TestPsiRpc, self).__init__(*args, **kwargs)
-        self._cls = 'PsiRpc'
+        super(TestCisRpc, self).__init__(*args, **kwargs)
+        self._cls = 'CisRpc'
         # self.driver_name = 'RPCCommDriver'
         self._inst_args = [self.name, self.fmt_str,
                            self.name, self.fmt_str]
@@ -195,7 +195,7 @@ class TestPsiRpc(TestBase):
     @property
     def driver_kwargs(self):
         r"""Keyword arguments for the driver."""
-        out = super(TestPsiRpc, self).driver_kwargs
+        out = super(TestCisRpc, self).driver_kwargs
         out['comm'] = 'RPCComm'
         return out
 
@@ -254,10 +254,10 @@ class TestPsiRpc(TestBase):
         nt.assert_equal(msg_recv, self.client_msg)
 
 
-class TestPsiRpcSplit(TestPsiRpc):
+class TestCisRpcSplit(TestCisRpc):
     r"""Test basic RPC communication with Python using split comm."""
     def __init__(self, *args, **kwargs):
-        super(TestPsiRpcSplit, self).__init__(*args, **kwargs)
+        super(TestCisRpcSplit, self).__init__(*args, **kwargs)
         self.icomm_name = self.name + 'A'
         self.ocomm_name = self.name + 'B'
         self._inst_args = [self.icomm_name, self.fmt_str,
@@ -267,56 +267,56 @@ class TestPsiRpcSplit(TestPsiRpc):
     @property
     def driver_kwargs(self):
         r"""Keyword arguments for the driver."""
-        out = super(TestPsiRpcSplit, self).driver_kwargs
+        out = super(TestCisRpcSplit, self).driver_kwargs
         # Reversed
         out['icomm_kwargs'] = dict(name=self.ocomm_name)
         out['ocomm_kwargs'] = dict(name=self.icomm_name)
         return out
     
 
-class TestPsiRpcMatlab(TestPsiRpc):
+class TestCisRpcMatlab(TestCisRpc):
     r"""Test basic RPC communication with Python as passed through Matlab."""
     def __init__(self, *args, **kwargs):
-        super(TestPsiRpcMatlab, self).__init__(*args, **kwargs)
+        super(TestCisRpcMatlab, self).__init__(*args, **kwargs)
         self.matlab = True
         self._inst_args = [self.name, self.fmt_str_matlab,
                            self.name, self.fmt_str_matlab]
 
 
-class TestPsiRpcClient(TestPsiRpc):
+class TestCisRpcClient(TestCisRpc):
     r"""Test client-side RPC communication with Python."""
     def __init__(self, *args, **kwargs):
-        super(TestPsiRpcClient, self).__init__(*args, **kwargs)
-        self._cls = 'PsiRpcClient'
+        super(TestCisRpcClient, self).__init__(*args, **kwargs)
+        self._cls = 'CisRpcClient'
         self._inst_args = [self.name, self.fmt_str, self.fmt_str]
 
     @property
     def driver_kwargs(self):
         r"""Keyword arguments for the driver."""
-        out = super(TestPsiRpc, self).driver_kwargs
+        out = super(TestCisRpc, self).driver_kwargs
         out['comm'] = 'ServerComm'
         return out
         
         
-class TestPsiRpcClientMatlab(TestPsiRpcClient):
+class TestCisRpcClientMatlab(TestCisRpcClient):
     r"""Test client-side RPC communication with Python as passed through Matlab."""
     def __init__(self, *args, **kwargs):
-        super(TestPsiRpcClientMatlab, self).__init__(*args, **kwargs)
+        super(TestCisRpcClientMatlab, self).__init__(*args, **kwargs)
         self.matlab = True
         self._inst_args = [self.name, self.fmt_str_matlab, self.fmt_str_matlab]
 
 
-class TestPsiRpcServer(TestPsiRpc):
+class TestCisRpcServer(TestCisRpc):
     r"""Test server-side RPC communication with Python."""
     def __init__(self, *args, **kwargs):
-        super(TestPsiRpcServer, self).__init__(*args, **kwargs)
-        self._cls = 'PsiRpcServer'
+        super(TestCisRpcServer, self).__init__(*args, **kwargs)
+        self._cls = 'CisRpcServer'
         self._inst_args = [self.name, self.fmt_str, self.fmt_str]
 
     @property
     def driver_kwargs(self):
         r"""Keyword arguments for the driver."""
-        out = super(TestPsiRpc, self).driver_kwargs
+        out = super(TestCisRpc, self).driver_kwargs
         out['comm'] = 'ClientComm'
         return out
         
@@ -345,19 +345,19 @@ class TestPsiRpcServer(TestPsiRpc):
         return self.file_rows[0]
         
         
-class TestPsiRpcServerMatlab(TestPsiRpcServer):
+class TestCisRpcServerMatlab(TestCisRpcServer):
     r"""Test server-side RPC communication with Python as passed through Matlab."""
     def __init__(self, *args, **kwargs):
-        super(TestPsiRpcServerMatlab, self).__init__(*args, **kwargs)
+        super(TestCisRpcServerMatlab, self).__init__(*args, **kwargs)
         self.matlab = True
         self._inst_args = [self.name, self.fmt_str_matlab, self.fmt_str_matlab]
 
 
-class TestPsiAsciiFileInput(TestBase):
+class TestCisAsciiFileInput(TestBase):
     r"""Test input from an unformatted text file."""
     def __init__(self, *args, **kwargs):
-        super(TestPsiAsciiFileInput, self).__init__(*args, **kwargs)
-        self._cls = 'PsiAsciiFileInput'
+        super(TestCisAsciiFileInput, self).__init__(*args, **kwargs)
+        self._cls = 'CisAsciiFileInput'
         self.tempfile = os.path.join(os.getcwd(), 'temp_ascii.txt')
         self.driver_name = 'AsciiFileInputDriver'
         self.driver_args = [self.name, self.tempfile]
@@ -371,11 +371,11 @@ class TestPsiAsciiFileInput(TestBase):
         skip_start = False
         if self.inst_kwargs.get('src_type', 1) == 0:
             skip_start = True
-        super(TestPsiAsciiFileInput, self).setup(skip_start=skip_start)
+        super(TestCisAsciiFileInput, self).setup(skip_start=skip_start)
 
     def teardown(self):
         r"""Remove the test file."""
-        super(TestPsiAsciiFileInput, self).teardown()
+        super(TestCisAsciiFileInput, self).teardown()
         if os.path.isfile(self.tempfile):
             os.remove(self.tempfile)
 
@@ -390,23 +390,23 @@ class TestPsiAsciiFileInput(TestBase):
         assert(not msg_flag)
 
 
-class TestPsiAsciiFileInput_local(TestPsiAsciiFileInput):
+class TestCisAsciiFileInput_local(TestCisAsciiFileInput):
     r"""Test input from an unformatted text file."""
     def __init__(self, *args, **kwargs):
-        super(TestPsiAsciiFileInput_local, self).__init__(*args, **kwargs)
+        super(TestCisAsciiFileInput_local, self).__init__(*args, **kwargs)
         self._inst_args = [self.tempfile]
         self._inst_kwargs = {'src_type': 0}  # local
 
     def test_recv_line(self):
         r"""Test receiving a line from a local file."""
-        super(TestPsiAsciiFileInput_local, self).test_recv_line()
+        super(TestCisAsciiFileInput_local, self).test_recv_line()
         
 
-class TestPsiAsciiFileOutput(TestBase):
+class TestCisAsciiFileOutput(TestBase):
     r"""Test output to an unformatted text file."""
     def __init__(self, *args, **kwargs):
-        super(TestPsiAsciiFileOutput, self).__init__(*args, **kwargs)
-        self._cls = 'PsiAsciiFileOutput'
+        super(TestCisAsciiFileOutput, self).__init__(*args, **kwargs)
+        self._cls = 'CisAsciiFileOutput'
         self.tempfile = os.path.join(os.getcwd(), 'temp_ascii.txt')
         self.driver_name = 'AsciiFileOutputDriver'
         self.driver_args = [self.name, self.tempfile]
@@ -426,12 +426,12 @@ class TestPsiAsciiFileOutput(TestBase):
         skip_start = False
         if self.inst_kwargs.get('dst_type', 1) == 0:
             skip_start = True
-        super(TestPsiAsciiFileOutput, self).setup(skip_start=skip_start)
+        super(TestCisAsciiFileOutput, self).setup(skip_start=skip_start)
 
     def teardown(self):
         r"""Remove the test file."""
         self.file_comm.remove_file()
-        super(TestPsiAsciiFileOutput, self).teardown()
+        super(TestCisAsciiFileOutput, self).teardown()
         
     def test_send_line(self):
         r"""Test sending a line to a remote file."""
@@ -453,23 +453,23 @@ class TestPsiAsciiFileOutput(TestBase):
             nt.assert_equal(res, self.file_contents)
 
 
-class TestPsiAsciiFileOutput_local(TestPsiAsciiFileOutput):
+class TestCisAsciiFileOutput_local(TestCisAsciiFileOutput):
     r"""Test input from an unformatted text file."""
     def __init__(self, *args, **kwargs):
-        super(TestPsiAsciiFileOutput_local, self).__init__(*args, **kwargs)
+        super(TestCisAsciiFileOutput_local, self).__init__(*args, **kwargs)
         self._inst_args = [self.tempfile]
         self._inst_kwargs = {'dst_type': 0}  # local
 
     def test_send_line(self):
         r"""Test sending a line to a local file."""
-        super(TestPsiAsciiFileOutput_local, self).test_send_line()
+        super(TestCisAsciiFileOutput_local, self).test_send_line()
         
 
-class TestPsiAsciiTableInput(TestPsiAsciiFileInput):
+class TestCisAsciiTableInput(TestCisAsciiFileInput):
     r"""Test input from an ascii table."""
     def __init__(self, *args, **kwargs):
-        super(TestPsiAsciiTableInput, self).__init__(*args, **kwargs)
-        self._cls = 'PsiAsciiTableInput'
+        super(TestCisAsciiTableInput, self).__init__(*args, **kwargs)
+        self._cls = 'CisAsciiTableInput'
         self.driver_name = 'AsciiTableInputDriver'
 
     def test_recv_line(self):
@@ -482,23 +482,23 @@ class TestPsiAsciiTableInput(TestPsiAsciiFileInput):
         assert(not msg_flag)
 
         
-class TestPsiAsciiTableInput_local(TestPsiAsciiTableInput):
+class TestCisAsciiTableInput_local(TestCisAsciiTableInput):
     r"""Test input from an ASCII table."""
     def __init__(self, *args, **kwargs):
-        super(TestPsiAsciiTableInput_local, self).__init__(*args, **kwargs)
+        super(TestCisAsciiTableInput_local, self).__init__(*args, **kwargs)
         self._inst_args = [self.tempfile]
         self._inst_kwargs = {'src_type': 0}  # local
 
     def test_recv_line(self):
         r"""Test receiving a row from a local table."""
-        super(TestPsiAsciiTableInput_local, self).test_recv_line()
+        super(TestCisAsciiTableInput_local, self).test_recv_line()
 
 
-class TestPsiAsciiArrayInput(TestPsiAsciiTableInput):
+class TestCisAsciiArrayInput(TestCisAsciiTableInput):
     r"""Test input from an ASCII table."""
     def __init__(self, *args, **kwargs):
-        super(TestPsiAsciiArrayInput, self).__init__(*args, **kwargs)
-        self._cls = 'PsiAsciiArrayInput'
+        super(TestCisAsciiArrayInput, self).__init__(*args, **kwargs)
+        self._cls = 'CisAsciiArrayInput'
         self.driver_name = 'AsciiTableInputDriver'
         self._driver_kwargs = {'as_array': True}
 
@@ -511,23 +511,23 @@ class TestPsiAsciiArrayInput(TestPsiAsciiTableInput):
         assert(not msg_flag)
 
 
-class TestPsiAsciiArrayInput_local(TestPsiAsciiArrayInput):
+class TestCisAsciiArrayInput_local(TestCisAsciiArrayInput):
     r"""Test input from an ASCII table."""
     def __init__(self, *args, **kwargs):
-        super(TestPsiAsciiArrayInput_local, self).__init__(*args, **kwargs)
+        super(TestCisAsciiArrayInput_local, self).__init__(*args, **kwargs)
         self._inst_args = [self.tempfile]
         self._inst_kwargs['src_type'] = 0  # local
 
     def test_recv_line(self):
         r"""Test receiving an array from a local table."""
-        super(TestPsiAsciiArrayInput_local, self).test_recv_line()
+        super(TestCisAsciiArrayInput_local, self).test_recv_line()
 
         
-class TestPsiAsciiTableOutput(TestPsiAsciiFileOutput):
+class TestCisAsciiTableOutput(TestCisAsciiFileOutput):
     r"""Test output from an ascii table."""
     def __init__(self, *args, **kwargs):
-        super(TestPsiAsciiTableOutput, self).__init__(*args, **kwargs)
-        self._cls = 'PsiAsciiTableOutput'
+        super(TestCisAsciiTableOutput, self).__init__(*args, **kwargs)
+        self._cls = 'CisAsciiTableOutput'
         self.tempfile = os.path.join(os.getcwd(), 'temp_ascii.txt')
         self.driver_name = 'AsciiTableOutputDriver'
         self.driver_args = [self.name, self.tempfile]
@@ -552,31 +552,31 @@ class TestPsiAsciiTableOutput(TestPsiAsciiFileOutput):
             nt.assert_equal(res, self.file_contents)
         
             
-class TestPsiAsciiTableOutputMatlab(TestPsiAsciiTableOutput):
+class TestCisAsciiTableOutputMatlab(TestCisAsciiTableOutput):
     r"""Test output from an ascii table as passed through Matlab."""
     def __init__(self, *args, **kwargs):
-        super(TestPsiAsciiTableOutputMatlab, self).__init__(*args, **kwargs)
+        super(TestCisAsciiTableOutputMatlab, self).__init__(*args, **kwargs)
         self.matlab = True
         self._inst_args = [self.name, self.fmt_str_matlab]
 
 
-class TestPsiAsciiTableOutput_local(TestPsiAsciiTableOutput):
+class TestCisAsciiTableOutput_local(TestCisAsciiTableOutput):
     r"""Test input from an ASCII table."""
     def __init__(self, *args, **kwargs):
-        super(TestPsiAsciiTableOutput_local, self).__init__(*args, **kwargs)
+        super(TestCisAsciiTableOutput_local, self).__init__(*args, **kwargs)
         self._inst_args = [self.tempfile, self.fmt_str]
         self._inst_kwargs = {'dst_type': 0}  # local
 
     def test_send_line(self):
         r"""Test sending a row to a local table."""
-        super(TestPsiAsciiTableOutput_local, self).test_send_line()
+        super(TestCisAsciiTableOutput_local, self).test_send_line()
         
         
-class TestPsiAsciiArrayOutput(TestPsiAsciiTableOutput):
+class TestCisAsciiArrayOutput(TestCisAsciiTableOutput):
     r"""Test input from an ASCII table."""
     def __init__(self, *args, **kwargs):
-        super(TestPsiAsciiArrayOutput, self).__init__(*args, **kwargs)
-        self._cls = 'PsiAsciiArrayOutput'
+        super(TestCisAsciiArrayOutput, self).__init__(*args, **kwargs)
+        self._cls = 'CisAsciiArrayOutput'
         self.driver_name = 'AsciiTableOutputDriver'
         self._driver_kwargs = {'as_array': True}
 
@@ -597,23 +597,23 @@ class TestPsiAsciiArrayOutput(TestPsiAsciiTableOutput):
             nt.assert_equal(res, self.file_contents)
         
         
-class TestPsiAsciiArrayOutput_local(TestPsiAsciiArrayOutput):
+class TestCisAsciiArrayOutput_local(TestCisAsciiArrayOutput):
     r"""Test input from an ASCII table as array."""
     def __init__(self, *args, **kwargs):
-        super(TestPsiAsciiArrayOutput_local, self).__init__(*args, **kwargs)
+        super(TestCisAsciiArrayOutput_local, self).__init__(*args, **kwargs)
         self._inst_args = [self.tempfile, self.fmt_str]
         self._inst_kwargs['dst_type'] = 0  # local
 
     def test_send_line(self):
         r"""Test sending an array to a local table."""
-        super(TestPsiAsciiArrayOutput_local, self).test_send_line()
+        super(TestCisAsciiArrayOutput_local, self).test_send_line()
         
         
-class TestPsiPickleInput(TestBase):
+class TestCisPickleInput(TestBase):
     r"""Test input from a pickle file."""
     def __init__(self, *args, **kwargs):
-        super(TestPsiPickleInput, self).__init__(*args, **kwargs)
-        self._cls = 'PsiPickleInput'
+        super(TestCisPickleInput, self).__init__(*args, **kwargs)
+        self._cls = 'CisPickleInput'
         self.tempfile = os.path.join(os.getcwd(), 'temp_ascii.dat')
         self.driver_name = 'PickleFileInputDriver'
         self.driver_args = [self.name, self.tempfile]
@@ -628,11 +628,11 @@ class TestPsiPickleInput(TestBase):
         skip_start = False
         if self.inst_kwargs.get('src_type', 1) == 0:
             skip_start = True
-        super(TestPsiPickleInput, self).setup(skip_start=skip_start)
+        super(TestCisPickleInput, self).setup(skip_start=skip_start)
 
     def teardown(self):
         r"""Remove the test file."""
-        super(TestPsiPickleInput, self).teardown()
+        super(TestCisPickleInput, self).teardown()
         if os.path.isfile(self.tempfile):
             os.remove(self.tempfile)
 
@@ -649,23 +649,23 @@ class TestPsiPickleInput(TestBase):
         self.assert_equal_data_dict(res)
 
 
-class TestPsiPickleInput_local(TestPsiPickleInput):
+class TestCisPickleInput_local(TestCisPickleInput):
     r"""Test input from a pickle file."""
     def __init__(self, *args, **kwargs):
-        super(TestPsiPickleInput_local, self).__init__(*args, **kwargs)
+        super(TestCisPickleInput_local, self).__init__(*args, **kwargs)
         self._inst_args = [self.tempfile]
         self._inst_kwargs = {'src_type': 0}  # local
 
     def test_recv(self):
         r"""Test receiving a pickle from a local file."""
-        super(TestPsiPickleInput_local, self).test_recv()
+        super(TestCisPickleInput_local, self).test_recv()
 
         
-class TestPsiPickleOutput(TestBase):
+class TestCisPickleOutput(TestBase):
     r"""Test output from a pickle."""
     def __init__(self, *args, **kwargs):
-        super(TestPsiPickleOutput, self).__init__(*args, **kwargs)
-        self._cls = 'PsiPickleOutput'
+        super(TestCisPickleOutput, self).__init__(*args, **kwargs)
+        self._cls = 'CisPickleOutput'
         self.tempfile = os.path.join(os.getcwd(), 'temp_ascii.dat')
         self.driver_name = 'PickleFileOutputDriver'
         self.driver_args = [self.name, self.tempfile]
@@ -687,11 +687,11 @@ class TestPsiPickleOutput(TestBase):
             skip_start = True
         if os.path.isfile(self.tempfile):  # pragma: debug
             os.remove(self.tempfile)
-        super(TestPsiPickleOutput, self).setup(skip_start=skip_start)
+        super(TestCisPickleOutput, self).setup(skip_start=skip_start)
 
     def teardown(self):
         r"""Remove the test file."""
-        super(TestPsiPickleOutput, self).teardown()
+        super(TestCisPickleOutput, self).teardown()
         if os.path.isfile(self.tempfile):
             os.remove(self.tempfile)
 
@@ -710,13 +710,13 @@ class TestPsiPickleOutput(TestBase):
         self.assert_equal_data_dict(self.tempfile)
 
 
-class TestPsiPickleOutput_local(TestPsiPickleOutput):
+class TestCisPickleOutput_local(TestCisPickleOutput):
     r"""Test input from an unformatted text file."""
     def __init__(self, *args, **kwargs):
-        super(TestPsiPickleOutput_local, self).__init__(*args, **kwargs)
+        super(TestCisPickleOutput_local, self).__init__(*args, **kwargs)
         self._inst_args = [self.tempfile]
         self._inst_kwargs = {'dst_type': 0}  # local
 
     def test_send(self):
         r"""Test sending a pickle to a local file."""
-        super(TestPsiPickleOutput_local, self).test_send()
+        super(TestCisPickleOutput_local, self).test_send()

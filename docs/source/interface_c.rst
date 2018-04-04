@@ -1,5 +1,5 @@
 C Interface
 ===========
 
-.. autodoxygenfile:: PsiInterface.h
+.. autodoxygenfile:: CisInterface.h
    :project: cis_interface

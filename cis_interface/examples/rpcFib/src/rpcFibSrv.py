@@ -1,6 +1,6 @@
 from __future__ import print_function
 import sys
-from cis_interface.interface.PsiInterface import PsiRpcServer
+from cis_interface.interface.CisInterface import CisRpcServer
 from cis_interface.tools import sleep
 
 
@@ -10,7 +10,7 @@ def fibServer(args):
     print('Hello from Python rpcFibSrv: sleeptime = %f' % sleeptime)
 
     # Create server-side rpc conneciton using model name
-    rpc = PsiRpcServer("rpcFibSrv", "%d", "%d %d")
+    rpc = CisRpcServer("rpcFibSrv", "%d", "%d %d")
 
     # Continue receiving requests until error occurs (the connection is closed
     # by all clients that have connected).

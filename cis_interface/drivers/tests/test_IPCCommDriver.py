@@ -10,6 +10,7 @@ class TestIPCCommParam(parent.TestCommParam):
         super(TestIPCCommParam, self).__init__(*args, **kwargs)
         self.driver = 'IPCCommDriver'
         self.comm_name = 'IPCComm'
+        self._cleanup_comm_class = self.comm_name
     
 
 @unittest.skipIf(not _ipc_installed, "IPC library not installed")

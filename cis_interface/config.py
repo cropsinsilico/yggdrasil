@@ -54,16 +54,24 @@ files = [def_config_file, usr_config_file, loc_config_file]
 cis_cfg.read(files)
 
 
+# Aliases for old versions of config options
+alias_map = [(('debug', 'psi'), ('debug', 'cis'))]
+for old, new in alias_map:
+    v = cis_cfg.get(*old)
+    if v:  # pragma: debug
+        cis_cfg.set(new[0], new[1], v)
+
+
 # Set associated environment variables
-env_map = [('debug', 'psi', 'PSI_DEBUG'),
+env_map = [('debug', 'cis', 'CIS_DEBUG'),
            ('debug', 'rmq', 'RMQ_DEBUG'),
-           ('debug', 'client', 'PSI_CLIENT_DEBUG'),
-           ('rmq', 'namespace', 'PSI_NAMESPACE'),
-           ('rmq', 'host', 'PSI_MSG_HOST'),
-           ('rmq', 'vhost', 'PSI_MSG_VHOST'),
-           ('rmq', 'user', 'PSI_MSG_USER'),
-           ('rmq', 'password', 'PSI_MSG_PW'),
-           ('parallel', 'cluster', 'PSI_CLUSTER'),
+           ('debug', 'client', 'CIS_CLIENT_DEBUG'),
+           ('rmq', 'namespace', 'CIS_NAMESPACE'),
+           ('rmq', 'host', 'CIS_MSG_HOST'),
+           ('rmq', 'vhost', 'CIS_MSG_VHOST'),
+           ('rmq', 'user', 'CIS_MSG_USER'),
+           ('rmq', 'password', 'CIS_MSG_PW'),
+           ('parallel', 'cluster', 'CIS_CLUSTER'),
            ]
 
 
@@ -80,7 +88,7 @@ def cfg_logging(cfg=None):
         cfg = cis_cfg
     _LOG_FORMAT = "%(levelname)s:%(module)s.%(funcName)s[%(lineno)d]:%(message)s"
     logging.basicConfig(level=logging.INFO, format=_LOG_FORMAT)
-    logLevelCIS = eval('logging.%s' % cfg.get('debug', 'psi', 'NOTSET'))
+    logLevelCIS = eval('logging.%s' % cfg.get('debug', 'cis', 'NOTSET'))
     logLevelRMQ = eval('logging.%s' % cfg.get('debug', 'rmq', 'INFO'))
     logging.getLogger("cis_interface").setLevel(level=logLevelCIS)
     logging.getLogger("pika").setLevel(level=logLevelRMQ)

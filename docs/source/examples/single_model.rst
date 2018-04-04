@@ -7,8 +7,8 @@ tranfer. Each pair represents a read-side and a write-side.
 
 ::
 
-    in = PsiInput(name)          # create a named input channel
-    out = PsiOutput(name)        # create a named output channel
+    in = CisInput(name)          # create a named input channel
+    out = CisOutput(name)        # create a named output channel
 
     in.send(data)                # send a message through the managed channel
     flag, data = out.recv(name)  # receive message from channel - block if empty channel
@@ -48,17 +48,17 @@ required to start the model executing.
 
 This example tells the system to run a Python model defined in the script
 "hellopython.py" and to connect the file inputdata/input.txt to the
-psi\_input named 'inFile' in your model, so when you recv() on it,
+cis\_input named 'inFile' in your model, so when you recv() on it,
 you'll get the file contents. Likewise when you send(data\_to\_send) to
-the channel you made in your code with psi\_output('outFile') the data
+the channel you made in your code with cis\_output('outFile') the data
 will go to the associated files.
 
 In additon to reading/writing to/from files on disk, models can send/recv
 messages to/from generic message queues that other models can connect to.
 In the example above, there is an output queue named 'helloQueueOut'
-messages sent to the channel psi\_output('helloQueueOut') can be received
+messages sent to the channel cis\_output('helloQueueOut') can be received
 by any model with a corresponding input channel. In this example, the model
-accesses this queue through the channel psi\_input('helloQueueIn'). These
+accesses this queue through the channel cis\_input('helloQueueIn'). These
 two channels are connected because they share the same argument
 'helloQueue' in their YAML blocks.
 
@@ -81,10 +81,10 @@ it from the input queue, and then sends it to the output file
 
 ::
 
-        inf = PsiInput('inFile')
-        outf = PsiOutput('outFile')
-        inq = PsiInput('helloQueueIn')
-        outq = PsiOutput('helloQueueOut')
+        inf = CisInput('inFile')
+        outf = CisOutput('outFile')
+        inq = CisInput('helloQueueIn')
+        outq = CisOutput('helloQueueOut')
 
         buf = inf.recv()
         outq.send(buf)

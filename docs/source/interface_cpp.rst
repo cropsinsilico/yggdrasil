@@ -1,5 +1,5 @@
 C++ Interface
 =============
 
-.. autodoxygenfile:: PsiInterface.hpp
+.. autodoxygenfile:: CisInterface.hpp
    :project: cis_interface

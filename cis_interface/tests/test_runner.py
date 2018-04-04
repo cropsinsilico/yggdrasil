@@ -56,9 +56,9 @@ class TestCisRunner(object):
     r"""Tests of the CisRunner class."""
     def __init__(self):
         nt.assert_raises(IOError, runner.CisRunner,
-                         ['fake_yaml.yml'], 'test_psi_run')
+                         ['fake_yaml.yml'], 'test_cis_run')
         self.runner = runner.CisRunner([ex_yamls['hello']['python']],
-                                       'test_psi_run')
+                                       'test_cis_run')
 
     def test_createIODriver(self):
         r"""Test createInputDriver and createOutputDriver."""

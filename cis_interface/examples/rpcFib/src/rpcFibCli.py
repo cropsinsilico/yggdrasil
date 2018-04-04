@@ -1,7 +1,7 @@
 from __future__ import print_function
 import sys
-from cis_interface.interface.PsiInterface import (
-    PsiRpcClient, PsiInput, PsiOutput)
+from cis_interface.interface.CisInterface import (
+    CisRpcClient, CisInput, CisOutput)
 from cis_interface import backwards
 
 
@@ -12,9 +12,9 @@ def fibClient(args):
 
     # Set up connections matching yaml
     # RPC client-side connection will be $(server_name)_$(client_name)
-    ymlfile = PsiInput("yaml_in")
-    rpc = PsiRpcClient("rpcFibSrv_rpcFibCli", "%d", "%d %d")
-    log = PsiOutput("output_log")
+    ymlfile = CisInput("yaml_in")
+    rpc = CisRpcClient("rpcFibSrv_rpcFibCli", "%d", "%d %d")
+    log = CisOutput("output_log")
 
     # Read entire contents of yaml
     ret, ycontent = ymlfile.recv()

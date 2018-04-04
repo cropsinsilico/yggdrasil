@@ -11,8 +11,6 @@ except ImportError:
     _rmq_installed = False
 
 
-_N_CONNECTIONS = 0
-_registered_connections = {}
 _rmq_param_sep = '_RMQPARAM_'
 
 
@@ -69,9 +67,7 @@ class RMQServer(CommBase.CommServer):
     r"""RMQ server object for cleaning up server connections."""
 
     def terminate(self, *args, **kwargs):
-        global _registered_connections
-        if self.srv_address in _registered_connections:
-            del _registered_connections[self.srv_address]
+        CommBase.unregister_comm('RMQComm', self.srv_address)
         super(RMQServer, self).terminate(*args, **kwargs)
 
 
@@ -98,11 +94,6 @@ class RMQComm(AsyncComm.AsyncComm):
             raise RuntimeError("Could not connect to RabbitMQ server.")
         self._server_class = RMQServer
         super(RMQComm, self)._init_before_open(**kwargs)
-
-    @classmethod
-    def comm_count(cls):
-        r"""int: Number of connections that have been opened on this process."""
-        return len(_registered_connections)
 
     @property
     def url(self):
@@ -184,6 +175,11 @@ class RMQComm(AsyncComm.AsyncComm):
         r"""bool: Is the comm installed."""
         return _rmq_server_running
 
+    @classmethod
+    def underlying_comm_class(self):
+        r"""str: Name of underlying communication class."""
+        return 'RMQComm'
+
     def opp_comm_kwargs(self):
         r"""Get keyword arguments to initialize communication with opposite
         comm object.
@@ -222,28 +218,9 @@ class RMQComm(AsyncComm.AsyncComm):
         self.channel.queue_bind(exchange=self.exchange,
                                 # routing_key=self.routing_key,
                                 queue=self.queue)
-        self.register_connection(res)
+        self.register_comm(self.address, (self.connection, self.channel))
         super(RMQComm, self).bind()
 
-    def register_connection(self, res):
-        r"""Add connection to list of registered connections.
-
-        Args:
-            res (obj): Object to register with connection address.
-
-        """
-        global _registered_connections
-        if self.address not in _registered_connections:
-            _registered_connections[self.address] = res
-
-    def unregister_connection(self):
-        r"""Remove connection from list of registered connections."""
-        global _registered_connections
-        if self.address not in _registered_connections:
-            return
-            # raise KeyError("Connection not registered.")
-        del _registered_connections[self.address]
-    
     def _open_direct(self):
         r"""Open connection and bind/connect to queue as necessary."""
         super(RMQComm, self)._open_direct()
@@ -267,7 +244,7 @@ class RMQComm(AsyncComm.AsyncComm):
         self.close_channel()
         self.close_connection()
         if not self.is_client:
-            self.unregister_connection()
+            self.unregister_comm(self.address)
         self.connection = None
         self.channel = None
         super(RMQComm, self)._close_direct(linger=linger)

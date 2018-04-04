@@ -1,5 +1,5 @@
 
-#include "PsiInterface.h"
+#include "CisInterface.h"
 #include <stdio.h>
 
 
@@ -21,26 +21,26 @@ int main(int argc, char *argv[]) {
   
   // Set up connections matching yaml
   // RPC client-side connection will be $(server_name)_$(client_name)
-  psiInput_t ymlfile = psiInput("yaml_in");
-  psiRpc_t rpc = psiRpcClient("rpcFibSrv_rpcFibCli", "%d", "%d %d");
-  psiOutput_t log = psiOutput("output_log");
+  cisInput_t ymlfile = cisInput("yaml_in");
+  cisRpc_t rpc = cisRpcClient("rpcFibSrv_rpcFibCli", "%d", "%d %d");
+  cisOutput_t log = cisOutput("output_log");
   int ret;
 
   // Read entire contents of yaml
-  char *ycontent = (char*)malloc(PSI_MSG_MAX*sizeof(char));
-  ret = psi_recv(ymlfile, ycontent, PSI_MSG_MAX);
+  char *ycontent = (char*)malloc(CIS_MSG_MAX*sizeof(char));
+  ret = cis_recv(ymlfile, ycontent, CIS_MSG_MAX);
   if (ret < 0) {
     printf("rpcFibCli(C): RECV ERROR\n");
     free(ycontent);
     exit(-1);
   }
   printf("rpcFibCli: yaml has %d lines\n", count_lines(ycontent, "\n") + 1);
-  ret = psi_recv(ymlfile, ycontent, PSI_MSG_MAX);
+  ret = cis_recv(ymlfile, ycontent, CIS_MSG_MAX);
   free(ycontent);
   
   int fib = -1;
   int fibNo = -1;
-  char *logmsg = (char*)malloc(PSI_MSG_MAX*sizeof(char));
+  char *logmsg = (char*)malloc(CIS_MSG_MAX*sizeof(char));
   int i;
   for (i = 1; i <= iterations; i++) {
     
@@ -56,7 +56,7 @@ int main(int argc, char *argv[]) {
     // Log result by sending it to the log connection
     sprintf(logmsg, "fib(%2d<-) = %-2d<-\n", fibNo, fib);
     printf("%s", logmsg);
-    ret = psi_send(log, logmsg, strlen(logmsg));
+    ret = cis_send(log, logmsg, strlen(logmsg));
     if (ret < 0) {
       printf("rpcFibCli(C): SEND ERROR\n");
       free(logmsg);

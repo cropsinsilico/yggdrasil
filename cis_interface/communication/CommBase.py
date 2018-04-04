@@ -14,7 +14,110 @@ CIS_MSG_HEAD = backwards.unicode2bytes('CIS_MSG_HEAD')
 HEAD_VAL_SEP = backwards.unicode2bytes(':CIS:')
 HEAD_KEY_SEP = backwards.unicode2bytes(',')
 _registered_servers = dict()
+_registered_comms = dict()
 _server_lock = threading.RLock()
+_registry_lock = threading.RLock()
+
+
+def is_registered(comm_class, key):
+    r"""Determine if a comm object has been registered under the specified key.
+    
+    Args:
+        comm_class (str): Comm class to check for the key under.
+        key (str): Key that should be checked.
+
+    """
+    with _registry_lock:
+        global _registered_comms
+        if comm_class not in _registered_comms:
+            return False
+        return (key in _registered_comms[comm_class])
+
+
+def get_comm_registry(comm_class):
+    r"""Get the comm registry for a comm class.
+
+    Args:
+        comm_class (str): Comm class to get registry for.
+
+    Returns:
+        dict: Dictionary of registered comm objects.
+
+    """
+    with _registry_lock:
+        if comm_class is None:
+            out = {}
+        else:
+            out = _registered_comms.get(comm_class, {})
+    return out
+
+
+def register_comm(comm_class, key, value):
+    r"""Add a comm object to the global registry.
+
+    Args:
+        comm_class (str): Comm class to register the object under.
+        key (str): Key that should be used to register the object.
+        value (obj): Object being registered.
+
+    """
+    with _registry_lock:
+        global _registered_comms
+        if comm_class not in _registered_comms:
+            _registered_comms[comm_class] = dict()
+        if key not in _registered_comms[comm_class]:
+            _registered_comms[comm_class][key] = value
+
+
+def unregister_comm(comm_class, key, dont_close=False):
+    r"""Remove a comm object from the global registry and close it.
+
+    Args:
+        comm_class (str): Comm class to check for key under.
+        key (str): Key for object that should be removed from the registry.
+        dont_close (bool, optional): If True, the comm will be removed from
+            the registry, but it won't be closed. Defaults to False.
+
+    Returns:
+        bool: True if an object was closed.
+
+    """
+    with _registry_lock:
+        global _registered_comms
+        if comm_class not in _registered_comms:
+            return False
+        if key not in _registered_comms[comm_class]:
+            return False
+        value = _registered_comms[comm_class].pop(key)
+        if dont_close:
+            return False
+        out = get_comm_class(comm_class).close_registry_entry(value)
+        del value
+    return out
+
+
+def cleanup_comms(comm_class, close_func=None):
+    r"""Clean up comms of a certain type.
+
+    Args:
+        comm_class (str): Comm class that should be cleaned up.
+
+    Returns:
+        int: Number of comms closed.
+
+    """
+    count = 0
+    if comm_class is None:
+        return count
+    with _registry_lock:
+        global _registered_comms
+        if comm_class in _registered_comms:
+            keys = [k for k in _registered_comms[comm_class].keys()]
+            for k in keys:
+                flag = unregister_comm(comm_class, k)
+                if flag:  # pragma: debug
+                    count += 1
+    return count
 
 
 class CommThreadLoop(tools.CisThreadLoop):
@@ -187,6 +290,7 @@ class CommBase(tools.CisClass):
         ValueError: If directions is not 'send' or 'recv'.
 
     """
+
     def __init__(self, name, address=None, direction='send',
                  deserialize=None, serialize=None, format_str=None,
                  dont_open=False, is_interface=False, recv_timeout=0.0,
@@ -195,6 +299,7 @@ class CommBase(tools.CisClass):
                  is_client=False, is_response_client=False,
                  is_server=False, is_response_server=False,
                  comm=None, matlab=False, **kwargs):
+        self._comm_class = None
         if comm is not None:
             assert(comm == self.comm_class)
         super(CommBase, self).__init__(name, **kwargs)
@@ -305,15 +410,49 @@ class CommBase(tools.CisClass):
         r"""str: Empty message."""
         return backwards.unicode2bytes('')
 
-    @classmethod
-    def comm_count(cls):
-        r"""int: Number of communication connections."""
-        return 0
-
     @property
     def comm_class(self):
         r"""str: Name of communication class."""
-        return str(self.__class__).split("'")[1].split(".")[-1]
+        if self._comm_class is None:
+            self._comm_class = str(self.__class__).split("'")[1].split(".")[-1]
+        return self._comm_class
+
+    @classmethod
+    def underlying_comm_class(self):
+        r"""str: Name of underlying communication class."""
+        return None
+
+    @classmethod
+    def close_registry_entry(cls, value):
+        r"""Close a registry entry."""
+        return False
+
+    @classmethod
+    def cleanup_comms(cls):
+        r"""Cleanup registered comms of this class."""
+        return cleanup_comms(cls.underlying_comm_class())
+
+    @classmethod
+    def comm_registry(cls):
+        r"""dict: Registry of comms of this class."""
+        return get_comm_registry(cls.underlying_comm_class())
+
+    def register_comm(self, key, value):
+        r"""Register a comm."""
+        self.debug("Registering comm: %s", key)
+        register_comm(self.comm_class, key, value)
+
+    def unregister_comm(self, key, dont_close=False):
+        r"""Unregister a comm."""
+        unregister_comm(self.comm_class, key, dont_close=dont_close)
+
+    @classmethod
+    def comm_count(cls):
+        r"""int: Number of communication connections."""
+        out = len(cls.comm_registry())
+        if out > 0:
+            print(cls, cls.comm_registry())
+        return out
 
     @classmethod
     def new_comm_kwargs(cls, *args, **kwargs):
@@ -530,15 +669,11 @@ class CommBase(tools.CisClass):
 
     def confirm_send(self, noblock=False):
         r"""Confirm that sent message was received."""
-        if noblock:
-            return True
-        return False
+        return noblock
 
     def confirm_recv(self, noblock=False):
         r"""Confirm that message was received."""
-        if noblock:
-            return True
-        return False
+        return noblock
 
     @property
     def n_msg(self):

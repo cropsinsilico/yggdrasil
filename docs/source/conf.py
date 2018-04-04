@@ -48,7 +48,7 @@ extensions = [
     'breathe',
 ]
 
-finterface = ['PsiInterface.h', 'PsiInterface.hpp', 'PsiInterface.m']
+finterface = ['CisInterface.h', 'CisInterface.hpp', 'CisInterface.m']
 fasciiio = ['AsciiTable.h', # 'AsciiTable.hpp', 'AsciiTable.m',
             'AsciiFile.h', # 'AsciiFile.hpp', 'AsciiFile.m',
 ]

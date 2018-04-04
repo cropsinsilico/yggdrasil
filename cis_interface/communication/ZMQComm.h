@@ -172,11 +172,12 @@ int do_reply_send(const comm_t *comm) {
     is_purge = 1;
   }
   // Send
-  zsock_set_linger(s, _zmq_sleeptime);
+  // zsock_set_linger(s, _zmq_sleeptime);
   int ret = zframe_send(&msg, s, 0);
   // Check for purge or EOF
   if (ret < 0) {
     cislog_error("do_reply_send(%s): Error sending reply frame.", comm->name);
+    zframe_destroy(&msg);
   } else {
     if (is_purge == 1) {
       cislog_debug("do_reply_send(%s): PURGE received", comm->name);
@@ -223,6 +224,7 @@ int do_reply_recv(const comm_t *comm, const int isock, const char *msg) {
   int ret = zframe_send(&msg_send, s, 0);
   if (ret < 0) {
     cislog_error("do_reply_recv(%s): Error sending confirmation.", comm->name);
+    zframe_destroy(&msg_send);
     return -1;
   }
   if (strcmp(msg, CIS_MSG_EOF) == 0) {
@@ -271,6 +273,7 @@ char* check_reply_send(const comm_t *comm, const char *data, const int len,
     }
     zrep->nsockets = 1;
     zrep->sockets[0] = zsock_new(ZMQ_REP);
+    zsock_set_linger(zrep->sockets[0], 0);
     if (zrep->sockets[0] == NULL) {
       cislog_error("check_reply_send(%s): Could not initialize empty socket.",
 		   comm->name);
@@ -372,6 +375,7 @@ int check_reply_recv(const comm_t *comm, char *data, const size_t len) {
     isock = zrep->nsockets;
     zrep->nsockets++;
     zrep->sockets[isock] = zsock_new(ZMQ_REQ);
+    zsock_set_linger(zrep->sockets[isock], 0);
     if (zrep->sockets[isock] == NULL) {
       cislog_error("check_reply_recv(%s): Could not initialize empty socket.",
 		   comm->name);
@@ -625,6 +629,7 @@ int zmq_comm_send(const comm_t x, const char *data, const size_t len) {
     ret = zframe_send(&f, s, 0);
     if (ret < 0) {
       cislog_error("zmq_comm_send(%s): Error in zframe_send", x.name);
+      zframe_destroy(&f);
     }
   }
   // Get reply

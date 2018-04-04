@@ -1,13 +1,13 @@
 % Input & output to an ASCII file line by line 
-in_file = PsiInterface('PsiAsciiFileInput', 'inputM_file');
-out_file = PsiInterface('PsiAsciiFileOutput', 'outputM_file');
+in_file = CisInterface('CisAsciiFileInput', 'inputM_file');
+out_file = CisInterface('CisAsciiFileOutput', 'outputM_file');
 % Input & output from a table row by row
-in_table = PsiInterface('PsiAsciiTableInput', 'inputM_table');
-out_table = PsiInterface('PsiAsciiTableOutput', 'outputM_table', ...
+in_table = CisInterface('CisAsciiTableInput', 'inputM_table');
+out_table = CisInterface('CisAsciiTableOutput', 'outputM_table', ...
 			 '%5s\t%ld\t%3.1f\t%3.1lf%+3.1lfj\n');
 % Input & output from a table as an array
-in_array = PsiInterface('PsiAsciiArrayInput', 'inputM_array');
-out_array = PsiInterface('PsiAsciiArrayOutput', 'outputM_array', ...
+in_array = CisInterface('CisAsciiArrayInput', 'inputM_array');
+out_array = CisInterface('CisAsciiArrayOutput', 'outputM_array', ...
 			 '%5s\t%ld\t%3.1f\t%3.1lf%+3.1lfj\n');
 
 % Read lines from ASCII text file until end of file is reached.

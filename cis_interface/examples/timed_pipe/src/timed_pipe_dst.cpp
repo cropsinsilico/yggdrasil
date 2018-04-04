@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include "PsiInterface.hpp"
+#include "CisInterface.hpp"
 
 int main() {
   int ret = 0;
@@ -9,8 +9,8 @@ int main() {
   printf("Hello from C++ pipe_dst\n");
 
   // Ins/outs matching with the the model yaml
-  PsiInput inq("input_pipe");
-  PsiOutput outf("output_file");
+  CisInput inq("input_pipe");
+  CisOutput outf("output_file");
   printf("pipe_dst(CPP): Created I/O channels\n");
 
   // Continue receiving input from the queue

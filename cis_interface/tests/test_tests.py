@@ -1,10 +1,10 @@
 import os
 import nose.tools as nt
-from cis_interface.tests import CisTest, IOInfo
+from cis_interface.tests import CisTestClass, IOInfo
 
 
-class TestCisTest(CisTest):
-    r"""Test errors for uninitialized CisTest."""
+class TestCisTest(CisTestClass):
+    r"""Test errors for uninitialized CisTestClass."""
 
     def create_instance(self):
         r"""Dummy overload to prevent initialization."""

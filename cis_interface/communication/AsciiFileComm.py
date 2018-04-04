@@ -15,7 +15,9 @@ class AsciiFileComm(FileComm):
         file (AsciiFile): Instance for read/writing to/from file.
 
     """
-    def __init__(self, name, dont_open=False, skip_AsciiFile=False, **kwargs):
+    def _init_before_open(self, skip_AsciiFile=False, **kwargs):
+        r"""Set up dataio and attributes."""
+        super(AsciiFileComm, self)._init_before_open(**kwargs)
         file_keys = ['comment', 'newline']
         file_kwargs = {}
         for k in file_keys:
@@ -23,7 +25,6 @@ class AsciiFileComm(FileComm):
                 file_kwargs[k] = kwargs.pop(k)
         self.file_kwargs = file_kwargs
         self.file = None
-        super(AsciiFileComm, self).__init__(name, dont_open=True, **kwargs)
         if not skip_AsciiFile:
             if self.direction == 'recv':
                 self.file = AsciiFile(self.address, 'r', **self.file_kwargs)
@@ -32,8 +33,6 @@ class AsciiFileComm(FileComm):
                     self.file = AsciiFile(self.address, 'a', **self.file_kwargs)
                 else:
                     self.file = AsciiFile(self.address, 'w', **self.file_kwargs)
-            if not dont_open:
-                self.open()
         else:
             self.file = None
 
@@ -67,10 +66,7 @@ class AsciiFileComm(FileComm):
     @property
     def fd(self):
         r"""Associated file identifier."""
-        if self.file is None:
-            return None
-        else:
-            return self.file.fd
+        return self.file.fd
 
     def _send(self, msg):
         r"""Write message to a file.

@@ -1,9 +1,9 @@
 import sys
-from cis_interface.interface.PsiInterface import PsiRpcServer
+from cis_interface.interface.CisInterface import CisRpcServer
 
 
 print("maxMsgSrv(P): Hello!")
-rpc = PsiRpcServer("maxMsgSrv", "%s", "%s")
+rpc = CisRpcServer("maxMsgSrv", "%s", "%s")
 
 while True:
     ret, input = rpc.rpcRecv()

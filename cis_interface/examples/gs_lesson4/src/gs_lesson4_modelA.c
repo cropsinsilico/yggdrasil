@@ -1,13 +1,13 @@
 #include <stdio.h>
 // Include methods for input/output channels
-#include "PsiInterface.h"
+#include "CisInterface.h"
 
 #define MYBUFSIZ 1000
 
 int main(int argc, char *argv[]) {
   // Initialize input/output channels
-  psiInput_t in_channel = psiInput("inputA");
-  psiOutput_t out_channel = psiOutput("outputA");
+  cisInput_t in_channel = cisInput("inputA");
+  cisOutput_t out_channel = cisOutput("outputA");
 
   // Declare resulting variables and create buffer for received message
   int flag = 1;
@@ -19,7 +19,7 @@ int main(int argc, char *argv[]) {
     // Receive input from input channel
     // If there is an error, the flag will be negative
     // Otherwise, it is the size of the received message
-    flag = psi_recv(in_channel, buf, MYBUFSIZ);
+    flag = cis_recv(in_channel, buf, MYBUFSIZ);
     if (flag < 0) {
       printf("Model A: No more input.\n");
       break;
@@ -30,7 +30,7 @@ int main(int argc, char *argv[]) {
 
     // Send output to output channel
     // If there is an error, the flag will be negative
-    flag = psi_send(out_channel, buf, flag);
+    flag = cis_send(out_channel, buf, flag);
     if (flag < 0) {
       printf("Model A: Error sending output.\n");
       break;

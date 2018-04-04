@@ -6,10 +6,11 @@ import nose.tools as nt
 import tempfile
 from cis_interface import runner, tools
 from cis_interface.examples import yamls
+from cis_interface.tests import CisTestBase
 from cis_interface.drivers.MatlabModelDriver import _matlab_installed
 
 
-class TestExample(unittest.TestCase, tools.CisClass):
+class TestExample(CisTestBase, tools.CisClass):
     r"""Base class for running examples."""
 
     def __init__(self, *args, **kwargs):
@@ -19,39 +20,13 @@ class TestExample(unittest.TestCase, tools.CisClass):
         self.env = {}
         self.runner = None
         self.expects_error = False
-        self._old_default_comm = None
         # self.debug_flag = True
         super(TestExample, self).__init__(*args, **kwargs)
 
-    def setup(self, *args, **kwargs):
-        r"""Setup to perform before test."""
-        self._old_default_comm = os.environ.get('CIS_DEFAULT_COMM', None)
-        self.set_utf8_encoding()
-        if self.debug_flag:  # pragma: debug
-            self.debug_log()
-
-    def teardown(self, *args, **kwargs):
-        r"""Teardown to perform after test."""
-        self.reset_log()
-        self.reset_encoding()
-        if self._old_default_comm is None:
-            if 'CIS_DEFAULT_COMM' in os.environ:
-                del os.environ['CIS_DEFAULT_COMM']
-        else:  # pragma: debug
-            os.environ['CIS_DEFAULT_COMM'] = self._old_default_comm
-
-    def shortDescription(self):
-        r"""Prefix first line of doc string with driver."""
-        out = super(TestExample, self).shortDescription()
-        return '%s: %s' % (self.name, out)
-
-    def setUp(self, *args, **kwargs):
-        r"""Redirect unittest to nose style setup."""
-        self.setup(*args, **kwargs)
-        
-    def tearDown(self, *args, **kwargs):
-        r"""Redirect unittest to nose style teardown."""
-        self.teardown(*args, **kwargs)
+    @property
+    def description_prefix(self):
+        r"""Prefix message with test name."""
+        return self.name
 
     @property
     def namespace(self):

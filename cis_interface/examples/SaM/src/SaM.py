@@ -1,14 +1,14 @@
 #!/usr/bin/python
 import sys
-from cis_interface.interface.PsiInterface import PsiInput, PsiOutput
+from cis_interface.interface.CisInterface import CisInput, CisOutput
 
 
 if __name__ == '__main__':
 
     # Get input and output channels matching yaml
-    in1 = PsiInput('input1_python')
-    in2 = PsiInput('static_python')
-    out1 = PsiOutput('output_python')
+    in1 = CisInput('input1_python')
+    in2 = CisInput('static_python')
+    out1 = CisOutput('output_python')
     print('SaM(P): Set up I/O channels')
 
     # Get input from input1 channel

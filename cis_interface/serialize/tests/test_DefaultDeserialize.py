@@ -1,14 +1,13 @@
 import nose.tools as nt
 from cis_interface import backwards
-from cis_interface.tests import CisTest, IOInfo
+from cis_interface.tests import CisTestClassInfo
 
 
-class TestDefaultDeserialize(CisTest, IOInfo):
+class TestDefaultDeserialize(CisTestClassInfo):
     r"""Test class for DefaultDeserialize class."""
 
     def __init__(self, *args, **kwargs):
         super(TestDefaultDeserialize, self).__init__(*args, **kwargs)
-        IOInfo.__init__(self)
         self._cls = 'DefaultDeserialize'
         self._result_empty = backwards.unicode2bytes('')
 

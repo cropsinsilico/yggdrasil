@@ -49,7 +49,7 @@ class Driver(tools.CisThreadLoop):
         super(Driver, self).__init__(name, **kwargs)
         self._thread_initialized = True
         self.debug('')
-        # if cis_cfg.get('debug', 'psi') == 'DEBUG':
+        # if cis_cfg.get('debug', 'cis') == 'DEBUG':
         #     self.sleeptime = 1.0
         # Set defaults
         if namespace is None:

@@ -1,8 +1,8 @@
 
 % Get input and output channels matching yaml
-in1 = PsiInterface('PsiInput', 'input1_matlab', '%d');
-in2 = PsiInterface('PsiInput', 'static_matlab', '%d');
-out1 = PsiInterface('PsiOutput', 'output_matlab', '%d');
+in1 = CisInterface('CisInput', 'input1_matlab', '%d');
+in2 = CisInterface('CisInput', 'static_matlab', '%d');
+out1 = CisInterface('CisOutput', 'output_matlab', '%d');
 disp('SaM(M): Set up I/O channels');
 
 % Get input from input1 channel

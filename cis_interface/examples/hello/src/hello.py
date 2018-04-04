@@ -1,16 +1,16 @@
 from __future__ import print_function
 import sys
-from cis_interface.interface.PsiInterface import PsiInput, PsiOutput
+from cis_interface.interface.CisInterface import CisInput, CisOutput
 
 
 def runhello():
     print('Hello from Python')
 
     # Ins/outs matching with the the model yaml
-    inf = PsiInput('inFile')
-    outf = PsiOutput('outFile')
-    inq = PsiInput('helloQueueIn')
-    outq = PsiOutput('helloQueueOut')
+    inf = CisInput('inFile')
+    outf = CisOutput('outFile')
+    inq = CisInput('helloQueueIn')
+    outq = CisOutput('helloQueueOut')
     print("hello(P): Created I/O channels")
 
     # Receive input from a local file

@@ -1,6 +1,8 @@
 # from logging import debug, error, exception
 from cis_interface.communication.AsciiFileComm import AsciiFileComm
 from cis_interface.dataio.AsciiTable import AsciiTable
+from cis_interface.serialize.DefaultSerialize import DefaultSerialize
+from cis_interface.serialize.DefaultDeserialize import DefaultDeserialize
 
 
 class AsciiTableComm(AsciiFileComm):
@@ -21,16 +23,21 @@ class AsciiTableComm(AsciiFileComm):
         array_was_read (bool): If True, the table array was already read in.
 
     """
-    def __init__(self, name, as_array=False, dont_open=False, **kwargs):
+    def _init_before_open(self, as_array=False, **kwargs):
+        r"""Set up dataio and attributes."""
         file_keys = ['format_str', 'dtype', 'column_names', 'column'
                      'use_astropy']
         file_kwargs = {}
         for k in file_keys:
             if k in kwargs:
                 file_kwargs[k] = kwargs.pop(k)
+        file_kwargs['format_str'] = self.format_str
+        self.format_str = None
+        self.meth_deserialize = DefaultDeserialize()
+        self.meth_serialize = DefaultSerialize()
         self.array_was_read = False
-        super(AsciiTableComm, self).__init__(name, dont_open=True,
-                                             skip_AsciiFile=True, **kwargs)
+        super(AsciiTableComm, self)._init_before_open(skip_AsciiFile=True,
+                                                      **kwargs)
         self.file_kwargs.update(**file_kwargs)
         self.as_array = as_array
         if self.direction == 'recv':
@@ -40,8 +47,6 @@ class AsciiTableComm(AsciiFileComm):
                 self.file = AsciiTable(self.address, 'a', **self.file_kwargs)
             else:
                 self.file = AsciiTable(self.address, 'w', **self.file_kwargs)
-        if not dont_open:
-            self.open()
 
     def opp_comm_kwargs(self):
         r"""Get keyword arguments to initialize communication with opposite
