@@ -148,6 +148,22 @@ class CisTestBase(unittest.TestCase):
             cfg_logging()
             self._old_loglevel = None
 
+    def set_default_comm(self, default_comm=None):
+        r"""Set the default comm."""
+        self._old_default_comm = os.environ.get('CIS_DEFAULT_COMM', None)
+        if default_comm is None:
+            default_comm = self._new_default_comm
+        if default_comm is not None:
+            os.environ['CIS_DEFAULT_COMM'] = default_comm
+
+    def reset_default_comm(self):
+        r"""Reset the default comm to the original value."""
+        if self._old_default_comm is None:
+            if 'CIS_DEFAULT_COMM' in os.environ:
+                del os.environ['CIS_DEFAULT_COMM']
+        else:  # pragma: debug
+            os.environ['CIS_DEFAULT_COMM'] = self._old_default_comm
+
     def setUp(self, *args, **kwargs):
         self.setup(*args, **kwargs)
 
@@ -169,9 +185,7 @@ class CisTestBase(unittest.TestCase):
                 open file descriptors.
 
         """
-        self._old_default_comm = os.environ.get('CIS_DEFAULT_COMM', None)
-        if self._new_default_comm is not None:
-            os.environ['CIS_DEFAULT_COMM'] = self._new_default_comm
+        self.set_default_comm()
         self.set_utf8_encoding()
         if self.debug_flag:  # pragma: debug
             self.debug_log()
@@ -235,11 +249,7 @@ class CisTestBase(unittest.TestCase):
         # Reset the log, encoding, and default comm
         self.reset_log()
         self.reset_encoding()
-        if self._old_default_comm is None:
-            if 'CIS_DEFAULT_COMM' in os.environ:
-                del os.environ['CIS_DEFAULT_COMM']
-        else:  # pragma: debug
-            os.environ['CIS_DEFAULT_COMM'] = self._old_default_comm
+        self.reset_default_comm()
         self._first_test = False
 
     @property
