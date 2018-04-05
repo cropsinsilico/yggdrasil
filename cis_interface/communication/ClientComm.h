@@ -244,16 +244,11 @@ int client_comm_send(comm_t x, const char *data, const size_t len) {
     cislog_error("client_comm_send(%s): no request comm registered", x.name);
     return -1;
   }
-  if (is_eof(data)) {
-    // Send EOF message without header
-    comm_t *req_comm = (comm_t*)(x.handle);
-    ret = default_comm_send(*req_comm, data, len);
-    req_comm->sent_eof[0] = 1;
-    return ret;
-  }
-  // Send message with header
   comm_t *req_comm = (comm_t*)(x.handle);
   ret = default_comm_send(*req_comm, data, len);
+  if (is_eof(data)) {
+    req_comm->sent_eof[0] = 1;
+  }
   return ret;
 };
 
