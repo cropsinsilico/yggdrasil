@@ -1,5 +1,5 @@
 import os
-from cis_interface import timing
+from cis_interface import timing, tools
 from cis_interface.drivers.MatlabModelDriver import _matlab_installed
 
 
@@ -15,7 +15,9 @@ def test_get_source():
 
 def test_combos():
     r"""Test different combinations of source/destination languages."""
-    lang_list = ['python', 'c', 'cpp']
+    lang_list = ['python']
+    if tools._c_library_avail:
+        lang_list += ['c', 'cpp']
     if _matlab_installed:
         lang_list.append('matlab')
     for l1 in lang_list:
@@ -28,12 +30,14 @@ def test_scaling_count():
     r"""Test running scaling with number of messages."""
     x = timing.TimedRun('python', 'python')
     x.scaling_count(10, nsamples=1)
+    x.scaling_count(10, nsamples=1, per_message=True)
 
 
 def test_scaling_size():
     r"""Test running scaling with size of messages."""
     x = timing.TimedRun('python', 'python')
     x.scaling_size(1, nsamples=1)
+    x.scaling_size(1, nsamples=1, per_message=True)
 
 
 def test_plot_scaling():
