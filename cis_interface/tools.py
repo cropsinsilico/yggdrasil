@@ -11,6 +11,7 @@ import yaml
 import pystache
 import warnings
 import atexit
+import uuid as uuid_gen
 from cis_interface.backwards import sio
 import subprocess
 from cis_interface import platform
@@ -463,6 +464,8 @@ class CisClass(logging.LoggerAdapter):
 
     Args:
         name (str): Class name.
+        uuid (str, optional): Unique ID for this instance. Defaults to None
+            and is assigned.
         workingDir (str, optional): Working directory. If not provided, the
             current working directory is used.
         timeout (float, optional): Maximum time (in seconds) that should be
@@ -474,6 +477,7 @@ class CisClass(logging.LoggerAdapter):
 
     Attributes:
         name (str): Class name.
+        uuid (str): Unique ID for this instance.
         sleeptime (float): Time that class should sleep for when sleep called.
         longsleep (float): Time that the class will sleep for when waiting for
             longer tasks to complete (10x longer than sleeptime).
@@ -487,9 +491,12 @@ class CisClass(logging.LoggerAdapter):
             are suppressed.
 
     """
-    def __init__(self, name, workingDir=None, timeout=60.0, sleeptime=0.01,
-                 **kwargs):
+    def __init__(self, name, uuid=None, workingDir=None,
+                 timeout=60.0, sleeptime=0.01, **kwargs):
         self._name = name
+        if uuid is None:
+            uuid = str(uuid_gen.uuid4())
+        self.uuid = uuid
         self.sleeptime = sleeptime
         self.longsleep = self.sleeptime * 10
         self.timeout = timeout

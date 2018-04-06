@@ -1,5 +1,4 @@
 import nose.tools as nt
-from cis_interface import backwards
 from cis_interface.serialize.tests.test_DefaultSerialize import \
     TestDefaultSerialize
 
@@ -10,14 +9,13 @@ class TestMatSerialize(TestDefaultSerialize):
     def __init__(self, *args, **kwargs):
         super(TestMatSerialize, self).__init__(*args, **kwargs)
         self._cls = 'MatSerialize'
+        self._empty_obj = dict()
+        self._objects = [self.data_dict]
 
-    def test_call_errors(self):
-        r"""Test call errors."""
-        nt.assert_raises(TypeError, self.instance, ['blah', 'blah'])
-
-    def test_call(self):
-        r"""Test call without format string."""
-        out = self.instance(self.data_dict)
-        # Exclude header with timestamp that could differ
-        assert(out.startswith(backwards.unicode2bytes("MATLAB")))
-        nt.assert_equal(out.split()[-1], self.mat_data.split()[-1])
+    def assert_result_equal(self, x, y):
+        r"""Assert that serialized/deserialized objects equal."""
+        self.assert_equal_data_dict(x, y)
+        
+    def test_serialize_errors(self):
+        r"""Test serialize errors."""
+        nt.assert_raises(TypeError, self.instance.serialize, ['blah', 'blah'])
