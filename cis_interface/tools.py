@@ -10,7 +10,6 @@ import signal
 import warnings
 import atexit
 import uuid as uuid_gen
-from cis_interface.backwards import sio
 import subprocess
 from cis_interface import platform
 from cis_interface import backwards
