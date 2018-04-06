@@ -15,7 +15,7 @@ if PY2:  # pragma: Python 2
     bytes_type = str
     unicode_type = str
     np_dtype_str = 'S'
-    string_types = [str, unicode]
+    string_types = (str, unicode)
 else:  # pragma: Python 3
     import pickle
     import configparser
@@ -26,7 +26,7 @@ else:  # pragma: Python 3
     unicode_type = str
     unicode = None
     np_dtype_str = 'S'
-    string_types = [bytes, str]
+    string_types = (bytes, str)
 if sys.version_info >= (3, 3):
     clock_time = time.perf_counter
 else:
