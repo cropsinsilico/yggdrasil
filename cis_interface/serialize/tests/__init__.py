@@ -357,6 +357,37 @@ def test_array_to_bytes():
                          b0[:-1], dtype2, order=order)
 
 
+def test_format_header():
+    r"""Test formatting header."""
+    kws_all = dict(
+        format_str="%5s\t%ld\t%g\t%g%+gj\n",
+        field_names=['name', 'number', 'value', 'complex'],
+        field_units=['n/a', 'g', 'cm', 'n/a'])
+    kws_all['dtype'] = serialize.cformat2nptype(kws_all['format_str'],
+                                                names=kws_all['field_names'])
+    res_all = dict(
+        format="# %5s\t%ld\t%g\t%g%+gj\n",
+        names="# name\tnumber\tvalue\tcomplex\n",
+        units="# n/a\tg\tcm\tn/a\n")
+    for x in [kws_all, res_all]:
+        for k, v in x.items():
+            if isinstance(v, str):
+                x[k] = backwards.unicode2bytes(v)
+            elif isinstance(v, list):
+                x[k] = [backwards.unicode2bytes(iv) for iv in v]
+    test_list = [(['format_str', 'field_names', 'field_units'],
+                  ['names', 'units', 'format']),
+                 (['field_names', 'field_units', 'dtype'],
+                  ['names', 'units', 'format']),
+                 (['field_names'], ['names']),
+                 (['field_units'], ['units'])]
+    for kws_keys, res_keys in test_list:
+        kws = {k: kws_all[k] for k in kws_keys}
+        res = backwards.unicode2bytes('').join([res_all[k] for k in res_keys])
+        nt.assert_equal(serialize.format_header(**kws), res)
+    nt.assert_raises(ValueError, serialize.format_header)
+
+
 def test_parse_header():
     r"""Test parsing header."""
     header = ["# name\tnumber\tvalue\tcomplex\n",
@@ -382,6 +413,9 @@ def test_parse_header():
     del res2['format_str']
     res2['fmts'] = []
     nt.assert_equal(serialize.parse_header(header2), res2)
+    # Test with explicit line numbers
+    nt.assert_equal(serialize.parse_header(header, lineno_names=0, lineno_units=1),
+                    res)
     # Test errors
     header3 = [header[0], header[0]]
     nt.assert_raises(RuntimeError, serialize.parse_header, header3)

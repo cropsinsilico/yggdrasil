@@ -33,7 +33,7 @@ class TestCommBase(CisTestClassInfo):
     def __init__(self, *args, **kwargs):
         super(TestCommBase, self).__init__(*args, **kwargs)
         self.comm = 'CommBase'
-        self.attr_list += ['name', 'address', 'direction', 'format_str',
+        self.attr_list += ['name', 'address', 'direction',
                            'serializer', 'recv_timeout',
                            'close_on_eof_recv', 'opp_address', 'opp_comms',
                            'maxMsgSize']
@@ -242,6 +242,10 @@ class TestCommBase(CisTestClassInfo):
         # Create work comm that should be cleaned up on teardown
         self.instance.create_work_comm()
 
+    def assert_msg_equal(self, x, y):
+        r"""Assert that two messages are equivalent."""
+        nt.assert_equal(x, y)
+
     def do_send_recv(self, send_meth='send', recv_meth='recv', msg_send=None,
                      n_msg_send_meth='n_msg_send', n_msg_recv_meth='n_msg_recv',
                      reverse_comms=False, send_kwargs=None, recv_kwargs=None,
@@ -305,7 +309,7 @@ class TestCommBase(CisTestClassInfo):
                 assert(recv_instance.is_closed)
             else:
                 assert(flag)
-            nt.assert_equal(msg_recv, msg_send)
+            self.assert_msg_equal(msg_recv, msg_send)
             # Wait for send to close
             if is_eof and close_on_send_eof:
                 T = send_instance.start_timeout(self.timeout)

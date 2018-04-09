@@ -415,7 +415,7 @@ class ConnectionDriver(Driver):
             bool: Success or failure of send.
 
         """
-        self.ocomm._first_send_done = True
+        self.ocomm._multiple_first_send = False
         T = self.start_timeout(self.timeout_send_1st)
         flag = self._send_message(*args, **kwargs)
         self.ocomm.suppress_special_debug = True

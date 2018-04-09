@@ -2,9 +2,8 @@ import os
 import uuid
 import atexit
 import threading
-from cis_interface import backwards, tools
+from cis_interface import backwards, tools, serialize
 from cis_interface.tools import get_CIS_MSG_MAX, CIS_MSG_EOF
-from cis_interface.serialize.DefaultSerialize import DefaultSerialize
 from cis_interface.communication import (
     new_comm, get_comm, get_comm_class)
 
@@ -204,18 +203,11 @@ class CommBase(tools.CisClass):
         serializer (DefaultSerialize, optional): Class with serialize and
             deserialize methods that should be used to process sent and received
             messages. Defaults to None and is constructed using provided
-            deserialize, serialize, and format_str arguments.
-        deserialize (obj, optional): Callable object that takes bytes as input
-            and returnes deserialized version. This will be used to process
-            received messages. Defaults to None and raw bytes will be returned
-            by recv.
-        serialize (obj, optional): Callable object that takes any object as
-            input and returns a serialized set of bytes. This will be used
-            to encode sent messages. Defaults to None and send will assume
-            that all messages are raw bytes.
-        format_str (str, optional): If provided and deserialize and/or serialize
-            are not provided, this string will be used to format/parse messages
-            that are sent/received. Defaults to None.
+            'serializer_kwargs'.
+        serializer_kwargs (dict, optional): Keyword arguments that should be
+            passed to DefaultSerialize to create serializer. Defaults to {}.
+        format_str (str, optional): String that should be used to format/parse
+            messages. Default to None.
         dont_open (bool, optional): If True, the connection will not be opened.
             Defaults to False.
         is_interface (bool, optional): Set to True if this comm is a Python
@@ -288,7 +280,6 @@ class CommBase(tools.CisClass):
     """
 
     def __init__(self, name, address=None, direction='send',
-                 serializer=None, deserialize=None, serialize=None, format_str=None,
                  dont_open=False, is_interface=False, recv_timeout=0.0,
                  close_on_eof_recv=True, close_on_eof_send=False,
                  single_use=False, reverse_names=False, no_suffix=False,
@@ -313,13 +304,6 @@ class CommBase(tools.CisClass):
         else:
             self.address = address
         self.direction = direction
-        if serializer is not None:
-            self.serializer = serializer
-        else:
-            self.serializer = DefaultSerialize(format_str=format_str,
-                                               func_serialize=serialize,
-                                               func_deserialize=deserialize)
-        self.format_str = format_str
         self.is_client = is_client
         self.is_server = is_server
         self.is_response_client = is_response_client
@@ -335,7 +319,7 @@ class CommBase(tools.CisClass):
         self._work_comms = {}
         self.single_use = single_use
         self._used = False
-        self._first_send_done = False
+        self._multiple_first_send = True
         self._n_sent = 0
         self._n_recv = 0
         self._bound = False
@@ -370,10 +354,17 @@ class CommBase(tools.CisClass):
         else:
             self.open()
 
-    def _init_before_open(self, **kwargs):
+    def _init_before_open(self, serializer=None, serializer_kwargs=None,
+                          format_str=None, **kwargs):
         r"""Initialization steps that should be performed after base class, but
         before the comm is opened."""
-        pass
+        if serializer is not None:
+            self.serializer = serializer
+        else:
+            if serializer_kwargs is None:
+                serializer_kwargs = {}
+            serializer_kwargs.setdefault('format_str', format_str)
+            self.serializer = serialize.get_serializer(**serializer_kwargs)
 
     @classmethod
     def _determine_suffix(cls, no_suffix=False, reverse_names=False,
@@ -871,7 +862,7 @@ class CommBase(tools.CisClass):
     # SEND METHODS
     def _safe_send(self, *args, **kwargs):
         r"""Send message checking if is 1st message and then waiting."""
-        if not self._first_send_done:
+        if (not self._used) and self._multiple_first_send:
             out = self._send_1st(*args, **kwargs)
         else:
             with self._closing_thread.lock:
@@ -901,7 +892,6 @@ class CommBase(tools.CisClass):
             self.sleep()
         self.stop_timeout(key_suffix='._send_1st')
         self.suppress_special_debug = False
-        self._first_send_done = True
         return flag
         
     def _send(self, msg, *args, **kwargs):
@@ -996,7 +986,9 @@ class CommBase(tools.CisClass):
             msg_s = backwards.unicode2bytes(msg)
         else:
             flag = True
-            msg_s = self.serializer.serialize(msg, header_kwargs=header_kwargs)
+            add_sinfo = (not (self._used or self.is_file))
+            msg_s = self.serializer.serialize(msg, header_kwargs=header_kwargs,
+                                              add_serializer_info=add_sinfo)
             # Create work comm if message too large to be sent all at once
             if (len(msg_s) > self.maxMsgSize) and (self.maxMsgSize != 0):
                 if header_kwargs is None:
@@ -1005,7 +997,9 @@ class CommBase(tools.CisClass):
                     work_comm = self.create_work_comm()
                     header_kwargs['address'] = work_comm.address
                     header_kwargs['id'] = work_comm.uuid
-                    msg_s = self.serializer.serialize(msg, header_kwargs=header_kwargs)
+                    msg_s = self.serializer.serialize(
+                        msg, header_kwargs=header_kwargs,
+                        add_serializer_info=add_sinfo)
         return flag, msg_s, header_kwargs
 
     def send(self, *args, **kwargs):
@@ -1022,8 +1016,9 @@ class CommBase(tools.CisClass):
         if self.single_use and self._used:  # pragma: debug
             raise RuntimeError("This comm is single use and it was already used.")
         try:
-            self._used = True
             ret = self.send_multipart(args, **kwargs)
+            if ret:
+                self._used = True
         except BaseException:
             self.exception('Failed to send.')
             return False
@@ -1202,11 +1197,13 @@ class CommBase(tools.CisClass):
         if s_msg == self.eof_msg:
             flag = self.on_recv_eof()
         msg, header = self.serializer.deserialize(s_msg)
-        self._used = True
         if second_pass:
             header = self._last_header
+            header['incomplete'] = False
         else:
             self._last_header = header
+        if not header.get('incomplete', False):
+            self._used = True
         return flag, msg, header
 
     def recv(self, *args, **kwargs):

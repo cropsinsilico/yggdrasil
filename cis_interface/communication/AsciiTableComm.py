@@ -1,8 +1,5 @@
-# from logging import debug, error, exception
+from cis_interface import serialize, backwards
 from cis_interface.communication.AsciiFileComm import AsciiFileComm
-from cis_interface.dataio.AsciiTable import AsciiTable
-from cis_interface.serialize.DefaultSerialize import DefaultSerialize
-from cis_interface.serialize.DefaultDeserialize import DefaultDeserialize
 
 
 class AsciiTableComm(AsciiFileComm):
@@ -11,72 +8,102 @@ class AsciiTableComm(AsciiFileComm):
     Args:
         name (str): The environment variable where communication address is
             stored.
+        format_str (str, optional): C style format string specifying how rows
+            in the table should be formated. Defaults to None. If receiving
+            from a file, this will be determined from the file contents during
+            the first read. If sending to a file, this must be updated before
+            anything can be written.
+        delimiter (str, optional): String that should be used to separate
+            columns. If not provided and format_str is not set prior to I/O,
+            this defaults to whitespace.
+        column_names (list, optional): Names that should be written to the
+            table header. Defaults to None.
+        column_units (list, optional): Units that should be written to the
+            table header. Defaults to None.
+        use_astropy (bool, optional): If True and the astropy package is
+            installed, it will be used to read/write the table. Defaults to
+            False.
         as_array (bool, optional): If True, table IO is done for entire array.
             Otherwise, the table is read/written line by line. Defaults to False.
         **kwargs: Additional keywords arguments are passed to parent class.
 
     Attributes:
-        file_kwargs (dict): Keyword arguments for the AsciiTable instance.
-        file (AsciiTable): Instance for read/writing to/from file.
         as_array (bool): If True, table IO is done for entire array. Otherwise,
             the table is read/written line by line.
-        array_was_read (bool): If True, the table array was already read in.
 
     """
-    def _init_before_open(self, as_array=False, **kwargs):
+    def _init_before_open(self, format_str=None, delimiter=None,
+                          column_names=None, column_units=None,
+                          as_array=False, use_astropy=False,
+                          serializer_kwargs=None, **kwargs):
         r"""Set up dataio and attributes."""
-        file_keys = ['format_str', 'dtype', 'column_names', 'column'
-                     'use_astropy']
-        file_kwargs = {}
-        for k in file_keys:
-            if k in kwargs:
-                file_kwargs[k] = kwargs.pop(k)
-        file_kwargs['format_str'] = self.format_str
-        self.format_str = None
-        self.meth_deserialize = DefaultDeserialize()
-        self.meth_serialize = DefaultSerialize()
-        self.array_was_read = False
-        super(AsciiTableComm, self)._init_before_open(skip_AsciiFile=True,
-                                                      **kwargs)
-        self.file_kwargs.update(**file_kwargs)
-        self.as_array = as_array
-        if self.direction == 'recv':
-            self.file = AsciiTable(self.address, 'r', **self.file_kwargs)
+        if serializer_kwargs is None:
+            serializer_kwargs = {}
+        self.header_was_read = False
+        self.header_was_written = False
+        serializer_kwargs.update(stype=3, format_str=format_str,
+                                 field_names=column_names,
+                                 field_units=column_units,
+                                 as_array=as_array, use_astropy=use_astropy)
+        kwargs['serializer_kwargs'] = serializer_kwargs
+        super(AsciiTableComm, self)._init_before_open(**kwargs)
+        self.as_array = self.serializer.as_array
+        if self.serializer.as_array:
+            self.read_meth = 'read'
         else:
-            if self.append:
-                self.file = AsciiTable(self.address, 'a', **self.file_kwargs)
-            else:
-                self.file = AsciiTable(self.address, 'w', **self.file_kwargs)
+            self.read_meth = 'readline'
+        if self.append:
+            self.header_was_written = True
+        if delimiter is None:
+            delimiter = serialize._default_delimiter
+        self.delimiter = backwards.unicode2bytes(delimiter)
+        
+    def read_header(self):
+        r"""Read header lines from the file and update serializer info."""
+        if self.header_was_read:
+            return
+        header_lines = []
+        header_size = 0
+        self.fd.seek(0)
+        for line in self.fd:
+            sline = backwards.unicode2bytes(
+                line.replace(self.platform_newline, self.newline))
+            if not sline.startswith(self.comment):
+                break
+            header_size += len(line)
+            header_lines.append(sline)
+        # Parse header & set serializer attributes
+        header = serialize.parse_header(header_lines)
+        for k in ['format_str', 'field_names', 'field_units']:
+            if header.get(k, False):
+                setattr(self.serializer, k, header[k])
+        # Try to determine format from array without header
+        if self.serializer.format_str is None:
+            all_contents = self.fd.read()
+            arr = serialize.table_to_array(all_contents,
+                                           names=self.serializer.field_names,
+                                           comment=self.comment,
+                                           delimiter=self.delimiter)
+            self.serializer.field_names = arr.dtype.names
+            self.serializer.format_str = serialize.table2format(
+                arr.dtype, delimiter=self.delimiter, comment=self.comment,
+                newline=self.newline)
+        self.delimiter = self.serializer.table_info['delimiter']
+        # Seek to just after the header
+        self.fd.seek(header_size)
+        self.header_was_read = True
 
-    def opp_comm_kwargs(self):
-        r"""Get keyword arguments to initialize communication with opposite
-        comm object.
-
-        Returns:
-            dict: Keyword arguments for opposite comm object.
-
-        """
-        kwargs = super(AsciiTableComm, self).opp_comm_kwargs()
-        kwargs['format_str'] = self.file.format_str
-        kwargs['dtype'] = self.file.dtype
-        kwargs['column_names'] = self.file.column_names
-        kwargs['column'] = self.file.column
-        kwargs['use_astropy'] = self.file.use_astropy
-        kwargs['as_array'] = self.as_array
-        return kwargs
-
-    @property
-    def n_msg_recv(self):
-        r"""int: The number of messages in the file."""
-        if ((self.is_open and self.direction == 'recv' and self.as_array and
-             not self.array_was_read)):
-            if self.remaining_bytes > 0:
-                out = 1
-            else:
-                out = 0
-        else:
-            out = super(AsciiTableComm, self).n_msg_recv
-        return out
+    def write_header(self):
+        r"""Write header lines to the file based on the serializer info."""
+        if self.header_was_written:
+            return
+        header_msg = serialize.format_header(
+            format_str=self.serializer.format_str,
+            field_names=self.serializer.field_names,
+            field_units=self.serializer.field_units,
+            comment=self.comment, newline=self.newline)
+        self.fd.write(header_msg)
+        self.header_was_written = True
 
     def _send(self, msg):
         r"""Write message to a file.
@@ -88,13 +115,8 @@ class AsciiTableComm(AsciiFileComm):
             bool: Success or failure of writing to the file.
 
         """
-        if msg != self.eof_msg:
-            if self.as_array:
-                self.file.write_bytes(msg, order='F', append=True)
-            else:
-                self.file.writeline_full(msg, validate=True)
-        self.file.fd.flush()
-        return True
+        self.write_header()
+        return super(AsciiTableComm, self)._send(msg)
 
     def _recv(self, timeout=0, **kwargs):
         r"""Reads message from a file.
@@ -107,20 +129,5 @@ class AsciiTableComm(AsciiFileComm):
             tuple(bool, str): Success or failure of reading from the file.
 
         """
-        if self.as_array:
-            if self.array_was_read:
-                flag = True
-                data = self.eof_msg
-            else:
-                if self.remaining_bytes > 0:
-                    flag = True
-                    data = self.file.read_bytes(order='F')
-                    self.array_was_read = True
-                else:
-                    flag = True
-                    data = self.eof_msg
-            # Only read the table array once
-            # self.close()
-        else:
-            flag, data = super(AsciiTableComm, self)._recv(dont_parse=True)
-        return (flag, data)
+        self.read_header()
+        return super(AsciiTableComm, self)._recv(timeout=timeout, **kwargs)

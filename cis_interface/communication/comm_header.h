@@ -7,7 +7,7 @@
 
 #define CIS_MSG_HEAD "CIS_MSG_HEAD"
 #define HEAD_VAL_SEP ":CIS:"
-#define HEAD_KEY_SEP ","
+#define HEAD_KEY_SEP ",CIS,"
 #define COMMBUFFSIZ 2000
 
 

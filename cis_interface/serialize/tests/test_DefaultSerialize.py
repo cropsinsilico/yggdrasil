@@ -1,6 +1,8 @@
+import numpy as np
 import nose.tools as nt
 from cis_interface.tests import CisTestClassInfo
 from cis_interface import backwards, tools, serialize
+from cis_interface.serialize import DefaultSerialize
 
 
 class TestDefaultSerialize(CisTestClassInfo):
@@ -13,6 +15,9 @@ class TestDefaultSerialize(CisTestClassInfo):
         self._empty_obj = backwards.unicode2bytes('')
         self._header_info = dict(arg1='1', arg2='two')
         self._objects = self.file_lines
+        self.attr_list += ['format_str', 'as_array', 'field_names',
+                           'field_units', 'nfields', 'field_formats',
+                           'numpy_dtype', 'scanf_format_str', 'serializer_info']
 
     @property
     def mod(self):
@@ -42,7 +47,8 @@ class TestDefaultSerialize(CisTestClassInfo):
         r"""Test serialize/deserialize with serializer info."""
         hout = self._header_info
         hout.update(**self.instance.serializer_info)
-        temp_seri = serialize.DefaultSerialize.DefaultSerialize()
+        temp_seri = serialize.get_serializer(
+            stype=self.instance.serializer_info['stype'])
         for iobj in self._objects:
             msg = self.instance.serialize(iobj, header_kwargs=self._header_info,
                                           add_serializer_info=True)
@@ -51,6 +57,7 @@ class TestDefaultSerialize(CisTestClassInfo):
             nt.assert_equal(ihead, hout)
             # Use info to reconstruct serializer
             iout, ihead = temp_seri.deserialize(msg)
+            self.assert_result_equal(iout, iobj)
             nt.assert_equal(ihead, hout)
             new_seri = serialize.get_serializer(**ihead)
             iout, ihead = new_seri.deserialize(msg)
@@ -85,7 +92,8 @@ class TestDefaultSerialize(CisTestClassInfo):
         r"""Test serialize/deserialize without format string."""
         if (len(self._inst_kwargs) == 0) and (self._cls == 'DefaultSerialize'):
             for iobj in self._objects:
-                msg = self.instance.serialize([iobj], header_kwargs=self._header_info)
+                msg = self.instance.serialize([iobj],
+                                              header_kwargs=self._header_info)
                 iout, ihead = self.instance.deserialize(msg)
                 self.assert_result_equal(iout, iobj)
                 nt.assert_equal(ihead, self._header_info)
@@ -103,9 +111,25 @@ class TestDefaultSerialize_format(TestDefaultSerialize):
 
     def __init__(self, *args, **kwargs):
         super(TestDefaultSerialize_format, self).__init__(*args, **kwargs)
-        self._inst_kwargs = {'format_str': self.fmt_str}
+        self._inst_kwargs = {'format_str': self.fmt_str,
+                             'field_names': self.file_field_names,
+                             'field_units': self.file_field_units}
         self._empty_obj = tuple()
         self._objects = self.file_rows
+
+
+class TestDefaultSerialize_array(TestDefaultSerialize_format):
+    r"""Test class for DefaultSerialize class with format as array."""
+
+    def __init__(self, *args, **kwargs):
+        super(TestDefaultSerialize_array, self).__init__(*args, **kwargs)
+        self._inst_kwargs['as_array'] = True
+        self._empty_obj = tuple()
+        self._objects = [self.file_array]
+
+    def assert_result_equal(self, x, y):
+        r"""Assert that serialized/deserialized objects equal."""
+        np.testing.assert_array_equal(x, y)
 
 
 class TestDefaultSerialize_func(TestDefaultSerialize):
@@ -113,15 +137,17 @@ class TestDefaultSerialize_func(TestDefaultSerialize):
 
     def __init__(self, *args, **kwargs):
         super(TestDefaultSerialize_func, self).__init__(*args, **kwargs)
+        self.func_serialize = self._func_serialize
+        self.func_deserialize = self._func_deserialize
         self._inst_kwargs = {'func_serialize': self.func_serialize,
                              'func_deserialize': self.func_deserialize}
         self._objects = self.file_rows
 
-    def func_serialize(self, args):
+    def _func_serialize(self, args):
         r"""Method that serializes using repr."""
         return backwards.unicode2bytes(repr(args))
 
-    def func_deserialize(self, args):
+    def _func_deserialize(self, args):
         r"""Method that deserializes using eval."""
         if len(args) == 0:
             return self._empty_obj
@@ -129,18 +155,32 @@ class TestDefaultSerialize_func(TestDefaultSerialize):
         return x
 
     def test_serialize_sinfo(self):
-        r"""Disabled: Test serialize/deserialize with serializer info."""
-        pass
+        r"""Test error on serialize with serializer info for function."""
+        nt.assert_raises(RuntimeError, self.instance.serialize,
+                         self._objects[0], add_serializer_info=True)
+
+
+class TestDefaultSerialize_class(TestDefaultSerialize_func):
+    r"""Test class for DefaultSerialize class with classes."""
+
+    def __init__(self, *args, **kwargs):
+        super(TestDefaultSerialize_class, self).__init__(*args, **kwargs)
+        temp_seri = DefaultSerialize.DefaultSerialize(format_str=self.fmt_str)
+        self._empty_obj = tuple()
+        self.func_serialize = temp_seri
+        self.func_deserialize = temp_seri
+        self._inst_kwargs = {'func_serialize': self.func_serialize,
+                             'func_deserialize': self.func_deserialize}
 
 
 class TestDefaultSerialize_func_error(TestDefaultSerialize_func):
     r"""Test class for DefaultSerialize class with incorrect functions."""
 
-    def func_serialize(self, args):
+    def _func_serialize(self, args):
         r"""Method that serializes using repr."""
         return args
 
-    def func_deserialize(self, args):
+    def _func_deserialize(self, args):
         r"""Method that deserializes using eval."""
         if len(args) == 0:
             return self._empty_obj

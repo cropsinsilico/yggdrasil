@@ -1,6 +1,6 @@
 import os
 import tempfile
-from cis_interface import backwards, platform
+from cis_interface import backwards, platform, serialize
 from cis_interface.communication import CommBase
 
 
@@ -14,14 +14,22 @@ class FileComm(CommBase.CommBase):
             from the file. Defaults to 'read'. Ignored if direction is 'send'.
         append (bool, optional): If True and writing, file is openned in append
             mode. Defaults to False.
+        open_as_binary (bool, optional): If True, the file is opened in binary
+            mode. Defaults to True.
+        newline (str, optional): String indicating a new line. Defaults to
+            serialize._default_newline.
         **kwargs: Additional keywords arguments are passed to parent class.
 
     Attributes:
         fd (file): File that should be read/written.
         read_meth (str): Method that should be used to read data from the file.
         append (bool): If True and writing, file is openned in append mode.
-        in_temp (bool, optional): If True, the path will be considered relative
-            to the platform temporary directory. Defaults to False.
+        in_temp (bool): If True, the path will be considered relative to the
+            platform temporary directory.
+        open_as_binary (bool): If True, the file is opened in binary mode.
+        newline (str): String indicating a new line.
+        platform_newline (str): String indicating a newline on the current
+            platform.
 
     Raises:
         ValueError: If the read_meth is not one of the supported values.
@@ -32,7 +40,7 @@ class FileComm(CommBase.CommBase):
         return super(FileComm, self).__init__(*args, **kwargs)
 
     def _init_before_open(self, read_meth='read', append=False, in_temp=False,
-                          **kwargs):
+                          open_as_binary=True, newline=None, **kwargs):
         r"""Get absolute path and set attributes."""
         super(FileComm, self)._init_before_open(**kwargs)
         if not hasattr(self, '_fd'):
@@ -41,10 +49,26 @@ class FileComm(CommBase.CommBase):
             raise ValueError("read_meth '%s' not supported." % read_meth)
         self.read_meth = read_meth
         self.append = append
-        if in_temp:
+        if newline is None:
+            newline = serialize._default_newline
+        self.newline = newline
+        self.platform_newline = platform._newline
+        self.in_temp = in_temp
+        if self.in_temp:
             self.address = os.path.join(tempfile.gettempdir(), self.address)
         self.address = os.path.abspath(self.address)
+        self.open_as_binary = open_as_binary
         self.is_file = True
+        # Put string attributes in the correct format
+        attr_conv = ['newline', 'platform_newline']
+        if self.open_as_binary:
+            func_conv = backwards.unicode2bytes
+        else:
+            func_conv = backwards.bytes2unicode
+        for k in attr_conv:
+            v = getattr(self, k)
+            if v is not None:
+                setattr(self, k, func_conv(v))
 
     @property
     def maxMsgSize(self):
@@ -71,14 +95,35 @@ class FileComm(CommBase.CommBase):
         kwargs.setdefault('address', 'file.txt')
         return args, kwargs
 
-    def _open(self):
+    @property
+    def open_mode(self):
+        r"""str: Mode that should be used to open the file."""
         if self.direction == 'recv':
-            self._fd = open(self.address, 'rb')
+            io_mode = 'r'
+        elif self.append:
+            io_mode = 'a'
         else:
-            if self.append:
-                self._fd = open(self.address, 'ab')
-            else:
-                self._fd = open(self.address, 'wb')
+            io_mode = 'w'
+        if self.open_as_binary:
+            return io_mode + 'b'
+        else:
+            return io_mode
+
+    def opp_comm_kwargs(self):
+        r"""Get keyword arguments to initialize communication with opposite
+        comm object.
+
+        Returns:
+            dict: Keyword arguments for opposite comm object.
+
+        """
+        kwargs = super(FileComm, self).opp_comm_kwargs()
+        kwargs['newline'] = self.newline
+        kwargs['open_as_binary'] = self.open_as_binary
+        return kwargs
+
+    def _open(self):
+        self._fd = open(self.address, self.open_mode)
 
     def _file_close(self):
         if self.is_open:
@@ -178,6 +223,8 @@ class FileComm(CommBase.CommBase):
 
         """
         if msg != self.eof_msg:
+            if not self.open_as_binary:
+                msg = backwards.bytes2unicode(msg)
             self.fd.write(msg)
         self.fd.flush()
         return True
@@ -190,7 +237,8 @@ class FileComm(CommBase.CommBase):
                 Defaults to self.recv_timeout. Unused.
 
         Returns:
-            bool: Success or failure of reading from the file.
+            tuple (bool, str): Success or failure of reading from the file and
+                the read messages as bytes.
 
         """
         if self.read_meth == 'read':
@@ -203,8 +251,9 @@ class FileComm(CommBase.CommBase):
         if len(out) == 0:
             out = self.eof_msg
         else:
-            out = out.replace(backwards.unicode2bytes(platform._newline),
-                              backwards.unicode2bytes('\n'))
+            out = out.replace(self.platform_newline, self.newline)
+        if not self.open_as_binary:
+            out = backwards.unicode2bytes(out)
         return (True, out)
 
     def purge(self):

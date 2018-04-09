@@ -2,10 +2,6 @@ import re
 import copy
 import numpy as np
 from cis_interface import backwards, platform, units
-from cis_interface.serialize import DefaultSerialize
-from cis_interface.serialize import AsciiTableSerialize
-from cis_interface.serialize import PickleSerialize
-from cis_interface.serialize import MatSerialize
 try:
     if backwards.PY2:  # pragma: Python 2
         from astropy.io import ascii as apy_ascii
@@ -40,13 +36,17 @@ def get_serializer(stype=0, **kwargs):
         DefaultSerializer: Serializer based on provided information.
 
     """
-    if stype in [0, 1]:
+    if stype in [0, 1, 2]:
+        from cis_interface.serialize import DefaultSerialize
         cls = DefaultSerialize.DefaultSerialize
-    elif stype in [2, 3]:
+    elif stype in [3]:
+        from cis_interface.serialize import AsciiTableSerialize
         cls = AsciiTableSerialize.AsciiTableSerialize
     elif stype == 4:
+        from cis_interface.serialize import PickleSerialize
         cls = PickleSerialize.PickleSerialize
     elif stype == 5:
+        from cis_interface.serialize import MatSerialize
         cls = MatSerialize.MatSerialize
     else:
         raise RuntimeError("Unknown serializer type code: %d" % stype)
@@ -198,6 +198,8 @@ def cformat2nptype(cfmt, names=None):
         dtype_list = [cformat2nptype(f) for f in fmt_list]
         if names is None:
             names = ['f%d' % i for i in range(nfmt)]
+        elif len(names) != nfmt:
+            raise ValueError("Number of names does not match the number of fields.")
         out = np.dtype([(n, d) for n, d in zip(names, dtype_list)])
         return out
     out = None
@@ -552,7 +554,8 @@ def format2table(fmt_str):
     for f in out['fmts'][1:]:
         isep, fmt_rem = fmt_rem.split(f, 1)
         seps.append(isep)
-    out['newline'] = fmt_rem
+    if fmt_rem:
+        out['newline'] = fmt_rem
     seps = set(seps)
     if len(seps) > 1:
         raise RuntimeError("There is more than one column separator (%s)." % seps)
@@ -560,8 +563,7 @@ def format2table(fmt_str):
     return out
 
 
-def table2format(fmts=[], delimiter=_default_delimiter, newline=_default_newline,
-                 comment=_default_comment):
+def table2format(fmts=[], delimiter=None, newline=None, comment=None):
     r"""Create a format string from table information.
 
     Args:
@@ -578,6 +580,14 @@ def table2format(fmts=[], delimiter=_default_delimiter, newline=_default_newline
         str, bytes: Table format string.
 
     """
+    if delimiter is None:
+        delimiter = _default_delimiter
+    if newline is None:
+        newline = _default_newline
+    if comment is None:
+        comment = _default_comment
+    if isinstance(fmts, np.dtype):
+        fmts = nptype2cformat(fmts)
     bytes_fmts = [backwards.unicode2bytes(f) for f in fmts]
     fmt_str = comment + delimiter.join(bytes_fmts) + newline
     return fmt_str
@@ -621,29 +631,38 @@ def array_to_table(arrs, fmt_str, use_astropy=False):
     return out
 
 
-def table_to_array(msg, fmt_str, use_astropy=False, names=None):
+def table_to_array(msg, fmt_str=None, use_astropy=False, names=None,
+                   delimiter=None, comment=None):
     r"""Extract information from an ASCII table as an array.
 
     Args:
         msg (bytes): ASCII table as bytes string.
         fmt_str (bytes): Format string that should be used to parse the table.
+            If not provided, this will attempt to determine the types of columns
+            based on their contents.
         use_astropy (bool, optional): If True, astropy will be used to parse
             the table if it is installed. Defaults to False.
         names (list, optional): Field names that should be used for the
             structured data type of the output array. If not provided, names
             are generated based on the order of the fields in the table.
+        delimiter (str, optional): String used to separate columns. Defaults to
+            None and is not used. This is only used if fmt_str is not provided.
+        comment (str, optional): String used to denote comments. Defaults to
+            None and is not used. This is only used if fmt_str is not provided.
 
     Returns:
         np.ndarray: Table contents as an array.
     
-    Raises:
-
     """
     if not _use_astropy:
         use_astropy = False
-    dtype = cformat2nptype(fmt_str, names=names)
-    info = format2table(fmt_str)
-    names = dtype.names
+    if fmt_str is None:
+        dtype = None
+        info = dict(delimiter=delimiter, comment=comment)
+    else:
+        dtype = cformat2nptype(fmt_str, names=names)
+        info = format2table(fmt_str)
+        names = dtype.names
     fd = backwards.sio.StringIO(msg)
     if use_astropy:
         tab = apy_ascii.read(fd, names=names, delimiter=info['delimiter'])
@@ -659,9 +678,11 @@ def table_to_array(msg, fmt_str, use_astropy=False, names=None):
                     arr = arr.astype(new_dtyp)
                 except ValueError:
                     pass
-        arr = arr.astype(dtype)
+        if dtype is not None:
+            arr = arr.astype(dtype)
     else:
-        arr = np.genfromtxt(fd, delimiter=info['delimiter'], dtype=dtype,
+        arr = np.genfromtxt(fd, delimiter=info['delimiter'],
+                            comments=info.get('comment', None), dtype=dtype,
                             autostrip=True, names=names)
     fd.close()
     return arr
@@ -754,11 +775,98 @@ def bytes_to_array(data, dtype, order='C', shape=None):
     return arr
 
 
-def parse_header(header):
+def format_header(format_str=None, dtype=None,
+                  comment=None, delimiter=None, newline=None,
+                  field_names=None, field_units=None):
+    r"""Get header lines for a table based on table information.
+
+    Args:
+        format_str (bytes, str, optional): Format string describing how the
+            table should be formatted. If not provided, information on the
+            formats is extracted from dtype.
+        dtype (np.dtype, optional): Structured data type specifying the types
+            of fields in the table. If not provided and format_str not
+            specified, the formats will not be part of the header.
+        comment (bytes, optional): String that should be used to comment the
+            header lines. If not provided and not in format_str, defaults to
+            _default_comment.
+        delimiter (bytes, optional): String that should be used to separate
+            columns. If not provided and not in format_str, defaults to
+            _default_delimiter.
+        newline (bytes, optional): String that should be used to end lines in
+            the table. If not provided and not in format_str, defaults to
+            _default_newline.
+        field_names (list, optional): List of field names that should be
+            included in the header. If not provided and dtype is None, names
+            will not be included in the header.
+        field_units (list, optional): List of field units that should be
+            included in the header. If not provided, units will not be
+            included.
+
+    Returns:
+        bytes: Bytes lines comprising a table header.
+
+    Raises:
+        ValueError: If there are not any format, names or units specified.
+
+    """
+    # Set defaults
+    fmts = None
+    if format_str is not None:
+        info = format2table(format_str)
+        if len(info['fmts']) > 0:
+            fmts = info['fmts']
+            if delimiter is None:
+                delimiter = info['delimiter']
+            if newline is None:
+                newline = info.get('newline', None)
+            if comment is None:
+                comment = info.get('comment', None)
+    if dtype is not None:
+        if fmts is None:
+            fmts = nptype2cformat(dtype, asbytes=True)
+        if field_names is None:
+            field_names = dtype.names
+    if delimiter is None:
+        delimiter = _default_delimiter
+    if comment is None:
+        comment = _default_comment
+    if newline is None:
+        newline = _default_newline
+    # Get count of fields
+    if fmts is not None:
+        nfld = len(fmts)
+    elif field_names is not None:
+        nfld = len(field_names)
+    elif field_units is not None:
+        nfld = len(field_units)
+    else:
+        raise ValueError("No formats, names, or units provided.")
+    # Create lines
+    out = []
+    for x in [field_names, field_units, fmts]:
+        if x is None:
+            continue
+        assert(len(x) == nfld)
+        out.append(comment + delimiter.join(x))
+    out = newline.join(out) + newline
+    return out
+
+
+def parse_header(header, newline=_default_newline, lineno_format=None,
+                 lineno_names=None, lineno_units=None):
     r"""Parse an ASCII table header to get information about the table.
 
     Args:
-        list: Header lines that should be parsed.
+        header (list, str): Header lines that should be parsed.
+        newline (str, optional): Newline character that should be used to split
+            header if it is not already a list. Defaults to _default_newline.
+        lineno_format (int, optional): Line number where formats are located.
+            If not provided, an attempt will be made to locate one.
+        lineno_names (int, optional): Line number where field names are located.
+            If not provided, an attempt will be made to locate one.
+        lineno_units (int, optional): Line number where field units are located.
+            If not provided, an attempt will be made to locate one.
 
     Returns:
         dict: Parameters describing the information determined from the header.
@@ -766,21 +874,39 @@ def parse_header(header):
     """
     out = dict()
     excl_lines = []
-    ncol = 0
-    # Locate format lines
-    for i in range(len(header)):
-        info = format2table(header[i])
+    if isinstance(header, backwards.bytes_type):
+        header = header.split(newline)
+    # Locate format line
+    if lineno_format is None:
+        for i in range(len(header)):
+            if len(extract_formats(header[i])) > 0:
+                lineno_format = i
+                break
+    # Get format information from format line
+    if lineno_format is not None:
+        excl_lines.append(lineno_format)
+        info = format2table(header[lineno_format])
         ncol = len(info['fmts'])
-        if ncol > 0:
-            excl_lines.append(i)
-            out.update(**info)
-            out['format_str'] = header[i].split(info['comment'])[-1]
-            break
-    if ncol == 0:
+        out.update(**info)
+        out['format_str'] = header[lineno_format].split(info['comment'])[-1]
+    else:
+        ncol = 0
         out.update(delimiter=_default_delimiter, comment=_default_comment,
-                   newline=_default_newline, fmts=[])
+                   fmts=[])
+    out.setdefault('newline', newline)
+    # Use explicit lines for names & units
+    if lineno_names is not None:
+        excl_lines.append(lineno_names)
+        out['field_names'] = header[lineno_names].split(out['comment'])[-1].split(
+            out['newline'])[0].split(out['delimiter'])
+    if lineno_units is not None:
+        excl_lines.append(lineno_units)
+        out['field_units'] = header[lineno_units].split(out['comment'])[-1].split(
+            out['newline'])[0].split(out['delimiter'])
     # Locate units & names
     for i in range(len(header)):
+        if ('field_units' in out) and ('field_names' in out):
+            break
         if i in excl_lines:
             continue
         cols = header[i].split(out['comment'])[-1].split(
@@ -803,5 +929,4 @@ def parse_header(header):
     return out
 
 
-__all__ = ['DefaultSerialize', 'AsciiTableSerialize',
-           'MatSerialize', 'PickleSerialize']
+__all__ = []

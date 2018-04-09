@@ -1,6 +1,6 @@
-from cis_interface import backwards
+import numpy as np
+from cis_interface import backwards, serialize
 from cis_interface.serialize.DefaultSerialize import DefaultSerialize
-from cis_interface.dataio.AsciiTable import AsciiTable
 
 
 class AsciiTableSerialize(DefaultSerialize):
@@ -13,17 +13,21 @@ class AsciiTableSerialize(DefaultSerialize):
 
     """
     def __init__(self, *args, **kwargs):
+        self.use_astropy = kwargs.pop('use_astropy', False)
         super(AsciiTableSerialize, self).__init__(*args, **kwargs)
-        self.table = AsciiTable('serialize', None, format_str=self.format_str)
+
+    @property
+    def table_info(self):
+        r"""dict: Table format information."""
+        if self.format_str is None:
+            return None
+        else:
+            return serialize.format2table(self.format_str)
 
     @property
     def serializer_type(self):
         r"""int: Type of serializer."""
-        if self.as_array:
-            out = 2
-        else:
-            out = 3
-        return out
+        return 3
         
     def func_serialize(self, args):
         r"""Serialize a message.
@@ -36,13 +40,20 @@ class AsciiTableSerialize(DefaultSerialize):
             bytes, str: Serialized message.
 
         """
+        if self.format_str is None:
+            if self.as_array:
+                dtype = args.dtype
+            else:
+                dtype = np.dtype(names=self.field_names,
+                                 formats=[type(x) for x in args])
+            self.format_str = serialize.table2format(dtype)
         if self.as_array:
-            out = self.table.array_to_bytes(args, order='F')
+            out = serialize.array_to_table(args, self.format_str,
+                                           use_astropy=self.use_astropy)
+            out = backwards.unicode2bytes(out)
         else:
-            if not isinstance(args, (list, tuple)):
-                args = [args]
-            out = self.table.format_line(*args)
-        return backwards.unicode2bytes(out)
+            out = super(AsciiTableSerialize, self).func_serialize(args)
+        return out
 
     def func_deserialize(self, msg):
         r"""Deserialize a message.
@@ -54,10 +65,14 @@ class AsciiTableSerialize(DefaultSerialize):
             obj: Deserialized message.
 
         """
+        if self.format_str is None:
+            raise RuntimeError("Format string is not defined.")
         if (len(msg) == 0):
             out = tuple()
         elif self.as_array:
-            out = self.table.bytes_to_array(msg, order='F')
+            out = serialize.table_to_array(msg, self.format_str,
+                                           use_astropy=self.use_astropy,
+                                           names=self.field_names)
         else:
-            out = self.table.process_line(msg)
+            out = super(AsciiTableSerialize, self).func_deserialize(msg)
         return out
