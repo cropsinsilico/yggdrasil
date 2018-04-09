@@ -361,15 +361,25 @@ class IOInfo(object):
     """
 
     def __init__(self):
-        self.file_field_names = ['name', 'count', 'size']
-        self.file_field_units = ['n/a', 'g', 'cm']
-        self.comment = backwards.unicode2bytes('#')
+        self.field_names = ['name', 'count', 'size']
+        self.field_units = ['n/a', 'g', 'cm']
+        self.comment = backwards.unicode2bytes('# ')
+        self.delimiter = backwards.unicode2bytes('\t')
+        self.newline = backwards.unicode2bytes('\n')
         self.fmt_str = backwards.unicode2bytes('%5s\t%d\t%f\n')
         self.fmt_str_matlab = backwards.unicode2bytes('%5s\\t%d\\t%f\\n')
         self.fmt_str_line = backwards.unicode2bytes('# ') + self.fmt_str
         # self.file_cols = ['name', 'count', 'size']
-        self.file_dtype = {'names': self.file_field_names,
+        self.file_dtype = {'names': self.field_names,
                            'formats': ['%s5' % backwards.np_dtype_str, 'i4', 'f8']}
+        self.field_names = [backwards.unicode2bytes(x) for x in self.field_names]
+        self.field_units = [backwards.unicode2bytes(x) for x in self.field_units]
+        self.field_names_line = (self.comment +
+                                 self.delimiter.join(self.field_names) +
+                                 self.newline)
+        self.field_units_line = (self.comment +
+                                 self.delimiter.join(self.field_units) +
+                                 self.newline)
         self.file_rows = [('one', int(1), 1.0),
                           ('two', int(2), 2.0),
                           ('three', int(3), 3.0)]
@@ -386,7 +396,7 @@ class IOInfo(object):
     @property
     def file_contents(self):
         r"""str: Complete contents of mock file."""
-        out = self.fmt_str_line
+        out = self.field_names_line + self.field_units_line + self.fmt_str_line
         for line in self.file_lines:
             out = out + line
         return out

@@ -382,10 +382,17 @@ class ConnectionDriver(Driver):
             bytes, str: Processed message.
 
         """
+        if (not self._first_send_done):
+            self.update_serializer()
         if self.translator is None:
             return msg
         else:
             return self.translator(msg)
+
+    def update_serializer(self):
+        r"""Update the serializer for the output comm based on input."""
+        if self.ocomm.serializer.serializer_type == 0:
+            self.ocomm.serializer = self.icomm.serializer
 
     def _send_message(self, *args, **kwargs):
         r"""Send a single message.

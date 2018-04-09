@@ -10,6 +10,16 @@ class TestAsciiTableOutputParam(parent.TestAsciiFileOutputParam):
         self.inst_kwargs['column'] = '\t'
         self.inst_kwargs['format_str'] = self.fmt_str
         self.ocomm_name = 'AsciiTableComm'
+
+    @property
+    def send_comm_kwargs(self):
+        r"""dict: Keyword arguments for send comm."""
+        out = super(TestAsciiTableOutputParam, self).send_comm_kwargs
+        out['serializer'] = None
+        out['serializer_kwargs'] = {'format_str': self.fmt_str,
+                                    'field_names': self.field_names,
+                                    'field_units': self.field_units}
+        return out
         
 
 class TestAsciiTableOutputDriverNoStart(TestAsciiTableOutputParam,
@@ -24,8 +34,7 @@ class TestAsciiTableOutputDriver(TestAsciiTableOutputParam,
 
     def send_file_contents(self):
         r"""Send file contents to driver."""
-        self.send_comm.send_nolimit(self.fmt_str)
-        for line in self.file_lines:
+        for line in self.file_rows:
             self.send_comm.send_nolimit(line)
         self.send_comm.send_nolimit_eof()
 
@@ -40,8 +49,14 @@ class TestAsciiTableOutputDriver_Array(TestAsciiTableOutputParam,
         self.inst_kwargs['column_names'] = 'None'
         self.inst_kwargs['use_astropy'] = 'False'
 
+    @property
+    def send_comm_kwargs(self):
+        r"""dict: Keyword arguments for send comm."""
+        out = super(TestAsciiTableOutputDriver_Array, self).send_comm_kwargs
+        out['serializer_kwargs']['as_array'] = True
+        return out
+
     def send_file_contents(self):
         r"""Send file contents to driver."""
-        self.send_comm.send_nolimit(self.fmt_str)
-        self.send_comm.send_nolimit(self.file_bytes)
+        self.send_comm.send_nolimit(self.file_array)
         self.send_comm.send_nolimit_eof()

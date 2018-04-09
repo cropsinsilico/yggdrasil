@@ -14,8 +14,8 @@ class TestAsciiTableComm(parent.TestAsciiFileComm):
         r"""dict: Keyword arguments for send instance."""
         out = super(TestAsciiTableComm, self).send_inst_kwargs
         out['format_str'] = self.fmt_str
-        out['column_names'] = self.file_field_names
-        out['column_units'] = self.file_field_units
+        out['column_names'] = self.field_names
+        out['column_units'] = self.field_units
         return out
 
     @property

@@ -112,8 +112,8 @@ class TestDefaultSerialize_format(TestDefaultSerialize):
     def __init__(self, *args, **kwargs):
         super(TestDefaultSerialize_format, self).__init__(*args, **kwargs)
         self._inst_kwargs = {'format_str': self.fmt_str,
-                             'field_names': self.file_field_names,
-                             'field_units': self.file_field_units}
+                             'field_names': self.field_names,
+                             'field_units': self.field_units}
         self._empty_obj = tuple()
         self._objects = self.file_rows
 
