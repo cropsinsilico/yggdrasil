@@ -488,7 +488,6 @@ class IOInfo(object):
                     x = self.load_mat(fd)
                 else:
                     x = pickle.load(fd)
-            print('loaded', x)
         elif isinstance(x, backwards.bytes_type):
             x = pickle.loads(x)
         nt.assert_equal(type(x), type(y))
