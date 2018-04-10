@@ -355,15 +355,20 @@ class CommBase(tools.CisClass):
             self.open()
 
     def _init_before_open(self, serializer=None, serializer_kwargs=None,
-                          format_str=None, **kwargs):
+                          serializer_type=None, **kwargs):
         r"""Initialization steps that should be performed after base class, but
         before the comm is opened."""
+        seri_kws = ['format_str', 'as_array', 'field_names', 'field_units',
+                    'stype']
         if serializer is not None:
             self.serializer = serializer
         else:
             if serializer_kwargs is None:
                 serializer_kwargs = {}
-            serializer_kwargs.setdefault('format_str', format_str)
+            serializer_kwargs.setdefault('stype', serializer_type)
+            for k in seri_kws:
+                if serializer_kwargs.get(k, None) is None:
+                    serializer_kwargs[k] = kwargs.pop(k, None)
             self.serializer = serialize.get_serializer(**serializer_kwargs)
 
     @classmethod
@@ -1203,6 +1208,9 @@ class CommBase(tools.CisClass):
         else:
             self._last_header = header
         if not header.get('incomplete', False):
+            # if not self._used:
+            #     self.serializer = serialize.get_serializer(**header)
+            #     msg, _ = self.serializer.deserialize(s_msg)
             self._used = True
         return flag, msg, header
 

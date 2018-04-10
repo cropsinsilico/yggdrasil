@@ -27,10 +27,6 @@ class AsciiTableComm(AsciiFileComm):
             Otherwise, the table is read/written line by line. Defaults to False.
         **kwargs: Additional keywords arguments are passed to parent class.
 
-    Attributes:
-        as_array (bool): If True, table IO is done for entire array. Otherwise,
-            the table is read/written line by line.
-
     """
     def _init_before_open(self, format_str=None, delimiter=None,
                           column_names=None, column_units=None,
@@ -47,7 +43,6 @@ class AsciiTableComm(AsciiFileComm):
                                  as_array=as_array, use_astropy=use_astropy)
         kwargs['serializer_kwargs'] = serializer_kwargs
         super(AsciiTableComm, self)._init_before_open(**kwargs)
-        self.as_array = self.serializer.as_array
         if self.serializer.as_array:
             self.read_meth = 'read'
         else:
@@ -80,6 +75,8 @@ class AsciiTableComm(AsciiFileComm):
         # Try to determine format from array without header
         if self.serializer.format_str is None:
             all_contents = self.fd.read()
+            if len(all_contents) == 0:
+                return
             arr = serialize.table_to_array(all_contents,
                                            names=self.serializer.field_names,
                                            comment=self.comment,

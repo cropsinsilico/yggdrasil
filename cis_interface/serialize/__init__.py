@@ -23,7 +23,7 @@ _default_delimiter = backwards.unicode2bytes('\t')
 _default_newline = backwards.unicode2bytes('\n')
 
 
-def get_serializer(stype=0, **kwargs):
+def get_serializer(stype=None, **kwargs):
     r"""Create a serializer from the provided information.
 
     Args:
@@ -36,6 +36,8 @@ def get_serializer(stype=0, **kwargs):
         DefaultSerializer: Serializer based on provided information.
 
     """
+    if stype is None:
+        stype = 0
     if stype in [0, 1, 2]:
         from cis_interface.serialize import DefaultSerialize
         cls = DefaultSerialize.DefaultSerialize

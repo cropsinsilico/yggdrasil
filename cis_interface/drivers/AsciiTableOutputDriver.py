@@ -50,7 +50,7 @@ class AsciiTableOutputDriver(AsciiFileOutputDriver):
                 ocomm_kws[k] = kwargs.pop(k)
                 if k in ['column_names', 'column_units', 'use_astropy', 'as_array']:
                     ocomm_kws[k] = eval_kwarg(ocomm_kws[k])
-        ocomm_kws.setdefault('format_str', 'temp')
+        # ocomm_kws.setdefault('format_str', 'temp')
         kwargs['ocomm_kws'] = ocomm_kws
         super(AsciiTableOutputDriver, self).__init__(name, args, **kwargs)
         self.debug('(%s)', args)
@@ -60,6 +60,9 @@ class AsciiTableOutputDriver(AsciiFileOutputDriver):
 
     def update_serializer(self):
         r"""Update the serializer for the output comm based on input."""
-        sinfo = self.icomm.serializer.serializer_info
+        sinfo = self.ocomm.serializer.serializer_info
         sinfo['stype'] = 3
+        sinfo.setdefault('format_str', self.icomm.serializer.format_str)
+        sinfo.setdefault('field_names', self.icomm.serializer.field_names)
+        sinfo.setdefault('field_units', self.icomm.serializer.field_units)
         self.ocomm.serializer = serialize.get_serializer(**sinfo)

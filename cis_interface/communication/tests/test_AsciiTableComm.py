@@ -7,7 +7,6 @@ class TestAsciiTableComm(parent.TestAsciiFileComm):
     def __init__(self, *args, **kwargs):
         super(TestAsciiTableComm, self).__init__(*args, **kwargs)
         self.comm = 'AsciiTableComm'
-        self.attr_list += ['as_array']
 
     @property
     def send_inst_kwargs(self):

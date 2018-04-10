@@ -184,7 +184,6 @@ class DefaultSerialize(object):
                     # out = np.empty(0, self.numpy_dtype)
                 else:
                     out = serialize.bytes_to_array(msg, self.numpy_dtype, order='F')
-                    print(out.dtype)
             else:
                 if len(msg) == 0:
                     out = tuple()
@@ -250,6 +249,12 @@ class DefaultSerialize(object):
             key_list = ['format_str', 'as_array', 'field_names', 'field_units']
             for k in key_list:
                 setattr(self, k, header_info.get(k, getattr(self, k)))
+            if self.serializer_type != header_info['stype']:
+                sinfo = self.serializer_info
+                sinfo['stype'] = header_info['stype']
+                # Monkey patch class (unadvised, but child classes are simple)
+                print('monkey patch', sinfo)
+                self = serialize.get_serializer(**sinfo)
             assert(self.serializer_type == header_info['stype'])
         body = header_info.pop('body')
         if len(body) < header_info['size']:

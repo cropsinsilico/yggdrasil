@@ -197,6 +197,7 @@ class TestCisRpc(TestBase):
         r"""Keyword arguments for the driver."""
         out = super(TestCisRpc, self).driver_kwargs
         out['comm'] = 'RPCComm'
+        out['format_str'] = self.fmt_str
         return out
 
     @property
@@ -217,7 +218,7 @@ class TestCisRpc(TestBase):
     @property
     def server_msg(self):
         r"""str: Test message for server side."""
-        return self.file_lines[0]
+        return self.file_rows[0]
         
     def test_rpcSendRecv(self):
         r"""Test sending/receiving formated output."""
@@ -293,7 +294,7 @@ class TestCisRpcClient(TestCisRpc):
     @property
     def driver_kwargs(self):
         r"""Keyword arguments for the driver."""
-        out = super(TestCisRpc, self).driver_kwargs
+        out = super(TestCisRpcClient, self).driver_kwargs
         out['comm'] = 'ServerComm'
         return out
         
@@ -316,7 +317,7 @@ class TestCisRpcServer(TestCisRpc):
     @property
     def driver_kwargs(self):
         r"""Keyword arguments for the driver."""
-        out = super(TestCisRpc, self).driver_kwargs
+        out = super(TestCisRpcServer, self).driver_kwargs
         out['comm'] = 'ClientComm'
         return out
         
@@ -337,7 +338,7 @@ class TestCisRpcServer(TestCisRpc):
     @property
     def client_msg(self):
         r"""str: Test message for client side."""
-        return self.file_lines[0]
+        return self.file_rows[0]
 
     @property
     def server_msg(self):
@@ -435,9 +436,7 @@ class TestCisAsciiFileOutput(TestBase):
         
     def test_send_line(self):
         r"""Test sending a line to a remote file."""
-        msg_flag = self.instance.send(self.fmt_str_line)
-        assert(msg_flag)
-        for lans in self.file_lines:
+        for lans in self.header_lines + self.file_lines:
             msg_flag = self.instance.send(lans)
             assert(msg_flag)
         self.instance.send_eof()
@@ -533,6 +532,14 @@ class TestCisAsciiTableOutput(TestCisAsciiFileOutput):
         self.driver_args = [self.name, self.tempfile]
         self._inst_args = [self.name, self.fmt_str]
         self._inst_kwargs = {}
+
+    @property
+    def driver_kwargs(self):
+        r"""dict: Keyword arguments for accompanying driver."""
+        out = super(TestCisAsciiTableOutput, self).driver_kwargs
+        out['column_names'] = self.field_names
+        out['column_units'] = self.field_units
+        return out
         
     def test_send_line(self):
         r"""Test sending a row to a remote table."""
@@ -565,10 +572,13 @@ class TestCisAsciiTableOutput_local(TestCisAsciiTableOutput):
     def __init__(self, *args, **kwargs):
         super(TestCisAsciiTableOutput_local, self).__init__(*args, **kwargs)
         self._inst_args = [self.tempfile, self.fmt_str]
-        self._inst_kwargs = {'dst_type': 0}  # local
+        self._inst_kwargs = {'dst_type': 0,  # local
+                             'field_names': self.field_names,
+                             'field_units': self.field_units}
 
     def test_send_line(self):
         r"""Test sending a row to a local table."""
+        # Required to get useful test names
         super(TestCisAsciiTableOutput_local, self).test_send_line()
         
         
@@ -602,10 +612,13 @@ class TestCisAsciiArrayOutput_local(TestCisAsciiArrayOutput):
     def __init__(self, *args, **kwargs):
         super(TestCisAsciiArrayOutput_local, self).__init__(*args, **kwargs)
         self._inst_args = [self.tempfile, self.fmt_str]
-        self._inst_kwargs['dst_type'] = 0  # local
+        self._inst_kwargs = {'dst_type': 0,  # local
+                             'field_names': self.field_names,
+                             'field_units': self.field_units}
 
     def test_send_line(self):
         r"""Test sending an array to a local table."""
+        # Required to get useful test names
         super(TestCisAsciiArrayOutput_local, self).test_send_line()
         
         
@@ -658,6 +671,7 @@ class TestCisPickleInput_local(TestCisPickleInput):
 
     def test_recv(self):
         r"""Test receiving a pickle from a local file."""
+        # Required to get useful test names
         super(TestCisPickleInput_local, self).test_recv()
 
         
@@ -719,4 +733,5 @@ class TestCisPickleOutput_local(TestCisPickleOutput):
 
     def test_send(self):
         r"""Test sending a pickle to a local file."""
+        # Required to get useful test names
         super(TestCisPickleOutput_local, self).test_send()

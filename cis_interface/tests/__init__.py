@@ -12,8 +12,7 @@ import nose.tools as nt
 from cis_interface.config import cis_cfg, cfg_logging
 from cis_interface.tools import get_CIS_MSG_MAX, get_default_comm, CisClass
 from cis_interface.backwards import pickle, BytesIO
-from cis_interface.dataio.AsciiTable import AsciiTable
-from cis_interface import backwards, platform
+from cis_interface import backwards, platform, serialize
 from cis_interface.communication import cleanup_comms, get_comm_class
 
 # Test data
@@ -383,6 +382,12 @@ class IOInfo(object):
         self.file_rows = [('one', int(1), 1.0),
                           ('two', int(2), 2.0),
                           ('three', int(3), 3.0)]
+
+    @property
+    def header_lines(self):
+        r"""list: Lines in a mock file header."""
+        out = [self.field_names_line, self.field_units_line, self.fmt_str_line]
+        return out
         
     @property
     def file_lines(self):
@@ -396,9 +401,11 @@ class IOInfo(object):
     @property
     def file_contents(self):
         r"""str: Complete contents of mock file."""
-        out = self.field_names_line + self.field_units_line + self.fmt_str_line
+        out = backwards.unicode2bytes('')
+        for line in self.header_lines:
+            out += line
         for line in self.file_lines:
-            out = out + line
+            out += line
         return out
 
     @property
@@ -481,6 +488,7 @@ class IOInfo(object):
                     x = self.load_mat(fd)
                 else:
                     x = pickle.load(fd)
+            print('loaded', x)
         elif isinstance(x, backwards.bytes_type):
             x = pickle.loads(x)
         nt.assert_equal(type(x), type(y))
@@ -529,8 +537,16 @@ class IOInfo(object):
                 written to.
 
         """
-        at = AsciiTable(fname, 'w', format_str=self.fmt_str)
-        at.write_array(self.file_array)
+        header = serialize.format_header(format_str=self.fmt_str,
+                                         comment=self.comment,
+                                         delimiter=self.delimiter,
+                                         newline=self.newline,
+                                         field_names=self.field_names,
+                                         field_units=self.field_units)
+        body = serialize.array_to_table(self.file_array, self.fmt_str)
+        with open(fname, 'wb') as fd:
+            fd.write(header)
+            fd.write(body)
 
     def write_pickle(self, fname):
         r"""Write the pickled table out to a file.

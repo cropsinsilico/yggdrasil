@@ -33,6 +33,8 @@ class ServerComm(CommBase.CommBase):
         self.ocomm = None
         self.response_kwargs.setdefault('comm', self.icomm.comm_class)
         self.response_kwargs.setdefault('recv_timeout', self.icomm.recv_timeout)
+        self.response_kwargs.setdefault('serializer_kwargs',
+                                        self.icomm.serializer.serializer_info)
         self._used_response_comms = dict()
         super(ServerComm, self).__init__(self.icomm.name, dont_open=dont_open,
                                          recv_timeout=self.icomm.recv_timeout,
