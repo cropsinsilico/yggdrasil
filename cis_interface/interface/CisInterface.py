@@ -40,6 +40,10 @@ def CisMatlab(_type, args=None):  # pragma: matlab
     """
     if args is None:
         args = []
+    if _type.startswith('Psi'):
+        _type = _type.replace('Psi', 'Cis', 1)
+    elif _type.startswith('PSI'):
+        _type = _type.replace('PSI', 'CIS', 1)
     cls = eval(_type)
     if isinstance(cls, (int, backwards.bytes_type, backwards.unicode_type)):
         obj = cls
