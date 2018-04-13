@@ -1,4 +1,5 @@
 import numpy as np
+from cis_interface import backwards
 from cis_interface.serialize.tests.test_DefaultSerialize import \
     TestDefaultSerialize
 
@@ -21,7 +22,7 @@ class TestAsciiTableSerializeSingle(TestAsciiTableSerialize):
 
     def __init__(self, *args, **kwargs):
         super(TestAsciiTableSerializeSingle, self).__init__(*args, **kwargs)
-        self._inst_kwargs['format_str'] = '%d\n'
+        self._inst_kwargs['format_str'] = backwards.unicode2bytes('%d\n')
         self._objects = [(1, )]
 
 

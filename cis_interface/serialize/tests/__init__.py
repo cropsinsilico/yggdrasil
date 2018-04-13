@@ -171,7 +171,7 @@ def test_cformat2pyscanf():
 
 def test_format_message():
     r"""Test formatting message from a list or arguments and back."""
-    fmt = "%5s\t%ld\t%lf\t%g%+gj\n"
+    fmt = backwards.unicode2bytes("%5s\t%ld\t%lf\t%g%+gj\n")
     dtype = serialize.cformat2nptype(fmt)
     x_arr = np.ones(1, dtype)
     x_tup = [x_arr[n][0] for n in x_arr.dtype.names]

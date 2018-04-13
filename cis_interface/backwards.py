@@ -39,16 +39,19 @@ def scanf_bytes(fmt, bytes_line):
         out_byt = scanf(fmt, bytes_line)
     else:  # pragma: Python 3
         out_uni = scanf(bytes2unicode(fmt), bytes2unicode(bytes_line))
-        out_byt = out_uni
-        # if out_uni is None:
-        #     out_byt = None
-        # else:
-        #     out_byt = []
-        #     for a in out_uni:
-        #         if isinstance(a, unicode_type):
-        #             out_byt.append(unicode2bytes(a))
-        #         else:
-        #             out_byt.append(a)
+        if isinstance(bytes_line, unicode_type):
+            out_byt = out_uni
+        else:
+            if out_uni is None:
+                out_byt = None
+            else:
+                out_byt = []
+                for a in out_uni:
+                    if isinstance(a, unicode_type):
+                        out_byt.append(unicode2bytes(a))
+                    else:
+                        out_byt.append(a)
+                out_byt = tuple(out_byt)
     return out_byt
 
 

@@ -379,14 +379,22 @@ class IOInfo(object):
         self.field_units_line = (self.comment +
                                  self.delimiter.join(self.field_units) +
                                  self.newline)
-        self.file_rows = [('one', int(1), 1.0),
-                          ('two', int(2), 2.0),
-                          ('three', int(3), 3.0)]
+        self.file_elements = [('one', int(1), 1.0),
+                              ('two', int(2), 2.0),
+                              ('three', int(3), 3.0)]
 
     @property
     def header_lines(self):
         r"""list: Lines in a mock file header."""
         out = [self.field_names_line, self.field_units_line, self.fmt_str_line]
+        return out
+
+    @property
+    def file_rows(self):
+        r"""list: File rows."""
+        out = []
+        for x in self.file_elements:
+            out.append((backwards.unicode2bytes(x[0]), x[1], x[2]))
         return out
         
     @property
@@ -394,8 +402,7 @@ class IOInfo(object):
         r"""list: Lines in a mock file."""
         out = []
         for r in self.file_rows:
-            out.append(backwards.unicode2bytes(
-                backwards.bytes2unicode(self.fmt_str) % r))
+            out.append(self.fmt_str % r)
         return out
 
     @property

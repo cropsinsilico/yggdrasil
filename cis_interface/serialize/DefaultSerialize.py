@@ -96,7 +96,7 @@ class DefaultSerialize(object):
                                "defined functions.")
         out = dict(stype=self.serializer_type)
         if self.format_str:
-            out['format_str'] = backwards.bytes2unicode(self.format_str)
+            out['format_str'] = self.format_str
         if self.as_array:
             out['as_array'] = int(self.as_array)
         if self.field_names:
@@ -316,9 +316,11 @@ class DefaultSerialize(object):
         for k in ['size', 'as_array', 'stype']:
             if k in out:
                 out[k] = int(float(out[k]))
-        for k in ['field_names', 'field_units']:
+        for k in ['format_str', 'field_names', 'field_units']:
             if k in out:
-                out[k] = out[k].split(',')
+                out[k] = backwards.unicode2bytes(out[k])
+                if k in ['field_names', 'field_units']:
+                    out[k] = out[k].split(backwards.unicode2bytes(','))
         # for k in ['format_str']:
         #     if k in out:
         #         out[k] = backwards.unicode2bytes(out[k])

@@ -73,8 +73,9 @@ class AsciiTableComm(AsciiFileComm):
             if header.get(k, False):
                 setattr(self.serializer, k, header[k])
         # Try to determine format from array without header
+        str_fmt = backwards.unicode2bytes('%s')
         if (((self.serializer.format_str is None) or
-             ('%s' in self.serializer.format_str))):
+             (str_fmt in self.serializer.format_str))):
             with open(self.address, self.open_mode) as fd:
                 fd.seek(header_size)
                 all_contents = fd.read()
@@ -89,11 +90,12 @@ class AsciiTableComm(AsciiFileComm):
                 self.serializer.format_str = serialize.table2format(
                     arr.dtype, delimiter=self.delimiter, comment=self.comment,
                     newline=self.newline)
-            while '%s' in self.serializer.format_str:
-                ifld = self.serializer.field_formats.index('%s')
+            while str_fmt in self.serializer.format_str:
+                ifld = self.serializer.field_formats.index(str_fmt)
                 max_len = len(max(arr[self.serializer.field_names[ifld]], key=len))
+                new_str_fmt = backwards.unicode2bytes('%' + str(max_len) + 's')
                 self.serializer.format_str = self.serializer.format_str.replace(
-                    '%s', '%' + str(max_len) + 's', 1)
+                    str_fmt, new_str_fmt, 1)
         self.delimiter = self.serializer.table_info['delimiter']
         # Seek to just after the header
         self.fd.seek(header_size)
@@ -107,7 +109,8 @@ class AsciiTableComm(AsciiFileComm):
             format_str=self.serializer.format_str,
             field_names=self.serializer.field_names,
             field_units=self.serializer.field_units,
-            comment=self.comment, newline=self.newline)
+            comment=self.comment, newline=self.newline,
+            delimiter=self.delimiter)
         self.fd.write(header_msg)
         self.header_was_written = True
 

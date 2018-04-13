@@ -202,7 +202,10 @@ def cformat2nptype(cfmt, names=None):
             names = ['f%d' % i for i in range(nfmt)]
         elif len(names) != nfmt:
             raise ValueError("Number of names does not match the number of fields.")
-        out = np.dtype([(n, d) for n, d in zip(names, dtype_list)])
+        else:
+            names = [backwards.bytes2unicode(n) for n in names]
+        out = np.dtype(dict(names=names, formats=dtype_list))
+        # out = np.dtype([(n, d) for n, d in zip(names, dtype_list)])
         return out
     out = None
     if cfmt_str[-1] in ['j']:
@@ -621,7 +624,7 @@ def array_to_table(arrs, fmt_str, use_astropy=False):
     dtype = cformat2nptype(fmt_str)
     info = format2table(fmt_str)
     arr1 = consolidate_array(arrs, dtype=dtype)
-    fd = backwards.sio.StringIO()
+    fd = backwards.BytesIO()
     if use_astropy:
         table = apy_Table(arr1)
         apy_ascii.write(table, fd, delimiter=info['delimiter'],
@@ -671,7 +674,7 @@ def table_to_array(msg, fmt_str=None, use_astropy=False, names=None,
         dtype = cformat2nptype(fmt_str, names=names)
         info = format2table(fmt_str)
         names = dtype.names
-    fd = backwards.sio.StringIO(msg)
+    fd = backwards.BytesIO(msg)
     if use_astropy:
         tab = apy_ascii.read(fd, names=names, delimiter=info['delimiter'])
         arr = tab.as_array()
@@ -689,6 +692,8 @@ def table_to_array(msg, fmt_str=None, use_astropy=False, names=None,
         if dtype is not None:
             arr = arr.astype(dtype)
     else:
+        if names is not None:
+            names = [backwards.bytes2unicode(n) for n in names]
         arr = np.genfromtxt(fd, delimiter=info['delimiter'],
                             comments=info.get('comment', None), dtype=dtype,
                             autostrip=True, names=names)
