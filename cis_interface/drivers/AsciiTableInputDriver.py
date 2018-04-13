@@ -47,7 +47,7 @@ class AsciiTableInputDriver(AsciiFileInputDriver):
         super(AsciiTableInputDriver, self).__init__(name, args, **kwargs)
         self.debug('(%s)', args)
 
-    def update_serializer(self):
+    def update_serializer(self, msg):
         r"""Update the serializer for the output comm based on input."""
         sinfo = self.icomm.serializer.serializer_info
         sinfo['stype'] = 0

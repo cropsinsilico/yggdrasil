@@ -60,6 +60,28 @@ map_cformat2nptype.append(
      'complex128'))
 
 
+def test_guess_serializer():
+    r"""Test guess_serializer."""
+    nele = 5
+    names = ["name", "number", "value", "complex"]
+    field_names = [backwards.unicode2bytes(n) for n in names]
+    dtypes = ['S5', 'i8', 'f8', 'c16']
+    dtype = np.dtype([(n, f) for n, f in zip(names, dtypes)])
+    arr_mix = np.zeros(nele, dtype)
+    arr_mix['name'][0] = 'hello'
+    fmt_arr = serialize._default_delimiter.join(
+        serialize.nptype2cformat(arr_mix.dtype, asbytes=True))
+    fmt_arr += serialize._default_newline
+    fmt = backwards.unicode2bytes('%s\t%ld\t%g\t%g%+gj\n')
+    test_list = [(arr_mix, dict(field_names=field_names, format_str=fmt_arr,
+                                stype=2, as_array=1)),
+                 (arr_mix[0].tolist(), dict(format_str=fmt, stype=1)),
+                 ('hello', dict(stype=0))]
+    for obj, sinfo_ans in test_list:
+        s = serialize.guess_serializer(obj)
+        nt.assert_equal(s.serializer_info, sinfo_ans)
+
+
 def test_get_serializer():
     r"""Test get_serializer."""
     max_code = 6
@@ -421,6 +443,25 @@ def test_parse_header():
     nt.assert_raises(RuntimeError, serialize.parse_header, header3)
     header4 = [header[1], header[1]]
     nt.assert_raises(RuntimeError, serialize.parse_header, header4)
+
+
+def test_numpy2pandas():
+    r"""Test conversion of a numpy array to a pandas data frame and back."""
+    nele = 5
+    names = ["name", "number", "value", "complex"]
+    dtypes = ['S5', 'i8', 'f8', 'c16']
+    dtype = np.dtype([(n, f) for n, f in zip(names, dtypes)])
+    arr_mix = np.zeros(nele, dtype)
+    arr_mix['name'][0] = 'hello'
+    arr_obj = np.array([list(), 'hello', 5], dtype='O')
+    test_arrs = [arr_mix,
+                 np.zeros(nele, 'float'),
+                 arr_mix['name'],
+                 arr_obj]
+    for ans in test_arrs:
+        frame = serialize.numpy2pandas(ans)
+        res = serialize.pandas2numpy(frame)
+        np.testing.assert_array_equal(ans, res)
 
 
 __all__ = []

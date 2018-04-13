@@ -1,6 +1,7 @@
 import re
 import copy
 import numpy as np
+import pandas
 from cis_interface import backwards, platform, units
 try:
     if backwards.PY2:  # pragma: Python 2
@@ -21,6 +22,43 @@ _fmt_char = backwards.unicode2bytes('%')
 _default_comment = backwards.unicode2bytes('# ')
 _default_delimiter = backwards.unicode2bytes('\t')
 _default_newline = backwards.unicode2bytes('\n')
+
+
+def guess_serializer(msg, **kwargs):
+    r"""Guess the type of serializer required based on the message object.
+
+    Args:
+        msg (obj): Python object that needs to be serialized.
+        **kwargs: Additional keyword arguments are passed to the serializer.
+
+    Returns:
+        DefaultSerializer: Serializer for object.
+
+    """
+    sinfo = dict(**kwargs)
+    kws_fmt = {k: kwargs.get(k, None) for k in ['delimiter', 'newline']}
+    kws_fmt['comment'] = backwards.unicode2bytes('')
+    if isinstance(msg, np.ndarray):
+        names = [backwards.unicode2bytes(n) for n in msg.dtype.names]
+        sinfo.setdefault('field_names', names)
+        sinfo.setdefault('format_str', table2format(msg.dtype, **kws_fmt))
+        sinfo.setdefault('as_array', True)
+    elif isinstance(msg, (list, tuple)):
+        typ_list = []
+        for x in msg:
+            if isinstance(x, backwards.string_types):
+                typ_list.append(np.dtype('S1'))
+            else:
+                typ_list.append(np.dtype(type(x)))
+        new_type = dict(formats=typ_list,
+                        names=['f%d' % i for i in range(len(typ_list))])
+        row_dtype = np.dtype(new_type)
+        format_str = table2format(row_dtype, **kws_fmt)
+        format_str = format_str.replace(backwards.unicode2bytes('%1s'),
+                                        backwards.unicode2bytes('%s'))
+        sinfo.setdefault('format_str', format_str)
+    out = get_serializer(**sinfo)
+    return out
 
 
 def get_serializer(stype=None, **kwargs):
@@ -697,7 +735,6 @@ def table_to_array(msg, fmt_str=None, use_astropy=False, names=None,
     else:
         if names is not None:
             names = [backwards.bytes2unicode(n) for n in names]
-        print(names, dtype)
         arr = np.genfromtxt(fd, delimiter=info['delimiter'],
                             comments=info.get('comment', None), dtype=dtype,
                             autostrip=True, names=names)
@@ -943,6 +980,55 @@ def parse_header(header, newline=_default_newline, lineno_format=None,
                 if 'field_names' in out:
                     raise RuntimeError("Two lines could contain the field names.")
                 out['field_names'] = cols
+    return out
+
+
+def numpy2pandas(arr):
+    r"""Covert a numpy structured array to a Pandas DataFrame.
+
+    Args:
+        arr (np.ndarray): Array to convert.
+
+    Returns:
+        pandas.DataFrame: Pandas data frame with contents from the input array.
+
+    """
+    return pandas.DataFrame(arr)
+
+
+def pandas2numpy(frame, index=False):
+    r"""Convert a Pandas DataFrame to a numpy structured array.
+
+    Args:
+        frame (pandas.DataFrame): Frame to convert.
+        index (bool, optional): If True, the index will be included as a field
+            in the array. Defaults to False.
+
+    Returns:
+        np.ndarray: Structured numpy array.
+
+    """
+    arr = frame.to_records(index=index)
+    # Covert object type to string
+    old_dtype = arr.dtype
+    new_dtype = dict(names=old_dtype.names, formats=[])
+    for i in range(len(old_dtype)):
+        if old_dtype[i] == object:
+            try:
+                max_len = len(max(arr[old_dtype.names[i]], key=len))
+                new_dtype['formats'].append(np.dtype("S%s" % max_len))
+            except TypeError:
+                new_dtype['formats'].append(old_dtype[i])
+        else:
+            new_dtype['formats'].append(old_dtype[i])
+    # Convert to unstructured array if name is default and only one column
+    if (len(new_dtype['names']) == 1) and (new_dtype['names'][0] == '0'):
+        out = np.zeros(arr.shape, dtype=new_dtype['formats'][0])
+        out[:] = arr[new_dtype['names'][0]]
+    else:
+        new_dtype = np.dtype(new_dtype)
+        out = np.zeros(arr.shape, dtype=new_dtype)
+        out[:] = arr[:]
     return out
 
 

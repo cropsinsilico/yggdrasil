@@ -237,6 +237,10 @@ class CommBase(tools.CisClass):
             Defaults to False.
         is_response_server (bool, optional): If True, the comm is a server-side
             response comm. Defaults to False.
+        recv_converter (func, optional): Converter that should be used on
+            received objects. Defaults to None.
+        send_converter (func, optional): Converter that should be used on
+            sent objects. Defaults to None.
         comm (str, optional): The comm that should be created. This only serves
             as a check that the correct class is being created. Defaults to None.
         matlab (bool, optional): True if the comm will be accessed by Matlab
@@ -269,6 +273,8 @@ class CommBase(tools.CisClass):
         is_response_server (bool): If True, the comm is a server-side response
             comm.
         is_file (bool): True if the comm accesses a file.
+        recv_converter (func): Converter that should be used on received objects.
+        send_converter (func): Converter that should be used on sent objects.
         matlab (bool): True if the comm will be accessed by Matlab code.
 
     Raises:
@@ -285,6 +291,7 @@ class CommBase(tools.CisClass):
                  single_use=False, reverse_names=False, no_suffix=False,
                  is_client=False, is_response_client=False,
                  is_server=False, is_response_server=False,
+                 recv_converter=None, send_converter=None,
                  comm=None, matlab=False, **kwargs):
         self._comm_class = None
         if comm is not None:
@@ -310,6 +317,8 @@ class CommBase(tools.CisClass):
         self.is_response_server = is_response_server
         self.is_file = False
         self.matlab = matlab
+        self.recv_converter = recv_converter
+        self.send_converter = send_converter
         self._server = None
         self.is_interface = is_interface
         self.recv_timeout = recv_timeout
@@ -993,8 +1002,17 @@ class CommBase(tools.CisClass):
         else:
             flag = True
             add_sinfo = (self._send_serializer and (not self.is_file))
-            # add_sinfo = (not (self._used or self.is_file))
-            msg_s = self.serializer.serialize(msg, header_kwargs=header_kwargs,
+            # Covert object
+            if self.send_converter is not None:
+                msg_ = self.send_converter(msg)
+            else:
+                msg_ = msg
+            # Guess at serializer if not yet set
+            if add_sinfo and (self.serializer.serializer_type == 0):
+                self.serializer = serialize.guess_serializer(
+                    msg_, **self.serializer.serializer_info)
+            # Serialize
+            msg_s = self.serializer.serialize(msg_, header_kwargs=header_kwargs,
                                               add_serializer_info=add_sinfo)
             # Create work comm if message too large to be sent all at once
             if (len(msg_s) > self.maxMsgSize) and (self.maxMsgSize != 0):
@@ -1005,7 +1023,7 @@ class CommBase(tools.CisClass):
                     header_kwargs['address'] = work_comm.address
                     header_kwargs['id'] = work_comm.uuid
                     msg_s = self.serializer.serialize(
-                        msg, header_kwargs=header_kwargs,
+                        msg_, header_kwargs=header_kwargs,
                         add_serializer_info=add_sinfo)
         return flag, msg_s, header_kwargs
 
@@ -1204,7 +1222,11 @@ class CommBase(tools.CisClass):
         flag = True
         if s_msg == self.eof_msg:
             flag = self.on_recv_eof()
-        msg, header = self.serializer.deserialize(s_msg)
+        msg_, header = self.serializer.deserialize(s_msg)
+        if (self.recv_converter is not None) and (s_msg != self.eof_msg):
+            msg = self.recv_converter(msg_)
+        else:
+            msg = msg_
         if second_pass:
             header = self._last_header
             header['incomplete'] = False

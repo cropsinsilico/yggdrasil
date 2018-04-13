@@ -407,6 +407,14 @@ class IOInfo(object):
         return out
 
     @property
+    def pandas_file_contents(self):
+        r"""str: Contents of mock Pandas file."""
+        s = serialize.get_serializer(stype=6, delimiter=self.delimiter,
+                                     write_header=True)
+        out = s.serialize(self.pandas_frame)
+        return out
+
+    @property
     def file_contents(self):
         r"""str: Complete contents of mock file."""
         out = backwards.unicode2bytes('')
@@ -572,6 +580,17 @@ class IOInfo(object):
         """
         with open(fname, 'wb') as fd:
             pickle.dump(self.data_dict, fd)
+
+    def write_pandas(self, fname):
+        r"""Write the pandas data frame out to a file.
+
+        Args:
+            fname (str): Full path to the file that the pickle should be
+                written to.
+
+        """
+        with open(fname, 'wb') as fd:
+            fd.write(self.pandas_file_contents)
 
 
 # class CisTestBaseInfo(CisTestBase, IOInfo):

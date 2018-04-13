@@ -266,6 +266,8 @@ def parse_connection(yml, yamldir, existing):
         elif read_meth == 'table_array':
             xi['driver'] = 'AsciiTableInputDriver'
             xi['as_array'] = True
+        elif read_meth == 'pandas':
+            xi['driver'] = 'PandasFileInputDriver'
         else:
             raise ValueError("Invalid read_meth '%s'." % read_meth)
         xo = None
@@ -284,6 +286,8 @@ def parse_connection(yml, yamldir, existing):
         elif write_meth == 'table_array':
             xo['driver'] = 'AsciiTableOutputDriver'
             xo['as_array'] = True
+        elif write_meth == 'pandas':
+            xo['driver'] = 'PandasFileOutputDriver'
         else:
             raise ValueError("Invalid write_meth '%s'." % write_meth)
         xi = None

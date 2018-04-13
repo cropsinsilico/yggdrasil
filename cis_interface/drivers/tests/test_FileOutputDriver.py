@@ -73,6 +73,11 @@ class TestFileOutputDriver(TestFileOutputParam, parent.TestConnectionDriver):
     #     r"""Commands to run while the instance is running."""
     #     self.send_file_contents()
 
+    @property
+    def contents_to_read(self):
+        r"""str: Contents that should be read to the file."""
+        return self.file_contents
+
     def assert_before_stop(self):
         r"""Assertions to make before stopping the driver instance."""
         # super(TestFileOutputDriver, self).assert_before_stop()
@@ -84,7 +89,7 @@ class TestFileOutputDriver(TestFileOutputParam, parent.TestConnectionDriver):
         assert(os.path.isfile(self.filepath))
         with open(self.filepath, 'rb') as fd:
             data = fd.read()
-        nt.assert_equal(data, self.file_contents)
+        nt.assert_equal(data, self.contents_to_read)
 
     def assert_after_terminate(self):
         r"""Assertions to make after terminating the driver instance."""

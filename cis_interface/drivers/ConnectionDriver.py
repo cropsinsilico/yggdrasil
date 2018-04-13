@@ -383,13 +383,13 @@ class ConnectionDriver(Driver):
 
         """
         if (self.ocomm._send_serializer):
-            self.update_serializer()
+            self.update_serializer(msg)
         if self.translator is None:
             return msg
         else:
             return self.translator(msg)
 
-    def update_serializer(self):
+    def update_serializer(self, msg):
         r"""Update the serializer for the output comm based on input."""
         if self.ocomm.serializer.serializer_type == 0:
             self.ocomm.serializer = self.icomm.serializer

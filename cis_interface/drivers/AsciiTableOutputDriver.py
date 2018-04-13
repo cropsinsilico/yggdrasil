@@ -58,7 +58,7 @@ class AsciiTableOutputDriver(AsciiFileOutputDriver):
             timeout_recv_format = 60
         self.timeout_recv_format = timeout_recv_format
 
-    def update_serializer(self):
+    def update_serializer(self, msg):
         r"""Update the serializer for the output comm based on input."""
         sinfo = self.ocomm.serializer.serializer_info
         sinfo['stype'] = 3

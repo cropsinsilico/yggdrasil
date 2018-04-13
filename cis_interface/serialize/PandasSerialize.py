@@ -5,7 +5,20 @@ from cis_interface.serialize.DefaultSerialize import DefaultSerialize
 
 
 class PandasSerialize(DefaultSerialize):
-    r"""Class for serializing/deserializing Pandas data frames."""
+    r"""Class for serializing/deserializing Pandas data frames.
+
+    Args:
+        delimiter (str, optional): Delimiter that should be used to serialize
+            pandas data frames to/from csv style files. Defaults to \t.
+        write_header (bool, optional): If True, headers will be added to
+            serialized tables. Defaults to True.
+
+    """
+
+    def __init__(self, *args, **kwargs):
+        self.delimiter = backwards.bytes2unicode(kwargs.pop('delimiter', '\t'))
+        self.write_header = kwargs.pop('write_header', True)
+        super(PandasSerialize, self).__init__(*args, **kwargs)
 
     @property
     def serializer_type(self):
@@ -31,7 +44,8 @@ class PandasSerialize(DefaultSerialize):
             for c in args.columns:
                 if isinstance(args_[c][0], backwards.bytes_type):
                     args_[c] = args_[c].apply(lambda s: s.decode('utf-8'))
-        args_.to_csv(fd, index=False, sep='\t', mode='wb', encoding='utf8')
+        args_.to_csv(fd, index=False, sep=self.delimiter,
+                     mode='wb', encoding='utf8', header=self.write_header)
         out = fd.getvalue()
         fd.close()
         return backwards.unicode2bytes(out)
@@ -50,11 +64,14 @@ class PandasSerialize(DefaultSerialize):
             out = msg
         else:
             fd = backwards.BytesIO(msg)
-            out = pandas.read_csv(fd, sep='\t', encoding='utf8')
+            out = pandas.read_csv(fd, sep=self.delimiter, encoding='utf8')
             fd.close()
             if not backwards.PY2:
                 # For Python 3 and higher, make sure strings are bytes
-                for c in out.columns:
-                    if isinstance(out[c][0], backwards.unicode_type):
+                for c, d in zip(out.columns, out.dtypes):
+                    if d == object:
                         out[c] = out[c].apply(lambda s: s.encode('utf-8'))
+            # for c, d in zip(out.columns, out.dtypes):
+            #     if d == object:
+            #         out[c] = out[c].apply(lambda s: s.strip())
         return out

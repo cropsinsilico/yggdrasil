@@ -1,4 +1,4 @@
-from cis_interface import backwards, tools
+from cis_interface import backwards, tools, serialize
 from cis_interface.communication import DefaultComm
 #    DefaultComm, RPCComm, ServerComm, ClientComm)
 
@@ -396,6 +396,63 @@ def CisPickleOutput(name, dst_type=1, matlab=False, **kwargs):
     else:
         base = DefaultComm
         kwargs['serializer_kwargs'] = dict(stype=4)
+    kwargs.setdefault('direction', 'send')
+    out = base(name, is_interface=True, recv_timeout=False,
+               matlab=matlab, **kwargs)
+    return out
+
+
+def CisPandasInput(name, src_type=1, matlab=False, **kwargs):
+    r"""Get class for handling Pandas input.
+
+    Args:
+        name (str): The path to the local file to read input from (if src_type
+            == 0) or the name of the message queue input should be received
+            from.
+        src_type (int, optional): If 0, input is read from a local file.
+            Otherwise, the input is received from a message queue. Defaults to
+            1.
+        **kwargs: Additional keyword arguments are passed to the base comm.
+
+    Returns:
+        DefaultComm: Communication object.
+        
+    """
+    if src_type == 0:
+        from cis_interface.communication import PandasFileComm
+        base = PandasFileComm.PandasFileComm
+        kwargs.setdefault('address', name)
+    else:
+        base = DefaultComm
+        kwargs['recv_converter'] = serialize.numpy2pandas
+    kwargs.setdefault('direction', 'recv')
+    out = base(name, is_interface=True, recv_timeout=False,
+               matlab=matlab, **kwargs)
+    return out
+
+
+def CisPandasOutput(name, dst_type=1, matlab=False, **kwargs):
+    r"""Get class for handling pandasd output.
+
+    Args:
+        name (str): The path to the local file where output should be saved
+            (if dst_type == 0) or the name of the message queue where the
+            output should be sent.
+        dst_type (int, optional): If 0, output is sent to a local file.
+            Otherwise, the output is sent to a message queue. Defaults to 1.
+        **kwargs: Additional keyword arguments are passed to the base comm.
+
+    Returns:
+        DefaultComm: Communication object.
+        
+    """
+    if dst_type == 0:
+        from cis_interface.communication import PandasFileComm
+        base = PandasFileComm.PandasFileComm
+        kwargs.setdefault('address', name)
+    else:
+        base = DefaultComm
+        kwargs['send_converter'] = serialize.pandas2numpy
     kwargs.setdefault('direction', 'send')
     out = base(name, is_interface=True, recv_timeout=False,
                matlab=matlab, **kwargs)
