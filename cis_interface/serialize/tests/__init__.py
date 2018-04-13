@@ -31,10 +31,10 @@ if np.dtype('int_') != np.dtype('longlong'):
     else:  # pragma: debug
         map_nptype2cformat.append(('longlong', '%lld'))
         map_nptype2cformat.append(('ulonglong', '%llu'))
-map_cformat2pyscanf = [(['%hhd', '%hd', '%d', '%ld', '%lld', '%l64d'], '%d'),
-                       (['%hhu', '%hu', '%u', '%lu', '%llu', '%l64u'], '%u'),
-                       (['%5s', '%s'], '%s'),
+map_cformat2pyscanf = [(['%5s', '%s'], '%s'),
                        ('%s', '%s'),
+                       # (['%hhd', '%hd', '%d', '%ld', '%lld', '%l64d'], '%d'),
+                       # (['%hhu', '%hu', '%u', '%lu', '%llu', '%l64u'], '%u'),
                        ('%g%+gj', '%g%+gj')]
 
 unsupported_cfmt = ['a', 'A', 'p', 'n', '']

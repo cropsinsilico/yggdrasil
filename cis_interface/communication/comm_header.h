@@ -22,6 +22,11 @@ typedef struct comm_head_t {
   char id[COMMBUFFSIZ]; //!< Unique ID associated with this message.
   char response_address[COMMBUFFSIZ]; //!< Response address.
   char request_id[COMMBUFFSIZ]; //!< Request id.
+  int serializer_type; //!< Code indicating the type of serializer.
+  char format_str[COMMBUFFSIZ]; //!< Format string for serializer.
+  char field_names[COMMBUFFSIZ]; //!< String containing field names.
+  char field_units[COMMBUFFSIZ]; //!< String containing field units.
+  int as_array; //!< 1 if messages will be serialized arrays.
 } comm_head_t;
 
 /*!
@@ -51,6 +56,9 @@ comm_head_t init_header(const size_t size, const char *address, const char *id) 
     strcpy(out.id, id);
   out.response_address[0] = '\0';
   out.request_id[0] = '\0';
+  out.serializer_type = -1;
+  out.format_str[0] = '\0';
+  out.as_array = 0;
   /* if (response_address == NULL) */
   /*   out.response_address[0] = '\0'; */
   /* else */
@@ -90,18 +98,19 @@ static inline
 int parse_header_entry(const char *head, const char *key, char *value,
 		       const size_t valsiz) {
   // Compile
+  /*
   if (strlen(HEAD_KEY_SEP) > 1) {
     cislog_error("parse_header_entry: HEAD_KEY_SEP is more than one character. Fix regex.");
     return -1;
-  }
+    } */
   char regex_text[200];
   regex_text[0] = '\0';
   strcat(regex_text, HEAD_KEY_SEP);
   strcat(regex_text, key);
   strcat(regex_text, HEAD_VAL_SEP);
-  strcat(regex_text, "([^");
+  strcat(regex_text, "([^(");
   strcat(regex_text, HEAD_KEY_SEP);
-  strcat(regex_text, "]*)");
+  strcat(regex_text, ")]*)");
   strcat(regex_text, HEAD_KEY_SEP);
   // Extract substring
   size_t *sind = NULL;
@@ -202,6 +211,41 @@ int format_comm_header(const comm_head_t head, char *buf, const size_t bufsiz) {
       pos += ret;
     }
   }
+  // Serializer type
+  if (head.serializer_type >= 0) {
+    char stype_str[100];
+    sprintf(stype_str, "%d", head.serializer_type);
+    ret = format_header_entry(buf + pos, "stype", stype_str, bufsiz - pos);
+    if (ret < 0) {
+      cislog_error("Adding stype entry would exceed buffer size\n");
+      return ret;
+    } else {
+      pos += ret;
+    }
+  }
+  // Serializer format_str
+  if (strlen(head.format_str) > 0) {
+    ret = format_header_entry(buf + pos, "format_str",
+			      head.format_str, bufsiz - pos);
+    if (ret < 0) {
+      cislog_error("Adding format_str entry would exceed buffer size\n");
+      return ret;
+    } else {
+      pos += ret;
+    }
+  }
+  // Serializer as_array
+  if (head.as_array > 0) {
+    char as_array_str[100];
+    sprintf(as_array_str, "%d", head.as_array);
+    ret = format_header_entry(buf + pos, "as_array", as_array_str, bufsiz - pos);
+    if (ret < 0) {
+      cislog_error("Adding as_array entry would exceed buffer size\n");
+      return ret;
+    } else {
+      pos += ret;
+    }
+  }
   // Closing header tag
   pos -= strlen(HEAD_KEY_SEP);
   buf[pos] = '\0';
@@ -275,6 +319,21 @@ comm_head_t parse_comm_header(const char *buf, const size_t bufsiz) {
     ret = parse_header_entry(head, "id", out.id, COMMBUFFSIZ);
     ret = parse_header_entry(head, "response_address", out.response_address, COMMBUFFSIZ);
     ret = parse_header_entry(head, "request_id", out.request_id, COMMBUFFSIZ);
+    // Extract serializer type
+    char stype_str[COMMBUFFSIZ];
+    ret = parse_header_entry(head, "stype", stype_str, COMMBUFFSIZ);
+    if (ret >= 0)
+      out.serializer_type = atoi(stype_str);
+    // Extract as_array serialization parameter
+    char array_str[COMMBUFFSIZ];
+    ret = parse_header_entry(head, "as_array", array_str, COMMBUFFSIZ);
+    if (ret >= 0)
+      out.as_array = atoi(array_str);
+    // Extract serializer information
+    ret = parse_header_entry(head, "format_str", out.format_str, COMMBUFFSIZ);
+    ret = parse_header_entry(head, "field_names", out.field_names, COMMBUFFSIZ);
+    ret = parse_header_entry(head, "field_units", out.field_units, COMMBUFFSIZ);
+    // Free header
     free(head);
   }
   return out;

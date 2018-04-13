@@ -143,6 +143,7 @@ class ClientRequestDriver(ConnectionDriver):
         # self.sleep()  # Help ensure that the server is connected
         self.debug("Sending client sign on")
         super(ClientRequestDriver, self).send_message(CIS_CLIENT_INI)
+        self.ocomm._send_serializer = True
         # self.info("%s: before loop complete", self.name)
 
     def send_eof(self):

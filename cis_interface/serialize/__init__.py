@@ -283,15 +283,19 @@ def cformat2pyscanf(cfmt):
                          "provided format string (%s)." % cfmt)
     for cfmt_str in fmt_list:
         # Hacky, but necessary to handle concatenation of a single byte
-        if cfmt_str[-1] == 'j':
-            # Handle complex format specifier
-            out = '%g%+gj'
+        if cfmt_str[-1] == 's':
+            out = '%s'
         else:
-            out = backwards.bytes2unicode(_fmt_char)
-            out += cfmt_str[-1]
-            out = out.replace('h', '')
-            out = out.replace('l', '')
-            out = out.replace('64', '')
+            out = cfmt_str
+        # if cfmt_str[-1] == 'j':
+        #     # Handle complex format specifier
+        #     out = '%g%+gj'
+        # else:
+        #     out = backwards.bytes2unicode(_fmt_char)
+        #     out += cfmt_str[-1]
+        #     out = out.replace('h', '')
+        #     out = out.replace('l', '')
+        #     out = out.replace('64', '')
         cfmt_out = cfmt_out.replace(cfmt_str, out, 1)
     if isinstance(cfmt, backwards.bytes_type):
         cfmt_out = backwards.unicode2bytes(cfmt_out)
@@ -328,7 +332,8 @@ def format_message(args, fmt_str):
             args_ += [a.real, a.imag]
         else:
             args_.append(a)
-    return backwards.format_bytes(fmt_str, tuple(args_))
+    out = backwards.format_bytes(fmt_str, tuple(args_))
+    return out
 
 
 def process_message(msg, fmt_str):
@@ -351,7 +356,8 @@ def process_message(msg, fmt_str):
     if not isinstance(msg, backwards.string_types):
         raise TypeError("Message must be a string or bytes string type.")
     nfmt = len(extract_formats(fmt_str))
-    args = backwards.scanf_bytes(cformat2pyscanf(fmt_str), msg)
+    py_fmt_str = cformat2pyscanf(fmt_str)
+    args = backwards.scanf_bytes(py_fmt_str, msg)
     if args is None:
         nargs = 0
     else:

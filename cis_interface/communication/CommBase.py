@@ -328,6 +328,7 @@ class CommBase(tools.CisClass):
         self._timeout_drain = False
         self._server_class = CommServer
         self._server_kwargs = {}
+        self._send_serializer = True
         # Add interface tag
         if self.is_interface:
             self._name += '_I'
@@ -991,7 +992,8 @@ class CommBase(tools.CisClass):
             msg_s = backwards.unicode2bytes(msg)
         else:
             flag = True
-            add_sinfo = (not (self._used or self.is_file))
+            add_sinfo = (self._send_serializer and (not self.is_file))
+            # add_sinfo = (not (self._used or self.is_file))
             msg_s = self.serializer.serialize(msg, header_kwargs=header_kwargs,
                                               add_serializer_info=add_sinfo)
             # Create work comm if message too large to be sent all at once
@@ -1024,6 +1026,7 @@ class CommBase(tools.CisClass):
             ret = self.send_multipart(args, **kwargs)
             if ret:
                 self._used = True
+                self._send_serializer = False
         except BaseException:
             self.exception('Failed to send.')
             return False

@@ -24,14 +24,16 @@ typedef struct comm_t {
   int valid; //!< 1 if communicator initialized, 0 otherwise.
   void *handle; //!< Pointer to handle for comm.
   void *info; //!< Pointer to any extra info comm requires.
-  seri_t serializer; //!< Serializer for comm messages.
+  seri_t *serializer; //!< Serializer for comm messages.
   size_t maxMsgSize; //!< The maximum message size.
   int always_send_header; //!< 1 if comm should always send a header.
   int index_in_register; //!< Index of the comm in the comm register.
   time_t *last_send; //!< Clock output at time of last send.
   int *sent_eof; //!< Flag specifying if EOF has been sent
   int *recv_eof; //!< Flag specifying if EOF has been received.
+  int *used; //!< Flag specifying if the comm has been used.
   void *reply; //!< Reply information.
+  int is_file; //!< Flag specifying if the comm connects directly to a file.
 } comm_t;
 
 
@@ -49,15 +51,16 @@ comm_t empty_comm_base() {
   ret.valid = 0;
   ret.handle = NULL;
   ret.info = NULL;
-  ret.serializer.type = DIRECT_SERI;
-  ret.serializer.info = NULL;
+  ret.serializer = NULL;
   ret.maxMsgSize = 0;
   ret.always_send_header = 0;
   ret.index_in_register = -1;
   ret.last_send = NULL;
   ret.sent_eof = NULL;
   ret.recv_eof = NULL;
+  ret.used = NULL;
   ret.reply = NULL;
+  ret.is_file = 0;
   return ret;
 };
 
@@ -88,17 +91,16 @@ comm_t* new_comm_base(char *address, const char *direction, const comm_type t,
   } else {
     strcpy(ret->direction, direction);
   }
-  if (seri_info != NULL) {
-    ret->serializer.type = FORMAT_SERI;
-    ret->serializer.info = seri_info;
-  }
+  ret->serializer = init_serializer(-1, seri_info);
   ret->maxMsgSize = CIS_MSG_MAX;
   ret->last_send = (time_t*)malloc(sizeof(time_t));
   ret->last_send[0] = 0;
   ret->sent_eof = (int*)malloc(sizeof(int));
   ret->recv_eof = (int*)malloc(sizeof(int));
+  ret->used = (int*)malloc(sizeof(int));
   ret->sent_eof[0] = 0;
   ret->recv_eof[0] = 0;
+  ret->used[0] = 0;
   return ret;
 };
 
@@ -169,6 +171,15 @@ int free_comm_base(comm_t *x) {
   if (x->recv_eof != NULL) {
     free(x->recv_eof);
     x->recv_eof = NULL;
+  }
+  if (x->used != NULL) {
+    free(x->used);
+    x->used = NULL;
+  }
+  if (x->serializer != NULL) {
+    free_serializer(x->serializer);
+    free(x->serializer);
+    x->serializer = NULL;
   }
   return 0;
 };

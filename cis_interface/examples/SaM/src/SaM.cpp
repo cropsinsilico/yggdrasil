@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include "CisInterface.hpp"
 
-#define BSIZE 100
+#define BSIZE 1000
 
 
 int main() {

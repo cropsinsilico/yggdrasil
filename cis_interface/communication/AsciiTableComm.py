@@ -73,8 +73,11 @@ class AsciiTableComm(AsciiFileComm):
             if header.get(k, False):
                 setattr(self.serializer, k, header[k])
         # Try to determine format from array without header
-        if self.serializer.format_str is None:
-            all_contents = self.fd.read()
+        if (((self.serializer.format_str is None) or
+             ('%s' in self.serializer.format_str))):
+            with open(self.address, self.open_mode) as fd:
+                fd.seek(header_size)
+                all_contents = fd.read()
             if len(all_contents) == 0:
                 return
             arr = serialize.table_to_array(all_contents,
@@ -82,9 +85,15 @@ class AsciiTableComm(AsciiFileComm):
                                            comment=self.comment,
                                            delimiter=self.delimiter)
             self.serializer.field_names = arr.dtype.names
-            self.serializer.format_str = serialize.table2format(
-                arr.dtype, delimiter=self.delimiter, comment=self.comment,
-                newline=self.newline)
+            if self.serializer.format_str is None:
+                self.serializer.format_str = serialize.table2format(
+                    arr.dtype, delimiter=self.delimiter, comment=self.comment,
+                    newline=self.newline)
+            while '%s' in self.serializer.format_str:
+                ifld = self.serializer.field_formats.index('%s')
+                max_len = len(max(arr[self.serializer.field_names[ifld]], key=len))
+                self.serializer.format_str = self.serializer.format_str.replace(
+                    '%s', '%' + str(max_len) + 's', 1)
         self.delimiter = self.serializer.table_info['delimiter']
         # Seek to just after the header
         self.fd.seek(header_size)
@@ -112,7 +121,8 @@ class AsciiTableComm(AsciiFileComm):
             bool: Success or failure of writing to the file.
 
         """
-        self.write_header()
+        if msg != self.eof_msg:
+            self.write_header()
         return super(AsciiTableComm, self)._send(msg)
 
     def _recv(self, timeout=0, **kwargs):

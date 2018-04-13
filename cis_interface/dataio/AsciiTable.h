@@ -130,12 +130,14 @@ int at_readline_full_realloc(const asciiTable_t t, char **buf,
     if (allow_realloc) {
       cislog_debug("at_readline_full_realloc: reallocating buffer from %d to %d bytes.",
 		   (int)len_buf, ret + 1);
-      (*buf) = (char*)realloc(*buf, ret + 1);
-      if (*buf == NULL) {
+      char *temp_buf = (char*)realloc(*buf, ret + 1);
+      if (temp_buf == NULL) {
 	cislog_error("at_readline_full_realloc: Failed to realloc buffer.");
+	free(*buf);
 	free(line);
 	return -1;
       }
+      *buf = temp_buf;
     } else {
       cislog_error("at_readline_full_realloc: line (%d bytes) is larger than destination buffer (%d bytes)",
 		   ret, (int)len_buf);
@@ -516,13 +518,16 @@ int at_vbytes_to_array(const asciiTable_t t, const char *data,
   int i;
   for (i = 0; i < t.ncols; i++) {
     char **temp;
+    char *t2;
     temp = va_arg(ap, char**);
     col_siz = nrows*t.format_siz[i];
-    *temp = (char*)realloc(*temp, col_siz);
-    if (*temp == NULL) {
+    t2 = (char*)realloc(*temp, col_siz);
+    if (t2 == NULL) {
       cislog_error("at_vbytes_to_array: Failed to realloc temp var.");
+      free(*temp);
       return -1;
     }
+    *temp = t2;
     // C order memory
     /* for (int j = 0; j < nrows; j++) { */
     /*   memcpy(*temp + j*t.format_siz[i], data + j*t.row_siz + cur_pos, t.format_siz[i]); */
@@ -622,6 +627,30 @@ void at_cleanup(asciiTable_t *t) {
     free((*t).format_siz);
   (*t).format_typ = NULL;
   (*t).format_siz = NULL;
+};
+
+/*!
+  @brief Update an existing asciiTable_t structure.
+  @param[in] t asciiTable_t* Address of table structure to update.
+  @param[in] filepath constant character pointer to file path.
+  @param[in] io_mode constant character pointer to I/O mode. "r" for read,
+  "w" for write.
+  @returns int -1 if there is an error, 0 otherwise.
+ */
+int at_update(asciiTable_t *t, const char *filepath, const char *io_mode) {
+  int flag = 0;
+  flag = af_update(&(t->f), filepath, io_mode);
+  if (flag == 0) {
+    if ((strlen(t->format_str) == 0) && (strcmp(io_mode, "r") == 0)) {
+      flag = at_discover_format_str(t);
+      if (flag >= 0)
+	flag = at_set_ncols(t);
+      if (flag >= 0)
+	flag = at_set_format_typ(t);
+    }
+  }
+  t->status = flag;
+  return flag;
 };
 
 /*!

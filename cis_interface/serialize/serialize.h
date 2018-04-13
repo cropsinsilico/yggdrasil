@@ -8,6 +8,117 @@
 
 
 /*!
+  @brief Create an empty serializer structure.
+  @returns seri_t Empty serializer.
+ */
+static inline
+seri_t empty_serializer() {
+  seri_t s;
+  s.type = DIRECT_SERI; // Can't be -1 (was that used?)
+  s.info = NULL;
+  return s;
+};
+
+/*!
+  @brief Update serializer with provided information.
+  @param[in] s seri_t * Address of serializer that should be updated. If NULL,
+  one is created.
+  @param[in] type int Type that should be updated for the serializer. If
+  negative, the type will be set depending on if info is NULL or not.
+  @param[in] info void * Information that should be copied to the serializer.
+  @returns int -1 if there is an error, 0 otherwise.
+*/
+static inline
+int update_serializer(seri_t *s, int type, const void *info) {
+  // Malloc if not initialized
+  if (s == NULL) {
+    cislog_error("update_serializer: Pointer to serializer is NULL.");
+    return -1;
+  }
+  // Copy information
+  if ((type == ASCII_TABLE_SERI) || (type == ASCII_TABLE_ARRAY_SERI)) {
+    asciiTable_t *handle = (asciiTable_t*)malloc(sizeof(asciiTable_t));
+    { // Limit content of format_str so double free not triggered
+      char *format_str;
+      if (info == NULL) {
+	format_str = (char*)(s->info);
+      } else {
+	format_str = (char*)info;
+      }
+      if (handle == NULL) {
+	cislog_error("update_serializer: Failed to allocate for asciiTable.");
+	return -1;
+      }
+      handle[0] = asciiTable("seri", "0", format_str, NULL, NULL, NULL);
+    }
+    if (s->info != NULL) {
+      free(s->info);
+    }
+    s->info = (void*)handle;
+  } else if (info == NULL) {
+    if (type < 0) {
+      type = DIRECT_SERI;
+    }
+  } else {
+    char *format_str = (char*)info;
+    int len_fmt = strlen(format_str);
+    void *t_sinfo = (void*)realloc(s->info, len_fmt + 1);
+    if (t_sinfo == NULL) {
+      cislog_error("update_serializer: Failed to reallocate for format string.");
+      free(s->info);
+      return -1;
+    }
+    s->info = t_sinfo;
+    strcpy((char*)(s->info), format_str);
+    // memcpy(s->info, format_str, len_fmt + 1);
+    // ((char*)(s->info))[len_fmt] = '\0';
+    if (type < 0) {
+      type = FORMAT_SERI;
+    }
+  }
+  s->type = (seri_type)type;
+  return 0;
+};
+
+/*! @brief Initialize serialier.
+  @param[in] type seri_type Type of serializer. If -1, the type will
+  be inferred from the info.
+  @param[in] info void * Information for the serializer.
+  @returns seri_t* Address of serializer.
+*/
+static inline
+seri_t * init_serializer(int type, const void *info) {
+  seri_t *s = (seri_t*)malloc(sizeof(seri_t));
+  if (s == NULL) {
+    cislog_error("init_serializer: Failed to allocate serializer.");
+    return NULL;
+  }
+  s[0] = empty_serializer();
+  int flag = update_serializer(s, type, info);
+  if (flag != 0) {
+    cislog_error("init_serializer: Failed to create serializer.");
+    free(s);
+    s = NULL;
+  }
+  return s;
+};
+
+
+/*! @brief Free serializer.
+  @param[in] s seri_t* Serializer that should be freed.
+  @returns int -1 if there was an error, 0 otherwise.
+*/
+static inline
+int free_serializer(seri_t *s) {
+  if (s->info != NULL) {
+    free(s->info);
+    s->info = NULL;
+  }
+  return 0;
+};
+
+
+/*!
   @brief Serialize arguments to create a message.
   @param[in] s seri_t Structure sepcifying how to serialize arguments.
   @param[in] buf character pointer to pointer to memory where serialized message

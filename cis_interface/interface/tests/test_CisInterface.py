@@ -296,6 +296,7 @@ class TestCisRpcClient(TestCisRpc):
         r"""Keyword arguments for the driver."""
         out = super(TestCisRpcClient, self).driver_kwargs
         out['comm'] = 'ServerComm'
+        out['response_kwargs'] = {'format_str': self.fmt_str}
         return out
         
         

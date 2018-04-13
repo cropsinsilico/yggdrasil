@@ -348,7 +348,7 @@ class ConnectionDriver(Driver):
             if self.icomm.is_closed:
                 return False
             flag, msg = self.icomm.recv(**kwargs)
-        if msg == self.icomm.eof_msg:
+        if isinstance(msg, backwards.bytes_type) and (msg == self.icomm.eof_msg):
             return self.on_eof()
         if flag:
             return msg
@@ -382,7 +382,7 @@ class ConnectionDriver(Driver):
             bytes, str: Processed message.
 
         """
-        if (not self._first_send_done):
+        if (self.ocomm._send_serializer):
             self.update_serializer()
         if self.translator is None:
             return msg

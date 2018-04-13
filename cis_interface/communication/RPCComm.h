@@ -30,7 +30,7 @@ int init_rpc_comm(comm_t *comm) {
   int ret;
   // Input comm
   comm_t *info = init_comm_base(comm->name, "recv", _default_comm,
-				comm->serializer.info);
+				comm->serializer->info);
   ret = init_default_comm(info);
   if (ret < 0) {
     cislog_error("init_rpc_comm(%s): Failed to initialize input comm", comm->name);

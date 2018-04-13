@@ -24,3 +24,6 @@ class FileOutputDriver(ConnectionDriver):
         super(FileOutputDriver, self).__init__(name, **kwargs)
         self.env[self.name] = self.icomm.address
         self.debug('(%s)', path)
+
+    def on_message(self, msg):
+        return super(FileOutputDriver, self).on_message(msg)
