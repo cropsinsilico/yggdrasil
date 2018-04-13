@@ -7,6 +7,7 @@ import unittest
 import numpy as np
 import threading
 import psutil
+import pandas
 from scipy.io import savemat, loadmat
 import nose.tools as nt
 from cis_interface.config import cis_cfg, cfg_logging
@@ -442,6 +443,13 @@ class IOInfo(object):
     def file_bytes(self):
         r"""str: Raw bytes of array of mock file contents."""
         return self.to_bytes(self.file_array)
+
+    @property
+    def pandas_frame(self):
+        r"""pandas.DataFrame: Pandas data frame."""
+        if not hasattr(self, '_pandas_frame'):
+            self._pandas_frame = pandas.DataFrame(self.file_array)
+        return self._pandas_frame
 
     @property
     def data_dict(self):

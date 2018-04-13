@@ -11,6 +11,7 @@ if PY2:  # pragma: Python 2
     from __builtin__ import unicode
     import types
     BytesIO = sio.StringIO
+    StringIO = sio.StringIO
     file_type = types.FileType
     bytes_type = str
     unicode_type = str
@@ -21,6 +22,7 @@ else:  # pragma: Python 3
     import configparser
     import io as sio
     BytesIO = sio.BytesIO
+    StringIO = sio.StringIO
     file_type = sio.IOBase
     bytes_type = bytes
     unicode_type = str

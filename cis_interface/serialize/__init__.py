@@ -50,6 +50,9 @@ def get_serializer(stype=None, **kwargs):
     elif stype == 5:
         from cis_interface.serialize import MatSerialize
         cls = MatSerialize.MatSerialize
+    elif stype == 6:
+        from cis_interface.serialize import PandasSerialize
+        cls = PandasSerialize.PandasSerialize
     else:
         raise RuntimeError("Unknown serializer type code: %d" % stype)
     return cls(**kwargs)
@@ -694,6 +697,7 @@ def table_to_array(msg, fmt_str=None, use_astropy=False, names=None,
     else:
         if names is not None:
             names = [backwards.bytes2unicode(n) for n in names]
+        print(names, dtype)
         arr = np.genfromtxt(fd, delimiter=info['delimiter'],
                             comments=info.get('comment', None), dtype=dtype,
                             autostrip=True, names=names)
