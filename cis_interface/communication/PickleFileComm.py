@@ -30,7 +30,7 @@ class PickleFileComm(FileComm.FileComm):
         prev_pos = self.fd.tell()
         flag, msg = super(PickleFileComm, self)._recv(timeout=timeout)
         if msg != self.eof_msg:
-            fd = backwards.sio.BytesIO(msg)
+            fd = backwards.BytesIO(msg)
             backwards.pickle.load(fd)
             used = fd.tell()
             self.fd.seek(prev_pos + used)
