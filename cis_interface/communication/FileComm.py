@@ -14,6 +14,8 @@ class FileComm(CommBase.CommBase):
             from the file. Defaults to 'read'. Ignored if direction is 'send'.
         append (bool, optional): If True and writing, file is openned in append
             mode. Defaults to False.
+        in_temp (bool, optional): If True, the path will be considered relative
+            to the platform temporary directory. Defaults to False.
         open_as_binary (bool, optional): If True, the file is opened in binary
             mode. Defaults to True.
         newline (str, optional): String indicating a new line. Defaults to

@@ -21,7 +21,7 @@ function client(iterations)
       exit_code = -1;
       break;
     end;
-    fib = result{0};
+    fib = result{1};
     fprintf('client(Matlab): Response fib(%d) = %d\n', i, fib);
 
     % Log result by sending it to the log connection

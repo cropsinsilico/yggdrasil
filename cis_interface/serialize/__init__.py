@@ -609,9 +609,12 @@ def format2table(fmt_str):
     if fmt_rem:
         out['newline'] = fmt_rem
     seps = set(seps)
-    if len(seps) > 1:
+    if len(seps) == 0:
+        out['delimiter'] = _default_delimiter
+    elif len(seps) == 1:
+        out['delimiter'] = list(seps)[0]
+    elif len(seps) > 1:
         raise RuntimeError("There is more than one column separator (%s)." % seps)
-    out['delimiter'] = list(seps)[0]
     return out
 
 
@@ -735,9 +738,13 @@ def table_to_array(msg, fmt_str=None, use_astropy=False, names=None,
     else:
         if names is not None:
             names = [backwards.bytes2unicode(n) for n in names]
-        arr = np.genfromtxt(fd, delimiter=info['delimiter'],
-                            comments=info.get('comment', None), dtype=dtype,
-                            autostrip=True, names=names)
+        np_kws = dict(delimiter=info['delimiter'])
+        if 'comment' in info:
+            np_kws['comments'] = info['comment']
+        for k, v in np_kws.items():
+            np_kws[k] = backwards.bytes2unicode(v)
+        arr = np.genfromtxt(fd, dtype=dtype, autostrip=True,
+                            names=names, **np_kws)
     fd.close()
     return arr
 
@@ -980,6 +987,42 @@ def parse_header(header, newline=_default_newline, lineno_format=None,
                 if 'field_names' in out:
                     raise RuntimeError("Two lines could contain the field names.")
                 out['field_names'] = cols
+    return out
+
+
+def numpy2dict(arr):
+    r"""Covert a numpy structured array to a dictionary of arrays.
+
+    Args:
+        arr (np.ndarray): Array to convert.
+
+    Returns:
+        dict: Dictionary with contents from the input array.
+
+    """
+    out = dict()
+    for n in arr.dtype.names:
+        out[n] = arr[n]
+    return out
+
+
+def dict2numpy(d):
+    r"""Convert a dictionary of arrays to a numpy structured array.
+
+    Args:
+        d (dict): Dictionary of arrays.
+
+    Returns:
+        np.ndarray: Structured numpy array.
+
+    """
+    names = [k for k in d.keys()]
+    dtypes = [v.dtype for v in d.values()]
+    dtype = np.dtype(dict(names=names, formats=dtypes))
+    shape = d[names[0]].shape
+    out = np.empty(shape, dtype)
+    for n in names:
+        out[n] = d[n]
     return out
 
 

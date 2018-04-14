@@ -89,6 +89,16 @@ class DefaultSerialize(object):
         return out
 
     @property
+    def empty_msg(self):
+        r"""obj: Object indicating empty message."""
+        stype = self.serializer_type
+        if stype <= 0:
+            out = backwards.unicode2bytes('')
+        else:
+            out = tuple()
+        return out
+
+    @property
     def serializer_info(self):
         r"""dict: Information about serializer required to reconstruct it."""
         if self.is_user_defined:
@@ -180,13 +190,13 @@ class DefaultSerialize(object):
         elif self.format_str is not None:
             if self.as_array:
                 if len(msg) == 0:
-                    out = tuple()
+                    out = self.empty_msg
                     # out = np.empty(0, self.numpy_dtype)
                 else:
                     out = serialize.bytes_to_array(msg, self.numpy_dtype, order='F')
             else:
                 if len(msg) == 0:
-                    out = tuple()
+                    out = self.empty_msg
                 else:
                     out = serialize.process_message(msg, self.format_str)
         else:

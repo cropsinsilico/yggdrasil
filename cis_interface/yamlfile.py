@@ -1,7 +1,7 @@
 import os
 import pystache
 import yaml
-from cis_interface.backwards import sio
+from cis_interface import backwards
 
 
 def load_yaml(fname):
@@ -22,7 +22,7 @@ def load_yaml(fname):
         # Mustache replace vars
         yamlparsed = f.read()
         yamlparsed = pystache.render(
-            sio.StringIO(yamlparsed).getvalue(), dict(os.environ))
+            backwards.StringIO(yamlparsed).getvalue(), dict(os.environ))
         yamlparsed = yaml.safe_load(yamlparsed)
     yamlparsed['workingDir'] = os.path.dirname(fname)
     return yamlparsed
@@ -247,13 +247,14 @@ def parse_connection(yml, yamldir, existing):
     out_name = yml.pop('output')
     # File input
     if in_name not in existing['output']:
-        if not os.path.isfile(os.path.realpath(os.path.join(yamldir, in_name))):
+        in_path = os.path.realpath(os.path.join(yamldir, in_name))
+        if not os.path.isfile(in_path):
             raise RuntimeError(("Input '%s' not found in any of the registered " +
                                 "model outputs and is not a file.") % in_name)
         if out_name not in existing['input']:
             raise RuntimeError(("Output '%s' not found in any of the model " +
                                 "inputs and cannot be a file.") % out_name)
-        args = in_name
+        args = in_path
         xi = existing['input'][out_name]
         xi['args'] = args
         read_meth = yml.pop('read_meth', 'all')
@@ -273,8 +274,16 @@ def parse_connection(yml, yamldir, existing):
         xo = None
     # File output
     elif out_name not in existing['input']:
-        args = out_name
         xo = existing['output'][in_name]
+        in_temp = xo.get('in_temp', yml.get('in_temp', 'False'))
+        if isinstance(in_temp, backwards.string_types):
+            in_temp = eval(in_temp)
+        if in_temp:
+            out_path = out_name
+            xo['in_temp'] = True
+        else:
+            out_path = os.path.realpath(os.path.join(yamldir, out_name))
+        args = out_path
         xo['args'] = args
         write_meth = yml.pop('write_meth', 'all')
         if write_meth == 'all':
@@ -309,4 +318,24 @@ def parse_connection(yml, yamldir, existing):
     else:
         xi.update(**yml)
     yml['name'] = args
+    # Direct comm keywords to input/output
+    comm_fields = ['format_str', 'field_names', 'field_units']
+    if xi is not None:
+        xi.setdefault('icomm_kws', dict())
+        for k in comm_fields:
+            if k in xi:
+                v = xi[k]
+                if k in ['field_names', 'field_units']:
+                    xi['icomm_kws'].setdefault(k, [n.strip() for n in v.split(',')])
+                else:
+                    xi['icomm_kws'].setdefault(k, v)
+    if xo is not None:
+        xo.setdefault('ocomm_kws', dict())
+        for k in comm_fields:
+            if k in xo:
+                v = xo[k]
+                if k in ['field_names', 'field_units']:
+                    xo['ocomm_kws'].setdefault(k, [n.strip() for n in v.split(',')])
+                else:
+                    xo['ocomm_kws'].setdefault(k, v)
     return existing

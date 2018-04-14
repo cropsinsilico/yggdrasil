@@ -1,5 +1,6 @@
 """Module for funneling messages from one comm to another."""
 import os
+import numpy as np
 import importlib
 import threading
 from cis_interface import backwards
@@ -508,15 +509,23 @@ class ConnectionDriver(Driver):
             self.set_break_flag()
             self.set_close_state('receiving')
             return
-        if isinstance(msg, backwards.bytes_type) and len(msg) == 0:
+        if ((isinstance(msg, type(self.icomm.serializer.empty_msg)) and
+             (msg == self.icomm.serializer.empty_msg))):
             self.state = 'waiting'
             self.verbose_debug(':run: Waiting for next message.')
             self.sleep()
             return
         self.nrecv += 1
         self.state = 'received'
-        self.debug('Received message that is %d bytes from %s.',
-                   len(msg), self.icomm.address)
+        if isinstance(msg, backwards.bytes_type):
+            self.debug('Received message that is %d bytes from %s.',
+                       len(msg), self.icomm.address)
+        elif isinstance(msg, np.ndarray):
+            self.debug('Received array with shape %s and data type %s from %s',
+                       msg.shape, msg.dtype, self.icomm.address)
+        else:
+            self.debug('Received message of type %s from %s',
+                       type(msg), self.icomm.address)
         # Process message
         self.state = 'processing'
         msg = self.on_message(msg)
@@ -525,7 +534,8 @@ class ConnectionDriver(Driver):
             self.set_break_flag()
             self.set_close_state('processing')
             return
-        elif len(msg) == 0:
+        elif ((isinstance(msg, type(self.ocomm.serializer.empty_msg)) and
+               (msg == self.ocomm.serializer.empty_msg))):
             self.debug('Message skipped.')
             self.nskip += 1
             return

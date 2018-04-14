@@ -93,5 +93,4 @@ class TestAsciiTableInputDriver_Array(TestAsciiTableInputParam,
         flag, data = self.recv_comm.recv_nolimit(self.timeout)
         assert(not flag)
         nt.assert_equal(data, self.recv_comm.eof_msg)
-        assert(self.instance.icomm.is_closed)
         assert(self.recv_comm.is_closed)

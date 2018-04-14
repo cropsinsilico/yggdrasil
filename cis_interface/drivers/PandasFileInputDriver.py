@@ -27,11 +27,4 @@ class PandasFileInputDriver(FileInputDriver):
 
     def update_serializer(self, msg):
         r"""Update the serializer for the output comm based on input."""
-        format_str = self.icomm.serializer.delimiter.join(
-            serialize.nptype2cformat(msg.dtype))
-        sinfo = self.ocomm.serializer.serializer_info
-        sinfo['stype'] = 0  # Force output as array
-        sinfo['as_array'] = True
-        sinfo.setdefault('format_str', format_str)
-        sinfo.setdefault('field_names', msg.dtype.names)
-        self.ocomm.serializer = serialize.get_serializer(**sinfo)
+        pass

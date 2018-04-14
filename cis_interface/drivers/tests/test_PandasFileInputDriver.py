@@ -65,3 +65,4 @@ class TestPandasFileInputDriver(TestPandasFileInputParam,
         flag, data = self.recv_comm.recv_nolimit(timeout=False)
         assert(not flag)
         nt.assert_equal(data, self.recv_comm.eof_msg)
+        assert(self.recv_comm.is_closed)

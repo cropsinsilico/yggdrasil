@@ -247,7 +247,7 @@ def test_combine_eles():
     res0['f0'][0] = 'hello'
     res1['name'][0] = 'hello'
     arrs = [np.zeros(1, dtype=dtype0) for i in range(nele)]
-    arrs[0][0] = backwards.unicode2bytes('hello')
+    arrs[0]['f0'] = backwards.unicode2bytes('hello')
     arrs_list = [a.tolist()[0] for a in arrs]
     np.testing.assert_array_equal(serialize.combine_eles(arrs), res0)
     np.testing.assert_array_equal(serialize.combine_eles(arrs_list), res0)
@@ -461,6 +461,21 @@ def test_numpy2pandas():
     for ans in test_arrs:
         frame = serialize.numpy2pandas(ans)
         res = serialize.pandas2numpy(frame)
+        np.testing.assert_array_equal(ans, res)
+
+
+def test_numpy2dict():
+    r"""Test conversion of a numpy array to a dictionary and back."""
+    nele = 5
+    names = ["name", "number", "value", "complex"]
+    dtypes = ['S5', 'i8', 'f8', 'c16']
+    dtype = np.dtype([(n, f) for n, f in zip(names, dtypes)])
+    arr_mix = np.zeros(nele, dtype)
+    arr_mix['name'][0] = 'hello'
+    test_arrs = [arr_mix]
+    for ans in test_arrs:
+        d = serialize.numpy2dict(ans)
+        res = serialize.dict2numpy(d)
         np.testing.assert_array_equal(ans, res)
 
 

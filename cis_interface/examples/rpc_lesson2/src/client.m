@@ -25,7 +25,7 @@ function client(iterations, client_index)
       exit_code = -1;
       break;
     end;
-    fib = result{0};
+    fib = result{1};
     fprintf('client%d(Matlab): Response fib(%d) = %d\n', client_index, ...
             i, fib);
 

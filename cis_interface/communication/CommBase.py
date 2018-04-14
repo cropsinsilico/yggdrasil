@@ -2,6 +2,7 @@ import os
 import uuid
 import atexit
 import threading
+import numpy as np
 from cis_interface import backwards, tools, serialize
 from cis_interface.tools import get_CIS_MSG_MAX, CIS_MSG_EOF
 from cis_interface.communication import (
@@ -599,7 +600,7 @@ class CommBase(tools.CisClass):
             while self.recv(timeout=0)[0]:
                 self.sleep()
         else:
-            self.comm.send_eof()
+            self.send_eof()
         self.linger_close()
 
     def atexit(self):  # pragma: debug
@@ -996,7 +997,7 @@ class CommBase(tools.CisClass):
             return False, self.empty_msg, work_comm
         if len(msg) == 1:
             msg = msg[0]
-        if isinstance(msg, backwards.bytes_type) and msg == self.eof_msg:
+        if isinstance(msg, backwards.bytes_type) and (msg == self.eof_msg):
             flag = self.on_send_eof()
             msg_s = backwards.unicode2bytes(msg)
         else:
@@ -1223,7 +1224,8 @@ class CommBase(tools.CisClass):
         if s_msg == self.eof_msg:
             flag = self.on_recv_eof()
         msg_, header = self.serializer.deserialize(s_msg)
-        if (self.recv_converter is not None) and (s_msg != self.eof_msg):
+        if (((self.recv_converter is not None) and (s_msg != self.eof_msg) and
+             (not header.get('incomplete', False)))):
             msg = self.recv_converter(msg_)
         else:
             msg = msg_
@@ -1335,6 +1337,74 @@ class CommBase(tools.CisClass):
         self._last_send = None
         self._last_recv = None
 
+    # Send/recv dictionary of fields
+    def send_dict(self, args_dict, field_order=None, **kwargs):
+        r"""Send a message with fields specified in the input dictionary.
+
+        Args:
+            args_dict (dict): Dictionary with fields specifying output fields.
+            field_order (list, optional): List of fields in the order they
+                should be passed to send. If not provided, the fields from
+                the serializer are used. If the serializer dosn't have
+                field names an error will be raised.
+            **kwargs: Additiona keyword arguments are passed to send.
+
+        Returns:
+            bool: Success/failure of send.
+
+        Raises:
+            RuntimeError: If the field order can not be determined.
+
+        """
+        if field_order is None:
+            if self.serializer.field_names is not None:
+                field_order = self.serializer.field_names
+            elif len(args_dict) <= 1:
+                field_order = [k for k in args_dict.keys()]
+            else:
+                raise RuntimeError("Could not determine the field order.")
+        as_array = True
+        for v in args_dict.values():
+            if not isinstance(v, np.ndarray):
+                as_array = False
+                break
+        if as_array:
+            args = (serialize.dict2numpy(args_dict), )
+        else:
+            args = tuple([args_dict[k] for k in field_order])
+        return self.send(*args, **kwargs)
+
+    def recv_dict(self, *args, **kwargs):
+        r"""Return a received message as a dictionary of fields. If there are
+        not any fields specified, the fields will have the form 'f0', 'f1',
+        'f2', ...
+
+        Args:
+            *args: Arguments are passed to recv.
+            **kwargs: Keyword arguments are passed to recv.
+
+        Returns:
+            tuple(bool, dict): Success/failure of receive and a dictionar of
+                message fields.
+
+        Raises:
+
+        """
+        flag, msg = self.recv(*args, **kwargs)
+        if flag:
+            if isinstance(msg, np.ndarray):
+                msg_dict = serialize.numpy2dict(msg)
+            elif isinstance(msg, tuple):
+                field_names = self.serializer.field_names
+                if field_names is None:
+                    field_names = ['f%d' % i for i in range(len(msg))]
+                msg_dict = {k: v for k, v in zip(field_names, msg)}
+            else:
+                msg_dict = {'f0': msg}
+        else:
+            msg_dict = msg
+        return flag, msg_dict
+        
     # ALIASES
     def send_line(self, *args, **kwargs):
         r"""Alias for send."""

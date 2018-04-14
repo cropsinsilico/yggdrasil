@@ -25,6 +25,11 @@ class PandasSerialize(DefaultSerialize):
         r"""int: Type of serializer."""
         return 6
         
+    @property
+    def empty_msg(self):
+        r"""obj: Object indicating empty message."""
+        return backwards.unicode2bytes('')
+            
     def func_serialize(self, args):
         r"""Serialize a message.
 
@@ -61,7 +66,7 @@ class PandasSerialize(DefaultSerialize):
 
         """
         if len(msg) == 0:
-            out = msg
+            out = self.empty_msg
         else:
             fd = backwards.BytesIO(msg)
             out = pandas.read_csv(fd, sep=self.delimiter, encoding='utf8')
