@@ -10,7 +10,7 @@ def test_AsciiTableComm_nofmt():
     r"""Test read of asciitable without format."""
     test_file = os.path.join(os.getcwd(), 'temp_file.txt')
     rows = [('one', 1, 1.0), ('two', 2, 2.0), ('three', 3, 3.0)]
-    lines = ['%5s\t%d\t%f\n' % r for r in rows]
+    lines = [backwards.format_bytes('%5s\t%d\t%f\n', r) for r in rows]
     contents = backwards.unicode2bytes(''.join(lines))
     with open(test_file, 'wb') as fd:
         fd.write(contents)

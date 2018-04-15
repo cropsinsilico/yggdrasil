@@ -406,7 +406,7 @@ class IOInfo(object):
         r"""list: Lines in a mock file."""
         out = []
         for r in self.file_rows:
-            out.append(self.fmt_str % r)
+            out.append(backwards.format_bytes(self.fmt_str, r))
         return out
 
     @property

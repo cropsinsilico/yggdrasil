@@ -753,7 +753,7 @@ def table_to_array(msg, fmt_str=None, use_astropy=False, names=None,
         for k, v in np_kws.items():
             np_kws[k] = backwards.bytes2unicode(v)
         arr = np.genfromtxt(fd, autostrip=True, dtype=None,
-                            names=names, encoding='bytes', **np_kws)
+                            names=names, **np_kws)
         if dtype is not None:
             arr = arr.astype(dtype)
     fd.close()
