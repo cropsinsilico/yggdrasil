@@ -72,7 +72,7 @@ def test_guess_serializer():
     fmt_arr = serialize._default_delimiter.join(
         serialize.nptype2cformat(arr_mix.dtype, asbytes=True))
     fmt_arr += serialize._default_newline
-    if platform._is_win:
+    if platform._is_win:  # pragma: windows
         fmt = backwards.unicode2bytes('%s\t%l64d\t%g\t%g%+gj\n')
     else:
         fmt = backwards.unicode2bytes('%s\t%ld\t%g\t%g%+gj\n')
