@@ -1,3 +1,4 @@
+from cis_interface import backwards
 import cis_interface.drivers.tests.test_AsciiFileOutputDriver as parent
 
 
@@ -46,7 +47,10 @@ class TestAsciiTableOutputDriver_Array(TestAsciiTableOutputParam,
     def __init__(self, *args, **kwargs):
         super(TestAsciiTableOutputDriver_Array, self).__init__(*args, **kwargs)
         self.inst_kwargs['as_array'] = 'True'
-        self.inst_kwargs['column_names'] = 'None'
+        names = [backwards.bytes2unicode(n) for n in self.field_names]
+        units = [backwards.bytes2unicode(n) for n in self.field_units]
+        self.inst_kwargs['column_names'] = ','.join(names)
+        self.inst_kwargs['column_units'] = ','.join(units)
         self.inst_kwargs['use_astropy'] = 'False'
 
     @property

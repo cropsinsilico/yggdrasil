@@ -393,7 +393,10 @@ class ConnectionDriver(Driver):
     def update_serializer(self, msg):
         r"""Update the serializer for the output comm based on input."""
         if self.ocomm.serializer.serializer_type == 0:
+            old_kwargs = self.ocomm.serializer.serializer_info
+            del old_kwargs['stype']
             self.ocomm.serializer = self.icomm.serializer
+            self.ocomm.serializer.update_serializer(**old_kwargs)
 
     def _send_message(self, *args, **kwargs):
         r"""Send a single message.

@@ -1009,9 +1009,8 @@ class CommBase(tools.CisClass):
             else:
                 msg_ = msg
             # Guess at serializer if not yet set
-            if add_sinfo and (self.serializer.serializer_type == 0):
-                self.serializer = serialize.guess_serializer(
-                    msg_, **self.serializer.serializer_info)
+            if add_sinfo:
+                self.serializer.update_from_message(msg_)
             # Serialize
             msg_s = self.serializer.serialize(msg_, header_kwargs=header_kwargs,
                                               add_serializer_info=add_sinfo)

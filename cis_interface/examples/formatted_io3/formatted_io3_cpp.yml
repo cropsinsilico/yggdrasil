@@ -3,13 +3,17 @@ models:
     driver: GCCModelDriver
     args: ./src/formatted_io3_modelA.cpp
     inputs: inputA
-    outputs: outputA
+    outputs:
+      name: outputA
+      field_names: name,count,size
 
   - name: cpp_modelB
     driver: GCCModelDriver
     args: ./src/formatted_io3_modelB.cpp
     inputs: inputB
-    outputs: outputB
+    outputs:
+      name: outputB
+      field_names: name,count,size
 
 connections:
   - input: outputA  # Connection between model A output & model B input

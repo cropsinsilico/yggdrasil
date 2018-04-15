@@ -8,39 +8,23 @@ class AsciiTableComm(AsciiFileComm):
     Args:
         name (str): The environment variable where communication address is
             stored.
-        format_str (str, optional): C style format string specifying how rows
-            in the table should be formated. Defaults to None. If receiving
-            from a file, this will be determined from the file contents during
-            the first read. If sending to a file, this must be updated before
-            anything can be written.
         delimiter (str, optional): String that should be used to separate
             columns. If not provided and format_str is not set prior to I/O,
             this defaults to whitespace.
-        column_names (list, optional): Names that should be written to the
-            table header. Defaults to None.
-        column_units (list, optional): Units that should be written to the
-            table header. Defaults to None.
         use_astropy (bool, optional): If True and the astropy package is
             installed, it will be used to read/write the table. Defaults to
             False.
-        as_array (bool, optional): If True, table IO is done for entire array.
-            Otherwise, the table is read/written line by line. Defaults to False.
         **kwargs: Additional keywords arguments are passed to parent class.
 
     """
-    def _init_before_open(self, format_str=None, delimiter=None,
-                          column_names=None, column_units=None,
-                          as_array=False, use_astropy=False,
+    def _init_before_open(self, delimiter=None, use_astropy=False,
                           serializer_kwargs=None, **kwargs):
         r"""Set up dataio and attributes."""
         if serializer_kwargs is None:
             serializer_kwargs = {}
         self.header_was_read = False
         self.header_was_written = False
-        serializer_kwargs.update(stype=3, format_str=format_str,
-                                 field_names=column_names,
-                                 field_units=column_units,
-                                 as_array=as_array, use_astropy=use_astropy)
+        serializer_kwargs.update(stype=3, use_astropy=use_astropy)
         kwargs['serializer_kwargs'] = serializer_kwargs
         super(AsciiTableComm, self)._init_before_open(**kwargs)
         if self.serializer.as_array:

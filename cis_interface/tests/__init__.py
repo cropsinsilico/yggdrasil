@@ -363,11 +363,13 @@ class IOInfo(object):
     def __init__(self):
         self.field_names = ['name', 'count', 'size']
         self.field_units = ['n/a', 'g', 'cm']
+        self.nfields = len(self.field_names)
         self.comment = backwards.unicode2bytes('# ')
         self.delimiter = backwards.unicode2bytes('\t')
         self.newline = backwards.unicode2bytes('\n')
         self.fmt_str = backwards.unicode2bytes('%5s\t%d\t%f\n')
         self.fmt_str_matlab = backwards.unicode2bytes('%5s\\t%d\\t%f\\n')
+        self.field_formats = self.fmt_str.split(self.newline)[0].split(self.delimiter)
         self.fmt_str_line = backwards.unicode2bytes('# ') + self.fmt_str
         # self.file_cols = ['name', 'count', 'size']
         self.file_dtype = {'names': self.field_names,

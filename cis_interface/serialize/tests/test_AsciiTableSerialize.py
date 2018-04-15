@@ -1,4 +1,5 @@
 import numpy as np
+import nose.tools as nt
 from cis_interface import backwards
 from cis_interface.serialize.tests.test_DefaultSerialize import \
     TestDefaultSerialize
@@ -16,14 +17,33 @@ class TestAsciiTableSerialize(TestDefaultSerialize):
         self._empty_obj = tuple()
         self._objects = self.file_rows
 
+    def test_field_specs(self):
+        r"""Test field specifiers."""
+        nt.assert_equal(self.instance.format_str, self.fmt_str)
+        nt.assert_equal(self.instance.nfields, self.nfields)
+        nt.assert_equal(self.instance.field_names, self.field_names)
+        nt.assert_equal(self.instance.field_units, self.field_units)
+        nt.assert_equal(self.instance.field_formats, self.field_formats)
 
-class TestAsciiTableSerializeSingle(TestAsciiTableSerialize):
+
+class TestAsciiTableSerializeSingle(TestDefaultSerialize):
     r"""Test class for AsciiTableSerialize class."""
 
     def __init__(self, *args, **kwargs):
         super(TestAsciiTableSerializeSingle, self).__init__(*args, **kwargs)
         self._inst_kwargs['format_str'] = backwards.unicode2bytes('%d\n')
+        self._cls = 'AsciiTableSerialize'
+        self._empty_obj = tuple()
         self._objects = [(1, )]
+
+    def test_field_specs(self):
+        r"""Test field specifiers."""
+        nt.assert_equal(self.instance.format_str, self._inst_kwargs['format_str'])
+        nt.assert_equal(self.instance.nfields, 1)
+        nt.assert_equal(self.instance.field_names, None)
+        nt.assert_equal(self.instance.field_units, None)
+        fmt_list = [backwards.unicode2bytes('%d')]
+        nt.assert_equal(self.instance.field_formats, fmt_list)
 
 
 class TestAsciiTableSerialize_asarray(TestAsciiTableSerialize):

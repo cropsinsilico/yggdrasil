@@ -78,7 +78,8 @@ def test_guess_serializer():
                  (arr_mix[0].tolist(), dict(format_str=fmt, stype=1)),
                  ('hello', dict(stype=0))]
     for obj, sinfo_ans in test_list:
-        s = serialize.guess_serializer(obj)
+        sinfo_res = serialize.guess_serializer(obj)
+        s = serialize.get_serializer(**sinfo_res)
         nt.assert_equal(s.serializer_info, sinfo_ans)
 
 

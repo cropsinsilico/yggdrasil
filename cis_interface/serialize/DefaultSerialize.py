@@ -50,7 +50,11 @@ class DefaultSerialize(object):
                  func_serialize=None, func_deserialize=None, **kwargs):
         self.format_str = format_str
         self.as_array = as_array
+        if field_names is not None:
+            field_names = [backwards.unicode2bytes(n) for n in field_names]
         self.field_names = field_names
+        if field_units is not None:
+            field_units = [backwards.unicode2bytes(n) for n in field_units]
         self.field_units = field_units
         if isinstance(func_serialize, DefaultSerialize):
             self._func_serialize = func_serialize.func_serialize
@@ -238,6 +242,26 @@ class DefaultSerialize(object):
             out = self.format_header(header_kwargs) + out
         return out
 
+    def update_from_message(self, msg, **kwargs):
+        kwargs.update(**self.serializer_info)
+        sinfo = serialize.guess_serializer(msg, **kwargs)
+        self.update_serializer(**sinfo)
+
+    def update_serializer(self, **kwargs):
+        r"""Update serializer with provided information."""
+        key_list = ['format_str', 'as_array', 'field_names', 'field_units']
+        for k in key_list:
+            setattr(self, k, kwargs.get(k, getattr(self, k)))
+        if 'stype' in kwargs:
+            stype = kwargs['stype']
+            if (self.serializer_type != stype) and (stype != 0):
+                sinfo = self.serializer_info
+                sinfo['stype'] = stype
+                # Monkey patch class (unadvised, but child classes are simple)
+                print('monkey patch', sinfo)
+                self = serialize.get_serializer(**sinfo)
+                assert(self.serializer_type == stype)
+
     def deserialize(self, msg):
         r"""Deserialize a message.
 
@@ -256,17 +280,7 @@ class DefaultSerialize(object):
         header_info = self.parse_header(msg)
         # Update parameters based on header info
         if 'stype' in header_info:
-            key_list = ['format_str', 'as_array', 'field_names', 'field_units']
-            for k in key_list:
-                setattr(self, k, header_info.get(k, getattr(self, k)))
-            if (((self.serializer_type != header_info['stype']) and
-                 (header_info['stype'] != 0))):
-                sinfo = self.serializer_info
-                sinfo['stype'] = header_info['stype']
-                # Monkey patch class (unadvised, but child classes are simple)
-                print('monkey patch', sinfo)
-                self = serialize.get_serializer(**sinfo)
-                assert(self.serializer_type == header_info['stype'])
+            self.update_serializer(**header_info)
         body = header_info.pop('body')
         if len(body) < header_info['size']:
             header_info['incomplete'] = True

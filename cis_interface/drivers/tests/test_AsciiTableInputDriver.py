@@ -1,5 +1,6 @@
 import numpy as np
 import nose.tools as nt
+from cis_interface import backwards
 import cis_interface.drivers.tests.test_AsciiFileInputDriver as parent
 import cis_interface.drivers.tests.test_FileInputDriver as super_parent
 
@@ -60,7 +61,10 @@ class TestAsciiTableInputDriver_Array(TestAsciiTableInputParam,
     def __init__(self, *args, **kwargs):
         super(TestAsciiTableInputDriver_Array, self).__init__(*args, **kwargs)
         self.inst_kwargs['as_array'] = 'True'
-        self.inst_kwargs['column_names'] = 'None'
+        names = [backwards.bytes2unicode(n) for n in self.field_names]
+        units = [backwards.bytes2unicode(n) for n in self.field_units]
+        self.inst_kwargs['column_names'] = ','.join(names)
+        self.inst_kwargs['column_units'] = ','.join(units)
         self.inst_kwargs['use_astropy'] = 'False'
 
     @property

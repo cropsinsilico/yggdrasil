@@ -325,6 +325,8 @@ def CisAsciiArrayOutput(name, fmt, dst_type=1, matlab=False, **kwargs):
         DefaultComm: Communication object.
         
     """
+    if matlab:
+        kwargs['send_converter'] = serialize.consolidate_array
     return CisAsciiTableOutput(name, fmt, as_array=True, dst_type=dst_type,
                                matlab=matlab, **kwargs)
 
@@ -426,9 +428,12 @@ def CisPandasInput(name, src_type=1, matlab=False, **kwargs):
         from cis_interface.communication import PandasFileComm
         base = PandasFileComm.PandasFileComm
         kwargs.setdefault('address', name)
+        if matlab:
+            kwargs['recv_converter'] = serialize.pandas2numpy
     else:
         base = DefaultComm
-        kwargs['recv_converter'] = serialize.numpy2pandas
+        if not matlab:
+            kwargs['recv_converter'] = serialize.numpy2pandas
     kwargs.setdefault('direction', 'recv')
     out = base(name, is_interface=True, recv_timeout=False,
                matlab=matlab, **kwargs)
@@ -454,9 +459,14 @@ def CisPandasOutput(name, dst_type=1, matlab=False, **kwargs):
         from cis_interface.communication import PandasFileComm
         base = PandasFileComm.PandasFileComm
         kwargs.setdefault('address', name)
+        if matlab:
+            kwargs['send_converter'] = serialize.numpy2pandas
     else:
         base = DefaultComm
-        kwargs['send_converter'] = serialize.pandas2numpy
+        if matlab:
+            kwargs['send_converter'] = serialize.consolidate_array
+        else:
+            kwargs['send_converter'] = serialize.pandas2numpy
     kwargs.setdefault('direction', 'send')
     out = base(name, is_interface=True, recv_timeout=False,
                matlab=matlab, **kwargs)

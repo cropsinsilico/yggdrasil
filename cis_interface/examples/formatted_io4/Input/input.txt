@@ -1,0 +1,4 @@
+name	count	size
+Input1	1	1.0
+Input2	2	2.0
+Input3	3	3.0

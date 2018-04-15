@@ -1,7 +1,7 @@
 models:
   - name: python_modelA
     driver: PythonModelDriver
-    args: ./src/formatted_io3_modelA.py
+    args: ./src/formatted_io4_modelA.py
     inputs: inputA
     outputs:
       name: outputA
@@ -9,7 +9,7 @@ models:
 
   - name: python_modelB
     driver: PythonModelDriver
-    args: ./src/formatted_io3_modelB.py
+    args: ./src/formatted_io4_modelB.py
     inputs: inputB
     outputs:
       name: outputB
@@ -20,7 +20,7 @@ connections:
     output: inputB
   - input: ./Input/input.txt  # Connection between file and model A input
     output: inputA
-    read_meth: table_array
+    read_meth: pandas
   - input: outputB  # Connection between model B output and file
     output: ./output.txt
-    write_meth: table_array
+    write_meth: pandas

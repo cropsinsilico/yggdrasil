@@ -89,7 +89,7 @@ class TestExample(CisTestBase, tools.CisClass):
 
     def check_file_exists(self, fname):
         r"""Check that a file exists."""
-        Tout = self.start_timeout()
+        Tout = self.start_timeout(2)
         while (not Tout.is_out) and (not os.path.isfile(fname)):  # pragma: debug
             self.sleep()
         self.stop_timeout()
@@ -97,7 +97,9 @@ class TestExample(CisTestBase, tools.CisClass):
 
     def check_file_size(self, fname, fsize):
         r"""Check that file is the correct size."""
-        Tout = self.start_timeout()
+        Tout = self.start_timeout(2)
+        if (os.stat(fname).st_size != fsize):
+            print(os.stat(fname).st_size, fsize)
         while ((not Tout.is_out) and
                (os.stat(fname).st_size != fsize)):  # pragma: debug
             self.sleep()

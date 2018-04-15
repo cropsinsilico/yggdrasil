@@ -35,6 +35,14 @@ class TestDefaultSerialize(CisTestClassInfo):
         r"""Assert that serialized/deserialized objects equal."""
         nt.assert_equal(x, y)
 
+    def test_field_specs(self):
+        r"""Test field specifiers."""
+        nt.assert_equal(self.instance.format_str, None)
+        nt.assert_equal(self.instance.nfields, 0)
+        nt.assert_equal(self.instance.field_names, None)
+        nt.assert_equal(self.instance.field_units, None)
+        nt.assert_equal(self.instance.field_formats, [])
+        
     def test_serialize(self):
         r"""Test serialize/deserialize."""
         for iobj in self._objects:
@@ -42,6 +50,10 @@ class TestDefaultSerialize(CisTestClassInfo):
             iout, ihead = self.instance.deserialize(msg)
             self.assert_result_equal(iout, iobj)
             nt.assert_equal(ihead, self.empty_head(msg))
+
+    def test_deserialize_error(self):
+        r"""Test error when deserializing message that is not bytes."""
+        nt.assert_raises(TypeError, self.instance.deserialize, None)
         
     def test_serialize_sinfo(self):
         r"""Test serialize/deserialize with serializer info."""
@@ -116,6 +128,14 @@ class TestDefaultSerialize_format(TestDefaultSerialize):
                              'field_units': self.field_units}
         self._empty_obj = tuple()
         self._objects = self.file_rows
+
+    def test_field_specs(self):
+        r"""Test field specifiers."""
+        nt.assert_equal(self.instance.format_str, self.fmt_str)
+        nt.assert_equal(self.instance.nfields, self.nfields)
+        nt.assert_equal(self.instance.field_names, self.field_names)
+        nt.assert_equal(self.instance.field_units, self.field_units)
+        nt.assert_equal(self.instance.field_formats, self.field_formats)
 
 
 class TestDefaultSerialize_array(TestDefaultSerialize_format):

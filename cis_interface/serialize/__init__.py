@@ -32,7 +32,7 @@ def guess_serializer(msg, **kwargs):
         **kwargs: Additional keyword arguments are passed to the serializer.
 
     Returns:
-        DefaultSerializer: Serializer for object.
+        dict: Extracted keyword arguments for creating a serializer.
 
     """
     sinfo = dict(**kwargs)
@@ -57,8 +57,7 @@ def guess_serializer(msg, **kwargs):
         format_str = format_str.replace(backwards.unicode2bytes('%1s'),
                                         backwards.unicode2bytes('%s'))
         sinfo.setdefault('format_str', format_str)
-    out = get_serializer(**sinfo)
-    return out
+    return sinfo
 
 
 def get_serializer(stype=None, **kwargs):
@@ -719,8 +718,14 @@ def table_to_array(msg, fmt_str=None, use_astropy=False, names=None,
         info = format2table(fmt_str)
         names = dtype.names
     fd = backwards.BytesIO(msg)
+    np_kws = dict()
+    if info.get('delimiter', None) is not None:
+        np_kws['delimiter'] = info['delimiter']
+    if info.get('comment', None) is not None:
+        np_kws['comments'] = info['comment']
     if use_astropy:
-        tab = apy_ascii.read(fd, names=names, delimiter=info['delimiter'])
+        tab = apy_ascii.read(fd, names=names, guess=True,
+                             format='no_header', **np_kws)
         arr = tab.as_array()
         typs = [arr.dtype[i].str for i in range(len(arr.dtype))]
         cols = tab.columns
@@ -738,13 +743,12 @@ def table_to_array(msg, fmt_str=None, use_astropy=False, names=None,
     else:
         if names is not None:
             names = [backwards.bytes2unicode(n) for n in names]
-        np_kws = dict(delimiter=info['delimiter'])
-        if 'comment' in info:
-            np_kws['comments'] = info['comment']
         for k, v in np_kws.items():
             np_kws[k] = backwards.bytes2unicode(v)
-        arr = np.genfromtxt(fd, dtype=dtype, autostrip=True,
-                            names=names, **np_kws)
+        arr = np.genfromtxt(fd, autostrip=True, dtype=None,
+                            names=names, encoding='bytes', **np_kws)
+        if dtype is not None:
+            arr = arr.astype(dtype)
     fd.close()
     return arr
 
@@ -906,7 +910,9 @@ def format_header(format_str=None, dtype=None,
     # Create lines
     out = []
     for x in [field_names, field_units, fmts]:
-        if x is None:
+        if (x is None):
+            continue
+        if (len(x) == 0) or (x[0] == 'None'):
             continue
         assert(len(x) == nfld)
         out.append(comment + delimiter.join(x))
