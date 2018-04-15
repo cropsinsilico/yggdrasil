@@ -72,7 +72,6 @@ class PandasSerialize(DefaultSerialize):
             out = self.empty_msg
         else:
             fd = backwards.BytesIO(msg)
-            print(np.dtype('long').itemsize, np.dtype('longlong').itemsize)
             out = pandas.read_csv(fd, sep=self.delimiter, encoding='utf8')
             fd.close()
             if not backwards.PY2:
@@ -83,7 +82,7 @@ class PandasSerialize(DefaultSerialize):
             # On windows, long != longlong and longlong requires special cformat
             # For now, long will be used to preserve the use of %ld to match long
             if platform._is_win:  # pragma: windows
-                if np.dtype('long').itemsize != np.dtype('longlong').itemsize:
+                if np.dtype('longlong').itemsize == 8:
                     new_dtypes = dict()
                     for c, d in zip(out.columns, out.dtypes):
                         if d == np.dtype('longlong'):
