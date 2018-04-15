@@ -1036,7 +1036,7 @@ def dict2numpy(d, order=None):
     """
     if order is None:
         order = sorted([k for k in d.keys()])
-    dtypes = [v.dtype for v in d.values()]
+    dtypes = [d[k].dtype for k in order]
     dtype = np.dtype(dict(names=order, formats=dtypes))
     shape = d[order[0]].shape
     out = np.empty(shape, dtype)
