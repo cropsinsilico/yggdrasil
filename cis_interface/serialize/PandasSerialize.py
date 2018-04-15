@@ -1,6 +1,7 @@
 import pandas
 import copy
-from cis_interface import backwards
+import numpy as np
+from cis_interface import backwards, platform
 from cis_interface.serialize.DefaultSerialize import DefaultSerialize
 
 
@@ -71,6 +72,7 @@ class PandasSerialize(DefaultSerialize):
             out = self.empty_msg
         else:
             fd = backwards.BytesIO(msg)
+            print(np.dtype('long').itemsize, np.dtype('longlong').itemsize)
             out = pandas.read_csv(fd, sep=self.delimiter, encoding='utf8')
             fd.close()
             if not backwards.PY2:
@@ -78,6 +80,17 @@ class PandasSerialize(DefaultSerialize):
                 for c, d in zip(out.columns, out.dtypes):
                     if d == object:
                         out[c] = out[c].apply(lambda s: s.encode('utf-8'))
+            # On windows, long != longlong and longlong requires special cformat
+            # For now, long will be used to preserve the use of %ld to match long
+            if platform._is_win:  # pragma: windows
+                if np.dtype('long').itemsize != np.dtype('longlong').itemsize:
+                    new_dtypes = dict()
+                    for c, d in zip(out.columns, out.dtypes):
+                        if d == np.dtype('longlong'):
+                            new_dtypes[c] = np.int32
+                        else:
+                            new_dtypes[c] = d
+                    out = out.astype(new_dtypes, copy=False)
             # for c, d in zip(out.columns, out.dtypes):
             #     if d == object:
             #         out[c] = out[c].apply(lambda s: s.strip())

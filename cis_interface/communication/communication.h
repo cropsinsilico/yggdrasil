@@ -647,6 +647,7 @@ int comm_recv_multipart(const comm_t x, char **data, const size_t len,
     cislog_error("comm_recv_multipart: Invalid comm");
     return ret;
   }
+  usleep(100);
   comm_head_t head = parse_comm_header(*data, headlen);
   if (!(head.valid)) {
     cislog_error("comm_recv(%s): Error parsing header.", x.name);
@@ -659,41 +660,48 @@ int comm_recv_multipart(const comm_t x, char **data, const size_t len,
       cislog_debug("comm_recv(%s): Updating serializer type to %d",
 		   x.name, head.serializer_type);
       if (head.serializer_type == 0) {
-	new_type = DIRECT_SERI;
+        new_type = DIRECT_SERI;
       } else if (head.serializer_type == 1) {
-	new_type = FORMAT_SERI;
+        new_type = FORMAT_SERI;
       } else if (head.serializer_type == 2) {
-	new_type = ASCII_TABLE_ARRAY_SERI;
-	// TODO: Treat this as a separate class
-	// new_type = ARRAY_SERI;
+        new_type = ASCII_TABLE_ARRAY_SERI;
+      // TODO: Treat this as a separate class
+      // new_type = ARRAY_SERI;
       } else if (head.serializer_type == 3) {
-	if (head.as_array == 0) {
-	  new_type = ASCII_TABLE_SERI;
-	} else {
-	  new_type = ASCII_TABLE_ARRAY_SERI;
-	}
+        if (head.as_array == 0) {
+          new_type = ASCII_TABLE_SERI;
+        } else {
+          new_type = ASCII_TABLE_ARRAY_SERI;
+        }
       }
       if (new_type >= 0) {
-	ret = update_serializer(x.serializer, new_type, new_info);
-	if (ret != 0) {
-	  cislog_error("comm_recv(%s): Error updating serializer.", x.name);
-	  return -1;
-	}
+        ret = update_serializer(x.serializer, new_type, new_info);
+        if (ret != 0) {
+          cislog_error("comm_recv(%s): Error updating serializer.", x.name);
+          return -1;
+        }
       }
-      // Set name for debug info
+      // Set name for debug info & simplify formats
       if ((new_type == ASCII_TABLE_SERI) || (new_type == ASCII_TABLE_ARRAY_SERI)) {
-	asciiTable_t *table = (asciiTable_t*)(x.serializer->info);
-	ret = at_update(table, x.name, "0");
-	if (ret != 0) {
-	  cislog_error("comm_recv(%s): Failed to update asciiTable address.",
-		       x.name);
-	  return -1;
-	}
-	ret = simplify_formats(table->format_str, CIS_MSG_MAX);
-	if (ret < 0) {
-	  cislog_error("comm_recv(%s): Failed to simplify recvd format.", x.name);
-	  return -1;
-	}
+        asciiTable_t *table = (asciiTable_t*)(x.serializer->info);
+        ret = at_update(table, x.name, "0");
+        if (ret != 0) {
+          cislog_error("comm_recv(%s): Failed to update asciiTable address.",
+                       x.name);
+          return -1;
+        }
+        ret = simplify_formats(table->format_str, CIS_MSG_MAX);
+        if (ret < 0) {
+          cislog_error("comm_recv(%s): Failed to simplify recvd table format.", x.name);
+          return -1;
+        }
+      } else if (new_type == FORMAT_SERI) {
+        char * format_str = (char*)(x.serializer->info);
+        ret = simplify_formats(format_str, x.serializer->size_info);
+        if (ret < 0) {
+          cislog_error("comm_recv(%s): Failed to simplify recvd format.", x.name);
+          return -1;
+        }
       }
     }
     if (head.multipart) {
@@ -702,7 +710,7 @@ int comm_recv_multipart(const comm_t x, char **data, const size_t len,
       (*data)[head.bodysiz] = '\0';
       // Return early if header contained entire message
       if (head.size == head.bodysiz) {
-	x.used[0] = 1;
+        x.used[0] = 1;
 	return (int)(head.bodysiz);
       }
       // Get address for new comm
@@ -788,6 +796,9 @@ int comm_recv(const comm_t x, char *data, const size_t len) {
     } else {
       ret = comm_recv_multipart(x, &data, len, ret, 0);
     }
+  } else {
+    cislog_error("comm_recv_realloc(%s): Failed to receive header or message.",
+      x.name);
   }
   return ret;
 };
@@ -812,6 +823,9 @@ int comm_recv_realloc(const comm_t x, char **data, const size_t len) {
     } else {
       ret = comm_recv_multipart(x, data, len, ret, 1);
     }
+  } else {
+    cislog_error("comm_recv_realloc(%s): Failed to receive header or message.",
+      x.name);
   }
   return ret;
 };

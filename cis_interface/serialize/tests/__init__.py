@@ -72,8 +72,8 @@ def test_guess_serializer():
     fmt_arr = serialize._default_delimiter.join(
         serialize.nptype2cformat(arr_mix.dtype, asbytes=True))
     fmt_arr += serialize._default_newline
-    if platform._is_win:
-        fmt = backwards.unicode2bytes('%s\t%l64d\t%g\t%g%+gj\n')
+    if platform._is_win:  # pragma: windows
+        fmt = backwards.unicode2bytes('%s\t%d\t%g\t%g%+gj\n')
     else:
         fmt = backwards.unicode2bytes('%s\t%ld\t%g\t%g%+gj\n')
     test_list = [(arr_mix, dict(field_names=field_names, format_str=fmt_arr,
@@ -265,10 +265,18 @@ def test_combine_eles():
     arrs_void = [res1[i] for i in range(nele)]
     arrs_mixd = [a.tolist() for a in res1]
     arrs_mixd[-1] = arrs_void[-1]
+    if platform._is_win:  # pragma: windows
+        dtype0_w = np.dtype({'names': names0, 'formats': ['S5', 'i4', 'f8', 'c16']})
+        dtype1_w = np.dtype({'names': names1, 'formats': ['S5', 'i4', 'f8', 'c16']})
+        res0_list = res0.astype(dtype0_w)
+        res1_list = res1.astype(dtype1_w)
+    else:
+        res0_list = res0
+        res1_list = res1
     np.testing.assert_array_equal(serialize.combine_eles(arrs), res0)
-    np.testing.assert_array_equal(serialize.combine_eles(arrs_list), res0)
+    np.testing.assert_array_equal(serialize.combine_eles(arrs_list), res0_list)
     np.testing.assert_array_equal(serialize.combine_eles(arrs_void), res1)
-    np.testing.assert_array_equal(serialize.combine_eles(arrs_mixd), res1)
+    np.testing.assert_array_equal(serialize.combine_eles(arrs_mixd), res1_list)
     np.testing.assert_array_equal(serialize.combine_eles(arrs, dtype=dtype1),
                                   res1)
     np.testing.assert_array_equal(serialize.combine_eles(arrs_list, dtype=dtype1),
@@ -288,6 +296,11 @@ def test_consolidate_array():
     # names1 = ["name", "number", "value", "complex"]
     dtypes = ['S5', 'i8', 'f8', 'c16']
     dtype0 = np.dtype([(n, f) for n, f in zip(names0, dtypes)])
+    if platform._is_win:  # pragma: windows
+        dtype0_list = np.dtype({'names': names0,
+                                'formats': ['S5', 'i4', 'f8', 'c16']})
+    else:
+        dtype0_list = dtype0
     # dtype1 = np.dtype([(n, f) for n, f in zip(names1, dtypes)])
     dtype2 = np.dtype([('f0', 'i8'), ('f1', 'f8')])
     dtype3 = np.dtype([('f0', 'i4'), ('f1', 'f4')])
@@ -305,8 +318,13 @@ def test_consolidate_array():
         x0list.append(x)
         x1list.append(x)
         if len(dtype) > 0:
-            dlist += [dtype, dtype, dtype]
-            x0list += [x, x_flat, x_flat]
+            dlist += [dtype, dtype]
+            if dtype == dtype0:
+                dtype_list = dtype0_list
+            else:
+                dtype_list = dtype
+            dlist.append(dtype_list)
+            x0list += [x, x_flat, x_flat.astype(dtype_list)]
             # Tests with lists of arrays rows or columns
             x1list.append([x[n] for n in dtype.names])
             x1list.append([x_flat[i] for i in range(len(x_flat))])
@@ -417,15 +435,19 @@ def test_array_to_bytes():
 def test_format_header():
     r"""Test formatting header."""
     kws_all = dict(
-        format_str="%5s\t%ld\t%g\t%g%+gj\n",
         field_names=['name', 'number', 'value', 'complex'],
         field_units=['n/a', 'g', 'cm', 'n/a'])
-    kws_all['dtype'] = serialize.cformat2nptype(kws_all['format_str'],
-                                                names=kws_all['field_names'])
     res_all = dict(
-        format="# %5s\t%ld\t%g\t%g%+gj\n",
         names="# name\tnumber\tvalue\tcomplex\n",
         units="# n/a\tg\tcm\tn/a\n")
+    if platform._is_win:  # pragma: windows
+        kws_all['format_str'] = "%5s\t%l64d\t%g\t%g%+gj\n"
+        res_all['format'] = "# " + kws_all['format_str']
+    else:
+        kws_all['format_str'] = "%5s\t%ld\t%g\t%g%+gj\n"
+        res_all['format'] = "# " + kws_all['format_str']
+    kws_all['dtype'] = serialize.cformat2nptype(kws_all['format_str'],
+                                                names=kws_all['field_names'])
     for x in [kws_all, res_all]:
         for k, v in x.items():
             if isinstance(v, str):

@@ -16,6 +16,7 @@ seri_t empty_serializer() {
   seri_t s;
   s.type = DIRECT_SERI; // Can't be -1 (was that used?)
   s.info = NULL;
+  s.size_info = 0;
   return s;
 };
 
@@ -54,6 +55,7 @@ int update_serializer(seri_t *s, int type, const void *info) {
     if (s->info != NULL) {
       free(s->info);
     }
+    s->size_info = sizeof(asciiTable_t);
     s->info = (void*)handle;
   } else if (info == NULL) {
     if (type < 0) {
@@ -61,15 +63,17 @@ int update_serializer(seri_t *s, int type, const void *info) {
     }
   } else {
     char *format_str = (char*)info;
-    int len_fmt = strlen(format_str);
-    void *t_sinfo = (void*)realloc(s->info, len_fmt + 1);
+    s->size_info = 2*strlen(format_str) + 1;
+    void *t_sinfo = (void*)realloc(s->info, s->size_info);
     if (t_sinfo == NULL) {
       cislog_error("update_serializer: Failed to reallocate for format string.");
+      s->size_info = 0;
       free(s->info);
       return -1;
     }
     s->info = t_sinfo;
     strcpy((char*)(s->info), format_str);
+    // size_t len_fmt = strlen(format_str);
     // memcpy(s->info, format_str, len_fmt + 1);
     // ((char*)(s->info))[len_fmt] = '\0';
     if (type < 0) {
