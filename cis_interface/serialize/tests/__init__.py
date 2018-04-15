@@ -72,7 +72,10 @@ def test_guess_serializer():
     fmt_arr = serialize._default_delimiter.join(
         serialize.nptype2cformat(arr_mix.dtype, asbytes=True))
     fmt_arr += serialize._default_newline
-    fmt = backwards.unicode2bytes('%s\t%ld\t%g\t%g%+gj\n')
+    if platform._is_win:
+        fmt = backwards.unicode2bytes('%s\t%l64d\t%g\t%g%+gj\n')
+    else:
+        fmt = backwards.unicode2bytes('%s\t%ld\t%g\t%g%+gj\n')
     test_list = [(arr_mix, dict(field_names=field_names, format_str=fmt_arr,
                                 stype=2, as_array=1)),
                  (arr_mix[0].tolist(), dict(format_str=fmt, stype=1)),
