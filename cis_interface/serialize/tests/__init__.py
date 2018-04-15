@@ -118,7 +118,10 @@ def test_nptype2cformat():
 
 def test_nptype2cformat_structured():
     r"""Test conversion from structured numpy dtype to C format string."""
-    fmts = ["%5s", "%ld", "%g", "%g%+gj"]
+    if platform._is_win:  # pragma: windows
+        fmts = ["%5s", "%l64d", "%g", "%g%+gj"]
+    else:
+        fmts = ["%5s", "%ld", "%g", "%g%+gj"]
     names0 = ['f0', 'f1', 'f2', 'f3']
     names1 = ["name", "number", "value", "complex"]
     dtypes = ['S5', 'i8', 'f8', 'c16']
