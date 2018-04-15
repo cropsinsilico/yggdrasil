@@ -218,13 +218,6 @@ class TestDefaultSerialize_func_error(TestDefaultSerialize_func):
         r"""Method that serializes using repr."""
         return args
 
-    def _func_deserialize(self, args):
-        r"""Method that deserializes using eval."""
-        if len(args) == 0:
-            return self._empty_obj
-        x = eval(backwards.bytes2unicode(args))
-        return x
-
     def test_serialize(self):
         r"""Test serialize with function that dosn't return correct type."""
         nt.assert_raises(TypeError, self.instance.serialize, (1,))

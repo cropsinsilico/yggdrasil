@@ -11,6 +11,7 @@ def test_serialize_nofmt():
     inst = AsciiTableSerialize.AsciiTableSerialize()
     test_msg = np.zeros((5, 5))
     nt.assert_raises(RuntimeError, inst.serialize, test_msg)
+    nt.assert_equal(inst.table_info, None)
 
     
 def test_deserialize_nofmt():
