@@ -42,6 +42,9 @@ class TestDefaultSerialize(CisTestClassInfo):
         nt.assert_equal(self.instance.field_names, None)
         nt.assert_equal(self.instance.field_units, None)
         nt.assert_equal(self.instance.field_formats, [])
+        nt.assert_equal(self.instance.numpy_dtype, None)
+        nt.assert_equal(self.instance.scanf_format_str, None)
+        nt.assert_equal(self.instance.is_user_defined, False)
         
     def test_serialize(self):
         r"""Test serialize/deserialize."""
@@ -136,6 +139,9 @@ class TestDefaultSerialize_format(TestDefaultSerialize):
         nt.assert_equal(self.instance.field_names, self.field_names)
         nt.assert_equal(self.instance.field_units, self.field_units)
         nt.assert_equal(self.instance.field_formats, self.field_formats)
+        nt.assert_equal(self.instance.numpy_dtype, self.file_dtype)
+        scanf_fmt = backwards.unicode2bytes('%s\t%d\t%f\n')
+        nt.assert_equal(self.instance.scanf_format_str, scanf_fmt)
 
 
 class TestDefaultSerialize_array(TestDefaultSerialize_format):
@@ -174,6 +180,18 @@ class TestDefaultSerialize_func(TestDefaultSerialize):
         x = eval(backwards.bytes2unicode(args))
         return x
 
+    def test_field_specs(self):
+        r"""Test field specifiers."""
+        nt.assert_equal(self.instance.format_str, None)
+        nt.assert_equal(self.instance.nfields, 0)
+        nt.assert_equal(self.instance.field_names, None)
+        nt.assert_equal(self.instance.field_units, None)
+        nt.assert_equal(self.instance.field_formats, [])
+        nt.assert_equal(self.instance.numpy_dtype, None)
+        nt.assert_equal(self.instance.scanf_format_str, None)
+        nt.assert_equal(self.instance.is_user_defined, True)
+        nt.assert_equal(self.instance.serializer_type, -1)
+        
     def test_serialize_sinfo(self):
         r"""Test error on serialize with serializer info for function."""
         nt.assert_raises(RuntimeError, self.instance.serialize,
@@ -217,4 +235,8 @@ class TestDefaultSerialize_func_error(TestDefaultSerialize_func):
 
     def test_serialize_sinfo(self):
         r"""Disabled: Test serialize/deserialize with serializer info."""
+        pass
+
+    def test_field_specs(self):
+        r"""Disabled: Test field specifiers."""
         pass

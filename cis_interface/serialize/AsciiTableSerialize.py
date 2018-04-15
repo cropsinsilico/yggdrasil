@@ -1,4 +1,3 @@
-import numpy as np
 from cis_interface import backwards, serialize
 from cis_interface.serialize.DefaultSerialize import DefaultSerialize
 
@@ -41,12 +40,13 @@ class AsciiTableSerialize(DefaultSerialize):
 
         """
         if self.format_str is None:
-            if self.as_array:
-                dtype = args.dtype
-            else:
-                dtype = np.dtype(names=self.field_names,
-                                 formats=[type(x) for x in args])
-            self.format_str = serialize.table2format(dtype)
+            # if self.as_array:
+            #     dtype = args.dtype
+            # else:
+            #     dtype = np.dtype(names=self.field_names,
+            #                      formats=[type(x) for x in args])
+            # self.format_str = serialize.table2format(dtype)
+            raise RuntimeError("Format string is not defined.")
         if self.as_array:
             out = serialize.array_to_table(args, self.format_str,
                                            use_astropy=self.use_astropy)

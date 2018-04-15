@@ -146,6 +146,8 @@ def test_cformat2nptype():
                      backwards.unicode2bytes('s'))
     nt.assert_raises(ValueError, serialize.cformat2nptype,
                      backwards.unicode2bytes('%'))
+    nt.assert_raises(ValueError, serialize.cformat2nptype,
+                     '%d\t%f', names=['one'])
     for a in unsupported_nptype:
         nt.assert_raises(ValueError, serialize.cformat2nptype,
                          backwards.unicode2bytes('%' + a))
@@ -241,6 +243,7 @@ def test_combine_eles():
     dtypes = ['S5', 'i8', 'f8', 'c16']
     dtype0 = np.dtype([(n, f) for n, f in zip(names0, dtypes)])
     dtype1 = np.dtype([(n, f) for n, f in zip(names1, dtypes)])
+    dtype_short = np.dtype([(n, f) for n, f in zip(names1[:-1], dtypes[:-1])])
     # nfld = len(names0)
     nele = 5
     res0 = np.zeros(nele, dtype0)
@@ -261,6 +264,9 @@ def test_combine_eles():
     nt.assert_raises(ValueError, serialize.combine_eles, arrs_list)
     arrs_list[0] = None
     nt.assert_raises(TypeError, serialize.combine_eles, arrs_list)
+    arrs_void = [res1[i] for i in range(nele)]
+    nt.assert_raises(ValueError, serialize.combine_eles, arrs_void,
+                     dtype=dtype_short)
 
 
 def test_consolidate_array():

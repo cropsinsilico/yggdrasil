@@ -50,7 +50,7 @@ class PandasSerialize(DefaultSerialize):
                 if isinstance(args_[c][0], backwards.bytes_type):
                     args_[c] = args_[c].apply(lambda s: s.decode('utf-8'))
         if self.field_names is not None:
-            args_.columns = self.field_names
+            args_.columns = [backwards.bytes2unicode(n) for n in self.field_names]
         args_.to_csv(fd, index=False, sep=self.delimiter,
                      mode='wb', encoding='utf8', header=self.write_header)
         out = fd.getvalue()

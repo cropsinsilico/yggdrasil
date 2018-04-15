@@ -372,8 +372,9 @@ class IOInfo(object):
         self.field_formats = self.fmt_str.split(self.newline)[0].split(self.delimiter)
         self.fmt_str_line = backwards.unicode2bytes('# ') + self.fmt_str
         # self.file_cols = ['name', 'count', 'size']
-        self.file_dtype = {'names': self.field_names,
-                           'formats': ['%s5' % backwards.np_dtype_str, 'i4', 'f8']}
+        self.file_dtype = np.dtype(
+            {'names': self.field_names,
+             'formats': ['%s5' % backwards.np_dtype_str, 'i4', 'f8']})
         self.field_names = [backwards.unicode2bytes(x) for x in self.field_names]
         self.field_units = [backwards.unicode2bytes(x) for x in self.field_units]
         self.field_names_line = (self.comment +

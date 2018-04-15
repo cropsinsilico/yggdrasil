@@ -1,8 +1,23 @@
 import numpy as np
 import nose.tools as nt
 from cis_interface import backwards
+from cis_interface.serialize import AsciiTableSerialize
 from cis_interface.serialize.tests.test_DefaultSerialize import \
     TestDefaultSerialize
+
+
+def test_serialize_nofmt():
+    r"""Test error on serialization without a format."""
+    inst = AsciiTableSerialize.AsciiTableSerialize()
+    test_msg = np.zeros((5, 5))
+    nt.assert_raises(RuntimeError, inst.serialize, test_msg)
+
+    
+def test_deserialize_nofmt():
+    r"""Test error on deserialization without a format."""
+    inst = AsciiTableSerialize.AsciiTableSerialize()
+    test_msg = backwards.unicode2bytes('lskdbjs;kfbj')
+    nt.assert_raises(RuntimeError, inst.deserialize, test_msg)
 
 
 class TestAsciiTableSerialize(TestDefaultSerialize):
@@ -24,6 +39,10 @@ class TestAsciiTableSerialize(TestDefaultSerialize):
         nt.assert_equal(self.instance.field_names, self.field_names)
         nt.assert_equal(self.instance.field_units, self.field_units)
         nt.assert_equal(self.instance.field_formats, self.field_formats)
+        nt.assert_equal(self.instance.numpy_dtype, self.file_dtype)
+        scanf_fmt = backwards.unicode2bytes('%s\t%d\t%f\n')
+        nt.assert_equal(self.instance.scanf_format_str, scanf_fmt)
+        self.instance.table_info
 
 
 class TestAsciiTableSerializeSingle(TestDefaultSerialize):
