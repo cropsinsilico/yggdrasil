@@ -3,6 +3,7 @@ import uuid
 import atexit
 import threading
 import numpy as np
+import pandas as pd
 from cis_interface import backwards, tools, serialize
 from cis_interface.tools import get_CIS_MSG_MAX, CIS_MSG_EOF
 from cis_interface.communication import (
@@ -1357,10 +1358,11 @@ class CommBase(tools.CisClass):
         """
         if field_order is None:
             if self.serializer.field_names is not None:
-                field_order = self.serializer.field_names
+                field_order = [
+                    backwards.bytes2unicode(n) for n in self.serializer.field_names]
             elif len(args_dict) <= 1:
                 field_order = [k for k in args_dict.keys()]
-            else:
+            else:  # pragma: debug
                 raise RuntimeError("Could not determine the field order.")
         as_array = True
         for v in args_dict.values():
@@ -1368,7 +1370,7 @@ class CommBase(tools.CisClass):
                 as_array = False
                 break
         if as_array:
-            args = (serialize.dict2numpy(args_dict), )
+            args = (serialize.dict2numpy(args_dict, order=field_order), )
         else:
             args = tuple([args_dict[k] for k in field_order])
         return self.send(*args, **kwargs)
@@ -1393,8 +1395,11 @@ class CommBase(tools.CisClass):
         if flag:
             if isinstance(msg, np.ndarray):
                 msg_dict = serialize.numpy2dict(msg)
+            elif isinstance(msg, pd.DataFrame):
+                msg_dict = serialize.pandas2dict(msg)
             elif isinstance(msg, tuple):
-                field_names = self.serializer.field_names
+                field_names = [
+                    backwards.bytes2unicode(n) for n in self.serializer.field_names]
                 if field_names is None:
                     field_names = ['f%d' % i for i in range(len(msg))]
                 msg_dict = {k: v for k, v in zip(field_names, msg)}

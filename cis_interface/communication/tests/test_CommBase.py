@@ -408,3 +408,18 @@ class TestCommBase(CisTestClassInfo):
         # Purge recv while closed
         self.recv_instance.close()
         self.recv_instance.purge()
+
+    def test_send_recv_dict(self):
+        r"""Test send/recv numpy array as dict."""
+        msg_send = dict(f0=self.msg_short)
+        if self.comm in ['CommBase', 'AsyncComm']:
+            flag = self.send_instance.send_dict(msg_send)
+            assert(not flag)
+            flag, msg_recv = self.recv_instance.recv_dict(timeout=self.timeout)
+            assert(not flag)
+        else:
+            flag = self.send_instance.send_dict(msg_send)
+            assert(flag)
+            flag, msg_recv = self.recv_instance.recv_dict(timeout=self.timeout)
+            assert(flag)
+            nt.assert_equal(msg_recv, msg_send)

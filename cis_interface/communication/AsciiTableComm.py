@@ -63,8 +63,8 @@ class AsciiTableComm(AsciiFileComm):
             with open(self.address, self.open_mode) as fd:
                 fd.seek(header_size)
                 all_contents = fd.read()
-            if len(all_contents) == 0:
-                return
+            if len(all_contents) == 0:  # pragma: debug
+                return  # In case the file has not been written
             arr = serialize.table_to_array(all_contents,
                                            names=self.serializer.field_names,
                                            comment=self.comment,
@@ -72,7 +72,8 @@ class AsciiTableComm(AsciiFileComm):
             self.serializer.field_names = arr.dtype.names
             if self.serializer.format_str is None:
                 self.serializer.format_str = serialize.table2format(
-                    arr.dtype, delimiter=self.delimiter, comment=self.comment,
+                    arr.dtype, delimiter=self.delimiter,
+                    comment=backwards.unicode2bytes(''),
                     newline=self.newline)
             while str_fmt in self.serializer.format_str:
                 ifld = self.serializer.field_formats.index(str_fmt)

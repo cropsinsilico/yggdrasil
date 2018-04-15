@@ -15,12 +15,12 @@ class TestAsciiTableInputParam(parent.TestAsciiFileInputParam):
         self.icomm_name = 'AsciiTableComm'
 
     @property
-    def msg_short(self):
+    def msg_short(self):  # pragma: debug
         r"""str: Always use file lines as message."""
         return self.file_rows[0]
     
     @property
-    def msg_long(self):
+    def msg_long(self):  # pragma: debug
         r"""str: Always use file lines as message."""
         return self.file_rows[0]
 
@@ -68,12 +68,12 @@ class TestAsciiTableInputDriver_Array(TestAsciiTableInputParam,
         self.inst_kwargs['use_astropy'] = 'False'
 
     @property
-    def msg_short(self):
+    def msg_short(self):  # pragma: debug
         r"""str: Always use file bytes as message."""
         return self.file_array
     
     @property
-    def msg_long(self):
+    def msg_long(self):  # pragma: debug
         r"""str: Always use file bytes as message."""
         return self.file_array
 

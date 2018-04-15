@@ -253,8 +253,13 @@ def test_combine_eles():
     arrs = [np.zeros(1, dtype=dtype0) for i in range(nele)]
     arrs[0]['f0'] = backwards.unicode2bytes('hello')
     arrs_list = [a.tolist()[0] for a in arrs]
+    arrs_void = [res1[i] for i in range(nele)]
+    arrs_mixd = [a.tolist() for a in res1]
+    arrs_mixd[-1] = arrs_void[-1]
     np.testing.assert_array_equal(serialize.combine_eles(arrs), res0)
     np.testing.assert_array_equal(serialize.combine_eles(arrs_list), res0)
+    np.testing.assert_array_equal(serialize.combine_eles(arrs_void), res1)
+    np.testing.assert_array_equal(serialize.combine_eles(arrs_mixd), res1)
     np.testing.assert_array_equal(serialize.combine_eles(arrs, dtype=dtype1),
                                   res1)
     np.testing.assert_array_equal(serialize.combine_eles(arrs_list, dtype=dtype1),
@@ -264,7 +269,6 @@ def test_combine_eles():
     nt.assert_raises(ValueError, serialize.combine_eles, arrs_list)
     arrs_list[0] = None
     nt.assert_raises(TypeError, serialize.combine_eles, arrs_list)
-    arrs_void = [res1[i] for i in range(nele)]
     nt.assert_raises(ValueError, serialize.combine_eles, arrs_void,
                      dtype=dtype_short)
 
@@ -309,6 +313,11 @@ def test_consolidate_array():
     np.testing.assert_array_equal(x0, x2)
     np.testing.assert_array_equal(x0, serialize.consolidate_array(
         np.zeros(nrow, dtype3), dtype=dtype2))
+    # Test with list of arrays
+    arr_void = np.ones(5, dtype0)
+    x0list.append(arr_void)
+    x1list.append([a for a in arr_void])
+    dlist.append(dtype0)
     # Loop over different test inputs
     i = 0
     for x0, x1, dtype in zip(x0list, x1list, dlist):
@@ -324,7 +333,10 @@ def test_consolidate_array():
                      np.zeros((4, 1)), dtype=dtype2)
     # Error on incorrect type
     nt.assert_raises(TypeError, serialize.consolidate_array, None)
-
+    # Error on dtypes with differing numbers of fields
+    nt.assert_raises(ValueError, serialize.consolidate_array,
+                     np.zeros(3, dtype0), dtype=dtype3)
+                     
 
 def test_format2table():
     r"""Test getting table information from a format string."""
@@ -333,10 +345,16 @@ def test_format2table():
            'comment': backwards.unicode2bytes('# '),
            'fmts': ["%5s", "%ld", "%lf", "%g%+gj"]}
     out['fmts'] = [backwards.unicode2bytes(f) for f in out['fmts']]
+    sfmt = out['fmts'][0]
+    sout = dict(**out)
+    sout['fmts'] = [sfmt]
+    del sout['newline'], sout['comment']
     fmt = backwards.unicode2bytes("# %5s\t%ld\t%lf\t%g%+gj\n")
     nt.assert_equal(dict(fmts=[]), serialize.format2table('hello'))
+    nt.assert_equal(sout, serialize.format2table(sfmt))
     nt.assert_equal(fmt, serialize.table2format(**out))
     nt.assert_equal(out, serialize.format2table(fmt))
+    nt.assert_equal(fmt, serialize.table2format(fmts=out['fmts']))
     nt.assert_raises(RuntimeError, serialize.format2table, "%5s,%ld\t%g\n")
 
 
@@ -347,6 +365,7 @@ def test_array_to_table():
         for f in flist:
             dtype = serialize.cformat2nptype(f)
             arr0 = np.ones(5, dtype)
+            arr0['f0'][0] = backwards.unicode2bytes('hello')
             tab = serialize.array_to_table(arr0, f, use_astropy=use_astropy)
             arr1 = serialize.table_to_array(tab, f, use_astropy=use_astropy)
             np.testing.assert_array_equal(arr1, arr0)
@@ -408,6 +427,8 @@ def test_format_header():
                   ['names', 'units', 'format']),
                  (['field_names', 'field_units', 'dtype'],
                   ['names', 'units', 'format']),
+                 (['field_units', 'dtype'],
+                  ['names', 'units', 'format']),
                  (['field_names'], ['names']),
                  (['field_units'], ['units'])]
     for kws_keys, res_keys in test_list:
@@ -436,6 +457,8 @@ def test_parse_header():
             res[k] = [backwards.unicode2bytes(s) for s in v]
     nt.assert_equal(serialize.parse_header(header), res)
     nt.assert_equal(serialize.parse_header(header[::-1]), res)
+    _empty = backwards.unicode2bytes('')
+    nt.assert_equal(serialize.parse_header(_empty.join(header)), res)
     # Test without formats
     header2 = header[:2]
     res2 = dict(**res)
@@ -474,16 +497,45 @@ def test_numpy2pandas():
 def test_numpy2dict():
     r"""Test conversion of a numpy array to a dictionary and back."""
     nele = 5
-    names = ["name", "number", "value", "complex"]
-    dtypes = ['S5', 'i8', 'f8', 'c16']
+    names = ["complex", "name", "number", "value"]
+    dtypes = ['c16', 'S5', 'i8', 'f8']
     dtype = np.dtype([(n, f) for n, f in zip(names, dtypes)])
     arr_mix = np.zeros(nele, dtype)
     arr_mix['name'][0] = 'hello'
     test_arrs = [arr_mix]
     for ans in test_arrs:
         d = serialize.numpy2dict(ans)
+        # Sorted
         res = serialize.dict2numpy(d)
         np.testing.assert_array_equal(ans, res)
+        # Provided
+        res = serialize.dict2numpy(d, order=names)
+        np.testing.assert_array_equal(ans, res)
+
+
+def test_pandas2dict():
+    r"""Test conversion of a Pandas data frame to a dictionary and back."""
+    nele = 5
+    names = ["complex", "name", "number", "value"]
+    dtypes = ['c16', 'S5', 'i8', 'f8']
+    dtype = np.dtype([(n, f) for n, f in zip(names, dtypes)])
+    arr_mix = np.zeros(nele, dtype)
+    arr_mix['name'][0] = 'hello'
+    arr_obj = np.array([list(), 'hello', 5], dtype='O')
+    test_arrs = [arr_mix,
+                 np.zeros(nele, 'float'),
+                 arr_mix['name'],
+                 arr_obj]
+    for ans in test_arrs:
+        frame = serialize.numpy2pandas(ans)
+        # Sorted
+        d = serialize.pandas2dict(frame)
+        res = serialize.dict2pandas(d)
+        np.testing.assert_array_equal(res, frame)
+        # Provided
+        d = serialize.pandas2dict(frame)
+        res = serialize.dict2pandas(d, order=ans.dtype.names)
+        np.testing.assert_array_equal(res, frame)
 
 
 __all__ = []

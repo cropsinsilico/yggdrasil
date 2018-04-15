@@ -98,8 +98,8 @@ class TestExample(CisTestBase, tools.CisClass):
     def check_file_size(self, fname, fsize):
         r"""Check that file is the correct size."""
         Tout = self.start_timeout(2)
-        if (os.stat(fname).st_size != fsize):
-            print(os.stat(fname).st_size, fsize)
+        if (os.stat(fname).st_size != fsize):  # pragma: debug
+            print('file sizes not equal', os.stat(fname).st_size, fsize)
         while ((not Tout.is_out) and
                (os.stat(fname).st_size != fsize)):  # pragma: debug
             self.sleep()

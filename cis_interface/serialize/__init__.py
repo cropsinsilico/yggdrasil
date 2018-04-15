@@ -497,21 +497,28 @@ def combine_eles(arrs, dtype=None):
         if isinstance(arrs[0], (np.ndarray, np.void)):
             dtype = arrs[0].dtype
         elif isinstance(arrs[0], (list, tuple)):
+            names = None
+            for iele in arrs:
+                if isinstance(iele, (np.ndarray, np.void)):
+                    names = iele.dtype.names
+                    break
             nflds = len(arrs[0])
-            names = ['f%d' % i for i in range(nflds)]
             dtype_list = []
-            for i, (n, a) in enumerate(zip(names, arrs[0])):
+            for i, a in enumerate(arrs[0]):
                 dtype_str = np.dtype(type(a)).str
                 if 'S' in dtype_str:
                     max_len = 0
                     for iele in arrs:
                         if isinstance(iele, (np.ndarray, np.void)):
+                            n = iele.dtype.names[i]
                             max_len = max(max_len, len(iele[n]))
                         else:
                             max_len = max(max_len, len(iele[i]))
                     dtype_str = 'S%d' % max_len
-                dtype_list.append((n, np.dtype(dtype_str)))
-            dtype = np.dtype(dtype_list)
+                dtype_list.append(np.dtype(dtype_str))
+            if names is None:
+                names = ['f%d' % i for i in range(nflds)]
+            dtype = np.dtype({'names': names, 'formats': dtype_list})
     # Combine rows
     out = np.empty(neles, dtype=dtype)
     for i, a in enumerate(arrs):
@@ -567,7 +574,7 @@ def consolidate_array(arrs, dtype=None):
                                  "is not compatible with the specified " +
                                  "data type (%s)." % dtype)
     elif isinstance(arrs, (list, tuple)):
-        if isinstance(arrs[0], np.ndarray):
+        if isinstance(arrs[0], (np.ndarray, np.void)):
             if len(arrs[0].dtype) > 1:
                 out = combine_eles(arrs, dtype=dtype)
             else:
@@ -891,7 +898,7 @@ def format_header(format_str=None, dtype=None,
         if fmts is None:
             fmts = nptype2cformat(dtype, asbytes=True)
         if field_names is None:
-            field_names = dtype.names
+            field_names = [backwards.unicode2bytes(n) for n in dtype.names]
     if delimiter is None:
         delimiter = _default_delimiter
     if comment is None:
@@ -912,8 +919,8 @@ def format_header(format_str=None, dtype=None,
     for x in [field_names, field_units, fmts]:
         if (x is None):
             continue
-        if (len(x) == 0) or (x[0] == 'None'):
-            continue
+        # if (len(x) == 0) or (x[0] == 'None'):
+        #     continue
         assert(len(x) == nfld)
         out.append(comment + delimiter.join(x))
     out = newline.join(out) + newline
@@ -942,7 +949,7 @@ def parse_header(header, newline=_default_newline, lineno_format=None,
     out = dict()
     excl_lines = []
     if isinstance(header, backwards.bytes_type):
-        header = header.split(newline)
+        header = [h + newline for h in header.split(newline)]
     # Locate format line
     if lineno_format is None:
         for i in range(len(header)):
@@ -1007,27 +1014,33 @@ def numpy2dict(arr):
 
     """
     out = dict()
-    for n in arr.dtype.names:
-        out[n] = arr[n]
+    if arr.dtype.names is None:
+        out['0'] = arr
+    else:
+        for n in arr.dtype.names:
+            out[n] = arr[n]
     return out
 
 
-def dict2numpy(d):
+def dict2numpy(d, order=None):
     r"""Convert a dictionary of arrays to a numpy structured array.
 
     Args:
         d (dict): Dictionary of arrays.
+        order (list, optional): Order that keys should be in array.
+            Defaults to None and will be sorted keys.
 
     Returns:
         np.ndarray: Structured numpy array.
 
     """
-    names = [k for k in d.keys()]
+    if order is None:
+        order = sorted([k for k in d.keys()])
     dtypes = [v.dtype for v in d.values()]
-    dtype = np.dtype(dict(names=names, formats=dtypes))
-    shape = d[names[0]].shape
+    dtype = np.dtype(dict(names=order, formats=dtypes))
+    shape = d[order[0]].shape
     out = np.empty(shape, dtype)
-    for n in names:
+    for n in order:
         out[n] = d[n]
     return out
 
@@ -1079,6 +1092,34 @@ def pandas2numpy(frame, index=False):
         out = np.zeros(arr.shape, dtype=new_dtype)
         out[:] = arr[:]
     return out
+
+
+def dict2pandas(d, order=None):
+    r"""Convert a dictionary of arrays to a numpy structured array.
+
+    Args:
+        d (dict): Dictionary of arrays.
+        order (list, optional): Order that keys should be in array.
+            Defaults to None and will be sorted keys.
+
+    Returns:
+        pandas.DataFrame: Pandas data frame with contents from the input dict.
+
+    """
+    return numpy2pandas(dict2numpy(d, order=order))
+
+
+def pandas2dict(frame):
+    r"""Convert a Pandas DataFrame to a numpy structured array.
+
+    Args:
+        frame (pandas.DataFrame): Frame to convert.
+
+    Returns:
+        dict: Dictionary with contents from the input frame.
+
+    """
+    return numpy2dict(pandas2numpy(frame))
 
 
 __all__ = []

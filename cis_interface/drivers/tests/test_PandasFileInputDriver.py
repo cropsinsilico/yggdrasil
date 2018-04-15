@@ -25,12 +25,12 @@ class TestPandasFileInputParam(parent.TestFileInputParam):
         return out
 
     @property
-    def msg_short(self):
+    def msg_short(self):  # pragma: debug
         r"""pandas.DataFrame: Pandas data frame."""
         return self.pandas_frame
     
     @property
-    def msg_long(self):
+    def msg_long(self):  # pragma: debug
         r"""pandas.DataFrame: Pandas data frame."""
         return self.pandas_frame
 

@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+from cis_interface import serialize, backwards
 from cis_interface.communication.tests import test_FileComm as parent
 
 
@@ -46,3 +47,14 @@ class TestPandasFileComm(parent.TestFileComm):
 
         """
         return pd.concat(msg_list)
+
+    def test_send_recv_dict(self):
+        r"""Test send/recv Pandas data frame as dict."""
+        msg_send = serialize.pandas2dict(self.msg_short)
+        names = [backwards.bytes2unicode(n) for n in self.field_names]
+        flag = self.send_instance.send_dict(msg_send, field_order=names)
+        assert(flag)
+        flag, msg_recv = self.recv_instance.recv_dict()
+        assert(flag)
+        msg_recv = serialize.dict2pandas(msg_recv, order=names)
+        self.assert_msg_equal(msg_recv, self.msg_short)
