@@ -5,7 +5,7 @@
 
 
 /*! @brief Serializer types. */
-enum seri_enum { DIRECT_SERI, FORMAT_SERI,
+enum seri_enum { DIRECT_SERI, FORMAT_SERI, ARRAY_SERI,
 		 ASCII_TABLE_SERI, ASCII_TABLE_ARRAY_SERI };
 typedef enum seri_enum seri_type;
 
@@ -14,7 +14,8 @@ typedef enum seri_enum seri_type;
 */
 typedef struct seri_t {
   seri_type type; //!< Serializer type.
-  const void *info; //!< Pointer to any extra info serializer requires.
+  void *info; //!< Pointer to any extra info serializer requires.
+  size_t size_info; //!< Size of allocate space for info.
 } seri_t;
 
 
@@ -30,7 +31,7 @@ typedef struct seri_t {
  */
 static inline
 int serialize_direct(const seri_t s, char *buf, const size_t buf_siz,
-        int *args_used, va_list ap) {
+		     int *args_used, va_list ap) {
   args_used[0] = 0;
   if (s.type != DIRECT_SERI)
     return -1;

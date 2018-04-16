@@ -17,9 +17,9 @@ int main(int argc,char *argv[]){
   CisAsciiTableOutput TableOutput("outputCPP_table",
                                   "%5s\t%ld\t%3.1f\t%3.1lf%+3.1lfj\n");
   // Input & output from a table as an array
-  CisAsciiTableInput ArrayInput("inputCPP_array", 1);
-  CisAsciiTableOutput ArrayOutput("outputCPP_array",
-				  "%5s\t%ld\t%3.1f\t%3.1lf%+3.1lfj\n", 1);
+  CisAsciiArrayInput ArrayInput("inputCPP_array");
+  CisAsciiArrayOutput ArrayOutput("outputCPP_array",
+				  "%5s\t%ld\t%3.1f\t%3.1lf%+3.1lfj\n");
 
   // Read lines from ASCII text file until end of file is reached.
   // As each line is received, it is then sent to the output ASCII file.

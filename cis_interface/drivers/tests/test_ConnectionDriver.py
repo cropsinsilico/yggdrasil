@@ -20,6 +20,10 @@ class TestConnectionParam(parent.TestParam):
         self.icomm_name = self.comm_name
         self.ocomm_name = self.comm_name
         self._extra_instances = []
+
+    def assert_msg_equal(self, x, y):
+        r"""Assert that two messages are equal."""
+        nt.assert_equal(x, y)
     
     @property
     def cleanup_comm_classes(self):
@@ -208,7 +212,7 @@ class TestConnectionDriver(TestConnectionParam, parent.TestDriver):
         flag, msg_recv = self.recv_comm.recv(self.timeout)
         if self.comm_name != 'CommBase':
             assert(flag)
-            nt.assert_equal(msg_recv, self.msg_short)
+            self.assert_msg_equal(msg_recv, self.msg_short)
             nt.assert_equal(self.instance.n_msg, 0)
 
     def test_send_recv_nolimit(self):
@@ -220,7 +224,7 @@ class TestConnectionDriver(TestConnectionParam, parent.TestDriver):
         flag, msg_recv = self.recv_comm.recv_nolimit(self.timeout)
         if self.comm_name != 'CommBase':
             assert(flag)
-            nt.assert_equal(msg_recv, self.msg_long)
+            self.assert_msg_equal(msg_recv, self.msg_long)
 
     def assert_before_stop(self, check_open=True):
         r"""Assertions to make before stopping the driver instance."""

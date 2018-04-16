@@ -74,7 +74,6 @@ static inline
 int free_server_comm(comm_t *x) {
   if (x->handle != NULL) {
     comm_t *handle = (comm_t*)(x->handle);
-    free((char*)(handle->serializer.info));
     free_default_comm(handle);
     free_comm_base(handle);
     free(x->handle);
@@ -83,7 +82,6 @@ int free_server_comm(comm_t *x) {
   if (x->info != NULL) {
     comm_t **info = (comm_t**)(x->info);
     if (*info != NULL) {
-      free((char*)(info[0]->serializer.info));
       free_default_comm(*info);
       free_comm_base(*info);
       free(*info);
@@ -91,9 +89,6 @@ int free_server_comm(comm_t *x) {
     free(info);
     x->info = NULL;
   }
-  // TODO: Why is the pointer invalid?
-  /* printf("serializer: %s\n", (char*)(x->serializer.info)); */
-  /* free((char*)(x->serializer.info)); */
   return 0;
 };
 
@@ -130,7 +125,6 @@ int server_comm_send(const comm_t x, const char *data, const size_t len) {
   }
   int ret = default_comm_send((*res_comm)[0], data, len);
   // Wait for msg to be received?
-  free((char*)(res_comm[0]->serializer.info));
   free_default_comm(res_comm[0]);
   free_comm_base(res_comm[0]);
   free(res_comm[0]);
@@ -178,12 +172,12 @@ int server_comm_recv(comm_t x, char **data, const size_t len, const int allow_re
     return -1;
   }
   strcpy(x.address, head.id);
-  char *seri_copy = (char*)malloc(strlen((char*)(x.serializer.info)) + 1);
+  char *seri_copy = (char*)malloc(strlen((char*)(x.serializer->info)) + 1);
   if (seri_copy == NULL) {
     cislog_error("server_comm_recv(%s): Failed to malloc seri_copy.");
     return -1;
   }
-  strcpy(seri_copy, (char*)(x.serializer.info));
+  strcpy(seri_copy, (char*)(x.serializer->info));
   comm_t **res_comm = (comm_t**)(x.info);
   res_comm[0] = new_comm_base(head.response_address, "send", _default_comm,
 			      seri_copy);

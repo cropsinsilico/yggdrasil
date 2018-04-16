@@ -34,4 +34,5 @@ esac
 cisrun $yaml1 $yaml2
 
 outfile="${TMPDIR}client_output.txt"
+echo $outfile
 cat $outfile

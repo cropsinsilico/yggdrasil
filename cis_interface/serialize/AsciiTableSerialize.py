@@ -1,31 +1,34 @@
-from cis_interface import backwards
+from cis_interface import backwards, serialize
 from cis_interface.serialize.DefaultSerialize import DefaultSerialize
-from cis_interface.dataio.AsciiTable import AsciiTable
 
 
 class AsciiTableSerialize(DefaultSerialize):
     r"""Class for serialize table output into bytes messages comprising a
     formatted ASCII table.
 
-    Args:
-        format_str (str): Format of ASCII table in C scanf style.
-        as_array (bool, optional): If True, input must be a numpy array
-            and the output will be the serialized bytes of the array in
-            column major ('F') order. If False, input must be elements
-            of a table row. Defaults to False.
-
     Attributes:
-        format_str (str): Format of ASCII table in C scanf style.
-        as_array (bool): True or False depending if output will be serialized
-            array or row.
+        table (AsciiTable): Table object used for formating/parsing table
+            entries.
 
     """
-    def __init__(self, format_str, as_array=False):
-        self.format_str = format_str
-        self.as_array = as_array
-        self.table = AsciiTable('serialize', None, format_str=format_str)
+    def __init__(self, *args, **kwargs):
+        self.use_astropy = kwargs.pop('use_astropy', False)
+        super(AsciiTableSerialize, self).__init__(*args, **kwargs)
 
-    def __call__(self, args):
+    @property
+    def table_info(self):
+        r"""dict: Table format information."""
+        if self.format_str is None:
+            return None
+        else:
+            return serialize.format2table(self.format_str)
+
+    @property
+    def serializer_type(self):
+        r"""int: Type of serializer."""
+        return 3
+        
+    def func_serialize(self, args):
         r"""Serialize a message.
 
         Args:
@@ -36,10 +39,40 @@ class AsciiTableSerialize(DefaultSerialize):
             bytes, str: Serialized message.
 
         """
+        if self.format_str is None:
+            # if self.as_array:
+            #     dtype = args.dtype
+            # else:
+            #     dtype = np.dtype(names=self.field_names,
+            #                      formats=[type(x) for x in args])
+            # self.format_str = serialize.table2format(dtype)
+            raise RuntimeError("Format string is not defined.")
         if self.as_array:
-            out = self.table.array_to_bytes(args, order='F')
+            out = serialize.array_to_table(args, self.format_str,
+                                           use_astropy=self.use_astropy)
+            out = backwards.unicode2bytes(out)
         else:
-            if not isinstance(args, (list, tuple)):
-                args = [args]
-            out = self.table.format_line(*args)
-        return backwards.unicode2bytes(out)
+            out = super(AsciiTableSerialize, self).func_serialize(args)
+        return out
+
+    def func_deserialize(self, msg):
+        r"""Deserialize a message.
+
+        Args:
+            msg: Message to be deserialized.
+
+        Returns:
+            obj: Deserialized message.
+
+        """
+        if self.format_str is None:
+            raise RuntimeError("Format string is not defined.")
+        if (len(msg) == 0):
+            out = tuple()
+        elif self.as_array:
+            out = serialize.table_to_array(msg, self.format_str,
+                                           use_astropy=self.use_astropy,
+                                           names=self.field_names)
+        else:
+            out = super(AsciiTableSerialize, self).func_deserialize(msg)
+        return out

@@ -3,13 +3,17 @@ models:
     driver: MatlabModelDriver
     args: ./src/formatted_io3_modelA.m
     inputs: inputA
-    outputs: outputA
+    outputs:
+      name: outputA
+      field_names: name,count,size
 
   - name: matlab_modelB
     driver: MatlabModelDriver
     args: ./src/formatted_io3_modelB.m
     inputs: inputB
-    outputs: outputB
+    outputs:
+      name: outputB
+      field_names: name,count,size
 
 connections:
   - input: outputA  # Connection between model A output & model B input

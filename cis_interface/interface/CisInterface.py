@@ -1,9 +1,6 @@
-from cis_interface import backwards, tools
-from cis_interface.communication import (
-    DefaultComm, RPCComm, ServerComm, ClientComm)
-from cis_interface.serialize import (
-    AsciiTableSerialize, AsciiTableDeserialize,
-    PickleSerialize, PickleDeserialize)
+from cis_interface import backwards, tools, serialize
+from cis_interface.communication import DefaultComm
+#    DefaultComm, RPCComm, ServerComm, ClientComm)
 
 
 CIS_MSG_MAX = tools.CIS_MSG_MAX
@@ -110,7 +107,7 @@ def CisRpc(outname, outfmt, inname, infmt, matlab=False):
         DefaultComm: Communication object.
         
     """
-    # from cis_interface.communication import RPCComm
+    from cis_interface.communication import RPCComm
     if matlab:  # pragma: matlab
         infmt = backwards.decode_escape(infmt)
         outfmt = backwards.decode_escape(outfmt)
@@ -144,7 +141,7 @@ def CisRpcServer(name, infmt='%s', outfmt='%s', matlab=False):
         ServerComm: Communication object.
         
     """
-    # from cis_interface.communication import ServerComm
+    from cis_interface.communication import ServerComm
     if matlab:  # pragma: matlab
         infmt = backwards.decode_escape(infmt)
         outfmt = backwards.decode_escape(outfmt)
@@ -171,7 +168,7 @@ def CisRpcClient(name, outfmt='%s', infmt='%s', matlab=False):
         ClientComm: Communication object.
         
     """
-    # from cis_interface.communication import ClientComm
+    from cis_interface.communication import ClientComm
     if matlab:  # pragma: matlab
         infmt = backwards.decode_escape(infmt)
         outfmt = backwards.decode_escape(outfmt)
@@ -262,23 +259,14 @@ def CisAsciiTableInput(name, as_array=False, src_type=1, matlab=False, **kwargs)
         from cis_interface.communication import AsciiTableComm
         base = AsciiTableComm.AsciiTableComm
         kwargs.setdefault('address', name)
+        kwargs['as_array'] = as_array
     else:
         base = DefaultComm
+        # TODO: This will be overwritten on recv
+        kwargs['serializer_kwargs'] = dict(as_array=as_array)
     kwargs.setdefault('direction', 'recv')
-    if src_type == 0:
-        kwargs['as_array'] = as_array
     out = base(name, is_interface=True, recv_timeout=False,
                matlab=matlab, **kwargs)
-    if src_type == 1:
-        ret, format_str = out.recv(timeout=out.timeout)
-        if not ret:  # pragma: debug
-            raise Exception('CisAsciiTableInput could not receive format' +
-                            'string from input.')
-    else:
-        format_str = out.file.format_str
-    out.meth_deserialize = AsciiTableDeserialize.AsciiTableDeserialize(
-        format_str=backwards.decode_escape(format_str),
-        as_array=as_array)
     return out
 
 
@@ -303,29 +291,20 @@ def CisAsciiTableOutput(name, fmt, as_array=False, dst_type=1, matlab=False,
         DefaultComm: Communication object.
         
     """
+    if matlab:  # pragma: matlab
+        fmt = backwards.decode_escape(fmt)
     if dst_type == 0:
         from cis_interface.communication import AsciiTableComm
         base = AsciiTableComm.AsciiTableComm
         kwargs.setdefault('address', name)
+        kwargs.update(as_array=as_array, format_str=fmt)
     else:
         base = DefaultComm
-    if matlab:  # pragma: matlab
-        fmt = backwards.decode_escape(fmt)
+        kwargs['serializer_kwargs'] = dict(as_array=as_array,
+                                           format_str=fmt)
     kwargs.setdefault('direction', 'send')
-    if dst_type == 0:
-        kwargs['as_array'] = as_array
-        kwargs['format_str'] = fmt
     out = base(name, is_interface=True, recv_timeout=False,
                matlab=matlab, **kwargs)
-    if dst_type == 1:
-        ret = out.send(backwards.decode_escape(fmt))
-        if not ret:  # pragma: debug
-            raise Exception('CisAsciiTableOutput could not send format ' +
-                            'string to output.')
-    else:
-        out.file.writeformat()
-    out.meth_serialize = AsciiTableSerialize.AsciiTableSerialize(
-        format_str=fmt, as_array=as_array)
     return out
     
 
@@ -346,6 +325,8 @@ def CisAsciiArrayOutput(name, fmt, dst_type=1, matlab=False, **kwargs):
         DefaultComm: Communication object.
         
     """
+    if matlab:  # pragma: matlab
+        kwargs['send_converter'] = serialize.consolidate_array
     return CisAsciiTableOutput(name, fmt, as_array=True, dst_type=dst_type,
                                matlab=matlab, **kwargs)
 
@@ -392,10 +373,10 @@ def CisPickleInput(name, src_type=1, matlab=False, **kwargs):
         kwargs.setdefault('address', name)
     else:
         base = DefaultComm
+        kwargs['serializer_kwargs'] = dict(stype=4)
     kwargs.setdefault('direction', 'recv')
     out = base(name, is_interface=True, recv_timeout=False,
                matlab=matlab, **kwargs)
-    out.meth_deserialize = PickleDeserialize.PickleDeserialize()
     return out
 
 
@@ -420,8 +401,73 @@ def CisPickleOutput(name, dst_type=1, matlab=False, **kwargs):
         kwargs.setdefault('address', name)
     else:
         base = DefaultComm
+        kwargs['serializer_kwargs'] = dict(stype=4)
     kwargs.setdefault('direction', 'send')
     out = base(name, is_interface=True, recv_timeout=False,
                matlab=matlab, **kwargs)
-    out.meth_serialize = PickleSerialize.PickleSerialize()
+    return out
+
+
+def CisPandasInput(name, src_type=1, matlab=False, **kwargs):
+    r"""Get class for handling Pandas input.
+
+    Args:
+        name (str): The path to the local file to read input from (if src_type
+            == 0) or the name of the message queue input should be received
+            from.
+        src_type (int, optional): If 0, input is read from a local file.
+            Otherwise, the input is received from a message queue. Defaults to
+            1.
+        **kwargs: Additional keyword arguments are passed to the base comm.
+
+    Returns:
+        DefaultComm: Communication object.
+        
+    """
+    if src_type == 0:
+        from cis_interface.communication import PandasFileComm
+        base = PandasFileComm.PandasFileComm
+        kwargs.setdefault('address', name)
+        if matlab:  # pragma: matlab
+            kwargs['recv_converter'] = serialize.pandas2numpy
+    else:
+        base = DefaultComm
+        if not matlab:
+            kwargs['recv_converter'] = serialize.numpy2pandas
+    kwargs.setdefault('direction', 'recv')
+    out = base(name, is_interface=True, recv_timeout=False,
+               matlab=matlab, **kwargs)
+    return out
+
+
+def CisPandasOutput(name, dst_type=1, matlab=False, **kwargs):
+    r"""Get class for handling pandasd output.
+
+    Args:
+        name (str): The path to the local file where output should be saved
+            (if dst_type == 0) or the name of the message queue where the
+            output should be sent.
+        dst_type (int, optional): If 0, output is sent to a local file.
+            Otherwise, the output is sent to a message queue. Defaults to 1.
+        **kwargs: Additional keyword arguments are passed to the base comm.
+
+    Returns:
+        DefaultComm: Communication object.
+        
+    """
+    if dst_type == 0:
+        from cis_interface.communication import PandasFileComm
+        base = PandasFileComm.PandasFileComm
+        kwargs.setdefault('address', name)
+        if matlab:  # pragma: matlab
+            kwargs['send_converter'] = serialize.numpy2pandas
+    else:
+        base = DefaultComm
+        if matlab:  # pragma: matlab
+            kwargs['send_converter'] = serialize.consolidate_array
+        else:
+            kwargs['send_converter'] = serialize.pandas2numpy
+    kwargs.setdefault('direction', 'send')
+    out = base(name, is_interface=True, recv_timeout=False,
+               matlab=matlab, **kwargs)
     return out

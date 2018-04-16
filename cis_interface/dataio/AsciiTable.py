@@ -377,13 +377,9 @@ class AsciiTable(AsciiFile):
         line = self.comment + backwards.unicode2bytes(' ') + self.format_str
         self.writeline_full(line)
 
-    def readline(self, dont_parse=False):
+    def readline(self):
         r"""Continue reading lines until a valid line (uncommented) is
         encountered and return the arguments found there.
-
-        Args:
-            dont_parse (bool, optional): If True, the raw line is returned.
-                Defaults to False.
 
         Returns:
             tuple (bool, tuple): End of file flag and the arguments that
@@ -395,8 +391,6 @@ class AsciiTable(AsciiFile):
         eof, line = False, None
         while (not eof) and (line is None):
             eof, line = self.readline_full(validate=True)
-        if dont_parse:
-            return eof, line
         if (not line) or eof:
             args = None
         else:
@@ -631,7 +625,7 @@ class AsciiTable(AsciiFile):
             self.close()
         return arr
 
-    def write_array(self, array, names=None, skip_header=False, append=False):
+    def write_array(self, array, names=None, skip_header=False):
         r"""Write a numpy array to the table.
 
         Args:
@@ -642,8 +636,6 @@ class AsciiTable(AsciiFile):
             skip_header (bool, optional): If True, no header information is
                 written (it is assumed it was already written. Defaults to
                 False.
-            append (bool, optional): If True, array is appended to existing
-                table. This sets skip_header to True. Defaults to False.
 
         Raises:
             ValueError: If names are provided, but not the same number as
@@ -657,11 +649,6 @@ class AsciiTable(AsciiFile):
         open_mode = self.open_mode
         openned = False
         fd = self.fd
-        if append:
-            skip_header = True
-            open_mode = 'a'
-            if self.open_as_binary:
-                open_mode += 'b'
         if not self.is_open:
             fd = open(self.filepath, open_mode)
             openned = True

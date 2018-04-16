@@ -252,9 +252,13 @@ class TestYamlConnectionInputAsciiTableArray(YamlTestBase):
                   '  - input: {{ %s }}' % _yaml_env,
                   '    output: inputA',
                   '    read_meth: table_array',
+                  '    field_units: name,count,size',
+                  '    format_str: "%5s\t%d\t%f\n"',
                   '  - input: outputA',
                   '    output: output.txt',
-                  '    write_meth: table_array'],)
+                  '    write_meth: table_array',
+                  '    field_units: name,count,size',
+                  '    format_str: "%5s\t%d\t%f\n"'], )
 
 
 class TestYamlComponentError(YamlTestBaseError):

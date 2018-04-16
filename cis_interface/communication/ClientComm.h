@@ -141,7 +141,6 @@ int free_client_comm(comm_t *x) {
       int i;
       for (i = 0; i < ncomm; i++) {
         if (info[0][i] != NULL) {
-          free((char*)(info[0][i]->serializer.info));
           free_default_comm(info[0][i]);
 	  free_comm_base(info[0][i]);
           free(info[0][i]);
@@ -159,15 +158,11 @@ int free_client_comm(comm_t *x) {
     char buf[100] = CIS_MSG_EOF;
     default_comm_send(*handle, buf, strlen(buf));
     handle->sent_eof[0] = 1;
-    free((char*)(handle->serializer.info));
     free_default_comm(handle);
     free_comm_base(handle);
     free(x->handle);
     x->handle = NULL;
   }
-  // TODO: Why is the pointer invalid?
-  // printf("serializer: %s\n", (char*)(x->serializer.info));
-  // free((char*)(x->serializer.info));
   return 0;
 };
 
@@ -201,13 +196,13 @@ comm_head_t client_response_header(comm_t x, comm_head_t head) {
     head.valid = 0;
     return head;
   }
-  char *seri_copy = (char*)malloc(strlen((char*)(x.serializer.info)) + 1);
+  char *seri_copy = (char*)malloc(strlen((char*)(x.serializer->info)) + 1);
   if (seri_copy == NULL) {
     cislog_error("client_response_header: Failed to malloc copy of serializer info.");
     head.valid = 0;
     return head;
   }
-  strcpy(seri_copy, (char*)(x.serializer.info));
+  strcpy(seri_copy, (char*)(x.serializer->info));
   res_comm[0][ncomm] = new_comm_base(NULL, "recv", _default_comm, seri_copy);
   int ret = new_default_address(res_comm[0][ncomm]);
   if (ret < 0) {
@@ -244,16 +239,11 @@ int client_comm_send(comm_t x, const char *data, const size_t len) {
     cislog_error("client_comm_send(%s): no request comm registered", x.name);
     return -1;
   }
-  if (is_eof(data)) {
-    // Send EOF message without header
-    comm_t *req_comm = (comm_t*)(x.handle);
-    ret = default_comm_send(*req_comm, data, len);
-    req_comm->sent_eof[0] = 1;
-    return ret;
-  }
-  // Send message with header
   comm_t *req_comm = (comm_t*)(x.handle);
   ret = default_comm_send(*req_comm, data, len);
+  if (is_eof(data)) {
+    req_comm->sent_eof[0] = 1;
+  }
   return ret;
 };
 
@@ -285,7 +275,6 @@ int client_comm_recv(comm_t x, char **data, const size_t len, const int allow_re
   // Close response comm and decrement count of response comms
   cislog_debug("client_comm_recv(%s): default_comm_recv returned %d",
 	       x.name, ret);
-  free((char*)(res_comm[0][0]->serializer.info));
   free_default_comm(res_comm[0][0]);
   free_comm_base(res_comm[0][0]);
   free(res_comm[0][0]);

@@ -1,5 +1,6 @@
 """Module for funneling messages from one comm to another."""
 import os
+import numpy as np
 import importlib
 import threading
 from cis_interface import backwards
@@ -348,7 +349,7 @@ class ConnectionDriver(Driver):
             if self.icomm.is_closed:
                 return False
             flag, msg = self.icomm.recv(**kwargs)
-        if msg == self.icomm.eof_msg:
+        if isinstance(msg, backwards.bytes_type) and (msg == self.icomm.eof_msg):
             return self.on_eof()
         if flag:
             return msg
@@ -382,10 +383,20 @@ class ConnectionDriver(Driver):
             bytes, str: Processed message.
 
         """
+        if (self.ocomm._send_serializer):
+            self.update_serializer(msg)
         if self.translator is None:
             return msg
         else:
             return self.translator(msg)
+
+    def update_serializer(self, msg):
+        r"""Update the serializer for the output comm based on input."""
+        if self.ocomm.serializer.serializer_type == 0:
+            old_kwargs = self.ocomm.serializer.serializer_info
+            del old_kwargs['stype']
+            self.ocomm.serializer = self.icomm.serializer
+            self.ocomm.serializer.update_serializer(**old_kwargs)
 
     def _send_message(self, *args, **kwargs):
         r"""Send a single message.
@@ -415,7 +426,7 @@ class ConnectionDriver(Driver):
             bool: Success or failure of send.
 
         """
-        self.ocomm._first_send_done = True
+        self.ocomm._multiple_first_send = False
         T = self.start_timeout(self.timeout_send_1st)
         flag = self._send_message(*args, **kwargs)
         self.ocomm.suppress_special_debug = True
@@ -501,15 +512,23 @@ class ConnectionDriver(Driver):
             self.set_break_flag()
             self.set_close_state('receiving')
             return
-        if isinstance(msg, backwards.bytes_type) and len(msg) == 0:
+        if ((isinstance(msg, type(self.icomm.serializer.empty_msg)) and
+             (msg == self.icomm.serializer.empty_msg))):
             self.state = 'waiting'
             self.verbose_debug(':run: Waiting for next message.')
             self.sleep()
             return
         self.nrecv += 1
         self.state = 'received'
-        self.debug('Received message that is %d bytes from %s.',
-                   len(msg), self.icomm.address)
+        if isinstance(msg, backwards.bytes_type):
+            self.debug('Received message that is %d bytes from %s.',
+                       len(msg), self.icomm.address)
+        elif isinstance(msg, np.ndarray):
+            self.debug('Received array with shape %s and data type %s from %s',
+                       msg.shape, msg.dtype, self.icomm.address)
+        else:
+            self.debug('Received message of type %s from %s',
+                       type(msg), self.icomm.address)
         # Process message
         self.state = 'processing'
         msg = self.on_message(msg)
@@ -518,7 +537,8 @@ class ConnectionDriver(Driver):
             self.set_break_flag()
             self.set_close_state('processing')
             return
-        elif len(msg) == 0:
+        elif ((isinstance(msg, type(self.ocomm.serializer.empty_msg)) and
+               (msg == self.ocomm.serializer.empty_msg))):
             self.debug('Message skipped.')
             self.nskip += 1
             return

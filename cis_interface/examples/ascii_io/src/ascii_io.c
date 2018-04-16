@@ -10,18 +10,16 @@ int main(int argc,char *argv[]){
   int ret;
 
   // Input & output to an ASCII file line by line
-  cisAsciiFileInput_t FileInput = cisAsciiFileInput("inputC_file", 1);
-  cisAsciiFileOutput_t FileOutput = cisAsciiFileOutput("outputC_file", 1);
+  cisAsciiFileInput_t FileInput = cisAsciiFileInput("inputC_file");
+  cisAsciiFileOutput_t FileOutput = cisAsciiFileOutput("outputC_file");
   // Input & output from a table row by row
-  cisAsciiTableInput_t TableInput = cisAsciiTableInput("inputC_table", 0, 1);
+  cisAsciiTableInput_t TableInput = cisAsciiTableInput("inputC_table");
   cisAsciiTableOutput_t TableOutput = cisAsciiTableOutput("outputC_table",
-							  "%5s\t%ld\t%3.1f\t%3.1lf%+3.1lfj\n",
-							  0, 1);
+							  "%5s\t%ld\t%3.1f\t%3.1lf%+3.1lfj\n");
   // Input & output from a table as an array
-  cisAsciiTableInput_t ArrayInput = cisAsciiTableInput("inputC_array", 1, 1);
-  cisAsciiTableOutput_t ArrayOutput = cisAsciiTableOutput("outputC_array",
-							  "%5s\t%ld\t%3.1f\t%3.1lf%+3.1lfj\n",
-							  1, 1);
+  cisAsciiArrayInput_t ArrayInput = cisAsciiArrayInput("inputC_array");
+  cisAsciiArrayOutput_t ArrayOutput = cisAsciiArrayOutput("outputC_array",
+							  "%5s\t%ld\t%3.1f\t%3.1lf%+3.1lfj\n");
 
   // Read lines from ASCII text file until end of file is reached.
   // As each line is received, it is then sent to the output ASCII file.

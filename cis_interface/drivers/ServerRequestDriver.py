@@ -121,7 +121,7 @@ class ServerRequestDriver(ConnectionDriver):
                 self.set_close_state('clients signed off')
                 self.debug("All clients have signed off.")
                 return super(ServerRequestDriver, self).on_eof()
-        return ''
+        return self.icomm.serializer.empty_msg
 
     def on_message(self, msg):
         r"""Process a message checking to see if it is a client signing on.
@@ -137,7 +137,7 @@ class ServerRequestDriver(ConnectionDriver):
             if msg == CIS_CLIENT_INI:
                 self.debug("New client signed on.")
                 self.nclients += 1
-                msg = ''
+                msg = self.icomm.serializer.empty_msg
                 return msg
         return super(ServerRequestDriver, self).on_message(msg)
     

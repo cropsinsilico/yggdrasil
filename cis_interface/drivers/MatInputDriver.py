@@ -1,5 +1,5 @@
 from cis_interface.drivers.FileInputDriver import FileInputDriver
-from cis_interface.serialize import MatDeserialize, PickleSerialize
+from cis_interface.serialize import MatSerialize, PickleSerialize
 
 
 class MatInputDriver(FileInputDriver):
@@ -15,8 +15,8 @@ class MatInputDriver(FileInputDriver):
     def __init__(self, name, args, **kwargs):
         icomm_kws = kwargs.get('icomm_kws', {})
         ocomm_kws = kwargs.get('ocomm_kws', {})
-        icomm_kws.setdefault('deserialize', MatDeserialize.MatDeserialize())
-        ocomm_kws.setdefault('serialize', PickleSerialize.PickleSerialize())
+        icomm_kws.setdefault('serializer', MatSerialize.MatSerialize())
+        ocomm_kws.setdefault('serializer', PickleSerialize.PickleSerialize())
         kwargs['icomm_kws'] = icomm_kws
         kwargs['ocomm_kws'] = ocomm_kws
         super(MatInputDriver, self).__init__(name, args, **kwargs)
