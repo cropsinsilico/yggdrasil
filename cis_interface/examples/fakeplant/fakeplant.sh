@@ -4,7 +4,7 @@
 case $1 in
     -m | --matlab )
 	echo "Running Python, C++, C, Matlab integration"
-	cisrun canopy.yml light.yml photosynthesis.yml growth_matlab.yml fakeplant.yml
+	cisrun canopy.yml light.yml photosynthesis.yml growth.yml fakeplant.yml
 	;;
     --canopy )
 	echo "Running Canopy Model"
@@ -18,16 +18,16 @@ case $1 in
 	echo "Running Photosynthesis Model"
 	cisrun photosynthesis.yml photosynthesis_files.yml
 	;;
-    --growth )
+    --growth-python )
 	echo "Running Python Growth Model"
-	cisrun growth.yml growth_files.yml
+	cisrun growth_python.yml growth_files.yml
 	;;
-    --growth-matlab )
+    --growth | --growth-matlab )
 	echo "Running Matlab Growth Model"
-	cisrun growth_matlab.yml growth_files.yml
+	cisrun growth.yml growth_files.yml
 	;;
     * )
 	echo "Running Python, C++, C integration"
-	cisrun canopy.yml light.yml photosynthesis.yml growth.yml fakeplant.yml
+	cisrun canopy.yml light.yml photosynthesis.yml growth_python.yml fakeplant.yml
 	;;
 esac
