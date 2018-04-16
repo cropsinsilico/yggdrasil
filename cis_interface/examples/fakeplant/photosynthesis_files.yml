@@ -2,8 +2,8 @@ connections:
   - input: ./Input/light_intensity.txt
     output: light_intensity
     read_meth: table
-  - input: ./Input/temp.txt
-    output: temp
+  - input: ./Input/temperature.txt
+    output: temperature
     read_meth: table
   - input: ./Input/co2.txt
     output: co2

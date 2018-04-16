@@ -26,8 +26,8 @@ connections:
     output: ambient_light
     read_meth: table
   # Photosynthesis file input
-  - input: ./Input/temp.txt
-    output: temp
+  - input: ./Input/temperature.txt
+    output: temperature
     read_meth: table
   - input: ./Input/co2.txt
     output: co2
