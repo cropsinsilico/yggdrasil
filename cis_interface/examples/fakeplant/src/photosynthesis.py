@@ -1,0 +1,52 @@
+import sys
+from cis_interface.interface import CisInput, CisOutput
+
+
+def calc_photosynthesis_rate(T, CO2, light):
+    r"""Calculate the rate of photosynthesis from environment properties.
+
+    Args:
+        T (float): Temperature.
+        CO2 (float): CO2 concentration.
+        light (float): Light intensity.
+
+    Returns:
+        float: Photosynthesis rate.
+
+    """
+    return light * (T**2) * CO2
+
+
+if __name__ == '__main__':
+    in_temp = CisInput('temp')
+    in_co2 = CisInput('co2')
+    in_light = CisInput('light_intensity')
+    out_photo = CisOutput('photosynthesis_rate', '%lf\n')
+    
+    # Receive temperature & CO2 concentration of environment
+    flag, msg = in_temp.recv()
+    if not flag:
+        print("photosynthesis: Failed to receive temperature.")
+        sys.exit(-1)
+    T = msg[0]
+    flag, msg = in_co2.recv()
+    if not flag:
+        print("photosynthesis: Failed to receive CO2 concentration.")
+        sys.exit(-1)
+    CO2 = msg[0]
+
+    # Loop over light intensities
+    while True:
+        flag, msg = in_light.recv()
+        if not flag:
+            print("photosynthesis: No more input.")
+            break
+        LI = msg[0]
+        PR = calc_photosynthesis_rate(T, CO2, LI)
+        flag = out_photo.send(PR)
+        if not flag:
+            print("photosynthesis: Failed to send output.")
+            sys.exit(-1)
+
+    sys.exit(0)
+        
