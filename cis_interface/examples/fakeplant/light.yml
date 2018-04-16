@@ -1,0 +1,9 @@
+model:
+  name: LightModel
+  driver: GCCModelDriver
+  args: ./src/light.c
+  inputs:
+    - ambient_light
+    - canopy_structure
+  outputs:
+    - light_intensity
