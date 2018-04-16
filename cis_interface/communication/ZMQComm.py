@@ -706,7 +706,7 @@ class ZMQComm(AsyncComm.AsyncComm):
         super(ZMQComm, self)._close_backlog(wait=wait)
         if self.direction == 'send':
             if (self.reply_socket_send is not None):
-                self.reply_socket_send.close(linger=self.zmq_sleeptime)
+                self.reply_socket_send.close(linger=0)  # self.zmq_sleeptime)
                 self.unregister_comm("REPLY_SEND_" + self.reply_socket_address)
         else:
             for k, socket in self.reply_socket_recv.items():
