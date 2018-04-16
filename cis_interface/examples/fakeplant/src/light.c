@@ -31,6 +31,7 @@ int main(int argc,char *argv[]) {
     printf("light: Error receiving ambient light.\n");
     return -1;
   }
+  printf("light: ambient light = %f\n", ambient_light);
 
   // Malloc arrays for use
   double **x1 = (double**)malloc(3*sizeof(double*));
@@ -54,12 +55,15 @@ int main(int argc,char *argv[]) {
       printf("light: End of input.\n");
       break;
     }
-
     for (i = 0; i < npatch; i++) {
       light_intensity = calc_light_intensity(ambient_light,
 					     x1[0][i], x1[1][i], x1[2][i],
 					     x2[0][i], x2[1][i], x2[2][i],
 					     x3[0][i], x3[1][i], x3[2][i]);
+      printf("canopy: structure = \t%f\t%f\t%f --> %f\n\t\t\t%f\t%f\t%f\n\t\t\t%f\t%f\t%f\n",
+	     x1[0][i], x1[1][i], x1[2][i], light_intensity,
+	     x2[0][i], x2[1][i], x2[2][i],
+	     x3[0][i], x3[1][i], x3[2][i]);
       ret = cisSend(LightOutput, light_intensity);
       if (ret < 0) {
 	printf("light: Error sending light intensity output.\n");

@@ -16,9 +16,8 @@ void grow_canopy(double growth_rate, double *layout,
   }
 
 }
+
 		
-
-
 int main(int argc, char *argv[]) {
 
   int i, j, return_code = 0;
@@ -50,6 +49,8 @@ int main(int argc, char *argv[]) {
     free(x3);
     return -1;
   }
+  printf("canopy: layout = %f, %f, %f\n",
+	 layout[0], layout[1], layout[2]);
   npatch = in_struct.recv(9, &x1[0], &x1[1], &x1[2],
 			  &x2[0], &x2[1], &x2[2],
 			  &x3[0], &x3[1], &x3[2]);
@@ -61,20 +62,24 @@ int main(int argc, char *argv[]) {
     free(x3);
     return -1;
   }
+  printf("canopy: %d patches in initial structure:\n\t\t%f\t%f\t%f\n\t\t%f\t%f\t%f\n\t\t%f\t%f\t%f...\n",
+	 npatch, x1[0][0], x1[1][0], x1[2][0],
+	 x2[0][0], x2[1][0], x2[2][0],
+	 x3[0][0], x3[1][0], x3[2][0]);
     
   // Loop over growth rates calculating new structure
-
   double growth_rate;
   while (1) {
-
     ret = in_growth.recv(1, &growth_rate);
     if (ret < 0) {
       printf("canopy: No more input.\n");
       break;
     }
-
     grow_canopy(growth_rate, layout, npatch, x1, x2, x3);
-    
+    printf("canopy: growth rate = %f --> \t%f\t%f\t%f\n\t\t\t\t\t%f\t%f\t%f\n\t\t\t\t\t%f\t%f\t%f...\n",
+	   growth_rate, x1[0][0], x1[1][0], x1[2][0],
+	   x2[0][0], x2[1][0], x2[2][0],
+	   x3[0][0], x3[1][0], x3[2][0]);
     ret = out_struct.send(9, npatch,
 			  x1[0], x1[1], x1[2],
 			  x2[0], x2[1], x2[2],
@@ -84,7 +89,6 @@ int main(int argc, char *argv[]) {
       return_code = -1;
       break;
     }
-
   }
   
   for (i = 0; i < 3; i++) {
