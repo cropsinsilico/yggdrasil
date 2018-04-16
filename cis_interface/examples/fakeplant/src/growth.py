@@ -12,7 +12,7 @@ def calculate_growth(photosynthesis_rate):
         float: Growth rate.
 
     """
-    return 10 * photosynthesis_rate
+    return 0.5 * photosynthesis_rate
 
 
 if __name__ == '__main__':

@@ -14,7 +14,7 @@ def calc_photosynthesis_rate(T, CO2, light):
         float: Photosynthesis rate.
 
     """
-    return light * (T**2) * CO2
+    return light * CO2 / T
 
 
 if __name__ == '__main__':

@@ -4,14 +4,14 @@
 using namespace std;
 
 
-void grow_canopy(double growth_rate, double *layout,
+void grow_canopy(double tstep, double *growth_rate, double *layout,
 		 int npatch, double **x1, double **x2, double **x3) {
   int i, j;
   for (i = 0; i < npatch; i++) {
     for (j = 0; j < 3; j++) {
-      x1[j][i] = growth_rate * layout[j] * x1[j][i];
-      x2[j][i] = growth_rate * layout[j] * x2[j][i];
-      x3[j][i] = growth_rate * layout[j] * x3[j][i];
+      x1[j][i] = growth_rate[i] * tstep * layout[j] * x1[j][i];
+      x2[j][i] = growth_rate[i] * tstep * layout[j] * x2[j][i];
+      x3[j][i] = growth_rate[i] * tstep * layout[j] * x3[j][i];
     }
   }
 
@@ -23,9 +23,12 @@ int main(int argc, char *argv[]) {
   int i, j, return_code = 0;
   CisInput in_layout("plant_layout");
   CisAsciiArrayInput in_struct("init_canopy_structure");
+  CisInput in_time("time");
   CisInput in_growth("growth_rate");
   char struct_format[200] = "%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\t%lf\n";
   CisAsciiArrayOutput out_struct("canopy_structure", struct_format);
+  double time_prev, time_curr, time_step;
+  time_curr = 0.0;
 
   // Malloc arrays for use
   double *layout = (double*)malloc(3*sizeof(double));
@@ -55,7 +58,7 @@ int main(int argc, char *argv[]) {
 			  &x2[0], &x2[1], &x2[2],
 			  &x3[0], &x3[1], &x3[2]);
   if (npatch < 0) {
-    printf("canopy: Error receiving structure.\n");
+    printf("canopy: Error receiving structure\n");
     free(layout);
     free(x1);
     free(x2);
@@ -66,20 +69,41 @@ int main(int argc, char *argv[]) {
 	 npatch, x1[0][0], x1[1][0], x1[2][0],
 	 x2[0][0], x2[1][0], x2[2][0],
 	 x3[0][0], x3[1][0], x3[2][0]);
+  ret = out_struct.send(9, npatch,
+			x1[0], x1[1], x1[2],
+			x2[0], x2[1], x2[2],
+			x3[0], x3[1], x3[2]);
+  if (ret < 0) {
+    printf("canopy: Error sending initial structure to output.\n");
+    return_code = -1;
+  }
     
   // Loop over growth rates calculating new structure
-  double growth_rate;
-  while (1) {
-    ret = in_growth.recv(1, &growth_rate);
+  double *growth_rate = (double*)malloc(npatch*sizeof(double));
+  while (ret >= 0) {
+    time_prev = time_curr;
+    ret = in_time.recv(1, &time_curr);
     if (ret < 0) {
       printf("canopy: No more input.\n");
       break;
     }
-    grow_canopy(growth_rate, layout, npatch, x1, x2, x3);
-    printf("canopy: growth rate = %f --> \t%f\t%f\t%f\n\t\t\t\t\t%f\t%f\t%f\n\t\t\t\t\t%f\t%f\t%f...\n",
-	   growth_rate, x1[0][0], x1[1][0], x1[2][0],
-	   x2[0][0], x2[1][0], x2[2][0],
-	   x3[0][0], x3[1][0], x3[2][0]);
+    // Receive growth rate for each patch
+    for (i = 0; i < npatch; i++) {
+      ret = in_growth.recv(1, growth_rate + i);
+      if (ret < 0) {
+	printf("canopy: Failed to get growth rate for patch %d during time frame %f to %f\n",
+	       i, time_prev, time_curr);
+	return_code = -1;
+	break;
+      }
+    }
+    grow_canopy(time_curr - time_prev, growth_rate, layout, npatch, x1, x2, x3);
+    for (i = 0; i < npatch; i++) {
+      printf("canopy: patch %d: growth rate = %f --> \t%f\t%f\t%f\n\t\t\t\t\t\t%f\t%f\t%f\n\t\t\t\t\t\t%f\t%f\t%f...\n",
+	     i, growth_rate[i], x1[0][i], x1[1][i], x1[2][i],
+	     x2[0][i], x2[1][i], x2[2][i],
+	     x3[0][i], x3[1][i], x3[2][i]);
+    }
     ret = out_struct.send(9, npatch,
 			  x1[0], x1[1], x1[2],
 			  x2[0], x2[1], x2[2],
