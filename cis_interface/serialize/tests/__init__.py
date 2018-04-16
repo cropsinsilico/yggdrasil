@@ -335,7 +335,7 @@ def test_consolidate_array():
             dlist += [dtype, dtype]
             if dtype == dtype0:
                 dtype_list = dtype0_list
-            else:
+            else:  # pragma: debug
                 dtype_list = dtype
             dlist.append(dtype_list)
             x0list += [x, x_flat, x_flat.astype(dtype_list)]

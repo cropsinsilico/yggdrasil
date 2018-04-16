@@ -17,12 +17,13 @@ def test_AsciiTableComm_nofmt():
     inst = AsciiTableComm.AsciiTableComm('test', test_file, direction='recv')
     inst.open()
     for ans in rows:
-        flag, x = inst.recv()
+        flag, x = inst.recv_dict()
         assert(flag)
         irow = [e for e in ans]
         irow[0] = backwards.unicode2bytes(irow[0])
-        irow = tuple(irow)
-        nt.assert_equal(x, irow)
+        idict = {'f%d' % i: irow[i] for i in range(len(irow))}
+        # irow = tuple(irow)
+        nt.assert_equal(x, idict)
     flag, x = inst.recv()
     assert(not flag)
     inst.close()

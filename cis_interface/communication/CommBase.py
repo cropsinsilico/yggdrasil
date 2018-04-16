@@ -1401,10 +1401,11 @@ class CommBase(tools.CisClass):
             elif isinstance(msg, pd.DataFrame):
                 msg_dict = serialize.pandas2dict(msg)
             elif isinstance(msg, tuple):
-                field_names = [
-                    backwards.bytes2unicode(n) for n in self.serializer.field_names]
-                if field_names is None:
+                if self.serializer.field_names is None:  # pragma: debug
                     field_names = ['f%d' % i for i in range(len(msg))]
+                else:
+                    field_names = [
+                        backwards.bytes2unicode(n) for n in self.serializer.field_names]
                 msg_dict = {k: v for k, v in zip(field_names, msg)}
             else:
                 msg_dict = {'f0': msg}
