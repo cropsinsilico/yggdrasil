@@ -2,9 +2,9 @@
 
 # ----------------Your Commands------------------- #
 case $1 in
-    -n | --nomatlab )
-	echo "Running Python, C++, C integration"
-	cisrun canopy.yml light.yml photosynthesis.yml growth.yml fakeplant_nomatlab.yml
+    -m | --matlab )
+	echo "Running Python, C++, C, Matlab integration"
+	cisrun canopy.yml light.yml photosynthesis.yml growth_matlab.yml fakeplant.yml
 	;;
     --canopy )
 	echo "Running Canopy Model"
@@ -19,11 +19,15 @@ case $1 in
 	cisrun photosynthesis.yml photosynthesis_files.yml
 	;;
     --growth )
-	echo "Running Growth Model"
+	echo "Running Python Growth Model"
 	cisrun growth.yml growth_files.yml
 	;;
+    --growth-matlab )
+	echo "Running Matlab Growth Model"
+	cisrun growth_matlab.yml growth_files.yml
+	;;
     * )
-	echo "Running Python, C++, C, Matlab integration"
+	echo "Running Python, C++, C integration"
 	cisrun canopy.yml light.yml photosynthesis.yml growth.yml fakeplant.yml
 	;;
 esac
