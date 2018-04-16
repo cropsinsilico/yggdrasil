@@ -1,0 +1,11 @@
+connections:
+  - input: ./Input/ambient_light.txt
+    output: ambient_light
+    read_meth: table
+  - input: ./Input/canopy_structure.txt
+    output: canopy_structure
+    read_meth: table_array
+  - input: light_intensity
+    output: ./Output/light_intensity.txt
+    write_meth: table
+    field_names: light_intensity
