@@ -13,7 +13,7 @@ double calc_light_intensity(double ambient_light,
   double c = sqrt(pow(x1 - x2, 2) + pow(y1 - y2, 2));
   double s = (a + b + c)/2.0;
   double A = sqrt(s*(s - a)*(s - b)*(s - c));
-  return ambient_light * A;
+  return ambient_light * A * (10.0 - (z1 + z2 + z3)/3.0)/10.0;
 }
 
 
@@ -60,7 +60,7 @@ int main(int argc,char *argv[]) {
 					     x1[0][i], x1[1][i], x1[2][i],
 					     x2[0][i], x2[1][i], x2[2][i],
 					     x3[0][i], x3[1][i], x3[2][i]);
-      printf("canopy: structure = \t%f\t%f\t%f --> %f\n\t\t\t%f\t%f\t%f\n\t\t\t%f\t%f\t%f\n",
+      printf("light: structure = \t%f\t%f\t%f --> light_intensity = %f\n\t\t\t%f\t%f\t%f\n\t\t\t%f\t%f\t%f\n",
 	     x1[0][i], x1[1][i], x1[2][i], light_intensity,
 	     x2[0][i], x2[1][i], x2[2][i],
 	     x3[0][i], x3[1][i], x3[2][i]);

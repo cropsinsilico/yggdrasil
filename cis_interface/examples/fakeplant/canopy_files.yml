@@ -5,6 +5,9 @@ connections:
   - input: ./Input/canopy_structure.txt
     output: init_canopy_structure
     read_meth: table_array
+  - input: ./Input/time.txt
+    output: time
+    read_meth: table
   - input: ./Input/growth_rate.txt
     output: growth_rate
     read_meth: table

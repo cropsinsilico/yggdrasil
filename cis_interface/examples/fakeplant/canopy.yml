@@ -6,5 +6,6 @@ model:
     - plant_layout
     - init_canopy_structure
     - growth_rate
+    - time
   outputs:
     - canopy_structure
