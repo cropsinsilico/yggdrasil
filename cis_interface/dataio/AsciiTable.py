@@ -377,13 +377,9 @@ class AsciiTable(AsciiFile):
         line = self.comment + backwards.unicode2bytes(' ') + self.format_str
         self.writeline_full(line)
 
-    def readline(self, dont_parse=False):
+    def readline(self):
         r"""Continue reading lines until a valid line (uncommented) is
         encountered and return the arguments found there.
-
-        Args:
-            dont_parse (bool, optional): If True, the raw line is returned.
-                Defaults to False.
 
         Returns:
             tuple (bool, tuple): End of file flag and the arguments that
@@ -395,8 +391,6 @@ class AsciiTable(AsciiFile):
         eof, line = False, None
         while (not eof) and (line is None):
             eof, line = self.readline_full(validate=True)
-        if dont_parse:
-            return eof, line
         if (not line) or eof:
             args = None
         else:

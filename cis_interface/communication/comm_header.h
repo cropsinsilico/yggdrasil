@@ -277,18 +277,34 @@ int format_comm_header(const comm_head_t head, char *buf, const size_t bufsiz) {
 static inline
 comm_head_t parse_comm_header(const char *buf, const size_t bufsiz) {
   comm_head_t out = init_header(0, NULL, NULL);
+  size_t sind, eind;
+  int ret;
+#ifdef _WIN32
+  // Windows regex of newline is buggy
+  size_t sind1, eind1, sind2, eind2;
+  char re_head_tag[COMMBUFFSIZ];
+  sprintf(re_head_tag, "(%s)", CIS_MSG_HEAD);
+  ret = find_match(re_head_tag, buf, &sind1, &eind1);
+  if (ret > 0) {
+    sind = sind1;
+    ret = find_match(re_head_tag, buf + eind1, &sind2, &eind2);
+    if (ret > 0)
+      eind = eind1 + eind2;
+  }
+#else
   // Extract just header
   char re_head[COMMBUFFSIZ] = CIS_MSG_HEAD;
   strcat(re_head, "(.*)");
   strcat(re_head, CIS_MSG_HEAD);
-  /* strcat(re_head, "(.*)"); */
-  size_t sind, eind;
-  int ret = find_match(re_head, buf, &sind, &eind);
+  // strcat(re_head, ".*");
+  ret = find_match(re_head, buf, &sind, &eind);
+#endif
   if (ret < 0) {
-    cislog_error("parse_comm_header: could not find header in '%s'", buf);
+    cislog_error("parse_comm_header: could not find header in '%.1000s'", buf);
     out.valid = 0;
     return out;
   } else if (ret == 0) {
+    cislog_debug("parse_comm_header: No header in '%.1000s...'", buf);
     out.multipart = 0;
     out.size = bufsiz;
   } else {

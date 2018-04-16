@@ -95,8 +95,8 @@ class TestFileComm_ascii(TestFileComm):
     r"""Test for FileComm communication class with open_as_binary = False."""
 
     @property
-    def inst_kwargs(self):
-        r"""dict: Keyword arguments for tested class."""
-        out = super(TestFileComm, self).inst_kwargs
+    def send_inst_kwargs(self):
+        r"""dict: Keyword arguments for send instance."""
+        out = super(TestFileComm_ascii, self).send_inst_kwargs
         out['open_as_binary'] = False
         return out

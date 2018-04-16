@@ -105,7 +105,7 @@ class CisTestBase(unittest.TestCase):
     def fd_count(self):
         r"""int: The number of open file descriptors."""
         proc = psutil.Process()
-        if platform._is_win:
+        if platform._is_win:  # pragma: windows
             out = proc.num_handles()
         else:
             out = proc.num_fds()

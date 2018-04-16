@@ -340,6 +340,8 @@ class CommBase(tools.CisClass):
         self._server_class = CommServer
         self._server_kwargs = {}
         self._send_serializer = True
+        if self.single_use and (not self.is_response_server):
+            self._send_serializer = False
         # Add interface tag
         if self.is_interface:
             self._name += '_I'
@@ -1012,6 +1014,7 @@ class CommBase(tools.CisClass):
             # Guess at serializer if not yet set
             if add_sinfo:
                 self.serializer.update_from_message(msg_)
+                self.debug('Sending sinfo: %s', self.serializer.serializer_info)
             # Serialize
             msg_s = self.serializer.serialize(msg_, header_kwargs=header_kwargs,
                                               add_serializer_info=add_sinfo)
@@ -1288,14 +1291,14 @@ class CommBase(tools.CisClass):
         # Parse message
         flag, msg, header = self.on_recv(s_msg)
         if not flag:
-            if not header.get('eof', False):
+            if not header.get('eof', False):  # pragma: debug
                 self.debug("Failed to receive message header.")
             return flag, msg
         # Receive remainder of message that was not received
         if header.get('incomplete', False):
             header['body'] = msg
             flag, s_msg = self._recv_multipart_worker(header, **kwargs)
-            if not flag:
+            if not flag:  # pragma: debug
                 return flag, s_msg
             # Parse complete message
             flag, msg, header2 = self.on_recv(s_msg, second_pass=True)
@@ -1398,10 +1401,11 @@ class CommBase(tools.CisClass):
             elif isinstance(msg, pd.DataFrame):
                 msg_dict = serialize.pandas2dict(msg)
             elif isinstance(msg, tuple):
-                field_names = [
-                    backwards.bytes2unicode(n) for n in self.serializer.field_names]
-                if field_names is None:
+                if self.serializer.field_names is None:  # pragma: debug
                     field_names = ['f%d' % i for i in range(len(msg))]
+                else:
+                    field_names = [
+                        backwards.bytes2unicode(n) for n in self.serializer.field_names]
                 msg_dict = {k: v for k, v in zip(field_names, msg)}
             else:
                 msg_dict = {'f0': msg}
