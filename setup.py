@@ -199,7 +199,10 @@ except (ImportError, IOError):
 
 # Create requirements list based on platform
 requirements = ["numpy", "scipy", "pyyaml", "pystache", "nose", "zmq", "psutil",
-                "pandas", "pint"]  # "unyt"]
+                'pandas; python_version >= "3.5"',
+                'pandas; python_version == "2.7"',
+                'pandas<0.21; python_version == "3.4"',
+                "pint"]  # "unyt"]
 # optional_requirements = ["pika", "astropy"]
 if not IS_WINDOWS:
     requirements.append("sysv_ipc")

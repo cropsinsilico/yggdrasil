@@ -37,7 +37,7 @@ int count_complex_formats(const char* fmt_str) {
 */
 static inline
 int count_formats(const char* fmt_str) {
-  const char * fmt_regex = "%([[:digit:]]+\\$)?[+-]?([ 0]|\'.{1})?-?[[:digit:]]*(\\.[[:digit:]]+)?[lhjztL]*[bcdeEufFgGosxX]";
+  const char * fmt_regex = "%([[:digit:]]+\\$)?[+-]?([ 0]|\'.{1})?-?[[:digit:]]*(\\.[[:digit:]]+)?[lhjztL]*(64)?[bcdeEufFgGosxX]";
   int ret = count_matches(fmt_regex, fmt_str);
   /* printf("%d, %s\n", ret, fmt_str); */
   return ret;
@@ -63,6 +63,12 @@ int simplify_formats(char *fmt_str, const size_t fmt_len) {
     ret = regex_replace_sub(fmt_str, fmt_len, fmt_regex2,
 			    "%l$1", 0);
   }
+/*#ifdef _WIN32
+  if (ret > 0) {
+    const char * fmt_regex3 = "%l64([du])";
+    ret = regex_replace_sub(fmt_str, fmt_len, fmt_regex3, "%l$1", 0);
+  }
+#endif*/
   return ret;
 };
 
@@ -395,6 +401,8 @@ int at_set_format_siz(asciiTable_t *t) {
     }
     (*t).format_siz[i] = siz;
     (*t).row_siz += siz;
+    // printf("format_str = %s\n", t->format_str);
+    // printf("col %d/%d siz = %d\n", i, (*t).ncols, siz);
   }
   return 0;
 }
@@ -467,6 +475,8 @@ int at_set_format_typ(asciiTable_t *t) {
       (*t).format_typ[icol] = AT_SHORT;
     } else if (find_match("%.*ll[id]", ifmt, &sind, &eind)) {
       (*t).format_typ[icol] = AT_LONGLONG;
+    } else if (find_match("%.*l64[id]", ifmt, &sind, &eind)) {
+      (*t).format_typ[icol] = AT_LONGLONG;
     } else if (find_match("%.*l[id]", ifmt, &sind, &eind)) {
       (*t).format_typ[icol] = AT_LONG;
     } else if (find_match("%.*[id]", ifmt, &sind, &eind)) {
@@ -476,6 +486,8 @@ int at_set_format_typ(asciiTable_t *t) {
     } else if (find_match("%.*h[uoxX]", ifmt, &sind, &eind)) {
       (*t).format_typ[icol] = AT_USHORT;
     } else if (find_match("%.*ll[uoxX]", ifmt, &sind, &eind)) {
+      (*t).format_typ[icol] = AT_ULONGLONG;
+    } else if (find_match("%.*l64[uoxX]", ifmt, &sind, &eind)) {
       (*t).format_typ[icol] = AT_ULONGLONG;
     } else if (find_match("%.*l[uoxX]", ifmt, &sind, &eind)) {
       (*t).format_typ[icol] = AT_ULONG;

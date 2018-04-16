@@ -105,7 +105,7 @@ class CisTestBase(unittest.TestCase):
     def fd_count(self):
         r"""int: The number of open file descriptors."""
         proc = psutil.Process()
-        if platform._is_win:
+        if platform._is_win:  # pragma: windows
             out = proc.num_handles()
         else:
             out = proc.num_fds()
@@ -435,25 +435,25 @@ class IOInfo(object):
             out[i] = row
         return out
 
-    def to_bytes(self, arr):
-        r"""Turn an array into the bytes that will be written.
+    # def to_bytes(self, arr):
+    #     r"""Turn an array into the bytes that will be written.
 
-        Args:
-            arr (np.ndarray): Array.
+    #     Args:
+    #         arr (np.ndarray): Array.
         
-        Returns:
-            str: Bytes that represent the array.
+    #     Returns:
+    #         str: Bytes that represent the array.
 
-        """
-        out = backwards.unicode2bytes('')
-        for n in arr.dtype.names:
-            out = out + arr[n].tobytes()
-        return out
+    #     """
+    #     out = backwards.unicode2bytes('')
+    #     for n in arr.dtype.names:
+    #         out = out + arr[n].tobytes()
+    #     return out
 
-    @property
-    def file_bytes(self):
-        r"""str: Raw bytes of array of mock file contents."""
-        return self.to_bytes(self.file_array)
+    # @property
+    # def file_bytes(self):
+    #     r"""str: Raw bytes of array of mock file contents."""
+    #     return self.to_bytes(self.file_array)
 
     @property
     def pandas_frame(self):

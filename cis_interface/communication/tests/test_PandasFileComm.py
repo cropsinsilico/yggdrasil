@@ -58,3 +58,40 @@ class TestPandasFileComm(parent.TestFileComm):
         assert(flag)
         msg_recv = serialize.dict2pandas(msg_recv, order=names)
         self.assert_msg_equal(msg_recv, self.msg_short)
+
+
+class TestPandasFileComm_names(TestPandasFileComm):
+    r"""Test for PandasFileComm communication class with field names sent."""
+
+    @property
+    def send_inst_kwargs(self):
+        r"""dict: Keyword arguments for send instance."""
+        out = super(TestPandasFileComm_names, self).send_inst_kwargs
+        out['field_names'] = self.field_names
+        return out
+
+    def test_send_recv_dict(self):
+        r"""Test send/recv Pandas data frame as dict."""
+        msg_send = serialize.pandas2dict(self.msg_short)
+        names = [backwards.bytes2unicode(n) for n in self.field_names]
+        flag = self.send_instance.send_dict(msg_send)
+        assert(flag)
+        flag, msg_recv = self.recv_instance.recv_dict()
+        assert(flag)
+        msg_recv = serialize.dict2pandas(msg_recv, order=names)
+        self.assert_msg_equal(msg_recv, self.msg_short)
+
+
+class TestPandasFileComm_single(TestPandasFileComm):
+    r"""Test for PandasFileComm communication class with field names sent."""
+
+    def test_send_recv_dict(self):
+        r"""Test send/recv Pandas data frame as dict."""
+        msg_send = dict(name=np.zeros((5, )))
+        flag = self.send_instance.send_dict(msg_send)
+        assert(flag)
+        flag, msg_recv = self.recv_instance.recv_dict()
+        assert(flag)
+        assert(isinstance(msg_recv, dict))
+        assert('name' in msg_recv)
+        self.assert_msg_equal(msg_recv['name'], msg_send['name'])
