@@ -1,7 +1,7 @@
 model:
   name: GrowthModel
-  driver: PythonModelDriver
-  args: ./src/growth.py
+  driver: MatlabModelDriver
+  args: ./src/growth.m
   inputs:
     - photosynthesis_rate
   outputs:
