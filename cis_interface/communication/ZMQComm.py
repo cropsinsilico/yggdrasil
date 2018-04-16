@@ -134,8 +134,9 @@ def bind_socket(socket, address, retry_timeout=-1):
             port = socket.bind_to_random_port(address)
             address += ":%d" % port
     except zmq.ZMQError as e:  # pragma: debug
-        if (e.errno not in [48, 98]) or (retry_timeout < 0):
-            print(e, e.errno)
+        if (retry_timeout < 0):
+            # if (e.errno not in [48, 98]) or (retry_timeout < 0):
+            # print(e, e.errno)
             raise e
         else:
             logging.debug("Retrying bind in %f s", retry_timeout)
