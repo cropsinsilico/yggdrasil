@@ -61,3 +61,26 @@ should be interpreted as tables and that the tables should be read/written in th
 entirety as arrays.
 
 .. include:: examples/formatted_io3_yml.rst
+
+
+Tables as Pandas Data Frames
+----------------------------
+
+In Python, tables can also be passed as `Pandas <https://pandas.pydata.org/>`_ 
+data frames.
+
+.. include:: examples/formatted_io4_src.rst
+
+The YAML specifies ``read_meth: pandas`` and ``write_meth: pandas`` for the
+connections to files to indicate that the files should be interpreted as CSV 
+tables using Pandas.
+
+.. include:: examples/formatted_io4_yml.rst
+
+As Pandas data frames are a Python specific construction, they cannot be 
+used within models written in other languages. However, the files can 
+still be read using Pandas. The data format returned to models on the 
+receiving end of sent Pandas data frames will receive arrays in the 
+proper native data type. In addition, a model written in Python can 
+receive any array sent by another model (whether or not it is Python) 
+as a Pandas data frame.
