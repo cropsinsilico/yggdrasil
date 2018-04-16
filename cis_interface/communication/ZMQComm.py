@@ -360,7 +360,7 @@ class ZMQComm(AsyncComm.AsyncComm):
         self._n_reply_recv = {}
         self._server_class = ZMQProxy
         self._server_kwargs = dict(context=self.context,
-                                   retry_timeout=4 * self.sleeptime)
+                                   retry_timeout=0.01)  # 4 * self.sleeptime)
         super(ZMQComm, self)._init_before_open(**kwargs)
 
     @classmethod
