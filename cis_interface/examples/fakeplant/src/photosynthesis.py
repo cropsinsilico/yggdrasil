@@ -18,7 +18,7 @@ def calc_photosynthesis_rate(T, CO2, light):
 
 
 if __name__ == '__main__':
-    in_temp = CisInput('temp')
+    in_temp = CisInput('temperature')
     in_co2 = CisInput('co2')
     in_light = CisInput('light_intensity')
     out_photo = CisOutput('photosynthesis_rate', '%lf\n')

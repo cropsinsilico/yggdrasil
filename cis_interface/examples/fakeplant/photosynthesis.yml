@@ -4,7 +4,7 @@ model:
   args: ./src/photosynthesis.py
   inputs:
     - light_intensity
-    - temp
+    - temperature
     - co2
   outputs:
     - photosynthesis_rate
