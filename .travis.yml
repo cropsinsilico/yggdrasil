@@ -103,6 +103,10 @@ before_install:
 
 install:
   - |
+    # Install pandas with conda on 3.4 until pip version updated to latest
+    if [[ $TRAVIS_PYTHON_VERSION == 3.4 ]]; then
+       conda install pandas
+    fi
     # setup environment
     ccache -s
     # Upgrade pip and setuptools and wheel to get clean install
