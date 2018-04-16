@@ -1,0 +1,10 @@
+model:
+  name: CanopyModel
+  driver: GCCModelDriver
+  args: ./src/canopy.cpp
+  inputs:
+    - plant_layout
+    - init_canopy_structure
+    - growth_rate
+  outputs:
+    - canopy_structure
