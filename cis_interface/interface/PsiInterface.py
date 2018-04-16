@@ -22,3 +22,5 @@ PsiAsciiArrayInput = CisInterface.CisAsciiArrayInput
 PsiAsciiArrayOutput = CisInterface.CisAsciiArrayOutput
 PsiPickleInput = CisInterface.CisPickleInput
 PsiPickleOutput = CisInterface.CisPickleOutput
+PsiPandasInput = CisInterface.CisPandasInput
+PsiPandasOutput = CisInterface.CisPandasOutput

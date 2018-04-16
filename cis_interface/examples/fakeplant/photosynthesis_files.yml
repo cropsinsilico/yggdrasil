@@ -1,0 +1,14 @@
+connections:
+  - input: ./Input/light_intensity.txt
+    output: light_intensity
+    read_meth: table
+  - input: ./Input/temperature.txt
+    output: temperature
+    read_meth: table
+  - input: ./Input/co2.txt
+    output: co2
+    read_meth: table
+  - input: photosynthesis_rate
+    output: ./Output/photosynthesis_rate.txt
+    write_meth: table
+    field_names: photosynthesis_rate

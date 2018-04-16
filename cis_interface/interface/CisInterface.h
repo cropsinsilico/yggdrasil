@@ -597,8 +597,8 @@ int rpcCall(const cisRpc_t rpc,  ...){
   Input Usage:
       1. One-time: Create file interface by providing either a channel name or
          a path to a local file.
-	    comm_t fin = cisAsciiFileInput("file_channel", 1); // channel
-	    comm_t fin = cisAsciiFileInput("/local/file.txt", 0); // local file
+	    comm_t fin = cisAsciiFileInput("file_channel"); // channel
+	    comm_t fin = cisAsciiFileInput_local("/local/file.txt"); // local file
       2. Prepare: Get pointer for line.
             char *line;
       3. Receive each line, terminating when receive returns -1 (EOF or channel
@@ -615,8 +615,8 @@ int rpcCall(const cisRpc_t rpc,  ...){
   Output Usage:
       1. One-time: Create file interface by providing either a channel name or
          a path to a local file.
-	    comm_t fout = cisAsciiFileOutput("file_channel", 1); // channel
-	    comm_t fout = cisAsciiFileOutput("/local/file.txt", 0); // local file
+	    comm_t fout = cisAsciiFileOutput("file_channel"); // channel
+	    comm_t fout = cisAsciiFileOutput_local("/local/file.txt"); // local file
       2. Send lines to the file. If return value is not 0, the send was not
           succesfull.
             int ret;
@@ -634,42 +634,47 @@ int rpcCall(const cisRpc_t rpc,  ...){
 #define cisAsciiFileOutput_t comm_t
 
 /*!
-  @brief Constructor for AsciiFile output comm.
-  Based on the value of dst_type, either a local file will be opened for output
-  (dst_type == 0), or a cisOutput_t connection will be made.
-  @param[in] name constant character pointer to path of local file or name of
-  an output queue.
-  @param[in] dst_type int 0 if name refers to a local file, 1 if it is a queue.
+  @brief Constructor for AsciiFile output comm to channel.
+  @param[in] name constant character pointer to name of an output channel.
   @returns comm_t for line-by-line output to a file or channel.
  */
 static inline
-comm_t cisAsciiFileOutput(const char *name, const int dst_type) {
-  comm_type type;
-  if (dst_type == 0)
-    type = ASCII_FILE_COMM;
-  else
-    type = _default_comm;
-  comm_t out = init_comm(name, "send", type, NULL);
+comm_t cisAsciiFileOutput(const char *name) {
+  comm_t out = init_comm(name, "send", _default_comm, NULL);
   return out;
 };
 
 /*!
-  @brief Constructor for AsciiFile input comm.
-  Based on the value of src_type, either a local file will be opened for input
-  (src_type == 0), or a cisInput_t connection will be made.
-  @param[in] name constant character pointer to path of local file or name of
-  an input queue.
-  @param[in] src_type int 0 if name refers to a local file, 1 if it is a queue.
+  @brief Constructor for AsciiFile output comm to local file.
+  @param[in] name constant character pointer to path of local file.
+  @returns comm_t for line-by-line output to a file or channel.
+ */
+static inline
+comm_t cisAsciiFileOutput_local(const char *name) {
+  comm_t out = init_comm(name, "send", ASCII_FILE_COMM, NULL);
+  return out;
+};
+
+/*!
+  @brief Constructor for AsciiFile input comm from channel.
+  @param[in] name constant character pointer to name of an input channel.
   @returns comm_t for line-by-line input from a file or channel.
  */
 static inline
-comm_t cisAsciiFileInput(const char *name, const int src_type) {
-  comm_type type;
-  if (src_type == 0)
-    type = ASCII_FILE_COMM;
-  else
-    type = _default_comm;
-  comm_t out = init_comm(name, "recv", type, NULL);
+comm_t cisAsciiFileInput(const char *name) {
+  comm_t out = init_comm(name, "recv", _default_comm, NULL);
+  return out;
+};
+
+
+/*!
+  @brief Constructor for AsciiFile input comm from local file.
+  @param[in] name constant character pointer to path of local file.
+  @returns comm_t for line-by-line input from a file or channel.
+ */
+static inline
+comm_t cisAsciiFileInput_local(const char *name) {
+  comm_t out = init_comm(name, "recv", ASCII_FILE_COMM, NULL);
   return out;
 };
 
@@ -688,8 +693,8 @@ comm_t cisAsciiFileInput(const char *name, const int src_type) {
   Input by Row Usage:
       1. One-time: Create file interface by providing either a channel name or
          a path to a local file.
-	    comm_t fin = cisAsciiTableInput("file_channel", 0, 1);    // channel
-	    comm_t fin = cisAsciiTableInput("/local/file.txt", 0, 0); // local table
+	    comm_t fin = cisAsciiTableInput("file_channel");    // channel
+	    comm_t fin = cisAsciiTableInput_local("/local/file.txt"); // local table
       2. Prepare: Allocate space for variables in row (the format in this
          example is "%5s %d %f\n" like the output example below).
 	    char a[5];
@@ -709,9 +714,9 @@ comm_t cisAsciiFileInput(const char *name, const int src_type) {
       1. One-time: Create file interface by providing either a channel name or
          a path to a local file and a format string for rows.
 	    comm_t fout = cisAsciiTableOutput("file_channel",    // channel
-                                              "%5s %d %f\n", 0, 1);
-	    comm_t fout = cisAsciiTableOutput("/local/file.txt", // local table
-                                              "%5s %d %f\n", 0, 0);
+                                              "%5s %d %f\n");
+	    comm_t fout = cisAsciiTableOutput_local("/local/file.txt", // local table
+                                                    "%5s %d %f\n");
       2. Send rows to the file by providing entries. Formatting is handled by
          the interface. If return value is not 0, the send was not succesful.
             int ret;
@@ -726,8 +731,8 @@ comm_t cisAsciiFileInput(const char *name, const int src_type) {
   Input by Array Usage:
       1. One-time: Create file interface by providing either a channel name or
          a path to a local file.
-	    comm_t fin = cisAsciiTableInput("file_channel", 1, 1);    // channel
-	    comm_t fin = cisAsciiTableInput("/local/file.txt", 1, 0); // local table
+	    comm_t fin = cisAsciiArrayInput("file_channel");    // channel
+	    comm_t fin = cisAsciiArrayInput_local("/local/file.txt"); // local table
       2. Prepare: Declare pointers for table columns (they will be allocated by
          the interface once the number of rows is known).
 	    char *aCol;
@@ -743,10 +748,10 @@ comm_t cisAsciiFileInput(const char *name, const int src_type) {
   Output by Array Usage:
       1. One-time: Create file interface by providing either a channel name or
          a path to a local file and a format string for rows.
-	    comm_t fout = cisAsciiTableOutput("file_channel",    // channel
-                                              "%5s %d %f\n", 1, 1);
-	    comm_t fout = cisAsciiTableOutput("/local/file.txt", // local table
-	                                      "%5s %d %f\n", 1, 0);
+	    comm_t fout = cisAsciiArrayOutput("file_channel",    // channel
+                                              "%5s %d %f\n");
+	    comm_t fout = cisAsciiArrayOutput_local("/local/file.txt", // local table
+	                                            "%5s %d %f\n");
       2. Send columns to the file by providing pointers (or arrays). Formatting
          is handled by the interface. If return value is not 0, the send was not
 	 succesful.
@@ -763,84 +768,122 @@ comm_t cisAsciiFileInput(const char *name, const int src_type) {
 /*! @brief Definitions for table sturctures. */
 #define cisAsciiTableInput_t comm_t
 #define cisAsciiTableOutput_t comm_t
+#define cisAsciiArrayInput_t comm_t
+#define cisAsciiArrayOutput_t comm_t
 
 /*!
-  @brief Constructor for table output comm.
-  @param[in] name constant character pointer to local file path or message
-  queue name.
+  @brief Constructor for table output comm to an output channel.
+  @param[in] name constant character pointer to output channel name.
   @param[in] format_str character pointer to format string that should be used
   to format rows into table lines.
-  @param[in] as_array int 1 if cisSend should format array columns. Otherwise,
-  cisSend will format and send a single table row.
-  @param[in] dst_type int 0 if name is a local file path, 1 if it is the name
-  of a message queue.
   @returns comm_t output structure.
  */
 static inline
-comm_t cisAsciiTableOutput(const char *name, const char *format_str,
-			   const int as_array, const int dst_type) {
-  comm_type type;
-  if (dst_type == 0)
-    type = ASCII_TABLE_COMM;
-  else
-    type = _default_comm;
-  comm_t out = init_comm(name, "send", type, (void*)format_str);
-  // For connection, send format and initialize serializer
-  if (dst_type != 0) {
-    int ret = comm_send(out, format_str, strlen(format_str));
-    if (ret < 0) {
-      cislog_error("cisAsciiTableOutput: Failed to send format string.\n");
-      out.valid = 0;
+comm_t cisAsciiTableOutput(const char *name, const char *format_str) {
+  int flag = 0;
+  comm_t out = init_comm(name, "send", _default_comm, NULL);
+  if (out.valid) {
+    flag = update_serializer(out.serializer, ASCII_TABLE_SERI,
+			     (void*)format_str);
+    if (flag == 0) {
+      asciiTable_t *table = (asciiTable_t*)(out.serializer->info);
+      flag = at_update(table, name, "0");
     }
-    // TODO: Make sure this is freed.
-    asciiTable_t *table = (asciiTable_t*)malloc(sizeof(asciiTable_t));
-    table[0] = asciiTable(name, "0", format_str,
-			  NULL, NULL, NULL);
-    out.serializer.type = ASCII_TABLE_SERI;
-    out.serializer.info = (void*)table;
   }
-  // Change serializer type if as_array
-  if (as_array == 1)
-    out.serializer.type = ASCII_TABLE_ARRAY_SERI;
+  // TODO: Make sure this is freed.
+  /* asciiTable_t *table = (asciiTable_t*)malloc(sizeof(asciiTable_t)); */
+  /* table[0] = asciiTable(name, "0", format_str, */
+  /* 			NULL, NULL, NULL); */
+  /* out.serializer.type = ASCII_TABLE_SERI; */
+  /* out.serializer.info = (void*)table; */
+  if (flag < 0) {
+    out.valid = 0;
+  }
   return out;
 };
 
 /*!
-  @brief Constructor for AsciiTable input comm.
-  @param[in] name constant character pointer to local file path or message
-  queue name.
-  @param[in] as_array int 1 if cisRecv should parse array columns. Otherwise,
-  cisRecv will parse messages as single rows.
-  @param[in] src_type int 0 if name is a local file path, 1 if it is the name
-  of a message queue.
+  @brief Constructor for AsciiTable input comm from an input channel.
+  @param[in] name constant character pointer to input channel name.
   @returns comm_t input structure.
  */
 static inline
-comm_t cisAsciiTableInput(const char *name, const int as_array, const int src_type) {
-  comm_type type;
-  if (src_type == 0)
-    type = ASCII_TABLE_COMM;
-  else
-    type = _default_comm;
-  comm_t out = init_comm(name, "recv", type, NULL);
-  // For connection, receive format and initialize serializer
-  if (src_type != 0) {
-    char format_str[CIS_MSG_BUF];
-    int ret = comm_recv(out, format_str, CIS_MSG_BUF);
-    if (ret < 0) {
-      cislog_error("cisAsciiTableInput: Failed to recv format string.\n");
-      out.valid = 0;
-    }
-    // TODO: Make sure this is freed.
-    asciiTable_t *table = (asciiTable_t*)malloc(sizeof(asciiTable_t));
-    table[0] = asciiTable(name, "0", format_str,
-			  NULL, NULL, NULL);
-    out.serializer.type = ASCII_TABLE_SERI;
-    out.serializer.info = (void*)table;
-  }
-  // Change serializer type if as_array
-  if (as_array == 1)
-    out.serializer.type = ASCII_TABLE_ARRAY_SERI;
+comm_t cisAsciiTableInput(const char *name) {
+  return init_comm(name, "recv", _default_comm, NULL);
+};
+
+/*!
+  @brief Constructor for table output comm to local file.
+  @param[in] name constant character pointer to local file path.
+  @param[in] format_str character pointer to format string that should be used
+  to format rows into table lines.
+  @returns comm_t output structure.
+ */
+static inline
+comm_t cisAsciiTableOutput_local(const char *name, const char *format_str) {
+  return init_comm(name, "send", ASCII_TABLE_COMM, (void*)format_str);
+};
+
+/*!
+  @brief Constructor for AsciiTable input comm from local file.
+  @param[in] name constant character pointer to local file path.
+  @returns comm_t input structure.
+ */
+static inline
+comm_t cisAsciiTableInput_local(const char *name) {
+  return init_comm(name, "recv", ASCII_TABLE_COMM, NULL);
+};
+
+/*!
+  @brief Constructor for table output comm with array output.
+  @param[in] name constant character pointer to an output channel name.
+  @param[in] format_str character pointer to format string that should be used
+  to format rows into table lines.
+  @returns comm_t output structure.
+ */
+static inline
+comm_t cisAsciiArrayOutput(const char *name, const char *format_str) {
+  comm_t out = cisAsciiTableOutput(name, format_str);
+  out.serializer->type = ASCII_TABLE_ARRAY_SERI;
+  return out;
+};
+
+/*!
+  @brief Constructor for AsciiTable input comm with array input.
+  @param[in] name constant character pointer to an input channel name.
+  @returns comm_t input structure.
+ */
+static inline
+comm_t cisAsciiArrayInput(const char *name) {
+  comm_t out = cisAsciiTableInput(name);
+  // Don't set this so it is updated when it is received.
+  // out.serializer->type = ASCII_TABLE_ARRAY_SERI;
+  return out;
+};
+
+/*!
+  @brief Constructor for table output comm to local file from arrays.
+  @param[in] name constant character pointer to local file path.
+  @param[in] format_str character pointer to format string that should be used
+  to format rows into table lines.
+  @returns comm_t output structure.
+ */
+static inline
+comm_t cisAsciiArrayOutput_local(const char *name, const char *format_str) {
+  comm_t out = init_comm(name, "send", ASCII_TABLE_COMM, (void*)format_str);
+  out.serializer->type = ASCII_TABLE_ARRAY_SERI;
+  return out;
+};
+
+/*!
+  @brief Constructor for AsciiTable input comm from local file as arrays.
+  @param[in] name constant character pointer to local file path.
+  @returns comm_t input structure.
+ */
+static inline
+comm_t cisAsciiArrayInput_local(const char *name) {
+  comm_t out = init_comm(name, "recv", ASCII_TABLE_COMM, NULL);
+  out.serializer->type = ASCII_TABLE_ARRAY_SERI;
   return out;
 };
 

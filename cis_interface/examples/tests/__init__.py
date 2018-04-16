@@ -55,7 +55,11 @@ class TestExample(CisTestBase, tools.CisClass):
         r"""str: Full path to the directory containing the yaml file."""
         if self.yaml is None:  # pragma: no cover
             return None
-        return os.path.dirname(self.yaml)
+        if isinstance(self.yaml, list):
+            out = os.path.dirname(self.yaml[0])
+        else:
+            out = os.path.dirname(self.yaml)
+        return out
 
     # @property
     # def yaml_contents(self):
@@ -89,7 +93,7 @@ class TestExample(CisTestBase, tools.CisClass):
 
     def check_file_exists(self, fname):
         r"""Check that a file exists."""
-        Tout = self.start_timeout()
+        Tout = self.start_timeout(2)
         while (not Tout.is_out) and (not os.path.isfile(fname)):  # pragma: debug
             self.sleep()
         self.stop_timeout()
@@ -97,7 +101,9 @@ class TestExample(CisTestBase, tools.CisClass):
 
     def check_file_size(self, fname, fsize):
         r"""Check that file is the correct size."""
-        Tout = self.start_timeout()
+        Tout = self.start_timeout(2)
+        if (os.stat(fname).st_size != fsize):  # pragma: debug
+            print('file sizes not equal', os.stat(fname).st_size, fsize)
         while ((not Tout.is_out) and
                (os.stat(fname).st_size != fsize)):  # pragma: debug
             self.sleep()

@@ -33,8 +33,8 @@ class TestCommBase(CisTestClassInfo):
     def __init__(self, *args, **kwargs):
         super(TestCommBase, self).__init__(*args, **kwargs)
         self.comm = 'CommBase'
-        self.attr_list += ['name', 'address', 'direction', 'format_str',
-                           'meth_deserialize', 'meth_serialize', 'recv_timeout',
+        self.attr_list += ['name', 'address', 'direction',
+                           'serializer', 'recv_timeout',
                            'close_on_eof_recv', 'opp_address', 'opp_comms',
                            'maxMsgSize']
 
@@ -212,17 +212,15 @@ class TestCommBase(CisTestClassInfo):
 
     def test_work_comm(self):
         r"""Test creating/removing a work comm."""
-        header_send = dict(id=self.uuid + '0')
-        wc_send = self.instance.create_work_comm(header_send)
-        nt.assert_raises(KeyError, self.instance.add_work_comm,
-                         header_send['id'], wc_send)
+        wc_send = self.instance.create_work_comm()
+        nt.assert_raises(KeyError, self.instance.add_work_comm, wc_send)
         # Create recv instance in way that tests new_comm
         header_recv = dict(id=self.uuid + '1', address=wc_send.address)
         recv_kwargs = self.instance.get_work_comm_kwargs
         recv_kwargs['work_comm_name'] = 'test_worker_%s' % header_recv['id']
         recv_kwargs['new_comm_class'] = wc_send.comm_class
         os.environ[recv_kwargs['work_comm_name']] = wc_send.opp_address
-        wc_recv = self.instance.create_work_comm(header_recv, **recv_kwargs)
+        wc_recv = self.instance.create_work_comm(**recv_kwargs)
         # wc_recv = self.instance.get_work_comm(header_recv)
         if self.comm in ['CommBase', 'AsyncComm']:
             flag = wc_send.send(self.test_msg)
@@ -238,11 +236,15 @@ class TestCommBase(CisTestClassInfo):
             # Assert errors on second attempt
             # nt.assert_raises(RuntimeError, wc_send.send, self.test_msg)
             nt.assert_raises(RuntimeError, wc_recv.recv)
-        self.instance.remove_work_comm(header_send['id'])
-        self.instance.remove_work_comm(header_recv['id'])
-        self.instance.remove_work_comm(header_recv['id'])
+        self.instance.remove_work_comm(wc_send.uuid)
+        self.instance.remove_work_comm(wc_recv.uuid)
+        self.instance.remove_work_comm(wc_recv.uuid)
         # Create work comm that should be cleaned up on teardown
-        self.instance.get_header(self.test_msg)
+        self.instance.create_work_comm()
+
+    def assert_msg_equal(self, x, y):
+        r"""Assert that two messages are equivalent."""
+        nt.assert_equal(x, y)
 
     def do_send_recv(self, send_meth='send', recv_meth='recv', msg_send=None,
                      n_msg_send_meth='n_msg_send', n_msg_recv_meth='n_msg_recv',
@@ -307,7 +309,7 @@ class TestCommBase(CisTestClassInfo):
                 assert(recv_instance.is_closed)
             else:
                 assert(flag)
-            nt.assert_equal(msg_recv, msg_send)
+            self.assert_msg_equal(msg_recv, msg_send)
             # Wait for send to close
             if is_eof and close_on_send_eof:
                 T = send_instance.start_timeout(self.timeout)
@@ -406,3 +408,18 @@ class TestCommBase(CisTestClassInfo):
         # Purge recv while closed
         self.recv_instance.close()
         self.recv_instance.purge()
+
+    def test_send_recv_dict(self):
+        r"""Test send/recv numpy array as dict."""
+        msg_send = dict(f0=self.msg_short)
+        if self.comm in ['CommBase', 'AsyncComm']:
+            flag = self.send_instance.send_dict(msg_send)
+            assert(not flag)
+            flag, msg_recv = self.recv_instance.recv_dict(timeout=self.timeout)
+            assert(not flag)
+        else:
+            flag = self.send_instance.send_dict(msg_send)
+            assert(flag)
+            flag, msg_recv = self.recv_instance.recv_dict(timeout=self.timeout)
+            assert(flag)
+            nt.assert_equal(msg_recv, msg_send)

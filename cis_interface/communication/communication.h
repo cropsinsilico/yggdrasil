@@ -131,11 +131,12 @@ int register_comm(comm_t *x) {
   if (x == NULL) {
     return 0;
   }
-  vcomms2clean = (void**)realloc(vcomms2clean, sizeof(void*)*(ncomms2clean + 1));
-  if (vcomms2clean == NULL) {
+  void **t_vcomms2clean = (void**)realloc(vcomms2clean, sizeof(void*)*(ncomms2clean + 1));
+  if (t_vcomms2clean == NULL) {
     cislog_error("register_comm(%s): Failed to realloc the comm list.", x->name);
     return -1;
   }
+  vcomms2clean = t_vcomms2clean;
   x->index_in_register = (int)ncomms2clean;
   vcomms2clean[ncomms2clean++] = (void*)x;
   return 0;
@@ -378,6 +379,35 @@ comm_head_t comm_send_multipart_header(const comm_t x, const size_t len) {
   sprintf(head.id, "%d", rand());
   head.multipart = 1;
   head.valid = 1;
+  // Add serializer information to header on first send
+  if ((x.used[0] == 0) && (x.is_file == 0)) {
+    seri_t *serializer;
+    if (x.type == CLIENT_COMM) {
+      comm_t *req_comm = (comm_t*)(x.handle);
+      serializer = req_comm->serializer;
+    } else {
+      serializer = x.serializer;
+    }
+    if (serializer->type == DIRECT_SERI) {
+      head.serializer_type = 0;
+    } else if (serializer->type == FORMAT_SERI) {
+      head.serializer_type = 1;
+      strcpy(head.format_str, (char*)(serializer->info));
+    } else if (serializer->type == ARRAY_SERI) {
+      head.serializer_type = 2;
+      strcpy(head.format_str, (char*)(serializer->info));
+      head.as_array = 1;
+    } else if (serializer->type == ASCII_TABLE_SERI) {
+      head.serializer_type = 1;
+      asciiTable_t *table = (asciiTable_t*)(serializer->info);
+      strcpy(head.format_str, table->format_str);
+    } else if (serializer->type == ASCII_TABLE_ARRAY_SERI) {
+      head.serializer_type = 2;
+      asciiTable_t *table = (asciiTable_t*)(serializer->info);
+      strcpy(head.format_str, table->format_str);
+      head.as_array = 1;
+    }
+  }
   // Why was this necessary?
   if (x.type == SERVER_COMM)
     strcpy(head.id, x.address);
@@ -424,11 +454,13 @@ int comm_send_multipart(const comm_t x, const char *data, const size_t len) {
     }
     if (((size_t)headlen + len) < x.maxMsgSize) {
       if (((size_t)headlen + len + 1) > (size_t)headbuf_len) {
-        headbuf = (char*)realloc(headbuf, (size_t)headlen + len + 1);
-        if (headbuf == NULL) {
+        char *t_headbuf = (char*)realloc(headbuf, (size_t)headlen + len + 1);
+        if (t_headbuf == NULL) {
           cislog_error("comm_send_multipart: Failed to realloc headbuf.");
+	  free(headbuf);
           return -1;          
         }
+	headbuf = t_headbuf;
         headbuf_len = headlen + (int)len + 1;
       }
       head.multipart = 0;
@@ -494,6 +526,8 @@ int comm_send_multipart(const comm_t x, const char *data, const size_t len) {
   // Free multipart
   free_comm(&xmulti);
   free(headbuf);
+  if (ret >= 0)
+    x.used[0] = 1;
   return ret;
 };
 
@@ -529,13 +563,15 @@ int comm_send(const comm_t x, const char *data, const size_t len) {
     }
   }
   if (((len > x.maxMsgSize) && (x.maxMsgSize > 0)) ||
-      ((x.always_send_header) && (!(is_eof(data))))) {
+      (((x.always_send_header) || (x.used[0] == 0)) && (!(is_eof(data))))) {
     return comm_send_multipart(x, data, len);
   }
   ret = comm_send_single(x, data, len);
   if (sending_eof) {
     cislog_debug("comm_send(%s): sent EOF, ret = %d", x.name, ret);
   }
+  if (ret >= 0)
+    x.used[0] = 1;
   return ret;
 };
 
@@ -611,17 +647,70 @@ int comm_recv_multipart(const comm_t x, char **data, const size_t len,
     cislog_error("comm_recv_multipart: Invalid comm");
     return ret;
   }
+  usleep(100);
   comm_head_t head = parse_comm_header(*data, headlen);
   if (!(head.valid)) {
     cislog_error("comm_recv(%s): Error parsing header.", x.name);
     ret = -1;
   } else {
+    // Get serializer information from header on first recv
+    if ((x.used[0] == 0) && (x.is_file == 0) && (x.serializer->type == 0)) {
+      int new_type = -1;
+      void *new_info = (void*)(head.format_str);
+      cislog_debug("comm_recv(%s): Updating serializer type to %d",
+		   x.name, head.serializer_type);
+      if (head.serializer_type == 0) {
+        new_type = DIRECT_SERI;
+      } else if (head.serializer_type == 1) {
+        new_type = FORMAT_SERI;
+      } else if (head.serializer_type == 2) {
+        new_type = ASCII_TABLE_ARRAY_SERI;
+      // TODO: Treat this as a separate class
+      // new_type = ARRAY_SERI;
+      } else if (head.serializer_type == 3) {
+        if (head.as_array == 0) {
+          new_type = ASCII_TABLE_SERI;
+        } else {
+          new_type = ASCII_TABLE_ARRAY_SERI;
+        }
+      }
+      if (new_type >= 0) {
+        ret = update_serializer(x.serializer, new_type, new_info);
+        if (ret != 0) {
+          cislog_error("comm_recv(%s): Error updating serializer.", x.name);
+          return -1;
+        }
+      }
+      // Set name for debug info & simplify formats
+      if ((new_type == ASCII_TABLE_SERI) || (new_type == ASCII_TABLE_ARRAY_SERI)) {
+        asciiTable_t *table = (asciiTable_t*)(x.serializer->info);
+        ret = at_update(table, x.name, "0");
+        if (ret != 0) {
+          cislog_error("comm_recv(%s): Failed to update asciiTable address.",
+                       x.name);
+          return -1;
+        }
+        ret = simplify_formats(table->format_str, CIS_MSG_MAX);
+        if (ret < 0) {
+          cislog_error("comm_recv(%s): Failed to simplify recvd table format.", x.name);
+          return -1;
+        }
+      } else if (new_type == FORMAT_SERI) {
+        char * format_str = (char*)(x.serializer->info);
+        ret = simplify_formats(format_str, x.serializer->size_info);
+        if (ret < 0) {
+          cislog_error("comm_recv(%s): Failed to simplify recvd format.", x.name);
+          return -1;
+        }
+      }
+    }
     if (head.multipart) {
       // Move part of message after header to front of data
       memmove(*data, *data + head.bodybeg, head.bodysiz);
       (*data)[head.bodysiz] = '\0';
       // Return early if header contained entire message
       if (head.size == head.bodysiz) {
+        x.used[0] = 1;
 	return (int)(head.bodysiz);
       }
       // Get address for new comm
@@ -638,13 +727,15 @@ int comm_recv_multipart(const comm_t x, char **data, const size_t len,
       // Reallocate data if necessary
       if ((head.size + 1) > len) {
 	if (allow_realloc) {
-	  *data = (char*)realloc(*data, head.size + 1);
-	  if (*data == NULL) {
+	  char *t_data = (char*)realloc(*data, head.size + 1);
+	  if (t_data == NULL) {
 	    cislog_error("comm_recv_multipart(%s): Failed to realloc buffer",
 			 x.name);
+	    free(*data);
 	    free_comm(&xmulti);
 	    return -1;
 	  }
+	  *data = t_data;
  	} else {
 	  cislog_error("comm_recv_multipart(%s): buffer is not large enough",
 		       x.name);
@@ -679,6 +770,8 @@ int comm_recv_multipart(const comm_t x, char **data, const size_t len,
       ret = (int)headlen;
     }
   }
+  if (ret >= 0)
+    x.used[0] = 1;
   return ret;
 };
 
@@ -694,12 +787,7 @@ int comm_recv_multipart(const comm_t x, char **data, const size_t len,
  */
 static
 int comm_recv(const comm_t x, char *data, const size_t len) {
-  int ret = -1;
-  if (x.valid == 0) {
-    cislog_error("comm_send: Invalid comm");
-    return ret;
-  }
-  ret = comm_recv_single(x, &data, len, 0);
+  int ret = comm_recv_single(x, &data, len, 0);
   if (ret > 0) {
     if (is_eof(data)) {
       cislog_debug("comm_recv(%s): EOF received.", x.name);
@@ -708,6 +796,9 @@ int comm_recv(const comm_t x, char *data, const size_t len) {
     } else {
       ret = comm_recv_multipart(x, &data, len, ret, 0);
     }
+  } else {
+    cislog_error("comm_recv_realloc(%s): Failed to receive header or message.",
+      x.name);
   }
   return ret;
 };
@@ -732,6 +823,9 @@ int comm_recv_realloc(const comm_t x, char **data, const size_t len) {
     } else {
       ret = comm_recv_multipart(x, data, len, ret, 1);
     }
+  } else {
+    cislog_error("comm_recv_realloc(%s): Failed to receive header or message.",
+      x.name);
   }
   return ret;
 };
@@ -811,13 +905,13 @@ int vcommSend(const comm_t x, va_list ap) {
     cislog_error("vcommSend(%s): Failed to alloc buffer", x.name);
     return -1;
   }
-  seri_t serializer = x.serializer;
+  seri_t *serializer = x.serializer;
   if (x.type == CLIENT_COMM) {
     comm_t *handle = (comm_t*)(x.handle);
     serializer = handle->serializer;
   }
   int args_used = 0;
-  ret = serialize(serializer, &buf, buf_siz, 1, &args_used, ap);
+  ret = serialize(*serializer, &buf, buf_siz, 1, &args_used, ap);
   if (ret < 0) {
     cislog_error("vcommSend(%s): serialization error", x.name);
     free(buf);
@@ -868,12 +962,12 @@ int vcommRecv(const comm_t x, va_list ap) {
   }
   cislog_debug("vcommRecv(%s): comm_recv returns %d: %.10s...", x.name, ret, buf);
   // Deserialize message
-  seri_t serializer = x.serializer;
+  seri_t *serializer = x.serializer;
   if (x.type == SERVER_COMM) {
     comm_t *handle = (comm_t*)(x.handle);
     serializer = handle->serializer;
   }
-  ret = deserialize(serializer, buf, ret, ap);
+  ret = deserialize(*serializer, buf, ret, ap);
   if (ret < 0) {
     cislog_error("vcommRecv(%s): error deserializing message (ret=%d)",
 		 x.name, ret);

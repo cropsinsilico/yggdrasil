@@ -1,7 +1,7 @@
 import os
 import numpy as np
+from cis_interface import serialize
 from cis_interface.examples.tests import TestExample
-from cis_interface.dataio.AsciiTable import AsciiTable
 
 
 class TestExampleAsciiIO(TestExample):
@@ -26,6 +26,11 @@ class TestExampleAsciiIO(TestExample):
         r"""str: Input array file."""
         return os.path.join(self.yamldir, 'Input', 'input_array.txt')
 
+    # @property
+    # def input_files(self):
+    #     r"""list Input files for the run."""
+    #     return [self.input_file, self.input_table, self.input_array]
+        
     @property
     def output_file(self):
         r"""str: Output file for the run."""
@@ -65,13 +70,16 @@ class TestExampleAsciiIO(TestExample):
         assert(os.path.isfile(self.output_array))
         with open(self.input_file, 'r') as fd:
             icont = fd.read()
-        iATT = AsciiTable(self.input_table, 'r')
-        iATA = AsciiTable(self.input_array, 'r')
+        with open(self.input_table, 'rb') as fd:
+            iATT = serialize.table_to_array(fd.read(), comment='#')
+        with open(self.input_array, 'rb') as fd:
+            iATA = serialize.table_to_array(fd.read(), comment='#')
         return [icont,
                 (self.check_table, iATT),
                 (self.check_table, iATA)]
 
     def check_table(self, fname, iAT):
         r"""Assert that contents of input/output ascii tables are identical."""
-        oAT = AsciiTable(fname, 'r', column_names=iAT.column_names)
-        np.testing.assert_equal(oAT.arr, iAT.arr)
+        with open(fname, 'rb') as fd:
+            oAT = serialize.table_to_array(fd.read(), comment='#')
+        np.testing.assert_equal(oAT, iAT)

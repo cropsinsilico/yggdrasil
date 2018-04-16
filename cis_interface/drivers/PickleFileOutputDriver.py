@@ -11,9 +11,11 @@ class PickleFileOutputDriver(FileOutputDriver):
 
     """
     def __init__(self, name, args, **kwargs):
-        # icomm_kws = kwargs.get('icomm_kws', {})
+        icomm_kws = kwargs.get('icomm_kws', {})
+        icomm_kws.setdefault('serializer_type', 4)
         ocomm_kws = kwargs.get('ocomm_kws', {})
         ocomm_kws.setdefault('comm', 'PickleFileComm')
+        kwargs['icomm_kws'] = icomm_kws
         kwargs['ocomm_kws'] = ocomm_kws
         super(PickleFileOutputDriver, self).__init__(name, args, **kwargs)
         self.debug('(%s)', args)

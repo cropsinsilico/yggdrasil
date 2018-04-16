@@ -10,6 +10,7 @@ ex_dict = {'gs_lesson1': ('python', 'matlab', 'c', 'cpp'),
            'formatted_io1': ('python', 'matlab', 'c', 'cpp'),
            'formatted_io2': ('python', 'matlab', 'c', 'cpp'),
            'formatted_io3': ('python', 'matlab', 'c', 'cpp'),
+           'formatted_io4': ('python', 'matlab', 'c', 'cpp'),
            'rpc_lesson1': ('python', 'matlab', 'c', 'cpp'),
            'rpc_lesson2': ('python', 'matlab', 'c', 'cpp'),
            'hello': ('python', 'matlab', 'c', 'cpp'),
@@ -18,7 +19,8 @@ ex_dict = {'gs_lesson1': ('python', 'matlab', 'c', 'cpp'),
            'ascii_io': ('python', 'matlab', 'c', 'cpp', 'all', 'all_nomatlab'),
            'rpcFib': ('python', 'matlab', 'c', 'cpp', 'all', 'all_nomatlab'),
            'maxMsg': ('python', 'matlab', 'c', 'cpp', 'all', 'all_nomatlab'),
-           'timed_pipe': ('python', 'matlab', 'c', 'cpp')}
+           'timed_pipe': ('python', 'matlab', 'c', 'cpp'),
+           'fakeplant': ('python', 'matlab', 'c', 'cpp', 'all', 'all_nomatlab')}
 ext_map = {'python': '.py',
            'matlab': '.m',
            'c': '.c',
@@ -77,6 +79,29 @@ for k, lang in ex_dict.items():
             yml_names = ['server_python.yml',
                          'client_%s.yml' % ilang]
             src_names = ['server.py', 'client%s' % ext_map[ilang]]
+        elif k == 'fakeplant':
+            if ilang.startswith('all'):
+                yml_names = ['canopy.yml', 'light.yml', 'photosynthesis.yml',
+                             'fakeplant.yml']
+                src_names = ['canopy.cpp', 'light.c', 'photosynthesis.py']
+                if ilang == 'all_nomatlab':
+                    yml_names.append('growth_python.yml')
+                    src_names.append('growth.py')
+                else:
+                    yml_names.append('growth.yml')
+                    src_names.append('growth.m')
+            elif ilang == 'python':
+                yml_names = ['photosynthesis.yml', 'photosynthesis_files.yml']
+                src_names = ['photosynthesis.py']
+            elif ilang == 'c':
+                yml_names = ['light.yml', 'light_files.yml']
+                src_names = ['light.c']
+            elif ilang == 'cpp':
+                yml_names = ['canopy.yml', 'canopy_files.yml']
+                src_names = ['canopy.cpp']
+            elif ilang == 'matlab':
+                yml_names = ['growth.yml', 'growth_files.yml']
+                src_names = ['growth.m']
         else:
             yml_names = ['%s_%s.yml' % (k, ilang)]
             if ilang.startswith('all'):

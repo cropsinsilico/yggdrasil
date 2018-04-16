@@ -7,13 +7,13 @@ import unittest
 import numpy as np
 import threading
 import psutil
+import pandas
 from scipy.io import savemat, loadmat
 import nose.tools as nt
 from cis_interface.config import cis_cfg, cfg_logging
 from cis_interface.tools import get_CIS_MSG_MAX, get_default_comm, CisClass
 from cis_interface.backwards import pickle, BytesIO
-from cis_interface.dataio.AsciiTable import AsciiTable
-from cis_interface import backwards, platform
+from cis_interface import backwards, platform, serialize
 from cis_interface.communication import cleanup_comms, get_comm_class
 
 # Test data
@@ -105,7 +105,7 @@ class CisTestBase(unittest.TestCase):
     def fd_count(self):
         r"""int: The number of open file descriptors."""
         proc = psutil.Process()
-        if platform._is_win:
+        if platform._is_win:  # pragma: windows
             out = proc.num_handles()
         else:
             out = proc.num_fds()
@@ -361,30 +361,70 @@ class IOInfo(object):
     """
 
     def __init__(self):
-        self.comment = backwards.unicode2bytes('#')
+        self.field_names = ['name', 'count', 'size']
+        self.field_units = ['n/a', 'g', 'cm']
+        self.nfields = len(self.field_names)
+        self.comment = backwards.unicode2bytes('# ')
+        self.delimiter = backwards.unicode2bytes('\t')
+        self.newline = backwards.unicode2bytes('\n')
         self.fmt_str = backwards.unicode2bytes('%5s\t%d\t%f\n')
         self.fmt_str_matlab = backwards.unicode2bytes('%5s\\t%d\\t%f\\n')
+        self.field_formats = self.fmt_str.split(self.newline)[0].split(self.delimiter)
         self.fmt_str_line = backwards.unicode2bytes('# ') + self.fmt_str
-        self.file_dtype = '%s5, i4, f8' % backwards.np_dtype_str
-        self.file_rows = [('one', int(1), 1.0),
-                          ('two', int(2), 2.0),
-                          ('three', int(3), 3.0)]
+        # self.file_cols = ['name', 'count', 'size']
+        self.file_dtype = np.dtype(
+            {'names': self.field_names,
+             'formats': ['%s5' % backwards.np_dtype_str, 'i4', 'f8']})
+        self.field_names = [backwards.unicode2bytes(x) for x in self.field_names]
+        self.field_units = [backwards.unicode2bytes(x) for x in self.field_units]
+        self.field_names_line = (self.comment +
+                                 self.delimiter.join(self.field_names) +
+                                 self.newline)
+        self.field_units_line = (self.comment +
+                                 self.delimiter.join(self.field_units) +
+                                 self.newline)
+        self.file_elements = [('one', int(1), 1.0),
+                              ('two', int(2), 2.0),
+                              ('three', int(3), 3.0)]
+
+    @property
+    def header_lines(self):
+        r"""list: Lines in a mock file header."""
+        out = [self.field_names_line, self.field_units_line, self.fmt_str_line]
+        return out
+
+    @property
+    def file_rows(self):
+        r"""list: File rows."""
+        out = []
+        for x in self.file_elements:
+            out.append((backwards.unicode2bytes(x[0]), x[1], x[2]))
+        return out
         
     @property
     def file_lines(self):
         r"""list: Lines in a mock file."""
         out = []
         for r in self.file_rows:
-            out.append(backwards.unicode2bytes(
-                backwards.bytes2unicode(self.fmt_str) % r))
+            out.append(backwards.format_bytes(self.fmt_str, r))
+        return out
+
+    @property
+    def pandas_file_contents(self):
+        r"""str: Contents of mock Pandas file."""
+        s = serialize.get_serializer(stype=6, delimiter=self.delimiter,
+                                     write_header=True)
+        out = s.serialize(self.pandas_frame)
         return out
 
     @property
     def file_contents(self):
         r"""str: Complete contents of mock file."""
-        out = self.fmt_str_line
+        out = backwards.unicode2bytes('')
+        for line in self.header_lines:
+            out += line
         for line in self.file_lines:
-            out = out + line
+            out += line
         return out
 
     @property
@@ -395,25 +435,32 @@ class IOInfo(object):
             out[i] = row
         return out
 
-    def to_bytes(self, arr):
-        r"""Turn an array into the bytes that will be written.
+    # def to_bytes(self, arr):
+    #     r"""Turn an array into the bytes that will be written.
 
-        Args:
-            arr (np.ndarray): Array.
+    #     Args:
+    #         arr (np.ndarray): Array.
         
-        Returns:
-            str: Bytes that represent the array.
+    #     Returns:
+    #         str: Bytes that represent the array.
 
-        """
-        out = backwards.unicode2bytes('')
-        for n in arr.dtype.names:
-            out = out + arr[n].tobytes()
-        return out
+    #     """
+    #     out = backwards.unicode2bytes('')
+    #     for n in arr.dtype.names:
+    #         out = out + arr[n].tobytes()
+    #     return out
+
+    # @property
+    # def file_bytes(self):
+    #     r"""str: Raw bytes of array of mock file contents."""
+    #     return self.to_bytes(self.file_array)
 
     @property
-    def file_bytes(self):
-        r"""str: Raw bytes of array of mock file contents."""
-        return self.to_bytes(self.file_array)
+    def pandas_frame(self):
+        r"""pandas.DataFrame: Pandas data frame."""
+        if not hasattr(self, '_pandas_frame'):
+            self._pandas_frame = pandas.DataFrame(self.file_array)
+        return self._pandas_frame
 
     @property
     def data_dict(self):
@@ -443,16 +490,19 @@ class IOInfo(object):
             del x[k]
         return x
 
-    def assert_equal_data_dict(self, x):
+    def assert_equal_data_dict(self, x, y=None):
         r"""Assert that the provided object is equivalent to data_dict.
 
         Args:
             x (obj): Object to check.
+            y (obj, optional): Object to check against. Defaults to self.data_dict.
 
         Raises:
             AssertionError: If the two are not equal.
 
         """
+        if y is None:
+            y = self.data_dict
         if isinstance(x, backwards.file_type):
             if x.name.endswith('.mat'):
                 x = self.load_mat(x)
@@ -466,13 +516,13 @@ class IOInfo(object):
                     x = pickle.load(fd)
         elif isinstance(x, backwards.bytes_type):
             x = pickle.loads(x)
-        nt.assert_equal(type(x), type(self.data_dict))
-        for k in self.data_dict:
+        nt.assert_equal(type(x), type(y))
+        for k in y:
             if k not in x:  # pragma: debug
                 raise AssertionError("Key %s expected, but not in result." % k)
-            np.testing.assert_array_equal(x[k], self.data_dict[k])
+            np.testing.assert_array_equal(x[k], y[k])
         for k in x:
-            if k not in self.data_dict:  # pragma: debug
+            if k not in y:  # pragma: debug
                 raise AssertionError("Key %s in result not expected." % k)
 
     @property
@@ -512,8 +562,16 @@ class IOInfo(object):
                 written to.
 
         """
-        at = AsciiTable(fname, 'w', format_str=self.fmt_str)
-        at.write_array(self.file_array)
+        header = serialize.format_header(format_str=self.fmt_str,
+                                         comment=self.comment,
+                                         delimiter=self.delimiter,
+                                         newline=self.newline,
+                                         field_names=self.field_names,
+                                         field_units=self.field_units)
+        body = serialize.array_to_table(self.file_array, self.fmt_str)
+        with open(fname, 'wb') as fd:
+            fd.write(header)
+            fd.write(body)
 
     def write_pickle(self, fname):
         r"""Write the pickled table out to a file.
@@ -525,6 +583,17 @@ class IOInfo(object):
         """
         with open(fname, 'wb') as fd:
             pickle.dump(self.data_dict, fd)
+
+    def write_pandas(self, fname):
+        r"""Write the pandas data frame out to a file.
+
+        Args:
+            fname (str): Full path to the file that the pickle should be
+                written to.
+
+        """
+        with open(fname, 'wb') as fd:
+            fd.write(self.pandas_file_contents)
 
 
 # class CisTestBaseInfo(CisTestBase, IOInfo):

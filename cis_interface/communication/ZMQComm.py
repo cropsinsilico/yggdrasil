@@ -134,7 +134,9 @@ def bind_socket(socket, address, retry_timeout=-1):
             port = socket.bind_to_random_port(address)
             address += ":%d" % port
     except zmq.ZMQError as e:  # pragma: debug
-        if (e.errno not in [48, 98]) or (retry_timeout < 0):
+        if (retry_timeout < 0):
+            # if (e.errno not in [48, 98]) or (retry_timeout < 0):
+            # print(e, e.errno)
             raise e
         else:
             logging.debug("Retrying bind in %f s", retry_timeout)
@@ -358,7 +360,7 @@ class ZMQComm(AsyncComm.AsyncComm):
         self._n_reply_recv = {}
         self._server_class = ZMQProxy
         self._server_kwargs = dict(context=self.context,
-                                   retry_timeout=4 * self.sleeptime)
+                                   retry_timeout=0.01)  # 4 * self.sleeptime)
         super(ZMQComm, self)._init_before_open(**kwargs)
 
     @classmethod
@@ -704,7 +706,7 @@ class ZMQComm(AsyncComm.AsyncComm):
         super(ZMQComm, self)._close_backlog(wait=wait)
         if self.direction == 'send':
             if (self.reply_socket_send is not None):
-                self.reply_socket_send.close(linger=self.zmq_sleeptime)
+                self.reply_socket_send.close(linger=0)  # self.zmq_sleeptime)
                 self.unregister_comm("REPLY_SEND_" + self.reply_socket_address)
         else:
             for k, socket in self.reply_socket_recv.items():

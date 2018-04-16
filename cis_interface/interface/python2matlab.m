@@ -14,7 +14,10 @@ function x_ml = python2matlab(x_py)
   elseif isa(x_py, 'py.bool')
     x_ml = logical(x_py);
   elseif isa(x_py, 'py.dict')
-    x_ml = struct(x_py);
+    % x_ml = struct(x_py);
+    dict_keys = python2matlab(py.list(keys(x_py)));
+    dict_vals = python2matlab(py.list(values(x_py)));
+    x_ml = containers.Map(dict_keys, dict_vals);
   elseif (isa(x_py, 'py.list') || isa(x_py, 'py.tuple') || isa(x_py, 'py.set'))
     x_ml = cell(x_py);
     [nr, nc] = size(x_ml);

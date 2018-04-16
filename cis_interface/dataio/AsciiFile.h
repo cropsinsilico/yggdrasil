@@ -133,6 +133,21 @@ int af_writeline_full(const asciiFile_t t, const char *line) {
 };
 
 /*!
+  @brief Update an existing asciiFile_t structure.
+  @param[in] t asciiFile_t* Address of file structure to update.
+  @param[in] filepath constant character pointer to file path.
+  @param[in] io_mode constant character pointer to I/O mode. "r" for read,
+  "w" for write.
+  @returns int -1 if there is an error, 0 otherwise.
+ */
+static inline
+int af_update(asciiFile_t *t, const char *filepath, const char *io_mode) {
+  t->filepath = filepath;
+  strcpy(t->io_mode, io_mode);
+  return 0;
+};
+
+/*!
   @brief Constructor for asciiFile_t structure.
   @param[in] filepath constant character pointer to file path.
   @param[in] io_mode const character pointer to I/O mode. "r" for read, "w" for
@@ -148,8 +163,7 @@ asciiFile_t asciiFile(const char *filepath, const char *io_mode,
 		      const char *comment, const char *newline) {
   asciiFile_t t;
   t.fd = NULL;
-  t.filepath = filepath;
-  strcpy(t.io_mode, io_mode);
+  af_update(&t, filepath, io_mode);
   // Set defaults for optional parameters
   if (comment == NULL)
     strcpy(t.comment, "# ");
