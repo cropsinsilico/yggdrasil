@@ -10,7 +10,7 @@ PY_MAJOR_VERSION = sys.version_info[0]
 PY2 = (PY_MAJOR_VERSION == 2)
 IS_WINDOWS = (sys.platform in ['win32', 'cygwin'])
 
-cis_ver = "0.1.3"
+cis_ver = "0.2"
 
 
 def install_matlab():
