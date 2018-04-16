@@ -25,6 +25,8 @@ if __name__ == '__main__':
             print('growth: No more input.')
             break
         grate = calculate_growth(*prate)
+        print('growth: photosynthesis rate = %f ---> growth rate = %f' % (
+                prate[0], grate))
         flag = output.send(grate)
         if not flag:
             print('growth: Error sending growth rate.')
