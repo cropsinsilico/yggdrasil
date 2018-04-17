@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>cis_interface.yamlfile &mdash; cis_interface 0.1.3 documentation</title>
+  <title>cis_interface.yamlfile &mdash; cis_interface 0.2.0 documentation</title>
   
 
   
@@ -58,7 +58,7 @@
             
             
               <div class="version">
-                0.1
+                0.2
               </div>
             
           
@@ -167,7 +167,7 @@
 <span class="kn">from</span> <span class="nn">cis_interface</span> <span class="k">import</span> <span class="n">backwards</span>
 
 
-<div class="viewcode-block" id="load_yaml"><a class="viewcode-back" href="../../cis_interface.html#cis_interface.yamlfile.load_yaml">[docs]</a><span class="k">def</span> <span class="nf">load_yaml</span><span class="p">(</span><span class="n">fname</span><span class="p">):</span>
+<div class="viewcode-block" id="load_yaml"><a class="viewcode-back" href="../../code_python.html#cis_interface.yamlfile.load_yaml">[docs]</a><span class="k">def</span> <span class="nf">load_yaml</span><span class="p">(</span><span class="n">fname</span><span class="p">):</span>
     <span class="sd">r&quot;&quot;&quot;Parse a yaml file defining a run.</span>
 
 <span class="sd">    Args:</span>
@@ -191,7 +191,7 @@
     <span class="k">return</span> <span class="n">yamlparsed</span></div>
 
 
-<div class="viewcode-block" id="parse_yaml"><a class="viewcode-back" href="../../cis_interface.html#cis_interface.yamlfile.parse_yaml">[docs]</a><span class="k">def</span> <span class="nf">parse_yaml</span><span class="p">(</span><span class="n">files</span><span class="p">):</span>
+<div class="viewcode-block" id="parse_yaml"><a class="viewcode-back" href="../../code_python.html#cis_interface.yamlfile.parse_yaml">[docs]</a><span class="k">def</span> <span class="nf">parse_yaml</span><span class="p">(</span><span class="n">files</span><span class="p">):</span>
     <span class="sd">r&quot;&quot;&quot;Parse list of yaml files.</span>
 
 <span class="sd">    Args:</span>
@@ -235,7 +235,7 @@
     <span class="k">return</span> <span class="n">existing</span></div>
 
 
-<div class="viewcode-block" id="parse_component"><a class="viewcode-back" href="../../cis_interface.html#cis_interface.yamlfile.parse_component">[docs]</a><span class="k">def</span> <span class="nf">parse_component</span><span class="p">(</span><span class="n">yml</span><span class="p">,</span> <span class="n">ctype</span><span class="p">,</span> <span class="n">yamldir</span><span class="p">,</span> <span class="n">existing</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="parse_component"><a class="viewcode-back" href="../../code_python.html#cis_interface.yamlfile.parse_component">[docs]</a><span class="k">def</span> <span class="nf">parse_component</span><span class="p">(</span><span class="n">yml</span><span class="p">,</span> <span class="n">ctype</span><span class="p">,</span> <span class="n">yamldir</span><span class="p">,</span> <span class="n">existing</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">r&quot;&quot;&quot;Parse a yaml entry for a component, adding it to the list of</span>
 <span class="sd">    existing components.</span>
 
@@ -283,7 +283,7 @@
     <span class="k">return</span> <span class="n">existing</span></div>
 
 
-<div class="viewcode-block" id="parse_model"><a class="viewcode-back" href="../../cis_interface.html#cis_interface.yamlfile.parse_model">[docs]</a><span class="k">def</span> <span class="nf">parse_model</span><span class="p">(</span><span class="n">yml</span><span class="p">,</span> <span class="n">yamldir</span><span class="p">,</span> <span class="n">existing</span><span class="p">):</span>
+<div class="viewcode-block" id="parse_model"><a class="viewcode-back" href="../../code_python.html#cis_interface.yamlfile.parse_model">[docs]</a><span class="k">def</span> <span class="nf">parse_model</span><span class="p">(</span><span class="n">yml</span><span class="p">,</span> <span class="n">yamldir</span><span class="p">,</span> <span class="n">existing</span><span class="p">):</span>
     <span class="sd">r&quot;&quot;&quot;Parse a yaml entry for a model.</span>
 
 <span class="sd">    Args:</span>
@@ -346,7 +346,7 @@
     <span class="k">return</span> <span class="n">existing</span></div>
 
     
-<div class="viewcode-block" id="parse_io"><a class="viewcode-back" href="../../cis_interface.html#cis_interface.yamlfile.parse_io">[docs]</a><span class="k">def</span> <span class="nf">parse_io</span><span class="p">(</span><span class="n">yml</span><span class="p">,</span> <span class="n">yamldir</span><span class="p">,</span> <span class="n">existing</span><span class="p">):</span>
+<div class="viewcode-block" id="parse_io"><a class="viewcode-back" href="../../code_python.html#cis_interface.yamlfile.parse_io">[docs]</a><span class="k">def</span> <span class="nf">parse_io</span><span class="p">(</span><span class="n">yml</span><span class="p">,</span> <span class="n">yamldir</span><span class="p">,</span> <span class="n">existing</span><span class="p">):</span>
     <span class="sd">r&quot;&quot;&quot;Parse a yaml entry for an I/O channel.</span>
 
 <span class="sd">    Args:</span>
@@ -374,7 +374,7 @@
     <span class="k">return</span> <span class="n">existing</span></div>
 
 
-<div class="viewcode-block" id="parse_connection"><a class="viewcode-back" href="../../cis_interface.html#cis_interface.yamlfile.parse_connection">[docs]</a><span class="k">def</span> <span class="nf">parse_connection</span><span class="p">(</span><span class="n">yml</span><span class="p">,</span> <span class="n">yamldir</span><span class="p">,</span> <span class="n">existing</span><span class="p">):</span>
+<div class="viewcode-block" id="parse_connection"><a class="viewcode-back" href="../../code_python.html#cis_interface.yamlfile.parse_connection">[docs]</a><span class="k">def</span> <span class="nf">parse_connection</span><span class="p">(</span><span class="n">yml</span><span class="p">,</span> <span class="n">yamldir</span><span class="p">,</span> <span class="n">existing</span><span class="p">):</span>
     <span class="sd">r&quot;&quot;&quot;Parse a yaml entry for a connection between I/O channels.</span>
 
 <span class="sd">    Args:</span>
@@ -536,7 +536,7 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../../',
-            VERSION:'0.1.3',
+            VERSION:'0.2.0',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',

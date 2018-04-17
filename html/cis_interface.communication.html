@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>cis_interface.communication package &mdash; cis_interface 0.1.3 documentation</title>
+  <title>cis_interface.communication package &mdash; cis_interface 0.2.0 documentation</title>
   
 
   
@@ -58,7 +58,7 @@
             
             
               <div class="version">
-                0.1
+                0.2
               </div>
             
           
@@ -811,7 +811,7 @@ with the response address in the header.</p>
 <dl class="class">
 <dt id="cis_interface.communication.CommBase.CommBase">
 <em class="property">class </em><code class="descclassname">cis_interface.communication.CommBase.</code><code class="descname">CommBase</code><span class="sig-paren">(</span><em>name</em>, <em>address=None</em>, <em>direction='send'</em>, <em>dont_open=False</em>, <em>is_interface=False</em>, <em>recv_timeout=0.0</em>, <em>close_on_eof_recv=True</em>, <em>close_on_eof_send=False</em>, <em>single_use=False</em>, <em>reverse_names=False</em>, <em>no_suffix=False</em>, <em>is_client=False</em>, <em>is_response_client=False</em>, <em>is_server=False</em>, <em>is_response_server=False</em>, <em>recv_converter=None</em>, <em>send_converter=None</em>, <em>comm=None</em>, <em>matlab=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/CommBase.html#CommBase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.CommBase.CommBase" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="cis_interface.html#cis_interface.tools.CisClass" title="cis_interface.tools.CisClass"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.tools.CisClass</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="code_python.html#cis_interface.tools.CisClass" title="cis_interface.tools.CisClass"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.tools.CisClass</span></code></a></p>
 <p>Class for handling I/O.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -826,7 +826,7 @@ address is taken from the environment variable.</li>
 through the connection. &#8216;send&#8217; if the connection will send
 messages, &#8216;recv&#8217; if the connecton will receive messages. Defaults
 to &#8216;send&#8217;.</li>
-<li><strong>serializer</strong> (<a class="reference internal" href="cis_interface.serialize.html#module-cis_interface.serialize.DefaultSerialize" title="cis_interface.serialize.DefaultSerialize"><em>DefaultSerialize</em></a><em>, </em><em>optional</em>) &#8211; Class with serialize and
+<li><strong>serializer</strong> (<a class="reference internal" href="cis_interface.serialize.html#cis_interface.serialize.DefaultSerialize.DefaultSerialize" title="cis_interface.serialize.DefaultSerialize.DefaultSerialize"><em>DefaultSerialize</em></a><em>, </em><em>optional</em>) &#8211; Class with serialize and
 deserialize methods that should be used to process sent and received
 messages. Defaults to None and is constructed using provided
 &#8216;serializer_kwargs&#8217;.</li>
@@ -1819,7 +1819,7 @@ _send_multipart_worker.</li>
 <dl class="class">
 <dt id="cis_interface.communication.CommBase.CommServer">
 <em class="property">class </em><code class="descclassname">cis_interface.communication.CommBase.</code><code class="descname">CommServer</code><span class="sig-paren">(</span><em>srv_address</em>, <em>cli_address=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/CommBase.html#CommServer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.CommBase.CommServer" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="cis_interface.html#cis_interface.tools.CisThreadLoop" title="cis_interface.tools.CisThreadLoop"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.tools.CisThreadLoop</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="code_python.html#cis_interface.tools.CisThreadLoop" title="cis_interface.tools.CisThreadLoop"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.tools.CisThreadLoop</span></code></a></p>
 <p>Basic server object to keep track of clients.</p>
 <dl class="attribute">
 <dt id="cis_interface.communication.CommBase.CommServer.cli_count">
@@ -1844,14 +1844,14 @@ _send_multipart_worker.</li>
 <dl class="class">
 <dt id="cis_interface.communication.CommBase.CommThreadLoop">
 <em class="property">class </em><code class="descclassname">cis_interface.communication.CommBase.</code><code class="descname">CommThreadLoop</code><span class="sig-paren">(</span><em>comm</em>, <em>name=None</em>, <em>suffix='CommThread'</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/CommBase.html#CommThreadLoop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.CommBase.CommThreadLoop" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="cis_interface.html#cis_interface.tools.CisThreadLoop" title="cis_interface.tools.CisThreadLoop"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.tools.CisThreadLoop</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="code_python.html#cis_interface.tools.CisThreadLoop" title="cis_interface.tools.CisThreadLoop"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.tools.CisThreadLoop</span></code></a></p>
 <p>Thread loop for comms to ensure cleanup.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>comm</strong> (<a class="reference internal" href="#cis_interface.communication.CommBase.CommBase" title="cis_interface.communication.CommBase.CommBase"><em>CommBase</em></a>) &#8211; Comm class that thread is for.</li>
+<li><strong>comm</strong> (<a class="reference internal" href="#module-cis_interface.communication.CommBase" title="cis_interface.communication.CommBase"><em>CommBase</em></a>) &#8211; Comm class that thread is for.</li>
 <li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) &#8211; Name for the thread. If not provided, one is
 created by combining the comm name and the provided suffix.</li>
 <li><strong>suffix</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) &#8211; Suffix that should be added to comm name to name
@@ -4106,7 +4106,7 @@ tools.get_default_comm() if not provided.</td>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'0.1.3',
+            VERSION:'0.2.0',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',

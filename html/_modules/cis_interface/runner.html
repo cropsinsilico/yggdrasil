@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>cis_interface.runner &mdash; cis_interface 0.1.3 documentation</title>
+  <title>cis_interface.runner &mdash; cis_interface 0.2.0 documentation</title>
   
 
   
@@ -58,7 +58,7 @@
             
             
               <div class="version">
-                0.1
+                0.2
               </div>
             
           
@@ -197,7 +197,7 @@
 <span class="c1">#                         prog + &#39;: %(message)s&#39; + COLOR_NORMAL)</span>
 
 
-<div class="viewcode-block" id="CisRunner"><a class="viewcode-back" href="../../cis_interface.html#cis_interface.runner.CisRunner">[docs]</a><span class="k">class</span> <span class="nc">CisRunner</span><span class="p">(</span><span class="n">CisClass</span><span class="p">):</span>
+<div class="viewcode-block" id="CisRunner"><a class="viewcode-back" href="../../code_python.html#cis_interface.runner.CisRunner">[docs]</a><span class="k">class</span> <span class="nc">CisRunner</span><span class="p">(</span><span class="n">CisClass</span><span class="p">):</span>
     <span class="sd">r&quot;&quot;&quot;This class handles the orchestration of starting the model and</span>
 <span class="sd">    IO drivers, monitoring their progress, and cleaning up on exit.</span>
 
@@ -268,12 +268,12 @@
         <span class="c1">#       pformat(self.modeldrivers))</span>
         <span class="c1"># atexit.register(self.cleanup)</span>
 
-<div class="viewcode-block" id="CisRunner.pprint"><a class="viewcode-back" href="../../cis_interface.html#cis_interface.runner.CisRunner.pprint">[docs]</a>    <span class="k">def</span> <span class="nf">pprint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+<div class="viewcode-block" id="CisRunner.pprint"><a class="viewcode-back" href="../../code_python.html#cis_interface.runner.CisRunner.pprint">[docs]</a>    <span class="k">def</span> <span class="nf">pprint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
         <span class="sd">r&quot;&quot;&quot;Print with color.&quot;&quot;&quot;</span>
         <span class="n">s</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">args</span><span class="p">)</span>
         <span class="nb">print</span><span class="p">((</span><span class="n">COLOR_TRACE</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="n">COLOR_NORMAL</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">s</span><span class="p">))</span></div>
 
-<div class="viewcode-block" id="CisRunner.signal_handler"><a class="viewcode-back" href="../../cis_interface.html#cis_interface.runner.CisRunner.signal_handler">[docs]</a>    <span class="k">def</span> <span class="nf">signal_handler</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sig</span><span class="p">,</span> <span class="n">frame</span><span class="p">):</span>
+<div class="viewcode-block" id="CisRunner.signal_handler"><a class="viewcode-back" href="../../code_python.html#cis_interface.runner.CisRunner.signal_handler">[docs]</a>    <span class="k">def</span> <span class="nf">signal_handler</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sig</span><span class="p">,</span> <span class="n">frame</span><span class="p">):</span>
         <span class="sd">r&quot;&quot;&quot;Terminate all drivers on interrrupt.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Interrupt with signal </span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">sig</span><span class="p">)</span>
         <span class="n">now</span> <span class="o">=</span> <span class="n">backwards</span><span class="o">.</span><span class="n">clock_time</span><span class="p">()</span>
@@ -306,7 +306,7 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="n">platform</span><span class="o">.</span><span class="n">_is_win</span><span class="p">:</span>
             <span class="n">signal</span><span class="o">.</span><span class="n">siginterrupt</span><span class="p">(</span><span class="n">signum</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
         
-<div class="viewcode-block" id="CisRunner.set_signal_handler"><a class="viewcode-back" href="../../cis_interface.html#cis_interface.runner.CisRunner.set_signal_handler">[docs]</a>    <span class="k">def</span> <span class="nf">set_signal_handler</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">signal_handler</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="CisRunner.set_signal_handler"><a class="viewcode-back" href="../../code_python.html#cis_interface.runner.CisRunner.set_signal_handler">[docs]</a>    <span class="k">def</span> <span class="nf">set_signal_handler</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">signal_handler</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">r&quot;&quot;&quot;Set the signal handler.</span>
 
 <span class="sd">        Args:</span>
@@ -323,12 +323,12 @@
         <span class="k">else</span><span class="p">:</span>  <span class="c1"># pragma: windows</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_swap_handler</span><span class="p">(</span><span class="n">signal</span><span class="o">.</span><span class="n">SIGBREAK</span><span class="p">,</span> <span class="n">signal_handler</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="CisRunner.reset_signal_handler"><a class="viewcode-back" href="../../cis_interface.html#cis_interface.runner.CisRunner.reset_signal_handler">[docs]</a>    <span class="k">def</span> <span class="nf">reset_signal_handler</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="CisRunner.reset_signal_handler"><a class="viewcode-back" href="../../code_python.html#cis_interface.runner.CisRunner.reset_signal_handler">[docs]</a>    <span class="k">def</span> <span class="nf">reset_signal_handler</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">r&quot;&quot;&quot;Reset signal handlers to old ones.&quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_old_handlers</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="n">signal</span><span class="o">.</span><span class="n">signal</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="CisRunner.run"><a class="viewcode-back" href="../../cis_interface.html#cis_interface.runner.CisRunner.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">signal_handler</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="CisRunner.run"><a class="viewcode-back" href="../../code_python.html#cis_interface.runner.CisRunner.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">signal_handler</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">r&quot;&quot;&quot;Run all of the models and wait for them to exit.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">loadDrivers</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">startDrivers</span><span class="p">()</span>
@@ -344,7 +344,7 @@
         <span class="k">return</span> <span class="n">chain</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">inputdrivers</span><span class="o">.</span><span class="n">values</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">outputdrivers</span><span class="o">.</span><span class="n">values</span><span class="p">(),</span>
                      <span class="bp">self</span><span class="o">.</span><span class="n">modeldrivers</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
 
-<div class="viewcode-block" id="CisRunner.io_drivers"><a class="viewcode-back" href="../../cis_interface.html#cis_interface.runner.CisRunner.io_drivers">[docs]</a>    <span class="k">def</span> <span class="nf">io_drivers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="CisRunner.io_drivers"><a class="viewcode-back" href="../../code_python.html#cis_interface.runner.CisRunner.io_drivers">[docs]</a>    <span class="k">def</span> <span class="nf">io_drivers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">r&quot;&quot;&quot;Return the input and output drivers for one or all models.</span>
 
 <span class="sd">        Args:</span>
@@ -363,7 +363,7 @@
                         <span class="n">driver</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;outputs&#39;</span><span class="p">,</span> <span class="nb">dict</span><span class="p">()))</span>
         <span class="k">return</span> <span class="n">out</span></div>
 
-<div class="viewcode-block" id="CisRunner.createDriver"><a class="viewcode-back" href="../../cis_interface.html#cis_interface.runner.CisRunner.createDriver">[docs]</a>    <span class="k">def</span> <span class="nf">createDriver</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">yml</span><span class="p">):</span>
+<div class="viewcode-block" id="CisRunner.createDriver"><a class="viewcode-back" href="../../code_python.html#cis_interface.runner.CisRunner.createDriver">[docs]</a>    <span class="k">def</span> <span class="nf">createDriver</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">yml</span><span class="p">):</span>
         <span class="sd">r&quot;&quot;&quot;Create a driver instance from the yaml information.</span>
 
 <span class="sd">        Args:</span>
@@ -386,7 +386,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">serverdrivers</span><span class="p">[</span><span class="n">yml</span><span class="p">[</span><span class="s1">&#39;args&#39;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">instance</span><span class="o">.</span><span class="n">comm_address</span>
         <span class="k">return</span> <span class="n">instance</span></div>
 
-<div class="viewcode-block" id="CisRunner.createModelDriver"><a class="viewcode-back" href="../../cis_interface.html#cis_interface.runner.CisRunner.createModelDriver">[docs]</a>    <span class="k">def</span> <span class="nf">createModelDriver</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">yml</span><span class="p">):</span>
+<div class="viewcode-block" id="CisRunner.createModelDriver"><a class="viewcode-back" href="../../code_python.html#cis_interface.runner.CisRunner.createModelDriver">[docs]</a>    <span class="k">def</span> <span class="nf">createModelDriver</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">yml</span><span class="p">):</span>
         <span class="sd">r&quot;&quot;&quot;Create a model driver instance from the yaml information.</span>
 
 <span class="sd">        Args:</span>
@@ -407,7 +407,7 @@
                    <span class="n">yml</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">],</span> <span class="n">pformat</span><span class="p">(</span><span class="n">yml</span><span class="p">[</span><span class="s1">&#39;instance&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">env</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">drv</span></div>
 
-<div class="viewcode-block" id="CisRunner.createInputDriver"><a class="viewcode-back" href="../../cis_interface.html#cis_interface.runner.CisRunner.createInputDriver">[docs]</a>    <span class="k">def</span> <span class="nf">createInputDriver</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">yml</span><span class="p">):</span>
+<div class="viewcode-block" id="CisRunner.createInputDriver"><a class="viewcode-back" href="../../code_python.html#cis_interface.runner.CisRunner.createInputDriver">[docs]</a>    <span class="k">def</span> <span class="nf">createInputDriver</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">yml</span><span class="p">):</span>
         <span class="sd">r&quot;&quot;&quot;Create an input driver instance from the yaml information.</span>
 
 <span class="sd">        Args:</span>
@@ -429,7 +429,7 @@
         <span class="n">drv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">createDriver</span><span class="p">(</span><span class="n">yml</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">drv</span></div>
 
-<div class="viewcode-block" id="CisRunner.createOutputDriver"><a class="viewcode-back" href="../../cis_interface.html#cis_interface.runner.CisRunner.createOutputDriver">[docs]</a>    <span class="k">def</span> <span class="nf">createOutputDriver</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">yml</span><span class="p">):</span>
+<div class="viewcode-block" id="CisRunner.createOutputDriver"><a class="viewcode-back" href="../../code_python.html#cis_interface.runner.CisRunner.createOutputDriver">[docs]</a>    <span class="k">def</span> <span class="nf">createOutputDriver</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">yml</span><span class="p">):</span>
         <span class="sd">r&quot;&quot;&quot;Create an output driver instance from the yaml information.</span>
 
 <span class="sd">        Args:</span>
@@ -463,7 +463,7 @@
         <span class="n">drv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">createDriver</span><span class="p">(</span><span class="n">yml</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">drv</span></div>
         
-<div class="viewcode-block" id="CisRunner.loadDrivers"><a class="viewcode-back" href="../../cis_interface.html#cis_interface.runner.CisRunner.loadDrivers">[docs]</a>    <span class="k">def</span> <span class="nf">loadDrivers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="CisRunner.loadDrivers"><a class="viewcode-back" href="../../code_python.html#cis_interface.runner.CisRunner.loadDrivers">[docs]</a>    <span class="k">def</span> <span class="nf">loadDrivers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">r&quot;&quot;&quot;Load all of the necessary drivers, doing the IO drivers first</span>
 <span class="sd">        and adding IO driver environmental variables back tot he models.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
@@ -486,7 +486,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">terminate</span><span class="p">()</span>
             <span class="k">raise</span></div>
 
-<div class="viewcode-block" id="CisRunner.startDrivers"><a class="viewcode-back" href="../../cis_interface.html#cis_interface.runner.CisRunner.startDrivers">[docs]</a>    <span class="k">def</span> <span class="nf">startDrivers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="CisRunner.startDrivers"><a class="viewcode-back" href="../../code_python.html#cis_interface.runner.CisRunner.startDrivers">[docs]</a>    <span class="k">def</span> <span class="nf">startDrivers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">r&quot;&quot;&quot;Start drivers, starting with the IO drivers.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Starting I/O drivers and models on system &#39;</span> <span class="o">+</span>
                   <span class="s1">&#39;</span><span class="si">{}</span><span class="s1"> in namespace </span><span class="si">{}</span><span class="s1"> with rank </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
@@ -515,7 +515,7 @@
             <span class="k">raise</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;ALL DRIVERS STARTED&#39;</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="CisRunner.waitModels"><a class="viewcode-back" href="../../cis_interface.html#cis_interface.runner.CisRunner.waitModels">[docs]</a>    <span class="k">def</span> <span class="nf">waitModels</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="CisRunner.waitModels"><a class="viewcode-back" href="../../code_python.html#cis_interface.runner.CisRunner.waitModels">[docs]</a>    <span class="k">def</span> <span class="nf">waitModels</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">r&quot;&quot;&quot;Wait for all model drivers to finish. When a model finishes,</span>
 <span class="sd">        join the thread and perform exits for associated IO drivers.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
@@ -552,7 +552,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">terminate</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Returning&#39;</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="CisRunner.do_client_exits"><a class="viewcode-back" href="../../cis_interface.html#cis_interface.runner.CisRunner.do_client_exits">[docs]</a>    <span class="k">def</span> <span class="nf">do_client_exits</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">):</span>
+<div class="viewcode-block" id="CisRunner.do_client_exits"><a class="viewcode-back" href="../../code_python.html#cis_interface.runner.CisRunner.do_client_exits">[docs]</a>    <span class="k">def</span> <span class="nf">do_client_exits</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">):</span>
         <span class="sd">r&quot;&quot;&quot;Perform exits for IO drivers associated with a client model.</span>
 
 <span class="sd">        Args:</span>
@@ -570,7 +570,7 @@
                 <span class="n">iod</span><span class="p">[</span><span class="s1">&#39;instance&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">on_client_exit</span><span class="p">()</span>
                 <span class="n">srv</span><span class="p">[</span><span class="s1">&#39;instance&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="CisRunner.do_model_exits"><a class="viewcode-back" href="../../cis_interface.html#cis_interface.runner.CisRunner.do_model_exits">[docs]</a>    <span class="k">def</span> <span class="nf">do_model_exits</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">):</span>
+<div class="viewcode-block" id="CisRunner.do_model_exits"><a class="viewcode-back" href="../../code_python.html#cis_interface.runner.CisRunner.do_model_exits">[docs]</a>    <span class="k">def</span> <span class="nf">do_model_exits</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">):</span>
         <span class="sd">r&quot;&quot;&quot;Perform exits for IO drivers associated with a model.</span>
 
 <span class="sd">        Args:</span>
@@ -590,7 +590,7 @@
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">drv</span><span class="p">[</span><span class="s1">&#39;instance&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">on_model_exit</span><span class="p">()</span></div>
     
-<div class="viewcode-block" id="CisRunner.terminate"><a class="viewcode-back" href="../../cis_interface.html#cis_interface.runner.CisRunner.terminate">[docs]</a>    <span class="k">def</span> <span class="nf">terminate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="CisRunner.terminate"><a class="viewcode-back" href="../../code_python.html#cis_interface.runner.CisRunner.terminate">[docs]</a>    <span class="k">def</span> <span class="nf">terminate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">r&quot;&quot;&quot;Immediately stop all drivers, beginning with IO drivers.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
         <span class="c1"># self.closeChannels(force_stop=True)</span>
@@ -605,21 +605,21 @@
                 <span class="c1">#     driver[&#39;instance&#39;].join()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Returning&#39;</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="CisRunner.cleanup"><a class="viewcode-back" href="../../cis_interface.html#cis_interface.runner.CisRunner.cleanup">[docs]</a>    <span class="k">def</span> <span class="nf">cleanup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="CisRunner.cleanup"><a class="viewcode-back" href="../../code_python.html#cis_interface.runner.CisRunner.cleanup">[docs]</a>    <span class="k">def</span> <span class="nf">cleanup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">r&quot;&quot;&quot;Perform cleanup operations for all drivers.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">driver</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_drivers</span><span class="p">:</span>
             <span class="k">if</span> <span class="s1">&#39;instance&#39;</span> <span class="ow">in</span> <span class="n">driver</span><span class="p">:</span>
                 <span class="n">driver</span><span class="p">[</span><span class="s1">&#39;instance&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">cleanup</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="CisRunner.printStatus"><a class="viewcode-back" href="../../cis_interface.html#cis_interface.runner.CisRunner.printStatus">[docs]</a>    <span class="k">def</span> <span class="nf">printStatus</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="CisRunner.printStatus"><a class="viewcode-back" href="../../code_python.html#cis_interface.runner.CisRunner.printStatus">[docs]</a>    <span class="k">def</span> <span class="nf">printStatus</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">r&quot;&quot;&quot;Print the status of all drivers, starting with the IO drivers.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">driver</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_drivers</span><span class="p">:</span>
             <span class="k">if</span> <span class="s1">&#39;instance&#39;</span> <span class="ow">in</span> <span class="n">driver</span><span class="p">:</span>
                 <span class="n">driver</span><span class="p">[</span><span class="s1">&#39;instance&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">printStatus</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="CisRunner.closeChannels"><a class="viewcode-back" href="../../cis_interface.html#cis_interface.runner.CisRunner.closeChannels">[docs]</a>    <span class="k">def</span> <span class="nf">closeChannels</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">force_stop</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<div class="viewcode-block" id="CisRunner.closeChannels"><a class="viewcode-back" href="../../code_python.html#cis_interface.runner.CisRunner.closeChannels">[docs]</a>    <span class="k">def</span> <span class="nf">closeChannels</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">force_stop</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">r&quot;&quot;&quot;Stop IO drivers and join the threads.</span>
 
 <span class="sd">        Args:</span>
@@ -653,7 +653,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Returning&#39;</span><span class="p">)</span></div></div>
 
         
-<div class="viewcode-block" id="get_runner"><a class="viewcode-back" href="../../cis_interface.html#cis_interface.runner.get_runner">[docs]</a><span class="k">def</span> <span class="nf">get_runner</span><span class="p">(</span><span class="n">models</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="get_runner"><a class="viewcode-back" href="../../code_python.html#cis_interface.runner.get_runner">[docs]</a><span class="k">def</span> <span class="nf">get_runner</span><span class="p">(</span><span class="n">models</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="sd">r&quot;&quot;&quot;Get runner for a set of models, getting run information from the</span>
 <span class="sd">    environment.</span>
 
@@ -719,7 +719,7 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../../',
-            VERSION:'0.1.3',
+            VERSION:'0.2.0',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',

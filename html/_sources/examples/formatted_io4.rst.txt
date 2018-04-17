@@ -1,6 +1,50 @@
 formatted_io4 Example
 =====================
 
+C Version
+---------
+
+Model Code:
+
+.. literalinclude:: /../../cis_interface/examples/formatted_io4/src/formatted_io4_modelA.c
+   :language: python
+   :linenos:
+
+.. literalinclude:: /../../cis_interface/examples/formatted_io4/src/formatted_io4_modelB.c
+   :language: python
+   :linenos:
+
+
+Model YAML:
+
+.. literalinclude:: /../../cis_interface/examples/formatted_io4/formatted_io4_c.yml
+   :language: yaml
+   :linenos:
+
+
+
+Matlab Version
+--------------
+
+Model Code:
+
+.. literalinclude:: /../../cis_interface/examples/formatted_io4/src/formatted_io4_modelA.m
+   :language: python
+   :linenos:
+
+.. literalinclude:: /../../cis_interface/examples/formatted_io4/src/formatted_io4_modelB.m
+   :language: python
+   :linenos:
+
+
+Model YAML:
+
+.. literalinclude:: /../../cis_interface/examples/formatted_io4/formatted_io4_matlab.yml
+   :language: yaml
+   :linenos:
+
+
+
 Python Version
 --------------
 
@@ -40,50 +84,6 @@ Model Code:
 Model YAML:
 
 .. literalinclude:: /../../cis_interface/examples/formatted_io4/formatted_io4_cpp.yml
-   :language: yaml
-   :linenos:
-
-
-
-Matlab Version
---------------
-
-Model Code:
-
-.. literalinclude:: /../../cis_interface/examples/formatted_io4/src/formatted_io4_modelA.m
-   :language: python
-   :linenos:
-
-.. literalinclude:: /../../cis_interface/examples/formatted_io4/src/formatted_io4_modelB.m
-   :language: python
-   :linenos:
-
-
-Model YAML:
-
-.. literalinclude:: /../../cis_interface/examples/formatted_io4/formatted_io4_matlab.yml
-   :language: yaml
-   :linenos:
-
-
-
-C Version
----------
-
-Model Code:
-
-.. literalinclude:: /../../cis_interface/examples/formatted_io4/src/formatted_io4_modelA.c
-   :language: python
-   :linenos:
-
-.. literalinclude:: /../../cis_interface/examples/formatted_io4/src/formatted_io4_modelB.c
-   :language: python
-   :linenos:
-
-
-Model YAML:
-
-.. literalinclude:: /../../cis_interface/examples/formatted_io4/formatted_io4_c.yml
    :language: yaml
    :linenos:
 

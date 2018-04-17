@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>cis_interface package &mdash; cis_interface 0.1.3 documentation</title>
+  <title>cis_interface package &mdash; cis_interface 0.2.0 documentation</title>
   
 
   
@@ -58,7 +58,7 @@
             
             
               <div class="version">
-                0.1
+                0.2
               </div>
             
           
@@ -436,7 +436,7 @@ class&#8217;s get.</li>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
 <li><strong>env</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a><em>, </em><em>optional</em>) &#8211; Dictionary of environment variables that should
 be updated. Defaults to <cite>os.environ</cite>.</li>
-<li><strong>cfg</strong> (<a class="reference internal" href="#cis_interface.config.CisConfigParser" title="cis_interface.config.CisConfigParser"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.config.CisConfigParser</span></code></a>, optional) &#8211; Config parser with options that should be used to update the
+<li><strong>cfg</strong> (<a class="reference internal" href="code_python.html#cis_interface.config.CisConfigParser" title="cis_interface.config.CisConfigParser"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.config.CisConfigParser</span></code></a>, optional) &#8211; Config parser with options that should be used to update the
 environment. Defaults to <code class="xref py py-data docutils literal"><span class="pre">cis_interface.config.cis_cfg</span></code>.</li>
 </ul>
 </td>
@@ -453,7 +453,7 @@ environment. Defaults to <code class="xref py py-data docutils literal"><span cl
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>cfg</strong> (<a class="reference internal" href="#cis_interface.config.CisConfigParser" title="cis_interface.config.CisConfigParser"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.config.CisConfigParser</span></code></a>, optional) &#8211; Config parser with options that should be used to update the
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>cfg</strong> (<a class="reference internal" href="code_python.html#cis_interface.config.CisConfigParser" title="cis_interface.config.CisConfigParser"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.config.CisConfigParser</span></code></a>, optional) &#8211; Config parser with options that should be used to update the
 environment. Defaults to <code class="xref py py-data docutils literal"><span class="pre">cis_interface.config.cis_cfg</span></code>.</td>
 </tr>
 </tbody>
@@ -471,7 +471,7 @@ environment. Defaults to <code class="xref py py-data docutils literal"><span cl
 <dl class="class">
 <dt id="cis_interface.runner.CisRunner">
 <em class="property">class </em><code class="descclassname">cis_interface.runner.</code><code class="descname">CisRunner</code><span class="sig-paren">(</span><em>modelYmls</em>, <em>namespace</em>, <em>host=None</em>, <em>rank=0</em>, <em>cis_debug_level=None</em>, <em>rmq_debug_level=None</em>, <em>cis_debug_prefix=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/runner.html#CisRunner"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.runner.CisRunner" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#cis_interface.tools.CisClass" title="cis_interface.tools.CisClass"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.tools.CisClass</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="code_python.html#cis_interface.tools.CisClass" title="cis_interface.tools.CisClass"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.tools.CisClass</span></code></a></p>
 <p>This class handles the orchestration of starting the model and
 IO drivers, monitoring their progress, and cleaning up on exit.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -798,7 +798,7 @@ that should be run.</li>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Runner for the provided models.</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first"><a class="reference internal" href="#cis_interface.runner.CisRunner" title="cis_interface.runner.CisRunner">CisRunner</a></p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first"><a class="reference internal" href="code_python.html#cis_interface.runner.CisRunner" title="cis_interface.runner.CisRunner">CisRunner</a></p>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.6)"><code class="xref py py-exc docutils literal"><span class="pre">Exception</span></code></a> &#8211; If config option &#8216;namespace&#8217; in &#8216;rmq&#8217; section not set.</p>
@@ -1362,7 +1362,7 @@ Defaults to True.</li>
 <dl class="class">
 <dt id="cis_interface.tools.CisThread">
 <em class="property">class </em><code class="descclassname">cis_interface.tools.</code><code class="descname">CisThread</code><span class="sig-paren">(</span><em>name=None</em>, <em>target=None</em>, <em>args=()</em>, <em>kwargs=None</em>, <em>daemon=False</em>, <em>group=None</em>, <em>**cis_kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tools.html#CisThread"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tools.CisThread" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/threading.html#threading.Thread" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">threading.Thread</span></code></a>, <a class="reference internal" href="#cis_interface.tools.CisClass" title="cis_interface.tools.CisClass"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.tools.CisClass</span></code></a></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/threading.html#threading.Thread" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">threading.Thread</span></code></a>, <a class="reference internal" href="code_python.html#cis_interface.tools.CisClass" title="cis_interface.tools.CisClass"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.tools.CisClass</span></code></a></p>
 <p>Thread for CiS that tracks when the thread is started and joined.</p>
 <dl class="attribute">
 <dt id="cis_interface.tools.CisThread.lock">
@@ -1501,7 +1501,7 @@ Defaults to None and is set based on the stack trace.</li>
 <dl class="class">
 <dt id="cis_interface.tools.CisThreadLoop">
 <em class="property">class </em><code class="descclassname">cis_interface.tools.</code><code class="descname">CisThreadLoop</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tools.html#CisThreadLoop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tools.CisThreadLoop" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#cis_interface.tools.CisThread" title="cis_interface.tools.CisThread"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.tools.CisThread</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="code_python.html#cis_interface.tools.CisThread" title="cis_interface.tools.CisThread"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.tools.CisThread</span></code></a></p>
 <p>Thread that will run a loop until the terminate event is called.</p>
 <dl class="method">
 <dt id="cis_interface.tools.CisThreadLoop.after_loop">
@@ -1757,7 +1757,7 @@ Defaults to True.</li>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Process that was started.</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="#cis_interface.tools.CisPopen" title="cis_interface.tools.CisPopen">CisPopen</a></p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="code_python.html#cis_interface.tools.CisPopen" title="cis_interface.tools.CisPopen">CisPopen</a></p>
 </td>
 </tr>
 </tbody>
@@ -2039,7 +2039,7 @@ such that they can be run simultaneously, passing input back and forth.</p>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'0.1.3',
+            VERSION:'0.2.0',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
