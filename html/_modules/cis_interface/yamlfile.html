@@ -1,0 +1,568 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>cis_interface.yamlfile &mdash; cis_interface 0.1.3 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> cis_interface
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../includeme.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../formatted_io.html">Formatted I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../server_client_io.html">Server/Client I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../server_client_io.html#one-server-two-clients">One Server, Two Clients</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../yaml.html">YAML Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../config.html">Configuration Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../units.html">Units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../c_format_strings.html">C-Style Format Strings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../io_drivers.html">Input/Output Drivers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../model_drivers.html">Model Drivers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../code.html">Code</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples/examples_toc.html">Examples</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">cis_interface</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>cis_interface.yamlfile</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for cis_interface.yamlfile</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">pystache</span>
+<span class="kn">import</span> <span class="nn">yaml</span>
+<span class="kn">from</span> <span class="nn">cis_interface</span> <span class="k">import</span> <span class="n">backwards</span>
+
+
+<div class="viewcode-block" id="load_yaml"><a class="viewcode-back" href="../../cis_interface.html#cis_interface.yamlfile.load_yaml">[docs]</a><span class="k">def</span> <span class="nf">load_yaml</span><span class="p">(</span><span class="n">fname</span><span class="p">):</span>
+    <span class="sd">r&quot;&quot;&quot;Parse a yaml file defining a run.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        fname (str): Path to the yaml file.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dict: Contents of yaml file.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">fname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">realpath</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">fname</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s2">&quot;Unable locate yaml file </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">fname</span><span class="p">)</span>
+    <span class="c1"># Open file and parse yaml</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="c1"># Mustache replace vars</span>
+        <span class="n">yamlparsed</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+        <span class="n">yamlparsed</span> <span class="o">=</span> <span class="n">pystache</span><span class="o">.</span><span class="n">render</span><span class="p">(</span>
+            <span class="n">backwards</span><span class="o">.</span><span class="n">StringIO</span><span class="p">(</span><span class="n">yamlparsed</span><span class="p">)</span><span class="o">.</span><span class="n">getvalue</span><span class="p">(),</span> <span class="nb">dict</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">))</span>
+        <span class="n">yamlparsed</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">safe_load</span><span class="p">(</span><span class="n">yamlparsed</span><span class="p">)</span>
+    <span class="n">yamlparsed</span><span class="p">[</span><span class="s1">&#39;workingDir&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">yamlparsed</span></div>
+
+
+<div class="viewcode-block" id="parse_yaml"><a class="viewcode-back" href="../../cis_interface.html#cis_interface.yamlfile.parse_yaml">[docs]</a><span class="k">def</span> <span class="nf">parse_yaml</span><span class="p">(</span><span class="n">files</span><span class="p">):</span>
+    <span class="sd">r&quot;&quot;&quot;Parse list of yaml files.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        files (str, list): Either the path to a single yaml file or a list of</span>
+<span class="sd">            yaml files.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        RuntimeError: If one of the I/O channels is not initialized with driver</span>
+<span class="sd">            information.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dict: Dictionary of information parsed from the yamls.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">existing</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">input</span><span class="o">=</span><span class="p">{},</span> <span class="n">output</span><span class="o">=</span><span class="p">{},</span> <span class="n">model</span><span class="o">=</span><span class="p">{},</span> <span class="n">connection</span><span class="o">=</span><span class="p">{})</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">files</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">files</span> <span class="o">=</span> <span class="p">[</span><span class="n">files</span><span class="p">]</span>
+    <span class="c1"># Load each file</span>
+    <span class="n">yamls</span> <span class="o">=</span> <span class="p">[</span><span class="n">load_yaml</span><span class="p">(</span><span class="n">f</span><span class="p">)</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">files</span><span class="p">]</span>
+    <span class="c1"># Parse models, then connections to ensure connections can be processed</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;models&#39;</span><span class="p">,</span> <span class="s1">&#39;connections&#39;</span><span class="p">]:</span>
+        <span class="k">for</span> <span class="n">yml</span> <span class="ow">in</span> <span class="n">yamls</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">yml</span><span class="p">:</span>
+                <span class="n">yml</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">yml</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="nb">list</span><span class="p">):</span>
+                <span class="n">yml</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">yml</span><span class="p">[</span><span class="n">k</span><span class="p">]]</span>
+            <span class="k">if</span> <span class="n">k</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="ow">in</span> <span class="n">yml</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">yml</span><span class="p">[</span><span class="n">k</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]],</span> <span class="nb">list</span><span class="p">):</span>
+                    <span class="n">yml</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">+=</span> <span class="n">yml</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">k</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">yml</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">yml</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">k</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span>
+            <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">yml</span><span class="p">[</span><span class="n">k</span><span class="p">]:</span>
+                <span class="n">existing</span> <span class="o">=</span> <span class="n">parse_component</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">k</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">yml</span><span class="p">[</span><span class="s1">&#39;workingDir&#39;</span><span class="p">],</span>
+                                           <span class="n">existing</span><span class="o">=</span><span class="n">existing</span><span class="p">)</span>
+    <span class="c1"># Make sure that I/O channels initialized</span>
+    <span class="k">for</span> <span class="n">io</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;input&#39;</span><span class="p">,</span> <span class="s1">&#39;output&#39;</span><span class="p">]:</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">existing</span><span class="p">[</span><span class="n">io</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="s1">&#39;driver&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">v</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;No driver established for </span><span class="si">%s</span><span class="s2"> channel </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span>
+                    <span class="n">io</span><span class="p">,</span> <span class="n">k</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">existing</span></div>
+
+
+<div class="viewcode-block" id="parse_component"><a class="viewcode-back" href="../../cis_interface.html#cis_interface.yamlfile.parse_component">[docs]</a><span class="k">def</span> <span class="nf">parse_component</span><span class="p">(</span><span class="n">yml</span><span class="p">,</span> <span class="n">ctype</span><span class="p">,</span> <span class="n">yamldir</span><span class="p">,</span> <span class="n">existing</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">r&quot;&quot;&quot;Parse a yaml entry for a component, adding it to the list of</span>
+<span class="sd">    existing components.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        yml (dict): YAML dictionary for a component.</span>
+<span class="sd">        ctype (str): Component type. This can be &#39;input&#39;, &#39;output&#39;,</span>
+<span class="sd">            &#39;model&#39;, or &#39;connection&#39;.</span>
+<span class="sd">        yamldir (str): Full path to directory containing the yaml this</span>
+<span class="sd">            component was in.</span>
+<span class="sd">        existing (dict, optional): Dictionary of existing components.</span>
+<span class="sd">            Defaults to empty dict.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        TypeError: If yml is not a dictionary.</span>
+<span class="sd">        ValueError: If dtype is not &#39;input&#39;, &#39;output&#39;, &#39;model&#39;, or</span>
+<span class="sd">            &#39;connection&#39;.</span>
+<span class="sd">        RuntimeError: If the yml dictionary is missing a required keyword.</span>
+<span class="sd">        ValueError: If the component already exists.</span>
+<span class="sd">        RuntimeError: If &#39;kwargs&#39; is an entry in the yml.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dict: All components identified.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">yml</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Component entry in yml must be a dictionary.&quot;</span><span class="p">)</span>
+    <span class="n">ctype_list</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;input&#39;</span><span class="p">,</span> <span class="s1">&#39;output&#39;</span><span class="p">,</span> <span class="s1">&#39;model&#39;</span><span class="p">,</span> <span class="s1">&#39;connection&#39;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">existing</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">existing</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="p">{}</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">ctype_list</span><span class="p">}</span>
+    <span class="k">if</span> <span class="n">ctype</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ctype_list</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;&#39;</span><span class="si">%s</span><span class="s2">&#39; is not a recognized component.&quot;</span><span class="p">)</span>
+    <span class="c1"># Parse based on type</span>
+    <span class="k">if</span> <span class="n">ctype</span> <span class="o">==</span> <span class="s1">&#39;model&#39;</span><span class="p">:</span>
+        <span class="n">existing</span> <span class="o">=</span> <span class="n">parse_model</span><span class="p">(</span><span class="n">yml</span><span class="p">,</span> <span class="n">yamldir</span><span class="p">,</span> <span class="n">existing</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">ctype</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;input&#39;</span><span class="p">,</span> <span class="s1">&#39;output&#39;</span><span class="p">]:</span>
+        <span class="n">existing</span> <span class="o">=</span> <span class="n">parse_io</span><span class="p">(</span><span class="n">yml</span><span class="p">,</span> <span class="n">yamldir</span><span class="p">,</span> <span class="n">existing</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">ctype</span> <span class="o">==</span> <span class="s1">&#39;connection&#39;</span><span class="p">:</span>
+        <span class="n">existing</span> <span class="o">=</span> <span class="n">parse_connection</span><span class="p">(</span><span class="n">yml</span><span class="p">,</span> <span class="n">yamldir</span><span class="p">,</span> <span class="n">existing</span><span class="p">)</span>
+    <span class="n">yml</span><span class="p">[</span><span class="s1">&#39;workingDir&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">yamldir</span>
+    <span class="c1"># Ensure component dosn&#39;t already exist</span>
+    <span class="k">if</span> <span class="n">yml</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="n">existing</span><span class="p">[</span><span class="n">ctype</span><span class="p">]:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> is already a registered &#39;</span><span class="si">%s</span><span class="s2">&#39; component.&quot;</span> <span class="o">%</span> <span class="p">(</span>
+            <span class="n">yml</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">],</span> <span class="n">ctype</span><span class="p">))</span>
+    <span class="n">existing</span><span class="p">[</span><span class="n">ctype</span><span class="p">][</span><span class="n">yml</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">yml</span>
+    <span class="k">return</span> <span class="n">existing</span></div>
+
+
+<div class="viewcode-block" id="parse_model"><a class="viewcode-back" href="../../cis_interface.html#cis_interface.yamlfile.parse_model">[docs]</a><span class="k">def</span> <span class="nf">parse_model</span><span class="p">(</span><span class="n">yml</span><span class="p">,</span> <span class="n">yamldir</span><span class="p">,</span> <span class="n">existing</span><span class="p">):</span>
+    <span class="sd">r&quot;&quot;&quot;Parse a yaml entry for a model.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        yml (dict): YAML dictionary for a model.</span>
+<span class="sd">        yamldir (str): Full path to directory containing the yaml this</span>
+<span class="sd">            component was in.</span>
+<span class="sd">        existing (dict): Dictionary of existing components.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        RuntimeError: If the yml dictionary is missing a required keyword.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dict: Updated log of all entries.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">kws_required</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;driver&#39;</span><span class="p">,</span> <span class="s1">&#39;args&#39;</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">kws_required</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">yml</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">((</span><span class="s2">&quot;The yml specs for component &#39;</span><span class="si">%s</span><span class="s2">&#39; is missing &quot;</span> <span class="o">+</span>
+                                <span class="s2">&quot;required keyword &#39;</span><span class="si">%s</span><span class="s2">&#39;.&quot;</span><span class="p">)</span> <span class="o">%</span> <span class="p">(</span>
+                                    <span class="n">yml</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span> <span class="n">k</span><span class="p">))</span>
+    <span class="c1"># Init I/O channels</span>
+    <span class="k">for</span> <span class="n">io</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;inputs&#39;</span><span class="p">,</span> <span class="s1">&#39;outputs&#39;</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="n">io</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">yml</span><span class="p">:</span>
+            <span class="n">yml</span><span class="p">[</span><span class="n">io</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">yml</span><span class="p">[</span><span class="n">io</span><span class="p">],</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="n">yml</span><span class="p">[</span><span class="n">io</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">yml</span><span class="p">[</span><span class="n">io</span><span class="p">]]</span>
+        <span class="k">if</span> <span class="n">io</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="ow">in</span> <span class="n">yml</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">yml</span><span class="p">[</span><span class="n">io</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]],</span> <span class="nb">list</span><span class="p">):</span>
+                <span class="n">yml</span><span class="p">[</span><span class="n">io</span><span class="p">]</span> <span class="o">+=</span> <span class="n">yml</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">io</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">yml</span><span class="p">[</span><span class="n">io</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">yml</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">io</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">yml</span><span class="p">[</span><span class="n">io</span><span class="p">])):</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">yml</span><span class="p">[</span><span class="n">io</span><span class="p">][</span><span class="n">i</span><span class="p">],</span> <span class="nb">str</span><span class="p">):</span>
+                <span class="n">yml</span><span class="p">[</span><span class="n">io</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">yml</span><span class="p">[</span><span class="n">io</span><span class="p">][</span><span class="n">i</span><span class="p">])</span>
+    <span class="c1"># Add server driver</span>
+    <span class="k">if</span> <span class="n">yml</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;is_server&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+        <span class="n">srv</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">yml</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">],</span>
+               <span class="s1">&#39;driver&#39;</span><span class="p">:</span> <span class="s1">&#39;ServerDriver&#39;</span><span class="p">,</span>
+               <span class="s1">&#39;args&#39;</span><span class="p">:</span> <span class="n">yml</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;_SERVER&#39;</span><span class="p">}</span>
+        <span class="n">yml</span><span class="p">[</span><span class="s1">&#39;inputs&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">srv</span><span class="p">)</span>
+        <span class="n">yml</span><span class="p">[</span><span class="s1">&#39;clients&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="c1"># Add client driver</span>
+    <span class="k">if</span> <span class="n">yml</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;client_of&#39;</span><span class="p">,</span> <span class="p">[]):</span>
+        <span class="n">srv_names</span> <span class="o">=</span> <span class="n">yml</span><span class="p">[</span><span class="s1">&#39;client_of&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">srv_names</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">srv_names</span> <span class="o">=</span> <span class="p">[</span><span class="n">srv_names</span><span class="p">]</span>
+        <span class="n">yml</span><span class="p">[</span><span class="s1">&#39;client_of&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">srv_names</span>
+        <span class="k">for</span> <span class="n">srv</span> <span class="ow">in</span> <span class="n">srv_names</span><span class="p">:</span>
+            <span class="n">cli</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">_</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">srv</span><span class="p">,</span> <span class="n">yml</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]),</span>
+                   <span class="s1">&#39;driver&#39;</span><span class="p">:</span> <span class="s1">&#39;ClientDriver&#39;</span><span class="p">,</span>
+                   <span class="s1">&#39;args&#39;</span><span class="p">:</span> <span class="n">srv</span> <span class="o">+</span> <span class="s1">&#39;_SERVER&#39;</span><span class="p">}</span>
+            <span class="n">yml</span><span class="p">[</span><span class="s1">&#39;outputs&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cli</span><span class="p">)</span>
+    <span class="c1"># Model index and I/O channels</span>
+    <span class="n">yml</span><span class="p">[</span><span class="s1">&#39;model_index&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">existing</span><span class="p">[</span><span class="s1">&#39;model&#39;</span><span class="p">])</span>
+    <span class="k">for</span> <span class="n">io</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;inputs&#39;</span><span class="p">,</span> <span class="s1">&#39;outputs&#39;</span><span class="p">]:</span>
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">yml</span><span class="p">[</span><span class="n">io</span><span class="p">]:</span>
+            <span class="n">x</span><span class="p">[</span><span class="s1">&#39;model_driver&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">yml</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span>
+            <span class="n">existing</span> <span class="o">=</span> <span class="n">parse_component</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">io</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">yamldir</span><span class="p">,</span> <span class="n">existing</span><span class="o">=</span><span class="n">existing</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">existing</span></div>
+
+    
+<div class="viewcode-block" id="parse_io"><a class="viewcode-back" href="../../cis_interface.html#cis_interface.yamlfile.parse_io">[docs]</a><span class="k">def</span> <span class="nf">parse_io</span><span class="p">(</span><span class="n">yml</span><span class="p">,</span> <span class="n">yamldir</span><span class="p">,</span> <span class="n">existing</span><span class="p">):</span>
+    <span class="sd">r&quot;&quot;&quot;Parse a yaml entry for an I/O channel.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        yml (dict): YAML dictionary for an I/O channel.</span>
+<span class="sd">        yamldir (str): Full path to directory containing the yaml this</span>
+<span class="sd">            component was in.</span>
+<span class="sd">        existing (dict): Dictionary of existing components.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        RuntimeError: If the yml dictionary is missing a required keyword.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dict: Updated log of all entries.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">is_driver</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;driver&#39;</span> <span class="ow">in</span> <span class="n">yml</span><span class="p">)</span>
+    <span class="n">kws_required</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">is_driver</span><span class="p">:</span>
+        <span class="n">kws_required</span> <span class="o">+=</span> <span class="p">[</span><span class="s1">&#39;driver&#39;</span><span class="p">,</span> <span class="s1">&#39;args&#39;</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">kws_required</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">yml</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">((</span><span class="s2">&quot;The yml specs for component &#39;</span><span class="si">%s</span><span class="s2">&#39; is missing &quot;</span> <span class="o">+</span>
+                                <span class="s2">&quot;required keyword &#39;</span><span class="si">%s</span><span class="s2">&#39;.&quot;</span><span class="p">)</span> <span class="o">%</span> <span class="p">(</span>
+                                    <span class="n">yml</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span> <span class="n">k</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">existing</span></div>
+
+
+<div class="viewcode-block" id="parse_connection"><a class="viewcode-back" href="../../cis_interface.html#cis_interface.yamlfile.parse_connection">[docs]</a><span class="k">def</span> <span class="nf">parse_connection</span><span class="p">(</span><span class="n">yml</span><span class="p">,</span> <span class="n">yamldir</span><span class="p">,</span> <span class="n">existing</span><span class="p">):</span>
+    <span class="sd">r&quot;&quot;&quot;Parse a yaml entry for a connection between I/O channels.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        yml (dict): YAML dictionary for a connection.</span>
+<span class="sd">        yamldir (str): Full path to directory containing the yaml this</span>
+<span class="sd">            component was in.</span>
+<span class="sd">        existing (dict): Dictionary of existing components.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        RuntimeError: If the yml dictionary is missing a required keyword.</span>
+<span class="sd">        AssertionError: If the &#39;input&#39; or &#39;output&#39; entry is not a string.</span>
+<span class="sd">        RuntimeError: If the &#39;input&#39; entry is not a model output or file.</span>
+<span class="sd">        RuntimeError: If neither the &#39;input&#39; or &#39;output&#39; entries correspond</span>
+<span class="sd">            to model I/O channels.</span>
+<span class="sd">        ValueError: If the &#39;input&#39; is a file and &#39;read_meth&#39; entry is not</span>
+<span class="sd">           &#39;all&#39;, &#39;line&#39;, &#39;table&#39;, or &#39;table_array&#39;.</span>
+<span class="sd">        ValueError: If the &#39;output&#39; is a file and &#39;write_meth&#39; entry is not</span>
+<span class="sd">           &#39;all&#39;, &#39;line&#39;, &#39;table&#39;, or &#39;table_array&#39;.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dict: Updated log of all entries.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">kws_required</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;input&#39;</span><span class="p">,</span> <span class="s1">&#39;output&#39;</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">kws_required</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">yml</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">((</span><span class="s2">&quot;The yml specs for component &#39;</span><span class="si">%s</span><span class="s2">&#39; is missing &quot;</span> <span class="o">+</span>
+                                <span class="s2">&quot;required keyword &#39;</span><span class="si">%s</span><span class="s2">&#39;.&quot;</span><span class="p">)</span> <span class="o">%</span> <span class="p">(</span>
+                                    <span class="n">yml</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span> <span class="n">k</span><span class="p">))</span>
+    <span class="k">assert</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">yml</span><span class="p">[</span><span class="s1">&#39;input&#39;</span><span class="p">],</span> <span class="nb">str</span><span class="p">))</span>
+    <span class="k">assert</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">yml</span><span class="p">[</span><span class="s1">&#39;output&#39;</span><span class="p">],</span> <span class="nb">str</span><span class="p">))</span>
+    <span class="n">in_name</span> <span class="o">=</span> <span class="n">yml</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;input&#39;</span><span class="p">)</span>
+    <span class="n">out_name</span> <span class="o">=</span> <span class="n">yml</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;output&#39;</span><span class="p">)</span>
+    <span class="c1"># File input</span>
+    <span class="k">if</span> <span class="n">in_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">existing</span><span class="p">[</span><span class="s1">&#39;output&#39;</span><span class="p">]:</span>
+        <span class="n">in_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">realpath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">yamldir</span><span class="p">,</span> <span class="n">in_name</span><span class="p">))</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">in_path</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">((</span><span class="s2">&quot;Input &#39;</span><span class="si">%s</span><span class="s2">&#39; not found in any of the registered &quot;</span> <span class="o">+</span>
+                                <span class="s2">&quot;model outputs and is not a file.&quot;</span><span class="p">)</span> <span class="o">%</span> <span class="n">in_name</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">out_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">existing</span><span class="p">[</span><span class="s1">&#39;input&#39;</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">((</span><span class="s2">&quot;Output &#39;</span><span class="si">%s</span><span class="s2">&#39; not found in any of the model &quot;</span> <span class="o">+</span>
+                                <span class="s2">&quot;inputs and cannot be a file.&quot;</span><span class="p">)</span> <span class="o">%</span> <span class="n">out_name</span><span class="p">)</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="n">in_path</span>
+        <span class="n">xi</span> <span class="o">=</span> <span class="n">existing</span><span class="p">[</span><span class="s1">&#39;input&#39;</span><span class="p">][</span><span class="n">out_name</span><span class="p">]</span>
+        <span class="n">xi</span><span class="p">[</span><span class="s1">&#39;args&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">args</span>
+        <span class="n">read_meth</span> <span class="o">=</span> <span class="n">yml</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;read_meth&#39;</span><span class="p">,</span> <span class="s1">&#39;all&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">read_meth</span> <span class="o">==</span> <span class="s1">&#39;all&#39;</span><span class="p">:</span>
+            <span class="n">xi</span><span class="p">[</span><span class="s1">&#39;driver&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;FileInputDriver&#39;</span>
+        <span class="k">elif</span> <span class="n">read_meth</span> <span class="o">==</span> <span class="s1">&#39;line&#39;</span><span class="p">:</span>
+            <span class="n">xi</span><span class="p">[</span><span class="s1">&#39;driver&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;AsciiFileInputDriver&#39;</span>
+        <span class="k">elif</span> <span class="n">read_meth</span> <span class="o">==</span> <span class="s1">&#39;table&#39;</span><span class="p">:</span>
+            <span class="n">xi</span><span class="p">[</span><span class="s1">&#39;driver&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;AsciiTableInputDriver&#39;</span>
+        <span class="k">elif</span> <span class="n">read_meth</span> <span class="o">==</span> <span class="s1">&#39;table_array&#39;</span><span class="p">:</span>
+            <span class="n">xi</span><span class="p">[</span><span class="s1">&#39;driver&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;AsciiTableInputDriver&#39;</span>
+            <span class="n">xi</span><span class="p">[</span><span class="s1">&#39;as_array&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">elif</span> <span class="n">read_meth</span> <span class="o">==</span> <span class="s1">&#39;pandas&#39;</span><span class="p">:</span>
+            <span class="n">xi</span><span class="p">[</span><span class="s1">&#39;driver&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;PandasFileInputDriver&#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid read_meth &#39;</span><span class="si">%s</span><span class="s2">&#39;.&quot;</span> <span class="o">%</span> <span class="n">read_meth</span><span class="p">)</span>
+        <span class="n">xo</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="c1"># File output</span>
+    <span class="k">elif</span> <span class="n">out_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">existing</span><span class="p">[</span><span class="s1">&#39;input&#39;</span><span class="p">]:</span>
+        <span class="n">xo</span> <span class="o">=</span> <span class="n">existing</span><span class="p">[</span><span class="s1">&#39;output&#39;</span><span class="p">][</span><span class="n">in_name</span><span class="p">]</span>
+        <span class="n">in_temp</span> <span class="o">=</span> <span class="n">xo</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;in_temp&#39;</span><span class="p">,</span> <span class="n">yml</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;in_temp&#39;</span><span class="p">,</span> <span class="s1">&#39;False&#39;</span><span class="p">))</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">in_temp</span><span class="p">,</span> <span class="n">backwards</span><span class="o">.</span><span class="n">string_types</span><span class="p">):</span>
+            <span class="n">in_temp</span> <span class="o">=</span> <span class="nb">eval</span><span class="p">(</span><span class="n">in_temp</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">in_temp</span><span class="p">:</span>
+            <span class="n">out_path</span> <span class="o">=</span> <span class="n">out_name</span>
+            <span class="n">xo</span><span class="p">[</span><span class="s1">&#39;in_temp&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">out_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">realpath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">yamldir</span><span class="p">,</span> <span class="n">out_name</span><span class="p">))</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="n">out_path</span>
+        <span class="n">xo</span><span class="p">[</span><span class="s1">&#39;args&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">args</span>
+        <span class="n">write_meth</span> <span class="o">=</span> <span class="n">yml</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;write_meth&#39;</span><span class="p">,</span> <span class="s1">&#39;all&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">write_meth</span> <span class="o">==</span> <span class="s1">&#39;all&#39;</span><span class="p">:</span>
+            <span class="n">xo</span><span class="p">[</span><span class="s1">&#39;driver&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;FileOutputDriver&#39;</span>
+        <span class="k">elif</span> <span class="n">write_meth</span> <span class="o">==</span> <span class="s1">&#39;line&#39;</span><span class="p">:</span>
+            <span class="n">xo</span><span class="p">[</span><span class="s1">&#39;driver&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;AsciiFileOutputDriver&#39;</span>
+        <span class="k">elif</span> <span class="n">write_meth</span> <span class="o">==</span> <span class="s1">&#39;table&#39;</span><span class="p">:</span>
+            <span class="n">xo</span><span class="p">[</span><span class="s1">&#39;driver&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;AsciiTableOutputDriver&#39;</span>
+        <span class="k">elif</span> <span class="n">write_meth</span> <span class="o">==</span> <span class="s1">&#39;table_array&#39;</span><span class="p">:</span>
+            <span class="n">xo</span><span class="p">[</span><span class="s1">&#39;driver&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;AsciiTableOutputDriver&#39;</span>
+            <span class="n">xo</span><span class="p">[</span><span class="s1">&#39;as_array&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">elif</span> <span class="n">write_meth</span> <span class="o">==</span> <span class="s1">&#39;pandas&#39;</span><span class="p">:</span>
+            <span class="n">xo</span><span class="p">[</span><span class="s1">&#39;driver&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;PandasFileOutputDriver&#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid write_meth &#39;</span><span class="si">%s</span><span class="s2">&#39;.&quot;</span> <span class="o">%</span> <span class="n">write_meth</span><span class="p">)</span>
+        <span class="n">xi</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="c1"># Generic Input/Output</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">_to_</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">in_name</span><span class="p">,</span> <span class="n">out_name</span><span class="p">)</span>
+        <span class="c1"># TODO: Use RMQ drivers when models are on different machines</span>
+        <span class="c1"># Output</span>
+        <span class="n">xo</span> <span class="o">=</span> <span class="n">existing</span><span class="p">[</span><span class="s1">&#39;output&#39;</span><span class="p">][</span><span class="n">in_name</span><span class="p">]</span>
+        <span class="n">xo</span><span class="p">[</span><span class="s1">&#39;args&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">args</span>
+        <span class="n">xo</span><span class="p">[</span><span class="s1">&#39;driver&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;OutputDriver&#39;</span>
+        <span class="c1"># Input</span>
+        <span class="n">xi</span> <span class="o">=</span> <span class="n">existing</span><span class="p">[</span><span class="s1">&#39;input&#39;</span><span class="p">][</span><span class="n">out_name</span><span class="p">]</span>
+        <span class="n">xi</span><span class="p">[</span><span class="s1">&#39;args&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">args</span>
+        <span class="n">xi</span><span class="p">[</span><span class="s1">&#39;driver&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;InputDriver&#39;</span>
+    <span class="c1"># Transfer connection keywords to one connection driver</span>
+    <span class="k">if</span> <span class="n">xi</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">xo</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="o">**</span><span class="n">yml</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">xi</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="o">**</span><span class="n">yml</span><span class="p">)</span>
+    <span class="n">yml</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">args</span>
+    <span class="c1"># Direct comm keywords to input/output</span>
+    <span class="n">comm_fields</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;format_str&#39;</span><span class="p">,</span> <span class="s1">&#39;field_names&#39;</span><span class="p">,</span> <span class="s1">&#39;field_units&#39;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">xi</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">xi</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;icomm_kws&#39;</span><span class="p">,</span> <span class="nb">dict</span><span class="p">())</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">comm_fields</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">xi</span><span class="p">:</span>
+                <span class="n">v</span> <span class="o">=</span> <span class="n">xi</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;field_names&#39;</span><span class="p">,</span> <span class="s1">&#39;field_units&#39;</span><span class="p">]:</span>
+                    <span class="n">xi</span><span class="p">[</span><span class="s1">&#39;icomm_kws&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="p">[</span><span class="n">n</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">v</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)])</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">xi</span><span class="p">[</span><span class="s1">&#39;icomm_kws&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">xo</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">xo</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;ocomm_kws&#39;</span><span class="p">,</span> <span class="nb">dict</span><span class="p">())</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">comm_fields</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">xo</span><span class="p">:</span>
+                <span class="n">v</span> <span class="o">=</span> <span class="n">xo</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;field_names&#39;</span><span class="p">,</span> <span class="s1">&#39;field_units&#39;</span><span class="p">]:</span>
+                    <span class="n">xo</span><span class="p">[</span><span class="s1">&#39;ocomm_kws&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="p">[</span><span class="n">n</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">v</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)])</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">xo</span><span class="p">[</span><span class="s1">&#39;ocomm_kws&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">existing</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Meagan Lang, David Raila.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'0.1.3',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          
+          SphinxRtdTheme.Navigation.enableSticky();
+          
+      });
+  </script> 
+
+</body>
+</html>

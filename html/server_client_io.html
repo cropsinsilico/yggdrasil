@@ -1,0 +1,917 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Server/Client I/O &mdash; cis_interface 0.1.3 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="YAML Files" href="yaml.html" />
+    <link rel="prev" title="Formatted I/O" href="formatted_io.html" /> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> cis_interface
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="includeme.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="formatted_io.html">Formatted I/O</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Server/Client I/O</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#one-server-one-client">One Server, One Client</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="#one-server-two-clients">One Server, Two Clients</a></li>
+<li class="toctree-l1"><a class="reference internal" href="yaml.html">YAML Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="config.html">Configuration Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="units.html">Units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="c_format_strings.html">C-Style Format Strings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="io_drivers.html">Input/Output Drivers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="model_drivers.html">Model Drivers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="code.html">Code</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/examples_toc.html">Examples</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">cis_interface</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Server/Client I/O</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/server_client_io.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="server-client-i-o">
+<h1>Server/Client I/O<a class="headerlink" href="#server-client-i-o" title="Permalink to this headline">¶</a></h1>
+<p>Often you will want to call one model from another like a functions. This
+would required sending the input variable(s) to the model being called and
+then sending the output variables(s) back to the calling model. We refer to
+this as a Remote Procedure Call (RPC). The model being called can be considered
+a server providing its calculations as a service to the client (the calling model).
+The cis_interface provides options for treating models as server and clients.</p>
+<div class="section" id="one-server-one-client">
+<h2>One Server, One Client<a class="headerlink" href="#one-server-one-client" title="Permalink to this headline">¶</a></h2>
+<p>In the example below, the &#8220;server&#8221; model computes the nth number in the
+Fibonacci sequence and the &#8220;client&#8221; model calls the server to get a certain
+portion of the Fibonacci sequences and then writes it to a log. The server
+will continue processing requests until all clients connected to it have
+disconnected.</p>
+<p>Model Code:</p>
+<div class="highlight-python"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">from</span> <span class="nn">cis_interface.interface.CisInterface</span> <span class="kn">import</span> <span class="n">CisRpcServer</span>
+
+
+<span class="k">def</span> <span class="nf">get_fibonacci</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+    <span class="sd">r&quot;&quot;&quot;Compute the nth number of the Fibonacci sequence.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        n (int): Index of the Fibonacci number in the Fibonacci sequence that</span>
+<span class="sd">            should be returned.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        int: The nth Fibonacci number.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">pprev</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">prev</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">fib_no</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">while</span> <span class="n">fib_no</span> <span class="o">&lt;</span> <span class="n">n</span><span class="p">:</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">prev</span> <span class="o">+</span> <span class="n">pprev</span>
+        <span class="n">pprev</span> <span class="o">=</span> <span class="n">prev</span>
+        <span class="n">prev</span> <span class="o">=</span> <span class="n">result</span>
+        <span class="n">fib_no</span> <span class="o">=</span> <span class="n">fib_no</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="k">return</span> <span class="n">result</span>
+
+
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="sd">r&quot;&quot;&quot;Function to execute server communication and computation in a loop.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        int: Exit code. Negative if an error occurred.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">exit_code</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Hello from Python server!&#39;</span><span class="p">)</span>
+
+    <span class="c1"># Create server-side rpc conneciton using model name</span>
+    <span class="n">rpc</span> <span class="o">=</span> <span class="n">CisRpcServer</span><span class="p">(</span><span class="s2">&quot;server&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Continue receiving requests until the connection is closed when all</span>
+    <span class="c1"># clients have disconnected.</span>
+    <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="s1">&#39;server: receiving...&#39;</span><span class="p">)</span>
+        <span class="n">retval</span><span class="p">,</span> <span class="n">rpc_in</span> <span class="o">=</span> <span class="n">rpc</span><span class="o">.</span><span class="n">recv</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">retval</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s1">&#39;server: end of input&#39;</span><span class="p">)</span>
+            <span class="k">break</span>
+
+        <span class="c1"># Compute fibonacci number</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="n">rpc_in</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">print</span><span class="p">(</span><span class="s1">&#39;server: Received request for Fibonacci number </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">n</span><span class="p">)</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">get_fibonacci</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s1">&#39;server: Sending response for Fibonacci number </span><span class="si">%d</span><span class="s1">: </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">result</span><span class="p">))</span>
+
+        <span class="c1"># Send response back</span>
+        <span class="n">flag</span> <span class="o">=</span> <span class="n">rpc</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">flag</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s1">&#39;server: ERROR sending&#39;</span><span class="p">)</span>
+            <span class="n">exit_code</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+            <span class="k">break</span>
+
+    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Goodbye from Python server&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">exit_code</span>
+
+    
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">exit_code</span> <span class="o">=</span> <span class="n">main</span><span class="p">()</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="n">exit_code</span><span class="p">)</span>
+</pre></div>
+</td></tr></table></div>
+<div class="highlight-python"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">from</span> <span class="nn">cis_interface.interface.CisInterface</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">CisRpcClient</span><span class="p">,</span> <span class="n">CisOutput</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">iterations</span><span class="p">):</span>
+    <span class="sd">r&quot;&quot;&quot;Function to execute client communication with server that computes</span>
+<span class="sd">    numbers in the Fibonacci sequence.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        iterations (int): The number of Fibonacci numbers to log.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        int: Exit code. Negative if an error occurred.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">exit_code</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Hello from Python client: iterations = </span><span class="si">%d</span><span class="s1"> &#39;</span> <span class="o">%</span> <span class="n">iterations</span><span class="p">)</span>
+
+    <span class="c1"># Set up connections matching yaml</span>
+    <span class="c1"># RPC client-side connection will be $(server_name)_$(client_name)</span>
+    <span class="n">rpc</span> <span class="o">=</span> <span class="n">CisRpcClient</span><span class="p">(</span><span class="s2">&quot;server_client&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">log</span> <span class="o">=</span> <span class="n">CisOutput</span><span class="p">(</span><span class="s2">&quot;output_log&quot;</span><span class="p">,</span> <span class="s1">&#39;fib(</span><span class="si">%-2d</span><span class="s1">) = </span><span class="si">%-2d</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+
+    <span class="c1"># Iterate over Fibonacci sequence</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">iterations</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+        
+        <span class="c1"># Call the server and receive response</span>
+        <span class="k">print</span><span class="p">(</span><span class="s1">&#39;client(Python): Calling fib(</span><span class="si">%d</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="n">i</span><span class="p">)</span>
+        <span class="n">ret</span><span class="p">,</span> <span class="n">result</span> <span class="o">=</span> <span class="n">rpc</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">ret</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s1">&#39;client(Python): RPC CALL ERROR&#39;</span><span class="p">)</span>
+            <span class="n">exit_code</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+            <span class="k">break</span>
+        <span class="n">fib</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">print</span><span class="p">(</span><span class="s1">&#39;client(Python): Response fib(</span><span class="si">%d</span><span class="s1">) = </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">fib</span><span class="p">))</span>
+
+        <span class="c1"># Log result by sending it to the log connection</span>
+        <span class="n">ret</span> <span class="o">=</span> <span class="n">log</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">fib</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">ret</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s1">&#39;client(Python): SEND ERROR&#39;</span><span class="p">)</span>
+            <span class="n">exit_code</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+            <span class="k">break</span>
+
+    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Goodbye from Python client&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">exit_code</span>
+
+    
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="c1"># Take number of iterations from the first argument</span>
+    <span class="n">exit_code</span> <span class="o">=</span> <span class="n">main</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="n">exit_code</span><span class="p">)</span>
+</pre></div>
+</td></tr></table></div>
+<p>(<a class="reference external" href="examples/rpc_lesson1.html">Example in other languages</a>)</p>
+<p>The interface server-side API call (CisRpcServer for Python),
+requires 3 input variables: the name of the server channel (this will be
+the name of the server model), a format string for input to the server model,
+and a format string for output from the server model. The client-side API call
+(CisRpcClient for Python), also requires 3 input variables: the name of the
+client channel (this is the name of the server model joined with the name of
+the client model by an underscore, <code class="docutils literal"><span class="pre">&lt;server&gt;_&lt;client&gt;</span></code>, a format string for
+input to the server model, and a format string for output form the server
+model. The last two arguments (the format strings) to both the server and
+client API calls should be the same.</p>
+<p>In the server model YAML, the key/value pair <code class="docutils literal"><span class="pre">is_server:</span> <span class="pre">True</span></code> needs
+to be added to the model entry to indicate that the model will be called
+as a server and requires a set of RPC channels. In the client model YAML,
+the key/value pair <code class="docutils literal"><span class="pre">client_of:</span> <span class="pre">&lt;server_model_name&gt;</span></code> is required to indicate
+that the model will act as a client of the <code class="docutils literal"><span class="pre">&lt;server_model_name&gt;</span></code> model.</p>
+<p>Model YAML:</p>
+<div class="highlight-yaml"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="nn">---</span>
+
+<span class="l l-Scalar l-Scalar-Plain">model</span><span class="p p-Indicator">:</span>
+  <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">server</span>
+  <span class="l l-Scalar l-Scalar-Plain">driver</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">PythonModelDriver</span>
+  <span class="l l-Scalar l-Scalar-Plain">args</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/server.py</span>
+  <span class="l l-Scalar l-Scalar-Plain">is_server</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">True</span>  <span class="c1"># Creates a RPC server queue called &quot;server&quot;</span>
+</pre></div>
+</td></tr></table></div>
+<div class="highlight-yaml"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="nn">---</span>
+
+<span class="l l-Scalar l-Scalar-Plain">model</span><span class="p p-Indicator">:</span>
+  <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">client</span>
+  <span class="l l-Scalar l-Scalar-Plain">driver</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">PythonModelDriver</span>
+  <span class="l l-Scalar l-Scalar-Plain">args</span><span class="p p-Indicator">:</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">./src/client.py</span>
+    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">3</span>  <span class="c1"># Pass the number of iterations that should be performed</span>
+  <span class="l l-Scalar l-Scalar-Plain">client_of</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">server</span>  <span class="c1"># Creates an RPC client queue &quot;server_client&quot;</span>
+  <span class="l l-Scalar l-Scalar-Plain">outputs</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">output_log</span>
+
+<span class="l l-Scalar l-Scalar-Plain">connections</span><span class="p p-Indicator">:</span>
+  <span class="l l-Scalar l-Scalar-Plain">input</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">output_log</span>
+  <span class="l l-Scalar l-Scalar-Plain">output</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">client_output.txt</span>
+  <span class="l l-Scalar l-Scalar-Plain">in_temp</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">True</span>
+</pre></div>
+</td></tr></table></div>
+<p>(<a class="reference external" href="examples/rpc_lesson1.html">Example in other languages</a>)</p>
+</div>
+</div>
+<div class="section" id="one-server-two-clients">
+<h1>One Server, Two Clients<a class="headerlink" href="#one-server-two-clients" title="Permalink to this headline">¶</a></h1>
+<p>There is no limit on the number of clients that can connect to a single
+server. In the example below, the server is the same as above. The client
+code is also essentially the same except that it has been modified to take
+a <code class="docutils literal"><span class="pre">client_index</span></code> variable that provides information to differentiates
+between two clients using the same source code.</p>
+<p>Model Code:</p>
+<div class="highlight-python"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">from</span> <span class="nn">cis_interface.interface.CisInterface</span> <span class="kn">import</span> <span class="n">CisRpcServer</span>
+
+
+<span class="k">def</span> <span class="nf">get_fibonacci</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+    <span class="sd">r&quot;&quot;&quot;Compute the nth number of the Fibonacci sequence.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        n (int): Index of the Fibonacci number in the Fibonacci sequence that</span>
+<span class="sd">            should be returned.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        int: The nth Fibonacci number.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">pprev</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">prev</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">fib_no</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">while</span> <span class="n">fib_no</span> <span class="o">&lt;</span> <span class="n">n</span><span class="p">:</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">prev</span> <span class="o">+</span> <span class="n">pprev</span>
+        <span class="n">pprev</span> <span class="o">=</span> <span class="n">prev</span>
+        <span class="n">prev</span> <span class="o">=</span> <span class="n">result</span>
+        <span class="n">fib_no</span> <span class="o">=</span> <span class="n">fib_no</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="k">return</span> <span class="n">result</span>
+
+
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="sd">r&quot;&quot;&quot;Function to execute server communication and computation in a loop.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        int: Exit code. Negative if an error occurred.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">exit_code</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Hello from Python server!&#39;</span><span class="p">)</span>
+
+    <span class="c1"># Create server-side rpc conneciton using model name</span>
+    <span class="n">rpc</span> <span class="o">=</span> <span class="n">CisRpcServer</span><span class="p">(</span><span class="s2">&quot;server&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Continue receiving requests until the connection is closed when all</span>
+    <span class="c1"># clients have disconnected.</span>
+    <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="s1">&#39;server: receiving...&#39;</span><span class="p">)</span>
+        <span class="n">retval</span><span class="p">,</span> <span class="n">rpc_in</span> <span class="o">=</span> <span class="n">rpc</span><span class="o">.</span><span class="n">recv</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">retval</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s1">&#39;server: end of input&#39;</span><span class="p">)</span>
+            <span class="k">break</span>
+
+        <span class="c1"># Compute fibonacci number</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="n">rpc_in</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">print</span><span class="p">(</span><span class="s1">&#39;server: Received request for Fibonacci number </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">n</span><span class="p">)</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">get_fibonacci</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s1">&#39;server: Sending response for Fibonacci number </span><span class="si">%d</span><span class="s1">: </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">result</span><span class="p">))</span>
+
+        <span class="c1"># Send response back</span>
+        <span class="n">flag</span> <span class="o">=</span> <span class="n">rpc</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">flag</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s1">&#39;server: ERROR sending&#39;</span><span class="p">)</span>
+            <span class="n">exit_code</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+            <span class="k">break</span>
+
+    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Goodbye from Python server&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">exit_code</span>
+
+    
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">exit_code</span> <span class="o">=</span> <span class="n">main</span><span class="p">()</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="n">exit_code</span><span class="p">)</span>
+</pre></div>
+</td></tr></table></div>
+<div class="highlight-python"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">from</span> <span class="nn">cis_interface.interface.CisInterface</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">CisRpcClient</span><span class="p">,</span> <span class="n">CisOutput</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">iterations</span><span class="p">,</span> <span class="n">client_index</span><span class="p">):</span>
+    <span class="sd">r&quot;&quot;&quot;Function to execute client communication with server that computes</span>
+<span class="sd">    numbers in the Fibonacci sequence.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        iterations (int): The number of Fibonacci numbers to log.</span>
+<span class="sd">        client_index (int): Index of the client in total list of clients.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        int: Exit code. Negative if an error occurred.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">exit_code</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Hello from Python client</span><span class="si">%d</span><span class="s1">: iterations = </span><span class="si">%d</span><span class="s1"> &#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">client_index</span><span class="p">,</span>
+                                                            <span class="n">iterations</span><span class="p">))</span>
+
+    <span class="c1"># Set up connections matching yaml</span>
+    <span class="c1"># RPC client-side connection will be $(server_name)_$(client_name)</span>
+    <span class="n">rpc</span> <span class="o">=</span> <span class="n">CisRpcClient</span><span class="p">(</span><span class="s2">&quot;server_client</span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">client_index</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">log</span> <span class="o">=</span> <span class="n">CisOutput</span><span class="p">(</span><span class="s2">&quot;output_log</span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">client_index</span><span class="p">,</span> <span class="s1">&#39;fib(</span><span class="si">%-2d</span><span class="s1">) = </span><span class="si">%-2d</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+
+    <span class="c1"># Iterate over Fibonacci sequence</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">iterations</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+        
+        <span class="c1"># Call the server and receive response</span>
+        <span class="k">print</span><span class="p">(</span><span class="s1">&#39;client</span><span class="si">%d</span><span class="s1">(Python): Calling fib(</span><span class="si">%d</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">client_index</span><span class="p">,</span> <span class="n">i</span><span class="p">))</span>
+        <span class="n">ret</span><span class="p">,</span> <span class="n">result</span> <span class="o">=</span> <span class="n">rpc</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">ret</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s1">&#39;client</span><span class="si">%d</span><span class="s1">(Python): RPC CALL ERROR&#39;</span> <span class="o">%</span> <span class="n">client_index</span><span class="p">)</span>
+            <span class="n">exit_code</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+            <span class="k">break</span>
+        <span class="n">fib</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">print</span><span class="p">(</span><span class="s1">&#39;client</span><span class="si">%d</span><span class="s1">(Python): Response fib(</span><span class="si">%d</span><span class="s1">) = </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">client_index</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">fib</span><span class="p">))</span>
+
+        <span class="c1"># Log result by sending it to the log connection</span>
+        <span class="n">ret</span> <span class="o">=</span> <span class="n">log</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">fib</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">ret</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s1">&#39;client</span><span class="si">%d</span><span class="s1">(Python): SEND ERROR&#39;</span> <span class="o">%</span> <span class="n">client_index</span><span class="p">)</span>
+            <span class="n">exit_code</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+            <span class="k">break</span>
+
+    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Goodbye from Python client</span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">client_index</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">exit_code</span>
+
+    
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="c1"># Take number of iterations from the first argument and the</span>
+    <span class="c1"># client index from the second</span>
+    <span class="n">exit_code</span> <span class="o">=</span> <span class="n">main</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="nb">int</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">2</span><span class="p">]))</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="n">exit_code</span><span class="p">)</span>
+</pre></div>
+</td></tr></table></div>
+<p>(<a class="reference external" href="examples/rpc_lesson2.html">Example in other languages</a>)</p>
+<p>The server YAML is the same as above. The client YAML now has entries for
+two models which are both clients of the server model and call the same
+source code.</p>
+<p>Model YAML:</p>
+<div class="highlight-yaml"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="nn">---</span>
+
+<span class="l l-Scalar l-Scalar-Plain">model</span><span class="p p-Indicator">:</span>
+  <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">server</span>
+  <span class="l l-Scalar l-Scalar-Plain">driver</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">PythonModelDriver</span>
+  <span class="l l-Scalar l-Scalar-Plain">args</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/server.py</span>
+  <span class="l l-Scalar l-Scalar-Plain">is_server</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">True</span>  <span class="c1"># Creates a RPC server queue called &quot;server&quot;</span>
+</pre></div>
+</td></tr></table></div>
+<div class="highlight-yaml"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="nn">---</span>
+
+<span class="l l-Scalar l-Scalar-Plain">models</span><span class="p p-Indicator">:</span>
+  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">client1</span>
+    <span class="l l-Scalar l-Scalar-Plain">driver</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">PythonModelDriver</span>
+    <span class="l l-Scalar l-Scalar-Plain">args</span><span class="p p-Indicator">:</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">./src/client.py</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">3</span>  <span class="c1"># Pass the number of iterations that should be performed</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">1</span>  <span class="c1"># Pass index of the client</span>
+    <span class="l l-Scalar l-Scalar-Plain">client_of</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">server</span>  <span class="c1"># Creates an RPC client queue &quot;server_client&quot;</span>
+    <span class="l l-Scalar l-Scalar-Plain">outputs</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">output_log1</span>
+  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">client2</span>
+    <span class="l l-Scalar l-Scalar-Plain">driver</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">PythonModelDriver</span>
+    <span class="l l-Scalar l-Scalar-Plain">args</span><span class="p p-Indicator">:</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">./src/client.py</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">5</span>  <span class="c1"># Pass the number of iterations that should be performed</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">2</span>  <span class="c1"># Pass index of the client</span>
+    <span class="l l-Scalar l-Scalar-Plain">client_of</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">server</span>  <span class="c1"># Creates an RPC client queue &quot;server_client&quot;</span>
+    <span class="l l-Scalar l-Scalar-Plain">outputs</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">output_log2</span>
+
+<span class="l l-Scalar l-Scalar-Plain">connections</span><span class="p p-Indicator">:</span>
+  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">input</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">output_log1</span>
+    <span class="l l-Scalar l-Scalar-Plain">output</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">client_output1.txt</span>
+    <span class="l l-Scalar l-Scalar-Plain">in_temp</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">True</span>
+  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">input</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">output_log2</span>
+    <span class="l l-Scalar l-Scalar-Plain">output</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">client_output2.txt</span>
+    <span class="l l-Scalar l-Scalar-Plain">in_temp</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">True</span>
+</pre></div>
+</td></tr></table></div>
+<p>(<a class="reference external" href="examples/rpc_lesson2.html">Example in other languages</a>)</p>
+<p>During runtime, request messages from both clients will be routed to the
+server model which will process the requests in the order they are received.</p>
+<div class="admonition-todo admonition" id="index-0">
+<p class="first admonition-title">Todo</p>
+<p class="last">Section on having multiple servers.</p>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="yaml.html" class="btn btn-neutral float-right" title="YAML Files" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="formatted_io.html" class="btn btn-neutral" title="Formatted I/O" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Meagan Lang, David Raila.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.1.3',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          
+          SphinxRtdTheme.Navigation.enableSticky();
+          
+      });
+  </script> 
+
+</body>
+</html>

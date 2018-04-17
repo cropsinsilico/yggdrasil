@@ -1,0 +1,1067 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>cis_interface.dataio.AsciiTable &mdash; cis_interface 0.1.3 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> cis_interface
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../includeme.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../formatted_io.html">Formatted I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../server_client_io.html">Server/Client I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../server_client_io.html#one-server-two-clients">One Server, Two Clients</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../yaml.html">YAML Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../config.html">Configuration Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../units.html">Units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../c_format_strings.html">C-Style Format Strings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../io_drivers.html">Input/Output Drivers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../model_drivers.html">Model Drivers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../code.html">Code</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/examples_toc.html">Examples</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">cis_interface</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>cis_interface.dataio.AsciiTable</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for cis_interface.dataio.AsciiTable</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">copy</span>
+<span class="c1"># from cis_interface.interface.scanf import scanf</span>
+<span class="kn">from</span> <span class="nn">cis_interface.dataio.AsciiFile</span> <span class="k">import</span> <span class="n">AsciiFile</span>
+<span class="kn">from</span> <span class="nn">cis_interface</span> <span class="k">import</span> <span class="n">backwards</span><span class="p">,</span> <span class="n">platform</span>
+<span class="kn">from</span> <span class="nn">numpy.compat</span> <span class="k">import</span> <span class="n">asbytes</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">backwards</span><span class="o">.</span><span class="n">PY2</span><span class="p">:</span>  <span class="c1"># pragma: Python 2</span>
+        <span class="kn">from</span> <span class="nn">astropy.io</span> <span class="k">import</span> <span class="n">ascii</span> <span class="k">as</span> <span class="n">apy_ascii</span>
+        <span class="kn">from</span> <span class="nn">astropy.table</span> <span class="k">import</span> <span class="n">Table</span> <span class="k">as</span> <span class="n">apy_Table</span>
+        <span class="n">_use_astropy</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="kn">from</span> <span class="nn">astropy.io.ascii</span> <span class="k">import</span> <span class="n">TableOutputter</span><span class="p">,</span> <span class="n">convert_numpy</span>
+        <span class="n">apy_tableout</span> <span class="o">=</span> <span class="n">TableOutputter</span><span class="p">()</span>
+        <span class="n">apy_tableout</span><span class="o">.</span><span class="n">default_converters</span> <span class="o">=</span> <span class="p">[</span><span class="n">convert_numpy</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int</span><span class="p">),</span>
+                                           <span class="n">convert_numpy</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float</span><span class="p">),</span>
+                                           <span class="n">convert_numpy</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">str</span><span class="p">),</span>
+                                           <span class="n">convert_numpy</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">complex</span><span class="p">)]</span>
+    <span class="k">else</span><span class="p">:</span>  <span class="c1"># pragma: Python 3</span>
+        <span class="n">apy_ascii</span><span class="p">,</span> <span class="n">apy_Table</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
+        <span class="n">_use_astropy</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+    <span class="n">apy_ascii</span><span class="p">,</span> <span class="n">apy_Table</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
+    <span class="c1"># print(&quot;astropy is not installed, reading/writing as an array will be &quot; +</span>
+    <span class="c1">#       &quot;disabled. astropy can be installed using &#39;pip install astropy&#39;.&quot;)</span>
+    <span class="n">_use_astropy</span> <span class="o">=</span> <span class="kc">False</span>
+
+
+<span class="n">_default_args</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;column&#39;</span><span class="p">:</span> <span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="p">}</span>
+<span class="n">_fmt_char</span> <span class="o">=</span> <span class="n">backwards</span><span class="o">.</span><span class="n">unicode2bytes</span><span class="p">(</span><span class="s1">&#39;%&#39;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="nptype2cformat"><a class="viewcode-back" href="../../../cis_interface.dataio.html#cis_interface.dataio.AsciiTable.nptype2cformat">[docs]</a><span class="k">def</span> <span class="nf">nptype2cformat</span><span class="p">(</span><span class="n">nptype</span><span class="p">):</span>
+    <span class="sd">r&quot;&quot;&quot;Convert a numpy data type to a c format string.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        nptype (str or numpy.dtype): Numpy data type that should be converted.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str: Corresponding c format specification string.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        TypeError: If nptype is not a string or numpy.dtype.</span>
+<span class="sd">        ValueError: If a matching format string cannot be determined.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">nptype</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">):</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="n">nptype</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">nptype</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="n">nptype</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Input must be a string or a numpy.dtype&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">t</span> <span class="ow">in</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;float_&quot;</span><span class="p">,</span> <span class="s2">&quot;float16&quot;</span><span class="p">,</span> <span class="s2">&quot;float32&quot;</span><span class="p">,</span> <span class="s2">&quot;float64&quot;</span><span class="p">]]:</span>
+        <span class="n">cfmt</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%g</span><span class="s2">&quot;</span>  <span class="c1"># Ensures readability</span>
+    <span class="k">elif</span> <span class="n">t</span> <span class="ow">in</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;complex_&quot;</span><span class="p">,</span> <span class="s2">&quot;complex64&quot;</span><span class="p">,</span> <span class="s2">&quot;complex128&quot;</span><span class="p">]]:</span>
+        <span class="n">cfmt</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%g%+g</span><span class="s2">j&quot;</span>
+    <span class="k">elif</span> <span class="n">t</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s2">&quot;int8&quot;</span><span class="p">):</span>
+        <span class="n">cfmt</span> <span class="o">=</span> <span class="s2">&quot;%hhd&quot;</span>
+    <span class="k">elif</span> <span class="n">t</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s2">&quot;short&quot;</span><span class="p">):</span>
+        <span class="n">cfmt</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%hd</span><span class="s2">&quot;</span>
+    <span class="k">elif</span> <span class="n">t</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s2">&quot;intc&quot;</span><span class="p">):</span>
+        <span class="n">cfmt</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%d</span><span class="s2">&quot;</span>
+    <span class="k">elif</span> <span class="n">t</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s2">&quot;int_&quot;</span><span class="p">):</span>
+        <span class="n">cfmt</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%ld</span><span class="s2">&quot;</span>
+    <span class="c1"># elif t == np.dtype(&quot;int64&quot;):</span>
+    <span class="c1">#     if platform._is_win:</span>
+    <span class="c1">#         cfmt = &quot;%l64d&quot;</span>
+    <span class="c1">#     else:  # pragma: no cover</span>
+    <span class="c1">#         cfmt = &quot;%ld&quot;</span>
+    <span class="k">elif</span> <span class="n">t</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s2">&quot;longlong&quot;</span><span class="p">):</span>
+        <span class="c1"># On windows C long is 32bit and long long is 64bit</span>
+        <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">_is_win</span><span class="p">:</span>  <span class="c1"># pragma: windows</span>
+            <span class="n">cfmt</span> <span class="o">=</span> <span class="s2">&quot;%l64d&quot;</span>
+        <span class="k">else</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+            <span class="n">cfmt</span> <span class="o">=</span> <span class="s2">&quot;%lld&quot;</span>
+    <span class="k">elif</span> <span class="n">t</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s2">&quot;uint8&quot;</span><span class="p">):</span>
+        <span class="n">cfmt</span> <span class="o">=</span> <span class="s2">&quot;%hhu&quot;</span>
+    <span class="k">elif</span> <span class="n">t</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s2">&quot;ushort&quot;</span><span class="p">):</span>
+        <span class="n">cfmt</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%hu</span><span class="s2">&quot;</span>
+    <span class="k">elif</span> <span class="n">t</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s2">&quot;uintc&quot;</span><span class="p">):</span>
+        <span class="n">cfmt</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%u</span><span class="s2">&quot;</span>
+    <span class="k">elif</span> <span class="n">t</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s2">&quot;uint64&quot;</span><span class="p">):</span>  <span class="c1"># Platform dependent</span>
+        <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">_is_win</span><span class="p">:</span>  <span class="c1"># pragma: windows</span>
+            <span class="n">cfmt</span> <span class="o">=</span> <span class="s2">&quot;%l64u&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">cfmt</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%lu</span><span class="s2">&quot;</span>
+    <span class="k">elif</span> <span class="n">t</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s2">&quot;ulonglong&quot;</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
+        <span class="c1"># On windows C unsigned long is 32bit and unsigned long long is 64bit</span>
+        <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">_is_win</span><span class="p">:</span>  <span class="c1"># pragma: windows</span>
+            <span class="n">cfmt</span> <span class="o">=</span> <span class="s2">&quot;%l64u&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">cfmt</span> <span class="o">=</span> <span class="s2">&quot;%llu&quot;</span>
+    <span class="k">elif</span> <span class="n">np</span><span class="o">.</span><span class="n">issubdtype</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s2">&quot;S&quot;</span><span class="p">)):</span>
+        <span class="k">if</span> <span class="n">t</span><span class="o">.</span><span class="n">itemsize</span> <span class="ow">is</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">cfmt</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">cfmt</span> <span class="o">=</span> <span class="s2">&quot;%&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">itemsize</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;s&quot;</span>
+    <span class="k">elif</span> <span class="n">np</span><span class="o">.</span><span class="n">issubdtype</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s2">&quot;U&quot;</span><span class="p">)):</span>
+        <span class="k">if</span> <span class="n">t</span><span class="o">.</span><span class="n">itemsize</span> <span class="ow">is</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">cfmt</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">cfmt</span> <span class="o">=</span> <span class="s2">&quot;%&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">itemsize</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;s&quot;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;No format specification string for dtype </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">t</span><span class="p">)</span>
+    <span class="c1"># Short and long specifiers not supported by python scanf</span>
+    <span class="c1"># cfmt = cfmt.replace(&quot;h&quot;, &quot;&quot;)</span>
+    <span class="c1"># cfmt = cfmt.replace(&quot;l&quot;, &quot;&quot;)</span>
+    <span class="k">return</span> <span class="n">cfmt</span></div>
+
+
+<div class="viewcode-block" id="cformat2nptype"><a class="viewcode-back" href="../../../cis_interface.dataio.html#cis_interface.dataio.AsciiTable.cformat2nptype">[docs]</a><span class="k">def</span> <span class="nf">cformat2nptype</span><span class="p">(</span><span class="n">cfmt</span><span class="p">):</span>
+    <span class="sd">r&quot;&quot;&quot;Convert a c format string to a numpy data type.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        cfmt (str): c format that should be translated.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str: Corresponding numpy data type.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        TypeError: if cfmt is not a string.</span>
+<span class="sd">        ValueError: If the c format does not begin with &#39;%&#39;.</span>
+<span class="sd">        ValueError: If the c format does not contain type info.</span>
+<span class="sd">        ValueError: If the c format cannot be translated to a numpy datatype.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># TODO: this may fail on 32bit systems where C long types are 32 bit</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">cfmt</span><span class="p">,</span> <span class="n">backwards</span><span class="o">.</span><span class="n">bytes_type</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Input must be of type </span><span class="si">%s</span><span class="s2">, not </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span>
+                        <span class="p">(</span><span class="n">backwards</span><span class="o">.</span><span class="n">bytes_type</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="n">cfmt</span><span class="p">)))</span>
+    <span class="k">elif</span> <span class="ow">not</span> <span class="n">cfmt</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">_fmt_char</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Provided C format string (</span><span class="si">%s</span><span class="s2">) &quot;</span> <span class="o">%</span> <span class="n">cfmt</span> <span class="o">+</span>
+                         <span class="s2">&quot;does not start with &#39;</span><span class="si">%%</span><span class="s2">&#39;&quot;</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">cfmt</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Provided C format string (</span><span class="si">%s</span><span class="s2">) &quot;</span> <span class="o">%</span> <span class="n">cfmt</span> <span class="o">+</span>
+                         <span class="s2">&quot;does not contain type info&quot;</span><span class="p">)</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">cfmt_str</span> <span class="o">=</span> <span class="n">backwards</span><span class="o">.</span><span class="n">bytes2unicode</span><span class="p">(</span><span class="n">cfmt</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">cfmt_str</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;j&#39;</span><span class="p">]:</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;complex128&#39;</span>
+    <span class="k">elif</span> <span class="n">cfmt_str</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;f&#39;</span><span class="p">,</span> <span class="s1">&#39;F&#39;</span><span class="p">,</span> <span class="s1">&#39;e&#39;</span><span class="p">,</span> <span class="s1">&#39;E&#39;</span><span class="p">,</span> <span class="s1">&#39;g&#39;</span><span class="p">,</span> <span class="s1">&#39;G&#39;</span><span class="p">]:</span>
+        <span class="c1"># if &#39;hh&#39; in cfmt_str:</span>
+        <span class="c1">#     out = &#39;float8&#39;</span>
+        <span class="c1"># elif cfmt_str[-2] == &#39;h&#39;:</span>
+        <span class="c1">#     out = &#39;float16&#39;</span>
+        <span class="c1"># elif &#39;ll&#39; in cfmt_str:</span>
+        <span class="c1">#     out = &#39;longfloat&#39;</span>
+        <span class="c1"># elif cfmt_str[-2] == &#39;l&#39;:</span>
+        <span class="c1">#     out = &#39;double&#39;</span>
+        <span class="c1"># else:</span>
+        <span class="c1">#     out = &#39;single&#39;</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;float64&#39;</span>
+    <span class="k">elif</span> <span class="n">cfmt_str</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;d&#39;</span><span class="p">,</span> <span class="s1">&#39;i&#39;</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="s1">&#39;hh&#39;</span> <span class="ow">in</span> <span class="n">cfmt_str</span><span class="p">:</span>  <span class="c1"># short short, single char</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;int8&#39;</span>
+        <span class="k">elif</span> <span class="n">cfmt_str</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;h&#39;</span><span class="p">:</span>  <span class="c1"># short</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;short&#39;</span>
+        <span class="k">elif</span> <span class="p">(</span><span class="s1">&#39;ll&#39;</span> <span class="ow">in</span> <span class="n">cfmt_str</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="s1">&#39;l64&#39;</span> <span class="ow">in</span> <span class="n">cfmt_str</span><span class="p">):</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;longlong&#39;</span>  <span class="c1"># long long</span>
+        <span class="k">elif</span> <span class="n">cfmt_str</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;l&#39;</span><span class="p">:</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;int_&#39;</span>  <span class="c1"># long (broken in python)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;intc&#39;</span>  <span class="c1"># int, platform dependent</span>
+    <span class="k">elif</span> <span class="n">cfmt_str</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;u&#39;</span><span class="p">,</span> <span class="s1">&#39;o&#39;</span><span class="p">,</span> <span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="s1">&#39;X&#39;</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="s1">&#39;hh&#39;</span> <span class="ow">in</span> <span class="n">cfmt_str</span><span class="p">:</span>  <span class="c1"># short short, single char</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;uint8&#39;</span>
+        <span class="k">elif</span> <span class="n">cfmt_str</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;h&#39;</span><span class="p">:</span>  <span class="c1"># short</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;ushort&#39;</span>
+        <span class="k">elif</span> <span class="p">(</span><span class="s1">&#39;ll&#39;</span> <span class="ow">in</span> <span class="n">cfmt_str</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="s1">&#39;l64&#39;</span> <span class="ow">in</span> <span class="n">cfmt_str</span><span class="p">):</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;ulonglong&#39;</span>  <span class="c1"># long long</span>
+        <span class="k">elif</span> <span class="n">cfmt_str</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;l&#39;</span><span class="p">:</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;uint64&#39;</span>  <span class="c1"># long (broken in python)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;uintc&#39;</span>  <span class="c1"># int, platform dependent</span>
+    <span class="k">elif</span> <span class="n">cfmt_str</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;c&#39;</span><span class="p">,</span> <span class="s1">&#39;s&#39;</span><span class="p">]:</span>
+        <span class="n">lstr</span> <span class="o">=</span> <span class="n">cfmt_str</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">lstr</span><span class="p">:</span>
+            <span class="n">lint</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">lstr</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">lint</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">lsiz</span> <span class="o">=</span> <span class="n">lint</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="n">backwards</span><span class="o">.</span><span class="n">np_dtype_str</span> <span class="o">+</span> <span class="s1">&#39;1&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">itemsize</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">backwards</span><span class="o">.</span><span class="n">np_dtype_str</span><span class="p">,</span> <span class="n">lsiz</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Could not find match for format str </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">cfmt</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="n">out</span><span class="p">)</span><span class="o">.</span><span class="n">str</span></div>
+
+
+<div class="viewcode-block" id="cformat2pyscanf"><a class="viewcode-back" href="../../../cis_interface.dataio.html#cis_interface.dataio.AsciiTable.cformat2pyscanf">[docs]</a><span class="k">def</span> <span class="nf">cformat2pyscanf</span><span class="p">(</span><span class="n">cfmt</span><span class="p">):</span>
+    <span class="sd">r&quot;&quot;&quot;Convert a c format specification string to a version that the</span>
+<span class="sd">    python scanf module can use.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        cfmt (str): C format specification string.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str: Version of cfmt that can be parsed by scanf.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        TypeError: if cfmt is not a bytes/str.</span>
+<span class="sd">        ValueError: If the c format does not begin with &#39;%&#39;.</span>
+<span class="sd">        ValueError: If the c format does not contain type info.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">cfmt</span><span class="p">,</span> <span class="n">backwards</span><span class="o">.</span><span class="n">bytes_type</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Input must be of type </span><span class="si">%s</span><span class="s2">.&quot;</span> <span class="o">%</span> <span class="n">backwards</span><span class="o">.</span><span class="n">bytes_type</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="ow">not</span> <span class="n">cfmt</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">_fmt_char</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Provided C format string (</span><span class="si">%s</span><span class="s2">) &quot;</span> <span class="o">%</span> <span class="n">cfmt</span> <span class="o">+</span>
+                         <span class="s2">&quot;does not start with &#39;%&#39;&quot;</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">cfmt</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Provided C format string (</span><span class="si">%s</span><span class="s2">) &quot;</span> <span class="o">%</span> <span class="n">cfmt</span> <span class="o">+</span>
+                         <span class="s2">&quot;does not contain type info&quot;</span><span class="p">)</span>
+    <span class="c1"># Hacky, but necessary to handle concatenation of a single byte</span>
+    <span class="n">cfmt_str</span> <span class="o">=</span> <span class="n">backwards</span><span class="o">.</span><span class="n">bytes2unicode</span><span class="p">(</span><span class="n">cfmt</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">cfmt_str</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;j&#39;</span><span class="p">:</span>
+        <span class="c1"># Handle complex format specifier</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%g%+g</span><span class="s1">j&#39;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">backwards</span><span class="o">.</span><span class="n">bytes2unicode</span><span class="p">(</span><span class="n">_fmt_char</span><span class="p">)</span>
+        <span class="n">out</span> <span class="o">+=</span> <span class="n">cfmt_str</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;h&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;l&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;64&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">backwards</span><span class="o">.</span><span class="n">unicode2bytes</span><span class="p">(</span><span class="n">out</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="AsciiTable"><a class="viewcode-back" href="../../../cis_interface.dataio.html#cis_interface.dataio.AsciiTable.AsciiTable">[docs]</a><span class="k">class</span> <span class="nc">AsciiTable</span><span class="p">(</span><span class="n">AsciiFile</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filepath</span><span class="p">,</span> <span class="n">io_mode</span><span class="p">,</span> <span class="n">format_str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">column_names</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">use_astropy</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                 <span class="n">column</span><span class="o">=</span><span class="n">_default_args</span><span class="p">[</span><span class="s1">&#39;column&#39;</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">r&quot;&quot;&quot;Class for reading/writing an ASCII table.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            filepath (str): Full path to the file that should be read from</span>
+<span class="sd">                or written to.</span>
+<span class="sd">            io_mode (str): Mode that should be used to open the file. Valid</span>
+<span class="sd">                values include &#39;r&#39;, &#39;w&#39;, and None. None can be used to</span>
+<span class="sd">                indicate an in memory table that will not be read from or</span>
+<span class="sd">                written to a file.</span>
+<span class="sd">            format_str (str): Format string that should be used to format</span>
+<span class="sd">                output in the case that the io_mode is &#39;w&#39; (write). It is not</span>
+<span class="sd">                required if the io_mode is any other value.</span>
+<span class="sd">            dtype (str): Numpy structured data type for each row. If not</span>
+<span class="sd">                provided it is set using format_str. Defaults to None.</span>
+<span class="sd">            column_names (list, optional): List of column names. Defaults to</span>
+<span class="sd">                None.</span>
+<span class="sd">            use_astropy (bool, optional): If True, astropy is used to determine</span>
+<span class="sd">                a table&#39;s format if it is installed. If False, a format string</span>
+<span class="sd">                must be contained in the table. Defaults to False.</span>
+<span class="sd">            column (str, optional): String that should be used to separate</span>
+<span class="sd">                columns. Defaults to &quot;\t&quot; (tab-delimited).</span>
+<span class="sd">            **kwargs: Additonal keyword arguments are passed to AsciiFile.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            RuntimeError: If format_str is not provided and the io_mode is &#39;w&#39;</span>
+<span class="sd">                (write).</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">use_astropy</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">use_astropy</span> <span class="o">=</span> <span class="n">_use_astropy</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">use_astropy</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_astropy</span><span class="p">:</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;open_as_binary&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">AsciiTable</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="n">io_mode</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">column_names</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="c1"># Add default args specific to ascii table</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">column</span> <span class="o">=</span> <span class="n">backwards</span><span class="o">.</span><span class="n">unicode2bytes</span><span class="p">(</span><span class="n">column</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_format_str</span> <span class="o">=</span> <span class="n">backwards</span><span class="o">.</span><span class="n">unicode2bytes</span><span class="p">(</span><span class="n">format_str</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dtype</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">)):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_dtype</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="n">dtype</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">io_mode</span> <span class="o">==</span> <span class="s1">&#39;r&#39;</span><span class="p">):</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">discover_format_str</span><span class="p">()</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;&#39;format_str&#39; must be provided for output&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">column_names</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">column_names</span><span class="p">)</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">ncols</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">column_names</span> <span class="o">=</span> <span class="n">column_names</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">format_str</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_format_str&#39;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_dtype&#39;</span><span class="p">):</span>
+                <span class="n">fmts</span> <span class="o">=</span> <span class="p">[</span><span class="n">backwards</span><span class="o">.</span><span class="n">unicode2bytes</span><span class="p">(</span><span class="n">nptype2cformat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
+                        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">))]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_format_str</span> <span class="o">=</span> <span class="n">backwards</span><span class="o">.</span><span class="n">unicode2bytes</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">column</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">fmts</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">newline</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Format string not set &quot;</span> <span class="o">+</span>
+                                   <span class="s2">&quot;and cannot be determined.&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_format_str</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">dtype</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_dtype&#39;</span><span class="p">):</span>
+            <span class="c1"># typs = [(f[-1] + str(i), np.dtype(cformat2nptype(f)))</span>
+            <span class="c1">#         for i, f in enumerate(self.fmts)]</span>
+            <span class="n">typs</span> <span class="o">=</span> <span class="p">[(</span><span class="s1">&#39;f&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="n">cformat2nptype</span><span class="p">(</span><span class="n">f</span><span class="p">)))</span>
+                    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">f</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fmts</span><span class="p">)]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_dtype</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="n">typs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dtype</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">fmts</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">r&quot;&quot;&quot;List of formats in format string.&quot;&quot;&quot;</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">format_str</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">newline</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">column</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">f</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">out</span> <span class="k">if</span> <span class="n">f</span><span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">ncols</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fmts</span><span class="p">)</span>
+        <span class="c1"># return self.format_str.count(_fmt_char)</span>
+
+<div class="viewcode-block" id="AsciiTable.update_format_str"><a class="viewcode-back" href="../../../cis_interface.dataio.html#cis_interface.dataio.AsciiTable.AsciiTable.update_format_str">[docs]</a>    <span class="k">def</span> <span class="nf">update_format_str</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_format_str</span><span class="p">):</span>
+        <span class="sd">r&quot;&quot;&quot;Change the format string and update the data type.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            new_format_str (str): New format string.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_format_str</span> <span class="o">=</span> <span class="n">backwards</span><span class="o">.</span><span class="n">unicode2bytes</span><span class="p">(</span><span class="n">new_format_str</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_dtype&#39;</span><span class="p">):</span>
+            <span class="nb">delattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_dtype&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="AsciiTable.update_dtype"><a class="viewcode-back" href="../../../cis_interface.dataio.html#cis_interface.dataio.AsciiTable.AsciiTable.update_dtype">[docs]</a>    <span class="k">def</span> <span class="nf">update_dtype</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_dtype</span><span class="p">):</span>
+        <span class="sd">r&quot;&quot;&quot;Change the data type and update the format string.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            new_dtype (str or np.dtype): New numpy data type.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">new_dtype</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">):</span>
+            <span class="k">pass</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">new_dtype</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">new_dtype</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="n">new_dtype</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dtype</span> <span class="o">=</span> <span class="n">new_dtype</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_format_str&#39;</span><span class="p">):</span>
+            <span class="nb">delattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_format_str&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="AsciiTable.writeheader"><a class="viewcode-back" href="../../../cis_interface.dataio.html#cis_interface.dataio.AsciiTable.AsciiTable.writeheader">[docs]</a>    <span class="k">def</span> <span class="nf">writeheader</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">r&quot;&quot;&quot;Write header including column names and format.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            names (list, optional): List of names of columns. Defaults to</span>
+<span class="sd">                None and the ones provided at construction are used if they</span>
+<span class="sd">                exist. Otherwise, no names are written.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">writenames</span><span class="p">(</span><span class="n">names</span><span class="o">=</span><span class="n">names</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">writeformat</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="AsciiTable.writenames"><a class="viewcode-back" href="../../../cis_interface.dataio.html#cis_interface.dataio.AsciiTable.AsciiTable.writenames">[docs]</a>    <span class="k">def</span> <span class="nf">writenames</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">r&quot;&quot;&quot;Write column names to file.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            names (list, optional): List of names of columns. Defaults to</span>
+<span class="sd">                None and the ones provided at construction are used if they</span>
+<span class="sd">                exist. Otherwise, no names are written.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            IndexError: If there are not enough names for all of the columns.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">names</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">names</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">column_names</span>
+        <span class="k">if</span> <span class="n">names</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">names</span><span class="p">)</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ncols</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">IndexError</span><span class="p">(</span><span class="s2">&quot;The number of names must match the number of columns.&quot;</span><span class="p">)</span>
+        <span class="n">names</span> <span class="o">=</span> <span class="p">[</span><span class="n">backwards</span><span class="o">.</span><span class="n">unicode2bytes</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">names</span><span class="p">]</span>
+        <span class="n">line</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">comment</span> <span class="o">+</span> <span class="n">backwards</span><span class="o">.</span><span class="n">unicode2bytes</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)</span> <span class="o">+</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">column</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">names</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">newline</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">writeline_full</span><span class="p">(</span><span class="n">line</span><span class="p">)</span></div>
+            
+<div class="viewcode-block" id="AsciiTable.writeformat"><a class="viewcode-back" href="../../../cis_interface.dataio.html#cis_interface.dataio.AsciiTable.AsciiTable.writeformat">[docs]</a>    <span class="k">def</span> <span class="nf">writeformat</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">r&quot;&quot;&quot;Write the format string to the file.&quot;&quot;&quot;</span>
+        <span class="n">line</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">comment</span> <span class="o">+</span> <span class="n">backwards</span><span class="o">.</span><span class="n">unicode2bytes</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">format_str</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">writeline_full</span><span class="p">(</span><span class="n">line</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="AsciiTable.readline"><a class="viewcode-back" href="../../../cis_interface.dataio.html#cis_interface.dataio.AsciiTable.AsciiTable.readline">[docs]</a>    <span class="k">def</span> <span class="nf">readline</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">r&quot;&quot;&quot;Continue reading lines until a valid line (uncommented) is</span>
+<span class="sd">        encountered and return the arguments found there.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            tuple (bool, tuple): End of file flag and the arguments that</span>
+<span class="sd">                were read from the line. If the end of file is reached,</span>
+<span class="sd">                None is returned.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        
+        <span class="n">eof</span><span class="p">,</span> <span class="n">line</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">None</span>
+        <span class="k">while</span> <span class="p">(</span><span class="ow">not</span> <span class="n">eof</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">line</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="n">eof</span><span class="p">,</span> <span class="n">line</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">readline_full</span><span class="p">(</span><span class="n">validate</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">line</span><span class="p">)</span> <span class="ow">or</span> <span class="n">eof</span><span class="p">:</span>
+            <span class="n">args</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">args</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">process_line</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">eof</span><span class="p">,</span> <span class="n">args</span></div>
+
+<div class="viewcode-block" id="AsciiTable.writeline"><a class="viewcode-back" href="../../../cis_interface.dataio.html#cis_interface.dataio.AsciiTable.AsciiTable.writeline">[docs]</a>    <span class="k">def</span> <span class="nf">writeline</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="sd">r&quot;&quot;&quot;Write arguments to a file in the table format.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            \*args: Any number of arguments that should be written to the file.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_open</span><span class="p">:</span>
+            <span class="n">line</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">format_line</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">line</span> <span class="o">=</span> <span class="n">backwards</span><span class="o">.</span><span class="n">unicode2bytes</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">writeline_full</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="n">validate</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="AsciiTable.readline_full"><a class="viewcode-back" href="../../../cis_interface.dataio.html#cis_interface.dataio.AsciiTable.AsciiTable.readline_full">[docs]</a>    <span class="k">def</span> <span class="nf">readline_full</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">validate</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">r&quot;&quot;&quot;Read a line and return it if it is not a comment.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            validate (bool, optional): If True, the line is checked to see if</span>
+<span class="sd">                it matches the expected table format. Defaults to False.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            tuple (bool, str): End of file flag and the line that was read (an</span>
+<span class="sd">                empty string if the end of file was encountered). If the line is</span>
+<span class="sd">                a comment, None is returned.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">eof</span><span class="p">,</span> <span class="n">line</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">AsciiTable</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">readline_full</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_open</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="n">eof</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">line</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="n">validate</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">validate_line</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">eof</span><span class="p">,</span> <span class="n">line</span></div>
+
+<div class="viewcode-block" id="AsciiTable.writeline_full"><a class="viewcode-back" href="../../../cis_interface.dataio.html#cis_interface.dataio.AsciiTable.AsciiTable.writeline_full">[docs]</a>    <span class="k">def</span> <span class="nf">writeline_full</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">line</span><span class="p">,</span> <span class="n">validate</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">r&quot;&quot;&quot;Write a line to the file in its present state.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            line (str): Line to be written.</span>
+<span class="sd">            validate (bool, optional): If True, the line is checked to see if</span>
+<span class="sd">                it matches the expected table format. Defaults to False.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_open</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="n">validate</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">validate_line</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">AsciiTable</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">writeline_full</span><span class="p">(</span><span class="n">line</span><span class="p">)</span></div>
+        
+<div class="viewcode-block" id="AsciiTable.format_line"><a class="viewcode-back" href="../../../cis_interface.dataio.html#cis_interface.dataio.AsciiTable.AsciiTable.format_line">[docs]</a>    <span class="k">def</span> <span class="nf">format_line</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="sd">r&quot;&quot;&quot;Create a line from the provided arguments using the table format.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            \*args: Arguments to create line from.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: The line created from the arguments.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            RuntimeError: If the incorrect number of arguments are passed.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">ncols</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Incorrect number of arguments.&quot;</span><span class="p">)</span>
+        <span class="c1"># Handle complex</span>
+        <span class="n">args_</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">args</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">iscomplexobj</span><span class="p">(</span><span class="n">a</span><span class="p">):</span>
+                <span class="n">args_</span> <span class="o">+=</span> <span class="p">[</span><span class="n">a</span><span class="o">.</span><span class="n">real</span><span class="p">,</span> <span class="n">a</span><span class="o">.</span><span class="n">imag</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">args_</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">backwards</span><span class="o">.</span><span class="n">format_bytes</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">format_str</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">args_</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">backwards</span><span class="o">.</span><span class="n">unicode2bytes</span><span class="p">(</span><span class="n">out</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="AsciiTable.process_line"><a class="viewcode-back" href="../../../cis_interface.dataio.html#cis_interface.dataio.AsciiTable.AsciiTable.process_line">[docs]</a>    <span class="k">def</span> <span class="nf">process_line</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">line</span><span class="p">):</span>
+        <span class="sd">r&quot;&quot;&quot;Extract values from the columns in the line using the table format.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            line (str): String to extract arguments from.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            tuple: The arguments extracted from line.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">new_fmt</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">column</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+            <span class="p">[</span><span class="n">backwards</span><span class="o">.</span><span class="n">unicode2bytes</span><span class="p">(</span><span class="n">cformat2pyscanf</span><span class="p">(</span><span class="n">f</span><span class="p">))</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">fmts</span><span class="p">])</span> <span class="o">+</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">newline</span><span class="p">)</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">backwards</span><span class="o">.</span><span class="n">scanf_bytes</span><span class="p">(</span><span class="n">new_fmt</span><span class="p">,</span> <span class="n">line</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">out</span></div>
+        
+<div class="viewcode-block" id="AsciiTable.validate_line"><a class="viewcode-back" href="../../../cis_interface.dataio.html#cis_interface.dataio.AsciiTable.AsciiTable.validate_line">[docs]</a>    <span class="k">def</span> <span class="nf">validate_line</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">line</span><span class="p">):</span>
+        <span class="sd">r&quot;&quot;&quot;Assert that the line matches the format string and produces the</span>
+<span class="sd">        expected number of values.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            TypeError: If the line is not a bytes/str.</span>
+<span class="sd">            AssertionError: If the line does not match the format string.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="n">backwards</span><span class="o">.</span><span class="n">bytes_type</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Line must be of type </span><span class="si">%s</span><span class="s2">, not </span><span class="si">%s</span><span class="s2">.&quot;</span>
+                            <span class="o">%</span> <span class="p">(</span><span class="n">backwards</span><span class="o">.</span><span class="n">bytes_type</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="n">line</span><span class="p">)))</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">process_line</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">args</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ncols</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">AssertionError</span><span class="p">(</span><span class="s2">&quot;The line does not match the format string.&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="AsciiTable.discover_format_str"><a class="viewcode-back" href="../../../cis_interface.dataio.html#cis_interface.dataio.AsciiTable.AsciiTable.discover_format_str">[docs]</a>    <span class="k">def</span> <span class="nf">discover_format_str</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">r&quot;&quot;&quot;Determine the format string by reading it from the file. The format</span>
+<span class="sd">        string is assumed to start with a comment and contain C-style format</span>
+<span class="sd">        codes (e.g. &#39;%f&#39;).</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            RuntimeError: If a format string cannot be located within the file.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_astropy</span><span class="p">:</span>
+            <span class="n">arr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_array</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_arr</span> <span class="o">=</span> <span class="n">arr</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_dtype</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_arr</span><span class="o">.</span><span class="n">dtype</span>
+            <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;column_names&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">column_names</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">arr</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">names</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">comment_list</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filepath</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">open_mode</span><span class="p">)</span> <span class="k">as</span> <span class="n">fd</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">fd</span><span class="p">:</span>
+                    <span class="n">line</span> <span class="o">=</span> <span class="n">backwards</span><span class="o">.</span><span class="n">unicode2bytes</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">comment</span><span class="p">):</span>
+                        <span class="n">sline</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">lstrip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">comment</span><span class="p">)</span>
+                        <span class="n">sline</span> <span class="o">=</span> <span class="n">sline</span><span class="o">.</span><span class="n">lstrip</span><span class="p">(</span><span class="n">backwards</span><span class="o">.</span><span class="n">unicode2bytes</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">))</span>
+                        <span class="n">sline</span> <span class="o">=</span> <span class="n">sline</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">backwards</span><span class="o">.</span><span class="n">unicode2bytes</span><span class="p">(</span><span class="n">platform</span><span class="o">.</span><span class="n">_newline</span><span class="p">),</span>
+                                              <span class="n">backwards</span><span class="o">.</span><span class="n">unicode2bytes</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">newline</span><span class="p">))</span>
+                        <span class="n">fmts</span> <span class="o">=</span> <span class="n">sline</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">column</span><span class="p">)</span>
+                        <span class="n">fmts</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">fmts</span> <span class="k">if</span> <span class="n">f</span><span class="p">]</span>
+                        <span class="n">is_fmt</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">_fmt_char</span><span class="p">)</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">fmts</span><span class="p">]</span>
+                        <span class="k">if</span> <span class="nb">sum</span><span class="p">(</span><span class="n">is_fmt</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">fmts</span><span class="p">):</span>
+                            <span class="n">out</span> <span class="o">=</span> <span class="n">sline</span>
+                            <span class="k">break</span>
+                        <span class="n">comment_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sline</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Could not locate a line containing format descriptors.&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_format_str</span> <span class="o">=</span> <span class="n">backwards</span><span class="o">.</span><span class="n">unicode2bytes</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
+            <span class="c1"># Do column names</span>
+            <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;column_names&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">column_names</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="k">for</span> <span class="n">sline</span> <span class="ow">in</span> <span class="n">comment_list</span><span class="p">:</span>
+                    <span class="n">names</span> <span class="o">=</span> <span class="n">sline</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">newline</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">column</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">names</span><span class="p">)</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">ncols</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">column_names</span> <span class="o">=</span> <span class="p">[</span>
+                            <span class="n">backwards</span><span class="o">.</span><span class="n">bytes2unicode</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">names</span><span class="p">]</span>
+                        <span class="k">break</span>
+            <span class="c1"># Do string lengths</span>
+            <span class="n">str_fmt</span> <span class="o">=</span> <span class="n">backwards</span><span class="o">.</span><span class="n">unicode2bytes</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">str_fmt</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_format_str</span><span class="p">:</span>
+                <span class="n">fmts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fmts</span>
+                <span class="n">idx_str</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">ifmt</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">fmts</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="n">ifmt</span> <span class="o">==</span> <span class="n">str_fmt</span><span class="p">:</span>
+                        <span class="n">idx_str</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+                <span class="n">max_len</span> <span class="o">=</span> <span class="p">{</span><span class="n">i</span><span class="p">:</span> <span class="mi">0</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">idx_str</span><span class="p">}</span>
+                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filepath</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">open_mode</span><span class="p">)</span> <span class="k">as</span> <span class="n">fd</span><span class="p">:</span>
+                    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">fd</span><span class="p">:</span>
+                        <span class="n">line</span> <span class="o">=</span> <span class="n">backwards</span><span class="o">.</span><span class="n">unicode2bytes</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">comment</span><span class="p">):</span>
+                            <span class="k">continue</span>
+                        <span class="n">cols</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">newline</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">column</span><span class="p">)</span>
+                        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">idx_str</span><span class="p">:</span>
+                            <span class="n">max_len</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">max_len</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="nb">len</span><span class="p">(</span><span class="n">cols</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">idx_str</span><span class="p">:</span>
+                    <span class="n">fmts</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">backwards</span><span class="o">.</span><span class="n">unicode2bytes</span><span class="p">(</span><span class="s1">&#39;%&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">max_len</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="o">+</span> <span class="s1">&#39;s&#39;</span><span class="p">)</span>
+                <span class="n">new_format_str</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">column</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">fmts</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">newline</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">update_format_str</span><span class="p">(</span><span class="n">new_format_str</span><span class="p">)</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">arr</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">r&quot;&quot;&quot;Numpy array of table contents if opened in read mode.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">io_mode</span> <span class="o">==</span> <span class="s1">&#39;w&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_arr&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_arr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_array</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_arr</span>
+
+<div class="viewcode-block" id="AsciiTable.read_array"><a class="viewcode-back" href="../../../cis_interface.dataio.html#cis_interface.dataio.AsciiTable.AsciiTable.read_array">[docs]</a>    <span class="k">def</span> <span class="nf">read_array</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">r&quot;&quot;&quot;Read the table in as an array.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            names (list, optional): List of column names to label columns. If</span>
+<span class="sd">                not provided, existing names are used if they exist. Defaults</span>
+<span class="sd">                to None.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            np.ndarray: Array of table contents.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError: If names are provided, but not the same number as</span>
+<span class="sd">                there are columns.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">names</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">names</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">column_names</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">names</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">names</span><span class="p">)</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ncols</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The number of names does not match the number of columns&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_arr&#39;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_arr</span>
+        <span class="n">openned</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_open</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">open</span><span class="p">()</span>
+            <span class="n">openned</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_astropy</span><span class="p">:</span>
+            <span class="n">tab</span> <span class="o">=</span> <span class="n">apy_ascii</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fd</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="n">names</span><span class="p">,</span>
+                                 <span class="o">**</span><span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;astropy_kwargs&#39;</span><span class="p">,</span> <span class="p">{}))</span>
+            <span class="n">arr</span> <span class="o">=</span> <span class="n">tab</span><span class="o">.</span><span class="n">as_array</span><span class="p">()</span>
+            <span class="n">typs</span> <span class="o">=</span> <span class="p">[</span><span class="n">arr</span><span class="o">.</span><span class="n">dtype</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">str</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">arr</span><span class="o">.</span><span class="n">dtype</span><span class="p">))]</span>
+            <span class="n">cols</span> <span class="o">=</span> <span class="n">tab</span><span class="o">.</span><span class="n">columns</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">arr</span><span class="o">.</span><span class="n">dtype</span><span class="p">)):</span>
+                <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">issubdtype</span><span class="p">(</span><span class="n">arr</span><span class="o">.</span><span class="n">dtype</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s1">&#39;S&#39;</span><span class="p">)):</span>
+                    <span class="n">new_typs</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">typs</span><span class="p">)</span>
+                    <span class="n">new_typs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;complex&#39;</span>
+                    <span class="n">new_dtyp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">([(</span><span class="n">c</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span><span class="p">,</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">cols</span><span class="p">,</span> <span class="n">new_typs</span><span class="p">)])</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="n">arr</span> <span class="o">=</span> <span class="n">arr</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">new_dtyp</span><span class="p">)</span>
+                    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                        <span class="k">pass</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">genfromtxt</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fd</span><span class="p">,</span>
+                                <span class="n">comments</span><span class="o">=</span><span class="n">backwards</span><span class="o">.</span><span class="n">bytes2unicode</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">comment</span><span class="p">),</span>
+                                <span class="n">delimiter</span><span class="o">=</span><span class="n">backwards</span><span class="o">.</span><span class="n">bytes2unicode</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">column</span><span class="p">),</span>
+                                <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span>
+                                <span class="n">autostrip</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="n">names</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">openned</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">arr</span></div>
+
+<div class="viewcode-block" id="AsciiTable.write_array"><a class="viewcode-back" href="../../../cis_interface.dataio.html#cis_interface.dataio.AsciiTable.AsciiTable.write_array">[docs]</a>    <span class="k">def</span> <span class="nf">write_array</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">array</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">skip_header</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">r&quot;&quot;&quot;Write a numpy array to the table.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            array (np.ndarray): Array to be written.</span>
+<span class="sd">            names (list, optional): List of column names to write out. If</span>
+<span class="sd">                not provided, existing names are used if they exist. Defaults</span>
+<span class="sd">                to None.</span>
+<span class="sd">            skip_header (bool, optional): If True, no header information is</span>
+<span class="sd">                written (it is assumed it was already written. Defaults to</span>
+<span class="sd">                False.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError: If names are provided, but not the same number as</span>
+<span class="sd">                there are columns.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">fmt</span> <span class="o">=</span> <span class="n">backwards</span><span class="o">.</span><span class="n">bytes2unicode</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">format_str</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">newline</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">column</span> <span class="o">=</span> <span class="n">backwards</span><span class="o">.</span><span class="n">bytes2unicode</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">column</span><span class="p">)</span>
+        <span class="n">comment</span> <span class="o">=</span> <span class="n">backwards</span><span class="o">.</span><span class="n">bytes2unicode</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">comment</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span>
+        <span class="n">newline</span> <span class="o">=</span> <span class="n">backwards</span><span class="o">.</span><span class="n">bytes2unicode</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">newline</span><span class="p">)</span>
+        <span class="n">open_mode</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">open_mode</span>
+        <span class="n">openned</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">fd</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fd</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_open</span><span class="p">:</span>
+            <span class="n">fd</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filepath</span><span class="p">,</span> <span class="n">open_mode</span><span class="p">)</span>
+            <span class="n">openned</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="n">skip_header</span><span class="p">:</span>
+            <span class="n">names</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">names</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">names</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">column_names</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">names</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">names</span><span class="p">)</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ncols</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The number of names does not match &quot;</span> <span class="o">+</span>
+                                 <span class="s2">&quot;the number of columns&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_astropy</span><span class="p">:</span>
+            <span class="n">table</span> <span class="o">=</span> <span class="n">apy_Table</span><span class="p">(</span><span class="n">array</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">skip_header</span><span class="p">:</span>
+                <span class="n">table_format</span> <span class="o">=</span> <span class="s1">&#39;no_header&#39;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">table_format</span> <span class="o">=</span> <span class="s1">&#39;commented_header&#39;</span>
+                <span class="n">table</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="s2">&quot;comments&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">fmt</span><span class="p">]</span>
+            <span class="n">apy_ascii</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">table</span><span class="p">,</span> <span class="n">fd</span><span class="p">,</span>
+                            <span class="n">delimiter</span><span class="o">=</span><span class="n">column</span><span class="p">,</span> <span class="n">comment</span><span class="o">=</span><span class="n">comment</span><span class="p">,</span>
+                            <span class="nb">format</span><span class="o">=</span><span class="n">table_format</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="n">names</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">skip_header</span><span class="p">:</span>
+                <span class="n">head</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">head</span> <span class="o">=</span> <span class="n">fmt</span>
+                <span class="k">if</span> <span class="n">names</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">head</span> <span class="o">=</span> <span class="n">column</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">names</span><span class="p">)</span> <span class="o">+</span> <span class="n">newline</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span> <span class="o">+</span> <span class="n">head</span>
+            <span class="c1"># Write directly to file, savetxt writes bytes as &quot;b&#39;body&#39;&quot;</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">head</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">head</span> <span class="o">=</span> <span class="n">head</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">newline</span><span class="p">,</span> <span class="n">newline</span> <span class="o">+</span> <span class="n">comment</span><span class="p">)</span>
+                <span class="n">fd</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">asbytes</span><span class="p">(</span><span class="n">comment</span> <span class="o">+</span> <span class="n">head</span> <span class="o">+</span> <span class="n">newline</span><span class="p">))</span>
+            <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">array</span><span class="p">:</span>
+                <span class="n">row2</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">row</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">iscomplexobj</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+                        <span class="n">row2</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">real</span><span class="p">)</span>
+                        <span class="n">row2</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">imag</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">row2</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+                <span class="n">line</span> <span class="o">=</span> <span class="n">backwards</span><span class="o">.</span><span class="n">format_bytes</span><span class="p">(</span><span class="n">asbytes</span><span class="p">(</span><span class="n">fmt</span><span class="p">),</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">row2</span><span class="p">))</span>
+                <span class="n">fd</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">line</span> <span class="o">+</span> <span class="n">asbytes</span><span class="p">(</span><span class="n">newline</span><span class="p">))</span>
+            <span class="c1"># np.savetxt(fd, array,</span>
+            <span class="c1">#            fmt=fmt, delimiter=column, comments=comment,</span>
+            <span class="c1">#            newline=newline, header=head)</span>
+        <span class="k">if</span> <span class="n">openned</span><span class="p">:</span>
+            <span class="n">fd</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="n">fd</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="AsciiTable.array_to_bytes"><a class="viewcode-back" href="../../../cis_interface.dataio.html#cis_interface.dataio.AsciiTable.AsciiTable.array_to_bytes">[docs]</a>    <span class="k">def</span> <span class="nf">array_to_bytes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arr</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="s1">&#39;C&#39;</span><span class="p">):</span>
+        <span class="sd">r&quot;&quot;&quot;Convert arr to bytestring.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            arr (np.ndarray, optional): Array to write to bytestring. If None</span>
+<span class="sd">                the array of table data is used. This can also be a list of</span>
+<span class="sd">                arrays, one for each field in the table, or a list of lists,</span>
+<span class="sd">                one for each element containing the fields for that element.</span>
+<span class="sd">            order (str, optional): Order that array should be written to the</span>
+<span class="sd">                bytestring. Defaults to &#39;C&#39;.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: Bytestring.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            TypeError: If the provided array is not a numpy array, list, or tuple.</span>
+<span class="sd">            ValueError: If the array is not the correct type.</span>
+<span class="sd">            ValueError: If there are not enough arrays in the input list.</span>
+<span class="sd">            ValueError: If any of the listed arrays doesn&#39;t have enough fields.</span>
+<span class="sd">            ValueError: If any of the listed arrays doesn&#39;t have enough elements.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">ntyp</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">names</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">arr</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">arr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">arr</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span> <span class="o">==</span> <span class="n">ntyp</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">arr</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+                <span class="n">nele</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">arr</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="n">arr1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">nele</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">names</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">arr</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="o">!=</span> <span class="n">nele</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Field </span><span class="si">%s</span><span class="s2"> does not have enough elements.&quot;</span> <span class="o">%</span> <span class="n">n</span><span class="p">)</span>
+                    <span class="n">arr1</span><span class="p">[</span><span class="n">n</span><span class="p">]</span> <span class="o">=</span> <span class="n">arr</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">arr</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">==</span> <span class="n">ntyp</span><span class="p">:</span>
+                <span class="n">nele</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span>
+                <span class="n">arr1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">nele</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nele</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">arr</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="o">!=</span> <span class="n">ntyp</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Element </span><span class="si">%d</span><span class="s2"> does not have enough fields.&quot;</span> <span class="o">%</span> <span class="n">i</span><span class="p">)</span>
+                    <span class="c1"># arr1[i] = np.asarray(arr[i], self.dtype)</span>
+                    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">ntyp</span><span class="p">):</span>
+                        <span class="n">arr1</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">arr</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Not enough arrays for fields&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">arr</span><span class="o">.</span><span class="n">dtype</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">):</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">arr</span><span class="o">.</span><span class="n">ndim</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">arr</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="n">ntyp</span><span class="p">):</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Data types do not match.&quot;</span><span class="p">)</span>
+                <span class="n">arr1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">arr</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">names</span><span class="p">):</span>
+                    <span class="n">arr1</span><span class="p">[</span><span class="n">n</span><span class="p">]</span> <span class="o">=</span> <span class="n">arr</span><span class="p">[:,</span> <span class="n">i</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">arr1</span> <span class="o">=</span> <span class="n">arr</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Provided array must be an array, list, or tuple.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">order</span> <span class="o">==</span> <span class="s1">&#39;F&#39;</span><span class="p">:</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">backwards</span><span class="o">.</span><span class="n">unicode2bytes</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">ntyp</span><span class="p">):</span>
+                <span class="n">n</span> <span class="o">=</span> <span class="n">arr1</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">names</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">issubdtype</span><span class="p">(</span><span class="n">arr1</span><span class="o">.</span><span class="n">dtype</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s1">&#39;complex&#39;</span><span class="p">)):</span>
+                    <span class="n">out</span> <span class="o">=</span> <span class="n">out</span> <span class="o">+</span> <span class="n">arr1</span><span class="p">[</span><span class="n">n</span><span class="p">]</span><span class="o">.</span><span class="n">real</span><span class="o">.</span><span class="n">tobytes</span><span class="p">()</span>
+                    <span class="n">out</span> <span class="o">=</span> <span class="n">out</span> <span class="o">+</span> <span class="n">arr1</span><span class="p">[</span><span class="n">n</span><span class="p">]</span><span class="o">.</span><span class="n">imag</span><span class="o">.</span><span class="n">tobytes</span><span class="p">()</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">out</span> <span class="o">=</span> <span class="n">out</span> <span class="o">+</span> <span class="n">arr1</span><span class="p">[</span><span class="n">n</span><span class="p">]</span><span class="o">.</span><span class="n">tobytes</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">arr1</span><span class="o">.</span><span class="n">tobytes</span><span class="p">(</span><span class="n">order</span><span class="o">=</span><span class="s1">&#39;C&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">out</span></div>
+
+<div class="viewcode-block" id="AsciiTable.bytes_to_array"><a class="viewcode-back" href="../../../cis_interface.dataio.html#cis_interface.dataio.AsciiTable.AsciiTable.bytes_to_array">[docs]</a>    <span class="k">def</span> <span class="nf">bytes_to_array</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="s1">&#39;C&#39;</span><span class="p">):</span>
+        <span class="sd">r&quot;&quot;&quot;Process bytes according to the table format and return it as an</span>
+<span class="sd">        array.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            data (bytes): Byte string of table data.</span>
+<span class="sd">            order (str, optional): Order of data for reshaping. Defaults to</span>
+<span class="sd">                &#39;C&#39;.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            np.ndarray: Numpy array containing data from bytes.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">itemsize</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Data length (</span><span class="si">%d</span><span class="s2">) must a multiple of the itemsize (</span><span class="si">%d</span><span class="s2">).&quot;</span>
+                               <span class="o">%</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">itemsize</span><span class="p">))</span>
+        <span class="n">nrows</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">//</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">itemsize</span>
+        <span class="k">if</span> <span class="n">order</span> <span class="o">==</span> <span class="s1">&#39;F&#39;</span><span class="p">:</span>
+            <span class="n">arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">nrows</span><span class="p">,),</span> <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+            <span class="n">prev</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">j</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">)):</span>
+                <span class="n">idata</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">prev</span><span class="p">:(</span><span class="n">prev</span> <span class="o">+</span> <span class="p">(</span><span class="n">nrows</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">itemsize</span><span class="p">))]</span>
+                <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">issubdtype</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s1">&#39;complex&#39;</span><span class="p">)):</span>
+                    <span class="n">idata_real</span> <span class="o">=</span> <span class="n">idata</span><span class="p">[:(</span><span class="n">nrows</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">itemsize</span> <span class="o">//</span> <span class="mi">2</span><span class="p">)]</span>
+                    <span class="n">idata_imag</span> <span class="o">=</span> <span class="n">idata</span><span class="p">[(</span><span class="n">nrows</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">itemsize</span> <span class="o">//</span> <span class="mi">2</span><span class="p">):]</span>
+                    <span class="n">arr_real</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fromstring</span><span class="p">(</span><span class="n">idata_real</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;float64&#39;</span><span class="p">)</span>
+                    <span class="n">arr_imag</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fromstring</span><span class="p">(</span><span class="n">idata_imag</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;float64&#39;</span><span class="p">)</span>
+                    <span class="n">arr</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">names</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">nrows</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                    <span class="n">arr</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">names</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span> <span class="o">+=</span> <span class="n">arr_real</span>
+                    <span class="n">arr</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">names</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span> <span class="o">+=</span> <span class="n">arr_imag</span> <span class="o">*</span> <span class="mi">1</span><span class="n">j</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">arr</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">names</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fromstring</span><span class="p">(</span><span class="n">idata</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                <span class="n">prev</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">idata</span><span class="p">)</span>
+                <span class="n">j</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fromstring</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+            <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">ncols</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Returned data does not match&quot;</span><span class="p">)</span>
+            <span class="n">nrows</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span> <span class="o">//</span> <span class="bp">self</span><span class="o">.</span><span class="n">ncols</span>
+            <span class="n">arr</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="n">nrows</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ncols</span><span class="p">),</span> <span class="n">order</span><span class="o">=</span><span class="n">order</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">arr</span></div>
+
+<div class="viewcode-block" id="AsciiTable.read_bytes"><a class="viewcode-back" href="../../../cis_interface.dataio.html#cis_interface.dataio.AsciiTable.AsciiTable.read_bytes">[docs]</a>    <span class="k">def</span> <span class="nf">read_bytes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="s1">&#39;C&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">r&quot;&quot;&quot;Read the table in as array and encode as bytes.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            order (str, optional): Order that array should be written to the</span>
+<span class="sd">                bytestring. Defaults to &#39;C&#39;.</span>
+<span class="sd">            **kwargs: Additional keyword arguments are passed to read_array.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            bytes: Array as bytes.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">arr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_array</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">array_to_bytes</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="n">order</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">out</span></div>
+
+<div class="viewcode-block" id="AsciiTable.write_bytes"><a class="viewcode-back" href="../../../cis_interface.dataio.html#cis_interface.dataio.AsciiTable.AsciiTable.write_bytes">[docs]</a>    <span class="k">def</span> <span class="nf">write_bytes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="s1">&#39;C&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">r&quot;&quot;&quot;Write a numpy array to the table.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            data (bytes): Bytes string to be interpreted as array and</span>
+<span class="sd">                written to file.</span>
+<span class="sd">            order (str, optional): Order of data for reshaping. Defaults to</span>
+<span class="sd">                &#39;C&#39;.</span>
+<span class="sd">            **kwargs: Additional keyword arguments are passed to write_array.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">arr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bytes_to_array</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="n">order</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">write_array</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Meagan Lang, David Raila.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../',
+            VERSION:'0.1.3',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          
+          SphinxRtdTheme.Navigation.enableSticky();
+          
+      });
+  </script> 
+
+</body>
+</html>

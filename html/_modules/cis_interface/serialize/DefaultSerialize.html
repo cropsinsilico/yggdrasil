@@ -1,0 +1,578 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>cis_interface.serialize.DefaultSerialize &mdash; cis_interface 0.1.3 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> cis_interface
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../includeme.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../formatted_io.html">Formatted I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../server_client_io.html">Server/Client I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../server_client_io.html#one-server-two-clients">One Server, Two Clients</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../yaml.html">YAML Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../config.html">Configuration Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../units.html">Units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../c_format_strings.html">C-Style Format Strings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../io_drivers.html">Input/Output Drivers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../model_drivers.html">Model Drivers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../code.html">Code</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/examples_toc.html">Examples</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">cis_interface</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>cis_interface.serialize.DefaultSerialize</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for cis_interface.serialize.DefaultSerialize</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">uuid</span>
+<span class="kn">from</span> <span class="nn">cis_interface</span> <span class="k">import</span> <span class="n">backwards</span><span class="p">,</span> <span class="n">tools</span><span class="p">,</span> <span class="n">serialize</span>
+
+
+<span class="n">CIS_MSG_HEAD</span> <span class="o">=</span> <span class="n">backwards</span><span class="o">.</span><span class="n">unicode2bytes</span><span class="p">(</span><span class="s1">&#39;CIS_MSG_HEAD&#39;</span><span class="p">)</span>
+<span class="n">HEAD_VAL_SEP</span> <span class="o">=</span> <span class="n">backwards</span><span class="o">.</span><span class="n">unicode2bytes</span><span class="p">(</span><span class="s1">&#39;:CIS:&#39;</span><span class="p">)</span>
+<span class="n">HEAD_KEY_SEP</span> <span class="o">=</span> <span class="n">backwards</span><span class="o">.</span><span class="n">unicode2bytes</span><span class="p">(</span><span class="s1">&#39;,CIS,&#39;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="DefaultSerialize"><a class="viewcode-back" href="../../../cis_interface.serialize.html#cis_interface.serialize.DefaultSerialize.DefaultSerialize">[docs]</a><span class="k">class</span> <span class="nc">DefaultSerialize</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">r&quot;&quot;&quot;Default class for serializing/deserializing a python object into/from</span>
+<span class="sd">    a bytes message.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        format_str (str, optional): If provided, this string will be used to</span>
+<span class="sd">            format messages from a list of arguments and parse messages to</span>
+<span class="sd">            get a list of arguments in C printf/scanf style. Defaults to</span>
+<span class="sd">            None and messages are assumed to already be bytes.</span>
+<span class="sd">        as_array (bool, optional): If True, each of the arguments being</span>
+<span class="sd">            serialized/deserialized will be arrays that are converted to/from</span>
+<span class="sd">            bytes in column major (&#39;F&#39;) order. Otherwise, each argument should</span>
+<span class="sd">            be a scalar. Defaults to False.</span>
+<span class="sd">        field_names (list, optional): The names of fields in the format string.</span>
+<span class="sd">            If not provided, names are set based on the order of the fields in</span>
+<span class="sd">            the format string.</span>
+<span class="sd">        field_units (list, optional): The units of fields in the format string.</span>
+<span class="sd">            If not provided, all fields are assumed to be dimensionless.</span>
+<span class="sd">        func_serialize (func, optional): Callable object that takes python</span>
+<span class="sd">            objects as input and returns a bytes string representation. Defaults</span>
+<span class="sd">            to None.</span>
+<span class="sd">        func_deserialize (func, optional): Callable object that takes a bytes</span>
+<span class="sd">            string as input and returns a deserialized python object. Defaults</span>
+<span class="sd">            to None.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        format_str (str): Format string used to format/parse bytes messages</span>
+<span class="sd">            from/to a list of arguments in C printf/scanf style.</span>
+<span class="sd">        as_array (bool): True or False depending if serialized/deserialized</span>
+<span class="sd">            python objects will be arrays or scalars.</span>
+<span class="sd">        field_names (list): The names of fields in the format string.</span>
+<span class="sd">        field_units (list): The units of fields in the format string.</span>
+<span class="sd">        func_serialize (func): Callable object that takes python object as input</span>
+<span class="sd">            and returns a bytes string representation.</span>
+<span class="sd">        func_deserialize (func): Callable object that takes a bytes string as</span>
+<span class="sd">            input and returns a deserialized python object.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">format_str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">as_array</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                 <span class="n">field_names</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">field_units</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">func_serialize</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">func_deserialize</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">format_str</span> <span class="o">=</span> <span class="n">format_str</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">as_array</span> <span class="o">=</span> <span class="n">as_array</span>
+        <span class="k">if</span> <span class="n">field_names</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">field_names</span> <span class="o">=</span> <span class="p">[</span><span class="n">backwards</span><span class="o">.</span><span class="n">unicode2bytes</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">field_names</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">field_names</span> <span class="o">=</span> <span class="n">field_names</span>
+        <span class="k">if</span> <span class="n">field_units</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">field_units</span> <span class="o">=</span> <span class="p">[</span><span class="n">backwards</span><span class="o">.</span><span class="n">unicode2bytes</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">field_units</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">field_units</span> <span class="o">=</span> <span class="n">field_units</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">func_serialize</span><span class="p">,</span> <span class="n">DefaultSerialize</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_func_serialize</span> <span class="o">=</span> <span class="n">func_serialize</span><span class="o">.</span><span class="n">func_serialize</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_func_serialize</span> <span class="o">=</span> <span class="n">func_serialize</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">func_deserialize</span><span class="p">,</span> <span class="n">DefaultSerialize</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_func_deserialize</span> <span class="o">=</span> <span class="n">func_deserialize</span><span class="o">.</span><span class="n">func_deserialize</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_func_deserialize</span> <span class="o">=</span> <span class="n">func_deserialize</span>
+
+    <span class="c1"># @property</span>
+    <span class="c1"># def serializer_class(self):</span>
+    <span class="c1">#     r&quot;&quot;&quot;str: String representation of the class.&quot;&quot;&quot;</span>
+    <span class="c1">#     cls = str(self.__class__).split(&quot;&#39;&quot;)</span>
+    <span class="c1">#     print(cls)</span>
+    <span class="c1">#     return cls</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">is_user_defined</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">r&quot;&quot;&quot;bool: True if serialization or deserialization function was user</span>
+<span class="sd">        defined.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">_func_serialize</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span>
+                <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_func_deserialize</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">))</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">serializer_type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">r&quot;&quot;&quot;int: Type of serializer.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_user_defined</span><span class="p">:</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">format_str</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">elif</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">as_array</span><span class="p">:</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="mi">2</span>
+        <span class="k">return</span> <span class="n">out</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">empty_msg</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">r&quot;&quot;&quot;obj: Object indicating empty message.&quot;&quot;&quot;</span>
+        <span class="n">stype</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">serializer_type</span>
+        <span class="k">if</span> <span class="n">stype</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">backwards</span><span class="o">.</span><span class="n">unicode2bytes</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">out</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">serializer_info</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">r&quot;&quot;&quot;dict: Information about serializer required to reconstruct it.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_user_defined</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Cannot get serializer info for user &quot;</span> <span class="o">+</span>
+                               <span class="s2">&quot;defined functions.&quot;</span><span class="p">)</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">stype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">serializer_type</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">format_str</span><span class="p">:</span>
+            <span class="n">out</span><span class="p">[</span><span class="s1">&#39;format_str&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">format_str</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">as_array</span><span class="p">:</span>
+            <span class="n">out</span><span class="p">[</span><span class="s1">&#39;as_array&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">as_array</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">field_names</span><span class="p">:</span>
+            <span class="n">out</span><span class="p">[</span><span class="s1">&#39;field_names&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">field_names</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">field_units</span><span class="p">:</span>
+            <span class="n">out</span><span class="p">[</span><span class="s1">&#39;field_units&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">field_units</span>
+        <span class="k">return</span> <span class="n">out</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">field_formats</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">r&quot;&quot;&quot;list: Format codes for each field in the format string.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">format_str</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[]</span>
+        <span class="k">return</span> <span class="n">serialize</span><span class="o">.</span><span class="n">extract_formats</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">format_str</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">nfields</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">r&quot;&quot;&quot;int: Number of fields in the format string.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">field_formats</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">numpy_dtype</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">r&quot;&quot;&quot;np.dtype: Data type associated with the format string.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">format_str</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">return</span> <span class="n">serialize</span><span class="o">.</span><span class="n">cformat2nptype</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">format_str</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">field_names</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">scanf_format_str</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">r&quot;&quot;&quot;str: Simplified format string for scanf.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">format_str</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">return</span> <span class="n">serialize</span><span class="o">.</span><span class="n">cformat2pyscanf</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">format_str</span><span class="p">)</span>
+        
+<div class="viewcode-block" id="DefaultSerialize.func_serialize"><a class="viewcode-back" href="../../../cis_interface.serialize.html#cis_interface.serialize.DefaultSerialize.DefaultSerialize.func_serialize">[docs]</a>    <span class="k">def</span> <span class="nf">func_serialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
+        <span class="sd">r&quot;&quot;&quot;Default method for serializing object into message.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            args (obj): List of arguments to be formatted or a ready made message.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            bytes, str: Serialized message.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            Exception: If there is no format string and more than one argument</span>
+<span class="sd">                is provided.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_func_serialize</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># Return directly to check and raise TypeError</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_func_serialize</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">format_str</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">as_array</span><span class="p">:</span>
+                <span class="n">out</span> <span class="o">=</span> <span class="n">serialize</span><span class="o">.</span><span class="n">array_to_bytes</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">numpy_dtype</span><span class="p">,</span>
+                                               <span class="n">order</span><span class="o">=</span><span class="s1">&#39;F&#39;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">out</span> <span class="o">=</span> <span class="n">serialize</span><span class="o">.</span><span class="n">format_message</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">format_str</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;No format string and more than one &quot;</span> <span class="o">+</span>
+                                    <span class="s2">&quot;argument provided.&quot;</span><span class="p">)</span>
+                <span class="n">out</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">out</span> <span class="o">=</span> <span class="n">args</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">backwards</span><span class="o">.</span><span class="n">unicode2bytes</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">out</span></div>
+
+<div class="viewcode-block" id="DefaultSerialize.func_deserialize"><a class="viewcode-back" href="../../../cis_interface.serialize.html#cis_interface.serialize.DefaultSerialize.DefaultSerialize.func_deserialize">[docs]</a>    <span class="k">def</span> <span class="nf">func_deserialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
+        <span class="sd">r&quot;&quot;&quot;Default method for deseserializing a message.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            msg (str, bytes): Message to be deserialized.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            tuple(obj, dict): Deserialized message and header information.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_func_deserialize</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_func_deserialize</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">format_str</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">as_array</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">empty_msg</span>
+                    <span class="c1"># out = np.empty(0, self.numpy_dtype)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">out</span> <span class="o">=</span> <span class="n">serialize</span><span class="o">.</span><span class="n">bytes_to_array</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">numpy_dtype</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="s1">&#39;F&#39;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">empty_msg</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">out</span> <span class="o">=</span> <span class="n">serialize</span><span class="o">.</span><span class="n">process_message</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">format_str</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">msg</span>
+        <span class="k">return</span> <span class="n">out</span></div>
+
+<div class="viewcode-block" id="DefaultSerialize.serialize"><a class="viewcode-back" href="../../../cis_interface.serialize.html#cis_interface.serialize.DefaultSerialize.DefaultSerialize.serialize">[docs]</a>    <span class="k">def</span> <span class="nf">serialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">header_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">add_serializer_info</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">r&quot;&quot;&quot;Serialize a message.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            args (obj): List of arguments to be formatted or a ready made message.</span>
+<span class="sd">            header_kwargs (dict, optional): Keyword arguments that should be</span>
+<span class="sd">                added to the header. Defaults to None and no header is added.</span>
+<span class="sd">            add_serializer_info (bool, optional): If True, add enough information</span>
+<span class="sd">                about this serializer to the header that the message can be</span>
+<span class="sd">                recovered.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            bytes, str: Serialized message.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            TypeError: If returned msg is not bytes type (str on Python 2).</span>
+
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">backwards</span><span class="o">.</span><span class="n">bytes_type</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">args</span> <span class="o">==</span> <span class="n">tools</span><span class="o">.</span><span class="n">CIS_MSG_EOF</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">args</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">func_serialize</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">backwards</span><span class="o">.</span><span class="n">bytes_type</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Serialization function did not yield bytes type.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">add_serializer_info</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">header_kwargs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">header_kwargs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+            <span class="n">header_kwargs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">serializer_info</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">header_kwargs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">header_kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;size&#39;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">out</span><span class="p">))</span>
+            <span class="n">header_kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;id&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">()))</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">format_header</span><span class="p">(</span><span class="n">header_kwargs</span><span class="p">)</span> <span class="o">+</span> <span class="n">out</span>
+        <span class="k">return</span> <span class="n">out</span></div>
+
+<div class="viewcode-block" id="DefaultSerialize.update_from_message"><a class="viewcode-back" href="../../../cis_interface.serialize.html#cis_interface.serialize.DefaultSerialize.DefaultSerialize.update_from_message">[docs]</a>    <span class="k">def</span> <span class="nf">update_from_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">kwargs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">serializer_info</span><span class="p">)</span>
+        <span class="n">sinfo</span> <span class="o">=</span> <span class="n">serialize</span><span class="o">.</span><span class="n">guess_serializer</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update_serializer</span><span class="p">(</span><span class="o">**</span><span class="n">sinfo</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="DefaultSerialize.update_serializer"><a class="viewcode-back" href="../../../cis_interface.serialize.html#cis_interface.serialize.DefaultSerialize.DefaultSerialize.update_serializer">[docs]</a>    <span class="k">def</span> <span class="nf">update_serializer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">r&quot;&quot;&quot;Update serializer with provided information.&quot;&quot;&quot;</span>
+        <span class="n">key_list</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;format_str&#39;</span><span class="p">,</span> <span class="s1">&#39;as_array&#39;</span><span class="p">,</span> <span class="s1">&#39;field_names&#39;</span><span class="p">,</span> <span class="s1">&#39;field_units&#39;</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">key_list</span><span class="p">:</span>
+            <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">)))</span>
+        <span class="k">if</span> <span class="s1">&#39;stype&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+            <span class="n">stype</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;stype&#39;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">serializer_type</span> <span class="o">!=</span> <span class="n">stype</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">stype</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">):</span>
+                <span class="n">sinfo</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">serializer_info</span>
+                <span class="n">sinfo</span><span class="p">[</span><span class="s1">&#39;stype&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">stype</span>
+                <span class="c1"># Monkey patch class (unadvised, but child classes are simple)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;monkey patch&#39;</span><span class="p">,</span> <span class="n">sinfo</span><span class="p">)</span>
+                <span class="bp">self</span> <span class="o">=</span> <span class="n">serialize</span><span class="o">.</span><span class="n">get_serializer</span><span class="p">(</span><span class="o">**</span><span class="n">sinfo</span><span class="p">)</span>
+                <span class="k">assert</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">serializer_type</span> <span class="o">==</span> <span class="n">stype</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="DefaultSerialize.deserialize"><a class="viewcode-back" href="../../../cis_interface.serialize.html#cis_interface.serialize.DefaultSerialize.DefaultSerialize.deserialize">[docs]</a>    <span class="k">def</span> <span class="nf">deserialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
+        <span class="sd">r&quot;&quot;&quot;Deserialize a message.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            msg (str, bytes): Message to be deserialized.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            tuple(obj, dict): Deserialized message and header information.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            TypeError: If msg is not bytes type (str on Python 2).</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">backwards</span><span class="o">.</span><span class="n">bytes_type</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Message to be deserialized is not bytes type.&quot;</span><span class="p">)</span>
+        <span class="n">header_info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parse_header</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="c1"># Update parameters based on header info</span>
+        <span class="k">if</span> <span class="s1">&#39;stype&#39;</span> <span class="ow">in</span> <span class="n">header_info</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">update_serializer</span><span class="p">(</span><span class="o">**</span><span class="n">header_info</span><span class="p">)</span>
+        <span class="n">body</span> <span class="o">=</span> <span class="n">header_info</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;body&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">body</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">header_info</span><span class="p">[</span><span class="s1">&#39;size&#39;</span><span class="p">]:</span>
+            <span class="n">header_info</span><span class="p">[</span><span class="s1">&#39;incomplete&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">return</span> <span class="n">body</span><span class="p">,</span> <span class="n">header_info</span>
+        <span class="k">if</span> <span class="n">body</span> <span class="o">==</span> <span class="n">tools</span><span class="o">.</span><span class="n">CIS_MSG_EOF</span><span class="p">:</span>
+            <span class="n">header_info</span><span class="p">[</span><span class="s1">&#39;eof&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">body</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">func_deserialize</span><span class="p">(</span><span class="n">body</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">out</span><span class="p">,</span> <span class="n">header_info</span></div>
+
+<div class="viewcode-block" id="DefaultSerialize.format_header"><a class="viewcode-back" href="../../../cis_interface.serialize.html#cis_interface.serialize.DefaultSerialize.DefaultSerialize.format_header">[docs]</a>    <span class="k">def</span> <span class="nf">format_header</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">header_info</span><span class="p">):</span>
+        <span class="sd">r&quot;&quot;&quot;Format header info to form a string that should prepend a message.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            header_info (dict): Properties that should be included in the header.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: Message with header in front.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">header</span> <span class="o">=</span> <span class="n">backwards</span><span class="o">.</span><span class="n">bytes2unicode</span><span class="p">(</span><span class="n">CIS_MSG_HEAD</span><span class="p">)</span>
+        <span class="n">header_str</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">header_info</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+                <span class="n">header_str</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">backwards</span><span class="o">.</span><span class="n">bytes2unicode</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">v</span><span class="p">])</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">backwards</span><span class="o">.</span><span class="n">string_types</span><span class="p">):</span>
+                <span class="n">header_str</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">backwards</span><span class="o">.</span><span class="n">bytes2unicode</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">header_str</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+        <span class="n">header</span> <span class="o">+=</span> <span class="n">backwards</span><span class="o">.</span><span class="n">bytes2unicode</span><span class="p">(</span><span class="n">HEAD_KEY_SEP</span><span class="p">)</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+            <span class="p">[</span><span class="s1">&#39;</span><span class="si">%s%s%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">backwards</span><span class="o">.</span><span class="n">bytes2unicode</span><span class="p">(</span><span class="n">k</span><span class="p">),</span>
+                         <span class="n">backwards</span><span class="o">.</span><span class="n">bytes2unicode</span><span class="p">(</span><span class="n">HEAD_VAL_SEP</span><span class="p">),</span>
+                         <span class="n">backwards</span><span class="o">.</span><span class="n">bytes2unicode</span><span class="p">(</span><span class="n">v</span><span class="p">))</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span>
+             <span class="n">header_str</span><span class="o">.</span><span class="n">items</span><span class="p">()])</span>
+        <span class="n">header</span> <span class="o">+=</span> <span class="n">backwards</span><span class="o">.</span><span class="n">bytes2unicode</span><span class="p">(</span><span class="n">CIS_MSG_HEAD</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">backwards</span><span class="o">.</span><span class="n">unicode2bytes</span><span class="p">(</span><span class="n">header</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="DefaultSerialize.parse_header"><a class="viewcode-back" href="../../../cis_interface.serialize.html#cis_interface.serialize.DefaultSerialize.DefaultSerialize.parse_header">[docs]</a>    <span class="k">def</span> <span class="nf">parse_header</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
+        <span class="sd">r&quot;&quot;&quot;Extract header info from a message.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            msg (str): Message to extract header from.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: Message properties.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">CIS_MSG_HEAD</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">msg</span><span class="p">:</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">body</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">msg</span><span class="p">))</span>
+            <span class="k">return</span> <span class="n">out</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">header</span><span class="p">,</span> <span class="n">body</span> <span class="o">=</span> <span class="n">msg</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">CIS_MSG_HEAD</span><span class="p">)</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">body</span><span class="o">=</span><span class="n">body</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">header</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">HEAD_KEY_SEP</span><span class="p">):</span>
+            <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">HEAD_VAL_SEP</span><span class="p">)</span>
+            <span class="n">out</span><span class="p">[</span><span class="n">backwards</span><span class="o">.</span><span class="n">bytes2unicode</span><span class="p">(</span><span class="n">k</span><span class="p">)]</span> <span class="o">=</span> <span class="n">backwards</span><span class="o">.</span><span class="n">bytes2unicode</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;size&#39;</span><span class="p">,</span> <span class="s1">&#39;as_array&#39;</span><span class="p">,</span> <span class="s1">&#39;stype&#39;</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">out</span><span class="p">:</span>
+                <span class="n">out</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">out</span><span class="p">[</span><span class="n">k</span><span class="p">]))</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;format_str&#39;</span><span class="p">,</span> <span class="s1">&#39;field_names&#39;</span><span class="p">,</span> <span class="s1">&#39;field_units&#39;</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">out</span><span class="p">:</span>
+                <span class="n">out</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">backwards</span><span class="o">.</span><span class="n">unicode2bytes</span><span class="p">(</span><span class="n">out</span><span class="p">[</span><span class="n">k</span><span class="p">])</span>
+                <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;field_names&#39;</span><span class="p">,</span> <span class="s1">&#39;field_units&#39;</span><span class="p">]:</span>
+                    <span class="n">out</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">out</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">backwards</span><span class="o">.</span><span class="n">unicode2bytes</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">))</span>
+        <span class="c1"># for k in [&#39;format_str&#39;]:</span>
+        <span class="c1">#     if k in out:</span>
+        <span class="c1">#         out[k] = backwards.unicode2bytes(out[k])</span>
+        <span class="k">return</span> <span class="n">out</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Meagan Lang, David Raila.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../',
+            VERSION:'0.1.3',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          
+          SphinxRtdTheme.Navigation.enableSticky();
+          
+      });
+  </script> 
+
+</body>
+</html>

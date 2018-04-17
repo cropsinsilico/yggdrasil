@@ -1,0 +1,370 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Configuration Files &mdash; cis_interface 0.1.3 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Units" href="units.html" />
+    <link rel="prev" title="YAML Files" href="yaml.html" /> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> cis_interface
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="includeme.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="formatted_io.html">Formatted I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="server_client_io.html">Server/Client I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="server_client_io.html#one-server-two-clients">One Server, Two Clients</a></li>
+<li class="toctree-l1"><a class="reference internal" href="yaml.html">YAML Files</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Configuration Files</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#debug-options">Debug Options</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#rabbitmq-options">RabbitMQ Options</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#parallel-options">Parallel Options</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="units.html">Units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="c_format_strings.html">C-Style Format Strings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="io_drivers.html">Input/Output Drivers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="model_drivers.html">Model Drivers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="code.html">Code</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/examples_toc.html">Examples</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">cis_interface</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Configuration Files</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/config.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="configuration-files">
+<span id="config-rst"></span><h1>Configuration Files<a class="headerlink" href="#configuration-files" title="Permalink to this headline">¶</a></h1>
+<p>Many components of the cis_interface framework&#8217;s behavior can be controlled
+by options in the configuration file. When installed cis_interface creates
+a user config file called &#8216;.cis_interface.cfg&#8217; in your home directory. By
+editting the options in the user config file, you can customize the behavior
+of your framework runs.</p>
+<p>Further customization for specific runs can be
+achieved by creating a local config file called &#8216;.cis_interface.cfg&#8217; in the
+directory where the interface will be run. Any options not found in the local
+will be filled in with values from the user config file. Any options not
+found in the user config file will be filled in with default package values.</p>
+<div class="section" id="debug-options">
+<h2>Debug Options<a class="headerlink" href="#debug-options" title="Permalink to this headline">¶</a></h2>
+<p>Options for controlling the level of information printed during a run can be
+controlled by options in the &#8216;[debug]&#8217; section of the config files. Each one
+can have any of the valid
+<a class="reference external" href="https://docs.python.org/2/library/logging.html#levels">logging levels</a>.
+These include:</p>
+<ul class="simple">
+<li><strong>NOTSET:</strong> Do not print any messages.</li>
+<li><strong>CRITICAL:</strong> Print only messages logged as critical.</li>
+<li><strong>ERROR:</strong> Print messages logged as error or critical.</li>
+<li><strong>WARNING:</strong> Print messages logged as warning, error, or critical.</li>
+<li><strong>INFO:</strong> Print messages logged as info, warning, error, or critical.</li>
+<li><strong>DEBUG:</strong> Print messages logged as debug, info, warning, error, or critical.</li>
+</ul>
+<p>The debug options are:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="10%" />
+<col width="11%" />
+<col width="79%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Option</th>
+<th class="head">Default</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>cis</td>
+<td>INFO</td>
+<td>Controls the level of messages printed by the
+cis_interface framework itself.</td>
+</tr>
+<tr class="row-odd"><td>rmq</td>
+<td>WARNING</td>
+<td>Controls the level of messages printed by
+RabbitMQ.</td>
+</tr>
+<tr class="row-even"><td>client</td>
+<td>INFO</td>
+<td>Controls the level of messages printed by
+cis_interface calls from the models.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="rabbitmq-options">
+<h2>RabbitMQ Options<a class="headerlink" href="#rabbitmq-options" title="Permalink to this headline">¶</a></h2>
+<p>Options in the &#8216;[RMQ]&#8217; section control the behavior of RabbitMQ connections.
+If the option is left blank, the default RabbitMQ option is used.
+These include:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="14%" />
+<col width="14%" />
+<col width="72%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Option</th>
+<th class="head">Default</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>namespace</td>
+<td>&nbsp;</td>
+<td>RabbitMQ exchange.</td>
+</tr>
+<tr class="row-odd"><td>host</td>
+<td>localhost</td>
+<td>RabbitMQ server host.</td>
+</tr>
+<tr class="row-even"><td>vhost</td>
+<td>&nbsp;</td>
+<td>RabbitMQ server virtual host.</td>
+</tr>
+<tr class="row-odd"><td>user</td>
+<td>guest</td>
+<td>RabbitMQ server user name.</td>
+</tr>
+<tr class="row-even"><td>password</td>
+<td>guest</td>
+<td>RabbitMQ server password.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="parallel-options">
+<h2>Parallel Options<a class="headerlink" href="#parallel-options" title="Permalink to this headline">¶</a></h2>
+<p>Options in the &#8216;[parallel]&#8217; section control the behavior of parallelization.
+Although, not supported in the current version of cis_interface, these
+include:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="15%" />
+<col width="11%" />
+<col width="74%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Option</th>
+<th class="head">Default</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>cluster</td>
+<td>&nbsp;</td>
+<td>List of IP address of cluster nodes.</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="units.html" class="btn btn-neutral float-right" title="Units" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="yaml.html" class="btn btn-neutral" title="YAML Files" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Meagan Lang, David Raila.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.1.3',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          
+          SphinxRtdTheme.Navigation.enableSticky();
+          
+      });
+  </script> 
+
+</body>
+</html>

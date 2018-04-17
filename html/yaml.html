@@ -1,0 +1,537 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>YAML Files &mdash; cis_interface 0.1.3 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Configuration Files" href="config.html" />
+    <link rel="prev" title="Server/Client I/O" href="server_client_io.html" /> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> cis_interface
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="includeme.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="formatted_io.html">Formatted I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="server_client_io.html">Server/Client I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="server_client_io.html#one-server-two-clients">One Server, Two Clients</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">YAML Files</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#model-options">Model Options</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#communication-options">Communication Options</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#driver-method">Driver Method</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#connection-method">Connection Method</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#connection-options">Connection Options</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="config.html">Configuration Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="units.html">Units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="c_format_strings.html">C-Style Format Strings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="io_drivers.html">Input/Output Drivers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="model_drivers.html">Model Drivers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="code.html">Code</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/examples_toc.html">Examples</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">cis_interface</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>YAML Files</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/yaml.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="yaml-files">
+<span id="yaml-rst"></span><h1>YAML Files<a class="headerlink" href="#yaml-files" title="Permalink to this headline">¶</a></h1>
+<p>Models and communication between models during are specified by the user in one
+or more YAML files. YAML files have a human readable structure that can be parsed
+by many different programming languages to recreate data structures. While the
+YAML language can express very complex data structures (more information can be
+found <a class="reference external" href="http://yaml.org/">here</a>), only a few key concepts
+are needed to create a YAML file for use with the cis_interface framework.</p>
+<ul class="simple">
+<li>Indentation: Entries with the same indentation belong to the same collection.</li>
+<li>Sequences: Entries that begin with a dash and a space (- ) are members
+of a sequence collection. Members of a sequence can be text, collections,
+or a mix of both.</li>
+<li>Mappings: Mapping entries use a colon and a space (: ) to seperate a
+<code class="docutils literal"><span class="pre">key:</span> <span class="pre">value</span></code> pair. Keys are text and values can be text or a collection.</li>
+</ul>
+<div class="section" id="model-options">
+<h2>Model Options<a class="headerlink" href="#model-options" title="Permalink to this headline">¶</a></h2>
+<p>At the root level of a cis_interface YAML, should be a mapping key <code class="docutils literal"><span class="pre">model:</span></code>
+or <code class="docutils literal"><span class="pre">models:</span></code>. This denotes information pertaining to the model(s) that should
+be run. The value for this key can be a single model entry:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">models</span><span class="p">:</span>
+  <span class="n">name</span><span class="p">:</span> <span class="n">modelA</span>
+  <span class="n">driver</span><span class="p">:</span> <span class="n">PythonModelDriver</span>
+  <span class="n">args</span><span class="p">:</span> <span class="o">./</span><span class="n">src</span><span class="o">/</span><span class="n">gs_lesson4_modelA</span><span class="o">.</span><span class="n">py</span>
+</pre></div>
+</div>
+<p>or a sequence of model entries:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">models</span><span class="p">:</span>
+  <span class="o">-</span> <span class="n">name</span><span class="p">:</span> <span class="n">modelA</span>
+    <span class="n">driver</span><span class="p">:</span> <span class="n">PythonModelDriver</span>
+    <span class="n">args</span><span class="p">:</span> <span class="o">./</span><span class="n">src</span><span class="o">/</span><span class="n">gs_lesson4_modelA</span><span class="o">.</span><span class="n">py</span>
+  <span class="o">-</span> <span class="n">name</span><span class="p">:</span> <span class="n">modelB</span>
+    <span class="n">driver</span><span class="p">:</span> <span class="n">GCCModelDriver</span>
+    <span class="n">args</span><span class="p">:</span> <span class="o">./</span><span class="n">src</span><span class="o">/</span><span class="n">gs_lesson4_modelB</span><span class="o">.</span><span class="n">c</span>
+</pre></div>
+</div>
+<p>At a minimum, each model entry should contain the following keys:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="12%" />
+<col width="88%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Key</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>name</td>
+<td>Unique name used to identify the model. This will be used to
+report errors associated with the model.</td>
+</tr>
+<tr class="row-odd"><td>driver</td>
+<td>The name of the driver class that should be used to run the model.
+The list of available drivers can be found
+<a class="reference internal" href="model_drivers.html#model-drivers-rst"><span class="std std-ref">here</span></a>.</td>
+</tr>
+<tr class="row-even"><td>args</td>
+<td>The full path to the file containing the model program that will
+be run by the driver or a list starting with the program file and
+including any arguments that should be passed as input to the
+program.</td>
+</tr>
+<tr class="row-odd"><td>inputs</td>
+<td>A mapping object containing the entry for a model input channel
+or a list of input channel entries. If the model does not get
+input from another model, this may be ommitted.</td>
+</tr>
+<tr class="row-even"><td>outputs</td>
+<td>A mapping object containing the entry for a model output channel
+or a list of output channel entries. If the model does not output
+to another model, this may be ommitted.</td>
+</tr>
+</tbody>
+</table>
+<p>Models entries can also have the following optional keys:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="12%" />
+<col width="88%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Key</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>is_server</td>
+<td>If <code class="docutils literal"><span class="pre">True</span></code>, this model will be considered to function as a
+server for one or more models. The corresponding channel that
+should be passed to the cis_interface API will be the name of
+the model.</td>
+</tr>
+<tr class="row-odd"><td>client_of</td>
+<td>The names of one or more models that this model will call as a
+server. If there are more than one, this should be specified as
+a sequence collection. The corresponding channel(s) that should
+be passed to the cis_interface API will be the name of the
+server model joined with the name of the client model with an
+underscore <code class="docutils literal"><span class="pre">&lt;server_model&gt;_&lt;client_model&gt;</span></code>. There will be one
+channel created for each server the model is a client of.</td>
+</tr>
+</tbody>
+</table>
+<p>Any additional keys in the model entry will be passed to the model driver. A
+full description of the available model drivers and potential arguments can be
+found <a class="reference internal" href="model_drivers.html#model-drivers-rst"><span class="std std-ref">here</span></a>.</p>
+</div>
+<div class="section" id="communication-options">
+<h2>Communication Options<a class="headerlink" href="#communication-options" title="Permalink to this headline">¶</a></h2>
+<p>There are two options for specifying communication channels for the models.
+One explicitly specifying the drivers and one specifying the connections
+between communication channels.</p>
+<div class="section" id="driver-method">
+<h3>Driver Method<a class="headerlink" href="#driver-method" title="Permalink to this headline">¶</a></h3>
+<p>In specifying communication via drivers, each input/output entry for the models
+should be a mapping collection with, at minimum, the following keys:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="8%" />
+<col width="92%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Key</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>name</td>
+<td>The name of the channel that will be provided by the model to the
+cis_interface API. This can be any text, but should be unique.</td>
+</tr>
+<tr class="row-odd"><td>driver</td>
+<td>The name of the input/output driver class that should be used.
+A list of available input/output drivers can be found
+<a class="reference internal" href="io_drivers.html#io-drivers-rst"><span class="std std-ref">here</span></a>.</td>
+</tr>
+<tr class="row-even"><td>args</td>
+<td>For connections made to other models, this should be text that matches
+that of the other model&#8217;s corresponding driver. For connections made
+to files, this should be the path to the file, relative to the
+location of the YAML file.</td>
+</tr>
+</tbody>
+</table>
+<p>Any additional keys in the input/output entry will be passed to the input/output
+driver. A full description of the available input/output drivers and potential
+arguments can be found <a class="reference internal" href="io_drivers.html#io-drivers-rst"><span class="std std-ref">here</span></a>.</p>
+</div>
+<div class="section" id="connection-method">
+<h3>Connection Method<a class="headerlink" href="#connection-method" title="Permalink to this headline">¶</a></h3>
+<p>To specify communication via connections, each input/output entry for the models
+need only contain a unique name for the communication channel. This can be
+specified as text:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="nb">input</span><span class="p">:</span> <span class="n">channel_name</span>
+</pre></div>
+</div>
+<p>or a key, value mapping:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="nb">input</span><span class="p">:</span>
+  <span class="n">name</span><span class="p">:</span> <span class="n">channel_name</span>
+</pre></div>
+</div>
+<p>The key/value mapping form should be used when other information about the
+communication channel needs to be provided (e.g. message format, field names,
+units).</p>
+<p>When using the connection format for specifying communication patterns, the
+YAML also needs to contains a <code class="docutils literal"><span class="pre">connections</span></code> key at the same level as the
+<code class="docutils literal"><span class="pre">models</span></code> key.</p>
+</div>
+</div>
+<div class="section" id="connection-options">
+<h2>Connection Options<a class="headerlink" href="#connection-options" title="Permalink to this headline">¶</a></h2>
+<p>The coordesponding value for the <code class="docutils literal"><span class="pre">connections</span></code> key should be one or more
+mapping collections with the following keys:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="8%" />
+<col width="92%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Key</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>input</td>
+<td>The channel/file that messages should be recieved from. To specify
+a model channel, this should be the name of an entry in a model&#8217;s
+<code class="docutils literal"><span class="pre">outputs</span></code> section. If this is a file, it should be the absolute
+path to the file or the relative path to the file from the directory
+containing the YAML.</td>
+</tr>
+<tr class="row-odd"><td>output</td>
+<td>The channel/file that messages recieved from the <code class="docutils literal"><span class="pre">input</span></code>
+channel/file should be sent to. If the <code class="docutils literal"><span class="pre">input</span></code> value is a file,
+the <code class="docutils literal"><span class="pre">output</span></code> value cannot be a file. To specify a model channel,
+this should be the name of an entry in a model&#8217;s <code class="docutils literal"><span class="pre">inputs</span></code> section.</td>
+</tr>
+</tbody>
+</table>
+<p>Connection mappings can also have the following optional keys:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="16%" />
+<col width="17%" />
+<col width="67%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Key</th>
+<th class="head" colspan="2">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>format_str</td>
+<td colspan="2">A C-style format string specifying how messages should be
+formatted/parsed from/to language specifying types (see
+<a class="reference internal" href="c_format_strings.html#c-style-format-strings-rst"><span class="std std-ref">C-Style Format Strings</span></a>).</td>
+</tr>
+<tr class="row-odd"><td>field_names</td>
+<td colspan="2">A sequence collection of names for the fields present in the
+format string.</td>
+</tr>
+<tr class="row-even"><td>field_untis</td>
+<td colspan="2">A sequence collection of units for the fields present in the
+format string (see <a class="reference internal" href="units.html#units-rst"><span class="std std-ref">Units</span></a>).</td>
+</tr>
+<tr class="row-odd"><td rowspan="6">read_meth</td>
+<td colspan="2">Only valid for connections that direct messages from a file to
+a model input channel. Values indicate how messages should be
+read from the file and include:</td>
+</tr>
+<tr class="row-even"><td><strong>Value</strong></td>
+<td><strong>Description</strong></td>
+</tr>
+<tr class="row-odd"><td>all</td>
+<td>The entire contents of the file are read as a
+single message. This is the default if not
+provided.</td>
+</tr>
+<tr class="row-even"><td>line</td>
+<td>The contents of the file are read one line at a
+time.</td>
+</tr>
+<tr class="row-odd"><td>table</td>
+<td>The file is assumed to be an ASCII table and read
+one row at a time. The format of the table is
+either read from the header or inferred from the
+table.</td>
+</tr>
+<tr class="row-even"><td>table_array</td>
+<td>The file is assumed to be an ASCII table and read
+in its entirety as an array.</td>
+</tr>
+<tr class="row-odd"><td rowspan="6">write_meth</td>
+<td colspan="2">Only valid for connections that direct messages from a model
+output channel to a file. Values indicate how messages should
+written to the file and include:</td>
+</tr>
+<tr class="row-even"><td><strong>Value</strong></td>
+<td><strong>Description</strong></td>
+</tr>
+<tr class="row-odd"><td>all</td>
+<td>The entire contents of the file are written at
+once. This is the default if not provided.</td>
+</tr>
+<tr class="row-even"><td>line</td>
+<td>The contents of the file are written one line at
+a time.</td>
+</tr>
+<tr class="row-odd"><td>table</td>
+<td>The file is assumed to be an ASCII table and is
+written one row at a time. The format of the
+table must be specified by the model in its API
+call or as a value in the connection mapping.</td>
+</tr>
+<tr class="row-even"><td>table_array</td>
+<td>The file is assumed to be an ASCII table and is
+written in its entirety as an array.</td>
+</tr>
+</tbody>
+</table>
+<p>The connection entries are used to determine which driver should be used to
+connect communication channels/files. Any additional keys in the connection
+entry will be passed to the input/output driver that is created for the
+connection. A full description of the available input/output drivers and
+potential arguments can be found <a class="reference internal" href="io_drivers.html#io-drivers-rst"><span class="std std-ref">here</span></a>.</p>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="config.html" class="btn btn-neutral float-right" title="Configuration Files" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="server_client_io.html" class="btn btn-neutral" title="Server/Client I/O" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Meagan Lang, David Raila.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.1.3',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          
+          SphinxRtdTheme.Navigation.enableSticky();
+          
+      });
+  </script> 
+
+</body>
+</html>

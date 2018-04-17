@@ -1,0 +1,1071 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>C Interface &mdash; cis_interface 0.1.3 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="C DataIO API" href="dataio_c.html" />
+    <link rel="prev" title="C Code" href="code_c.html" /> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> cis_interface
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="includeme.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="formatted_io.html">Formatted I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="server_client_io.html">Server/Client I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="server_client_io.html#one-server-two-clients">One Server, Two Clients</a></li>
+<li class="toctree-l1"><a class="reference internal" href="yaml.html">YAML Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="config.html">Configuration Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="units.html">Units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="c_format_strings.html">C-Style Format Strings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="io_drivers.html">Input/Output Drivers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="model_drivers.html">Model Drivers</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="code.html">Code</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="code_python.html">Python Code</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="code_c.html">C Code</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="code_c.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4 current"><a class="current reference internal" href="#">C Interface</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dataio_c.html">C DataIO API</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="code_cpp.html">C++ Code</a></li>
+<li class="toctree-l2"><a class="reference internal" href="code_matlab.html">Matlab Code</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="examples/examples_toc.html">Examples</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">cis_interface</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="code.html">Code</a> &raquo;</li>
+        
+          <li><a href="code_c.html">C Code</a> &raquo;</li>
+        
+      <li>C Interface</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/interface_c.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="c-interface">
+<h1>C Interface<a class="headerlink" href="#c-interface" title="Permalink to this headline">¶</a></h1>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Defines</p>
+<dl class="macro">
+<dt id="c.cisOutput_t">
+<span class="target" id="_cis_interface_8h_1a89c54eec309a8498443672a39c8d9cd0"></span><code class="descname">cisOutput_t</code><a class="headerlink" href="#c.cisOutput_t" title="Permalink to this definition">¶</a></dt>
+<dd><p>Flag for checking if CisInterface.h has already been included. </p>
+<p>Aliases to preserve names of original structures. </p>
+</dd></dl>
+
+<dl class="macro">
+<dt id="c.cisInput_t">
+<span class="target" id="_cis_interface_8h_1a81eb1392eea6528be3d9701fa4a0b7c1"></span><code class="descname">cisInput_t</code><a class="headerlink" href="#c.cisInput_t" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="macro">
+<dt id="c.cis_free">
+<span class="target" id="_cis_interface_8h_1a8ad421d1e250e6b1a17845b97a05a0d2"></span><code class="descname">cis_free</code><a class="headerlink" href="#c.cis_free" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="macro">
+<dt id="c.cisRpc_t">
+<span class="target" id="_cis_interface_8h_1af22c777047582e1b4e25b5eae7852b8f"></span><code class="descname">cisRpc_t</code><a class="headerlink" href="#c.cisRpc_t" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remote Procedure Call (RPC) structure. Contains information required to coordinate sending/receiving response/requests from/to an RPC server/client. </p>
+<p>Remote Procedure Call (RPC) IO</p>
+<p>Handle IO case of a server receiving input from clients, performing some calculation, and then sending a response back to the client.</p>
+<p>Server Usage:<ol class="arabic simple">
+<li>One-time: Create server channels with format specifiers for input and output. cisRpc_t srv = cisRpcServer(&#8220;srv_name&#8221;, &#8220;%d&#8221;, &#8220;%d %d&#8221;);</li>
+<li>Prepare: Allocate space for recovered variables from request. int a;</li>
+<li>Receive request: int ret = rpcRecv(srv, &amp;a);</li>
+<li>Process: Do tasks the server should do with input to produce output. int b = 2*a; int c = 3*a;</li>
+<li>Send response: ret = rpcSend(srv, b, c);</li>
+<li>Free: cis_free(&amp;srv);</li>
+</ol>
+</p>
+<p>Client Usage:<ol class="arabic simple">
+<li>One-time: Create client channels to desired server with format specifiers for output and input (should be the same arguments as for the server except for name). cisRpc_t cli = cisRpcClient(&#8220;cli_name&#8221;, &#8220;%d&#8221;, &#8220;%d %d&#8221;);</li>
+<li>Prepare: Allocate space for recovered variables from response. int b, c;</li>
+<li>Call server: int ret = rpcCall(cli, 1, &amp;b, &amp;c);</li>
+<li>Free: cis_free(&amp;cli);</li>
+</ol>
+</p>
+<p>Clients can also send several requests at once before receiving any responses. This allows the server to be processing the next requests while the client handles the previous response, thereby increasing efficiency. The responses are assumed to be in the same order as the generating requests (i.e. first come, first served). </p>
+</dd></dl>
+
+<dl class="macro">
+<dt id="c.cisAsciiFileInput_t">
+<span class="target" id="_cis_interface_8h_1af819ffb615e4fb1b3a3e17760b104da5"></span><code class="descname">cisAsciiFileInput_t</code><a class="headerlink" href="#c.cisAsciiFileInput_t" title="Permalink to this definition">¶</a></dt>
+<dd><p>Definitions for file sturctures. </p>
+<p>File IO</p>
+<p>Handle I/O from/to a local or remote file line by line.</p>
+<p>Input Usage:<ol class="arabic simple">
+<li>One-time: Create file interface by providing either a channel name or a path to a local file. comm_t fin = cisAsciiFileInput(&#8220;file_channel&#8221;); // channel comm_t fin = cisAsciiFileInput_local(&#8220;/local/file.txt&#8221;); // local file</li>
+<li>Prepare: Get pointer for line. char *line;</li>
+<li>Receive each line, terminating when receive returns -1 (EOF or channel closed). int ret = 1; while (ret &gt; 0) { ret = cisRecv(fin, &amp;line); // line will be realloced to fit message Do something with the line }</li>
+<li>Cleanup. Call functions to deallocate structures and close files. free(line); cis_free(&amp;fin);</li>
+</ol>
+</p>
+<p>Output Usage:<ol class="arabic simple">
+<li>One-time: Create file interface by providing either a channel name or a path to a local file. comm_t fout = cisAsciiFileOutput(&#8220;file_channel&#8221;); // channel comm_t fout = cisAsciiFileOutput_local(&#8220;/local/file.txt&#8221;); // local file</li>
+<li>Send lines to the file. If return value is not 0, the send was not succesfull. int ret; ret = cisSend(fin, &#8220;Line 1\n&#8221;); ret = cisSend(fout, &#8220;Line 1\n&#8221;); ret = cisSend(fout, &#8220;Line 2\n&#8221;);</li>
+<li>Cleanup. Call functions to deallocate structures and close files. cis_free(&amp;fout); </li>
+</ol>
+</p>
+</dd></dl>
+
+<dl class="macro">
+<dt id="c.cisAsciiFileOutput_t">
+<span class="target" id="_cis_interface_8h_1a6585f1181e2ded085e88896c3e964e0f"></span><code class="descname">cisAsciiFileOutput_t</code><a class="headerlink" href="#c.cisAsciiFileOutput_t" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="macro">
+<dt id="c.cisAsciiTableInput_t">
+<span class="target" id="_cis_interface_8h_1a00faaf2ad1a2ad78004357f62e38d6ef"></span><code class="descname">cisAsciiTableInput_t</code><a class="headerlink" href="#c.cisAsciiTableInput_t" title="Permalink to this definition">¶</a></dt>
+<dd><p>Definitions for table sturctures. </p>
+<p>Table IO</p>
+<p>Handle I/O from/to a local or remote ASCII table either line-by-line or as an array.</p>
+<p><em>Row-by-Row </em></p>
+<p>Input by Row Usage:<ol class="arabic simple">
+<li>One-time: Create file interface by providing either a channel name or a path to a local file. comm_t fin = cisAsciiTableInput(&#8220;file_channel&#8221;); // channel comm_t fin = cisAsciiTableInput_local(&#8220;/local/file.txt&#8221;); // local table</li>
+<li>Prepare: Allocate space for variables in row (the format in this example is &#8220;%5s %d %f\n&#8221; like the output example below). char a[5]; int b; double c;</li>
+<li>Receive each row, terminating when receive returns -1 (EOF or channel closed). int ret = 1; while (ret &gt; 0) { ret = cisRecv(fin, &amp;a, &amp;b, &amp;c); Do something with the row }</li>
+<li>Cleanup. Call functions to deallocate structures and close files. cis_free(&amp;fin);</li>
+</ol>
+</p>
+<p>Output by Row Usage:<ol class="arabic simple">
+<li>One-time: Create file interface by providing either a channel name or a path to a local file and a format string for rows. comm_t fout = cisAsciiTableOutput(&#8220;file_channel&#8221;, // channel &#8220;%5s %d %f\n&#8221;); comm_t fout = cisAsciiTableOutput_local(&#8220;/local/file.txt&#8221;, // local table &#8220;%5s %d %f\n&#8221;);</li>
+<li>Send rows to the file by providing entries. Formatting is handled by the interface. If return value is not 0, the send was not succesful. int ret; ret = cisSend(fout, &#8220;one&#8221;, 1, 1.0); ret = cisSend(fout, &#8220;two&#8221;, 2, 2.0);</li>
+<li>Cleanup. Call functions to deallocate structures and close files. cis_free(&amp;fout);</li>
+</ol>
+</p>
+<p><em>Array </em></p>
+<p>Input by Array Usage:<ol class="arabic simple">
+<li>One-time: Create file interface by providing either a channel name or a path to a local file. comm_t fin = cisAsciiArrayInput(&#8220;file_channel&#8221;); // channel comm_t fin = cisAsciiArrayInput_local(&#8220;/local/file.txt&#8221;); // local table</li>
+<li>Prepare: Declare pointers for table columns (they will be allocated by the interface once the number of rows is known). char *aCol; int *bCol; double *cCol;</li>
+<li>Receive entire table as columns. Return value will be the number of elements in each column (the number of table rows). Negative values indicate errors. int ret = cisRecv(fin, &amp;a, &amp;b, &amp;c);</li>
+<li>Cleanup. Call functions to deallocate structures and close files. cis_free(&amp;fin);</li>
+</ol>
+</p>
+<p>Output by Array Usage:<ol class="arabic simple">
+<li>One-time: Create file interface by providing either a channel name or a path to a local file and a format string for rows. comm_t fout = cisAsciiArrayOutput(&#8220;file_channel&#8221;, // channel &#8220;%5s %d %f\n&#8221;); comm_t fout = cisAsciiArrayOutput_local(&#8220;/local/file.txt&#8221;, // local table &#8220;%5s %d %f\n&#8221;);</li>
+<li>Send columns to the file by providing pointers (or arrays). Formatting is handled by the interface. If return value is not 0, the send was not succesful. char aCol[] = {&#8220;one  &#8221;, &#8220;two  &#8221;, &#8220;three&#8221;}; \ Each str is of len 5 int bCol[3] = {1, 2, 3}; float cCol[3] = {1.0, 2.0, 3.0}; int ret = cisSend(fout, a, b, c);</li>
+<li>Cleanup. Call functions to deallocate structures and close files. cis_free(&amp;fin); </li>
+</ol>
+</p>
+</dd></dl>
+
+<dl class="macro">
+<dt id="c.cisAsciiTableOutput_t">
+<span class="target" id="_cis_interface_8h_1abd01de3954de4a524c4b7e1e790f1dd7"></span><code class="descname">cisAsciiTableOutput_t</code><a class="headerlink" href="#c.cisAsciiTableOutput_t" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="macro">
+<dt id="c.cisAsciiArrayInput_t">
+<span class="target" id="_cis_interface_8h_1a17141a99c0fd10b6e00e4dcd3cb8c847"></span><code class="descname">cisAsciiArrayInput_t</code><a class="headerlink" href="#c.cisAsciiArrayInput_t" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="macro">
+<dt id="c.cisAsciiArrayOutput_t">
+<span class="target" id="_cis_interface_8h_1a02c19ad52739090d6a40fc6c00df89cf"></span><code class="descname">cisAsciiArrayOutput_t</code><a class="headerlink" href="#c.cisAsciiArrayOutput_t" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Functions</p>
+<dl class="function">
+<dt id="_CPPv212cisOutputFmtPKcPKc">
+<span id="cisOutputFmt__cCP.cCP"></span><span class="target" id="_cis_interface_8h_1abc1fc1f644571ffa9665908e778bec87"></span><em class="property">static</em> cisOutput_t <code class="descname">cisOutputFmt</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em>, <em class="property">const</em> char *<em>fmtString</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv212cisOutputFmtPKcPKc" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor for cisOutput_t structure with format. Create a cisOutput_t structure based on a provided name that is used to locate a particular comm address stored in the environment variable name and a format string that can be used to format arguments into outgoing messages for the queue. </p>
+<p>Basic IO</p>
+<p>Output Usage:<ol class="arabic simple">
+<li>One-time: Create output channel (store in named variables) cisOutput_t output_channel = cisOutput(&#8220;out_name&#8221;);</li>
+<li>Prepare: Format data to a character array buffer. char buffer[CIS_MSG_BUF]; sprintf(buffer, &#8220;a=%d, b=%d&#8221;, 1, 2);</li>
+<li>Send: ret = cis_send(output_channel, buffer, strlen(buffer));</li>
+<li>Free: cis_free(&amp;output_channel);</li>
+</ol>
+</p>
+<p>Input Usage:<ol class="arabic simple">
+<li>One-time: Create output channel (store in named variables) cisInput_t input_channel = cisInput(&#8220;in_name&#8221;);</li>
+<li>Prepare: Allocate a character array buffer. char buffer[CIS_MSG_BUF];</li>
+<li>Receive: int ret = cis_recv(input_channel, buffer, CIS_MSG_BUF);</li>
+<li>Free: cis_free(&amp;input_channel);</li>
+</ol>
+</p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>cisOutput_t output queue structure. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">name</span></code>: constant character pointer to name of queue. </li>
+<li><code class="docutils literal"><span class="pre">fmtString</span></code>: character pointer to format string. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv211cisInputFmtPKcPKc">
+<span id="cisInputFmt__cCP.cCP"></span><span class="target" id="_cis_interface_8h_1a11cf635ccfa238a362740caf25b73651"></span><em class="property">static</em> cisInput_t <code class="descname">cisInputFmt</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em>, <em class="property">const</em> char *<em>fmtString</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv211cisInputFmtPKcPKc" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor for cisInput_t structure with format. Create a cisInput_t structure based on a provided name that is used to locate a particular comm address stored in the environment variable name and a format stirng that can be used to extract arguments from received messages. </p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>cisInput_t input queue structure. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">name</span></code>: constant character pointer to name of queue. </li>
+<li><code class="docutils literal"><span class="pre">fmtString</span></code>: character pointer to format string. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv29cisOutputPKc">
+<span id="cisOutput__cCP"></span><span class="target" id="_cis_interface_8h_1aa63c8cfafa7474a7f7aab26c65086e06"></span><em class="property">static</em> cisOutput_t <code class="descname">cisOutput</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv29cisOutputPKc" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor for cisOutput_t output structure. Create a cisOutput_t structure based on a provided name that is used to locate a particular comm address stored in the environment variable name. </p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>cisOutput_t output queue structure. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">name</span></code>: constant character pointer to name of queue. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv28cisInputPKc">
+<span id="cisInput__cCP"></span><span class="target" id="_cis_interface_8h_1ade11dfda5470091d783e028d3299e9bb"></span><em class="property">static</em> cisInput_t <code class="descname">cisInput</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv28cisInputPKc" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor for cisInput_t structure. Create a cisInput_t structure based on a provided name that is used to locate a particular comm address stored in the environment variable name. </p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>cisInput_t input queue structure. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">name</span></code>: constant character pointer to name of queue. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv28cis_sendK11cisOutput_tPKcK6size_t">
+<span id="cis_send__cisOutput_tC.cCP.sC"></span><span class="target" id="_cis_interface_8h_1afccb7cd87002493258f90a1be322a021"></span><em class="property">static</em> int <code class="descname">cis_send</code><span class="sig-paren">(</span><em class="property">const</em> cisOutput_t <em>cisQ</em>, <em class="property">const</em> char *<em>data</em>, <em class="property">const</em> size_t <em>len</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv28cis_sendK11cisOutput_tPKcK6size_t" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Send a message to an output queue. Send a message smaller than CIS_MSG_MAX bytes to an output queue. If the message is larger, it will not be sent. </p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>int 0 if send succesfull, -1 if send unsuccessful. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">cisQ</span></code>: cisOutput_t structure that queue should be sent to. </li>
+<li><code class="docutils literal"><span class="pre">data</span></code>: character pointer to message that should be sent. </li>
+<li><code class="docutils literal"><span class="pre">len</span></code>: size_t length of message to be sent. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv212cis_send_eofK11cisOutput_t">
+<span id="cis_send_eof__cisOutput_tC"></span><span class="target" id="_cis_interface_8h_1ae0c60f8237960b3388819c6190fb3736"></span><em class="property">static</em> int <code class="descname">cis_send_eof</code><span class="sig-paren">(</span><em class="property">const</em> cisOutput_t <em>cisQ</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv212cis_send_eofK11cisOutput_t" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Send EOF message to the output queue. </p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>int 0 if send successfull, -1 if unsuccessful. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">cisQ</span></code>: cisOutput_t structure that message should be sent to. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv28cis_recvK10cisInput_tPcK6size_t">
+<span id="cis_recv__cisInput_tC.cP.sC"></span><span class="target" id="_cis_interface_8h_1a68ae84778c4859adcba153129f1861ec"></span><em class="property">static</em> int <code class="descname">cis_recv</code><span class="sig-paren">(</span><em class="property">const</em> cisInput_t <em>cisQ</em>, char *<em>data</em>, <em class="property">const</em> size_t <em>len</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv28cis_recvK10cisInput_tPcK6size_t" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Receive a message from an input queue. Receive a message smaller than CIS_MSG_MAX bytes from an input queue. </p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>int -1 if message could not be received. Length of the received message if message was received. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">cisQ</span></code>: cisOutput_t structure that message should be sent to. </li>
+<li><code class="docutils literal"><span class="pre">data</span></code>: character pointer to allocated buffer where the message should be saved. </li>
+<li><code class="docutils literal"><span class="pre">len</span></code>: const size_t length of the allocated message buffer in bytes. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv216cis_send_nolimitK11cisOutput_tPKcK6size_t">
+<span id="cis_send_nolimit__cisOutput_tC.cCP.sC"></span><span class="target" id="_cis_interface_8h_1a69fceba99f3b1d01e203de88a0769e7c"></span><em class="property">static</em> int <code class="descname">cis_send_nolimit</code><span class="sig-paren">(</span><em class="property">const</em> cisOutput_t <em>cisQ</em>, <em class="property">const</em> char *<em>data</em>, <em class="property">const</em> size_t <em>len</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv216cis_send_nolimitK11cisOutput_tPKcK6size_t" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Send a large message to an output queue. Send a message larger than CIS_MSG_MAX bytes to an output queue by breaking it up between several smaller messages and sending initial message with the size of the message that should be expected. Must be partnered with cis_recv_nolimit for communication to make sense. </p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>int 0 if send succesfull, -1 if send unsuccessful. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">cisQ</span></code>: cisOutput_t structure that message should be sent to. </li>
+<li><code class="docutils literal"><span class="pre">data</span></code>: character pointer to message that should be sent. </li>
+<li><code class="docutils literal"><span class="pre">len</span></code>: size_t length of message to be sent. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv220cis_send_nolimit_eofK11cisOutput_t">
+<span id="cis_send_nolimit_eof__cisOutput_tC"></span><span class="target" id="_cis_interface_8h_1a1a78473e3fe0762bc6c145ade7c57b1c"></span><em class="property">static</em> int <code class="descname">cis_send_nolimit_eof</code><span class="sig-paren">(</span><em class="property">const</em> cisOutput_t <em>cisQ</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv220cis_send_nolimit_eofK11cisOutput_t" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Send EOF message to the output queue. </p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>int 0 if send successfull, -1 if unsuccessful. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">cisQ</span></code>: cisOutput_t structure that message should be sent to. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv216cis_recv_nolimitK10cisInput_tPPcK6size_t">
+<span id="cis_recv_nolimit__cisInput_tC.cPP.sC"></span><span class="target" id="_cis_interface_8h_1a548f71b94045cae76adf5ef7c05c265b"></span><em class="property">static</em> int <code class="descname">cis_recv_nolimit</code><span class="sig-paren">(</span><em class="property">const</em> cisInput_t <em>cisQ</em>, char **<em>data</em>, <em class="property">const</em> size_t <em>len0</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv216cis_recv_nolimitK10cisInput_tPPcK6size_t" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Receive a large message from an input queue. Receive a message larger than CIS_MSG_MAX bytes from an input queue by receiving it in parts. This expects the first message to be the size of the total message. </p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>int -1 if message could not be received. Length of the received message if message was received. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">cisQ</span></code>: cisOutput_t structure that message should be sent to. </li>
+<li><code class="docutils literal"><span class="pre">data</span></code>: character pointer to pointer for allocated buffer where the message should be stored. A pointer to a pointer is used so that the buffer may be reallocated as necessary for the incoming message. </li>
+<li><code class="docutils literal"><span class="pre">len0</span></code>: size_t length of the initial allocated message buffer in bytes. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv28vcisSendK11cisOutput_t7va_list">
+<span id="vcisSend__cisOutput_tC.va_list"></span><span class="target" id="_cis_interface_8h_1a4b571310ac37bbb8db4ec4af4333057d"></span><em class="property">static</em> int <code class="descname">vcisSend</code><span class="sig-paren">(</span><em class="property">const</em> cisOutput_t <em>cisQ</em>, va_list <em>ap</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv28vcisSendK11cisOutput_t7va_list" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Send arguments as a small formatted message to an output queue. Use the format string to create a message from the input arguments that is then sent to the specified output queue. If the message is larger than CIS_MSG_MAX or cannot be encoded, it will not be sent. </p>
+<p>Formatted IO</p>
+<p>Output Usage:<ol class="arabic simple">
+<li>One-time: Create output channel with format specifier. cisOutput_t output_channel = cisOutputFmt(&#8220;out_name&#8221;, &#8220;a=%d, b=%d&#8221;);</li>
+<li>Send: ret = cisSend(output_channel, 1, 2);</li>
+<li>Free: cis_free(&amp;output_channel);</li>
+</ol>
+</p>
+<p>Input Usage:<ol class="arabic simple">
+<li>One-time: Create output channel with format specifier. cisInput_t input_channel = cisInput(&#8220;in_name&#8221;, &#8220;a=%d, b=%d&#8221;);</li>
+<li>Prepare: Allocate space for recovered variables. int a, b;</li>
+<li>Receive: int ret = cisRecv(input_channel, &amp;a, &amp;b);</li>
+<li>Free: cis_free(&amp;input_channel);</li>
+</ol>
+</p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>int 0 if send succesfull, -1 if send unsuccessful. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">cisQ</span></code>: cisOutput_t structure that queue should be sent to. </li>
+<li><code class="docutils literal"><span class="pre">ap</span></code>: va_list arguments to be formatted into a message using sprintf. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv28vcisRecvK10cisInput_t7va_list">
+<span id="vcisRecv__cisInput_tC.va_list"></span><span class="target" id="_cis_interface_8h_1a32b86b07f613d9e8e1c03d04a80361d6"></span><em class="property">static</em> int <code class="descname">vcisRecv</code><span class="sig-paren">(</span><em class="property">const</em> cisInput_t <em>cisQ</em>, va_list <em>ap</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv28vcisRecvK10cisInput_t7va_list" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Assign arguments by receiving and parsing a message from an input queue. Receive a message smaller than CIS_MSG_MAX bytes from an input queue and parse it using the associated format string. </p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>int -1 if message could not be received or could not be parsed. Length of the received message if message was received and parsed. -2 is returned if EOF is received. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">cisQ</span></code>: cisOutput_t structure that message should be sent to. </li>
+<li><code class="docutils literal"><span class="pre">ap</span></code>: va_list arguments that should be assigned by parsing the received message using sscanf. As these are being assigned, they should be pointers to memory that has already been allocated. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv27cisSendK11cisOutput_tz">
+<span id="cisSend__cisOutput_tC.z"></span><span class="target" id="_cis_interface_8h_1a27fa81a4e9007004304e2d869ba54b2e"></span><em class="property">static</em> int <code class="descname">cisSend</code><span class="sig-paren">(</span><em class="property">const</em> cisOutput_t <em>cisQ</em>, ...<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv27cisSendK11cisOutput_tz" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Send arguments as a small formatted message to an output queue. Use the format string to create a message from the input arguments that is then sent to the specified output queue. If the message is larger than CIS_MSG_MAX or cannot be encoded, it will not be sent. </p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>int 0 if send succesfull, -1 if send unsuccessful. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">cisQ</span></code>: cisOutput_t structure that queue should be sent to. </li>
+<li><code class="docutils literal"><span class="pre">...</span></code>: arguments to be formatted into a message using sprintf. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv27cisRecvK10cisInput_tz">
+<span id="cisRecv__cisInput_tC.z"></span><span class="target" id="_cis_interface_8h_1ad8014b9893c1281d0f67e81650cd9449"></span><em class="property">static</em> int <code class="descname">cisRecv</code><span class="sig-paren">(</span><em class="property">const</em> cisInput_t <em>cisQ</em>, ...<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv27cisRecvK10cisInput_tz" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Assign arguments by receiving and parsing a message from an input queue. Receive a message smaller than CIS_MSG_MAX bytes from an input queue and parse it using the associated format string. </p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>int -1 if message could not be received or could not be parsed. Length of the received message if message was received and parsed. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">cisQ</span></code>: cisOutput_t structure that message should be sent to. </li>
+<li><code class="docutils literal"><span class="pre">...</span></code>: arguments that should be assigned by parsing the received message using sscanf. As these are being assigned, they should be pointers to memory that has already been allocated. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv216vcisSend_nolimitK11cisOutput_t7va_list">
+<span id="vcisSend_nolimit__cisOutput_tC.va_list"></span><span class="target" id="_cis_interface_8h_1ac9f4dd406ffd17c8a7a5b8e1bd1e5b60"></span><em class="property">static</em> int <code class="descname">vcisSend_nolimit</code><span class="sig-paren">(</span><em class="property">const</em> cisOutput_t <em>cisQ</em>, va_list <em>ap</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv216vcisSend_nolimitK11cisOutput_t7va_list" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Send arguments as a large formatted message to an output queue. Use the format string to create a message from the input arguments that is then sent to the specified output queue. The message can be larger than CIS_MSG_MAX. If it cannot be encoded, it will not be sent. </p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>int 0 if formatting and send succesfull, -1 if formatting or send unsuccessful. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">cisQ</span></code>: cisOutput_t structure that queue should be sent to. </li>
+<li><code class="docutils literal"><span class="pre">ap</span></code>: va_list arguments to be formatted into a message using sprintf. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv216vcisRecv_nolimitK10cisInput_t7va_list">
+<span id="vcisRecv_nolimit__cisInput_tC.va_list"></span><span class="target" id="_cis_interface_8h_1ac5694a3cd748ba71cf724aeac3212211"></span><em class="property">static</em> int <code class="descname">vcisRecv_nolimit</code><span class="sig-paren">(</span><em class="property">const</em> cisInput_t <em>cisQ</em>, va_list <em>ap</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv216vcisRecv_nolimitK10cisInput_t7va_list" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Assign arguments by receiving and parsing a message from an input queue. Receive a message larger than CIS_MSG_MAX bytes in chunks from an input queue and parse it using the associated format string. </p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>int -1 if message could not be received or could not be parsed. Length of the received message if message was received and parsed. -2 is returned if EOF is received. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">cisQ</span></code>: cisOutput_t structure that message should be sent to. </li>
+<li><code class="docutils literal"><span class="pre">ap</span></code>: va_list arguments that should be assigned by parsing the received message using sscanf. As these are being assigned, they should be pointers to memory that has already been allocated. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv215cisSend_nolimitK11cisOutput_tz">
+<span id="cisSend_nolimit__cisOutput_tC.z"></span><span class="target" id="_cis_interface_8h_1a27b0cd0f98a2436398f344e26999b59f"></span><em class="property">static</em> int <code class="descname">cisSend_nolimit</code><span class="sig-paren">(</span><em class="property">const</em> cisOutput_t <em>cisQ</em>, ...<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv215cisSend_nolimitK11cisOutput_tz" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Send arguments as a large formatted message to an output queue. Use the format string to create a message from the input arguments that is then sent to the specified output queue. The message can be larger than CIS_MSG_MAX. If it cannot be encoded, it will not be sent. </p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>int 0 if formatting and send succesfull, -1 if formatting or send unsuccessful. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">cisQ</span></code>: cisOutput_t structure that queue should be sent to. </li>
+<li><code class="docutils literal"><span class="pre">...</span></code>: arguments to be formatted into a message using sprintf. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv215cisRecv_nolimitK10cisInput_tz">
+<span id="cisRecv_nolimit__cisInput_tC.z"></span><span class="target" id="_cis_interface_8h_1a2bbe09c22c5a36238697ce7e84aa0340"></span><em class="property">static</em> int <code class="descname">cisRecv_nolimit</code><span class="sig-paren">(</span><em class="property">const</em> cisInput_t <em>cisQ</em>, ...<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv215cisRecv_nolimitK10cisInput_tz" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Assign arguments by receiving and parsing a message from an input queue. Receive a message larger than CIS_MSG_MAX bytes in chunks from an input queue and parse it using the associated format string. </p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>int -1 if message could not be received or could not be parsed. Length of the received message if message was received and parsed. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">cisQ</span></code>: cisInput_t structure that message should be sent to. </li>
+<li><code class="docutils literal"><span class="pre">...</span></code>: arguments that should be assigned by parsing the received message using sscanf. As these are being assigned, they should be pointers to memory that has already been allocated. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv26cisRpcPKcPKcPKc">
+<span id="cisRpc__cCP.cCP.cCP"></span><span class="target" id="_cis_interface_8h_1a9e5dcdb948b85f39b78a82b7f39295a2"></span><em class="property">static</em> cisRpc_t <code class="descname">cisRpc</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em>, <em class="property">const</em> char *<em>outFormat</em>, <em class="property">const</em> char *<em>inFormat</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv26cisRpcPKcPKcPKc" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor for RPC structure. Creates an instance of cisRpc_t with provided information. </p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>cisRpc_t structure with provided info. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">name</span></code>: constant character pointer name of the output queue. </li>
+<li><code class="docutils literal"><span class="pre">outFormat</span></code>: character pointer to format that should be used for formatting output. </li>
+<li><code class="docutils literal"><span class="pre">inFormat</span></code>: character pointer to format that should be used for parsing input. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv212cisRpcClientPKcPKcPKc">
+<span id="cisRpcClient__cCP.cCP.cCP"></span><span class="target" id="_cis_interface_8h_1a548c6e52666dcbf3e0d90727a35406e1"></span><em class="property">static</em> comm_t <code class="descname">cisRpcClient</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em>, <em class="property">const</em> char *<em>outFormat</em>, <em class="property">const</em> char *<em>inFormat</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv212cisRpcClientPKcPKcPKc" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor for client side RPC structure. Creates an instance of cisRpc_t with provided information. </p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>cisRpc_t structure with provided info. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">name</span></code>: constant character pointer to name for queues. </li>
+<li><code class="docutils literal"><span class="pre">outFormat</span></code>: character pointer to format that should be used for formatting output. </li>
+<li><code class="docutils literal"><span class="pre">inFormat</span></code>: character pointer to format that should be used for parsing input. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv212cisRpcServerPKcPKcPKc">
+<span id="cisRpcServer__cCP.cCP.cCP"></span><span class="target" id="_cis_interface_8h_1aa05ee60575e0e09cea72d2e5559da357"></span><em class="property">static</em> comm_t <code class="descname">cisRpcServer</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em>, <em class="property">const</em> char *<em>inFormat</em>, <em class="property">const</em> char *<em>outFormat</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv212cisRpcServerPKcPKcPKc" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor for server side RPC structure. Creates an instance of cisRpc_t with provided information. </p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>cisRpc_t structure with provided info. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">name</span></code>: constant character pointer to name for queues. </li>
+<li><code class="docutils literal"><span class="pre">inFormat</span></code>: character pointer to format that should be used for parsing input. </li>
+<li><code class="docutils literal"><span class="pre">outFormat</span></code>: character pointer to format that should be used for formatting output. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv28vrpcSendK8cisRpc_t7va_list">
+<span id="vrpcSend__cisRpc_tC.va_list"></span><span class="target" id="_cis_interface_8h_1a338ade30a1d96a4f4fe80f0ec008cf1d"></span><em class="property">static</em> int <code class="descname">vrpcSend</code><span class="sig-paren">(</span><em class="property">const</em> cisRpc_t <em>rpc</em>, va_list <em>ap</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv28vrpcSendK8cisRpc_t7va_list" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Format and send a message to an RPC output queue. Format provided arguments list using the output queue format string and then sends it to the output queue under the assumption that it is larger than the maximum message size. </p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>integer specifying if the send was succesful. Values &gt;= 0 indicate success. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">rpc</span></code>: cisRpc_t structure with RPC information. </li>
+<li><code class="docutils literal"><span class="pre">ap</span></code>: va_list variable list of arguments for formatting. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv28vrpcRecvK8cisRpc_t7va_list">
+<span id="vrpcRecv__cisRpc_tC.va_list"></span><span class="target" id="_cis_interface_8h_1aaaaab617056d44a0d9eb09c8c09c74f7"></span><em class="property">static</em> int <code class="descname">vrpcRecv</code><span class="sig-paren">(</span><em class="property">const</em> cisRpc_t <em>rpc</em>, va_list <em>ap</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv28vrpcRecvK8cisRpc_t7va_list" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Receive and parse a message from an RPC input queue. Receive a message from the input queue under the assumption that it is larger than the maximum message size. Then parse the message using the input queue format string to extract parameters and assign them to the arguments. </p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>integer specifying if the receive was succesful. Values &gt;= 0 indicate success. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">rpc</span></code>: cisRpc_t structure with RPC information. </li>
+<li><code class="docutils literal"><span class="pre">ap</span></code>: va_list variable list of arguments that should be assigned parameters extracted using the format string. Since these will be assigned, they should be pointers to memory that has already been allocated. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv27rpcSendK8cisRpc_tz">
+<span id="rpcSend__cisRpc_tC.z"></span><span class="target" id="_cis_interface_8h_1a3c1a243b0e4d19f150ee0d32d23b99f3"></span><em class="property">static</em> int <code class="descname">rpcSend</code><span class="sig-paren">(</span><em class="property">const</em> cisRpc_t <em>rpc</em>, ...<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv27rpcSendK8cisRpc_tz" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Format and send a message to an RPC output queue. Format provided arguments using the output queue format string and then sends it to the output queue under the assumption that it is larger than the maximum message size. </p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>integer specifying if the send was succesful. Values &gt;= 0 indicate success. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">rpc</span></code>: cisRpc_t structure with RPC information. </li>
+<li><code class="docutils literal"><span class="pre">...</span></code>: arguments for formatting. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv27rpcRecvK8cisRpc_tz">
+<span id="rpcRecv__cisRpc_tC.z"></span><span class="target" id="_cis_interface_8h_1ae090fb59de249aa2380319c63a08547a"></span><em class="property">static</em> int <code class="descname">rpcRecv</code><span class="sig-paren">(</span><em class="property">const</em> cisRpc_t <em>rpc</em>, ...<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv27rpcRecvK8cisRpc_tz" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Receive and parse a message from an RPC input queue. Receive a message from the input queue under the assumption that it is larger than the maximum message size. Then parse the message using the input queue format string to extract parameters and assign them to the arguments. </p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>integer specifying if the receive was succesful. Values &gt;= 0 indicate success. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">rpc</span></code>: cisRpc_t structure with RPC information. </li>
+<li><code class="docutils literal"><span class="pre">...</span></code>: mixed arguments that should be assigned parameters extracted using the format string. Since these will be assigned, they should be pointers to memory that has already been allocated. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv28vrpcCallK8cisRpc_t7va_list">
+<span id="vrpcCall__cisRpc_tC.va_list"></span><span class="target" id="_cis_interface_8h_1a7aed7b692f8f1efff7b7d46744eb9a27"></span><em class="property">static</em> int <code class="descname">vrpcCall</code><span class="sig-paren">(</span><em class="property">const</em> cisRpc_t <em>rpc</em>, va_list <em>ap</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv28vrpcCallK8cisRpc_t7va_list" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Send request to an RPC server from the client and wait for a response. Format arguments using the output queue format string, send the message to the output queue, receive a response from the input queue, and assign arguments from the message using the input queue format string to parse it. </p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>integer specifying if the receive was succesful. Values &gt;= 0 indicate success. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">rpc</span></code>: cisRpc_t structure with RPC information. </li>
+<li><code class="docutils literal"><span class="pre">ap</span></code>: va_list mixed arguments that include those that should be formatted using the output format string, followed by those that should be assigned parameters extracted using the input format string. These that will be assigned should be pointers to memory that has already been allocated. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv27rpcCallK8cisRpc_tz">
+<span id="rpcCall__cisRpc_tC.z"></span><span class="target" id="_cis_interface_8h_1a9d46189fed9ba11f675d79e5604ccc44"></span><em class="property">static</em> int <code class="descname">rpcCall</code><span class="sig-paren">(</span><em class="property">const</em> cisRpc_t <em>rpc</em>, ...<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv27rpcCallK8cisRpc_tz" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Send request to an RPC server from the client and wait for a response. Format arguments using the output queue format string, send the message to the output queue, receive a response from the input queue, and assign arguments from the message using the input queue format string to parse it. </p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>integer specifying if the receive was succesful. Values &gt;= 0 indicate success. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">rpc</span></code>: cisRpc_t structure with RPC information. </li>
+<li><code class="docutils literal"><span class="pre">...</span></code>: mixed arguments that include those that should be formatted using the output format string, followed by those that should be assigned parameters extracted using the input format string. These that will be assigned should be pointers to memory that has already been allocated. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv218cisAsciiFileOutputPKc">
+<span id="cisAsciiFileOutput__cCP"></span><span class="target" id="_cis_interface_8h_1a993b1b96f209669372632b327bef476d"></span><em class="property">static</em> comm_t <code class="descname">cisAsciiFileOutput</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv218cisAsciiFileOutputPKc" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor for AsciiFile output comm to channel. </p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>comm_t for line-by-line output to a file or channel. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">name</span></code>: constant character pointer to name of an output channel. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv224cisAsciiFileOutput_localPKc">
+<span id="cisAsciiFileOutput_local__cCP"></span><span class="target" id="_cis_interface_8h_1af80049a6939afd97599e1b6d54d742d8"></span><em class="property">static</em> comm_t <code class="descname">cisAsciiFileOutput_local</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv224cisAsciiFileOutput_localPKc" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor for AsciiFile output comm to local file. </p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>comm_t for line-by-line output to a file or channel. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">name</span></code>: constant character pointer to path of local file. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv217cisAsciiFileInputPKc">
+<span id="cisAsciiFileInput__cCP"></span><span class="target" id="_cis_interface_8h_1a5bd44d0ac76cbe9ddad37b017967afa8"></span><em class="property">static</em> comm_t <code class="descname">cisAsciiFileInput</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv217cisAsciiFileInputPKc" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor for AsciiFile input comm from channel. </p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>comm_t for line-by-line input from a file or channel. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">name</span></code>: constant character pointer to name of an input channel. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv223cisAsciiFileInput_localPKc">
+<span id="cisAsciiFileInput_local__cCP"></span><span class="target" id="_cis_interface_8h_1a819420c32b1768adf6ecddb77f01a46d"></span><em class="property">static</em> comm_t <code class="descname">cisAsciiFileInput_local</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv223cisAsciiFileInput_localPKc" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor for AsciiFile input comm from local file. </p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>comm_t for line-by-line input from a file or channel. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">name</span></code>: constant character pointer to path of local file. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv219cisAsciiTableOutputPKcPKc">
+<span id="cisAsciiTableOutput__cCP.cCP"></span><span class="target" id="_cis_interface_8h_1aab37e4d3c533bbb346834d243ada439c"></span><em class="property">static</em> comm_t <code class="descname">cisAsciiTableOutput</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em>, <em class="property">const</em> char *<em>format_str</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv219cisAsciiTableOutputPKcPKc" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor for table output comm to an output channel. </p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>comm_t output structure. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">name</span></code>: constant character pointer to output channel name. </li>
+<li><code class="docutils literal"><span class="pre">format_str</span></code>: character pointer to format string that should be used to format rows into table lines. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv218cisAsciiTableInputPKc">
+<span id="cisAsciiTableInput__cCP"></span><span class="target" id="_cis_interface_8h_1a432b2af70ec581e27c2551e70cc2240f"></span><em class="property">static</em> comm_t <code class="descname">cisAsciiTableInput</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv218cisAsciiTableInputPKc" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor for AsciiTable input comm from an input channel. </p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>comm_t input structure. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">name</span></code>: constant character pointer to input channel name. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv225cisAsciiTableOutput_localPKcPKc">
+<span id="cisAsciiTableOutput_local__cCP.cCP"></span><span class="target" id="_cis_interface_8h_1a152031e8e2ddc407fe1c387a15884726"></span><em class="property">static</em> comm_t <code class="descname">cisAsciiTableOutput_local</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em>, <em class="property">const</em> char *<em>format_str</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv225cisAsciiTableOutput_localPKcPKc" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor for table output comm to local file. </p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>comm_t output structure. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">name</span></code>: constant character pointer to local file path. </li>
+<li><code class="docutils literal"><span class="pre">format_str</span></code>: character pointer to format string that should be used to format rows into table lines. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv224cisAsciiTableInput_localPKc">
+<span id="cisAsciiTableInput_local__cCP"></span><span class="target" id="_cis_interface_8h_1ae4443c64fc45f9444a6732be670217b5"></span><em class="property">static</em> comm_t <code class="descname">cisAsciiTableInput_local</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv224cisAsciiTableInput_localPKc" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor for AsciiTable input comm from local file. </p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>comm_t input structure. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">name</span></code>: constant character pointer to local file path. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv219cisAsciiArrayOutputPKcPKc">
+<span id="cisAsciiArrayOutput__cCP.cCP"></span><span class="target" id="_cis_interface_8h_1ae0ba86b371a7dfdcad88d0b7c483b3f9"></span><em class="property">static</em> comm_t <code class="descname">cisAsciiArrayOutput</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em>, <em class="property">const</em> char *<em>format_str</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv219cisAsciiArrayOutputPKcPKc" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor for table output comm with array output. </p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>comm_t output structure. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">name</span></code>: constant character pointer to an output channel name. </li>
+<li><code class="docutils literal"><span class="pre">format_str</span></code>: character pointer to format string that should be used to format rows into table lines. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv218cisAsciiArrayInputPKc">
+<span id="cisAsciiArrayInput__cCP"></span><span class="target" id="_cis_interface_8h_1af39c49344f4e7193a49f1009eb21391a"></span><em class="property">static</em> comm_t <code class="descname">cisAsciiArrayInput</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv218cisAsciiArrayInputPKc" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor for AsciiTable input comm with array input. </p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>comm_t input structure. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">name</span></code>: constant character pointer to an input channel name. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv225cisAsciiArrayOutput_localPKcPKc">
+<span id="cisAsciiArrayOutput_local__cCP.cCP"></span><span class="target" id="_cis_interface_8h_1ab108509a9e8a2884ff313438331acd3a"></span><em class="property">static</em> comm_t <code class="descname">cisAsciiArrayOutput_local</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em>, <em class="property">const</em> char *<em>format_str</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv225cisAsciiArrayOutput_localPKcPKc" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor for table output comm to local file from arrays. </p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>comm_t output structure. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">name</span></code>: constant character pointer to local file path. </li>
+<li><code class="docutils literal"><span class="pre">format_str</span></code>: character pointer to format string that should be used to format rows into table lines. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv224cisAsciiArrayInput_localPKc">
+<span id="cisAsciiArrayInput_local__cCP"></span><span class="target" id="_cis_interface_8h_1af12bbe5627639515df52b78a1989ad53"></span><em class="property">static</em> comm_t <code class="descname">cisAsciiArrayInput_local</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv224cisAsciiArrayInput_localPKc" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor for AsciiTable input comm from local file as arrays. </p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>comm_t input structure. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">name</span></code>: constant character pointer to local file path. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="dataio_c.html" class="btn btn-neutral float-right" title="C DataIO API" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="code_c.html" class="btn btn-neutral" title="C Code" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Meagan Lang, David Raila.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.1.3',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          
+          SphinxRtdTheme.Navigation.enableSticky();
+          
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,826 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>cis_interface.interface package &mdash; cis_interface 0.1.3 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="cis_interface.dataio package" href="cis_interface.dataio.html" />
+    <link rel="prev" title="Python Code" href="code_python.html" /> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> cis_interface
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="includeme.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="formatted_io.html">Formatted I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="server_client_io.html">Server/Client I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="server_client_io.html#one-server-two-clients">One Server, Two Clients</a></li>
+<li class="toctree-l1"><a class="reference internal" href="yaml.html">YAML Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="config.html">Configuration Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="units.html">Units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="c_format_strings.html">C-Style Format Strings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="io_drivers.html">Input/Output Drivers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="model_drivers.html">Model Drivers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="code.html">Code</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/examples_toc.html">Examples</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">cis_interface</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="code.html">Code</a> &raquo;</li>
+        
+          <li><a href="code_python.html">Python Code</a> &raquo;</li>
+        
+      <li>cis_interface.interface package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/cis_interface.interface.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="cis-interface-interface-package">
+<h1>cis_interface.interface package<a class="headerlink" href="#cis-interface-interface-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+</div>
+</div>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-cis_interface.interface.CisInterface">
+<span id="cis-interface-interface-cisinterface-module"></span><h2>cis_interface.interface.CisInterface module<a class="headerlink" href="#module-cis_interface.interface.CisInterface" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="cis_interface.interface.CisInterface.CisAsciiArrayInput">
+<code class="descclassname">cis_interface.interface.CisInterface.</code><code class="descname">CisAsciiArrayInput</code><span class="sig-paren">(</span><em>name</em>, <em>src_type=1</em>, <em>matlab=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/CisInterface.html#CisAsciiArrayInput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.CisInterface.CisAsciiArrayInput" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get class for handling table-like formatted input as arrays.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; The path to the local file to read input from (if src_type
+== 0) or the name of the message queue input should be received
+from.</li>
+<li><strong>src_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>, </em><em>optional</em>) &#8211; If 0, input is read from a local file.
+Otherwise, the input is received from a message queue. Defaults to
+1.</li>
+<li><strong>**kwargs</strong> &#8211; Additional keyword arguments are passed to the base comm.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Communication object.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="cis_interface.communication.html#cis_interface.communication.DefaultComm" title="cis_interface.communication.DefaultComm">DefaultComm</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.interface.CisInterface.CisAsciiArrayOutput">
+<code class="descclassname">cis_interface.interface.CisInterface.</code><code class="descname">CisAsciiArrayOutput</code><span class="sig-paren">(</span><em>name</em>, <em>fmt</em>, <em>dst_type=1</em>, <em>matlab=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/CisInterface.html#CisAsciiArrayOutput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.CisInterface.CisAsciiArrayOutput" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get class for handling table-like formatted output.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; The path to the local file where output should be saved
+(if dst_type == 0) or the name of the message queue where the
+output should be sent.</li>
+<li><strong>fmt</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; A C style format string specifying how each &#8216;row&#8217; of output
+should be formated. This should include the newline character.</li>
+<li><strong>dst_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>, </em><em>optional</em>) &#8211; If 0, output is sent to a local file.
+Otherwise, the output is sent to a message queue. Defaults to 1.</li>
+<li><strong>**kwargs</strong> &#8211; Additional keyword arguments are passed to the base comm.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Communication object.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="cis_interface.communication.html#cis_interface.communication.DefaultComm" title="cis_interface.communication.DefaultComm">DefaultComm</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.interface.CisInterface.CisAsciiFileInput">
+<code class="descclassname">cis_interface.interface.CisInterface.</code><code class="descname">CisAsciiFileInput</code><span class="sig-paren">(</span><em>name</em>, <em>src_type=1</em>, <em>matlab=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/CisInterface.html#CisAsciiFileInput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.CisInterface.CisAsciiFileInput" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get class for generic ASCII input from either a file or message
+queue.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; Path to the local file that input should be read from (if
+src_type == 0) or the name of the input message queue that input
+should be received from.</li>
+<li><strong>src_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>, </em><em>optional</em>) &#8211; If 0, input is read from a local file.
+Otherwise input is received from a message queue. Defauts to 1.</li>
+<li><strong>**kwargs</strong> &#8211; Additional keyword arguments are passed to the base comm.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Communication object.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="cis_interface.communication.html#cis_interface.communication.DefaultComm" title="cis_interface.communication.DefaultComm">DefaultComm</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.interface.CisInterface.CisAsciiFileOutput">
+<code class="descclassname">cis_interface.interface.CisInterface.</code><code class="descname">CisAsciiFileOutput</code><span class="sig-paren">(</span><em>name</em>, <em>dst_type=1</em>, <em>matlab=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/CisInterface.html#CisAsciiFileOutput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.CisInterface.CisAsciiFileOutput" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get class for generic ASCII output to either a local file or message
+queue.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; Path to the local file where output should be written (if
+dst_type == 0) or the name of the message queue where output
+should be sent.</li>
+<li><strong>dst_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>, </em><em>optional</em>) &#8211; If 0, output is written to a local file.
+Otherwise, output is sent to a message queue. Defaults to 1.</li>
+<li><strong>**kwargs</strong> &#8211; Additional keyword arguments are passed to the base comm.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Communication object.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="cis_interface.communication.html#cis_interface.communication.DefaultComm" title="cis_interface.communication.DefaultComm">DefaultComm</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.interface.CisInterface.CisAsciiTableInput">
+<code class="descclassname">cis_interface.interface.CisInterface.</code><code class="descname">CisAsciiTableInput</code><span class="sig-paren">(</span><em>name</em>, <em>as_array=False</em>, <em>src_type=1</em>, <em>matlab=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/CisInterface.html#CisAsciiTableInput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.CisInterface.CisAsciiTableInput" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get class for handling table-like formatted input.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; The path to the local file to read input from (if src_type
+== 0) or the name of the message queue input should be received
+from.</li>
+<li><strong>as_array</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) &#8211; If True, recv returns the entire table
+array and can only be called once. If False, recv returns row
+entries. Default to False.</li>
+<li><strong>src_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>, </em><em>optional</em>) &#8211; If 0, input is read from a local file.
+Otherwise, the input is received from a message queue. Defaults to
+1.</li>
+<li><strong>**kwargs</strong> &#8211; Additional keyword arguments are passed to the base comm.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Communication object.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="cis_interface.communication.html#cis_interface.communication.DefaultComm" title="cis_interface.communication.DefaultComm">DefaultComm</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.interface.CisInterface.CisAsciiTableOutput">
+<code class="descclassname">cis_interface.interface.CisInterface.</code><code class="descname">CisAsciiTableOutput</code><span class="sig-paren">(</span><em>name</em>, <em>fmt</em>, <em>as_array=False</em>, <em>dst_type=1</em>, <em>matlab=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/CisInterface.html#CisAsciiTableOutput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.CisInterface.CisAsciiTableOutput" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get class for handling table-like formatted output.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; The path to the local file where output should be saved
+(if dst_type == 0) or the name of the message queue where the
+output should be sent.</li>
+<li><strong>fmt</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; A C style format string specifying how each &#8216;row&#8217; of output
+should be formated. This should include the newline character.</li>
+<li><strong>as_array</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) &#8211; If True, send expects and entire array.
+If False, send expects the entries for one table row. Defaults to
+False.</li>
+<li><strong>dst_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>, </em><em>optional</em>) &#8211; If 0, output is sent to a local file.
+Otherwise, the output is sent to a message queue. Defaults to 1.</li>
+<li><strong>**kwargs</strong> &#8211; Additional keyword arguments are passed to the base comm.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Communication object.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="cis_interface.communication.html#cis_interface.communication.DefaultComm" title="cis_interface.communication.DefaultComm">DefaultComm</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.interface.CisInterface.CisInput">
+<code class="descclassname">cis_interface.interface.CisInterface.</code><code class="descname">CisInput</code><span class="sig-paren">(</span><em>name</em>, <em>format_str=None</em>, <em>matlab=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/CisInterface.html#CisInput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.CisInterface.CisInput" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get class for handling input from a message queue.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; The name of the message queue. Combined with the
+suffix &#8216;_IN&#8217;, it should match an environment variable containing
+a message queue key.</li>
+<li><strong>format_str</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) &#8211; C style format string that should be used
+to deserialize messages that are receieved into a list of python
+objects. Defaults to None and raw string messages are returned.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Communication object.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="cis_interface.communication.html#cis_interface.communication.DefaultComm" title="cis_interface.communication.DefaultComm">DefaultComm</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.interface.CisInterface.CisMatlab">
+<code class="descclassname">cis_interface.interface.CisInterface.</code><code class="descname">CisMatlab</code><span class="sig-paren">(</span><em>_type</em>, <em>args=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/CisInterface.html#CisMatlab"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.CisInterface.CisMatlab" title="Permalink to this definition">¶</a></dt>
+<dd><p>Short interface to identify functions called by Matlab.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; Name of class that should be returned.</li>
+<li><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a>) &#8211; Additional arguments that should be passed to class
+initializer.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">An instance of the requested class.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">obj</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.interface.CisInterface.CisOutput">
+<code class="descclassname">cis_interface.interface.CisInterface.</code><code class="descname">CisOutput</code><span class="sig-paren">(</span><em>name</em>, <em>format_str=None</em>, <em>matlab=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/CisInterface.html#CisOutput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.CisInterface.CisOutput" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get class for handling output to a message queue.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; The name of the message queue. Combined with the
+suffix &#8216;_OUT&#8217;, it should match an environment variable containing
+a message queue key.</li>
+<li><strong>format_str</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) &#8211; C style format string that should be used
+to create a message from a list of python ojbects. Defaults to None
+and raw string messages are sent.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Communication object.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="cis_interface.communication.html#cis_interface.communication.DefaultComm" title="cis_interface.communication.DefaultComm">DefaultComm</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.interface.CisInterface.CisPandasInput">
+<code class="descclassname">cis_interface.interface.CisInterface.</code><code class="descname">CisPandasInput</code><span class="sig-paren">(</span><em>name</em>, <em>src_type=1</em>, <em>matlab=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/CisInterface.html#CisPandasInput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.CisInterface.CisPandasInput" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get class for handling Pandas input.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; The path to the local file to read input from (if src_type
+== 0) or the name of the message queue input should be received
+from.</li>
+<li><strong>src_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>, </em><em>optional</em>) &#8211; If 0, input is read from a local file.
+Otherwise, the input is received from a message queue. Defaults to
+1.</li>
+<li><strong>**kwargs</strong> &#8211; Additional keyword arguments are passed to the base comm.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Communication object.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="cis_interface.communication.html#cis_interface.communication.DefaultComm" title="cis_interface.communication.DefaultComm">DefaultComm</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.interface.CisInterface.CisPandasOutput">
+<code class="descclassname">cis_interface.interface.CisInterface.</code><code class="descname">CisPandasOutput</code><span class="sig-paren">(</span><em>name</em>, <em>dst_type=1</em>, <em>matlab=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/CisInterface.html#CisPandasOutput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.CisInterface.CisPandasOutput" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get class for handling pandasd output.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; The path to the local file where output should be saved
+(if dst_type == 0) or the name of the message queue where the
+output should be sent.</li>
+<li><strong>dst_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>, </em><em>optional</em>) &#8211; If 0, output is sent to a local file.
+Otherwise, the output is sent to a message queue. Defaults to 1.</li>
+<li><strong>**kwargs</strong> &#8211; Additional keyword arguments are passed to the base comm.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Communication object.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="cis_interface.communication.html#cis_interface.communication.DefaultComm" title="cis_interface.communication.DefaultComm">DefaultComm</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.interface.CisInterface.CisPickleInput">
+<code class="descclassname">cis_interface.interface.CisInterface.</code><code class="descname">CisPickleInput</code><span class="sig-paren">(</span><em>name</em>, <em>src_type=1</em>, <em>matlab=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/CisInterface.html#CisPickleInput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.CisInterface.CisPickleInput" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get class for handling pickled input.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; The path to the local file to read input from (if src_type
+== 0) or the name of the message queue input should be received
+from.</li>
+<li><strong>src_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>, </em><em>optional</em>) &#8211; If 0, input is read from a local file.
+Otherwise, the input is received from a message queue. Defaults to
+1.</li>
+<li><strong>**kwargs</strong> &#8211; Additional keyword arguments are passed to the base comm.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Communication object.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="cis_interface.communication.html#cis_interface.communication.DefaultComm" title="cis_interface.communication.DefaultComm">DefaultComm</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.interface.CisInterface.CisPickleOutput">
+<code class="descclassname">cis_interface.interface.CisInterface.</code><code class="descname">CisPickleOutput</code><span class="sig-paren">(</span><em>name</em>, <em>dst_type=1</em>, <em>matlab=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/CisInterface.html#CisPickleOutput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.CisInterface.CisPickleOutput" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get class for handling pickled output.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; The path to the local file where output should be saved
+(if dst_type == 0) or the name of the message queue where the
+output should be sent.</li>
+<li><strong>dst_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>, </em><em>optional</em>) &#8211; If 0, output is sent to a local file.
+Otherwise, the output is sent to a message queue. Defaults to 1.</li>
+<li><strong>**kwargs</strong> &#8211; Additional keyword arguments are passed to the base comm.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Communication object.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="cis_interface.communication.html#cis_interface.communication.DefaultComm" title="cis_interface.communication.DefaultComm">DefaultComm</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.interface.CisInterface.CisRpc">
+<code class="descclassname">cis_interface.interface.CisInterface.</code><code class="descname">CisRpc</code><span class="sig-paren">(</span><em>outname</em>, <em>outfmt</em>, <em>inname</em>, <em>infmt</em>, <em>matlab=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/CisInterface.html#CisRpc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.CisInterface.CisRpc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get class for sending a message and then receiving a response.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>outname</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; The name of the output message queue.</li>
+<li><strong>outfmt</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; Format string used to format variables in a
+message sent to the output message queue.</li>
+<li><strong>inname</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; The name of the input message queue.</li>
+<li><strong>infmt</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; Format string used to recover variables from
+messages received from the input message queue.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Communication object.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="cis_interface.communication.html#cis_interface.communication.DefaultComm" title="cis_interface.communication.DefaultComm">DefaultComm</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.interface.CisInterface.CisRpcClient">
+<code class="descclassname">cis_interface.interface.CisInterface.</code><code class="descname">CisRpcClient</code><span class="sig-paren">(</span><em>name</em>, <em>outfmt='%s'</em>, <em>infmt='%s'</em>, <em>matlab=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/CisInterface.html#CisRpcClient"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.CisInterface.CisRpcClient" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get class for handling requests and response to an RPC Server from a
+client.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; The name of the server queues.</li>
+<li><strong>outfmt</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) &#8211; Format string used to format variables in a
+message sent to the request queue. Defautls to &#8216;%s&#8217;.</li>
+<li><strong>infmt</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) &#8211; Format string used to recover variables from
+messages received from the response queue. Defautls to &#8216;%s&#8217;.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Communication object.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="cis_interface.communication.html#module-cis_interface.communication.ClientComm" title="cis_interface.communication.ClientComm">ClientComm</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.interface.CisInterface.CisRpcServer">
+<code class="descclassname">cis_interface.interface.CisInterface.</code><code class="descname">CisRpcServer</code><span class="sig-paren">(</span><em>name</em>, <em>infmt='%s'</em>, <em>outfmt='%s'</em>, <em>matlab=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/CisInterface.html#CisRpcServer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.CisInterface.CisRpcServer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get class for handling requests and response for an RPC Server.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; The name of the server queues.</li>
+<li><strong>infmt</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) &#8211; Format string used to recover variables from
+messages received from the request queue. Defaults to &#8216;%s&#8217;.</li>
+<li><strong>outfmt</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) &#8211; Format string used to format variables in a
+message sent to the response queue. Defautls to &#8216;%s&#8217;.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Communication object.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="cis_interface.communication.html#module-cis_interface.communication.ServerComm" title="cis_interface.communication.ServerComm">ServerComm</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.interface.CisInterface.bufMsgSize">
+<code class="descclassname">cis_interface.interface.CisInterface.</code><code class="descname">bufMsgSize</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/CisInterface.html#bufMsgSize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.CisInterface.bufMsgSize" title="Permalink to this definition">¶</a></dt>
+<dd><p>int: Buffer size for average message.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.interface.CisInterface.eof_msg">
+<code class="descclassname">cis_interface.interface.CisInterface.</code><code class="descname">eof_msg</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/CisInterface.html#eof_msg"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.CisInterface.eof_msg" title="Permalink to this definition">¶</a></dt>
+<dd><p>str: Message signalling end of file.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.interface.CisInterface.maxMsgSize">
+<code class="descclassname">cis_interface.interface.CisInterface.</code><code class="descname">maxMsgSize</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/CisInterface.html#maxMsgSize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.CisInterface.maxMsgSize" title="Permalink to this definition">¶</a></dt>
+<dd><p>int: The maximum message size.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-cis_interface.interface.PsiInterface">
+<span id="cis-interface-interface-psiinterface-module"></span><h2>cis_interface.interface.PsiInterface module<a class="headerlink" href="#module-cis_interface.interface.PsiInterface" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-cis_interface.interface">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-cis_interface.interface" title="Permalink to this headline">¶</a></h2>
+<p>Routines for interfacing with framework from Python/C/C++/Matlab.</p>
+<dl class="function">
+<dt id="cis_interface.interface.CisInput">
+<code class="descclassname">cis_interface.interface.</code><code class="descname">CisInput</code><span class="sig-paren">(</span><em>name</em>, <em>format_str=None</em>, <em>matlab=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/CisInterface.html#CisInput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.CisInput" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get class for handling input from a message queue.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; The name of the message queue. Combined with the
+suffix &#8216;_IN&#8217;, it should match an environment variable containing
+a message queue key.</li>
+<li><strong>format_str</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) &#8211; C style format string that should be used
+to deserialize messages that are receieved into a list of python
+objects. Defaults to None and raw string messages are returned.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Communication object.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="cis_interface.communication.html#cis_interface.communication.DefaultComm" title="cis_interface.communication.DefaultComm">DefaultComm</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.interface.CisOutput">
+<code class="descclassname">cis_interface.interface.</code><code class="descname">CisOutput</code><span class="sig-paren">(</span><em>name</em>, <em>format_str=None</em>, <em>matlab=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/CisInterface.html#CisOutput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.CisOutput" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get class for handling output to a message queue.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; The name of the message queue. Combined with the
+suffix &#8216;_OUT&#8217;, it should match an environment variable containing
+a message queue key.</li>
+<li><strong>format_str</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) &#8211; C style format string that should be used
+to create a message from a list of python ojbects. Defaults to None
+and raw string messages are sent.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Communication object.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="cis_interface.communication.html#cis_interface.communication.DefaultComm" title="cis_interface.communication.DefaultComm">DefaultComm</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.interface.CisRpc">
+<code class="descclassname">cis_interface.interface.</code><code class="descname">CisRpc</code><span class="sig-paren">(</span><em>outname</em>, <em>outfmt</em>, <em>inname</em>, <em>infmt</em>, <em>matlab=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/CisInterface.html#CisRpc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.CisRpc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get class for sending a message and then receiving a response.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>outname</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; The name of the output message queue.</li>
+<li><strong>outfmt</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; Format string used to format variables in a
+message sent to the output message queue.</li>
+<li><strong>inname</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; The name of the input message queue.</li>
+<li><strong>infmt</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; Format string used to recover variables from
+messages received from the input message queue.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Communication object.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="cis_interface.communication.html#cis_interface.communication.DefaultComm" title="cis_interface.communication.DefaultComm">DefaultComm</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="cis_interface.dataio.html" class="btn btn-neutral float-right" title="cis_interface.dataio package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="code_python.html" class="btn btn-neutral" title="Python Code" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Meagan Lang, David Raila.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.1.3',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          
+          SphinxRtdTheme.Navigation.enableSticky();
+          
+      });
+  </script> 
+
+</body>
+</html>

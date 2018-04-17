@@ -1,0 +1,700 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>cis_interface.interface.CisInterface &mdash; cis_interface 0.1.3 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> cis_interface
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../includeme.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../formatted_io.html">Formatted I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../server_client_io.html">Server/Client I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../server_client_io.html#one-server-two-clients">One Server, Two Clients</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../yaml.html">YAML Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../config.html">Configuration Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../units.html">Units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../c_format_strings.html">C-Style Format Strings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../io_drivers.html">Input/Output Drivers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../model_drivers.html">Model Drivers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../code.html">Code</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/examples_toc.html">Examples</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">cis_interface</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>cis_interface.interface.CisInterface</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for cis_interface.interface.CisInterface</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">cis_interface</span> <span class="k">import</span> <span class="n">backwards</span><span class="p">,</span> <span class="n">tools</span><span class="p">,</span> <span class="n">serialize</span>
+<span class="kn">from</span> <span class="nn">cis_interface.communication</span> <span class="k">import</span> <span class="n">DefaultComm</span>
+<span class="c1">#    DefaultComm, RPCComm, ServerComm, ClientComm)</span>
+
+
+<span class="n">CIS_MSG_MAX</span> <span class="o">=</span> <span class="n">tools</span><span class="o">.</span><span class="n">CIS_MSG_MAX</span>
+<span class="n">CIS_MSG_EOF</span> <span class="o">=</span> <span class="n">tools</span><span class="o">.</span><span class="n">CIS_MSG_EOF</span>
+<span class="n">CIS_MSG_BUF</span> <span class="o">=</span> <span class="n">tools</span><span class="o">.</span><span class="n">CIS_MSG_BUF</span>
+
+
+<div class="viewcode-block" id="maxMsgSize"><a class="viewcode-back" href="../../../cis_interface.interface.html#cis_interface.interface.CisInterface.maxMsgSize">[docs]</a><span class="k">def</span> <span class="nf">maxMsgSize</span><span class="p">():</span>
+    <span class="sd">r&quot;&quot;&quot;int: The maximum message size.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">CIS_MSG_MAX</span></div>
+
+
+<div class="viewcode-block" id="bufMsgSize"><a class="viewcode-back" href="../../../cis_interface.interface.html#cis_interface.interface.CisInterface.bufMsgSize">[docs]</a><span class="k">def</span> <span class="nf">bufMsgSize</span><span class="p">():</span>
+    <span class="sd">r&quot;&quot;&quot;int: Buffer size for average message.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">CIS_MSG_BUF</span></div>
+
+
+<div class="viewcode-block" id="eof_msg"><a class="viewcode-back" href="../../../cis_interface.interface.html#cis_interface.interface.CisInterface.eof_msg">[docs]</a><span class="k">def</span> <span class="nf">eof_msg</span><span class="p">():</span>
+    <span class="sd">r&quot;&quot;&quot;str: Message signalling end of file.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">CIS_MSG_EOF</span></div>
+
+
+<div class="viewcode-block" id="CisMatlab"><a class="viewcode-back" href="../../../cis_interface.interface.html#cis_interface.interface.CisInterface.CisMatlab">[docs]</a><span class="k">def</span> <span class="nf">CisMatlab</span><span class="p">(</span><span class="n">_type</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>  <span class="c1"># pragma: matlab</span>
+    <span class="sd">r&quot;&quot;&quot;Short interface to identify functions called by Matlab.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        _type (str): Name of class that should be returned.</span>
+<span class="sd">        args (list): Additional arguments that should be passed to class</span>
+<span class="sd">            initializer.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        obj: An instance of the requested class.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">args</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">if</span> <span class="n">_type</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;Psi&#39;</span><span class="p">):</span>
+        <span class="n">_type</span> <span class="o">=</span> <span class="n">_type</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;Psi&#39;</span><span class="p">,</span> <span class="s1">&#39;Cis&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">_type</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;PSI&#39;</span><span class="p">):</span>
+        <span class="n">_type</span> <span class="o">=</span> <span class="n">_type</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;PSI&#39;</span><span class="p">,</span> <span class="s1">&#39;CIS&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">cls</span> <span class="o">=</span> <span class="nb">eval</span><span class="p">(</span><span class="n">_type</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">backwards</span><span class="o">.</span><span class="n">bytes_type</span><span class="p">,</span> <span class="n">backwards</span><span class="o">.</span><span class="n">unicode_type</span><span class="p">)):</span>
+        <span class="n">obj</span> <span class="o">=</span> <span class="n">cls</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;matlab&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
+        <span class="n">obj</span> <span class="o">=</span> <span class="n">cls</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">obj</span></div>
+
+
+<div class="viewcode-block" id="CisInput"><a class="viewcode-back" href="../../../cis_interface.interface.html#cis_interface.interface.CisInterface.CisInput">[docs]</a><span class="k">def</span> <span class="nf">CisInput</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">format_str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">matlab</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">r&quot;&quot;&quot;Get class for handling input from a message queue.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        name (str): The name of the message queue. Combined with the</span>
+<span class="sd">            suffix &#39;_IN&#39;, it should match an environment variable containing</span>
+<span class="sd">            a message queue key.</span>
+<span class="sd">        format_str (str, optional): C style format string that should be used</span>
+<span class="sd">            to deserialize messages that are receieved into a list of python</span>
+<span class="sd">            objects. Defaults to None and raw string messages are returned.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        DefaultComm: Communication object.</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">matlab</span> <span class="ow">and</span> <span class="n">format_str</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># pragma: matlab</span>
+        <span class="n">format_str</span> <span class="o">=</span> <span class="n">backwards</span><span class="o">.</span><span class="n">decode_escape</span><span class="p">(</span><span class="n">format_str</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">DefaultComm</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="s1">&#39;recv&#39;</span><span class="p">,</span> <span class="n">format_str</span><span class="o">=</span><span class="n">format_str</span><span class="p">,</span>
+                       <span class="n">is_interface</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">recv_timeout</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">matlab</span><span class="o">=</span><span class="n">matlab</span><span class="p">)</span></div>
+    
+
+<div class="viewcode-block" id="CisOutput"><a class="viewcode-back" href="../../../cis_interface.interface.html#cis_interface.interface.CisInterface.CisOutput">[docs]</a><span class="k">def</span> <span class="nf">CisOutput</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">format_str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">matlab</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">r&quot;&quot;&quot;Get class for handling output to a message queue.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        name (str): The name of the message queue. Combined with the</span>
+<span class="sd">            suffix &#39;_OUT&#39;, it should match an environment variable containing</span>
+<span class="sd">            a message queue key.</span>
+<span class="sd">        format_str (str, optional): C style format string that should be used</span>
+<span class="sd">            to create a message from a list of python ojbects. Defaults to None</span>
+<span class="sd">            and raw string messages are sent.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        DefaultComm: Communication object.</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">matlab</span> <span class="ow">and</span> <span class="n">format_str</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># pragma: matlab</span>
+        <span class="n">format_str</span> <span class="o">=</span> <span class="n">backwards</span><span class="o">.</span><span class="n">decode_escape</span><span class="p">(</span><span class="n">format_str</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">DefaultComm</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="s1">&#39;send&#39;</span><span class="p">,</span> <span class="n">format_str</span><span class="o">=</span><span class="n">format_str</span><span class="p">,</span>
+                       <span class="n">is_interface</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">recv_timeout</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">matlab</span><span class="o">=</span><span class="n">matlab</span><span class="p">)</span></div>
+
+    
+<div class="viewcode-block" id="CisRpc"><a class="viewcode-back" href="../../../cis_interface.interface.html#cis_interface.interface.CisInterface.CisRpc">[docs]</a><span class="k">def</span> <span class="nf">CisRpc</span><span class="p">(</span><span class="n">outname</span><span class="p">,</span> <span class="n">outfmt</span><span class="p">,</span> <span class="n">inname</span><span class="p">,</span> <span class="n">infmt</span><span class="p">,</span> <span class="n">matlab</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">r&quot;&quot;&quot;Get class for sending a message and then receiving a response.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        outname (str): The name of the output message queue.</span>
+<span class="sd">        outfmt (str): Format string used to format variables in a</span>
+<span class="sd">            message sent to the output message queue.</span>
+<span class="sd">        inname (str): The name of the input message queue.</span>
+<span class="sd">        infmt (str): Format string used to recover variables from</span>
+<span class="sd">            messages received from the input message queue.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        DefaultComm: Communication object.</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">cis_interface.communication</span> <span class="k">import</span> <span class="n">RPCComm</span>
+    <span class="k">if</span> <span class="n">matlab</span><span class="p">:</span>  <span class="c1"># pragma: matlab</span>
+        <span class="n">infmt</span> <span class="o">=</span> <span class="n">backwards</span><span class="o">.</span><span class="n">decode_escape</span><span class="p">(</span><span class="n">infmt</span><span class="p">)</span>
+        <span class="n">outfmt</span> <span class="o">=</span> <span class="n">backwards</span><span class="o">.</span><span class="n">decode_escape</span><span class="p">(</span><span class="n">outfmt</span><span class="p">)</span>
+    <span class="n">icomm_kwargs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">format_str</span><span class="o">=</span><span class="n">infmt</span><span class="p">)</span>
+    <span class="n">ocomm_kwargs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">format_str</span><span class="o">=</span><span class="n">outfmt</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">inname</span> <span class="o">==</span> <span class="n">outname</span><span class="p">:</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="n">inname</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">_</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">inname</span><span class="p">,</span> <span class="n">outname</span><span class="p">)</span>
+        <span class="n">icomm_kwargs</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">inname</span>
+        <span class="n">ocomm_kwargs</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">outname</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="n">RPCComm</span><span class="o">.</span><span class="n">RPCComm</span><span class="p">(</span><span class="n">name</span><span class="p">,</span>
+                          <span class="n">icomm_kwargs</span><span class="o">=</span><span class="n">icomm_kwargs</span><span class="p">,</span>
+                          <span class="n">ocomm_kwargs</span><span class="o">=</span><span class="n">ocomm_kwargs</span><span class="p">,</span>
+                          <span class="n">is_interface</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">recv_timeout</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                          <span class="n">matlab</span><span class="o">=</span><span class="n">matlab</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">out</span></div>
+
+
+<div class="viewcode-block" id="CisRpcServer"><a class="viewcode-back" href="../../../cis_interface.interface.html#cis_interface.interface.CisInterface.CisRpcServer">[docs]</a><span class="k">def</span> <span class="nf">CisRpcServer</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">infmt</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">outfmt</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">matlab</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">r&quot;&quot;&quot;Get class for handling requests and response for an RPC Server.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        name (str): The name of the server queues.</span>
+<span class="sd">        infmt (str, optional): Format string used to recover variables from</span>
+<span class="sd">            messages received from the request queue. Defaults to &#39;%s&#39;.</span>
+<span class="sd">        outfmt (str, optional): Format string used to format variables in a</span>
+<span class="sd">            message sent to the response queue. Defautls to &#39;%s&#39;.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        ServerComm: Communication object.</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">cis_interface.communication</span> <span class="k">import</span> <span class="n">ServerComm</span>
+    <span class="k">if</span> <span class="n">matlab</span><span class="p">:</span>  <span class="c1"># pragma: matlab</span>
+        <span class="n">infmt</span> <span class="o">=</span> <span class="n">backwards</span><span class="o">.</span><span class="n">decode_escape</span><span class="p">(</span><span class="n">infmt</span><span class="p">)</span>
+        <span class="n">outfmt</span> <span class="o">=</span> <span class="n">backwards</span><span class="o">.</span><span class="n">decode_escape</span><span class="p">(</span><span class="n">outfmt</span><span class="p">)</span>
+    <span class="n">icomm_kwargs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">format_str</span><span class="o">=</span><span class="n">infmt</span><span class="p">)</span>
+    <span class="n">ocomm_kwargs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">format_str</span><span class="o">=</span><span class="n">outfmt</span><span class="p">)</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="n">ServerComm</span><span class="o">.</span><span class="n">ServerComm</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">response_kwargs</span><span class="o">=</span><span class="n">ocomm_kwargs</span><span class="p">,</span>
+                                <span class="n">is_interface</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">recv_timeout</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                                <span class="n">matlab</span><span class="o">=</span><span class="n">matlab</span><span class="p">,</span> <span class="o">**</span><span class="n">icomm_kwargs</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">out</span></div>
+    
+
+<div class="viewcode-block" id="CisRpcClient"><a class="viewcode-back" href="../../../cis_interface.interface.html#cis_interface.interface.CisInterface.CisRpcClient">[docs]</a><span class="k">def</span> <span class="nf">CisRpcClient</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">outfmt</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">infmt</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">matlab</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">r&quot;&quot;&quot;Get class for handling requests and response to an RPC Server from a</span>
+<span class="sd">    client.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        name (str): The name of the server queues.</span>
+<span class="sd">        outfmt (str, optional): Format string used to format variables in a</span>
+<span class="sd">            message sent to the request queue. Defautls to &#39;%s&#39;.</span>
+<span class="sd">        infmt (str, optional): Format string used to recover variables from</span>
+<span class="sd">            messages received from the response queue. Defautls to &#39;%s&#39;.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        ClientComm: Communication object.</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">cis_interface.communication</span> <span class="k">import</span> <span class="n">ClientComm</span>
+    <span class="k">if</span> <span class="n">matlab</span><span class="p">:</span>  <span class="c1"># pragma: matlab</span>
+        <span class="n">infmt</span> <span class="o">=</span> <span class="n">backwards</span><span class="o">.</span><span class="n">decode_escape</span><span class="p">(</span><span class="n">infmt</span><span class="p">)</span>
+        <span class="n">outfmt</span> <span class="o">=</span> <span class="n">backwards</span><span class="o">.</span><span class="n">decode_escape</span><span class="p">(</span><span class="n">outfmt</span><span class="p">)</span>
+    <span class="n">icomm_kwargs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">format_str</span><span class="o">=</span><span class="n">infmt</span><span class="p">)</span>
+    <span class="n">ocomm_kwargs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">format_str</span><span class="o">=</span><span class="n">outfmt</span><span class="p">)</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="n">ClientComm</span><span class="o">.</span><span class="n">ClientComm</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">response_kwargs</span><span class="o">=</span><span class="n">icomm_kwargs</span><span class="p">,</span>
+                                <span class="n">is_interface</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">recv_timeout</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                                <span class="n">matlab</span><span class="o">=</span><span class="n">matlab</span><span class="p">,</span> <span class="o">**</span><span class="n">ocomm_kwargs</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">out</span></div>
+    
+
+<span class="c1"># Specialized classes for ascii IO</span>
+<div class="viewcode-block" id="CisAsciiFileInput"><a class="viewcode-back" href="../../../cis_interface.interface.html#cis_interface.interface.CisInterface.CisAsciiFileInput">[docs]</a><span class="k">def</span> <span class="nf">CisAsciiFileInput</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">src_type</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">matlab</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">r&quot;&quot;&quot;Get class for generic ASCII input from either a file or message</span>
+<span class="sd">    queue.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        name (str): Path to the local file that input should be read from (if</span>
+<span class="sd">            src_type == 0) or the name of the input message queue that input</span>
+<span class="sd">            should be received from.</span>
+<span class="sd">        src_type (int, optional): If 0, input is read from a local file.</span>
+<span class="sd">            Otherwise input is received from a message queue. Defauts to 1.</span>
+<span class="sd">        **kwargs: Additional keyword arguments are passed to the base comm.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        DefaultComm: Communication object.</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">src_type</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="kn">from</span> <span class="nn">cis_interface.communication</span> <span class="k">import</span> <span class="n">AsciiFileComm</span>
+        <span class="n">base</span> <span class="o">=</span> <span class="n">AsciiFileComm</span><span class="o">.</span><span class="n">AsciiFileComm</span>
+        <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;address&#39;</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">base</span> <span class="o">=</span> <span class="n">DefaultComm</span>
+    <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;direction&#39;</span><span class="p">,</span> <span class="s1">&#39;recv&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">base</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">is_interface</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">recv_timeout</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                <span class="n">matlab</span><span class="o">=</span><span class="n">matlab</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="CisAsciiFileOutput"><a class="viewcode-back" href="../../../cis_interface.interface.html#cis_interface.interface.CisInterface.CisAsciiFileOutput">[docs]</a><span class="k">def</span> <span class="nf">CisAsciiFileOutput</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">dst_type</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">matlab</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">r&quot;&quot;&quot;Get class for generic ASCII output to either a local file or message</span>
+<span class="sd">    queue.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        name (str): Path to the local file where output should be written (if</span>
+<span class="sd">            dst_type == 0) or the name of the message queue where output</span>
+<span class="sd">            should be sent.</span>
+<span class="sd">        dst_type (int, optional): If 0, output is written to a local file.</span>
+<span class="sd">            Otherwise, output is sent to a message queue. Defaults to 1.</span>
+<span class="sd">        **kwargs: Additional keyword arguments are passed to the base comm.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        DefaultComm: Communication object.</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">dst_type</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="kn">from</span> <span class="nn">cis_interface.communication</span> <span class="k">import</span> <span class="n">AsciiFileComm</span>
+        <span class="n">base</span> <span class="o">=</span> <span class="n">AsciiFileComm</span><span class="o">.</span><span class="n">AsciiFileComm</span>
+        <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;address&#39;</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">base</span> <span class="o">=</span> <span class="n">DefaultComm</span>
+    <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;direction&#39;</span><span class="p">,</span> <span class="s1">&#39;send&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">base</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">is_interface</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">recv_timeout</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                <span class="n">matlab</span><span class="o">=</span><span class="n">matlab</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+            
+
+<span class="c1"># Specialized classes for ascii table IO</span>
+<div class="viewcode-block" id="CisAsciiTableInput"><a class="viewcode-back" href="../../../cis_interface.interface.html#cis_interface.interface.CisInterface.CisAsciiTableInput">[docs]</a><span class="k">def</span> <span class="nf">CisAsciiTableInput</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">as_array</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">src_type</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">matlab</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">r&quot;&quot;&quot;Get class for handling table-like formatted input.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        name (str): The path to the local file to read input from (if src_type</span>
+<span class="sd">            == 0) or the name of the message queue input should be received</span>
+<span class="sd">            from.</span>
+<span class="sd">        as_array (bool, optional): If True, recv returns the entire table</span>
+<span class="sd">            array and can only be called once. If False, recv returns row</span>
+<span class="sd">            entries. Default to False.</span>
+<span class="sd">        src_type (int, optional): If 0, input is read from a local file.</span>
+<span class="sd">            Otherwise, the input is received from a message queue. Defaults to</span>
+<span class="sd">            1.</span>
+<span class="sd">        **kwargs: Additional keyword arguments are passed to the base comm.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        DefaultComm: Communication object.</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">src_type</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="kn">from</span> <span class="nn">cis_interface.communication</span> <span class="k">import</span> <span class="n">AsciiTableComm</span>
+        <span class="n">base</span> <span class="o">=</span> <span class="n">AsciiTableComm</span><span class="o">.</span><span class="n">AsciiTableComm</span>
+        <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;address&#39;</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;as_array&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">as_array</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">base</span> <span class="o">=</span> <span class="n">DefaultComm</span>
+        <span class="c1"># TODO: This will be overwritten on recv</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;serializer_kwargs&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">as_array</span><span class="o">=</span><span class="n">as_array</span><span class="p">)</span>
+    <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;direction&#39;</span><span class="p">,</span> <span class="s1">&#39;recv&#39;</span><span class="p">)</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="n">base</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">is_interface</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">recv_timeout</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+               <span class="n">matlab</span><span class="o">=</span><span class="n">matlab</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">out</span></div>
+
+
+<div class="viewcode-block" id="CisAsciiTableOutput"><a class="viewcode-back" href="../../../cis_interface.interface.html#cis_interface.interface.CisInterface.CisAsciiTableOutput">[docs]</a><span class="k">def</span> <span class="nf">CisAsciiTableOutput</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">fmt</span><span class="p">,</span> <span class="n">as_array</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">dst_type</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">matlab</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                        <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">r&quot;&quot;&quot;Get class for handling table-like formatted output.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        name (str): The path to the local file where output should be saved</span>
+<span class="sd">            (if dst_type == 0) or the name of the message queue where the</span>
+<span class="sd">            output should be sent.</span>
+<span class="sd">        fmt (str): A C style format string specifying how each &#39;row&#39; of output</span>
+<span class="sd">            should be formated. This should include the newline character.</span>
+<span class="sd">        as_array (bool, optional): If True, send expects and entire array.</span>
+<span class="sd">            If False, send expects the entries for one table row. Defaults to</span>
+<span class="sd">            False.</span>
+<span class="sd">        dst_type (int, optional): If 0, output is sent to a local file.</span>
+<span class="sd">            Otherwise, the output is sent to a message queue. Defaults to 1.</span>
+<span class="sd">        **kwargs: Additional keyword arguments are passed to the base comm.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        DefaultComm: Communication object.</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">matlab</span><span class="p">:</span>  <span class="c1"># pragma: matlab</span>
+        <span class="n">fmt</span> <span class="o">=</span> <span class="n">backwards</span><span class="o">.</span><span class="n">decode_escape</span><span class="p">(</span><span class="n">fmt</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">dst_type</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="kn">from</span> <span class="nn">cis_interface.communication</span> <span class="k">import</span> <span class="n">AsciiTableComm</span>
+        <span class="n">base</span> <span class="o">=</span> <span class="n">AsciiTableComm</span><span class="o">.</span><span class="n">AsciiTableComm</span>
+        <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;address&#39;</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+        <span class="n">kwargs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">as_array</span><span class="o">=</span><span class="n">as_array</span><span class="p">,</span> <span class="n">format_str</span><span class="o">=</span><span class="n">fmt</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">base</span> <span class="o">=</span> <span class="n">DefaultComm</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;serializer_kwargs&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">as_array</span><span class="o">=</span><span class="n">as_array</span><span class="p">,</span>
+                                           <span class="n">format_str</span><span class="o">=</span><span class="n">fmt</span><span class="p">)</span>
+    <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;direction&#39;</span><span class="p">,</span> <span class="s1">&#39;send&#39;</span><span class="p">)</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="n">base</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">is_interface</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">recv_timeout</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+               <span class="n">matlab</span><span class="o">=</span><span class="n">matlab</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">out</span></div>
+    
+
+<div class="viewcode-block" id="CisAsciiArrayOutput"><a class="viewcode-back" href="../../../cis_interface.interface.html#cis_interface.interface.CisInterface.CisAsciiArrayOutput">[docs]</a><span class="k">def</span> <span class="nf">CisAsciiArrayOutput</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">fmt</span><span class="p">,</span> <span class="n">dst_type</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">matlab</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">r&quot;&quot;&quot;Get class for handling table-like formatted output.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        name (str): The path to the local file where output should be saved</span>
+<span class="sd">            (if dst_type == 0) or the name of the message queue where the</span>
+<span class="sd">            output should be sent.</span>
+<span class="sd">        fmt (str): A C style format string specifying how each &#39;row&#39; of output</span>
+<span class="sd">            should be formated. This should include the newline character.</span>
+<span class="sd">        dst_type (int, optional): If 0, output is sent to a local file.</span>
+<span class="sd">            Otherwise, the output is sent to a message queue. Defaults to 1.</span>
+<span class="sd">        **kwargs: Additional keyword arguments are passed to the base comm.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        DefaultComm: Communication object.</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">matlab</span><span class="p">:</span>  <span class="c1"># pragma: matlab</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;send_converter&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">serialize</span><span class="o">.</span><span class="n">consolidate_array</span>
+    <span class="k">return</span> <span class="n">CisAsciiTableOutput</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">fmt</span><span class="p">,</span> <span class="n">as_array</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">dst_type</span><span class="o">=</span><span class="n">dst_type</span><span class="p">,</span>
+                               <span class="n">matlab</span><span class="o">=</span><span class="n">matlab</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="CisAsciiArrayInput"><a class="viewcode-back" href="../../../cis_interface.interface.html#cis_interface.interface.CisInterface.CisAsciiArrayInput">[docs]</a><span class="k">def</span> <span class="nf">CisAsciiArrayInput</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">src_type</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">matlab</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">r&quot;&quot;&quot;Get class for handling table-like formatted input as arrays.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        name (str): The path to the local file to read input from (if src_type</span>
+<span class="sd">            == 0) or the name of the message queue input should be received</span>
+<span class="sd">            from.</span>
+<span class="sd">        src_type (int, optional): If 0, input is read from a local file.</span>
+<span class="sd">            Otherwise, the input is received from a message queue. Defaults to</span>
+<span class="sd">            1.</span>
+<span class="sd">        **kwargs: Additional keyword arguments are passed to the base comm.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        DefaultComm: Communication object.</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">CisAsciiTableInput</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">as_array</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">src_type</span><span class="o">=</span><span class="n">src_type</span><span class="p">,</span>
+                              <span class="n">matlab</span><span class="o">=</span><span class="n">matlab</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="CisPickleInput"><a class="viewcode-back" href="../../../cis_interface.interface.html#cis_interface.interface.CisInterface.CisPickleInput">[docs]</a><span class="k">def</span> <span class="nf">CisPickleInput</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">src_type</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">matlab</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">r&quot;&quot;&quot;Get class for handling pickled input.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        name (str): The path to the local file to read input from (if src_type</span>
+<span class="sd">            == 0) or the name of the message queue input should be received</span>
+<span class="sd">            from.</span>
+<span class="sd">        src_type (int, optional): If 0, input is read from a local file.</span>
+<span class="sd">            Otherwise, the input is received from a message queue. Defaults to</span>
+<span class="sd">            1.</span>
+<span class="sd">        **kwargs: Additional keyword arguments are passed to the base comm.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        DefaultComm: Communication object.</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">src_type</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="kn">from</span> <span class="nn">cis_interface.communication</span> <span class="k">import</span> <span class="n">PickleFileComm</span>
+        <span class="n">base</span> <span class="o">=</span> <span class="n">PickleFileComm</span><span class="o">.</span><span class="n">PickleFileComm</span>
+        <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;address&#39;</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">base</span> <span class="o">=</span> <span class="n">DefaultComm</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;serializer_kwargs&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">stype</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+    <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;direction&#39;</span><span class="p">,</span> <span class="s1">&#39;recv&#39;</span><span class="p">)</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="n">base</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">is_interface</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">recv_timeout</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+               <span class="n">matlab</span><span class="o">=</span><span class="n">matlab</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">out</span></div>
+
+
+<div class="viewcode-block" id="CisPickleOutput"><a class="viewcode-back" href="../../../cis_interface.interface.html#cis_interface.interface.CisInterface.CisPickleOutput">[docs]</a><span class="k">def</span> <span class="nf">CisPickleOutput</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">dst_type</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">matlab</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">r&quot;&quot;&quot;Get class for handling pickled output.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        name (str): The path to the local file where output should be saved</span>
+<span class="sd">            (if dst_type == 0) or the name of the message queue where the</span>
+<span class="sd">            output should be sent.</span>
+<span class="sd">        dst_type (int, optional): If 0, output is sent to a local file.</span>
+<span class="sd">            Otherwise, the output is sent to a message queue. Defaults to 1.</span>
+<span class="sd">        **kwargs: Additional keyword arguments are passed to the base comm.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        DefaultComm: Communication object.</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">dst_type</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="kn">from</span> <span class="nn">cis_interface.communication</span> <span class="k">import</span> <span class="n">PickleFileComm</span>
+        <span class="n">base</span> <span class="o">=</span> <span class="n">PickleFileComm</span><span class="o">.</span><span class="n">PickleFileComm</span>
+        <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;address&#39;</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">base</span> <span class="o">=</span> <span class="n">DefaultComm</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;serializer_kwargs&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">stype</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+    <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;direction&#39;</span><span class="p">,</span> <span class="s1">&#39;send&#39;</span><span class="p">)</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="n">base</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">is_interface</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">recv_timeout</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+               <span class="n">matlab</span><span class="o">=</span><span class="n">matlab</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">out</span></div>
+
+
+<div class="viewcode-block" id="CisPandasInput"><a class="viewcode-back" href="../../../cis_interface.interface.html#cis_interface.interface.CisInterface.CisPandasInput">[docs]</a><span class="k">def</span> <span class="nf">CisPandasInput</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">src_type</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">matlab</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">r&quot;&quot;&quot;Get class for handling Pandas input.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        name (str): The path to the local file to read input from (if src_type</span>
+<span class="sd">            == 0) or the name of the message queue input should be received</span>
+<span class="sd">            from.</span>
+<span class="sd">        src_type (int, optional): If 0, input is read from a local file.</span>
+<span class="sd">            Otherwise, the input is received from a message queue. Defaults to</span>
+<span class="sd">            1.</span>
+<span class="sd">        **kwargs: Additional keyword arguments are passed to the base comm.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        DefaultComm: Communication object.</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">src_type</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="kn">from</span> <span class="nn">cis_interface.communication</span> <span class="k">import</span> <span class="n">PandasFileComm</span>
+        <span class="n">base</span> <span class="o">=</span> <span class="n">PandasFileComm</span><span class="o">.</span><span class="n">PandasFileComm</span>
+        <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;address&#39;</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">matlab</span><span class="p">:</span>  <span class="c1"># pragma: matlab</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;recv_converter&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">serialize</span><span class="o">.</span><span class="n">pandas2numpy</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">base</span> <span class="o">=</span> <span class="n">DefaultComm</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">matlab</span><span class="p">:</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;recv_converter&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">serialize</span><span class="o">.</span><span class="n">numpy2pandas</span>
+    <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;direction&#39;</span><span class="p">,</span> <span class="s1">&#39;recv&#39;</span><span class="p">)</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="n">base</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">is_interface</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">recv_timeout</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+               <span class="n">matlab</span><span class="o">=</span><span class="n">matlab</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">out</span></div>
+
+
+<div class="viewcode-block" id="CisPandasOutput"><a class="viewcode-back" href="../../../cis_interface.interface.html#cis_interface.interface.CisInterface.CisPandasOutput">[docs]</a><span class="k">def</span> <span class="nf">CisPandasOutput</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">dst_type</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">matlab</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">r&quot;&quot;&quot;Get class for handling pandasd output.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        name (str): The path to the local file where output should be saved</span>
+<span class="sd">            (if dst_type == 0) or the name of the message queue where the</span>
+<span class="sd">            output should be sent.</span>
+<span class="sd">        dst_type (int, optional): If 0, output is sent to a local file.</span>
+<span class="sd">            Otherwise, the output is sent to a message queue. Defaults to 1.</span>
+<span class="sd">        **kwargs: Additional keyword arguments are passed to the base comm.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        DefaultComm: Communication object.</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">dst_type</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="kn">from</span> <span class="nn">cis_interface.communication</span> <span class="k">import</span> <span class="n">PandasFileComm</span>
+        <span class="n">base</span> <span class="o">=</span> <span class="n">PandasFileComm</span><span class="o">.</span><span class="n">PandasFileComm</span>
+        <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;address&#39;</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">matlab</span><span class="p">:</span>  <span class="c1"># pragma: matlab</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;send_converter&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">serialize</span><span class="o">.</span><span class="n">numpy2pandas</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">base</span> <span class="o">=</span> <span class="n">DefaultComm</span>
+        <span class="k">if</span> <span class="n">matlab</span><span class="p">:</span>  <span class="c1"># pragma: matlab</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;send_converter&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">serialize</span><span class="o">.</span><span class="n">consolidate_array</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;send_converter&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">serialize</span><span class="o">.</span><span class="n">pandas2numpy</span>
+    <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;direction&#39;</span><span class="p">,</span> <span class="s1">&#39;send&#39;</span><span class="p">)</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="n">base</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">is_interface</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">recv_timeout</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+               <span class="n">matlab</span><span class="o">=</span><span class="n">matlab</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">out</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Meagan Lang, David Raila.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../',
+            VERSION:'0.1.3',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          
+          SphinxRtdTheme.Navigation.enableSticky();
+          
+      });
+  </script> 
+
+</body>
+</html>

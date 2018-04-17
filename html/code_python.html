@@ -1,0 +1,2001 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Python Code &mdash; cis_interface 0.1.3 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="cis_interface.interface package" href="cis_interface.interface.html" />
+    <link rel="prev" title="Code" href="code.html" /> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> cis_interface
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="includeme.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="formatted_io.html">Formatted I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="server_client_io.html">Server/Client I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="server_client_io.html#one-server-two-clients">One Server, Two Clients</a></li>
+<li class="toctree-l1"><a class="reference internal" href="yaml.html">YAML Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="config.html">Configuration Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="units.html">Units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="c_format_strings.html">C-Style Format Strings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="io_drivers.html">Input/Output Drivers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="model_drivers.html">Model Drivers</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="code.html">Code</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Python Code</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#subpackages">Subpackages</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="cis_interface.interface.html">cis_interface.interface package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cis_interface.dataio.html">cis_interface.dataio package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cis_interface.drivers.html">cis_interface.drivers package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cis_interface.examples.html">cis_interface.examples package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-cis_interface.backwards">cis_interface.backwards module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-cis_interface.command_line">cis_interface.command_line module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-cis_interface.config">cis_interface.config module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-cis_interface.platform">cis_interface.platform module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-cis_interface.runner">cis_interface.runner module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-cis_interface.scanf">cis_interface.scanf module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-cis_interface.tools">cis_interface.tools module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-cis_interface.units">cis_interface.units module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-cis_interface.yamlfile">cis_interface.yamlfile module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-cis_interface">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="code_c.html">C Code</a></li>
+<li class="toctree-l2"><a class="reference internal" href="code_cpp.html">C++ Code</a></li>
+<li class="toctree-l2"><a class="reference internal" href="code_matlab.html">Matlab Code</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="examples/examples_toc.html">Examples</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">cis_interface</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="code.html">Code</a> &raquo;</li>
+        
+      <li>Python Code</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/code_python.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="python-code">
+<h1>Python Code<a class="headerlink" href="#python-code" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="cis_interface.interface.html">cis_interface.interface package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cis_interface.dataio.html">cis_interface.dataio package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cis_interface.drivers.html">cis_interface.drivers package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cis_interface.examples.html">cis_interface.examples package</a></li>
+</ul>
+</div>
+<blockquote>
+<div>cis_interface.tests</div></blockquote>
+</div>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-cis_interface.backwards">
+<span id="cis-interface-backwards-module"></span><h2>cis_interface.backwards module<a class="headerlink" href="#module-cis_interface.backwards" title="Permalink to this headline">¶</a></h2>
+<p>This module allows for backward compatibility.</p>
+<dl class="function">
+<dt id="cis_interface.backwards.bytes2unicode">
+<code class="descclassname">cis_interface.backwards.</code><code class="descname">bytes2unicode</code><span class="sig-paren">(</span><em>b</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/backwards.html#bytes2unicode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.backwards.bytes2unicode" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert from bytes/unicode/str to unicode.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>b</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.6)"><em>bytes</em></a><em>, </em><em>unicode</em><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; Bytes to be converted into unicode.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">String version of input.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">unicode/str</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#TypeError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal"><span class="pre">TypeError</span></code></a> &#8211; If supplied type cannot be converted to unicode.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.backwards.unicode2bytes">
+<code class="descclassname">cis_interface.backwards.</code><code class="descname">unicode2bytes</code><span class="sig-paren">(</span><em>s</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/backwards.html#unicode2bytes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.backwards.unicode2bytes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert from bytes/unicode/str to a bytes object.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>s</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.6)"><em>bytes</em></a><em>, </em><em>unicode</em>) &#8211; Object to convert to a bytes version.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Bytes version of input.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.6)">bytes</a></td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#TypeError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal"><span class="pre">TypeError</span></code></a> &#8211; If supplied type cannot be converted to bytes.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="module-cis_interface.command_line">
+<span id="cis-interface-command-line-module"></span><h2>cis_interface.command_line module<a class="headerlink" href="#module-cis_interface.command_line" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="cis_interface.command_line.cc_flags">
+<code class="descclassname">cis_interface.command_line.</code><code class="descname">cc_flags</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/command_line.html#cc_flags"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.command_line.cc_flags" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the compiler flags necessary for including the interface
+library in a C or C++ program.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The necessary compiler flags and preprocessor definitions.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.6)">list</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.command_line.ciscc">
+<code class="descclassname">cis_interface.command_line.</code><code class="descname">ciscc</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/command_line.html#ciscc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.command_line.ciscc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compile C/C++ program.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.command_line.cisrun">
+<code class="descclassname">cis_interface.command_line.</code><code class="descname">cisrun</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/command_line.html#cisrun"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.command_line.cisrun" title="Permalink to this definition">¶</a></dt>
+<dd><p>Start a run.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.command_line.ld_flags">
+<code class="descclassname">cis_interface.command_line.</code><code class="descname">ld_flags</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/command_line.html#ld_flags"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.command_line.ld_flags" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the linker flags necessary for calling functions/classes from
+the interface library in a C or C++ program.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The necessary library linking flags.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.6)">list</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="module-cis_interface.config">
+<span id="cis-interface-config-module"></span><h2>cis_interface.config module<a class="headerlink" href="#module-cis_interface.config" title="Permalink to this headline">¶</a></h2>
+<p>This module imports the configuration for cis_interface.</p>
+<div class="admonition-todo admonition" id="index-0">
+<p class="first admonition-title">Todo</p>
+<p class="last">Remove reference to environment variables for accessing config options.</p>
+</div>
+<dl class="class">
+<dt id="cis_interface.config.CisConfigParser">
+<em class="property">class </em><code class="descclassname">cis_interface.config.</code><code class="descname">CisConfigParser</code><span class="sig-paren">(</span><em>defaults=None</em>, <em>dict_type=&lt;class 'collections.OrderedDict'&gt;</em>, <em>allow_no_value=False</em>, <em>*</em>, <em>delimiters=('='</em>, <em>':')</em>, <em>comment_prefixes=('#'</em>, <em>';')</em>, <em>inline_comment_prefixes=None</em>, <em>strict=True</em>, <em>empty_lines_in_values=True</em>, <em>default_section='DEFAULT'</em>, <em>interpolation=&lt;object object&gt;</em>, <em>converters=&lt;object object&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/config.html#CisConfigParser"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.config.CisConfigParser" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/configparser.html#configparser.ConfigParser" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">configparser.ConfigParser</span></code></a></p>
+<p>Config parser that returns None if option not provided on get.</p>
+<dl class="method">
+<dt id="cis_interface.config.CisConfigParser.get">
+<code class="descname">get</code><span class="sig-paren">(</span><em>section</em>, <em>option</em>, <em>default=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/config.html#CisConfigParser.get"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.config.CisConfigParser.get" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return None if the section/option does not exist.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>section</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; Name of section.</li>
+<li><strong>option</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; Name of option in section.</li>
+<li><strong>default</strong> (<em>obj</em><em>, </em><em>optional</em>) &#8211; Value that should be returned if the
+section and/or option are not found or are an empty string.
+Defaults to None.</li>
+<li><strong>**kwargs</strong> &#8211; Additional keyword arguments are passed to the parent
+class&#8217;s get.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">String entry if the section &amp; option exist, otherwise default.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">obj</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.config.cfg_environment">
+<code class="descclassname">cis_interface.config.</code><code class="descname">cfg_environment</code><span class="sig-paren">(</span><em>env=None</em>, <em>cfg=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/config.html#cfg_environment"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.config.cfg_environment" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set environment variables based on config options.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>env</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a><em>, </em><em>optional</em>) &#8211; Dictionary of environment variables that should
+be updated. Defaults to <cite>os.environ</cite>.</li>
+<li><strong>cfg</strong> (<a class="reference internal" href="cis_interface.html#cis_interface.config.CisConfigParser" title="cis_interface.config.CisConfigParser"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.config.CisConfigParser</span></code></a>, optional) &#8211; Config parser with options that should be used to update the
+environment. Defaults to <code class="xref py py-data docutils literal"><span class="pre">cis_interface.config.cis_cfg</span></code>.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.config.cfg_logging">
+<code class="descclassname">cis_interface.config.</code><code class="descname">cfg_logging</code><span class="sig-paren">(</span><em>cfg=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/config.html#cfg_logging"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.config.cfg_logging" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set logging levels from config options.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>cfg</strong> (<a class="reference internal" href="cis_interface.html#cis_interface.config.CisConfigParser" title="cis_interface.config.CisConfigParser"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.config.CisConfigParser</span></code></a>, optional) &#8211; Config parser with options that should be used to update the
+environment. Defaults to <code class="xref py py-data docutils literal"><span class="pre">cis_interface.config.cis_cfg</span></code>.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="module-cis_interface.platform">
+<span id="cis-interface-platform-module"></span><h2>cis_interface.platform module<a class="headerlink" href="#module-cis_interface.platform" title="Permalink to this headline">¶</a></h2>
+<p>This module handle platform compatibility issues.</p>
+</div>
+<div class="section" id="module-cis_interface.runner">
+<span id="cis-interface-runner-module"></span><h2>cis_interface.runner module<a class="headerlink" href="#module-cis_interface.runner" title="Permalink to this headline">¶</a></h2>
+<p>This module provides tools for running models using cis_interface.</p>
+<dl class="class">
+<dt id="cis_interface.runner.CisRunner">
+<em class="property">class </em><code class="descclassname">cis_interface.runner.</code><code class="descname">CisRunner</code><span class="sig-paren">(</span><em>modelYmls</em>, <em>namespace</em>, <em>host=None</em>, <em>rank=0</em>, <em>cis_debug_level=None</em>, <em>rmq_debug_level=None</em>, <em>cis_debug_prefix=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/runner.html#CisRunner"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.runner.CisRunner" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="cis_interface.html#cis_interface.tools.CisClass" title="cis_interface.tools.CisClass"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.tools.CisClass</span></code></a></p>
+<p>This class handles the orchestration of starting the model and
+IO drivers, monitoring their progress, and cleaning up on exit.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>modelYmls</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a>) &#8211; List of paths to yaml files specifying the models
+that should be run.</li>
+<li><strong>namespace</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; Name that should be used to uniquely identify any RMQ
+exchange.</li>
+<li><strong>host</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) &#8211; Name of the host that the models will be launched
+from. Defaults to None.</li>
+<li><strong>rank</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>, </em><em>optional</em>) &#8211; Rank of this set of models if run in parallel.
+Defaults to 0.</li>
+<li><strong>cis_debug_level</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) &#8211; Level for CiS debug messages. Defaults
+to environment variable &#8216;CIS_DEBUG&#8217;.</li>
+<li><strong>rmq_debug_level</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) &#8211; Level for RabbitMQ debug messages.
+Defaults to environment variable &#8216;RMQ_DEBUG&#8217;.</li>
+<li><strong>cis_debug_prefix</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) &#8211; Prefix for CiS debug messages.
+Defaults to namespace.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="cis_interface.runner.CisRunner.namespace">
+<code class="descname">namespace</code><a class="headerlink" href="#cis_interface.runner.CisRunner.namespace" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str</em> &#8211; Name that should be used to uniquely identify any RMQ
+exchange.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.runner.CisRunner.host">
+<code class="descname">host</code><a class="headerlink" href="#cis_interface.runner.CisRunner.host" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str</em> &#8211; Name of the host that the models will be launched from.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.runner.CisRunner.rank">
+<code class="descname">rank</code><a class="headerlink" href="#cis_interface.runner.CisRunner.rank" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>int</em> &#8211; Rank of this set of models if run in parallel.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.runner.CisRunner.modeldrivers">
+<code class="descname">modeldrivers</code><a class="headerlink" href="#cis_interface.runner.CisRunner.modeldrivers" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>dict</em> &#8211; Model drivers associated with this run.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.runner.CisRunner.inputdrivers">
+<code class="descname">inputdrivers</code><a class="headerlink" href="#cis_interface.runner.CisRunner.inputdrivers" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>dict</em> &#8211; Input drivers associated with this run.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.runner.CisRunner.outputdrivers">
+<code class="descname">outputdrivers</code><a class="headerlink" href="#cis_interface.runner.CisRunner.outputdrivers" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>dict</em> &#8211; Output drivers associated with this run.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.runner.CisRunner.serverdrivers">
+<code class="descname">serverdrivers</code><a class="headerlink" href="#cis_interface.runner.CisRunner.serverdrivers" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>dict</em> &#8211; The addresses associated with different server
+drivers.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.runner.CisRunner.interrupt_time">
+<code class="descname">interrupt_time</code><a class="headerlink" href="#cis_interface.runner.CisRunner.interrupt_time" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>float</em> &#8211; Time of last interrupt signal.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.runner.CisRunner.error_flag">
+<code class="descname">error_flag</code><a class="headerlink" href="#cis_interface.runner.CisRunner.error_flag" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>bool</em> &#8211; True if one or more models raises an error.</p>
+</dd></dl>
+
+<p>..todo:: namespace, host, and rank do not seem strictly necessary.</p>
+<dl class="attribute">
+<dt id="cis_interface.runner.CisRunner.all_drivers">
+<code class="descname">all_drivers</code><a class="headerlink" href="#cis_interface.runner.CisRunner.all_drivers" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>iterator</em> &#8211; For all drivers.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.runner.CisRunner.cleanup">
+<code class="descname">cleanup</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/runner.html#CisRunner.cleanup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.runner.CisRunner.cleanup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Perform cleanup operations for all drivers.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.runner.CisRunner.closeChannels">
+<code class="descname">closeChannels</code><span class="sig-paren">(</span><em>force_stop=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/runner.html#CisRunner.closeChannels"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.runner.CisRunner.closeChannels" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stop IO drivers and join the threads.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>force_stop</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) &#8211; If True, the terminate method is
+used to stop the drivers. Otherwise, the stop method is used.
+The stop method will try to exit gracefully while terminate
+will exit as quickly as possible. Defaults to False.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.runner.CisRunner.createDriver">
+<code class="descname">createDriver</code><span class="sig-paren">(</span><em>yml</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/runner.html#CisRunner.createDriver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.runner.CisRunner.createDriver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a driver instance from the yaml information.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>yml</strong> (<em>yaml</em>) &#8211; Yaml object containing driver information.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">An instance of the specified driver.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.6)">object</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.runner.CisRunner.createInputDriver">
+<code class="descname">createInputDriver</code><span class="sig-paren">(</span><em>yml</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/runner.html#CisRunner.createInputDriver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.runner.CisRunner.createInputDriver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create an input driver instance from the yaml information.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>yml</strong> (<em>yaml</em>) &#8211; Yaml object containing driver information.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">An instance of the specified driver.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.6)">object</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.runner.CisRunner.createModelDriver">
+<code class="descname">createModelDriver</code><span class="sig-paren">(</span><em>yml</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/runner.html#CisRunner.createModelDriver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.runner.CisRunner.createModelDriver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a model driver instance from the yaml information.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>yml</strong> (<em>yaml</em>) &#8211; Yaml object containing driver information.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">An instance of the specified driver.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.6)">object</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.runner.CisRunner.createOutputDriver">
+<code class="descname">createOutputDriver</code><span class="sig-paren">(</span><em>yml</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/runner.html#CisRunner.createOutputDriver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.runner.CisRunner.createOutputDriver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create an output driver instance from the yaml information.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>yml</strong> (<em>yaml</em>) &#8211; Yaml object containing driver information.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">An instance of the specified driver.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.6)">object</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.runner.CisRunner.do_client_exits">
+<code class="descname">do_client_exits</code><span class="sig-paren">(</span><em>model</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/runner.html#CisRunner.do_client_exits"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.runner.CisRunner.do_client_exits" title="Permalink to this definition">¶</a></dt>
+<dd><p>Perform exits for IO drivers associated with a client model.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>model</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) &#8211; Dictionary of model parameters including any
+associated IO drivers.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.runner.CisRunner.do_model_exits">
+<code class="descname">do_model_exits</code><span class="sig-paren">(</span><em>model</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/runner.html#CisRunner.do_model_exits"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.runner.CisRunner.do_model_exits" title="Permalink to this definition">¶</a></dt>
+<dd><p>Perform exits for IO drivers associated with a model.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>model</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) &#8211; Dictionary of model parameters including any
+associated IO drivers.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.runner.CisRunner.io_drivers">
+<code class="descname">io_drivers</code><span class="sig-paren">(</span><em>model=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/runner.html#CisRunner.io_drivers"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.runner.CisRunner.io_drivers" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the input and output drivers for one or all models.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>model</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) &#8211; Name of a model that I/O drivers should be
+returned for. Defaults to None and all I/O drivers are returned.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Access to list of I/O drivers.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">iterator</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.runner.CisRunner.loadDrivers">
+<code class="descname">loadDrivers</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/runner.html#CisRunner.loadDrivers"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.runner.CisRunner.loadDrivers" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load all of the necessary drivers, doing the IO drivers first
+and adding IO driver environmental variables back tot he models.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.runner.CisRunner.pprint">
+<code class="descname">pprint</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/runner.html#CisRunner.pprint"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.runner.CisRunner.pprint" title="Permalink to this definition">¶</a></dt>
+<dd><p>Print with color.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.runner.CisRunner.printStatus">
+<code class="descname">printStatus</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/runner.html#CisRunner.printStatus"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.runner.CisRunner.printStatus" title="Permalink to this definition">¶</a></dt>
+<dd><p>Print the status of all drivers, starting with the IO drivers.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.runner.CisRunner.reset_signal_handler">
+<code class="descname">reset_signal_handler</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/runner.html#CisRunner.reset_signal_handler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.runner.CisRunner.reset_signal_handler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reset signal handlers to old ones.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.runner.CisRunner.run">
+<code class="descname">run</code><span class="sig-paren">(</span><em>signal_handler=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/runner.html#CisRunner.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.runner.CisRunner.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run all of the models and wait for them to exit.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.runner.CisRunner.set_signal_handler">
+<code class="descname">set_signal_handler</code><span class="sig-paren">(</span><em>signal_handler=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/runner.html#CisRunner.set_signal_handler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.runner.CisRunner.set_signal_handler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the signal handler.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>signal_handler</strong> (<em>function</em><em>, </em><em>optional</em>) &#8211; Function that should handle
+received SIGINT and SIGTERM signals. Defaults to
+self.signal_handler.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.runner.CisRunner.signal_handler">
+<code class="descname">signal_handler</code><span class="sig-paren">(</span><em>sig</em>, <em>frame</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/runner.html#CisRunner.signal_handler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.runner.CisRunner.signal_handler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Terminate all drivers on interrrupt.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.runner.CisRunner.startDrivers">
+<code class="descname">startDrivers</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/runner.html#CisRunner.startDrivers"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.runner.CisRunner.startDrivers" title="Permalink to this definition">¶</a></dt>
+<dd><p>Start drivers, starting with the IO drivers.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.runner.CisRunner.terminate">
+<code class="descname">terminate</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/runner.html#CisRunner.terminate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.runner.CisRunner.terminate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Immediately stop all drivers, beginning with IO drivers.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.runner.CisRunner.waitModels">
+<code class="descname">waitModels</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/runner.html#CisRunner.waitModels"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.runner.CisRunner.waitModels" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wait for all model drivers to finish. When a model finishes,
+join the thread and perform exits for associated IO drivers.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.runner.get_runner">
+<code class="descclassname">cis_interface.runner.</code><code class="descname">get_runner</code><span class="sig-paren">(</span><em>models</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/runner.html#get_runner"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.runner.get_runner" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get runner for a set of models, getting run information from the
+environment.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>models</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a>) &#8211; List of yaml files containing information on the models
+that should be run.</li>
+<li><strong>**kwargs</strong> &#8211; Additonal keyword arguments are passed to CisRunner.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Runner for the provided models.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first"><a class="reference internal" href="cis_interface.html#cis_interface.runner.CisRunner" title="cis_interface.runner.CisRunner">CisRunner</a></p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.6)"><code class="xref py py-exc docutils literal"><span class="pre">Exception</span></code></a> &#8211; If config option &#8216;namespace&#8217; in &#8216;rmq&#8217; section not set.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="module-cis_interface.scanf">
+<span id="cis-interface-scanf-module"></span><h2>cis_interface.scanf module<a class="headerlink" href="#module-cis_interface.scanf" title="Permalink to this headline">¶</a></h2>
+<p>Small scanf implementation.</p>
+<p>Python has powerful regular expressions but sometimes they are totally overkill
+when you just want to parse a simple-formatted string.
+C programmers use the scanf-function for these tasks (see link below).</p>
+<p>This implementation of scanf translates the simple scanf-format into
+regular expressions. Unlike C you can be sure that there are no buffer overflows
+possible.</p>
+<dl class="docutils">
+<dt>For more information see</dt>
+<dd><ul class="first last simple">
+<li><a class="reference external" href="http://www.python.org/doc/current/lib/node49.html">http://www.python.org/doc/current/lib/node49.html</a></li>
+<li><a class="reference external" href="http://en.wikipedia.org/wiki/Scanf">http://en.wikipedia.org/wiki/Scanf</a></li>
+</ul>
+</dd>
+<dt>Original code from:</dt>
+<dd><a class="reference external" href="http://code.activestate.com/recipes/502213-simple-scanf-implementation/">http://code.activestate.com/recipes/502213-simple-scanf-implementation/</a></dd>
+</dl>
+<p>Modified original to make the %f more robust, as well as added %* modifier to
+skip fields.</p>
+<p>Version: 1.3.3</p>
+<dl class="docutils">
+<dt>Releases:</dt>
+<dd><dl class="first last docutils">
+<dt>1.0</dt>
+<dd><dl class="first last docutils">
+<dt>2010-10-11</dt>
+<dd><ul class="first last simple">
+<li>Initial release</li>
+</ul>
+</dd>
+</dl>
+</dd>
+<dt>1.1</dt>
+<dd><dl class="first last docutils">
+<dt>2010-10-13</dt>
+<dd><ul class="first last simple">
+<li>Changed regex from &#8216;match&#8217; (only matches at beginning of line)
+to &#8216;search&#8217; (matches anywhere in line)</li>
+<li>Bugfix - ignore cast for skipped fields</li>
+</ul>
+</dd>
+</dl>
+</dd>
+<dt>1.2</dt>
+<dd><dl class="first last docutils">
+<dt>2013-05-30</dt>
+<dd><ul class="first last simple">
+<li>Added &#8216;collapseWhitespace&#8217; flag (defaults to True) to take the search
+string and replace all whitespace with regex string to match repeated
+whitespace.  This enables better matching in log files where the data
+has been formatted for easier reading.  These cases have variable
+amounts of whitespace between the columns, depending on the number
+of characters in the data itself.</li>
+</ul>
+</dd>
+</dl>
+</dd>
+<dt>1.3</dt>
+<dd><dl class="first last docutils">
+<dt>2016-01-18</dt>
+<dd><ul class="first last simple">
+<li>Add &#8216;extractdata&#8217; function.</li>
+</ul>
+</dd>
+</dl>
+</dd>
+<dt>1.3.1</dt>
+<dd><dl class="first last docutils">
+<dt>2016-06-23</dt>
+<dd><ul class="first last simple">
+<li>Release to PyPi, now including README.md</li>
+</ul>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+<dt>Updates by Meagan Lang:</dt>
+<dd><dl class="first last docutils">
+<dt>2018-04-12</dt>
+<dd><ul class="first last simple">
+<li>Added ability to parse components of field specifiers and cope with
+whitespace padding.</li>
+</ul>
+</dd>
+</dl>
+</dd>
+</dl>
+<dl class="function">
+<dt id="cis_interface.scanf.scanf">
+<code class="descclassname">cis_interface.scanf.</code><code class="descname">scanf</code><span class="sig-paren">(</span><em>format</em>, <em>s=None</em>, <em>collapseWhitespace=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/scanf.html#scanf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.scanf.scanf" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>scanf supports the following formats:</dt>
+<dd>%c        One character
+%5c       5 characters
+%d, %i    int value
+%7d, %7i  int value with length 7
+%f        float value
+%o        octal value
+%X, %x    hex value
+%s        string terminated by whitespace</dd>
+</dl>
+<p>Examples:
+&gt;&gt;&gt; scanf(&#8220;%s - %d errors, %d warnings&#8221;, &#8220;/usr/sbin/sendmail - 0 errors, 4 warnings&#8221;)
+(&#8216;/usr/sbin/sendmail&#8217;, 0, 4)
+&gt;&gt;&gt; scanf(&#8220;%o %x %d&#8221;, &#8220;0123 0x123 123&#8221;)
+(66, 291, 123)</p>
+<p>If the parameter s is a file-like object, s.readline is called.
+If s is not specified, stdin is assumed.</p>
+<p>The function returns a tuple of found values
+or None if the format does not match.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.scanf.scanf_compile">
+<code class="descclassname">cis_interface.scanf.</code><code class="descname">scanf_compile</code><span class="sig-paren">(</span><em>format</em>, <em>collapseWhitespace=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/scanf.html#scanf_compile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.scanf.scanf_compile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Translate the format into a regular expression</p>
+<p>For example:
+&gt;&gt;&gt; format_re, casts = _scanf_compile(&#8216;%s - %d errors, %d warnings&#8217;)
+&gt;&gt;&gt; print format_re.pattern
+(S+) - ([+-]?d+) errors, ([+-]?d+) warnings</p>
+<p>Translated formats are cached for faster reuse</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-cis_interface.tools">
+<span id="cis-interface-tools-module"></span><h2>cis_interface.tools module<a class="headerlink" href="#module-cis_interface.tools" title="Permalink to this headline">¶</a></h2>
+<p>This modules offers various tools.</p>
+<dl class="class">
+<dt id="cis_interface.tools.CisClass">
+<em class="property">class </em><code class="descclassname">cis_interface.tools.</code><code class="descname">CisClass</code><span class="sig-paren">(</span><em>name</em>, <em>uuid=None</em>, <em>workingDir=None</em>, <em>timeout=60.0</em>, <em>sleeptime=0.01</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tools.html#CisClass"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tools.CisClass" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/logging.html#logging.LoggerAdapter" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">logging.LoggerAdapter</span></code></a></p>
+<p>Base class for CiS classes.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; Class name.</li>
+<li><strong>uuid</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) &#8211; Unique ID for this instance. Defaults to None
+and is assigned.</li>
+<li><strong>workingDir</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) &#8211; Working directory. If not provided, the
+current working directory is used.</li>
+<li><strong>timeout</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>, </em><em>optional</em>) &#8211; Maximum time (in seconds) that should be
+spent waiting on a process. Defaults to 60.</li>
+<li><strong>sleeptime</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>, </em><em>optional</em>) &#8211; Time that class should sleep for when
+sleep is called. Defaults to 0.01.</li>
+<li><strong>**kwargs</strong> &#8211; Additional keyword arguments are assigned to the extra_kwargs
+dictionary.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="cis_interface.tools.CisClass.name">
+<code class="descname">name</code><a class="headerlink" href="#cis_interface.tools.CisClass.name" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str</em> &#8211; Class name.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.tools.CisClass.uuid">
+<code class="descname">uuid</code><a class="headerlink" href="#cis_interface.tools.CisClass.uuid" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str</em> &#8211; Unique ID for this instance.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.tools.CisClass.sleeptime">
+<code class="descname">sleeptime</code><a class="headerlink" href="#cis_interface.tools.CisClass.sleeptime" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>float</em> &#8211; Time that class should sleep for when sleep called.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.tools.CisClass.longsleep">
+<code class="descname">longsleep</code><a class="headerlink" href="#cis_interface.tools.CisClass.longsleep" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>float</em> &#8211; Time that the class will sleep for when waiting for
+longer tasks to complete (10x longer than sleeptime).</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.tools.CisClass.timeout">
+<code class="descname">timeout</code><a class="headerlink" href="#cis_interface.tools.CisClass.timeout" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>float</em> &#8211; Maximum time that should be spent waiting on a process.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.tools.CisClass.workingDir">
+<code class="descname">workingDir</code><a class="headerlink" href="#cis_interface.tools.CisClass.workingDir" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str</em> &#8211; Working directory.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.tools.CisClass.errors">
+<code class="descname">errors</code><a class="headerlink" href="#cis_interface.tools.CisClass.errors" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>list</em> &#8211; List of errors.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.tools.CisClass.extra_kwargs">
+<code class="descname">extra_kwargs</code><a class="headerlink" href="#cis_interface.tools.CisClass.extra_kwargs" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>dict</em> &#8211; Keyword arguments that were not parsed.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.tools.CisClass.sched_out">
+<code class="descname">sched_out</code><a class="headerlink" href="#cis_interface.tools.CisClass.sched_out" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>obj</em> &#8211; Output from the last scheduled task with output.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.tools.CisClass.logger">
+<code class="descname">logger</code><a class="headerlink" href="#cis_interface.tools.CisClass.logger" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>logging.Logger</em> &#8211; Logger object for this object.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.tools.CisClass.suppress_special_debug">
+<code class="descname">suppress_special_debug</code><a class="headerlink" href="#cis_interface.tools.CisClass.suppress_special_debug" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>bool</em> &#8211; If True, special_debug log messages
+are suppressed.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.tools.CisClass.as_str">
+<code class="descname">as_str</code><span class="sig-paren">(</span><em>obj</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tools.html#CisClass.as_str"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tools.CisClass.as_str" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return str version of object if it is not already a string.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>obj</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.6)"><em>object</em></a>) &#8211; Object that should be turned into a string.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">String version of provided object.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)">str</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.tools.CisClass.check_timeout">
+<code class="descname">check_timeout</code><span class="sig-paren">(</span><em>key=None</em>, <em>key_level=0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tools.html#CisClass.check_timeout"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tools.CisClass.check_timeout" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check timeout for the calling function/method.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>key</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) &#8211; Key for timeout that should be checked.
+Defaults to None and is set by the calling class and
+function/method (See <cite>timeout_key</cite>).</li>
+<li><strong>key_level</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>, </em><em>optional</em>) &#8211; Positive integer indicating the level of
+the calling class and function/method that should be used to
+key the timeout. 0 is the class and function/method that called
+start_timeout. Higher values use classes and function/methods
+further up in the stack. Defaults to 0.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#KeyError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal"><span class="pre">KeyError</span></code></a> &#8211; If there is not a timeout registered for the specified
+key.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.tools.CisClass.debug_log">
+<code class="descname">debug_log</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tools.html#CisClass.debug_log"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tools.CisClass.debug_log" title="Permalink to this definition">¶</a></dt>
+<dd><p>Turn on debugging.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.tools.CisClass.display">
+<code class="descname">display</code><span class="sig-paren">(</span><em>msg=''</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tools.html#CisClass.display"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tools.CisClass.display" title="Permalink to this definition">¶</a></dt>
+<dd><p>Print a message, no log.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.tools.CisClass.dummy_log">
+<code class="descname">dummy_log</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tools.html#CisClass.dummy_log"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tools.CisClass.dummy_log" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dummy log function that dosn&#8217;t do anything.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.tools.CisClass.error">
+<code class="descname">error</code><a class="headerlink" href="#cis_interface.tools.CisClass.error" title="Permalink to this definition">¶</a></dt>
+<dd><p>Log an error level message.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.tools.CisClass.exception">
+<code class="descname">exception</code><a class="headerlink" href="#cis_interface.tools.CisClass.exception" title="Permalink to this definition">¶</a></dt>
+<dd><p>Log an exception level message.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.tools.CisClass.get_timeout_key">
+<code class="descname">get_timeout_key</code><span class="sig-paren">(</span><em>key_level=0</em>, <em>key_suffix=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tools.html#CisClass.get_timeout_key"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tools.CisClass.get_timeout_key" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a key for a given level in the stack, relative to the
+function calling get_timeout_key.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>key_level</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>, </em><em>optional</em>) &#8211; Positive integer indicating the level of
+the calling class and function/method that should be used to
+key the timeout. 0 is the class and function/method that is 2
+steps higher in the stack. Higher values use classes and
+function/methods further up in the stack. Defaults to 0.</li>
+<li><strong>key_suffix</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) &#8211; String that should be appended to the
+end of the generated key. Defaults to None and is ignored.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Key identifying calling object and method.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)">str</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt>
+<code class="descname">name</code></dt>
+<dd><p>Name of the class object.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.tools.CisClass.printStatus">
+<code class="descname">printStatus</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tools.html#CisClass.printStatus"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tools.CisClass.printStatus" title="Permalink to this definition">¶</a></dt>
+<dd><p>Print the class status.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.tools.CisClass.print_encoded">
+<code class="descname">print_encoded</code><span class="sig-paren">(</span><em>msg</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tools.html#CisClass.print_encoded"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tools.CisClass.print_encoded" title="Permalink to this definition">¶</a></dt>
+<dd><p>Print bytes to stdout, encoding if possible.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>msg</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.6)"><em>bytes</em></a>) &#8211; Message to print.</li>
+<li><strong>*args</strong> &#8211; Additional arguments are passed to print.</li>
+<li><strong>**kwargs</strong> &#8211; Additional keyword arguments are passed to print.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.tools.CisClass.process">
+<code class="descname">process</code><span class="sig-paren">(</span><em>msg</em>, <em>kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tools.html#CisClass.process"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tools.CisClass.process" title="Permalink to this definition">¶</a></dt>
+<dd><p>Process logging message.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.tools.CisClass.raise_error">
+<code class="descname">raise_error</code><span class="sig-paren">(</span><em>e</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tools.html#CisClass.raise_error"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tools.CisClass.raise_error" title="Permalink to this definition">¶</a></dt>
+<dd><p>Raise an exception, logging it first.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>e</strong> (<a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.6)"><em>Exception</em></a>) &#8211; Exception to raise.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body">The provided exception.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.tools.CisClass.reset_log">
+<code class="descname">reset_log</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tools.html#CisClass.reset_log"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tools.CisClass.reset_log" title="Permalink to this definition">¶</a></dt>
+<dd><p>Resetting logging to prior value.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.tools.CisClass.sched_task">
+<code class="descname">sched_task</code><span class="sig-paren">(</span><em>t</em>, <em>func</em>, <em>args=[]</em>, <em>kwargs={}</em>, <em>store_output=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tools.html#CisClass.sched_task"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tools.CisClass.sched_task" title="Permalink to this definition">¶</a></dt>
+<dd><p>Schedule a task that will be executed after a certain time has
+elapsed.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>t</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; Number of seconds that should be waited before task
+is executed.</li>
+<li><strong>func</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.6)"><em>object</em></a>) &#8211; Function that should be executed.</li>
+<li><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>, </em><em>optional</em>) &#8211; Arguments for the provided function.
+Defaults to [].</li>
+<li><strong>kwargs</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a><em>, </em><em>optional</em>) &#8211; Keyword arguments for the provided
+function. Defaults to {}.</li>
+<li><strong>store_output</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) &#8211; If True, the output from the
+scheduled task is stored in self.sched_out. Otherwise, it is not
+stored. Defaults to False.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.tools.CisClass.sleep">
+<code class="descname">sleep</code><span class="sig-paren">(</span><em>t=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tools.html#CisClass.sleep"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tools.CisClass.sleep" title="Permalink to this definition">¶</a></dt>
+<dd><p>Have the class sleep for some period of time.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>t</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>, </em><em>optional</em>) &#8211; Time that class should sleep for. If not
+provided, the attribute &#8216;sleeptime&#8217; is used.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.tools.CisClass.special_debug">
+<code class="descname">special_debug</code><a class="headerlink" href="#cis_interface.tools.CisClass.special_debug" title="Permalink to this definition">¶</a></dt>
+<dd><p>Log debug level message contingent of supression flag.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.tools.CisClass.start_timeout">
+<code class="descname">start_timeout</code><span class="sig-paren">(</span><em>t=None</em>, <em>key=None</em>, <em>key_level=0</em>, <em>key_suffix=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tools.html#CisClass.start_timeout"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tools.CisClass.start_timeout" title="Permalink to this definition">¶</a></dt>
+<dd><p>Start a timeout for the calling function/method.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>t</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>, </em><em>optional</em>) &#8211; Maximum time that the calling function should
+wait before timeing out. If not provided, the attribute
+&#8216;timeout&#8217; is used.</li>
+<li><strong>key</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) &#8211; Key that should be associated with the timeout
+that is created. Defaults to None and is set by the calling
+class and function/method (See <cite>get_timeout_key</cite>).</li>
+<li><strong>key_level</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>, </em><em>optional</em>) &#8211; Positive integer indicating the level of
+the calling class and function/method that should be used to
+key the timeout. 0 is the class and function/method that called
+start_timeout. Higher values use classes and function/methods
+further up in the stack. Defaults to 0.</li>
+<li><strong>key_suffix</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) &#8211; String that should be appended to the
+end of the generated key. Defaults to None and is ignored.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#KeyError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal"><span class="pre">KeyError</span></code></a> &#8211; If the key already exists.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.tools.CisClass.stop_timeout">
+<code class="descname">stop_timeout</code><span class="sig-paren">(</span><em>key=None</em>, <em>key_level=0</em>, <em>key_suffix=None</em>, <em>quiet=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tools.html#CisClass.stop_timeout"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tools.CisClass.stop_timeout" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stop a timeout for the calling function method.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>key</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) &#8211; Key for timeout that should be stopped.
+Defaults to None and is set by the calling class and
+function/method (See <cite>timeout_key</cite>).</li>
+<li><strong>key_level</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>, </em><em>optional</em>) &#8211; Positive integer indicating the level of
+the calling class and function/method that should be used to
+key the timeout. 0 is the class and function/method that called
+start_timeout. Higher values use classes and function/methods
+further up in the stack. Defaults to 0.</li>
+<li><strong>key_suffix</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) &#8211; String that should be appended to the
+end of the generated key. Defaults to None and is ignored.</li>
+<li><strong>quiet</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) &#8211; If True, error message on timeout exceeded
+will be debug log. Defaults to False.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#KeyError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal"><span class="pre">KeyError</span></code></a> &#8211; If there is not a timeout registered for the specified
+key.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.tools.CisClass.timeout_key">
+<code class="descname">timeout_key</code><a class="headerlink" href="#cis_interface.tools.CisClass.timeout_key" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str</em> &#8211; Key identifying calling object and method.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.tools.CisClass.verbose_debug">
+<code class="descname">verbose_debug</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tools.html#CisClass.verbose_debug"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tools.CisClass.verbose_debug" title="Permalink to this definition">¶</a></dt>
+<dd><p>Log a verbose debug level message.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.tools.CisPopen">
+<em class="property">class </em><code class="descclassname">cis_interface.tools.</code><code class="descname">CisPopen</code><span class="sig-paren">(</span><em>cmd_args</em>, <em>forward_signals=True</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tools.html#CisPopen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tools.CisPopen" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/subprocess.html#subprocess.Popen" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">subprocess.Popen</span></code></a></p>
+<p>Uses Popen to open a process without a buffer. If not already set,
+the keyword arguments &#8216;bufsize&#8217;, &#8216;stdout&#8217;, and &#8216;stderr&#8217; are set to
+0, subprocess.PIPE, and subprocess.STDOUT respectively. This sets the
+output stream to unbuffered and directs both stdout and stderr to the
+stdout pipe. In addition this class overrides Popen.kill() to allow
+processes to be killed with CTRL_BREAK_EVENT on windows.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; Shell command or list of arguments that should be
+run.</li>
+<li><strong>forward_signals</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) &#8211; If True, flags will be set such
+that signals received by the spawning process will be forwarded
+to the child process. If False, the signals will not be forwarded.
+Defaults to True.</li>
+<li><strong>**kwargs</strong> &#8211; Additional keywords arguments are passed to Popen.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="cis_interface.tools.CisPopen.kill">
+<code class="descname">kill</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tools.html#CisPopen.kill"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tools.CisPopen.kill" title="Permalink to this definition">¶</a></dt>
+<dd><p>On windows using CTRL_BREAK_EVENT to kill the process.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.tools.CisThread">
+<em class="property">class </em><code class="descclassname">cis_interface.tools.</code><code class="descname">CisThread</code><span class="sig-paren">(</span><em>name=None</em>, <em>target=None</em>, <em>args=()</em>, <em>kwargs=None</em>, <em>daemon=False</em>, <em>group=None</em>, <em>**cis_kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tools.html#CisThread"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tools.CisThread" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/threading.html#threading.Thread" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">threading.Thread</span></code></a>, <a class="reference internal" href="cis_interface.html#cis_interface.tools.CisClass" title="cis_interface.tools.CisClass"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.tools.CisClass</span></code></a></p>
+<p>Thread for CiS that tracks when the thread is started and joined.</p>
+<dl class="attribute">
+<dt id="cis_interface.tools.CisThread.lock">
+<code class="descname">lock</code><a class="headerlink" href="#cis_interface.tools.CisThread.lock" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>threading.RLock</em> &#8211; Lock for accessing the sockets from multiple
+threads.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.tools.CisThread.start_event">
+<code class="descname">start_event</code><a class="headerlink" href="#cis_interface.tools.CisThread.start_event" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>threading.Event</em> &#8211; Event indicating that the thread was
+started.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.tools.CisThread.terminate_event">
+<code class="descname">terminate_event</code><a class="headerlink" href="#cis_interface.tools.CisThread.terminate_event" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>threading.Event</em> &#8211; Event indicating that the thread
+should be terminated. The target must exit when this is set.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.tools.CisThread.atexit">
+<code class="descname">atexit</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tools.html#CisThread.atexit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tools.CisThread.atexit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Actions performed when python exits.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.tools.CisThread.before_start">
+<code class="descname">before_start</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tools.html#CisThread.before_start"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tools.CisThread.before_start" title="Permalink to this definition">¶</a></dt>
+<dd><p>Actions to perform on the main thread before starting the thread.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.tools.CisThread.cleanup">
+<code class="descname">cleanup</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tools.html#CisThread.cleanup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tools.CisThread.cleanup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Actions to perform to clean up the thread after it has stopped.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.tools.CisThread.main_terminated">
+<code class="descname">main_terminated</code><a class="headerlink" href="#cis_interface.tools.CisThread.main_terminated" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>bool</em> &#8211; True if the main thread has terminated.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.tools.CisThread.run">
+<code class="descname">run</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tools.html#CisThread.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tools.CisThread.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Continue running until terminate event set.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.tools.CisThread.set_started_flag">
+<code class="descname">set_started_flag</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tools.html#CisThread.set_started_flag"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tools.CisThread.set_started_flag" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the started flag for the thread to True.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.tools.CisThread.set_terminated_flag">
+<code class="descname">set_terminated_flag</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tools.html#CisThread.set_terminated_flag"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tools.CisThread.set_terminated_flag" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the terminated flag for the thread to True.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.tools.CisThread.start">
+<code class="descname">start</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tools.html#CisThread.start"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tools.CisThread.start" title="Permalink to this definition">¶</a></dt>
+<dd><p>Start thread and print info.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.tools.CisThread.terminate">
+<code class="descname">terminate</code><span class="sig-paren">(</span><em>no_wait=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tools.html#CisThread.terminate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tools.CisThread.terminate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the terminate event and wait for the thread to stop.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>no_wait</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) &#8211; If True, terminate will not block until
+the thread stops. Defaults to False and blocks.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#AssertionError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal"><span class="pre">AssertionError</span></code></a> &#8211; If no_wait is False and the thread has not stopped
+after the timeout.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.tools.CisThread.unset_started_flag">
+<code class="descname">unset_started_flag</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tools.html#CisThread.unset_started_flag"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tools.CisThread.unset_started_flag" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the started flag for the thread to False.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.tools.CisThread.unset_terminated_flag">
+<code class="descname">unset_terminated_flag</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tools.html#CisThread.unset_terminated_flag"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tools.CisThread.unset_terminated_flag" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the terminated flag for the thread to False.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.tools.CisThread.wait">
+<code class="descname">wait</code><span class="sig-paren">(</span><em>timeout=None</em>, <em>key=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tools.html#CisThread.wait"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tools.CisThread.wait" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wait until thread finish to return using sleeps rather than
+blocking.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>timeout</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>, </em><em>optional</em>) &#8211; Maximum time that should be waited for
+the driver to finish. Defaults to None and is infinite.</li>
+<li><strong>key</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) &#8211; Key that should be used to register the timeout.
+Defaults to None and is set based on the stack trace.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.tools.CisThread.was_started">
+<code class="descname">was_started</code><a class="headerlink" href="#cis_interface.tools.CisThread.was_started" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>bool</em> &#8211; True if the thread was started. False otherwise.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.tools.CisThread.was_terminated">
+<code class="descname">was_terminated</code><a class="headerlink" href="#cis_interface.tools.CisThread.was_terminated" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>bool</em> &#8211; True if the thread was terminated. False otherwise.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.tools.CisThreadLoop">
+<em class="property">class </em><code class="descclassname">cis_interface.tools.</code><code class="descname">CisThreadLoop</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tools.html#CisThreadLoop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tools.CisThreadLoop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="cis_interface.html#cis_interface.tools.CisThread" title="cis_interface.tools.CisThread"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.tools.CisThread</span></code></a></p>
+<p>Thread that will run a loop until the terminate event is called.</p>
+<dl class="method">
+<dt id="cis_interface.tools.CisThreadLoop.after_loop">
+<code class="descname">after_loop</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tools.html#CisThreadLoop.after_loop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tools.CisThreadLoop.after_loop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Actions performed after the loop.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.tools.CisThreadLoop.before_loop">
+<code class="descname">before_loop</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tools.html#CisThreadLoop.before_loop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tools.CisThreadLoop.before_loop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Actions performed before the loop.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.tools.CisThreadLoop.on_main_terminated">
+<code class="descname">on_main_terminated</code><span class="sig-paren">(</span><em>dont_break=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tools.html#CisThreadLoop.on_main_terminated"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tools.CisThreadLoop.on_main_terminated" title="Permalink to this definition">¶</a></dt>
+<dd><p>Actions performed when 1st main terminated.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>dont_break</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) &#8211; If True, the break flag won&#8217;t be set.
+Defaults to False.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.tools.CisThreadLoop.run">
+<code class="descname">run</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tools.html#CisThreadLoop.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tools.CisThreadLoop.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Continue running until terminate event set.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.tools.CisThreadLoop.run_loop">
+<code class="descname">run_loop</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tools.html#CisThreadLoop.run_loop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tools.CisThreadLoop.run_loop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Actions performed on each loop iteration.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.tools.CisThreadLoop.set_break_flag">
+<code class="descname">set_break_flag</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tools.html#CisThreadLoop.set_break_flag"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tools.CisThreadLoop.set_break_flag" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the break flag for the thread to True.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.tools.CisThreadLoop.terminate">
+<code class="descname">terminate</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tools.html#CisThreadLoop.terminate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tools.CisThreadLoop.terminate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Also set break flag.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.tools.CisThreadLoop.unset_break_flag">
+<code class="descname">unset_break_flag</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tools.html#CisThreadLoop.unset_break_flag"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tools.CisThreadLoop.unset_break_flag" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the break flag for the thread to False.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.tools.CisThreadLoop.was_break">
+<code class="descname">was_break</code><a class="headerlink" href="#cis_interface.tools.CisThreadLoop.was_break" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>bool</em> &#8211; True if the break flag was set.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.tools.TimeOut">
+<em class="property">class </em><code class="descclassname">cis_interface.tools.</code><code class="descname">TimeOut</code><span class="sig-paren">(</span><em>max_time</em>, <em>key=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tools.html#TimeOut"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tools.TimeOut" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+<p>Class for checking if a period of time has been elapsed.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>max_time</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>, </em><em>bbol</em>) &#8211; Maximum period of time that should elapse before
+&#8216;is_out&#8217; returns True. If False, &#8216;is_out&#8217; will never return True.
+Providing 0 indicates that &#8216;is_out&#8217; should immediately return True.</li>
+<li><strong>key</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) &#8211; Key that was used to register the timeout. Defaults
+to None.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="cis_interface.tools.TimeOut.max_time">
+<code class="descname">max_time</code><a class="headerlink" href="#cis_interface.tools.TimeOut.max_time" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>float</em> &#8211; Maximum period of time that should elapsed before
+&#8216;is_out&#8217; returns True.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.tools.TimeOut.start_time">
+<code class="descname">start_time</code><a class="headerlink" href="#cis_interface.tools.TimeOut.start_time" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>float</em> &#8211; Result of time.time() at start.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.tools.TimeOut.key">
+<code class="descname">key</code><a class="headerlink" href="#cis_interface.tools.TimeOut.key" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str</em> &#8211; Key that was used to register the timeout.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.tools.TimeOut.elapsed">
+<code class="descname">elapsed</code><a class="headerlink" href="#cis_interface.tools.TimeOut.elapsed" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>float</em> &#8211; Total time that has elapsed since the start.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.tools.TimeOut.is_out">
+<code class="descname">is_out</code><a class="headerlink" href="#cis_interface.tools.TimeOut.is_out" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>bool</em> &#8211; True if there is not any time remaining. False otherwise.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.tools.check_locks">
+<code class="descclassname">cis_interface.tools.</code><code class="descname">check_locks</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tools.html#check_locks"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tools.check_locks" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check for locks in lock registry that are locked.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.tools.check_sockets">
+<code class="descclassname">cis_interface.tools.</code><code class="descname">check_sockets</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tools.html#check_sockets"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tools.check_sockets" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check registered sockets.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.tools.check_threads">
+<code class="descclassname">cis_interface.tools.</code><code class="descname">check_threads</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tools.html#check_threads"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tools.check_threads" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check for threads that are still running.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.tools.cis_atexit">
+<code class="descclassname">cis_interface.tools.</code><code class="descname">cis_atexit</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tools.html#cis_atexit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tools.cis_atexit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Things to do at exit.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.tools.eval_kwarg">
+<code class="descclassname">cis_interface.tools.</code><code class="descname">eval_kwarg</code><span class="sig-paren">(</span><em>x</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tools.html#eval_kwarg"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tools.eval_kwarg" title="Permalink to this definition">¶</a></dt>
+<dd><p>If x is a string, eval it. Otherwise just return it.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>x</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>obj</em>) &#8211; String to be evaluated as an object or an object.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Result of evaluated string or the input object.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">obj</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.tools.get_CIS_MSG_MAX">
+<code class="descclassname">cis_interface.tools.</code><code class="descname">get_CIS_MSG_MAX</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tools.html#get_CIS_MSG_MAX"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tools.get_CIS_MSG_MAX" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the maximum message size for the default comm.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.tools.get_default_comm">
+<code class="descclassname">cis_interface.tools.</code><code class="descname">get_default_comm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tools.html#get_default_comm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tools.get_default_comm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the default comm that should be used for message passing.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.tools.is_ipc_installed">
+<code class="descclassname">cis_interface.tools.</code><code class="descname">is_ipc_installed</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tools.html#is_ipc_installed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tools.is_ipc_installed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determine if the IPC libraries are installed.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">True if the IPC libraries are installed, False otherwise.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)">bool</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.tools.is_zmq_installed">
+<code class="descclassname">cis_interface.tools.</code><code class="descname">is_zmq_installed</code><span class="sig-paren">(</span><em>check_c=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tools.html#is_zmq_installed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tools.is_zmq_installed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determine if the libczmq &amp; libzmq libraries are installed.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">True if both libraries are installed, False otherwise.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)">bool</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.tools.kill">
+<code class="descclassname">cis_interface.tools.</code><code class="descname">kill</code><span class="sig-paren">(</span><em>pid</em>, <em>signum</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tools.html#kill"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tools.kill" title="Permalink to this definition">¶</a></dt>
+<dd><p>Kill process by mapping signal number.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>pid</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; Process ID.</li>
+<li><strong>signum</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; Signal that should be sent.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.tools.locate_path">
+<code class="descclassname">cis_interface.tools.</code><code class="descname">locate_path</code><span class="sig-paren">(</span><em>fname</em>, <em>basedir='/'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tools.html#locate_path"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tools.locate_path" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find the full path to a file using where on Windows.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.tools.popen_nobuffer">
+<code class="descclassname">cis_interface.tools.</code><code class="descname">popen_nobuffer</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tools.html#popen_nobuffer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tools.popen_nobuffer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Uses Popen to open a process without a buffer. If not already set,
+the keyword arguments &#8216;bufsize&#8217;, &#8216;stdout&#8217;, and &#8216;stderr&#8217; are set to
+0, subprocess.PIPE, and subprocess.STDOUT respectively. This sets the
+output stream to unbuffered and directs both stdout and stderr to the
+stdout pipe.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; Shell command or list of arguments that should be
+run.</li>
+<li><strong>forward_signals</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) &#8211; If True, flags will be set such
+that signals received by the spawning process will be forwarded
+to the child process. If False, the signals will not be forwarded.
+Defaults to True.</li>
+<li><strong>**kwargs</strong> &#8211; Additional keywords arguments are passed to Popen.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Process that was started.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="cis_interface.html#cis_interface.tools.CisPopen" title="cis_interface.tools.CisPopen">CisPopen</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.tools.print_encoded">
+<code class="descclassname">cis_interface.tools.</code><code class="descname">print_encoded</code><span class="sig-paren">(</span><em>msg</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tools.html#print_encoded"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tools.print_encoded" title="Permalink to this definition">¶</a></dt>
+<dd><p>Print bytes to stdout, encoding if possible.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>msg</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.6)"><em>bytes</em></a>) &#8211; Message to print.</li>
+<li><strong>*args</strong> &#8211; Additional arguments are passed to print.</li>
+<li><strong>**kwargs</strong> &#8211; Additional keyword arguments are passed to print.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.tools.sleep">
+<code class="descclassname">cis_interface.tools.</code><code class="descname">sleep</code><span class="sig-paren">(</span><em>interval</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tools.html#sleep"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tools.sleep" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sleep for a specified number of seconds.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>interval</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; Time in seconds that process should sleep.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="module-cis_interface.units">
+<span id="cis-interface-units-module"></span><h2>cis_interface.units module<a class="headerlink" href="#module-cis_interface.units" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="cis_interface.units.is_unit">
+<code class="descclassname">cis_interface.units.</code><code class="descname">is_unit</code><span class="sig-paren">(</span><em>ustr</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/units.html#is_unit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.units.is_unit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determine if a string is a valid unit.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>ustr</strong> &#8211; String representation to test.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">True if the string is a valid unit. False otherwise.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)">bool</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="module-cis_interface.yamlfile">
+<span id="cis-interface-yamlfile-module"></span><h2>cis_interface.yamlfile module<a class="headerlink" href="#module-cis_interface.yamlfile" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="cis_interface.yamlfile.load_yaml">
+<code class="descclassname">cis_interface.yamlfile.</code><code class="descname">load_yaml</code><span class="sig-paren">(</span><em>fname</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/yamlfile.html#load_yaml"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.yamlfile.load_yaml" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parse a yaml file defining a run.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>fname</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; Path to the yaml file.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Contents of yaml file.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)">dict</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.yamlfile.parse_component">
+<code class="descclassname">cis_interface.yamlfile.</code><code class="descname">parse_component</code><span class="sig-paren">(</span><em>yml</em>, <em>ctype</em>, <em>yamldir</em>, <em>existing=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/yamlfile.html#parse_component"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.yamlfile.parse_component" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parse a yaml entry for a component, adding it to the list of
+existing components.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>yml</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) &#8211; YAML dictionary for a component.</li>
+<li><strong>ctype</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; Component type. This can be &#8216;input&#8217;, &#8216;output&#8217;,
+&#8216;model&#8217;, or &#8216;connection&#8217;.</li>
+<li><strong>yamldir</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; Full path to directory containing the yaml this
+component was in.</li>
+<li><strong>existing</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a><em>, </em><em>optional</em>) &#8211; Dictionary of existing components.
+Defaults to empty dict.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first simple">
+<li><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#TypeError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal"><span class="pre">TypeError</span></code></a> &#8211; If yml is not a dictionary.</li>
+<li><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal"><span class="pre">ValueError</span></code></a> &#8211; If dtype is not &#8216;input&#8217;, &#8216;output&#8217;, &#8216;model&#8217;, or
+&#8216;connection&#8217;.</li>
+<li><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#RuntimeError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal"><span class="pre">RuntimeError</span></code></a> &#8211; If the yml dictionary is missing a required keyword.</li>
+<li><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal"><span class="pre">ValueError</span></code></a> &#8211; If the component already exists.</li>
+<li><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#RuntimeError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal"><span class="pre">RuntimeError</span></code></a> &#8211; If &#8216;kwargs&#8217; is an entry in the yml.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">All components identified.</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)">dict</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.yamlfile.parse_connection">
+<code class="descclassname">cis_interface.yamlfile.</code><code class="descname">parse_connection</code><span class="sig-paren">(</span><em>yml</em>, <em>yamldir</em>, <em>existing</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/yamlfile.html#parse_connection"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.yamlfile.parse_connection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parse a yaml entry for a connection between I/O channels.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>yml</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) &#8211; YAML dictionary for a connection.</li>
+<li><strong>yamldir</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; Full path to directory containing the yaml this
+component was in.</li>
+<li><strong>existing</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) &#8211; Dictionary of existing components.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first simple">
+<li><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#RuntimeError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal"><span class="pre">RuntimeError</span></code></a> &#8211; If the yml dictionary is missing a required keyword.</li>
+<li><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#AssertionError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal"><span class="pre">AssertionError</span></code></a> &#8211; If the &#8216;input&#8217; or &#8216;output&#8217; entry is not a string.</li>
+<li><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#RuntimeError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal"><span class="pre">RuntimeError</span></code></a> &#8211; If the &#8216;input&#8217; entry is not a model output or file.</li>
+<li><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#RuntimeError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal"><span class="pre">RuntimeError</span></code></a> &#8211; If neither the &#8216;input&#8217; or &#8216;output&#8217; entries correspond
+to model I/O channels.</li>
+<li><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal"><span class="pre">ValueError</span></code></a> &#8211; If the &#8216;input&#8217; is a file and &#8216;read_meth&#8217; entry is not
+&#8216;all&#8217;, &#8216;line&#8217;, &#8216;table&#8217;, or &#8216;table_array&#8217;.</li>
+<li><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal"><span class="pre">ValueError</span></code></a> &#8211; If the &#8216;output&#8217; is a file and &#8216;write_meth&#8217; entry is not
+&#8216;all&#8217;, &#8216;line&#8217;, &#8216;table&#8217;, or &#8216;table_array&#8217;.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Updated log of all entries.</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)">dict</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.yamlfile.parse_io">
+<code class="descclassname">cis_interface.yamlfile.</code><code class="descname">parse_io</code><span class="sig-paren">(</span><em>yml</em>, <em>yamldir</em>, <em>existing</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/yamlfile.html#parse_io"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.yamlfile.parse_io" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parse a yaml entry for an I/O channel.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>yml</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) &#8211; YAML dictionary for an I/O channel.</li>
+<li><strong>yamldir</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; Full path to directory containing the yaml this
+component was in.</li>
+<li><strong>existing</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) &#8211; Dictionary of existing components.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#RuntimeError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal"><span class="pre">RuntimeError</span></code></a> &#8211; If the yml dictionary is missing a required keyword.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Updated log of all entries.</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)">dict</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.yamlfile.parse_model">
+<code class="descclassname">cis_interface.yamlfile.</code><code class="descname">parse_model</code><span class="sig-paren">(</span><em>yml</em>, <em>yamldir</em>, <em>existing</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/yamlfile.html#parse_model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.yamlfile.parse_model" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parse a yaml entry for a model.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>yml</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) &#8211; YAML dictionary for a model.</li>
+<li><strong>yamldir</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; Full path to directory containing the yaml this
+component was in.</li>
+<li><strong>existing</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) &#8211; Dictionary of existing components.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#RuntimeError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal"><span class="pre">RuntimeError</span></code></a> &#8211; If the yml dictionary is missing a required keyword.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Updated log of all entries.</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)">dict</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.yamlfile.parse_yaml">
+<code class="descclassname">cis_interface.yamlfile.</code><code class="descname">parse_yaml</code><span class="sig-paren">(</span><em>files</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/yamlfile.html#parse_yaml"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.yamlfile.parse_yaml" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parse list of yaml files.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>files</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a>) &#8211; Either the path to a single yaml file or a list of
+yaml files.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#RuntimeError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal"><span class="pre">RuntimeError</span></code></a> &#8211; If one of the I/O channels is not initialized with driver
+information.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Dictionary of information parsed from the yamls.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)">dict</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="module-cis_interface">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-cis_interface" title="Permalink to this headline">¶</a></h2>
+<p>This package provides a framework for integrating models across languages
+such that they can be run simultaneously, passing input back and forth.</p>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="cis_interface.interface.html" class="btn btn-neutral float-right" title="cis_interface.interface package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="code.html" class="btn btn-neutral" title="Code" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Meagan Lang, David Raila.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.1.3',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          
+          SphinxRtdTheme.Navigation.enableSticky();
+          
+      });
+  </script> 
+
+</body>
+</html>

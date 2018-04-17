@@ -1,0 +1,141 @@
+cis_interface.communication package
+===================================
+
+Subpackages
+-----------
+
+.. toctree::
+
+    cis_interface.communication.tests
+
+Submodules
+----------
+
+cis_interface.communication.AsciiFileComm module
+------------------------------------------------
+
+.. automodule:: cis_interface.communication.AsciiFileComm
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+cis_interface.communication.AsciiTableComm module
+-------------------------------------------------
+
+.. automodule:: cis_interface.communication.AsciiTableComm
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+cis_interface.communication.AsyncComm module
+--------------------------------------------
+
+.. automodule:: cis_interface.communication.AsyncComm
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+cis_interface.communication.ClientComm module
+---------------------------------------------
+
+.. automodule:: cis_interface.communication.ClientComm
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+cis_interface.communication.CommBase module
+-------------------------------------------
+
+.. automodule:: cis_interface.communication.CommBase
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+cis_interface.communication.ErrorComm module
+--------------------------------------------
+
+.. automodule:: cis_interface.communication.ErrorComm
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+cis_interface.communication.FileComm module
+-------------------------------------------
+
+.. automodule:: cis_interface.communication.FileComm
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+cis_interface.communication.IPCComm module
+------------------------------------------
+
+.. automodule:: cis_interface.communication.IPCComm
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+cis_interface.communication.PandasFileComm module
+-------------------------------------------------
+
+.. automodule:: cis_interface.communication.PandasFileComm
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+cis_interface.communication.PickleFileComm module
+-------------------------------------------------
+
+.. automodule:: cis_interface.communication.PickleFileComm
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+cis_interface.communication.RMQAsyncComm module
+-----------------------------------------------
+
+.. automodule:: cis_interface.communication.RMQAsyncComm
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+cis_interface.communication.RMQComm module
+------------------------------------------
+
+.. automodule:: cis_interface.communication.RMQComm
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+cis_interface.communication.RPCComm module
+------------------------------------------
+
+.. automodule:: cis_interface.communication.RPCComm
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+cis_interface.communication.ServerComm module
+---------------------------------------------
+
+.. automodule:: cis_interface.communication.ServerComm
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+cis_interface.communication.ZMQComm module
+------------------------------------------
+
+.. automodule:: cis_interface.communication.ZMQComm
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: cis_interface.communication
+    :members:
+    :undoc-members:
+    :show-inheritance:

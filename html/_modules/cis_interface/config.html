@@ -1,0 +1,347 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>cis_interface.config &mdash; cis_interface 0.1.3 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> cis_interface
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../includeme.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../formatted_io.html">Formatted I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../server_client_io.html">Server/Client I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../server_client_io.html#one-server-two-clients">One Server, Two Clients</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../yaml.html">YAML Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../config.html">Configuration Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../units.html">Units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../c_format_strings.html">C-Style Format Strings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../io_drivers.html">Input/Output Drivers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../model_drivers.html">Model Drivers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../code.html">Code</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples/examples_toc.html">Examples</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">cis_interface</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>cis_interface.config</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for cis_interface.config</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module imports the configuration for cis_interface.</span>
+
+<span class="sd">.. todo::</span>
+<span class="sd">   Remove reference to environment variables for accessing config options.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">from</span> <span class="nn">cis_interface.backwards</span> <span class="k">import</span> <span class="n">configparser</span>
+
+
+<div class="viewcode-block" id="CisConfigParser"><a class="viewcode-back" href="../../cis_interface.html#cis_interface.config.CisConfigParser">[docs]</a><span class="k">class</span> <span class="nc">CisConfigParser</span><span class="p">(</span><span class="n">configparser</span><span class="o">.</span><span class="n">ConfigParser</span><span class="p">):</span>
+    <span class="sd">r&quot;&quot;&quot;Config parser that returns None if option not provided on get.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="CisConfigParser.get"><a class="viewcode-back" href="../../cis_interface.html#cis_interface.config.CisConfigParser.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">section</span><span class="p">,</span> <span class="n">option</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">r&quot;&quot;&quot;Return None if the section/option does not exist.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            section (str): Name of section.</span>
+<span class="sd">            option (str): Name of option in section.</span>
+<span class="sd">            default (obj, optional): Value that should be returned if the</span>
+<span class="sd">                section and/or option are not found or are an empty string.</span>
+<span class="sd">                Defaults to None.</span>
+<span class="sd">            **kwargs: Additional keyword arguments are passed to the parent</span>
+<span class="sd">                class&#39;s get.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            obj: String entry if the section &amp; option exist, otherwise default.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">section</span> <span class="o">=</span> <span class="n">section</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+        <span class="n">option</span> <span class="o">=</span> <span class="n">option</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_section</span><span class="p">(</span><span class="n">section</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_option</span><span class="p">(</span><span class="n">section</span><span class="p">,</span> <span class="n">option</span><span class="p">):</span>
+            <span class="c1"># Super does not work for ConfigParser as not inherited from object</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">configparser</span><span class="o">.</span><span class="n">ConfigParser</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">section</span><span class="p">,</span> <span class="n">option</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="c1"># Count empty strings as not provided</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">out</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">default</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">out</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">default</span></div></div>
+        
+        
+<span class="c1"># In order read: defaults, user, local files</span>
+<span class="n">cis_cfg</span> <span class="o">=</span> <span class="n">CisConfigParser</span><span class="p">()</span>
+<span class="n">config_file</span> <span class="o">=</span> <span class="s1">&#39;.cis_interface.cfg&#39;</span>
+<span class="n">def_config_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">__file__</span><span class="p">),</span> <span class="s1">&#39;defaults.cfg&#39;</span><span class="p">)</span>
+<span class="n">usr_config_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;~&#39;</span><span class="p">,</span> <span class="n">config_file</span><span class="p">))</span>
+<span class="n">loc_config_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(),</span> <span class="n">config_file</span><span class="p">)</span>
+<span class="k">assert</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">def_config_file</span><span class="p">))</span>
+<span class="n">files</span> <span class="o">=</span> <span class="p">[</span><span class="n">def_config_file</span><span class="p">,</span> <span class="n">usr_config_file</span><span class="p">,</span> <span class="n">loc_config_file</span><span class="p">]</span>
+<span class="n">cis_cfg</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">files</span><span class="p">)</span>
+
+
+<span class="c1"># Aliases for old versions of config options</span>
+<span class="n">alias_map</span> <span class="o">=</span> <span class="p">[((</span><span class="s1">&#39;debug&#39;</span><span class="p">,</span> <span class="s1">&#39;psi&#39;</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;debug&#39;</span><span class="p">,</span> <span class="s1">&#39;cis&#39;</span><span class="p">))]</span>
+<span class="k">for</span> <span class="n">old</span><span class="p">,</span> <span class="n">new</span> <span class="ow">in</span> <span class="n">alias_map</span><span class="p">:</span>
+    <span class="n">v</span> <span class="o">=</span> <span class="n">cis_cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="o">*</span><span class="n">old</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">v</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
+        <span class="n">cis_cfg</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">new</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">new</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">v</span><span class="p">)</span>
+
+
+<span class="c1"># Set associated environment variables</span>
+<span class="n">env_map</span> <span class="o">=</span> <span class="p">[(</span><span class="s1">&#39;debug&#39;</span><span class="p">,</span> <span class="s1">&#39;cis&#39;</span><span class="p">,</span> <span class="s1">&#39;CIS_DEBUG&#39;</span><span class="p">),</span>
+           <span class="p">(</span><span class="s1">&#39;debug&#39;</span><span class="p">,</span> <span class="s1">&#39;rmq&#39;</span><span class="p">,</span> <span class="s1">&#39;RMQ_DEBUG&#39;</span><span class="p">),</span>
+           <span class="p">(</span><span class="s1">&#39;debug&#39;</span><span class="p">,</span> <span class="s1">&#39;client&#39;</span><span class="p">,</span> <span class="s1">&#39;CIS_CLIENT_DEBUG&#39;</span><span class="p">),</span>
+           <span class="p">(</span><span class="s1">&#39;rmq&#39;</span><span class="p">,</span> <span class="s1">&#39;namespace&#39;</span><span class="p">,</span> <span class="s1">&#39;CIS_NAMESPACE&#39;</span><span class="p">),</span>
+           <span class="p">(</span><span class="s1">&#39;rmq&#39;</span><span class="p">,</span> <span class="s1">&#39;host&#39;</span><span class="p">,</span> <span class="s1">&#39;CIS_MSG_HOST&#39;</span><span class="p">),</span>
+           <span class="p">(</span><span class="s1">&#39;rmq&#39;</span><span class="p">,</span> <span class="s1">&#39;vhost&#39;</span><span class="p">,</span> <span class="s1">&#39;CIS_MSG_VHOST&#39;</span><span class="p">),</span>
+           <span class="p">(</span><span class="s1">&#39;rmq&#39;</span><span class="p">,</span> <span class="s1">&#39;user&#39;</span><span class="p">,</span> <span class="s1">&#39;CIS_MSG_USER&#39;</span><span class="p">),</span>
+           <span class="p">(</span><span class="s1">&#39;rmq&#39;</span><span class="p">,</span> <span class="s1">&#39;password&#39;</span><span class="p">,</span> <span class="s1">&#39;CIS_MSG_PW&#39;</span><span class="p">),</span>
+           <span class="p">(</span><span class="s1">&#39;parallel&#39;</span><span class="p">,</span> <span class="s1">&#39;cluster&#39;</span><span class="p">,</span> <span class="s1">&#39;CIS_CLUSTER&#39;</span><span class="p">),</span>
+           <span class="p">]</span>
+
+
+<div class="viewcode-block" id="cfg_logging"><a class="viewcode-back" href="../../cis_interface.html#cis_interface.config.cfg_logging">[docs]</a><span class="k">def</span> <span class="nf">cfg_logging</span><span class="p">(</span><span class="n">cfg</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">r&quot;&quot;&quot;Set logging levels from config options.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        cfg (:class:`cis_interface.config.CisConfigParser`, optional):</span>
+<span class="sd">            Config parser with options that should be used to update the</span>
+<span class="sd">            environment. Defaults to :data:`cis_interface.config.cis_cfg`.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">cfg</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">cfg</span> <span class="o">=</span> <span class="n">cis_cfg</span>
+    <span class="n">_LOG_FORMAT</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%(levelname)s</span><span class="s2">:</span><span class="si">%(module)s</span><span class="s2">.</span><span class="si">%(funcName)s</span><span class="s2">[</span><span class="si">%(lineno)d</span><span class="s2">]:</span><span class="si">%(message)s</span><span class="s2">&quot;</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="n">_LOG_FORMAT</span><span class="p">)</span>
+    <span class="n">logLevelCIS</span> <span class="o">=</span> <span class="nb">eval</span><span class="p">(</span><span class="s1">&#39;logging.</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;debug&#39;</span><span class="p">,</span> <span class="s1">&#39;cis&#39;</span><span class="p">,</span> <span class="s1">&#39;NOTSET&#39;</span><span class="p">))</span>
+    <span class="n">logLevelRMQ</span> <span class="o">=</span> <span class="nb">eval</span><span class="p">(</span><span class="s1">&#39;logging.</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;debug&#39;</span><span class="p">,</span> <span class="s1">&#39;rmq&#39;</span><span class="p">,</span> <span class="s1">&#39;INFO&#39;</span><span class="p">))</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;cis_interface&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">logLevelCIS</span><span class="p">)</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;pika&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">logLevelRMQ</span><span class="p">)</span></div>
+        
+
+<div class="viewcode-block" id="cfg_environment"><a class="viewcode-back" href="../../cis_interface.html#cis_interface.config.cfg_environment">[docs]</a><span class="k">def</span> <span class="nf">cfg_environment</span><span class="p">(</span><span class="n">env</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">cfg</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">r&quot;&quot;&quot;Set environment variables based on config options.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        env (dict, optional): Dictionary of environment variables that should</span>
+<span class="sd">            be updated. Defaults to `os.environ`.</span>
+<span class="sd">        cfg (:class:`cis_interface.config.CisConfigParser`, optional):</span>
+<span class="sd">            Config parser with options that should be used to update the</span>
+<span class="sd">            environment. Defaults to :data:`cis_interface.config.cis_cfg`.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">env</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">env</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span>
+    <span class="k">if</span> <span class="n">cfg</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">cfg</span> <span class="o">=</span> <span class="n">cis_cfg</span>
+    <span class="k">for</span> <span class="n">s</span><span class="p">,</span> <span class="n">o</span><span class="p">,</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">env_map</span><span class="p">:</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">o</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">v</span><span class="p">:</span>
+            <span class="n">env</span><span class="p">[</span><span class="n">e</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span></div>
+
+            
+<span class="c1"># Do initial update of logging &amp; environment (legacy)</span>
+<span class="n">cfg_logging</span><span class="p">()</span>
+<span class="n">cfg_environment</span><span class="p">()</span>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Meagan Lang, David Raila.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'0.1.3',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          
+          SphinxRtdTheme.Navigation.enableSticky();
+          
+      });
+  </script> 
+
+</body>
+</html>

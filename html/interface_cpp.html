@@ -1,0 +1,1095 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>C++ Interface &mdash; cis_interface 0.1.3 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="C++ DataIO API" href="dataio_cpp.html" />
+    <link rel="prev" title="C++ Code" href="code_cpp.html" /> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> cis_interface
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="includeme.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="formatted_io.html">Formatted I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="server_client_io.html">Server/Client I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="server_client_io.html#one-server-two-clients">One Server, Two Clients</a></li>
+<li class="toctree-l1"><a class="reference internal" href="yaml.html">YAML Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="config.html">Configuration Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="units.html">Units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="c_format_strings.html">C-Style Format Strings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="io_drivers.html">Input/Output Drivers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="model_drivers.html">Model Drivers</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="code.html">Code</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="code_python.html">Python Code</a></li>
+<li class="toctree-l2"><a class="reference internal" href="code_c.html">C Code</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="code_cpp.html">C++ Code</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="code_cpp.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4 current"><a class="current reference internal" href="#">C++ Interface</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dataio_cpp.html">C++ DataIO API</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="code_matlab.html">Matlab Code</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="examples/examples_toc.html">Examples</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">cis_interface</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="code.html">Code</a> &raquo;</li>
+        
+          <li><a href="code_cpp.html">C++ Code</a> &raquo;</li>
+        
+      <li>C++ Interface</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/interface_cpp.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="c-interface">
+<h1>C++ Interface<a class="headerlink" href="#c-interface" title="Permalink to this headline">¶</a></h1>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Defines</p>
+<dl class="macro">
+<dt id="c.CISINTERFACE_HPP_">
+<span class="target" id="_cis_interface_8hpp_1ac218e3f993b48db1061034f8d18e1fad"></span><code class="descname">CISINTERFACE_HPP_</code><a class="headerlink" href="#c.CISINTERFACE_HPP_" title="Permalink to this definition">¶</a></dt>
+<dd><p>Flag for checking if CisInterface.hpp has already been included. </p>
+</dd></dl>
+
+</div>
+<dl class="class">
+<dt id="_CPPv28CisInput">
+<span id="CisInput"></span><span class="target" id="class_cis_input"></span><em class="property">class </em><code class="descname">CisInput</code><a class="headerlink" href="#_CPPv28CisInput" title="Permalink to this definition">¶</a><br /></dt>
+<dd><em>#include &lt;CisInterface.hpp&gt;</em><p>C++ interface to cisInput_t functionality. </p>
+<p>The <a class="reference internal" href="#class_cis_input"><span class="std std-ref">CisInput</span></a> class is a basic wrapper around the C cisInput_t structure and associated functions from the CisInterface.h header. It provides the user with C++ style access to basic input via an IPC queue. </p>
+<p>Subclassed by <a class="reference internal" href="#class_cis_ascii_file_input"><span class="std std-ref">CisAsciiFileInput</span></a></p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Functions</p>
+<dl class="function">
+<dt id="_CPPv2N8CisInput8CisInputEPKc">
+<span id="CisInput::CisInput__cCP"></span><span class="target" id="class_cis_input_1a5a81811ecb4ea9b3d786ea60522cdcb7"></span><code class="descname">CisInput</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N8CisInput8CisInputEPKc" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor for <a class="reference internal" href="#class_cis_input"><span class="std std-ref">CisInput</span></a>. </p>
+<p><dl class="docutils">
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">name</span></code>: constant character pointer to name of input queue. This should be the argument to an input driver in the yaml specification file. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv2N8CisInput8CisInputE10cisInput_t">
+<span id="CisInput::CisInput__cisInput_t"></span><span class="target" id="class_cis_input_1a9e6a005bec40db9eacc4bd7c8051c112"></span><code class="descname">CisInput</code><span class="sig-paren">(</span>cisInput_t <em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N8CisInput8CisInputE10cisInput_t" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Empty constructor for inheritance. </p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv2N8CisInput8CisInputEPKcPKc">
+<span id="CisInput::CisInput__cCP.cCP"></span><span class="target" id="class_cis_input_1ad39b94867de8741606bef7f1acdcbfd2"></span><code class="descname">CisInput</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em>, <em class="property">const</em> char *<em>fmt</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N8CisInput8CisInputEPKcPKc" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor for <a class="reference internal" href="#class_cis_input"><span class="std std-ref">CisInput</span></a> with format. </p>
+<p><dl class="docutils">
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">name</span></code>: constant character pointer to name of input queue. This should be the argument to an input driver in the yaml specification file. </li>
+<li><code class="docutils literal"><span class="pre">fmt</span></code>: character pointer to format string for parsing messages. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv2N8CisInput11_destroy_piEv">
+<span id="CisInput::_destroy_pi"></span><span class="target" id="class_cis_input_1af098d058831c5aeb24c785daf322d0d3"></span>void <code class="descname">_destroy_pi</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N8CisInput11_destroy_piEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Alias to allow freeing of underlying C struct at the class level. </p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv2N8CisInputD0Ev">
+<span id="CisInput::~CisInput"></span><span class="target" id="class_cis_input_1a66ff037c37e380abd82e107980f0af44"></span><code class="descname">~CisInput</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N8CisInputD0Ev" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Destructor for <a class="reference internal" href="#class_cis_input"><span class="std std-ref">CisInput</span></a>. See cis_free in CisInterface.h for details. </p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv2N8CisInput2piEv">
+<span id="CisInput::pi"></span><span class="target" id="class_cis_input_1a2b560759fbd797db1dc049e886ce72e5"></span>cisInput_t <code class="descname">pi</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N8CisInput2piEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Return the cisInput_t structure. </p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>cisInput_t structure underlying the class. </dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv2N8CisInput4recvEPcK6size_t">
+<span id="CisInput::recv__cP.sC"></span><span class="target" id="class_cis_input_1aa05f26dd9d8db09e12da739831637a2a"></span>int <code class="descname">recv</code><span class="sig-paren">(</span>char *<em>data</em>, <em class="property">const</em> size_t <em>len</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N8CisInput4recvEPcK6size_t" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Receive a message shorter than CIS_MSG_MAX from the input queue. See cis_recv in CisInterface.h for additional details. </p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>int -1 if message could not be received. Length of the received message if message was received. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">data</span></code>: character pointer to allocated buffer where the message should be saved. </li>
+<li><code class="docutils literal"><span class="pre">len</span></code>: size_t length of the allocated message buffer in bytes. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv2N8CisInput4recvEKiz">
+<span id="CisInput::recv__iC.z"></span><span class="target" id="class_cis_input_1a387134ab4f750a06654946d4b92d412d"></span>int <code class="descname">recv</code><span class="sig-paren">(</span><em class="property">const</em> int <em>nargs</em>, ...<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N8CisInput4recvEKiz" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Receive and parse a message shorter than CIS_MSG_MAX from the input queue. See cisRecv from CisInterface.h for details. </p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>integer specifying if the receive was succesful. Values &gt;= 0 indicate success. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">nargs</span></code>: int Number of arguments being passed. </li>
+<li><code class="docutils literal"><span class="pre">...</span></code>: mixed arguments that should be assigned parameters extracted using the format string. Since these will be assigned, they should be pointers to memory that has already been allocated. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv2N8CisInput12recv_nolimitEPPcK6size_t">
+<span id="CisInput::recv_nolimit__cPP.sC"></span><span class="target" id="class_cis_input_1a962f5ebcac9d8b70fe3cd907da6dd3a9"></span>int <code class="descname">recv_nolimit</code><span class="sig-paren">(</span>char **<em>data</em>, <em class="property">const</em> size_t <em>len</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N8CisInput12recv_nolimitEPPcK6size_t" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Receive a message larger than CIS_MSG_MAX from the input queue. See cis_recv_nolimit in CisInterface.h for additional details. </p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>int -1 if message could not be received. Length of the received message if message was received. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">data</span></code>: character pointer to allocated buffer where the message should be saved. </li>
+<li><code class="docutils literal"><span class="pre">len</span></code>: size_t length of the allocated message buffer in bytes. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv2N8CisInput12recv_nolimitEKiz">
+<span id="CisInput::recv_nolimit__iC.z"></span><span class="target" id="class_cis_input_1aa78610915e128dc1ed0d234271d2d656"></span>int <code class="descname">recv_nolimit</code><span class="sig-paren">(</span><em class="property">const</em> int <em>nargs</em>, ...<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N8CisInput12recv_nolimitEKiz" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Receive and parse a message larger than CIS_MSG_MAX from the input queue. See cisRecv_nolimit from CisInterface.h for details. </p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>integer specifying if the receive was succesful. Values &gt;= 0 indicate success. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">nargs</span></code>: int Number of arguments being passed. </li>
+<li><code class="docutils literal"><span class="pre">...</span></code>: mixed arguments that should be assigned parameters extracted using the format string. Since these will be assigned, they should be pointers to memory that has already been allocated. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Private Members</p>
+<dl class="member">
+<dt id="_CPPv2N8CisInput3_piE">
+<span id="CisInput::_pi__cisInput_t"></span><span class="target" id="class_cis_input_1a2e19f15c0a05515264929f60fbe64121"></span>cisInput_t <code class="descname">_pi</code><a class="headerlink" href="#_CPPv2N8CisInput3_piE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="class">
+<dt id="_CPPv29CisOutput">
+<span id="CisOutput"></span><span class="target" id="class_cis_output"></span><em class="property">class </em><code class="descname">CisOutput</code><a class="headerlink" href="#_CPPv29CisOutput" title="Permalink to this definition">¶</a><br /></dt>
+<dd><em>#include &lt;CisInterface.hpp&gt;</em><p>C++ interface to cisOutput_t functionality. </p>
+<p>The <a class="reference internal" href="#class_cis_output"><span class="std std-ref">CisOutput</span></a> class is a basic wrapper around the C cisOutput_t structure and associated functions from the CisInterface.h header. It provides the user with C++ style access to basic output via an IPC queue. </p>
+<p>Subclassed by <a class="reference internal" href="#class_cis_ascii_file_output"><span class="std std-ref">CisAsciiFileOutput</span></a></p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Functions</p>
+<dl class="function">
+<dt id="_CPPv2N9CisOutput9CisOutputEPKc">
+<span id="CisOutput::CisOutput__cCP"></span><span class="target" id="class_cis_output_1acbe5281010e3dd4617006a03d9c6c06c"></span><code class="descname">CisOutput</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N9CisOutput9CisOutputEPKc" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor for <a class="reference internal" href="#class_cis_output"><span class="std std-ref">CisOutput</span></a>. </p>
+<p><dl class="docutils">
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">name</span></code>: constant character pointer to name of output queue. This should be the argument to an output driver in the yaml specification file. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv2N9CisOutput9CisOutputEPKcPKc">
+<span id="CisOutput::CisOutput__cCP.cCP"></span><span class="target" id="class_cis_output_1a276eaee68d97cba54726752784d6c4df"></span><code class="descname">CisOutput</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em>, <em class="property">const</em> char *<em>fmt</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N9CisOutput9CisOutputEPKcPKc" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor for <a class="reference internal" href="#class_cis_output"><span class="std std-ref">CisOutput</span></a> with format. </p>
+<p><dl class="docutils">
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">name</span></code>: constant character pointer to name of output queue. This should be the argument to an output driver in the yaml specification file. </li>
+<li><code class="docutils literal"><span class="pre">fmt</span></code>: character pointer to format string for formatting variables. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv2N9CisOutput9CisOutputE11cisOutput_t">
+<span id="CisOutput::CisOutput__cisOutput_t"></span><span class="target" id="class_cis_output_1abf373bf8e55beb4b32d558463b134a51"></span><code class="descname">CisOutput</code><span class="sig-paren">(</span>cisOutput_t <em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N9CisOutput9CisOutputE11cisOutput_t" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Empty constructor for inheritance. </p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv2N9CisOutput11_destroy_piEv">
+<span id="CisOutput::_destroy_pi"></span><span class="target" id="class_cis_output_1af977def262b778702e06277f5d50f102"></span>void <code class="descname">_destroy_pi</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N9CisOutput11_destroy_piEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Alias to allow freeing of underlying C struct at the class level. </p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv2N9CisOutputD0Ev">
+<span id="CisOutput::~CisOutput"></span><span class="target" id="class_cis_output_1a7dc7c92d8c50f61075d1ef0cf0dfce8f"></span><code class="descname">~CisOutput</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N9CisOutputD0Ev" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Destructor for <a class="reference internal" href="#class_cis_output"><span class="std std-ref">CisOutput</span></a>. See cis_free in CisInterface.h for details. </p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv2N9CisOutput2piEv">
+<span id="CisOutput::pi"></span><span class="target" id="class_cis_output_1a173ffd20bb1ce255ba95562caa220d6a"></span>cisOutput_t <code class="descname">pi</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N9CisOutput2piEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Return the cisOutput_t structure. </p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>cisOutput_t structure underlying the class. </dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv2N9CisOutput4sendEPKcK6size_t">
+<span id="CisOutput::send__cCP.sC"></span><span class="target" id="class_cis_output_1a38322e95e9743e4b5b5d4c529d13031e"></span>int <code class="descname">send</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>data</em>, <em class="property">const</em> size_t <em>len</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N9CisOutput4sendEPKcK6size_t" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Send a message smaller than CIS_MSG_MAX to the output queue. If the message is larger than CIS_MSG_MAX an error code will be returned. See cis_send in CisInterface.h for details. </p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>int 0 if send succesfull, -1 if send unsuccessful. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">data</span></code>: character pointer to message that should be sent. </li>
+<li><code class="docutils literal"><span class="pre">len</span></code>: size_t length of message to be sent. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv2N9CisOutput4sendEKiz">
+<span id="CisOutput::send__iC.z"></span><span class="target" id="class_cis_output_1ad30d4a8e64e7a9b7033cddf4a3aef9de"></span>int <code class="descname">send</code><span class="sig-paren">(</span><em class="property">const</em> int <em>nargs</em>, ...<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N9CisOutput4sendEKiz" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Format and send a message smaller than CIS_MSG_MAX to the output queue. See cisSend from CisInterface.h for details. </p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>integer specifying if the send was succesful. Values &gt;= 0 indicate success. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">nargs</span></code>: int Number of arguments being passed. </li>
+<li><code class="docutils literal"><span class="pre">...</span></code>: arguments for formatting. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv2N9CisOutput12send_nolimitEPKcK6size_t">
+<span id="CisOutput::send_nolimit__cCP.sC"></span><span class="target" id="class_cis_output_1a794b0e4d24de72339faab690554db4d3"></span>int <code class="descname">send_nolimit</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>data</em>, <em class="property">const</em> size_t <em>len</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N9CisOutput12send_nolimitEPKcK6size_t" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Send a message larger than CIS_MSG_MAX to the output queue. See cis_send_nolimit in CisInterface.h for details. </p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>int 0 if send succesfull, -1 if send unsuccessful. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">data</span></code>: character pointer to message that should be sent. </li>
+<li><code class="docutils literal"><span class="pre">len</span></code>: size_t length of message to be sent. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv2N9CisOutput12send_nolimitEKiz">
+<span id="CisOutput::send_nolimit__iC.z"></span><span class="target" id="class_cis_output_1a5b7e84b70352f3a5f99650184a076564"></span>int <code class="descname">send_nolimit</code><span class="sig-paren">(</span><em class="property">const</em> int <em>nargs</em>, ...<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N9CisOutput12send_nolimitEKiz" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Format and send a message larger than CIS_MSG_MAX to the output queue. See cisSend from CisInterface.h for details. </p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>integer specifying if the send was succesful. Values &gt;= 0 indicate success. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">nargs</span></code>: int Number of arguments being passed. </li>
+<li><code class="docutils literal"><span class="pre">...</span></code>: arguments for formatting. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv2N9CisOutput8send_eofEv">
+<span id="CisOutput::send_eof"></span><span class="target" id="class_cis_output_1a083fb17afbb3c03f103929850506e545"></span>int <code class="descname">send_eof</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N9CisOutput8send_eofEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Send EOF message to output file, closing it. </p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>int 0 if send was succesfull. All other values indicate errors. </dd>
+</dl>
+</p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Private Members</p>
+<dl class="member">
+<dt id="_CPPv2N9CisOutput3_piE">
+<span id="CisOutput::_pi__cisOutput_t"></span><span class="target" id="class_cis_output_1aeaa19426ff87e34bf3761ca6b351e8a0"></span>cisOutput_t <code class="descname">_pi</code><a class="headerlink" href="#_CPPv2N9CisOutput3_piE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="class">
+<dt id="_CPPv26CisRpc">
+<span id="CisRpc"></span><span class="target" id="class_cis_rpc"></span><em class="property">class </em><code class="descname">CisRpc</code><a class="headerlink" href="#_CPPv26CisRpc" title="Permalink to this definition">¶</a><br /></dt>
+<dd><em>#include &lt;CisInterface.hpp&gt;</em><p>C++ interface to cisRpc_t functionality. </p>
+<p>The <a class="reference internal" href="#class_cis_rpc"><span class="std std-ref">CisRpc</span></a> class is a basic wrapper around the C cisRpc_t structure and associated functions from the CisInterface.h header. It provides the user with C++ style access to basic RPC messaging via IPC queues. </p>
+<p>Subclassed by <a class="reference internal" href="#class_cis_rpc_client"><span class="std std-ref">CisRpcClient</span></a>, <a class="reference internal" href="#class_cis_rpc_server"><span class="std std-ref">CisRpcServer</span></a></p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Functions</p>
+<dl class="function">
+<dt id="_CPPv2N6CisRpc6CisRpcEPKcPKcPKc">
+<span id="CisRpc::CisRpc__cCP.cCP.cCP"></span><span class="target" id="class_cis_rpc_1a91e65146ad3b4d1a3999835003b1cf37"></span><code class="descname">CisRpc</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em>, <em class="property">const</em> char *<em>outFormat</em>, <em class="property">const</em> char *<em>inFormat</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N6CisRpc6CisRpcEPKcPKcPKc" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor for <a class="reference internal" href="#class_cis_rpc"><span class="std std-ref">CisRpc</span></a>. </p>
+<p><dl class="docutils">
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">name</span></code>: constant character pointer name of the output queue. </li>
+<li><code class="docutils literal"><span class="pre">outFormat</span></code>: character pointer to format that should be used for formatting output. </li>
+<li><code class="docutils literal"><span class="pre">inFormat</span></code>: character pointer to format that should be used for parsing input. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv2N6CisRpc6CisRpcE8cisRpc_t">
+<span id="CisRpc::CisRpc__cisRpc_t"></span><span class="target" id="class_cis_rpc_1aca7fcde600dcb7b42ef93a5e9405358b"></span><code class="descname">CisRpc</code><span class="sig-paren">(</span>cisRpc_t <em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N6CisRpc6CisRpcE8cisRpc_t" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Empty constructor for inheritance. </p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv2N6CisRpc11_destroy_piEv">
+<span id="CisRpc::_destroy_pi"></span><span class="target" id="class_cis_rpc_1a29148e3e2924edc61aeec247ed939161"></span>void <code class="descname">_destroy_pi</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N6CisRpc11_destroy_piEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Alias to allow freeing of underlying C struct at the class level. </p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv2N6CisRpcD0Ev">
+<span id="CisRpc::~CisRpc"></span><span class="target" id="class_cis_rpc_1accbcccd1fd223660be6e8cf54cace2a8"></span><code class="descname">~CisRpc</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N6CisRpcD0Ev" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Destructor for <a class="reference internal" href="#class_cis_rpc"><span class="std std-ref">CisRpc</span></a>. See cis_free in CisInterface.h for details. </p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv2N6CisRpc2piEv">
+<span id="CisRpc::pi"></span><span class="target" id="class_cis_rpc_1ac58fc44e28ea378a1ef6b12684371aef"></span>cisRpc_t <code class="descname">pi</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N6CisRpc2piEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Return the cisRpc_t structure. </p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>cisRpc_t structure underlying the class. </dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv2N6CisRpc4sendEKiz">
+<span id="CisRpc::send__iC.z"></span><span class="target" id="class_cis_rpc_1afb4143aa59acfe94df91435262cde01e"></span>int <code class="descname">send</code><span class="sig-paren">(</span><em class="property">const</em> int <em>nargs</em>, ...<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N6CisRpc4sendEKiz" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Format and send a message to an RPC output queue. See rpcSend from CisInterface.h for details. </p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>integer specifying if the send was succesful. Values &gt;= 0 indicate success. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">nargs</span></code>: int Number of arguments being passed. </li>
+<li><code class="docutils literal"><span class="pre">...</span></code>: arguments for formatting. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv2N6CisRpc4recvEKiz">
+<span id="CisRpc::recv__iC.z"></span><span class="target" id="class_cis_rpc_1a6b1acb06791551c0c3096f678690e315"></span>int <code class="descname">recv</code><span class="sig-paren">(</span><em class="property">const</em> int <em>nargs</em>, ...<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N6CisRpc4recvEKiz" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Receive and parse a message from an RPC input queue. See rpcRecv from CisInterface.h for details. </p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>integer specifying if the receive was succesful. Values &gt;= 0 indicate success. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">nargs</span></code>: int Number of arguments being passed. </li>
+<li><code class="docutils literal"><span class="pre">...</span></code>: mixed arguments that should be assigned parameters extracted using the format string. Since these will be assigned, they should be pointers to memory that has already been allocated. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Private Members</p>
+<dl class="member">
+<dt id="_CPPv2N6CisRpc3_piE">
+<span id="CisRpc::_pi__cisRpc_t"></span><span class="target" id="class_cis_rpc_1a04e90eb6d57173fa6c98544f445b7c5f"></span>cisRpc_t <code class="descname">_pi</code><a class="headerlink" href="#_CPPv2N6CisRpc3_piE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="class">
+<dt id="_CPPv212CisRpcServer">
+<span id="CisRpcServer"></span><span class="target" id="class_cis_rpc_server"></span><em class="property">class </em><code class="descname">CisRpcServer</code><a class="headerlink" href="#_CPPv212CisRpcServer" title="Permalink to this definition">¶</a><br /></dt>
+<dd><em>#include &lt;CisInterface.hpp&gt;</em><p>C++ interface to cisRpc_t server-side functionality. The <a class="reference internal" href="#class_cis_rpc_server"><span class="std std-ref">CisRpcServer</span></a> class is a basic wrapper around the C cisRpc_t structure and associated server-side functions from the CisInterface.h header. It provides the user with C++ style access to basic RPC server operations. </p>
+<p>Inherits from <a class="reference internal" href="#class_cis_rpc"><span class="std std-ref">CisRpc</span></a></p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Functions</p>
+<dl class="function">
+<dt id="_CPPv2N12CisRpcServer12CisRpcServerEPKcPKcPKc">
+<span id="CisRpcServer::CisRpcServer__cCP.cCP.cCP"></span><span class="target" id="class_cis_rpc_server_1a4d531d6b97d3916f9b4fe9398b71f60f"></span><code class="descname">CisRpcServer</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em>, <em class="property">const</em> char *<em>inFormat</em>, <em class="property">const</em> char *<em>outFormat</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N12CisRpcServer12CisRpcServerEPKcPKcPKc" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor for <a class="reference internal" href="#class_cis_rpc_server"><span class="std std-ref">CisRpcServer</span></a>. </p>
+<p><dl class="docutils">
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">name</span></code>: constant character pointer name used for input and output queues. </li>
+<li><code class="docutils literal"><span class="pre">inFormat</span></code>: character pointer to format that should be used for parsing input. </li>
+<li><code class="docutils literal"><span class="pre">outFormat</span></code>: character pointer to format that should be used for formatting output. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv2N12CisRpcServerD0Ev">
+<span id="CisRpcServer::~CisRpcServer"></span><span class="target" id="class_cis_rpc_server_1a5681ecdcbcd03ad613f4843c39a3403b"></span><code class="descname">~CisRpcServer</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N12CisRpcServerD0Ev" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Destructor for <a class="reference internal" href="#class_cis_rpc_server"><span class="std std-ref">CisRpcServer</span></a>. See cis_free in CisInterface.h for details. </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="class">
+<dt id="_CPPv212CisRpcClient">
+<span id="CisRpcClient"></span><span class="target" id="class_cis_rpc_client"></span><em class="property">class </em><code class="descname">CisRpcClient</code><a class="headerlink" href="#_CPPv212CisRpcClient" title="Permalink to this definition">¶</a><br /></dt>
+<dd><em>#include &lt;CisInterface.hpp&gt;</em><p>C++ interface to cisRpc_t client-side functionality. The <a class="reference internal" href="#class_cis_rpc_client"><span class="std std-ref">CisRpcClient</span></a> class is a basic wrapper around the C cisRpc_t structure and associated client-side functions from the CisInterface.h header. It provides the user with C++ style access to basic RPC client operations. </p>
+<p>Inherits from <a class="reference internal" href="#class_cis_rpc"><span class="std std-ref">CisRpc</span></a></p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Functions</p>
+<dl class="function">
+<dt id="_CPPv2N12CisRpcClient12CisRpcClientEPKcPKcPKc">
+<span id="CisRpcClient::CisRpcClient__cCP.cCP.cCP"></span><span class="target" id="class_cis_rpc_client_1a02fb4a473e586bb441524365f976cc02"></span><code class="descname">CisRpcClient</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em>, <em class="property">const</em> char *<em>outFormat</em>, <em class="property">const</em> char *<em>inFormat</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N12CisRpcClient12CisRpcClientEPKcPKcPKc" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor for <a class="reference internal" href="#class_cis_rpc_client"><span class="std std-ref">CisRpcClient</span></a>. </p>
+<p><dl class="docutils">
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">name</span></code>: constant character pointer name used for input and output queues. </li>
+<li><code class="docutils literal"><span class="pre">outFormat</span></code>: character pointer to format that should be used for formatting output. </li>
+<li><code class="docutils literal"><span class="pre">inFormat</span></code>: character pointer to format that should be used for parsing input. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv2N12CisRpcClientD0Ev">
+<span id="CisRpcClient::~CisRpcClient"></span><span class="target" id="class_cis_rpc_client_1a58598885fe23f219ab5d1b9f74ee1d6f"></span><code class="descname">~CisRpcClient</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N12CisRpcClientD0Ev" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Destructor for <a class="reference internal" href="#class_cis_rpc_client"><span class="std std-ref">CisRpcClient</span></a>. See cis_free in CisInterface.h for details. </p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv2N12CisRpcClient4callEKiz">
+<span id="CisRpcClient::call__iC.z"></span><span class="target" id="class_cis_rpc_client_1a2378157bcfdde78aef3f8a0068daec39"></span>int <code class="descname">call</code><span class="sig-paren">(</span><em class="property">const</em> int <em>nargs</em>, ...<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N12CisRpcClient4callEKiz" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Send request to an RPC server from the client and wait for a response. See rpcCall in CisInterface.h for details. </p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>integer specifying if the receive was succesful. Values &gt;= 0 indicate success. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">nargs</span></code>: int Number of arguments being passed. </li>
+<li><code class="docutils literal"><span class="pre">...</span></code>: mixed arguments that include those that should be formatted using the output format string, followed by those that should be assigned parameters extracted using the input format string. These that will be assigned should be pointers to memory that has already been allocated. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="class">
+<dt id="_CPPv218CisAsciiFileOutput">
+<span id="CisAsciiFileOutput"></span><span class="target" id="class_cis_ascii_file_output"></span><em class="property">class </em><code class="descname">CisAsciiFileOutput</code><a class="headerlink" href="#_CPPv218CisAsciiFileOutput" title="Permalink to this definition">¶</a><br /></dt>
+<dd><em>#include &lt;CisInterface.hpp&gt;</em><p>C++ interface to cisAsciiFileOutput_t functionality. The <a class="reference internal" href="#class_cis_ascii_file_output"><span class="std std-ref">CisAsciiFileOutput</span></a> class is a basic wrapper around the C cisAsciiFileOutput_t structure and associated functions from the CisInterface.h header. It provides the user with C++ style access to basic ASCII file output operations. </p>
+<p>Inherits from <a class="reference internal" href="#class_cis_output"><span class="std std-ref">CisOutput</span></a></p>
+<p>Subclassed by <a class="reference internal" href="#class_cis_ascii_array_output"><span class="std std-ref">CisAsciiArrayOutput</span></a>, <a class="reference internal" href="#class_cis_ascii_array_output__local"><span class="std std-ref">CisAsciiArrayOutput_local</span></a>, <a class="reference internal" href="#class_cis_ascii_file_output__local"><span class="std std-ref">CisAsciiFileOutput_local</span></a>, <a class="reference internal" href="#class_cis_ascii_table_output"><span class="std std-ref">CisAsciiTableOutput</span></a>, <a class="reference internal" href="#class_cis_ascii_table_output__local"><span class="std std-ref">CisAsciiTableOutput_local</span></a></p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Functions</p>
+<dl class="function">
+<dt id="_CPPv2N18CisAsciiFileOutput18CisAsciiFileOutputEPKc">
+<span id="CisAsciiFileOutput::CisAsciiFileOutput__cCP"></span><span class="target" id="class_cis_ascii_file_output_1ab17524610ace98b485e02932ba3468af"></span><code class="descname">CisAsciiFileOutput</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N18CisAsciiFileOutput18CisAsciiFileOutputEPKc" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor for <a class="reference internal" href="#class_cis_ascii_file_output"><span class="std std-ref">CisAsciiFileOutput</span></a>. </p>
+<p><dl class="docutils">
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">name</span></code>: constant character pointer to the name of an output channel. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv2N18CisAsciiFileOutput18CisAsciiFileOutputE11cisOutput_t">
+<span id="CisAsciiFileOutput::CisAsciiFileOutput__cisOutput_t"></span><span class="target" id="class_cis_ascii_file_output_1a123f97ab25f1930bc4930e468de1bf05"></span><code class="descname">CisAsciiFileOutput</code><span class="sig-paren">(</span>cisOutput_t <em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N18CisAsciiFileOutput18CisAsciiFileOutputE11cisOutput_t" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Empty constructor for inheritance. </p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv2N18CisAsciiFileOutput9send_lineEPKc">
+<span id="CisAsciiFileOutput::send_line__cCP"></span><span class="target" id="class_cis_ascii_file_output_1a8863d020f0cc7c4690fa0877358eae6d"></span>int <code class="descname">send_line</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>line</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N18CisAsciiFileOutput9send_lineEPKc" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Send a single line to a file or queue. </p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>int 0 if send was succesfull. All other values indicate errors. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">line</span></code>: character pointer to line that should be sent. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="class">
+<dt id="_CPPv224CisAsciiFileOutput_local">
+<span id="CisAsciiFileOutput_local"></span><span class="target" id="class_cis_ascii_file_output__local"></span><em class="property">class </em><code class="descname">CisAsciiFileOutput_local</code><a class="headerlink" href="#_CPPv224CisAsciiFileOutput_local" title="Permalink to this definition">¶</a><br /></dt>
+<dd><em>#include &lt;CisInterface.hpp&gt;</em><p>C++ interface to cisAsciiFileOutput_t functionality for local files. The <a class="reference internal" href="#class_cis_ascii_file_output__local"><span class="std std-ref">CisAsciiFileOutput_local</span></a> class is a basic wrapper around the C cisAsciiFileOutput_t structure and associated functions from the CisInterface.h header. It provides the user with C++ style access to basic ASCII file output operations. </p>
+<p>Inherits from <a class="reference internal" href="#class_cis_ascii_file_output"><span class="std std-ref">CisAsciiFileOutput</span></a></p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Functions</p>
+<dl class="function">
+<dt id="_CPPv2N24CisAsciiFileOutput_local24CisAsciiFileOutput_localEPKc">
+<span id="CisAsciiFileOutput_local::CisAsciiFileOutput_local__cCP"></span><span class="target" id="class_cis_ascii_file_output__local_1a879ac5cab1e7f7b8625cef59e239db91"></span><code class="descname">CisAsciiFileOutput_local</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N24CisAsciiFileOutput_local24CisAsciiFileOutput_localEPKc" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor for <a class="reference internal" href="#class_cis_ascii_file_output"><span class="std std-ref">CisAsciiFileOutput</span></a>. </p>
+<p><dl class="docutils">
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">name</span></code>: constant character pointer to path of local file. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="class">
+<dt id="_CPPv217CisAsciiFileInput">
+<span id="CisAsciiFileInput"></span><span class="target" id="class_cis_ascii_file_input"></span><em class="property">class </em><code class="descname">CisAsciiFileInput</code><a class="headerlink" href="#_CPPv217CisAsciiFileInput" title="Permalink to this definition">¶</a><br /></dt>
+<dd><em>#include &lt;CisInterface.hpp&gt;</em><p>C++ interface to cisAsciiFileInput_t functionality. The <a class="reference internal" href="#class_cis_ascii_file_input"><span class="std std-ref">CisAsciiFileInput</span></a> class is a basic wrapper around the C cisAsciiFileInput_t structure and associated functions from the CisInterface.h header. It provides the user with C++ style access to basic ASCII file input operations. </p>
+<p>Inherits from <a class="reference internal" href="#class_cis_input"><span class="std std-ref">CisInput</span></a></p>
+<p>Subclassed by <a class="reference internal" href="#class_cis_ascii_array_input"><span class="std std-ref">CisAsciiArrayInput</span></a>, <a class="reference internal" href="#class_cis_ascii_array_input__local"><span class="std std-ref">CisAsciiArrayInput_local</span></a>, <a class="reference internal" href="#class_cis_ascii_file_input__local"><span class="std std-ref">CisAsciiFileInput_local</span></a>, <a class="reference internal" href="#class_cis_ascii_table_input"><span class="std std-ref">CisAsciiTableInput</span></a>, <a class="reference internal" href="#class_cis_ascii_table_input__local"><span class="std std-ref">CisAsciiTableInput_local</span></a></p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Functions</p>
+<dl class="function">
+<dt id="_CPPv2N17CisAsciiFileInput17CisAsciiFileInputEPKc">
+<span id="CisAsciiFileInput::CisAsciiFileInput__cCP"></span><span class="target" id="class_cis_ascii_file_input_1aac31cfe291fe9b5f4dc16bb78a123e8c"></span><code class="descname">CisAsciiFileInput</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N17CisAsciiFileInput17CisAsciiFileInputEPKc" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor for <a class="reference internal" href="#class_cis_ascii_file_input"><span class="std std-ref">CisAsciiFileInput</span></a>. </p>
+<p><dl class="docutils">
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">name</span></code>: constant character pointer to the name of an input channel. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv2N17CisAsciiFileInput17CisAsciiFileInputE10cisInput_t">
+<span id="CisAsciiFileInput::CisAsciiFileInput__cisInput_t"></span><span class="target" id="class_cis_ascii_file_input_1a7bee575f759ecb42dbe4d525638d5bc1"></span><code class="descname">CisAsciiFileInput</code><span class="sig-paren">(</span>cisInput_t <em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N17CisAsciiFileInput17CisAsciiFileInputE10cisInput_t" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Empty constructor for inheritance. </p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv2N17CisAsciiFileInput9recv_lineEPcK6size_t">
+<span id="CisAsciiFileInput::recv_line__cP.sC"></span><span class="target" id="class_cis_ascii_file_input_1a4509672e282e82990974104a811c1605"></span>int <code class="descname">recv_line</code><span class="sig-paren">(</span>char *<em>line</em>, <em class="property">const</em> size_t <em>n</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N17CisAsciiFileInput9recv_lineEPcK6size_t" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Receive a single line from an associated file or queue. See af_recv_line in CisInterface.h for details. </p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>int Number of bytes read/received. Negative values indicate that there was either an error or the EOF message was received. </dd>
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">line</span></code>: character pointer to allocate memory where the received line should be stored. </li>
+<li><code class="docutils literal"><span class="pre">n</span></code>: size_t Size of the allocated memory block in bytes. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="class">
+<dt id="_CPPv223CisAsciiFileInput_local">
+<span id="CisAsciiFileInput_local"></span><span class="target" id="class_cis_ascii_file_input__local"></span><em class="property">class </em><code class="descname">CisAsciiFileInput_local</code><a class="headerlink" href="#_CPPv223CisAsciiFileInput_local" title="Permalink to this definition">¶</a><br /></dt>
+<dd><em>#include &lt;CisInterface.hpp&gt;</em><p>C++ interface to cisAsciiFileInput_t functionality for local files. The <a class="reference internal" href="#class_cis_ascii_file_input__local"><span class="std std-ref">CisAsciiFileInput_local</span></a> class is a basic wrapper around the C cisAsciiFileInput_t structure and associated functions from the CisInterface.h header. It provides the user with C++ style access to basic ASCII file input operations. </p>
+<p>Inherits from <a class="reference internal" href="#class_cis_ascii_file_input"><span class="std std-ref">CisAsciiFileInput</span></a></p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Functions</p>
+<dl class="function">
+<dt id="_CPPv2N23CisAsciiFileInput_local23CisAsciiFileInput_localEPKc">
+<span id="CisAsciiFileInput_local::CisAsciiFileInput_local__cCP"></span><span class="target" id="class_cis_ascii_file_input__local_1a6a503a34514e6c0bd5ba6429393b2629"></span><code class="descname">CisAsciiFileInput_local</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N23CisAsciiFileInput_local23CisAsciiFileInput_localEPKc" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor for <a class="reference internal" href="#class_cis_ascii_file_input__local"><span class="std std-ref">CisAsciiFileInput_local</span></a>. </p>
+<p><dl class="docutils">
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">name</span></code>: constant character pointer to path of local file. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="class">
+<dt id="_CPPv219CisAsciiTableOutput">
+<span id="CisAsciiTableOutput"></span><span class="target" id="class_cis_ascii_table_output"></span><em class="property">class </em><code class="descname">CisAsciiTableOutput</code><a class="headerlink" href="#_CPPv219CisAsciiTableOutput" title="Permalink to this definition">¶</a><br /></dt>
+<dd><em>#include &lt;CisInterface.hpp&gt;</em><p>C++ interface to cisAsciiTableOutput_t functionality. </p>
+<p>The <a class="reference internal" href="#class_cis_ascii_table_output"><span class="std std-ref">CisAsciiTableOutput</span></a> class is a basic wrapper around the C cisAsciiTableOutput_t structure and associated functions from the CisInterface.h header. It provides the user with C++ style access to basic ASCII table output operations. </p>
+<p>Inherits from <a class="reference internal" href="#class_cis_ascii_file_output"><span class="std std-ref">CisAsciiFileOutput</span></a></p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Functions</p>
+<dl class="function">
+<dt id="_CPPv2N19CisAsciiTableOutput19CisAsciiTableOutputEPKcPKc">
+<span id="CisAsciiTableOutput::CisAsciiTableOutput__cCP.cCP"></span><span class="target" id="class_cis_ascii_table_output_1aa579418326a4192bf481e4e46fd3c170"></span><code class="descname">CisAsciiTableOutput</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em>, <em class="property">const</em> char *<em>format_str</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N19CisAsciiTableOutput19CisAsciiTableOutputEPKcPKc" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor for <a class="reference internal" href="#class_cis_ascii_table_output"><span class="std std-ref">CisAsciiTableOutput</span></a>. </p>
+<p><dl class="docutils">
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">name</span></code>: constant character pointer to the name of an output channel. </li>
+<li><code class="docutils literal"><span class="pre">format_str</span></code>: character pointer to format string that should be used to format rows into table lines. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="class">
+<dt id="_CPPv225CisAsciiTableOutput_local">
+<span id="CisAsciiTableOutput_local"></span><span class="target" id="class_cis_ascii_table_output__local"></span><em class="property">class </em><code class="descname">CisAsciiTableOutput_local</code><a class="headerlink" href="#_CPPv225CisAsciiTableOutput_local" title="Permalink to this definition">¶</a><br /></dt>
+<dd><em>#include &lt;CisInterface.hpp&gt;</em><p>C++ interface to cisAsciiTableOutput_t functionality for local files. </p>
+<p>The <a class="reference internal" href="#class_cis_ascii_table_output"><span class="std std-ref">CisAsciiTableOutput</span></a> class is a basic wrapper around the C cisAsciiTableOutput_t structure and associated functions from the CisInterface.h header. It provides the user with C++ style access to basic ASCII table output operations. </p>
+<p>Inherits from <a class="reference internal" href="#class_cis_ascii_file_output"><span class="std std-ref">CisAsciiFileOutput</span></a></p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Functions</p>
+<dl class="function">
+<dt id="_CPPv2N25CisAsciiTableOutput_local25CisAsciiTableOutput_localEPKcPKc">
+<span id="CisAsciiTableOutput_local::CisAsciiTableOutput_local__cCP.cCP"></span><span class="target" id="class_cis_ascii_table_output__local_1af18720ffabf013387aa1bcb8f8826ce3"></span><code class="descname">CisAsciiTableOutput_local</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em>, <em class="property">const</em> char *<em>format_str</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N25CisAsciiTableOutput_local25CisAsciiTableOutput_localEPKcPKc" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor for <a class="reference internal" href="#class_cis_ascii_table_output"><span class="std std-ref">CisAsciiTableOutput</span></a> for local files. </p>
+<p><dl class="docutils">
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">name</span></code>: constant character pointer to path of local table. </li>
+<li><code class="docutils literal"><span class="pre">format_str</span></code>: character pointer to format string that should be used to format rows into table lines. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="class">
+<dt id="_CPPv219CisAsciiArrayOutput">
+<span id="CisAsciiArrayOutput"></span><span class="target" id="class_cis_ascii_array_output"></span><em class="property">class </em><code class="descname">CisAsciiArrayOutput</code><a class="headerlink" href="#_CPPv219CisAsciiArrayOutput" title="Permalink to this definition">¶</a><br /></dt>
+<dd><em>#include &lt;CisInterface.hpp&gt;</em><p>C++ interface to cisAsciiTableOutput_t functionality with arrays. </p>
+<p>The <a class="reference internal" href="#class_cis_ascii_array_output"><span class="std std-ref">CisAsciiArrayOutput</span></a> class is a basic wrapper around the C cisAsciiTableOutput_t structure and associated functions from the CisInterface.h header. It provides the user with C++ style access to basic ASCII table output operations. </p>
+<p>Inherits from <a class="reference internal" href="#class_cis_ascii_file_output"><span class="std std-ref">CisAsciiFileOutput</span></a></p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Functions</p>
+<dl class="function">
+<dt id="_CPPv2N19CisAsciiArrayOutput19CisAsciiArrayOutputEPKcPKc">
+<span id="CisAsciiArrayOutput::CisAsciiArrayOutput__cCP.cCP"></span><span class="target" id="class_cis_ascii_array_output_1a3a4e19e80478aa1748f4074d72d3932a"></span><code class="descname">CisAsciiArrayOutput</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em>, <em class="property">const</em> char *<em>format_str</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N19CisAsciiArrayOutput19CisAsciiArrayOutputEPKcPKc" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor for <a class="reference internal" href="#class_cis_ascii_array_output"><span class="std std-ref">CisAsciiArrayOutput</span></a>. </p>
+<p><dl class="docutils">
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">name</span></code>: constant character pointer to the name of an output channel. </li>
+<li><code class="docutils literal"><span class="pre">format_str</span></code>: character pointer to format string that should be used to format arrays into a table. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="class">
+<dt id="_CPPv225CisAsciiArrayOutput_local">
+<span id="CisAsciiArrayOutput_local"></span><span class="target" id="class_cis_ascii_array_output__local"></span><em class="property">class </em><code class="descname">CisAsciiArrayOutput_local</code><a class="headerlink" href="#_CPPv225CisAsciiArrayOutput_local" title="Permalink to this definition">¶</a><br /></dt>
+<dd><em>#include &lt;CisInterface.hpp&gt;</em><p>C++ interface to cisAsciiTableOutput_t functionality for local files. </p>
+<p>The <a class="reference internal" href="#class_cis_ascii_array_output"><span class="std std-ref">CisAsciiArrayOutput</span></a> class is a basic wrapper around the C cisAsciiTableOutput_t structure and associated functions from the CisInterface.h header. It provides the user with C++ style access to basic ASCII table output operations. </p>
+<p>Inherits from <a class="reference internal" href="#class_cis_ascii_file_output"><span class="std std-ref">CisAsciiFileOutput</span></a></p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Functions</p>
+<dl class="function">
+<dt id="_CPPv2N25CisAsciiArrayOutput_local25CisAsciiArrayOutput_localEPKcPKc">
+<span id="CisAsciiArrayOutput_local::CisAsciiArrayOutput_local__cCP.cCP"></span><span class="target" id="class_cis_ascii_array_output__local_1a65fa28278be3cf10be0e1a4882f2327f"></span><code class="descname">CisAsciiArrayOutput_local</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em>, <em class="property">const</em> char *<em>format_str</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N25CisAsciiArrayOutput_local25CisAsciiArrayOutput_localEPKcPKc" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor for <a class="reference internal" href="#class_cis_ascii_array_output"><span class="std std-ref">CisAsciiArrayOutput</span></a> for local files. </p>
+<p><dl class="docutils">
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">name</span></code>: constant character pointer to path of local table. </li>
+<li><code class="docutils literal"><span class="pre">format_str</span></code>: character pointer to format string that should be used to format arrays into table columns. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="class">
+<dt id="_CPPv218CisAsciiTableInput">
+<span id="CisAsciiTableInput"></span><span class="target" id="class_cis_ascii_table_input"></span><em class="property">class </em><code class="descname">CisAsciiTableInput</code><a class="headerlink" href="#_CPPv218CisAsciiTableInput" title="Permalink to this definition">¶</a><br /></dt>
+<dd><em>#include &lt;CisInterface.hpp&gt;</em><p>C++ interface to cisAsciiTableInput_t functionality. </p>
+<p>The <a class="reference internal" href="#class_cis_ascii_table_input"><span class="std std-ref">CisAsciiTableInput</span></a> class is a basic wrapper around the C cisAsciiTableInput_t structure and associated functions from the CisInterface.h header. It provides the user with C++ style access to basic ASCII table input operations. </p>
+<p>Inherits from <a class="reference internal" href="#class_cis_ascii_file_input"><span class="std std-ref">CisAsciiFileInput</span></a></p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Functions</p>
+<dl class="function">
+<dt id="_CPPv2N18CisAsciiTableInput18CisAsciiTableInputEPKc">
+<span id="CisAsciiTableInput::CisAsciiTableInput__cCP"></span><span class="target" id="class_cis_ascii_table_input_1ae87bf636c04e42a7ab745eb164c52b41"></span><code class="descname">CisAsciiTableInput</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N18CisAsciiTableInput18CisAsciiTableInputEPKc" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor for <a class="reference internal" href="#class_cis_ascii_table_input"><span class="std std-ref">CisAsciiTableInput</span></a>. Due to issues with the C++ version of vsscanf, flags and precision indicators for floating point format specifiers (e.g. e, f), must be removed so that table input can be properly parsed. </p>
+<p><dl class="docutils">
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">name</span></code>: constant character pointer to the name of an input channel. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="class">
+<dt id="_CPPv224CisAsciiTableInput_local">
+<span id="CisAsciiTableInput_local"></span><span class="target" id="class_cis_ascii_table_input__local"></span><em class="property">class </em><code class="descname">CisAsciiTableInput_local</code><a class="headerlink" href="#_CPPv224CisAsciiTableInput_local" title="Permalink to this definition">¶</a><br /></dt>
+<dd><em>#include &lt;CisInterface.hpp&gt;</em><p>C++ interface to cisAsciiTableInput_t functionality for local files. </p>
+<p>The <a class="reference internal" href="#class_cis_ascii_table_input"><span class="std std-ref">CisAsciiTableInput</span></a> class is a basic wrapper around the C cisAsciiTableInput_t structure and associated functions from the CisInterface.h header. It provides the user with C++ style access to basic ASCII table input operations. </p>
+<p>Inherits from <a class="reference internal" href="#class_cis_ascii_file_input"><span class="std std-ref">CisAsciiFileInput</span></a></p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Functions</p>
+<dl class="function">
+<dt id="_CPPv2N24CisAsciiTableInput_local24CisAsciiTableInput_localEPKc">
+<span id="CisAsciiTableInput_local::CisAsciiTableInput_local__cCP"></span><span class="target" id="class_cis_ascii_table_input__local_1a1f7f46702f688c571b4c86617ef5035d"></span><code class="descname">CisAsciiTableInput_local</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N24CisAsciiTableInput_local24CisAsciiTableInput_localEPKc" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor for <a class="reference internal" href="#class_cis_ascii_table_input__local"><span class="std std-ref">CisAsciiTableInput_local</span></a>. Due to issues with the C++ version of vsscanf, flags and precision indicators for floating point format specifiers (e.g. e, f), must be removed so that table input can be properly parsed. </p>
+<p><dl class="docutils">
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">name</span></code>: constant character pointer to path of local table. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="class">
+<dt id="_CPPv218CisAsciiArrayInput">
+<span id="CisAsciiArrayInput"></span><span class="target" id="class_cis_ascii_array_input"></span><em class="property">class </em><code class="descname">CisAsciiArrayInput</code><a class="headerlink" href="#_CPPv218CisAsciiArrayInput" title="Permalink to this definition">¶</a><br /></dt>
+<dd><em>#include &lt;CisInterface.hpp&gt;</em><p>C++ interface to cisAsciiTableInput_t functionality for arrays. </p>
+<p>The <a class="reference internal" href="#class_cis_ascii_array_input"><span class="std std-ref">CisAsciiArrayInput</span></a> class is a basic wrapper around the C cisAsciiTableInput_t structure and associated functions from the CisInterface.h header. It provides the user with C++ style access to basic ASCII table input operations. </p>
+<p>Inherits from <a class="reference internal" href="#class_cis_ascii_file_input"><span class="std std-ref">CisAsciiFileInput</span></a></p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Functions</p>
+<dl class="function">
+<dt id="_CPPv2N18CisAsciiArrayInput18CisAsciiArrayInputEPKc">
+<span id="CisAsciiArrayInput::CisAsciiArrayInput__cCP"></span><span class="target" id="class_cis_ascii_array_input_1a5b93411bc0df794c6f6a3189d2e02289"></span><code class="descname">CisAsciiArrayInput</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N18CisAsciiArrayInput18CisAsciiArrayInputEPKc" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor for <a class="reference internal" href="#class_cis_ascii_array_input"><span class="std std-ref">CisAsciiArrayInput</span></a>. Due to issues with the C++ version of vsscanf, flags and precision indicators for floating point format specifiers (e.g. e, f), must be removed so that table input can be properly parsed. </p>
+<p><dl class="docutils">
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">name</span></code>: constant character pointer to the name of an input channel. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="class">
+<dt id="_CPPv224CisAsciiArrayInput_local">
+<span id="CisAsciiArrayInput_local"></span><span class="target" id="class_cis_ascii_array_input__local"></span><em class="property">class </em><code class="descname">CisAsciiArrayInput_local</code><a class="headerlink" href="#_CPPv224CisAsciiArrayInput_local" title="Permalink to this definition">¶</a><br /></dt>
+<dd><em>#include &lt;CisInterface.hpp&gt;</em><p>C++ interface to cisAsciiTableInput_t functionality for local files as arrays. </p>
+<p>The <a class="reference internal" href="#class_cis_ascii_array_input"><span class="std std-ref">CisAsciiArrayInput</span></a> class is a basic wrapper around the C cisAsciiTableInput_t structure and associated functions from the CisInterface.h header. It provides the user with C++ style access to basic ASCII table input operations. </p>
+<p>Inherits from <a class="reference internal" href="#class_cis_ascii_file_input"><span class="std std-ref">CisAsciiFileInput</span></a></p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Functions</p>
+<dl class="function">
+<dt id="_CPPv2N24CisAsciiArrayInput_local24CisAsciiArrayInput_localEPKc">
+<span id="CisAsciiArrayInput_local::CisAsciiArrayInput_local__cCP"></span><span class="target" id="class_cis_ascii_array_input__local_1ab1a315749639f0edd562184bcdb34d42"></span><code class="descname">CisAsciiArrayInput_local</code><span class="sig-paren">(</span><em class="property">const</em> char *<em>name</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv2N24CisAsciiArrayInput_local24CisAsciiArrayInput_localEPKc" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor for <a class="reference internal" href="#class_cis_ascii_array_input__local"><span class="std std-ref">CisAsciiArrayInput_local</span></a>. Due to issues with the C++ version of vsscanf, flags and precision indicators for floating point format specifiers (e.g. e, f), must be removed so that table input can be properly parsed. </p>
+<p><dl class="docutils">
+<dt><strong>Parameters</strong></dt>
+<dd><ul class="breatheparameterlist first last simple">
+<li><code class="docutils literal"><span class="pre">name</span></code>: constant character pointer to path of local table. </li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="dataio_cpp.html" class="btn btn-neutral float-right" title="C++ DataIO API" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="code_cpp.html" class="btn btn-neutral" title="C++ Code" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Meagan Lang, David Raila.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.1.3',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          
+          SphinxRtdTheme.Navigation.enableSticky();
+          
+      });
+  </script> 
+
+</body>
+</html>

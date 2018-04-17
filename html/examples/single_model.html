@@ -1,0 +1,314 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Running a Single Model &mdash; cis_interface 0.1.3 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> cis_interface
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../includeme.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../formatted_io.html">Formatted I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../server_client_io.html">Server/Client I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../server_client_io.html#one-server-two-clients">One Server, Two Clients</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../yaml.html">YAML Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../config.html">Configuration Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../units.html">Units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../c_format_strings.html">C-Style Format Strings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../io_drivers.html">Input/Output Drivers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../model_drivers.html">Model Drivers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../code.html">Code</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples_toc.html">Examples</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">cis_interface</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+      <li>Running a Single Model</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/examples/single_model.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="running-a-single-model">
+<h1>Running a Single Model<a class="headerlink" href="#running-a-single-model" title="Permalink to this headline">¶</a></h1>
+<p>The model communications interface consists of 2 pairs of very simple
+functions - one pair to create channels and one pair to accomplish data
+tranfer. Each pair represents a read-side and a write-side.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="ow">in</span> <span class="o">=</span> <span class="n">CisInput</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>          <span class="c1"># create a named input channel</span>
+<span class="n">out</span> <span class="o">=</span> <span class="n">CisOutput</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>        <span class="c1"># create a named output channel</span>
+
+<span class="ow">in</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>                <span class="c1"># send a message through the managed channel</span>
+<span class="n">flag</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>  <span class="c1"># receive message from channel - block if empty channel</span>
+</pre></div>
+</div>
+<p>Python-style is shown, but as these interfaces are thin wrappers around
+System V IPC message queues, equivalent thin-wrappers are implemented
+easily in almost any language. Models may create and use as many
+channels as necessary, depending on the number of interfaces that they
+require.</p>
+<p>The only other model requirement is to provide a YAML specification file
+that declares the channels that the model uses, and the system command
+required to start the model executing.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">model</span><span class="p">:</span>
+  <span class="n">name</span><span class="p">:</span> <span class="n">hellopython</span>
+  <span class="n">driver</span><span class="p">:</span> <span class="n">PythonModelDriver</span>
+  <span class="n">args</span><span class="p">:</span> <span class="n">hellopython</span><span class="o">.</span><span class="n">py</span>
+
+  <span class="n">inputs</span><span class="p">:</span>
+  <span class="o">-</span> <span class="n">name</span><span class="p">:</span> <span class="n">inFile</span>
+    <span class="n">driver</span><span class="p">:</span> <span class="n">FileInputDriver</span>
+    <span class="n">args</span><span class="p">:</span> <span class="nb">input</span><span class="o">.</span><span class="n">txt</span>
+  <span class="o">-</span> <span class="n">name</span><span class="p">:</span> <span class="n">helloQueueIn</span>
+    <span class="n">driver</span><span class="p">:</span> <span class="n">RMQInputDriver</span>
+    <span class="n">args</span><span class="p">:</span> <span class="n">helloQueue</span>
+
+  <span class="n">outputs</span><span class="p">:</span>
+  <span class="o">-</span> <span class="n">name</span><span class="p">:</span> <span class="n">helloQueueOut</span>
+    <span class="n">driver</span><span class="p">:</span> <span class="n">RMQOutputDriver</span>
+    <span class="n">args</span><span class="p">:</span> <span class="n">helloQueue</span>
+  <span class="o">-</span> <span class="n">name</span><span class="p">:</span> <span class="n">outFile</span>
+    <span class="n">driver</span><span class="p">:</span> <span class="n">FileOutputDriver</span>
+    <span class="n">args</span><span class="p">:</span> <span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="n">output</span><span class="o">.</span><span class="n">txt</span>
+</pre></div>
+</div>
+<p>This example tells the system to run a Python model defined in the script
+&#8220;hellopython.py&#8221; and to connect the file inputdata/input.txt to the
+cis_input named &#8216;inFile&#8217; in your model, so when you recv() on it,
+you&#8217;ll get the file contents. Likewise when you send(data_to_send) to
+the channel you made in your code with cis_output(&#8216;outFile&#8217;) the data
+will go to the associated files.</p>
+<p>In additon to reading/writing to/from files on disk, models can send/recv
+messages to/from generic message queues that other models can connect to.
+In the example above, there is an output queue named &#8216;helloQueueOut&#8217;
+messages sent to the channel cis_output(&#8216;helloQueueOut&#8217;) can be received
+by any model with a corresponding input channel. In this example, the model
+accesses this queue through the channel cis_input(&#8216;helloQueueIn&#8217;). These
+two channels are connected because they share the same argument
+&#8216;helloQueue&#8217; in their YAML blocks.</p>
+<p>The final part is the model runner, cisrun - to which you pass your
+yml file. The model runner reads the specification, arranges for your
+inputs and outputs to come and go as you&#8217;ve specified, and then calls
+your model with the arguments as specified in the model stanza. The
+model runs, using the send and recv calls as needed, and when the model
+exits, the communications get cleaned up by the runner. The examaple
+hellopython.py under examples is run like this (in examples/python):</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">cisrun</span> <span class="n">hellopython</span><span class="o">.</span><span class="n">yml</span>
+</pre></div>
+</div>
+<p>The code in hellopython.py uses the channels to read data from
+the file input.txt, sends the data to the output queue, receives
+it from the input queue, and then sends it to the output file
+/tmp/output.txt:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">inf</span> <span class="o">=</span> <span class="n">CisInput</span><span class="p">(</span><span class="s1">&#39;inFile&#39;</span><span class="p">)</span>
+<span class="n">outf</span> <span class="o">=</span> <span class="n">CisOutput</span><span class="p">(</span><span class="s1">&#39;outFile&#39;</span><span class="p">)</span>
+<span class="n">inq</span> <span class="o">=</span> <span class="n">CisInput</span><span class="p">(</span><span class="s1">&#39;helloQueueIn&#39;</span><span class="p">)</span>
+<span class="n">outq</span> <span class="o">=</span> <span class="n">CisOutput</span><span class="p">(</span><span class="s1">&#39;helloQueueOut&#39;</span><span class="p">)</span>
+
+<span class="n">buf</span> <span class="o">=</span> <span class="n">inf</span><span class="o">.</span><span class="n">recv</span><span class="p">()</span>
+<span class="n">outq</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">buf</span><span class="p">)</span>
+<span class="n">buf</span> <span class="o">=</span> <span class="n">inq</span><span class="o">.</span><span class="n">recv</span><span class="p">()</span>
+<span class="n">outf</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">buf</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This example is very simple and only shows how to run a single model
+which could be accomplished by just handling input/output within the
+script. The real advantage to using the CiS framework comes when you
+need two models in different languages to communicate.</p>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Meagan Lang, David Raila.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../',
+            VERSION:'0.1.3',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../_static/jquery.js"></script>
+      <script type="text/javascript" src="../_static/underscore.js"></script>
+      <script type="text/javascript" src="../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          
+          SphinxRtdTheme.Navigation.enableSticky();
+          
+      });
+  </script> 
+
+</body>
+</html>

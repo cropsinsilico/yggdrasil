@@ -1,0 +1,364 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Code &mdash; cis_interface 0.1.3 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Python Code" href="code_python.html" />
+    <link rel="prev" title="Model Drivers" href="model_drivers.html" /> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> cis_interface
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="includeme.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="formatted_io.html">Formatted I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="server_client_io.html">Server/Client I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="server_client_io.html#one-server-two-clients">One Server, Two Clients</a></li>
+<li class="toctree-l1"><a class="reference internal" href="yaml.html">YAML Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="config.html">Configuration Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="units.html">Units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="c_format_strings.html">C-Style Format Strings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="io_drivers.html">Input/Output Drivers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="model_drivers.html">Model Drivers</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Code</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="code_python.html">Python Code</a></li>
+<li class="toctree-l2"><a class="reference internal" href="code_c.html">C Code</a></li>
+<li class="toctree-l2"><a class="reference internal" href="code_cpp.html">C++ Code</a></li>
+<li class="toctree-l2"><a class="reference internal" href="code_matlab.html">Matlab Code</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="examples/examples_toc.html">Examples</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">cis_interface</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Code</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/code.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="code">
+<h1>Code<a class="headerlink" href="#code" title="Permalink to this headline">¶</a></h1>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="code_python.html">Python Code</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="code_python.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="cis_interface.interface.html">cis_interface.interface package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="cis_interface.interface.html#subpackages">Subpackages</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cis_interface.interface.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cis_interface.interface.html#module-cis_interface.interface.CisInterface">cis_interface.interface.CisInterface module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cis_interface.interface.html#module-cis_interface.interface.PsiInterface">cis_interface.interface.PsiInterface module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cis_interface.interface.html#module-cis_interface.interface">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="cis_interface.dataio.html">cis_interface.dataio package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="cis_interface.dataio.html#subpackages">Subpackages</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cis_interface.dataio.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cis_interface.dataio.html#module-cis_interface.dataio.AsciiFile">cis_interface.dataio.AsciiFile module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cis_interface.dataio.html#module-cis_interface.dataio.AsciiTable">cis_interface.dataio.AsciiTable module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cis_interface.dataio.html#module-cis_interface.dataio">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="cis_interface.drivers.html">cis_interface.drivers package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="cis_interface.drivers.html#subpackages">Subpackages</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cis_interface.drivers.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cis_interface.drivers.html#module-cis_interface.drivers.AsciiFileInputDriver">cis_interface.drivers.AsciiFileInputDriver module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cis_interface.drivers.html#module-cis_interface.drivers.AsciiFileOutputDriver">cis_interface.drivers.AsciiFileOutputDriver module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cis_interface.drivers.html#module-cis_interface.drivers.AsciiTableInputDriver">cis_interface.drivers.AsciiTableInputDriver module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cis_interface.drivers.html#module-cis_interface.drivers.AsciiTableOutputDriver">cis_interface.drivers.AsciiTableOutputDriver module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cis_interface.drivers.html#module-cis_interface.drivers.CMakeModelDriver">cis_interface.drivers.CMakeModelDriver module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cis_interface.drivers.html#module-cis_interface.drivers.ClientDriver">cis_interface.drivers.ClientDriver module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cis_interface.drivers.html#module-cis_interface.drivers.ClientRequestDriver">cis_interface.drivers.ClientRequestDriver module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cis_interface.drivers.html#module-cis_interface.drivers.ClientResponseDriver">cis_interface.drivers.ClientResponseDriver module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cis_interface.drivers.html#module-cis_interface.drivers.CommDriver">cis_interface.drivers.CommDriver module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cis_interface.drivers.html#module-cis_interface.drivers.ConnectionDriver">cis_interface.drivers.ConnectionDriver module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cis_interface.drivers.html#module-cis_interface.drivers.Driver">cis_interface.drivers.Driver module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cis_interface.drivers.html#module-cis_interface.drivers.FileInputDriver">cis_interface.drivers.FileInputDriver module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cis_interface.drivers.html#module-cis_interface.drivers.FileOutputDriver">cis_interface.drivers.FileOutputDriver module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cis_interface.drivers.html#module-cis_interface.drivers.GCCModelDriver">cis_interface.drivers.GCCModelDriver module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cis_interface.drivers.html#module-cis_interface.drivers.IODriver">cis_interface.drivers.IODriver module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cis_interface.drivers.html#module-cis_interface.drivers.IPCCommDriver">cis_interface.drivers.IPCCommDriver module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cis_interface.drivers.html#module-cis_interface.drivers.InputCommDriver">cis_interface.drivers.InputCommDriver module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cis_interface.drivers.html#module-cis_interface.drivers.InputDriver">cis_interface.drivers.InputDriver module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cis_interface.drivers.html#module-cis_interface.drivers.MakeModelDriver">cis_interface.drivers.MakeModelDriver module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cis_interface.drivers.html#module-cis_interface.drivers.MatInputDriver">cis_interface.drivers.MatInputDriver module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cis_interface.drivers.html#module-cis_interface.drivers.MatOutputDriver">cis_interface.drivers.MatOutputDriver module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cis_interface.drivers.html#module-cis_interface.drivers.MatlabModelDriver">cis_interface.drivers.MatlabModelDriver module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cis_interface.drivers.html#module-cis_interface.drivers.ModelDriver">cis_interface.drivers.ModelDriver module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cis_interface.drivers.html#module-cis_interface.drivers.OutputCommDriver">cis_interface.drivers.OutputCommDriver module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cis_interface.drivers.html#module-cis_interface.drivers.OutputDriver">cis_interface.drivers.OutputDriver module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cis_interface.drivers.html#module-cis_interface.drivers.PandasFileInputDriver">cis_interface.drivers.PandasFileInputDriver module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cis_interface.drivers.html#module-cis_interface.drivers.PandasFileOutputDriver">cis_interface.drivers.PandasFileOutputDriver module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cis_interface.drivers.html#module-cis_interface.drivers.PickleFileInputDriver">cis_interface.drivers.PickleFileInputDriver module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cis_interface.drivers.html#module-cis_interface.drivers.PickleFileOutputDriver">cis_interface.drivers.PickleFileOutputDriver module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cis_interface.drivers.html#module-cis_interface.drivers.PythonModelDriver">cis_interface.drivers.PythonModelDriver module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cis_interface.drivers.html#module-cis_interface.drivers.RMQAsyncClientDriver">cis_interface.drivers.RMQAsyncClientDriver module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cis_interface.drivers.html#module-cis_interface.drivers.RMQAsyncCommDriver">cis_interface.drivers.RMQAsyncCommDriver module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cis_interface.drivers.html#module-cis_interface.drivers.RMQAsyncServerDriver">cis_interface.drivers.RMQAsyncServerDriver module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cis_interface.drivers.html#module-cis_interface.drivers.RMQClientDriver">cis_interface.drivers.RMQClientDriver module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cis_interface.drivers.html#module-cis_interface.drivers.RMQCommDriver">cis_interface.drivers.RMQCommDriver module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cis_interface.drivers.html#module-cis_interface.drivers.RMQInputDriver">cis_interface.drivers.RMQInputDriver module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cis_interface.drivers.html#module-cis_interface.drivers.RMQOutputDriver">cis_interface.drivers.RMQOutputDriver module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cis_interface.drivers.html#module-cis_interface.drivers.RMQServerDriver">cis_interface.drivers.RMQServerDriver module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cis_interface.drivers.html#module-cis_interface.drivers.RPCCommDriver">cis_interface.drivers.RPCCommDriver module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cis_interface.drivers.html#module-cis_interface.drivers.RPCDriver">cis_interface.drivers.RPCDriver module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cis_interface.drivers.html#module-cis_interface.drivers.ServerDriver">cis_interface.drivers.ServerDriver module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cis_interface.drivers.html#module-cis_interface.drivers.ServerRequestDriver">cis_interface.drivers.ServerRequestDriver module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cis_interface.drivers.html#module-cis_interface.drivers.ServerResponseDriver">cis_interface.drivers.ServerResponseDriver module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cis_interface.drivers.html#module-cis_interface.drivers.ZMQCommDriver">cis_interface.drivers.ZMQCommDriver module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cis_interface.drivers.html#module-contents">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="cis_interface.examples.html">cis_interface.examples package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="cis_interface.examples.html#subpackages">Subpackages</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cis_interface.examples.html#module-cis_interface.examples">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="code_python.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="code_python.html#module-cis_interface.backwards">cis_interface.backwards module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="code_python.html#module-cis_interface.command_line">cis_interface.command_line module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="code_python.html#module-cis_interface.config">cis_interface.config module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="code_python.html#module-cis_interface.platform">cis_interface.platform module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="code_python.html#module-cis_interface.runner">cis_interface.runner module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="code_python.html#module-cis_interface.scanf">cis_interface.scanf module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="code_python.html#module-cis_interface.tools">cis_interface.tools module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="code_python.html#module-cis_interface.units">cis_interface.units module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="code_python.html#module-cis_interface.yamlfile">cis_interface.yamlfile module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="code_python.html#module-cis_interface">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="code_c.html">C Code</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="code_c.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="interface_c.html">C Interface</a></li>
+<li class="toctree-l3"><a class="reference internal" href="dataio_c.html">C DataIO API</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="code_cpp.html">C++ Code</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="code_cpp.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="interface_cpp.html">C++ Interface</a></li>
+<li class="toctree-l3"><a class="reference internal" href="dataio_cpp.html">C++ DataIO API</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="code_matlab.html">Matlab Code</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="code_matlab.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="interface_m.html">Matlab Interface</a></li>
+<li class="toctree-l3"><a class="reference internal" href="dataio_m.html">Matlab DataIO API</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="code_python.html" class="btn btn-neutral float-right" title="Python Code" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="model_drivers.html" class="btn btn-neutral" title="Model Drivers" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Meagan Lang, David Raila.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.1.3',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          
+          SphinxRtdTheme.Navigation.enableSticky();
+          
+      });
+  </script> 
+
+</body>
+</html>

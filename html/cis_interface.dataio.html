@@ -1,0 +1,868 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>cis_interface.dataio package &mdash; cis_interface 0.1.3 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="cis_interface.drivers package" href="cis_interface.drivers.html" />
+    <link rel="prev" title="cis_interface.interface package" href="cis_interface.interface.html" /> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> cis_interface
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="includeme.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="formatted_io.html">Formatted I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="server_client_io.html">Server/Client I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="server_client_io.html#one-server-two-clients">One Server, Two Clients</a></li>
+<li class="toctree-l1"><a class="reference internal" href="yaml.html">YAML Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="config.html">Configuration Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="units.html">Units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="c_format_strings.html">C-Style Format Strings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="io_drivers.html">Input/Output Drivers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="model_drivers.html">Model Drivers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="code.html">Code</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/examples_toc.html">Examples</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">cis_interface</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="code.html">Code</a> &raquo;</li>
+        
+          <li><a href="code_python.html">Python Code</a> &raquo;</li>
+        
+      <li>cis_interface.dataio package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/cis_interface.dataio.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="cis-interface-dataio-package">
+<h1>cis_interface.dataio package<a class="headerlink" href="#cis-interface-dataio-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+</div>
+</div>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-cis_interface.dataio.AsciiFile">
+<span id="cis-interface-dataio-asciifile-module"></span><h2>cis_interface.dataio.AsciiFile module<a class="headerlink" href="#module-cis_interface.dataio.AsciiFile" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="cis_interface.dataio.AsciiFile.AsciiFile">
+<em class="property">class </em><code class="descclassname">cis_interface.dataio.AsciiFile.</code><code class="descname">AsciiFile</code><span class="sig-paren">(</span><em>filepath</em>, <em>io_mode</em>, <em>comment='#'</em>, <em>newline='n'</em>, <em>open_as_binary=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/dataio/AsciiFile.html#AsciiFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.dataio.AsciiFile.AsciiFile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+<dl class="method">
+<dt id="cis_interface.dataio.AsciiFile.AsciiFile.close">
+<code class="descname">close</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/dataio/AsciiFile.html#AsciiFile.close"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.dataio.AsciiFile.AsciiFile.close" title="Permalink to this definition">¶</a></dt>
+<dd><p>Close the associated file descriptor if it is open.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.dataio.AsciiFile.AsciiFile.is_open">
+<code class="descname">is_open</code><a class="headerlink" href="#cis_interface.dataio.AsciiFile.AsciiFile.is_open" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>bool</em> &#8211; Returns True if the file descriptor is open.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.dataio.AsciiFile.AsciiFile.open">
+<code class="descname">open</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/dataio/AsciiFile.html#AsciiFile.open"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.dataio.AsciiFile.AsciiFile.open" title="Permalink to this definition">¶</a></dt>
+<dd><p>Open the associated file descriptor if it is not already open.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.dataio.AsciiFile.AsciiFile.open_mode">
+<code class="descname">open_mode</code><a class="headerlink" href="#cis_interface.dataio.AsciiFile.AsciiFile.open_mode" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str</em> &#8211; Mode that should be used to open the file.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.dataio.AsciiFile.AsciiFile.readline">
+<code class="descname">readline</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/dataio/AsciiFile.html#AsciiFile.readline"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.dataio.AsciiFile.AsciiFile.readline" title="Permalink to this definition">¶</a></dt>
+<dd><p>Continue reading lines until a valid line (uncommented) is
+encountered</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><dl class="docutils">
+<dt>End of file flag and the line that was read</dt>
+<dd>(None if the end of file was encountered).</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.6)">tuple</a> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)">bool</a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)">str</a>)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.dataio.AsciiFile.AsciiFile.readline_full">
+<code class="descname">readline_full</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/dataio/AsciiFile.html#AsciiFile.readline_full"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.dataio.AsciiFile.AsciiFile.readline_full" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read a line and return it if it is not a comment.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><dl class="docutils">
+<dt>End of file flag and the line that was read (an</dt>
+<dd>empty string if the end of file was encountered). If the line is
+a comment, None is returned.</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.6)">tuple</a> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)">bool</a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)">str</a>)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.dataio.AsciiFile.AsciiFile.writeline">
+<code class="descname">writeline</code><span class="sig-paren">(</span><em>line</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/dataio/AsciiFile.html#AsciiFile.writeline"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.dataio.AsciiFile.AsciiFile.writeline" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write a line to the file, adding a newline character if it is not
+present.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>line</strong> (<em>str/bytes</em>) &#8211; Line to be written with/without the newline
+character.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#TypeError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal"><span class="pre">TypeError</span></code></a> &#8211; If line is not the correct bytes type.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.dataio.AsciiFile.AsciiFile.writeline_full">
+<code class="descname">writeline_full</code><span class="sig-paren">(</span><em>line</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/dataio/AsciiFile.html#AsciiFile.writeline_full"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.dataio.AsciiFile.AsciiFile.writeline_full" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write a line to the file in its present state. If it is not open,
+nothing happens.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>line</strong> (<em>str/bytes</em>) &#8211; Line to be written.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#TypeError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal"><span class="pre">TypeError</span></code></a> &#8211; If line is not the correct bytes type.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-cis_interface.dataio.AsciiTable">
+<span id="cis-interface-dataio-asciitable-module"></span><h2>cis_interface.dataio.AsciiTable module<a class="headerlink" href="#module-cis_interface.dataio.AsciiTable" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="cis_interface.dataio.AsciiTable.AsciiTable">
+<em class="property">class </em><code class="descclassname">cis_interface.dataio.AsciiTable.</code><code class="descname">AsciiTable</code><span class="sig-paren">(</span><em>filepath</em>, <em>io_mode</em>, <em>format_str=None</em>, <em>dtype=None</em>, <em>column_names=None</em>, <em>use_astropy=False</em>, <em>column='t'</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/dataio/AsciiTable.html#AsciiTable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.dataio.AsciiTable.AsciiTable" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.dataio.AsciiFile.AsciiFile" title="cis_interface.dataio.AsciiFile.AsciiFile"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.dataio.AsciiFile.AsciiFile</span></code></a></p>
+<dl class="attribute">
+<dt id="cis_interface.dataio.AsciiTable.AsciiTable.arr">
+<code class="descname">arr</code><a class="headerlink" href="#cis_interface.dataio.AsciiTable.AsciiTable.arr" title="Permalink to this definition">¶</a></dt>
+<dd><p>Numpy array of table contents if opened in read mode.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.dataio.AsciiTable.AsciiTable.array_to_bytes">
+<code class="descname">array_to_bytes</code><span class="sig-paren">(</span><em>arr=None</em>, <em>order='C'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/dataio/AsciiTable.html#AsciiTable.array_to_bytes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.dataio.AsciiTable.AsciiTable.array_to_bytes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert arr to bytestring.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>arr</strong> (<em>np.ndarray</em><em>, </em><em>optional</em>) &#8211; Array to write to bytestring. If None
+the array of table data is used. This can also be a list of
+arrays, one for each field in the table, or a list of lists,
+one for each element containing the fields for that element.</li>
+<li><strong>order</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) &#8211; Order that array should be written to the
+bytestring. Defaults to &#8216;C&#8217;.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Bytestring.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)">str</a></p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
+<li><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#TypeError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal"><span class="pre">TypeError</span></code></a> &#8211; If the provided array is not a numpy array, list, or tuple.</li>
+<li><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal"><span class="pre">ValueError</span></code></a> &#8211; If the array is not the correct type.</li>
+<li><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal"><span class="pre">ValueError</span></code></a> &#8211; If there are not enough arrays in the input list.</li>
+<li><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal"><span class="pre">ValueError</span></code></a> &#8211; If any of the listed arrays doesn&#8217;t have enough fields.</li>
+<li><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal"><span class="pre">ValueError</span></code></a> &#8211; If any of the listed arrays doesn&#8217;t have enough elements.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.dataio.AsciiTable.AsciiTable.bytes_to_array">
+<code class="descname">bytes_to_array</code><span class="sig-paren">(</span><em>data</em>, <em>order='C'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/dataio/AsciiTable.html#AsciiTable.bytes_to_array"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.dataio.AsciiTable.AsciiTable.bytes_to_array" title="Permalink to this definition">¶</a></dt>
+<dd><p>Process bytes according to the table format and return it as an
+array.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>data</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.6)"><em>bytes</em></a>) &#8211; Byte string of table data.</li>
+<li><strong>order</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) &#8211; Order of data for reshaping. Defaults to
+&#8216;C&#8217;.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Numpy array containing data from bytes.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">np.ndarray</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.dataio.AsciiTable.AsciiTable.discover_format_str">
+<code class="descname">discover_format_str</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/dataio/AsciiTable.html#AsciiTable.discover_format_str"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.dataio.AsciiTable.AsciiTable.discover_format_str" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determine the format string by reading it from the file. The format
+string is assumed to start with a comment and contain C-style format
+codes (e.g. &#8216;%f&#8217;).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#RuntimeError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal"><span class="pre">RuntimeError</span></code></a> &#8211; If a format string cannot be located within the file.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.dataio.AsciiTable.AsciiTable.dtype">
+<code class="descname">dtype</code><a class="headerlink" href="#cis_interface.dataio.AsciiTable.AsciiTable.dtype" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.dataio.AsciiTable.AsciiTable.fmts">
+<code class="descname">fmts</code><a class="headerlink" href="#cis_interface.dataio.AsciiTable.AsciiTable.fmts" title="Permalink to this definition">¶</a></dt>
+<dd><p>List of formats in format string.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.dataio.AsciiTable.AsciiTable.format_line">
+<code class="descname">format_line</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/dataio/AsciiTable.html#AsciiTable.format_line"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.dataio.AsciiTable.AsciiTable.format_line" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a line from the provided arguments using the table format.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>*args</strong> &#8211; Arguments to create line from.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The line created from the arguments.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)">str</a></td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#RuntimeError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal"><span class="pre">RuntimeError</span></code></a> &#8211; If the incorrect number of arguments are passed.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.dataio.AsciiTable.AsciiTable.format_str">
+<code class="descname">format_str</code><a class="headerlink" href="#cis_interface.dataio.AsciiTable.AsciiTable.format_str" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.dataio.AsciiTable.AsciiTable.ncols">
+<code class="descname">ncols</code><a class="headerlink" href="#cis_interface.dataio.AsciiTable.AsciiTable.ncols" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.dataio.AsciiTable.AsciiTable.process_line">
+<code class="descname">process_line</code><span class="sig-paren">(</span><em>line</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/dataio/AsciiTable.html#AsciiTable.process_line"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.dataio.AsciiTable.AsciiTable.process_line" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extract values from the columns in the line using the table format.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>line</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; String to extract arguments from.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The arguments extracted from line.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.6)">tuple</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.dataio.AsciiTable.AsciiTable.read_array">
+<code class="descname">read_array</code><span class="sig-paren">(</span><em>names=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/dataio/AsciiTable.html#AsciiTable.read_array"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.dataio.AsciiTable.AsciiTable.read_array" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read the table in as an array.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>names</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>, </em><em>optional</em>) &#8211; List of column names to label columns. If
+not provided, existing names are used if they exist. Defaults
+to None.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Array of table contents.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">np.ndarray</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal"><span class="pre">ValueError</span></code></a> &#8211; If names are provided, but not the same number as
+there are columns.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.dataio.AsciiTable.AsciiTable.read_bytes">
+<code class="descname">read_bytes</code><span class="sig-paren">(</span><em>order='C'</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/dataio/AsciiTable.html#AsciiTable.read_bytes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.dataio.AsciiTable.AsciiTable.read_bytes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read the table in as array and encode as bytes.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>order</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) &#8211; Order that array should be written to the
+bytestring. Defaults to &#8216;C&#8217;.</li>
+<li><strong>**kwargs</strong> &#8211; Additional keyword arguments are passed to read_array.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Array as bytes.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.6)">bytes</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.dataio.AsciiTable.AsciiTable.readline">
+<code class="descname">readline</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/dataio/AsciiTable.html#AsciiTable.readline"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.dataio.AsciiTable.AsciiTable.readline" title="Permalink to this definition">¶</a></dt>
+<dd><p>Continue reading lines until a valid line (uncommented) is
+encountered and return the arguments found there.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><dl class="docutils">
+<dt>End of file flag and the arguments that</dt>
+<dd>were read from the line. If the end of file is reached,
+None is returned.</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.6)">tuple</a> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)">bool</a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.6)">tuple</a>)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.dataio.AsciiTable.AsciiTable.readline_full">
+<code class="descname">readline_full</code><span class="sig-paren">(</span><em>validate=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/dataio/AsciiTable.html#AsciiTable.readline_full"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.dataio.AsciiTable.AsciiTable.readline_full" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read a line and return it if it is not a comment.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>validate</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) &#8211; If True, the line is checked to see if
+it matches the expected table format. Defaults to False.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="docutils">
+<dt>End of file flag and the line that was read (an</dt>
+<dd>empty string if the end of file was encountered). If the line is
+a comment, None is returned.</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.6)">tuple</a> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)">bool</a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)">str</a>)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.dataio.AsciiTable.AsciiTable.update_dtype">
+<code class="descname">update_dtype</code><span class="sig-paren">(</span><em>new_dtype</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/dataio/AsciiTable.html#AsciiTable.update_dtype"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.dataio.AsciiTable.AsciiTable.update_dtype" title="Permalink to this definition">¶</a></dt>
+<dd><p>Change the data type and update the format string.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>new_dtype</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em> or </em><em>np.dtype</em>) &#8211; New numpy data type.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.dataio.AsciiTable.AsciiTable.update_format_str">
+<code class="descname">update_format_str</code><span class="sig-paren">(</span><em>new_format_str</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/dataio/AsciiTable.html#AsciiTable.update_format_str"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.dataio.AsciiTable.AsciiTable.update_format_str" title="Permalink to this definition">¶</a></dt>
+<dd><p>Change the format string and update the data type.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>new_format_str</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; New format string.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.dataio.AsciiTable.AsciiTable.validate_line">
+<code class="descname">validate_line</code><span class="sig-paren">(</span><em>line</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/dataio/AsciiTable.html#AsciiTable.validate_line"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.dataio.AsciiTable.AsciiTable.validate_line" title="Permalink to this definition">¶</a></dt>
+<dd><p>Assert that the line matches the format string and produces the
+expected number of values.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
+<li><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#TypeError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal"><span class="pre">TypeError</span></code></a> &#8211; If the line is not a bytes/str.</li>
+<li><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#AssertionError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal"><span class="pre">AssertionError</span></code></a> &#8211; If the line does not match the format string.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.dataio.AsciiTable.AsciiTable.write_array">
+<code class="descname">write_array</code><span class="sig-paren">(</span><em>array</em>, <em>names=None</em>, <em>skip_header=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/dataio/AsciiTable.html#AsciiTable.write_array"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.dataio.AsciiTable.AsciiTable.write_array" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write a numpy array to the table.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>array</strong> (<em>np.ndarray</em>) &#8211; Array to be written.</li>
+<li><strong>names</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>, </em><em>optional</em>) &#8211; List of column names to write out. If
+not provided, existing names are used if they exist. Defaults
+to None.</li>
+<li><strong>skip_header</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) &#8211; If True, no header information is
+written (it is assumed it was already written. Defaults to
+False.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal"><span class="pre">ValueError</span></code></a> &#8211; If names are provided, but not the same number as
+there are columns.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.dataio.AsciiTable.AsciiTable.write_bytes">
+<code class="descname">write_bytes</code><span class="sig-paren">(</span><em>data</em>, <em>order='C'</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/dataio/AsciiTable.html#AsciiTable.write_bytes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.dataio.AsciiTable.AsciiTable.write_bytes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write a numpy array to the table.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>data</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.6)"><em>bytes</em></a>) &#8211; Bytes string to be interpreted as array and
+written to file.</li>
+<li><strong>order</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) &#8211; Order of data for reshaping. Defaults to
+&#8216;C&#8217;.</li>
+<li><strong>**kwargs</strong> &#8211; Additional keyword arguments are passed to write_array.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.dataio.AsciiTable.AsciiTable.writeformat">
+<code class="descname">writeformat</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/dataio/AsciiTable.html#AsciiTable.writeformat"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.dataio.AsciiTable.AsciiTable.writeformat" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write the format string to the file.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.dataio.AsciiTable.AsciiTable.writeheader">
+<code class="descname">writeheader</code><span class="sig-paren">(</span><em>names=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/dataio/AsciiTable.html#AsciiTable.writeheader"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.dataio.AsciiTable.AsciiTable.writeheader" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write header including column names and format.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>names</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>, </em><em>optional</em>) &#8211; List of names of columns. Defaults to
+None and the ones provided at construction are used if they
+exist. Otherwise, no names are written.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.dataio.AsciiTable.AsciiTable.writeline">
+<code class="descname">writeline</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/dataio/AsciiTable.html#AsciiTable.writeline"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.dataio.AsciiTable.AsciiTable.writeline" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write arguments to a file in the table format.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>*args</strong> &#8211; Any number of arguments that should be written to the file.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.dataio.AsciiTable.AsciiTable.writeline_full">
+<code class="descname">writeline_full</code><span class="sig-paren">(</span><em>line</em>, <em>validate=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/dataio/AsciiTable.html#AsciiTable.writeline_full"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.dataio.AsciiTable.AsciiTable.writeline_full" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write a line to the file in its present state.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>line</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; Line to be written.</li>
+<li><strong>validate</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) &#8211; If True, the line is checked to see if
+it matches the expected table format. Defaults to False.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.dataio.AsciiTable.AsciiTable.writenames">
+<code class="descname">writenames</code><span class="sig-paren">(</span><em>names=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/dataio/AsciiTable.html#AsciiTable.writenames"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.dataio.AsciiTable.AsciiTable.writenames" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write column names to file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>names</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>, </em><em>optional</em>) &#8211; List of names of columns. Defaults to
+None and the ones provided at construction are used if they
+exist. Otherwise, no names are written.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#IndexError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal"><span class="pre">IndexError</span></code></a> &#8211; If there are not enough names for all of the columns.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.dataio.AsciiTable.cformat2nptype">
+<code class="descclassname">cis_interface.dataio.AsciiTable.</code><code class="descname">cformat2nptype</code><span class="sig-paren">(</span><em>cfmt</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/dataio/AsciiTable.html#cformat2nptype"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.dataio.AsciiTable.cformat2nptype" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert a c format string to a numpy data type.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>cfmt</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; c format that should be translated.</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Corresponding numpy data type.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)">str</a></p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
+<li><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#TypeError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal"><span class="pre">TypeError</span></code></a> &#8211; if cfmt is not a string.</li>
+<li><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal"><span class="pre">ValueError</span></code></a> &#8211; If the c format does not begin with &#8216;%&#8217;.</li>
+<li><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal"><span class="pre">ValueError</span></code></a> &#8211; If the c format does not contain type info.</li>
+<li><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal"><span class="pre">ValueError</span></code></a> &#8211; If the c format cannot be translated to a numpy datatype.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.dataio.AsciiTable.cformat2pyscanf">
+<code class="descclassname">cis_interface.dataio.AsciiTable.</code><code class="descname">cformat2pyscanf</code><span class="sig-paren">(</span><em>cfmt</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/dataio/AsciiTable.html#cformat2pyscanf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.dataio.AsciiTable.cformat2pyscanf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert a c format specification string to a version that the
+python scanf module can use.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>cfmt</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; C format specification string.</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Version of cfmt that can be parsed by scanf.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)">str</a></p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
+<li><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#TypeError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal"><span class="pre">TypeError</span></code></a> &#8211; if cfmt is not a bytes/str.</li>
+<li><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal"><span class="pre">ValueError</span></code></a> &#8211; If the c format does not begin with &#8216;%&#8217;.</li>
+<li><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal"><span class="pre">ValueError</span></code></a> &#8211; If the c format does not contain type info.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.dataio.AsciiTable.nptype2cformat">
+<code class="descclassname">cis_interface.dataio.AsciiTable.</code><code class="descname">nptype2cformat</code><span class="sig-paren">(</span><em>nptype</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/dataio/AsciiTable.html#nptype2cformat"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.dataio.AsciiTable.nptype2cformat" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert a numpy data type to a c format string.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>nptype</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em> or </em><em>numpy.dtype</em>) &#8211; Numpy data type that should be converted.</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Corresponding c format specification string.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)">str</a></p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
+<li><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#TypeError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal"><span class="pre">TypeError</span></code></a> &#8211; If nptype is not a string or numpy.dtype.</li>
+<li><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal"><span class="pre">ValueError</span></code></a> &#8211; If a matching format string cannot be determined.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="module-cis_interface.dataio">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-cis_interface.dataio" title="Permalink to this headline">¶</a></h2>
+<p>Routines for standardized I/O.</p>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="cis_interface.drivers.html" class="btn btn-neutral float-right" title="cis_interface.drivers package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="cis_interface.interface.html" class="btn btn-neutral" title="cis_interface.interface package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Meagan Lang, David Raila.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.1.3',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          
+          SphinxRtdTheme.Navigation.enableSticky();
+          
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,605 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Model Drivers &mdash; cis_interface 0.1.3 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Code" href="code.html" />
+    <link rel="prev" title="Input/Output Drivers" href="io_drivers.html" /> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> cis_interface
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="includeme.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="formatted_io.html">Formatted I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="server_client_io.html">Server/Client I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="server_client_io.html#one-server-two-clients">One Server, Two Clients</a></li>
+<li class="toctree-l1"><a class="reference internal" href="yaml.html">YAML Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="config.html">Configuration Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="units.html">Units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="c_format_strings.html">C-Style Format Strings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="io_drivers.html">Input/Output Drivers</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Model Drivers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="code.html">Code</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/examples_toc.html">Examples</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">cis_interface</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Model Drivers</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/model_drivers.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="model-drivers">
+<span id="model-drivers-rst"></span><h1>Model Drivers<a class="headerlink" href="#model-drivers" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="cis_interface.drivers.ModelDriver.ModelDriver">
+<em class="property">class </em><code class="descclassname">cis_interface.drivers.ModelDriver.</code><code class="descname">ModelDriver</code><span class="sig-paren">(</span><em>name</em>, <em>args</em>, <em>is_server=False</em>, <em>client_of=[]</em>, <em>with_strace=False</em>, <em>strace_flags=None</em>, <em>with_valgrind=False</em>, <em>valgrind_flags=None</em>, <em>model_index=0</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/ModelDriver.html#ModelDriver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.ModelDriver.ModelDriver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Base class for Model drivers and for running executable based models.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; Driver name.</li>
+<li><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a>) &#8211; Argument(s) for running the model on the command
+line. This should be a complete command including the necessary
+executable and command line arguments to that executable.</li>
+<li><strong>is_server</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) &#8211; If True, the model is assumed to be a server
+and an instance of <a class="reference internal" href="cis_interface.drivers.html#module-cis_interface.drivers.ServerDriver" title="cis_interface.drivers.ServerDriver"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.drivers.ServerDriver</span></code></a>
+is started. Defaults to False.</li>
+<li><strong>client_of</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>, </em><em>optional</em>) &#8211; The names of ne or more servers that
+this model is a client of. Defaults to empty list.</li>
+<li><strong>with_strace</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) &#8211; If True, the command is run with strace (on
+Linux) or dtrace (on OSX). Defaults to False.</li>
+<li><strong>strace_flags</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>, </em><em>optional</em>) &#8211; Flags to pass to strace (or dtrace).
+Defaults to [].</li>
+<li><strong>with_valgrind</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) &#8211; If True, the command is run with valgrind.
+Defaults to False.</li>
+<li><strong>valgrind_flags</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>, </em><em>optional</em>) &#8211; Flags to pass to valgrind. Defaults to [].</li>
+<li><strong>model_index</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>, </em><em>optional</em>) &#8211; Index of model in list of models being run.
+Defaults to 0.</li>
+<li><strong>**kwargs</strong> &#8211; Additional keyword arguments are passed to parent class.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="ModelDriver.args">
+<code class="descname">args</code><a class="headerlink" href="#ModelDriver.args" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>list</em> &#8211; Argument(s) for running the model on the command line.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="ModelDriver.process">
+<code class="descname">process</code><a class="headerlink" href="#ModelDriver.process" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="code_python.html#cis_interface.tools.CisPopen" title="cis_interface.tools.CisPopen"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.tools.CisPopen</span></code></a> &#8211; Process used to run
+the model.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="ModelDriver.is_server">
+<code class="descname">is_server</code><a class="headerlink" href="#ModelDriver.is_server" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>bool</em> &#8211; If True, the model is assumed to be a server and an
+instance of <a class="reference internal" href="cis_interface.drivers.html#module-cis_interface.drivers.ServerDriver" title="cis_interface.drivers.ServerDriver"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.drivers.ServerDriver</span></code></a> is
+started.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="ModelDriver.client_of">
+<code class="descname">client_of</code><a class="headerlink" href="#ModelDriver.client_of" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>list</em> &#8211; The names of server models that this model is a
+client of.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="ModelDriver.with_strace">
+<code class="descname">with_strace</code><a class="headerlink" href="#ModelDriver.with_strace" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>bool</em> &#8211; If True, the command is run with strace or dtrace.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="ModelDriver.strace_flags">
+<code class="descname">strace_flags</code><a class="headerlink" href="#ModelDriver.strace_flags" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>list</em> &#8211; Flags to pass to strace/dtrace.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="ModelDriver.with_valgrind">
+<code class="descname">with_valgrind</code><a class="headerlink" href="#ModelDriver.with_valgrind" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>bool</em> &#8211; If True, the command is run with valgrind.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="ModelDriver.valgrind_flags">
+<code class="descname">valgrind_flags</code><a class="headerlink" href="#ModelDriver.valgrind_flags" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>list</em> &#8211; Flags to pass to valgrind.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="ModelDriver.model_index">
+<code class="descname">model_index</code><a class="headerlink" href="#ModelDriver.model_index" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>int</em> &#8211; Index of model in list of models being run.</p>
+</dd></dl>
+
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#RuntimeError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal"><span class="pre">RuntimeError</span></code></a> &#8211; If both with_strace and with_valgrind are True.</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="cis_interface.drivers.ModelDriver.ModelDriver.after_loop">
+<code class="descname">after_loop</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/ModelDriver.html#ModelDriver.after_loop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.ModelDriver.ModelDriver.after_loop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Actions to perform after run_loop has finished. Mainly checking
+if there was an error and then handling it.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.drivers.ModelDriver.ModelDriver.before_loop">
+<code class="descname">before_loop</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/ModelDriver.html#ModelDriver.before_loop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.ModelDriver.ModelDriver.before_loop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Actions before loop.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.drivers.ModelDriver.ModelDriver.before_start">
+<code class="descname">before_start</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/ModelDriver.html#ModelDriver.before_start"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.ModelDriver.ModelDriver.before_start" title="Permalink to this definition">¶</a></dt>
+<dd><p>Actions to perform before the run starts.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.drivers.ModelDriver.ModelDriver.enqueue_output_loop">
+<code class="descname">enqueue_output_loop</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/ModelDriver.html#ModelDriver.enqueue_output_loop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.ModelDriver.ModelDriver.enqueue_output_loop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Keep passing lines to queue.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.drivers.ModelDriver.ModelDriver.graceful_stop">
+<code class="descname">graceful_stop</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/ModelDriver.html#ModelDriver.graceful_stop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.ModelDriver.ModelDriver.graceful_stop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gracefully stop the driver.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.drivers.ModelDriver.ModelDriver.kill_process">
+<code class="descname">kill_process</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/ModelDriver.html#ModelDriver.kill_process"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.ModelDriver.ModelDriver.kill_process" title="Permalink to this definition">¶</a></dt>
+<dd><p>Kill the process running the model, checking return code.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.drivers.ModelDriver.ModelDriver.model_process_complete">
+<code class="descname">model_process_complete</code><a class="headerlink" href="#cis_interface.drivers.ModelDriver.ModelDriver.model_process_complete" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>bool</em> &#8211; Has the process finished or not. Returns True if the process
+has not started.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.drivers.ModelDriver.ModelDriver.run_loop">
+<code class="descname">run_loop</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/ModelDriver.html#ModelDriver.run_loop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.ModelDriver.ModelDriver.run_loop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loop to check if model is still running and forward output.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.drivers.ModelDriver.ModelDriver.wait_process">
+<code class="descname">wait_process</code><span class="sig-paren">(</span><em>timeout=None</em>, <em>key=None</em>, <em>key_suffix=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/ModelDriver.html#ModelDriver.wait_process"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.ModelDriver.ModelDriver.wait_process" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wait for some amount of time for the process to finish.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>timeout</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>, </em><em>optional</em>) &#8211; Time (in seconds) that should be waited.
+Defaults to None and is infinite.</li>
+<li><strong>key</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) &#8211; Key that should be used to register the timeout.
+Defaults to None and set based on the stack trace.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">True if the process completed. False otherwise.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)">bool</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.drivers.PythonModelDriver.PythonModelDriver">
+<em class="property">class </em><code class="descclassname">cis_interface.drivers.PythonModelDriver.</code><code class="descname">PythonModelDriver</code><span class="sig-paren">(</span><em>name</em>, <em>args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/PythonModelDriver.html#PythonModelDriver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.PythonModelDriver.PythonModelDriver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class for running Python models.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; Driver name.</li>
+<li><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a>) &#8211; Argument(s) for running the model on the command
+after the call to python.</li>
+<li><strong>**kwargs</strong> &#8211; Additional keyword arguments are passed to parent class&#8217;s
+__init__ method.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.drivers.MatlabModelDriver.MatlabModelDriver">
+<em class="property">class </em><code class="descclassname">cis_interface.drivers.MatlabModelDriver.</code><code class="descname">MatlabModelDriver</code><span class="sig-paren">(</span><em>name</em>, <em>args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/MatlabModelDriver.html#MatlabModelDriver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.MatlabModelDriver.MatlabModelDriver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Base class for running Matlab models.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; Driver name.</li>
+<li><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a>) &#8211; Argument(s) for running the model in matlab.
+Generally, this should be the full path to a Matlab script.</li>
+<li><strong>**kwargs</strong> &#8211; Additional keyword arguments are passed to parent class&#8217;s
+__init__ method.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="MatlabModelDriver.started_matlab">
+<code class="descname">started_matlab</code><a class="headerlink" href="#MatlabModelDriver.started_matlab" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>bool</em> &#8211; True if the driver had to start a new matlab
+engine. False otherwise.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="MatlabModelDriver.screen_session">
+<code class="descname">screen_session</code><a class="headerlink" href="#MatlabModelDriver.screen_session" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str</em> &#8211; Screen session that Matlab was started in.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="MatlabModelDriver.mlengine">
+<code class="descname">mlengine</code><a class="headerlink" href="#MatlabModelDriver.mlengine" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>object</em> &#8211; Matlab engine used to run script.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="MatlabModelDriver.mlsession">
+<code class="descname">mlsession</code><a class="headerlink" href="#MatlabModelDriver.mlsession" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str</em> &#8211; Name of the Matlab session that was started.</p>
+</dd></dl>
+
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#RuntimeError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal"><span class="pre">RuntimeError</span></code></a> &#8211; If Matlab is not installed.</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="cis_interface.drivers.MatlabModelDriver.MatlabModelDriver.after_loop">
+<code class="descname">after_loop</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/MatlabModelDriver.html#MatlabModelDriver.after_loop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.MatlabModelDriver.MatlabModelDriver.after_loop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Actions to perform after run_loop has finished. Mainly checking
+if there was an error and then handling it.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.drivers.MatlabModelDriver.MatlabModelDriver.before_start">
+<code class="descname">before_start</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/MatlabModelDriver.html#MatlabModelDriver.before_start"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.MatlabModelDriver.MatlabModelDriver.before_start" title="Permalink to this definition">¶</a></dt>
+<dd><p>Actions to perform before the run loop.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.drivers.MatlabModelDriver.MatlabModelDriver.cleanup">
+<code class="descname">cleanup</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/MatlabModelDriver.html#MatlabModelDriver.cleanup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.MatlabModelDriver.MatlabModelDriver.cleanup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Close the Matlab session and engine.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.drivers.MatlabModelDriver.MatlabModelDriver.run_loop">
+<code class="descname">run_loop</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/MatlabModelDriver.html#MatlabModelDriver.run_loop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.MatlabModelDriver.MatlabModelDriver.run_loop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loop to check if model is still running and forward output.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.drivers.MatlabModelDriver.MatlabModelDriver.start_matlab">
+<code class="descname">start_matlab</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/MatlabModelDriver.html#MatlabModelDriver.start_matlab"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.MatlabModelDriver.MatlabModelDriver.start_matlab" title="Permalink to this definition">¶</a></dt>
+<dd><p>Start matlab session and connect to it.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.drivers.GCCModelDriver.GCCModelDriver">
+<em class="property">class </em><code class="descclassname">cis_interface.drivers.GCCModelDriver.</code><code class="descname">GCCModelDriver</code><span class="sig-paren">(</span><em>name</em>, <em>args</em>, <em>cc=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/GCCModelDriver.html#GCCModelDriver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.GCCModelDriver.GCCModelDriver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class for running gcc compiled drivers.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; Driver name.</li>
+<li><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a>) &#8211; Argument(s) for running the model on the command
+line. If the first element ends with &#8216;.c&#8217;, the driver attempts to
+compile the code with the necessary interface include directories.
+Additional arguments that start with &#8216;-I&#8217; are included in the
+compile command. Others are assumed to be runtime arguments.</li>
+<li><strong>cc</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) &#8211; C/C++ Compiler that should be used. Defaults to
+gcc for &#8216;.c&#8217; files, and g++ for &#8216;.cpp&#8217; or &#8216;.cc&#8217; files on Linux or
+OSX. Defaults to cl on Windows.</li>
+<li><strong>**kwargs</strong> &#8211; Additional keyword arguments are passed to parent class.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="docutils">
+<dt>Attributes (in additon to parent class&#8217;s):</dt>
+<dd>compiled (bool): True if the compilation was succesful. False otherwise.
+cfile (str): Source file.
+cc (str): C/C++ Compiler that should be used.
+flags (list): List of compiler flags.
+efile (str): Compiled executable file.</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
+<li><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#RuntimeError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal"><span class="pre">RuntimeError</span></code></a> &#8211; If neither the IPC or ZMQ C libraries are available.</li>
+<li><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#RuntimeError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal"><span class="pre">RuntimeError</span></code></a> &#8211; If the compilation fails.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="cis_interface.drivers.GCCModelDriver.GCCModelDriver.cleanup">
+<code class="descname">cleanup</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/GCCModelDriver.html#GCCModelDriver.cleanup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.GCCModelDriver.GCCModelDriver.cleanup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove compile executable.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.drivers.GCCModelDriver.GCCModelDriver.parse_arguments">
+<code class="descname">parse_arguments</code><span class="sig-paren">(</span><em>args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/GCCModelDriver.html#GCCModelDriver.parse_arguments"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.GCCModelDriver.GCCModelDriver.parse_arguments" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sort arguments based on their syntax. Arguments ending with &#8216;.c&#8217; or
+&#8216;.cpp&#8217; are considered source and the first one will be compiled to an
+executable. Arguments starting with &#8216;-L&#8217; or &#8216;-l&#8217; are treated as linker
+flags. Arguments starting with &#8216;-&#8216; are treated as compiler flags. Any
+arguments that do not fall into one of the categories will be treated
+as command line arguments for the compiled executable.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a>) &#8211; List of arguments provided.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#RuntimeError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal"><span class="pre">RuntimeError</span></code></a> &#8211; If there is not a valid source file in the argument
+list.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.drivers.GCCModelDriver.GCCModelDriver.remove_products">
+<code class="descname">remove_products</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/GCCModelDriver.html#GCCModelDriver.remove_products"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.GCCModelDriver.GCCModelDriver.remove_products" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delete products produced during the compilation process.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="code.html" class="btn btn-neutral float-right" title="Code" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="io_drivers.html" class="btn btn-neutral" title="Input/Output Drivers" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Meagan Lang, David Raila.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.1.3',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          
+          SphinxRtdTheme.Navigation.enableSticky();
+          
+      });
+  </script> 
+
+</body>
+</html>

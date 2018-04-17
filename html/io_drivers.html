@@ -1,0 +1,816 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Input/Output Drivers &mdash; cis_interface 0.1.3 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Model Drivers" href="model_drivers.html" />
+    <link rel="prev" title="C-Style Format Strings" href="c_format_strings.html" /> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> cis_interface
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="includeme.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="formatted_io.html">Formatted I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="server_client_io.html">Server/Client I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="server_client_io.html#one-server-two-clients">One Server, Two Clients</a></li>
+<li class="toctree-l1"><a class="reference internal" href="yaml.html">YAML Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="config.html">Configuration Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="units.html">Units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="c_format_strings.html">C-Style Format Strings</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Input/Output Drivers</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#file-input-drivers">File Input Drivers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#file-output-drivers">File Output Drivers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#general-input-drivers">General Input Drivers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#general-output-drivers">General Output Drivers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id1">Input/Output Drivers</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="model_drivers.html">Model Drivers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="code.html">Code</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/examples_toc.html">Examples</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">cis_interface</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Input/Output Drivers</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/io_drivers.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="input-output-drivers">
+<span id="io-drivers-rst"></span><h1>Input/Output Drivers<a class="headerlink" href="#input-output-drivers" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="file-input-drivers">
+<h2>File Input Drivers<a class="headerlink" href="#file-input-drivers" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="cis_interface.drivers.FileInputDriver.FileInputDriver">
+<em class="property">class </em><code class="descclassname">cis_interface.drivers.FileInputDriver.</code><code class="descname">FileInputDriver</code><span class="sig-paren">(</span><em>name</em>, <em>args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/FileInputDriver.html#FileInputDriver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.FileInputDriver.FileInputDriver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class that sends messages read from a file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; Name of the queue that messages should be sent to.</li>
+<li><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; Path to the file that messages should be read from.</li>
+<li><strong>**kwargs</strong> &#8211; Additional keyword arguments are passed to the parent class.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.drivers.AsciiFileInputDriver.AsciiFileInputDriver">
+<em class="property">class </em><code class="descclassname">cis_interface.drivers.AsciiFileInputDriver.</code><code class="descname">AsciiFileInputDriver</code><span class="sig-paren">(</span><em>name</em>, <em>args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/AsciiFileInputDriver.html#AsciiFileInputDriver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.AsciiFileInputDriver.AsciiFileInputDriver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class that sends lines from an ASCII file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; Name of the queue that messages should be sent to.</li>
+<li><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) &#8211; Path to the file that messages should be read from
+or dictionary containing the filepath and other keyword arguments
+to be passed to the created AsciiFile object.</li>
+<li><strong>comment</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) &#8211; String that should be used to identify
+comments. Default set by <code class="xref py py-class docutils literal"><span class="pre">AsciiFile</span></code>.</li>
+<li><strong>newline</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) &#8211; String that should be used to identify
+the end of a line. Default set by <code class="xref py py-class docutils literal"><span class="pre">AsciiFile</span></code>.</li>
+<li><strong>**kwargs</strong> &#8211; Additional keyword arguments are passed to parent class.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.drivers.AsciiTableInputDriver.AsciiTableInputDriver">
+<em class="property">class </em><code class="descclassname">cis_interface.drivers.AsciiTableInputDriver.</code><code class="descname">AsciiTableInputDriver</code><span class="sig-paren">(</span><em>name</em>, <em>args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/AsciiTableInputDriver.html#AsciiTableInputDriver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.AsciiTableInputDriver.AsciiTableInputDriver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class to handle input from an ASCII table.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; Name of the input queue to send messages to.</li>
+<li><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) &#8211; Path to the file that messages should be read from
+or dictionary containing the filepath and other keyword arguments
+to be passed to the created AsciiTable object.</li>
+<li><strong>format_str</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; Format string that should be used to format
+output in the case that the io_mode is &#8216;w&#8217; (write). It is not
+required if the io_mode is any other value.</li>
+<li><strong>field_names</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>, </em><em>optional</em>) &#8211; List of column names. Defaults to None.</li>
+<li><strong>field_units</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>, </em><em>optional</em>) &#8211; List of column units. Defaults to None.</li>
+<li><strong>use_astropy</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) &#8211; If True, astropy is used to determine
+a table&#8217;s format if it is installed. If False, a format string
+must be contained in the table. Defaults to False.</li>
+<li><strong>delimiter</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) &#8211; String that should be used to separate
+columns. Default set by serialize._default_delimiter.</li>
+<li><strong>comment</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) &#8211; String that should be used to identify
+comments. Default set by serialize._default_comment.</li>
+<li><strong>newline</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) &#8211; String that should be used to identify
+the end of a line. Default set by serialize._default_newline.</li>
+<li><strong>as_array</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) &#8211; If True, the table contents are sent all at
+once as an array. Defaults to False.</li>
+<li><strong>**kwargs</strong> &#8211; Additional keyword arguments are passed to parent class.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="cis_interface.drivers.AsciiTableInputDriver.AsciiTableInputDriver.update_serializer">
+<code class="descname">update_serializer</code><span class="sig-paren">(</span><em>msg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/AsciiTableInputDriver.html#AsciiTableInputDriver.update_serializer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.AsciiTableInputDriver.AsciiTableInputDriver.update_serializer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the serializer for the output comm based on input.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.drivers.PickleFileInputDriver.PickleFileInputDriver">
+<em class="property">class </em><code class="descclassname">cis_interface.drivers.PickleFileInputDriver.</code><code class="descname">PickleFileInputDriver</code><span class="sig-paren">(</span><em>name</em>, <em>args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/PickleFileInputDriver.html#PickleFileInputDriver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.PickleFileInputDriver.PickleFileInputDriver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class that sends messages read from a file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; Name of the queue that messages should be sent to.</li>
+<li><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; Path to the file that messages should be read from.</li>
+<li><strong>**kwargs</strong> &#8211; Additional keyword arguments are passed to the parent class.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.drivers.MatInputDriver.MatInputDriver">
+<em class="property">class </em><code class="descclassname">cis_interface.drivers.MatInputDriver.</code><code class="descname">MatInputDriver</code><span class="sig-paren">(</span><em>name</em>, <em>args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/MatInputDriver.html#MatInputDriver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.MatInputDriver.MatInputDriver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class that sends pickled dictionaries of matricies read from a .mat
+file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; Name of the queue that messages should be sent to.</li>
+<li><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; Path to the .mat file that messages should be read from.</li>
+<li><strong>**kwargs</strong> &#8211; Additional keyword arguments are passed to parent class.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="file-output-drivers">
+<h2>File Output Drivers<a class="headerlink" href="#file-output-drivers" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="cis_interface.drivers.FileOutputDriver.FileOutputDriver">
+<em class="property">class </em><code class="descclassname">cis_interface.drivers.FileOutputDriver.</code><code class="descname">FileOutputDriver</code><span class="sig-paren">(</span><em>name</em>, <em>path</em>, <em>in_temp=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/FileOutputDriver.html#FileOutputDriver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.FileOutputDriver.FileOutputDriver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class to handle output of received messages to a file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; Name of the output queue to receive messages from.</li>
+<li><strong>path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; Path to the file that messages should be written to.</li>
+<li><strong>in_temp</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) &#8211; If True or &#8216;True&#8217;, the path will be
+considered relative to the temporary directory. Defaults to False.</li>
+<li><strong>**kwargs</strong> &#8211; Additional keyword arguments are passed to the parent class.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.drivers.AsciiFileOutputDriver.AsciiFileOutputDriver">
+<em class="property">class </em><code class="descclassname">cis_interface.drivers.AsciiFileOutputDriver.</code><code class="descname">AsciiFileOutputDriver</code><span class="sig-paren">(</span><em>name</em>, <em>args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/AsciiFileOutputDriver.html#AsciiFileOutputDriver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.AsciiFileOutputDriver.AsciiFileOutputDriver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class to handle output line by line to an ASCII file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; Name of the output queue to receive messages from.</li>
+<li><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) &#8211; Path to the file that messages should be written to
+or dictionary containing the filepath and other keyword arguments
+to be passed to the created AsciiFile object.</li>
+<li><strong>comment</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) &#8211; String that should be used to identify
+comments. Default set by <code class="xref py py-class docutils literal"><span class="pre">AsciiFile</span></code>.</li>
+<li><strong>newline</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) &#8211; String that should be used to identify
+the end of a line. Default set by <code class="xref py py-class docutils literal"><span class="pre">AsciiFile</span></code>.</li>
+<li><strong>**kwargs</strong> &#8211; Additional keyword arguments are passed to parent class.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.drivers.PickleFileOutputDriver.PickleFileOutputDriver">
+<em class="property">class </em><code class="descclassname">cis_interface.drivers.PickleFileOutputDriver.</code><code class="descname">PickleFileOutputDriver</code><span class="sig-paren">(</span><em>name</em>, <em>args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/PickleFileOutputDriver.html#PickleFileOutputDriver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.PickleFileOutputDriver.PickleFileOutputDriver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class that writes received messages to a file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; Name of the queue that messages should be sent to.</li>
+<li><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; Path to the file that messages should be read from.</li>
+<li><strong>**kwargs</strong> &#8211; Additional keyword arguments are passed to the parent class.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.drivers.MatOutputDriver.MatOutputDriver">
+<em class="property">class </em><code class="descclassname">cis_interface.drivers.MatOutputDriver.</code><code class="descname">MatOutputDriver</code><span class="sig-paren">(</span><em>name</em>, <em>args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/MatOutputDriver.html#MatOutputDriver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.MatOutputDriver.MatOutputDriver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class to handle output to .mat Matlab files.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; Name of the output queue to receive messages from.</li>
+<li><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; Path to the file that messages should be written to.</li>
+<li><strong>**kwargs</strong> &#8211; Additional keyword arguments are passed to parent class.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="general-input-drivers">
+<h2>General Input Drivers<a class="headerlink" href="#general-input-drivers" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="cis_interface.drivers.InputDriver.InputDriver">
+<em class="property">class </em><code class="descclassname">cis_interface.drivers.InputDriver.</code><code class="descname">InputDriver</code><span class="sig-paren">(</span><em>name</em>, <em>args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/InputDriver.html#InputDriver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.InputDriver.InputDriver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Driver for receiving input from another model&#8217;s comm via a local comm.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; The name of the local message comm that the driver should
+connect to.</li>
+<li><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; The name of the other message comme that the driver should
+connect to.</li>
+<li><strong>**kwargs</strong> &#8211; Additional keyword arguments are passed to parent class.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.drivers.RMQInputDriver.RMQInputDriver">
+<em class="property">class </em><code class="descclassname">cis_interface.drivers.RMQInputDriver.</code><code class="descname">RMQInputDriver</code><span class="sig-paren">(</span><em>name</em>, <em>args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/RMQInputDriver.html#RMQInputDriver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.RMQInputDriver.RMQInputDriver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Driver for receiving input from a RabbitMQ server via a local comm.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; The name of the local message queue that the driver should
+connect to.</li>
+<li><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; The name of the RabbitMQ message queue that the driver
+should connect to.</li>
+<li><strong>**kwargs</strong> &#8211; Additional keyword arguments are passed to parent class.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="general-output-drivers">
+<h2>General Output Drivers<a class="headerlink" href="#general-output-drivers" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt>
+<em class="property">class </em><code class="descclassname">cis_interface.drivers.InputDriver.</code><code class="descname">InputDriver</code><span class="sig-paren">(</span><em>name</em>, <em>args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/InputDriver.html#InputDriver"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Driver for receiving input from another model&#8217;s comm via a local comm.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; The name of the local message comm that the driver should
+connect to.</li>
+<li><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; The name of the other message comme that the driver should
+connect to.</li>
+<li><strong>**kwargs</strong> &#8211; Additional keyword arguments are passed to parent class.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="class">
+<dt>
+<em class="property">class </em><code class="descclassname">cis_interface.drivers.RMQInputDriver.</code><code class="descname">RMQInputDriver</code><span class="sig-paren">(</span><em>name</em>, <em>args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/RMQInputDriver.html#RMQInputDriver"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Driver for receiving input from a RabbitMQ server via a local comm.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; The name of the local message queue that the driver should
+connect to.</li>
+<li><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; The name of the RabbitMQ message queue that the driver
+should connect to.</li>
+<li><strong>**kwargs</strong> &#8211; Additional keyword arguments are passed to parent class.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="id1">
+<h2>Input/Output Drivers<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="cis_interface.drivers.RPCDriver.RPCDriver">
+<em class="property">class </em><code class="descclassname">cis_interface.drivers.RPCDriver.</code><code class="descname">RPCDriver</code><span class="sig-paren">(</span><em>name</em>, <em>args=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/RPCDriver.html#RPCDriver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.RPCDriver.RPCDriver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Base class for any driver that requires to access to input &amp; output
+queues for RPC type functionality.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; The name of the message queue set that the driver should
+connect to. (name + &#8220;_IN&#8221; and name + &#8220;_OUT&#8221;)</li>
+<li><strong>**kwargs</strong> &#8211; Additional keyword arguments are passed to parent class.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="RPCDriver.icomm">
+<code class="descname">icomm</code><a class="headerlink" href="#RPCDriver.icomm" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="cis_interface.drivers.html#module-cis_interface.drivers.CommDriver" title="cis_interface.drivers.CommDriver"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.drivers.CommDriver</span></code></a> &#8211; Driver for the input
+message queue.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="RPCDriver.ocomm">
+<code class="descname">ocomm</code><a class="headerlink" href="#RPCDriver.ocomm" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="cis_interface.drivers.html#module-cis_interface.drivers.CommDriver" title="cis_interface.drivers.CommDriver"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.drivers.CommDriver</span></code></a> &#8211; Driver for the output
+message ueue.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.drivers.RPCDriver.RPCDriver.cleanup">
+<code class="descname">cleanup</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/RPCDriver.html#RPCDriver.cleanup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.RPCDriver.RPCDriver.cleanup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Perform cleanup for IPC drivers.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.drivers.RPCDriver.RPCDriver.close_comms">
+<code class="descname">close_comms</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/RPCDriver.html#RPCDriver.close_comms"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.RPCDriver.RPCDriver.close_comms" title="Permalink to this definition">¶</a></dt>
+<dd><p>Close the IPC comms.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.drivers.RPCDriver.RPCDriver.comms_open">
+<code class="descname">comms_open</code><a class="headerlink" href="#cis_interface.drivers.RPCDriver.RPCDriver.comms_open" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>bool</em> &#8211; True if both input and output comms open.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.drivers.RPCDriver.RPCDriver.do_terminate">
+<code class="descname">do_terminate</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/RPCDriver.html#RPCDriver.do_terminate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.RPCDriver.RPCDriver.do_terminate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Terminate input/output comm drivers.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.drivers.RPCDriver.RPCDriver.graceful_stop">
+<code class="descname">graceful_stop</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/RPCDriver.html#RPCDriver.graceful_stop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.RPCDriver.RPCDriver.graceful_stop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Allow the IPC comms to terminate gracefully.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.drivers.RPCDriver.RPCDriver.is_valid">
+<code class="descname">is_valid</code><a class="headerlink" href="#cis_interface.drivers.RPCDriver.RPCDriver.is_valid" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>bool</em> &#8211; True if both comms are open and parent class is valid.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.drivers.RPCDriver.RPCDriver.n_msg_in">
+<code class="descname">n_msg_in</code><a class="headerlink" href="#cis_interface.drivers.RPCDriver.RPCDriver.n_msg_in" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>int</em> &#8211; The number of messages in the input comm.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.drivers.RPCDriver.RPCDriver.n_msg_out">
+<code class="descname">n_msg_out</code><a class="headerlink" href="#cis_interface.drivers.RPCDriver.RPCDriver.n_msg_out" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>int</em> &#8211; The number of messages in the output comm.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.drivers.RPCDriver.RPCDriver.on_model_exit">
+<code class="descname">on_model_exit</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/RPCDriver.html#RPCDriver.on_model_exit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.RPCDriver.RPCDriver.on_model_exit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Actions to perform when the associated model driver is finished.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.drivers.RPCDriver.RPCDriver.printStatus">
+<code class="descname">printStatus</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/RPCDriver.html#RPCDriver.printStatus"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.RPCDriver.RPCDriver.printStatus" title="Permalink to this definition">¶</a></dt>
+<dd><p>Print information on the status of the driver.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.drivers.RPCDriver.RPCDriver.recv">
+<code class="descname">recv</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/RPCDriver.html#RPCDriver.recv"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.RPCDriver.RPCDriver.recv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Receive message smaller than maxMsgSize from the input comm.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>*args</strong> &#8211; Arguments are passed to input comm recv method.</li>
+<li><strong>**kwargs</strong> &#8211; Keyword arguments are passed to input comm recv method.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><dl class="docutils">
+<dt>Success or failure of recv and the received</dt>
+<dd><p class="first last">message.</p>
+</dd>
+</dl>
+</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.6)">tuple</a> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)">bool</a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)">str</a>)</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.drivers.RPCDriver.RPCDriver.recv_nolimit">
+<code class="descname">recv_nolimit</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/RPCDriver.html#RPCDriver.recv_nolimit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.RPCDriver.RPCDriver.recv_nolimit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Receive message larger than maxMsgSize from the output comm.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>*args</strong> &#8211; Arguments are passed to input comm recv_nolimit method.</li>
+<li><strong>**kwargs</strong> &#8211; Keyword arguments are passed to input comm recv_nolimit
+method.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><dl class="docutils">
+<dt>Success or failure of recv and the received</dt>
+<dd><p class="first last">message.</p>
+</dd>
+</dl>
+</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.6)">tuple</a> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)">bool</a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)">str</a>)</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.drivers.RPCDriver.RPCDriver.send">
+<code class="descname">send</code><span class="sig-paren">(</span><em>data</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/RPCDriver.html#RPCDriver.send"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.RPCDriver.RPCDriver.send" title="Permalink to this definition">¶</a></dt>
+<dd><p>Send message smaller than maxMsgSize to the output comm.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>data</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; Message to be sent.</li>
+<li><strong>*args</strong> &#8211; Arguments are passed to output comm send method.</li>
+<li><strong>**kwargs</strong> &#8211; Keyword arguments are passed to output comm send method.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Succes or failure of send.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)">bool</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.drivers.RPCDriver.RPCDriver.send_nolimit">
+<code class="descname">send_nolimit</code><span class="sig-paren">(</span><em>data</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/RPCDriver.html#RPCDriver.send_nolimit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.RPCDriver.RPCDriver.send_nolimit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Send message larger than maxMsgSize to the input comm.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>data</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; Message to be sent.</li>
+<li><strong>*args</strong> &#8211; Arguments are passed to output comm send_nolimit method.</li>
+<li><strong>**kwargs</strong> &#8211; Keyword arguments are passed to output comm send_nolimit
+method.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Succes or failure of send.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)">bool</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.drivers.RPCDriver.RPCDriver.start">
+<code class="descname">start</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/RPCDriver.html#RPCDriver.start"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.RPCDriver.RPCDriver.start" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run the input/output comm drivers.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.drivers.ClientDriver.ClientDriver">
+<em class="property">class </em><code class="descclassname">cis_interface.drivers.ClientDriver.</code><code class="descname">ClientDriver</code><span class="sig-paren">(</span><em>model_request_name</em>, <em>request_name=None</em>, <em>comm=None</em>, <em>comm_address=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/ClientDriver.html#ClientDriver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.ClientDriver.ClientDriver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for ClientRequestDriver.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.drivers.ServerDriver.ServerDriver">
+<em class="property">class </em><code class="descclassname">cis_interface.drivers.ServerDriver.</code><code class="descname">ServerDriver</code><span class="sig-paren">(</span><em>model_request_name</em>, <em>request_name=None</em>, <em>comm=None</em>, <em>comm_address=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/ServerDriver.html#ServerDriver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.ServerDriver.ServerDriver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for ServerRequestDriver.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.drivers.RMQClientDriver.RMQClientDriver">
+<em class="property">class </em><code class="descclassname">cis_interface.drivers.RMQClientDriver.</code><code class="descname">RMQClientDriver</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/RMQClientDriver.html#RMQClientDriver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.RMQClientDriver.RMQClientDriver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class for handling an RMQ client.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>*args</strong> &#8211; Arguments are passed to parent class.</li>
+<li><strong>**kwargs</strong> &#8211; Keyword arguments are passed to parent class.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.drivers.RMQServerDriver.RMQServerDriver">
+<em class="property">class </em><code class="descclassname">cis_interface.drivers.RMQServerDriver.</code><code class="descname">RMQServerDriver</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/RMQServerDriver.html#RMQServerDriver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.RMQServerDriver.RMQServerDriver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class for handling an RMQ server.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>*args</strong> &#8211; Arguments are passed to parent class.</li>
+<li><strong>**kwargs</strong> &#8211; Keyword arguments are passed to parent class.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="model_drivers.html" class="btn btn-neutral float-right" title="Model Drivers" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="c_format_strings.html" class="btn btn-neutral" title="C-Style Format Strings" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Meagan Lang, David Raila.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.1.3',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          
+          SphinxRtdTheme.Navigation.enableSticky();
+          
+      });
+  </script> 
+
+</body>
+</html>
