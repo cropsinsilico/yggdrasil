@@ -12,7 +12,7 @@ class TestExampleFakeplant(TestExample):
     @property
     def output_dir(self):
         r"""str: Output directory."""
-        if self.yamldir is None:
+        if self.yamldir is None:  # pragma: debug
             return None
         return os.path.join(self.yamldir, 'Output')
 
