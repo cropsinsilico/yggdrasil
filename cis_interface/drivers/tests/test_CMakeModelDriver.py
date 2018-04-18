@@ -4,7 +4,31 @@ import unittest
 from cis_interface import tools
 from cis_interface.tests import scripts
 import cis_interface.drivers.tests.test_ModelDriver as parent
-from cis_interface.drivers.CMakeModelDriver import CMakeModelDriver
+from cis_interface.drivers.CMakeModelDriver import (
+    CMakeModelDriver, create_include)
+
+
+def test_create_include():
+    r"""Test create_include."""
+    target = 'target'
+    testlist = [(['-DCIS'], [], ['ADD_DEFINITIONS(-DCIS)']),
+                (['-Iinclude_dir'], [], ['INCLUDE_DIRECTORIES(include_dir)']),
+                ([], ['-lm'], ['TARGET_LINK_LIBRARIES(%s -lm)' % target]),
+                ([], ['-Llib_dir'], ['LINK_DIRECTORIES(lib_dir)']),
+                ([], ['/LIBPATH:"lib_dir"'], ['LINK_DIRECTORIES(lib_dir)']),
+                ([], ['m'], ['TARGET_LINK_LIBRARIES(%s m)' % target])]
+    for c, l, lines in testlist:
+        out = create_include(None, target, compile_flags=c,
+                             linker_flags=l)
+        for x in lines:
+            print(x, out)
+            assert(x in out)
+    nt.assert_raises(ValueError, create_include,
+                     None, target, compile_flags=['invalid'])
+    nt.assert_raises(ValueError, create_include,
+                     None, target, linker_flags=['-invalid'])
+    nt.assert_raises(ValueError, create_include,
+                     None, target, linker_flags=['/invalid'])
 
 
 @unittest.skipIf(tools._c_library_avail, "C Library installed")
@@ -36,7 +60,8 @@ class TestCMakeModelParam(parent.TestModelParam):
         super(TestCMakeModelParam, self).__init__(*args, **kwargs)
         self.driver = 'CMakeModelDriver'
         self.attr_list += ['compiled', 'target', 'sourcedir',
-                           'builddir', 'target_file', 'include_file']
+                           'builddir', 'target_file', 'include_file',
+                           'cmakeargs']
         self.sourcedir, self.target = os.path.split(scripts['cmake'])
         self.args = [self.target]
         # self._inst_kwargs['yml']['workingDir']

@@ -1,6 +1,6 @@
 import os
 import shutil
-from cis_interface import tools
+from cis_interface import tools, backwards
 from cis_interface.drivers.ModelDriver import ModelDriver
 from cis_interface.drivers import GCCModelDriver
 
@@ -27,15 +27,28 @@ def create_include(fname, target, compile_flags=[], linker_flags=[]):
             lines.append('ADD_DEFINITIONS(%s)' % x)
         elif x.startswith('-I'):
             lines.append('INCLUDE_DIRECTORIES(%s)' % x.split('-I', 1)[-1])
-        else:  # pragma: debug
-            raise Exception("Could not parse compiler flag '%s'." % x)
+        else:
+            raise ValueError("Could not parse compiler flag '%s'." % x)
     for x in linker_flags:
         if x.startswith('-l'):
-            lines.append('TARGET_LINK_DIRECTORIES(%s %s)' % (target, x))
-        else:  # pragma: debug
-            raise Exception("Could not parse compiler flag '%s'." % x)
-    with open(fname, 'w') as fd:
-        fd.write('\n'.join(lines))
+            lines.append('TARGET_LINK_LIBRARIES(%s %s)' % (target, x))
+        elif x.startswith('-L'):
+            libdir = x.split('-L')[-1]
+            lines.append('LINK_DIRECTORIES(%s)' % libdir)
+        elif x.startswith('/LIBPATH:'):  # pragma: windows
+            libdir = x.split('/LIBPATH:')[-1]
+            if '"' in libdir:
+                libdir = libdir.split('"')[1]
+            lines.append('LINK_DIRECTORIES(%s)' % libdir)
+        elif x.startswith('-') or x.startswith('/'):
+            raise ValueError("Could not parse compiler flag '%s'." % x)
+        else:
+            lines.append('TARGET_LINK_LIBRARIES(%s %s)' % (target, x))
+    if fname is None:
+        return lines
+    else:
+        with open(fname, 'w') as fd:
+            fd.write('\n'.join(lines))
 
 
 class CMakeModelDriver(ModelDriver):
@@ -56,6 +69,11 @@ class CMakeModelDriver(ModelDriver):
         builddir (str, optional): Directory where the build should be saved.
             Defaults to <sourcedir>/build. It can be relative to self.workingDir
             or absolute.
+        cmakeargs (list, optional): Arguments that should be passed to cmake.
+            Defaults to [].
+        preserve_cache (bool, optional): If True the cmake cache will be kept
+            following the run, otherwise all files created by cmake will be
+            cleaned up. Defaults to False.
         **kwargs: Additional keyword arguments are passed to parent class.
 
     Attributes:
@@ -63,12 +81,16 @@ class CMakeModelDriver(ModelDriver):
         target (str): Name of executable that should be created and called.
         sourcedir (str): Source directory to call cmake on.
         builddir (str): Directory where the build should be saved.
+        cmakeargs (list): Arguments that should be passed to cmake.
+        preserve_cache (bool): If True the cmake cache will be kept following the
+            run, otherwise all files created by cmake will be cleaned up.
 
     Raises:
         RuntimeError: If neither the IPC or ZMQ C libraries are available.
 
     """
-    def __init__(self, name, args, sourcedir=None, builddir=None, **kwargs):
+    def __init__(self, name, args, sourcedir=None, builddir=None,
+                 cmakeargs=None, preserve_cache=False, **kwargs):
         super(CMakeModelDriver, self).__init__(name, args, **kwargs)
         if not tools._c_library_avail:  # pragma: windows
             raise RuntimeError("No library available for models written in C/C++.")
@@ -85,6 +107,12 @@ class CMakeModelDriver(ModelDriver):
         elif not os.path.isabs(builddir):
             builddir = os.path.join(self.workingDir, builddir)
         self.builddir = builddir
+        if cmakeargs is None:
+            cmakeargs = []
+        elif isinstance(cmakeargs, backwards.string_types):
+            cmakeargs = [cmakeargs]
+        self.cmakeargs = cmakeargs
+        self.preserve_cache = preserve_cache
         self.target_file = os.path.join(self.builddir, self.target)
         self.include_file = os.path.join(self.sourcedir, 'cis_cmake.txt')
         self.args[0] = self.target_file
@@ -109,16 +137,19 @@ class CMakeModelDriver(ModelDriver):
         os.chdir(self.sourcedir)
         if not os.path.isfile('CMakeLists.txt'):
             os.chdir(curdir)
+            self.cleanup()
             raise IOError('No CMakeLists.txt file found in %s.' % self.sourcedir)
         # Configuration
         if target != 'clean':
-            config_cmd = ['cmake', '-H.', self.sourcedir, '-B%s' % self.builddir]
+            config_cmd = ['cmake'] + self.cmakeargs
+            config_cmd += ['-H.', self.sourcedir, '-B%s' % self.builddir]
             self.debug(' '.join(config_cmd))
             comp_process = tools.popen_nobuffer(config_cmd)
             output, err = comp_process.communicate()
             exit_code = comp_process.returncode
             if exit_code != 0:
                 os.chdir(curdir)
+                self.cleanup()
                 self.error(output)
                 raise RuntimeError("CMake config failed with code %d." % exit_code)
             self.debug('Config output: \n%s' % output)
@@ -133,6 +164,7 @@ class CMakeModelDriver(ModelDriver):
         if exit_code != 0:
             os.chdir(curdir)
             self.error(output)
+            self.cleanup()
             raise RuntimeError("CMake build failed with code %d." % exit_code)
         self.debug('Build output: \n%s' % output)
         self.debug('Make complete')
@@ -141,14 +173,18 @@ class CMakeModelDriver(ModelDriver):
     def cleanup(self):
         r"""Remove compile executable."""
         # self.run_cmake('clean')
-        rmfiles = [self.include_file,
-                   os.path.join(self.builddir, 'Makefile'),
-                   os.path.join(self.builddir, 'CMakeCache.txt'),
-                   os.path.join(self.builddir, 'cmake_install.cmake'),
-                   os.path.join(self.builddir, 'CMakeFiles')]
-        for f in rmfiles:
-            if os.path.isdir(f):
-                shutil.rmtree(f)
-            elif os.path.isfile(f):
-                os.remove(f)
+        if not self.preserve_cache:
+            rmfiles = [self.include_file,
+                       self.target_file,
+                       os.path.join(self.builddir, 'Makefile'),
+                       os.path.join(self.builddir, 'CMakeCache.txt'),
+                       os.path.join(self.builddir, 'cmake_install.cmake'),
+                       os.path.join(self.builddir, 'CMakeFiles')]
+            for f in rmfiles:
+                if os.path.isdir(f):
+                    shutil.rmtree(f)
+                elif os.path.isfile(f):
+                    os.remove(f)
+            if os.path.isdir(self.builddir) and (not os.listdir(self.builddir)):
+                os.rmdir(self.builddir)
         super(CMakeModelDriver, self).cleanup()
