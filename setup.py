@@ -6,6 +6,7 @@ import warnings
 import subprocess
 import tempfile
 from setuptools import setup, find_packages
+from distutils.sysconfig import get_python_lib
 PY_MAJOR_VERSION = sys.version_info[0]
 PY2 = (PY_MAJOR_VERSION == 2)
 IS_WINDOWS = (sys.platform in ['win32', 'cygwin'])
@@ -45,6 +46,8 @@ def install_matlab():
     cmd = [sys.executable, 'setup.py',
            'build', '--build-base=%s' % blddir,
            'install']
+    if '--user' in sys.argv:
+        cmd.append('--user')
     try:
         result = subprocess.check_output(cmd, cwd=mtl_setup)
         if PY_MAJOR_VERSION == 3:
@@ -206,6 +209,17 @@ requirements = ["numpy", "scipy", "pyyaml", "pystache", "nose", "zmq", "psutil",
 # optional_requirements = ["pika", "astropy"]
 if not IS_WINDOWS:
     requirements.append("sysv_ipc")
+
+
+# Warn that local install may not have entry points on path
+if '--user' in sys.argv:
+    script_dir = os.path.realpath(os.path.join(get_python_lib(),
+                                               '../../../bin/'))
+    warnings.warn("When installing locally, you may need to add the script " +
+                  "directory to your path manually in order to have access " +
+                  "to the command line entry points (e.g. cisrun). " +
+                  "If 'cisrun' is not a recognized command, try adding " +
+                  "'%s' to your PATH.")
     
 setup(
     name="cis_interface",
