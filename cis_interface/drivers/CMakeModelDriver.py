@@ -27,6 +27,8 @@ def create_include(fname, target, compile_flags=[], linker_flags=[]):
             lines.append('ADD_DEFINITIONS(%s)' % x)
         elif x.startswith('-I'):
             lines.append('INCLUDE_DIRECTORIES(%s)' % x.split('-I', 1)[-1])
+        elif x.startswith('-') or x.startswith('/'):
+            lines.append('ADD_DEFINITIONS(%s)' % x)
         else:
             raise ValueError("Could not parse compiler flag '%s'." % x)
     for x in linker_flags:
@@ -41,7 +43,7 @@ def create_include(fname, target, compile_flags=[], linker_flags=[]):
                 libdir = libdir.split('"')[1]
             lines.append('LINK_DIRECTORIES(%s)' % libdir)
         elif x.startswith('-') or x.startswith('/'):
-            raise ValueError("Could not parse compiler flag '%s'." % x)
+            raise ValueError("Could not parse linker flag '%s'." % x)
         else:
             lines.append('TARGET_LINK_LIBRARIES(%s %s)' % (target, x))
     if fname is None:

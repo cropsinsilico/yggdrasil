@@ -12,6 +12,8 @@ def test_create_include():
     r"""Test create_include."""
     target = 'target'
     testlist = [(['-DCIS'], [], ['ADD_DEFINITIONS(-DCIS)']),
+                (['-Wall'], [], ['ADD_DEFINITIONS(-Wall)']),
+                (['/nologo'], [], ['ADD_DEFINITIONS(/nologo)']),
                 (['-Iinclude_dir'], [], ['INCLUDE_DIRECTORIES(include_dir)']),
                 ([], ['-lm'], ['TARGET_LINK_LIBRARIES(%s -lm)' % target]),
                 ([], ['-Llib_dir'], ['LINK_DIRECTORIES(lib_dir)']),
@@ -21,7 +23,6 @@ def test_create_include():
         out = create_include(None, target, compile_flags=c,
                              linker_flags=l)
         for x in lines:
-            print(x, out)
             assert(x in out)
     nt.assert_raises(ValueError, create_include,
                      None, target, compile_flags=['invalid'])
