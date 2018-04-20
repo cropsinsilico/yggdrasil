@@ -1,11 +1,44 @@
 import os
+import re
 import shutil
-from cis_interface import tools, backwards
+from cis_interface import tools, backwards, platform
 from cis_interface.drivers.ModelDriver import ModelDriver
 from cis_interface.drivers import GCCModelDriver
 
 
-def create_include(fname, target, compile_flags=[], linker_flags=[]):
+_regex_win32_dir = GCCModelDriver._incl_regex
+_regex_win32_lib = os.path.join(_regex_win32_dir, 'build',
+                                'Debug', 'regex_win32.lib')
+
+
+def build_regex_win32(using_cmake=False):  # pragma: windows
+    r"""Build the regex_win32 library using cmake."""
+    # Configure project
+    cmd = ['cmake', '-H.', '-Bbuild']
+    comp_process = tools.popen_nobuffer(cmd, cwd=_regex_win32_dir)
+    output, err = comp_process.communicate()
+    exit_code = comp_process.returncode
+    if exit_code != 0:  # pragma: debug
+        print(' '.join(cmd))
+        tools.print_encoded(output, end="")
+        raise RuntimeError("Could not config regex_win32")
+    # Build project
+    cmd = ['cmake', '--build', 'build', '--clean-first']
+    comp_process = tools.popen_nobuffer(cmd, cwd=_regex_win32_dir)
+    output, err = comp_process.communicate()
+    exit_code = comp_process.returncode
+    if exit_code != 0:  # pragma: debug
+        print(' '.join(cmd))
+        tools.print_encoded(output, end="")
+        raise RuntimeError("Could not build regex_win32")
+    assert(os.path.isfile(_regex_win32_lib))
+
+
+if platform._is_win and (not os.path.isfile(_regex_win32_lib)):  # pragma: windows
+    build_regex_win32()
+
+
+def create_include(fname, target, compile_flags=None, linker_flags=None):
     r"""Create CMakeList include file with necessary includes,
     definitions, and linker flags.
 
@@ -18,15 +51,26 @@ def create_include(fname, target, compile_flags=[], linker_flags=[]):
             should be set. Defaults to [].
 
     """
-    _compile_flags, _linker_flags = GCCModelDriver.get_flags()
+    if compile_flags is None:
+        compile_flags = []
+    if linker_flags is None:
+        linker_flags = []
+    _compile_flags, _linker_flags = GCCModelDriver.get_flags(for_cmake=True)
+    if platform._is_win:  # pragma: windows
+        assert(os.path.isfile(_regex_win32_lib))
+        _linker_flags.append(_regex_win32_lib)
     compile_flags += _compile_flags
     linker_flags += _linker_flags
     lines = []
+    var_count = 0
     for x in compile_flags:
         if x.startswith('-D'):
             lines.append('ADD_DEFINITIONS(%s)' % x)
         elif x.startswith('-I'):
-            lines.append('INCLUDE_DIRECTORIES(%s)' % x.split('-I', 1)[-1])
+            xdir = x.split('-I', 1)[-1]
+            if platform._is_win:
+                xdir = xdir.replace('\\', re.escape('\\'))
+            lines.append('INCLUDE_DIRECTORIES(%s)' % xdir)
         elif x.startswith('-') or x.startswith('/'):
             lines.append('ADD_DEFINITIONS(%s)' % x)
         else:
@@ -36,19 +80,45 @@ def create_include(fname, target, compile_flags=[], linker_flags=[]):
             lines.append('TARGET_LINK_LIBRARIES(%s %s)' % (target, x))
         elif x.startswith('-L'):
             libdir = x.split('-L')[-1]
+            if platform._is_win:
+                libdir = libdir.replace('\\', re.escape('\\'))
             lines.append('LINK_DIRECTORIES(%s)' % libdir)
         elif x.startswith('/LIBPATH:'):  # pragma: windows
             libdir = x.split('/LIBPATH:')[-1]
             if '"' in libdir:
                 libdir = libdir.split('"')[1]
+            if platform._is_win:
+                libdir = libdir.replace('\\', re.escape('\\'))
             lines.append('LINK_DIRECTORIES(%s)' % libdir)
         elif x.startswith('-') or x.startswith('/'):
             raise ValueError("Could not parse linker flag '%s'." % x)
         else:
-            lines.append('TARGET_LINK_LIBRARIES(%s %s)' % (target, x))
+            if os.path.isfile(x):
+                xd, xf = os.path.split(x)
+                xl, xe = os.path.splitext(xf)
+                if xe in ['.so', '.dll']:
+                    lines.append('ADD_LIBRARY(%s SHARED IMPORTED)' % xl)
+                else:
+                    lines.append('ADD_LIBRARY(%s STATIC IMPORTED)' % xl)
+                lines.append('SET_TARGET_PROPERTIES(')
+                lines.append('    %s PROPERTIES' % xl)
+                # lines.append('    PROPERTIES LINKER_LANGUAGE CXX')
+                if platform._is_win:
+                    lines.append('    IMPORTED_LOCATION %s)' %
+                                 x.replace('\\', re.escape('\\')))
+                else:
+                    lines.append('    IMPORTED_LOCATION %s)' % x)
+                lines.append('TARGET_LINK_LIBRARIES(%s %s)' % (target, xl))
+                # lines.append('FIND_LIBRARY(VAR%d %s HINTS %s)' % (var_count, xf, xd))
+                # lines.append('TARGET_LINK_LIBRARIES(%s ${VAR%s})' % (target, var_count))
+                var_count += 1
+            else:
+                lines.append('TARGET_LINK_LIBRARIES(%s %s)' % (target, x))
     if fname is None:
         return lines
     else:
+        if os.path.isfile(fname):
+            os.remove(fname)
         with open(fname, 'w') as fd:
             fd.write('\n'.join(lines))
 
@@ -152,20 +222,20 @@ class CMakeModelDriver(ModelDriver):
             if exit_code != 0:
                 os.chdir(curdir)
                 self.cleanup()
-                self.error(output)
+                self.error(backwards.bytes2unicode(output))
                 raise RuntimeError("CMake config failed with code %d." % exit_code)
             self.debug('Config output: \n%s' % output)
         # Build
         build_cmd = ['cmake', '--build', self.builddir, '--clean-first']
         if self.target is not None:
             build_cmd += ['--target', self.target]
-        self.debug(' '.join(build_cmd))
+        self.info(' '.join(build_cmd))
         comp_process = tools.popen_nobuffer(build_cmd)
         output, err = comp_process.communicate()
         exit_code = comp_process.returncode
         if exit_code != 0:
             os.chdir(curdir)
-            self.error(output)
+            self.error(backwards.bytes2unicode(output))
             self.cleanup()
             raise RuntimeError("CMake build failed with code %d." % exit_code)
         self.debug('Build output: \n%s' % output)

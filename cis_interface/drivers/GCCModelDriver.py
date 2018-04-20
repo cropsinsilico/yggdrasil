@@ -10,11 +10,16 @@ _incl_interface = os.path.join(_top_dir, 'interface')
 _incl_io = os.path.join(_top_dir, 'io')
 _incl_seri = os.path.join(_top_dir, 'serialize')
 _incl_comm = os.path.join(_top_dir, 'communication')
-_regex_win32_lib = os.path.join(_top_dir, 'regex_win32.lib')
+_incl_regex = os.path.join(_top_dir, 'regex')
+_regex_win32_lib = os.path.join(_incl_regex, 'regex_win32.lib')
 
 
-def get_zmq_flags():
+def get_zmq_flags(for_cmake=False):
     r"""Get the necessary flags for compiling & linking with zmq libraries.
+
+    Args:
+        for_cmake (bool, optional): If True, the returned flags will match the
+            format required by cmake. Defaults to False.
 
     Returns:
         tuple(list, list): compile and linker flags.
@@ -32,15 +37,22 @@ def get_zmq_flags():
                 pinc_d = os.path.dirname(pinc)
                 plib_d, plib_f = os.path.split(plib)
                 _compile_flags.append("-I%s" % pinc_d)
-                _linker_flags += [plib_f, '/LIBPATH:"%s"' % plib_d]
+                if for_cmake:
+                    _linker_flags.append(plib)
+                else:
+                    _linker_flags += [plib_f, '/LIBPATH:"%s"' % plib_d]
         else:
             _linker_flags += ["-lczmq", "-lzmq"]
         _compile_flags += ["-DZMQINSTALLED"]
     return _compile_flags, _linker_flags
 
 
-def get_ipc_flags():
+def get_ipc_flags(for_cmake=False):
     r"""Get the necessary flags for compiling & linking with ipc libraries.
+
+    Args:
+        for_cmake (bool, optional): If True, the returned flags will match the
+            format required by cmake. Defaults to False.
 
     Returns:
         tuple(list, list): compile and linker flags.
@@ -53,8 +65,12 @@ def get_ipc_flags():
     return _compile_flags, _linker_flags
 
 
-def get_flags():
+def get_flags(for_cmake=False):
     r"""Get the necessary flags for compiling & linking with CiS libraries.
+
+    Args:
+        for_cmake (bool, optional): If True, the returned flags will match the
+            format required by cmake. Defaults to False.
 
     Returns:
         tuple(list, list): compile and linker flags.
@@ -66,25 +82,27 @@ def get_flags():
         logging.warning("No library installed for models written in C")
         return _compile_flags, _linker_flags
     if platform._is_win:  # pragma: windows
-        _regex_win32 = os.path.split(_regex_win32_lib)
-        _compile_flags += ["/nologo", "-D_CRT_SECURE_NO_WARNINGS", "-I" + _regex_win32[0]]
-        _linker_flags += [_regex_win32[1], '/LIBPATH:"%s"' % _regex_win32[0]]
+        assert(os.path.isfile(_regex_win32_lib))
+        _compile_flags += ["/nologo", "-D_CRT_SECURE_NO_WARNINGS"]
+        if not for_cmake:
+            _regex_win32 = os.path.split(_regex_win32_lib)
+            _linker_flags += [_regex_win32[1], '/LIBPATH:"%s"' % _regex_win32[0]]
     if tools._zmq_installed_c:
-        zmq_flags = get_zmq_flags()
+        zmq_flags = get_zmq_flags(for_cmake=for_cmake)
         _compile_flags += zmq_flags[0]
         _linker_flags += zmq_flags[1]
     if tools._ipc_installed:
-        ipc_flags = get_ipc_flags()
+        ipc_flags = get_ipc_flags(for_cmake=for_cmake)
         _compile_flags += ipc_flags[0]
         _linker_flags += ipc_flags[1]
-    for x in [_incl_interface, _incl_io, _incl_comm, _incl_seri]:
+    for x in [_top_dir, _incl_interface, _incl_io, _incl_comm, _incl_seri, _incl_regex]:
         _compile_flags += ["-I" + x]
     if tools.get_default_comm() == 'IPCComm':
         _compile_flags += ["-DIPCDEF"]
     return _compile_flags, _linker_flags
 
 
-def build_regex_win32():  # pragma: windows
+def build_regex_win32(using_cmake=False):  # pragma: windows
     r"""Build the regex_win32 library."""
     _regex_win32_dir = os.path.dirname(_regex_win32_lib)
     _regex_win32_cpp = os.path.join(_regex_win32_dir, 'regex_win32.cpp')
