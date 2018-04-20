@@ -11,7 +11,7 @@ _regex_win32_lib = os.path.join(_regex_win32_dir, 'build',
                                 'Debug', 'regex_win32.lib')
 
 
-def build_regex_win32(using_cmake=False):  # pragma: windows
+def build_regex_win32():  # pragma: windows
     r"""Build the regex_win32 library using cmake."""
     # Configure project
     cmd = ['cmake', '-H.', '-Bbuild']

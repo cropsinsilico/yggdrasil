@@ -95,7 +95,7 @@ def get_flags(for_cmake=False):
         ipc_flags = get_ipc_flags(for_cmake=for_cmake)
         _compile_flags += ipc_flags[0]
         _linker_flags += ipc_flags[1]
-    for x in [_top_dir, _incl_interface, _incl_io, _incl_comm, _incl_seri, _incl_regex]:
+    for x in [_incl_interface, _incl_io, _incl_comm, _incl_seri, _incl_regex]:
         _compile_flags += ["-I" + x]
     if tools.get_default_comm() == 'IPCComm':
         _compile_flags += ["-DIPCDEF"]
