@@ -84,6 +84,7 @@ def get_flags(for_cmake=False):
     if platform._is_win:  # pragma: windows
         assert(os.path.isfile(_regex_win32_lib))
         _compile_flags += ["/nologo", "-D_CRT_SECURE_NO_WARNINGS"]
+        _compile_flags += ['-I' + _top_dir]
         if not for_cmake:
             _regex_win32 = os.path.split(_regex_win32_lib)
             _linker_flags += [_regex_win32[1], '/LIBPATH:"%s"' % _regex_win32[0]]
