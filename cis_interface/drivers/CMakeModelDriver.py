@@ -90,34 +90,33 @@ def create_include(fname, target, compile_flags=None, linker_flags=None):
             if platform._is_win:
                 libdir = libdir.replace('\\', re.escape('\\'))
             lines.append('LINK_DIRECTORIES(%s)' % libdir)
+        elif os.path.isfile(x):
+            xd, xf = os.path.split(x)
+            xl, xe = os.path.splitext(xf)
+            if xe in ['.so', '.dll']:
+                lines.append('ADD_LIBRARY(%s SHARED IMPORTED)' % xl)
+            else:
+                lines.append('ADD_LIBRARY(%s STATIC IMPORTED)' % xl)
+            lines.append('SET_TARGET_PROPERTIES(')
+            lines.append('    %s PROPERTIES' % xl)
+            # lines.append('    PROPERTIES LINKER_LANGUAGE CXX')
+            if platform._is_win:
+                lines.append('    IMPORTED_LOCATION %s)' %
+                             x.replace('\\', re.escape('\\')))
+            else:
+                lines.append('    IMPORTED_LOCATION %s)' % x)
+            lines.append('TARGET_LINK_LIBRARIES(%s %s)' % (target, xl))
+            # lines.append('FIND_LIBRARY(VAR%d %s HINTS %s)' % (var_count, xf, xd))
+            # lines.append('TARGET_LINK_LIBRARIES(%s ${VAR%s})' % (target, var_count))
+            var_count += 1
         elif x.startswith('-') or x.startswith('/'):
             raise ValueError("Could not parse linker flag '%s'." % x)
         else:
-            if os.path.isfile(x):
-                xd, xf = os.path.split(x)
-                xl, xe = os.path.splitext(xf)
-                if xe in ['.so', '.dll']:
-                    lines.append('ADD_LIBRARY(%s SHARED IMPORTED)' % xl)
-                else:
-                    lines.append('ADD_LIBRARY(%s STATIC IMPORTED)' % xl)
-                lines.append('SET_TARGET_PROPERTIES(')
-                lines.append('    %s PROPERTIES' % xl)
-                # lines.append('    PROPERTIES LINKER_LANGUAGE CXX')
-                if platform._is_win:
-                    lines.append('    IMPORTED_LOCATION %s)' %
-                                 x.replace('\\', re.escape('\\')))
-                else:
-                    lines.append('    IMPORTED_LOCATION %s)' % x)
-                lines.append('TARGET_LINK_LIBRARIES(%s %s)' % (target, xl))
-                # lines.append('FIND_LIBRARY(VAR%d %s HINTS %s)' % (var_count, xf, xd))
-                # lines.append('TARGET_LINK_LIBRARIES(%s ${VAR%s})' % (target, var_count))
-                var_count += 1
-            else:
-                lines.append('TARGET_LINK_LIBRARIES(%s %s)' % (target, x))
+            lines.append('TARGET_LINK_LIBRARIES(%s %s)' % (target, x))
     if fname is None:
         return lines
     else:
-        if os.path.isfile(fname):
+        if os.path.isfile(fname):  # pragma: debug
             os.remove(fname)
         with open(fname, 'w') as fd:
             fd.write('\n'.join(lines))
@@ -172,12 +171,12 @@ class CMakeModelDriver(ModelDriver):
         if sourcedir is None:
             sourcedir = self.workingDir
         elif not os.path.isabs(sourcedir):
-            sourcedir = os.path.join(self.workingDir, sourcedir)
+            sourcedir = os.path.realpath(os.path.join(self.workingDir, sourcedir))
         self.sourcedir = sourcedir
         if builddir is None:
             builddir = os.path.join(sourcedir, 'build')
         elif not os.path.isabs(builddir):
-            builddir = os.path.join(self.workingDir, builddir)
+            builddir = os.path.realpath(os.path.join(self.workingDir, builddir))
         self.builddir = builddir
         if cmakeargs is None:
             cmakeargs = []
