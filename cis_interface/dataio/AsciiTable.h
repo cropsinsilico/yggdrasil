@@ -649,6 +649,7 @@ void at_cleanup(asciiTable_t *t) {
   "w" for write.
   @returns int -1 if there is an error, 0 otherwise.
  */
+static inline
 int at_update(asciiTable_t *t, const char *filepath, const char *io_mode) {
   int flag = 0;
   flag = af_update(&(t->f), filepath, io_mode);

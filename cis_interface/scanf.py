@@ -133,7 +133,7 @@ def cformat2regex(flags, width, precision, length, specifier):
         str: Regex expression that will match the provided components.
 
     """
-    pat_dec = '\d+(?:\.\d+)?'
+    pat_dec = '[-+]?\d+(?:\.\d+)?'
     pat_sub = ''
     pad_zero = 0
     # Left padding specified in flags
