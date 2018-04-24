@@ -23,7 +23,7 @@ def test_combos():
     for l1 in lang_list:
         for l2 in lang_list:
             x = timing.TimedRun(l1, l2)
-            x.run(1, 10)
+            x.time_run(1, 10)
 
 
 def test_scaling_count():

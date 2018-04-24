@@ -1,9 +1,11 @@
 import os
 import time
 import yaml
+import uuid
+import perf
 import tempfile
 import numpy as np
-from cis_interface import tools, runner, drivers, examples, backwards
+from cis_interface import tools, runner, drivers, examples, backwards, platform
 from cis_interface.drivers.MatlabModelDriver import _matlab_installed
 from cis_interface.tests import CisTestBase
 import matplotlib.pyplot as plt
@@ -46,6 +48,7 @@ class TimedRun(CisTestBase, tools.CisClass):
     Attributes:
         lang_src (str): Language that messages should be sent from.
         lang_dst (str): Language that messages should be sent to.
+        platform (str): Platform that the test is being run on.
         scalings_file (str): Full path to the file where scalings data will be
             saved.
         comm_type (str): Name of communication class that should be used for
@@ -62,6 +65,12 @@ class TimedRun(CisTestBase, tools.CisClass):
         self.scalings_file = scalings_file
         self.comm_type = comm_type
         self.program_name = name
+        if platform._is_win:
+            self.platform = 'Windows'
+        elif platform._is_osx:
+            self.platform = 'OSX'
+        else:
+            self.platform = 'Linux'
         name = '%s_%s_%s' % (name, lang_src, lang_dst)
         tools.CisClass.__init__(self, name)
         super(TimedRun, self).__init__(skip_unittest=True, **kwargs)
@@ -70,9 +79,23 @@ class TimedRun(CisTestBase, tools.CisClass):
         self.data = self.load_scalings()
         if self.name not in self.data:
             self.data[self.name] = {}
-        if os.path.isfile(self.yamlfile):
-            os.remove(self.yamlfile)
-        self.make_yamlfile(self.yamlfile)
+        self.fyaml = dict()
+        self.foutput = dict()
+        self.entries = dict()
+
+    def entry_name(self, nmsg, msg_size):
+        r"""Get a unique identifier for a run.
+
+        Args:
+            nmsg (int): Number of messages that should be sent.
+            msg_size (int): Size of each message that should be sent.
+
+        """
+        out = '%s(%s,%s,%s,%s,%d,%d)' % (self.program_name,
+                                         self.platform, self.comm_type,
+                                         self.lang_src, self.lang_dst,
+                                         nmsg, msg_size)
+        return out
 
     @property
     def description_prefix(self):
@@ -80,19 +103,23 @@ class TimedRun(CisTestBase, tools.CisClass):
         return self.name
 
     @property
-    def namespace(self):
-        r"""str: Namespace for the example."""
-        return "%s_%s" % (self.name, self.uuid)
-
-    @property
     def tempdir(self):
         r"""str: Temporary directory."""
         return tempfile.gettempdir()
 
     @property
-    def output_file(self):
+    def output_file_format(self):
         r"""str: Full path to the output file created by the run."""
-        return os.path.join(self.tempdir, 'output_timed_pipe.txt')
+        return os.path.join(self.tempdir, 'output_%s.txt')
+
+    def get_new_uuid(self):
+        r"""Get a new unique ID.
+
+        Returns:
+            str: Unique identifier.
+
+        """
+        return str(uuid.uuid4())
 
     def output_content(self, nmsg, msg_size):
         r"""Get the result that should be output to file during the run.
@@ -108,21 +135,25 @@ class TimedRun(CisTestBase, tools.CisClass):
         siz = nmsg * msg_size
         return '0' * siz
 
-    def check_output(self, nmsg, msg_size):
+    def check_output(self, fout, nmsg, msg_size):
         r"""Assert that the output file contains the expected result.
 
         Args:
-            nmsg: The number of messages that will be sent.
-            msg_sizze: The size of the the messages that will be sent.
+            fout (str): The file that should be checked.
+            nmsg (int): The number of messages that will be sent.
+            msg_sizze (int): The size of the the messages that will be sent.
 
         """
-        fout = self.output_file
         fres = self.output_content(nmsg, msg_size)
         self.check_file(fout, fres)
 
-    def cleanup_output(self):
-        r"""Cleanup the output file."""
-        fout = self.output_file
+    def cleanup_output(self, fout):
+        r"""Cleanup the output file.
+
+        Args:
+           fout (str): The file to be cleaned up.
+        
+        """
         if os.path.isfile(fout):
             os.remove(fout)
 
@@ -137,8 +168,9 @@ class TimedRun(CisTestBase, tools.CisClass):
         return get_source(self.lang_dst, 'dst', name=self.program_name)
 
     @property
-    def yamlfile(self):
-        path = os.path.join(self.tempdir, '%s.yml' % self.name)
+    def yamlfile_format(self):
+        r"""str: Format string for creating a yaml file."""
+        path = os.path.join(self.tempdir, '%s.yml')
         return path
 
     def make_yamlfile(self, path):
@@ -185,11 +217,75 @@ class TimedRun(CisTestBase, tools.CisClass):
                           'args': 'timed_pipe'},
                'outputs': {'name': 'output_file',
                            'driver': 'AsciiFileOutputDriver',
-                           'args': os.path.basename(self.output_file),
+                           'args': "{{PIPE_OUT_FILE}}",
                            'in_temp': True}}
         return out
 
-    def run(self, nmsg, msg_size, nrep=10, overwrite=False):
+    def before_run(self, nmsg, msg_size):
+        r"""Actions that should be performed before a run.
+
+        Args:
+            nmsg (int): Number of messages that should be sent.
+            msg_size (int): Size of each message that should be sent.
+
+        Returns:
+            str: Unique identifier for the run.
+
+        """
+        nmsg = int(nmsg)
+        msg_size = int(msg_size)
+        run_uuid = self.get_new_uuid()
+        self.entries[run_uuid] = (nmsg, msg_size)
+        self.fyaml[run_uuid] = self.yamlfile_format % run_uuid
+        self.foutput[run_uuid] = self.output_file_format % run_uuid
+        if os.path.isfile(self.fyaml[run_uuid]):
+            os.remove(self.fyaml[run_uuid])
+        self.make_yamlfile(self.fyaml[run_uuid])
+        env = {'PIPE_MSG_COUNT': str(nmsg),
+               'PIPE_MSG_SIZE': str(msg_size),
+               'PIPE_OUT_FILE': self.foutput[run_uuid]}
+        os.environ.update(env)
+        # self.debug_log()
+        self.set_default_comm(self.comm_type)
+        self.cleanup_output(self.foutput[run_uuid])
+        self.info("Starting %s...", self.entry_name(nmsg, msg_size))
+        return run_uuid
+
+    def after_run(self, run_uuid, result):
+        r"""Actions that should be performed after a run.
+
+        Args:
+            nmsg (int): Number of messages that were sent.
+            msg_size (int): Size of each message that were sent.
+            result (tuple): Average and standard deviation in the time (in
+                seconds) required to execute the program.
+
+        """
+        nmsg, msg_size = self.entries[run_uuid]
+        fout = self.foutput[run_uuid]
+        self.info("Finished %s: %f s", self.entry_name(nmsg, msg_size), result[0])
+        self.check_output(fout, nmsg, msg_size)
+        self.cleanup_output(fout)
+        self.reset_log()
+        self.reset_default_comm()
+        del self.entries[run_uuid], self.fyaml[run_uuid], self.foutput[run_uuid]
+
+    def run(self, run_uuid):
+        r"""Run test sending a set of messages between the designated models.
+
+        Args:
+            run_uuid (str): Unique ID for the run.
+
+        """
+        r = runner.get_runner(self.fyaml[uuid],
+                              namespace=self.name + uuid)
+        r.run()
+        assert(not r.error_flag)
+
+    def time_run(self, *args, **kwargs):
+        return self.time_run_mine(*args, **kwargs)
+
+    def time_run_mine(self, nmsg, msg_size, nrep=10, overwrite=False):
         r"""Time sending a set of messages between the designated models.
 
         Args:
@@ -200,38 +296,23 @@ class TimedRun(CisTestBase, tools.CisClass):
                 Defaults to 10.
             overwrite (bool, optional): If True, any existing entry for this
                 run will be overwritten. Defaults to False.
-        
+
         Returns:
             tuple: Average and standard deviation in the time (in seconds)
                 required to execute the program.
 
         """
-        nmsg = int(nmsg)
-        msg_size = int(msg_size)
-        if ((nmsg, msg_size) not in self.data[self.name]) or overwrite:
-            env = {'PIPE_MSG_COUNT': str(nmsg),
-                   'PIPE_MSG_SIZE': str(msg_size)}
-            os.environ.update(env)
-            out = np.empty(nrep, dtype='float')
-            # self.debug_log()
-            self.set_default_comm(self.comm_type)
+        if (nmsg, msg_size) not in self.data[self.name] or overwrite:
+            out = np.zeros(nrep, 'double')
             for i in range(nrep):
-                self.cleanup_output()
-                self.info("Starting run: %s to %s", self.lang_src, self.lang_dst)
+                run_uuid = self.before_run(nmsg, msg_size)
                 t0 = time.time()
-                r = runner.get_runner(self.yamlfile, namespace=self.namespace)
-                r.run()
+                self.run(run_uuid)
                 t1 = time.time()
                 out[i] = t1 - t0
-                self.info("Finished %s to %s: %f s", self.lang_src, self.lang_dst,
-                          out[i])
-                assert(not r.error_flag)
-                self.check_output(nmsg, msg_size)
-                self.cleanup_output()
+                self.after_run(run_uuid, out)
             self.data[self.name][(nmsg, msg_size)] = (np.mean(out), np.std(out))
             self.save_scalings()
-            self.reset_log()
-            self.reset_default_comm()
         return self.data[self.name][(nmsg, msg_size)]
 
     def plot_scaling(self, x, y, xname, yerr=None, axs=None, label=None,
@@ -324,11 +405,11 @@ class TimedRun(CisTestBase, tools.CisClass):
             else:
                 raise ValueError("Scaling must be 'linear' or 'log'.")
         if per_message:
-            avg0, std0 = self.run(0, 0)
+            avg0, std0 = self.time_run(0, 0)
         avg = []
         std = []
         for c in counts:
-            iavg, istd = self.run(c, msg_size)
+            iavg, istd = self.time_run(c, msg_size)
             if per_message:
                 iavg = (iavg - avg0) / c
             avg.append(iavg)
@@ -371,11 +452,11 @@ class TimedRun(CisTestBase, tools.CisClass):
             else:
                 raise ValueError("Scaling must be 'linear' or 'log'.")
         if per_message:
-            avg0, std0 = self.run(0, 0)
+            avg0, std0 = self.time_run(0, 0)
         avg = []
         std = []
         for s in sizes:
-            iavg, istd = self.run(nmsg, s)
+            iavg, istd = self.time_run(nmsg, s)
             if per_message:
                 iavg = (iavg - avg0) / nmsg
             avg.append(iavg)
