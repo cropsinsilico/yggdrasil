@@ -45,6 +45,23 @@ client    INFO       Controls the level of messages printed by
 ======    =======    =================================================
 
 
+Windows Options
+---------------
+
+On Windows, it may be necessary for you to manually specify the location of
+the ``libzmq`` and ``czmq`` headers and libraries. These can be set using
+the following config options. This should not be necessary on Linux/OSX.
+
+==============    ====================================================
+Option            Description
+==============    ====================================================
+libzmq_include    Full path to the zmq.h header.
+libzmq_static     Full path to the zmq.lib static library.
+czmq_include      Full path to the czmq.h header.
+czmq_static       Full path to the czmq.lib static library.
+==============    ====================================================
+
+
 RabbitMQ Options
 ----------------
 

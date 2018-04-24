@@ -9,6 +9,10 @@ from cis_interface.drivers import GCCModelDriver
 def cisrun():
     r"""Start a run."""
     prog = sys.argv[0].split(os.path.sep)[-1]
+    # Print help
+    if '-h' in sys.argv:
+        print('Usage: cisrun [YAMLFILE1] [YAMLFILE2]...')
+        return
     models = sys.argv[1:]
     cisRunner = runner.get_runner(models, cis_debug_prefix=prog)
     try:

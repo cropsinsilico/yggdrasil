@@ -1,5 +1,6 @@
 #include <stdio.h>
-#include <hellofunc.h>
+#include "gcc_model.h"
+#include "hellofunc.h"
 #include <CisInterface.hpp>
 
 int main() {

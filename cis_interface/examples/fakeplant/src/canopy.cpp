@@ -81,12 +81,6 @@ int main(int argc, char *argv[]) {
   // Loop over growth rates calculating new structure
   double *growth_rate = (double*)malloc(npatch*sizeof(double));
   while (ret >= 0) {
-    time_prev = time_curr;
-    ret = in_time.recv(1, &time_curr);
-    if (ret < 0) {
-      printf("canopy: No more input.\n");
-      break;
-    }
     // Receive growth rate for each patch
     for (i = 0; i < npatch; i++) {
       ret = in_growth.recv(1, growth_rate + i);
@@ -97,6 +91,7 @@ int main(int argc, char *argv[]) {
 	break;
       }
     }
+    // Update structure and send to out
     grow_canopy(time_curr - time_prev, growth_rate, layout, npatch, x1, x2, x3);
     for (i = 0; i < npatch; i++) {
       printf("canopy: patch %d: growth rate = %f --> \t%f\t%f\t%f\n\t\t\t\t\t\t%f\t%f\t%f\n\t\t\t\t\t\t%f\t%f\t%f...\n",
@@ -111,6 +106,13 @@ int main(int argc, char *argv[]) {
     if (ret < 0) {
       printf("canopy: Error sending structure output.\n");
       return_code = -1;
+      break;
+    }
+    // Check for next time
+    time_prev = time_curr;
+    ret = in_time.recv(1, &time_curr);
+    if (ret < 0) {
+      printf("canopy: No more input.\n");
       break;
     }
   }

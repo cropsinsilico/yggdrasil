@@ -1,3 +1,4 @@
+[![PyPI version](https://badge.fury.io/py/cis_interface.svg)](https://badge.fury.io/py/cis_interface)
 [![Build Status](https://travis-ci.org/cropsinsilico/cis_interface.svg?branch=master)](https://travis-ci.org/cropsinsilico/cis_interface)
 [![Build status](https://ci.appveyor.com/api/projects/status/y9du52gefaw4ees9/branch/master?svg=true)](https://ci.appveyor.com/project/langmm/cis-interface/branch/master)
 [![Coverage Status](https://coveralls.io/repos/github/cropsinsilico/cis_interface/badge.svg?branch=master)](https://coveralls.io/github/cropsinsilico/cis_interface?branch=master)

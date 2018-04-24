@@ -29,6 +29,7 @@ script_list = [
     ('c', ['gcc_model.c', 'hellofunc.c']),
     ('cpp', ['gcc_model.cpp', 'hellofunc.c']),
     ('make', 'gcc_model'),
+    ('cmake', 'gcc_model'),
     ('matlab', 'matlab_model.m'),
     ('python', 'python_model.py'),
     ('error', 'error_model.py')]
@@ -46,6 +47,7 @@ yaml_list = [
     ('c', 'gcc_model.yml'),
     ('cpp', 'gpp_model.yml'),
     ('make', 'make_model.yml'),
+    ('cmake', 'cmake_model.yml'),
     ('matlab', 'matlab_model.yml'),
     ('python', 'python_model.yml'),
     ('error', 'error_model.yml')]

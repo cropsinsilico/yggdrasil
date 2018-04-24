@@ -1,6 +1,7 @@
 import pint
 from cis_interface import backwards
 _ureg = pint.UnitRegistry()
+_ureg.define('micro_mole = 1e-6 * mole = uMol = umol')
 
 
 def is_unit(ustr):
