@@ -9,7 +9,6 @@ model:
     - name: inputPy_file
       driver: AsciiFileInputDriver
       args: ./Input/input_file.txt
-      onexit: printStatus
 
     - name: inputPy_table
       driver: AsciiTableInputDriver
