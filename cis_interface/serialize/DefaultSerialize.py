@@ -50,6 +50,7 @@ class DefaultSerialize(object):
                  func_serialize=None, func_deserialize=None, **kwargs):
         self.format_str = format_str
         self.as_array = as_array
+        self._alias = None
         if field_names is not None:
             field_names = [backwards.unicode2bytes(n) for n in field_names]
         self.field_names = field_names
@@ -72,6 +73,13 @@ class DefaultSerialize(object):
     #     print(cls)
     #     return cls
 
+    def __getattr__(self, *args, **kwargs):
+        r"""Return alias result if there is one."""
+        if self._alias is None:
+            return super(DefaultSerialize, self).__getattr__(*args, **kwargs)
+        else:
+            return self._alias.__getattr__(*args, **kwargs)
+
     @property
     def is_user_defined(self):
         r"""bool: True if serialization or deserialization function was user
@@ -82,7 +90,9 @@ class DefaultSerialize(object):
     @property
     def serializer_type(self):
         r"""int: Type of serializer."""
-        if self.is_user_defined:
+        if self._alias is not None:
+            out = self._alias.serializer_type
+        elif self.is_user_defined:
             out = -1
         elif self.format_str is None:
             out = 0
@@ -159,7 +169,9 @@ class DefaultSerialize(object):
                 is provided.
 
         """
-        if self._func_serialize is not None:
+        if self._alias is not None:
+            return self._alias.func_serialize(args)
+        elif self._func_serialize is not None:
             # Return directly to check and raise TypeError
             return self._func_serialize(args)
         elif self.format_str is not None:
@@ -189,7 +201,9 @@ class DefaultSerialize(object):
             tuple(obj, dict): Deserialized message and header information.
 
         """
-        if self._func_deserialize is not None:
+        if self._alias is not None:
+            out = self._alias.func_deserialize(msg)
+        elif self._func_deserialize is not None:
             out = self._func_deserialize(msg)
         elif self.format_str is not None:
             if self.as_array:
@@ -257,9 +271,7 @@ class DefaultSerialize(object):
             if (self.serializer_type != stype) and (stype != 0):
                 sinfo = self.serializer_info
                 sinfo['stype'] = stype
-                # Monkey patch class (unadvised, but child classes are simple)
-                print('monkey patch', sinfo)
-                self = serialize.get_serializer(**sinfo)
+                self._alias = serialize.get_serializer(**sinfo)
                 assert(self.serializer_type == stype)
 
     def deserialize(self, msg):

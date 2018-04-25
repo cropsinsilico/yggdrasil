@@ -10,7 +10,7 @@ class TestAsciiMapSerialize(TestDefaultSerialize):
     def __init__(self, *args, **kwargs):
         super(TestAsciiMapSerialize, self).__init__(*args, **kwargs)
         self._cls = 'AsciiMapSerialize'
-        self._objects = [{'arg1': 'val1', 'arg2': 1}]
+        self._objects = [self.map_dict]
         self._empty_obj = dict()
 
     def test_error_delim(self):

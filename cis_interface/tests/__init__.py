@@ -388,6 +388,7 @@ class IOInfo(object):
         self.file_elements = [('one', int(1), 1.0),
                               ('two', int(2), 2.0),
                               ('three', int(3), 3.0)]
+        self.map_dict = dict(args1=1, args2='2')
 
     @property
     def header_lines(self):
@@ -574,6 +575,21 @@ class IOInfo(object):
         with open(fname, 'wb') as fd:
             fd.write(header)
             fd.write(body)
+
+    def write_map(self, fname):
+        r"""Write the map dictionary out to a file.
+
+        Args:
+            fname (str): Full path to the file that the map should be
+                written to.
+
+        """
+        with open(fname, 'w') as fd:
+            for k, v in self.map_dict.items():
+                if isinstance(v, backwards.string_types):
+                    fd.write("%s\t'%s'\n" % (k, v))
+                else:
+                    fd.write("%s\t%s\n" % (k, repr(v)))
 
     def write_pickle(self, fname):
         r"""Write the pickled table out to a file.
