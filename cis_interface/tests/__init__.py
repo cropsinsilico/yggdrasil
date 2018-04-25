@@ -576,6 +576,17 @@ class IOInfo(object):
             fd.write(header)
             fd.write(body)
 
+    @property
+    def mapfile_contents(self):
+        r"""bytes: The contents of the test ASCII map file."""
+        out = ''
+        for k, v in self.map_dict.items():
+            if isinstance(v, backwards.string_types):
+                out += "%s\t'%s'\n" % (k, v)
+            else:
+                out += "%s\t%s\n" % (k, repr(v))
+        return backwards.unicode2bytes(out)
+
     def write_map(self, fname):
         r"""Write the map dictionary out to a file.
 
@@ -584,12 +595,8 @@ class IOInfo(object):
                 written to.
 
         """
-        with open(fname, 'w') as fd:
-            for k, v in self.map_dict.items():
-                if isinstance(v, backwards.string_types):
-                    fd.write("%s\t'%s'\n" % (k, v))
-                else:
-                    fd.write("%s\t%s\n" % (k, repr(v)))
+        with open(fname, 'wb') as fd:
+            fd.write(self.mapfile_contents)
 
     def write_pickle(self, fname):
         r"""Write the pickled table out to a file.
