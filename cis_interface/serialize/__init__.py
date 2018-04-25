@@ -90,6 +90,9 @@ def get_serializer(stype=None, **kwargs):
     elif stype == 6:
         from cis_interface.serialize import PandasSerialize
         cls = PandasSerialize.PandasSerialize
+    elif stype == 7:
+        from cis_interface.serialize import AsciiMapSerialize
+        cls = AsciiMapSerialize.AsciiMapSerialize
     else:
         raise RuntimeError("Unknown serializer type code: %d" % stype)
     return cls(**kwargs)
