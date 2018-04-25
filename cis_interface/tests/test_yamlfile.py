@@ -261,6 +261,26 @@ class TestYamlConnectionInputAsciiTableArray(YamlTestBase):
                   '    format_str: "%5s\t%d\t%f\n"'], )
 
 
+class TestYamlConnectionInputPickle(YamlTestBase):
+    r"""Test connection with Pickle."""
+    _contents = (['models:',
+                  '  - name: modelA',
+                  '    driver: GCCModelDriver',
+                  '    args: ./src/modelA.c',
+                  '    inputs:',
+                  '      - inputA',
+                  '    outputs:',
+                  '      - outputA',
+                  '',
+                  'connections:',
+                  '  - input: {{ %s }}' % _yaml_env,
+                  '    output: inputA',
+                  '    read_meth: pickle',
+                  '  - input: outputA',
+                  '    output: output.txt',
+                  '    write_meth: pickle'], )
+
+
 class TestYamlConnectionInputPandas(YamlTestBase):
     r"""Test connection with Pandas csv."""
     _contents = (['models:',

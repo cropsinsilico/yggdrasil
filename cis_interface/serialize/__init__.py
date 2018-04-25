@@ -38,7 +38,10 @@ def guess_serializer(msg, **kwargs):
     sinfo = dict(**kwargs)
     kws_fmt = {k: kwargs.get(k, None) for k in ['delimiter', 'newline']}
     kws_fmt['comment'] = backwards.unicode2bytes('')
-    if isinstance(msg, np.ndarray):
+    if sinfo.get('stype', 0) > 3:
+        # Don't guess for Pandas, Pickle, Map
+        pass
+    elif isinstance(msg, np.ndarray):
         names = [backwards.unicode2bytes(n) for n in msg.dtype.names]
         sinfo.setdefault('field_names', names)
         sinfo.setdefault('format_str', table2format(msg.dtype, **kws_fmt))

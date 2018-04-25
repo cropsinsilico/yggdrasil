@@ -257,6 +257,12 @@ class DefaultSerialize(object):
         return out
 
     def update_from_message(self, msg, **kwargs):
+        r"""Update serializer information based on the message.
+
+        Args:
+            msg (obj): Python object being sent as a message.
+
+        """
         kwargs.update(**self.serializer_info)
         sinfo = serialize.guess_serializer(msg, **kwargs)
         self.update_serializer(**sinfo)
