@@ -401,6 +401,10 @@ class IOInfo(object):
                              face_normals=[[0, 1, None], None],
                              face_texcoords=[[0, 1, None], None],
                              material='material')
+        self.ply_dict = dict(vertices=[[1.0, 2.0, 3.0],
+                                       [4.0, 5.0, 6.0],
+                                       [7.0, 8.0, 9.0]],
+                             faces=[[0, 1, 2]])
 
     @property
     def header_lines(self):
