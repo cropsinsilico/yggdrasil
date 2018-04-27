@@ -19,6 +19,10 @@ class TestDefaultSerialize(CisTestClassInfo):
                            'field_units', 'nfields', 'field_formats',
                            'numpy_dtype', 'scanf_format_str', 'serializer_info']
 
+    def map_sent2recv(self, obj):
+        r"""Convert a sent object into a received one."""
+        return obj
+
     @property
     def mod(self):
         r"""Module for class to be tested."""
@@ -51,7 +55,7 @@ class TestDefaultSerialize(CisTestClassInfo):
         for iobj in self._objects:
             msg = self.instance.serialize(iobj)
             iout, ihead = self.instance.deserialize(msg)
-            self.assert_result_equal(iout, iobj)
+            self.assert_result_equal(iout, self.map_sent2recv(iobj))
             nt.assert_equal(ihead, self.empty_head(msg))
 
     def test_deserialize_error(self):
@@ -68,15 +72,15 @@ class TestDefaultSerialize(CisTestClassInfo):
             msg = self.instance.serialize(iobj, header_kwargs=self._header_info,
                                           add_serializer_info=True)
             iout, ihead = self.instance.deserialize(msg)
-            self.assert_result_equal(iout, iobj)
+            self.assert_result_equal(iout, self.map_sent2recv(iobj))
             nt.assert_equal(ihead, hout)
             # Use info to reconstruct serializer
             iout, ihead = temp_seri.deserialize(msg)
-            self.assert_result_equal(iout, iobj)
+            self.assert_result_equal(iout, self.map_sent2recv(iobj))
             nt.assert_equal(ihead, hout)
             new_seri = serialize.get_serializer(**ihead)
             iout, ihead = new_seri.deserialize(msg)
-            self.assert_result_equal(iout, iobj)
+            self.assert_result_equal(iout, self.map_sent2recv(iobj))
             nt.assert_equal(ihead, hout)
         
     def test_serialize_header(self):
@@ -84,7 +88,7 @@ class TestDefaultSerialize(CisTestClassInfo):
         for iobj in self._objects:
             msg = self.instance.serialize(iobj, header_kwargs=self._header_info)
             iout, ihead = self.instance.deserialize(msg)
-            self.assert_result_equal(iout, iobj)
+            self.assert_result_equal(iout, self.map_sent2recv(iobj))
             nt.assert_equal(ihead, self._header_info)
         
     def test_serialize_eof(self):
@@ -110,7 +114,7 @@ class TestDefaultSerialize(CisTestClassInfo):
                 msg = self.instance.serialize([iobj],
                                               header_kwargs=self._header_info)
                 iout, ihead = self.instance.deserialize(msg)
-                self.assert_result_equal(iout, iobj)
+                self.assert_result_equal(iout, self.map_sent2recv(iobj))
                 nt.assert_equal(ihead, self._header_info)
             nt.assert_raises(Exception, self.instance.serialize, ['msg', 0])
         

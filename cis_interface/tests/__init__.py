@@ -389,6 +389,18 @@ class IOInfo(object):
                               ('two', int(2), 2.0),
                               ('three', int(3), 3.0)]
         self.map_dict = dict(args1=1, args2='2')
+        self.obj_dict = dict(vertices=[[1.0, 2.0, 3.0],
+                                       [4.0, 5.0, 6.0],
+                                       [7.0, 8.0, 9.0]],
+                             normals=[[1.0, 2.0, 3.0],
+                                      [4.0, 5.0, 6.0],
+                                      [7.0, 8.0, 9.0]],
+                             texcoords=[[1.0, 2.0], [2.0, 3.0], [3.0, 4.0]],
+                             faces=[[0, 1, 2],
+                                    [(0, 0, 0), (1, 1, 1), (2, 2, 2)]],
+                             face_normals=[[0, 1, None], None],
+                             face_texcoords=[[0, 1, None], None],
+                             material='material')
 
     @property
     def header_lines(self):

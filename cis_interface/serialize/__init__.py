@@ -47,19 +47,20 @@ def guess_serializer(msg, **kwargs):
         sinfo.setdefault('format_str', table2format(msg.dtype, **kws_fmt))
         sinfo.setdefault('as_array', True)
     elif isinstance(msg, (list, tuple)):
-        typ_list = []
-        for x in msg:
-            if isinstance(x, backwards.string_types):
-                typ_list.append(np.dtype('S1'))
-            else:
-                typ_list.append(np.dtype(type(x)))
-        new_type = dict(formats=typ_list,
-                        names=['f%d' % i for i in range(len(typ_list))])
-        row_dtype = np.dtype(new_type)
-        format_str = table2format(row_dtype, **kws_fmt)
-        format_str = format_str.replace(backwards.unicode2bytes('%1s'),
-                                        backwards.unicode2bytes('%s'))
-        sinfo.setdefault('format_str', format_str)
+        if 'format_str' not in sinfo:
+            typ_list = []
+            for x in msg:
+                if isinstance(x, backwards.string_types):
+                    typ_list.append(np.dtype('S1'))
+                else:
+                    typ_list.append(np.dtype(type(x)))
+            new_type = dict(formats=typ_list,
+                            names=['f%d' % i for i in range(len(typ_list))])
+            row_dtype = np.dtype(new_type)
+            format_str = table2format(row_dtype, **kws_fmt)
+            format_str = format_str.replace(backwards.unicode2bytes('%1s'),
+                                            backwards.unicode2bytes('%s'))
+            sinfo.setdefault('format_str', format_str)
     return sinfo
 
 
@@ -96,6 +97,9 @@ def get_serializer(stype=None, **kwargs):
     elif stype == 7:
         from cis_interface.serialize import AsciiMapSerialize
         cls = AsciiMapSerialize.AsciiMapSerialize
+    elif stype == 8:
+        from cis_interface.serialize import ObjSerialize
+        cls = ObjSerialize.ObjSerialize
     else:
         raise RuntimeError("Unknown serializer type code: %d" % stype)
     return cls(**kwargs)
