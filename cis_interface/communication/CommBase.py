@@ -144,6 +144,8 @@ class CommThreadLoop(tools.CisThreadLoop):
         r"""Actions taken on the backlog thread when the main thread stops."""
         # for i in threading.enumerate():
         #     print(i.name)
+        self.debug('is_interface = %s, direction = %s',
+                   self.comm.is_interface, self.comm.direction)
         if self.comm.is_interface:
             self.debug('_1st_main_terminated = %s', str(self._1st_main_terminated))
             if self.comm.direction == 'send':
@@ -781,6 +783,7 @@ class CommBase(tools.CisClass):
         r"""dict: Keyword arguments for an existing work comm."""
         return dict(comm=self.comm_class, direction='recv',
                     recv_timeout=self.recv_timeout,
+                    is_interface=self.is_interface,
                     single_use=True)
 
     @property
@@ -788,6 +791,7 @@ class CommBase(tools.CisClass):
         r"""dict: Keyword arguments for a new work comm."""
         return dict(comm=self.comm_class, direction='send',
                     recv_timeout=self.recv_timeout,
+                    is_interface=self.is_interface,
                     uuid=str(uuid.uuid4()), single_use=True)
 
     def get_work_comm(self, header, work_comm_name=None, **kwargs):

@@ -31,6 +31,8 @@ class AsyncComm(CommBase.CommBase):
         self.dont_backlog = dont_backlog
         if kwargs.get('matlab', False):
             self.dont_backlog = True
+        # if kwargs.get('is_inteface', False):
+        #     self.done_backlog = True
         self._backlog_recv = []
         self._backlog_send = []
         self._backlog_thread = None
@@ -192,11 +194,17 @@ class AsyncComm(CommBase.CommBase):
     @property
     def is_confirmed_send(self):
         r"""bool: True if all sent messages have been confirmed."""
+        for v in self._work_comms.values():
+            if (v.direction == 'send') and not v.is_confirmed_send:  # pragma: debug
+                return False
         return (self.n_msg_direct_send == 0)
 
     @property
     def is_confirmed_recv(self):
         r"""bool: True if all received messages have been confirmed."""
+        for v in self._work_comms.values():
+            if (v.direction == 'recv') and not v.is_confirmed_recv:  # pragma: debug
+                return False
         return (self.n_msg_direct_recv == 0)
 
     @property
