@@ -3,6 +3,7 @@ from openalea.lpy import Lsystem
 from openalea.plantgl.all import Tesselator
 from cis_interface.interface.CisInterface import (
     CisInput, CisAsciiArrayOutput)
+from cis_interface.serialize.PlySerialize import PlySerialize
 
 # Parse input
 error_code = 0
@@ -12,6 +13,7 @@ if len(sys.argv) != 2:
     print(usage.format(__name__))
 fname = sys.argv[1]
 ply_format = './Output/output_%d.ply'
+sply = PlySerialize()
 
 # Connect to I/O channels
 in1 = CisInput('LPy_time')
@@ -40,22 +42,16 @@ while (flag):
         tree = lsys.iterate(tree, 1)
 
     # Discretize the scene
-    # vertices = []
-    # faces = []
     scene = lsys.sceneInterpretation(tree)
-    nind = 0
-    nvert = 0
-    vert_part = ''
-    ind_part = ''
+    ply_dict = dict(vertices=[], vertex_colors=[], faces=[])
     mesh = []
     for k, shapes in scene.todict().items():
         for shape in shapes:
             d.process(shape)
             c = shape.appearance.ambient
             for p in d.result.pointList:
-                # vertices.append((p.x, p.y, p.z, c.red, c.green, c.blue))
-                vert_part += "%f %f %f %i %i %i\n" % (
-                    p.x, p.y, p.z, c.red, c.green, c.blue)
+                ply_dict['vertices'].append([p.x, p.y, p.z])
+                ply_dict['vertex_colors'].append([c.red, c.green, c.blue])
             for i3 in d.result.indexList:
                 imesh = []
                 for i in range(3):
@@ -69,11 +65,9 @@ while (flag):
                     imesh += [_iv3.x, _iv3.y, _iv3.z]
                 if imesh:
                     mesh.append(imesh)
-                # faces.append((3, i3[0] + nvert, i3[1] + nvert, i3[2] + nvert))
-                ind_part += "3 %i %i %i\n" % (
-                    i3[0] + nvert, i3[1] + nvert, i3[2] + nvert)
-            nind += len(d.result.indexList)
-            nvert += len(d.result.pointList)
+                nvert = len(ply_dict['vertices'])
+                ply_dict['faces'].append([i3[0] + nvert, i3[1] + nvert, i3[2] + nvert])
+            # Clear descretizer to ensure no hold over verts/faces
             d.clear()
 
     # Send output as just verts in each face
@@ -84,27 +78,9 @@ while (flag):
         break
 
     # Write output in ply format
-    # TODO: Create ply serializer
-    header = """ply
-    format ascii 1.0
-    comment author Xarthisius
-    comment File Generated with PlantGL API
-    element vertex {nvert}
-    property float x
-    property float y
-    property float z
-    property uchar diffuse_red
-    property uchar diffuse_green
-    property uchar diffuse_blue
-    element face {nind}
-    property list uchar int vertex_indices
-    end_header
-    """
     iply = ply_format % niter
-    with open(iply, 'w') as fd:
-        fd.write(header.format(nvert=nvert, nind=nind))
-        fd.write(vert_part)
-        fd.write(ind_part)
+    with open(iply, 'wb') as fd:
+        fd.write(sply.serialize(ply_dict))
     print('LPy: Wrote %s' % iply)
 
 

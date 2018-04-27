@@ -69,7 +69,7 @@ class PlySerialize(DefaultSerialize):
                       'property uchar diffuse_blue',
                       'element face %d' % nface,
                       'property list uchar int vertex_indices',
-                      'end_header', '']
+                      'end_header']
         # Set colors if not provided
         if not args.get('vertex_colors', []):
             args['vertex_colors'] = []
