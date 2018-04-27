@@ -1,4 +1,5 @@
 import sys
+import numpy as np
 from openalea.lpy import Lsystem
 from openalea.plantgl.all import Tesselator
 from cis_interface.interface.CisInterface import (
@@ -18,7 +19,6 @@ sply = PlySerialize()
 # Connect to I/O channels
 in1 = CisInput('LPy_time')
 out = CisAsciiArrayOutput('LPy_mesh', '%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\n')
-
 
 # Create lsystem & discretizer
 lsys = Lsystem(fname)
@@ -45,6 +45,9 @@ while (flag):
     scene = lsys.sceneInterpretation(tree)
     ply_dict = dict(vertices=[], vertex_colors=[], faces=[])
     mesh = []
+    mins = 1e6 * np.ones(3, 'float')
+    maxs = -1e6 * np.ones(3, 'float')
+    nvert = 0
     for k, shapes in scene.todict().items():
         for shape in shapes:
             d.process(shape)
@@ -59,14 +62,18 @@ while (flag):
                     if _i3 == len(d.result.pointList):
                         # TODO: sometimes the index is equal to the length of
                         # the points list. Should this be some special vertex?
+                        # _i3 = 0
                         # print(_i3, len(d.result.pointList))
-                        _i3 = 0
+                        imesh = []
+                        break
                     _iv3 = d.result.pointList[_i3]
                     imesh += [_iv3.x, _iv3.y, _iv3.z]
+                    mins = np.minimum(mins, np.array([_iv3.x, _iv3.y, _iv3.z]))
+                    maxs = np.maximum(maxs, np.array([_iv3.x, _iv3.y, _iv3.z]))
                 if imesh:
                     mesh.append(imesh)
-                nvert = len(ply_dict['vertices'])
                 ply_dict['faces'].append([i3[0] + nvert, i3[1] + nvert, i3[2] + nvert])
+            nvert += len(d.result.pointList)
             # Clear descretizer to ensure no hold over verts/faces
             d.clear()
 
@@ -76,6 +83,9 @@ while (flag):
         print('LPy: Failed to send mesh.')
         error_code = -1
         break
+    print('LPy: Sent mesh with %d triangles.' % len(mesh))
+    print('LPy: \tmins: %f %f %f' % (mins[0], mins[1], mins[2]))
+    print('LPy: \tmaxs: %f %f %f' % (maxs[0], maxs[1], maxs[2]))
 
     # Write output in ply format
     iply = ply_format % niter

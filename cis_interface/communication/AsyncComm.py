@@ -31,8 +31,8 @@ class AsyncComm(CommBase.CommBase):
         self.dont_backlog = dont_backlog
         if kwargs.get('matlab', False):
             self.dont_backlog = True
-        # if kwargs.get('is_inteface', False):
-        #     self.done_backlog = True
+        if kwargs.get('is_inteface', False):
+            self.dont_backlog = True
         self._backlog_recv = []
         self._backlog_send = []
         self._backlog_thread = None

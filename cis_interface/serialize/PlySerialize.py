@@ -137,6 +137,7 @@ class PlySerialize(DefaultSerialize):
             while len(out['faces']) < nface:
                 values = lines[i].split()
                 if len(values) > 0:
-                    out['faces'].append(map(int, values[1:]))
+                    nv = int(values[0])
+                    out['faces'].append(map(int, values[1:(nv + 1)]))
                 i += 1
         return out
