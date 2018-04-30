@@ -658,8 +658,8 @@ int comm_recv_multipart(const comm_t x, char **data, const size_t len,
 	if ((head.size - prev) > xmulti.maxMsgSize)
 	  msgsiz = xmulti.maxMsgSize;
 	else
-	  msgsiz = head.size - prev + 1;
-	ret = comm_recv_single(xmulti, &pos, msgsiz, 0);
+	  msgsiz = head.size - prev;
+	ret = comm_recv_single(xmulti, &pos, msgsiz + 1, 0);
 	if (ret < 0) {
 	  cislog_debug("comm_recv_multipart(%s): recv interupted at %d of %d bytes.",
 		       x.name, prev, head.size);
