@@ -146,11 +146,11 @@ class ObjSerialize(DefaultSerialize):
                 if not values:
                     continue
                 if values[0] == 'v':
-                    out['vertices'].append(map(float, values[1:4]))
+                    out['vertices'].append([x for x in map(float, values[1:4])])
                 elif values[0] == 'vn':
-                    out['normals'].append(map(float, values[1:4]))
+                    out['normals'].append([x for x in map(float, values[1:4])])
                 elif values[0] == 'vt':
-                    out['texcoords'].append(map(float, values[1:3]))
+                    out['texcoords'].append([x for x in map(float, values[1:3])])
                 elif values[0] in ('usemtl', 'usemat'):
                     out['material'] = values[1]
                 elif values[0] == 'f':
