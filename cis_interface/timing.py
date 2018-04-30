@@ -1,8 +1,11 @@
 import os
+import sys
 import time
 import yaml
 import uuid
 import perf
+import subprocess
+import warnings
 import tempfile
 import numpy as np
 from cis_interface import tools, runner, drivers, examples, backwards, platform
@@ -14,6 +17,67 @@ _linewidth = 4
 mpl.rcParams['axes.linewidth'] = _linewidth
 mpl.rcParams['axes.labelweight'] = 'bold'
 mpl.rcParams['font.weight'] = 'bold'
+
+
+def write_perf_script(script_file, nmsg, msg_size,
+                      lang_src='python', lang_dst='python',
+                      comm_type=None):
+    r"""Write a script to run perf."""
+    if comm_type is None:
+        comm_type = tools.get_default_comm()
+    lines = [
+        'import perf',
+        'from cis_interface import timing',
+        'nrep = 3',
+        'nmsg = %d' % nmsg,
+        'msg_size = %d' % msg_size,
+        'lang_src = "%s"' % lang_src,
+        'lang_dst = "%s"' % lang_dst,
+        'comm_type = "%s"' % comm_type,
+        'timer = timing.TimedRun(lang_src, lang_dst, comm_type=comm_type)',
+        'runner = perf.Runner(values=nrep)',
+        'out = runner.bench_time_func(timer.entry_name(nmsg, msg_size),',
+        '                             timing.perf_func,',
+        '                             timer, nmsg, msg_size)',
+        ]
+    if os.path.isfile(script_file):
+        os.remove(script_file)
+    with open(script_file, 'w') as fd:
+        fd.write('\n'.join(lines))
+
+
+def perf_func(loops, timer, nmsg, msg_size):
+    r"""Function to do perf loops over function.
+
+    Args:
+        loops (int): Number of loops to perform.
+        timer (TimedRun): Class with information about the run and methods
+            required for setup/teardown.
+        nmsg (int): Number of messages that should be sent in the test.
+        msg_size (int): Size of messages that should be sent in the test.
+
+    Returns:
+        float: Time (in seconds) required to perform the test the required
+            number of times.
+
+    """
+    ttot = 0
+    range_it = range(loops)
+    for i in range_it:
+        run_uuid = timer.before_run(nmsg, msg_size)
+        flag = False
+        while not flag:
+            try:
+                t0 = perf.perf_counter()
+                timer.run(run_uuid)
+                t1 = perf.perf_counter()
+                tdif = t1 - t0
+                timer.after_run(run_uuid, tdif)
+                ttot += tdif
+                flag = True
+            except AssertionError as e:
+                warnings.warn("Error '%s'. Trying again." % e)
+    return ttot
 
 
 def get_source(lang, direction, name='timed_pipe'):
@@ -42,6 +106,9 @@ class TimedRun(CisTestBase, tools.CisClass):
         name (str, optional): Name of the example. Defaults to 'timed_pipe'.
         scalings_file (str, optional): Full path to the file where scalings
             data should be logged. Defaults to 'scalings_{name}_{comm_type}.dat'.
+        perf_file (str, optional): Full path to file containing a perf
+            BenchmarkSuite that runs should be added to. Defaults to
+            'benches.json'.
         comm_type (str, optional): Name of communication class that should be
             used for tests. Defaults to the current default comm class.
 
@@ -51,18 +118,23 @@ class TimedRun(CisTestBase, tools.CisClass):
         platform (str): Platform that the test is being run on.
         scalings_file (str): Full path to the file where scalings data will be
             saved.
+        perf_file (str): Full path to file containing a perf BenchmarkSuite
+            that runs will be added to.
         comm_type (str): Name of communication class that should be used for
             tests.
 
     """
     def __init__(self, lang_src, lang_dst, name='timed_pipe',
-                 scalings_file=None, comm_type=None, **kwargs):
+                 scalings_file=None, perf_file=None, comm_type=None, **kwargs):
         if comm_type is None:
             comm_type = tools.get_default_comm()
         if scalings_file is None:
             scalings_file = os.path.join(os.getcwd(), 'scaling_%s_%s.dat' % (
                 name, comm_type))
+        if perf_file is None:
+            perf_file = os.path.join(os.getcwd(), 'benches.json')
         self.scalings_file = scalings_file
+        self.perf_file = perf_file
         self.comm_type = comm_type
         self.program_name = name
         if platform._is_win:
@@ -76,6 +148,7 @@ class TimedRun(CisTestBase, tools.CisClass):
         super(TimedRun, self).__init__(skip_unittest=True, **kwargs)
         self.lang_src = lang_src
         self.lang_dst = lang_dst
+        self.perf = self.load_perf()
         self.data = self.load_scalings()
         if self.name not in self.data:
             self.data[self.name] = {}
@@ -173,6 +246,11 @@ class TimedRun(CisTestBase, tools.CisClass):
         path = os.path.join(self.tempdir, '%s.yml')
         return path
 
+    @property
+    def perfscript(self):
+        r"""str: Format string for creating a perf script."""
+        return os.path.join(self.tempdir, 'runperf.py')
+
     def make_yamlfile(self, path):
         r"""Create a YAML file for running the test.
 
@@ -257,13 +335,12 @@ class TimedRun(CisTestBase, tools.CisClass):
         Args:
             nmsg (int): Number of messages that were sent.
             msg_size (int): Size of each message that were sent.
-            result (tuple): Average and standard deviation in the time (in
-                seconds) required to execute the program.
+            result (float): Time required (in seconds) to execute the program.
 
         """
         nmsg, msg_size = self.entries[run_uuid]
         fout = self.foutput[run_uuid]
-        self.info("Finished %s: %f s", self.entry_name(nmsg, msg_size), result[0])
+        self.info("Finished %s: %f s", self.entry_name(nmsg, msg_size), result)
         self.check_output(fout, nmsg, msg_size)
         self.cleanup_output(fout)
         self.reset_log()
@@ -277,13 +354,48 @@ class TimedRun(CisTestBase, tools.CisClass):
             run_uuid (str): Unique ID for the run.
 
         """
-        r = runner.get_runner(self.fyaml[uuid],
-                              namespace=self.name + uuid)
+        r = runner.get_runner(self.fyaml[run_uuid],
+                              namespace=self.name + run_uuid)
         r.run()
         assert(not r.error_flag)
 
     def time_run(self, *args, **kwargs):
-        return self.time_run_mine(*args, **kwargs)
+        # return self.time_run_mine(*args, **kwargs)
+        return self.time_run_perf(*args, **kwargs)
+
+    def time_run_perf(self, nmsg, msg_size, nrep=10, overwrite=False):
+        r"""Time sending a set of messages between the designated models.
+
+        Args:
+            nmsg (int): Number of messages that should be sent.
+            msg_size (int): Size of each message that should be sent.
+            nrep (int, optional): Number of times the test should be repeated
+                to get an average execution time and standard deviation.
+                Defaults to 10.
+            overwrite (bool, optional): If True, any existing entry for this
+                run will be overwritten. Defaults to False.
+
+        Returns:
+            tuple: Average and standard deviation in the time (in seconds)
+                required to execute the program.
+
+        """
+        entry_name = self.entry_name(nmsg, msg_size)
+        if (((self.perf is None) or overwrite or
+             (entry_name not in self.perf.get_benchmark_names()))):
+            write_perf_script(self.perfscript, nmsg, msg_size,
+                              lang_src=self.lang_src,
+                              lang_dst=self.lang_dst,
+                              comm_type=self.comm_type)
+            cmd = [sys.executable, self.perfscript, '--append=' + self.perf_file]
+            subprocess.call(cmd)
+            assert(os.path.isfile(self.perf_file))
+            self.perf = self.load_perf()
+        out = self.perf.get_benchmark(entry_name)
+        print(out.get_runs()[0].values)
+        print(out.get_values())
+        print(out.get_nvalue(), out.get_loops())
+        return (out.mean(), out.stdev())
 
     def time_run_mine(self, nmsg, msg_size, nrep=10, overwrite=False):
         r"""Time sending a set of messages between the designated models.
@@ -310,13 +422,14 @@ class TimedRun(CisTestBase, tools.CisClass):
                 self.run(run_uuid)
                 t1 = time.time()
                 out[i] = t1 - t0
-                self.after_run(run_uuid, out)
+                self.after_run(run_uuid, np.mean(out))
             self.data[self.name][(nmsg, msg_size)] = (np.mean(out), np.std(out))
             self.save_scalings()
         return self.data[self.name][(nmsg, msg_size)]
 
     def plot_scaling(self, x, y, xname, yerr=None, axs=None, label=None,
-                     scaling='linear', plot_kws={}, per_message=False):
+                     xscale='linear', yscale='linear',
+                     plot_kws={}, per_message=False):
         r"""Plot scaling of run time with a variable.
 
         Args:
@@ -329,8 +442,10 @@ class TimedRun(CisTestBase, tools.CisClass):
                 added to. If not provided, one is created.
             label (str, optional): Label that should be used for the line.
                 Defaults to None.
-            scaling (str, optional): 'log' or 'linear' to indicate what scale
-                the axes should use. Defaults to 'linear'.
+            xscale (str, optional): 'log' or 'linear' to indicate what scale
+                the x axis should use. Defaults to 'linear'.
+            yscale (str, optional): 'log' or 'linear' to indicate what scale
+                the y axis should use. Defaults to 'linear'.
             plot_kws (dict, optional): Ploting keywords that should be passed.
                 Defaults to {}.
             per_message (bool, optional): If True, the time per message is
@@ -353,20 +468,23 @@ class TimedRun(CisTestBase, tools.CisClass):
                 axs.set_ylabel('Time per Message (s)')
             else:
                 axs.set_ylabel('Time (s)')
+        # Set axes scales
+        if xscale == 'log':
+            axs.set_xscale('log')
+        if yscale == 'log':
+            axs.set_yscale('log')
         # Plot
-        if scaling == 'log':
-            if yerr is not None:
-                axs.set_xscale('log')
-                axs.errorbar(x, y, yerr=yerr,
-                             label=label, **plot_kws)
+        if yerr is not None:
+            # Convert yscale to prevent negative values for log y
+            if yscale == 'log':
+                ylower = np.maximum(1e-2, y - yerr)
+                yerr_lower = y - ylower
             else:
-                # axs.loglog(x, y, label=label, **plot_kws)
-                axs.semilogx(x, y, label=label, **plot_kws)
+                yerr_lower = y - yerr
+            axs.errorbar(x, y, yerr=[yerr_lower, 2 * yerr],
+                         label=label, **plot_kws)
         else:
-            if yerr is not None:
-                axs.errorbar(x, y, yerr=yerr, label=label, **plot_kws)
-            else:
-                axs.plot(x, y, label=label, **plot_kws)
+            axs.plot(x, y, label=label, **plot_kws)
         return axs
 
     def scaling_count(self, msg_size, counts=None, min_count=1, max_count=100,
@@ -463,6 +581,19 @@ class TimedRun(CisTestBase, tools.CisClass):
             std.append(istd)
         return (sizes, avg, std)
 
+    def load_perf(self):
+        r"""Load perf BenchmarkSuite from file.
+
+        Returns:
+            perf.BenchmarkSuite: Suite of performance data.
+
+        """
+        if os.path.isfile(self.perf_file):
+            out = perf.BenchmarkSuite.load(self.perf_file)
+        else:
+            out = None
+        return out
+
     def load_scalings(self):
         r"""Load scalings data from pickle file.
 
@@ -558,11 +689,12 @@ def plot_scalings(nmsg=1, msg_size=1000, counts=None, sizes=None,
             x2, y2, z2 = x.scaling_size(nmsg, sizes=sizes,
                                         per_message=per_message)
             x.plot_scaling(x1, y1, 'count', yerr=z1, axs=axs[0],
+                           yscale='log',
                            label=label, plot_kws=plot_kws,
                            per_message=per_message)
             x.plot_scaling(x2, y2, 'size', yerr=z2, axs=axs[1],
-                           scaling='log', label=label,
-                           plot_kws=plot_kws,
+                           yscale='log', xscale='log',
+                           label=label, plot_kws=plot_kws,
                            per_message=per_message)
     legend = axs[0].legend(bbox_to_anchor=box_leg, loc='upper center', ncol=3)
     legend.get_frame().set_linewidth(_linewidth)

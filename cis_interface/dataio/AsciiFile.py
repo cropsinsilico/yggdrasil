@@ -57,7 +57,7 @@ class AsciiFile(object):
     @property
     def is_open(self):
         r"""bool: Returns True if the file descriptor is open."""
-        return (self.fd is not None)
+        return (self.fd is not None) and (not self.fd.closed)
 
     @property
     def open_mode(self):
