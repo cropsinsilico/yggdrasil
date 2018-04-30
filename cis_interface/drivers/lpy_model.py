@@ -59,13 +59,13 @@ while (flag):
                 imesh = []
                 for i in range(3):
                     _i3 = i3[i]
-                    if _i3 == len(d.result.pointList):
-                        # TODO: sometimes the index is equal to the length of
-                        # the points list. Should this be some special vertex?
-                        # _i3 = 0
-                        # print(_i3, len(d.result.pointList))
-                        imesh = []
-                        break
+                    # if _i3 == len(d.result.pointList):
+                    #     # TODO: sometimes the index is equal to the length of
+                    #     # the points list. Should this be some special vertex?
+                    #     # _i3 = 0
+                    #     print(_i3, len(d.result.pointList))
+                    #     imesh = []
+                    #     break
                     _iv3 = d.result.pointList[_i3]
                     imesh += [_iv3.x, _iv3.y, _iv3.z]
                     mins = np.minimum(mins, np.array([_iv3.x, _iv3.y, _iv3.z]))

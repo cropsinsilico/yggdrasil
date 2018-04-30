@@ -35,7 +35,7 @@ class ObjSerialize(DefaultSerialize):
         r"""obj: Object indicating empty message."""
         return backwards.unicode2bytes('')
             
-    def func_serialize(self, args):
+    def func_serialize(self, args, zero_indexed=True):
         r"""Serialize a message.
 
         Args:
@@ -53,7 +53,11 @@ class ObjSerialize(DefaultSerialize):
                     vertex in the face. Entries of None are ignored.
                 face_normals (list): Indices of normals for each vertex in the
                     face. Entries of None are ignored.
-
+            zero_indexed (bool, optional): If True, the input indices are assumed
+                to start at zero and they will be adjusted to start at one and
+                conform with .obj format. If False, the input indices are assumed
+                to start at one and they will not be adjusted. Defaults to True.
+               
         Returns:
             bytes, str: Serialized message.
 
@@ -99,28 +103,34 @@ class ObjSerialize(DefaultSerialize):
                                 continue
                             f[j][key_index] = t[j]
             # Add lines
+            add_ind = 0
+            if zero_indexed:
+                add_ind = 1
             for f in faces:
                 iline = 'f'
                 for j in range(len(f)):
                     v = f[j]
-                    iline += ' %d/' % v[0]
+                    iline += ' %d/' % (v[0] + add_ind)
                     if v[1] is not None:
-                        iline += '%d' % v[1]
+                        iline += '%d' % (v[1] + add_ind)
                     iline += '/'
                     if v[2] is not None:
-                        iline += '%d' % v[2]
+                        iline += '%d' % (v[2] + add_ind)
                 lines.append(iline)
         out = self.newline.join(lines)
         return backwards.unicode2bytes(out)
 
-    def func_deserialize(self, msg):
+    def func_deserialize(self, msg, zero_indexed=True):
         r"""Deserialize a message.
 
         Args:
             msg (str, bytes): Message to be deserialized.
+            zero_indexed (bool, optional): If True, the parsed indices are adjusted
+                to start at zero. If False, the indices will not be adjusted and
+                will start at one as per .obj format. Defaults to True.
 
         Returns:
-            dict: Deserialized .obj information.
+            dict: Deserialized .obj information. The faces are zero indexed.
 
         """
         if len(msg) == 0:
@@ -144,21 +154,26 @@ class ObjSerialize(DefaultSerialize):
                 elif values[0] in ('usemtl', 'usemat'):
                     out['material'] = values[1]
                 elif values[0] == 'f':
+                    sub_ind = 0
+                    if zero_indexed:
+                        sub_ind = 1
                     face = []
                     texcoords = []
                     norms = []
                     for v in values[1:]:
                         w = v.split('/')
-                        face.append(int(w[0]))
+                        face.append(int(w[0]) - sub_ind)
                         itexc = None
                         inorm = None
                         if len(w) >= 2 and len(w[1]) > 0:
-                            itexc = int(w[1])
+                            itexc = int(w[1]) - sub_ind
                         texcoords.append(itexc)
                         if len(w) >= 3 and len(w[2]) > 0:
-                            inorm = int(w[2])
+                            inorm = int(w[2]) - sub_ind
                         norms.append(inorm)
                     out['faces'].append(face)
                     out['face_texcoords'].append(texcoords)
                     out['face_normals'].append(norms)
+                    for x in out['faces'][-1]:
+                        assert(x <= (len(out['vertices']) - sub_ind))
         return out
