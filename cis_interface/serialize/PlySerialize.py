@@ -128,9 +128,9 @@ class PlySerialize(DefaultSerialize):
             while len(out['vertices']) < nvert:
                 values = lines[i].split()
                 if len(values) > 0:
-                    out['vertices'].append(map(float, values[:3]))
+                    out['vertices'].append([x for x in map(float, values[:3])])
                     if len(values) >= 6:
-                        out['vertex_colors'].append(map(int, values[3:]))
+                        out['vertex_colors'].append([x for x in map(int, values[3:])])
                     else:
                         out['vertex_colors'].append(self.default_rgb)
                 i += 1
@@ -138,7 +138,7 @@ class PlySerialize(DefaultSerialize):
                 values = lines[i].split()
                 if len(values) > 0:
                     nv = int(values[0])
-                    out['faces'].append(map(int, values[1:(nv + 1)]))
+                    out['faces'].append([x for x in map(int, values[1:(nv + 1)])])
                     for x in out['faces'][-1]:
                         assert(x < len(out['vertices']))
                 i += 1
