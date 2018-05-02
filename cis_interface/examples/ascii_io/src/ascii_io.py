@@ -65,15 +65,18 @@ if __name__ == '__main__':
             out_table.send_eof()
 
     # Read entire array from ASCII table into numpy array
-    ret, arr = in_array.recv_array()
-    if not ret:
-        print("ascii_io(P): ERROR RECVING ARRAY")
-        sys.exit(-1)
-    print("Array: (%d rows)" % len(arr))
-    # Print each line in the array
-    for i in range(len(arr)):
-        print("%5s, %d, %3.1f, %s" % tuple(arr[i]))
-    # Send the array to output. Formatting is handled on the output driver side.
-    ret = out_array.send_array(arr)
-    if not ret:
-        print("ascii_io(P): ERROR SENDING ARRAY")
+    ret = True
+    while ret:
+        ret, arr = in_array.recv_array()
+        if ret:
+            print("Array: (%d rows)" % len(arr))
+            # Print each line in the array
+            for i in range(len(arr)):
+                print("%5s, %d, %3.1f, %s" % tuple(arr[i]))
+            # Send the array to output. Formatting is handled on the output driver side.
+            ret = out_array.send_array(arr)
+            if not ret:
+                print("ascii_io(P): ERROR SENDING ARRAY")
+                break
+        else:
+            print("ascii_io(P): End of array input (Python)")

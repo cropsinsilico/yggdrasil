@@ -209,10 +209,10 @@ class FileComm(CommBase.CommBase):
             bool: False so that message not sent.
 
         """
-        flag = super(FileComm, self).on_send_eof()
+        flag, msg_s = super(FileComm, self).on_send_eof()
         self.fd.flush()
         # self.close()
-        return flag
+        return flag, msg_s
 
     def _send(self, msg):
         r"""Write message to a file.

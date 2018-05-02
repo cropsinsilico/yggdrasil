@@ -408,11 +408,33 @@ comm_head_t comm_send_multipart_header(const comm_t x, const size_t len) {
       head.as_array = 1;
     }
   }
-  // Why was this necessary?
-  if (x.type == SERVER_COMM)
+  const comm_t *x0;
+  if (x.type == SERVER_COMM) {
+    comm_t **res_comm = (comm_t**)(x.info);
+    if (res_comm[0] == NULL) {
+      cislog_error("comm_send_multipart_header(%s): no response comm registered", x.name);
+      head.valid = 0;
+      return head;
+    }
+    x0 = &((*res_comm)[0]);
+    // Why was this necessary?
     strcpy(head.id, x.address);
-  else if (x.type == CLIENT_COMM)
+  } else if (x.type == CLIENT_COMM) {
     head = client_response_header(x, head);
+    x0 = (comm_t*)(x.handle);
+  } else {
+    x0 = &x;
+  }
+  // Get ZMQ header info
+  if (x0->type == ZMQ_COMM) {
+    char *reply_address = set_reply_send(x0);
+    if (reply_address == NULL) {
+      cislog_error("comm_send_multipart: Could not set reply address.");
+      head.valid = 0;
+      return head;
+    }
+    strcpy(head.zmq_reply, reply_address);
+  }
   return head;
 };
 
@@ -480,7 +502,16 @@ int comm_send_multipart(const comm_t x, const char *data, const size_t len) {
     }
     xmulti.sent_eof[0] = 1;
     xmulti.recv_eof[0] = 1;
+    xmulti.is_work_comm = 1;
     strcpy(head.address, xmulti.address);
+    if (xmulti.type == ZMQ_COMM) {
+      char *reply_address = set_reply_send(&xmulti);
+      if (reply_address == NULL) {
+	cislog_error("comm_send_multipart: Could not set worker reply address.");
+	return -1;
+      }
+      strcpy(head.zmq_reply_worker, reply_address);
+    }
     headlen = format_comm_header(head, headbuf, headbuf_len);
     if (headlen < 0) {
       cislog_error("comm_send_multipart: Failed to format header.");
@@ -563,9 +594,10 @@ int comm_send(const comm_t x, const char *data, const size_t len) {
     }
   }
   if (((len > x.maxMsgSize) && (x.maxMsgSize > 0)) ||
-      (((x.always_send_header) || (x.used[0] == 0)) && (!(is_eof(data))))) {
+      (((x.always_send_header) || (x.used[0] == 0)))) { // && (!(is_eof(data))))) {
     return comm_send_multipart(x, data, len);
   }
+  printf("Sending single\n");
   ret = comm_send_single(x, data, len);
   if (sending_eof) {
     cislog_debug("comm_send(%s): sent EOF, ret = %d", x.name, ret);
@@ -699,7 +731,7 @@ int comm_recv_multipart(const comm_t x, char **data, const size_t len,
         char * format_str = (char*)(x.serializer->info);
         ret = simplify_formats(format_str, x.serializer->size_info);
         if (ret < 0) {
-          cislog_error("comm_recv(%s): Failed to simplify recvd format.", x.name);
+          cislog_error("comm_recv_multipart(%s): Failed to simplify recvd format.", x.name);
           return -1;
         }
       }
@@ -708,6 +740,11 @@ int comm_recv_multipart(const comm_t x, char **data, const size_t len,
       // Move part of message after header to front of data
       memmove(*data, *data + head.bodybeg, head.bodysiz);
       (*data)[head.bodysiz] = '\0';
+      if (is_eof(*data)) {
+	cislog_debug("comm_recv_multipart(%s): EOF received.", x.name);
+	x.recv_eof[0] = 1;
+	return -2;
+      }
       // Return early if header contained entire message
       if (head.size == head.bodysiz) {
         x.used[0] = 1;
@@ -721,6 +758,14 @@ int comm_recv_multipart(const comm_t x, char **data, const size_t len,
       }
       xmulti.sent_eof[0] = 1;
       xmulti.recv_eof[0] = 1;
+      xmulti.is_work_comm = 1;
+      if (xmulti.type == ZMQ_COMM) {
+	int reply_socket = set_reply_recv(&xmulti, head.zmq_reply_worker);
+	if (reply_socket < 0) {
+	  cislog_error("comm_recv_multipart: Failed to set worker reply address.");
+	  return -1;
+	}
+      }
       // Receive parts of message
       size_t prev = head.bodysiz;
       size_t msgsiz = 0;

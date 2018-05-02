@@ -1007,12 +1007,13 @@ class CommBase(tools.CisClass):
             bool: True if EOF message should be sent, False otherwise.
 
         """
+        msg_s = backwards.unicode2bytes(self.eof_msg)
         with self._closing_thread.lock:
             if not self._eof_sent.is_set():
                 self._eof_sent.set()
             else:  # pragma: debug
-                return False
-        return True
+                return False, msg_s
+        return True, msg_s
 
     def on_send(self, msg, header_kwargs=None):
         r"""Process message to be sent including handling serializing
@@ -1035,8 +1036,7 @@ class CommBase(tools.CisClass):
         if len(msg) == 1:
             msg = msg[0]
         if isinstance(msg, backwards.bytes_type) and (msg == self.eof_msg):
-            flag = self.on_send_eof()
-            msg_s = backwards.unicode2bytes(msg)
+            flag, msg_s = self.on_send_eof()
         else:
             flag = True
             add_sinfo = (self._send_serializer and (not self.is_file))
@@ -1255,9 +1255,9 @@ class CommBase(tools.CisClass):
 
         """
         flag = True
-        if s_msg == self.eof_msg:
-            flag = self.on_recv_eof()
         msg_, header = self.serializer.deserialize(s_msg)
+        if isinstance(msg_, backwards.bytes_type) and (msg_ == self.eof_msg):
+            flag = self.on_recv_eof()
         if (((self.recv_converter is not None) and (s_msg != self.eof_msg) and
              (not header.get('incomplete', False)))):
             msg = self.recv_converter(msg_)

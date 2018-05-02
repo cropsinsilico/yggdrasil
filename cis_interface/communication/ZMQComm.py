@@ -601,16 +601,6 @@ class ZMQComm(AsyncComm.AsyncComm):
 
 
         """
-        # if self.direction == 'recv':
-        #     return msg
-        # # Create socket
-        # self.set_reply_socket_send()
-        # new_msg = backwards.format_bytes(
-        #     backwards.unicode2bytes(':%s:%s:%s:'), (
-        #         _reply_msg, self.reply_socket_address,
-        #         _reply_msg))
-        # new_msg += msg
-        # return new_msg
         return msg
         
     def check_reply_socket_recv(self, msg):
@@ -625,19 +615,12 @@ class ZMQComm(AsyncComm.AsyncComm):
         """
         if self.direction == 'send':
             return msg, None
-        # prefix = backwards.format_bytes(
-        #     backwards.unicode2bytes(':%s:'), (_reply_msg,))
-        # if msg.startswith(prefix):
-        #     _, address, new_msg = msg.split(prefix)
-        #     self.set_reply_socket_recv(address)
-        # else:  # pragma: debug
-        #     new_msg = msg
-        #     raise Exception("No reply socket address attached.")
-        # return new_msg, address
         header = self.serializer.parse_header(msg)
         address = header.get('zmq_reply', None)
         if (address is None):
             address = self.reply_socket_address
+        if address is not None:
+            self.set_reply_socket_recv(address)
         return msg, address
 
     # @property
@@ -849,6 +832,18 @@ class ZMQComm(AsyncComm.AsyncComm):
             c.reply_socket_address = c.set_reply_socket_recv(header['zmq_reply_worker'])
         return c
     
+    def on_send_eof(self):
+        r"""Actions to perform when EOF being sent.
+
+        Returns:
+            bool: True if EOF message should be sent, False otherwise.
+
+        """
+        flag, msg_s = super(ZMQComm, self).on_send_eof()
+        header = dict(zmq_reply=self.set_reply_socket_send(),
+                      size=len(msg_s), id=str(uuid.uuid4()))
+        return flag, self.serializer.format_header(header) + msg_s
+        
     def on_send(self, msg, header_kwargs=None):
         r"""Process message to be sent including handling serializing
         message and handling EOF.
@@ -863,9 +858,10 @@ class ZMQComm(AsyncComm.AsyncComm):
                 bytes message to send, and header info contained in the message.
 
         """
-        if header_kwargs is None:
-            header_kwargs = dict()
-        header_kwargs['zmq_reply'] = self.set_reply_socket_send()
+        if self.direction == 'send':
+            if header_kwargs is None:
+                header_kwargs = dict()
+            header_kwargs['zmq_reply'] = self.set_reply_socket_send()
         return super(ZMQComm, self).on_send(msg, header_kwargs=header_kwargs)
         
     def _send_multipart_worker(self, msg, header, **kwargs):

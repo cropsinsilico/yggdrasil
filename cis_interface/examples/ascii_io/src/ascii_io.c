@@ -83,32 +83,36 @@ int main(int argc,char *argv[]){
   double *value_arr = NULL;
   double *comp_real_arr = NULL;
   double *comp_imag_arr = NULL;
-  ret = cisRecv(ArrayInput, &name_arr, &number_arr, &value_arr,
-		&comp_real_arr, &comp_imag_arr);
-		      
-  if (ret < 0) {
-    printf("ascii_io(C): ERROR RECVING ARRAY\n");
-  } else {
-    printf("Array: (%d rows)\n", ret);
-    // Print each line in the array
-    int i;
-    for (i = 0; i < ret; i++)
-      printf("%.5s, %ld, %3.1f, %3.1lf%+3.1lfj\n", &name_arr[5*i], number_arr[i],
-	     value_arr[i], comp_real_arr[i], comp_imag_arr[i]);
-    // Send the columns in the array to output. Formatting is handled on the
-    // output driver side.
-    ret = cisSend(ArrayOutput, ret, name_arr, number_arr, value_arr,
-		  comp_real_arr, comp_imag_arr);
-    if (ret < 0)
-      printf("ascii_io(C): ERROR SENDING ARRAY\n");
+  ret = 0;
+  while (ret >= 0) {
+    ret = cisRecv(ArrayInput, &name_arr, &number_arr, &value_arr,
+		  &comp_real_arr, &comp_imag_arr);
+    if (ret >= 0) {
+      printf("Array: (%d rows)\n", ret);
+      // Print each line in the array
+      int i;
+      for (i = 0; i < ret; i++)
+	printf("%.5s, %ld, %3.1f, %3.1lf%+3.1lfj\n", &name_arr[5*i], number_arr[i],
+	       value_arr[i], comp_real_arr[i], comp_imag_arr[i]);
+      // Send the columns in the array to output. Formatting is handled on the
+      // output driver side.
+      ret = cisSend(ArrayOutput, ret, name_arr, number_arr, value_arr,
+		    comp_real_arr, comp_imag_arr);
+      if (ret < 0) {
+	printf("ascii_io(C): ERROR SENDING ARRAY\n");
+	break;
+      }
+    } else {
+      printf("End of array input (C)\n");
+    }
   }
-  
+    
   // Free dynamically allocated columns
   if (name_arr) free(name_arr);
   if (number_arr) free(number_arr);
   if (value_arr) free(value_arr);
   if (comp_real_arr) free(comp_real_arr);
   if (comp_imag_arr) free(comp_imag_arr);
-
+  
   return 0;
 }

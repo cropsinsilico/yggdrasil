@@ -34,6 +34,7 @@ typedef struct comm_t {
   int *used; //!< Flag specifying if the comm has been used.
   void *reply; //!< Reply information.
   int is_file; //!< Flag specifying if the comm connects directly to a file.
+  int is_work_comm; //!< Flag specifying if comm is a temporary work comm.
 } comm_t;
 
 
@@ -61,6 +62,7 @@ comm_t empty_comm_base() {
   ret.used = NULL;
   ret.reply = NULL;
   ret.is_file = 0;
+  ret.is_work_comm = 0;
   return ret;
 };
 
