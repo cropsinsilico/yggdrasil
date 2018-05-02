@@ -25,6 +25,8 @@ lsys = Lsystem(fname)
 d = Tesselator()
     
 # Continue looping until no more input times
+# TODO: Automated unit conversion
+mm_to_cm = 0.1
 flag = True
 while (flag):
 
@@ -51,9 +53,13 @@ while (flag):
     for k, shapes in scene.todict().items():
         for shape in shapes:
             d.process(shape)
+            if d.result is None:
+                continue
             c = shape.appearance.ambient
             for p in d.result.pointList:
-                ply_dict['vertices'].append([p.x, p.y, p.z])
+                ply_dict['vertices'].append([mm_to_cm * p.x,
+                                             mm_to_cm * p.z,
+                                             mm_to_cm * p.y])
                 ply_dict['vertex_colors'].append([c.red, c.green, c.blue])
             for i3 in d.result.indexList:
                 imesh = []
@@ -67,9 +73,10 @@ while (flag):
                     #     imesh = []
                     #     break
                     _iv3 = d.result.pointList[_i3]
-                    imesh += [_iv3.x, _iv3.y, _iv3.z]
-                    mins = np.minimum(mins, np.array([_iv3.x, _iv3.y, _iv3.z]))
-                    maxs = np.maximum(maxs, np.array([_iv3.x, _iv3.y, _iv3.z]))
+                    _iv3_cm = [mm_to_cm * _iv3.x, mm_to_cm * _iv3.z, mm_to_cm * _iv3.y]
+                    imesh += _iv3_cm
+                    mins = np.minimum(mins, np.array(_iv3_cm))
+                    maxs = np.maximum(maxs, np.array(_iv3_cm))
                 if imesh:
                     mesh.append(imesh)
                 ply_dict['faces'].append([i3[0] + nvert, i3[1] + nvert, i3[2] + nvert])

@@ -794,16 +794,13 @@ class CommBase(tools.CisClass):
                     is_interface=self.is_interface,
                     uuid=str(uuid.uuid4()), single_use=True)
 
-    def get_work_comm(self, header, work_comm_name=None, **kwargs):
+    def get_work_comm(self, header, **kwargs):
         r"""Get temporary work comm, creating as necessary.
 
         Args:
             header (dict): Information that will be sent in the message header
                 to the work comm.
-            work_comm_name (str, optional): Name that should be used for the
-                work comm. If not provided, one is created from the header id
-                and the comm class.
-            **kwargs: Additional keyword arguments are passed to get_comm.
+            **kwargs: Additional keyword arguments are passed to header2workcomm.
 
         Returns:
             Comm: Work comm.
@@ -812,14 +809,7 @@ class CommBase(tools.CisClass):
         c = self._work_comms.get(header['id'], None)
         if c is not None:
             return c
-        kws = self.get_work_comm_kwargs
-        kws.update(**kwargs)
-        kws['uuid'] = header['id']
-        if work_comm_name is None:
-            cls = kws.get("comm", tools.get_default_comm())
-            work_comm_name = 'temp_%s_%s.%s' % (
-                cls, kws['direction'], header['id'])
-        c = get_comm(work_comm_name, address=header['address'], **kws)
+        c = self.header2workcomm(header, **kwargs)
         self.add_work_comm(c)
         return c
 
@@ -881,6 +871,49 @@ class CommBase(tools.CisClass):
             # c = self._work_comms[key]
             # c.close_in_thread(no_wait=True)
             raise Exception("Closing in thread not recommended")
+
+    def workcomm2header(self, work_comm, **kwargs):
+        r"""Get header information from a comm.
+
+        Args:
+            comm (CommBase): Work comm that header describes.
+            **kwargs: Additional keyword arguments are added to the header.
+
+        Returns:
+            dict: Header information that will be sent with a message.
+
+        """
+        header_kwargs = kwargs
+        header_kwargs['address'] = work_comm.address
+        header_kwargs['id'] = work_comm.uuid
+        return header_kwargs
+
+    def header2workcomm(self, header, work_comm_name=None, **kwargs):
+        r"""Get a work comm based on header info.
+
+        Args:
+            header (dict): Information that will be sent in the message header
+                to the work comm.
+            work_comm_name (str, optional): Name that should be used for the
+                work comm. If not provided, one is created from the header id
+                and the comm class.
+            **kwargs: Additional keyword arguments are added to the returned
+                dictionary.
+
+        Returns:
+            CommBase: Work comm.
+
+        """
+        kws = self.get_work_comm_kwargs
+        kws.update(**kwargs)
+        kws['uuid'] = header['id']
+        kws['address'] = header['address']
+        if work_comm_name is None:
+            cls = kws.get("comm", tools.get_default_comm())
+            work_comm_name = 'temp_%s_%s.%s' % (
+                cls, kws['direction'], header['id'])
+        c = get_comm(work_comm_name, **kws)
+        return c
 
     # SEND METHODS
     def _safe_send(self, *args, **kwargs):
@@ -981,15 +1014,12 @@ class CommBase(tools.CisClass):
                 return False
         return True
 
-    def on_send(self, msg, send_header=False, header_kwargs=None):
+    def on_send(self, msg, header_kwargs=None):
         r"""Process message to be sent including handling serializing
         message and handling EOF.
 
         Args:
             msg (obj): Message to be sent
-            send_header (bool, optional): If True, the message will be sent as
-                multipart with header even if the message is smaller than
-                maxMsgSize. Defaults to False.
             header_kwargs (dict, optional): Keyword arguments that should be
                 added to the header.
 
@@ -1028,11 +1058,12 @@ class CommBase(tools.CisClass):
                     header_kwargs = dict()
                 if 'address' not in header_kwargs:
                     work_comm = self.create_work_comm()
-                    header_kwargs['address'] = work_comm.address
-                    header_kwargs['id'] = work_comm.uuid
-                    msg_s = self.serializer.serialize(
-                        msg_, header_kwargs=header_kwargs,
-                        add_serializer_info=add_sinfo)
+                else:
+                    work_comm = self.get_work_comm(header_kwargs)
+                header_kwargs = self.workcomm2header(work_comm, **header_kwargs)
+                msg_s = self.serializer.serialize(
+                    msg_, header_kwargs=header_kwargs,
+                    add_serializer_info=add_sinfo)
         return flag, msg_s, header_kwargs
 
     def send(self, *args, **kwargs):
@@ -1066,16 +1097,13 @@ class CommBase(tools.CisClass):
             # self.close_in_thread(no_wait=True, timeout=False)
         return ret
 
-    def send_multipart(self, msg, send_header=False, header_kwargs=None, **kwargs):
+    def send_multipart(self, msg, header_kwargs=None, **kwargs):
         r"""Send a multipart message. If the message is smaller than maxMsgSize,
         it is sent using _send, otherwise it is sent to a worker comm using
         _send_multipart_worker.
 
         Args:
             msg (obj): Message to be sent.
-            send_header (bool, optional): If True, the message will be sent as
-                multipart with header even if the message is smaller than
-                maxMsgSize. Defaults to False.
             header_kwargs (dict, optional): Keyword arguments that should be
                 added to the header.
             **kwargs: Additional keyword arguments are passed to _send or
@@ -1086,8 +1114,7 @@ class CommBase(tools.CisClass):
         
         """
         # Create serialized message that should be sent
-        flag, msg_s, header = self.on_send(msg, send_header=send_header,
-                                           header_kwargs=header_kwargs)
+        flag, msg_s, header = self.on_send(msg, header_kwargs=header_kwargs)
         if not flag:
             return flag
         msg_len = len(msg_s)

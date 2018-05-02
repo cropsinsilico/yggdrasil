@@ -565,6 +565,31 @@ class ZMQComm(AsyncComm.AsyncComm):
                     self.socket.setsockopt(zmq.SUBSCRIBE, self.topic_filter)
                 self._openned = True
 
+    def set_reply_socket_send(self):
+        r"""Set the send reply socket if it dosn't exist."""
+        if self.reply_socket_send is None:
+            self.reply_socket_send = self.context.socket(zmq.REP)
+            self.reply_socket_send.setsockopt(zmq.LINGER, 0)
+            address = format_address(_default_protocol, 'localhost')
+            address = bind_socket(self.reply_socket_send, address)
+            self.register_comm('REPLY_SEND_' + address, self.reply_socket_send)
+            self.reply_socket_address = address
+            self.debug("new send address: %s", address)
+        return self.reply_socket_address
+
+    def set_reply_socket_recv(self, address):
+        r"""Set the recv reply socket if the address dosn't exist."""
+        if address not in self.reply_socket_recv:
+            self.reply_socket_recv[address] = self.context.socket(zmq.REQ)
+            self.reply_socket_recv[address].setsockopt(zmq.LINGER, 0)
+            self.reply_socket_recv[address].connect(address)
+            self.register_comm('REPLY_RECV_' + backwards.bytes2unicode(address),
+                               self.reply_socket_recv[address])
+            self._n_reply_recv[address] = 0
+            self._n_zmq_recv[address] = 0
+            self.debug("new recv address: %s", address)
+        return address
+
     def check_reply_socket_send(self, msg):
         r"""Append reply socket address if it
 
@@ -576,23 +601,17 @@ class ZMQComm(AsyncComm.AsyncComm):
 
 
         """
-        if self.direction == 'recv':
-            return msg
-        # Create socket
-        if self.reply_socket_send is None:
-            self.reply_socket_send = self.context.socket(zmq.REP)
-            self.reply_socket_send.setsockopt(zmq.LINGER, 0)
-            address = format_address(_default_protocol, 'localhost')
-            address = bind_socket(self.reply_socket_send, address)
-            self.register_comm('REPLY_SEND_' + address, self.reply_socket_send)
-            self.reply_socket_address = address
-            self.debug("new send address: %s", address)
-        new_msg = backwards.format_bytes(
-            backwards.unicode2bytes(':%s:%s:%s:'), (
-                _reply_msg, self.reply_socket_address,
-                _reply_msg))
-        new_msg += msg
-        return new_msg
+        # if self.direction == 'recv':
+        #     return msg
+        # # Create socket
+        # self.set_reply_socket_send()
+        # new_msg = backwards.format_bytes(
+        #     backwards.unicode2bytes(':%s:%s:%s:'), (
+        #         _reply_msg, self.reply_socket_address,
+        #         _reply_msg))
+        # new_msg += msg
+        # return new_msg
+        return msg
         
     def check_reply_socket_recv(self, msg):
         r"""Check incoming message for reply address.
@@ -606,23 +625,20 @@ class ZMQComm(AsyncComm.AsyncComm):
         """
         if self.direction == 'send':
             return msg, None
-        prefix = backwards.format_bytes(
-            backwards.unicode2bytes(':%s:'), (_reply_msg,))
-        if msg.startswith(prefix):
-            _, address, new_msg = msg.split(prefix)
-            if address not in self.reply_socket_recv:
-                self.reply_socket_recv[address] = self.context.socket(zmq.REQ)
-                self.reply_socket_recv[address].setsockopt(zmq.LINGER, 0)
-                self.reply_socket_recv[address].connect(address)
-                self.register_comm('REPLY_RECV_' + backwards.bytes2unicode(address),
-                                   self.reply_socket_recv[address])
-                self._n_reply_recv[address] = 0
-                self._n_zmq_recv[address] = 0
-            self.debug("new recv address: %s", address)
-        else:  # pragma: debug
-            new_msg = msg
-            raise Exception("No reply socket address attached.")
-        return new_msg, address
+        # prefix = backwards.format_bytes(
+        #     backwards.unicode2bytes(':%s:'), (_reply_msg,))
+        # if msg.startswith(prefix):
+        #     _, address, new_msg = msg.split(prefix)
+        #     self.set_reply_socket_recv(address)
+        # else:  # pragma: debug
+        #     new_msg = msg
+        #     raise Exception("No reply socket address attached.")
+        # return new_msg, address
+        header = self.serializer.parse_header(msg)
+        address = header.get('zmq_reply', None)
+        if (address is None):
+            address = self.reply_socket_address
+        return msg, address
 
     # @property
     # def n_reply_sent(self):
@@ -800,6 +816,58 @@ class ZMQComm(AsyncComm.AsyncComm):
         out['context'] = self.context
         return out
     
+    def workcomm2header(self, work_comm, **kwargs):
+        r"""Get header information from a comm.
+
+        Args:
+            comm (CommBase): Work comm that header describes.
+            **kwargs: Additional keyword arguments are added to the header.
+
+        Returns:
+            dict: Header information that will be sent with a message.
+
+        """
+        out = super(ZMQComm, self).workcomm2header(work_comm, **kwargs)
+        if self.direction == 'send':
+            out['zmq_reply_worker'] = work_comm.set_reply_socket_send()
+        return out
+
+    def header2workcomm(self, header, **kwargs):
+        r"""Get a work comm based on header info.
+
+        Args:
+            header (dict): Information that will be sent in the message header
+                to the work comm.
+            **kwargs: Additional keyword arguments are passed to the parent method.
+
+        Returns:
+            CommBase: Work comm.
+
+        """
+        c = super(ZMQComm, self).header2workcomm(header, **kwargs)
+        if ('zmq_reply_worker' in header) and (self.direction == 'recv'):
+            c.reply_socket_address = c.set_reply_socket_recv(header['zmq_reply_worker'])
+        return c
+    
+    def on_send(self, msg, header_kwargs=None):
+        r"""Process message to be sent including handling serializing
+        message and handling EOF.
+
+        Args:
+            msg (obj): Message to be sent
+            header_kwargs (dict, optional): Keyword arguments that should be
+                added to the header.
+
+        Returns:
+            tuple (bool, str, dict): Truth of if message should be sent, raw
+                bytes message to send, and header info contained in the message.
+
+        """
+        if header_kwargs is None:
+            header_kwargs = dict()
+        header_kwargs['zmq_reply'] = self.set_reply_socket_send()
+        return super(ZMQComm, self).on_send(msg, header_kwargs=header_kwargs)
+        
     def _send_multipart_worker(self, msg, header, **kwargs):
         r"""Send multipart message to the worker comm identified.
 
