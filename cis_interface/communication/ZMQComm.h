@@ -831,5 +831,27 @@ int zmq_comm_recv(const comm_t x, char **data, const size_t len,
   return -1;
 };
 
+/*!
+  @brief Add reply socket information to a send comm.
+  @param[in] comm comm_t* Comm that confirmation is for.
+  @returns char* Reply socket address.
+*/
+static inline
+char *set_reply_send(const comm_t *comm) {
+  zmq_install_error();
+  return NULL;
+};
+
+/*!
+  @brief Add reply socket information to a recv comm.
+  @param[in] comm comm_t* Comm that confirmation is for.
+  @returns int Index of the reply socket.
+*/
+static inline
+int set_reply_recv(const comm_t *comm, const char* address) {
+  zmq_install_error();
+  return -1;
+};
+
 #endif /*ZMQINSTALLED*/
 #endif /*CISZMQCOMM_H_*/
