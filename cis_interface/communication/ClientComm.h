@@ -155,9 +155,6 @@ int free_client_comm(comm_t *x) {
   free_client_response_count(x);
   if (x->handle != NULL) {
     comm_t *handle = (comm_t*)(x->handle);
-    char buf[100] = CIS_MSG_EOF;
-    default_comm_send(*handle, buf, strlen(buf));
-    handle->sent_eof[0] = 1;
     free_default_comm(handle);
     free_comm_base(handle);
     free(x->handle);

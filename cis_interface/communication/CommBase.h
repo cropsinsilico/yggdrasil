@@ -183,6 +183,7 @@ int free_comm_base(comm_t *x) {
     free(x->serializer);
     x->serializer = NULL;
   }
+  x->valid = 0;
   return 0;
 };
 

@@ -8,6 +8,7 @@
 
 int main(int argc,char *argv[]){
   int ret;
+  int error_code = 0;
 
   // Input & output to an ASCII file line by line
   CisAsciiFileInput FileInput("inputCPP_file");
@@ -36,6 +37,7 @@ int main(int argc,char *argv[]){
       ret = FileOutput.send_line(line);
       if (ret < 0) {
 	printf("ascii_io(CPP): ERROR SENDING LINE\n");
+	error_code = -1;
 	break;
       }
     } else {
@@ -66,6 +68,7 @@ int main(int argc,char *argv[]){
       ret = TableOutput.send(5, name, number, value, comp_real, comp_imag);
       if (ret < 0) {
 	printf("ascii_io(CPP): ERROR SENDING ROW\n");
+	error_code = -1;
 	break;
       }
     } else {
@@ -101,6 +104,7 @@ int main(int argc,char *argv[]){
 			     comp_real_arr, comp_imag_arr);
       if (ret < 0) {
 	printf("ascii_io(CPP): ERROR SENDING ARRAY\n");
+	error_code = -1;
 	break;
       }
     } else {
@@ -115,5 +119,5 @@ int main(int argc,char *argv[]){
   if (comp_real_arr) free(comp_real_arr);
   if (comp_imag_arr) free(comp_imag_arr);
 
-  return 0;
+  return error_code;
 }

@@ -583,6 +583,7 @@ class CommBase(tools.CisClass):
         if self._closing_thread.was_started and (not no_wait):  # pragma: debug
             self._closing_thread.wait(key=str(uuid.uuid4()), timeout=timeout)
             if _started_thread and not self._closing_thread.was_terminated:
+                self.debug("Closing thread took too long")
                 self.close()
 
     def linger_close(self):
@@ -1235,10 +1236,24 @@ class CommBase(tools.CisClass):
         self.debug("Received EOF")
         self._eof_recv.set()
         if self.close_on_eof_recv:
+            self.debug("Lingering close on EOF Received")
             self.linger_close()
             return False
         else:
             return True
+
+    def is_eof(self, msg):
+        r"""Determine if a message is an EOF.
+
+        Args:
+            msg (obj): Message object to be tested.
+
+        Returns:
+            bool: True if the message indicates an EOF, False otherwise.
+
+        """
+        out = (isinstance(msg, backwards.bytes_type) and (msg == self.eof_msg))
+        return out
     
     def on_recv(self, s_msg, second_pass=False):
         r"""Process raw received message including handling deserializing
@@ -1256,10 +1271,12 @@ class CommBase(tools.CisClass):
         """
         flag = True
         msg_, header = self.serializer.deserialize(s_msg)
-        if isinstance(msg_, backwards.bytes_type) and (msg_ == self.eof_msg):
+        if self.is_eof(msg_):
             flag = self.on_recv_eof()
-        if (((self.recv_converter is not None) and (s_msg != self.eof_msg) and
-             (not header.get('incomplete', False)))):
+            msg = msg_
+        elif ((self.recv_converter is not None) and
+              (not header.get('incomplete', False))):
+            self.debug("Converting message")
             msg = self.recv_converter(msg_)
         else:
             msg = msg_

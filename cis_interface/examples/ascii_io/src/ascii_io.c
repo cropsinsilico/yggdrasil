@@ -8,6 +8,7 @@
 
 int main(int argc,char *argv[]){
   int ret;
+  int error_code = 0;
 
   // Input & output to an ASCII file line by line
   cisAsciiFileInput_t FileInput = cisAsciiFileInput("inputC_file");
@@ -35,6 +36,7 @@ int main(int argc,char *argv[]){
       ret = cisSend(FileOutput, line);
       if (ret < 0) {
 	printf("ascii_io(C): ERROR SENDING LINE\n");
+	error_code = -1;
 	break;
       }
     } else {
@@ -65,6 +67,7 @@ int main(int argc,char *argv[]){
       ret = cisSend(TableOutput, name, number, value, comp_real, comp_imag);
       if (ret < 0) {
 	printf("ascii_io(C): ERROR SENDING ROW\n");
+	error_code = -1;
 	break;
       }
     } else {
@@ -100,6 +103,7 @@ int main(int argc,char *argv[]){
 		    comp_real_arr, comp_imag_arr);
       if (ret < 0) {
 	printf("ascii_io(C): ERROR SENDING ARRAY\n");
+	error_code = -1;
 	break;
       }
     } else {
@@ -114,5 +118,5 @@ int main(int argc,char *argv[]){
   if (comp_real_arr) free(comp_real_arr);
   if (comp_imag_arr) free(comp_imag_arr);
   
-  return 0;
+  return error_code;
 }

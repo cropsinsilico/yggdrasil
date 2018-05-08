@@ -66,10 +66,12 @@ int free_comm(comm_t *x) {
   int ret = 0;
   if (x == NULL)
     return ret;
+  cislog_debug("free_comm(%s)", x->name);
   comm_type t = x->type;
   // Send EOF for output comms and then wait for messages to be recv'd
-  if ((is_send(x->direction)) && (t != CLIENT_COMM) && (x->valid)) {
+  if ((is_send(x->direction)) && (x->valid)) {
     if (_cis_error_flag == 0) {
+      cislog_debug("free_comm(%s): Sending EOF", x->name);
       comm_send_eof(*x);
       while (comm_nmsg(*x) > 0) {
         cislog_debug("free_comm(%s): draining %d messages",
@@ -369,12 +371,14 @@ int comm_send_single(const comm_t x, const char *data, const size_t len) {
 /*!
   @brief Create header for multipart message.
   @param[in] x comm_t structure that header will be sent to.
+  @param[in] const char * Message to be sent.
   @param[in] len size_t Size of message body.
   @returns comm_head_t Header info that should be sent before the message
   body.
 */
 static
-comm_head_t comm_send_multipart_header(const comm_t x, const size_t len) {
+comm_head_t comm_send_multipart_header(const comm_t x, const char * data,
+				       const size_t len) {
   comm_head_t head = init_header(len, NULL, NULL);
   sprintf(head.id, "%d", rand());
   head.multipart = 1;
@@ -420,7 +424,9 @@ comm_head_t comm_send_multipart_header(const comm_t x, const size_t len) {
     // Why was this necessary?
     strcpy(head.id, x.address);
   } else if (x.type == CLIENT_COMM) {
-    head = client_response_header(x, head);
+    if (!(is_eof(data))) {
+      head = client_response_header(x, head);
+    }
     x0 = (comm_t*)(x.handle);
   } else {
     x0 = &x;
@@ -456,7 +462,7 @@ int comm_send_multipart(const comm_t x, const char *data, const size_t len) {
   }
   comm_t xmulti = empty_comm_base();
   // Get header
-  comm_head_t head = comm_send_multipart_header(x, len);
+  comm_head_t head = comm_send_multipart_header(x, data, len);
   if (head.valid == 0) {
     cislog_error("comm_send_multipart: Invalid header generated.");
     return -1;
@@ -587,7 +593,12 @@ int comm_send(const comm_t x, const char *data, const size_t len) {
   if (is_eof(data)) {
     if (x.sent_eof[0] == 0) {
       x.sent_eof[0] = 1;
+      if (x.type == CLIENT_COMM) {
+	comm_t *req_comm = (comm_t*)(x.handle);
+	req_comm->sent_eof[0] = 1;
+      }
       sending_eof = 1;
+      cislog_debug("comm_send(%s): Sending EOF", x.name);
     } else {
       cislog_error("comm_send(%s): EOF already sent", x.name);
       return ret;
@@ -595,10 +606,12 @@ int comm_send(const comm_t x, const char *data, const size_t len) {
   }
   if (((len > x.maxMsgSize) && (x.maxMsgSize > 0)) ||
       (((x.always_send_header) || (x.used[0] == 0)))) { // && (!(is_eof(data))))) {
-    return comm_send_multipart(x, data, len);
+    ret = comm_send_multipart(x, data, len);
+  } else {
+    cislog_debug("comm_send(%s): Sending as single message without a header.",
+		 x.name);
+    ret = comm_send_single(x, data, len);
   }
-  printf("Sending single\n");
-  ret = comm_send_single(x, data, len);
   if (sending_eof) {
     cislog_debug("comm_send(%s): sent EOF, ret = %d", x.name, ret);
   }
