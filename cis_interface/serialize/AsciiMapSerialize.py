@@ -39,7 +39,9 @@ class AsciiMapSerialize(DefaultSerialize):
 
         """
         out = ''
-        for k, v in args.items():
+        order = sorted([k for k in args.keys()])
+        for k in order:
+            v = args[k]
             if not isinstance(k, str):
                 raise ValueError("Serialization of non-string keys not supported.")
             out += k + self.delimiter
