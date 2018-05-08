@@ -776,12 +776,12 @@ class ZMQComm(AsyncComm.AsyncComm):
     #         return (self._n_zmq_sent == self._n_reply_sent)
     #     return True  # pragma: debug
 
-    # @property
-    # def is_confirmed_recv(self):
-    #     r"""bool: True if all received messages have been confirmed."""
-    #     if self.is_open_backlog:
-    #         return (self._n_zmq_recv == self._n_reply_recv)
-    #     return True  # pragma: debug
+    @property
+    def is_confirmed_recv(self):
+        r"""bool: True if all received messages have been confirmed."""
+        if self.is_open_backlog:
+            return (self._n_zmq_recv == self._n_reply_recv)
+        return True  # pragma: debug
 
     @property
     def get_work_comm_kwargs(self):

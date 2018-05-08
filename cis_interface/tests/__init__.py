@@ -596,7 +596,9 @@ class IOInfo(object):
     def mapfile_contents(self):
         r"""bytes: The contents of the test ASCII map file."""
         out = ''
-        for k, v in self.map_dict.items():
+        order = sorted([k for k in self.map_dict.keys()])
+        for k in order:
+            v = self.map_dict[k]
             if isinstance(v, backwards.string_types):
                 out += "%s\t'%s'\n" % (k, v)
             else:
