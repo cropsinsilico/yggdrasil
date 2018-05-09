@@ -149,7 +149,7 @@ class PlySerialize(DefaultSerialize):
         return out
 
     def apply_scalar_map(self, ply_dict, scalar_arr, color_map=None,
-                         vmin=None, vmax=None):
+                         vmin=None, vmax=None, scaling='linear'):
         r"""Set the color of faces in a 3D object based on a scalar map.
 
         Args:
@@ -162,29 +162,53 @@ class PlySerialize(DefaultSerialize):
                 colormap. Defaults to min(scalar_arr).
             vmax (float, optional): Value that should map to the maximum of the
                 colormap. Defaults to max(scalar_arr).
+            scaling (str, optional): Scaling that should be used to map the scalar
+                array onto the colormap. Defaults to 'linear'.
 
         Returns:
             dict: Ply with updated vertex colors.
 
         """
         if color_map is None:
-            color_map = 'plasma'
+            color_map = 'summer'
+            # color_map = 'plasma'
         if vmin is None:
-            vmin = min(scalar_arr)
+            vmin = scalar_arr.min()
         if vmax is None:
-            vmax = max(scalar_arr)
+            vmax = scalar_arr.max()
+        print(vmin, vmax)
         cmap = cm.get_cmap(color_map)
-        norm = mpl.colors.Normalize(vmin=vmin, vmax=vmax)
+        if scaling == 'log':
+            norm = mpl.colors.LogNorm(vmin=vmin, vmax=vmax)
+        elif scaling == 'linear':
+            norm = mpl.colors.Normalize(vmin=vmin, vmax=vmax)
+        else:  # pragma: debug
+            raise Exception("Scaling must be 'linear' or 'log'.")
         m = cm.ScalarMappable(norm=norm, cmap=cmap)
-        color_arr = 255 * m.to_rgba(scalar_arr)
-        vertex_colors = [[] for x in ply_dict['vertices']]
+        # Map vertices onto faces
+        vertex_scalar = [[] for x in ply_dict['vertices']]
         for i in range(len(ply_dict['faces'])):
-            c = color_arr[i]
             for v in ply_dict['faces'][i]:
-                vertex_colors[v].append(c)
+                vertex_scalar[v].append(scalar_arr[i])
+        for i in range(len(vertex_scalar)):
+            vertex_scalar[i] = np.max(vertex_scalar[i])
+        vertex_scalar = np.array(vertex_scalar)
+        if scaling == 'log':
+            vertex_colors = np.ma.MaskedArray(vertex_scalar, vertex_scalar == 0)
+        vertex_colors = (255 * m.to_rgba(vertex_scalar)).astype('int')[:, :3].tolist()
+        # Map face colors onto vertices
+        # if scaling == 'log':
+        #     scalar_arr = np.ma.MaskedArray(scalar_arr, scalar_arr == 0)
+        # face_colors = 255 * m.to_rgba(scalar_arr)
+        # vertex_colors = [[] for x in ply_dict['vertices']]
+        # for i in range(len(ply_dict['faces'])):
+        #     c = face_colors[i]
+        #     for v in ply_dict['faces'][i]:
+        #         vertex_colors[v].append(c)
         # Average over vertex colors
-        for i in range(len(vertex_colors)):
-            vertex_colors[i] = np.mean(vertex_colors[i], axis=0)
-            vertex_colors[i] = vertex_colors[i].astype('int').tolist()[:3]
+        # for i in range(len(vertex_colors)):
+        #     vertex_colors[i] = np.mean(vertex_colors[i], axis=0)
+        #     vertex_colors[i] = vertex_colors[i].astype('int').tolist()[:3]
         out = copy.deepcopy(ply_dict)
         out['vertex_colors'] = vertex_colors
+        return out

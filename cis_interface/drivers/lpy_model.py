@@ -58,8 +58,8 @@ while (flag):
             c = shape.appearance.ambient
             for p in d.result.pointList:
                 ply_dict['vertices'].append([mm_to_cm * p.x,
-                                             mm_to_cm * p.z,
-                                             mm_to_cm * p.y])
+                                             mm_to_cm * p.y,
+                                             mm_to_cm * p.z])
                 ply_dict['vertex_colors'].append([c.red, c.green, c.blue])
             for i3 in d.result.indexList:
                 imesh = []
@@ -73,7 +73,7 @@ while (flag):
                     #     imesh = []
                     #     break
                     _iv3 = d.result.pointList[_i3]
-                    _iv3_cm = [mm_to_cm * _iv3.x, mm_to_cm * _iv3.z, mm_to_cm * _iv3.y]
+                    _iv3_cm = [mm_to_cm * _iv3.x, mm_to_cm * _iv3.y, mm_to_cm * _iv3.z]
                     imesh += _iv3_cm
                     mins = np.minimum(mins, np.array(_iv3_cm))
                     maxs = np.maximum(maxs, np.array(_iv3_cm))
