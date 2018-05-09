@@ -98,11 +98,11 @@ def get_serializer(stype=None, **kwargs):
         from cis_interface.serialize import AsciiMapSerialize
         cls = AsciiMapSerialize.AsciiMapSerialize
     elif stype == 8:
-        from cis_interface.serialize import ObjSerialize
-        cls = ObjSerialize.ObjSerialize
-    elif stype == 9:
         from cis_interface.serialize import PlySerialize
         cls = PlySerialize.PlySerialize
+    elif stype == 9:
+        from cis_interface.serialize import ObjSerialize
+        cls = ObjSerialize.ObjSerialize
     else:
         raise RuntimeError("Unknown serializer type code: %d" % stype)
     return cls(**kwargs)

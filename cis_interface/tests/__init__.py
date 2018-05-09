@@ -1,5 +1,6 @@
 """Testing things."""
 import os
+import copy
 import shutil
 import uuid
 import importlib
@@ -389,22 +390,18 @@ class IOInfo(object):
                               ('two', int(2), 2.0),
                               ('three', int(3), 3.0)]
         self.map_dict = dict(args1=1, args2='2')
-        self.obj_dict = dict(vertices=[[1.0, 2.0, 3.0],
-                                       [4.0, 5.0, 6.0],
-                                       [7.0, 8.0, 9.0]],
-                             normals=[[1.0, 2.0, 3.0],
-                                      [4.0, 5.0, 6.0],
-                                      [7.0, 8.0, 9.0]],
-                             texcoords=[[1.0, 2.0], [2.0, 3.0], [3.0, 4.0]],
-                             faces=[[0, 1, 2],
-                                    [(0, 0, 0), (1, 1, 1), (2, 2, 2)]],
-                             face_normals=[[0, 1, None], None],
-                             face_texcoords=[[0, 1, None], None],
-                             material='material')
         self.ply_dict = dict(vertices=[[1.0, 2.0, 3.0],
                                        [4.0, 5.0, 6.0],
-                                       [7.0, 8.0, 9.0]],
-                             faces=[[0, 1, 2]])
+                                       [7.0, 8.0, 9.0],
+                                       [10.0, 11.0, 12.0]],
+                             faces=[[0, 1, 2], [1, 2, 3]])
+        self.obj_dict = copy.deepcopy(self.ply_dict)
+        self.obj_dict.update(normals=self.obj_dict['vertices'],
+                             texcoords=[[1.0, 2.0], [2.0, 3.0], [3.0, 4.0], [5.0, 6.0]],
+                             face_normals=[[0, 1, None], None, None],
+                             face_texcoords=[[0, 1, None], None, None],
+                             material='material')
+        self.obj_dict['faces'].append([(0, 0, 0), (1, 1, 1), (2, 2, 2)])
 
     @property
     def header_lines(self):

@@ -1,9 +1,8 @@
-import copy
-from cis_interface.serialize.tests.test_DefaultSerialize import \
-    TestDefaultSerialize
+from cis_interface.serialize.tests.test_PlySerialize import \
+    TestPlySerialize
 
 
-class TestObjSerialize(TestDefaultSerialize):
+class TestObjSerialize(TestPlySerialize):
     r"""Test class for TestObjSerialize class."""
 
     def __init__(self, *args, **kwargs):
@@ -13,8 +12,8 @@ class TestObjSerialize(TestDefaultSerialize):
 
     def map_sent2recv(self, obj):
         r"""Convert a sent object into a received one."""
+        out = super(TestObjSerialize, self).map_sent2recv(obj)
         face_keys = {'face_texcoords': 1, 'face_normals': 2}
-        out = copy.deepcopy(obj)
         for k in face_keys.keys():
             out.setdefault(k, [])
         if 'faces' in out:

@@ -1,40 +1,17 @@
 import getpass
 from cis_interface import backwards
-from cis_interface.serialize.DefaultSerialize import DefaultSerialize
+from cis_interface.serialize.PlySerialize import PlySerialize
 
 
-class ObjSerialize(DefaultSerialize):
+class ObjSerialize(PlySerialize):
     r"""Class for serializing/deserializing .obj file formats. Reader
-    adapted from https://www.pygame.org/wiki/OBJFileLoader.
-
-    Args:
-        write_header (bool, optional): If True, headers will be added to
-            serialized output. Defaults to True.
-        newline (str, optional): String that should be used for new lines.
-            Defaults to '\n'.
-
-    Attributes:
-        write_header (bool): If True, headers will be added to serialized
-            output.
-        newline (str): String that should be used for new lines.
-
-    """
-
-    def __init__(self, *args, **kwargs):
-        self.write_header = kwargs.pop('write_header', True)
-        self.newline = backwards.bytes2unicode(kwargs.pop('newline', '\n'))
-        super(ObjSerialize, self).__init__(*args, **kwargs)
+    adapted from https://www.pygame.org/wiki/OBJFileLoader."""
 
     @property
     def serializer_type(self):
         r"""int: Type of serializer."""
-        return 8
+        return 9
         
-    @property
-    def empty_msg(self):
-        r"""obj: Object indicating empty message."""
-        return backwards.unicode2bytes('')
-            
     def func_serialize(self, args, zero_indexed=True):
         r"""Serialize a message.
 
@@ -42,6 +19,8 @@ class ObjSerialize(DefaultSerialize):
             args (dict): Dictionary of obj information. Fields include:
                 material (str): Material to use for faces.
                 vertices (list): 3D vertices comprising the object.
+                vertex_colors (list): RGB values for each of the vertices.
+                    If not provided, all vertices will be black.
                 normals (list): 3D normals for vertices.
                 texcoords (list): 3D texture coordinates for vertices.
                 faces (list): Indices of 3 or more vertices making up faces or a
@@ -63,6 +42,11 @@ class ObjSerialize(DefaultSerialize):
 
         """
         lines = []
+        # Set colors if not provided
+        # if not args.get('vertex_colors', []):
+        #     args['vertex_colors'] = []
+        #     for v in args.get('vertices', []):
+        #         args['vertex_colors'].append(self.default_rgb)
         # Header
         if self.write_header:
             lines += ['# Author %s' % getpass.getuser(),
@@ -70,8 +54,15 @@ class ObjSerialize(DefaultSerialize):
         if args.get('material', None) is not None:
             lines.append('usemtl %s' % args['material'])
         if 'vertices' in args:
-            for v in args['vertices']:
-                lines.append('v %f %f %f' % tuple(v))
+            if not args.get('vertex_colors', []):
+                for v in args['vertices']:
+                    lines.append('v %f %f %f' % tuple(v))
+            else:
+                for i in len(args['vertices']):
+                    line = 'v'
+                    line += ' %f %f %f' % tuple(args['vertices'][i])
+                    line += ' %d %d %d' % tuple(args['vertex_colors'][i])
+                    lines.append(line)
         if 'normals' in args:
             for v in args['normals']:
                 lines.append('vn %f %f %f' % tuple(v))
@@ -138,7 +129,8 @@ class ObjSerialize(DefaultSerialize):
         else:
             lines = backwards.bytes2unicode(msg).split(self.newline)
             out = dict(vertices=[], material=None, normals=[], texcoords=[],
-                       faces=[], face_texcoords=[], face_normals=[])
+                       faces=[], face_texcoords=[], face_normals=[],
+                       vertex_colors=[])
             for line in lines:
                 if line.startswith('#'):
                     continue
@@ -147,6 +139,10 @@ class ObjSerialize(DefaultSerialize):
                     continue
                 if values[0] == 'v':
                     out['vertices'].append([x for x in map(float, values[1:4])])
+                    if len(values) == 7:
+                        out['vertex_colors'].append([x for x in map(int, values[4:7])])
+                    else:
+                        out['vertex_colors'].append(self.default_rgb)
                 elif values[0] == 'vn':
                     out['normals'].append([x for x in map(float, values[1:4])])
                 elif values[0] == 'vt':

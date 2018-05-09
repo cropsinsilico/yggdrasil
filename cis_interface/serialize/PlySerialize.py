@@ -1,4 +1,8 @@
 import getpass
+import copy
+import numpy as np
+import matplotlib as mpl
+import matplotlib.cm as cm
 from cis_interface import backwards
 from cis_interface.serialize.DefaultSerialize import DefaultSerialize
 
@@ -20,7 +24,7 @@ class PlySerialize(DefaultSerialize):
             missing colors.
 
     """
-
+    
     def __init__(self, *args, **kwargs):
         self.write_header = kwargs.pop('write_header', True)
         self.newline = backwards.bytes2unicode(kwargs.pop('newline', '\n'))
@@ -30,7 +34,7 @@ class PlySerialize(DefaultSerialize):
     @property
     def serializer_type(self):
         r"""int: Type of serializer."""
-        return 9
+        return 8
         
     @property
     def empty_msg(self):
@@ -143,3 +147,44 @@ class PlySerialize(DefaultSerialize):
                         assert(x < len(out['vertices']))
                 i += 1
         return out
+
+    def apply_scalar_map(self, ply_dict, scalar_arr, color_map=None,
+                         vmin=None, vmax=None):
+        r"""Set the color of faces in a 3D object based on a scalar map.
+
+        Args:
+            ply_dict (dict): Ply fields.
+            scalar_arr (arr): Scalar values that should be mapped to colors
+                for each face.
+            color_map (str, optional): The name of the color map that should
+                be used. Defaults to 'plasma'.
+            vmin (float, optional): Value that should map to the minimum of the
+                colormap. Defaults to min(scalar_arr).
+            vmax (float, optional): Value that should map to the maximum of the
+                colormap. Defaults to max(scalar_arr).
+
+        Returns:
+            dict: Ply with updated vertex colors.
+
+        """
+        if color_map is None:
+            color_map = 'plasma'
+        if vmin is None:
+            vmin = min(scalar_arr)
+        if vmax is None:
+            vmax = max(scalar_arr)
+        cmap = cm.get_cmap(color_map)
+        norm = mpl.colors.Normalize(vmin=vmin, vmax=vmax)
+        m = cm.ScalarMappable(norm=norm, cmap=cmap)
+        color_arr = 255 * m.to_rgba(scalar_arr)
+        vertex_colors = [[] for x in ply_dict['vertices']]
+        for i in range(len(ply_dict['faces'])):
+            c = color_arr[i]
+            for v in ply_dict['faces'][i]:
+                vertex_colors[v].append(c)
+        # Average over vertex colors
+        for i in range(len(vertex_colors)):
+            vertex_colors[i] = np.mean(vertex_colors[i], axis=0)
+            vertex_colors[i] = vertex_colors[i].astype('int').tolist()[:3]
+        out = copy.deepcopy(ply_dict)
+        out['vertex_colors'] = vertex_colors

@@ -1,4 +1,5 @@
 import copy
+import numpy as np
 from cis_interface.serialize.tests.test_DefaultSerialize import \
     TestDefaultSerialize
 
@@ -10,6 +11,13 @@ class TestPlySerialize(TestDefaultSerialize):
         super(TestPlySerialize, self).__init__(*args, **kwargs)
         self._cls = 'PlySerialize'
         self._objects = [self.ply_dict]
+
+    def test_apply_scalar_map(self):
+        r"""Test applying a scalar colormap."""
+        for _o in self._objects:
+            o = self.map_sent2recv(_o)
+            scalar_arr = np.arange(len(o['faces']))
+            self.instance.apply_scalar_map(o, scalar_arr)
 
     def map_sent2recv(self, obj):
         r"""Convert a sent object into a received one."""
