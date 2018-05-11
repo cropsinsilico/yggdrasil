@@ -17,7 +17,8 @@ class TestPlySerialize(TestDefaultSerialize):
         for _o in self._objects:
             o = self.map_sent2recv(_o)
             scalar_arr = np.arange(len(o['faces']))
-            self.instance.apply_scalar_map(o, scalar_arr)
+            self.instance.apply_scalar_map(o, scalar_arr,
+                                           scale_by_area=True)
 
     def map_sent2recv(self, obj):
         r"""Convert a sent object into a received one."""

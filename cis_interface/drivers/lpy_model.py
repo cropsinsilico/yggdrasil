@@ -52,6 +52,7 @@ while (flag):
     nvert = 0
     for k, shapes in scene.todict().items():
         for shape in shapes:
+            # print(k, shape.name)
             d.process(shape)
             if d.result is None:
                 continue
