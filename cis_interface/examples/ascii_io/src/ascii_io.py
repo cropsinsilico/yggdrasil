@@ -9,6 +9,8 @@ from cis_interface.interface.CisInterface import (
     
 if __name__ == '__main__':
 
+    error_code = 0
+
     # Input & output to an ASCII file line by line
     in_file = CisAsciiFileInput('inputPy_file')
     out_file = CisAsciiFileOutput('outputPy_file')
@@ -35,6 +37,7 @@ if __name__ == '__main__':
             ret = out_file.send_line(line)
             if not ret:
                 print("ascii_io(P): ERROR SENDING LINE")
+                error_code = -1
                 break
         else:
             # If the receive was not succesful, send the end-of-file message to
@@ -57,6 +60,7 @@ if __name__ == '__main__':
             ret = out_table.send_row(*line)
             if not ret:
                 print("ascii_io(P): ERROR SENDING ROW")
+                error_code = -1
                 break
         else:
             # If the receive was not succesful, send the end-of-file message to
@@ -65,15 +69,21 @@ if __name__ == '__main__':
             out_table.send_eof()
 
     # Read entire array from ASCII table into numpy array
-    ret, arr = in_array.recv_array()
-    if not ret:
-        print("ascii_io(P): ERROR RECVING ARRAY")
-        sys.exit(-1)
-    print("Array: (%d rows)" % len(arr))
-    # Print each line in the array
-    for i in range(len(arr)):
-        print("%5s, %d, %3.1f, %s" % tuple(arr[i]))
-    # Send the array to output. Formatting is handled on the output driver side.
-    ret = out_array.send_array(arr)
-    if not ret:
-        print("ascii_io(P): ERROR SENDING ARRAY")
+    ret = True
+    while ret:
+        ret, arr = in_array.recv_array()
+        if ret:
+            print("Array: (%d rows)" % len(arr))
+            # Print each line in the array
+            for i in range(len(arr)):
+                print("%5s, %d, %3.1f, %s" % tuple(arr[i]))
+            # Send the array to output. Formatting is handled on the output driver side.
+            ret = out_array.send_array(arr)
+            if not ret:
+                print("ascii_io(P): ERROR SENDING ARRAY")
+                error_code = -1
+                break
+        else:
+            print("ascii_io(P): End of array input (Python)")
+
+    sys.exit(error_code)

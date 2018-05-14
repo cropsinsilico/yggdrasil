@@ -202,6 +202,7 @@ except (ImportError, IOError):
 
 # Create requirements list based on platform
 requirements = ["numpy", "scipy", "pyyaml", "pystache", "nose", "zmq", "psutil",
+                "matplotlib",
                 'pandas; python_version >= "3.5"',
                 'pandas; python_version == "2.7"',
                 'pandas<0.21; python_version == "3.4"',

@@ -54,7 +54,11 @@ int init_server_comm(comm_t *comm) {
   // 	 handle->name, handle->type, handle->address);
   strcpy(comm->direction, "recv");
   comm->handle = (void*)handle;
-  comm->always_send_header = 0;
+  if (_default_comm == ZMQ_COMM) {
+    comm->always_send_header = 1;
+  } else {
+    comm->always_send_header = 0;
+  }
   comm_t **info = (comm_t**)malloc(sizeof(comm_t*));
   if (info == NULL) {
     cislog_error("init_server_comm: Failed to malloc info.");
@@ -165,6 +169,11 @@ int server_comm_recv(comm_t x, char **data, const size_t len, const int allow_re
   if (!(head.valid)) {
     cislog_error("server_comm_recv(%s): Error parsing header.", x.name);
     return -1;
+  }
+  // Return EOF
+  if (is_eof((*data) + head.bodybeg)) {
+    req_comm->recv_eof[0] = 1;
+    return ret;
   }
   // If there is not a response address
   if (strlen(head.response_address) == 0) {

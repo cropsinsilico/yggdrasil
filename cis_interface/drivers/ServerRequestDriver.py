@@ -187,7 +187,6 @@ class ServerRequestDriver(ConnectionDriver):
                     self.exception("Could not create/start response driver.")
                     return False
             # Send response address in header
-            kwargs.setdefault('send_header', True)
             kwargs.setdefault('header_kwargs', {})
             kwargs['header_kwargs'].setdefault(
                 'response_address', response_driver.model_response_address)

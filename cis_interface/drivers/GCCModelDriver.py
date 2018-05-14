@@ -84,6 +84,7 @@ def get_flags(for_cmake=False):
     if platform._is_win:  # pragma: windows
         assert(os.path.isfile(_regex_win32_lib))
         _compile_flags += ["/nologo", "-D_CRT_SECURE_NO_WARNINGS"]
+        _compile_flags += ['-I' + _top_dir]
         if not for_cmake:
             _regex_win32 = os.path.split(_regex_win32_lib)
             _linker_flags += [_regex_win32[1], '/LIBPATH:"%s"' % _regex_win32[0]]
@@ -95,7 +96,7 @@ def get_flags(for_cmake=False):
         ipc_flags = get_ipc_flags(for_cmake=for_cmake)
         _compile_flags += ipc_flags[0]
         _linker_flags += ipc_flags[1]
-    for x in [_top_dir, _incl_interface, _incl_io, _incl_comm, _incl_seri, _incl_regex]:
+    for x in [_incl_interface, _incl_io, _incl_comm, _incl_seri, _incl_regex]:
         _compile_flags += ["-I" + x]
     if tools.get_default_comm() == 'IPCComm':
         _compile_flags += ["-DIPCDEF"]

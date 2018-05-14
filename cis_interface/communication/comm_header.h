@@ -27,6 +27,8 @@ typedef struct comm_head_t {
   char field_names[COMMBUFFSIZ]; //!< String containing field names.
   char field_units[COMMBUFFSIZ]; //!< String containing field units.
   int as_array; //!< 1 if messages will be serialized arrays.
+  char zmq_reply[COMMBUFFSIZ]; //!< Reply address for ZMQ sockets.
+  char zmq_reply_worker[COMMBUFFSIZ]; //!< Reply address for worker socket.
 } comm_head_t;
 
 /*!
@@ -59,6 +61,8 @@ comm_head_t init_header(const size_t size, const char *address, const char *id) 
   out.serializer_type = -1;
   out.format_str[0] = '\0';
   out.as_array = 0;
+  out.zmq_reply[0] = '\0';
+  out.zmq_reply_worker[0] = '\0';
   /* if (response_address == NULL) */
   /*   out.response_address[0] = '\0'; */
   /* else */
@@ -246,6 +250,28 @@ int format_comm_header(const comm_head_t head, char *buf, const size_t bufsiz) {
       pos += ret;
     }
   }
+  // ZMQ Reply address
+  if (strlen(head.zmq_reply) > 0) {
+    ret = format_header_entry(buf + pos, "zmq_reply",
+			      head.zmq_reply, bufsiz - pos);
+    if (ret < 0) {
+      cislog_error("Adding zmq_reply entry would exceed buffer size\n");
+      return ret;
+    } else {
+      pos += ret;
+    }
+  }
+  // ZMQ Reply address for worker
+  if (strlen(head.zmq_reply_worker) > 0) {
+    ret = format_header_entry(buf + pos, "zmq_reply_worker",
+			      head.zmq_reply_worker, bufsiz - pos);
+    if (ret < 0) {
+      cislog_error("Adding zmq_reply_worker entry would exceed buffer size\n");
+      return ret;
+    } else {
+      pos += ret;
+    }
+  }
   // Closing header tag
   pos -= strlen(HEAD_KEY_SEP);
   buf[pos] = '\0';
@@ -349,6 +375,9 @@ comm_head_t parse_comm_header(const char *buf, const size_t bufsiz) {
     ret = parse_header_entry(head, "format_str", out.format_str, COMMBUFFSIZ);
     ret = parse_header_entry(head, "field_names", out.field_names, COMMBUFFSIZ);
     ret = parse_header_entry(head, "field_units", out.field_units, COMMBUFFSIZ);
+    // ZMQ reply addresses
+    ret = parse_header_entry(head, "zmq_reply", out.zmq_reply, COMMBUFFSIZ);
+    ret = parse_header_entry(head, "zmq_reply_worker", out.zmq_reply_worker, COMMBUFFSIZ);
     // Free header
     free(head);
   }

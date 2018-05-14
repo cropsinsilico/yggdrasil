@@ -1,5 +1,6 @@
 """Testing things."""
 import os
+import copy
 import shutil
 import uuid
 import importlib
@@ -388,6 +389,19 @@ class IOInfo(object):
         self.file_elements = [('one', int(1), 1.0),
                               ('two', int(2), 2.0),
                               ('three', int(3), 3.0)]
+        self.map_dict = dict(args1=1, args2='2')
+        self.ply_dict = dict(vertices=[[1.0, 2.0, 3.0],
+                                       [4.0, 5.0, 6.0],
+                                       [7.0, 8.0, 9.0],
+                                       [10.0, 11.0, 12.0]],
+                             faces=[[0, 1, 2], [1, 2, 3]])
+        self.obj_dict = copy.deepcopy(self.ply_dict)
+        self.obj_dict.update(normals=self.obj_dict['vertices'],
+                             texcoords=[[1.0, 2.0], [2.0, 3.0], [3.0, 4.0], [5.0, 6.0]],
+                             face_normals=[[0, 1, None], None, None],
+                             face_texcoords=[[0, 1, None], None, None],
+                             material='material')
+        self.obj_dict['faces'].append([(0, 0, 0), (1, 1, 1), (2, 2, 2)])
 
     @property
     def header_lines(self):
@@ -574,6 +588,30 @@ class IOInfo(object):
         with open(fname, 'wb') as fd:
             fd.write(header)
             fd.write(body)
+
+    @property
+    def mapfile_contents(self):
+        r"""bytes: The contents of the test ASCII map file."""
+        out = ''
+        order = sorted([k for k in self.map_dict.keys()])
+        for k in order:
+            v = self.map_dict[k]
+            if isinstance(v, backwards.string_types):
+                out += "%s\t'%s'\n" % (k, v)
+            else:
+                out += "%s\t%s\n" % (k, repr(v))
+        return backwards.unicode2bytes(out)
+
+    def write_map(self, fname):
+        r"""Write the map dictionary out to a file.
+
+        Args:
+            fname (str): Full path to the file that the map should be
+                written to.
+
+        """
+        with open(fname, 'wb') as fd:
+            fd.write(self.mapfile_contents)
 
     def write_pickle(self, fname):
         r"""Write the pickled table out to a file.

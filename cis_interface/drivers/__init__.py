@@ -43,7 +43,7 @@ def create_driver(driver=None, name=None, args=None, **kwargs):
 
 __all__ = ['import_driver', 'create_driver', 'Driver',
            'ModelDriver', 'PythonModelDriver', 'GCCModelDriver',
-           'MakeModelDriver', 'MatlabModelDriver',
+           'MakeModelDriver', 'MatlabModelDriver', 'LPyModelDriver',
            'IODriver', 'FileInputDriver', 'FileOutputDriver',
            'AsciiFileInputDriver', 'AsciiFileOutputDriver',
            'AsciiTableInputDriver', 'AsciiTableOutputDriver',

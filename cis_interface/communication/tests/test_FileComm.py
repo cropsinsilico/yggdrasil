@@ -30,9 +30,14 @@ class TestFileComm(parent.TestCommBase):
         return out
 
     @property
+    def append_msg(self):
+        r"""str: Message that should be sent by second comm."""
+        return self.test_msg
+    
+    @property
     def double_msg(self):
         r"""str: Message that should result from writing two test messages."""
-        return 2 * self.test_msg
+        return self.merge_messages([self.test_msg, self.append_msg])
 
     def merge_messages(self, msg_list):
         r"""Merge multiple messages to produce the expected total message.
@@ -55,7 +60,7 @@ class TestFileComm(parent.TestCommBase):
         kwargs = self.send_inst_kwargs
         kwargs['append'] = True
         new_inst = new_comm('append%s' % self.uuid, **kwargs)
-        flag = new_inst.send(self.test_msg)
+        flag = new_inst.send(self.append_msg)
         assert(flag)
         self.remove_instance(new_inst)
         # Read entire contents

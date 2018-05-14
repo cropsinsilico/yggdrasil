@@ -57,15 +57,15 @@ function x_py = matlab2python(x_ml)
 	all_match = false;
       end;
       if all_match
-	x_py = cell2mat(x_ml);
+        x_py = cell2mat(x_ml).tolist();
       else
 	x_py = matlab2python(reduce_dim(x_ml));
       end;
     else
-      data_size = size(x_ml);
+      data_size = int16(size(x_ml));
       transpose = x_ml';
-      x_py = py.numpy.reshape(transpose(:)', data_size);
-    end
+      x_py = py.numpy.reshape(transpose(:)', data_size).tolist();
+    end;
   else;
     disp('Could not convert matlab type to python type');
     disp(x_ml);
