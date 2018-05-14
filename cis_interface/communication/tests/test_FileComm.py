@@ -23,6 +23,13 @@ class TestFileComm(parent.TestCommBase):
         nt.assert_raises(ValueError, new_comm, self.name, **kwargs)
 
     @property
+    def send_inst_kwargs(self):
+        r"""dict: Keyword arguments for send instance."""
+        out = super(TestFileComm, self).send_inst_kwargs
+        out['in_temp'] = True
+        return out
+
+    @property
     def double_msg(self):
         r"""str: Message that should result from writing two test messages."""
         return 2 * self.test_msg
