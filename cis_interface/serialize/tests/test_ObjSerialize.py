@@ -22,7 +22,7 @@ class TestObjSerialize(TestPlySerialize):
         if 'faces' in out:
             for i in range(len(out['faces'])):
                 for k in face_keys.keys():
-                    if i == len(out[k]):
+                    if i == len(out[k]):  # pragma: debug
                         out[k].append(None)
                     if out[k][i] is None:
                         out[k][i] = [None for _ in out['faces'][i]]
