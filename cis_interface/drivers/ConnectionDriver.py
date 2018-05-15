@@ -314,11 +314,7 @@ class ConnectionDriver(Driver):
         self.state = 'before loop'
         try:
             self.open_comm()
-            if self.icomm.is_file or self.ocomm.is_file:
-                timeout = False
-            else:
-                timeout = 10 * self.timeout
-            T = self.start_timeout(timeout)
+            T = self.start_timeout(10 * self.timeout)
             while (not T.is_out) and (not self.is_valid):
                 self.sleep()
             self.stop_timeout()

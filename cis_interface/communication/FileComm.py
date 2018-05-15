@@ -141,6 +141,10 @@ class FileComm(CommBase.CommBase):
         r"""Open the file."""
         super(FileComm, self).open()
         self._open()
+        T = self.start_timeout()
+        while (not T.is_out) and (not self.is_open):
+            self.sleep()
+        self.stop_timeout()
         self.register_comm(self.address, self.fd)
 
     def _close(self, *args, **kwargs):
