@@ -42,11 +42,6 @@ class ObjSerialize(PlySerialize):
 
         """
         lines = []
-        # Set colors if not provided
-        # if not args.get('vertex_colors', []):
-        #     args['vertex_colors'] = []
-        #     for v in args.get('vertices', []):
-        #         args['vertex_colors'].append(self.default_rgb)
         # Header
         if self.write_header:
             lines += ['# Author %s' % getpass.getuser(),
@@ -58,7 +53,7 @@ class ObjSerialize(PlySerialize):
                 for v in args['vertices']:
                     lines.append('v %f %f %f' % tuple(v))
             else:
-                for i in len(args['vertices']):
+                for i in range(len(args['vertices'])):
                     line = 'v'
                     line += ' %f %f %f' % tuple(args['vertices'][i])
                     line += ' %d %d %d' % tuple(args['vertex_colors'][i])

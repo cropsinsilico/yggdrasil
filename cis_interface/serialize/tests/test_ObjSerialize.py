@@ -1,3 +1,4 @@
+import copy
 from cis_interface.serialize.tests.test_PlySerialize import \
     TestPlySerialize
 
@@ -8,7 +9,9 @@ class TestObjSerialize(TestPlySerialize):
     def __init__(self, *args, **kwargs):
         super(TestObjSerialize, self).__init__(*args, **kwargs)
         self._cls = 'ObjSerialize'
-        self._objects = [self.obj_dict]
+        obj_dict2 = copy.deepcopy(self.obj_dict)
+        obj_dict2['vertex_colors'] = [[0, 0, 0] for v in obj_dict2['vertices']]
+        self._objects = [self.obj_dict, obj_dict2]
 
     def map_sent2recv(self, obj):
         r"""Convert a sent object into a received one."""

@@ -10,7 +10,9 @@ class TestPlySerialize(TestDefaultSerialize):
     def __init__(self, *args, **kwargs):
         super(TestPlySerialize, self).__init__(*args, **kwargs)
         self._cls = 'PlySerialize'
-        self._objects = [self.ply_dict]
+        ply_dict2 = copy.deepcopy(self.ply_dict)
+        ply_dict2['vertex_colors'] = [[0, 0, 0] for v in ply_dict2['vertices']]
+        self._objects = [self.ply_dict, ply_dict2]
 
     def test_apply_scalar_map(self):
         r"""Test applying a scalar colormap."""

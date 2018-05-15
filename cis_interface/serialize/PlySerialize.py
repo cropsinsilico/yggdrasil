@@ -67,24 +67,31 @@ class PlySerialize(DefaultSerialize):
                       'element vertex %d' % nvert,
                       'property float x',
                       'property float y',
-                      'property float z',
-                      'property uchar diffuse_red',
-                      'property uchar diffuse_green',
-                      'property uchar diffuse_blue',
-                      'element face %d' % nface,
+                      'property float z']
+            if args.get('vertex_colors', []):
+                lines += ['property uchar diffuse_red',
+                          'property uchar diffuse_green',
+                          'property uchar diffuse_blue']
+            lines += ['element face %d' % nface,
                       'property list uchar int vertex_indices',
                       'end_header']
         # Set colors if not provided
-        if not args.get('vertex_colors', []):
-            args['vertex_colors'] = []
-            for v in args.get('vertices', []):
-                args['vertex_colors'].append(self.default_rgb)
+        # if not args.get('vertex_colors', []):
+        #     args['vertex_colors'] = []
+        #     for v in args.get('vertices', []):
+        #         args['vertex_colors'].append(self.default_rgb)
         # 3D objects
-        for i in range(len(args.get('vertices', []))):
-            v = args['vertices'][i]
-            c = args['vertex_colors'][i]
-            entry = tuple(list(v) + list(c))
-            lines.append('%f %f %f %d %d %d' % entry)
+        if args.get('vertex_colors', []):
+            for i in range(len(args.get('vertices', []))):
+                v = args['vertices'][i]
+                c = args['vertex_colors'][i]
+                entry = tuple(list(v) + list(c))
+                lines.append('%f %f %f %d %d %d' % entry)
+        else:
+            for i in range(len(args.get('vertices', []))):
+                v = args['vertices'][i]
+                entry = tuple(list(v))
+                lines.append('%f %f %f' % entry)
         for f in args.get('faces', []):
             nv = len(f)
             iline = '%d' % nv
@@ -206,7 +213,7 @@ class PlySerialize(DefaultSerialize):
             vmin = vertex_scalar.min()
         if vmax is None:
             vmax = vertex_scalar.max()
-        print(vmin, vmax)
+        # print(vmin, vmax)
         cmap = cm.get_cmap(color_map)
         if scaling == 'log':
             norm = mpl.colors.LogNorm(vmin=vmin, vmax=vmax)
