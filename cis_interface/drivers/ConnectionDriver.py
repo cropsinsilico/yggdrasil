@@ -314,11 +314,7 @@ class ConnectionDriver(Driver):
         self.state = 'before loop'
         try:
             self.open_comm()
-            T = self.start_timeout(10 * self.timeout)
-            while (not T.is_out) and (not self.is_valid):
-                self.sleep()
-            self.stop_timeout()
-            # self.sleep()  # Help ensure senders/receivers connected before messages
+            self.sleep()  # Help ensure senders/receivers connected before messages
             self.debug('Running in %s, is_valid = %s', os.getcwd(), str(self.is_valid))
             assert(self.is_valid)
         except BaseException:  # pragma: debug
