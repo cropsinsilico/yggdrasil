@@ -317,7 +317,7 @@ class ConnectionDriver(Driver):
             if self.icomm.is_file or self.ocomm.is_file:
                 timeout = False
             else:
-                timeout = self.timeout
+                timeout = 10 * self.timeout
             T = self.start_timeout(timeout)
             while (not T.is_out) and (not self.is_valid):
                 self.sleep()
