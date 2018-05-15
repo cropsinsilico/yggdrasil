@@ -215,6 +215,17 @@ class TestDefaultSerialize_class(TestDefaultSerialize_func):
                              'func_deserialize': self.func_deserialize}
 
 
+class TestDefaultSerialize_alias(TestDefaultSerialize_format):
+    r"""Test class for DefaultSerialize class with alias."""
+
+    def setup(self, *args, **kwargs):
+        r"""Create an instance of the class."""
+        super(TestDefaultSerialize_alias, self).setup(*args, **kwargs)
+        alias = self.instance
+        self._instance = DefaultSerialize.DefaultSerialize()
+        self._instance._alias = alias
+
+
 class TestDefaultSerialize_func_error(TestDefaultSerialize_func):
     r"""Test class for DefaultSerialize class with incorrect functions."""
 

@@ -73,14 +73,14 @@ class DefaultSerialize(object):
     #     print(cls)
     #     return cls
 
-    def __getattr__(self, name):
+    def __getattribute__(self, name):
         r"""Return alias result if there is one."""
         if name == '_alias':
-            return super(DefaultSerialize, self).__getattr__(name)
+            return super(DefaultSerialize, self).__getattribute__(name)
         if self._alias is None:
-            return super(DefaultSerialize, self).__getattr__(name)
+            return super(DefaultSerialize, self).__getattribute__(name)
         else:
-            return self._alias.__getattr__(name)
+            return self._alias.__getattribute__(name)
 
     @property
     def is_user_defined(self):
