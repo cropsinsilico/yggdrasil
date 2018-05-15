@@ -1,9 +1,13 @@
-#include <regex.h>
-#include <stdint.h>
-
 /*! @brief Flag for checking if regex_posix has already been included.*/
 #ifndef REGEX_POSIX_H_
 #define REGEX_POSIX_H_
+
+#include <regex.h>
+#include <stdint.h>
+
+#ifdef __cplusplus /* If this is a C++ compiler, use C linkage */
+extern "C" {
+#endif
 
 /*!
   @brief Create a regex from a character array.
@@ -404,5 +408,9 @@ int regex_replace_sub(char *buf, const size_t len_buf,
   regfree(&r);
   return (int)cur_siz;
 };
+
+#ifdef __cplusplus /* If this is a C++ compiler, end C linkage */
+}
+#endif
 
 #endif /*REGEX_POSIX_H_*/

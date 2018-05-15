@@ -1,9 +1,13 @@
-#include <../tools.h>
-#include <../dataio/AsciiTable.h>
-
 /*! @brief Flag for checking if this header has already been included. */
 #ifndef CISCOMMHEADER_H_
 #define CISCOMMHEADER_H_
+
+#include <../tools.h>
+#include <../dataio/AsciiTable.h>
+
+#ifdef __cplusplus /* If this is a C++ compiler, use C linkage */
+extern "C" {
+#endif
 
 #define CIS_MSG_HEAD "CIS_MSG_HEAD"
 #define HEAD_VAL_SEP ":CIS:"
@@ -384,5 +388,8 @@ comm_head_t parse_comm_header(const char *buf, const size_t bufsiz) {
   return out;
 };
 
+#ifdef __cplusplus /* If this is a C++ compiler, end C linkage */
+}
+#endif
 
 #endif /*CISCOMMHEADER_H_*/

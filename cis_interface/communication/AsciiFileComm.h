@@ -1,11 +1,15 @@
+/*! @brief Flag for checking if this header has already been included. */
+#ifndef CISASCIIFILECOMM_H_
+#define CISASCIIFILECOMM_H_
+
 #include <../tools.h>
 #include <CommBase.h>
 #include <../dataio/AsciiFile.h>
 #include <../dataio/AsciiTable.h>
 
-/*! @brief Flag for checking if this header has already been included. */
-#ifndef CISASCIIFILECOMM_H_
-#define CISASCIIFILECOMM_H_
+#ifdef __cplusplus /* If this is a C++ compiler, use C linkage */
+extern "C" {
+#endif
 
 /*! @brief Number of files creates. */
 static unsigned _cisAsciiFilesCreated;
@@ -138,5 +142,9 @@ int ascii_file_comm_recv(const comm_t x, char **data, size_t len,
  */
 #define ascii_file_comm_recv_nolimit ascii_file_comm_recv
 
+
+#ifdef __cplusplus /* If this is a C++ compiler, end C linkage */
+}
+#endif
 
 #endif /*CISASCIIFILECOMM_H_*/

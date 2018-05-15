@@ -1,10 +1,9 @@
-extern "C" {
-#include "CisInterface.h"
-};
-
 /*! @brief Flag for checking if CisInterface.hpp has already been included.*/
 #ifndef CISINTERFACE_HPP_
 #define CISINTERFACE_HPP_
+
+#include "CisInterface.h"
+
 
 /*!
   @brief C++ interface to cisInput_t functionality.

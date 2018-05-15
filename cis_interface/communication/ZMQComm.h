@@ -6,8 +6,14 @@
 #include "comm_header.h"
 
 #ifdef ZMQINSTALLED
-
 #include <czmq.h>
+#endif
+
+#ifdef __cplusplus /* If this is a C++ compiler, use C linkage */
+extern "C" {
+#endif
+
+#ifdef ZMQINSTALLED
 
 static unsigned _zmq_rand_seeded = 0;
 static unsigned _last_port_set = 0;
@@ -138,12 +144,19 @@ int do_reply_send(const comm_t *comm) {
   // Poll
   cislog_debug("do_reply_send(%s): address=%s, begin", comm->name,
   	       zrep->addresses[0]);
+#if defined(__cplusplus) && defined(_WIN32)
+  // TODO: There seems to be an error in the poller when using it in C++
+#else
   zpoller_t *poller = zpoller_new(s, NULL);
-  if (poller == NULL) {
+  if (!(poller)) {
     cislog_error("do_reply_send(%s): Could not create poller", comm->name);
     return -1;
   }
+  assert(poller);
+  cislog_debug("do_reply_send(%s): waiting on poller...", comm->name);
   void *p = zpoller_wait(poller, -1);
+  //void *p = zpoller_wait(poller, 1000);
+  cislog_debug("do_reply_send(%s): poller returned", comm->name); 
   zpoller_destroy(&poller);
   if (p == NULL) {
     if (zpoller_terminated(poller)) {
@@ -155,6 +168,7 @@ int do_reply_send(const comm_t *comm) {
     }
     return -1;
   }
+#endif
   // Receive
   zframe_t *msg = zframe_recv(s);
   if (msg == NULL) {
@@ -854,4 +868,9 @@ int set_reply_recv(const comm_t *comm, const char* address) {
 };
 
 #endif /*ZMQINSTALLED*/
+
+#ifdef __cplusplus /* If this is a C++ compiler, end C linkage */
+}
+#endif
+
 #endif /*CISZMQCOMM_H_*/

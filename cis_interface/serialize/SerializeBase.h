@@ -1,8 +1,11 @@
-#include <../tools.h>
-
 #ifndef CISSERIALIZEBASE_H_
 #define CISSERIALIZEBASE_H_
 
+#include <../tools.h>
+
+#ifdef __cplusplus /* If this is a C++ compiler, use C linkage */
+extern "C" {
+#endif
 
 /*! @brief Serializer types. */
 enum seri_enum { DIRECT_SERI, FORMAT_SERI, ARRAY_SERI,
@@ -63,5 +66,8 @@ int deserialize_direct(const seri_t s, const char *buf, const size_t buf_siz,
   return 1;
 };
   
+#ifdef __cplusplus /* If this is a C++ compiler, end C linkage */
+}
+#endif
 
 #endif /*CISSERIALIZEBASE_H_*/

@@ -1,8 +1,12 @@
-#include <../tools.h>
-
 /*! @brief Flag for checking if this header has already been included. */
 #ifndef CISCOMMBASE_H_
 #define CISCOMMBASE_H_
+
+#include <../tools.h>
+
+#ifdef __cplusplus /* If this is a C++ compiler, use C linkage */
+extern "C" {
+#endif
 
 /*! @brief Communicator types. */
 enum comm_enum { NULL_COMM, IPC_COMM, ZMQ_COMM,
@@ -213,5 +217,9 @@ int comm_base_send(const comm_t x, const char *data, const size_t len) {
   return 0;
 };
 
+
+#ifdef __cplusplus /* If this is a C++ compiler, end C linkage */
+}
+#endif
   
 #endif /*CISCOMMBASE_H_*/

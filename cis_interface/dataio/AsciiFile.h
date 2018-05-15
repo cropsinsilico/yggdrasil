@@ -1,8 +1,12 @@
-#include <../tools.h>
-
 /*! @brief Flag for checking if AsciiFile.h has already been included.*/
 #ifndef ASCIIFILE_H_
 #define ASCIIFILE_H_
+
+#include <../tools.h>
+
+#ifdef __cplusplus /* If this is a C++ compiler, use C linkage */
+extern "C" {
+#endif
 
 /*! @brief Maximum line size. */
 #define LINE_SIZE_MAX 1024*2
@@ -175,5 +179,9 @@ asciiFile_t asciiFile(const char *filepath, const char *io_mode,
     strcpy(t.newline, newline);
   return t;
 };
+
+#ifdef __cplusplus /* If this is a C++ compiler, end C linkage */
+}
+#endif
 
 #endif /*ASCIIFILE_H_*/

@@ -1,11 +1,14 @@
+#ifndef CISSERIALIZE_H_
+#define CISSERIALIZE_H_
+
 #include <../tools.h>
 #include <SerializeBase.h>
 #include <FormatSerialize.h>
 #include <AsciiTableSerialize.h>
 
-#ifndef CISSERIALIZE_H_
-#define CISSERIALIZE_H_
-
+#ifdef __cplusplus /* If this is a C++ compiler, use C linkage */
+extern "C" {
+#endif
 
 /*!
   @brief Create an empty serializer structure.
@@ -201,5 +204,8 @@ int deserialize(const seri_t s, const char *buf, const size_t buf_siz, va_list a
   return ret;
 };
 
+#ifdef __cplusplus /* If this is a C++ compiler, end C linkage */
+}
+#endif
 
 #endif /*CISSERIALIZE_H_*/

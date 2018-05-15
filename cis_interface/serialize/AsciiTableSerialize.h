@@ -1,10 +1,13 @@
+#ifndef CISASCIITABLESERIALIZE_H_
+#define CISASCIITABLESERIALIZE_H_
+
 #include <../tools.h>
 #include <SerializeBase.h>
 #include <../dataio/AsciiTable.h>
 
-#ifndef CISASCIITABLESERIALIZE_H_
-#define CISASCIITABLESERIALIZE_H_
-
+#ifdef __cplusplus /* If this is a C++ compiler, use C linkage */
+extern "C" {
+#endif
 
 /*!
   @brief Serialize arguments to create a table row.
@@ -83,5 +86,8 @@ int deserialize_ascii_table_array(const seri_t s, const char *buf,
   return ret;
 };
 
+#ifdef __cplusplus /* If this is a C++ compiler, end C linkage */
+}
+#endif
 
 #endif /*CISASCIITABLESERIALIZE_H_*/

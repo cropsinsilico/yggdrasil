@@ -1,3 +1,7 @@
+/*! @brief Flag for checking if this header has already been included. */
+#ifndef CISIPCCOMM_H_
+#define CISIPCCOMM_H_
+
 #ifdef IPCINSTALLED
 #include <fcntl.h>           /* For O_* constants */
 #include <sys/stat.h>        /* For mode constants */
@@ -8,9 +12,9 @@
 #endif /*IPCINSTALLED*/
 #include <CommBase.h>
 
-/*! @brief Flag for checking if this header has already been included. */
-#ifndef CISIPCCOMM_H_
-#define CISIPCCOMM_H_
+#ifdef __cplusplus /* If this is a C++ compiler, use C linkage */
+extern "C" {
+#endif
 
 #ifdef IPCINSTALLED
 
@@ -490,4 +494,9 @@ int ipc_comm_recv(const comm_t x, char **data, const size_t len,
 };
 
 #endif /*IPCINSTALLED*/
+
+#ifdef __cplusplus /* If this is a C++ compiler, end C linkage */
+}
+#endif
+
 #endif /*CISIPCCOMM_H_*/

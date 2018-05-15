@@ -1,3 +1,7 @@
+/*! @brief Flag for checking if this header has already been included. */
+#ifndef CISCOMMUNICATION_H_
+#define CISCOMMUNICATION_H_
+
 #include <../tools.h>
 #include <../serialize/serialize.h>
 #include <comm_header.h>
@@ -11,9 +15,9 @@
 #include <AsciiTableComm.h>
 #include <DefaultComm.h>
 
-/*! @brief Flag for checking if this header has already been included. */
-#ifndef CISCOMMUNICATION_H_
-#define CISCOMMUNICATION_H_
+#ifdef __cplusplus /* If this is a C++ compiler, use C linkage */
+extern "C" {
+#endif
 
 /*! @brief Memory to keep track of comms to clean up at exit. */
 static void **vcomms2clean = NULL;
@@ -100,6 +104,7 @@ int free_comm(comm_t *x) {
 static
 void clean_comms(void) {
   size_t i;
+  cislog_debug("atexit begin");
   for (i = 0; i < ncomms2clean; i++) {
     if (vcomms2clean[i] != NULL) {
       free_comm((comm_t*)(vcomms2clean[i]));
@@ -1037,5 +1042,8 @@ int vcommRecv(const comm_t x, va_list ap) {
 #define vcommSend_nolimit vcommSend
 #define vcommRecv_nolimit vcommRecv
 
+#ifdef __cplusplus /* If this is a C++ compiler, end C linkage */
+}
+#endif
 
 #endif /*CISCOMMUNICATION_H_*/

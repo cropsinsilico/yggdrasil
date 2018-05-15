@@ -1,10 +1,14 @@
+/*! @brief Flag for checking if this header has already been included. */
+#ifndef CISSERVERCOMM_H_
+#define CISSERVERCOMM_H_
+
 #include <CommBase.h>
 #include <DefaultComm.h>
 #include <comm_header.h>
 
-/*! @brief Flag for checking if this header has already been included. */
-#ifndef CISSERVERCOMM_H_
-#define CISSERVERCOMM_H_
+#ifdef __cplusplus /* If this is a C++ compiler, use C linkage */
+extern "C" {
+#endif
 
 // Handle is recv address
 // Info is response
@@ -201,5 +205,9 @@ int server_comm_recv(comm_t x, char **data, const size_t len, const int allow_re
   res_comm[0]->recv_eof[0] = 1;
   return ret;
 };
+
+#ifdef __cplusplus /* If this is a C++ compiler, end C linkage */
+}
+#endif
 
 #endif /*CISSERVERCOMM_H_*/

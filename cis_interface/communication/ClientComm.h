@@ -1,11 +1,15 @@
+/*! @brief Flag for checking if this header has already been included. */
+#ifndef CISCLIENTCOMM_H_
+#define CISCLIENTCOMM_H_
+
 #include <../tools.h>
 #include <CommBase.h>
 #include <DefaultComm.h>
 #include <comm_header.h>
 
-/*! @brief Flag for checking if this header has already been included. */
-#ifndef CISCLIENTCOMM_H_
-#define CISCLIENTCOMM_H_
+#ifdef __cplusplus /* If this is a C++ compiler, use C linkage */
+extern "C" {
+#endif
 
 // Handle is send address
 // Info is response
@@ -280,5 +284,10 @@ int client_comm_recv(comm_t x, char **data, const size_t len, const int allow_re
   memmove(*res_comm, *res_comm + 1, nresp*sizeof(comm_t*));
   return ret;
 };
+
+
+#ifdef __cplusplus /* If this is a C++ compiler, end C linkage */
+}
+#endif
 
 #endif /*CISCLIENTCOMM_H_*/
