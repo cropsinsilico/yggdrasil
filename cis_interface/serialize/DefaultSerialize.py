@@ -77,7 +77,7 @@ class DefaultSerialize(object):
         r"""Return alias result if there is one."""
         if name == '_alias':
             return super(DefaultSerialize, self).__getattribute__(name)
-        if self._alias is None:
+        if getattr(self, '_alias', None) is None:
             return super(DefaultSerialize, self).__getattribute__(name)
         else:
             return self._alias.__getattribute__(name)
