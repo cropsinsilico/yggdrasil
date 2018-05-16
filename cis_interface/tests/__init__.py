@@ -33,7 +33,8 @@ script_list = [
     ('cmake', 'gcc_model'),
     ('matlab', 'matlab_model.m'),
     ('python', 'python_model.py'),
-    ('error', 'error_model.py')]
+    ('error', 'error_model.py'),
+    ('lpy', 'lpy_model.lpy')]
 scripts = {}
 for k, v in script_list:
     if isinstance(v, list):
@@ -51,7 +52,8 @@ yaml_list = [
     ('cmake', 'cmake_model.yml'),
     ('matlab', 'matlab_model.yml'),
     ('python', 'python_model.yml'),
-    ('error', 'error_model.yml')]
+    ('error', 'error_model.yml'),
+    ('lpy', 'lpy_model.yml')]
 yamls = {k: os.path.join(yaml_dir, v) for k, v in yaml_list}
 
 # Makefile

@@ -14,6 +14,15 @@ IS_WINDOWS = (sys.platform in ['win32', 'cygwin'])
 cis_ver = "0.2"
 
 
+try:
+    from openalea import lpy
+    lpy_installed = True
+except ImportError:
+    warnings.warn("Could not import openalea.lpy. " +
+                  "LPy support will be disabled.")
+    lpy_installed = False
+
+
 def install_matlab():
     r"""Attempt to install the MATLAB engine API for Python."""
     # Check to see if its already installed
@@ -179,6 +188,13 @@ if cov_installed:
     else:
         excl_list = add_excl_rule(excl_list, 'pragma: matlab')
         excl_list = rm_excl_rule(excl_list, 'pragma: no matlab')
+    # LPy
+    if lpy_installed:
+        excl_list = add_excl_rule(excl_list, 'pragma: no lpy')
+        excl_list = rm_excl_rule(excl_list, 'pragma: lpy')
+    else:
+        excl_list = add_excl_rule(excl_list, 'pragma: lpy')
+        excl_list = rm_excl_rule(excl_list, 'pragma: no lpy')
     # Add new rules
     cp.set('report', 'exclude_lines', '\n'+'\n'.join(excl_list))
     # Write

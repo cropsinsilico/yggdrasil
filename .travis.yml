@@ -13,6 +13,7 @@ env:
     INSTALLZMQ=1
     INSTALLRMQ=0
     INSTALLAPY=0
+    INSTALLLPY=0
 
 # services:
 #   - rabbitmq
@@ -25,7 +26,7 @@ matrix:
       env: INSTALLRMQ=1
     - python: 3.4
     - python: 3.5
-      env: INSTALLAPY=1
+      env: INSTALLAPY=1 INSTALLLPY=1
     - python: 3.6
       env: INSTALLZMQ=0 INSTALLRMQ=0
     - python: 3.6
@@ -53,6 +54,30 @@ matrix:
 
 before_install:
   - |
+    sudo apt-get update
+    # We do this conditionally because it saves us some downloading if the
+    # version is the same.
+    if [[ $TRAVIS_OS_NAME == 'osx' ]]; then
+      if [[ "$TRAVIS_PYTHON_VERSION" == "2.7" ]]; then
+        wget https://repo.continuum.io/miniconda/Miniconda2-latest-MacOSX-x86_64.sh -O miniconda.sh;
+      else
+        wget https://repo.continuum.io/miniconda/Miniconda3-latest-MacOSX-x86_64.sh -O miniconda.sh;
+      fi
+    else
+      if [[ "$TRAVIS_PYTHON_VERSION" == "2.7" ]]; then
+        wget https://repo.continuum.io/miniconda/Miniconda2-latest-Linux-x86_64.sh -O miniconda.sh;
+      else
+        wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh;
+      fi
+    fi
+    bash miniconda.sh -b -p $HOME/miniconda
+    export PATH="$HOME/miniconda/bin:$PATH"
+    hash -r
+    conda config --set always_yes yes --set changeps1 no
+    conda update -q conda
+    # Useful for debugging any issues with conda
+    conda info -a
+
     if [[ $TRAVIS_OS_NAME == 'osx' ]]; then
        brew update
        # brew install ccache
@@ -70,6 +95,17 @@ before_install:
     if [[ $INSTALLAPY == '1' ]]; then
        echo Installing AstroPy...;
        pip install astropy
+    fi
+
+    # Install LPy
+    if [[ $INSTALLLPY == '1' ]]; then
+       echo Installing LPy...;
+       sh ci/install-lpy-linux.sh
+       # if [[ $TRAVIS_OS_NAME == 'osx' ]]; then
+       #    sh ci/install-lpy-osx.sh
+       # else
+       #    sh ci/install-lpy-linux.sh
+       # fi
     fi
 
     # Install ZeroMQ

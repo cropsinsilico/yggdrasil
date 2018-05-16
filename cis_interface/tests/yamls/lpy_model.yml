@@ -1,0 +1,5 @@
+model:
+  name: lpy_model
+  driver: LPyModelDriver
+  args:
+    - ../scripts/lpy_model.lpy
