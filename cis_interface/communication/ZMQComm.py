@@ -299,6 +299,7 @@ class ZMQComm(AsyncComm.AsyncComm):
                           socket_action=None, topic_filter='',
                           dealer_identity=None, **kwargs):
         r"""Initialize defaults for socket type/action based on direction."""
+        self.reply_socket_lock = threading.RLock()
         self.socket_lock = threading.RLock()
         # Client/Server things
         if self.is_client:
@@ -568,25 +569,28 @@ class ZMQComm(AsyncComm.AsyncComm):
     def set_reply_socket_send(self):
         r"""Set the send reply socket if it dosn't exist."""
         if self.reply_socket_send is None:
-            self.reply_socket_send = self.context.socket(zmq.REP)
-            self.reply_socket_send.setsockopt(zmq.LINGER, 0)
+            s = self.context.socket(zmq.REP)
+            s.setsockopt(zmq.LINGER, 0)
             address = format_address(_default_protocol, 'localhost')
-            address = bind_socket(self.reply_socket_send, address)
-            self.register_comm('REPLY_SEND_' + address, self.reply_socket_send)
-            self.reply_socket_address = address
+            address = bind_socket(s, address)
+            self.register_comm('REPLY_SEND_' + address, s)
+            with self.reply_socket_lock:
+                self.reply_socket_send = s
+                self.reply_socket_address = address
             self.debug("new send address: %s", address)
         return self.reply_socket_address
 
     def set_reply_socket_recv(self, address):
         r"""Set the recv reply socket if the address dosn't exist."""
         if address not in self.reply_socket_recv:
-            self.reply_socket_recv[address] = self.context.socket(zmq.REQ)
-            self.reply_socket_recv[address].setsockopt(zmq.LINGER, 0)
-            self.reply_socket_recv[address].connect(address)
-            self.register_comm('REPLY_RECV_' + backwards.bytes2unicode(address),
-                               self.reply_socket_recv[address])
-            self._n_reply_recv[address] = 0
-            self._n_zmq_recv[address] = 0
+            s = self.context.socket(zmq.REQ)
+            s.setsockopt(zmq.LINGER, 0)
+            s.connect(address)
+            self.register_comm('REPLY_RECV_' + backwards.bytes2unicode(address), s)
+            with self.reply_socket_lock:
+                self._n_reply_recv[address] = 0
+                self._n_zmq_recv[address] = 0
+                self.reply_socket_recv[address] = s
             self.debug("new recv address: %s", address)
         return address
 
@@ -999,13 +1003,15 @@ class ZMQComm(AsyncComm.AsyncComm):
 
     def confirm_recv(self, noblock=False):
         r"""Confirm that message was received."""
+        with self.reply_socket_lock:
+            keys = [k for k in self.reply_socket_recv.keys()]
         if noblock:
-            for k in self.reply_socket_recv.keys():
+            for k in keys:
                 if self.is_open and (self._n_zmq_recv[k] != self._n_reply_recv[k]):
                     self._n_reply_recv[k] = self._n_zmq_recv[k]
             return True
         flag = None
-        for k in self.reply_socket_recv.keys():
+        for k in keys:
             if self.is_open and (self._n_zmq_recv[k] != self._n_reply_recv[k]):
                 self.debug("Confirming %d/%d received messages",
                            self._n_reply_recv[k], self._n_zmq_recv[k])
