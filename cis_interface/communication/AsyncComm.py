@@ -28,11 +28,8 @@ class AsyncComm(CommBase.CommBase):
         
     """
     def __init__(self, name, dont_backlog=False, **kwargs):
-        self.dont_backlog = dont_backlog
-        if kwargs.get('matlab', False):
-            self.dont_backlog = True
-        if kwargs.get('is_inteface', False):
-            self.dont_backlog = True
+        self.dont_backlog = (dont_backlog or kwargs.get('matlab', False) or
+                             kwargs.get('is_inteface', False))
         self._backlog_recv = []
         self._backlog_send = []
         self._backlog_thread = None

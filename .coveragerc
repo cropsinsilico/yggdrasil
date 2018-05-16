@@ -9,6 +9,7 @@ omit =
      cis_interface/tests/scripts/python_model.py
      cis_interface/command_line.py
      cis_interface/scanf.py
+     cis_interface/drivers/lpy_model.py
 
 [report]
 sort = Cover

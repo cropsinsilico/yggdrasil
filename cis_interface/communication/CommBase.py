@@ -1057,10 +1057,11 @@ class CommBase(tools.CisClass):
             if (len(msg_s) > self.maxMsgSize) and (self.maxMsgSize != 0):
                 if header_kwargs is None:
                     header_kwargs = dict()
-                if 'address' not in header_kwargs:
-                    work_comm = self.create_work_comm()
-                else:
-                    work_comm = self.get_work_comm(header_kwargs)
+                work_comm = self.create_work_comm()
+                # if 'address' not in header_kwargs:
+                #     work_comm = self.create_work_comm()
+                # else:
+                #     work_comm = self.get_work_comm(header_kwargs)
                 header_kwargs = self.workcomm2header(work_comm, **header_kwargs)
                 msg_s = self.serializer.serialize(
                     msg_, header_kwargs=header_kwargs,

@@ -107,9 +107,8 @@ class FileComm(CommBase.CommBase):
         else:
             io_mode = 'w'
         if self.open_as_binary:
-            return io_mode + 'b'
-        else:
-            return io_mode
+            io_mode += 'b'
+        return io_mode
 
     def opp_comm_kwargs(self):
         r"""Get keyword arguments to initialize communication with opposite
@@ -142,7 +141,7 @@ class FileComm(CommBase.CommBase):
         super(FileComm, self).open()
         self._open()
         T = self.start_timeout()
-        while (not T.is_out) and (not self.is_open):
+        while (not T.is_out) and (not self.is_open):  # pragma: debug
             self.sleep()
         self.stop_timeout()
         self.register_comm(self.address, self.fd)

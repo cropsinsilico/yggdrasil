@@ -219,7 +219,7 @@ def format_bytes(s, args):
             else:
                 new_args.append(a)
         out = converter(s) % tuple(new_args)
-        if PY34 and is_bytes:
+        if is_bytes:
             out = unicode2bytes(out)
     return out
 

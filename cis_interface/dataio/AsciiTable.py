@@ -262,19 +262,8 @@ class AsciiTable(AsciiFile):
         
     def validate_line(self, line):
         r"""Assert that the line matches the format string and produces the
-        expected number of values.
-
-        Raises:
-            TypeError: If the line is not a bytes/str.
-            AssertionError: If the line does not match the format string.
-
-        """
-        if not isinstance(line, backwards.bytes_type):
-            raise TypeError("Line must be of type %s, not %s."
-                            % (backwards.bytes_type, type(line)))
-        args = self.process_line(line)
-        if args is None or (len(args) != self.ncols):
-            raise AssertionError("The line does not match the format string.")
+        expected number of values."""
+        self.process_line(line)
 
     def discover_format_str(self):
         r"""Determine the format string by reading it from the file. The format

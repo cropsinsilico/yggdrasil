@@ -1046,7 +1046,7 @@ def discover_header(fd, serializer, newline=_default_newline,
     for k in ['format_str', 'field_names', 'field_units']:
         if header.get(k, False):
             setattr(serializer, k, header[k])
-    if delimiter is None:
+    if (delimiter is None) or ('format_str' in header):
         delimiter = header['delimiter']
     # Try to determine format from array without header
     str_fmt = backwards.unicode2bytes('%s')

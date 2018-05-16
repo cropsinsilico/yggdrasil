@@ -62,10 +62,10 @@ class AsciiFile(object):
     @property
     def open_mode(self):
         r"""str: Mode that should be used to open the file."""
+        out = self.io_mode
         if self.open_as_binary:
-            return self.io_mode + 'b'
-        else:
-            return self.io_mode
+            out += 'b'
+        return out
 
     def open(self):
         r"""Open the associated file descriptor if it is not already open."""
