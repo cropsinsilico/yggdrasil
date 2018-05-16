@@ -92,9 +92,7 @@ class DefaultSerialize(object):
     @property
     def serializer_type(self):
         r"""int: Type of serializer."""
-        if self._alias is not None:
-            out = self._alias.serializer_type
-        elif self.is_user_defined:
+        if self.is_user_defined:
             out = -1
         elif self.format_str is None:
             out = 0
@@ -171,9 +169,7 @@ class DefaultSerialize(object):
                 is provided.
 
         """
-        if self._alias is not None:
-            return self._alias.func_serialize(args)
-        elif self._func_serialize is not None:
+        if self._func_serialize is not None:
             # Return directly to check and raise TypeError
             return self._func_serialize(args)
         elif self.format_str is not None:
@@ -203,9 +199,7 @@ class DefaultSerialize(object):
             tuple(obj, dict): Deserialized message and header information.
 
         """
-        if self._alias is not None:
-            out = self._alias.func_deserialize(msg)
-        elif self._func_deserialize is not None:
+        if self._func_deserialize is not None:
             out = self._func_deserialize(msg)
         elif self.format_str is not None:
             if self.as_array:
