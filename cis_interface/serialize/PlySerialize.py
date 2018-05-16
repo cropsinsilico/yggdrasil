@@ -204,7 +204,7 @@ class PlySerialize(DefaultSerialize):
             vertex_scalar[i] = np.mean(vertex_scalar[i])
         vertex_scalar = np.array(vertex_scalar)
         if scaling == 'log':
-            vertex_scalar = np.ma.MaskedArray(vertex_scalar, vertex_scalar == 0)
+            vertex_scalar = np.ma.MaskedArray(vertex_scalar, vertex_scalar <= 0)
         # Get color scaling
         if color_map is None:
             # color_map = 'summer'

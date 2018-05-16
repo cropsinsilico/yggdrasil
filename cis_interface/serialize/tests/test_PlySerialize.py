@@ -18,7 +18,7 @@ class TestPlySerialize(TestDefaultSerialize):
         r"""Test applying a scalar colormap."""
         for _o, scale in zip(self._objects, ['linear', 'log']):
             o = self.map_sent2recv(_o)
-            scalar_arr = np.arange(len(o['faces']))
+            scalar_arr = np.arange(len(o['faces'])).astype('float')
             self.instance.apply_scalar_map(o, scalar_arr, scaling=scale,
                                            scale_by_area=True)
 

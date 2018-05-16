@@ -392,10 +392,10 @@ class IOInfo(object):
                               ('two', int(2), 2.0),
                               ('three', int(3), 3.0)]
         self.map_dict = dict(args1=1, args2='2')
-        self.ply_dict = dict(vertices=[[1.0, 2.0, 3.0],
-                                       [4.0, 5.0, 6.0],
-                                       [7.0, 8.0, 9.0],
-                                       [10.0, 11.0, 12.0]],
+        self.ply_dict = dict(vertices=[[0.0, 0.0, 0.0],
+                                       [0.0, 1.0, 0.0],
+                                       [1.0, 0.0, 0.0],
+                                       [1.0, 1.0, 0.0]],
                              faces=[[0, 1, 2], [1, 2, 3]])
         self.obj_dict = copy.deepcopy(self.ply_dict)
         self.obj_dict.update(normals=self.obj_dict['vertices'],
