@@ -687,12 +687,17 @@ def array_to_table(arrs, fmt_str, use_astropy=False):
     dtype = cformat2nptype(fmt_str)
     info = format2table(fmt_str)
     arr1 = consolidate_array(arrs, dtype=dtype)
-    fd = backwards.BytesIO()
     if use_astropy:
+        fd = backwards.StringIO()
         table = apy_Table(arr1)
-        apy_ascii.write(table, fd, delimiter=info['delimiter'],
+        delimiter = info['delimiter']
+        delimiter = backwards.bytes2unicode(delimiter)
+        print('delimiter', delimiter)
+        apy_ascii.write(table, fd, delimiter=delimiter,
                         format='no_header')
+        out = backwards.unicode2bytes(fd.getvalue())
     else:
+        fd = backwards.BytesIO()
         for ele in arr1:
             line = format_message(ele.tolist(), fmt_str)
             fd.write(line)
@@ -700,7 +705,7 @@ def array_to_table(arrs, fmt_str, use_astropy=False):
         # np.savetxt(fd, arr1,
         #            fmt=fmt, delimiter=info['delimiter'],
         #            newline=info['newline'], header='')
-    out = fd.getvalue()
+        out = fd.getvalue()
     fd.close()
     return out
 
@@ -744,6 +749,9 @@ def table_to_array(msg, fmt_str=None, use_astropy=False, names=None,
     if info.get('comment', None) is not None:
         np_kws['comments'] = info['comment']
     if use_astropy:
+        for k in ['delimiter', 'comment']:
+            if k in np_kws:
+                np_kws[k] = backwards.bytes2unicode(np_kws[k])
         tab = apy_ascii.read(fd, names=names, guess=True,
                              format='no_header', **np_kws)
         arr = tab.as_array()
