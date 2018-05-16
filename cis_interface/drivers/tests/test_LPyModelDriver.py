@@ -8,7 +8,8 @@ import cis_interface.drivers.tests.test_ModelDriver as parent
 @unittest.skipIf(LPyModelDriver._lpy_installed, "LPy is installed")
 def test_LPyModelDriver_nolpy():  # pragma: no lpy
     r"""Test LPyModelDriver error when LPy not installed."""
-    nt.assert_raises(RuntimeError, LPyModelDriver, 'test', scripts['lpy'])
+    nt.assert_raises(RuntimeError, LPyModelDriver.LPyModelDriver,
+                     'test', scripts['lpy'])
 
 
 class TestLPyModelParam(parent.TestModelParam):

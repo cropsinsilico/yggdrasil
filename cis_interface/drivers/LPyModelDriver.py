@@ -7,11 +7,11 @@ from logging import warning
 from cis_interface.drivers.ModelDriver import ModelDriver
 try:  # pragma: lpy
     from openalea import lpy
-    _lpy_installed = True
 except ImportError:  # pragma: no lpy
     warning("Could not import openalea.lpy. " +
             "LPy support will be disabled.")
-    _lpy_installed = False
+    lpy = None
+_lpy_installed = (lpy is not None)
 
 
 _model_script = os.path.join(os.path.dirname(__file__), 'lpy_model.py')

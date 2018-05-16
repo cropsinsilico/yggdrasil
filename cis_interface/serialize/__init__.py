@@ -4,11 +4,11 @@ import numpy as np
 import pandas
 from cis_interface import backwards, platform, units
 try:
-    if backwards.PY2:  # pragma: Python 2
+    if not backwards.PY2:  # pragma: Python 3
         from astropy.io import ascii as apy_ascii
         from astropy.table import Table as apy_Table
         _use_astropy = True
-    else:  # pragma: Python 3
+    else:  # pragma: Python 2
         apy_ascii, apy_Table = None, None
         _use_astropy = False
 except ImportError:  # pragma: no cover
