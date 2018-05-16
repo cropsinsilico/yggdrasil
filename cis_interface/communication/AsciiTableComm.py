@@ -41,49 +41,11 @@ class AsciiTableComm(AsciiFileComm):
         r"""Read header lines from the file and update serializer info."""
         if self.header_was_read:
             return
-        header_lines = []
-        header_size = 0
         self.fd.seek(0)
-        for line in self.fd:
-            sline = backwards.unicode2bytes(
-                line.replace(self.platform_newline, self.newline))
-            if not sline.startswith(self.comment):
-                break
-            header_size += len(line)
-            header_lines.append(sline)
-        # Parse header & set serializer attributes
-        header = serialize.parse_header(header_lines)
-        for k in ['format_str', 'field_names', 'field_units']:
-            if header.get(k, False):
-                setattr(self.serializer, k, header[k])
-        # Try to determine format from array without header
-        str_fmt = backwards.unicode2bytes('%s')
-        if (((self.serializer.format_str is None) or
-             (str_fmt in self.serializer.format_str))):
-            with open(self.address, self.open_mode) as fd:
-                fd.seek(header_size)
-                all_contents = fd.read()
-            if len(all_contents) == 0:  # pragma: debug
-                return  # In case the file has not been written
-            arr = serialize.table_to_array(all_contents,
-                                           names=self.serializer.field_names,
-                                           comment=self.comment,
-                                           delimiter=self.delimiter)
-            self.serializer.field_names = arr.dtype.names
-            if self.serializer.format_str is None:
-                self.serializer.format_str = serialize.table2format(
-                    arr.dtype, delimiter=self.delimiter,
-                    comment=backwards.unicode2bytes(''),
-                    newline=self.newline)
-            while str_fmt in self.serializer.format_str:
-                ifld = self.serializer.field_formats.index(str_fmt)
-                max_len = len(max(arr[self.serializer.field_names[ifld]], key=len))
-                new_str_fmt = backwards.unicode2bytes('%' + str(max_len) + 's')
-                self.serializer.format_str = self.serializer.format_str.replace(
-                    str_fmt, new_str_fmt, 1)
+        serialize.discover_header(self.fd, self.serializer,
+                                  newline=self.newline, comment=self.comment,
+                                  delimiter=self.delimiter)
         self.delimiter = self.serializer.table_info['delimiter']
-        # Seek to just after the header
-        self.fd.seek(header_size)
         self.header_was_read = True
 
     def write_header(self):

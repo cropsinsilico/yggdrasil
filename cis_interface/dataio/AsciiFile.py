@@ -1,9 +1,9 @@
 import os
-from cis_interface import backwards, platform
+from cis_interface import backwards, platform, serialize
 
 
-_default_args = {'comment': '#',
-                 'newline': '\n'}
+_default_args = {'comment': serialize._default_comment,
+                 'newline': serialize._default_newline}
 
 
 class AsciiFile(object):

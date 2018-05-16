@@ -667,6 +667,34 @@ def table2format(fmts=[], delimiter=None, newline=None, comment=None):
     return fmt_str
 
 
+# def unicode_dtype(old_dtype):
+#     r"""Convert a dtype to use unicode.
+
+#     Args:
+#         old_dtype (np.dtype): Numpy data type.
+
+#     Returns:
+#         np.dtype: Numpy dtype with bytes replaced with unicode.
+
+#     """
+#     if backwards.PY2:  # pragma: Python 2
+#         new_dtype = old_dtype
+#     else:  # pragma: Python 3
+#         ntype = len(old_dtype)
+#         if ntype > 0:
+#             names = old_dtype.names
+#             types = [unicode_dtype(old_dtype[i]) for i in range(ntype)]
+#             new_type = dict(formats=types, names=names)
+#             new_dtype = np.dtype(new_type)
+#         else:
+#             if np.issubdtype(old_dtype, np.dtype('S')):
+#                 front, width = old_dtype.str.split('S')
+#                 new_dtype = np.dtype(front + 'U' + width)
+#             else:
+#                 new_dtype = old_dtype
+#     return new_dtype
+
+
 def array_to_table(arrs, fmt_str, use_astropy=False):
     r"""Serialize an array as an ASCII table.
 
@@ -692,7 +720,6 @@ def array_to_table(arrs, fmt_str, use_astropy=False):
         table = apy_Table(arr1)
         delimiter = info['delimiter']
         delimiter = backwards.bytes2unicode(delimiter)
-        print('delimiter', delimiter)
         apy_ascii.write(table, fd, delimiter=delimiter,
                         format='no_header')
         out = backwards.unicode2bytes(fd.getvalue())
@@ -711,7 +738,7 @@ def array_to_table(arrs, fmt_str, use_astropy=False):
 
 
 def table_to_array(msg, fmt_str=None, use_astropy=False, names=None,
-                   delimiter=None, comment=None):
+                   delimiter=None, comment=None, encoding='utf-8'):
     r"""Extract information from an ASCII table as an array.
 
     Args:
@@ -728,6 +755,8 @@ def table_to_array(msg, fmt_str=None, use_astropy=False, names=None,
             None and is not used. This is only used if fmt_str is not provided.
         comment (str, optional): String used to denote comments. Defaults to
             None and is not used. This is only used if fmt_str is not provided.
+        encoding (str, optional): Encoding that should be used in Python 3 or
+            higher to extract information from the message. Defaults to 'utf-8'.
 
     Returns:
         np.ndarray: Table contents as an array.
@@ -743,20 +772,46 @@ def table_to_array(msg, fmt_str=None, use_astropy=False, names=None,
         info = format2table(fmt_str)
         names = dtype.names
     fd = backwards.BytesIO(msg)
+    if names is not None:
+        names = [backwards.bytes2unicode(n) for n in names]
     np_kws = dict()
     if info.get('delimiter', None) is not None:
         np_kws['delimiter'] = info['delimiter']
     if info.get('comment', None) is not None:
         np_kws['comments'] = info['comment']
+    for k, v in np_kws.items():
+        np_kws[k] = backwards.bytes2unicode(v)
     if use_astropy:
-        for k in ['delimiter', 'comment']:
-            if k in np_kws:
-                np_kws[k] = backwards.bytes2unicode(np_kws[k])
+        # fd = backwards.StringIO(backwards.bytes2unicode(msg))
+        if 'comments' in np_kws:
+            np_kws['comment'] = np_kws.pop('comments')
         tab = apy_ascii.read(fd, names=names, guess=True,
+                             encoding=encoding,
                              format='no_header', **np_kws)
         arr = tab.as_array()
         typs = [arr.dtype[i].str for i in range(len(arr.dtype))]
-        cols = tab.columns
+        cols = [c for c in tab.columns]
+        # Convert type bytes if python 3
+        if not backwards.PY2:  # pragma: Python 3
+            new_typs = copy.copy(typs)
+            convert = []
+            for i in range(len(arr.dtype)):
+                if np.issubdtype(arr.dtype[i], np.dtype('U')):
+                    new_typs[i] = 'S' + typs[i].split('U')[-1]
+                    convert.append(i)
+            if convert:
+                old_arr = arr
+                new_dtyp = np.dtype([(c, t) for c, t in zip(cols, new_typs)])
+                new_arr = np.zeros(arr.shape, new_dtyp)
+                for i in range(len(arr.dtype)):
+                    if i in convert:
+                        x = np.char.encode(old_arr[cols[i]], encoding='utf-8')
+                        new_arr[cols[i]] = x
+                    else:
+                        new_arr[cols[i]] = old_arr[cols[i]]
+                arr = new_arr
+                typs = new_typs
+        # Convert complex type
         for i in range(len(arr.dtype)):
             if np.issubdtype(arr.dtype[i], np.dtype('S')):
                 new_typs = copy.copy(typs)
@@ -769,10 +824,6 @@ def table_to_array(msg, fmt_str=None, use_astropy=False, names=None,
         if dtype is not None:
             arr = arr.astype(dtype)
     else:
-        if names is not None:
-            names = [backwards.bytes2unicode(n) for n in names]
-        for k, v in np_kws.items():
-            np_kws[k] = backwards.bytes2unicode(v)
         arr = np.genfromtxt(fd, autostrip=True, dtype=None,
                             names=names, **np_kws)
         if dtype is not None:
@@ -943,9 +994,87 @@ def format_header(format_str=None, dtype=None,
         # if (len(x) == 0) or (x[0] == 'None'):
         #     continue
         assert(len(x) == nfld)
-        out.append(comment + delimiter.join(x))
+        out.append(comment +
+                   delimiter.join([backwards.unicode2bytes(ix) for ix in x]))
     out = newline.join(out) + newline
     return out
+
+
+def discover_header(fd, serializer, newline=_default_newline,
+                    comment=_default_comment, delimiter=None,
+                    lineno_format=None, lineno_names=None, lineno_units=None,
+                    use_astropy=False):
+    r"""Discover ASCII table header info from a file.
+
+    Args:
+        fd (file): File object containing the table.
+        serializer (DefaultSerialize): Serializer that should be updated with
+            header information.
+        newline (str, optional): Newline character that should be used to split
+            header if it is not already a list. Defaults to _default_newline.
+        comment (bytes, optional): String that should be used to mark the
+            header lines. If not provided and not in format_str, defaults to
+            _default_comment.
+        delimiter (bytes, optional): String that should be used to separate
+            columns. If not provided and not in format_str, defaults to
+            _default_delimiter.
+        lineno_format (int, optional): Line number where formats are located.
+            If not provided, an attempt will be made to locate one.
+        lineno_names (int, optional): Line number where field names are located.
+            If not provided, an attempt will be made to locate one.
+        lineno_units (int, optional): Line number where field units are located.
+            If not provided, an attempt will be made to locate one.
+        use_astropy (bool, optional): If True, astropy will be used to parse
+            the table if it is installed. Defaults to False.
+
+    """
+    header_lines = []
+    header_size = 0
+    prev_pos = fd.tell()
+    for line in fd:
+        sline = backwards.unicode2bytes(line.replace(
+            backwards.unicode2bytes(platform._newline), newline))
+        if not sline.startswith(comment):
+            break
+        header_size += len(line)
+        header_lines.append(sline)
+    # Parse header & set serializer attributes
+    header = parse_header(header_lines, newline=newline,
+                          lineno_format=lineno_format,
+                          lineno_names=lineno_names,
+                          lineno_units=lineno_units)
+    for k in ['format_str', 'field_names', 'field_units']:
+        if header.get(k, False):
+            setattr(serializer, k, header[k])
+    if delimiter is None:
+        delimiter = header['delimiter']
+    # Try to determine format from array without header
+    str_fmt = backwards.unicode2bytes('%s')
+    if (((serializer.format_str is None) or
+         (str_fmt in serializer.format_str))):
+        fd.seek(prev_pos + header_size)
+        all_contents = fd.read()
+        if len(all_contents) == 0:  # pragma: debug
+            return  # In case the file has not been written
+        arr = table_to_array(all_contents,
+                             names=serializer.field_names,
+                             comment=comment,
+                             delimiter=delimiter,
+                             use_astropy=use_astropy)
+        serializer.field_names = arr.dtype.names
+        if serializer.format_str is None:
+            serializer.format_str = table2format(
+                arr.dtype, delimiter=delimiter,
+                comment=backwards.unicode2bytes(''),
+                newline=header['newline'])
+        while str_fmt in serializer.format_str:
+            ifld = serializer.field_formats.index(str_fmt)
+            max_len = len(max(arr[serializer.field_names[ifld]], key=len))
+            new_str_fmt = backwards.unicode2bytes('%' + str(max_len) + 's')
+            serializer.format_str = serializer.format_str.replace(
+                str_fmt, new_str_fmt, 1)
+    # Seek to just after the header
+    fd.seek(prev_pos + header_size)
 
 
 def parse_header(header, newline=_default_newline, lineno_format=None,
