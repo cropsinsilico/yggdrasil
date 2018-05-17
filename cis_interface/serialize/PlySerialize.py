@@ -98,7 +98,7 @@ class PlySerialize(DefaultSerialize):
             for v in f:
                 iline += ' %d' % v
             lines.append(iline)
-        out = self.newline.join(lines)
+        out = self.newline.join(lines) + self.newline
         return backwards.unicode2bytes(out)
 
     def func_deserialize(self, msg, nvert=None, nface=None):
@@ -153,6 +153,44 @@ class PlySerialize(DefaultSerialize):
                     for x in out['faces'][-1]:
                         assert(x < len(out['vertices']))
                 i += 1
+        return out
+
+    def merge(self, ply_list):
+        r"""Merge a list of ply dictionaries.
+
+        Args:
+            ply_list (list): Ply dictionaries.
+
+        Returns:
+            dict: Merged ply dictionary.
+
+        """
+        # Check if colors should be added to output
+        do_colors = False
+        for x in ply_list:
+            if 'vertex_colors' in x:
+                do_colors = True
+                break
+        # Merge fields
+        nvert = 0
+        out = dict(vertices=[], faces=[])
+        if do_colors:
+            out['vertex_colors'] = []
+        for x in ply_list:
+            invert = len(x['vertices'])
+            # Vertex fields
+            out['vertices'] += x['vertices']
+            if do_colors:
+                if 'vertex_colors' in x:
+                    vc = x['vertex_colors']
+                else:
+                    vc = [self.default_rgb for _ in range(invert)]
+                out['vertex_colors'] += vc
+            # Face fields
+            for f in x['faces']:
+                out['faces'].append([v + nvert for v in f])
+            # Advance vert count
+            nvert += invert
         return out
 
     def apply_scalar_map(self, ply_dict, scalar_arr, color_map=None,

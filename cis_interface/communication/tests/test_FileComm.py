@@ -29,7 +29,6 @@ class TestFileComm(parent.TestCommBase):
         r"""dict: Keyword arguments for send instance."""
         out = super(TestFileComm, self).send_inst_kwargs
         out['in_temp'] = True
-        out['remove_existing'] = True
         return out
 
     @property
@@ -62,7 +61,6 @@ class TestFileComm(parent.TestCommBase):
         # Open file in append
         kwargs = self.send_inst_kwargs
         kwargs['append'] = True
-        kwargs['remove_existing'] = False
         new_inst = new_comm('append%s' % self.uuid, **kwargs)
         flag = new_inst.send(self.append_msg)
         assert(flag)

@@ -29,6 +29,7 @@ class PickleFileComm(FileComm.FileComm):
         """
         prev_pos = self.fd.tell()
         flag, msg = super(PickleFileComm, self)._recv(timeout=timeout)
+        # Rewind file if message contains more than one pickle
         if msg != self.eof_msg:
             fd = backwards.BytesIO(msg)
             backwards.pickle.load(fd)

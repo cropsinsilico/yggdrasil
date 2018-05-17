@@ -51,7 +51,7 @@ class FileComm(CommBase.CommBase):
 
     def _init_before_open(self, read_meth='read', append=False, in_temp=False,
                           open_as_binary=True, newline=None, is_series=False,
-                          remove_existing=False, **kwargs):
+                          **kwargs):
         r"""Get absolute path and set attributes."""
         super(FileComm, self)._init_before_open(**kwargs)
         if not hasattr(self, '_fd'):
@@ -82,9 +82,6 @@ class FileComm(CommBase.CommBase):
             v = getattr(self, k)
             if v is not None:
                 setattr(self, k, func_conv(v))
-        # Remove existing files
-        if remove_existing:
-            self.remove_file()
 
     @property
     def maxMsgSize(self):
@@ -116,6 +113,8 @@ class FileComm(CommBase.CommBase):
         r"""str: Mode that should be used to open the file."""
         if self.direction == 'recv':
             io_mode = 'r'
+        elif self.append == 'ow':
+            io_mode = 'r+'
         elif self.append:
             io_mode = 'a'
         else:
@@ -138,12 +137,63 @@ class FileComm(CommBase.CommBase):
         kwargs['is_series'] = self.is_series
         return kwargs
 
-    def _advance_in_series(self, index=None):
-        if index is None:
-            index = self._series_index + 1
-        self._file_close()
-        self._series_index = index
-        self._open()
+    def record_position(self):
+        r"""Record the current position in the file/series."""
+        _rec_pos = self.fd.tell()
+        _rec_ind = self._series_index
+        return _rec_pos, _rec_ind
+
+    def change_position(self, file_pos, series_index=None):
+        r"""Change the position in the file/series.
+
+        Args:
+            file_pos (int): Position that should be moved to in the file.
+            series_index (int, optinal): Index of the file in the series that
+                should be moved to. Defaults to None and will be set to the
+                current series index.
+
+        """
+        if series_index is None:
+            series_index = self._series_index
+        self.advance_in_series(series_index)
+        self.advance_in_file(file_pos)
+
+    def advance_in_file(self, file_pos):
+        r"""Advance to a certain position in the current file.
+
+        Args:
+            file_pos (int): Position that should be moved to in the current.
+                file.
+
+        """
+        if self.is_open:
+            self.fd.seek(file_pos)
+
+    def advance_in_series(self, series_index=None):
+        r"""Advance to a certain file in a series.
+
+        Args:
+            series_index (int, optional): Index of file in the series that
+                should be moved to. Defaults to None and call will advance to
+                the next file in the series.
+
+        Returns:
+            bool: True if the file was advanced in the series, False otherwise.
+
+        """
+        out = False
+        if self.is_series:
+            if series_index is None:
+                series_index = self._series_index + 1
+            if self._series_index != series_index:
+                if (((self.direction == 'send') or
+                     os.path.isfile(self.get_series_address(series_index)))):
+                    self._file_close()
+                    self._series_index = series_index
+                    self._open()
+                    out = True
+                    self.debug("Advanced to %d", series_index)
+        return out
 
     def get_series_address(self, index=None):
         r"""Get the address of a file in the series.
@@ -160,16 +210,24 @@ class FileComm(CommBase.CommBase):
             index = self._series_index
         return self.address % index
 
-    def _open(self):
+    @property
+    def current_address(self):
+        r"""str: Address of file currently being used."""
         if self.is_series:
             address = self.get_series_address()
         else:
             address = self.address
+        return address
+        
+    def _open(self):
+        address = self.current_address
         self._fd = open(address, self.open_mode)
         T = self.start_timeout()
         while (not T.is_out) and (not self.is_open):  # pragma: debug
             self.sleep()
         self.stop_timeout()
+        if self.append == 'ow':
+            self.fd.seek(0, os.SEEK_END)
 
     def _file_close(self):
         if self.is_open:
@@ -223,11 +281,11 @@ class FileComm(CommBase.CommBase):
         r"""int: Remaining bytes in the file."""
         if self.is_closed or self.direction == 'send':
             return 0
+        pos = self.record_position()
         try:
             curpos = self.fd.tell()
             self.fd.seek(0, os.SEEK_END)
             endpos = self.fd.tell()
-            self.fd.seek(curpos)
             out = endpos - curpos
         except ValueError:  # pragma: debug
             out = 0
@@ -239,6 +297,7 @@ class FileComm(CommBase.CommBase):
                     break
                 out += os.path.getsize(fname)
                 i += 1
+        self.change_position(*pos)
         return out
 
     @property
@@ -249,20 +308,16 @@ class FileComm(CommBase.CommBase):
         if self.read_meth == 'read':
             return int(self.remaining_bytes > 0)
         elif self.read_meth == 'readline':
+            pos = self.record_position()
             try:
-                if self.is_series:
-                    curind = self._series_index
-                curpos = self.fd.tell()
                 out = 0
                 flag, msg = self._recv()
                 while len(msg) != 0 and msg != self.eof_msg:
                     out += 1
                     flag, msg = self._recv()
-                if self.is_series:
-                    self._advance_in_series(curind)
-                self.fd.seek(curpos)
             except ValueError:  # pragma: debug
                 out = 0
+            self.change_position(*pos)
         else:  # pragma: debug
             self.error('Unsupported read_meth: %s', self.read_meth)
             out = 0
@@ -294,9 +349,12 @@ class FileComm(CommBase.CommBase):
             if not self.open_as_binary:
                 msg = backwards.bytes2unicode(msg)
             self.fd.write(msg)
+            if self.append == 'ow':
+                self.fd.truncate()
         self.fd.flush()
         if msg != self.eof_msg and self.is_series:
-            self._advance_in_series()
+            self.advance_in_series()
+            self.info("Advanced to %d", self._series_index)
         return True
 
     def _recv(self, timeout=0):
@@ -317,12 +375,9 @@ class FileComm(CommBase.CommBase):
         elif self.read_meth == 'readline':
             out = self.fd.readline()
         if len(out) == 0:
-            if self.is_series:
-                try:
-                    self._advance_in_series()
-                    flag, out = self._recv()
-                except IOError:
-                    out = self.eof_msg
+            if self.advance_in_series():
+                self.info("Advanced to %d", self._series_index)
+                flag, out = self._recv()
             else:
                 out = self.eof_msg
         else:

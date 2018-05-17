@@ -242,9 +242,16 @@ class TestCommBase(CisTestClassInfo):
         # Create work comm that should be cleaned up on teardown
         self.instance.create_work_comm()
 
+    def map_sent2recv(self, obj):
+        r"""Convert a sent object into a received one."""
+        return obj
+
     def assert_msg_equal(self, x, y):
         r"""Assert that two messages are equivalent."""
-        nt.assert_equal(x, y)
+        if y == self.send_instance.eof_msg:
+            nt.assert_equal(x, y)
+        else:
+            nt.assert_equal(x, self.map_sent2recv(y))
 
     def do_send_recv(self, send_meth='send', recv_meth='recv', msg_send=None,
                      n_msg_send_meth='n_msg_send', n_msg_recv_meth='n_msg_recv',
@@ -411,8 +418,8 @@ class TestCommBase(CisTestClassInfo):
         self.recv_instance.purge()
 
     def test_send_recv_dict(self):
-        r"""Test send/recv numpy array as dict."""
-        msg_send = dict(f0=self.msg_short)
+        r"""Test send/recv message as dict."""
+        msg_send = dict(f0=self.map_sent2recv(self.msg_short))
         if self.comm in ['CommBase', 'AsyncComm']:
             flag = self.send_instance.send_dict(msg_send)
             assert(not flag)
