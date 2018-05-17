@@ -68,7 +68,7 @@ def create_include(fname, target, compile_flags=None, linker_flags=None):
             lines.append('ADD_DEFINITIONS(%s)' % x)
         elif x.startswith('-I'):
             xdir = x.split('-I', 1)[-1]
-            if platform._is_win:
+            if platform._is_win:  # pragma: windows
                 xdir = xdir.replace('\\', re.escape('\\'))
             lines.append('INCLUDE_DIRECTORIES(%s)' % xdir)
         elif x.startswith('-') or x.startswith('/'):
