@@ -148,8 +148,8 @@ class ObjSerialize(PlySerialize):
         else:
             lines = backwards.bytes2unicode(msg).split(self.newline)
             out = dict(vertices=[], material=None, normals=[], texcoords=[],
-                       faces=[], face_texcoords=[], face_normals=[],
-                       vertex_colors=[])
+                       faces=[], face_texcoords=[], face_normals=[])
+            nvert = 0
             for line in lines:
                 if line.startswith('#'):
                     continue
@@ -159,9 +159,14 @@ class ObjSerialize(PlySerialize):
                 if values[0] == 'v':
                     out['vertices'].append([x for x in map(float, values[1:4])])
                     if len(values) == 7:
+                        if 'vertex_colors' not in out:
+                            out['vertex_colors'] = [self.default_rgb for
+                                                    _ in range(nvert)]
                         out['vertex_colors'].append([x for x in map(int, values[4:7])])
                     else:
-                        out['vertex_colors'].append(self.default_rgb)
+                        if 'vertex_colors' in out:
+                            out['vertex_colors'].append(self.default_rgb)
+                    nvert += 1
                 elif values[0] == 'vn':
                     out['normals'].append([x for x in map(float, values[1:4])])
                 elif values[0] == 'vt':

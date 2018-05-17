@@ -101,7 +101,8 @@ class PlySerialize(DefaultSerialize):
         out = self.newline.join(lines) + self.newline
         return backwards.unicode2bytes(out)
 
-    def func_deserialize(self, msg, nvert=None, nface=None):
+    def func_deserialize(self, msg, nvert=None, nface=None,
+                         do_vertex_colors=False):
         r"""Deserialize a message.
 
         Args:
@@ -110,6 +111,9 @@ class PlySerialize(DefaultSerialize):
                 header is not in the message. Defaults to None.
             nface (int, optional): Number of faces expected if the ply
                 header is not in the message. Defaults to None.
+            do_vertex_colors (bool, optional): If True the vertex color
+                will be contained in the vertex information if the ply
+                header is not in the message. Defaults to False.
 
         Returns:
             dict: Deserialized .ply information.
@@ -126,24 +130,36 @@ class PlySerialize(DefaultSerialize):
                     headline = i + 1
                     break
             if headline > 0:
+                element = None
                 for i in range(headline):
-                    if lines[i].startswith('element vertex'):
-                        nvert = int(lines[i].split()[2])
-                    elif lines[i].startswith('element face'):
-                        nface = int(lines[i].split()[2])
+                    if lines[i].startswith('element'):
+                        parts = lines[i].split()
+                        element = parts[1]
+                        if element == 'vertex':
+                            nvert = int(parts[2])
+                        elif element == 'face':
+                            nface = int(parts[2])
+                        continue
+                    if element == 'vertex':
+                        if 'green' in lines[i]:
+                            do_vertex_colors = True
             if (nvert is None) or (nface is None):  # pragma: debug
                 raise RuntimeError("Could not locate element definitions.")
             # Get 3D info
-            out = dict(vertices=[], faces=[], vertex_colors=[])
+            out = dict(vertices=[], faces=[])
+            if do_vertex_colors:
+                out['vertex_colors'] = []
             i = headline
             while len(out['vertices']) < nvert:
                 values = lines[i].split()
                 if len(values) > 0:
                     out['vertices'].append([x for x in map(float, values[:3])])
-                    if len(values) >= 6:
-                        out['vertex_colors'].append([x for x in map(int, values[3:])])
-                    else:
-                        out['vertex_colors'].append(self.default_rgb)
+                    if do_vertex_colors:
+                        if len(values) >= 6:
+                            out['vertex_colors'].append(
+                                [x for x in map(int, values[3:])])
+                        else:
+                            out['vertex_colors'].append(self.default_rgb)
                 i += 1
             while len(out['faces']) < nface:
                 values = lines[i].split()

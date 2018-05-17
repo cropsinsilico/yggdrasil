@@ -471,3 +471,117 @@ def CisPandasOutput(name, dst_type=1, matlab=False, **kwargs):
     out = base(name, is_interface=True, recv_timeout=False,
                matlab=matlab, **kwargs)
     return out
+
+
+def CisPlyInput(name, src_type=1, matlab=False, **kwargs):
+    r"""Get class for handling Ply input.
+
+    Args:
+        name (str): The path to the local file to read input from (if src_type
+            == 0) or the name of the message queue input should be received
+            from.
+        src_type (int, optional): If 0, input is read from a local file.
+            Otherwise, the input is received from a message queue. Defaults to
+            1.
+        **kwargs: Additional keyword arguments are passed to the base comm.
+
+    Returns:
+        DefaultComm: Communication object.
+        
+    """
+    if src_type == 0:
+        from cis_interface.communication import PlyFileComm
+        base = PlyFileComm.PlyFileComm
+        kwargs.setdefault('address', name)
+    else:
+        base = DefaultComm
+        kwargs['serializer_kwargs'] = dict(stype=8)
+    kwargs.setdefault('direction', 'recv')
+    out = base(name, is_interface=True, recv_timeout=False,
+               matlab=matlab, **kwargs)
+    return out
+
+
+def CisPlyOutput(name, dst_type=1, matlab=False, **kwargs):
+    r"""Get class for handling Ply output.
+
+    Args:
+        name (str): The path to the local file where output should be saved
+            (if dst_type == 0) or the name of the message queue where the
+            output should be sent.
+        dst_type (int, optional): If 0, output is sent to a local file.
+            Otherwise, the output is sent to a message queue. Defaults to 1.
+        **kwargs: Additional keyword arguments are passed to the base comm.
+
+    Returns:
+        DefaultComm: Communication object.
+        
+    """
+    if dst_type == 0:
+        from cis_interface.communication import PlyFileComm
+        base = PlyFileComm.PlyFileComm
+        kwargs.setdefault('address', name)
+    else:
+        base = DefaultComm
+        kwargs['serializer_kwargs'] = dict(stype=8)
+    kwargs.setdefault('direction', 'send')
+    out = base(name, is_interface=True, recv_timeout=False,
+               matlab=matlab, **kwargs)
+    return out
+
+
+def CisObjInput(name, src_type=1, matlab=False, **kwargs):
+    r"""Get class for handling Obj input.
+
+    Args:
+        name (str): The path to the local file to read input from (if src_type
+            == 0) or the name of the message queue input should be received
+            from.
+        src_type (int, optional): If 0, input is read from a local file.
+            Otherwise, the input is received from a message queue. Defaults to
+            1.
+        **kwargs: Additional keyword arguments are passed to the base comm.
+
+    Returns:
+        DefaultComm: Communication object.
+        
+    """
+    if src_type == 0:
+        from cis_interface.communication import ObjFileComm
+        base = ObjFileComm.ObjFileComm
+        kwargs.setdefault('address', name)
+    else:
+        base = DefaultComm
+        kwargs['serializer_kwargs'] = dict(stype=9)
+    kwargs.setdefault('direction', 'recv')
+    out = base(name, is_interface=True, recv_timeout=False,
+               matlab=matlab, **kwargs)
+    return out
+
+
+def CisObjOutput(name, dst_type=1, matlab=False, **kwargs):
+    r"""Get class for handling Obj output.
+
+    Args:
+        name (str): The path to the local file where output should be saved
+            (if dst_type == 0) or the name of the message queue where the
+            output should be sent.
+        dst_type (int, optional): If 0, output is sent to a local file.
+            Otherwise, the output is sent to a message queue. Defaults to 1.
+        **kwargs: Additional keyword arguments are passed to the base comm.
+
+    Returns:
+        DefaultComm: Communication object.
+        
+    """
+    if dst_type == 0:
+        from cis_interface.communication import ObjFileComm
+        base = ObjFileComm.ObjFileComm
+        kwargs.setdefault('address', name)
+    else:
+        base = DefaultComm
+        kwargs['serializer_kwargs'] = dict(stype=9)
+    kwargs.setdefault('direction', 'send')
+    out = base(name, is_interface=True, recv_timeout=False,
+               matlab=matlab, **kwargs)
+    return out

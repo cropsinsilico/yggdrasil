@@ -436,6 +436,20 @@ class IOInfo(object):
         return out
 
     @property
+    def ply_file_contents(self):
+        r"""The contents of a file containing the ply data."""
+        serializer = serialize.get_serializer(stype=8)
+        out = serializer.serialize(self.ply_dict)
+        return out
+
+    @property
+    def obj_file_contents(self):
+        r"""The contents of a file containing the obj data."""
+        serializer = serialize.get_serializer(stype=9)
+        out = serializer.serialize(self.obj_dict)
+        return out
+
+    @property
     def file_contents(self):
         r"""str: Complete contents of mock file."""
         out = backwards.unicode2bytes('')
@@ -636,6 +650,28 @@ class IOInfo(object):
         """
         with open(fname, 'wb') as fd:
             fd.write(self.pandas_file_contents)
+
+    def write_ply(self, fname):
+        r"""Write the ply data out to a file.
+
+        Args:
+            fname (str): Full path to the file that the ply should be
+                written to.
+
+        """
+        with open(fname, 'wb') as fd:
+            fd.write(self.ply_file_contents)
+
+    def write_obj(self, fname):
+        r"""Write the obj data out to a file.
+
+        Args:
+            fname (str): Full path to the file that the obj should be
+                written to.
+
+        """
+        with open(fname, 'wb') as fd:
+            fd.write(self.obj_file_contents)
 
 
 # class CisTestBaseInfo(CisTestBase, IOInfo):

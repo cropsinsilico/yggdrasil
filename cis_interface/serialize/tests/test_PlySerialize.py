@@ -22,10 +22,10 @@ class TestPlySerialize(TestDefaultSerialize):
     def map_sent2recv(self, obj):
         r"""Convert a sent object into a received one."""
         out = copy.deepcopy(obj)
-        if 'vertex_colors' not in out:
-            out['vertex_colors'] = []
-            for v in out['vertices']:
-                out['vertex_colors'].append(self.instance.default_rgb)
+        # if 'vertex_colors' not in out:
+        #     out['vertex_colors'] = []
+        #     for v in out['vertices']:
+        #         out['vertex_colors'].append(self.instance.default_rgb)
         return out
 
     def test_merge(self):
