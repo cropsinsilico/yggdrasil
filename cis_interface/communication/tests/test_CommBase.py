@@ -251,6 +251,7 @@ class TestCommBase(CisTestClassInfo):
                      reverse_comms=False, send_kwargs=None, recv_kwargs=None,
                      close_on_send_eof=None, close_on_recv_eof=None):
         r"""Generic send/recv of a message."""
+        tkey = 'do_send_recv'
         is_eof = ('eof' in send_meth)
         if msg_send is None:
             if is_eof:
@@ -295,11 +296,11 @@ class TestCommBase(CisTestClassInfo):
             assert(flag)
             # Wait for messages to be received
             if not is_eof:
-                T = recv_instance.start_timeout(self.timeout)
+                T = recv_instance.start_timeout(self.timeout, key_suffix=tkey)
                 while ((not T.is_out) and (not recv_instance.is_closed) and
                        (getattr(recv_instance, n_msg_recv_meth) == 0)):  # pragma: debug
                     recv_instance.sleep()
-                recv_instance.stop_timeout()
+                recv_instance.stop_timeout(key_suffix=tkey)
                 assert(getattr(recv_instance, n_msg_recv_meth) >= 1)
                 # IPC nolimit sends multiple messages
                 # nt.assert_equal(recv_instance.n_msg_recv, 1)
@@ -312,17 +313,17 @@ class TestCommBase(CisTestClassInfo):
             self.assert_msg_equal(msg_recv, msg_send)
             # Wait for send to close
             if is_eof and close_on_send_eof:
-                T = send_instance.start_timeout(self.timeout)
+                T = send_instance.start_timeout(self.timeout, key_suffix=tkey)
                 while (not T.is_out) and (not send_instance.is_closed):  # pragma: debug
                     send_instance.sleep()
-                send_instance.stop_timeout()
+                send_instance.stop_timeout(key_suffix=tkey)
                 assert(send_instance.is_closed)
         # Make sure no messages outgoing
-        T = send_instance.start_timeout(self.timeout)
+        T = send_instance.start_timeout(self.timeout, key_suffix=tkey)
         while ((not T.is_out) and
                (getattr(send_instance, n_msg_send_meth) != 0)):  # pragma: debug
             send_instance.sleep()
-        send_instance.stop_timeout()
+        send_instance.stop_timeout(key_suffix=tkey)
         if not (is_eof or reverse_comms):
             send_instance.wait_for_confirm(timeout=self.timeout)
             recv_instance.wait_for_confirm(timeout=self.timeout)

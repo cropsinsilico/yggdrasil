@@ -20,6 +20,11 @@ class FileComm(CommBase.CommBase):
             mode. Defaults to True.
         newline (str, optional): String indicating a new line. Defaults to
             serialize._default_newline.
+        is_series (bool, optional): If True, input/output will be done to
+            a series of files. If reading, each file will be processed until
+            the end is reached. If writing, each output will be to a new
+            file in the series. The addressed is assumed to contain a format
+            for the index of the file. Defaults to False.
         **kwargs: Additional keywords arguments are passed to parent class.
 
     Attributes:
@@ -30,6 +35,9 @@ class FileComm(CommBase.CommBase):
             platform temporary directory.
         open_as_binary (bool): If True, the file is opened in binary mode.
         newline (str): String indicating a new line.
+        is_series (bool): If True, input/output will be done to a series of
+            files. If reading, each file will be processed until the end is
+            reached. If writing, each output will be to a new file in the series.
         platform_newline (str): String indicating a newline on the current
             platform.
 
@@ -42,7 +50,8 @@ class FileComm(CommBase.CommBase):
         return super(FileComm, self).__init__(*args, **kwargs)
 
     def _init_before_open(self, read_meth='read', append=False, in_temp=False,
-                          open_as_binary=True, newline=None, **kwargs):
+                          open_as_binary=True, newline=None, is_series=False,
+                          remove_existing=False, **kwargs):
         r"""Get absolute path and set attributes."""
         super(FileComm, self)._init_before_open(**kwargs)
         if not hasattr(self, '_fd'):
@@ -61,6 +70,8 @@ class FileComm(CommBase.CommBase):
         self.address = os.path.abspath(self.address)
         self.open_as_binary = open_as_binary
         self.is_file = True
+        self.is_series = is_series
+        self._series_index = 0
         # Put string attributes in the correct format
         attr_conv = ['newline', 'platform_newline']
         if self.open_as_binary:
@@ -71,6 +82,9 @@ class FileComm(CommBase.CommBase):
             v = getattr(self, k)
             if v is not None:
                 setattr(self, k, func_conv(v))
+        # Remove existing files
+        if remove_existing:
+            self.remove_file()
 
     @property
     def maxMsgSize(self):
@@ -121,10 +135,41 @@ class FileComm(CommBase.CommBase):
         kwargs = super(FileComm, self).opp_comm_kwargs()
         kwargs['newline'] = self.newline
         kwargs['open_as_binary'] = self.open_as_binary
+        kwargs['is_series'] = self.is_series
         return kwargs
 
+    def _advance_in_series(self, index=None):
+        if index is None:
+            index = self._series_index + 1
+        self._file_close()
+        self._series_index = index
+        self._open()
+
+    def get_series_address(self, index=None):
+        r"""Get the address of a file in the series.
+
+        Args:
+            index (int, optional): Index in series to get address for.
+                Defaults to None and the current index is used.
+
+        Returns:
+            str: Address for the file in the series.
+
+        """
+        if index is None:
+            index = self._series_index
+        return self.address % index
+
     def _open(self):
-        self._fd = open(self.address, self.open_mode)
+        if self.is_series:
+            address = self.get_series_address()
+        else:
+            address = self.address
+        self._fd = open(address, self.open_mode)
+        T = self.start_timeout()
+        while (not T.is_out) and (not self.is_open):  # pragma: debug
+            self.sleep()
+        self.stop_timeout()
 
     def _file_close(self):
         if self.is_open:
@@ -140,10 +185,6 @@ class FileComm(CommBase.CommBase):
         r"""Open the file."""
         super(FileComm, self).open()
         self._open()
-        T = self.start_timeout()
-        while (not T.is_out) and (not self.is_open):  # pragma: debug
-            self.sleep()
-        self.stop_timeout()
         self.register_comm(self.address, self.fd)
 
     def _close(self, *args, **kwargs):
@@ -155,8 +196,17 @@ class FileComm(CommBase.CommBase):
     def remove_file(self):
         r"""Remove the file."""
         assert(self.is_closed)
-        if os.path.isfile(self.address):
-            os.remove(self.address)
+        if self.is_series:
+            i = 0
+            while True:
+                address = self.get_series_address(i)
+                if not os.path.isfile(address):
+                    break
+                os.remove(address)
+                i += 1
+        else:
+            if os.path.isfile(self.address):
+                os.remove(self.address)
 
     @property
     def is_open(self):
@@ -178,9 +228,18 @@ class FileComm(CommBase.CommBase):
             self.fd.seek(0, os.SEEK_END)
             endpos = self.fd.tell()
             self.fd.seek(curpos)
+            out = endpos - curpos
         except ValueError:  # pragma: debug
-            return 0
-        return endpos - curpos
+            out = 0
+        if self.is_series:
+            i = self._series_index + 1
+            while True:
+                fname = self.get_series_address(i)
+                if not os.path.isfile(fname):
+                    break
+                out += os.path.getsize(fname)
+                i += 1
+        return out
 
     @property
     def n_msg_recv(self):
@@ -191,12 +250,16 @@ class FileComm(CommBase.CommBase):
             return int(self.remaining_bytes > 0)
         elif self.read_meth == 'readline':
             try:
+                if self.is_series:
+                    curind = self._series_index
                 curpos = self.fd.tell()
                 out = 0
                 flag, msg = self._recv()
                 while len(msg) != 0 and msg != self.eof_msg:
                     out += 1
                     flag, msg = self._recv()
+                if self.is_series:
+                    self._advance_in_series(curind)
                 self.fd.seek(curpos)
             except ValueError:  # pragma: debug
                 out = 0
@@ -232,6 +295,8 @@ class FileComm(CommBase.CommBase):
                 msg = backwards.bytes2unicode(msg)
             self.fd.write(msg)
         self.fd.flush()
+        if msg != self.eof_msg and self.is_series:
+            self._advance_in_series()
         return True
 
     def _recv(self, timeout=0):
@@ -246,20 +311,25 @@ class FileComm(CommBase.CommBase):
                 the read messages as bytes.
 
         """
+        flag = True
         if self.read_meth == 'read':
             out = self.fd.read()
         elif self.read_meth == 'readline':
             out = self.fd.readline()
-        else:  # pragma: debug
-            self.error('Unsupported read_meth: %s', self.read_meth)
-            out = ''
         if len(out) == 0:
-            out = self.eof_msg
+            if self.is_series:
+                try:
+                    self._advance_in_series()
+                    flag, out = self._recv()
+                except IOError:
+                    out = self.eof_msg
+            else:
+                out = self.eof_msg
         else:
             out = out.replace(self.platform_newline, self.newline)
         if not self.open_as_binary:
             out = backwards.unicode2bytes(out)
-        return (True, out)
+        return (flag, out)
 
     def purge(self):
         r"""Purge all messages from the comm."""

@@ -1,3 +1,4 @@
+import os
 import nose.tools as nt
 from cis_interface.communication import new_comm
 from cis_interface.communication.tests import test_CommBase as parent
@@ -9,7 +10,8 @@ class TestFileComm(parent.TestCommBase):
         super(TestFileComm, self).__init__(*args, **kwargs)
         self.comm = 'FileComm'
         self.attr_list += ['fd', 'read_meth', 'append', 'in_temp',
-                           'open_as_binary', 'newline', 'platform_newline']
+                           'open_as_binary', 'newline', 'is_series',
+                           'platform_newline']
 
     def teardown(self):
         r"""Remove the file."""
@@ -27,6 +29,7 @@ class TestFileComm(parent.TestCommBase):
         r"""dict: Keyword arguments for send instance."""
         out = super(TestFileComm, self).send_inst_kwargs
         out['in_temp'] = True
+        out['remove_existing'] = True
         return out
 
     @property
@@ -59,6 +62,7 @@ class TestFileComm(parent.TestCommBase):
         # Open file in append
         kwargs = self.send_inst_kwargs
         kwargs['append'] = True
+        kwargs['remove_existing'] = False
         new_inst = new_comm('append%s' % self.uuid, **kwargs)
         flag = new_inst.send(self.append_msg)
         assert(flag)
@@ -77,6 +81,23 @@ class TestFileComm(parent.TestCommBase):
     def test_work_comm(self):
         r"""Disabled: Test creating/removing a work comm."""
         pass
+
+    def test_series(self):
+        r"""Test sending/receiving to/from a series of files."""
+        # Set up series
+        fname = '%d'.join(os.path.splitext(self.send_instance.address))
+        self.send_instance.close()
+        self.recv_instance.close()
+        self.send_instance.is_series = True
+        self.recv_instance.is_series = True
+        self.send_instance.address = fname
+        self.recv_instance.address = fname
+        self.send_instance.open()
+        self.recv_instance.open()
+        # Send/receive multiple messages
+        nmsg = 2
+        for i in range(nmsg):
+            self.do_send_recv()
         
     def test_remaining_bytes(self):
         r"""Test remaining_bytes."""
