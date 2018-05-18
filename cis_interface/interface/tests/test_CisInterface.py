@@ -969,3 +969,120 @@ class TestCisPlyOutput_local(TestCisPlyOutput):
         r"""Test sending a ply to a local file."""
         # Required to get useful test names
         super(TestCisPlyOutput_local, self).test_send()
+
+
+class TestCisObjInput(TestBase):
+    r"""Test input from a obj file."""
+    def __init__(self, *args, **kwargs):
+        super(TestCisObjInput, self).__init__(*args, **kwargs)
+        self._cls = 'CisObjInput'
+        self.tempfile = os.path.join(os.getcwd(), 'temp.obj')
+        self.driver_name = 'ObjFileInputDriver'
+        self.driver_args = [self.name, self.tempfile]
+        self._inst_args = [self.name]
+        self._inst_kwargs = {}
+
+    def setup(self):
+        r"""Create a test file and start the driver."""
+        if (((not os.path.isfile(self.tempfile)) or
+             (os.stat(self.tempfile).st_size == 0))):
+            self.write_obj(self.tempfile)
+        skip_start = False
+        if self.inst_kwargs.get('src_type', 1) == 0:
+            skip_start = True
+        super(TestCisObjInput, self).setup(skip_start=skip_start)
+
+    def teardown(self):
+        r"""Remove the test file."""
+        super(TestCisObjInput, self).teardown()
+        if os.path.isfile(self.tempfile):
+            os.remove(self.tempfile)
+
+    def test_recv(self):
+        r"""Test receiving a obj from a remote file."""
+        Tout = self.instance.start_timeout()
+        while ((not Tout.is_out) and
+               (os.stat(self.tempfile).st_size == 0)):  # pragma: debug
+            self.instance.sleep()
+        self.instance.stop_timeout()
+        msg_flag, res = self.instance.recv(timeout=self.timeout)
+        assert(msg_flag)
+        assert(len(res) > 0)
+        nt.assert_equal(res, self.instance.serializer.standardize(self.obj_dict))
+
+
+class TestCisObjInput_local(TestCisObjInput):
+    r"""Test input from a obj file."""
+    def __init__(self, *args, **kwargs):
+        super(TestCisObjInput_local, self).__init__(*args, **kwargs)
+        self._inst_args = [self.tempfile]
+        self._inst_kwargs = {'src_type': 0}  # local
+
+    def test_recv(self):
+        r"""Test receiving a obj from a local file."""
+        # Required to get useful test names
+        super(TestCisObjInput_local, self).test_recv()
+
+        
+class TestCisObjOutput(TestBase):
+    r"""Test output from a obj."""
+    def __init__(self, *args, **kwargs):
+        super(TestCisObjOutput, self).__init__(*args, **kwargs)
+        self._cls = 'CisObjOutput'
+        self.tempfile = os.path.join(os.getcwd(), 'temp.obj')
+        self.driver_name = 'ObjFileOutputDriver'
+        self.driver_args = [self.name, self.tempfile]
+        self._inst_args = [self.name]
+        self._inst_kwargs = {}
+
+    @property
+    def file_comm(self):
+        r"""FileComm: File communicator."""
+        if self.inst_kwargs.get('dst_type', 1) == 0:
+            return self.instance
+        else:
+            return self.driver.ocomm
+        
+    def setup(self):
+        r"""Create a test file and start the driver."""
+        skip_start = False
+        if self.inst_kwargs.get('dst_type', 1) == 0:
+            skip_start = True
+        if os.path.isfile(self.tempfile):  # pragma: debug
+            os.remove(self.tempfile)
+        super(TestCisObjOutput, self).setup(skip_start=skip_start)
+
+    def teardown(self):
+        r"""Remove the test file."""
+        super(TestCisObjOutput, self).teardown()
+        if os.path.isfile(self.tempfile):
+            os.remove(self.tempfile)
+
+    def test_send(self):
+        r"""Test sending a obj to a remote file."""
+        msg_flag = self.instance.send(self.obj_dict)
+        assert(msg_flag)
+        self.instance.send_eof()
+        # Read temp file
+        Tout = self.instance.start_timeout()
+        while ((not Tout.is_out) and self.file_comm.is_open):
+            self.instance.sleep()
+        self.instance.stop_timeout()
+        # Read temp file
+        assert(os.path.isfile(self.tempfile))
+        with open(self.tempfile, 'rb') as fd:
+            contents = fd.read()
+        nt.assert_equal(contents, self.obj_file_contents)
+
+
+class TestCisObjOutput_local(TestCisObjOutput):
+    r"""Test input from an unformatted text file."""
+    def __init__(self, *args, **kwargs):
+        super(TestCisObjOutput_local, self).__init__(*args, **kwargs)
+        self._inst_args = [self.tempfile]
+        self._inst_kwargs = {'dst_type': 0}  # local
+
+    def test_send(self):
+        r"""Test sending a obj to a local file."""
+        # Required to get useful test names
+        super(TestCisObjOutput_local, self).test_send()
