@@ -227,9 +227,11 @@ def parse_connection(yml, yamldir, existing):
         RuntimeError: If neither the 'input' or 'output' entries correspond
             to model I/O channels.
         ValueError: If the 'input' is a file and 'read_meth' entry is not
-           'all', 'line', 'table', or 'table_array'.
+           'all', 'line', 'table', 'table_array', 'pickle', 'pandas', 'map',
+           'ply', or 'obj'.
         ValueError: If the 'output' is a file and 'write_meth' entry is not
-           'all', 'line', 'table', or 'table_array'.
+           'all', 'line', 'table', 'table_array', 'pickle', 'pandas', 'map',
+           'ply', or 'obj'.
 
     Returns:
         dict: Updated log of all entries.
@@ -273,6 +275,10 @@ def parse_connection(yml, yamldir, existing):
             xi['driver'] = 'PandasFileInputDriver'
         elif read_meth == 'map':
             xi['driver'] = 'AsciiMapInputDriver'
+        elif read_meth == 'ply':
+            xi['driver'] = 'PlyFileInputDriver'
+        elif read_meth == 'obj':
+            xi['driver'] = 'ObjFileInputDriver'
         else:
             raise ValueError("Invalid read_meth '%s'." % read_meth)
         xo = None
@@ -305,6 +311,10 @@ def parse_connection(yml, yamldir, existing):
             xo['driver'] = 'PandasFileOutputDriver'
         elif write_meth == 'map':
             xo['driver'] = 'AsciiMapOutputDriver'
+        elif write_meth == 'ply':
+            xo['driver'] = 'PlyFileOutputDriver'
+        elif write_meth == 'obj':
+            xo['driver'] = 'ObjFileOutputDriver'
         else:
             raise ValueError("Invalid write_meth '%s'." % write_meth)
         xi = None

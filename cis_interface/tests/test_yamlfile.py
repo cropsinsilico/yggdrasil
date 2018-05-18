@@ -325,6 +325,46 @@ class TestYamlConnectionInputAsciiMap(YamlTestBase):
                   '    write_meth: map'], )
 
 
+class TestYamlConnectionInputPly(YamlTestBase):
+    r"""Test connection with Ply file."""
+    _contents = (['models:',
+                  '  - name: modelA',
+                  '    driver: GCCModelDriver',
+                  '    args: ./src/modelA.c',
+                  '    inputs:',
+                  '      - inputA',
+                  '    outputs:',
+                  '      - outputA',
+                  '',
+                  'connections:',
+                  '  - input: {{ %s }}' % _yaml_env,
+                  '    output: inputA',
+                  '    read_meth: ply',
+                  '  - input: outputA',
+                  '    output: output.ply',
+                  '    write_meth: ply'], )
+
+
+class TestYamlConnectionInputObj(YamlTestBase):
+    r"""Test connection with Obj file."""
+    _contents = (['models:',
+                  '  - name: modelA',
+                  '    driver: GCCModelDriver',
+                  '    args: ./src/modelA.c',
+                  '    inputs:',
+                  '      - inputA',
+                  '    outputs:',
+                  '      - outputA',
+                  '',
+                  'connections:',
+                  '  - input: {{ %s }}' % _yaml_env,
+                  '    output: inputA',
+                  '    read_meth: obj',
+                  '  - input: outputA',
+                  '    output: output.obj',
+                  '    write_meth: obj'], )
+
+
 class TestYamlComponentError(YamlTestBaseError):
     r"""Test error for non-dictionary component."""
     _error = TypeError
