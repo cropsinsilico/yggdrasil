@@ -71,7 +71,6 @@ int free_comm(comm_t *x) {
   if (x == NULL)
     return ret;
   cislog_debug("free_comm(%s)", x->name);
-  comm_type t = x->type;
   // Send EOF for output comms and then wait for messages to be recv'd
   if ((is_send(x->direction)) && (x->valid)) {
     if (_cis_error_flag == 0) {
@@ -415,6 +414,10 @@ comm_head_t comm_send_multipart_header(const comm_t x, const char * data,
       asciiTable_t *table = (asciiTable_t*)(serializer->info);
       strcpy(head.format_str, table->format_str);
       head.as_array = 1;
+    } else if (serializer->type == PLY_SERI) {
+      head.serializer_type = 8;
+    } else if (serializer->type == OBJ_SERI) {
+      head.serializer_type = 9;
     }
   }
   const comm_t *x0;
@@ -723,6 +726,10 @@ int comm_recv_multipart(const comm_t x, char **data, const size_t len,
         } else {
           new_type = ASCII_TABLE_ARRAY_SERI;
         }
+      } else if (head.serializer_type == 8) {
+	new_type = PLY_SERI;
+      } else if (head.serializer_type == 9) {
+	new_type = OBJ_SERI;
       }
       if (new_type >= 0) {
         ret = update_serializer(x.serializer, new_type, new_info);

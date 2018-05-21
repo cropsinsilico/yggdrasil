@@ -9,7 +9,8 @@ extern "C" {
 
 /*! @brief Serializer types. */
 enum seri_enum { DIRECT_SERI, FORMAT_SERI, ARRAY_SERI,
-		 ASCII_TABLE_SERI, ASCII_TABLE_ARRAY_SERI };
+		 ASCII_TABLE_SERI, ASCII_TABLE_ARRAY_SERI,
+		 PLY_SERI, OBJ_SERI};
 typedef enum seri_enum seri_type;
 
 /*!
@@ -51,7 +52,7 @@ int serialize_direct(const seri_t s, char *buf, const size_t buf_siz,
   @param[in] s seri_t Structure sepcifying how to deserialize message.
   @param[in] buf character pointer to serialized message.
   @param[in] buf_siz size_t Size of buf.
-  @param[in] ap va_list Arguments to be parsed from message.
+  @param[out] ap va_list Arguments to be parsed from message.
   returns: int The number of populated arguments. -1 indicates an error.
  */
 static inline

@@ -28,8 +28,6 @@ extern "C" {
 	    sprintf(buffer, "a=%d, b=%d", 1, 2);
       3. Send:
 	    ret = cis_send(output_channel, buffer, strlen(buffer));
-      4. Free:
-            cis_free(&output_channel);
 
   Input Usage:
       1. One-time: Create output channel (store in named variables)
@@ -38,8 +36,6 @@ extern "C" {
             char buffer[CIS_MSG_BUF];
       3. Receive:
             int ret = cis_recv(input_channel, buffer, CIS_MSG_BUF);
-      4. Free:
-            cis_free(&input_channel);
 */
 //==============================================================================
 
@@ -205,8 +201,6 @@ int cis_recv_nolimit(const cisInput_t cisQ, char **data, const size_t len0){
             int a, b;
       3. Receive:
             int ret = cisRecv(input_channel, &a, &b);
-      4. Free:
-            cis_free(&input_channel);
 */
 //==============================================================================
 
@@ -371,8 +365,6 @@ int cisRecv_nolimit(const cisInput_t cisQ, ...) {
 	    int c = 3*a;
       5. Send response:
 	    ret = rpcSend(srv, b, c);
-      6. Free:
-            cis_free(&srv);
 
   Client Usage:
       1. One-time: Create client channels to desired server with format
@@ -383,8 +375,6 @@ int cisRecv_nolimit(const cisInput_t cisQ, ...) {
             int b, c;
       3. Call server:
             int ret = rpcCall(cli, 1, &b, &c);
-      4. Free:
-            cis_free(&cli);
 
    Clients can also send several requests at once before receiving any
    responses. This allows the server to be processing the next requests
@@ -612,9 +602,8 @@ int rpcCall(const cisRpc_t rpc,  ...){
 	      ret = cisRecv(fin, &line); // line will be realloced to fit message
 	      // Do something with the line
 	    }
-      4. Cleanup. Call functions to deallocate structures and close files.
+      4. Cleanup. Call functions to deallocate structures.
             free(line);
-            cis_free(&fin);
 
   Output Usage:
       1. One-time: Create file interface by providing either a channel name or
@@ -627,8 +616,6 @@ int rpcCall(const cisRpc_t rpc,  ...){
 	    ret = cisSend(fin, "Line 1\n");
 	    ret = cisSend(fout, "Line 1\n");
 	    ret = cisSend(fout, "Line 2\n");
-      4. Cleanup. Call functions to deallocate structures and close files.
-            cis_free(&fout);
 
 */
 //==============================================================================
@@ -711,8 +698,6 @@ comm_t cisAsciiFileInput_local(const char *name) {
 	      ret = cisRecv(fin, &a, &b, &c);
 	      // Do something with the row
 	    }
-      4. Cleanup. Call functions to deallocate structures and close files.
-            cis_free(&fin);
 
   Output by Row Usage:
       1. One-time: Create file interface by providing either a channel name or
@@ -726,8 +711,6 @@ comm_t cisAsciiFileInput_local(const char *name) {
             int ret;
 	    ret = cisSend(fout, "one", 1, 1.0);
 	    ret = cisSend(fout, "two", 2, 2.0);
-      4. Cleanup. Call functions to deallocate structures and close files.
-            cis_free(&fout);
 
   Array
   =====
@@ -746,8 +729,10 @@ comm_t cisAsciiFileInput_local(const char *name) {
          elements in each column (the number of table rows). Negative values
 	 indicate errors.
             int ret = cisRecv(fin, &a, &b, &c);
-      4. Cleanup. Call functions to deallocate structures and close files.
-            cis_free(&fin);
+      4. Cleanup. Call functions to deallocate structures.
+            free(a);
+            free(b);
+            free(c);
 
   Output by Array Usage:
       1. One-time: Create file interface by providing either a channel name or
@@ -763,8 +748,6 @@ comm_t cisAsciiFileInput_local(const char *name) {
 	    int bCol[3] = {1, 2, 3};
 	    float cCol[3] = {1.0, 2.0, 3.0};
             int ret = cisSend(fout, a, b, c);
-      3. Cleanup. Call functions to deallocate structures and close files.
-            cis_free(&fin);
 
 */
 //==============================================================================
@@ -890,6 +873,72 @@ comm_t cisAsciiArrayInput_local(const char *name) {
   out.serializer->type = ASCII_TABLE_ARRAY_SERI;
   return out;
 };
+
+//==============================================================================
+/*!
+  Ply IO
+
+  Handle I/O from/to a Ply file.
+
+  Input Usage:
+      1. One-time: Create file interface by providing a channel name.
+	    comm_t fin = cisPlyInput("file_channel");  // channel
+      2. Prepare: Allocate ply structure.
+            ply_t p;
+      3. Receive each structure, terminating when receive returns -1 (EOF or channel
+         closed).
+	    int ret = 1;
+	    while (ret > 0) {
+	      ret = cisRecv(fin, &p);
+	      // Do something with the ply structure
+	    }
+
+  Output by Usage:
+      1. One-time: Create file interface by providing a channel name.
+	    comm_t fout = cisPlyOutput("file_channel");  // channel
+      2. Send structure to the file by providing entries. Formatting is handled by
+         the interface. If return value is not 0, the send was not succesful.
+            int ret;
+	    ply_t p;
+	    // Populate the structure
+	    ret = cisSend(fout, p);
+	    ret = cisSend(fout, p);
+
+*/
+//==============================================================================
+
+/*! @brief Definitions for ply structures. */
+#define cisPlyInput_t comm_t
+#define cisPlyOutput_t comm_t
+
+/*!
+  @brief Constructor for ply output comm to an output channel.
+  @param[in] name constant character pointer to output channel name.
+  @returns comm_t output structure.
+ */
+static inline
+comm_t cisPlyOutput(const char *name) {
+  int flag = 0;
+  comm_t out = init_comm(name, "send", _default_comm, NULL);
+  if (out.valid) {
+    flag = update_serializer(out.serializer, PLY_SERI, NULL);
+  }
+  if (flag < 0) {
+    out.valid = 0;
+  }
+  return out;
+};
+
+/*!
+  @brief Constructor for ply input comm from an input channel.
+  @param[in] name constant character pointer to input channel name.
+  @returns comm_t input structure.
+ */
+static inline
+comm_t cisPlyInput(const char *name) {
+  return init_comm(name, "recv", _default_comm, NULL);
+};
+
 
 #ifdef __cplusplus /* If this is a C++ compiler, end C linkage */
 }

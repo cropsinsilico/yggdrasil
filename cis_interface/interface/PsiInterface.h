@@ -52,6 +52,10 @@
 #define psiAsciiArrayOutput cisAsciiArrayOutput
 #define psiAsciiArrayInput_local cisAsciiArrayInput_local
 #define psiAsciiArrayOutput_local cisAsciiArrayOutput_local
+#define psiPlyInput_t cisPlyInput_t
+#define psiPlyOutput_t cisPlyOutput_t
+#define psiPlyInput cisPlyInput
+#define psiPlyOutput cisPlyOutput
 
 
 #endif /*PSIINTERFACE_H_*/
