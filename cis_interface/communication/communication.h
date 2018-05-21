@@ -700,14 +700,14 @@ int comm_recv_multipart(const comm_t x, char **data, const size_t len,
   usleep(100);
   comm_head_t head = parse_comm_header(*data, headlen);
   if (!(head.valid)) {
-    cislog_error("comm_recv(%s): Error parsing header.", x.name);
+    cislog_error("comm_recv_multipart(%s): Error parsing header.", x.name);
     ret = -1;
   } else {
     // Get serializer information from header on first recv
     if ((x.used[0] == 0) && (x.is_file == 0) && (x.serializer->type == 0)) {
       int new_type = -1;
       void *new_info = (void*)(head.format_str);
-      cislog_debug("comm_recv(%s): Updating serializer type to %d",
+      cislog_debug("comm_recv_multipart(%s): Updating serializer type to %d",
 		   x.name, head.serializer_type);
       if (head.serializer_type == 0) {
         new_type = DIRECT_SERI;
@@ -727,7 +727,7 @@ int comm_recv_multipart(const comm_t x, char **data, const size_t len,
       if (new_type >= 0) {
         ret = update_serializer(x.serializer, new_type, new_info);
         if (ret != 0) {
-          cislog_error("comm_recv(%s): Error updating serializer.", x.name);
+          cislog_error("comm_recv_multipart(%s): Error updating serializer.", x.name);
           return -1;
         }
       }
@@ -736,13 +736,13 @@ int comm_recv_multipart(const comm_t x, char **data, const size_t len,
         asciiTable_t *table = (asciiTable_t*)(x.serializer->info);
         ret = at_update(table, x.name, "0");
         if (ret != 0) {
-          cislog_error("comm_recv(%s): Failed to update asciiTable address.",
+          cislog_error("comm_recv_multipart(%s): Failed to update asciiTable address.",
                        x.name);
           return -1;
         }
         ret = simplify_formats(table->format_str, CIS_MSG_MAX);
         if (ret < 0) {
-          cislog_error("comm_recv(%s): Failed to simplify recvd table format.", x.name);
+          cislog_error("comm_recv_multipart(%s): Failed to simplify recvd table format.", x.name);
           return -1;
         }
       } else if (new_type == FORMAT_SERI) {

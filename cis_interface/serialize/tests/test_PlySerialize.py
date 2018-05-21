@@ -19,19 +19,18 @@ class TestPlySerialize(TestDefaultSerialize):
         r"""obj: Primary object that should be used for messages."""
         return self.ply_dict
 
-    def map_sent2recv(self, obj):
-        r"""Convert a sent object into a received one."""
-        out = copy.deepcopy(obj)
-        return out
+    def test_properties(self):
+        r"""Test properties of PlyDict."""
+        prop_list = ['nvert', 'nface', 'bounds', 'mesh']
+        for p in prop_list:
+            getattr(self._base_object, p)
 
     def test_merge(self):
         r"""Test mergining two ply objects."""
-        self.instance.merge(self._objects)
+        self._objects[0].merge(self._objects)
 
     def test_apply_scalar_map(self):
         r"""Test applying a scalar colormap."""
-        for _o, scale in zip(self._objects, ['linear', 'log']):
-            o = self.map_sent2recv(_o)
-            scalar_arr = np.arange(len(o['faces'])).astype('float')
-            self.instance.apply_scalar_map(o, scalar_arr, scaling=scale,
-                                           scale_by_area=True)
+        for o, scale in zip(self._objects, ['linear', 'log']):
+            scalar_arr = np.arange(o.nface).astype('float')
+            o.apply_scalar_map(scalar_arr, scaling=scale, scale_by_area=True)

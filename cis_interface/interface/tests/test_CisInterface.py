@@ -1008,7 +1008,7 @@ class TestCisObjInput(TestBase):
         msg_flag, res = self.instance.recv(timeout=self.timeout)
         assert(msg_flag)
         assert(len(res) > 0)
-        nt.assert_equal(res, self.instance.serializer.standardize(self.obj_dict))
+        nt.assert_equal(res, self.obj_dict)
 
 
 class TestCisObjInput_local(TestCisObjInput):

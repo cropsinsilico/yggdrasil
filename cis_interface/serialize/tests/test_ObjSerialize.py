@@ -16,14 +16,3 @@ class TestObjSerialize(TestPlySerialize):
     def _base_object(self):
         r"""obj: Primary object that should be used for messages."""
         return self.obj_dict
-
-    def map_sent2recv(self, obj):
-        r"""Convert a sent object into a received one."""
-        out = super(TestObjSerialize, self).map_sent2recv(obj)
-        out = self.instance.standardize(out)
-        return out
-
-    def test_standardize(self):
-        r"""Test standardization of objects."""
-        for o in self._objects:
-            self.instance.standardize(o)

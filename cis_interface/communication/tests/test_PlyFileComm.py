@@ -1,4 +1,3 @@
-import copy
 from cis_interface.communication.tests import test_FileComm as parent
 
 
@@ -18,11 +17,6 @@ class TestPlyFileComm(parent.TestFileComm):
         r"""dict: Ply information."""
         return self.ply_dict
 
-    def map_sent2recv(self, obj):
-        r"""Convert a sent object into a received one."""
-        out = copy.deepcopy(obj)
-        return out
-
     def merge_messages(self, msg_list):
         r"""Merge multiple messages to produce the expected total message.
 
@@ -33,4 +27,4 @@ class TestPlyFileComm(parent.TestFileComm):
             obj: Merged message.
 
         """
-        return self.send_instance.serializer.merge(msg_list)
+        return msg_list[0].merge(msg_list[1:])

@@ -40,8 +40,7 @@ class TestObjFileInputDriver(TestObjFileInputParam,
         # File contents
         flag, msg_recv = self.recv_comm.recv_nolimit(self.timeout)
         assert(flag)
-        nt.assert_equal(msg_recv,
-                        self.recv_comm.serializer.standardize(self.obj_dict))
+        nt.assert_equal(msg_recv, self.obj_dict)
         # EOF
         flag, msg_recv = self.recv_comm.recv_nolimit(self.timeout)
         assert(not flag)

@@ -354,7 +354,7 @@ class FileComm(CommBase.CommBase):
         self.fd.flush()
         if msg != self.eof_msg and self.is_series:
             self.advance_in_series()
-            self.info("Advanced to %d", self._series_index)
+            self.debug("Advanced to %d", self._series_index)
         return True
 
     def _recv(self, timeout=0):
@@ -376,7 +376,7 @@ class FileComm(CommBase.CommBase):
             out = self.fd.readline()
         if len(out) == 0:
             if self.advance_in_series():
-                self.info("Advanced to %d", self._series_index)
+                self.debug("Advanced to %d", self._series_index)
                 flag, out = self._recv()
             else:
                 out = self.eof_msg

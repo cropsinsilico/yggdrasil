@@ -35,8 +35,8 @@ class PlyFileComm(FileComm):
             msg_ply, header = self.serializer.deserialize(msg)
             with open(self.current_address, 'rb') as fd:
                 old_ply, header = self.serializer.deserialize(fd.read())
-            new_ply = self.serializer.merge([old_ply, msg_ply])
-            new_msg = self.serializer.serialize(new_ply)
+            old_ply.append(msg_ply)
+            new_msg = self.serializer.serialize(old_ply)
         else:
             new_msg = msg
         return super(PlyFileComm, self)._send(new_msg)

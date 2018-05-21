@@ -16,9 +16,3 @@ class TestObjFileComm(parent.TestPlyFileComm):
     def msg_long(self):
         r"""dict: Obj information."""
         return self.obj_dict
-
-    def map_sent2recv(self, obj):
-        r"""Convert a sent object into a received one."""
-        out = super(TestObjFileComm, self).map_sent2recv(obj)
-        out = self.send_instance.serializer.standardize(out)
-        return out

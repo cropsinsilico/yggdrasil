@@ -7,6 +7,234 @@ from cis_interface import backwards
 from cis_interface.serialize.DefaultSerialize import DefaultSerialize
 
 
+class PlyDict(dict):
+    r"""Class for storing ply information.
+
+    Args:
+        vertices (list, optional): 3D positions of vertices comprising the
+            3D object. Defaults to [].
+        faces (list, optional): Indices of 3 or more vertices making up faces.
+            Defaults to [].
+        vertex_colors (list, optional): RGB values for each of the vertices.
+            If not provided, all vertices will be black. Defaults to [].
+
+    """
+    def __init__(self, **kwargs):
+        list_keys = ['vertices', 'faces', 'vertex_colors']
+        for k in list_keys:
+            if kwargs.get(k, None) is None:
+                kwargs.setdefault(k, [])
+        super(PlyDict, self).__init__(**kwargs)
+
+    @property
+    def nvert(self):
+        r"""int: Number of vertices."""
+        return len(self['vertices'])
+
+    @property
+    def nface(self):
+        r"""int: Number of faces."""
+        return len(self['faces'])
+
+    @property
+    def bounds(self):
+        r"""tuple: Minimums and maximums of vertices."""
+        mins = 1e6 * np.ones(3, 'float')
+        maxs = -1e6 * np.ones(3, 'float')
+        for v in self['vertices']:
+            mins = np.minimum(mins, np.array(v))
+            maxs = np.maximum(maxs, np.array(v))
+        return mins, maxs
+
+    @property
+    def mesh(self):
+        r"""list: Vertices for each face in the structure."""
+        mesh = []
+        for f in self['faces']:
+            imesh = []
+            for i in range(3):
+                imesh += self['vertices'][f[i]]
+            mesh.append(imesh)
+        return mesh
+
+    @classmethod
+    def from_scene(cls, scene, d=None, conversion=1.0):
+        r"""Create a ply dictionary from a PlantGL scene and descritizer.
+
+        Args:
+            scene (openalea.plantgl.scene): Scene that should be descritized.
+            d (openalea.plantgl.descritizer, optional): Descritizer. Defaults
+                to openalea.plantgl.all.Tesselator.
+            conversion (float, optional): Conversion factor that should be
+                applied to the vertex positions. Defaults to 1.0.
+
+        """
+        if d is None:
+            from openalea.plantgl.all import Tesselator
+            d = Tesselator()
+        out = cls()
+        for k, shapes in scene.todict().items():
+            for shape in shapes:
+                # print(k, shape.name)
+                d.process(shape)
+                if d.result is None:
+                    continue
+                iply = cls()
+                c = shape.appearance.ambient
+                for p in d.result.pointList:
+                    iply['vertices'].append([conversion * p.x,
+                                             conversion * p.y,
+                                             conversion * p.z])
+                    iply['vertex_colors'].append([c.red, c.green, c.blue])
+                for i3 in d.result.indexList:
+                    iply['faces'].append([i3[0], i3[1], i3[2]])
+                out.append(iply)
+                # Clear descretizer to ensure no hold over verts/faces
+                d.clear()
+        return out
+
+    def set_vertex_colors(self, default_rgb=None):
+        r"""Set the vertex colors to a default if they are not yet set.
+
+        Args:
+            default_rgb (list, optional): Default color in RGB that should be
+                used for missing colors. Defaults to [0, 0, 0].
+
+        """
+        if len(self['vertex_colors']) == self.nvert:
+            return
+        if default_rgb is None:
+            default_rgb = [0, 0, 0]
+        self['vertex_colors'] = [default_rgb for _ in range(self.nvert)]
+
+    def append(self, solf, default_rgb=None):
+        r"""Append new ply information to this dictionary.
+
+        Args:
+            solf (PlyDict): Another ply to append to this one.
+            default_rgb (list, optional): Default color in RGB that should be
+                used for missing colors. Defaults to [0, 0, 0].
+
+        """
+        do_colors = False
+        if self['vertex_colors'] or solf['vertex_colors']:
+            self.set_vertex_colors(default_rgb=default_rgb)
+            solf.set_vertex_colors(default_rgb=default_rgb)
+            do_colors = True
+        # Vertex fields
+        nvert = self.nvert
+        self['vertices'] += solf['vertices']
+        if do_colors:
+            self['vertex_colors'] += solf['vertex_colors']
+        # Face fields
+        for f in solf['faces']:
+            self['faces'].append([v + nvert for v in f])
+
+    def merge(self, ply_list, no_copy=False, default_rgb=None):
+        r"""Merge a list of ply dictionaries.
+
+        Args:
+            ply_list (list): Ply dictionaries.
+            no_copy (bool, optional): If True, the current dictionary will be
+                updated, otherwise a copy will be returned with the update.
+                Defaults to False.
+            default_rgb (list, optional): Default color in RGB that should be
+                used for missing colors. Defaults to [0, 0, 0].
+
+        Returns:
+            dict: Merged ply dictionary.
+
+        """
+        if not isinstance(ply_list, list):
+            ply_list = [ply_list]
+        # Merge fields
+        if no_copy:
+            out = self
+        else:
+            out = copy.deepcopy(self)
+        for x in ply_list:
+            out.append(x, default_rgb=default_rgb)
+        return out
+
+    def apply_scalar_map(self, scalar_arr, color_map=None,
+                         vmin=None, vmax=None, scaling='linear',
+                         scale_by_area=False, no_copy=False):
+        r"""Set the color of faces in a 3D object based on a scalar map.
+        This creates a copy unless no_copy is True.
+
+        Args:
+            scalar_arr (arr): Scalar values that should be mapped to colors
+                for each face.
+            color_map (str, optional): The name of the color map that should
+                be used. Defaults to 'plasma'.
+            vmin (float, optional): Value that should map to the minimum of the
+                colormap. Defaults to min(scalar_arr).
+            vmax (float, optional): Value that should map to the maximum of the
+                colormap. Defaults to max(scalar_arr).
+            scaling (str, optional): Scaling that should be used to map the scalar
+                array onto the colormap. Defaults to 'linear'.
+            scale_by_area (bool, optional): If True, the elements of the scalar
+                array will be multiplied by the area of the corresponding face.
+                If True, vmin and vmax should be in terms of the scaled array.
+                Defaults to False.
+            no_copy (bool, optional): If True, the returned object will not be a
+                copy. Defaults to False.
+
+        Returns:
+            dict: Ply with updated vertex colors.
+
+        """
+        # Scale by area
+        if scale_by_area:
+            scalar_arr = copy.deepcopy(scalar_arr)
+            for i in range(len(self['faces'])):
+                f = self['faces'][i]
+                v0 = np.array(self['vertices'][f[0]])
+                v1 = np.array(self['vertices'][f[1]])
+                v2 = np.array(self['vertices'][f[2]])
+                a = np.sqrt(np.sum((v0 - v1)**2))
+                b = np.sqrt(np.sum((v1 - v2)**2))
+                c = np.sqrt(np.sum((v2 - v0)**2))
+                s = (a + b + c) / 2.0
+                area = np.sqrt(s * (s - a) * (s - b) * (s - c))
+                scalar_arr[i] = area * scalar_arr[i]
+        # Map vertices onto faces
+        vertex_scalar = [[] for x in self['vertices']]
+        for i in range(len(self['faces'])):
+            for v in self['faces'][i]:
+                vertex_scalar[v].append(scalar_arr[i])
+        for i in range(len(vertex_scalar)):
+            vertex_scalar[i] = np.mean(vertex_scalar[i])
+        vertex_scalar = np.array(vertex_scalar)
+        if scaling == 'log':
+            vertex_scalar = np.ma.MaskedArray(vertex_scalar, vertex_scalar <= 0)
+        # Get color scaling
+        if color_map is None:
+            # color_map = 'summer'
+            color_map = 'plasma'
+        if vmin is None:
+            vmin = vertex_scalar.min()
+        if vmax is None:
+            vmax = vertex_scalar.max()
+        # print(vmin, vmax)
+        cmap = cm.get_cmap(color_map)
+        if scaling == 'log':
+            norm = mpl.colors.LogNorm(vmin=vmin, vmax=vmax)
+        elif scaling == 'linear':
+            norm = mpl.colors.Normalize(vmin=vmin, vmax=vmax)
+        else:  # pragma: debug
+            raise Exception("Scaling must be 'linear' or 'log'.")
+        m = cm.ScalarMappable(norm=norm, cmap=cmap)
+        # Scale colors
+        vertex_colors = (255 * m.to_rgba(vertex_scalar)).astype('int')[:, :3].tolist()
+        if no_copy:
+            out = self
+        else:
+            out = copy.deepcopy(self)
+        out['vertex_colors'] = vertex_colors
+        return out
+
+
 class PlySerialize(DefaultSerialize):
     r"""Class for serializing/deserializing .ply file formats.
 
@@ -45,19 +273,17 @@ class PlySerialize(DefaultSerialize):
         r"""Serialize a message.
 
         Args:
-            args (dict): Dictionary of ply information. Fields include:
-                vertices (list): 3D positions of vertices comprising the object.
-                faces (list): Indices of 3 or more vertices making up faces.
-                vertex_colors (list): RGB values for each of the vertices.
-                    If not provided, all vertices will be black.
+            args (PlyDict): Dictionary of ply information.
 
         Returns:
             bytes, str: Serialized message.
 
         """
         lines = []
-        nvert = len(args.get('vertices', []))
-        nface = len(args.get('faces', []))
+        if isinstance(args, dict):
+            args = PlyDict(**args)
+        nvert = args.nvert
+        nface = args.nface
         # Header
         if self.write_header:
             lines += ['ply',
@@ -75,20 +301,15 @@ class PlySerialize(DefaultSerialize):
             lines += ['element face %d' % nface,
                       'property list uchar int vertex_indices',
                       'end_header']
-        # Set colors if not provided
-        # if not args.get('vertex_colors', []):
-        #     args['vertex_colors'] = []
-        #     for v in args.get('vertices', []):
-        #         args['vertex_colors'].append(self.default_rgb)
         # 3D objects
         if args.get('vertex_colors', []):
-            for i in range(len(args.get('vertices', []))):
+            for i in range(args.nvert):
                 v = args['vertices'][i]
                 c = args['vertex_colors'][i]
                 entry = tuple(list(v) + list(c))
                 lines.append('%f %f %f %d %d %d' % entry)
         else:
-            for i in range(len(args.get('vertices', []))):
+            for i in range(args.nvert):
                 v = args['vertices'][i]
                 entry = tuple(list(v))
                 lines.append('%f %f %f' % entry)
@@ -146,11 +367,9 @@ class PlySerialize(DefaultSerialize):
             if (nvert is None) or (nface is None):  # pragma: debug
                 raise RuntimeError("Could not locate element definitions.")
             # Get 3D info
-            out = dict(vertices=[], faces=[])
-            if do_vertex_colors:
-                out['vertex_colors'] = []
+            out = PlyDict()
             i = headline
-            while len(out['vertices']) < nvert:
+            while out.nvert < nvert:
                 values = lines[i].split()
                 if len(values) > 0:
                     out['vertices'].append([x for x in map(float, values[:3])])
@@ -161,123 +380,12 @@ class PlySerialize(DefaultSerialize):
                         else:
                             out['vertex_colors'].append(self.default_rgb)
                 i += 1
-            while len(out['faces']) < nface:
+            while out.nface < nface:
                 values = lines[i].split()
                 if len(values) > 0:
                     nv = int(values[0])
                     out['faces'].append([x for x in map(int, values[1:(nv + 1)])])
                     for x in out['faces'][-1]:
-                        assert(x < len(out['vertices']))
+                        assert(x < out.nvert)
                 i += 1
-        return out
-
-    def merge(self, ply_list):
-        r"""Merge a list of ply dictionaries.
-
-        Args:
-            ply_list (list): Ply dictionaries.
-
-        Returns:
-            dict: Merged ply dictionary.
-
-        """
-        # Check if colors should be added to output
-        do_colors = False
-        for x in ply_list:
-            if 'vertex_colors' in x:
-                do_colors = True
-                break
-        # Merge fields
-        nvert = 0
-        out = dict(vertices=[], faces=[])
-        if do_colors:
-            out['vertex_colors'] = []
-        for x in ply_list:
-            invert = len(x['vertices'])
-            # Vertex fields
-            out['vertices'] += x['vertices']
-            if do_colors:
-                if 'vertex_colors' in x:
-                    vc = x['vertex_colors']
-                else:
-                    vc = [self.default_rgb for _ in range(invert)]
-                out['vertex_colors'] += vc
-            # Face fields
-            for f in x['faces']:
-                out['faces'].append([v + nvert for v in f])
-            # Advance vert count
-            nvert += invert
-        return out
-
-    def apply_scalar_map(self, ply_dict, scalar_arr, color_map=None,
-                         vmin=None, vmax=None, scaling='linear',
-                         scale_by_area=False):
-        r"""Set the color of faces in a 3D object based on a scalar map.
-
-        Args:
-            ply_dict (dict): Ply fields.
-            scalar_arr (arr): Scalar values that should be mapped to colors
-                for each face.
-            color_map (str, optional): The name of the color map that should
-                be used. Defaults to 'plasma'.
-            vmin (float, optional): Value that should map to the minimum of the
-                colormap. Defaults to min(scalar_arr).
-            vmax (float, optional): Value that should map to the maximum of the
-                colormap. Defaults to max(scalar_arr).
-            scaling (str, optional): Scaling that should be used to map the scalar
-                array onto the colormap. Defaults to 'linear'.
-            scale_by_area (bool, optional): If True, the elements of the scalar
-                array will be multiplied by the area of the corresponding face.
-                If True, vmin and vmax should be in terms of the scaled array.
-                Defaults to False.
-
-        Returns:
-            dict: Ply with updated vertex colors.
-
-        """
-        # Scale by area
-        if scale_by_area:
-            scalar_arr = copy.deepcopy(scalar_arr)
-            for i in range(len(ply_dict['faces'])):
-                f = ply_dict['faces'][i]
-                v0 = np.array(ply_dict['vertices'][f[0]])
-                v1 = np.array(ply_dict['vertices'][f[1]])
-                v2 = np.array(ply_dict['vertices'][f[2]])
-                a = np.sqrt(np.sum((v0 - v1)**2))
-                b = np.sqrt(np.sum((v1 - v2)**2))
-                c = np.sqrt(np.sum((v2 - v0)**2))
-                s = (a + b + c) / 2.0
-                area = np.sqrt(s * (s - a) * (s - b) * (s - c))
-                scalar_arr[i] = area * scalar_arr[i]
-        # Map vertices onto faces
-        vertex_scalar = [[] for x in ply_dict['vertices']]
-        for i in range(len(ply_dict['faces'])):
-            for v in ply_dict['faces'][i]:
-                vertex_scalar[v].append(scalar_arr[i])
-        for i in range(len(vertex_scalar)):
-            vertex_scalar[i] = np.mean(vertex_scalar[i])
-        vertex_scalar = np.array(vertex_scalar)
-        if scaling == 'log':
-            vertex_scalar = np.ma.MaskedArray(vertex_scalar, vertex_scalar <= 0)
-        # Get color scaling
-        if color_map is None:
-            # color_map = 'summer'
-            color_map = 'plasma'
-        if vmin is None:
-            vmin = vertex_scalar.min()
-        if vmax is None:
-            vmax = vertex_scalar.max()
-        # print(vmin, vmax)
-        cmap = cm.get_cmap(color_map)
-        if scaling == 'log':
-            norm = mpl.colors.LogNorm(vmin=vmin, vmax=vmax)
-        elif scaling == 'linear':
-            norm = mpl.colors.Normalize(vmin=vmin, vmax=vmax)
-        else:  # pragma: debug
-            raise Exception("Scaling must be 'linear' or 'log'.")
-        m = cm.ScalarMappable(norm=norm, cmap=cmap)
-        # Scale colors
-        vertex_colors = (255 * m.to_rgba(vertex_scalar)).astype('int')[:, :3].tolist()
-        out = copy.deepcopy(ply_dict)
-        out['vertex_colors'] = vertex_colors
         return out

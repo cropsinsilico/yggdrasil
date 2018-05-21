@@ -39,7 +39,8 @@ class TestFileComm(parent.TestCommBase):
     @property
     def double_msg(self):
         r"""str: Message that should result from writing two test messages."""
-        return self.merge_messages([self.test_msg, self.append_msg])
+        out = self.merge_messages([self.test_msg, self.append_msg])
+        return out
 
     def merge_messages(self, msg_list):
         r"""Merge multiple messages to produce the expected total message.
