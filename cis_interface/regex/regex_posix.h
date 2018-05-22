@@ -123,12 +123,12 @@ int find_matches(const char *regex_text, const char *to_match,
   if (ret)
     return -1;
   // Loop until string done
-  const size_t n_sub_matches = 10;
+  const size_t n_sub_matches = 50;
   regmatch_t m[n_sub_matches];
   int nomatch = regexec(&r, to_match, n_sub_matches, m, 0);
   if (!(nomatch)) {
     // Count
-    while (1) {
+    while (n_match < n_sub_matches) {
       if ((m[n_match].rm_so == -1) && (m[n_match].rm_eo == -1)) {
 	break;
       }

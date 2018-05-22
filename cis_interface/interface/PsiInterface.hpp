@@ -14,5 +14,9 @@
 #define PsiAsciiFileOutput CisAsciiFileOutput
 #define PsiAsciiTableInput CisAsciiTableInput
 #define PsiAsciiTableOutput CisAsciiTableOutput
+#define PsiPlyOutput CisPlyOutput
+#define PsiPlyInput CisPlyInput
+#define PsiObjOutput CisObjOutput
+#define PsiObjInput CisObjInput
 
 #endif /*PSIINTERFACE_HPP_*/

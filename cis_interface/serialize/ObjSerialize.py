@@ -167,7 +167,7 @@ class ObjSerialize(PlySerialize):
                 if v[2] is not None:
                     iline += '%d' % (v[2] + add_ind)
             lines.append(iline)
-        out = self.newline.join(lines)
+        out = self.newline.join(lines) + self.newline
         return backwards.unicode2bytes(out)
 
     def func_deserialize(self, msg, zero_indexed=True):

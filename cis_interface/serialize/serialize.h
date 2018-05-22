@@ -6,6 +6,7 @@
 #include "FormatSerialize.h"
 #include "AsciiTableSerialize.h"
 #include "PlySerialize.h"
+#include "ObjSerialize.h"
 
 #ifdef __cplusplus /* If this is a C++ compiler, use C linkage */
 extern "C" {
@@ -157,6 +158,8 @@ int serialize(const seri_t s, char **buf, const size_t buf_siz,
     ret = serialize_ascii_table_array(s, *buf, buf_siz, args_used, ap);
   else if (t == PLY_SERI)
     ret = serialize_ply(s, *buf, buf_siz, args_used, ap);
+  else if (t == OBJ_SERI)
+    ret = serialize_obj(s, *buf, buf_siz, args_used, ap);
   else {
     cislog_error("serialize: Unsupported seri_type %d", t);
   }
@@ -203,6 +206,8 @@ int deserialize(const seri_t s, const char *buf, const size_t buf_siz, va_list a
     ret = deserialize_ascii_table_array(s, buf, buf_siz, ap);
   else if (t == PLY_SERI)
     ret = deserialize_ply(s, buf, buf_siz, ap);
+  else if (t == OBJ_SERI)
+    ret = deserialize_obj(s, buf, buf_siz, ap);
   else {
     cislog_error("deserialize: Unsupported seri_type %d", t);
   }

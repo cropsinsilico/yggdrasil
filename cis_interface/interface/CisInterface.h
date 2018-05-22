@@ -940,6 +940,72 @@ comm_t cisPlyInput(const char *name) {
 };
 
 
+//==============================================================================
+/*!
+  Obj IO
+
+  Handle I/O from/to a Obj file.
+
+  Input Usage:
+      1. One-time: Create file interface by providing a channel name.
+	    comm_t fin = cisObjInput("file_channel");  // channel
+      2. Prepare: Allocate obj structure.
+            obj_t p;
+      3. Receive each structure, terminating when receive returns -1 (EOF or channel
+         closed).
+	    int ret = 1;
+	    while (ret > 0) {
+	      ret = cisRecv(fin, &p);
+	      // Do something with the obj structure
+	    }
+
+  Output by Usage:
+      1. One-time: Create file interface by providing a channel name.
+	    comm_t fout = cisObjOutput("file_channel");  // channel
+      2. Send structure to the file by providing entries. Formatting is handled by
+         the interface. If return value is not 0, the send was not succesful.
+            int ret;
+	    obj_t p;
+	    // Populate the structure
+	    ret = cisSend(fout, p);
+	    ret = cisSend(fout, p);
+
+*/
+//==============================================================================
+
+/*! @brief Definitions for obj structures. */
+#define cisObjInput_t comm_t
+#define cisObjOutput_t comm_t
+
+/*!
+  @brief Constructor for obj output comm to an output channel.
+  @param[in] name constant character pointer to output channel name.
+  @returns comm_t output structure.
+ */
+static inline
+comm_t cisObjOutput(const char *name) {
+  int flag = 0;
+  comm_t out = init_comm(name, "send", _default_comm, NULL);
+  if (out.valid) {
+    flag = update_serializer(out.serializer, OBJ_SERI, NULL);
+  }
+  if (flag < 0) {
+    out.valid = 0;
+  }
+  return out;
+};
+
+/*!
+  @brief Constructor for obj input comm from an input channel.
+  @param[in] name constant character pointer to input channel name.
+  @returns comm_t input structure.
+ */
+static inline
+comm_t cisObjInput(const char *name) {
+  return init_comm(name, "recv", _default_comm, NULL);
+};
+
+
 #ifdef __cplusplus /* If this is a C++ compiler, end C linkage */
 }
 #endif
