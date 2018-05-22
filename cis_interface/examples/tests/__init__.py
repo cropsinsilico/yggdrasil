@@ -114,11 +114,7 @@ class TestExample(CisTestBase, tools.CisClass):
         r"""Check that the contents of a file are correct."""
         with open(fname, 'r') as fd:
             ocont = fd.read()
-        try:
-            nt.assert_equal(ocont, result)
-        except BaseException:
-            print('input: %s' % result)
-            print('output: %s' % ocont)
+        nt.assert_equal(ocont, result)
 
     def check_results(self):
         r"""This should be overridden with checks for the result."""
@@ -134,7 +130,7 @@ class TestExample(CisTestBase, tools.CisClass):
             if isinstance(res, tuple):
                 res[0](fout, *res[1:])
             else:
-                # self.check_file_size(fout, len(res))
+                self.check_file_size(fout, len(res))
                 self.check_file_contents(fout, res)
 
     def run_example(self):
