@@ -141,17 +141,17 @@ class ObjSerialize(PlySerialize):
         if 'vertices' in sargs:
             if not sargs.get('vertex_colors', []):
                 for v in sargs['vertices']:
-                    lines.append('v %f %f %f' % tuple(v))
+                    lines.append('v %6.4f %6.4f %6.4f' % tuple(v))
             else:
                 for i in range(len(sargs['vertices'])):
                     line = 'v'
-                    line += ' %f %f %f' % tuple(sargs['vertices'][i])
+                    line += ' %6.4f %6.4f %6.4f' % tuple(sargs['vertices'][i])
                     line += ' %d %d %d' % tuple(sargs['vertex_colors'][i])
                     lines.append(line)
         for v in sargs['normals']:
-            lines.append('vn %f %f %f' % tuple(v))
+            lines.append('vn %6.4f %6.4f %6.4f' % tuple(v))
         for v in sargs['texcoords']:
-            lines.append('vt %f %f' % tuple(v))
+            lines.append('vt %6.4f %6.4f' % tuple(v))
         # Faces
         add_ind = 0
         if zero_indexed:

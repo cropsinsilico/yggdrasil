@@ -307,12 +307,12 @@ class PlySerialize(DefaultSerialize):
                 v = args['vertices'][i]
                 c = args['vertex_colors'][i]
                 entry = tuple(list(v) + list(c))
-                lines.append('%f %f %f %d %d %d' % entry)
+                lines.append('%6.4f %6.4f %6.4f %d %d %d' % entry)
         else:
             for i in range(args.nvert):
                 v = args['vertices'][i]
                 entry = tuple(list(v))
-                lines.append('%f %f %f' % entry)
+                lines.append('%6.4f %6.4f %6.4f' % entry)
         for f in args.get('faces', []):
             nv = len(f)
             iline = '%d' % nv
