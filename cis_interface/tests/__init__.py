@@ -402,8 +402,8 @@ class IOInfo(object):
         self.obj_dict = copy.deepcopy(self.ply_dict)
         self.obj_dict.update(normals=copy.deepcopy(self.obj_dict['vertices']),
                              texcoords=[[1.0, 2.0], [2.0, 3.0], [3.0, 4.0], [5.0, 6.0]],
-                             face_normals=[[0, 1, None], None, None],
-                             face_texcoords=[[0, 1, None], None, None],
+                             face_normals=[[0, 1, 2], None, None],
+                             face_texcoords=[[0, 1, 2], None, None],
                              material='material')
         self.obj_dict['faces'].append([(0, 0, 0), (1, 1, 1), (2, 2, 2)])
         self.ply_dict = PlyDict(**self.ply_dict)

@@ -57,7 +57,48 @@ class PlyDict(dict):
         return mesh
 
     @classmethod
-    def from_scene(cls, scene, d=None, conversion=1.0):
+    def from_shape(cls, shape, d, conversion=1.0):
+        r"""Create a ply dictionary from a PlantGL shape and descritizer.
+
+        Args:
+            scene (openalea.plantgl.scene): Scene that should be descritized.
+            d (openalea.plantgl.descritizer): Descritizer.
+            conversion (float, optional): Conversion factor that should be
+                applied to the vertex positions. Defaults to 1.0.
+
+        """
+        iply = None
+        d.process(shape)
+        if d.result is not None:
+            iply = cls()
+            # Vertices
+            for p in d.result.pointList:
+                iply['vertices'].append([conversion * p.x,
+                                         conversion * p.y,
+                                         conversion * p.z])
+            # Colors
+            if d.result.colorPerVertex and d.result.colorList:
+                if d.result.isColorIndexListToDefault():
+                    for c in d.result.colorList:
+                        iply['vertex_colors'].append([c.red,
+                                                      c.green,
+                                                      c.blue])
+                else:  # pragma: debug
+                    raise Exception("Indexed vertex colors not supported.")
+            # elif not shape.appearance.isAmbientToDefault():
+            #     c = shape.appearance.ambient
+            #     icolor = [c.red, c.green, c.blue]
+            #     iply['vertex_colors'] += [icolor for p in d.result.pointList]
+            # Material
+            if (shape.appearance.name != shape.appearance.DEFAULT_MATERIAL.name):
+                iply['material'] = shape.appearance.name
+            # Faces
+            for i3 in d.result.indexList:
+                iply['faces'].append([i3[0], i3[1], i3[2]])
+        return iply
+
+    @classmethod
+    def from_scene(cls, scene, d=None, conversion=1.0, default_rgb=None):
         r"""Create a ply dictionary from a PlantGL scene and descritizer.
 
         Args:
@@ -66,6 +107,8 @@ class PlyDict(dict):
                 to openalea.plantgl.all.Tesselator.
             conversion (float, optional): Conversion factor that should be
                 applied to the vertex positions. Defaults to 1.0.
+            default_rgb (list, optional): Default color in RGB that should be
+                used for missing colors. Defaults to [0, 0, 0].
 
         """
         if d is None:
@@ -74,23 +117,94 @@ class PlyDict(dict):
         out = cls()
         for k, shapes in scene.todict().items():
             for shape in shapes:
-                # print(k, shape.name)
-                d.process(shape)
-                if d.result is None:
-                    continue
-                iply = cls()
-                c = shape.appearance.ambient
-                for p in d.result.pointList:
-                    iply['vertices'].append([conversion * p.x,
-                                             conversion * p.y,
-                                             conversion * p.z])
-                    iply['vertex_colors'].append([c.red, c.green, c.blue])
-                for i3 in d.result.indexList:
-                    iply['faces'].append([i3[0], i3[1], i3[2]])
-                out.append(iply)
-                # Clear descretizer to ensure no hold over verts/faces
+                d.clear()
+                iply = cls.from_shape(shape, d, conversion=conversion)
+                if iply is not None:
+                    out.append(iply, default_rgb=default_rgb)
                 d.clear()
         return out
+
+    def to_scene(self, conversion=1.0, name=None):
+        r"""Create a PlantGL scene from a Ply dictionary.
+
+        Args:
+            conversion (float, optional): Conversion factor that should be
+                applied to the vertices. Defaults to 1.0.
+            name (str, optional): Name that should be given to the created
+                PlantGL symbol. Defaults to None and is ignored.
+
+        Returns:
+        
+
+        """
+        import openalea.plantgl.all as pgl
+        smb_class, args, kwargs = self.to_geom_args(conversion=conversion,
+                                                    name=name)
+        smb = smb_class(*args, **kwargs)
+        if name is not None:
+            smb.setName(name)
+        if self.get('material', None) is not None:
+            mat = pgl.Material(self['material'])
+            shp = pgl.Shape(smb, mat)
+        else:
+            shp = pgl.Shape(smb)
+        if name is not None:
+            shp.setName(name)
+        scn = pgl.Scene([shp])
+        return scn
+
+    def to_geom_args(self, conversion=1.0, name=None):
+        r"""Get arguments for creating a PlantGL geometry.
+
+        Args:
+            conversion (float, optional): Conversion factor that should be
+                applied to the vertices. Defaults to 1.0.
+            name (str, optional): Name that should be given to the created
+                PlantGL symbol. Defaults to None and is ignored.
+
+        Returns:
+            tuple: Class, arguments and keyword arguments for PlantGL geometry.
+
+        """
+        import openalea.plantgl.all as pgl
+        kwargs = dict()
+        # Add vertices
+        obj_points = []
+        for v in self['vertices']:
+            xarr = conversion * np.array(v)
+            obj_points.append(pgl.Vector3(xarr[0], xarr[1], xarr[2]))
+        points = pgl.Point3Array(obj_points)
+        # Add indices
+        obj_indices = []
+        nind = None
+        index_class = pgl.Index3
+        array_class = pgl.Index3Array
+        smb_class = pgl.TriangleSet
+        for f in self['faces']:
+            if nind is None:
+                nind = len(f)
+                if nind == 3:
+                    pass
+                else:
+                    raise ValueError("No PlantGL class for faces with %d vertices."
+                                     % nind)
+            else:
+                if len(f) != nind:
+                    raise ValueError("Faces do not all contain %d vertices." % nind)
+            f_int = [int(_f) for _f in f]
+            obj_indices.append(index_class(*f_int))
+        indices = array_class(obj_indices)
+        # Add colors
+        if self['vertex_colors']:
+            obj_colors = []
+            for c in self['vertex_colors']:
+                assert(len(c) == 3)
+                obj_colors.append(pgl.Color4(c[0], c[1], c[2], 1))
+            colors = pgl.Color4Array(obj_colors)
+            kwargs['colorList'] = colors
+            kwargs['colorPerVertex'] = True
+        args = (points, indices)
+        return smb_class, args, kwargs
 
     def set_vertex_colors(self, default_rgb=None):
         r"""Set the vertex colors to a default if they are not yet set.
@@ -359,8 +473,7 @@ class PlySerialize(DefaultSerialize):
                             nvert = int(parts[2])
                         elif element == 'face':
                             nface = int(parts[2])
-                        continue
-                    if element == 'vertex':
+                    elif element == 'vertex':
                         if 'green' in lines[i]:
                             do_vertex_colors = True
             if (nvert is None) or (nface is None):  # pragma: debug
@@ -373,11 +486,10 @@ class PlySerialize(DefaultSerialize):
                 if len(values) > 0:
                     out['vertices'].append([x for x in map(float, values[:3])])
                     if do_vertex_colors:
+                        iclr = self.default_rgb
                         if len(values) >= 6:
-                            out['vertex_colors'].append(
-                                [x for x in map(int, values[3:])])
-                        else:
-                            out['vertex_colors'].append(self.default_rgb)
+                            iclr = [x for x in map(int, values[3:])]
+                        out['vertex_colors'].append(iclr)
                 i += 1
             while out.nface < nface:
                 values = lines[i].split()

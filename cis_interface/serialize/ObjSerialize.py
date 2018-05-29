@@ -69,11 +69,97 @@ class ObjDict(PlyDict):
                         out[k][i][j] = v[kindex]
         return out
 
+    @classmethod
+    def from_shape(cls, shape, d, conversion=1.0):
+        r"""Create a ply dictionary from a PlantGL shape and descritizer.
+
+        Args:
+            scene (openalea.plantgl.scene): Scene that should be descritized.
+            d (openalea.plantgl.descritizer): Descritizer.
+            conversion (float, optional): Conversion factor that should be
+                applied to the vertex positions. Defaults to 1.0.
+
+        """
+        iobj = super(ObjDict, cls).from_shape(shape, d, conversion=conversion)
+        if iobj is not None:
+            # Texcoords
+            if d.result.texCoordList:
+                for t in d.result.texCoordList:
+                    # TODO: Should the coords be scaled?
+                    iobj['texcoords'].append([t.x, t.y])
+                if d.result.texCoordIndexList:
+                    for t in d.result.texCoordIndexList:
+                        if t[0] < len(iobj['texcoords']):
+                            iobj['face_texcoords'].append([t[0], t[1], t[2]])
+                        else:
+                            iobj['face_texcoords'].append([None, None, None])
+            # Normals
+            if d.result.normalList:
+                for n in d.result.normalList:
+                    iobj['normals'].append([n.x, n.y, n.z])
+                if d.result.texCoordIndexList:
+                    for n in d.result.texCoordIndexList:
+                        if n[0] < len(iobj['normals']):
+                            iobj['face_normals'].append([n[0], n[1], n[2]])
+                        else:
+                            iobj['face_normals'].append([None, None, None])
+        return iobj
+
+    def to_geom_args(self, conversion=1.0, name=None):
+        r"""Get arguments for creating a PlantGL geometry.
+
+        Args:
+            conversion (float, optional): Conversion factor that should be
+                applied to the vertices. Defaults to 1.0.
+            name (str, optional): Name that should be given to the created
+                PlantGL symbol. Defaults to None and is ignored.
+
+        Returns:
+            tuple: Class, arguments and keyword arguments for PlantGL geometry.
+
+        """
+        import openalea.plantgl.all as pgl
+        smb_class, args, kwargs = super(ObjDict, self).to_geom_args(
+            conversion=conversion, name=name)
+        index_class = pgl.Index3
+        array_class = pgl.Index3Array
+        # Texture coords
+        if self.get('texcoords', []):
+            obj_texcoords = []
+            for t in self['texcoords']:
+                obj_texcoords.append(pgl.Vector2(t[0], t[1]))
+            kwargs['texCoordList'] = pgl.Point2Array(obj_texcoords)
+            if self.get('face_texcoords', []):
+                obj_ftexcoords = []
+                for t in self['face_texcoords']:
+                    if (t is not None) and (t[0] is not None):
+                        entry = [int(_t) for _t in t]
+                    else:
+                        entry = [len(self['texcoords']) for _ in range(3)]
+                    obj_ftexcoords.append(index_class(*entry))
+                kwargs['texCoordIndexList'] = array_class(obj_ftexcoords)
+        # Normals
+        if self.get('normals', []):
+            obj_normals = []
+            for n in self['normals']:
+                obj_normals.append(pgl.Vector3(n[0], n[1], n[2]))
+            kwargs['normalList'] = pgl.Point3Array(obj_normals)
+            if self.get('face_normals', []):
+                obj_fnormals = []
+                for n in self['face_normals']:
+                    if (n is not None) and (n[0] is not None):
+                        entry = [int(_n) for _n in n]
+                    else:
+                        entry = [len(self['normals']) for _ in range(3)]
+                    obj_fnormals.append(index_class(*entry))
+                kwargs['normalIndexList'] = array_class(obj_fnormals)
+        return smb_class, args, kwargs
+
     def append(self, solf, default_rgb=None):
         r"""Append new ply information to this dictionary.
 
         Args:
-            solf (PlyDict): Another ply to append to this one.
+            solf (ObjDict): Another ply to append to this one.
             default_rgb (list, optional): Default color in RGB that should be
                 used for missing colors. Defaults to [0, 0, 0].
 
@@ -196,14 +282,14 @@ class ObjSerialize(PlySerialize):
                     continue
                 if values[0] == 'v':
                     out['vertices'].append([x for x in map(float, values[1:4])])
+                    iclr = self.default_rgb
                     if len(values) == 7:
                         if not out['vertex_colors']:
                             out['vertex_colors'] = [self.default_rgb for
                                                     _ in range(nvert)]
-                        out['vertex_colors'].append([x for x in map(int, values[4:7])])
-                    else:
-                        if out['vertex_colors']:
-                            out['vertex_colors'].append(self.default_rgb)
+                        iclr = [x for x in map(int, values[4:7])]
+                    if out['vertex_colors']:
+                        out['vertex_colors'].append(iclr)
                     nvert += 1
                 elif values[0] == 'vn':
                     out['normals'].append([x for x in map(float, values[1:4])])
