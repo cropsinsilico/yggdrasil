@@ -256,6 +256,7 @@ class TestCommBase(CisTestClassInfo):
     def do_send_recv(self, send_meth='send', recv_meth='recv', msg_send=None,
                      n_msg_send_meth='n_msg_send', n_msg_recv_meth='n_msg_recv',
                      reverse_comms=False, send_kwargs=None, recv_kwargs=None,
+                     n_send=1, n_recv=1,
                      close_on_send_eof=None, close_on_recv_eof=None):
         r"""Generic send/recv of a message."""
         tkey = 'do_send_recv'
@@ -287,6 +288,11 @@ class TestCommBase(CisTestClassInfo):
             close_on_send_eof = send_instance.close_on_eof_send
         recv_instance.close_on_eof_recv = close_on_recv_eof
         send_instance.close_on_eof_send = close_on_send_eof
+        if self.comm == 'CommBundle':
+            for x in recv_instance.comm_list:
+                x.close_on_eof_recv = close_on_recv_eof
+            for x in send_instance.comm_list:
+                x.close_on_eof_send = close_on_send_eof
         fsend_meth = getattr(send_instance, send_meth)
         frecv_meth = getattr(recv_instance, recv_meth)
         if self.comm in ['CommBase', 'AsyncComm']:
@@ -299,25 +305,28 @@ class TestCommBase(CisTestClassInfo):
                                  self.test_msg)
                 nt.assert_raises(NotImplementedError, self.recv_instance._recv)
         else:
-            flag = fsend_meth(*send_args, **send_kwargs)
-            assert(flag)
-            # Wait for messages to be received
-            if not is_eof:
-                T = recv_instance.start_timeout(self.timeout, key_suffix=tkey)
-                while ((not T.is_out) and (not recv_instance.is_closed) and
-                       (getattr(recv_instance, n_msg_recv_meth) == 0)):  # pragma: debug
-                    recv_instance.sleep()
-                recv_instance.stop_timeout(key_suffix=tkey)
-                assert(getattr(recv_instance, n_msg_recv_meth) >= 1)
-                # IPC nolimit sends multiple messages
-                # nt.assert_equal(recv_instance.n_msg_recv, 1)
-            flag, msg_recv = frecv_meth(timeout=self.timeout, **recv_kwargs)
-            if is_eof and close_on_recv_eof:
-                assert(not flag)
-                assert(recv_instance.is_closed)
-            else:
+            for i in range(n_send):
+                flag = fsend_meth(*send_args, **send_kwargs)
                 assert(flag)
-            self.assert_msg_equal(msg_recv, msg_send)
+            # Wait for messages to be received
+            for i in range(n_recv):
+                if not is_eof:
+                    T = recv_instance.start_timeout(self.timeout, key_suffix=tkey)
+                    while ((not T.is_out) and (not recv_instance.is_closed) and
+                           (getattr(recv_instance,
+                                    n_msg_recv_meth) == 0)):  # pragma: debug
+                        recv_instance.sleep()
+                    recv_instance.stop_timeout(key_suffix=tkey)
+                    assert(getattr(recv_instance, n_msg_recv_meth) >= 1)
+                    # IPC nolimit sends multiple messages
+                    # nt.assert_equal(recv_instance.n_msg_recv, 1)
+                flag, msg_recv = frecv_meth(timeout=self.timeout, **recv_kwargs)
+                if is_eof and close_on_recv_eof:
+                    assert(not flag)
+                    assert(recv_instance.is_closed)
+                else:
+                    assert(flag)
+                self.assert_msg_equal(msg_recv, msg_send)
             # Wait for send to close
             if is_eof and close_on_send_eof:
                 T = send_instance.start_timeout(self.timeout, key_suffix=tkey)

@@ -1294,7 +1294,7 @@ class CommBase(tools.CisClass):
         return flag, msg, header
 
     def recv(self, *args, **kwargs):
-        r"""Receive a message shorter than CIS_MSG_MAX.
+        r"""Receive a message.
 
         Args:
             *args: All arguments are passed to comm _recv method.
