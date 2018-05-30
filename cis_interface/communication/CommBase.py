@@ -7,7 +7,7 @@ import pandas as pd
 from cis_interface import backwards, tools, serialize
 from cis_interface.tools import get_CIS_MSG_MAX, CIS_MSG_EOF
 from cis_interface.communication import (
-    new_comm, get_comm, get_comm_class)
+    new_comm, get_comm, get_comm_class, determine_suffix)
 
 
 _registered_servers = dict()
@@ -303,8 +303,9 @@ class CommBase(tools.CisClass):
         super(CommBase, self).__init__(name, **kwargs)
         if not self.__class__.is_installed():
             raise RuntimeError("Comm class %s not installed" % self.__class__)
-        suffix = self.__class__._determine_suffix(
-            no_suffix=no_suffix, reverse_names=reverse_names, direction=direction)
+        suffix = determine_suffix(no_suffix=no_suffix,
+                                  reverse_names=reverse_names,
+                                  direction=direction)
         self.name_base = name
         self.suffix = suffix
         self._name = name + suffix
@@ -357,6 +358,7 @@ class CommBase(tools.CisClass):
                                                name=self.name + '.ClosingThread')
         self._eof_recv = threading.Event()
         self._eof_sent = threading.Event()
+        self._field_backlog = dict()
         if self.single_use:
             self._eof_recv.set()
             self._eof_sent.set()
@@ -387,22 +389,6 @@ class CommBase(tools.CisClass):
                     serializer_kwargs[k] = kwargs.pop(k, None)
             self.serializer = serialize.get_serializer(**serializer_kwargs)
 
-    @classmethod
-    def _determine_suffix(cls, no_suffix=False, reverse_names=False,
-                          direction='send', **kwargs):
-        r"""Determine the suffix that should be used for the comm name."""
-        if direction not in ['send', 'recv']:
-            raise ValueError("Unrecognized message direction: %s" % direction)
-        if no_suffix:
-            suffix = ''
-        else:
-            if ((((direction == 'send') and (not reverse_names)) or
-                 ((direction == 'recv') and reverse_names))):
-                suffix = '_OUT'
-            else:
-                suffix = '_IN'
-        return suffix
-    
     @classmethod
     def is_installed(cls):
         r"""bool: Is the comm installed."""
@@ -716,6 +702,41 @@ class CommBase(tools.CisClass):
         r"""str: Message indicating EOF."""
         return backwards.unicode2bytes(CIS_MSG_EOF)
 
+    def is_eof(self, msg):
+        r"""Determine if a message is an EOF.
+
+        Args:
+            msg (obj): Message object to be tested.
+
+        Returns:
+            bool: True if the message indicates an EOF, False otherwise.
+
+        """
+        out = (isinstance(msg, backwards.bytes_type) and (msg == self.eof_msg))
+        return out
+    
+    @property
+    def empty_obj_recv(self):
+        r"""obj: Empty message object."""
+        emsg, _ = self.serializer.deserialize(self.empty_msg)
+        if (self.recv_converter is not None):
+            emsg = self.recv_converter(emsg)
+        return emsg
+
+    def is_empty_recv(self, msg):
+        r"""Check if a received message object is empty.
+
+        Args:
+            msg (obj): Message object.
+
+        Returns:
+            bool: True if the object is empty, False otherwise.
+
+        """
+        if self.is_eof(msg):
+            return False
+        return (msg == self.empty_obj_recv)
+    
     def chunk_message(self, msg):
         r"""Yield chunks of message of size maxMsgSize
 
@@ -1243,19 +1264,6 @@ class CommBase(tools.CisClass):
         else:
             return True
 
-    def is_eof(self, msg):
-        r"""Determine if a message is an EOF.
-
-        Args:
-            msg (obj): Message object to be tested.
-
-        Returns:
-            bool: True if the message indicates an EOF, False otherwise.
-
-        """
-        out = (isinstance(msg, backwards.bytes_type) and (msg == self.eof_msg))
-        return out
-    
     def on_recv(self, s_msg, second_pass=False):
         r"""Process raw received message including handling deserializing
         message and handling EOF.
@@ -1444,7 +1452,7 @@ class CommBase(tools.CisClass):
 
         """
         flag, msg = self.recv(*args, **kwargs)
-        if flag:
+        if flag and not self.is_eof(msg):
             if isinstance(msg, np.ndarray):
                 msg_dict = serialize.numpy2dict(msg)
             elif isinstance(msg, pd.DataFrame):
@@ -1461,7 +1469,39 @@ class CommBase(tools.CisClass):
         else:
             msg_dict = msg
         return flag, msg_dict
-        
+
+    # SEND/RECV FIELDS
+    # def recv_field(self, field, *args, **kwargs):
+    #     r"""Receive an entry for a single field.
+
+    #     Args:
+    #         field (str): Name of the field that should be received.
+    #         *args: All arguments are passed to recv method if there is not
+    #             an existing entry for the requested field.
+    #         **kwargs: All keyword arguments are passed to recv method if there
+    #             is not an existing entry for the requested field.
+
+    #     Returns:
+    #         tuple (bool, obj): Success or failure of receive and received
+    #             field entry.
+
+    #     """
+    #     flag = True
+    #     field_msg = self.empty_msg
+    #     if not self._field_backlog.get(field, []):
+    #         flag, msg = self.recv_dict(*args, **kwargs)
+    #         if self.is_eof(msg):
+    #             for k in self.fields:
+    #                 self._field_backlog.setdefault(k, [])
+    #                 self._field_backlog[k].append(msg)
+    #         elif not self.is_empty_recv(msg):
+    #             for k, v in msg.items():
+    #                 self._field_backlog.setdefault(k, [])
+    #                 self._field_backlog.append(v)
+    #     if self._field_backlog.get(field, []):
+    #         field_msg = self._field_backlog[field].pop(0)
+    #     return flag, field_msg
+
     # ALIASES
     def send_line(self, *args, **kwargs):
         r"""Alias for send."""

@@ -8,17 +8,17 @@ def get_comm_name(name, i):
     r"""Get the name of the ith comm in the series.
 
     Args:
-        name (str): Name of the bundle comm.
-        i (int): Index of comm in bundle.
+        name (str): Name of the fork comm.
+        i (int): Index of comm in fork bundle.
 
     Returns:
-        str: Name of ith comm in bundle.
+        str: Name of ith comm in fork bundle.
 
     """
     return '%s_%d' % (name, i)
 
 
-class CommBundle(CommBase.CommBase):
+class ForkComm(CommBase.CommBase):
     r"""Class for receiving/sending messages from/to multiple comms.
 
     Args:
@@ -29,7 +29,7 @@ class CommBundle(CommBase.CommBase):
         **kwargs: Additional keyword arguments are passed to the parent class.
 
     Attributes:
-        comm_list (list): Comms included in this bundle.
+        comm_list (list): Comms included in this fork.
         curr_comm_index (int): Index comm that next receive will be from.
 
     """
@@ -37,12 +37,12 @@ class CommBundle(CommBase.CommBase):
         self.comm_list = []
         self.curr_comm_index = 0
         self.eof_recv = []
-        super(CommBundle, self).__init__(name, **kwargs)
+        super(ForkComm, self).__init__(name, **kwargs)
 
     def _init_before_open(self, comm_kwargs=None, **kwargs):
         r"""Initialization steps that should be performed after base class, but
         before the comm is opened."""
-        super(CommBundle, self)._init_before_open(**kwargs)
+        super(ForkComm, self)._init_before_open(**kwargs)
         assert(not self.single_use)
         assert(not self.is_server)
         assert(not self.is_client)
@@ -101,7 +101,7 @@ class CommBundle(CommBase.CommBase):
             dict: Keyword arguments for opposite comm object.
 
         """
-        kwargs = super(CommBundle, self).opp_comm_kwargs()
+        kwargs = super(ForkComm, self).opp_comm_kwargs()
         kwargs['comm_kwargs'] = [x.opp_comm_kwargs() for x in self.comm_list]
         return kwargs
 
@@ -183,28 +183,6 @@ class CommBundle(CommBase.CommBase):
         r"""int: The number of outgoing messages in the connection to drain."""
         return sum([x.n_msg_send_drain for x in self.comm_list])
 
-    @property
-    def empty_obj_recv(self):
-        r"""obj: Empty message object."""
-        emsg, _ = self.serializer.deserialize(self.empty_msg)
-        if (self.recv_converter is not None):
-            emsg = self.recv_converter(emsg)
-        return emsg
-
-    def is_empty_recv(self, msg):
-        r"""Check if a received message object is empty.
-
-        Args:
-            msg (obj): Message object.
-
-        Returns:
-            bool: True if the object is empty, False otherwise.
-
-        """
-        if self.is_eof(msg):
-            return False
-        return (msg == self.empty_obj_recv)
-    
     def send(self, *args, **kwargs):
         r"""Send a message.
 
@@ -239,7 +217,7 @@ class CommBundle(CommBase.CommBase):
             timeout = self.recv_timeout
         kwargs['timeout'] = 0
         first_comm = True
-        T = self.start_timeout(timeout, key_suffix='recv:bundled')
+        T = self.start_timeout(timeout, key_suffix='recv:forkd')
         out = None
         while ((not T.is_out) or first_comm) and self.is_open and (out is None):
             for i in range(len(self)):
@@ -259,7 +237,7 @@ class CommBundle(CommBase.CommBase):
                 self.curr_comm_index += 1
             first_comm = False
             self.sleep()
-        self.stop_timeout(key_suffix='recv:bundled')
+        self.stop_timeout(key_suffix='recv:forkd')
         if out is None:
             if self.is_closed:
                 self.debug('Comm closed')
@@ -270,6 +248,6 @@ class CommBundle(CommBase.CommBase):
 
     def purge(self):
         r"""Purge all messages from the comm."""
-        super(CommBundle, self).purge()
+        super(ForkComm, self).purge()
         for x in self.comm_list:
             x.purge()

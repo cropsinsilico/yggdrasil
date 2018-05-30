@@ -1,11 +1,11 @@
 from cis_interface.communication.tests.test_CommBase import TestCommBase
 
 
-class TestCommBundle(TestCommBase):
-    r"""Tests for CommBase communication class."""
+class TestForkComm(TestCommBase):
+    r"""Tests for ForkComm communication class."""
     def __init__(self, *args, **kwargs):
-        super(TestCommBase, self).__init__(*args, **kwargs)
-        self.comm = 'CommBundle'
+        super(TestForkComm, self).__init__(*args, **kwargs)
+        self.comm = 'ForkComm'
         self.attr_list += ['comm_list', 'curr_comm_index']
         self.comm_list = [None, 'FileComm']
         self.comm_kwargs = [{'comm': x} for x in self.comm_list]
@@ -18,7 +18,7 @@ class TestCommBundle(TestCommBase):
     @property
     def send_inst_kwargs(self):
         r"""dict: Keyword arguments for send instance."""
-        out = super(TestCommBundle, self).send_inst_kwargs
+        out = super(TestForkComm, self).send_inst_kwargs
         out['comm_kwargs'] = self.comm_kwargs
         return out
 
@@ -37,5 +37,5 @@ class TestCommBundle(TestCommBase):
     def do_send_recv(self, *args, **kwargs):
         r"""Generic send/recv of a message."""
         if 'eof' not in kwargs.get('send_meth', 'None'):
-            kwargs['n_recv'] = len(self.comm_kwargs)
-        super(TestCommBundle, self).do_send_recv(*args, **kwargs)
+            kwargs['n_recv'] = len(self.comm_list)
+        super(TestForkComm, self).do_send_recv(*args, **kwargs)

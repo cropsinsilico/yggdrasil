@@ -2,6 +2,41 @@ import importlib
 from cis_interface import tools
 
 
+def determine_suffix(no_suffix=False, reverse_names=False,
+                     direction='send', **kwargs):
+    r"""Determine the suffix that should be used for the comm name.
+
+    Args:
+        no_suffix (bool, optional): If True, the suffix will be an empty
+            string. Defaults to False.
+        reverse_names (bool, optional): If True, the suffix will be
+            opposite that indicated by the direction. Defaults to False.
+        direction (str, optional): The direction that the comm will
+            processing messages. Defaults to 'send'.
+        **kwargs: Additional keyword arguments are ignored.
+
+    Returns:
+        str: Suffix that will be added to the comm name when producing
+            the name of the environment variable where information about
+            the comm will be stored.
+
+    Raises:
+        ValueError: If the direction is not 'recv' or 'send'.
+
+    """
+    if direction not in ['send', 'recv']:
+        raise ValueError("Unrecognized message direction: %s" % direction)
+    if no_suffix:
+        suffix = ''
+    else:
+        if ((((direction == 'send') and (not reverse_names)) or
+             ((direction == 'recv') and reverse_names))):
+            suffix = '_OUT'
+        else:
+            suffix = '_IN'
+    return suffix
+
+
 def get_comm_class(comm=None):
     r"""Return a communication class given it's name.
 
@@ -42,7 +77,7 @@ def get_comm(name, comm=None, new_comm_class=None, **kwargs):
         kwargs.setdefault('comm_kwargs', [{} for c in comm])
         for i, c in enumerate(comm):
             kwargs['comm_kwargs'].setdefault('comm', c)
-        comm = 'CommBundle'
+        comm = 'ForkComm'
     comm_cls = get_comm_class(comm)
     return comm_cls(name, **kwargs)
     
@@ -70,7 +105,7 @@ def new_comm(name, comm=None, **kwargs):
         kwargs.setdefault('comm_kwargs', [{} for c in comm])
         for i, c in enumerate(comm):
             kwargs['comm_kwargs'].setdefault('comm', c)
-        comm = 'CommBundle'
+        comm = 'ForkComm'
     comm_cls = get_comm_class(comm)
     return comm_cls.new_comm(name, **kwargs)
 

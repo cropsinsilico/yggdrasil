@@ -1,6 +1,5 @@
 from cis_interface import backwards, tools, serialize
 from cis_interface.communication import DefaultComm
-#    DefaultComm, RPCComm, ServerComm, ClientComm)
 
 
 CIS_MSG_MAX = tools.CIS_MSG_MAX

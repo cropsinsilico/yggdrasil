@@ -288,7 +288,7 @@ class TestCommBase(CisTestClassInfo):
             close_on_send_eof = send_instance.close_on_eof_send
         recv_instance.close_on_eof_recv = close_on_recv_eof
         send_instance.close_on_eof_send = close_on_send_eof
-        if self.comm == 'CommBundle':
+        if self.comm == 'ForkComm':
             for x in recv_instance.comm_list:
                 x.close_on_eof_recv = close_on_recv_eof
             for x in send_instance.comm_list:
