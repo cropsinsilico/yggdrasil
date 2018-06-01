@@ -1,0 +1,168 @@
+connections:
+  schema:
+    input:
+      excludes: input_file
+      required: true
+      type: string
+    input_file:
+      excludes: input
+      required: true
+      schema: &id003
+        append:
+          coerce: &id001 !str_to_bool {}
+          required: false
+          type: boolean
+        as_array: &id004
+          coerce: *id001
+          required: false
+          type: boolean
+        field_names: &id005
+          coerce: &id002 !str_to_list {}
+          required: false
+          schema:
+            type: string
+          type: list
+        field_units: &id006
+          coerce: *id002
+          required: false
+          schema:
+            type: string
+          type: list
+        filetype:
+          allowed:
+          - file
+          - file
+          - ascii
+          - table
+          - ply
+          - obj
+          - pandas
+          - file
+          required: true
+          type: string
+        format_str: &id007
+          required: false
+          type: string
+        in_temp:
+          coerce: *id001
+          required: false
+          type: boolean
+        is_series:
+          coerce: *id001
+          required: false
+          type: boolean
+        name: &id008
+          type: string
+        newline:
+          required: false
+          type: string
+        stype: &id009
+          coerce: !str_to_int {}
+          required: false
+          type: int
+        type: &id010
+          required: false
+          type: string
+        units: &id011
+          required: false
+          type: string
+    output:
+      excludes: output_file
+      required: true
+      type: string
+    output_file:
+      excludes: output
+      required: true
+      schema: *id003
+    translator:
+      coerce: !str_to_function {}
+      required: false
+      validator: !validate_function {}
+  type: list
+models:
+  schema:
+    args:
+      required: true
+      type: string
+    builddir:
+      dependencies:
+        language:
+        - cmake
+      required: false
+      type: string
+    client_of:
+      required: false
+      schema:
+        type: string
+      type: list
+    cmakeargs:
+      dependencies:
+        language:
+        - cmake
+      required: false
+      schema:
+        type: string
+      type: list
+    inputs:
+      required: false
+      schema: &id012
+        as_array: *id004
+        field_names: *id005
+        field_units: *id006
+        format_str: *id007
+        name: *id008
+        stype: *id009
+        type: *id010
+        units: *id011
+      type: list
+    is_server:
+      coerce: &id013 !str_to_bool {}
+      required: false
+      type: boolean
+    language:
+      allowed:
+      - executable
+      - matlab
+      - c
+      - c++
+      - cpp
+      - make
+      - lpy
+      - python
+      - cmake
+      required: true
+      type: string
+    name:
+      required: true
+      type: string
+    outputs:
+      required: false
+      schema: *id012
+      type: list
+    sourcedir:
+      dependencies:
+        language:
+        - cmake
+      required: false
+      type: string
+    strace_flags:
+      coerce: *id013
+      required: false
+      schema:
+        type: string
+      type: list
+    valgrind_flags:
+      coerce: *id013
+      required: false
+      schema:
+        type: string
+      type: list
+    with_strace:
+      coerce: *id013
+      required: false
+      type: boolean
+    with_valgrind:
+      coerce: *id013
+      required: false
+      type: boolean
+  type: list

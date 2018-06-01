@@ -8,6 +8,8 @@ from cis_interface import backwards, tools, serialize
 from cis_interface.tools import get_CIS_MSG_MAX, CIS_MSG_EOF
 from cis_interface.communication import (
     new_comm, get_comm, get_comm_class, determine_suffix)
+from cis_interface.yamlfile import (
+    register_component, str_to_list, str_to_bool, str_to_int)
 
 
 _registered_servers = dict()
@@ -191,7 +193,8 @@ class CommServer(tools.CisThreadLoop):
             self.terminate()
             _registered_servers.pop(self.srv_address)
 
-    
+
+@register_component
 class CommBase(tools.CisClass):
     r"""Class for handling I/O.
 
@@ -288,6 +291,22 @@ class CommBase(tools.CisClass):
         ValueError: If directions is not 'send' or 'recv'.
 
     """
+
+    _schema_type = 'io'
+    _schema = {'name': {'type': 'string'},
+               'type': {'type': 'string', 'required': False},  # TODO: add values
+               'units': {'type': 'string', 'required': False},  # TODO: add values
+               'format_str': {'type': 'string', 'required': False},
+               'as_array': {'type': 'boolean', 'required': False,
+                            'coerce': str_to_bool},
+               'field_names': {'type': 'list', 'required': False,
+                               'coerce': str_to_list,
+                               'schema': {'type': 'string'}},
+               'field_units': {'type': 'list', 'required': False,
+                               'coerce': str_to_list,
+                               'schema': {'type': 'string'}},  # TODO: coerce units
+               'stype': {'type': 'int', 'required': False,
+                         'coerce': str_to_int}}
 
     def __init__(self, name, address=None, direction='send',
                  dont_open=False, is_interface=False, recv_timeout=0.0,

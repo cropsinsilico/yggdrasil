@@ -1,3 +1,5 @@
+import os
+import glob
 import importlib
 from cis_interface import tools
 
@@ -127,6 +129,13 @@ def cleanup_comms(comm=None):
 
     """
     return get_comm_class(comm).cleanup_comms()
+
+
+def import_all_comms():
+    r"""Import all comms to ensure they are registered."""
+    for x in glob.glob(os.path.join(os.path.dirname(__file__), '*.py')):
+        if not x.startswith('__'):
+            get_comm_class(os.path.basename(x)[:-3])
 
 
 __all__ = ['new_comm', 'get_comm', 'get_comm_class', 'cleanup_comms',

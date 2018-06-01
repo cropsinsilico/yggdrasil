@@ -1,7 +1,9 @@
 from cis_interface import serialize, backwards
 from cis_interface.communication.FileComm import FileComm
+from cis_interface.yamlfile import register_component, inherit_schema
 
 
+@register_component
 class AsciiFileComm(FileComm):
     r"""Class for handling I/O from/to a file on disk.
 
@@ -17,6 +19,10 @@ class AsciiFileComm(FileComm):
         comment (str): String indicating a comment.
 
     """
+
+    _filetype = 'ascii'
+    _schema = inherit_schema(FileComm._schema, 'filetype', _filetype,
+                             comment={'type': 'string', 'required': False})
 
     def _init_before_open(self, comment=serialize._default_comment, **kwargs):
         r"""Get absolute path and set attributes."""

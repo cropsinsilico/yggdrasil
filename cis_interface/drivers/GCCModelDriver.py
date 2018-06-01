@@ -3,6 +3,7 @@ import logging
 from cis_interface import platform, tools
 from cis_interface.config import cis_cfg
 from cis_interface.drivers.ModelDriver import ModelDriver
+from cis_interface.yamlfile import register_component, inherit_schema
 
 
 _top_dir = os.path.normpath(os.path.join(os.path.dirname(__file__), '../'))
@@ -225,6 +226,7 @@ def do_compile(src, out=None, cc=None, ccflags=None, ldflags=None,
     return out
 
 
+@register_component
 class GCCModelDriver(ModelDriver):
     r"""Class for running gcc compiled drivers.
 
@@ -252,6 +254,10 @@ class GCCModelDriver(ModelDriver):
         RuntimeError: If the compilation fails.
 
     """
+
+    _language = ['c', 'c++', 'cpp']
+    _schema = inherit_schema(ModelDriver._schema, 'language', _language,
+                             cc={'type': 'string', 'required': False})
 
     def __init__(self, name, args, cc=None, **kwargs):
         super(GCCModelDriver, self).__init__(name, args, **kwargs)

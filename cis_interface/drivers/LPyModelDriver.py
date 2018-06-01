@@ -11,12 +11,14 @@ except ImportError:  # pragma: no lpy
     warning("Could not import openalea.lpy. " +
             "LPy support will be disabled.")
     lpy = None
+from cis_interface.yamlfile import register_component
 _lpy_installed = (lpy is not None)
 
 
 _model_script = os.path.join(os.path.dirname(__file__), 'lpy_model.py')
 
 
+@register_component
 class LPyModelDriver(ModelDriver):  # pragma: lpy
     r"""Class for running LPy models.
 
@@ -27,6 +29,8 @@ class LPyModelDriver(ModelDriver):  # pragma: lpy
             __init__ method.
 
     """
+
+    _language = 'lpy'
 
     def __init__(self, name, args, **kwargs):
         if not _lpy_installed:  # pragma: no lpy

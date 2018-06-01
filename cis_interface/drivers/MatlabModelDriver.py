@@ -13,6 +13,7 @@ except ImportError:  # pragma: no matlab
 from cis_interface.drivers.ModelDriver import ModelDriver
 from cis_interface import backwards, tools
 from cis_interface.tools import TimeOut, sleep
+from cis_interface.yamlfile import register_component
 
 
 _top_dir = os.path.normpath(os.path.join(os.path.dirname(__file__), '../'))
@@ -260,6 +261,7 @@ class MatlabProcess(tools.CisClass):  # pragma: matlab
         self.print_output()
 
 
+@register_component
 class MatlabModelDriver(ModelDriver):  # pragma: matlab
     r"""Base class for running Matlab models.
 
@@ -281,6 +283,8 @@ class MatlabModelDriver(ModelDriver):  # pragma: matlab
         RuntimeError: If Matlab is not installed.
 
     """
+
+    _language = 'matlab'
 
     def __init__(self, name, args, **kwargs):
         if not _matlab_installed:  # pragma: no matlab

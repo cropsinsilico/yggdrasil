@@ -1,6 +1,8 @@
 from cis_interface.communication import FileComm
+from cis_interface.yamlfile import register_component
 
 
+@register_component
 class AsciiMapComm(FileComm.FileComm):
     r"""Class for handling I/O from/to a ASCII map on disk.
 
@@ -9,6 +11,9 @@ class AsciiMapComm(FileComm.FileComm):
         **kwargs: Additional keywords arguments are passed to parent class.
 
     """
+
+    _schema_filetype = 'map'
+
     def __init__(self, name, **kwargs):
         kwargs.setdefault('readmeth', 'read')
         kwargs['serializer_kwargs'] = dict(stype=7)

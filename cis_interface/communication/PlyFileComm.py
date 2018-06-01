@@ -1,6 +1,8 @@
 from cis_interface.communication.FileComm import FileComm
+from cis_interface.yamlfile import register_component
 
 
+@register_component
 class PlyFileComm(FileComm):
     r"""Class for handling I/O from/to a .ply file on disk.
 
@@ -10,6 +12,9 @@ class PlyFileComm(FileComm):
         **kwargs: Additional keywords arguments are passed to parent class.
 
     """
+
+    _filetype = 'ply'
+
     def _init_before_open(self, serializer_kwargs=None, **kwargs):
         if serializer_kwargs is None:
             serializer_kwargs = {}

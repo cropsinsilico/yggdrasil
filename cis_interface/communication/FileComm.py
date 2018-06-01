@@ -2,8 +2,10 @@ import os
 import tempfile
 from cis_interface import backwards, platform, serialize
 from cis_interface.communication import CommBase
+from cis_interface.yamlfile import register_component, str_to_bool
 
 
+@register_component
 class FileComm(CommBase.CommBase):
     r"""Class for handling I/O from/to a file on disk.
 
@@ -45,6 +47,19 @@ class FileComm(CommBase.CommBase):
         ValueError: If the read_meth is not one of the supported values.
 
     """
+
+    _filetype = 'file'
+    _schema_type = 'file'
+    _schema = dict(CommBase.CommBase._schema,
+                   filetype={'type': 'string', 'required': True},
+                   append={'type': 'boolean', 'required': False,
+                           'coerce': str_to_bool},
+                   in_temp={'type': 'boolean', 'required': False,
+                            'coerce': str_to_bool},
+                   newline={'type': 'string', 'required': False},
+                   is_series={'type': 'boolean', 'required': False,
+                              'coerce': str_to_bool})
+
     def __init__(self, *args, **kwargs):
         kwargs.setdefault('close_on_eof_send', True)
         return super(FileComm, self).__init__(*args, **kwargs)

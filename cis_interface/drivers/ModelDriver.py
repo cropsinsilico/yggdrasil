@@ -9,8 +9,10 @@ try:
     from Queue import Queue, Empty
 except ImportError:
     from queue import Queue, Empty  # python 3.x
+from cis_interface.yamlfile import register_component, str_to_bool
 
 
+@register_component
 class ModelDriver(Driver):
     r"""Base class for Model drivers and for running executable based models.
 
@@ -54,6 +56,26 @@ class ModelDriver(Driver):
         RuntimeError: If both with_strace and with_valgrind are True.
 
     """
+
+    _language = 'executable'
+    _schema_type = 'model'
+    _schema = {'name': {'type': 'string', 'required': True},
+               'language': {'type': 'string', 'required': True},
+               'args': {'type': 'string', 'required': True},
+               'is_server': {'type': 'boolean', 'required': False,
+                             'coerce': str_to_bool},
+               'client_of': {'type': 'list', 'required': False,
+                             'schema': {'type': 'string'}},
+               'with_strace': {'type': 'boolean', 'required': False,
+                               'coerce': str_to_bool},
+               'strace_flags': {'type': 'list', 'required': False,
+                                'schema': {'type': 'string'},
+                                'coerce': str_to_bool},
+               'with_valgrind': {'type': 'boolean', 'required': False,
+                                 'coerce': str_to_bool},
+               'valgrind_flags': {'type': 'list', 'required': False,
+                                  'schema': {'type': 'string'},
+                                  'coerce': str_to_bool}}
 
     def __init__(self, name, args, is_server=False, client_of=[],
                  with_strace=False, strace_flags=None,

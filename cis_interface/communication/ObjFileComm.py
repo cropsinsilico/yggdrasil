@@ -1,6 +1,8 @@
 from cis_interface.communication.PlyFileComm import PlyFileComm
+from cis_interface.yamlfile import register_component
 
 
+@register_component
 class ObjFileComm(PlyFileComm):
     r"""Class for handling I/O from/to a .obj file on disk.
 
@@ -10,6 +12,9 @@ class ObjFileComm(PlyFileComm):
         **kwargs: Additional keywords arguments are passed to parent class.
 
     """
+
+    _filetype = 'obj'
+
     def _init_before_open(self, serializer_kwargs=None, **kwargs):
         if serializer_kwargs is None:
             serializer_kwargs = {}

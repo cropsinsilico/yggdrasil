@@ -1,4 +1,6 @@
 r"""IO and Model drivers."""
+import os
+import glob
 import importlib
 
 
@@ -39,6 +41,14 @@ def create_driver(driver=None, name=None, args=None, **kwargs):
     else:
         instance = class_(name, args, **kwargs)
     return instance
+
+
+def import_all_drivers():
+    r"""Import all drivers to ensure they are registered."""
+    for x in glob.glob(os.path.join(os.path.dirname(__file__), '*.py')):
+        xbase = os.path.basename(x)
+        if (not xbase.startswith('__')) and (xbase != 'lpy_model.py'):
+            import_driver(xbase[:-3])
 
 
 __all__ = ['import_driver', 'create_driver', 'Driver',

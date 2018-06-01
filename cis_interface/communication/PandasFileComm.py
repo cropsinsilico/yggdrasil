@@ -1,7 +1,9 @@
 from cis_interface import backwards, serialize
 from cis_interface.communication.FileComm import FileComm
+from cis_interface.yamlfile import register_component, inherit_schema
 
 
+@register_component
 class PandasFileComm(FileComm):
     r"""Class for handling I/O from/to a pandas csv file on disk.
 
@@ -13,6 +15,11 @@ class PandasFileComm(FileComm):
         **kwargs: Additional keywords arguments are passed to parent class.
 
     """
+
+    _filetype = 'pandas'
+    _schema = inherit_schema(FileComm._schema, 'filetype', _filetype,
+                             delimiter={'type': 'string', 'required': False})
+
     def _init_before_open(self, delimiter='\t', serializer_kwargs=None, **kwargs):
         r"""Set up dataio and attributes."""
         if serializer_kwargs is None:

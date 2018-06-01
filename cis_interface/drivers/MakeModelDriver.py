@@ -2,6 +2,7 @@ import os
 from cis_interface import tools, platform
 from cis_interface.drivers.ModelDriver import ModelDriver
 from cis_interface.drivers import GCCModelDriver
+from cis_interface.yamlfile import register_component, inherit_schema
 
 
 def setup_environ(compile_flags=[], linker_flags=[]):
@@ -19,6 +20,7 @@ def setup_environ(compile_flags=[], linker_flags=[]):
     os.environ['CISLDFLAGS'] = ' '.join(linker_flags + _linker_flags)
 
 
+@register_component
 class MakeModelDriver(ModelDriver):
     r"""Class for running make file compiled drivers. Before running the
     make command, the necessary compiler & linker flags for the interface's
@@ -51,6 +53,13 @@ class MakeModelDriver(ModelDriver):
         RuntimeError: If neither the IPC or ZMQ C libraries are available.
 
     """
+
+    _language = 'make'
+    _schema = inherit_schema(ModelDriver._schema, 'language', _language,
+                             make_command={'type': 'string', 'required': False},
+                             makefile={'type': 'string', 'required': False},
+                             makedir={'type': 'string', 'required': False})
+
     def __init__(self, name, args, make_command=None, makedir=None,
                  makefile=None, **kwargs):
         super(MakeModelDriver, self).__init__(name, args, **kwargs)

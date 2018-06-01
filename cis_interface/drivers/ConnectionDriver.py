@@ -1,11 +1,11 @@
 """Module for funneling messages from one comm to another."""
 import os
 import numpy as np
-import importlib
 import threading
 from cis_interface import backwards
 from cis_interface.communication import new_comm
 from cis_interface.drivers.Driver import Driver
+from cis_interface.yamlfile import str_to_function
 
 
 class ConnectionDriver(Driver):
@@ -55,16 +55,7 @@ class ConnectionDriver(Driver):
             ocomm_kws = dict()
         # Translator
         if isinstance(translator, str):
-            pkg_mod = translator.split(':')
-            if len(pkg_mod) == 2:
-                mod, fun = pkg_mod[:]
-            else:
-                raise ValueError("Could not parse translator string: %s" % translator)
-            modobj = importlib.import_module(mod)
-            if not hasattr(modobj, fun):
-                raise AttributeError("Module %s has no funciton %s" % (
-                    modobj, fun))
-            translator = getattr(modobj, fun)
+            translator = str_to_function(translator)
         if (translator is not None) and (not hasattr(translator, '__call__')):
             raise ValueError("Translator %s not callable." % translator)
         # Input communicator

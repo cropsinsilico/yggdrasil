@@ -4,6 +4,7 @@ import shutil
 from cis_interface import tools, backwards, platform
 from cis_interface.drivers.ModelDriver import ModelDriver
 from cis_interface.drivers import GCCModelDriver
+from cis_interface.yamlfile import register_component, inherit_schema
 
 
 _regex_win32_dir = GCCModelDriver._incl_regex
@@ -122,6 +123,7 @@ def create_include(fname, target, compile_flags=None, linker_flags=None):
             fd.write('\n'.join(lines))
 
 
+@register_component
 class CMakeModelDriver(ModelDriver):
     r"""Class for running cmake compiled drivers. Before running the
     cmake command, the cmake commands for setting the necessary compiler & linker
@@ -160,6 +162,14 @@ class CMakeModelDriver(ModelDriver):
         RuntimeError: If neither the IPC or ZMQ C libraries are available.
 
     """
+
+    _language = 'cmake'
+    _schema = inherit_schema(ModelDriver._schema, 'language', _language,
+                             sourcedir={'type': 'string', 'required': False},
+                             builddir={'type': 'string', 'required': False},
+                             cmakeargs={'type': 'list', 'required': False,
+                                        'schema': {'type': 'string'}})
+
     def __init__(self, name, args, sourcedir=None, builddir=None,
                  cmakeargs=None, preserve_cache=False, **kwargs):
         super(CMakeModelDriver, self).__init__(name, args, **kwargs)

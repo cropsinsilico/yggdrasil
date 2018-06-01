@@ -4,6 +4,7 @@
 import os
 import sys
 from cis_interface.drivers.ModelDriver import ModelDriver
+from cis_interface.yamlfile import register_component
 
 
 _top_dir = os.path.normpath(os.path.join(os.path.dirname(__file__), '../'))
@@ -11,6 +12,7 @@ _incl_interface = os.path.join(_top_dir, 'interface')
 _incl_io = os.path.join(_top_dir, 'io')
 
 
+@register_component
 class PythonModelDriver(ModelDriver):
     r"""Class for running Python models.
 
@@ -22,6 +24,8 @@ class PythonModelDriver(ModelDriver):
             __init__ method.
 
     """
+
+    _language = 'python'
 
     def __init__(self, name, args, **kwargs):
         super(PythonModelDriver, self).__init__(name, args, **kwargs)

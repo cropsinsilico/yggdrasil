@@ -1,7 +1,326 @@
 import os
+import copy
+import pprint
 import pystache
 import yaml
+import importlib
 from cis_interface import backwards
+from cis_interface.drivers import import_all_drivers
+from cis_interface.communication import import_all_comms
+
+
+_schema_fname = os.path.abspath(os.path.join(
+    os.path.dirname(__file__), '.cis_schema.yml'))
+_registered_languages = []
+_registered_models = {}
+_registered_io = {}
+_registered_filetypes = []
+_registered_files = {}
+_registered_connections = {}
+
+
+class CoerceClass(yaml.YAMLObject):
+    r"""Class for coercing strings to types in schema."""
+
+    yaml_loader = yaml.SafeLoader
+
+    def __init__(self, *args):
+        pass
+
+    def __call__(self, s):
+        return s
+
+    def __repr__(self):
+        return "%s()" % self.__class__.__name__
+
+    def __reduce__(self):
+        """Return state information for pickling"""
+        return self.__class__, tuple()
+
+    def __eq__(self, other):
+        return isinstance(other, self.__class__)
+
+
+class str_to_int_class(CoerceClass):
+    r"""Convert a string to an integer.
+
+    Args:
+        s (str): String to convert to an int.
+
+    Returns:
+        int: Integer conversion of the string.
+
+    """
+    yaml_tag = '!str_to_int'
+
+    def __call__(self, s):
+        return int(s)
+
+
+class str_to_bool_class(CoerceClass):
+    r"""Convert a string to a boolean.
+
+    Args:
+        s (str): String to convert to a bool.
+
+    Returns:
+        bool: Evaluation of if the string is True or False.
+
+    """
+    yaml_tag = '!str_to_bool'
+
+    def __call__(self, s):
+        return (s.lower() == 'true')
+
+
+class str_to_list_class(CoerceClass):
+    r"""Convert a comma separated string of values into a list.
+
+    Args:
+        s (str): String of comma separated values.
+
+    Returns:
+        list: List of values from string.
+
+    """
+    yaml_tag = '!str_to_list'
+
+    def __call__(self, s):
+        return s.split(',')
+
+
+class str_to_function_class(CoerceClass):
+    r"""Convert a string to a function.
+
+    Args:
+        s (str): String specifying function. The format should be
+            "<package.module>:<function>" so that <function> can be imported
+            from <package>.
+
+    Returns:
+        func: Callable function.
+
+    """
+    yaml_tag = '!str_to_function'
+
+    def __call__(self, s):
+        pkg_mod = s.split(':')
+        if len(pkg_mod) == 2:
+            mod, fun = pkg_mod[:]
+        else:
+            raise ValueError("Could not parse function string: %s" % s)
+        modobj = importlib.import_module(mod)
+        if not hasattr(modobj, fun):
+            raise AttributeError("Module %s has no funciton %s" % (
+                modobj, fun))
+        out = getattr(modobj, fun)
+        return out
+
+
+class validate_function_class(CoerceClass):
+    r"""Validate a value that should be a function."""
+    yaml_tag = '!validate_function'
+
+    def __call__(self, field, value, error):
+        if not hasattr(value, '__call__'):
+            error(field, "Functions must be callable.")
+
+
+str_to_int = str_to_int_class()
+str_to_bool = str_to_bool_class()
+str_to_list = str_to_list_class()
+str_to_function = str_to_function_class()
+validate_function = validate_function_class()
+
+
+def register_component(component_class):
+    r"""Decorator for registering a class as a yaml component."""
+    global _registered_languages, _registered_models, _registered_io
+    global _registered_filetypes, _registered_files
+    global _registered_connections
+    yaml_typ = component_class._schema_type
+    yaml_opt = component_class._schema
+    name = component_class.__class__
+    if yaml_typ == 'model':
+        if isinstance(component_class._language, list):
+            ilang = component_class._language
+        else:
+            ilang = [component_class._language]
+        _registered_languages += ilang
+        _registered_models[name] = yaml_opt
+    elif yaml_typ == 'io':
+        _registered_io[name] = yaml_opt
+    elif yaml_typ == 'file':
+        if isinstance(component_class._filetype, list):
+            ifile = component_class._filetype
+        else:
+            ifile = [component_class._filetype]
+        _registered_filetypes += ifile
+        _registered_files[name] = yaml_opt
+    elif yaml_typ == 'connection':
+        _registered_connections[name] = yaml_opt
+    return component_class
+
+
+def load_schema(fname):
+    r"""Load a schema of all the yaml options from a file.
+
+    Args:
+        fname (str): Full path to the file the schema should be loaded from.
+
+    Returns:
+        dict: cis_interface YAML options.
+
+    """
+    with open(fname, 'r') as f:
+        contents = f.read()
+        schema = yaml.safe_load(contents)
+    return schema
+
+
+def save_schema(fname, schema):
+    r"""Save a schema of all the yaml options to a file.
+
+    Args:
+        fname (str): Full path to the file the schema should be saved to.
+        schema (dict): cis_interface YAML options.
+
+    """
+    with open(fname, 'w') as f:
+        yaml.dump(schema, f, default_flow_style=False)
+
+
+def merge_schemas(schema_dict):
+    r"""Merge a set of schemas.
+
+    Args:
+        schema_dict (dict): Schemas to merge.
+
+    Returns:
+        dict: Merged schema.
+
+    """
+    out = {}
+    for x in schema_dict.values():
+        for k, v in x.items():
+            if k not in out:
+                out[k] = v
+            else:
+                diff = [ik for ik in set(v) - set(out[k])]
+                if (len(diff) == 0):
+                    pass
+                elif (len(diff) == 1) and (diff[0] == 'dependencies'):
+                    alldeps = {}
+                    deps = [out[k]['dependencies'], v['dependencies']]
+                    for idep in deps:
+                        for ik, iv in idep:
+                            if ik not in alldeps:
+                                alldeps[ik] = []
+                            if isinstance(iv, list):
+                                alldeps[ik] += iv
+                            else:
+                                alldeps[ik].append(iv)
+                    for ik in alldeps.keys():
+                        alldeps[ik] = list(set(alldeps[ik]))
+                    vcopy = copy.deecopy(v)
+                    vcopy['dependencies'] = alldeps
+                    out[k].update(**vcopy)
+                else:  # pragma: debug
+                    print('Existing:')
+                    pprint.pprint(out[k])
+                    print('New:')
+                    pprint.pprint(v)
+                    raise ValueError("Cannot merge schemas.")
+    return out
+
+
+def inherit_schema(orig, key, value, **kwargs):
+    r"""Create an inherited schema, adding new value to accepted ones for
+    dependencies.
+    
+    Args:
+        orig (dict): Schema that will be inherited.
+        key (str): Field that other fields are dependent on.
+        value (str): New value for key that dependent fields should accept.
+        **kwargs: Additional keyword arguments will be added to the schema
+            with dependency on the provided key/value pair.
+
+    Returns:
+        dict: New schema.
+
+    """
+    if isinstance(value, list):
+        value_list = value
+    else:
+        value_list = [value]
+    out = copy.deepcopy(orig)
+    for k in out.keys():
+        if ('dependencies' in out[k]) and (key in out[k]['dependencies']):
+            if not isinstance(out[k]['dependencies'][key], list):
+                out[k]['dependencies'][key] = [out[k]['dependencies'][key]]
+            out[k]['dependencies'][key] += value_list
+    for k, v in kwargs.items():
+        out[k] = v
+        out[k].setdefault('dependencies', {})
+        out[k]['dependencies'].setdefault(key, [])
+        out[k]['dependencies'][key] += value_list
+    out.update(**kwargs)
+    return out
+
+
+def create_schema():
+    r"""Create a schema of all of the yaml options."""
+    schema = {}
+    # Import all necessary classes to complete registry
+    import_all_drivers()
+    import_all_comms()
+    # IO
+    io_schema = merge_schemas(_registered_io)
+    # File
+    file_schema = merge_schemas(_registered_files)
+    file_schema['filetype']['allowed'] = _registered_filetypes
+    # Models
+    model_schema = merge_schemas(_registered_models)
+    model_schema['language']['allowed'] = _registered_languages
+    model_schema['inputs'] = {'type': 'list', 'required': False,
+                              'schema': io_schema}
+    model_schema['outputs'] = {'type': 'list', 'required': False,
+                               'schema': io_schema}
+    schema['models'] = {'type': 'list', 'schema': model_schema}
+    # Connections
+    conn_schema = {'input': {'type': 'string', 'required': True,
+                             'excludes': 'input_file'},
+                   'input_file': {'schema': file_schema, 'required': True,
+                                  'excludes': 'input'},
+                   'output': {'type': 'string', 'required': True,
+                              'excludes': 'output_file'},
+                   'output_file': {'schema': file_schema, 'required': True,
+                                   'excludes': 'output'},
+                   'translator': {'validator': validate_function,
+                                  'required': False,
+                                  'coerce': str_to_function}}
+    schema['connections'] = {'type': 'list', 'schema': conn_schema}
+    return schema
+
+
+def get_schema(fname=None):
+    r"""Return the cis_interface schema for YAML options.
+
+    Args:
+        fname (str, optional): Full path to the file that the schema should be
+            loaded from. If the file dosn't exist, it is created. Defaults to
+            _schema_fname.
+
+    Returns:
+        dict: cis_interface YAML options.
+
+    """
+    if fname is None:
+        fname = _schema_fname
+    if not os.path.isfile(fname):
+        schema = create_schema()
+        save_schema(fname, schema)
+    return load_schema(fname)
 
 
 def load_yaml(fname):

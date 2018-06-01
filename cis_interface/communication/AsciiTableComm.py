@@ -1,7 +1,10 @@
 from cis_interface import serialize, backwards
 from cis_interface.communication.AsciiFileComm import AsciiFileComm
+from cis_interface.yamlfile import (
+    register_component, str_to_bool, inherit_schema)
 
 
+@register_component
 class AsciiTableComm(AsciiFileComm):
     r"""Class for handling I/O from/to a file on disk.
 
@@ -17,6 +20,13 @@ class AsciiTableComm(AsciiFileComm):
         **kwargs: Additional keywords arguments are passed to parent class.
 
     """
+    
+    _filetype = 'table'
+    _schema = inherit_schema(AsciiFileComm._schema, 'filetype', _filetype,
+                             delimiter={'type': 'string', 'required': False},
+                             use_astropy={'type': 'boolean', 'required': False,
+                                          'coerce': str_to_bool})
+
     def _init_before_open(self, delimiter=None, use_astropy=False,
                           serializer_kwargs=None, **kwargs):
         r"""Set up dataio and attributes."""

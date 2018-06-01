@@ -1,7 +1,9 @@
 from cis_interface import backwards
 from cis_interface.communication import FileComm
+from cis_interface.yamlfile import register_component
 
 
+@register_component
 class PickleFileComm(FileComm.FileComm):
     r"""Class for handling I/O from/to a pickled file on disk.
 
@@ -10,6 +12,9 @@ class PickleFileComm(FileComm.FileComm):
         **kwargs: Additional keywords arguments are passed to parent class.
 
     """
+
+    _schema_filetype = 'pickle'
+
     def __init__(self, name, **kwargs):
         kwargs.setdefault('readmeth', 'read')
         kwargs['serializer_kwargs'] = dict(stype=4)
