@@ -9,8 +9,7 @@ try:
     from Queue import Queue, Empty
 except ImportError:
     from queue import Queue, Empty  # python 3.x
-from cis_interface.schema import (
-    register_component, str_to_bool, any_to_str)
+from cis_interface.schema import register_component
 
 
 @register_component
@@ -64,21 +63,16 @@ class ModelDriver(Driver):
                'language': {'type': 'string', 'required': True},
                'working_dir': {'type': 'string', 'required': True},
                'args': {'type': ['list', 'string'], 'required': True,
-                        'schema': {'type': 'string', 'coerce': any_to_str}},
-               'is_server': {'type': 'boolean', 'required': False,
-                             'coerce': str_to_bool},
+                        'schema': {'type': 'string'}},
+               'is_server': {'type': 'boolean', 'required': False},
                'client_of': {'type': 'list', 'required': False,
                              'schema': {'type': 'string'}},
-               'with_strace': {'type': 'boolean', 'required': False,
-                               'coerce': str_to_bool},
+               'with_strace': {'type': 'boolean', 'required': False},
                'strace_flags': {'type': 'list', 'required': False,
-                                'schema': {'type': 'string'},
-                                'coerce': str_to_bool},
-               'with_valgrind': {'type': 'boolean', 'required': False,
-                                 'coerce': str_to_bool},
+                                'schema': {'type': 'string'}},
+               'with_valgrind': {'type': 'boolean', 'required': False},
                'valgrind_flags': {'type': 'list', 'required': False,
-                                  'schema': {'type': 'string'},
-                                  'coerce': str_to_bool}}
+                                  'schema': {'type': 'string'}}}
 
     def __init__(self, name, args, is_server=False, client_of=[],
                  with_strace=False, strace_flags=None,

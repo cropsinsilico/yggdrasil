@@ -1,7 +1,6 @@
 from cis_interface import serialize, backwards
 from cis_interface.communication.AsciiFileComm import AsciiFileComm
-from cis_interface.schema import (
-    register_component, str_to_bool, inherit_schema)
+from cis_interface.schema import register_component, inherit_schema
 
 
 @register_component
@@ -24,8 +23,7 @@ class AsciiTableComm(AsciiFileComm):
     _filetype = 'table'
     _schema = inherit_schema(AsciiFileComm._schema, 'filetype', _filetype,
                              delimiter={'type': 'string', 'required': False},
-                             use_astropy={'type': 'boolean', 'required': False,
-                                          'coerce': str_to_bool})
+                             use_astropy={'type': 'boolean', 'required': False})
 
     def _init_before_open(self, delimiter=None, use_astropy=False,
                           serializer_kwargs=None, **kwargs):

@@ -1,37 +1,33 @@
 comm:
-  as_array: &id003
-    coerce: &id002 !str_to_bool {}
+  as_array: &id001
     required: false
     type: boolean
-  field_names: &id004
-    coerce: &id001 !str_to_list {}
+  field_names: &id002
     required: false
     schema:
       type: string
     type: list
-  field_units: &id005
-    coerce: *id001
+  field_units: &id003
     required: false
     schema:
       type: string
     type: list
-  format_str: &id006
+  format_str: &id004
     required: false
     type: string
-  name: &id007
+  name: &id005
     required: true
     type: string
-  onexit: &id008
+  onexit: &id006
     required: false
     type: string
-  stype: &id009
-    coerce: !str_to_int {}
+  stype: &id007
     required: false
     type: integer
-  type: &id010
+  type: &id008
     required: false
     type: string
-  units: &id011
+  units: &id009
     required: false
     type: string
 comm_schema_subtypes:
@@ -49,71 +45,64 @@ connection:
     excludes: input
     required: true
     schema:
-      append: &id012
-        coerce: *id002
-        default: false
+      append: &id010
         required: false
         type: boolean
-      as_array: *id003
-      comment: &id013
+      as_array: *id001
+      comment: &id011
         dependencies:
           filetype:
-          - table
           - ascii
+          - table
         required: false
         type: string
-      delimiter: &id014
+      delimiter: &id012
         dependencies:
           filetype:
           - table
           - pandas
         required: false
         type: string
-      field_names: *id004
-      field_units: *id005
-      filetype: &id015
+      field_names: *id002
+      field_units: *id003
+      filetype: &id013
         allowed:
-        - map
-        - obj
-        - binary
-        - pickle
-        - ply
         - table
+        - pickle
+        - obj
         - ascii
+        - binary
         - pandas
+        - map
+        - ply
         default: binary
         required: false
         type: string
-      format_str: *id006
-      in_temp: &id016
-        coerce: *id002
-        default: false
+      format_str: *id004
+      in_temp: &id014
         required: false
         type: boolean
-      is_series: &id017
-        coerce: *id002
-        default: false
+      is_series: &id015
         required: false
         type: boolean
-      name: *id007
-      newline: &id018
+      name: *id005
+      newline: &id016
         default: '
 
           '
         required: false
         type: string
-      onexit: *id008
-      stype: *id009
-      type: *id010
-      units: *id011
-      use_astropy: &id019
-        coerce: *id002
+      onexit: *id006
+      stype: *id007
+      type: *id008
+      units: *id009
+      use_astropy: &id017
         dependencies:
           filetype:
           - table
         required: false
         type: boolean
-      working_dir: &id020
+      working_dir: &id018
         required: true
         type: string
     type: dict
@@ -125,29 +114,32 @@ connection:
     excludes: output
     required: true
     schema:
-      append: *id012
-      as_array: *id003
-      comment: *id013
-      delimiter: *id014
-      field_names: *id004
-      field_units: *id005
-      filetype: *id015
-      format_str: *id006
-      in_temp: *id016
-      is_series: *id017
-      name: *id007
-      newline: *id018
-      onexit: *id008
-      stype: *id009
-      type: *id010
-      units: *id011
-      use_astropy: *id019
-      working_dir: *id020
+      append: *id010
+      as_array: *id001
+      comment: *id011
+      delimiter: *id012
+      field_names: *id002
+      field_units: *id003
+      filetype: *id013
+      format_str: *id004
+      in_temp: *id014
+      is_series: *id015
+      name: *id005
+      newline: *id016
+      onexit: *id006
+      stype: *id007
+      type: *id008
+      units: *id009
+      use_astropy: *id017
+      working_dir: *id018
     type: dict
   translator:
-    coerce: !str_to_function {}
     required: false
-    validator: !validate_function {}
+    schema:
+      type: function
+    type:
+    - function
+    - list
 connection_schema_subtypes:
   AsciiFileInputDriver:
   - !!python/tuple
@@ -255,24 +247,24 @@ connection_schema_subtypes:
     - RMQComm
     - output
 file:
-  append: *id012
-  as_array: *id003
-  comment: *id013
-  delimiter: *id014
-  field_names: *id004
-  field_units: *id005
-  filetype: *id015
-  format_str: *id006
-  in_temp: *id016
-  is_series: *id017
-  name: *id007
-  newline: *id018
-  onexit: *id008
-  stype: *id009
-  type: *id010
-  units: *id011
-  use_astropy: *id019
-  working_dir: *id020
+  append: *id010
+  as_array: *id001
+  comment: *id011
+  delimiter: *id012
+  field_names: *id002
+  field_units: *id003
+  filetype: *id013
+  format_str: *id004
+  in_temp: *id014
+  is_series: *id015
+  name: *id005
+  newline: *id016
+  onexit: *id006
+  stype: *id007
+  type: *id008
+  units: *id009
+  use_astropy: *id017
+  working_dir: *id018
 file_schema_subtypes:
   AsciiFileComm:
   - ascii
@@ -295,7 +287,6 @@ model:
   args:
     required: true
     schema:
-      coerce: !any_to_str {}
       type: string
     type:
     - list
@@ -331,32 +322,31 @@ model:
     required: false
     schema:
       schema:
-        as_array: *id003
-        field_names: *id004
-        field_units: *id005
-        format_str: *id006
-        name: *id007
-        onexit: *id008
-        stype: *id009
-        type: *id010
-        units: *id011
+        as_array: *id001
+        field_names: *id002
+        field_units: *id003
+        format_str: *id004
+        name: *id005
+        onexit: *id006
+        stype: *id007
+        type: *id008
+        units: *id009
       type: dict
     type: list
   is_server:
-    coerce: *id002
     required: false
     type: boolean
   language:
     allowed:
-    - c
-    - cmake
-    - lpy
-    - python
-    - make
     - executable
-    - c++
-    - matlab
+    - python
     - cpp
+    - lpy
+    - matlab
+    - cmake
+    - c
+    - make
+    - c++
     required: true
     type: string
   make_command:
@@ -384,15 +374,15 @@ model:
     required: false
     schema:
       schema:
-        as_array: *id003
-        field_names: *id004
-        field_units: *id005
-        format_str: *id006
-        name: *id007
-        onexit: *id008
-        stype: *id009
-        type: *id010
-        units: *id011
+        as_array: *id001
+        field_names: *id002
+        field_units: *id003
+        format_str: *id004
+        name: *id005
+        onexit: *id006
+        stype: *id007
+        type: *id008
+        units: *id009
       type: dict
     type: list
   sourcedir:
@@ -402,23 +392,19 @@ model:
     required: false
     type: string
   strace_flags:
-    coerce: *id002
     required: false
     schema:
       type: string
     type: list
   valgrind_flags:
-    coerce: *id002
     required: false
     schema:
       type: string
     type: list
   with_strace:
-    coerce: *id002
     required: false
     type: boolean
   with_valgrind:
-    coerce: *id002
     required: false
     type: boolean
   working_dir:

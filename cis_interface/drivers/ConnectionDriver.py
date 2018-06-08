@@ -5,8 +5,7 @@ import threading
 from cis_interface import backwards
 from cis_interface.communication import new_comm, get_comm_class
 from cis_interface.drivers.Driver import Driver
-from cis_interface.schema import (
-    register_component, str_to_function, validate_function)
+from cis_interface.schema import register_component, str_to_function
 
 
 @register_component
@@ -65,8 +64,8 @@ class ConnectionDriver(Driver):
                           'excludes': 'output_file'},
                'output_file': {'type': 'dict', 'required': True,
                                'excludes': 'output'},
-               'translator': {'validator': validate_function,
-                              'coerce': str_to_function,
+               'translator': {'type': ['function', 'list'],
+                              'schema': {'type': 'function'},
                               'required': False}}
     _is_input = False
     _is_output = False

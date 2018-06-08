@@ -8,8 +8,7 @@ from cis_interface import backwards, tools, serialize
 from cis_interface.tools import get_CIS_MSG_MAX, CIS_MSG_EOF
 from cis_interface.communication import (
     new_comm, get_comm, get_comm_class, determine_suffix)
-from cis_interface.schema import (
-    register_component, str_to_list, str_to_bool, str_to_int)
+from cis_interface.schema import register_component
 
 
 _registered_servers = dict()
@@ -298,16 +297,12 @@ class CommBase(tools.CisClass):
                'type': {'type': 'string', 'required': False},  # TODO: add values
                'units': {'type': 'string', 'required': False},  # TODO: add values
                'format_str': {'type': 'string', 'required': False},
-               'as_array': {'type': 'boolean', 'required': False,
-                            'coerce': str_to_bool},
+               'as_array': {'type': 'boolean', 'required': False},
                'field_names': {'type': 'list', 'required': False,
-                               'coerce': str_to_list,
                                'schema': {'type': 'string'}},
                'field_units': {'type': 'list', 'required': False,
-                               'coerce': str_to_list,
                                'schema': {'type': 'string'}},  # TODO: coerce units
-               'stype': {'type': 'integer', 'required': False,
-                         'coerce': str_to_int},
+               'stype': {'type': 'integer', 'required': False},
                'onexit': {'type': 'string', 'required': False}}
 
     def __init__(self, name, address=None, direction='send',

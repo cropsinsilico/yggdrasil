@@ -3,7 +3,9 @@ import copy
 import pprint
 import importlib
 import yaml
+import types
 import cerberus
+import collections
 from cis_interface.drivers import import_all_drivers
 from cis_interface.communication import import_all_comms
 
@@ -128,6 +130,87 @@ def get_schema(fname=None):
     else:
         out = load_schema(fname)
     return out
+
+
+function_type = cerberus.TypeDefinition('function', types.FunctionType, ())
+
+
+def str_to_function(value):
+    r"""Convert a string to a function.
+
+    Args:
+        value (str, list): String or list of strings, specifying function(s).
+            The format should be "<package.module>:<function>" so that
+            <function> can be imported from <package>.
+
+    Returns:
+        func: Callable function.
+
+    """
+    if isinstance(value, list):
+        single = False
+        vlist = value
+    else:
+        single = True
+        vlist = [value]
+    out = []
+    for s in vlist:
+        if isinstance(s, str):
+            pkg_mod = s.split(':')
+            if len(pkg_mod) == 2:
+                mod, fun = pkg_mod[:]
+            else:
+                raise ValueError("Could not parse function string: %s" % s)
+            modobj = importlib.import_module(mod)
+            if not hasattr(modobj, fun):
+                raise AttributeError("Module %s has no funciton %s" % (
+                    modobj, fun))
+            out.append(getattr(modobj, fun))
+        elif hasattr(s, '__call__'):
+            out.append(s)
+        else:
+            raise TypeError("Cannot coerce type %s to function" % s)
+    if single:
+        out = out[0]
+    return out
+
+
+class SchemaValidator(cerberus.Validator):
+    r"""Class for validating the schema."""
+
+    types_mapping = cerberus.Validator.types_mapping.copy()
+    types_mapping['function'] = function_type
+
+    def _resolve_rules_set(self, *args, **kwargs):
+        rules = super(SchemaValidator, self)._resolve_rules_set(*args, **kwargs)
+        if isinstance(rules, collections.Mapping):
+            t = rules.get('type', None)
+            if t in ['string', 'integer', 'boolean', 'list', 'function']:
+                rules['coerce'] = t
+        return rules
+
+    def _normalize_coerce_string(self, value):
+        return str(value)
+
+    def _normalize_coerce_integer(self, value):
+        return int(value)
+
+    def _normalize_coerce_boolean(self, value):
+        if isinstance(value, str):
+            return (value.lower() == 'true')
+        else:
+            return bool(value)
+
+    def _normalize_coerce_list(self, value):
+        if isinstance(value, str):
+            return [v.strip() for v in value.split(',')]
+        elif isinstance(value, list):
+            return value
+        else:
+            raise TypeError("Cannot coerce type %s to list." % type(value))
+
+    def _normalize_coerce_function(self, value):
+        return str_to_function(value)
 
 
 class ComponentSchema(dict):
@@ -274,7 +357,7 @@ class SchemaRegistry(dict):
                     if k == 'connection':
                         subtype = (x._icomm_type, x._ocomm_type, x.direction())
                     comp[k].append(x, subtype=subtype)
-                    cerberus.Validator(comp[k])
+                    SchemaValidator(comp[k])
             # Add lists of required properties
             comp['file']['filetype']['allowed'] = comp['file'].subtypes
             comp['model']['language']['allowed'] = comp['model'].subtypes
@@ -288,7 +371,7 @@ class SchemaRegistry(dict):
             comp['connection']['output_file']['schema'] = comp['file']
             # Make sure final versions are valid schemas
             for x in comp.values():
-                cerberus.Validator(x)
+                SchemaValidator(x)
         super(SchemaRegistry, self).__init__(**comp)
 
     @classmethod
@@ -378,7 +461,7 @@ class SchemaRegistry(dict):
                'connections': {'type': 'list',
                                'schema': {'type': 'dict',
                                           'schema': self['connection']}}}
-        return cerberus.Validator(out)
+        return SchemaValidator(out)
 
 
 class SchemaLoader(yaml.SafeLoader):
@@ -415,162 +498,3 @@ SchemaDumper.add_representer(ComponentSchema,
                              SchemaDumper.represent_ComponentSchema)
 SchemaDumper.add_representer(SchemaRegistry,
                              SchemaDumper.represent_SchemaRegistry)
-
-
-class CoerceClass(yaml.YAMLObject):
-    r"""Class for coercing strings to types in schema."""
-
-    yaml_loader = SchemaLoader
-    yaml_dumper = SchemaDumper
-
-    def __init__(self, *args):
-        pass
-
-    def __call__(self, s):
-        return s
-
-    def __repr__(self):
-        return "%s()" % self.__class__.__name__
-
-    def __reduce__(self):
-        """Return state information for pickling"""
-        return self.__class__, tuple()
-
-    def __eq__(self, other):
-        return (type(other) == type(self))
-
-    def __ne__(self, other):
-        return not (self == other)
-
-
-class any_to_str_class(CoerceClass):
-    r"""Convert any variable to a string using str().
-
-    Args:
-        s (obj): Object to convert to a string.
-
-    Returns:
-        str: String version of the input object.
-
-    """
-    yaml_tag = '!any_to_str'
-
-    def __call__(self, s):
-        return str(s)
-
-
-class str_to_int_class(CoerceClass):
-    r"""Convert a string to an integer.
-
-    Args:
-        s (str): String to convert to an int.
-
-    Returns:
-        int: Integer conversion of the string.
-
-    """
-    yaml_tag = '!str_to_int'
-
-    def __call__(self, s):
-        return int(s)
-
-
-class str_to_bool_class(CoerceClass):
-    r"""Convert a string to a boolean.
-
-    Args:
-        s (str): String to convert to a bool.
-
-    Returns:
-        bool: Evaluation of if the string is True or False.
-
-    """
-    yaml_tag = '!str_to_bool'
-
-    def __call__(self, s):
-        if isinstance(s, str):
-            return (s.lower() == 'true')
-        else:
-            return bool(s)
-
-
-class str_to_list_class(CoerceClass):
-    r"""Convert a comma separated string of values into a list.
-
-    Args:
-        s (str): String of comma separated values.
-
-    Returns:
-        list: List of values from string.
-
-    """
-    yaml_tag = '!str_to_list'
-
-    def __call__(self, s):
-        if isinstance(s, str):
-            return s.split(',')
-        elif isinstance(s, list):
-            return s
-        else:
-            raise TypeError("Cannot coerce type %s to list." % type(s))
-
-
-class str_to_function_class(CoerceClass):
-    r"""Convert a string to a function.
-
-    Args:
-        s (str): String specifying function. The format should be
-            "<package.module>:<function>" so that <function> can be imported
-            from <package>.
-
-    Returns:
-        func: Callable function.
-
-    """
-    yaml_tag = '!str_to_function'
-
-    def __call__(self, slist):
-        single = False
-        if not isinstance(slist, list):
-            single = True
-            slist = [slist]
-        out = []
-        for s in slist:
-            if isinstance(s, str):
-                pkg_mod = s.split(':')
-                if len(pkg_mod) == 2:
-                    mod, fun = pkg_mod[:]
-                else:
-                    raise ValueError("Could not parse function string: %s" % s)
-                modobj = importlib.import_module(mod)
-                if not hasattr(modobj, fun):
-                    raise AttributeError("Module %s has no funciton %s" % (
-                        modobj, fun))
-                out.append(getattr(modobj, fun))
-            elif hasattr(s, '__call__'):
-                out.append(s)
-            else:
-                raise TypeError("Cannot coerce type %s to function" % s)
-        if single:
-            out = out[0]
-        return out
-
-
-class validate_function_class(CoerceClass):
-    r"""Validate a value that should be a function."""
-    yaml_tag = '!validate_function'
-
-    def __call__(self, field, value, error):
-        if not isinstance(value, list):
-            value = [value]
-        for v in value:
-            if not hasattr(v, '__call__'):
-                error(field, "Functions must be callable.")
-
-
-any_to_str = any_to_str_class()
-str_to_int = str_to_int_class()
-str_to_bool = str_to_bool_class()
-str_to_list = str_to_list_class()
-str_to_function = str_to_function_class()
-validate_function = validate_function_class()

@@ -2,7 +2,7 @@ import os
 import tempfile
 from cis_interface import backwards, platform, serialize
 from cis_interface.communication import CommBase
-from cis_interface.schema import register_component, str_to_bool
+from cis_interface.schema import register_component
 
 
 @register_component
@@ -54,14 +54,12 @@ class FileComm(CommBase.CommBase):
                    working_dir={'type': 'string', 'required': True},
                    filetype={'type': 'string', 'required': False,
                              'default': _filetype},
-                   append={'type': 'boolean', 'required': False,
-                           'coerce': str_to_bool},
-                   in_temp={'type': 'boolean', 'required': False,
-                            'coerce': str_to_bool},
+                   append={'type': 'boolean', 'required': False},
+                   in_temp={'type': 'boolean', 'required': False},
                    newline={'type': 'string', 'required': False,
-                            'default': serialize._default_newline},
-                   is_series={'type': 'boolean', 'required': False,
-                              'coerce': str_to_bool})
+                            'default': backwards.bytes2unicode(
+                                serialize._default_newline)},
+                   is_series={'type': 'boolean', 'required': False})
 
     def __init__(self, *args, **kwargs):
         kwargs.setdefault('close_on_eof_send', True)
