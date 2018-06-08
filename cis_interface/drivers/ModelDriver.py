@@ -9,7 +9,8 @@ try:
     from Queue import Queue, Empty
 except ImportError:
     from queue import Queue, Empty  # python 3.x
-from cis_interface.yamlfile import register_component, str_to_bool
+from cis_interface.schema import (
+    register_component, str_to_bool, any_to_str)
 
 
 @register_component
@@ -61,7 +62,9 @@ class ModelDriver(Driver):
     _schema_type = 'model'
     _schema = {'name': {'type': 'string', 'required': True},
                'language': {'type': 'string', 'required': True},
-               'args': {'type': 'string', 'required': True},
+               'working_dir': {'type': 'string', 'required': True},
+               'args': {'type': ['list', 'string'], 'required': True,
+                        'schema': {'type': 'string', 'coerce': any_to_str}},
                'is_server': {'type': 'boolean', 'required': False,
                              'coerce': str_to_bool},
                'client_of': {'type': 'list', 'required': False,
@@ -137,7 +140,7 @@ class ModelDriver(Driver):
             pre_args += ['valgrind'] + self.valgrind_flags
         # print(pre_args + self.args)
         self.model_process = tools.CisPopen(pre_args + self.args, env=env,
-                                            cwd=self.workingDir,
+                                            cwd=self.working_dir,
                                             forward_signals=False,
                                             shell=platform._is_win)
         # Start thread to queue output
@@ -172,7 +175,7 @@ class ModelDriver(Driver):
     def before_loop(self):
         r"""Actions before loop."""
         self.debug('Running %s from %s with cwd %s and env %s',
-                   self.args, os.getcwd(), self.workingDir, pformat(self.env))
+                   self.args, os.getcwd(), self.working_dir, pformat(self.env))
 
     def run_loop(self):
         r"""Loop to check if model is still running and forward output."""

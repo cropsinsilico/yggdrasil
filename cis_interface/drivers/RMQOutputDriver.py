@@ -1,7 +1,9 @@
 """Module for sending output to a RabbitMQ server."""
 from cis_interface.drivers.OutputDriver import OutputDriver
+from cis_interface.schema import register_component
 
 
+@register_component
 class RMQOutputDriver(OutputDriver):
     r"""Driver for sending output to a RabbitMQ server.
 
@@ -13,11 +15,10 @@ class RMQOutputDriver(OutputDriver):
         **kwargs: Additional keyword arguments are passed to parent class.
 
     """
+
+    _ocomm_type = 'RMQComm'
     
     def __init__(self, name, args, **kwargs):
-        # icomm_kws = kwargs.get('icomm_kws', {})
-        ocomm_kws = kwargs.get('ocomm_kws', {})
-        ocomm_kws.setdefault('comm', 'RMQComm')
-        ocomm_kws['queue'] = args
-        kwargs['ocomm_kws'] = ocomm_kws
+        kwargs.setdefault('ocomm_kws', {})
+        kwargs['ocomm_kws']['queue'] = args
         super(RMQOutputDriver, self).__init__(name, args, **kwargs)

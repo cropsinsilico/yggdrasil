@@ -3,11 +3,13 @@ import os
 import numpy as np
 import threading
 from cis_interface import backwards
-from cis_interface.communication import new_comm
+from cis_interface.communication import new_comm, get_comm_class
 from cis_interface.drivers.Driver import Driver
-from cis_interface.yamlfile import str_to_function
+from cis_interface.schema import (
+    register_component, str_to_function, validate_function)
 
 
+@register_component
 class ConnectionDriver(Driver):
     r"""Class that continuously passes messages from one comm to another.
 
@@ -20,11 +22,15 @@ class ConnectionDriver(Driver):
             before passing them to the output communicator. If a string, the
             format should be "<package.module>:<function>" so that <function>
             can be imported from <package>. Defaults to None and messages are
-            passed directly.
+            passed directly. This can also be a list of functions/strings that
+            will be called on the messages in the order they are provided.
         timeout_send_1st (float, optional): Time in seconds that should be
             waited before giving up on the first send. Defaults to self.timeout.
         single_use (bool, optional): If True, the driver will be stopped after
             one loop. Defaults to False.
+        onexit (str, optional): Class method that should be called when the
+            corresponding model exits, but before the driver is shut down.
+            Defaults to None.
         **kwargs: Additonal keyword arguments are passed to the parent class.
 
     Attributes:
@@ -43,52 +49,61 @@ class ConnectionDriver(Driver):
             giving up on the first send.
         single_use (bool): If True, the driver will be stopped after one
             loop.
+        onexit (str): Class method that should be called when the corresponding
+            model exits, but before the driver is shut down.
 
     """
-    def __init__(self, name, icomm_kws=None, ocomm_kws=None,
-                 translator=None, timeout_send_1st=None, single_use=False,
-                 **kwargs):
+    
+    _icomm_type = 'DefaultComm'
+    _ocomm_type = 'DefaultComm'
+    _schema_type = 'connection'
+    _schema = {'input': {'type': 'string', 'required': True,
+                         'excludes': 'input_file'},
+               'input_file': {'type': 'dict', 'required': True,
+                              'excludes': 'input'},
+               'output': {'type': 'string', 'required': True,
+                          'excludes': 'output_file'},
+               'output_file': {'type': 'dict', 'required': True,
+                               'excludes': 'output'},
+               'translator': {'validator': validate_function,
+                              'coerce': str_to_function,
+                              'required': False}}
+    _is_input = False
+    _is_output = False
+
+    @classmethod
+    def direction(cls):
+        r"""Get direction of connection."""
+        if cls._is_input:
+            out = 'input'
+        elif cls._is_output:
+            out = 'output'
+        else:
+            out = None
+        return out
+
+    def __init__(self, name, translator=None, timeout_send_1st=None,
+                 single_use=False, onexit=None, **kwargs):
         super(ConnectionDriver, self).__init__(name, **kwargs)
-        if icomm_kws is None:
-            icomm_kws = dict()
-        if ocomm_kws is None:
-            ocomm_kws = dict()
         # Translator
-        if isinstance(translator, str):
-            translator = str_to_function(translator)
-        if (translator is not None) and (not hasattr(translator, '__call__')):
-            raise ValueError("Translator %s not callable." % translator)
-        # Input communicator
-        self.debug("Creating input comm")
-        icomm_kws['direction'] = 'recv'
-        icomm_kws['dont_open'] = True
-        icomm_kws['reverse_names'] = True
-        icomm_kws['close_on_eof_recv'] = False
-        icomm_name = icomm_kws.pop('name', name)
-        self.icomm = new_comm(icomm_name, **icomm_kws)
-        self.icomm_kws = icomm_kws
-        self.env[self.icomm.name] = self.icomm.address
-        # Output communicator
-        self.debug("Creating output comm")
-        ocomm_kws['direction'] = 'send'
-        ocomm_kws['dont_open'] = True
-        ocomm_kws['reverse_names'] = True
-        # ocomm_kws['close_on_eof_send'] = False
-        ocomm_name = ocomm_kws.pop('name', name)
-        try:
-            self.ocomm = new_comm(ocomm_name, **ocomm_kws)
-        except BaseException:
-            self.icomm.close()
-            raise
-        self.ocomm_kws = ocomm_kws
-        self.env[self.ocomm.name] = self.ocomm.address
+        if translator is None:
+            translator = []
+        elif not isinstance(translator, list):
+            translator = [translator]
+        self.translator = []
+        for t in translator:
+            if isinstance(t, str):
+                t = str_to_function(t)
+            if not hasattr(t, '__call__'):
+                raise ValueError("Translator %s not callable." % t)
+            self.translator.append(t)
+        if (onexit is not None) and (not hasattr(self, onexit)):
+            raise ValueError("onexit '%s' is not a class method." % onexit)
+        self.onexit = onexit
         # Attributes
-        self._is_input = ('Input' in str(self.__class__))
-        self._is_output = ('Output' in str(self.__class__))
         self._eof_sent = False
         if timeout_send_1st is None:
             timeout_send_1st = self.timeout
-        self.translator = translator
         self.single_use = single_use
         self.timeout_send_1st = timeout_send_1st
         self._first_send_done = False
@@ -103,6 +118,8 @@ class ConnectionDriver(Driver):
         self.nskip = 0
         self.state = 'started'
         self.close_state = ''
+        # Add comms and print debug info
+        self._init_comms(name, **kwargs)
         self.debug('')
         self.debug(80 * '=')
         self.debug('class = %s', self.__class__)
@@ -113,6 +130,48 @@ class ConnectionDriver(Driver):
                    self.ocomm.name, self.ocomm.address)
         self.debug(80 * '=')
 
+    def _init_comms(self, name, icomm_kws=None, ocomm_kws=None, **kwargs):
+        r"""Parse keyword arguments for input/output comms."""
+        if icomm_kws is None:
+            icomm_kws = dict()
+        if ocomm_kws is None:
+            ocomm_kws = dict()
+        # Input communicator
+        self.debug("Creating input comm")
+        icomm_kws['direction'] = 'recv'
+        icomm_kws['dont_open'] = True
+        icomm_kws['reverse_names'] = True
+        icomm_kws['close_on_eof_recv'] = False
+        icomm_kws.setdefault('comm', self._icomm_type)
+        icomm_kws.setdefault('name', name)
+        if self._is_input:
+            ikws = get_comm_class(icomm_kws['comm'])._schema
+            for k in ikws:
+                if (k not in icomm_kws) and (k in kwargs):
+                    icomm_kws[k] = kwargs[k]
+        self.icomm = new_comm(icomm_kws.pop('name'), **icomm_kws)
+        self.icomm_kws = icomm_kws
+        self.env[self.icomm.name] = self.icomm.address
+        # Output communicator
+        self.debug("Creating output comm")
+        ocomm_kws['direction'] = 'send'
+        ocomm_kws['dont_open'] = True
+        ocomm_kws['reverse_names'] = True
+        ocomm_kws.setdefault('comm', self._ocomm_type)
+        ocomm_kws.setdefault('name', name)
+        if self._is_output:
+            okws = get_comm_class(ocomm_kws['comm'])._schema
+            for k in okws:
+                if (k not in ocomm_kws) and (k in kwargs):
+                    ocomm_kws[k] = kwargs[k]
+        try:
+            self.ocomm = new_comm(ocomm_kws.pop('name'), **ocomm_kws)
+        except BaseException:
+            self.icomm.close()
+            raise
+        self.ocomm_kws = ocomm_kws
+        self.env[self.ocomm.name] = self.ocomm.address
+        
     def wait_for_route(self, timeout=None):
         r"""Wait until messages have been routed."""
         T = self.start_timeout(timeout)
@@ -223,8 +282,10 @@ class ConnectionDriver(Driver):
 
     def on_model_exit(self):
         r"""Drain input and then close it."""
-        # self.info("%s: on_model_exit", self.name)
         self.debug('')
+        if (self.onexit not in [None, 'on_model_exit', 'pass']):
+            self.debug("Calling onexit = '%s'" % self.onexit)
+            getattr(self, self.onexit)()
         self.set_close_state('model exit')
         if self._is_input:
             self.drain_input(timeout=self.timeout)
@@ -383,10 +444,9 @@ class ConnectionDriver(Driver):
         """
         if (self.ocomm._send_serializer):
             self.update_serializer(msg)
-        if self.translator is None:
-            return msg
-        else:
-            return self.translator(msg)
+        for t in self.translator:
+            msg = t(msg)
+        return msg
 
     def update_serializer(self, msg):
         r"""Update the serializer for the output comm based on input."""

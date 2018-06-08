@@ -53,6 +53,8 @@ class ClientRequestDriver(ConnectionDriver):
 
     """
 
+    _is_output = True
+
     def __init__(self, model_request_name, request_name=None,
                  comm=None, comm_address=None, **kwargs):
         if request_name is None:
@@ -79,7 +81,6 @@ class ClientRequestDriver(ConnectionDriver):
         self.comm = comm
         self.comm_address = self.ocomm.opp_address
         self._block_response = False
-        self._is_output = True
 
     @property
     def last_header(self):

@@ -4,7 +4,7 @@ import shutil
 from cis_interface import tools, backwards, platform
 from cis_interface.drivers.ModelDriver import ModelDriver
 from cis_interface.drivers import GCCModelDriver
-from cis_interface.yamlfile import register_component, inherit_schema
+from cis_interface.schema import register_component, inherit_schema
 
 
 _regex_win32_dir = GCCModelDriver._incl_regex
@@ -136,11 +136,11 @@ class CMakeModelDriver(ModelDriver):
         args (str, list): Executable that should be created (cmake target) and
             any arguments for the executable.
         sourcedir (str, optional): Source directory to call cmake on. If not
-            provided it is set to self.workingDir. This should be the directory
+            provided it is set to self.working_dir. This should be the directory
             containing the CMakeLists.txt file. It can be relative to
-            self.workingDir or absolute.
+            self.working_dir or absolute.
         builddir (str, optional): Directory where the build should be saved.
-            Defaults to <sourcedir>/build. It can be relative to self.workingDir
+            Defaults to <sourcedir>/build. It can be relative to self.working_dir
             or absolute.
         cmakeargs (list, optional): Arguments that should be passed to cmake.
             Defaults to [].
@@ -179,14 +179,14 @@ class CMakeModelDriver(ModelDriver):
         self.compiled = False
         self.target = self.args[0]
         if sourcedir is None:
-            sourcedir = self.workingDir
+            sourcedir = self.working_dir
         elif not os.path.isabs(sourcedir):
-            sourcedir = os.path.realpath(os.path.join(self.workingDir, sourcedir))
+            sourcedir = os.path.realpath(os.path.join(self.working_dir, sourcedir))
         self.sourcedir = sourcedir
         if builddir is None:
             builddir = os.path.join(sourcedir, 'build')
         elif not os.path.isabs(builddir):
-            builddir = os.path.realpath(os.path.join(self.workingDir, builddir))
+            builddir = os.path.realpath(os.path.join(self.working_dir, builddir))
         self.builddir = builddir
         if cmakeargs is None:
             cmakeargs = []

@@ -2,7 +2,7 @@ import os
 import tempfile
 from cis_interface import backwards, platform, serialize
 from cis_interface.communication import CommBase
-from cis_interface.yamlfile import register_component, str_to_bool
+from cis_interface.schema import register_component, str_to_bool
 
 
 @register_component
@@ -48,15 +48,18 @@ class FileComm(CommBase.CommBase):
 
     """
 
-    _filetype = 'file'
+    _filetype = 'binary'
     _schema_type = 'file'
     _schema = dict(CommBase.CommBase._schema,
-                   filetype={'type': 'string', 'required': True},
+                   working_dir={'type': 'string', 'required': True},
+                   filetype={'type': 'string', 'required': False,
+                             'default': _filetype},
                    append={'type': 'boolean', 'required': False,
                            'coerce': str_to_bool},
                    in_temp={'type': 'boolean', 'required': False,
                             'coerce': str_to_bool},
-                   newline={'type': 'string', 'required': False},
+                   newline={'type': 'string', 'required': False,
+                            'default': serialize._default_newline},
                    is_series={'type': 'boolean', 'required': False,
                               'coerce': str_to_bool})
 

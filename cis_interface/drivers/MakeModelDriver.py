@@ -2,7 +2,7 @@ import os
 from cis_interface import tools, platform
 from cis_interface.drivers.ModelDriver import ModelDriver
 from cis_interface.drivers import GCCModelDriver
-from cis_interface.yamlfile import register_component, inherit_schema
+from cis_interface.schema import register_component, inherit_schema
 
 
 def setup_environ(compile_flags=[], linker_flags=[]):
@@ -39,7 +39,7 @@ class MakeModelDriver(ModelDriver):
         makedir (str, optional): Directory where make should be invoked from
             if it is not the same as the directory containing the makefile.
             Defaults to directory containing makefile if an absolute path is
-            provided, otherwise self.workingDir.
+            provided, otherwise self.working_dir.
         **kwargs: Additional keyword arguments are passed to parent class.
 
     Attributes:
@@ -77,7 +77,7 @@ class MakeModelDriver(ModelDriver):
             if (makefile is not None) and os.path.isabs(makefile):
                 makedir = os.path.dirname(makefile)
             else:
-                makedir = self.workingDir
+                makedir = self.working_dir
         if makefile is None:
             makefile = 'Makefile'
         self.make_command = make_command

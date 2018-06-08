@@ -1,6 +1,8 @@
 from cis_interface.drivers.FileOutputDriver import FileOutputDriver
+from cis_interface.schema import register_component
 
 
+@register_component
 class ObjFileOutputDriver(FileOutputDriver):
     r"""Class that writes received messages to a file.
 
@@ -10,12 +12,12 @@ class ObjFileOutputDriver(FileOutputDriver):
         **kwargs: Additional keyword arguments are passed to the parent class.
 
     """
+
+    _ocomm_type = 'ObjFileComm'
+
     def __init__(self, name, args, **kwargs):
         icomm_kws = kwargs.get('icomm_kws', {})
         icomm_kws.setdefault('serializer_type', 9)
-        ocomm_kws = kwargs.get('ocomm_kws', {})
-        ocomm_kws.setdefault('comm', 'ObjFileComm')
         kwargs['icomm_kws'] = icomm_kws
-        kwargs['ocomm_kws'] = ocomm_kws
         super(ObjFileOutputDriver, self).__init__(name, args, **kwargs)
         self.debug('(%s)', args)

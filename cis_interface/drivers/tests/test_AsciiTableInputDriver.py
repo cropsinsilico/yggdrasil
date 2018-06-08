@@ -60,12 +60,12 @@ class TestAsciiTableInputDriver_Array(TestAsciiTableInputParam,
 
     def __init__(self, *args, **kwargs):
         super(TestAsciiTableInputDriver_Array, self).__init__(*args, **kwargs)
-        self.inst_kwargs['as_array'] = 'True'
+        self.inst_kwargs['as_array'] = True
         names = [backwards.bytes2unicode(n) for n in self.field_names]
         units = [backwards.bytes2unicode(n) for n in self.field_units]
-        self.inst_kwargs['column_names'] = ','.join(names)
-        self.inst_kwargs['column_units'] = ','.join(units)
-        self.inst_kwargs['use_astropy'] = 'False'
+        self.inst_kwargs['column_names'] = names
+        self.inst_kwargs['column_units'] = units
+        self.inst_kwargs['use_astropy'] = False
 
     @property
     def msg_short(self):  # pragma: debug

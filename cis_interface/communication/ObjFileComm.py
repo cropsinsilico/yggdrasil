@@ -1,5 +1,5 @@
 from cis_interface.communication.PlyFileComm import PlyFileComm
-from cis_interface.yamlfile import register_component
+from cis_interface.schema import register_component
 
 
 @register_component

@@ -443,7 +443,7 @@ class CisClass(logging.LoggerAdapter):
         name (str): Class name.
         uuid (str, optional): Unique ID for this instance. Defaults to None
             and is assigned.
-        workingDir (str, optional): Working directory. If not provided, the
+        working_dir (str, optional): Working directory. If not provided, the
             current working directory is used.
         timeout (float, optional): Maximum time (in seconds) that should be
             spent waiting on a process. Defaults to 60.
@@ -459,7 +459,7 @@ class CisClass(logging.LoggerAdapter):
         longsleep (float): Time that the class will sleep for when waiting for
             longer tasks to complete (10x longer than sleeptime).
         timeout (float): Maximum time that should be spent waiting on a process.
-        workingDir (str): Working directory.
+        working_dir (str): Working directory.
         errors (list): List of errors.
         extra_kwargs (dict): Keyword arguments that were not parsed.
         sched_out (obj): Output from the last scheduled task with output.
@@ -468,7 +468,7 @@ class CisClass(logging.LoggerAdapter):
             are suppressed.
 
     """
-    def __init__(self, name, uuid=None, workingDir=None,
+    def __init__(self, name, uuid=None, working_dir=None,
                  timeout=60.0, sleeptime=0.01, **kwargs):
         self._name = name
         if uuid is None:
@@ -479,10 +479,10 @@ class CisClass(logging.LoggerAdapter):
         self.timeout = timeout
         self._timeouts = {}
         # Set defaults
-        if workingDir is None:
-            workingDir = os.getcwd()
+        if working_dir is None:
+            working_dir = os.getcwd()
         # Assign things
-        self.workingDir = workingDir
+        self.working_dir = working_dir
         self.errors = []
         self.extra_kwargs = kwargs
         self.sched_out = None

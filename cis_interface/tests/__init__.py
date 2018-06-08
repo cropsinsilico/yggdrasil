@@ -267,11 +267,6 @@ class CisTestBase(unittest.TestCase):
             out = '%s: %s' % (self.description_prefix, out)
         return out
 
-    # @property
-    # def workingDir(self):
-    #     r"""str: Working directory."""
-    #     return os.path.dirname(__file__)
-
 
 class CisTestClass(CisTestBase):
     r"""Test class for a CisClass."""

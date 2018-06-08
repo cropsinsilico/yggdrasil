@@ -1,6 +1,6 @@
 from cis_interface import backwards
 from cis_interface.communication import FileComm
-from cis_interface.yamlfile import register_component
+from cis_interface.schema import register_component
 
 
 @register_component
@@ -13,7 +13,7 @@ class PickleFileComm(FileComm.FileComm):
 
     """
 
-    _schema_filetype = 'pickle'
+    _filetype = 'pickle'
 
     def __init__(self, name, **kwargs):
         kwargs.setdefault('readmeth', 'read')

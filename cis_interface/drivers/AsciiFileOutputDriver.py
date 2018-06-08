@@ -1,6 +1,8 @@
 from cis_interface.drivers.FileOutputDriver import FileOutputDriver
+from cis_interface.schema import register_component
 
 
+@register_component
 class AsciiFileOutputDriver(FileOutputDriver):
     r"""Class to handle output line by line to an ASCII file.
 
@@ -16,15 +18,5 @@ class AsciiFileOutputDriver(FileOutputDriver):
         **kwargs: Additional keyword arguments are passed to parent class.
 
     """
-    
-    def __init__(self, name, args, **kwargs):
-        file_keys = ['comment', 'newline']
-        # icomm_kws = kwargs.get('icomm_kws', {})
-        ocomm_kws = kwargs.get('ocomm_kws', {})
-        ocomm_kws.setdefault('comm', 'AsciiFileComm')
-        for k in file_keys:
-            if k in kwargs:
-                ocomm_kws[k] = kwargs.pop(k)
-        kwargs['ocomm_kws'] = ocomm_kws
-        super(AsciiFileOutputDriver, self).__init__(name, args, **kwargs)
-        self.debug('(%s)', args)
+
+    _ocomm_type = 'AsciiFileComm'

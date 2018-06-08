@@ -29,6 +29,8 @@ class ServerRequestDriver(ConnectionDriver):
 
     """
 
+    _is_input = True
+
     def __init__(self, model_request_name, request_name=None,
                  comm=None, comm_address=None, **kwargs):
         if request_name is None:
@@ -56,7 +58,6 @@ class ServerRequestDriver(ConnectionDriver):
         self.comm = comm
         self.comm_address = self.icomm.address  # opp_address
         self._block_response = False
-        self._is_input = True
 
     @property
     def last_header(self):

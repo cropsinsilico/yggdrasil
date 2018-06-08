@@ -1,5 +1,5 @@
 from cis_interface.communication import FileComm
-from cis_interface.yamlfile import register_component
+from cis_interface.schema import register_component
 
 
 @register_component
@@ -12,7 +12,7 @@ class AsciiMapComm(FileComm.FileComm):
 
     """
 
-    _schema_filetype = 'map'
+    _filetype = 'map'
 
     def __init__(self, name, **kwargs):
         kwargs.setdefault('readmeth', 'read')

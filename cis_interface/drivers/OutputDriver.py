@@ -1,6 +1,8 @@
 from cis_interface.drivers.ConnectionDriver import ConnectionDriver
+from cis_interface.schema import register_component
 
 
+@register_component
 class OutputDriver(ConnectionDriver):
     r"""Driver for sending output to another model's comm via a local comm.
 
@@ -12,6 +14,8 @@ class OutputDriver(ConnectionDriver):
         **kwargs: Additional keyword arguments are passed to parent class.
 
     """
+
+    _is_output = True
 
     def __init__(self, name, args, **kwargs):
         # icomm_kws = kwargs.get('icomm_kws', {})

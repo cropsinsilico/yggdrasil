@@ -85,8 +85,8 @@ class TestCMakeModelParam(parent.TestModelParam):
         self.sourcedir, self.target = os.path.split(scripts['cmake'])
         self.builddir = os.path.join(self.sourcedir, 'build')
         self.args = [self.target]
-        # self._inst_kwargs['yml']['workingDir']
-        self._inst_kwargs['yml']['workingDir'] = self.sourcedir
+        # self._inst_kwargs['yml']['working_dir']
+        self._inst_kwargs['yml']['working_dir'] = self.sourcedir
 
     def test_sbdir(self):
         r"""Test that source/build directories set correctly."""
@@ -101,8 +101,8 @@ class TestCMakeModelDriverNoStart(TestCMakeModelParam,
     
     def __init__(self, *args, **kwargs):
         super(TestCMakeModelDriverNoStart, self).__init__(*args, **kwargs)
-        # Version specifying sourcedir via workingDir
-        self._inst_kwargs['yml']['workingDir'] = self.sourcedir
+        # Version specifying sourcedir via working_dir
+        self._inst_kwargs['yml']['working_dir'] = self.sourcedir
         # Relative paths
         self._inst_kwargs['sourcedir'] = './'
         self._inst_kwargs['builddir'] = 'build'

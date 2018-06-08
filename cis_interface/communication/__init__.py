@@ -50,7 +50,7 @@ def get_comm_class(comm=None):
         class: Communicator class.
 
     """
-    if comm is None:
+    if (comm is None) or (comm == 'DefaultComm'):
         comm = tools.get_default_comm()
     mod = importlib.import_module('cis_interface.communication.%s' % comm)
     comm_cls = getattr(mod, comm)

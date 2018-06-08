@@ -6,28 +6,6 @@ from cis_interface.tests import CisTestClass
 _yaml_env = 'TEST_YAML_FILE'
 
 
-def test_schema():
-    r"""Test schema."""
-    fname = 'test_schema.yml'
-    if os.path.isfile(fname):
-        os.remove(fname)
-    # Get default schema
-    schema = yamlfile.get_schema()
-    assert(schema is not None)
-    # Test saving/loading schema
-    schema0 = yamlfile.create_schema()
-    yamlfile.save_schema(fname, schema0)
-    assert(os.path.isfile(fname))
-    schema1 = yamlfile.load_schema(fname)
-    nt.assert_equal(schema1, schema0)
-    os.remove(fname)
-    # Test getting schema
-    schema2 = yamlfile.get_schema(fname)
-    assert(os.path.isfile(fname))
-    nt.assert_equal(schema2, schema0)
-    os.remove(fname)
-
-
 def test_load_yaml_error():
     r"""Test error on loading invalid file."""
     nt.assert_raises(IOError, yamlfile.load_yaml, 'invalid')
@@ -154,7 +132,7 @@ class TestYamlIODrivers(YamlTestBase):
                   '    inputs:',
                   '      - name: inputA',
                   '        driver: FileInputDriver',
-                  '        args: fileA.txt'],
+                  '        args: {{ %s }}' % _yaml_env],
                  ['model:',
                   '  - name: modelB',
                   '    driver: GCCModelDriver',
@@ -162,7 +140,7 @@ class TestYamlIODrivers(YamlTestBase):
                   '    input:',
                   '      - name: inputB',
                   '        driver: FileInputDriver',
-                  '        args: fileB.txt'],
+                  '        args: {{ %s }}' % _yaml_env],
                  ['model:',
                   '  name: modelC',
                   '  driver: GCCModelDriver',
@@ -170,7 +148,7 @@ class TestYamlIODrivers(YamlTestBase):
                   '  input:',
                   '    name: inputC',
                   '    driver: FileInputDriver',
-                  '    args: fileC.txt'],
+                  '    args: {{ %s }}' % _yaml_env],
                  ['models:',
                   '  name: modelD',
                   '  driver: GCCModelDriver',
@@ -178,7 +156,7 @@ class TestYamlIODrivers(YamlTestBase):
                   '  inputs:',
                   '    name: inputD',
                   '    driver: FileInputDriver',
-                  '    args: fileD.txt'], )
+                  '    args: {{ %s }}' % _yaml_env], )
 
 
 class TestYamlConnection(YamlTestBase):
@@ -418,7 +396,7 @@ class TestYamlConnectionError(YamlTestBaseError):
 
 class TestYamlMissingModelArgsError(YamlTestBaseError):
     r"""Test error when there is a missing arguments to a model."""
-    _error = RuntimeError
+    _error = ValueError
     _contents = (['models:',
                   '  - name: modelA',
                   '    args: ./src/modelA.c',
@@ -430,7 +408,7 @@ class TestYamlMissingModelArgsError(YamlTestBaseError):
 
 class TestYamlMissingIOArgsError(YamlTestBaseError):
     r"""Test error when there is a missing arguments to an I/O driver."""
-    _error = RuntimeError
+    _error = ValueError
     _contents = (['models:',
                   '  - name: modelA',
                   '    driver: GCCModelDriver',
@@ -442,7 +420,7 @@ class TestYamlMissingIOArgsError(YamlTestBaseError):
 
 class TestYamlMissingConnArgsError(YamlTestBaseError):
     r"""Test error when there is a missing arguments to a connection."""
-    _error = RuntimeError
+    _error = ValueError
     _contents = (['models:',
                   '  - name: modelA',
                   '    driver: GCCModelDriver',

@@ -3,7 +3,7 @@ import logging
 from cis_interface import platform, tools
 from cis_interface.config import cis_cfg
 from cis_interface.drivers.ModelDriver import ModelDriver
-from cis_interface.yamlfile import register_component, inherit_schema
+from cis_interface.schema import register_component, inherit_schema
 
 
 _top_dir = os.path.normpath(os.path.join(os.path.dirname(__file__), '../'))
@@ -270,7 +270,7 @@ class GCCModelDriver(ModelDriver):
         self.debug("Compiling")
         self.efile = do_compile(self.src, out=self.efile, cc=self.cc,
                                 ccflags=self.ccflags, ldflags=self.ldflags,
-                                working_dir=self.workingDir)
+                                working_dir=self.working_dir)
         assert(os.path.isfile(self.efile))
         self.debug("Compiled %s", self.efile)
         if platform._is_win:  # pragma: windows

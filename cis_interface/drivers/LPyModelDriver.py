@@ -11,7 +11,7 @@ except ImportError:  # pragma: no lpy
     warning("Could not import openalea.lpy. " +
             "LPy support will be disabled.")
     lpy = None
-from cis_interface.yamlfile import register_component
+from cis_interface.schema import register_component
 _lpy_installed = (lpy is not None)
 
 

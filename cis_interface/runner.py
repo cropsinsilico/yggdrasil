@@ -214,7 +214,8 @@ class CisRunner(CisClass):
         curpath = os.getcwd()
         if 'ClientDriver' in yml['driver']:
             yml.setdefault('comm_address', self.serverdrivers[yml['args']])
-        os.chdir(yml['workingDir'])
+        if 'working_dir' in yml:
+            os.chdir(yml['working_dir'])
         instance = create_driver(yml=yml, namespace=self.namespace,
                                  rank=self.rank, **yml)
         yml['instance'] = instance
@@ -255,11 +256,7 @@ class CisRunner(CisClass):
 
         """
         if yml['args'] not in self._outputchannels:
-            try:
-                norm_path = os.path.normpath(os.path.join(
-                    yml['workingDir'], yml['args']))
-                assert(os.path.isfile(norm_path))
-            except AssertionError:
+            if not os.path.isfile(yml['args']):
                 raise Exception(("Input driver %s could not locate a " +
                                  "corresponding file or output channel %s") % (
                                      yml["name"], yml["args"]))
@@ -421,13 +418,7 @@ class CisRunner(CisClass):
             if not drv['instance'].is_alive():
                 continue
             self.debug('on_model_exit %s', drv['name'])
-            if 'onexit' in drv:
-                self.debug(drv['onexit'])
-                if drv['onexit'] != 'pass':
-                    exit_method = getattr(drv['instance'], drv['onexit'])
-                    exit_method()
-            else:
-                drv['instance'].on_model_exit()
+            drv['instance'].on_model_exit()
     
     def terminate(self):
         r"""Immediately stop all drivers, beginning with IO drivers."""

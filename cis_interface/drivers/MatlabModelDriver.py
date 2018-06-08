@@ -13,7 +13,7 @@ except ImportError:  # pragma: no matlab
 from cis_interface.drivers.ModelDriver import ModelDriver
 from cis_interface import backwards, tools
 from cis_interface.tools import TimeOut, sleep
-from cis_interface.yamlfile import register_component
+from cis_interface.schema import register_component
 
 
 _top_dir = os.path.normpath(os.path.join(os.path.dirname(__file__), '../'))

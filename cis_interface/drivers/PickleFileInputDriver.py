@@ -1,6 +1,8 @@
 from cis_interface.drivers.FileInputDriver import FileInputDriver
+from cis_interface.schema import register_component
 
 
+@register_component
 class PickleFileInputDriver(FileInputDriver):
     r"""Class that sends messages read from a file.
 
@@ -10,10 +12,5 @@ class PickleFileInputDriver(FileInputDriver):
         **kwargs: Additional keyword arguments are passed to the parent class.
 
     """
-    def __init__(self, name, args, **kwargs):
-        icomm_kws = kwargs.get('icomm_kws', {})
-        # ocomm_kws = kwargs.get('ocomm_kws', {})
-        icomm_kws.setdefault('comm', 'PickleFileComm')
-        kwargs['icomm_kws'] = icomm_kws
-        super(PickleFileInputDriver, self).__init__(name, args, **kwargs)
-        self.debug('(%s)', args)
+
+    _icomm_type = 'PickleFileComm'

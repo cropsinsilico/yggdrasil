@@ -65,7 +65,7 @@ class TestCisRunner(object):
         yml = {'name': 'fake_IODriver',
                'args': 'fake_channel',
                'driver': 'InputDriver',
-               'workingDir': os.getcwd(),
+               'working_dir': os.getcwd(),
                'kwargs': {}}
         nt.assert_raises(Exception, self.runner.createInputDriver, yml)
         yml['driver'] = 'OutputDriver'

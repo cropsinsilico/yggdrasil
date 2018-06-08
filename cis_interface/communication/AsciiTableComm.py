@@ -1,6 +1,6 @@
 from cis_interface import serialize, backwards
 from cis_interface.communication.AsciiFileComm import AsciiFileComm
-from cis_interface.yamlfile import (
+from cis_interface.schema import (
     register_component, str_to_bool, inherit_schema)
 
 

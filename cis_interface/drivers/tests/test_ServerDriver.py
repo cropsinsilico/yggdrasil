@@ -71,7 +71,7 @@ class TestServerParam(parent.TestConnectionParam):
             'ClientDriver', 'test_model_request.' + str(uuid.uuid4()),
             comm=self.client_comm,
             comm_address=comm_address,
-            namespace=self.namespace, workingDir=self.workingDir,
+            namespace=self.namespace, working_dir=self.working_dir,
             timeout=self.timeout)
         return inst
 

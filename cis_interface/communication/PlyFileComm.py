@@ -1,5 +1,5 @@
 from cis_interface.communication.FileComm import FileComm
-from cis_interface.yamlfile import register_component
+from cis_interface.schema import register_component
 
 
 @register_component
