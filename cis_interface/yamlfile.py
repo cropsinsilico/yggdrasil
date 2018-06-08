@@ -3,7 +3,7 @@ import pprint
 import pystache
 import yaml
 from cis_interface import backwards
-from schema import get_schema
+from cis_interface.schema import get_schema
 
 
 def load_yaml(fname):
