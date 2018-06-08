@@ -140,6 +140,17 @@ class TestCommBase(CisTestClassInfo):
         recv_inst = new_comm(err_name, **recv_kwargs)
         return send_inst, recv_inst
 
+    def test_empty_msg(self):
+        r"""Test identification of empty message."""
+        msg = self.instance.empty_obj_recv
+        assert(self.instance.is_empty_recv(msg))
+        assert(not self.instance.is_empty_recv(self.instance.eof_msg))
+        if self.recv_instance.recv_converter is None:
+            self.recv_instance.recv_converter = lambda x: x
+            msg = self.instance.empty_obj_recv
+            assert(self.instance.is_empty_recv(msg))
+            assert(not self.instance.is_empty_recv(self.instance.eof_msg))
+            
     def test_maxMsgSize(self):
         r"""Print maxMsgSize."""
         self.instance.debug('maxMsgSize: %d, %d, %d', self.maxMsgSize,

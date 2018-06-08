@@ -40,7 +40,11 @@ connection:
   input:
     excludes: input_file
     required: true
-    type: string
+    schema:
+      type: string
+    type:
+    - string
+    - list
   input_file:
     excludes: input
     required: true
@@ -52,8 +56,8 @@ connection:
       comment: &id011
         dependencies:
           filetype:
-          - ascii
           - table
+          - ascii
         required: false
         type: string
       delimiter: &id012
@@ -67,14 +71,14 @@ connection:
       field_units: *id003
       filetype: &id013
         allowed:
-        - table
-        - pickle
-        - obj
-        - ascii
-        - binary
-        - pandas
         - map
+        - obj
+        - binary
+        - pickle
         - ply
+        - table
+        - ascii
+        - pandas
         default: binary
         required: false
         type: string
@@ -109,7 +113,11 @@ connection:
   output:
     excludes: output_file
     required: true
-    type: string
+    schema:
+      type: string
+    type:
+    - string
+    - list
   output_file:
     excludes: output
     required: true
@@ -338,15 +346,15 @@ model:
     type: boolean
   language:
     allowed:
-    - executable
-    - python
-    - cpp
-    - lpy
-    - matlab
-    - cmake
     - c
+    - cmake
+    - lpy
+    - python
     - make
+    - executable
     - c++
+    - matlab
+    - cpp
     required: true
     type: string
   make_command:

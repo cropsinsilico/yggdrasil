@@ -50,7 +50,7 @@ def inherit_schema(orig, key, value, **kwargs):
     out = copy.deepcopy(orig)
     for k in out.keys():
         if ('dependencies' in out[k]) and (key in out[k]['dependencies']):
-            if not isinstance(out[k]['dependencies'][key], list):
+            if not isinstance(out[k]['dependencies'][key], list):  # pragma: debug
                 out[k]['dependencies'][key] = [out[k]['dependencies'][key]]
             out[k]['dependencies'][key] += value_list
     for k, v in kwargs.items():
@@ -180,15 +180,29 @@ class SchemaValidator(cerberus.Validator):
 
     types_mapping = cerberus.Validator.types_mapping.copy()
     types_mapping['function'] = function_type
+    cis_type_order = ['list', 'string', 'integer', 'boolean', 'function']
 
     def _resolve_rules_set(self, *args, **kwargs):
         rules = super(SchemaValidator, self)._resolve_rules_set(*args, **kwargs)
         if isinstance(rules, collections.Mapping):
-            t = rules.get('type', None)
-            if t in ['string', 'integer', 'boolean', 'list', 'function']:
-                rules['coerce'] = t
+            rules = self._add_coerce(rules)
         return rules
 
+    def _add_coerce(self, rules):
+        if 'coerce' in rules:
+            return rules
+        t = rules.get('type', None)
+        if isinstance(t, list):
+            clist = []
+            for k in self.cis_type_order:
+                if k in t:
+                    clist.append(k)
+            if clist:
+                rules['coerce'] = clist
+        elif t in self.cis_type_order:
+            rules['coerce'] = t
+        return rules
+        
     def _normalize_coerce_string(self, value):
         return str(value)
 
@@ -306,7 +320,7 @@ class ComponentSchema(dict):
                                 alldeps[ik] = []
                             if isinstance(iv, list):
                                 alldeps[ik] += iv
-                            else:
+                            else:  # pragma: debug
                                 alldeps[ik].append(iv)
                     for ik in alldeps.keys():
                         alldeps[ik] = list(set(alldeps[ik]))

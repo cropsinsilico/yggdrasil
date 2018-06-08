@@ -56,11 +56,13 @@ class ConnectionDriver(Driver):
     _icomm_type = 'DefaultComm'
     _ocomm_type = 'DefaultComm'
     _schema_type = 'connection'
-    _schema = {'input': {'type': 'string', 'required': True,
+    _schema = {'input': {'type': ['string', 'list'], 'required': True,
+                         'schema': {'type': 'string'},
                          'excludes': 'input_file'},
                'input_file': {'type': 'dict', 'required': True,
                               'excludes': 'input'},
-               'output': {'type': 'string', 'required': True,
+               'output': {'type': ['string', 'list'], 'required': True,
+                          'schema': {'type': 'string'},
                           'excludes': 'output_file'},
                'output_file': {'type': 'dict', 'required': True,
                                'excludes': 'output'},
@@ -293,6 +295,7 @@ class ConnectionDriver(Driver):
                 self.ocomm.close()
         if self._is_output:
             self.drain_input(timeout=self.timeout)
+            self.wait_for_route(timeout=self.timeout)
             with self.lock:
                 self.icomm.close()
         super(ConnectionDriver, self).on_model_exit()

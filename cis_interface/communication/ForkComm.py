@@ -46,8 +46,9 @@ class ForkComm(CommBase.CommBase):
         assert(not self.single_use)
         assert(not self.is_server)
         assert(not self.is_client)
-        if comm_kwargs is None:
-            comm_kwargs = [dict() for _ in range(len(self))]
+        if comm_kwargs is None:  # pragma: debug
+            # comm_kwargs = [dict() for _ in range(len(self))]
+            raise ValueError("'comm_kwargs' must be provided.")
         assert(len(comm_kwargs) == len(self))
         for i in range(len(self)):
             ikw = dict(**kwargs)
@@ -221,8 +222,6 @@ class ForkComm(CommBase.CommBase):
         out = None
         while ((not T.is_out) or first_comm) and self.is_open and (out is None):
             for i in range(len(self)):
-                if out is not None:
-                    break
                 x = self.curr_comm
                 if x.is_open:
                     flag, msg = x.recv(*args, **kwargs)
@@ -230,13 +229,12 @@ class ForkComm(CommBase.CommBase):
                         self.eof_recv[self.curr_comm_index % len(self)] = 1
                         if sum(self.eof_recv) == len(self):
                             out = (flag, msg)
-                            break
                     elif (not self.is_empty_recv(msg)):
                         out = (flag, msg)
-                        break
                 self.curr_comm_index += 1
             first_comm = False
-            self.sleep()
+            if out is None:
+                self.sleep()
         self.stop_timeout(key_suffix='recv:forkd')
         if out is None:
             if self.is_closed:

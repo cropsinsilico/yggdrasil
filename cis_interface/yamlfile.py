@@ -165,8 +165,8 @@ def prep_connection(yml, iodict):
         migrate_keys(yml, yml['output_file'])
     elif 'input' in yml:
         migrate_keys(yml, iodict['outputs'][yml['input']])
-    elif 'output' in yml:
-        migrate_keys(yml, iodict['inputs'][yml['output']])
+    # elif 'output' in yml:
+    #     migrate_keys(yml, iodict['inputs'][yml['output']])
         
 
 def bridge_io_drivers(yml, iodict):
@@ -319,7 +319,7 @@ def parse_yaml(files):
         raise ValueError("Invalid yaml.")
     yml_all = v.document
     # Parse models, then connections to ensure connections can be processed
-    existing = dict(input={}, output={}, model={}, connection={})
+    existing = None
     for k in ['models', 'connections']:
         for yml in yml_all[k]:
             existing = parse_component(yml, k[:-1], existing=existing)
@@ -397,8 +397,9 @@ def parse_model(yml, existing):
     # Add client driver
     if yml.get('client_of', []):
         srv_names = yml['client_of']
-        if isinstance(srv_names, str):
-            srv_names = [srv_names]
+        # prep_model converts to list
+        # if isinstance(srv_names, str):
+        #     srv_names = [srv_names]
         yml['client_of'] = srv_names
         for srv in srv_names:
             cli = {'name': '%s_%s' % (srv, yml['name']),

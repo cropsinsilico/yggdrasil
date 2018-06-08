@@ -6,6 +6,11 @@ from cis_interface.tests import CisTestClass
 _yaml_env = 'TEST_YAML_FILE'
 
 
+def direct_translate(msg):
+    r"""Test translator that just returns passed message."""
+    return msg
+
+
 def test_load_yaml_error():
     r"""Test error on loading invalid file."""
     nt.assert_raises(IOError, yamlfile.load_yaml, 'invalid')
@@ -13,8 +18,15 @@ def test_load_yaml_error():
 
 def test_parse_component_error():
     r"""Test errors in parse_component."""
+    nt.assert_raises(TypeError, yamlfile.parse_component,
+                     1, 'invalid', 'invalid')
     nt.assert_raises(ValueError, yamlfile.parse_component,
                      {}, 'invalid', 'invalid')
+
+
+def test_cdriver2filetype_error():
+    r"""Test errors in cdriver2filetype."""
+    nt.assert_raises(ValueError, yamlfile.cdriver2filetype, 'invalid')
 
 
 class YamlTestBase(CisTestClass):
@@ -179,6 +191,27 @@ class TestYamlConnection(YamlTestBase):
                   '      - outputB'],)
 
 
+class TestYamlConnectionTranslator(YamlTestBase):
+    r"""Test connection between I/O channels."""
+    _contents = (['models:',
+                  '  - name: modelA',
+                  '    driver: GCCModelDriver',
+                  '    args: ./src/modelA.c',
+                  '    inputs:',
+                  '      - inputA',
+                  '',
+                  'connections:',
+                  '  - input: outputB',
+                  '    output: inputA',
+                  '    translator: %s:direct_translate' % __name__],
+                 ['models:',
+                  '  - name: modelB',
+                  '    driver: GCCModelDriver',
+                  '    args: ./src/modelB.c',
+                  '    outputs:',
+                  '      - outputB'],)
+
+
 class TestYamlConnectionInputFile(YamlTestBase):
     r"""Test connection with File."""
     _contents = (['models:',
@@ -192,9 +225,11 @@ class TestYamlConnectionInputFile(YamlTestBase):
                   '',
                   'connections:',
                   '  - input: {{ %s }}' % _yaml_env,
+                  '    read_meth: all',
                   '    output: inputA',
                   '  - input: outputA',
-                  '    output: output.txt'],)
+                  '    output: output.txt',
+                  '    write_meth: all'],)
 
 
 class TestYamlConnectionInputAsciiFile(YamlTestBase):
@@ -392,6 +427,50 @@ class TestYamlConnectionError(YamlTestBaseError):
                   '    args: ./src/modelA.c',
                   '    inputs:',
                   '      - inputA'],)
+
+
+class TestYamlConnectionError_readmeth(YamlTestBaseError):
+    r"""Test error when read_meth is specified for non-file."""
+    _error = ValueError
+    _contents = (['models:',
+                  '  - name: modelA',
+                  '    driver: GCCModelDriver',
+                  '    args: ./src/modelA.c',
+                  '    inputs:',
+                  '      - inputA',
+                  '',
+                  'connections:',
+                  '  - input: outputB',
+                  '    output: inputA',
+                  '    read_meth: pickle'],
+                 ['models:',
+                  '  - name: modelB',
+                  '    driver: GCCModelDriver',
+                  '    args: ./src/modelB.c',
+                  '    outputs:',
+                  '      - outputB'],)
+
+
+class TestYamlConnectionError_writemeth(YamlTestBaseError):
+    r"""Test error when write_meth is specified for non-file."""
+    _error = ValueError
+    _contents = (['models:',
+                  '  - name: modelA',
+                  '    driver: GCCModelDriver',
+                  '    args: ./src/modelA.c',
+                  '    inputs:',
+                  '      - inputA',
+                  '',
+                  'connections:',
+                  '  - input: outputB',
+                  '    output: inputA',
+                  '    write_meth: pickle'],
+                 ['models:',
+                  '  - name: modelB',
+                  '    driver: GCCModelDriver',
+                  '    args: ./src/modelB.c',
+                  '    outputs:',
+                  '      - outputB'],)
 
 
 class TestYamlMissingModelArgsError(YamlTestBaseError):

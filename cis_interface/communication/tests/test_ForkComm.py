@@ -13,13 +13,13 @@ class TestForkComm(TestCommBase):
     @property
     def cleanup_comm_classes(self):
         r"""list: Comm classes that should be cleaned up following the test."""
-        return set([self.comm, self.send_inst_kwargs['comm']] + self.comm_list)
+        return set([self.comm] + self.comm_list)
 
     @property
     def send_inst_kwargs(self):
         r"""dict: Keyword arguments for send instance."""
         out = super(TestForkComm, self).send_inst_kwargs
-        out['comm_kwargs'] = self.comm_kwargs
+        out['comm'] = self.comm_list
         return out
 
     def test_error_send(self):

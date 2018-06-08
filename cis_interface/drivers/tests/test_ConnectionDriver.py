@@ -260,7 +260,14 @@ class TestConnectionDriverTranslate(TestConnectionDriver):
         r"""dict: Keyword arguments for tested class."""
         out = super(TestConnectionDriverTranslate, self).inst_kwargs
         out['translator'] = '%s:direct_translate' % __name__
+        out['onexit'] = 'printStatus'
         return out
+
+
+def test_ConnectionDriverOnexit_errors():
+    r"""Test that errors are raised for invalid onexit."""
+    nt.assert_raises(ValueError, ConnectionDriver, 'test',
+                     onexit='invalid')
 
 
 def test_ConnectionDriverTranslate_errors():
