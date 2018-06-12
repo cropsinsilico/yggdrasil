@@ -71,28 +71,12 @@ class ForkComm(CommBase.CommBase):
         assert(not self.is_server)
         assert(not self.is_client)
 
-    # def _init_before_open(self, comm_kwargs=None, **kwargs):
-    #     r"""Initialization steps that should be performed after base class, but
-    #     before the comm is opened."""
-    #     super(ForkComm, self)._init_before_open(**kwargs)
-    #     assert(not self.single_use)
-    #     assert(not self.is_server)
-    #     assert(not self.is_client)
-    #     if comm_kwargs is None:  # pragma: debug
-    #         # comm_kwargs = [dict() for _ in range(len(self))]
-    #         raise ValueError("'comm_kwargs' must be provided.")
-    #     assert(len(comm_kwargs) == len(self))
-    #     for i in range(len(self)):
-    #         ikw = dict(**kwargs)
-    #         ikw['address'] = self.address_list[i]
-    #         if comm_kwargs[i] is not None:
-    #             ikw.update(**comm_kwargs[i])
-    #         iname = ikw.pop('name', None)
-    #         if iname is None:
-    #             iname = get_comm_name(self.name, i)
-    #         self.comm_list.append(get_comm(iname, **ikw))
-    #         self.eof_recv.append(0)
-            
+    def printStatus(self, nindent=0):
+        r"""Print status of the communicator."""
+        super(ForkComm, self).printStatus(nindent=nindent)
+        for x in self.comm_list:
+            x.printStatus(nindent=nindent + 1)
+
     def __len__(self):
         return len(self.comm_list)
 

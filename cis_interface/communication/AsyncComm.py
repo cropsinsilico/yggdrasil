@@ -38,6 +38,21 @@ class AsyncComm(CommBase.CommBase):
         self.backlog_open = False
         super(AsyncComm, self).__init__(name, **kwargs)
 
+    def printStatus(self, nindent=0):
+        r"""Print status of the communicator."""
+        super(AsyncComm, self).printStatus(nindent=nindent)
+        prefix = '\t' + nindent * '\t'
+        print('%s%-15s: %s' % (prefix, 'open (backlog)', self.is_open_backlog))
+        print('%s%-15s: %s' % (prefix, 'open (direct)', self.is_open_direct))
+        print('%s%-15s: %s' % (prefix, 'nsent (backlog)', self.n_msg_backlog_send))
+        print('%s%-15s: %s' % (prefix, 'nrecv (backlog)', self.n_msg_backlog_recv))
+        print('%s%-15s: %s' % (prefix, 'nsent (direct)', self.n_msg_direct_send))
+        print('%s%-15s: %s' % (prefix, 'nrecv (direct)', self.n_msg_direct_recv))
+        if len(self._work_comms) > 0:
+            print('%sWork comms:' % prefix)
+            for v in self._work_comms.values():
+                v.printStatus(nindent=nindent + 1)
+
     @property
     def backlog_thread(self):
         r"""tools.CisThread: Thread that will handle sinding or receiving

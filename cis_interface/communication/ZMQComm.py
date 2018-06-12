@@ -297,7 +297,8 @@ class ZMQComm(AsyncComm.AsyncComm):
     
     def _init_before_open(self, context=None, socket_type=None,
                           socket_action=None, topic_filter='',
-                          dealer_identity=None, **kwargs):
+                          dealer_identity=None,
+                          reply_socket_address=None, **kwargs):
         r"""Initialize defaults for socket type/action based on direction."""
         self.reply_socket_lock = threading.RLock()
         self.socket_lock = threading.RLock()
@@ -352,7 +353,7 @@ class ZMQComm(AsyncComm.AsyncComm):
         self._recv_identities = set([])
         # Reply socket attributes
         self.zmq_sleeptime = int(10000 * self.sleeptime)
-        self.reply_socket_address = None
+        self.reply_socket_address = reply_socket_address
         self.reply_socket_send = None
         self.reply_socket_recv = {}
         self._n_zmq_sent = 0
@@ -363,6 +364,17 @@ class ZMQComm(AsyncComm.AsyncComm):
         self._server_kwargs = dict(context=self.context,
                                    retry_timeout=0.01)  # 4 * self.sleeptime)
         super(ZMQComm, self)._init_before_open(**kwargs)
+
+    def printStatus(self, nindent=0):
+        r"""Print status of the communicator."""
+        super(ZMQComm, self).printStatus(nindent=nindent)
+        prefix = '\t' + nindent * '\t'
+        print('%s%-15s: %s' % (prefix, 'nsent (zmq)', self._n_zmq_sent))
+        print('%s%-15s: %s' % (prefix, 'nsent reply (zmq)', self._n_reply_sent))
+        for k in self._n_zmq_recv.keys():
+            print('%s%-15s: %s' % (prefix, 'nrecv (%s)' % k, self._n_zmq_recv[k]))
+            print('%s%-15s: %s' % (prefix, 'nrecv reply (%s)' % k,
+                                   self._n_reply_recv[k]))
 
     @classmethod
     def is_installed(cls):
@@ -831,9 +843,9 @@ class ZMQComm(AsyncComm.AsyncComm):
             CommBase: Work comm.
 
         """
-        c = super(ZMQComm, self).header2workcomm(header, **kwargs)
         if ('zmq_reply_worker' in header) and (self.direction == 'recv'):
-            c.reply_socket_address = c.set_reply_socket_recv(header['zmq_reply_worker'])
+            kwargs['reply_socket_address'] = header['zmq_reply_worker']
+        c = super(ZMQComm, self).header2workcomm(header, **kwargs)
         return c
     
     def on_send_eof(self):
@@ -983,6 +995,8 @@ class ZMQComm(AsyncComm.AsyncComm):
         # Confirm receipt
         if k is not None:
             self._n_zmq_recv[k] += 1
+        else:  # pragma: debug
+            self.info("No reply address.")
         return (True, msg)
 
     def confirm_send(self, noblock=False):

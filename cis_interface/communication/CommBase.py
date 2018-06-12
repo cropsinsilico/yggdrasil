@@ -404,6 +404,17 @@ class CommBase(tools.CisClass):
                     serializer_kwargs[k] = kwargs.pop(k, None)
             self.serializer = serialize.get_serializer(**serializer_kwargs)
 
+    def printStatus(self, nindent=0):
+        r"""Print status of the communicator."""
+        prefix = nindent * '\t'
+        print('%s%s:' % (prefix, self.name))
+        prefix += '\t'
+        print('%s%-15s: %s' % (prefix, 'address', self.address))
+        print('%s%-15s: %s' % (prefix, 'direction', self.direction))
+        print('%s%-15s: %s' % (prefix, 'open', self.is_open))
+        print('%s%-15s: %s' % (prefix, 'nsent', self._n_sent))
+        print('%s%-15s: %s' % (prefix, 'nrecv', self._n_recv))
+
     @classmethod
     def is_installed(cls):
         r"""bool: Is the comm installed."""
@@ -1202,12 +1213,12 @@ class CommBase(tools.CisClass):
 
     # RECV METHODS
     def _safe_recv(self, *args, **kwargs):
-        r"""Save receive that does things for all comm classes."""
+        r"""Safe receive that does things for all comm classes."""
         with self._closing_thread.lock:
             if self.is_closed:
                 return (False, self.empty_msg)
             out = self._recv(*args, **kwargs)
-        if out[0]:
+        if out[0] and out[1]:
             self._n_recv += 1
             self._last_recv = backwards.clock_time()
         return out
