@@ -1,3 +1,0 @@
-.. include:: maxMsg_c_src.rst
-
-.. include:: maxMsg_c_yml.rst

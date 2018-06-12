@@ -1,3 +1,0 @@
-.. include:: ascii_io_c_src.rst
-
-.. include:: ascii_io_c_yml.rst

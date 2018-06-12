@@ -1,3 +1,0 @@
-.. include:: rpcFib_all_nomatlab_src.rst
-
-.. include:: rpcFib_all_nomatlab_yml.rst

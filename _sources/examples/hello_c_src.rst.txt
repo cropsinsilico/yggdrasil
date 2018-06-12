@@ -1,3 +1,0 @@
-.. literalinclude:: ../../../cis_interface/examples/hello/src/hello.c
-
-(Example in: `C <hello_c.rst>`__, `C++ <hello_cpp.rst>`__, `Matlab <hello_matlab.rst>`__, `Python <hello_python.rst>`__)

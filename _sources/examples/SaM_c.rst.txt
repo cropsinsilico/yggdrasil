@@ -1,3 +1,0 @@
-.. include:: SaM_c_src.rst
-
-.. include:: SaM_c_yml.rst

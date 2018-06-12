@@ -1,6 +1,0 @@
-.. literalinclude:: /../../cis_interface/examples/gs_lesson2/gs_lesson2_python.yml
-   :language: yaml
-   :linenos:
-
-
-(`Example in other languages <gs_lesson2.rst>`__)

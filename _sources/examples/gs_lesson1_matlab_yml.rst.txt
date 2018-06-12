@@ -1,3 +1,0 @@
-.. literalinclude:: ../../../cis_interface/examples/gs_lesson1/gs_lesson1_matlab.yml
-
-(Example in: `C <gs_lesson1_c.rst>`__, `C++ <gs_lesson1_cpp.rst>`__, `Matlab <gs_lesson1_matlab.rst>`__, `Python <gs_lesson1_python.rst>`__)

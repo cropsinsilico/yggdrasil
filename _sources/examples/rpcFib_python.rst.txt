@@ -1,3 +1,0 @@
-.. include:: rpcFib_python_src.rst
-
-.. include:: rpcFib_python_yml.rst

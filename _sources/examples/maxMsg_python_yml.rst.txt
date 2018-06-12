@@ -1,5 +1,0 @@
-.. literalinclude:: ../../../cis_interface/examples/maxMsg/maxMsgCli_python.yml
-
-.. literalinclude:: ../../../cis_interface/examples/maxMsg/maxMsgSrv_python.yml
-
-(Example in: `Mixed <maxMsg_all.rst>`__, `Mixed w/o Matlab <maxMsg_all_nomatlab.rst>`__, `C <maxMsg_c.rst>`__, `C++ <maxMsg_cpp.rst>`__, `Matlab <maxMsg_matlab.rst>`__, `Python <maxMsg_python.rst>`__)

@@ -1,1 +1,0 @@
-.. include:: SaM_python.rst

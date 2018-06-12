@@ -1,3 +1,0 @@
-.. include:: rpcFib_c_src.rst
-
-.. include:: rpcFib_c_yml.rst

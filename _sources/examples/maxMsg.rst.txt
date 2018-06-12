@@ -1,1 +1,0 @@
-.. include:: maxMsg_python.rst

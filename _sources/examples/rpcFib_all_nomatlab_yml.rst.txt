@@ -1,7 +1,0 @@
-.. literalinclude:: ../../../cis_interface/examples/rpcFib/rpcFibCli_python.yml
-
-.. literalinclude:: ../../../cis_interface/examples/rpcFib/rpcFibCliPar_cpp.yml
-
-.. literalinclude:: ../../../cis_interface/examples/rpcFib/rpcFibSrv_c.yml
-
-(Example in: `Mixed <rpcFib_all.rst>`__, `Mixed w/o Matlab <rpcFib_all_nomatlab.rst>`__, `C <rpcFib_c.rst>`__, `C++ <rpcFib_cpp.rst>`__, `Matlab <rpcFib_matlab.rst>`__, `Python <rpcFib_python.rst>`__)

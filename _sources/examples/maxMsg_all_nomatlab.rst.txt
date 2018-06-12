@@ -1,3 +1,0 @@
-.. include:: maxMsg_all_nomatlab_src.rst
-
-.. include:: maxMsg_all_nomatlab_yml.rst

@@ -1,3 +1,0 @@
-.. include:: gs_lesson4_matlab_src.rst
-
-.. include:: gs_lesson4_matlab_yml.rst

@@ -1,3 +1,0 @@
-.. literalinclude:: ../../../cis_interface/examples/SaM/SaM_python.yml
-
-(Example in: `Mixed <SaM_all.rst>`__, `Mixed w/o Matlab <SaM_all_nomatlab.rst>`__, `C <SaM_c.rst>`__, `C++ <SaM_cpp.rst>`__, `Matlab <SaM_matlab.rst>`__, `Python <SaM_python.rst>`__)
