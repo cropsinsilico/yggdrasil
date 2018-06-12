@@ -26,7 +26,7 @@ be run. The value for this key can be a single model entry::
 
   models:
     name: modelA
-    driver: PythonModelDriver
+    language: python
     args: ./src/gs_lesson4_modelA.py
 
 
@@ -34,10 +34,10 @@ or a sequence of model entries::
 
   models:
     - name: modelA
-      driver: PythonModelDriver
+      language: python
       args: ./src/gs_lesson4_modelA.py
     - name: modelB
-      driver: GCCModelDriver
+      language: c
       args: ./src/gs_lesson4_modelB.c
 
 At a minimum, each model entry should contain the following keys:
@@ -48,10 +48,26 @@ At a minimum, each model entry should contain the following keys:
 | name    | Unique name used to identify the model. This will be used to       |
 |         | report errors associated with the model.                           |
 +---------+--------------------------------------------------------------------+
-| driver  | The name of the driver class that should be used to run the model. |
-|         | The list of available drivers can be found                         |
-|         | :ref:`here <model_drivers_rst>`.                                   |
-+---------+--------------------------------------------------------------------+
+| language| The language that the model is written in. Valid values include:   |
+|         +------------+-------------------------------------------------------+
+|         | **Value**  | **Description**                                       |
+|         +------------+-------------------------------------------------------+
+|         | executable | The model is a pre-compiled executable.               |
+|         +------------+-------------------------------------------------------+
+|         | python     | The model is written in Python.                       |
+|         +------------+-------------------------------------------------------+
+|         | matlab     | The model is written in Matlab.                       |
+|         +------------+-------------------------------------------------------+
+|         | c          | The model is written in C.                            |
+|         +------------+-------------------------------------------------------+
+|         | c++/c      | The model is written in C++.                          |
+|         +------------+-------------------------------------------------------+
+|         | make       | The model is written in C/C++ and has a Makefile.     |
+|         +------------+-------------------------------------------------------+
+|         | cmake      | The model is written in C/C++ and has a CMakeLists.txt|
+|         +------------+-------------------------------------------------------+
+|         | lpy        | The model is an LPy lsystem model.                    |
++---------+------------+-------------------------------------------------------+
 | args    | The full path to the file containing the model program that will   |
 |         | be run by the driver or a list starting with the program file and  |
 |         | including any arguments that should be passed as input to the      |
@@ -85,43 +101,18 @@ client_of    The names of one or more models that this model will call as a
 	     channel created for each server the model is a client of.
 =========    ===================================================================
 
-Any additional keys in the model entry will be passed to the model driver. A 
-full description of the available model drivers and potential arguments can be 
-found :ref:`here <model_drivers_rst>`.
+..
+   Any additional keys in the model entry will be passed to the model driver. A 
+   full description of the available model drivers and potential arguments can be 
+   found :ref:`here <model_drivers_rst>`.
 
 
 Communication Options
 ---------------------
 
 There are two options for specifying communication channels for the models. 
-One explicitly specifying the drivers and one specifying the connections 
-between communication channels.
-
-
-Driver Method
-*************
-
-In specifying communication via drivers, each input/output entry for the models 
-should be a mapping collection with, at minimum, the following keys:
-
-
-======    ======================================================================
-Key       Description
-======    ======================================================================
-name      The name of the channel that will be provided by the model to the 
-          |cis_interface| API. This can be any text, but should be unique.
-driver    The name of the input/output driver class that should be used. 
-          A list of available input/output drivers can be found
-          :ref:`here <io_drivers_rst>`.
-args      For connections made to other models, this should be text that matches 
-          that of the other model's corresponding driver. For connections made 
-	  to files, this should be the path to the file, relative to the 
-	  location of the YAML file.
-======    ======================================================================
-
-Any additional keys in the input/output entry will be passed to the input/output 
-driver. A full description of the available input/output drivers and potential 
-arguments can be found :ref:`here <io_drivers_rst>`.
+One specifying the connections between communication channels and one 
+explicitly specifying the drivers.
 
 
 Connection Method
@@ -153,19 +144,20 @@ Connection Options
 The coordesponding value for the ``connections`` key should be one or more 
 mapping collections with the following keys:
 
-======    ======================================================================
-Key       Description
-======    ======================================================================
-input     The channel/file that messages should be recieved from. To specify 
-	  a model channel, this should be the name of an entry in a model's 
-	  ``outputs`` section. If this is a file, it should be the absolute 
-	  path to the file or the relative path to the file from the directory 
-	  containing the YAML.
-output    The channel/file that messages recieved from the ``input`` 
-          channel/file should be sent to. If the ``input`` value is a file, 
-	  the ``output`` value cannot be a file. To specify a model channel, 
-	  this should be the name of an entry in a model's ``inputs`` section.
-======    ======================================================================
+==================    ==========================================================
+Key                   Description
+==================    ==========================================================
+input/input_file      The channel/file that messages should be recieved from. To 
+                      specify a model channel, this should be the name of an 
+                      entry in a model's ``outputs`` section. If this is a file, 
+                      it should be the absolute path to the file or the relative 
+                      path to the file from the directory containing the YAML.
+output/output_file    The channel/file that messages recieved from the ``input`` 
+                      channel/file should be sent to. If the ``input`` value is 
+	              a file, the ``output`` value cannot be a file. To specify 
+	              a model channel, this should be the name of an entry in a 
+                      model's ``inputs`` section.
+==================    ==========================================================
 
 
 Connection mappings can also have the following optional keys:
@@ -173,6 +165,12 @@ Connection mappings can also have the following optional keys:
 +------------+-----------------------------------------------------------------+
 | Key        | Description                                                     |
 +============+=================================================================+
+| translator | One or more functions that should be used to tranlate messages  |
+|            | from the connection input before passing it alone to the        |
+|            | connection output. Translators should be specified as strings   |
+|            | with the format "<package.module>:<function>" such that         |
+|            | <function> can be imported from <package>.                      |
++------------+-----------------------------------------------------------------+
 | format_str | A C-style format string specifying how messages should be       |
 |            | formatted/parsed from/to language specifying types (see         |
 |            | :ref:`C-Style Format Strings <c_style_format_strings_rst>`).    |
@@ -180,20 +178,24 @@ Connection mappings can also have the following optional keys:
 | field_names| A sequence collection of names for the fields present in the    |
 |            | format string.                                                  |
 +------------+-----------------------------------------------------------------+
-| field_untis| A sequence collection of units for the fields present in the    |
+| field_units| A sequence collection of units for the fields present in the    |
 |            | format string (see :ref:`Units <units_rst>`).                   |
 +------------+-----------------------------------------------------------------+
-| read_meth  | Only valid for connections that direct messages from a file to  |
-|            | a model input channel. Values indicate how messages should be   |
-|            | read from the file and include:                                 |
+| as_array   | True or False. If True and filetype is table, the table will    |
+|            | be read in it's entirety and passed as an array.                |
++------------+-----------------------------------------------------------------+
+| filetype   | Only valid for connections that direct messages from a file to  |
+|            | a model input channel or from a model output channel to a file. |
+|            | Values indicate how messages should be read from the file and   |
+|            | include:                                                        |
 |            +-------------+---------------------------------------------------+
 |            | **Value**   | **Description**                                   |
 |            +-------------+---------------------------------------------------+
-|            | all         | The entire contents of the file are read as a     |
+|            | binary      | The entire contents of the file are read as a     |
 |            |             | single message. This is the default if not        |
 |            |             | provided.                                         |
 |            +-------------+---------------------------------------------------+
-|            | line        | The contents of the file are read one line at a   |
+|            | ascii       | The contents of the file are read one line at a   |
 |            |             | time.                                             |
 |            +-------------+---------------------------------------------------+
 |            | table       | The file is assumed to be an ASCII table and read |
@@ -201,28 +203,12 @@ Connection mappings can also have the following optional keys:
 |            |             | either read from the header or inferred from the  |
 |            |             | table.                                            |
 |            +-------------+---------------------------------------------------+
-|            | table_array | The file is assumed to be an ASCII table and read |
-|            |             | in its entirety as an array.                      |
-+------------+-------------+---------------------------------------------------+
-| write_meth | Only valid for connections that direct messages from a model    |
-|            | output channel to a file. Values indicate how messages should   |
-|            | written to the file and include:                                |
+|            | pandas      | The file is a table created from a Pandas data    |
+|            |             | frame.                                            |
 |            +-------------+---------------------------------------------------+
-|            | **Value**   | **Description**                                   |
+|            | ply         | The file contains a 3D structure in Ply format.   |
 |            +-------------+---------------------------------------------------+
-|            | all         | The entire contents of the file are written at    |
-|            |             | once. This is the default if not provided.        |
-|            +-------------+---------------------------------------------------+
-|            | line        | The contents of the file are written one line at  |
-|            |             | a time.                                           |
-|            +-------------+---------------------------------------------------+
-|            | table       | The file is assumed to be an ASCII table and is   |
-|            |             | written one row at a time. The format of the      |
-|            |             | table must be specified by the model in its API   |
-|            |             | call or as a value in the connection mapping.     |
-|            +-------------+---------------------------------------------------+
-|            | table_array | The file is assumed to be an ASCII table and is   |
-|            |             | written in its entirety as an array.              |
+|            | obj         | The file contains a 3D structure in Obj format.   |
 +------------+-------------+---------------------------------------------------+
 
 The connection entries are used to determine which driver should be used to 
@@ -230,3 +216,28 @@ connect communication channels/files. Any additional keys in the connection
 entry will be passed to the input/output driver that is created for the 
 connection. A full description of the available input/output drivers and 
 potential arguments can be found :ref:`here <io_drivers_rst>`.
+
+
+Driver Method
+*************
+
+In specifying communication via drivers, each input/output entry for the models 
+should be a mapping collection with, at minimum, the following keys:
+
+======    ======================================================================
+Key       Description
+======    ======================================================================
+name      The name of the channel that will be provided by the model to the 
+          |cis_interface| API. This can be any text, but should be unique.
+driver    The name of the input/output driver class that should be used. 
+          A list of available input/output drivers can be found
+          :ref:`here <io_drivers_rst>`.
+args      For connections made to other models, this should be text that matches 
+          that of the other model's corresponding driver. For connections made 
+	  to files, this should be the path to the file, relative to the 
+	  location of the YAML file.
+======    ======================================================================
+
+Any additional keys in the input/output entry will be passed to the input/output 
+driver. A full description of the available input/output drivers and potential 
+arguments can be found :ref:`here <io_drivers_rst>`.
