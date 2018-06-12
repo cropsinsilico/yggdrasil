@@ -1,0 +1,1367 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>cis_interface.serialize package &mdash; cis_interface 0.2.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> cis_interface
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.2
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="includeme.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="formatted_io.html">Formatted I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="server_client_io.html">Server/Client I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="server_client_io.html#one-server-two-clients">One Server, Two Clients</a></li>
+<li class="toctree-l1"><a class="reference internal" href="yaml.html">YAML Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="config.html">Configuration Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="units.html">Units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="c_format_strings.html">C-Style Format Strings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="io_drivers.html">Input/Output Drivers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="model_drivers.html">Model Drivers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="code.html">Code</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/examples_toc.html">Examples</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">cis_interface</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>cis_interface.serialize package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/cis_interface.serialize.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="cis-interface-serialize-package">
+<h1>cis_interface.serialize package<a class="headerlink" href="#cis-interface-serialize-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-cis_interface.serialize.AsciiMapSerialize">
+<span id="cis-interface-serialize-asciimapserialize-module"></span><h2>cis_interface.serialize.AsciiMapSerialize module<a class="headerlink" href="#module-cis_interface.serialize.AsciiMapSerialize" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="cis_interface.serialize.AsciiMapSerialize.AsciiMapSerialize">
+<em class="property">class </em><code class="descclassname">cis_interface.serialize.AsciiMapSerialize.</code><code class="descname">AsciiMapSerialize</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/serialize/AsciiMapSerialize.html#AsciiMapSerialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.serialize.AsciiMapSerialize.AsciiMapSerialize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.serialize.DefaultSerialize.DefaultSerialize" title="cis_interface.serialize.DefaultSerialize.DefaultSerialize"><code class="xref py py-class docutils literal notranslate"><span class="pre">cis_interface.serialize.DefaultSerialize.DefaultSerialize</span></code></a></p>
+<p>Class for serializing/deserializing name/value mapping.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>delimiter</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – Delimiter that should be used to
+separate name/value pairs in the map. Defaults to t.</li>
+<li><strong>newline</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – Delimiter that should be used to
+separate lines. Defaults to n.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="cis_interface.serialize.AsciiMapSerialize.AsciiMapSerialize.empty_msg">
+<code class="descname">empty_msg</code><a class="headerlink" href="#cis_interface.serialize.AsciiMapSerialize.AsciiMapSerialize.empty_msg" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>obj</em> – Object indicating empty message.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.serialize.AsciiMapSerialize.AsciiMapSerialize.func_deserialize">
+<code class="descname">func_deserialize</code><span class="sig-paren">(</span><em>msg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/serialize/AsciiMapSerialize.html#AsciiMapSerialize.func_deserialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.serialize.AsciiMapSerialize.AsciiMapSerialize.func_deserialize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deserialize a message.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>msg</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.6)"><em>bytes</em></a>) – Message to be deserialized.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Deserialized Python dictionary.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)">dict</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.serialize.AsciiMapSerialize.AsciiMapSerialize.func_serialize">
+<code class="descname">func_serialize</code><span class="sig-paren">(</span><em>args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/serialize/AsciiMapSerialize.html#AsciiMapSerialize.func_serialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.serialize.AsciiMapSerialize.AsciiMapSerialize.func_serialize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Serialize a message.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) – Python dictionary to be serialized.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Serialized message.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.6)">bytes</a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)">str</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.serialize.AsciiMapSerialize.AsciiMapSerialize.serializer_type">
+<code class="descname">serializer_type</code><a class="headerlink" href="#cis_interface.serialize.AsciiMapSerialize.AsciiMapSerialize.serializer_type" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>int</em> – Type of serializer.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-cis_interface.serialize.AsciiTableSerialize">
+<span id="cis-interface-serialize-asciitableserialize-module"></span><h2>cis_interface.serialize.AsciiTableSerialize module<a class="headerlink" href="#module-cis_interface.serialize.AsciiTableSerialize" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="cis_interface.serialize.AsciiTableSerialize.AsciiTableSerialize">
+<em class="property">class </em><code class="descclassname">cis_interface.serialize.AsciiTableSerialize.</code><code class="descname">AsciiTableSerialize</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/serialize/AsciiTableSerialize.html#AsciiTableSerialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.serialize.AsciiTableSerialize.AsciiTableSerialize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.serialize.DefaultSerialize.DefaultSerialize" title="cis_interface.serialize.DefaultSerialize.DefaultSerialize"><code class="xref py py-class docutils literal notranslate"><span class="pre">cis_interface.serialize.DefaultSerialize.DefaultSerialize</span></code></a></p>
+<p>Class for serialize table output into bytes messages comprising a
+formatted ASCII table.</p>
+<dl class="attribute">
+<dt id="cis_interface.serialize.AsciiTableSerialize.AsciiTableSerialize.table">
+<code class="descname">table</code><a class="headerlink" href="#cis_interface.serialize.AsciiTableSerialize.AsciiTableSerialize.table" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>AsciiTable</em> – Table object used for formating/parsing table
+entries.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.serialize.AsciiTableSerialize.AsciiTableSerialize.func_deserialize">
+<code class="descname">func_deserialize</code><span class="sig-paren">(</span><em>msg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/serialize/AsciiTableSerialize.html#AsciiTableSerialize.func_deserialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.serialize.AsciiTableSerialize.AsciiTableSerialize.func_deserialize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deserialize a message.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>msg</strong> – Message to be deserialized.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Deserialized message.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">obj</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.serialize.AsciiTableSerialize.AsciiTableSerialize.func_serialize">
+<code class="descname">func_serialize</code><span class="sig-paren">(</span><em>args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/serialize/AsciiTableSerialize.html#AsciiTableSerialize.func_serialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.serialize.AsciiTableSerialize.AsciiTableSerialize.func_serialize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Serialize a message.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>args</strong> – List of arguments to be formatted or numpy array to be
+serialized.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Serialized message.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.6)">bytes</a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)">str</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.serialize.AsciiTableSerialize.AsciiTableSerialize.serializer_type">
+<code class="descname">serializer_type</code><a class="headerlink" href="#cis_interface.serialize.AsciiTableSerialize.AsciiTableSerialize.serializer_type" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>int</em> – Type of serializer.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.serialize.AsciiTableSerialize.AsciiTableSerialize.table_info">
+<code class="descname">table_info</code><a class="headerlink" href="#cis_interface.serialize.AsciiTableSerialize.AsciiTableSerialize.table_info" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>dict</em> – Table format information.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-cis_interface.serialize.DefaultSerialize">
+<span id="cis-interface-serialize-defaultserialize-module"></span><h2>cis_interface.serialize.DefaultSerialize module<a class="headerlink" href="#module-cis_interface.serialize.DefaultSerialize" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="cis_interface.serialize.DefaultSerialize.DefaultSerialize">
+<em class="property">class </em><code class="descclassname">cis_interface.serialize.DefaultSerialize.</code><code class="descname">DefaultSerialize</code><span class="sig-paren">(</span><em>format_str=None</em>, <em>as_array=False</em>, <em>field_names=None</em>, <em>field_units=None</em>, <em>func_serialize=None</em>, <em>func_deserialize=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/serialize/DefaultSerialize.html#DefaultSerialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.serialize.DefaultSerialize.DefaultSerialize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Default class for serializing/deserializing a python object into/from
+a bytes message.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>format_str</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – If provided, this string will be used to
+format messages from a list of arguments and parse messages to
+get a list of arguments in C printf/scanf style. Defaults to
+None and messages are assumed to already be bytes.</li>
+<li><strong>as_array</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, each of the arguments being
+serialized/deserialized will be arrays that are converted to/from
+bytes in column major (‘F’) order. Otherwise, each argument should
+be a scalar. Defaults to False.</li>
+<li><strong>field_names</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>, </em><em>optional</em>) – The names of fields in the format string.
+If not provided, names are set based on the order of the fields in
+the format string.</li>
+<li><strong>field_units</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>, </em><em>optional</em>) – The units of fields in the format string.
+If not provided, all fields are assumed to be dimensionless.</li>
+<li><strong>func_serialize</strong> (<em>func</em><em>, </em><em>optional</em>) – Callable object that takes python
+objects as input and returns a bytes string representation. Defaults
+to None.</li>
+<li><strong>func_deserialize</strong> (<em>func</em><em>, </em><em>optional</em>) – Callable object that takes a bytes
+string as input and returns a deserialized python object. Defaults
+to None.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="cis_interface.serialize.DefaultSerialize.DefaultSerialize.format_str">
+<code class="descname">format_str</code><a class="headerlink" href="#cis_interface.serialize.DefaultSerialize.DefaultSerialize.format_str" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str</em> – Format string used to format/parse bytes messages
+from/to a list of arguments in C printf/scanf style.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.serialize.DefaultSerialize.DefaultSerialize.as_array">
+<code class="descname">as_array</code><a class="headerlink" href="#cis_interface.serialize.DefaultSerialize.DefaultSerialize.as_array" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>bool</em> – True or False depending if serialized/deserialized
+python objects will be arrays or scalars.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.serialize.DefaultSerialize.DefaultSerialize.field_names">
+<code class="descname">field_names</code><a class="headerlink" href="#cis_interface.serialize.DefaultSerialize.DefaultSerialize.field_names" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>list</em> – The names of fields in the format string.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.serialize.DefaultSerialize.DefaultSerialize.field_units">
+<code class="descname">field_units</code><a class="headerlink" href="#cis_interface.serialize.DefaultSerialize.DefaultSerialize.field_units" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>list</em> – The units of fields in the format string.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.serialize.DefaultSerialize.DefaultSerialize.func_serialize">
+<code class="descname">func_serialize</code><a class="reference internal" href="_modules/cis_interface/serialize/DefaultSerialize.html#DefaultSerialize.func_serialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.serialize.DefaultSerialize.DefaultSerialize.func_serialize" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>func</em> – Callable object that takes python object as input
+and returns a bytes string representation.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.serialize.DefaultSerialize.DefaultSerialize.func_deserialize">
+<code class="descname">func_deserialize</code><a class="reference internal" href="_modules/cis_interface/serialize/DefaultSerialize.html#DefaultSerialize.func_deserialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.serialize.DefaultSerialize.DefaultSerialize.func_deserialize" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>func</em> – Callable object that takes a bytes string as
+input and returns a deserialized python object.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.serialize.DefaultSerialize.DefaultSerialize.__getattribute__">
+<code class="descname">__getattribute__</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/serialize/DefaultSerialize.html#DefaultSerialize.__getattribute__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.serialize.DefaultSerialize.DefaultSerialize.__getattribute__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return alias result if there is one.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.serialize.DefaultSerialize.DefaultSerialize.deserialize">
+<code class="descname">deserialize</code><span class="sig-paren">(</span><em>msg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/serialize/DefaultSerialize.html#DefaultSerialize.deserialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.serialize.DefaultSerialize.DefaultSerialize.deserialize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deserialize a message.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>msg</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.6)"><em>bytes</em></a>) – Message to be deserialized.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Deserialized message and header information.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.6)">tuple</a>(obj, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)">dict</a>)</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#TypeError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">TypeError</span></code></a> – If msg is not bytes type (str on Python 2).</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.serialize.DefaultSerialize.DefaultSerialize.empty_msg">
+<code class="descname">empty_msg</code><a class="headerlink" href="#cis_interface.serialize.DefaultSerialize.DefaultSerialize.empty_msg" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>obj</em> – Object indicating empty message.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.serialize.DefaultSerialize.DefaultSerialize.field_formats">
+<code class="descname">field_formats</code><a class="headerlink" href="#cis_interface.serialize.DefaultSerialize.DefaultSerialize.field_formats" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>list</em> – Format codes for each field in the format string.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.serialize.DefaultSerialize.DefaultSerialize.format_header">
+<code class="descname">format_header</code><span class="sig-paren">(</span><em>header_info</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/serialize/DefaultSerialize.html#DefaultSerialize.format_header"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.serialize.DefaultSerialize.DefaultSerialize.format_header" title="Permalink to this definition">¶</a></dt>
+<dd><p>Format header info to form a string that should prepend a message.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>header_info</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) – Properties that should be included in the header.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Message with header in front.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)">str</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<code class="descname">func_deserialize</code><span class="sig-paren">(</span><em>msg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/serialize/DefaultSerialize.html#DefaultSerialize.func_deserialize"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Default method for deseserializing a message.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>msg</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.6)"><em>bytes</em></a>) – Message to be deserialized.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Deserialized message and header information.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.6)">tuple</a>(obj, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)">dict</a>)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<code class="descname">func_serialize</code><span class="sig-paren">(</span><em>args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/serialize/DefaultSerialize.html#DefaultSerialize.func_serialize"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Default method for serializing object into message.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>args</strong> (<em>obj</em>) – List of arguments to be formatted or a ready made message.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Serialized message.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.6)">bytes</a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)">str</a></td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.6)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">Exception</span></code></a> – If there is no format string and more than one argument
+is provided.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.serialize.DefaultSerialize.DefaultSerialize.is_user_defined">
+<code class="descname">is_user_defined</code><a class="headerlink" href="#cis_interface.serialize.DefaultSerialize.DefaultSerialize.is_user_defined" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>bool</em> – True if serialization or deserialization function was user
+defined.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.serialize.DefaultSerialize.DefaultSerialize.nfields">
+<code class="descname">nfields</code><a class="headerlink" href="#cis_interface.serialize.DefaultSerialize.DefaultSerialize.nfields" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>int</em> – Number of fields in the format string.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.serialize.DefaultSerialize.DefaultSerialize.numpy_dtype">
+<code class="descname">numpy_dtype</code><a class="headerlink" href="#cis_interface.serialize.DefaultSerialize.DefaultSerialize.numpy_dtype" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>np.dtype</em> – Data type associated with the format string.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.serialize.DefaultSerialize.DefaultSerialize.parse_header">
+<code class="descname">parse_header</code><span class="sig-paren">(</span><em>msg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/serialize/DefaultSerialize.html#DefaultSerialize.parse_header"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.serialize.DefaultSerialize.DefaultSerialize.parse_header" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extract header info from a message.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>msg</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Message to extract header from.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Message properties.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)">dict</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.serialize.DefaultSerialize.DefaultSerialize.scanf_format_str">
+<code class="descname">scanf_format_str</code><a class="headerlink" href="#cis_interface.serialize.DefaultSerialize.DefaultSerialize.scanf_format_str" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str</em> – Simplified format string for scanf.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.serialize.DefaultSerialize.DefaultSerialize.serialize">
+<code class="descname">serialize</code><span class="sig-paren">(</span><em>args</em>, <em>header_kwargs=None</em>, <em>add_serializer_info=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/serialize/DefaultSerialize.html#DefaultSerialize.serialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.serialize.DefaultSerialize.DefaultSerialize.serialize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Serialize a message.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>args</strong> (<em>obj</em>) – List of arguments to be formatted or a ready made message.</li>
+<li><strong>header_kwargs</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a><em>, </em><em>optional</em>) – Keyword arguments that should be
+added to the header. Defaults to None and no header is added.</li>
+<li><strong>add_serializer_info</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, add enough information
+about this serializer to the header that the message can be
+recovered.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Serialized message.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.6)">bytes</a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)">str</a></p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#TypeError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">TypeError</span></code></a> – If returned msg is not bytes type (str on Python 2).</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.serialize.DefaultSerialize.DefaultSerialize.serializer_info">
+<code class="descname">serializer_info</code><a class="headerlink" href="#cis_interface.serialize.DefaultSerialize.DefaultSerialize.serializer_info" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>dict</em> – Information about serializer required to reconstruct it.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.serialize.DefaultSerialize.DefaultSerialize.serializer_type">
+<code class="descname">serializer_type</code><a class="headerlink" href="#cis_interface.serialize.DefaultSerialize.DefaultSerialize.serializer_type" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>int</em> – Type of serializer.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.serialize.DefaultSerialize.DefaultSerialize.update_from_message">
+<code class="descname">update_from_message</code><span class="sig-paren">(</span><em>msg</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/serialize/DefaultSerialize.html#DefaultSerialize.update_from_message"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.serialize.DefaultSerialize.DefaultSerialize.update_from_message" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update serializer information based on the message.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>msg</strong> (<em>obj</em>) – Python object being sent as a message.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.serialize.DefaultSerialize.DefaultSerialize.update_serializer">
+<code class="descname">update_serializer</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/serialize/DefaultSerialize.html#DefaultSerialize.update_serializer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.serialize.DefaultSerialize.DefaultSerialize.update_serializer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update serializer with provided information.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-cis_interface.serialize.MatSerialize">
+<span id="cis-interface-serialize-matserialize-module"></span><h2>cis_interface.serialize.MatSerialize module<a class="headerlink" href="#module-cis_interface.serialize.MatSerialize" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="cis_interface.serialize.MatSerialize.MatSerialize">
+<em class="property">class </em><code class="descclassname">cis_interface.serialize.MatSerialize.</code><code class="descname">MatSerialize</code><span class="sig-paren">(</span><em>format_str=None</em>, <em>as_array=False</em>, <em>field_names=None</em>, <em>field_units=None</em>, <em>func_serialize=None</em>, <em>func_deserialize=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/serialize/MatSerialize.html#MatSerialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.serialize.MatSerialize.MatSerialize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.serialize.DefaultSerialize.DefaultSerialize" title="cis_interface.serialize.DefaultSerialize.DefaultSerialize"><code class="xref py py-class docutils literal notranslate"><span class="pre">cis_interface.serialize.DefaultSerialize.DefaultSerialize</span></code></a></p>
+<p>Class for serializing a python object into a bytes message using the
+Matlab .mat format.</p>
+<dl class="method">
+<dt id="cis_interface.serialize.MatSerialize.MatSerialize.func_deserialize">
+<code class="descname">func_deserialize</code><span class="sig-paren">(</span><em>msg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/serialize/MatSerialize.html#MatSerialize.func_deserialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.serialize.MatSerialize.MatSerialize.func_deserialize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deserialize a message.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>msg</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.6)"><em>bytes</em></a>) – Message to be deserialized.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Deserialized Python object.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">obj</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.serialize.MatSerialize.MatSerialize.func_serialize">
+<code class="descname">func_serialize</code><span class="sig-paren">(</span><em>args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/serialize/MatSerialize.html#MatSerialize.func_serialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.serialize.MatSerialize.MatSerialize.func_serialize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Serialize a message.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>args</strong> (<em>obj</em>) – Python object to be serialized.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Serialized message.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.6)">bytes</a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)">str</a></td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#TypeError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">TypeError</span></code></a> – If args is not a dictionary.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.serialize.MatSerialize.MatSerialize.serializer_type">
+<code class="descname">serializer_type</code><a class="headerlink" href="#cis_interface.serialize.MatSerialize.MatSerialize.serializer_type" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>int</em> – Type of serializer.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-cis_interface.serialize.ObjSerialize">
+<span id="cis-interface-serialize-objserialize-module"></span><h2>cis_interface.serialize.ObjSerialize module<a class="headerlink" href="#module-cis_interface.serialize.ObjSerialize" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="cis_interface.serialize.ObjSerialize.ObjDict">
+<em class="property">class </em><code class="descclassname">cis_interface.serialize.ObjSerialize.</code><code class="descname">ObjDict</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/serialize/ObjSerialize.html#ObjDict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.serialize.ObjSerialize.ObjDict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.serialize.PlySerialize.PlyDict" title="cis_interface.serialize.PlySerialize.PlyDict"><code class="xref py py-class docutils literal notranslate"><span class="pre">cis_interface.serialize.PlySerialize.PlyDict</span></code></a></p>
+<p>Class for storing obj information.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>vertices</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>, </em><em>optional</em>) – 3D positions of vertices comprising the
+3D object. Defaults to [].</li>
+<li><strong>faces</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>, </em><em>optional</em>) – Indices of 3 or more vertices making up faces
+or a tuple containing the indices for the position, texture
+coordinate, and normal for each vertex in the face. This
+information can also be provided in their own lists, but
+there must be an entry for every face. Defaults to [].</li>
+<li><strong>vertex_colors</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>, </em><em>optional</em>) – RGB values for each of the vertices.
+If not provided, all vertices will be black. Defaults to [].</li>
+<li><strong>material</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – Material to use for faces. Defaults to None.</li>
+<li><strong>normals</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>, </em><em>optional</em>) – 3D normals for vertices. Defaults to [].</li>
+<li><strong>texcoords</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>, </em><em>optional</em>) – 3D texture coordinates for vertices.
+Defaults to [].</li>
+<li><strong>face_texcoords</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>, </em><em>optional</em>) – Indices of texture coordinates for each
+vertex in the face. Entries of None are ignored. Defaults to [].</li>
+<li><strong>face_normals</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>, </em><em>optional</em>) – Indices of normals for each vertex in the
+face. Entries of None are ignored. Defaults to [].</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="cis_interface.serialize.ObjSerialize.ObjDict.append">
+<code class="descname">append</code><span class="sig-paren">(</span><em>solf</em>, <em>default_rgb=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/serialize/ObjSerialize.html#ObjDict.append"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.serialize.ObjSerialize.ObjDict.append" title="Permalink to this definition">¶</a></dt>
+<dd><p>Append new ply information to this dictionary.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>solf</strong> (<a class="reference internal" href="#cis_interface.serialize.ObjSerialize.ObjDict" title="cis_interface.serialize.ObjSerialize.ObjDict"><em>ObjDict</em></a>) – Another ply to append to this one.</li>
+<li><strong>default_rgb</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>, </em><em>optional</em>) – Default color in RGB that should be
+used for missing colors. Defaults to [0, 0, 0].</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="cis_interface.serialize.ObjSerialize.ObjDict.from_shape">
+<em class="property">classmethod </em><code class="descname">from_shape</code><span class="sig-paren">(</span><em>shape</em>, <em>d</em>, <em>conversion=1.0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/serialize/ObjSerialize.html#ObjDict.from_shape"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.serialize.ObjSerialize.ObjDict.from_shape" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a ply dictionary from a PlantGL shape and descritizer.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>scene</strong> (<em>openalea.plantgl.scene</em>) – Scene that should be descritized.</li>
+<li><strong>d</strong> (<em>openalea.plantgl.descritizer</em>) – Descritizer.</li>
+<li><strong>conversion</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>, </em><em>optional</em>) – Conversion factor that should be
+applied to the vertex positions. Defaults to 1.0.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.serialize.ObjSerialize.ObjDict.standardize">
+<code class="descname">standardize</code><span class="sig-paren">(</span><em>no_copy=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/serialize/ObjSerialize.html#ObjDict.standardize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.serialize.ObjSerialize.ObjDict.standardize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Put the dictionary in the standard format with face information
+split into separate fields.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>no_copy</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, the current dictionary will be
+updated. Otherwise a copy will be returned. Defaults to False.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Standardized obj information.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="#cis_interface.serialize.ObjSerialize.ObjDict" title="cis_interface.serialize.ObjSerialize.ObjDict">ObjDict</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.serialize.ObjSerialize.ObjDict.to_geom_args">
+<code class="descname">to_geom_args</code><span class="sig-paren">(</span><em>conversion=1.0</em>, <em>name=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/serialize/ObjSerialize.html#ObjDict.to_geom_args"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.serialize.ObjSerialize.ObjDict.to_geom_args" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get arguments for creating a PlantGL geometry.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>conversion</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>, </em><em>optional</em>) – Conversion factor that should be
+applied to the vertices. Defaults to 1.0.</li>
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – Name that should be given to the created
+PlantGL symbol. Defaults to None and is ignored.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Class, arguments and keyword arguments for PlantGL geometry.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.6)">tuple</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.serialize.ObjSerialize.ObjSerialize">
+<em class="property">class </em><code class="descclassname">cis_interface.serialize.ObjSerialize.</code><code class="descname">ObjSerialize</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/serialize/ObjSerialize.html#ObjSerialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.serialize.ObjSerialize.ObjSerialize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.serialize.PlySerialize.PlySerialize" title="cis_interface.serialize.PlySerialize.PlySerialize"><code class="xref py py-class docutils literal notranslate"><span class="pre">cis_interface.serialize.PlySerialize.PlySerialize</span></code></a></p>
+<p>Class for serializing/deserializing .obj file formats. Reader
+adapted from <a class="reference external" href="https://www.pygame.org/wiki/OBJFileLoader">https://www.pygame.org/wiki/OBJFileLoader</a>.</p>
+<dl class="method">
+<dt id="cis_interface.serialize.ObjSerialize.ObjSerialize.func_deserialize">
+<code class="descname">func_deserialize</code><span class="sig-paren">(</span><em>msg</em>, <em>zero_indexed=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/serialize/ObjSerialize.html#ObjSerialize.func_deserialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.serialize.ObjSerialize.ObjSerialize.func_deserialize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deserialize a message.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>msg</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.6)"><em>bytes</em></a>) – Message to be deserialized.</li>
+<li><strong>zero_indexed</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, the parsed indices are adjusted
+to start at zero. If False, the indices will not be adjusted and
+will start at one as per .obj format. Defaults to True.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Deserialized .obj information. The faces are zero indexed.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="#cis_interface.serialize.ObjSerialize.ObjDict" title="cis_interface.serialize.ObjSerialize.ObjDict">ObjDict</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.serialize.ObjSerialize.ObjSerialize.func_serialize">
+<code class="descname">func_serialize</code><span class="sig-paren">(</span><em>args</em>, <em>zero_indexed=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/serialize/ObjSerialize.html#ObjSerialize.func_serialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.serialize.ObjSerialize.ObjSerialize.func_serialize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Serialize a message.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>args</strong> (<a class="reference internal" href="#cis_interface.serialize.ObjSerialize.ObjDict" title="cis_interface.serialize.ObjSerialize.ObjDict"><em>ObjDict</em></a>) – Dictionary of obj information.</li>
+<li><strong>zero_indexed</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, the input indices are assumed
+to start at zero and they will be adjusted to start at one and
+conform with .obj format. If False, the input indices are assumed
+to start at one and they will not be adjusted. Defaults to True.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Serialized message.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.6)">bytes</a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)">str</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.serialize.ObjSerialize.ObjSerialize.serializer_type">
+<code class="descname">serializer_type</code><a class="headerlink" href="#cis_interface.serialize.ObjSerialize.ObjSerialize.serializer_type" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>int</em> – Type of serializer.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-cis_interface.serialize.PandasSerialize">
+<span id="cis-interface-serialize-pandasserialize-module"></span><h2>cis_interface.serialize.PandasSerialize module<a class="headerlink" href="#module-cis_interface.serialize.PandasSerialize" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="cis_interface.serialize.PandasSerialize.PandasSerialize">
+<em class="property">class </em><code class="descclassname">cis_interface.serialize.PandasSerialize.</code><code class="descname">PandasSerialize</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/serialize/PandasSerialize.html#PandasSerialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.serialize.PandasSerialize.PandasSerialize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.serialize.DefaultSerialize.DefaultSerialize" title="cis_interface.serialize.DefaultSerialize.DefaultSerialize"><code class="xref py py-class docutils literal notranslate"><span class="pre">cis_interface.serialize.DefaultSerialize.DefaultSerialize</span></code></a></p>
+<p>Class for serializing/deserializing Pandas data frames.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>delimiter</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – Delimiter that should be used to serialize
+pandas data frames to/from csv style files. Defaults to t.</li>
+<li><strong>write_header</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, headers will be added to
+serialized tables. Defaults to True.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="cis_interface.serialize.PandasSerialize.PandasSerialize.empty_msg">
+<code class="descname">empty_msg</code><a class="headerlink" href="#cis_interface.serialize.PandasSerialize.PandasSerialize.empty_msg" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>obj</em> – Object indicating empty message.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.serialize.PandasSerialize.PandasSerialize.func_deserialize">
+<code class="descname">func_deserialize</code><span class="sig-paren">(</span><em>msg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/serialize/PandasSerialize.html#PandasSerialize.func_deserialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.serialize.PandasSerialize.PandasSerialize.func_deserialize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deserialize a message.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>msg</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.6)"><em>bytes</em></a>) – Message to be deserialized.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Deserialized Python object.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">obj</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.serialize.PandasSerialize.PandasSerialize.func_serialize">
+<code class="descname">func_serialize</code><span class="sig-paren">(</span><em>args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/serialize/PandasSerialize.html#PandasSerialize.func_serialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.serialize.PandasSerialize.PandasSerialize.func_serialize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Serialize a message.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>args</strong> (<em>obj</em>) – Python object to be serialized.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Serialized message.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.6)">bytes</a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)">str</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.serialize.PandasSerialize.PandasSerialize.serializer_type">
+<code class="descname">serializer_type</code><a class="headerlink" href="#cis_interface.serialize.PandasSerialize.PandasSerialize.serializer_type" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>int</em> – Type of serializer.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-cis_interface.serialize.PickleSerialize">
+<span id="cis-interface-serialize-pickleserialize-module"></span><h2>cis_interface.serialize.PickleSerialize module<a class="headerlink" href="#module-cis_interface.serialize.PickleSerialize" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="cis_interface.serialize.PickleSerialize.PickleSerialize">
+<em class="property">class </em><code class="descclassname">cis_interface.serialize.PickleSerialize.</code><code class="descname">PickleSerialize</code><span class="sig-paren">(</span><em>format_str=None</em>, <em>as_array=False</em>, <em>field_names=None</em>, <em>field_units=None</em>, <em>func_serialize=None</em>, <em>func_deserialize=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/serialize/PickleSerialize.html#PickleSerialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.serialize.PickleSerialize.PickleSerialize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.serialize.DefaultSerialize.DefaultSerialize" title="cis_interface.serialize.DefaultSerialize.DefaultSerialize"><code class="xref py py-class docutils literal notranslate"><span class="pre">cis_interface.serialize.DefaultSerialize.DefaultSerialize</span></code></a></p>
+<p>Class for serializing a python object into a bytes message by pickling.</p>
+<dl class="attribute">
+<dt id="cis_interface.serialize.PickleSerialize.PickleSerialize.empty_msg">
+<code class="descname">empty_msg</code><a class="headerlink" href="#cis_interface.serialize.PickleSerialize.PickleSerialize.empty_msg" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>obj</em> – Object indicating empty message.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.serialize.PickleSerialize.PickleSerialize.func_deserialize">
+<code class="descname">func_deserialize</code><span class="sig-paren">(</span><em>msg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/serialize/PickleSerialize.html#PickleSerialize.func_deserialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.serialize.PickleSerialize.PickleSerialize.func_deserialize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deserialize a message.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>msg</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.6)"><em>bytes</em></a>) – Message to be deserialized.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Deserialized Python object.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">obj</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.serialize.PickleSerialize.PickleSerialize.func_serialize">
+<code class="descname">func_serialize</code><span class="sig-paren">(</span><em>args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/serialize/PickleSerialize.html#PickleSerialize.func_serialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.serialize.PickleSerialize.PickleSerialize.func_serialize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Serialize a message.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>args</strong> (<em>obj</em>) – Python object to be serialized.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Serialized message.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.6)">bytes</a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)">str</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.serialize.PickleSerialize.PickleSerialize.serializer_type">
+<code class="descname">serializer_type</code><a class="headerlink" href="#cis_interface.serialize.PickleSerialize.PickleSerialize.serializer_type" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>int</em> – Type of serializer.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-cis_interface.serialize.PlySerialize">
+<span id="cis-interface-serialize-plyserialize-module"></span><h2>cis_interface.serialize.PlySerialize module<a class="headerlink" href="#module-cis_interface.serialize.PlySerialize" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="cis_interface.serialize.PlySerialize.PlyDict">
+<em class="property">class </em><code class="descclassname">cis_interface.serialize.PlySerialize.</code><code class="descname">PlyDict</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/serialize/PlySerialize.html#PlyDict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.serialize.PlySerialize.PlyDict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a></p>
+<p>Class for storing ply information.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>vertices</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>, </em><em>optional</em>) – 3D positions of vertices comprising the
+3D object. Defaults to [].</li>
+<li><strong>faces</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>, </em><em>optional</em>) – Indices of 3 or more vertices making up faces.
+Defaults to [].</li>
+<li><strong>vertex_colors</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>, </em><em>optional</em>) – RGB values for each of the vertices.
+If not provided, all vertices will be black. Defaults to [].</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="cis_interface.serialize.PlySerialize.PlyDict.append">
+<code class="descname">append</code><span class="sig-paren">(</span><em>solf</em>, <em>default_rgb=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/serialize/PlySerialize.html#PlyDict.append"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.serialize.PlySerialize.PlyDict.append" title="Permalink to this definition">¶</a></dt>
+<dd><p>Append new ply information to this dictionary.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>solf</strong> (<a class="reference internal" href="#cis_interface.serialize.PlySerialize.PlyDict" title="cis_interface.serialize.PlySerialize.PlyDict"><em>PlyDict</em></a>) – Another ply to append to this one.</li>
+<li><strong>default_rgb</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>, </em><em>optional</em>) – Default color in RGB that should be
+used for missing colors. Defaults to [0, 0, 0].</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.serialize.PlySerialize.PlyDict.apply_scalar_map">
+<code class="descname">apply_scalar_map</code><span class="sig-paren">(</span><em>scalar_arr</em>, <em>color_map=None</em>, <em>vmin=None</em>, <em>vmax=None</em>, <em>scaling='linear'</em>, <em>scale_by_area=False</em>, <em>no_copy=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/serialize/PlySerialize.html#PlyDict.apply_scalar_map"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.serialize.PlySerialize.PlyDict.apply_scalar_map" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the color of faces in a 3D object based on a scalar map.
+This creates a copy unless no_copy is True.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>scalar_arr</strong> (<em>arr</em>) – Scalar values that should be mapped to colors
+for each face.</li>
+<li><strong>color_map</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – The name of the color map that should
+be used. Defaults to ‘plasma’.</li>
+<li><strong>vmin</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>, </em><em>optional</em>) – Value that should map to the minimum of the
+colormap. Defaults to min(scalar_arr).</li>
+<li><strong>vmax</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>, </em><em>optional</em>) – Value that should map to the maximum of the
+colormap. Defaults to max(scalar_arr).</li>
+<li><strong>scaling</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – Scaling that should be used to map the scalar
+array onto the colormap. Defaults to ‘linear’.</li>
+<li><strong>scale_by_area</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, the elements of the scalar
+array will be multiplied by the area of the corresponding face.
+If True, vmin and vmax should be in terms of the scaled array.
+Defaults to False.</li>
+<li><strong>no_copy</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, the returned object will not be a
+copy. Defaults to False.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Ply with updated vertex colors.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)">dict</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.serialize.PlySerialize.PlyDict.bounds">
+<code class="descname">bounds</code><a class="headerlink" href="#cis_interface.serialize.PlySerialize.PlyDict.bounds" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>tuple</em> – Minimums and maximums of vertices.</p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="cis_interface.serialize.PlySerialize.PlyDict.from_scene">
+<em class="property">classmethod </em><code class="descname">from_scene</code><span class="sig-paren">(</span><em>scene</em>, <em>d=None</em>, <em>conversion=1.0</em>, <em>default_rgb=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/serialize/PlySerialize.html#PlyDict.from_scene"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.serialize.PlySerialize.PlyDict.from_scene" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a ply dictionary from a PlantGL scene and descritizer.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>scene</strong> (<em>openalea.plantgl.scene</em>) – Scene that should be descritized.</li>
+<li><strong>d</strong> (<em>openalea.plantgl.descritizer</em><em>, </em><em>optional</em>) – Descritizer. Defaults
+to openalea.plantgl.all.Tesselator.</li>
+<li><strong>conversion</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>, </em><em>optional</em>) – Conversion factor that should be
+applied to the vertex positions. Defaults to 1.0.</li>
+<li><strong>default_rgb</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>, </em><em>optional</em>) – Default color in RGB that should be
+used for missing colors. Defaults to [0, 0, 0].</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="cis_interface.serialize.PlySerialize.PlyDict.from_shape">
+<em class="property">classmethod </em><code class="descname">from_shape</code><span class="sig-paren">(</span><em>shape</em>, <em>d</em>, <em>conversion=1.0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/serialize/PlySerialize.html#PlyDict.from_shape"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.serialize.PlySerialize.PlyDict.from_shape" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a ply dictionary from a PlantGL shape and descritizer.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>scene</strong> (<em>openalea.plantgl.scene</em>) – Scene that should be descritized.</li>
+<li><strong>d</strong> (<em>openalea.plantgl.descritizer</em>) – Descritizer.</li>
+<li><strong>conversion</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>, </em><em>optional</em>) – Conversion factor that should be
+applied to the vertex positions. Defaults to 1.0.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.serialize.PlySerialize.PlyDict.merge">
+<code class="descname">merge</code><span class="sig-paren">(</span><em>ply_list</em>, <em>no_copy=False</em>, <em>default_rgb=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/serialize/PlySerialize.html#PlyDict.merge"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.serialize.PlySerialize.PlyDict.merge" title="Permalink to this definition">¶</a></dt>
+<dd><p>Merge a list of ply dictionaries.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>ply_list</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a>) – Ply dictionaries.</li>
+<li><strong>no_copy</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, the current dictionary will be
+updated, otherwise a copy will be returned with the update.
+Defaults to False.</li>
+<li><strong>default_rgb</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>, </em><em>optional</em>) – Default color in RGB that should be
+used for missing colors. Defaults to [0, 0, 0].</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Merged ply dictionary.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)">dict</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.serialize.PlySerialize.PlyDict.mesh">
+<code class="descname">mesh</code><a class="headerlink" href="#cis_interface.serialize.PlySerialize.PlyDict.mesh" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>list</em> – Vertices for each face in the structure.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.serialize.PlySerialize.PlyDict.nface">
+<code class="descname">nface</code><a class="headerlink" href="#cis_interface.serialize.PlySerialize.PlyDict.nface" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>int</em> – Number of faces.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.serialize.PlySerialize.PlyDict.nvert">
+<code class="descname">nvert</code><a class="headerlink" href="#cis_interface.serialize.PlySerialize.PlyDict.nvert" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>int</em> – Number of vertices.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.serialize.PlySerialize.PlyDict.set_vertex_colors">
+<code class="descname">set_vertex_colors</code><span class="sig-paren">(</span><em>default_rgb=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/serialize/PlySerialize.html#PlyDict.set_vertex_colors"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.serialize.PlySerialize.PlyDict.set_vertex_colors" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the vertex colors to a default if they are not yet set.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>default_rgb</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>, </em><em>optional</em>) – Default color in RGB that should be
+used for missing colors. Defaults to [0, 0, 0].</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.serialize.PlySerialize.PlyDict.to_geom_args">
+<code class="descname">to_geom_args</code><span class="sig-paren">(</span><em>conversion=1.0</em>, <em>name=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/serialize/PlySerialize.html#PlyDict.to_geom_args"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.serialize.PlySerialize.PlyDict.to_geom_args" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get arguments for creating a PlantGL geometry.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>conversion</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>, </em><em>optional</em>) – Conversion factor that should be
+applied to the vertices. Defaults to 1.0.</li>
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – Name that should be given to the created
+PlantGL symbol. Defaults to None and is ignored.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Class, arguments and keyword arguments for PlantGL geometry.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.6)">tuple</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.serialize.PlySerialize.PlyDict.to_scene">
+<code class="descname">to_scene</code><span class="sig-paren">(</span><em>conversion=1.0</em>, <em>name=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/serialize/PlySerialize.html#PlyDict.to_scene"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.serialize.PlySerialize.PlyDict.to_scene" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a PlantGL scene from a Ply dictionary.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>conversion</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>, </em><em>optional</em>) – Conversion factor that should be
+applied to the vertices. Defaults to 1.0.</li>
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – Name that should be given to the created
+PlantGL symbol. Defaults to None and is ignored.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Returns:</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.serialize.PlySerialize.PlySerialize">
+<em class="property">class </em><code class="descclassname">cis_interface.serialize.PlySerialize.</code><code class="descname">PlySerialize</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/serialize/PlySerialize.html#PlySerialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.serialize.PlySerialize.PlySerialize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.serialize.DefaultSerialize.DefaultSerialize" title="cis_interface.serialize.DefaultSerialize.DefaultSerialize"><code class="xref py py-class docutils literal notranslate"><span class="pre">cis_interface.serialize.DefaultSerialize.DefaultSerialize</span></code></a></p>
+<p>Class for serializing/deserializing .ply file formats.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>write_header</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, headers will be added to
+serialized output. Defaults to True.</li>
+<li><strong>newline</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – String that should be used for new lines.
+Defaults to ‘n’.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="cis_interface.serialize.PlySerialize.PlySerialize.write_header">
+<code class="descname">write_header</code><a class="headerlink" href="#cis_interface.serialize.PlySerialize.PlySerialize.write_header" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>bool</em> – If True, headers will be added to serialized
+output.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.serialize.PlySerialize.PlySerialize.newline">
+<code class="descname">newline</code><a class="headerlink" href="#cis_interface.serialize.PlySerialize.PlySerialize.newline" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str</em> – String that should be used for new lines.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.serialize.PlySerialize.PlySerialize.default_rgb">
+<code class="descname">default_rgb</code><a class="headerlink" href="#cis_interface.serialize.PlySerialize.PlySerialize.default_rgb" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>list</em> – Default color in RGB that should be used for
+missing colors.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.serialize.PlySerialize.PlySerialize.empty_msg">
+<code class="descname">empty_msg</code><a class="headerlink" href="#cis_interface.serialize.PlySerialize.PlySerialize.empty_msg" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>obj</em> – Object indicating empty message.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.serialize.PlySerialize.PlySerialize.func_deserialize">
+<code class="descname">func_deserialize</code><span class="sig-paren">(</span><em>msg</em>, <em>nvert=None</em>, <em>nface=None</em>, <em>do_vertex_colors=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/serialize/PlySerialize.html#PlySerialize.func_deserialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.serialize.PlySerialize.PlySerialize.func_deserialize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deserialize a message.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>msg</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.6)"><em>bytes</em></a>) – Message to be deserialized.</li>
+<li><strong>nvert</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>, </em><em>optional</em>) – Number of vertices expected if the ply
+header is not in the message. Defaults to None.</li>
+<li><strong>nface</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>, </em><em>optional</em>) – Number of faces expected if the ply
+header is not in the message. Defaults to None.</li>
+<li><strong>do_vertex_colors</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) – If True the vertex color
+will be contained in the vertex information if the ply
+header is not in the message. Defaults to False.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Deserialized .ply information.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)">dict</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.serialize.PlySerialize.PlySerialize.func_serialize">
+<code class="descname">func_serialize</code><span class="sig-paren">(</span><em>args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/serialize/PlySerialize.html#PlySerialize.func_serialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.serialize.PlySerialize.PlySerialize.func_serialize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Serialize a message.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>args</strong> (<a class="reference internal" href="#cis_interface.serialize.PlySerialize.PlyDict" title="cis_interface.serialize.PlySerialize.PlyDict"><em>PlyDict</em></a>) – Dictionary of ply information.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Serialized message.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.6)">bytes</a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)">str</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.serialize.PlySerialize.PlySerialize.serializer_type">
+<code class="descname">serializer_type</code><a class="headerlink" href="#cis_interface.serialize.PlySerialize.PlySerialize.serializer_type" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>int</em> – Type of serializer.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-cis_interface.serialize">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-cis_interface.serialize" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Meagan Lang, David Raila.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.2.0',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  <script type="text/javascript" src="_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
