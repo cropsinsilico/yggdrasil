@@ -23,13 +23,6 @@ class TestForkComm(TestCommBase):
         out['ncomm'] = self.ncomm
         return out
 
-    @property
-    def inst_kwargs(self):
-        r"""list: Keyword arguments for tested class."""
-        out = super(TestForkComm, self).inst_kwargs
-        out['comm'] = 'ForkComm'  # To force test of construction from addresses
-        return out
-
     def test_error_name(self):
         r"""Test error on missing address."""
         nt.assert_raises(RuntimeError, self.import_cls, 'test%s' % uuid.uuid4())
@@ -51,3 +44,13 @@ class TestForkComm(TestCommBase):
         if 'eof' not in kwargs.get('send_meth', 'None'):
             kwargs['n_recv'] = self.ncomm
         super(TestForkComm, self).do_send_recv(*args, **kwargs)
+
+
+class TestForkCommList(TestForkComm):
+    r"""Tests for ForkComm communication class with construction from address."""
+    @property
+    def inst_kwargs(self):
+        r"""list: Keyword arguments for tested class."""
+        out = super(TestForkComm, self).inst_kwargs
+        out['comm'] = 'ForkComm'  # To force test of construction from addresses
+        return out
