@@ -1,0 +1,37 @@
+cis_interface.interface package
+===============================
+
+Subpackages
+-----------
+
+.. toctree::
+
+    cis_interface.interface.tests
+
+Submodules
+----------
+
+cis_interface.interface.CisInterface module
+-------------------------------------------
+
+.. automodule:: cis_interface.interface.CisInterface
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+cis_interface.interface.PsiInterface module
+-------------------------------------------
+
+.. automodule:: cis_interface.interface.PsiInterface
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: cis_interface.interface
+    :members:
+    :undoc-members:
+    :show-inheritance:
