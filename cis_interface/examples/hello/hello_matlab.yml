@@ -12,7 +12,7 @@ model:
     - name: helloQueueIn    
       driver: InputDriver
       args: helloQueue
-      onexit: on_model_exit
+      onexit: printStatus
 
   outputs:
     - name: helloQueueOut    

@@ -3,7 +3,7 @@ import nose.tools as nt
 from cis_interface import schema
 
 
-def direct_translate(msg):
+def direct_translate(msg):  # pragma: no cover
     r"""Test translator that just returns passed message."""
     return msg
 

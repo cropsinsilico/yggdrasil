@@ -6,7 +6,7 @@ from cis_interface.tests import CisTestClass
 _yaml_env = 'TEST_YAML_FILE'
 
 
-def direct_translate(msg):
+def direct_translate(msg):  # pragma: no cover
     r"""Test translator that just returns passed message."""
     return msg
 
