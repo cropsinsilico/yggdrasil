@@ -1,12 +1,12 @@
 models:
   - name: python_modelA
-    driver: PythonModelDriver
+    language: python
     args: ./src/gs_lesson4_modelA.py
     inputs: inputA
     outputs: outputA
 
   - name: python_modelB
-    driver: PythonModelDriver
+    language: python
     args: ./src/gs_lesson4_modelB.py
     inputs: inputB
     outputs: outputB

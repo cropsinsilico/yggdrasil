@@ -1,12 +1,12 @@
 models:
   - name: python_modelA
-    driver: PythonModelDriver
+    language: python
     args: ./src/formatted_io5_modelA.py
     inputs: inputA
     outputs: outputA
 
   - name: python_modelB
-    driver: PythonModelDriver
+    language: python
     args: ./src/formatted_io5_modelB.py
     inputs: inputB
     outputs: outputB

@@ -1,6 +1,6 @@
 models:
   - name: python_modelA
-    driver: PythonModelDriver
+    language: python
     args: ./src/gs_lesson4b_modelA.py
 
     inputs:
@@ -14,7 +14,7 @@ models:
         args: A_to_B  # Connection to inputB
 
   - name: python_modelB
-    driver: PythonModelDriver
+    language: python
     args: ./src/gs_lesson4b_modelB.py
 
     inputs:

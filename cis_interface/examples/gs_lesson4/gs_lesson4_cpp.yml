@@ -1,12 +1,12 @@
 models:
   - name: cpp_modelA
-    driver: GCCModelDriver
+    language: c++
     args: ./src/gs_lesson4_modelA.cpp
     inputs: inputA
     outputs: outputA
 
   - name: cpp_modelB
-    driver: GCCModelDriver
+    language: c++
     args: ./src/gs_lesson4_modelB.cpp
     inputs: inputB
     outputs: outputB

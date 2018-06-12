@@ -1,6 +1,6 @@
 models:
   - name: python_model
-    driver: PythonModelDriver  # Runs the python script using default Python
+    language: python  # Runs the python script using default Python
     args: ./src/gs_lesson3.py
     inputs:
       - input

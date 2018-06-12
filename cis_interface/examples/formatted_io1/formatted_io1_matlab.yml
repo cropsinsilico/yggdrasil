@@ -1,12 +1,12 @@
 models:
   - name: matlab_modelA
-    driver: MatlabModelDriver
+    language: matlab
     args: ./src/formatted_io1_modelA.m
     inputs: inputA
     outputs: outputA
 
   - name: matlab_modelB
-    driver: MatlabModelDriver
+    language: matlab
     args: ./src/formatted_io1_modelB.m
     inputs: inputB
     outputs: outputB

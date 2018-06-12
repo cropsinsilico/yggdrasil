@@ -1,6 +1,6 @@
 models:
   - name: c_modelA
-    driver: GCCModelDriver
+    language: c
     args: ./src/formatted_io3_modelA.c
     inputs: inputA
     outputs:
@@ -8,7 +8,7 @@ models:
       field_names: name,count,size
 
   - name: c_modelB
-    driver: GCCModelDriver
+    language: c
     args: ./src/formatted_io3_modelB.c
     inputs: inputB
     outputs:

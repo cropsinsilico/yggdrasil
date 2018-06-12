@@ -1,6 +1,6 @@
 model:
   name: LightModel
-  driver: GCCModelDriver
+  language: c
   args:
     - ./src/light.c
     - -lm

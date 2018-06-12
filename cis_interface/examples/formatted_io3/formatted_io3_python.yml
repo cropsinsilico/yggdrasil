@@ -1,6 +1,6 @@
 models:
   - name: python_modelA
-    driver: PythonModelDriver
+    language: python
     args: ./src/formatted_io3_modelA.py
     inputs: inputA
     outputs:
@@ -8,7 +8,7 @@ models:
       field_names: name,count,size
 
   - name: python_modelB
-    driver: PythonModelDriver
+    language: python
     args: ./src/formatted_io3_modelB.py
     inputs: inputB
     outputs:

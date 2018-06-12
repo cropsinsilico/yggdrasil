@@ -1,6 +1,6 @@
 models:
   - name: matlab_model
-    driver: MatlabModelDriver  # Runs the script using a Matlab engine
+    language: matlab  # Runs the script using a Matlab engine
     args: ./src/gs_lesson3.m
     inputs:
       - input

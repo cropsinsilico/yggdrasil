@@ -1,6 +1,6 @@
 models:
   - name: matlab_modelA
-    driver: MatlabModelDriver
+    language: matlab
     args: ./src/formatted_io3_modelA.m
     inputs: inputA
     outputs:
@@ -8,7 +8,7 @@ models:
       field_names: name,count,size
 
   - name: matlab_modelB
-    driver: MatlabModelDriver
+    language: matlab
     args: ./src/formatted_io3_modelB.m
     inputs: inputB
     outputs:

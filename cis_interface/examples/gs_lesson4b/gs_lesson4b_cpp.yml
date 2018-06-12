@@ -1,6 +1,6 @@
 models:
   - name: cpp_modelA
-    driver: GCCModelDriver
+    language: c++
     args: ./src/gs_lesson4b_modelA.cpp
 
     inputs:
@@ -14,7 +14,7 @@ models:
         args: A_to_B  # Connection to inputB
 
   - name: cpp_modelB
-    driver: GCCModelDriver
+    language: c++
     args: ./src/gs_lesson4b_modelB.cpp
 
     inputs:

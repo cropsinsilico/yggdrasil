@@ -1,6 +1,6 @@
 models:
   - name: cpp_modelA
-    driver: GCCModelDriver
+    language: c++
     args: ./src/formatted_io4_modelA.cpp
     inputs: inputA
     outputs:
@@ -8,7 +8,7 @@ models:
       field_names: name,count,size
 
   - name: cpp_modelB
-    driver: GCCModelDriver
+    language: c++
     args: ./src/formatted_io4_modelB.cpp
     inputs: inputB
     outputs:

@@ -1,12 +1,12 @@
 models:
   - name: c_modelA
-    driver: GCCModelDriver
+    language: c
     args: ./src/formatted_io6_modelA.c
     inputs: inputA
     outputs: outputA
 
   - name: c_modelB
-    driver: GCCModelDriver
+    language: c
     args: ./src/formatted_io6_modelB.c
     inputs: inputB
     outputs: outputB

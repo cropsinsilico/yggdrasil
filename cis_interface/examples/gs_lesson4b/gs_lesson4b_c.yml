@@ -1,6 +1,6 @@
 models:
   - name: c_modelA
-    driver: GCCModelDriver
+    language: c
     args: ./src/gs_lesson4b_modelA.c
 
     inputs:
@@ -14,7 +14,7 @@ models:
         args: A_to_B  # Connection to inputB
 
   - name: c_modelB
-    driver: GCCModelDriver
+    language: c
     args: ./src/gs_lesson4b_modelB.c
 
     inputs:
