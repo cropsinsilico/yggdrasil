@@ -1,7 +1,7 @@
 #!/bin/bash
 
 export PSI_DEBUG="INFO"
-export PSI_NAMESPACE="gs_lesson5"
+export PSI_NAMESPACE="gs_lesson4b"
 
 yaml= 
 
@@ -9,19 +9,19 @@ yaml=
 case $1 in
     "" | -p | --python )
 	echo "Running Python"
-	yaml='gs_lesson5_python.yml'
+	yaml='gs_lesson4b_python.yml'
 	;;
     -m | --matlab )
 	echo "Running Matlab"
-	yaml='gs_lesson5_matlab.yml'
+	yaml='gs_lesson4b_matlab.yml'
 	;;
     -c | --gcc )
 	echo "Running C"
-	yaml='gs_lesson5_c.yml'
+	yaml='gs_lesson4b_c.yml'
 	;;
     --cpp | --g++)
 	echo "Running C++"
-	yaml='gs_lesson5_cpp.yml'
+	yaml='gs_lesson4b_cpp.yml'
 	;;
 esac
 

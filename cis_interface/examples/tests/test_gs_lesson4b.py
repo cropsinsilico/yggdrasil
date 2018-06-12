@@ -2,12 +2,12 @@ import os
 from cis_interface.examples.tests import TestExample
 
 
-class TestExampleGS5(TestExample):
-    r"""Test the Getting Started Lesson 5 example."""
+class TestExampleGS4b(TestExample):
+    r"""Test the Getting Started Lesson 4b example."""
 
     def __init__(self, *args, **kwargs):
-        super(TestExampleGS5, self).__init__(*args, **kwargs)
-        self._name = 'gs_lesson5'
+        super(TestExampleGS4b, self).__init__(*args, **kwargs)
+        self._name = 'gs_lesson4b'
 
     @property
     def input_files(self):

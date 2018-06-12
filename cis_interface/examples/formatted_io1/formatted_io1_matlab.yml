@@ -16,7 +16,7 @@ connections:
     output: inputB
   - input: ./Input/input.txt  # Connection between file and model A input
     output: inputA
-    read_meth: line
+    filetype: ascii
   - input: outputB  # Connection between model B output and file
     output: ./output.txt
-    write_meth: line
+    filetype: ascii

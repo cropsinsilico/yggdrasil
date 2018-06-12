@@ -14,21 +14,22 @@ connections:
   # Canopy file input
   - input: ./Input/plant_layout.txt
     output: plant_layout
-    read_meth: table
+    filetype: table
   - input: ./Input/canopy_structure.txt
     output: init_canopy_structure
-    read_meth: table_array
+    filetype: table
+    as_array: True
   - input: ./Input/time.txt
     output: time
-    read_meth: table
+    filetype: table
   # Light file input
   - input: ./Input/ambient_light.txt
     output: ambient_light
-    read_meth: table
+    filetype: table
   # Photosynthesis file input
   - input: ./Input/temperature.txt
     output: temperature
-    read_meth: table
+    filetype: table
   - input: ./Input/co2.txt
     output: co2
-    read_meth: table
+    filetype: table

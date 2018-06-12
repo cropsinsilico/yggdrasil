@@ -2,13 +2,13 @@ models:
   - name: cpp_model
     driver: GCCModelDriver  # Compiles the source code with the necessary cis_interface libraries
     args: ./src/gs_lesson3.cpp
-
     inputs:
-      - name: input
-        driver: FileInputDriver
-        args: ./Input/input.txt
-
+      - input
     outputs:
-      - name: output
-        driver: FileOutputDriver
-        args: ./output.txt
+      - output
+
+connections:
+  - input_file: ./Input/input.txt
+    output: input
+  - input: output
+    output: ./output.txt

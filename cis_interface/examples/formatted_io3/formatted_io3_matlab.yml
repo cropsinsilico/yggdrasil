@@ -20,7 +20,9 @@ connections:
     output: inputB
   - input: ./Input/input.txt  # Connection between file and model A input
     output: inputA
-    read_meth: table_array
+    as_array: True
+    filetype: table
   - input: outputB  # Connection between model B output and file
     output: ./output.txt
-    write_meth: table_array
+    as_array: True
+    filetype: table

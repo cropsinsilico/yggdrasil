@@ -16,7 +16,7 @@ connections:
     output: inputB
   - input: ./Input/input.obj  # Connection between file and model A input
     output: inputA
-    read_meth: obj
+    filetype: obj
   - input: outputB  # Connection between model B output and file
     output: ./output.obj
-    write_meth: obj
+    filetype: obj
