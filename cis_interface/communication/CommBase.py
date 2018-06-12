@@ -302,8 +302,7 @@ class CommBase(tools.CisClass):
                                'schema': {'type': 'string'}},
                'field_units': {'type': 'list', 'required': False,
                                'schema': {'type': 'string'}},  # TODO: coerce units
-               'stype': {'type': 'integer', 'required': False},
-               'onexit': {'type': 'string', 'required': False}}
+               'stype': {'type': 'integer', 'required': False}}
 
     def __init__(self, name, address=None, direction='send',
                  dont_open=False, is_interface=False, recv_timeout=0.0,

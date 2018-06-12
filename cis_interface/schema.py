@@ -195,7 +195,7 @@ class SchemaValidator(cerberus.Validator):
         if isinstance(t, list):
             clist = []
             for k in self.cis_type_order:
-                if k in t:
+                if (k != 'list') and (k in t):
                     clist.append(k)
             if clist:
                 rules['coerce'] = clist
@@ -204,7 +204,12 @@ class SchemaValidator(cerberus.Validator):
         return rules
         
     def _normalize_coerce_string(self, value):
-        return str(value)
+        if isinstance(value, list):
+            return [self._normalize_coerce_string(v) for v in value]
+        elif isinstance(value, dict):
+            return {k: self._normalize_coerce_string(v) for k, v in value.items()}
+        else:
+            return str(value)
 
     def _normalize_coerce_integer(self, value):
         return int(value)

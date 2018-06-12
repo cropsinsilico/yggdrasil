@@ -68,7 +68,8 @@ class ConnectionDriver(Driver):
                                'excludes': 'output'},
                'translator': {'type': ['function', 'list'],
                               'schema': {'type': 'function'},
-                              'required': False}}
+                              'required': False},
+               'onexit': {'type': 'string', 'required': False}}
     _is_input = False
     _is_output = False
 
@@ -152,7 +153,7 @@ class ConnectionDriver(Driver):
                     icomm_kws[k] = kwargs[k]
         self.icomm = new_comm(icomm_kws.pop('name'), **icomm_kws)
         self.icomm_kws = icomm_kws
-        self.env[self.icomm.name] = self.icomm.address
+        self.env.update(**self.icomm.opp_comms)
         # Output communicator
         self.debug("Creating output comm")
         ocomm_kws['direction'] = 'send'
@@ -171,7 +172,7 @@ class ConnectionDriver(Driver):
             self.icomm.close()
             raise
         self.ocomm_kws = ocomm_kws
-        self.env[self.ocomm.name] = self.ocomm.address
+        self.env.update(**self.ocomm.opp_comms)
         
     def wait_for_route(self, timeout=None):
         r"""Wait until messages have been routed."""

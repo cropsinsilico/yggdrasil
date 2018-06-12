@@ -27,7 +27,9 @@ def test_SchemaValidator():
     r"""Test schema validator."""
     v = schema.SchemaValidator()
     test_vals = {
-        'string': [('s', 's'), (1, '1'), (1.0, '1.0')],
+        'string': [('s', 's'), (1, '1'), (1.0, '1.0'),
+                   (['1', 1], ['1', '1']),
+                   ({'1': 1, '2': '2'}, {'1': '1', '2': '2'})],
         'integer': [('1', 1), (1, 1), (1.0, 1)],
         'boolean': [('True', True), ('False', False),
                     (True, True), (False, False),

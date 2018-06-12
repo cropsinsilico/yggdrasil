@@ -23,4 +23,4 @@ class InputDriver(ConnectionDriver):
         icomm_kws['no_suffix'] = True
         kwargs['icomm_kws'] = icomm_kws
         super(InputDriver, self).__init__(name, **kwargs)
-        self.comm_env[self.icomm.name] = self.icomm.address
+        self.comm_env.update(**self.icomm.opp_comms)

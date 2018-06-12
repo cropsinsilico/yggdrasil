@@ -144,6 +144,8 @@ class TestYamlIODrivers(YamlTestBase):
                   '    inputs:',
                   '      - name: inputA',
                   '        driver: FileInputDriver',
+                  '        translator: %s:direct_translate' % __name__,
+                  '        onexit: printStatus',
                   '        args: {{ %s }}' % _yaml_env],
                  ['model:',
                   '  - name: modelB',
@@ -191,6 +193,44 @@ class TestYamlConnection(YamlTestBase):
                   '      - outputB'],)
 
 
+class TestYamlConnectionFork(YamlTestBase):
+    r"""Test connection between I/O channels."""
+    _contents = (['models:',
+                  '  - name: modelA',
+                  '    driver: GCCModelDriver',
+                  '    args: ./src/modelA.c',
+                  '    inputs:',
+                  '      - inputA',
+                  '    outputs:',
+                  '      - outputA',
+                  '',
+                  'connections:',
+                  '  - inputs: ',
+                  '      - outputB',
+                  '      - outputC',
+                  '    output: inputA',
+                  '  - input: outputA',
+                  '    outputs:',
+                  '      - inputB',
+                  '      - inputC'],
+                 ['models:',
+                  '  - name: modelB',
+                  '    driver: GCCModelDriver',
+                  '    args: ./src/modelB.c',
+                  '    inputs:',
+                  '      - inputB',
+                  '    outputs:',
+                  '      - outputB'],
+                 ['models:',
+                  '  - name: modelC',
+                  '    driver: GCCModelDriver',
+                  '    args: ./src/modelC.c',
+                  '    inputs:',
+                  '      - inputC',
+                  '    outputs:',
+                  '      - outputC'],)
+
+
 class TestYamlConnectionTranslator(YamlTestBase):
     r"""Test connection between I/O channels."""
     _contents = (['models:',
@@ -224,11 +264,13 @@ class TestYamlConnectionInputFile(YamlTestBase):
                   '      - outputA',
                   '',
                   'connections:',
-                  '  - input: {{ %s }}' % _yaml_env,
+                  '  - input:',
+                  '      - {{ %s }}' % _yaml_env,
                   '    read_meth: all',
                   '    output: inputA',
                   '  - input: outputA',
-                  '    output: output.txt',
+                  '    output:',
+                  '      - output.txt',
                   '    write_meth: all'],)
 
 
@@ -427,6 +469,38 @@ class TestYamlConnectionError(YamlTestBaseError):
                   '    args: ./src/modelA.c',
                   '    inputs:',
                   '      - inputA'],)
+
+
+class TestYamlConnectionError_forkin(YamlTestBaseError):
+    r"""Test error when there is not connection for a fork input channel."""
+    _error = RuntimeError
+    _contents = (['models:',
+                  '  - name: modelA',
+                  '    driver: GCCModelDriver',
+                  '    args: ./src/modelA.c',
+                  '    inputs:',
+                  '      - inputA',
+                  'connections:',
+                  '  - input:',
+                  '      - output1',
+                  '      - output2',
+                  '  - output: inputA'],)
+
+
+class TestYamlConnectionError_forkout(YamlTestBaseError):
+    r"""Test error when there is not connection for a fork output channel."""
+    _error = RuntimeError
+    _contents = (['models:',
+                  '  - name: modelA',
+                  '    driver: GCCModelDriver',
+                  '    args: ./src/modelA.c',
+                  '    outputs:',
+                  '      - outputA',
+                  'connections:',
+                  '  - input: outputA',
+                  '  - output:',
+                  '      - input1',
+                  '      - input2'],)
 
 
 class TestYamlConnectionError_readmeth(YamlTestBaseError):

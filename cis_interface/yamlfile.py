@@ -118,10 +118,23 @@ def prep_connection(yml, iodict):
         iodict (dict): Log of all input/outputs.
 
     """
+    # Plural
+    if ('inputs' in yml):
+        yml['input'] = yml.pop('inputs')
+    if ('outputs' in yml):
+        yml['output'] = yml.pop('outputs')
     # Input
-    if ('input' in yml) and (yml['input'] not in iodict['outputs']):
-        if 'input_file' not in yml:
+    if ('input' in yml):
+        if isinstance(yml['input'], list) and (len(yml['input']) == 1):
+            yml['input'] = yml['input'][0]
+        if ((isinstance(yml['input'], str) and
+             (yml['input'] not in iodict['outputs']) and
+             ('input_file' not in yml))):
             yml['input_file'] = yml.pop('input')
+        elif isinstance(yml['input'], list):
+            for x in yml['input']:
+                if x not in iodict['outputs']:
+                    raise RuntimeError('%s not connected and cannot be a file.' % x)
     if isinstance(yml.get('input_file', None), str):
         yml['input_file'] = dict(name=yml['input_file'])
     if ('read_meth' in yml):
@@ -129,9 +142,17 @@ def prep_connection(yml, iodict):
             raise ValueError("'read_meth' set, but input is not a file.")
         yml['input_file'].update(**rwmeth2filetype(yml.pop('read_meth')))
     # Output
-    if ('output' in yml) and (yml['output'] not in iodict['inputs']):
-        if 'output_file' not in yml:
+    if ('output' in yml):
+        if isinstance(yml['output'], list) and (len(yml['output']) == 1):
+            yml['output'] = yml['output'][0]
+        if ((isinstance(yml['output'], str) and
+             (yml['output'] not in iodict['inputs']) and
+             ('output_file' not in yml))):
             yml['output_file'] = yml.pop('output')
+        elif isinstance(yml['output'], list):
+            for x in yml['output']:
+                if x not in iodict['inputs']:
+                    raise RuntimeError('%s not connected and cannot be a file.' % x)
     if isinstance(yml.get('output_file', None), str):
         yml['output_file'] = dict(name=yml['output_file'])
     if ('write_meth' in yml):
@@ -151,9 +172,13 @@ def prep_connection(yml, iodict):
 
     def migrate_keys(from_dict, to_dict):
         klist = list(from_dict.keys())
+        if not isinstance(to_dict, list):
+            to_dict = [to_dict]
         for k in klist:
             if k not in conn_keys:
-                to_dict.setdefault(k, from_dict.pop(k))
+                v = from_dict.pop(k)
+                for d in to_dict:
+                    d.setdefault(k, v)
 
     if 'input_file' in yml:
         if working_dir:
@@ -164,9 +189,13 @@ def prep_connection(yml, iodict):
             yml['output_file'].setdefault('working_dir', working_dir)
         migrate_keys(yml, yml['output_file'])
     elif 'input' in yml:
-        migrate_keys(yml, iodict['outputs'][yml['input']])
-    # elif 'output' in yml:
-    #     migrate_keys(yml, iodict['inputs'][yml['output']])
+        if isinstance(yml['input'], list):
+            io_names = yml['input']
+        else:
+            io_names = [yml['input']]
+        allio = [iodict['outputs'][x] for x in io_names]
+        migrate_keys(yml, allio)
+    # Error should be raised if there is no input
         
 
 def bridge_io_drivers(yml, iodict):
@@ -247,9 +276,9 @@ def bridge_io_drivers(yml, iodict):
                     continue
                 if k == 'translator':
                     conn.setdefault(k, [])
-                    conn[k].append(y[k])
+                    conn[k].append(y.pop(k))
                 else:
-                    conn.setdefault(k, y[k])
+                    conn.setdefault(k, y.pop(k))
             del y['driver'], y['args']
         # Add connection
         iodict['connections'].append(conn)
@@ -329,6 +358,8 @@ def parse_yaml(files):
             if 'driver' not in v:
                 raise RuntimeError("No driver established for %s channel %s" % (
                     io, k))
+    # Link io drivers back to models
+    existing = link_model_io(existing)
     return existing
 
 
@@ -355,7 +386,8 @@ def parse_component(yml, ctype, existing=None):
     """
     if not isinstance(yml, dict):
         raise TypeError("Component entry in yml must be a dictionary.")
-    ctype_list = ['input', 'output', 'model', 'connection']
+    ctype_list = ['input', 'output', 'model', 'connection',
+                  'model_input', 'model_output']
     if existing is None:
         existing = {k: {} for k in ctype_list}
     if ctype not in ctype_list:
@@ -411,10 +443,10 @@ def parse_model(yml, existing):
     yml['model_index'] = len(existing['model'])
     for io in ['inputs', 'outputs']:
         for x in yml[io]:
-            x['model_driver'] = yml['name']
+            x['model_driver'] = [yml['name']]
             existing = parse_component(x, io[:-1], existing=existing)
     return existing
-
+            
     
 def parse_connection(yml, existing):
     r"""Parse a yaml entry for a connection between I/O channels.
@@ -438,6 +470,10 @@ def parse_connection(yml, existing):
     conn_keys_gen = ['input', 'input_file', 'output', 'output_file']
     conn_keys = list(set(schema['connection'].keys()) - set(conn_keys_gen))
     yml_conn = {}
+    if not isinstance(yml.get('input', []), list):
+        yml['input'] = [yml['input']]
+    if not isinstance(yml.get('output', []), list):
+        yml['output'] = [yml['output']]
     # File input
     if 'input_file' in yml:
         fname = os.path.expanduser(yml['input_file']['name'])
@@ -448,9 +484,9 @@ def parse_connection(yml, existing):
             raise RuntimeError(("Input '%s' not found in any of the registered " +
                                 "model outputs and is not a file.") % fname)
         args = fname
-        name = yml['output']
-        icomm_pair = (ftyp2comm[yml['input_file']['filetype']], 'DefaultComm')
+        name = ','.join(yml['output'])
         ocomm_pair = None
+        icomm_pair = (ftyp2comm[yml['input_file']['filetype']], 'DefaultComm')
         yml_conn.update(**yml['input_file'])
     # File output
     elif 'output_file' in yml:
@@ -460,28 +496,51 @@ def parse_connection(yml, existing):
                 fname = os.path.join(yml['output_file']['working_dir'], fname)
             fname = os.path.normpath(fname)
         args = fname
-        name = yml['input']
-        icomm_pair = None
+        name = ','.join(yml['input'])
         ocomm_pair = ('DefaultComm', ftyp2comm[yml['output_file']['filetype']])
+        icomm_pair = None
         yml_conn.update(**yml['output_file'])
     # Generic Input/Output
     else:
-        args = '%s_to_%s' % (yml['input'], yml['output'])
+        iname = ','.join(yml['input'])
+        oname = ','.join(yml['output'])
+        args = '%s_to_%s' % (iname, oname)
         name = args
         # TODO: Use RMQ drivers when models are on different machines
         # ocomm_pair = ('DefaultComm', 'rmq')
         # icomm_pair = ('rmq', 'DefaultComm')
         ocomm_pair = ('DefaultComm', 'DefaultComm')
         icomm_pair = ('DefaultComm', 'DefaultComm')
-    # Get input/output drivers
+    # Output driver
     xo = None
-    xi = None
     if ocomm_pair is not None:
-        xo = existing['output'][yml['input']]
+        iyml = yml['input']
+        iname = ','.join(iyml)
+        if len(iyml) == 1:
+            xo = existing['output'][iyml[0]]
+        else:
+            xo = {'name': iname, 'comm': [], 'model_driver': []}
+            for y in iyml:
+                xo['comm'].append(existing['output'][y])
+                xo['model_driver'] += existing['output'][y]['model_driver']
+                del existing['output'][y]
+            existing = parse_component(xo, 'output', existing)
         xo['args'] = args
         xo['driver'] = comm2conn[(ocomm_pair[0], ocomm_pair[1], 'output')]
+    # Input driver
+    xi = None
     if icomm_pair is not None:
-        xi = existing['input'][yml['output']]
+        oyml = yml['output']
+        oname = ','.join(oyml)
+        if len(oyml) == 1:
+            xi = existing['input'][oyml[0]]
+        else:
+            xi = {'name': oname, 'comm': [], 'model_driver': []}
+            for y in oyml:
+                xi['comm'].append(existing['input'][y])
+                xi['model_driver'] += existing['input'][y]['model_driver']
+                del existing['input'][y]
+            existing = parse_component(xi, 'input', existing)
         xi['args'] = args
         xi['driver'] = comm2conn[(icomm_pair[0], icomm_pair[1], 'input')]
     # Transfer connection keywords to one connection driver
@@ -494,4 +553,29 @@ def parse_connection(yml, existing):
     else:
         xi.update(**yml_conn)
     yml['name'] = name
+    return existing
+
+
+def link_model_io(existing):
+    r"""Link I/O drivers back to the models they communicate with.
+
+    Args:
+        existing (dict): Dictionary of existing components.
+
+    Returns:
+        dict: Dictionary with I/O drivers added to models.
+
+    """
+    # Add fields
+    for m in existing['model'].keys():
+        existing['model'][m]['input_drivers'] = []
+        existing['model'][m]['output_drivers'] = []
+    # Add input dirvers
+    for io in existing['input'].values():
+        for m in io['model_driver']:
+            existing['model'][m]['input_drivers'].append(io)
+    # Add output dirvers
+    for io in existing['output'].values():
+        for m in io['model_driver']:
+            existing['model'][m]['output_drivers'].append(io)
     return existing

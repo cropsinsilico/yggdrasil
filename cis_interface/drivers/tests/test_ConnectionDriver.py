@@ -194,6 +194,7 @@ class TestConnectionDriver(TestConnectionParam, parent.TestDriver):
             assert(self.send_comm.is_open)
         if (self.recv_comm.comm_class != 'CommBase'):
             assert(self.recv_comm.is_open)
+        self.nmsg_recv = 1
 
     def test_early_close(self):
         r"""Test early deletion of message queue."""
@@ -209,10 +210,12 @@ class TestConnectionDriver(TestConnectionParam, parent.TestDriver):
         # self.instance.sleep()
         # if self.comm_name != 'CommBase':
         #     nt.assert_equal(self.recv_comm.n_msg, 1)
-        flag, msg_recv = self.recv_comm.recv(self.timeout)
+        for i in range(self.nmsg_recv):
+            flag, msg_recv = self.recv_comm.recv(self.timeout)
+            if self.comm_name != 'CommBase':
+                assert(flag)
+                self.assert_msg_equal(msg_recv, self.msg_short)
         if self.comm_name != 'CommBase':
-            assert(flag)
-            self.assert_msg_equal(msg_recv, self.msg_short)
             nt.assert_equal(self.instance.n_msg, 0)
 
     def test_send_recv_nolimit(self):
@@ -221,10 +224,11 @@ class TestConnectionDriver(TestConnectionParam, parent.TestDriver):
         flag = self.send_comm.send_nolimit(self.msg_long)
         if self.comm_name != 'CommBase':
             assert(flag)
-        flag, msg_recv = self.recv_comm.recv_nolimit(self.timeout)
-        if self.comm_name != 'CommBase':
-            assert(flag)
-            self.assert_msg_equal(msg_recv, self.msg_long)
+        for i in range(self.nmsg_recv):
+            flag, msg_recv = self.recv_comm.recv_nolimit(self.timeout)
+            if self.comm_name != 'CommBase':
+                assert(flag)
+                self.assert_msg_equal(msg_recv, self.msg_long)
 
     def assert_before_stop(self, check_open=True):
         r"""Assertions to make before stopping the driver instance."""
@@ -242,6 +246,24 @@ class TestConnectionDriver(TestConnectionParam, parent.TestDriver):
         r"""Assertions to make after terminating the driver instance."""
         super(TestConnectionDriver, self).assert_after_terminate()
         assert(self.instance.is_comm_closed)
+
+
+class TestConnectionDriverFork(TestConnectionDriver):
+    r"""Test class for the ConnectionDriver class between fork comms."""
+
+    def setup(self, *args, **kwargs):
+        r"""Initialize comm object pair."""
+        self.ncomm_input = 2
+        self.ncomm_output = 1
+        super(TestConnectionDriverFork, self).setup(*args, **kwargs)
+        self.nmsg_recv = self.ncomm_input * self.ncomm_output
+
+    @property
+    def inst_kwargs(self):
+        r"""dict: Keyword arguments for tested class."""
+        out = super(TestConnectionDriverFork, self).inst_kwargs
+        out['icomm_kws']['comm'] = [None for i in range(self.ncomm_input)]
+        return out
 
 
 def direct_translate(msg):

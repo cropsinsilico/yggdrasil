@@ -18,16 +18,13 @@ comm:
   name: &id005
     required: true
     type: string
-  onexit: &id006
-    required: false
-    type: string
-  stype: &id007
+  stype: &id006
     required: false
     type: integer
-  type: &id008
+  type: &id007
     required: false
     type: string
-  units: &id009
+  units: &id008
     required: false
     type: string
 comm_schema_subtypes:
@@ -49,67 +46,69 @@ connection:
     excludes: input
     required: true
     schema:
-      append: &id010
+      append: &id009
         required: false
         type: boolean
       as_array: *id001
-      comment: &id011
+      comment: &id010
         dependencies:
           filetype:
-          - table
           - ascii
+          - table
         required: false
         type: string
-      delimiter: &id012
+      delimiter: &id011
         dependencies:
           filetype:
-          - table
           - pandas
+          - table
         required: false
         type: string
       field_names: *id002
       field_units: *id003
-      filetype: &id013
+      filetype: &id012
         allowed:
         - map
-        - obj
-        - binary
+        - pandas
         - pickle
         - ply
-        - table
+        - binary
         - ascii
-        - pandas
+        - obj
+        - table
         default: binary
         required: false
         type: string
       format_str: *id004
-      in_temp: &id014
+      in_temp: &id013
         required: false
         type: boolean
-      is_series: &id015
+      is_series: &id014
         required: false
         type: boolean
       name: *id005
-      newline: &id016
+      newline: &id015
         default: '
 
           '
         required: false
         type: string
-      onexit: *id006
-      stype: *id007
-      type: *id008
-      units: *id009
-      use_astropy: &id017
+      stype: *id006
+      type: *id007
+      units: *id008
+      use_astropy: &id016
         dependencies:
           filetype:
           - table
         required: false
         type: boolean
-      working_dir: &id018
+      working_dir: &id017
         required: true
         type: string
     type: dict
+  onexit:
+    required: false
+    type: string
   output:
     excludes: output_file
     required: true
@@ -122,24 +121,23 @@ connection:
     excludes: output
     required: true
     schema:
-      append: *id010
+      append: *id009
       as_array: *id001
-      comment: *id011
-      delimiter: *id012
+      comment: *id010
+      delimiter: *id011
       field_names: *id002
       field_units: *id003
-      filetype: *id013
+      filetype: *id012
       format_str: *id004
-      in_temp: *id014
-      is_series: *id015
+      in_temp: *id013
+      is_series: *id014
       name: *id005
-      newline: *id016
-      onexit: *id006
-      stype: *id007
-      type: *id008
-      units: *id009
-      use_astropy: *id017
-      working_dir: *id018
+      newline: *id015
+      stype: *id006
+      type: *id007
+      units: *id008
+      use_astropy: *id016
+      working_dir: *id017
     type: dict
   translator:
     required: false
@@ -255,24 +253,23 @@ connection_schema_subtypes:
     - RMQComm
     - output
 file:
-  append: *id010
+  append: *id009
   as_array: *id001
-  comment: *id011
-  delimiter: *id012
+  comment: *id010
+  delimiter: *id011
   field_names: *id002
   field_units: *id003
-  filetype: *id013
+  filetype: *id012
   format_str: *id004
-  in_temp: *id014
-  is_series: *id015
+  in_temp: *id013
+  is_series: *id014
   name: *id005
-  newline: *id016
-  onexit: *id006
-  stype: *id007
-  type: *id008
-  units: *id009
-  use_astropy: *id017
-  working_dir: *id018
+  newline: *id015
+  stype: *id006
+  type: *id007
+  units: *id008
+  use_astropy: *id016
+  working_dir: *id017
 file_schema_subtypes:
   AsciiFileComm:
   - ascii
@@ -335,10 +332,9 @@ model:
         field_units: *id003
         format_str: *id004
         name: *id005
-        onexit: *id006
-        stype: *id007
-        type: *id008
-        units: *id009
+        stype: *id006
+        type: *id007
+        units: *id008
       type: dict
     type: list
   is_server:
@@ -346,15 +342,15 @@ model:
     type: boolean
   language:
     allowed:
-    - c
-    - cmake
-    - lpy
-    - python
-    - make
     - executable
-    - c++
-    - matlab
     - cpp
+    - python
+    - matlab
+    - lpy
+    - cmake
+    - make
+    - c++
+    - c
     required: true
     type: string
   make_command:
@@ -387,10 +383,9 @@ model:
         field_units: *id003
         format_str: *id004
         name: *id005
-        onexit: *id006
-        stype: *id007
-        type: *id008
-        units: *id009
+        stype: *id006
+        type: *id007
+        units: *id008
       type: dict
     type: list
   sourcedir:

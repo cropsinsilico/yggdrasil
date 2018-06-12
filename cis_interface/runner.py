@@ -196,8 +196,8 @@ class CisRunner(CisClass):
             out = chain(self.inputdrivers.values(), self.outputdrivers.values())
         else:
             driver = self.modeldrivers[model]
-            out = chain(driver.get('inputs', dict()),
-                        driver.get('outputs', dict()))
+            out = chain(driver.get('input_drivers', dict()),
+                        driver.get('output_drivers', dict()))
         return out
 
     def createDriver(self, yml):
@@ -237,6 +237,7 @@ class CisRunner(CisClass):
         yml['env'] = {}
         for iod in self.io_drivers(yml['name']):
             yml['env'].update(iod['instance'].env)
+            iod['models'].append(yml['name'])
         drv = self.createDriver(yml)
         if 'client_of' in yml:
             for srv in yml['client_of']:
@@ -255,6 +256,7 @@ class CisRunner(CisClass):
             object: An instance of the specified driver.
 
         """
+        yml['models'] = []
         if yml['args'] not in self._outputchannels:
             if not os.path.isfile(yml['args']):
                 raise Exception(("Input driver %s could not locate a " +
@@ -274,6 +276,7 @@ class CisRunner(CisClass):
 
         """
         from cis_interface.drivers import FileOutputDriver
+        yml['models'] = []
         if yml['args'] in self._inputchannels:
             yml.setdefault('comm_env', {})
             yml['comm_env'] = self._inputchannels[yml['args']]['instance'].comm_env
@@ -415,10 +418,12 @@ class CisRunner(CisClass):
 
         """
         for drv in self.io_drivers(model['name']):
+            drv['models'].remove(model['name'])
             if not drv['instance'].is_alive():
                 continue
-            self.debug('on_model_exit %s', drv['name'])
-            drv['instance'].on_model_exit()
+            if (len(drv['models']) == 0):
+                self.debug('on_model_exit %s', drv['name'])
+                drv['instance'].on_model_exit()
     
     def terminate(self):
         r"""Immediately stop all drivers, beginning with IO drivers."""
