@@ -125,7 +125,11 @@ Model-to-model communication (with drivers)
 For backwards compatibility, connections can also be specified in terms of 
 the underlying drivers without an explicit ``connections`` section. The 
 exact same models from the previous example can be connected using the 
-following model. In this schema, model ``input`` and ``output`` entries 
+following YAML.
+
+.. include:: examples/gs_lesson4b_yml.rst
+
+In this schema, model ``input`` and ``output`` entries 
 must have the following fields:
 
 ======    ======================================================================

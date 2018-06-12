@@ -115,8 +115,14 @@ def write_lang(fd, k, l):
     fd.write('\n')
 
     
-def write_code_line(fd, s, upone=False, language='python'):
+def write_code_line(fd, s, upone=False, language=None):
     p = os.path.sep + get_rel_path(s, upone=True)
+    ext2lang = {'.yml': 'yaml', '.py': 'python',
+                '.c': 'c', '.cpp': 'c++', '.m': 'matlab'}
+    if language is None:
+        ext = os.path.splitext(p)[-1]
+        language = ext2lang.get(ext, 'python')
+        print('extension', ext, language)
     fd.write(".. literalinclude:: %s\n" % p)
     fd.write("   :language: %s\n" % language)
     fd.write("   :linenos:\n")
