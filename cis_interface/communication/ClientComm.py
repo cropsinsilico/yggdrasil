@@ -97,7 +97,7 @@ class ClientComm(CommBase.CommBase):
 
         """
         kwargs = super(ClientComm, self).opp_comm_kwargs()
-        kwargs['comm'] = get_comm_class("ServerComm")
+        kwargs['comm'] = "ServerComm"
         kwargs['request_comm'] = self.ocomm.comm_class
         kwargs['response_kwargs'] = self.response_kwargs
         return kwargs

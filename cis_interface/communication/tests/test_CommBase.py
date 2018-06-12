@@ -2,7 +2,7 @@ import os
 import uuid
 import nose.tools as nt
 from cis_interface.tests import CisTestClassInfo
-from cis_interface.communication import new_comm, CommBase
+from cis_interface.communication import new_comm, get_comm, CommBase
 
 
 def test_registry():
@@ -114,10 +114,11 @@ class TestCommBase(CisTestClassInfo):
         self.remove_instance(self.send_instance)
         super(TestCommBase, self).teardown(*args, **kwargs)
 
-    # def create_instance(self):
-    #     r"""Create a new instance of the class."""
-    #     inst = new_comm(*self.inst_args, **self.inst_kwargs)
-    #     return inst
+    def create_instance(self):
+        r"""Create a new instance of the class."""
+        inst = get_comm(*self.inst_args, **self.inst_kwargs)
+        assert(isinstance(inst, self.import_cls))
+        return inst
 
     def remove_instance(self, inst):
         r"""Remove an instance."""
