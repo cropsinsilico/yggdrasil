@@ -38,9 +38,7 @@ class ForkComm(CommBase.CommBase):
         self.curr_comm_index = 0
         self.eof_recv = []
         address = kwargs.pop('address', None)
-        if comm == 'ForkComm':
-            comm = None
-        if (comm is None):
+        if (comm in [None, 'ForkComm']):
             if isinstance(address, list):
                 ncomm = len(address)
             else:

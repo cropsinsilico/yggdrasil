@@ -141,11 +141,6 @@ class TestCommBase(CisTestClassInfo):
         recv_inst = new_comm(err_name, **recv_kwargs)
         return send_inst, recv_inst
 
-    def test_printStatus(self):
-        r"""Test print of communication status."""
-        self.send_instance.printStatus()
-        self.recv_instance.printStatus()
-
     def test_empty_msg(self):
         r"""Test identification of empty message."""
         msg = self.instance.empty_obj_recv
@@ -357,12 +352,13 @@ class TestCommBase(CisTestClassInfo):
                (getattr(send_instance, n_msg_send_meth) != 0)):  # pragma: debug
             send_instance.sleep()
         send_instance.stop_timeout(key_suffix=tkey)
+        # Print status of comms
+        send_instance.printStatus()
+        recv_instance.printStatus()
+        # Confirm recept of messages
         if not (is_eof or reverse_comms):
             send_instance.wait_for_confirm(timeout=self.timeout)
             recv_instance.wait_for_confirm(timeout=self.timeout)
-            if (not send_instance.is_confirmed) or (not recv_instance.is_confirmed):
-                send_instance.printStatus()
-                recv_instance.printStatus()
             assert(send_instance.is_confirmed)
             assert(recv_instance.is_confirmed)
             send_instance.confirm(noblock=True)
