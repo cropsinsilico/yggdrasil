@@ -386,8 +386,9 @@ class ConnectionDriver(Driver):
         # Close input comm in case loop did not
         self.drain_input(timeout=False)
         with self.lock:
+            self.info('after loop lock')
             if self._skip_after_loop:
-                self.debug("After loop skipped.")
+                self.info("After loop skipped.")
                 return
             self.icomm.close()
         # Send EOF in case the model didn't
@@ -396,6 +397,7 @@ class ConnectionDriver(Driver):
         # Close output comm after waiting for output to be processed
         # self.drain_output(timeout=False)
         # self.ocomm.close()
+        self.info('after_loop complete')
 
     def recv_message(self, **kwargs):
         r"""Get a new message to send.
@@ -435,7 +437,8 @@ class ConnectionDriver(Driver):
             self.drain_input(timeout=False)
             with self.lock:
                 self.icomm.close()
-            self.info('After EOF')
+            self.info('EOF sent')
+        self.info('After EOF')
         return False
 
     def on_message(self, msg):
