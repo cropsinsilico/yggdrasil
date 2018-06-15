@@ -284,16 +284,21 @@ class ConnectionDriver(Driver):
 
     def on_model_exit(self):
         r"""Drain input and then close it."""
-        self.debug('')
+        self.info('')
         if (self.onexit not in [None, 'on_model_exit', 'pass']):
             self.debug("Calling onexit = '%s'" % self.onexit)
             getattr(self, self.onexit)()
         self.set_close_state('model exit')
         if self._is_input:
+            self.info("Draining input on model exit")
             self.drain_input(timeout=self.timeout)
+            self.info("Finished draining input")
             with self.lock:
+                self.info("Closing input")
                 self.icomm.close()
+                self.info("Closed input, closing output")
                 self.ocomm.close()
+                self.info("Closed output")
         if self._is_output:
             self.drain_input(timeout=self.timeout)
             self.wait_for_route(timeout=self.timeout)
@@ -429,10 +434,13 @@ class ConnectionDriver(Driver):
         self.state = 'eof'
         with self.lock:
             self.send_eof()
+        self.info('Draining input on EOF')
         self.drain_input(timeout=False)
+        self.info('Input drain complete')
         with self.lock:
             self.set_close_state('eof')
             self.icomm.close()
+        self.info("Closed input on EOF")
         return False
 
     def on_message(self, msg):
