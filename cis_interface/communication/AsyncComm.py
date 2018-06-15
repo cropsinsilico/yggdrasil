@@ -485,6 +485,9 @@ class AsyncComm(CommBase.CommBase):
         r"""Purge all messages from the comm."""
         super(AsyncComm, self).purge()
         with self.backlog_thread.lock:
+            if self.direction == 'recv':
+                while self.n_msg_direct > 0:  # pragma: debug
+                    self._recv_direct()
             self.backlog_recv_ready.clear()
             self.backlog_send_ready.clear()
             self._backlog_recv = []

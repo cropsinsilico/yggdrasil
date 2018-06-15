@@ -424,7 +424,8 @@ comm_head_t comm_send_multipart_header(const comm_t x, const char * data,
   if (x.type == SERVER_COMM) {
     comm_t **res_comm = (comm_t**)(x.info);
     if (res_comm[0] == NULL) {
-      cislog_error("comm_send_multipart_header(%s): no response comm registered", x.name);
+      cislog_error("comm_send_multipart_header(%s): no response comm registered",
+		   x.name);
       head.valid = 0;
       return head;
     }
@@ -443,7 +444,7 @@ comm_head_t comm_send_multipart_header(const comm_t x, const char * data,
   if (x0->type == ZMQ_COMM) {
     char *reply_address = set_reply_send(x0);
     if (reply_address == NULL) {
-      cislog_error("comm_send_multipart: Could not set reply address.");
+      cislog_error("comm_send_multipart_header: Could not set reply address.");
       head.valid = 0;
       return head;
     }
