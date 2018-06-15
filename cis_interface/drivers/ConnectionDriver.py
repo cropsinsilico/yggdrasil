@@ -284,26 +284,22 @@ class ConnectionDriver(Driver):
 
     def on_model_exit(self):
         r"""Drain input and then close it."""
-        self.info('')
+        self.debug('')
         if (self.onexit not in [None, 'on_model_exit', 'pass']):
             self.debug("Calling onexit = '%s'" % self.onexit)
             getattr(self, self.onexit)()
-        self.set_close_state('model exit')
-        if self._is_input:
-            self.info("Draining input on model exit")
-            self.drain_input(timeout=self.timeout)
-            self.info("Finished draining input")
-            with self.lock:
-                self.info("Closing input")
-                self.icomm.close()
-                self.info("Closed input, closing output")
-                self.ocomm.close()
-                self.info("Closed output")
-        if self._is_output:
-            self.drain_input(timeout=self.timeout)
-            self.wait_for_route(timeout=self.timeout)
-            with self.lock:
-                self.icomm.close()
+        if self.set_close_state('model exit'):
+            self.debug('Model exit triggered close')
+            if self._is_input:
+                self.drain_input(timeout=self.timeout)
+                with self.lock:
+                    self.icomm.close()
+                    self.ocomm.close()
+            if self._is_output:
+                self.drain_input(timeout=self.timeout)
+                self.wait_for_route(timeout=self.timeout)
+                with self.lock:
+                    self.icomm.close()
         super(ConnectionDriver, self).on_model_exit()
 
     def do_terminate(self):
@@ -434,13 +430,10 @@ class ConnectionDriver(Driver):
         self.state = 'eof'
         with self.lock:
             self.send_eof()
-        self.info('Draining input on EOF')
         self.drain_input(timeout=False)
-        self.info('Input drain complete')
         with self.lock:
             self.set_close_state('eof')
             self.icomm.close()
-        self.info("Closed input on EOF")
         return False
 
     def on_message(self, msg):
@@ -557,9 +550,12 @@ class ConnectionDriver(Driver):
 
     def set_close_state(self, state):
         r"""Set the close state if its not already set."""
+        out = False
         with self.lock:
             if not self.close_state:
                 self.close_state = state
+                out = True
+        return out
 
     def run_loop(self):
         r"""Run the driver. Continue looping over messages until there are not
