@@ -289,7 +289,7 @@ class ConnectionDriver(Driver):
             self.debug("Calling onexit = '%s'" % self.onexit)
             getattr(self, self.onexit)()
         if self.set_close_state('model exit'):
-            self.info('Model exit triggered close')
+            self.debug('Model exit triggered close')
             self.drain_input(timeout=self.timeout)
             if self._is_input:
                 with self.lock:
