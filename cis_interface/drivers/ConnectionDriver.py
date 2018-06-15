@@ -284,12 +284,12 @@ class ConnectionDriver(Driver):
 
     def on_model_exit(self):
         r"""Drain input and then close it."""
-        self.debug('')
+        self.info('')
         if (self.onexit not in [None, 'on_model_exit', 'pass']):
             self.debug("Calling onexit = '%s'" % self.onexit)
             getattr(self, self.onexit)()
         if self.set_close_state('model exit'):
-            self.debug('Model exit triggered close')
+            self.info('Model exit triggered close')
             if self._is_input:
                 self.drain_input(timeout=self.timeout)
                 with self.lock:
@@ -300,6 +300,7 @@ class ConnectionDriver(Driver):
                 self.wait_for_route(timeout=self.timeout)
                 with self.lock:
                     self.icomm.close()
+        self.info('After on_model_exit')
         super(ConnectionDriver, self).on_model_exit()
 
     def do_terminate(self):
@@ -426,7 +427,7 @@ class ConnectionDriver(Driver):
             str, bool: Value that should be returned by recv_message on EOF.
 
         """
-        self.debug('EOF received')
+        self.info('EOF received')
         self.state = 'eof'
         with self.lock:
             self.send_eof()
@@ -434,6 +435,7 @@ class ConnectionDriver(Driver):
         with self.lock:
             self.set_close_state('eof')
             self.icomm.close()
+        self.info('After EOF')
         return False
 
     def on_message(self, msg):
