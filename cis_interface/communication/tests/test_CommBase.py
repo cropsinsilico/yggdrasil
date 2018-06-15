@@ -421,7 +421,7 @@ class TestCommBase(CisTestClassInfo):
         r"""Test send/recv of EOF message through nolimit."""
         self.do_send_recv(send_meth='send_nolimit_eof')
 
-    def test_purge(self):
+    def test_purge(self, nrecv=1):
         r"""Test purging messages from the comm."""
         nt.assert_equal(self.send_instance.n_msg, 0)
         nt.assert_equal(self.recv_instance.n_msg, 0)
@@ -430,7 +430,8 @@ class TestCommBase(CisTestClassInfo):
             flag = self.send_instance.send(self.msg_short)
             assert(flag)
             T = self.recv_instance.start_timeout()
-            while (not T.is_out) and (self.recv_instance.n_msg == 0):  # pragma: debug
+            while ((not T.is_out) and
+                   (self.recv_instance.n_msg != nrecv)):  # pragma: debug
                 self.recv_instance.sleep()
             self.recv_instance.stop_timeout()
             nt.assert_greater(self.recv_instance.n_msg, 0)

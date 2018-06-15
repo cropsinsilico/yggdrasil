@@ -45,6 +45,11 @@ class TestForkComm(TestCommBase):
             kwargs['n_recv'] = self.ncomm
         super(TestForkComm, self).do_send_recv(*args, **kwargs)
 
+    def test_purge(self, **kwargs):
+        r"""Test purging messages from the comm."""
+        kwargs['nrecv'] = self.ncomm
+        super(TestForkComm, self).test_purge(**kwargs)
+
 
 class TestForkCommList(TestForkComm):
     r"""Tests for ForkComm communication class with construction from address."""
