@@ -725,11 +725,11 @@ class ZMQComm(AsyncComm.AsyncComm):
                 # elif self._connected:
                 #     self.disconnect()
                 self.socket.close(linger=0)
-                if self.protocol == 'ipc':
-                    print(self.host, os.path.isfile(self.host))
-                if (self.direction == 'recv') and (self.protocol == 'ipc'):
-                    if os.path.isfile(self.host):
-                        os.remove(self.host)
+                # if self.protocol == 'ipc':
+                #     print(self.host, os.path.isfile(self.host))
+                # if (self.direction == 'recv') and (self.protocol == 'ipc'):
+                #     if os.path.isfile(self.host):
+                #         os.remove(self.host)
             self.unregister_comm(self.registry_key)
         super(ZMQComm, self)._close_direct(linger=linger)
 
