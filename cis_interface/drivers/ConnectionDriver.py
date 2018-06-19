@@ -448,7 +448,7 @@ class ConnectionDriver(Driver):
             self.debug('EOF received')
             self.state = 'eof'
             self.set_close_state('eof')
-            self.icomm.close()
+            self.set_break_flag()
         self.debug('After EOF')
         return False
 
