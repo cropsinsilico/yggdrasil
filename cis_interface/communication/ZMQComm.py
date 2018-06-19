@@ -382,7 +382,7 @@ class ZMQComm(AsyncComm.AsyncComm):
         self._n_reply_recv = {}
         self._server_class = ZMQProxy
         self._server_kwargs = dict(context=self.context,
-                                   nretry=4, retry_timeout=self.sleeptime)
+                                   nretry=4, retry_timeout=2.0 * self.sleeptime)
         super(ZMQComm, self)._init_before_open(**kwargs)
 
     def printStatus(self, nindent=0):
