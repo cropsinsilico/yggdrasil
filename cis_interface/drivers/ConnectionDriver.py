@@ -288,18 +288,18 @@ class ConnectionDriver(Driver):
         if (self.onexit not in [None, 'on_model_exit', 'pass']):
             self.debug("Calling onexit = '%s'" % self.onexit)
             getattr(self, self.onexit)()
-        if self.set_close_state('model exit'):
-            self.debug('Model exit triggered close')
-            self.drain_input(timeout=self.timeout)
-            if self._is_input:
-                with self.lock:
-                    self.icomm.close()
-                    self.ocomm.close()
-            if self._is_output:
-                self.wait_for_route(timeout=self.timeout)
-                with self.lock:
-                    self.icomm.close()
-            self.set_break_flag()
+        self.drain_input(timeout=self.timeout)
+        self.set_close_state('model exit')
+        self.debug('Model exit triggered close')
+        if self._is_input:
+            with self.lock:
+                self.icomm.close()
+                self.ocomm.close()
+        if self._is_output:
+            self.wait_for_route(timeout=self.timeout)
+            with self.lock:
+                self.icomm.close()
+        self.set_break_flag()
         self.debug('After on_model_exit')
         super(ConnectionDriver, self).on_model_exit()
 
@@ -444,15 +444,18 @@ class ConnectionDriver(Driver):
             str, bool: Value that should be returned by recv_message on EOF.
 
         """
-        self.debug('EOF received')
-        self.state = 'eof'
-        if self.set_close_state('eof'):
-            with self.lock:
-                self.send_eof()
-            self.confirm_input(timeout=False)
-            with self.lock:
-                self.icomm.close()
-            self.debug('EOF sent')
+        with self.lock:
+            self.debug('EOF received')
+            self.state = 'eof'
+            self.set_close_state('eof')
+            self.icomm.close()
+        # if self.set_close_state('eof'):
+        #     with self.lock:
+        #         self.send_eof()
+        #     self.confirm_input(timeout=False)
+        #     with self.lock:
+        #         self.icomm.close()
+        #     self.debug('EOF sent')
         self.debug('After EOF')
         return False
 

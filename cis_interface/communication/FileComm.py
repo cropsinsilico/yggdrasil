@@ -237,7 +237,8 @@ class FileComm(CommBase.CommBase):
         
     def _open(self):
         address = self.current_address
-        self._fd = open(address, self.open_mode)
+        if self.fd is None:
+            self._fd = open(address, self.open_mode)
         T = self.start_timeout()
         while (not T.is_out) and (not self.is_open):  # pragma: debug
             self.sleep()
@@ -258,8 +259,7 @@ class FileComm(CommBase.CommBase):
     def open(self):
         r"""Open the file."""
         super(FileComm, self).open()
-        if not self.is_open:
-            self._open()
+        self._open()
         self.register_comm(self.address, self.fd)
 
     def _close(self, *args, **kwargs):
