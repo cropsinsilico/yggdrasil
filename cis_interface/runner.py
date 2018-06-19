@@ -330,14 +330,20 @@ class CisRunner(CisClass):
                       self.host, self.namespace, self.rank))
         driver = dict(name='name')
         try:
+            # Start connections
             for driver in self.io_drivers():
                 self.debug("Starting driver %s", driver['name'])
                 d = driver['instance']
                 if not d.was_started:
                     d.start()
-                    d.wait_for_loop()
-                    assert(d.was_loop)
-                    assert(not d.errors)
+            # Ensure connections in loop
+            for driver in self.io_drivers():
+                self.debug("Checking driver %s", driver['name'])
+                d = driver['instance']
+                d.wait_for_loop()
+                assert(d.was_loop)
+                assert(not d.errors)
+            # Start models
             # self.sleep(1)  # on windows comms can take a while start
             for driver in self.modeldrivers.values():
                 self.debug("Starting driver %s", driver['name'])

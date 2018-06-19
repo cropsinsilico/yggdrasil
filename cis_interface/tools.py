@@ -1001,7 +1001,8 @@ class CisThreadLoop(CisThread):
 
         """
         T = self.start_timeout(timeout, key_level=1, key=key)
-        while self.is_alive() and (not self.was_loop) and (not T.is_out):
+        while (self.is_alive() and (not self.was_loop) and
+               (not T.is_out)):  # pragma: debug
             self.verbose_debug('Waiting for thread to enter loop...')
             self.sleep()
         self.stop_timeout(key_level=1, key=key)
