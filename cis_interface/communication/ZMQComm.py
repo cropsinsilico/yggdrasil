@@ -726,7 +726,7 @@ class ZMQComm(AsyncComm.AsyncComm):
                 #     self.disconnect()
                 self.socket.close(linger=0)
                 if self.protocol == 'ipc':
-                    print(self.host, os.path.isfile(self.host)) 
+                    print(self.host, os.path.isfile(self.host))
                 if (self.direction == 'recv') and (self.protocol == 'ipc'):
                     if os.path.isfile(self.host):
                         os.remove(self.host)

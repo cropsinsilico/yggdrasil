@@ -335,6 +335,9 @@ class CisRunner(CisClass):
                 d = driver['instance']
                 if not d.was_started:
                     d.start()
+                    d.wait_for_loop()
+                    assert(d.was_loop)
+                    assert(not d.errors)
             # self.sleep(1)  # on windows comms can take a while start
             for driver in self.modeldrivers.values():
                 self.debug("Starting driver %s", driver['name'])

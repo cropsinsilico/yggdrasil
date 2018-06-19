@@ -945,6 +945,8 @@ class CisThreadLoop(CisThread):
         super(CisThreadLoop, self).__init__(*args, **kwargs)
         self._1st_main_terminated = False
         self.break_flag = False
+        self.loop_event = threading.Event()
+        self.loop_flag = False
 
     def on_main_terminated(self, dont_break=False):  # pragma: debug
         r"""Actions performed when 1st main terminated.
@@ -971,6 +973,39 @@ class CisThreadLoop(CisThread):
         r"""bool: True if the break flag was set."""
         return self.break_flag
 
+    def set_loop_flag(self):
+        r"""Set the loop flag for the thread to True."""
+        # self.loop_event.set()
+        self.loop_flag = True
+
+    def unset_loop_flag(self):  # pragma: debug
+        r"""Set the loop flag for the thread to False."""
+        # self.loop_event.clear()
+        self.loop_flag = False
+
+    @property
+    def was_loop(self):
+        r"""bool: True if the thread was loop. False otherwise."""
+        # return self.loop_event.is_set()
+        return self.loop_flag
+
+    def wait_for_loop(self, timeout=None, key=None):
+        r"""Wait until thread enters loop to return using sleeps rather than
+        blocking.
+
+        Args:
+            timeout (float, optional): Maximum time that should be waited for
+                the thread to enter loop. Defaults to None and is infinite.
+            key (str, optional): Key that should be used to register the timeout.
+                Defaults to None and is set based on the stack trace.
+
+        """
+        T = self.start_timeout(timeout, key_level=1, key=key)
+        while self.is_alive() and (not self.was_loop) and (not T.is_out):
+            self.verbose_debug('Waiting for thread to enter loop...')
+            self.sleep()
+        self.stop_timeout(key_level=1, key=key)
+
     def before_loop(self):
         r"""Actions performed before the loop."""
         self.debug('')
@@ -991,6 +1026,8 @@ class CisThreadLoop(CisThread):
         self.debug("Starting loop")
         try:
             self.before_loop()
+            if (not self.was_break):
+                self.set_loop_flag()
             while (not self.was_break):
                 if ((self.main_terminated and
                      (not self._1st_main_terminated))):  # pragma: debug
