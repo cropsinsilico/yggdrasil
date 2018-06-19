@@ -379,9 +379,10 @@ class CisRunner(CisClass):
                     if not d.errors:
                         self.info("%s finished running.", drv['name'])
                         self.do_model_exits(drv)
-                        self.do_client_exits(drv)
-                        running.remove(drv)
                         self.info("%s completed model exits.", drv['name'])
+                        self.do_client_exits(drv)
+                        self.info("%s completed client exits.", drv['name'])
+                        running.remove(drv)
                 else:
                     self.info('%s still running', drv['name'])
             dead = []

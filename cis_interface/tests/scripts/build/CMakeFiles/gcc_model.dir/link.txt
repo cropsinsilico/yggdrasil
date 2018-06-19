@@ -1,0 +1,1 @@
+/usr/bin/c++       CMakeFiles/gcc_model.dir/gcc_model.cpp.o CMakeFiles/gcc_model.dir/hellofunc.c.o  -o gcc_model -rdynamic -lczmq -lzmq 
