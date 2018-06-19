@@ -1,3 +1,5 @@
+import os
+import tempfile
 import uuid
 import zmq
 import threading
@@ -21,6 +23,16 @@ _wait_send_t = 0  # 0.0001
 _reply_msg = backwards.unicode2bytes('CIS_REPLY')
 _purge_msg = backwards.unicode2bytes('CIS_PURGE')
 _global_context = zmq.Context.instance()
+
+
+def get_ipc_host():
+    r"""Get an IPC host using uuid.
+
+    Returns:
+        str: File path for IPC transport created using uuid.
+
+    """
+    return os.path.join(tempfile.gettempdir(), str(uuid.uuid4()) + '.ipc')
 
         
 def get_socket_type_mate(t_in):
@@ -180,7 +192,7 @@ class ZMQProxy(CommBase.CommServer):
         context = context or _global_context
         # Create new address for the frontend
         if cli_param['protocol'] in ['inproc', 'ipc']:
-            cli_param['host'] = str(uuid.uuid4())
+            cli_param['host'] = get_ipc_host()
         cli_address = format_address(cli_param['protocol'], cli_param['host'])
         self.cli_socket = context.socket(zmq.ROUTER)
         self.cli_address = bind_socket(self.cli_socket, cli_address,
@@ -447,7 +459,7 @@ class ZMQComm(AsyncComm.AsyncComm):
             protocol = _default_protocol
         if host is None:
             if protocol in ['inproc', 'ipc']:
-                host = str(uuid.uuid4())
+                host = get_ipc_host()
             else:
                 host = 'localhost'
         if 'address' not in kwargs:
@@ -713,6 +725,11 @@ class ZMQComm(AsyncComm.AsyncComm):
                 # elif self._connected:
                 #     self.disconnect()
                 self.socket.close(linger=0)
+                if self.protocol == 'ipc':
+                    print(self.host, os.path.isfile(self.host)) 
+                if (self.direction == 'recv') and (self.protocol == 'ipc'):
+                    if os.path.isfile(self.host):
+                        os.remove(self.host)
             self.unregister_comm(self.registry_key)
         super(ZMQComm, self)._close_direct(linger=linger)
 
