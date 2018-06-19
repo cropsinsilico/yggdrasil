@@ -258,7 +258,8 @@ class FileComm(CommBase.CommBase):
     def open(self):
         r"""Open the file."""
         super(FileComm, self).open()
-        self._open()
+        if not self.is_open:
+            self._open()
         self.register_comm(self.address, self.fd)
 
     def _close(self, *args, **kwargs):
