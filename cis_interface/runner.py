@@ -416,6 +416,7 @@ class CisRunner(CisClass):
             if len(srv['clients']) == 0:
                 iod = self.inputdrivers[srv_name]
                 iod['instance'].on_client_exit()
+                iod['instance'].wait()
                 srv['instance'].stop()
 
     def do_model_exits(self, model):
@@ -433,6 +434,7 @@ class CisRunner(CisClass):
             if (len(drv['models']) == 0):
                 self.debug('on_model_exit %s', drv['name'])
                 drv['instance'].on_model_exit()
+                drv['instance'].wait()
     
     def terminate(self):
         r"""Immediately stop all drivers, beginning with IO drivers."""

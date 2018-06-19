@@ -122,7 +122,7 @@ def parse_address(address):
     return out
 
 
-def bind_socket(socket, address, retry_timeout=-1):
+def bind_socket(socket, address, retry_timeout=-1, nretry=1):
     r"""Bind a socket to an address, getting a random port as necessary.
 
     Args:
@@ -131,7 +131,9 @@ def bind_socket(socket, address, retry_timeout=-1):
         retry_timeout (float, optional): Time (in seconds) that should be
             waited before retrying to bind the socket to the address. If
             negative, a retry will not be attempted and an error will be
-            raised. Defaults to -1;
+            raised. Defaults to -1.
+        nretry (int, optional): Number of times to try binding the socket to
+            the addresses. Defaults to 1.
 
     Returns:
         str: Address that socket was bound to, including random port if one
@@ -146,14 +148,15 @@ def bind_socket(socket, address, retry_timeout=-1):
             port = socket.bind_to_random_port(address)
             address += ":%d" % port
     except zmq.ZMQError as e:  # pragma: debug
-        if (retry_timeout < 0):
+        if (retry_timeout < 0) or (nretry == 0):
             # if (e.errno not in [48, 98]) or (retry_timeout < 0):
             # print(e, e.errno)
             raise e
         else:
             logging.debug("Retrying bind in %f s", retry_timeout)
             tools.sleep(retry_timeout)
-            address = bind_socket(socket, address)
+            address = bind_socket(socket, address, nretry=nretry - 1,
+                                  retry_timeout=retry_timeout)
     return address
 
     
@@ -171,7 +174,9 @@ class ZMQProxy(CommBase.CommServer):
         retry_timeout (float, optional): Time (in seconds) that should be
             waited before retrying to bind the sockets to the addresses. If
             negative, a retry will not be attempted and an error will be
-            raised. Defaults to -1;
+            raised. Defaults to -1.
+        nretry (int, optional): Number of times to try binding the sockets to
+            the addresses. Defaults to 1.
         **kwargs: Additional keyword arguments are passed to the parent class.
 
     Attributes:
@@ -183,7 +188,8 @@ class ZMQProxy(CommBase.CommServer):
         cli_count (int): Number of clients that have connected to this proxy.
 
     """
-    def __init__(self, srv_address, context=None, retry_timeout=-1, **kwargs):
+    def __init__(self, srv_address, context=None, retry_timeout=-1,
+                 nretry=1, **kwargs):
         # Get parameters
         srv_param = parse_address(srv_address)
         cli_param = dict()
@@ -196,6 +202,7 @@ class ZMQProxy(CommBase.CommServer):
         cli_address = format_address(cli_param['protocol'], cli_param['host'])
         self.cli_socket = context.socket(zmq.ROUTER)
         self.cli_address = bind_socket(self.cli_socket, cli_address,
+                                       nretry=nretry,
                                        retry_timeout=retry_timeout)
         self.cli_socket.setsockopt(zmq.LINGER, 0)
         CommBase.register_comm('ZMQComm', 'ROUTER_server_' + self.cli_address,
@@ -204,6 +211,7 @@ class ZMQProxy(CommBase.CommServer):
         self.srv_socket = context.socket(zmq.DEALER)
         self.srv_socket.setsockopt(zmq.LINGER, 0)
         self.srv_address = bind_socket(self.srv_socket, srv_address,
+                                       nretry=nretry,
                                        retry_timeout=retry_timeout)
         CommBase.register_comm('ZMQComm', 'DEALER_server_' + self.srv_address,
                                self.srv_socket)
@@ -374,7 +382,7 @@ class ZMQComm(AsyncComm.AsyncComm):
         self._n_reply_recv = {}
         self._server_class = ZMQProxy
         self._server_kwargs = dict(context=self.context,
-                                   retry_timeout=0.02)  # 4 * self.sleeptime)
+                                   nretry=4, retry_timeout=self.sleeptime)
         super(ZMQComm, self)._init_before_open(**kwargs)
 
     def printStatus(self, nindent=0):
@@ -513,7 +521,8 @@ class ZMQComm(AsyncComm.AsyncComm):
                            self.socket_type_name, self.address)
                 try:
                     self.address = bind_socket(self.socket, self.address,
-                                               retry_timeout=2 * self.sleeptime)
+                                               retry_timeout=self.sleeptime,
+                                               nretry=2)
                 except zmq.ZMQError as e:
                     if (self.socket_type_name == 'PAIR') and (e.errno == 98):
                         self.error(("There is already a 'PAIR' socket sending " +

@@ -388,8 +388,9 @@ class ConnectionDriver(Driver):
             self.debug('Running in %s, is_valid = %s', os.getcwd(), str(self.is_valid))
             assert(self.is_valid)
         except BaseException:  # pragma: debug
-            self.exception('Could not prep for loop.')
             self.printStatus()
+            self.exception('Could not prep for loop (is_open = (%s, %s)).' % (
+                self.icomm.is_open, self.ocomm.is_open))
             self.close_comm()
             self.set_break_flag()
 
