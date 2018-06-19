@@ -327,8 +327,8 @@ class ConnectionDriver(Driver):
         msg = beg_msg
         msg += '%-50s' % (self.__module__.split('.')[-1] + '(' + self.name + '): ')
         msg += '%-30s' % ('last action: ' + self.state)
-        msg += '%-21s' % ('is_open(%s, %s)' % (self.icomm.is_open,
-                                               self.ocomm.is_open))
+        msg += '%-25s' % ('is_open(%s, %s), ' % (self.icomm.is_open,
+                                                 self.ocomm.is_open))
         msg += '%-15s' % (str(self.nrecv) + ' received, ')
         msg += '%-15s' % (str(self.nproc) + ' processed, ')
         msg += '%-15s' % (str(self.nskip) + ' skipped, ')
