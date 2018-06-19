@@ -124,7 +124,6 @@ class ServerRequestDriver(ConnectionDriver):
             self.nclients -= 1
             self.debug("Client signed off. nclients = %d", self.nclients)
             if self.nclients == 0:
-                self.set_close_state('clients signed off')
                 self.debug("All clients have signed off.")
                 return super(ServerRequestDriver, self).on_eof()
         return self.icomm.serializer.empty_msg

@@ -573,6 +573,7 @@ class ConnectionDriver(Driver):
         out = False
         with self.lock:
             if not self.close_state:
+                self.info("Setting close state to %s", state)
                 self.close_state = state
                 out = True
         return out
