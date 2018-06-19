@@ -110,12 +110,6 @@ class ServerRequestDriver(ConnectionDriver):
     def on_client_exit(self):
         r"""Close input comm to stop the loop."""
         self.debug('')
-        # self.stop()
-        # if self.set_close_state('client exit'):
-        #     self.debug('Client exit triggered close')
-        #     self.drain_input(timeout=self.timeout)
-        #     with self.lock:
-        #         self.icomm.close()
     
     def on_eof(self):
         r"""On EOF, decrement number of clients. Only send EOF if the number

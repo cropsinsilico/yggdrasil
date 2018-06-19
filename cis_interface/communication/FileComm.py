@@ -153,6 +153,12 @@ class FileComm(CommBase.CommBase):
         kwargs['is_series'] = self.is_series
         return kwargs
 
+    @property
+    def registry_key(self):
+        r"""str: String used to register the socket."""
+        # return self.address
+        return '%s_%s_%s' % (self.address, self.direction, self.uuid)
+
     def record_position(self):
         r"""Record the current position in the file/series."""
         _rec_pos = self.fd.tell()
@@ -260,12 +266,12 @@ class FileComm(CommBase.CommBase):
         r"""Open the file."""
         super(FileComm, self).open()
         self._open()
-        self.register_comm(self.address, self.fd)
+        self.register_comm(self.registry_key, self.fd)
 
     def _close(self, *args, **kwargs):
         r"""Close the file."""
         self._file_close()
-        self.unregister_comm(self.address)
+        self.unregister_comm(self.registry_key)
         super(FileComm, self)._close(*args, **kwargs)
 
     def remove_file(self):

@@ -449,13 +449,6 @@ class ConnectionDriver(Driver):
             self.state = 'eof'
             self.set_close_state('eof')
             self.icomm.close()
-        # if self.set_close_state('eof'):
-        #     with self.lock:
-        #         self.send_eof()
-        #     self.confirm_input(timeout=False)
-        #     with self.lock:
-        #         self.icomm.close()
-        #     self.debug('EOF sent')
         self.debug('After EOF')
         return False
 
@@ -566,7 +559,7 @@ class ConnectionDriver(Driver):
             flag = self._send_1st_message(*args, **kwargs)
         # if self.single_use:
         #     with self.lock:
-        #         self.info('used')
+        #         self.debug('Used')
         #         self.icomm.drain_messages()
         #         self.icomm.close()
         return flag
@@ -576,7 +569,7 @@ class ConnectionDriver(Driver):
         out = False
         with self.lock:
             if not self.close_state:
-                self.info("Setting close state to %s", state)
+                self.debug("Setting close state to %s", state)
                 self.close_state = state
                 out = True
         return out
