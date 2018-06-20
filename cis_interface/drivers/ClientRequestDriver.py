@@ -147,19 +147,6 @@ class ClientRequestDriver(ConnectionDriver):
         self.ocomm._send_serializer = True
         # self.info("%s: before loop complete", self.name)
 
-    def send_eof(self):
-        r"""Send EOF message.
-
-        Returns:
-            bool: Success or failure of send.
-
-        """
-        with self.lock:
-            if self.icomm._last_header is None:  # pragma: debug
-                self.icomm._last_header = dict()
-            self.icomm._last_header['response_address'] = CIS_CLIENT_EOF
-        return super(ClientRequestDriver, self).send_eof()
-
     def send_message(self, *args, **kwargs):
         r"""Start a response driver for a request message and send message with
         header.
@@ -175,7 +162,8 @@ class ClientRequestDriver(ConnectionDriver):
         if self.ocomm.is_closed:
             return False
         # Start response driver
-        if self.model_response_address != CIS_CLIENT_EOF:
+        is_eof = kwargs.get('is_eof', False)
+        if not is_eof:
             with self.lock:
                 if (not self.is_comm_open) or self._block_response:  # pragma: debug
                     return False

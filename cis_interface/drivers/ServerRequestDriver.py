@@ -1,7 +1,6 @@
 from cis_interface.drivers.ConnectionDriver import ConnectionDriver
 from cis_interface.drivers.ServerResponseDriver import ServerResponseDriver
-from cis_interface.drivers.ClientRequestDriver import (
-    CIS_CLIENT_INI, CIS_CLIENT_EOF)
+from cis_interface.drivers.ClientRequestDriver import CIS_CLIENT_INI
 
 
 class ServerRequestDriver(ConnectionDriver):
@@ -110,6 +109,12 @@ class ServerRequestDriver(ConnectionDriver):
     def on_client_exit(self):
         r"""Close input comm to stop the loop."""
         self.debug('')
+        self.wait()
+        self.set_close_state('client exit')
+        with self.lock:
+            self.icomm.close()
+        self.wait()
+        self.debug('Finished')
     
     def on_eof(self):
         r"""On EOF, decrement number of clients. Only send EOF if the number
@@ -140,19 +145,6 @@ class ServerRequestDriver(ConnectionDriver):
                 return msg
         return super(ServerRequestDriver, self).on_message(msg)
     
-    def send_eof(self):
-        r"""Send EOF message.
-
-        Returns:
-            bool: Success or failure of send.
-
-        """
-        with self.lock:
-            if self.icomm._last_header is None:  # pragma: debug
-                self.icomm._last_header = dict()
-            self.icomm._last_header['response_address'] = CIS_CLIENT_EOF
-        return super(ServerRequestDriver, self).send_eof()
-
     def send_message(self, *args, **kwargs):
         r"""Send a single message.
 
@@ -167,7 +159,8 @@ class ServerRequestDriver(ConnectionDriver):
         if self.ocomm.is_closed:
             return False
         # Start response driver
-        if self.response_address != CIS_CLIENT_EOF:
+        is_eof = kwargs.get('is_eof', False)
+        if not is_eof:
             self.debug("Starting new ServerResponseDriver at: %s" %
                        self.response_address)
             with self.lock:

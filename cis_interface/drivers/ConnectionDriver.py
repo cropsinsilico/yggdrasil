@@ -300,7 +300,8 @@ class ConnectionDriver(Driver):
             with self.lock:
                 self.icomm.close()
         self.set_break_flag()
-        self.debug('After on_model_exit')
+        self.wait()
+        self.debug('Finished')
         super(ConnectionDriver, self).on_model_exit()
 
     def do_terminate(self):
@@ -350,7 +351,7 @@ class ConnectionDriver(Driver):
                     break
                 elif self.icomm.is_confirmed_recv:
                     break
-            self.sleep()
+            self.sleep(10 * self.sleeptime)
         self.stop_timeout()
 
     def drain_input(self, timeout=None):
@@ -400,6 +401,7 @@ class ConnectionDriver(Driver):
         self.debug('')
         # Close input comm in case loop did not
         self.confirm_input(timeout=False)
+        self.debug('Confirmed input')
         with self.lock:
             self.debug('Acquired lock')
             if self._skip_after_loop:
@@ -534,10 +536,11 @@ class ConnectionDriver(Driver):
         """
         with self.lock:
             if self._eof_sent:
+                self.debug('Already sent EOF')
                 return False
             self._eof_sent = True
-        self.debug('')
-        return self.send_message(self.ocomm.eof_msg)
+        self.debug('Sent EOF')
+        return self.send_message(self.ocomm.eof_msg, is_eof=True)
 
     def send_message(self, *args, **kwargs):
         r"""Send a single message.
@@ -551,6 +554,7 @@ class ConnectionDriver(Driver):
 
         """
         self.debug('')
+        kwargs.pop('is_eof', False)
         with self.lock:
             self._used = True
         if self._first_send_done:
@@ -569,7 +573,7 @@ class ConnectionDriver(Driver):
         out = False
         with self.lock:
             if not self.close_state:
-                self.debug("Setting close state to %s", state)
+                self.info("Setting close state to %s", state)
                 self.close_state = state
                 out = True
         return out
