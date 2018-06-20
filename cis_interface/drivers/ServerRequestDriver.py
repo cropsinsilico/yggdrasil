@@ -113,6 +113,7 @@ class ServerRequestDriver(ConnectionDriver):
         with self.lock:
             self.icomm.close()
         self.wait()
+        self.confirm_output()
         self.debug('Finished')
     
     def on_eof(self):

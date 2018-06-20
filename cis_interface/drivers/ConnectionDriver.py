@@ -345,11 +345,23 @@ class ConnectionDriver(Driver):
     def confirm_input(self, timeout=None):
         r"""Confirm receipt of messages from input comm."""
         T = self.start_timeout(timeout)
-        while not T.is_out:
+        while not T.is_out:  # pragma: debug
             with self.lock:
                 if (not self.icomm.is_open):
                     break
                 elif self.icomm.is_confirmed_recv:
+                    break
+            self.sleep(10 * self.sleeptime)
+        self.stop_timeout()
+
+    def confirm_output(self, timeout=None):
+        r"""Confirm receipt of messages from output comm."""
+        T = self.start_timeout(timeout)
+        while not T.is_out:  # pragma: debug
+            with self.lock:
+                if (not self.ocomm.is_open):
+                    break
+                elif self.ocomm.is_confirmed_send:
                     break
             self.sleep(10 * self.sleeptime)
         self.stop_timeout()
@@ -411,9 +423,7 @@ class ConnectionDriver(Driver):
         # Send EOF in case the model didn't
         if not self.single_use:
             self.send_eof()
-        # Close output comm after waiting for output to be processed
-        # self.drain_output(timeout=False)
-        # self.ocomm.close()
+        # Do not close output comm in case model/connection still receiving
         self.debug('Finished')
 
     def recv_message(self, **kwargs):

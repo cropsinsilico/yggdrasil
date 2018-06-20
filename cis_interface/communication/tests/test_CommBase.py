@@ -446,14 +446,5 @@ class TestCommBase(CisTestClassInfo):
     def test_send_recv_dict(self):
         r"""Test send/recv message as dict."""
         msg_send = dict(f0=self.map_sent2recv(self.msg_short))
-        if self.comm in ['CommBase', 'AsyncComm']:
-            flag = self.send_instance.send_dict(msg_send)
-            assert(not flag)
-            flag, msg_recv = self.recv_instance.recv_dict(timeout=self.timeout)
-            assert(not flag)
-        else:
-            flag = self.send_instance.send_dict(msg_send)
-            assert(flag)
-            flag, msg_recv = self.recv_instance.recv_dict(timeout=self.timeout)
-            assert(flag)
-            nt.assert_equal(msg_recv, msg_send)
+        self.do_send_recv(send_meth='send_dict', recv_meth='recv_dict',
+                          msg_send=msg_send)
