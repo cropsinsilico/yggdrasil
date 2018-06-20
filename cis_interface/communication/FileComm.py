@@ -310,7 +310,7 @@ class FileComm(CommBase.CommBase):
             self.fd.seek(0, os.SEEK_END)
             endpos = self.fd.tell()
             out = endpos - curpos
-        except ValueError:  # pragma: debug
+        except (ValueError, AttributeError):  # pragma: debug
             out = 0
         if self.is_series:
             i = self._series_index + 1
