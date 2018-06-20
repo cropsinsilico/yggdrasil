@@ -23,6 +23,7 @@ Welcome to cis_interface's documentation!
    model_drivers
    code
    examples/examples_toc
+   release
    
 Indices and tables
 ==================

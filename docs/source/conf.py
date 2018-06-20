@@ -100,9 +100,9 @@ author = u'Meagan Lang, David Raila'
 # built documents.
 #
 # The short X.Y version.
-version = u'0.2'
+version = u'0.3'
 # The full version, including alpha/beta/rc tags.
-release = u'0.2.0'
+release = u'0.3.0'
 
 # Substitutions
 # .. _Docs: http://cis_interface.readthedocs.io/en/latest/

@@ -122,7 +122,6 @@ def write_code_line(fd, s, upone=False, language=None):
     if language is None:
         ext = os.path.splitext(p)[-1]
         language = ext2lang.get(ext, 'python')
-        print('extension', ext, language)
     fd.write(".. literalinclude:: %s\n" % p)
     fd.write("   :language: %s\n" % language)
     fd.write("   :linenos:\n")
