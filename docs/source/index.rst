@@ -23,6 +23,7 @@ Welcome to cis_interface's documentation!
    model_drivers
    code
    examples/examples_toc
+   hackathon2018/index
    
 Indices and tables
 ==================
