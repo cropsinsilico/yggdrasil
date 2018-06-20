@@ -402,6 +402,22 @@ class CisRunner(CisClass):
             self.terminate()
         self.debug('Returning')
 
+    def do_model_exits(self, model):
+        r"""Perform exits for IO drivers associated with a model.
+
+        Args:
+            model (dict): Dictionary of model parameters including any
+                associated IO drivers.
+
+        """
+        for drv in self.io_drivers(model['name']):
+            drv['models'].remove(model['name'])
+            if not drv['instance'].is_alive():
+                continue
+            if (len(drv['models']) == 0):
+                self.debug('on_model_exit %s', drv['name'])
+                drv['instance'].on_model_exit()
+    
     def do_client_exits(self, model):
         r"""Perform exits for IO drivers associated with a client model.
 
@@ -420,22 +436,6 @@ class CisRunner(CisClass):
                 iod['instance'].on_client_exit()
                 srv['instance'].stop()
 
-    def do_model_exits(self, model):
-        r"""Perform exits for IO drivers associated with a model.
-
-        Args:
-            model (dict): Dictionary of model parameters including any
-                associated IO drivers.
-
-        """
-        for drv in self.io_drivers(model['name']):
-            drv['models'].remove(model['name'])
-            if not drv['instance'].is_alive():
-                continue
-            if (len(drv['models']) == 0):
-                self.debug('on_model_exit %s', drv['name'])
-                drv['instance'].on_model_exit()
-    
     def terminate(self):
         r"""Immediately stop all drivers, beginning with IO drivers."""
         self.debug('')

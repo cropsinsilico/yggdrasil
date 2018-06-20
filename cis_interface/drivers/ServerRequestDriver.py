@@ -109,8 +109,7 @@ class ServerRequestDriver(ConnectionDriver):
     def on_client_exit(self):
         r"""Close input comm to stop the loop."""
         self.debug('')
-        self.wait()
-        self.set_close_state('client exit')
+        self.wait_close_state('client exit')
         with self.lock:
             self.icomm.close()
         self.wait()
