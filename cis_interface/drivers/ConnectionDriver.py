@@ -545,7 +545,7 @@ class ConnectionDriver(Driver):
 
         """
         with self.lock:
-            if self._eof_sent:
+            if self._eof_sent:  # pragma: debug
                 self.debug('Already sent EOF')
                 return False
             self._eof_sent = True

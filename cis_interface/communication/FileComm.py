@@ -113,7 +113,7 @@ class FileComm(CommBase.CommBase):
     def close_registry_entry(cls, value):
         r"""Close a registry entry."""
         out = False
-        if not value.closed:
+        if not value.closed:  # pragma: debug
             value.close()
             out = True
         return out
