@@ -68,13 +68,13 @@ connection:
       field_units: *id003
       filetype: &id012
         allowed:
+        - ascii
+        - binary
         - map
+        - obj
         - pandas
         - pickle
         - ply
-        - binary
-        - ascii
-        - obj
         - table
         default: binary
         required: false
@@ -342,15 +342,15 @@ model:
     type: boolean
   language:
     allowed:
-    - executable
-    - cpp
-    - python
-    - matlab
-    - lpy
-    - cmake
-    - make
-    - c++
     - c
+    - c++
+    - cmake
+    - cpp
+    - executable
+    - lpy
+    - make
+    - matlab
+    - python
     required: true
     type: string
   make_command:
