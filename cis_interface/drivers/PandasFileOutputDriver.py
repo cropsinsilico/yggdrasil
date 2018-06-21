@@ -1,7 +1,9 @@
 from cis_interface import serialize
 from cis_interface.drivers.FileOutputDriver import FileOutputDriver
+from cis_interface.schema import register_component
 
 
+@register_component
 class PandasFileOutputDriver(FileOutputDriver):
     r"""Class to handle output of received messages to a Pandas csv file.
 
@@ -13,16 +15,12 @@ class PandasFileOutputDriver(FileOutputDriver):
         **kwargs: Additional keyword arguments are passed to parent class.
 
     """
+
+    _ocomm_type = 'PandasFileComm'
+
     def __init__(self, name, args, **kwargs):
-        file_keys = ['delimiter']
-        # icomm_kws = kwargs.get('icomm_kws', {})
-        ocomm_kws = kwargs.get('ocomm_kws', {})
-        ocomm_kws.setdefault('comm', 'PandasFileComm')
-        ocomm_kws.setdefault('send_converter', serialize.numpy2pandas)
-        for k in file_keys:
-            if k in kwargs:
-                ocomm_kws[k] = kwargs.pop(k)
-        kwargs['ocomm_kws'] = ocomm_kws
+        kwargs.setdefault('ocomm_kws', {})
+        kwargs['ocomm_kws'].setdefault('send_converter', serialize.numpy2pandas)
         super(PandasFileOutputDriver, self).__init__(name, args, **kwargs)
         self.debug('(%s)', args)
 

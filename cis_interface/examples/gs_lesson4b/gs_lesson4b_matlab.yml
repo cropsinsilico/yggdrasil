@@ -1,0 +1,28 @@
+models:
+  - name: matlab_modelA
+    language: matlab
+    args: ./src/gs_lesson4b_modelA.m
+
+    inputs:
+      - name: inputA
+        driver: FileInputDriver
+        args: ./Input/input.txt
+
+    outputs:
+      - name: outputA
+        driver: OutputDriver  # Output to another channel
+        args: A_to_B  # Conneciton to inputB
+
+  - name: matlab_modelB
+    language: matlab
+    args: ./src/gs_lesson4b_modelB.m
+
+    inputs:
+      - name: inputB
+        driver: InputDriver  # Input from another channel
+        args: A_to_B  # Conneciton to inputA
+
+    outputs:
+      - name: outputB
+        driver: FileOutputDriver
+        args: ./output.txt

@@ -1,3 +1,6 @@
+#ifndef CISTOOLS_H_
+#define CISTOOLS_H_
+
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -5,8 +8,9 @@
 #include <errno.h>
 #include <time.h>
 
-#ifndef CISTOOLS_H_
-#define CISTOOLS_H_
+#ifdef __cplusplus /* If this is a C++ compiler, use C linkage */
+extern "C" {
+#endif
 
 // Platform specific
 #ifdef _WIN32
@@ -141,7 +145,7 @@ void cisError(const char* fmt, ...) {
   va_end(ap);
   _cis_error_flag = 1;
 };
-  
+
 #ifdef CIS_DEBUG
 #if CIS_DEBUG <= 10
 #define cislog_error cisError
@@ -215,6 +219,8 @@ int is_send(const char *buf) {
   return not_empty_match("send", buf);
 };
 
-
+#ifdef __cplusplus /* If this is a C++ compiler, end C linkage */
+}
+#endif
 
 #endif /*CISTOOLS_H_*/

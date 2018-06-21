@@ -1,0 +1,28 @@
+models:
+  - name: c_modelA
+    language: c
+    args: ./src/gs_lesson4b_modelA.c
+
+    inputs:
+      - name: inputA
+        driver: FileInputDriver
+        args: ./Input/input.txt
+
+    outputs:
+      - name: outputA
+        driver: OutputDriver  # Output to another channel
+        args: A_to_B  # Connection to inputB
+
+  - name: c_modelB
+    language: c
+    args: ./src/gs_lesson4b_modelB.c
+
+    inputs:
+      - name: inputB
+        driver: InputDriver  # Input from another channel
+        args: A_to_B  # Conneciton to inputA
+
+    outputs:
+      - name: outputB
+        driver: FileOutputDriver
+        args: ./output.txt

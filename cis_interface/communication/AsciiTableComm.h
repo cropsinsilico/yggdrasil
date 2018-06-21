@@ -1,10 +1,14 @@
+/*! @brief Flag for checking if this header has already been included. */
+#ifndef CISASCIITABLECOMM_H_
+#define CISASCIITABLECOMM_H_
+
 #include <../tools.h>
 #include <CommBase.h>
 #include <../dataio/AsciiTable.h>
 
-/*! @brief Flag for checking if this header has already been included. */
-#ifndef CISASCIITABLECOMM_H_
-#define CISASCIITABLECOMM_H_
+#ifdef __cplusplus /* If this is a C++ compiler, use C linkage */
+extern "C" {
+#endif
 
 /*! @brief Number of tables creates. */
 static unsigned _cisAsciiTablesCreated;
@@ -185,5 +189,9 @@ int ascii_table_comm_recv(const comm_t x, char **data, const size_t len,
  */
 #define ascii_table_comm_recv_nolimit ascii_table_comm_recv
 
+
+#ifdef __cplusplus /* If this is a C++ compiler, end C linkage */
+}
+#endif
 
 #endif /*CISASCIITABLECOMM_H_*/

@@ -9,6 +9,7 @@ out_table = CisInterface('CisAsciiTableOutput', 'outputM_table', ...
 in_array = CisInterface('CisAsciiArrayInput', 'inputM_array');
 out_array = CisInterface('CisAsciiArrayOutput', 'outputM_array', ...
 			 '%5s\t%ld\t%3.1f\t%3.1lf%+3.1lfj\n');
+exit_code = 0;
 
 % Read lines from ASCII text file until end of file is reached.
 % As each line is received, it is then sent to the output ASCII file.
@@ -23,6 +24,7 @@ while flag
     ret = out_file.send(line);
     if (~ret);
       disp('ascii_io(M): ERROR SENDING LINE');
+      exit_code = -1;
       break;
     end;
   else
@@ -47,6 +49,7 @@ while flag
     ret = out_table.send(line);
     if (~ret);
       disp('ascii_io(M): ERROR SENDING ROW');
+      exit_code = -1;
       break;
     end;
   else
@@ -58,23 +61,30 @@ while flag
 end;
 
 % Read entire array from ASCII table into an array
-[flag, arr] = in_array.recv();
-if (~flag);
-  disp('ascii_io(M): ERROR RECVING ARRAY');
-  exit(-1);
-end;
-nr = size(arr, 1);
-fprintf('Array: (%d rows)\n', nr);
-% Print each line in the array
-for i = 1:nr
-  fprintf('%5s, %d, %3.1f, %3.1f%+3.1fi\n', ...
-  	  char(arr{i,1}), arr{i,2}, arr{i,3}, ...
-  	  real(arr{i,4}), imag(arr{i,4}));
-end;
-% Send the array to output. Formatting is handled on the output driver side.
-ret = out_array.send(arr);
-if (~ret);
-  disp('ascii_io(M): ERROR SENDING ARRAY');
+flag = true;
+while flag
+  [flag, arr] = in_array.recv();
+  if flag
+    nr = size(arr, 1);
+    fprintf('Array: (%d rows)\n', nr);
+    % Print each line in the array
+    for i = 1:nr
+      fprintf('%5s, %d, %3.1f, %3.1f%+3.1fi\n', ...
+	      char(arr{i,1}), arr{i,2}, arr{i,3}, ...
+	      real(arr{i,4}), imag(arr{i,4}));
+    end;
+    % Send the array to output. Formatting is handled on the output driver side.
+    ret = out_array.send(arr);
+    if (~ret);
+      disp('ascii_io(M): ERROR SENDING ARRAY');
+      exit_code = -1;
+      break;
+    end;
+  else
+    % If the receive was not succesful, send the end-of-file message to
+    % close the output file.
+    disp('End of array input (Matlab)');
+  end;
 end;
 
-exit(0);
+exit(exit_code);

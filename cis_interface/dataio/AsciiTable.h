@@ -1,9 +1,13 @@
-#include <../tools.h>
-#include "AsciiFile.h"
-
 /*! @brief Flag for checking if AsciiTable.h has already been included.*/
 #ifndef ASCIITABLE_H_
 #define ASCIITABLE_H_
+
+#include <../tools.h>
+#include "AsciiFile.h"
+
+#ifdef __cplusplus /* If this is a C++ compiler, use C linkage */
+extern "C" {
+#endif
 
 #define FMT_LEN 100
 
@@ -719,5 +723,9 @@ asciiTable_t asciiTable(const char *filepath, const char *io_mode,
   /* printf("ncols = %d, row_siz = %d\n", t.ncols, t.row_siz); */
   return t;
 };
+
+#ifdef __cplusplus /* If this is a C++ compiler, end C linkage */
+}
+#endif
 
 #endif /*ASCIITABLE_H_*/

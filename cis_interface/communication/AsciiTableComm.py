@@ -1,7 +1,9 @@
 from cis_interface import serialize, backwards
 from cis_interface.communication.AsciiFileComm import AsciiFileComm
+from cis_interface.schema import register_component, inherit_schema
 
 
+@register_component
 class AsciiTableComm(AsciiFileComm):
     r"""Class for handling I/O from/to a file on disk.
 
@@ -17,6 +19,12 @@ class AsciiTableComm(AsciiFileComm):
         **kwargs: Additional keywords arguments are passed to parent class.
 
     """
+    
+    _filetype = 'table'
+    _schema = inherit_schema(AsciiFileComm._schema, 'filetype', _filetype,
+                             delimiter={'type': 'string', 'required': False},
+                             use_astropy={'type': 'boolean', 'required': False})
+
     def _init_before_open(self, delimiter=None, use_astropy=False,
                           serializer_kwargs=None, **kwargs):
         r"""Set up dataio and attributes."""
@@ -41,49 +49,13 @@ class AsciiTableComm(AsciiFileComm):
         r"""Read header lines from the file and update serializer info."""
         if self.header_was_read:
             return
-        header_lines = []
-        header_size = 0
-        self.fd.seek(0)
-        for line in self.fd:
-            sline = backwards.unicode2bytes(
-                line.replace(self.platform_newline, self.newline))
-            if not sline.startswith(self.comment):
-                break
-            header_size += len(line)
-            header_lines.append(sline)
-        # Parse header & set serializer attributes
-        header = serialize.parse_header(header_lines)
-        for k in ['format_str', 'field_names', 'field_units']:
-            if header.get(k, False):
-                setattr(self.serializer, k, header[k])
-        # Try to determine format from array without header
-        str_fmt = backwards.unicode2bytes('%s')
-        if (((self.serializer.format_str is None) or
-             (str_fmt in self.serializer.format_str))):
-            with open(self.address, self.open_mode) as fd:
-                fd.seek(header_size)
-                all_contents = fd.read()
-            if len(all_contents) == 0:  # pragma: debug
-                return  # In case the file has not been written
-            arr = serialize.table_to_array(all_contents,
-                                           names=self.serializer.field_names,
-                                           comment=self.comment,
-                                           delimiter=self.delimiter)
-            self.serializer.field_names = arr.dtype.names
-            if self.serializer.format_str is None:
-                self.serializer.format_str = serialize.table2format(
-                    arr.dtype, delimiter=self.delimiter,
-                    comment=backwards.unicode2bytes(''),
-                    newline=self.newline)
-            while str_fmt in self.serializer.format_str:
-                ifld = self.serializer.field_formats.index(str_fmt)
-                max_len = len(max(arr[self.serializer.field_names[ifld]], key=len))
-                new_str_fmt = backwards.unicode2bytes('%' + str(max_len) + 's')
-                self.serializer.format_str = self.serializer.format_str.replace(
-                    str_fmt, new_str_fmt, 1)
+        pos = self.record_position()
+        self.change_position(0)
+        serialize.discover_header(self.fd, self.serializer,
+                                  newline=self.newline, comment=self.comment,
+                                  delimiter=self.delimiter)
         self.delimiter = self.serializer.table_info['delimiter']
-        # Seek to just after the header
-        self.fd.seek(header_size)
+        self.change_position(*pos)
         self.header_was_read = True
 
     def write_header(self):
@@ -98,6 +70,54 @@ class AsciiTableComm(AsciiFileComm):
             delimiter=self.delimiter)
         self.fd.write(header_msg)
         self.header_was_written = True
+
+    def record_position(self):
+        r"""Record the current position in the file/series."""
+        pos, ind = super(AsciiTableComm, self).record_position()
+        return pos, ind, self.header_was_read, self.header_was_written
+
+    def change_position(self, file_pos, series_index=None,
+                        header_was_read=None, header_was_written=None):
+        r"""Change the position in the file/series.
+
+        Args:
+            file_pos (int): Position that should be moved to in the file.
+            series_index (int, optinal): Index of the file in the series that
+                should be moved to. Defaults to None and will be set to the
+                current series index.
+            header_was_read (bool, optional): Status of if header has been
+                read or not. Defaults to None and will be set to the current
+                value.
+            header_was_written (bool, optional): Status of if header has been
+                written or not. Defaults to None and will be set to the current
+                value.
+
+        """
+        if header_was_read is None:
+            header_was_read = self.header_was_read
+        if header_was_written is None:
+            header_was_written = self.header_was_written
+        super(AsciiTableComm, self).change_position(file_pos, series_index)
+        self.header_was_read = header_was_read
+        self.header_was_written = header_was_written
+
+    def advance_in_series(self, *args, **kwargs):
+        r"""Advance to a certain file in a series.
+
+        Args:
+            index (int, optional): Index of file in the series that should be
+                moved to. Defaults to None and call will advance to the next
+                file in the series.
+
+        Returns:
+            bool: True if the file was advanced in the series, False otherwise.
+
+        """
+        out = super(AsciiTableComm, self).advance_in_series(*args, **kwargs)
+        if out:
+            self.header_was_read = False
+            self.header_was_written = False
+        return out
 
     def _send(self, msg):
         r"""Write message to a file.

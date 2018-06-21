@@ -1,0 +1,13 @@
+model:
+  name: lpy_model
+  driver: LPyModelDriver
+  args:
+    - ../scripts/lpy_model.lpy
+  input: LPy_time
+  output: LPy_mesh
+
+connections:
+  input: lpy_times.txt
+  output: LPy_time
+  input: LPy_mesh
+  output: lpy_mesh.ply  

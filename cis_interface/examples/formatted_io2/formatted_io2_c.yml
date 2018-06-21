@@ -1,12 +1,12 @@
 models:
   - name: c_modelA
-    driver: GCCModelDriver
+    language: c
     args: ./src/formatted_io2_modelA.c
     inputs: inputA
     outputs: outputA
 
   - name: c_modelB
-    driver: GCCModelDriver
+    language: c
     args: ./src/formatted_io2_modelB.c
     inputs: inputB
     outputs: outputB
@@ -16,7 +16,7 @@ connections:
     output: inputB
   - input: ./Input/input.txt  # Connection between file and model A input
     output: inputA
-    read_meth: table
+    filetype: table
   - input: outputB  # Connection between model B output and file
     output: ./output.txt
-    write_meth: table
+    filetype: table

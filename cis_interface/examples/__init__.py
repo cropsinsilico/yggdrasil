@@ -6,11 +6,13 @@ ex_dict = {'gs_lesson1': ('python', 'matlab', 'c', 'cpp'),
            'gs_lesson2': ('python', 'matlab', 'c', 'cpp'),
            'gs_lesson3': ('python', 'matlab', 'c', 'cpp'),
            'gs_lesson4': ('python', 'matlab', 'c', 'cpp'),
-           'gs_lesson5': ('python', 'matlab', 'c', 'cpp'),
+           'gs_lesson4b': ('python', 'matlab', 'c', 'cpp'),
            'formatted_io1': ('python', 'matlab', 'c', 'cpp'),
            'formatted_io2': ('python', 'matlab', 'c', 'cpp'),
            'formatted_io3': ('python', 'matlab', 'c', 'cpp'),
            'formatted_io4': ('python', 'matlab', 'c', 'cpp'),
+           'formatted_io5': ('python', 'matlab', 'c', 'cpp'),
+           'formatted_io6': ('python', 'matlab', 'c', 'cpp'),
            'rpc_lesson1': ('python', 'matlab', 'c', 'cpp'),
            'rpc_lesson2': ('python', 'matlab', 'c', 'cpp'),
            'hello': ('python', 'matlab', 'c', 'cpp'),
@@ -70,8 +72,9 @@ for k, lang in ex_dict.items():
                          '%sSrv_%s.yml' % (k, srv_l)]
             src_names = ['%s%s' % (k, ext_map[cli_l]),
                          '%s%s' % (k, ext_map[srv_l])]
-        elif k in ['gs_lesson4', 'gs_lesson5',
-                   'formatted_io1', 'formatted_io2', 'formatted_io3', 'formatted_io4']:
+        elif k in ['gs_lesson4', 'gs_lesson4b',
+                   'formatted_io1', 'formatted_io2', 'formatted_io3',
+                   'formatted_io4', 'formatted_io5', 'formatted_io6']:
             yml_names = ['%s_%s.yml' % (k, ilang)]
             src_names = ['%s_modelA%s' % (k, ext_map[ilang]),
                          '%s_modelB%s' % (k, ext_map[ilang])]

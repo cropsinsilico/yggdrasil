@@ -1,20 +1,22 @@
 models:
   - name: cpp_modelA
-    driver: GCCModelDriver
-    args: ./src/gs_lesson5_modelA.cpp
+    language: c++
+    args: ./src/formatted_io5_modelA.cpp
     inputs: inputA
     outputs: outputA
 
   - name: cpp_modelB
-    driver: GCCModelDriver
-    args: ./src/gs_lesson5_modelB.cpp
+    language: c++
+    args: ./src/formatted_io5_modelB.cpp
     inputs: inputB
     outputs: outputB
 
 connections:
   - input: outputA  # Connection between model A output & model B input
     output: inputB
-  - input: ./Input/input.txt  # Connection between file and model A input
+  - input: ./Input/input.ply  # Connection between file and model A input
     output: inputA
+    filetype: ply
   - input: outputB  # Connection between model B output and file
-    output: ./output.txt
+    output: ./output.ply
+    filetype: ply

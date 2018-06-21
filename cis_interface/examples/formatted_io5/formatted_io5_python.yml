@@ -1,0 +1,22 @@
+models:
+  - name: python_modelA
+    language: python
+    args: ./src/formatted_io5_modelA.py
+    inputs: inputA
+    outputs: outputA
+
+  - name: python_modelB
+    language: python
+    args: ./src/formatted_io5_modelB.py
+    inputs: inputB
+    outputs: outputB
+
+connections:
+  - input: outputA  # Connection between model A output & model B input
+    output: inputB
+  - input: ./Input/input.ply  # Connection between file and model A input
+    output: inputA
+    filetype: ply
+  - input: outputB  # Connection between model B output and file
+    output: ./output.ply
+    filetype: ply

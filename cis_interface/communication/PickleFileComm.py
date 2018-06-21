@@ -1,7 +1,9 @@
 from cis_interface import backwards
 from cis_interface.communication import FileComm
+from cis_interface.schema import register_component
 
 
+@register_component
 class PickleFileComm(FileComm.FileComm):
     r"""Class for handling I/O from/to a pickled file on disk.
 
@@ -10,6 +12,9 @@ class PickleFileComm(FileComm.FileComm):
         **kwargs: Additional keywords arguments are passed to parent class.
 
     """
+
+    _filetype = 'pickle'
+
     def __init__(self, name, **kwargs):
         kwargs.setdefault('readmeth', 'read')
         kwargs['serializer_kwargs'] = dict(stype=4)
@@ -29,6 +34,7 @@ class PickleFileComm(FileComm.FileComm):
         """
         prev_pos = self.fd.tell()
         flag, msg = super(PickleFileComm, self)._recv(timeout=timeout)
+        # Rewind file if message contains more than one pickle
         if msg != self.eof_msg:
             fd = backwards.BytesIO(msg)
             backwards.pickle.load(fd)

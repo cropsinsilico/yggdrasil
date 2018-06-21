@@ -1,8 +1,12 @@
-#include <../tools.h>
-
 /*! @brief Flag for checking if this header has already been included. */
 #ifndef CISCOMMBASE_H_
 #define CISCOMMBASE_H_
+
+#include <../tools.h>
+
+#ifdef __cplusplus /* If this is a C++ compiler, use C linkage */
+extern "C" {
+#endif
 
 /*! @brief Communicator types. */
 enum comm_enum { NULL_COMM, IPC_COMM, ZMQ_COMM,
@@ -34,6 +38,7 @@ typedef struct comm_t {
   int *used; //!< Flag specifying if the comm has been used.
   void *reply; //!< Reply information.
   int is_file; //!< Flag specifying if the comm connects directly to a file.
+  int is_work_comm; //!< Flag specifying if comm is a temporary work comm.
 } comm_t;
 
 
@@ -61,6 +66,7 @@ comm_t empty_comm_base() {
   ret.used = NULL;
   ret.reply = NULL;
   ret.is_file = 0;
+  ret.is_work_comm = 0;
   return ret;
 };
 
@@ -181,6 +187,7 @@ int free_comm_base(comm_t *x) {
     free(x->serializer);
     x->serializer = NULL;
   }
+  x->valid = 0;
   return 0;
 };
 
@@ -210,5 +217,9 @@ int comm_base_send(const comm_t x, const char *data, const size_t len) {
   return 0;
 };
 
+
+#ifdef __cplusplus /* If this is a C++ compiler, end C linkage */
+}
+#endif
   
 #endif /*CISCOMMBASE_H_*/

@@ -35,7 +35,7 @@ class RMQAsyncComm(RMQComm.RMQComm):
         self._reconnecting = False
         self._close_called = False
         self._buffered_messages = []
-        self._qres = 0
+        self._qres = None
         self._qres_lock = threading.RLock()
         self._qres_event = threading.Event()
         self._qres_event.set()
@@ -309,6 +309,7 @@ class RMQAsyncComm(RMQComm.RMQComm):
                 connection.ioloop.stop()
                 self.connection = None
                 self._closing = False
+                self._qres_event.set()
             else:
                 self.warning('Connection closed, reopening in %f seconds: (%s) %s',
                              self.sleeptime, reply_code, reply_text)

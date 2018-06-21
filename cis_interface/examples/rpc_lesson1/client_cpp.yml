@@ -2,7 +2,7 @@
 
 model:
   name: client
-  driver: GCCModelDriver
+  language: c++
   args:
     - ./src/client.cpp
     - 3  # Pass the number of iterations that should be performed

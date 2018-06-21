@@ -28,9 +28,8 @@ class AsyncComm(CommBase.CommBase):
         
     """
     def __init__(self, name, dont_backlog=False, **kwargs):
-        self.dont_backlog = dont_backlog
-        if kwargs.get('matlab', False):
-            self.dont_backlog = True
+        self.dont_backlog = (dont_backlog or kwargs.get('matlab', False) or
+                             kwargs.get('is_inteface', False))
         self._backlog_recv = []
         self._backlog_send = []
         self._backlog_thread = None
@@ -38,6 +37,21 @@ class AsyncComm(CommBase.CommBase):
         self.backlog_recv_ready = threading.Event()
         self.backlog_open = False
         super(AsyncComm, self).__init__(name, **kwargs)
+
+    def printStatus(self, nindent=0):
+        r"""Print status of the communicator."""
+        super(AsyncComm, self).printStatus(nindent=nindent)
+        prefix = '\t' + nindent * '\t'
+        print('%s%-15s: %s' % (prefix, 'open (backlog)', self.is_open_backlog))
+        print('%s%-15s: %s' % (prefix, 'open (direct)', self.is_open_direct))
+        print('%s%-15s: %s' % (prefix, 'nsent (backlog)', self.n_msg_backlog_send))
+        print('%s%-15s: %s' % (prefix, 'nrecv (backlog)', self.n_msg_backlog_recv))
+        print('%s%-15s: %s' % (prefix, 'nsent (direct)', self.n_msg_direct_send))
+        print('%s%-15s: %s' % (prefix, 'nrecv (direct)', self.n_msg_direct_recv))
+        if len(self._work_comms) > 0:
+            print('%sWork comms:' % prefix)
+            for v in self._work_comms.values():
+                v.printStatus(nindent=nindent + 1)
 
     @property
     def backlog_thread(self):
@@ -192,11 +206,17 @@ class AsyncComm(CommBase.CommBase):
     @property
     def is_confirmed_send(self):
         r"""bool: True if all sent messages have been confirmed."""
+        for v in self._work_comms.values():
+            if (v.direction == 'send') and not v.is_confirmed_send:  # pragma: debug
+                return False
         return (self.n_msg_direct_send == 0)
 
     @property
     def is_confirmed_recv(self):
         r"""bool: True if all received messages have been confirmed."""
+        for v in self._work_comms.values():
+            if (v.direction == 'recv') and not v.is_confirmed_recv:  # pragma: debug
+                return False
         return (self.n_msg_direct_recv == 0)
 
     @property
@@ -465,6 +485,9 @@ class AsyncComm(CommBase.CommBase):
         r"""Purge all messages from the comm."""
         super(AsyncComm, self).purge()
         with self.backlog_thread.lock:
+            if self.direction == 'recv':
+                while self.n_msg_direct > 0:  # pragma: debug
+                    self._recv_direct()
             self.backlog_recv_ready.clear()
             self.backlog_send_ready.clear()
             self._backlog_recv = []

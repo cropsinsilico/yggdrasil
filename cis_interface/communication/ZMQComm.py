@@ -1,3 +1,5 @@
+import os
+import tempfile
 import uuid
 import zmq
 import threading
@@ -21,6 +23,16 @@ _wait_send_t = 0  # 0.0001
 _reply_msg = backwards.unicode2bytes('CIS_REPLY')
 _purge_msg = backwards.unicode2bytes('CIS_PURGE')
 _global_context = zmq.Context.instance()
+
+
+def get_ipc_host():
+    r"""Get an IPC host using uuid.
+
+    Returns:
+        str: File path for IPC transport created using uuid.
+
+    """
+    return os.path.join(tempfile.gettempdir(), str(uuid.uuid4()) + '.ipc')
 
         
 def get_socket_type_mate(t_in):
@@ -110,7 +122,7 @@ def parse_address(address):
     return out
 
 
-def bind_socket(socket, address, retry_timeout=-1):
+def bind_socket(socket, address, retry_timeout=-1, nretry=1):
     r"""Bind a socket to an address, getting a random port as necessary.
 
     Args:
@@ -119,7 +131,9 @@ def bind_socket(socket, address, retry_timeout=-1):
         retry_timeout (float, optional): Time (in seconds) that should be
             waited before retrying to bind the socket to the address. If
             negative, a retry will not be attempted and an error will be
-            raised. Defaults to -1;
+            raised. Defaults to -1.
+        nretry (int, optional): Number of times to try binding the socket to
+            the addresses. Defaults to 1.
 
     Returns:
         str: Address that socket was bound to, including random port if one
@@ -134,14 +148,15 @@ def bind_socket(socket, address, retry_timeout=-1):
             port = socket.bind_to_random_port(address)
             address += ":%d" % port
     except zmq.ZMQError as e:  # pragma: debug
-        if (retry_timeout < 0):
+        if (retry_timeout < 0) or (nretry == 0):
             # if (e.errno not in [48, 98]) or (retry_timeout < 0):
             # print(e, e.errno)
             raise e
         else:
             logging.debug("Retrying bind in %f s", retry_timeout)
             tools.sleep(retry_timeout)
-            address = bind_socket(socket, address)
+            address = bind_socket(socket, address, nretry=nretry - 1,
+                                  retry_timeout=retry_timeout)
     return address
 
     
@@ -159,7 +174,9 @@ class ZMQProxy(CommBase.CommServer):
         retry_timeout (float, optional): Time (in seconds) that should be
             waited before retrying to bind the sockets to the addresses. If
             negative, a retry will not be attempted and an error will be
-            raised. Defaults to -1;
+            raised. Defaults to -1.
+        nretry (int, optional): Number of times to try binding the sockets to
+            the addresses. Defaults to 1.
         **kwargs: Additional keyword arguments are passed to the parent class.
 
     Attributes:
@@ -171,7 +188,8 @@ class ZMQProxy(CommBase.CommServer):
         cli_count (int): Number of clients that have connected to this proxy.
 
     """
-    def __init__(self, srv_address, context=None, retry_timeout=-1, **kwargs):
+    def __init__(self, srv_address, context=None, retry_timeout=-1,
+                 nretry=1, **kwargs):
         # Get parameters
         srv_param = parse_address(srv_address)
         cli_param = dict()
@@ -180,10 +198,11 @@ class ZMQProxy(CommBase.CommServer):
         context = context or _global_context
         # Create new address for the frontend
         if cli_param['protocol'] in ['inproc', 'ipc']:
-            cli_param['host'] = str(uuid.uuid4())
+            cli_param['host'] = get_ipc_host()
         cli_address = format_address(cli_param['protocol'], cli_param['host'])
         self.cli_socket = context.socket(zmq.ROUTER)
         self.cli_address = bind_socket(self.cli_socket, cli_address,
+                                       nretry=nretry,
                                        retry_timeout=retry_timeout)
         self.cli_socket.setsockopt(zmq.LINGER, 0)
         CommBase.register_comm('ZMQComm', 'ROUTER_server_' + self.cli_address,
@@ -192,6 +211,7 @@ class ZMQProxy(CommBase.CommServer):
         self.srv_socket = context.socket(zmq.DEALER)
         self.srv_socket.setsockopt(zmq.LINGER, 0)
         self.srv_address = bind_socket(self.srv_socket, srv_address,
+                                       nretry=nretry,
                                        retry_timeout=retry_timeout)
         CommBase.register_comm('ZMQComm', 'DEALER_server_' + self.srv_address,
                                self.srv_socket)
@@ -297,8 +317,10 @@ class ZMQComm(AsyncComm.AsyncComm):
     
     def _init_before_open(self, context=None, socket_type=None,
                           socket_action=None, topic_filter='',
-                          dealer_identity=None, **kwargs):
+                          dealer_identity=None,
+                          reply_socket_address=None, **kwargs):
         r"""Initialize defaults for socket type/action based on direction."""
+        self.reply_socket_lock = threading.RLock()
         self.socket_lock = threading.RLock()
         # Client/Server things
         if self.is_client:
@@ -351,7 +373,7 @@ class ZMQComm(AsyncComm.AsyncComm):
         self._recv_identities = set([])
         # Reply socket attributes
         self.zmq_sleeptime = int(10000 * self.sleeptime)
-        self.reply_socket_address = None
+        self.reply_socket_address = reply_socket_address
         self.reply_socket_send = None
         self.reply_socket_recv = {}
         self._n_zmq_sent = 0
@@ -360,8 +382,19 @@ class ZMQComm(AsyncComm.AsyncComm):
         self._n_reply_recv = {}
         self._server_class = ZMQProxy
         self._server_kwargs = dict(context=self.context,
-                                   retry_timeout=0.01)  # 4 * self.sleeptime)
+                                   nretry=4, retry_timeout=2.0 * self.sleeptime)
         super(ZMQComm, self)._init_before_open(**kwargs)
+
+    def printStatus(self, nindent=0):
+        r"""Print status of the communicator."""
+        super(ZMQComm, self).printStatus(nindent=nindent)
+        prefix = '\t' + nindent * '\t'
+        print('%s%-15s: %s' % (prefix, 'nsent (zmq)', self._n_zmq_sent))
+        print('%s%-15s: %s' % (prefix, 'nsent reply (zmq)', self._n_reply_sent))
+        for k in self._n_zmq_recv.keys():
+            print('%s%-15s: %s' % (prefix, 'nrecv (%s)' % k, self._n_zmq_recv[k]))
+            print('%s%-15s: %s' % (prefix, 'nrecv reply (%s)' % k,
+                                   self._n_reply_recv[k]))
 
     @classmethod
     def is_installed(cls):
@@ -434,7 +467,7 @@ class ZMQComm(AsyncComm.AsyncComm):
             protocol = _default_protocol
         if host is None:
             if protocol in ['inproc', 'ipc']:
-                host = str(uuid.uuid4())
+                host = get_ipc_host()
             else:
                 host = 'localhost'
         if 'address' not in kwargs:
@@ -488,7 +521,8 @@ class ZMQComm(AsyncComm.AsyncComm):
                            self.socket_type_name, self.address)
                 try:
                     self.address = bind_socket(self.socket, self.address,
-                                               retry_timeout=2 * self.sleeptime)
+                                               retry_timeout=self.sleeptime,
+                                               nretry=2)
                 except zmq.ZMQError as e:
                     if (self.socket_type_name == 'PAIR') and (e.errno == 98):
                         self.error(("There is already a 'PAIR' socket sending " +
@@ -565,6 +599,34 @@ class ZMQComm(AsyncComm.AsyncComm):
                     self.socket.setsockopt(zmq.SUBSCRIBE, self.topic_filter)
                 self._openned = True
 
+    def set_reply_socket_send(self):
+        r"""Set the send reply socket if it dosn't exist."""
+        if self.reply_socket_send is None:
+            s = self.context.socket(zmq.REP)
+            s.setsockopt(zmq.LINGER, 0)
+            address = format_address(_default_protocol, 'localhost')
+            address = bind_socket(s, address)
+            self.register_comm('REPLY_SEND_' + address, s)
+            with self.reply_socket_lock:
+                self.reply_socket_send = s
+                self.reply_socket_address = address
+            self.debug("new send address: %s", address)
+        return self.reply_socket_address
+
+    def set_reply_socket_recv(self, address):
+        r"""Set the recv reply socket if the address dosn't exist."""
+        if address not in self.reply_socket_recv:
+            s = self.context.socket(zmq.REQ)
+            s.setsockopt(zmq.LINGER, 0)
+            s.connect(address)
+            self.register_comm('REPLY_RECV_' + backwards.bytes2unicode(address), s)
+            with self.reply_socket_lock:
+                self._n_reply_recv[address] = 0
+                self._n_zmq_recv[address] = 0
+                self.reply_socket_recv[address] = s
+            self.debug("new recv address: %s", address)
+        return address
+
     def check_reply_socket_send(self, msg):
         r"""Append reply socket address if it
 
@@ -576,23 +638,7 @@ class ZMQComm(AsyncComm.AsyncComm):
 
 
         """
-        if self.direction == 'recv':
-            return msg
-        # Create socket
-        if self.reply_socket_send is None:
-            self.reply_socket_send = self.context.socket(zmq.REP)
-            self.reply_socket_send.setsockopt(zmq.LINGER, 0)
-            address = format_address(_default_protocol, 'localhost')
-            address = bind_socket(self.reply_socket_send, address)
-            self.register_comm('REPLY_SEND_' + address, self.reply_socket_send)
-            self.reply_socket_address = address
-            self.debug("new send address: %s", address)
-        new_msg = backwards.format_bytes(
-            backwards.unicode2bytes(':%s:%s:%s:'), (
-                _reply_msg, self.reply_socket_address,
-                _reply_msg))
-        new_msg += msg
-        return new_msg
+        return msg
         
     def check_reply_socket_recv(self, msg):
         r"""Check incoming message for reply address.
@@ -606,23 +652,13 @@ class ZMQComm(AsyncComm.AsyncComm):
         """
         if self.direction == 'send':
             return msg, None
-        prefix = backwards.format_bytes(
-            backwards.unicode2bytes(':%s:'), (_reply_msg,))
-        if msg.startswith(prefix):
-            _, address, new_msg = msg.split(prefix)
-            if address not in self.reply_socket_recv:
-                self.reply_socket_recv[address] = self.context.socket(zmq.REQ)
-                self.reply_socket_recv[address].setsockopt(zmq.LINGER, 0)
-                self.reply_socket_recv[address].connect(address)
-                self.register_comm('REPLY_RECV_' + backwards.bytes2unicode(address),
-                                   self.reply_socket_recv[address])
-                self._n_reply_recv[address] = 0
-                self._n_zmq_recv[address] = 0
-            self.debug("new recv address: %s", address)
-        else:  # pragma: debug
-            new_msg = msg
-            raise Exception("No reply socket address attached.")
-        return new_msg, address
+        header = self.serializer.parse_header(msg)
+        address = header.get('zmq_reply', None)
+        if (address is None):
+            address = self.reply_socket_address
+        if address is not None:
+            self.set_reply_socket_recv(address)
+        return msg, address
 
     # @property
     # def n_reply_sent(self):
@@ -698,6 +734,11 @@ class ZMQComm(AsyncComm.AsyncComm):
                 # elif self._connected:
                 #     self.disconnect()
                 self.socket.close(linger=0)
+                # if self.protocol == 'ipc':
+                #     print(self.host, os.path.isfile(self.host))
+                # if (self.direction == 'recv') and (self.protocol == 'ipc'):
+                #     if os.path.isfile(self.host):
+                #         os.remove(self.host)
             self.unregister_comm(self.registry_key)
         super(ZMQComm, self)._close_direct(linger=linger)
 
@@ -777,12 +818,12 @@ class ZMQComm(AsyncComm.AsyncComm):
     #         return (self._n_zmq_sent == self._n_reply_sent)
     #     return True  # pragma: debug
 
-    # @property
-    # def is_confirmed_recv(self):
-    #     r"""bool: True if all received messages have been confirmed."""
-    #     if self.is_open_backlog:
-    #         return (self._n_zmq_recv == self._n_reply_recv)
-    #     return True  # pragma: debug
+    @property
+    def is_confirmed_recv(self):
+        r"""bool: True if all received messages have been confirmed."""
+        if self.is_open_backlog:
+            return (self._n_zmq_recv == self._n_reply_recv)
+        return True  # pragma: debug
 
     @property
     def get_work_comm_kwargs(self):
@@ -800,6 +841,71 @@ class ZMQComm(AsyncComm.AsyncComm):
         out['context'] = self.context
         return out
     
+    def workcomm2header(self, work_comm, **kwargs):
+        r"""Get header information from a comm.
+
+        Args:
+            comm (CommBase): Work comm that header describes.
+            **kwargs: Additional keyword arguments are added to the header.
+
+        Returns:
+            dict: Header information that will be sent with a message.
+
+        """
+        out = super(ZMQComm, self).workcomm2header(work_comm, **kwargs)
+        if self.direction == 'send':
+            out['zmq_reply_worker'] = work_comm.set_reply_socket_send()
+        return out
+
+    def header2workcomm(self, header, **kwargs):
+        r"""Get a work comm based on header info.
+
+        Args:
+            header (dict): Information that will be sent in the message header
+                to the work comm.
+            **kwargs: Additional keyword arguments are passed to the parent method.
+
+        Returns:
+            CommBase: Work comm.
+
+        """
+        if ('zmq_reply_worker' in header) and (self.direction == 'recv'):
+            kwargs['reply_socket_address'] = header['zmq_reply_worker']
+        c = super(ZMQComm, self).header2workcomm(header, **kwargs)
+        return c
+    
+    def on_send_eof(self):
+        r"""Actions to perform when EOF being sent.
+
+        Returns:
+            bool: True if EOF message should be sent, False otherwise.
+
+        """
+        flag, msg_s = super(ZMQComm, self).on_send_eof()
+        header = dict(zmq_reply=self.set_reply_socket_send(),
+                      size=len(msg_s), id=str(uuid.uuid4()))
+        return flag, self.serializer.format_header(header) + msg_s
+        
+    def on_send(self, msg, header_kwargs=None):
+        r"""Process message to be sent including handling serializing
+        message and handling EOF.
+
+        Args:
+            msg (obj): Message to be sent
+            header_kwargs (dict, optional): Keyword arguments that should be
+                added to the header.
+
+        Returns:
+            tuple (bool, str, dict): Truth of if message should be sent, raw
+                bytes message to send, and header info contained in the message.
+
+        """
+        if self.direction == 'send':
+            if header_kwargs is None:
+                header_kwargs = dict()
+            header_kwargs['zmq_reply'] = self.set_reply_socket_send()
+        return super(ZMQComm, self).on_send(msg, header_kwargs=header_kwargs)
+        
     def _send_multipart_worker(self, msg, header, **kwargs):
         r"""Send multipart message to the worker comm identified.
 
@@ -915,6 +1021,8 @@ class ZMQComm(AsyncComm.AsyncComm):
         # Confirm receipt
         if k is not None:
             self._n_zmq_recv[k] += 1
+        else:  # pragma: debug
+            self.info("No reply address.")
         return (True, msg)
 
     def confirm_send(self, noblock=False):
@@ -935,13 +1043,15 @@ class ZMQComm(AsyncComm.AsyncComm):
 
     def confirm_recv(self, noblock=False):
         r"""Confirm that message was received."""
+        with self.reply_socket_lock:
+            keys = [k for k in self.reply_socket_recv.keys()]
         if noblock:
-            for k in self.reply_socket_recv.keys():
+            for k in keys:
                 if self.is_open and (self._n_zmq_recv[k] != self._n_reply_recv[k]):
                     self._n_reply_recv[k] = self._n_zmq_recv[k]
             return True
         flag = None
-        for k in self.reply_socket_recv.keys():
+        for k in keys:
             if self.is_open and (self._n_zmq_recv[k] != self._n_reply_recv[k]):
                 self.debug("Confirming %d/%d received messages",
                            self._n_reply_recv[k], self._n_zmq_recv[k])

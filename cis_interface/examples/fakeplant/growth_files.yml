@@ -1,8 +1,8 @@
 connections:
   - input: ./Input/photosynthesis_rate.txt
     output: photosynthesis_rate
-    read_meth: table
+    filetype: table
   - input: growth_rate
     output: ./Output/growth_rate.txt
-    write_meth: table
+    filetype: table
     field_names: growth_rate

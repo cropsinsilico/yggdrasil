@@ -97,7 +97,7 @@ class ClientComm(CommBase.CommBase):
 
         """
         kwargs = super(ClientComm, self).opp_comm_kwargs()
-        kwargs['comm'] = get_comm_class("ServerComm")
+        kwargs['comm'] = "ServerComm"
         kwargs['request_comm'] = self.ocomm.comm_class
         kwargs['response_kwargs'] = self.response_kwargs
         return kwargs
@@ -172,7 +172,6 @@ class ClientComm(CommBase.CommBase):
         #     self.debug("send(): Connection closed.")
         #     return False
         if msg != self.eof_msg:
-            kwargs['send_header'] = True
             kwargs['header_kwargs'] = self.create_response_comm()
         out = self.ocomm.send(*args, **kwargs)
         if (not out) and (msg != self.eof_msg):

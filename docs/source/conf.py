@@ -17,6 +17,7 @@
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
 import os
+import glob
 import sys
 import sphinx_rtd_theme
 # sys.path.insert(0, os.path.abspath('.'))
@@ -52,13 +53,16 @@ finterface = ['CisInterface.h', 'CisInterface.hpp', 'CisInterface.m']
 fasciiio = ['AsciiTable.h', # 'AsciiTable.hpp', 'AsciiTable.m',
             'AsciiFile.h', # 'AsciiFile.hpp', 'AsciiFile.m',
 ]
+fserialize = [os.path.basename(f) for f in glob.glob(
+    os.path.join(srcdir, 'serialize', '*.h'))]
 
 breathe_projects = {"cis_interface": doxydir}
 breathe_default_project = "cis_interface"
 breathe_projects_source = {"cis_interface": (
     srcdir,
     ([os.path.join('interface', f) for f in finterface] +
-     [os.path.join('dataio', f) for f in fasciiio]))
+     [os.path.join('dataio', f) for f in fasciiio] +
+     fserialize))
     }
 
 # Napoleon settings
@@ -96,9 +100,9 @@ author = u'Meagan Lang, David Raila'
 # built documents.
 #
 # The short X.Y version.
-version = u'0.2'
+version = u'0.3'
 # The full version, including alpha/beta/rc tags.
-release = u'0.2.0'
+release = u'0.3.0'
 
 # Substitutions
 # .. _Docs: http://cis_interface.readthedocs.io/en/latest/

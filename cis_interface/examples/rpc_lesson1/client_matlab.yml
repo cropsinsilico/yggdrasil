@@ -2,7 +2,7 @@
 
 model:
   name: client
-  driver: MatlabModelDriver
+  language: matlab
   args:
     - ./src/client.m
     - 3  # Pass the number of iterations that should be performed

@@ -1,9 +1,13 @@
-#include <regex.h>
-#include <stdint.h>
-
 /*! @brief Flag for checking if regex_posix has already been included.*/
 #ifndef REGEX_POSIX_H_
 #define REGEX_POSIX_H_
+
+#include <regex.h>
+#include <stdint.h>
+
+#ifdef __cplusplus /* If this is a C++ compiler, use C linkage */
+extern "C" {
+#endif
 
 /*!
   @brief Create a regex from a character array.
@@ -119,12 +123,12 @@ int find_matches(const char *regex_text, const char *to_match,
   if (ret)
     return -1;
   // Loop until string done
-  const size_t n_sub_matches = 10;
+  const size_t n_sub_matches = 50;
   regmatch_t m[n_sub_matches];
   int nomatch = regexec(&r, to_match, n_sub_matches, m, 0);
   if (!(nomatch)) {
     // Count
-    while (1) {
+    while (n_match < n_sub_matches) {
       if ((m[n_match].rm_so == -1) && (m[n_match].rm_eo == -1)) {
 	break;
       }
@@ -404,5 +408,9 @@ int regex_replace_sub(char *buf, const size_t len_buf,
   regfree(&r);
   return (int)cur_siz;
 };
+
+#ifdef __cplusplus /* If this is a C++ compiler, end C linkage */
+}
+#endif
 
 #endif /*REGEX_POSIX_H_*/

@@ -1,11 +1,16 @@
-#include <../tools.h>
-#include <SerializeBase.h>
-#include <FormatSerialize.h>
-#include <AsciiTableSerialize.h>
-
 #ifndef CISSERIALIZE_H_
 #define CISSERIALIZE_H_
 
+#include "../tools.h"
+#include "SerializeBase.h"
+#include "FormatSerialize.h"
+#include "AsciiTableSerialize.h"
+#include "PlySerialize.h"
+#include "ObjSerialize.h"
+
+#ifdef __cplusplus /* If this is a C++ compiler, use C linkage */
+extern "C" {
+#endif
 
 /*!
   @brief Create an empty serializer structure.
@@ -151,6 +156,10 @@ int serialize(const seri_t s, char **buf, const size_t buf_siz,
     ret = serialize_ascii_table(s, *buf, buf_siz, args_used, ap);
   else if (t == ASCII_TABLE_ARRAY_SERI)
     ret = serialize_ascii_table_array(s, *buf, buf_siz, args_used, ap);
+  else if (t == PLY_SERI)
+    ret = serialize_ply(s, *buf, buf_siz, args_used, ap);
+  else if (t == OBJ_SERI)
+    ret = serialize_obj(s, *buf, buf_siz, args_used, ap);
   else {
     cislog_error("serialize: Unsupported seri_type %d", t);
   }
@@ -161,7 +170,7 @@ int serialize(const seri_t s, char **buf, const size_t buf_siz,
 	cislog_error("serialize: Failed to realloc buffer.");
 	ret = -1;
       } else {
-	ret = serialize(s, buf, ret+1, 0, args_used, ap2);
+	ret = serialize(s, buf, ret+1, 1, args_used, ap2);
       }
     } else {
       cislog_error("serialize: encoded message too large for the buffer. (buf_siz=%d, len=%d)",
@@ -195,11 +204,18 @@ int deserialize(const seri_t s, const char *buf, const size_t buf_siz, va_list a
     ret = deserialize_ascii_table(s, buf, buf_siz, ap);
   else if (t == ASCII_TABLE_ARRAY_SERI)
     ret = deserialize_ascii_table_array(s, buf, buf_siz, ap);
+  else if (t == PLY_SERI)
+    ret = deserialize_ply(s, buf, buf_siz, ap);
+  else if (t == OBJ_SERI)
+    ret = deserialize_obj(s, buf, buf_siz, ap);
   else {
     cislog_error("deserialize: Unsupported seri_type %d", t);
   }
   return ret;
 };
 
+#ifdef __cplusplus /* If this is a C++ compiler, end C linkage */
+}
+#endif
 
 #endif /*CISSERIALIZE_H_*/

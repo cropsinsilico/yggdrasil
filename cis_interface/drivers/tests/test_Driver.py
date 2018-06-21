@@ -25,17 +25,17 @@ class TestParam(CisTestClassInfo):
         self.args = None
         self.namespace = 'TESTING_%s' % self.uuid
         self.attr_list += ['name', 'sleeptime', 'longsleep', 'timeout',
-                           'yml', 'env', 'namespace', 'rank', 'workingDir',
+                           'yml', 'env', 'namespace', 'rank', 'working_dir',
                            'lock']
-        self._inst_kwargs = {'yml': {'workingDir': self.workingDir},
+        self._inst_kwargs = {'yml': {'working_dir': self.working_dir},
                              'timeout': self.timeout,
                              'sleeptime': self.sleeptime,
-                             # 'workingDir': self.workingDir,
+                             # 'working_dir': self.working_dir,
                              'namespace': self.namespace}
         self.debug_flag = False
 
     @property
-    def workingDir(self):
+    def working_dir(self):
         r"""str: Working directory."""
         return os.path.dirname(__file__)
 
@@ -84,7 +84,7 @@ class TestParam(CisTestClassInfo):
     def create_instance(self):
         r"""Create a new instance object."""
         curpath = os.getcwd()
-        os.chdir(self.workingDir)
+        os.chdir(self.working_dir)
         inst = super(TestParam, self).create_instance()
         os.chdir(curpath)
         return inst

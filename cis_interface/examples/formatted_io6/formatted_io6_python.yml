@@ -1,20 +1,22 @@
 models:
   - name: python_modelA
-    driver: PythonModelDriver
-    args: ./src/gs_lesson5_modelA.py
+    language: python
+    args: ./src/formatted_io6_modelA.py
     inputs: inputA
     outputs: outputA
 
   - name: python_modelB
-    driver: PythonModelDriver
-    args: ./src/gs_lesson5_modelB.py
+    language: python
+    args: ./src/formatted_io6_modelB.py
     inputs: inputB
     outputs: outputB
 
 connections:
   - input: outputA  # Connection between model A output & model B input
     output: inputB
-  - input: ./Input/input.txt  # Connection between file and model A input
+  - input: ./Input/input.obj  # Connection between file and model A input
     output: inputA
+    filetype: obj
   - input: outputB  # Connection between model B output and file
-    output: ./output.txt
+    output: ./output.obj
+    filetype: obj

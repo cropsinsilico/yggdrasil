@@ -9,9 +9,9 @@ void grow_canopy(double tstep, double *growth_rate, double *layout,
   int i, j;
   for (i = 0; i < npatch; i++) {
     for (j = 0; j < 3; j++) {
-      x1[j][i] = growth_rate[i] * tstep * layout[j] * x1[j][i];
-      x2[j][i] = growth_rate[i] * tstep * layout[j] * x2[j][i];
-      x3[j][i] = growth_rate[i] * tstep * layout[j] * x3[j][i];
+      x1[j][i] = (1.0 + growth_rate[i] * tstep * layout[j]) * x1[j][i];
+      x2[j][i] = (1.0 + growth_rate[i] * tstep * layout[j]) * x2[j][i];
+      x3[j][i] = (1.0 + growth_rate[i] * tstep * layout[j]) * x3[j][i];
     }
   }
 
@@ -69,6 +69,9 @@ int main(int argc, char *argv[]) {
 	 npatch, x1[0][0], x1[1][0], x1[2][0],
 	 x2[0][0], x2[1][0], x2[2][0],
 	 x3[0][0], x3[1][0], x3[2][0]);
+
+  // Send canopy to output and get growth rate for it
+  double *growth_rate = (double*)malloc(npatch*sizeof(double));
   ret = out_struct.send(9, npatch,
 			x1[0], x1[1], x1[2],
 			x2[0], x2[1], x2[2],
@@ -76,20 +79,25 @@ int main(int argc, char *argv[]) {
   if (ret < 0) {
     printf("canopy: Error sending initial structure to output.\n");
     return_code = -1;
-  }
-    
-  // Loop over growth rates calculating new structure
-  double *growth_rate = (double*)malloc(npatch*sizeof(double));
-  while (ret >= 0) {
-    // Receive growth rate for each patch
+  } else {
     for (i = 0; i < npatch; i++) {
       ret = in_growth.recv(1, growth_rate + i);
       if (ret < 0) {
-	printf("canopy: Failed to get growth rate for patch %d during time frame %f to %f\n",
-	       i, time_prev, time_curr);
+	printf("canopy: Failed to get initial growth rate for patch %d.\n", i);
 	return_code = -1;
 	break;
       }
+    }
+  }
+
+  // Loop over growth rates calculating new structure
+  while (ret >= 0) {
+    // Check for next time
+    time_prev = time_curr;
+    ret = in_time.recv(1, &time_curr);
+    if (ret < 0) {
+      printf("canopy: No more input.\n");
+      break;
     }
     // Update structure and send to out
     grow_canopy(time_curr - time_prev, growth_rate, layout, npatch, x1, x2, x3);
@@ -108,12 +116,15 @@ int main(int argc, char *argv[]) {
       return_code = -1;
       break;
     }
-    // Check for next time
-    time_prev = time_curr;
-    ret = in_time.recv(1, &time_curr);
-    if (ret < 0) {
-      printf("canopy: No more input.\n");
-      break;
+    // Receive growth rate for each patch
+    for (i = 0; i < npatch; i++) {
+      ret = in_growth.recv(1, growth_rate + i);
+      if (ret < 0) {
+	printf("canopy: Failed to get growth rate for patch %d during time frame %f to %f\n",
+	       i, time_prev, time_curr);
+	return_code = -1;
+	break;
+      }
     }
   }
   

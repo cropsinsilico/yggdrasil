@@ -1,6 +1,6 @@
 model:
   name: PhotosynthesisModel
-  driver: PythonModelDriver
+  language: python
   args: ./src/photosynthesis.py
   inputs:
     - light_intensity

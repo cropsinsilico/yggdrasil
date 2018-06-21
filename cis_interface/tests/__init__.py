@@ -1,5 +1,6 @@
 """Testing things."""
 import os
+import copy
 import shutil
 import uuid
 import importlib
@@ -15,6 +16,8 @@ from cis_interface.tools import get_CIS_MSG_MAX, get_default_comm, CisClass
 from cis_interface.backwards import pickle, BytesIO
 from cis_interface import backwards, platform, serialize
 from cis_interface.communication import cleanup_comms, get_comm_class
+from cis_interface.serialize.PlySerialize import PlyDict
+from cis_interface.serialize.ObjSerialize import ObjDict
 
 # Test data
 data_dir = os.path.join(os.path.dirname(__file__), 'data')
@@ -32,7 +35,8 @@ script_list = [
     ('cmake', 'gcc_model'),
     ('matlab', 'matlab_model.m'),
     ('python', 'python_model.py'),
-    ('error', 'error_model.py')]
+    ('error', 'error_model.py'),
+    ('lpy', 'lpy_model.lpy')]
 scripts = {}
 for k, v in script_list:
     if isinstance(v, list):
@@ -50,7 +54,8 @@ yaml_list = [
     ('cmake', 'cmake_model.yml'),
     ('matlab', 'matlab_model.yml'),
     ('python', 'python_model.yml'),
-    ('error', 'error_model.yml')]
+    ('error', 'error_model.yml'),
+    ('lpy', 'lpy_model.yml')]
 yamls = {k: os.path.join(yaml_dir, v) for k, v in yaml_list}
 
 # Makefile
@@ -262,11 +267,6 @@ class CisTestBase(unittest.TestCase):
             out = '%s: %s' % (self.description_prefix, out)
         return out
 
-    # @property
-    # def workingDir(self):
-    #     r"""str: Working directory."""
-    #     return os.path.dirname(__file__)
-
 
 class CisTestClass(CisTestBase):
     r"""Test class for a CisClass."""
@@ -388,6 +388,21 @@ class IOInfo(object):
         self.file_elements = [('one', int(1), 1.0),
                               ('two', int(2), 2.0),
                               ('three', int(3), 3.0)]
+        self.map_dict = dict(args1=1, args2='2')
+        self.ply_dict = dict(vertices=[[0.0, 0.0, 0.0],
+                                       [0.0, 1.0, 0.0],
+                                       [1.0, 0.0, 0.0],
+                                       [1.0, 1.0, 0.0]],
+                             faces=[[0, 1, 2], [1, 2, 3]])
+        self.obj_dict = copy.deepcopy(self.ply_dict)
+        self.obj_dict.update(normals=copy.deepcopy(self.obj_dict['vertices']),
+                             texcoords=[[1.0, 2.0], [2.0, 3.0], [3.0, 4.0], [5.0, 6.0]],
+                             face_normals=[[0, 1, 2], None, None],
+                             face_texcoords=[[0, 1, 2], None, None],
+                             material='material')
+        self.obj_dict['faces'].append([(0, 0, 0), (1, 1, 1), (2, 2, 2)])
+        self.ply_dict = PlyDict(**self.ply_dict)
+        self.obj_dict = ObjDict(**self.obj_dict)
 
     @property
     def header_lines(self):
@@ -417,6 +432,20 @@ class IOInfo(object):
         s = serialize.get_serializer(stype=6, delimiter=self.delimiter,
                                      write_header=True)
         out = s.serialize(self.pandas_frame)
+        return out
+
+    @property
+    def ply_file_contents(self):
+        r"""The contents of a file containing the ply data."""
+        serializer = serialize.get_serializer(stype=8)
+        out = serializer.serialize(self.ply_dict)
+        return out
+
+    @property
+    def obj_file_contents(self):
+        r"""The contents of a file containing the obj data."""
+        serializer = serialize.get_serializer(stype=9)
+        out = serializer.serialize(self.obj_dict)
         return out
 
     @property
@@ -516,8 +545,8 @@ class IOInfo(object):
                     x = self.load_mat(fd)
                 else:
                     x = pickle.load(fd)
-        elif isinstance(x, backwards.bytes_type):
-            x = pickle.loads(x)
+        # elif isinstance(x, backwards.bytes_type):
+        #     x = pickle.loads(x)
         nt.assert_equal(type(x), type(y))
         for k in y:
             if k not in x:  # pragma: debug
@@ -575,6 +604,30 @@ class IOInfo(object):
             fd.write(header)
             fd.write(body)
 
+    @property
+    def mapfile_contents(self):
+        r"""bytes: The contents of the test ASCII map file."""
+        out = ''
+        order = sorted([k for k in self.map_dict.keys()])
+        for k in order:
+            v = self.map_dict[k]
+            if isinstance(v, backwards.string_types):
+                out += "%s\t'%s'\n" % (k, v)
+            else:
+                out += "%s\t%s\n" % (k, repr(v))
+        return backwards.unicode2bytes(out)
+
+    def write_map(self, fname):
+        r"""Write the map dictionary out to a file.
+
+        Args:
+            fname (str): Full path to the file that the map should be
+                written to.
+
+        """
+        with open(fname, 'wb') as fd:
+            fd.write(self.mapfile_contents)
+
     def write_pickle(self, fname):
         r"""Write the pickled table out to a file.
 
@@ -596,6 +649,28 @@ class IOInfo(object):
         """
         with open(fname, 'wb') as fd:
             fd.write(self.pandas_file_contents)
+
+    def write_ply(self, fname):
+        r"""Write the ply data out to a file.
+
+        Args:
+            fname (str): Full path to the file that the ply should be
+                written to.
+
+        """
+        with open(fname, 'wb') as fd:
+            fd.write(self.ply_file_contents)
+
+    def write_obj(self, fname):
+        r"""Write the obj data out to a file.
+
+        Args:
+            fname (str): Full path to the file that the obj should be
+                written to.
+
+        """
+        with open(fname, 'wb') as fd:
+            fd.write(self.obj_file_contents)
 
 
 # class CisTestBaseInfo(CisTestBase, IOInfo):

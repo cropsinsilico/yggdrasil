@@ -1,6 +1,6 @@
 models:
   - name: c_modelA
-    driver: GCCModelDriver
+    language: c
     args: ./src/formatted_io3_modelA.c
     inputs: inputA
     outputs:
@@ -8,7 +8,7 @@ models:
       field_names: name,count,size
 
   - name: c_modelB
-    driver: GCCModelDriver
+    language: c
     args: ./src/formatted_io3_modelB.c
     inputs: inputB
     outputs:
@@ -20,7 +20,9 @@ connections:
     output: inputB
   - input: ./Input/input.txt  # Connection between file and model A input
     output: inputA
-    read_meth: table_array
+    as_array: True
+    filetype: table
   - input: outputB  # Connection between model B output and file
     output: ./output.txt
-    write_meth: table_array
+    as_array: True
+    filetype: table

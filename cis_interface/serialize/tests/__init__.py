@@ -95,7 +95,7 @@ def test_guess_serializer():
 
 def test_get_serializer():
     r"""Test get_serializer."""
-    max_code = 6
+    max_code = 9
     for x in range(max_code + 1):
         serialize.get_serializer(stype=x, format_str='%s\n')
     nt.assert_raises(RuntimeError, serialize.get_serializer, stype=max_code + 1)

@@ -1,0 +1,28 @@
+models:
+  - name: python_modelA
+    language: python
+    args: ./src/gs_lesson4b_modelA.py
+
+    inputs:
+      - name: inputA
+        driver: FileInputDriver
+        args: ./Input/input.txt
+
+    outputs:
+      - name: outputA
+        driver: OutputDriver  # Output to another channel
+        args: A_to_B  # Connection to inputB
+
+  - name: python_modelB
+    language: python
+    args: ./src/gs_lesson4b_modelB.py
+
+    inputs:
+      - name: inputB
+        driver: InputDriver  # Input from another channel
+        args: A_to_B  # Conneciton to inputA
+
+    outputs:
+      - name: outputB
+        driver: FileOutputDriver
+        args: ./output.txt

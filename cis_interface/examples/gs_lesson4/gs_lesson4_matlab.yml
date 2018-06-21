@@ -1,28 +1,20 @@
 models:
   - name: matlab_modelA
-    driver: MatlabModelDriver
+    language: matlab
     args: ./src/gs_lesson4_modelA.m
-
-    inputs:
-      - name: inputA
-        driver: FileInputDriver
-        args: ./Input/input.txt
-
-    outputs:
-      - name: outputA
-        driver: OutputDriver  # Output to another channel
-        args: A_to_B  # Conneciton to inputB
+    inputs: inputA
+    outputs: outputA
 
   - name: matlab_modelB
-    driver: MatlabModelDriver
+    language: matlab
     args: ./src/gs_lesson4_modelB.m
+    inputs: inputB
+    outputs: outputB
 
-    inputs:
-      - name: inputB
-        driver: InputDriver  # Input from another channel
-        args: A_to_B  # Conneciton to inputA
-
-    outputs:
-      - name: outputB
-        driver: FileOutputDriver
-        args: ./output.txt
+connections:
+  - input: outputA  # Connection between model A output & model B input
+    output: inputB
+  - input: ./Input/input.txt  # Connection between file and model A input
+    output: inputA
+  - input: outputB  # Connection between model B output and file
+    output: ./output.txt

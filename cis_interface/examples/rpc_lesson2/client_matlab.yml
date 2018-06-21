@@ -2,7 +2,7 @@
 
 models:
   - name: client1
-    driver: MatlabModelDriver
+    language: matlab
     args:
       - ./src/client.m
       - 3  # Pass the number of iterations that should be performed
@@ -10,7 +10,7 @@ models:
     client_of: server  # Creates an RPC client queue "server_client"
     outputs: output_log1
   - name: client2
-    driver: MatlabModelDriver
+    language: matlab
     args:
       - ./src/client.m
       - 5  # Pass the number of iterations that should be performed

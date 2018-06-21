@@ -1,6 +1,6 @@
 model:
   name: GrowthModel
-  driver: PythonModelDriver
+  language: python
   args: ./src/growth.py
   inputs:
     - photosynthesis_rate

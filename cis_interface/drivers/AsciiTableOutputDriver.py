@@ -1,8 +1,9 @@
 from cis_interface import serialize
-from cis_interface.tools import eval_kwarg
 from cis_interface.drivers.AsciiFileOutputDriver import AsciiFileOutputDriver
+from cis_interface.schema import register_component
 
 
+@register_component
 class AsciiTableOutputDriver(AsciiFileOutputDriver):
     r"""Class to handle output of received messages to an ASCII table.
 
@@ -30,27 +31,16 @@ class AsciiTableOutputDriver(AsciiFileOutputDriver):
         **kwargs: Additional keyword arguments are passed to parent class.
 
     """
+
+    _ocomm_type = 'AsciiTableComm'
+
     def __init__(self, name, args, **kwargs):
-        file_keys = ['format_str', 'field_names', 'field_units',
-                     'use_astropy', 'delimiter', 'as_array']
         alias_keys = [('column_names', 'field_names'),
                       ('column_units', 'field_units'),
                       ('column', 'delimiter')]
         for old, new in alias_keys:
             if kwargs.get(old, None) is not None:
                 kwargs.setdefault(new, kwargs.pop(old))
-        ocomm_kws = kwargs.get('ocomm_kws', {})
-        ocomm_kws.setdefault('comm', 'AsciiTableComm')
-        for k in file_keys:
-            if k in kwargs:
-                ocomm_kws[k] = kwargs.pop(k)
-                # Eval commands non-string args from yaml string
-                if k in ['field_names', 'field_units']:
-                    if isinstance(ocomm_kws[k], str):
-                        ocomm_kws[k] = ocomm_kws[k].split(',')
-                elif k in ['use_astropy', 'as_array']:
-                    ocomm_kws[k] = eval_kwarg(ocomm_kws[k])
-        kwargs['ocomm_kws'] = ocomm_kws
         super(AsciiTableOutputDriver, self).__init__(name, args, **kwargs)
         self.debug('(%s)', args)
 

@@ -11,3 +11,9 @@ Model Drivers
     :members:
 .. autoclass:: cis_interface.drivers.GCCModelDriver.GCCModelDriver
     :members:
+.. autoclass:: cis_interface.drivers.MakeModelDriver.MakeModelDriver
+    :members:
+.. autoclass:: cis_interface.drivers.CMakeModelDriver.CMakeModelDriver
+    :members:
+.. autoclass:: cis_interface.drivers.LPyModelDriver.LPyModelDriver
+    :members:

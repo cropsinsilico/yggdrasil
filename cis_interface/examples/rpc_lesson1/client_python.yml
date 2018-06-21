@@ -2,7 +2,7 @@
 
 model:
   name: client
-  driver: PythonModelDriver
+  language: python
   args:
     - ./src/client.py
     - 3  # Pass the number of iterations that should be performed

@@ -1,7 +1,9 @@
 from cis_interface import serialize
 from cis_interface.drivers.FileInputDriver import FileInputDriver
+from cis_interface.schema import register_component
 
 
+@register_component
 class PandasFileInputDriver(FileInputDriver):
     r"""Class to handle input from a Pandas csv file.
 
@@ -13,15 +15,12 @@ class PandasFileInputDriver(FileInputDriver):
         **kwargs: Additional keyword arguments are passed to parent class.
 
     """
+
+    _icomm_type = 'PandasFileComm'
+
     def __init__(self, name, args, **kwargs):
-        file_keys = ['delimiter']
-        icomm_kws = kwargs.get('icomm_kws', {})
-        icomm_kws.setdefault('comm', 'PandasFileComm')
-        icomm_kws.setdefault('recv_converter', serialize.pandas2numpy)
-        for k in file_keys:
-            if k in kwargs:
-                icomm_kws[k] = kwargs.pop(k)
-        kwargs['icomm_kws'] = icomm_kws
+        kwargs.setdefault('icomm_kws', {})
+        kwargs['icomm_kws'].setdefault('recv_converter', serialize.pandas2numpy)
         super(PandasFileInputDriver, self).__init__(name, args, **kwargs)
         self.debug('(%s)', args)
 

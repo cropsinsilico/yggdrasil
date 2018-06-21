@@ -443,7 +443,7 @@ class CisClass(logging.LoggerAdapter):
         name (str): Class name.
         uuid (str, optional): Unique ID for this instance. Defaults to None
             and is assigned.
-        workingDir (str, optional): Working directory. If not provided, the
+        working_dir (str, optional): Working directory. If not provided, the
             current working directory is used.
         timeout (float, optional): Maximum time (in seconds) that should be
             spent waiting on a process. Defaults to 60.
@@ -459,7 +459,7 @@ class CisClass(logging.LoggerAdapter):
         longsleep (float): Time that the class will sleep for when waiting for
             longer tasks to complete (10x longer than sleeptime).
         timeout (float): Maximum time that should be spent waiting on a process.
-        workingDir (str): Working directory.
+        working_dir (str): Working directory.
         errors (list): List of errors.
         extra_kwargs (dict): Keyword arguments that were not parsed.
         sched_out (obj): Output from the last scheduled task with output.
@@ -468,7 +468,7 @@ class CisClass(logging.LoggerAdapter):
             are suppressed.
 
     """
-    def __init__(self, name, uuid=None, workingDir=None,
+    def __init__(self, name, uuid=None, working_dir=None,
                  timeout=60.0, sleeptime=0.01, **kwargs):
         self._name = name
         if uuid is None:
@@ -479,10 +479,10 @@ class CisClass(logging.LoggerAdapter):
         self.timeout = timeout
         self._timeouts = {}
         # Set defaults
-        if workingDir is None:
-            workingDir = os.getcwd()
+        if working_dir is None:
+            working_dir = os.getcwd()
         # Assign things
-        self.workingDir = workingDir
+        self.working_dir = working_dir
         self.errors = []
         self.extra_kwargs = kwargs
         self.sched_out = None
@@ -945,6 +945,8 @@ class CisThreadLoop(CisThread):
         super(CisThreadLoop, self).__init__(*args, **kwargs)
         self._1st_main_terminated = False
         self.break_flag = False
+        self.loop_event = threading.Event()
+        self.loop_flag = False
 
     def on_main_terminated(self, dont_break=False):  # pragma: debug
         r"""Actions performed when 1st main terminated.
@@ -971,6 +973,40 @@ class CisThreadLoop(CisThread):
         r"""bool: True if the break flag was set."""
         return self.break_flag
 
+    def set_loop_flag(self):
+        r"""Set the loop flag for the thread to True."""
+        # self.loop_event.set()
+        self.loop_flag = True
+
+    def unset_loop_flag(self):  # pragma: debug
+        r"""Set the loop flag for the thread to False."""
+        # self.loop_event.clear()
+        self.loop_flag = False
+
+    @property
+    def was_loop(self):
+        r"""bool: True if the thread was loop. False otherwise."""
+        # return self.loop_event.is_set()
+        return self.loop_flag
+
+    def wait_for_loop(self, timeout=None, key=None):
+        r"""Wait until thread enters loop to return using sleeps rather than
+        blocking.
+
+        Args:
+            timeout (float, optional): Maximum time that should be waited for
+                the thread to enter loop. Defaults to None and is infinite.
+            key (str, optional): Key that should be used to register the timeout.
+                Defaults to None and is set based on the stack trace.
+
+        """
+        T = self.start_timeout(timeout, key_level=1, key=key)
+        while (self.is_alive() and (not self.was_loop) and
+               (not T.is_out)):  # pragma: debug
+            self.verbose_debug('Waiting for thread to enter loop...')
+            self.sleep()
+        self.stop_timeout(key_level=1, key=key)
+
     def before_loop(self):
         r"""Actions performed before the loop."""
         self.debug('')
@@ -991,6 +1027,8 @@ class CisThreadLoop(CisThread):
         self.debug("Starting loop")
         try:
             self.before_loop()
+            if (not self.was_break):
+                self.set_loop_flag()
             while (not self.was_break):
                 if ((self.main_terminated and
                      (not self._1st_main_terminated))):  # pragma: debug

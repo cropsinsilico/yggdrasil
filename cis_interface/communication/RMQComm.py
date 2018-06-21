@@ -9,6 +9,7 @@ except ImportError:
                     "RabbitMQ support will be disabled.")
     pika = None
     _rmq_installed = False
+from cis_interface.schema import register_component
 
 
 _rmq_param_sep = '_RMQPARAM_'
@@ -71,6 +72,7 @@ class RMQServer(CommBase.CommServer):
         super(RMQServer, self).terminate(*args, **kwargs)
 
 
+@register_component
 class RMQComm(AsyncComm.AsyncComm):
     r"""Class for handling basic RabbitMQ communications.
 
@@ -82,6 +84,8 @@ class RMQComm(AsyncComm.AsyncComm):
         RuntimeError: If a connection cannot be established.
 
     """
+
+    _commtype = 'rmq'
     
     def _init_before_open(self, **kwargs):
         r"""Set null connection and channel."""

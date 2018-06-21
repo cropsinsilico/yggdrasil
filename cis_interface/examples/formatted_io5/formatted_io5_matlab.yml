@@ -1,0 +1,22 @@
+models:
+  - name: matlab_modelA
+    language: matlab
+    args: ./src/formatted_io5_modelA.m
+    inputs: inputA
+    outputs: outputA
+
+  - name: matlab_modelB
+    language: matlab
+    args: ./src/formatted_io5_modelB.m
+    inputs: inputB
+    outputs: outputB
+
+connections:
+  - input: outputA  # Connection between model A output & model B input
+    output: inputB
+  - input: ./Input/input.ply  # Connection between file and model A input
+    output: inputA
+    filetype: ply
+  - input: outputB  # Connection between model B output and file
+    output: ./output.ply
+    filetype: ply

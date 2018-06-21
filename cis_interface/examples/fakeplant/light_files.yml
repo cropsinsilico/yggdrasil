@@ -1,11 +1,12 @@
 connections:
   - input: ./Input/ambient_light.txt
     output: ambient_light
-    read_meth: table
+    filetype: table
   - input: ./Input/canopy_structure.txt
     output: canopy_structure
-    read_meth: table_array
+    filetype: table
+    as_array: True
   - input: light_intensity
     output: ./Output/light_intensity.txt
-    write_meth: table
+    filetype: table
     field_names: light_intensity

@@ -1,6 +1,6 @@
 models:
   - name: python_modelA
-    driver: PythonModelDriver
+    language: python
     args: ./src/formatted_io4_modelA.py
     inputs: inputA
     outputs:
@@ -8,7 +8,7 @@ models:
       field_names: name,count,size
 
   - name: python_modelB
-    driver: PythonModelDriver
+    language: python
     args: ./src/formatted_io4_modelB.py
     inputs: inputB
     outputs:
@@ -20,7 +20,7 @@ connections:
     output: inputB
   - input: ./Input/input.txt  # Connection between file and model A input
     output: inputA
-    read_meth: pandas
+    filetype: pandas
   - input: outputB  # Connection between model B output and file
     output: ./output.txt
-    write_meth: pandas
+    filetype: pandas

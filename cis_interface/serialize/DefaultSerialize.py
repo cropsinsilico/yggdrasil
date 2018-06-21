@@ -50,6 +50,7 @@ class DefaultSerialize(object):
                  func_serialize=None, func_deserialize=None, **kwargs):
         self.format_str = format_str
         self.as_array = as_array
+        self._alias = None
         if field_names is not None:
             field_names = [backwards.unicode2bytes(n) for n in field_names]
         self.field_names = field_names
@@ -71,6 +72,15 @@ class DefaultSerialize(object):
     #     cls = str(self.__class__).split("'")
     #     print(cls)
     #     return cls
+
+    def __getattribute__(self, name):
+        r"""Return alias result if there is one."""
+        if name == '_alias':
+            return super(DefaultSerialize, self).__getattribute__(name)
+        if getattr(self, '_alias', None) is None:
+            return super(DefaultSerialize, self).__getattribute__(name)
+        else:
+            return self._alias.__getattribute__(name)
 
     @property
     def is_user_defined(self):
@@ -243,6 +253,12 @@ class DefaultSerialize(object):
         return out
 
     def update_from_message(self, msg, **kwargs):
+        r"""Update serializer information based on the message.
+
+        Args:
+            msg (obj): Python object being sent as a message.
+
+        """
         kwargs.update(**self.serializer_info)
         sinfo = serialize.guess_serializer(msg, **kwargs)
         self.update_serializer(**sinfo)
@@ -257,9 +273,7 @@ class DefaultSerialize(object):
             if (self.serializer_type != stype) and (stype != 0):
                 sinfo = self.serializer_info
                 sinfo['stype'] = stype
-                # Monkey patch class (unadvised, but child classes are simple)
-                print('monkey patch', sinfo)
-                self = serialize.get_serializer(**sinfo)
+                self._alias = serialize.get_serializer(**sinfo)
                 assert(self.serializer_type == stype)
 
     def deserialize(self, msg):

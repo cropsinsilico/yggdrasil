@@ -1,10 +1,9 @@
-extern "C" {
-#include "CisInterface.h"
-};
-
 /*! @brief Flag for checking if CisInterface.hpp has already been included.*/
 #ifndef CISINTERFACE_HPP_
 #define CISINTERFACE_HPP_
+
+#include "CisInterface.h"
+
 
 /*!
   @brief C++ interface to cisInput_t functionality.
@@ -704,5 +703,102 @@ public:
     CisAsciiFileInput(cisAsciiArrayInput_local(name)) {}
 
 };
+
+
+/*!
+  @brief C++ interface to cisPlyOutput_t functionality.
+  The CisPlyOutput class is a basic wrapper around the C
+  cisPlyOutput_t structure and associated functions from the
+  CisInterface.h header. It provides the user with C++ style access to basic
+  ASCII file output operations.
+ */
+class CisPlyOutput : public CisOutput {
+public:
+
+  /*!
+    @brief Constructor for CisPlyOutput.
+    @param[in] name constant character pointer to the name of an output channel.
+   */
+  CisPlyOutput(const char *name) :
+    CisOutput(cisPlyOutput(name)) {}
+  
+  /*! @brief Empty constructor for inheritance. */
+  CisPlyOutput(cisOutput_t x) :
+    CisOutput(x) {}
+  
+};
+
+
+/*!
+  @brief C++ interface to cisPlyInput_t functionality.
+  The CisPlyInput class is a basic wrapper around the C
+  cisPlyInput_t structure and associated functions from the
+  CisInterface.h header. It provides the user with C++ style access to basic
+  ASCII file input operations.
+ */
+class CisPlyInput : public CisInput {
+public:
+
+  /*!
+    @brief Constructor for CisPlyInput.
+    @param[in] name constant character pointer to the name of an input channel.
+   */
+  CisPlyInput(const char *name) :
+    CisInput(cisPlyInput(name)) {}
+
+  /*! @brief Empty constructor for inheritance. */
+  CisPlyInput(cisInput_t x) :
+    CisInput(x) {}
+  
+};
+
+
+/*!
+  @brief C++ interface to cisObjOutput_t functionality.
+  The CisObjOutput class is a basic wrapper around the C
+  cisObjOutput_t structure and associated functions from the
+  CisInterface.h header. It provides the user with C++ style access to basic
+  ASCII file output operations.
+ */
+class CisObjOutput : public CisOutput {
+public:
+
+  /*!
+    @brief Constructor for CisObjOutput.
+    @param[in] name constant character pointer to the name of an output channel.
+   */
+  CisObjOutput(const char *name) :
+    CisOutput(cisObjOutput(name)) {}
+  
+  /*! @brief Empty constructor for inheritance. */
+  CisObjOutput(cisOutput_t x) :
+    CisOutput(x) {}
+  
+};
+
+
+/*!
+  @brief C++ interface to cisObjInput_t functionality.
+  The CisObjInput class is a basic wrapper around the C
+  cisObjInput_t structure and associated functions from the
+  CisInterface.h header. It provides the user with C++ style access to basic
+  ASCII file input operations.
+ */
+class CisObjInput : public CisInput {
+public:
+
+  /*!
+    @brief Constructor for CisObjInput.
+    @param[in] name constant character pointer to the name of an input channel.
+   */
+  CisObjInput(const char *name) :
+    CisInput(cisObjInput(name)) {}
+
+  /*! @brief Empty constructor for inheritance. */
+  CisObjInput(cisInput_t x) :
+    CisInput(x) {}
+  
+};
+
 
 #endif /*CISINTERFACE_HPP_*/

@@ -1,12 +1,12 @@
 models:
   - name: python_modelA
-    driver: PythonModelDriver
+    language: python
     args: ./src/formatted_io1_modelA.py
     inputs: inputA
     outputs: outputA
 
   - name: python_modelB
-    driver: PythonModelDriver
+    language: python
     args: ./src/formatted_io1_modelB.py
     inputs: inputB
     outputs: outputB
@@ -16,7 +16,7 @@ connections:
     output: inputB
   - input: ./Input/input.txt  # Connection between file and model A input
     output: inputA
-    read_meth: line
+    filetype: ascii
   - input: outputB  # Connection between model B output and file
     output: ./output.txt
-    write_meth: line
+    filetype: ascii
