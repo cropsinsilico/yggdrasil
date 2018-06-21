@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>formatted_io4 Example &mdash; cis_interface 0.2.0 documentation</title>
+  <title>formatted_io4 Example &mdash; cis_interface 0.3.0 documentation</title>
   
 
   
@@ -29,7 +29,7 @@
   <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="rpc_lesson1 Example" href="rpc_lesson1.html" />
+    <link rel="next" title="formatted_io5 Example" href="formatted_io5.html" />
     <link rel="prev" title="formatted_io3 Example" href="formatted_io3.html" /> 
 
   
@@ -59,7 +59,7 @@
             
             
               <div class="version">
-                0.2
+                0.3
               </div>
             
           
@@ -103,7 +103,7 @@
 <li class="toctree-l2"><a class="reference internal" href="gs_lesson2.html">gs_lesson2 Example</a></li>
 <li class="toctree-l2"><a class="reference internal" href="gs_lesson3.html">gs_lesson3 Example</a></li>
 <li class="toctree-l2"><a class="reference internal" href="gs_lesson4.html">gs_lesson4 Example</a></li>
-<li class="toctree-l2"><a class="reference internal" href="gs_lesson5.html">gs_lesson5 Example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gs_lesson4b.html">gs_lesson4b Example</a></li>
 <li class="toctree-l2"><a class="reference internal" href="formatted_io1.html">formatted_io1 Example</a></li>
 <li class="toctree-l2"><a class="reference internal" href="formatted_io2.html">formatted_io2 Example</a></li>
 <li class="toctree-l2"><a class="reference internal" href="formatted_io3.html">formatted_io3 Example</a></li>
@@ -114,10 +114,13 @@
 <li class="toctree-l3"><a class="reference internal" href="#matlab-version">Matlab Version</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="formatted_io5.html">formatted_io5 Example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="formatted_io6.html">formatted_io6 Example</a></li>
 <li class="toctree-l2"><a class="reference internal" href="rpc_lesson1.html">rpc_lesson1 Example</a></li>
 <li class="toctree-l2"><a class="reference internal" href="rpc_lesson2.html">rpc_lesson2 Example</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="../release.html">Release Steps</a></li>
 </ul>
 
             
@@ -335,7 +338,7 @@
 25
 26</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">models</span><span class="p p-Indicator">:</span>
   <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">python_modelA</span>
-    <span class="l l-Scalar l-Scalar-Plain">driver</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">PythonModelDriver</span>
+    <span class="l l-Scalar l-Scalar-Plain">language</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">python</span>
     <span class="l l-Scalar l-Scalar-Plain">args</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/formatted_io4_modelA.py</span>
     <span class="l l-Scalar l-Scalar-Plain">inputs</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">inputA</span>
     <span class="l l-Scalar l-Scalar-Plain">outputs</span><span class="p p-Indicator">:</span>
@@ -343,7 +346,7 @@
       <span class="l l-Scalar l-Scalar-Plain">field_names</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">name,count,size</span>
 
   <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">python_modelB</span>
-    <span class="l l-Scalar l-Scalar-Plain">driver</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">PythonModelDriver</span>
+    <span class="l l-Scalar l-Scalar-Plain">language</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">python</span>
     <span class="l l-Scalar l-Scalar-Plain">args</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/formatted_io4_modelB.py</span>
     <span class="l l-Scalar l-Scalar-Plain">inputs</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">inputB</span>
     <span class="l l-Scalar l-Scalar-Plain">outputs</span><span class="p p-Indicator">:</span>
@@ -355,17 +358,17 @@
     <span class="l l-Scalar l-Scalar-Plain">output</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">inputB</span>
   <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">input</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/input.txt</span>  <span class="c1"># Connection between file and model A input</span>
     <span class="l l-Scalar l-Scalar-Plain">output</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">inputA</span>
-    <span class="l l-Scalar l-Scalar-Plain">read_meth</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">pandas</span>
+    <span class="l l-Scalar l-Scalar-Plain">filetype</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">pandas</span>
   <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">input</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">outputB</span>  <span class="c1"># Connection between model B output and file</span>
     <span class="l l-Scalar l-Scalar-Plain">output</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">./output.txt</span>
-    <span class="l l-Scalar l-Scalar-Plain">write_meth</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">pandas</span>
+    <span class="l l-Scalar l-Scalar-Plain">filetype</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">pandas</span>
 </pre></div>
 </td></tr></table></div>
 </div>
 <div class="section" id="c-version">
 <h2>C++ Version<a class="headerlink" href="#c-version" title="Permalink to this headline">¶</a></h2>
 <p>Model Code:</p>
-<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+<div class="highlight-c++ notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
  2
  3
  4
@@ -415,51 +418,51 @@
 48
 49
 50
-51</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="c1">#include &lt;iostream&gt;</span>
-<span class="o">//</span> <span class="n">Include</span> <span class="n">methods</span> <span class="k">for</span> <span class="nb">input</span><span class="o">/</span><span class="n">output</span> <span class="n">channels</span>
-<span class="c1">#include &quot;CisInterface.hpp&quot;</span>
+51</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&lt;iostream&gt;</span><span class="cp"></span>
+<span class="c1">// Include methods for input/output channels</span>
+<span class="cp">#include</span> <span class="cpf">&quot;CisInterface.hpp&quot;</span><span class="cp"></span>
 
-<span class="nb">int</span> <span class="n">main</span><span class="p">(</span><span class="nb">int</span> <span class="n">argc</span><span class="p">,</span> <span class="n">char</span> <span class="o">*</span><span class="n">argv</span><span class="p">[])</span> <span class="p">{</span>
-  <span class="o">//</span> <span class="n">Initialize</span> <span class="nb">input</span><span class="o">/</span><span class="n">output</span> <span class="n">channels</span>
-  <span class="n">CisAsciiArrayInput</span> <span class="n">in_channel</span><span class="p">(</span><span class="s2">&quot;inputA&quot;</span><span class="p">);</span>
-  <span class="n">CisAsciiArrayOutput</span> <span class="n">out_channel</span><span class="p">(</span><span class="s2">&quot;outputA&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">%6s</span><span class="se">\t</span><span class="si">%ld</span><span class="se">\t</span><span class="si">%f</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">);</span>
+<span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">argv</span><span class="p">[])</span> <span class="p">{</span>
+  <span class="c1">// Initialize input/output channels</span>
+  <span class="n">CisAsciiArrayInput</span> <span class="n">in_channel</span><span class="p">(</span><span class="s">&quot;inputA&quot;</span><span class="p">);</span>
+  <span class="n">CisAsciiArrayOutput</span> <span class="n">out_channel</span><span class="p">(</span><span class="s">&quot;outputA&quot;</span><span class="p">,</span> <span class="s">&quot;%6s</span><span class="se">\t</span><span class="s">%ld</span><span class="se">\t</span><span class="s">%f</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
 
-  <span class="o">//</span> <span class="n">Declare</span> <span class="n">resulting</span> <span class="n">variables</span> <span class="ow">and</span> <span class="n">create</span> <span class="nb">buffer</span> <span class="k">for</span> <span class="n">received</span> <span class="n">message</span>
-  <span class="nb">int</span> <span class="n">flag</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
-  <span class="n">char</span> <span class="o">*</span><span class="n">name</span> <span class="o">=</span> <span class="n">NULL</span><span class="p">;</span>
-  <span class="nb">long</span> <span class="o">*</span><span class="n">count</span> <span class="o">=</span> <span class="n">NULL</span><span class="p">;</span>
-  <span class="n">double</span> <span class="o">*</span><span class="n">size</span> <span class="o">=</span> <span class="n">NULL</span><span class="p">;</span>
+  <span class="c1">// Declare resulting variables and create buffer for received message</span>
+  <span class="kt">int</span> <span class="n">flag</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+  <span class="kt">char</span> <span class="o">*</span><span class="n">name</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+  <span class="kt">long</span> <span class="o">*</span><span class="n">count</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+  <span class="kt">double</span> <span class="o">*</span><span class="n">size</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
 
-  <span class="o">//</span> <span class="n">Loop</span> <span class="n">until</span> <span class="n">there</span> <span class="ow">is</span> <span class="n">no</span> <span class="n">longer</span> <span class="nb">input</span> <span class="ow">or</span> <span class="n">the</span> <span class="n">queues</span> <span class="n">are</span> <span class="n">closed</span>
+  <span class="c1">// Loop until there is no longer input or the queues are closed</span>
   <span class="k">while</span> <span class="p">(</span><span class="n">flag</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
   
-    <span class="o">//</span> <span class="n">Receive</span> <span class="nb">input</span> <span class="kn">from</span> <span class="nn">input</span> <span class="nn">channel</span>
-    <span class="o">//</span> <span class="n">If</span> <span class="n">there</span> <span class="ow">is</span> <span class="n">an</span> <span class="n">error</span><span class="p">,</span> <span class="n">the</span> <span class="n">flag</span> <span class="n">will</span> <span class="n">be</span> <span class="n">negative</span>
-    <span class="o">//</span> <span class="n">Otherwise</span><span class="p">,</span> <span class="n">it</span> <span class="ow">is</span> <span class="n">the</span> <span class="n">size</span> <span class="n">of</span> <span class="n">the</span> <span class="n">received</span> <span class="n">message</span>
-    <span class="n">flag</span> <span class="o">=</span> <span class="n">in_channel</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">name</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">count</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">size</span><span class="p">);</span>
+    <span class="c1">// Receive input from input channel</span>
+    <span class="c1">// If there is an error, the flag will be negative</span>
+    <span class="c1">// Otherwise, it is the size of the received message</span>
+    <span class="n">flag</span> <span class="o">=</span> <span class="n">in_channel</span><span class="p">.</span><span class="n">recv</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">name</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">count</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">size</span><span class="p">);</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">flag</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-      <span class="n">std</span><span class="p">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s2">&quot;Model A: No more input.&quot;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="p">::</span><span class="n">endl</span><span class="p">;</span>
+      <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Model A: No more input.&quot;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
       <span class="k">break</span><span class="p">;</span>
     <span class="p">}</span>
 
-    <span class="o">//</span> <span class="n">Print</span> <span class="n">received</span> <span class="n">message</span>
-    <span class="nb">int</span> <span class="n">nrows</span> <span class="o">=</span> <span class="n">flag</span><span class="p">;</span>
-    <span class="n">printf</span><span class="p">(</span><span class="s2">&quot;Model A: (</span><span class="si">%d</span><span class="s2"> rows)</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">nrows</span><span class="p">);</span>
-    <span class="nb">int</span> <span class="n">i</span><span class="p">;</span>
+    <span class="c1">// Print received message</span>
+    <span class="kt">int</span> <span class="n">nrows</span> <span class="o">=</span> <span class="n">flag</span><span class="p">;</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;Model A: (%d rows)</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">nrows</span><span class="p">);</span>
+    <span class="kt">int</span> <span class="n">i</span><span class="p">;</span>
     <span class="k">for</span> <span class="p">(</span><span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">nrows</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
-      <span class="n">printf</span><span class="p">(</span><span class="s2">&quot;   </span><span class="si">%.6s</span><span class="s2">, </span><span class="si">%ld</span><span class="s2">, </span><span class="si">%f</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">name</span><span class="p">[</span><span class="mi">6</span><span class="o">*</span><span class="n">i</span><span class="p">],</span> <span class="n">count</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">size</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span>
+      <span class="n">printf</span><span class="p">(</span><span class="s">&quot;   %.6s, %ld, %f</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">name</span><span class="p">[</span><span class="mi">6</span><span class="o">*</span><span class="n">i</span><span class="p">],</span> <span class="n">count</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">size</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span>
 
-    <span class="o">//</span> <span class="n">Send</span> <span class="n">output</span> <span class="n">to</span> <span class="n">output</span> <span class="n">channel</span>
-    <span class="o">//</span> <span class="n">If</span> <span class="n">there</span> <span class="ow">is</span> <span class="n">an</span> <span class="n">error</span><span class="p">,</span> <span class="n">the</span> <span class="n">flag</span> <span class="n">will</span> <span class="n">be</span> <span class="n">negative</span>
-    <span class="n">flag</span> <span class="o">=</span> <span class="n">out_channel</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">nrows</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">count</span><span class="p">,</span> <span class="n">size</span><span class="p">);</span>
+    <span class="c1">// Send output to output channel</span>
+    <span class="c1">// If there is an error, the flag will be negative</span>
+    <span class="n">flag</span> <span class="o">=</span> <span class="n">out_channel</span><span class="p">.</span><span class="n">send</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">nrows</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">count</span><span class="p">,</span> <span class="n">size</span><span class="p">);</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">flag</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-      <span class="n">std</span><span class="p">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s2">&quot;Model A: Error sending output.&quot;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="p">::</span><span class="n">endl</span><span class="p">;</span>
+      <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Model A: Error sending output.&quot;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
       <span class="k">break</span><span class="p">;</span>
     <span class="p">}</span>
 
   <span class="p">}</span>
   
-  <span class="o">//</span> <span class="n">Free</span> <span class="n">dynamically</span> <span class="n">allocated</span> <span class="n">columns</span>
+  <span class="c1">// Free dynamically allocated columns</span>
   <span class="k">if</span> <span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="n">free</span><span class="p">(</span><span class="n">name</span><span class="p">);</span>
   <span class="k">if</span> <span class="p">(</span><span class="n">count</span><span class="p">)</span> <span class="n">free</span><span class="p">(</span><span class="n">count</span><span class="p">);</span>
   <span class="k">if</span> <span class="p">(</span><span class="n">size</span><span class="p">)</span> <span class="n">free</span><span class="p">(</span><span class="n">size</span><span class="p">);</span>
@@ -468,7 +471,7 @@
 <span class="p">}</span>
 </pre></div>
 </td></tr></table></div>
-<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+<div class="highlight-c++ notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
  2
  3
  4
@@ -520,53 +523,53 @@
 50
 51
 52
-53</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="c1">#include &lt;iostream&gt;</span>
-<span class="o">//</span> <span class="n">Include</span> <span class="n">methods</span> <span class="k">for</span> <span class="nb">input</span><span class="o">/</span><span class="n">output</span> <span class="n">channels</span>
-<span class="c1">#include &quot;CisInterface.hpp&quot;</span>
+53</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&lt;iostream&gt;</span><span class="cp"></span>
+<span class="c1">// Include methods for input/output channels</span>
+<span class="cp">#include</span> <span class="cpf">&quot;CisInterface.hpp&quot;</span><span class="cp"></span>
 
-<span class="c1">#define MYBUFSIZ 1000</span>
+<span class="cp">#define MYBUFSIZ 1000</span>
 
-<span class="nb">int</span> <span class="n">main</span><span class="p">(</span><span class="nb">int</span> <span class="n">argc</span><span class="p">,</span> <span class="n">char</span> <span class="o">*</span><span class="n">argv</span><span class="p">[])</span> <span class="p">{</span>
-  <span class="o">//</span> <span class="n">Initialize</span> <span class="nb">input</span><span class="o">/</span><span class="n">output</span> <span class="n">channels</span>
-  <span class="n">CisAsciiArrayInput</span> <span class="n">in_channel</span><span class="p">(</span><span class="s2">&quot;inputB&quot;</span><span class="p">);</span>
-  <span class="n">CisAsciiArrayOutput</span> <span class="n">out_channel</span><span class="p">(</span><span class="s2">&quot;outputB&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">%6s</span><span class="se">\t</span><span class="si">%ld</span><span class="se">\t</span><span class="si">%f</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">);</span>
+<span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">argv</span><span class="p">[])</span> <span class="p">{</span>
+  <span class="c1">// Initialize input/output channels</span>
+  <span class="n">CisAsciiArrayInput</span> <span class="n">in_channel</span><span class="p">(</span><span class="s">&quot;inputB&quot;</span><span class="p">);</span>
+  <span class="n">CisAsciiArrayOutput</span> <span class="n">out_channel</span><span class="p">(</span><span class="s">&quot;outputB&quot;</span><span class="p">,</span> <span class="s">&quot;%6s</span><span class="se">\t</span><span class="s">%ld</span><span class="se">\t</span><span class="s">%f</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
 
-  <span class="o">//</span> <span class="n">Declare</span> <span class="n">resulting</span> <span class="n">variables</span> <span class="ow">and</span> <span class="n">create</span> <span class="nb">buffer</span> <span class="k">for</span> <span class="n">received</span> <span class="n">message</span>
-  <span class="nb">int</span> <span class="n">flag</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
-  <span class="n">char</span> <span class="o">*</span><span class="n">name</span> <span class="o">=</span> <span class="n">NULL</span><span class="p">;</span>
-  <span class="nb">long</span> <span class="o">*</span><span class="n">count</span> <span class="o">=</span> <span class="n">NULL</span><span class="p">;</span>
-  <span class="n">double</span> <span class="o">*</span><span class="n">size</span> <span class="o">=</span> <span class="n">NULL</span><span class="p">;</span>
+  <span class="c1">// Declare resulting variables and create buffer for received message</span>
+  <span class="kt">int</span> <span class="n">flag</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+  <span class="kt">char</span> <span class="o">*</span><span class="n">name</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+  <span class="kt">long</span> <span class="o">*</span><span class="n">count</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+  <span class="kt">double</span> <span class="o">*</span><span class="n">size</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
 
-  <span class="o">//</span> <span class="n">Loop</span> <span class="n">until</span> <span class="n">there</span> <span class="ow">is</span> <span class="n">no</span> <span class="n">longer</span> <span class="nb">input</span> <span class="ow">or</span> <span class="n">the</span> <span class="n">queues</span> <span class="n">are</span> <span class="n">closed</span>
+  <span class="c1">// Loop until there is no longer input or the queues are closed</span>
   <span class="k">while</span> <span class="p">(</span><span class="n">flag</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
   
-    <span class="o">//</span> <span class="n">Receive</span> <span class="nb">input</span> <span class="kn">from</span> <span class="nn">input</span> <span class="nn">channel</span>
-    <span class="o">//</span> <span class="n">If</span> <span class="n">there</span> <span class="ow">is</span> <span class="n">an</span> <span class="n">error</span><span class="p">,</span> <span class="n">the</span> <span class="n">flag</span> <span class="n">will</span> <span class="n">be</span> <span class="n">negative</span>
-    <span class="o">//</span> <span class="n">Otherwise</span><span class="p">,</span> <span class="n">it</span> <span class="ow">is</span> <span class="n">the</span> <span class="n">size</span> <span class="n">of</span> <span class="n">the</span> <span class="n">received</span> <span class="n">message</span>
-    <span class="n">flag</span> <span class="o">=</span> <span class="n">in_channel</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">name</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">count</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">size</span><span class="p">);</span>
+    <span class="c1">// Receive input from input channel</span>
+    <span class="c1">// If there is an error, the flag will be negative</span>
+    <span class="c1">// Otherwise, it is the size of the received message</span>
+    <span class="n">flag</span> <span class="o">=</span> <span class="n">in_channel</span><span class="p">.</span><span class="n">recv</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">name</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">count</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">size</span><span class="p">);</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">flag</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-      <span class="n">std</span><span class="p">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s2">&quot;Model B: No more input.&quot;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="p">::</span><span class="n">endl</span><span class="p">;</span>
+      <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Model B: No more input.&quot;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
       <span class="k">break</span><span class="p">;</span>
     <span class="p">}</span>
 
-    <span class="o">//</span> <span class="n">Print</span> <span class="n">received</span> <span class="n">message</span>
-    <span class="nb">int</span> <span class="n">nrows</span> <span class="o">=</span> <span class="n">flag</span><span class="p">;</span>
-    <span class="n">printf</span><span class="p">(</span><span class="s2">&quot;Model A: (</span><span class="si">%d</span><span class="s2"> rows)</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">nrows</span><span class="p">);</span>
-    <span class="nb">int</span> <span class="n">i</span><span class="p">;</span>
+    <span class="c1">// Print received message</span>
+    <span class="kt">int</span> <span class="n">nrows</span> <span class="o">=</span> <span class="n">flag</span><span class="p">;</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;Model A: (%d rows)</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">nrows</span><span class="p">);</span>
+    <span class="kt">int</span> <span class="n">i</span><span class="p">;</span>
     <span class="k">for</span> <span class="p">(</span><span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">nrows</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
-      <span class="n">printf</span><span class="p">(</span><span class="s2">&quot;   </span><span class="si">%.6s</span><span class="s2">, </span><span class="si">%ld</span><span class="s2">, </span><span class="si">%f</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">name</span><span class="p">[</span><span class="mi">6</span><span class="o">*</span><span class="n">i</span><span class="p">],</span> <span class="n">count</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">size</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span>
+      <span class="n">printf</span><span class="p">(</span><span class="s">&quot;   %.6s, %ld, %f</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">name</span><span class="p">[</span><span class="mi">6</span><span class="o">*</span><span class="n">i</span><span class="p">],</span> <span class="n">count</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">size</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span>
 
-    <span class="o">//</span> <span class="n">Send</span> <span class="n">output</span> <span class="n">to</span> <span class="n">output</span> <span class="n">channel</span>
-    <span class="o">//</span> <span class="n">If</span> <span class="n">there</span> <span class="ow">is</span> <span class="n">an</span> <span class="n">error</span><span class="p">,</span> <span class="n">the</span> <span class="n">flag</span> <span class="n">will</span> <span class="n">be</span> <span class="n">negative</span>
-    <span class="n">flag</span> <span class="o">=</span> <span class="n">out_channel</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">nrows</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">count</span><span class="p">,</span> <span class="n">size</span><span class="p">);</span>
+    <span class="c1">// Send output to output channel</span>
+    <span class="c1">// If there is an error, the flag will be negative</span>
+    <span class="n">flag</span> <span class="o">=</span> <span class="n">out_channel</span><span class="p">.</span><span class="n">send</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">nrows</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">count</span><span class="p">,</span> <span class="n">size</span><span class="p">);</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">flag</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-      <span class="n">std</span><span class="p">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s2">&quot;Model B: Error sending output.&quot;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="p">::</span><span class="n">endl</span><span class="p">;</span>
+      <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Model B: Error sending output.&quot;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
       <span class="k">break</span><span class="p">;</span>
     <span class="p">}</span>
 
   <span class="p">}</span>
   
-  <span class="o">//</span> <span class="n">Free</span> <span class="n">dynamically</span> <span class="n">allocated</span> <span class="n">columns</span>
+  <span class="c1">// Free dynamically allocated columns</span>
   <span class="k">if</span> <span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="n">free</span><span class="p">(</span><span class="n">name</span><span class="p">);</span>
   <span class="k">if</span> <span class="p">(</span><span class="n">count</span><span class="p">)</span> <span class="n">free</span><span class="p">(</span><span class="n">count</span><span class="p">);</span>
   <span class="k">if</span> <span class="p">(</span><span class="n">size</span><span class="p">)</span> <span class="n">free</span><span class="p">(</span><span class="n">size</span><span class="p">);</span>
@@ -603,7 +606,7 @@
 25
 26</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">models</span><span class="p p-Indicator">:</span>
   <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">cpp_modelA</span>
-    <span class="l l-Scalar l-Scalar-Plain">driver</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">GCCModelDriver</span>
+    <span class="l l-Scalar l-Scalar-Plain">language</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">c++</span>
     <span class="l l-Scalar l-Scalar-Plain">args</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/formatted_io4_modelA.cpp</span>
     <span class="l l-Scalar l-Scalar-Plain">inputs</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">inputA</span>
     <span class="l l-Scalar l-Scalar-Plain">outputs</span><span class="p p-Indicator">:</span>
@@ -611,7 +614,7 @@
       <span class="l l-Scalar l-Scalar-Plain">field_names</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">name,count,size</span>
 
   <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">cpp_modelB</span>
-    <span class="l l-Scalar l-Scalar-Plain">driver</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">GCCModelDriver</span>
+    <span class="l l-Scalar l-Scalar-Plain">language</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">c++</span>
     <span class="l l-Scalar l-Scalar-Plain">args</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/formatted_io4_modelB.cpp</span>
     <span class="l l-Scalar l-Scalar-Plain">inputs</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">inputB</span>
     <span class="l l-Scalar l-Scalar-Plain">outputs</span><span class="p p-Indicator">:</span>
@@ -623,17 +626,17 @@
     <span class="l l-Scalar l-Scalar-Plain">output</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">inputB</span>
   <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">input</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/input.txt</span>  <span class="c1"># Connection between file and model A input</span>
     <span class="l l-Scalar l-Scalar-Plain">output</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">inputA</span>
-    <span class="l l-Scalar l-Scalar-Plain">read_meth</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">pandas</span>
+    <span class="l l-Scalar l-Scalar-Plain">filetype</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">pandas</span>
   <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">input</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">outputB</span>  <span class="c1"># Connection between model B output and file</span>
     <span class="l l-Scalar l-Scalar-Plain">output</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">./output.txt</span>
-    <span class="l l-Scalar l-Scalar-Plain">write_meth</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">pandas</span>
+    <span class="l l-Scalar l-Scalar-Plain">filetype</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">pandas</span>
 </pre></div>
 </td></tr></table></div>
 </div>
 <div class="section" id="id1">
 <h2>C Version<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
 <p>Model Code:</p>
-<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+<div class="highlight-c notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
  2
  3
  4
@@ -684,51 +687,51 @@
 49
 50
 51
-52</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="c1">#include &lt;stdio.h&gt;</span>
-<span class="o">//</span> <span class="n">Include</span> <span class="n">methods</span> <span class="k">for</span> <span class="nb">input</span><span class="o">/</span><span class="n">output</span> <span class="n">channels</span>
-<span class="c1">#include &quot;CisInterface.h&quot;</span>
+52</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp"></span>
+<span class="c1">// Include methods for input/output channels</span>
+<span class="cp">#include</span> <span class="cpf">&quot;CisInterface.h&quot;</span><span class="cp"></span>
 
-<span class="nb">int</span> <span class="n">main</span><span class="p">(</span><span class="nb">int</span> <span class="n">argc</span><span class="p">,</span> <span class="n">char</span> <span class="o">*</span><span class="n">argv</span><span class="p">[])</span> <span class="p">{</span>
-  <span class="o">//</span> <span class="n">Initialize</span> <span class="nb">input</span><span class="o">/</span><span class="n">output</span> <span class="n">channels</span>
-  <span class="n">cisAsciiArrayInput_t</span> <span class="n">in_channel</span> <span class="o">=</span> <span class="n">cisAsciiArrayInput</span><span class="p">(</span><span class="s2">&quot;inputA&quot;</span><span class="p">);</span>
-  <span class="n">cisAsciiArrayOutput_t</span> <span class="n">out_channel</span> <span class="o">=</span> <span class="n">cisAsciiArrayOutput</span><span class="p">(</span><span class="s2">&quot;outputA&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">%6s</span><span class="se">\t</span><span class="si">%ld</span><span class="se">\t</span><span class="si">%f</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">);</span>
+<span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">argv</span><span class="p">[])</span> <span class="p">{</span>
+  <span class="c1">// Initialize input/output channels</span>
+  <span class="n">cisAsciiArrayInput_t</span> <span class="n">in_channel</span> <span class="o">=</span> <span class="n">cisAsciiArrayInput</span><span class="p">(</span><span class="s">&quot;inputA&quot;</span><span class="p">);</span>
+  <span class="n">cisAsciiArrayOutput_t</span> <span class="n">out_channel</span> <span class="o">=</span> <span class="n">cisAsciiArrayOutput</span><span class="p">(</span><span class="s">&quot;outputA&quot;</span><span class="p">,</span> <span class="s">&quot;%6s</span><span class="se">\t</span><span class="s">%ld</span><span class="se">\t</span><span class="s">%f</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
 
-  <span class="o">//</span> <span class="n">Declare</span> <span class="n">resulting</span> <span class="n">variables</span> <span class="ow">and</span> <span class="n">create</span> <span class="nb">buffer</span> <span class="k">for</span> <span class="n">received</span> <span class="n">message</span>
-  <span class="nb">int</span> <span class="n">flag</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
-  <span class="n">char</span> <span class="o">*</span><span class="n">name</span> <span class="o">=</span> <span class="n">NULL</span><span class="p">;</span>
-  <span class="nb">long</span> <span class="o">*</span><span class="n">count</span> <span class="o">=</span> <span class="n">NULL</span><span class="p">;</span>
-  <span class="n">double</span> <span class="o">*</span><span class="n">size</span> <span class="o">=</span> <span class="n">NULL</span><span class="p">;</span>
+  <span class="c1">// Declare resulting variables and create buffer for received message</span>
+  <span class="kt">int</span> <span class="n">flag</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+  <span class="kt">char</span> <span class="o">*</span><span class="n">name</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+  <span class="kt">long</span> <span class="o">*</span><span class="n">count</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+  <span class="kt">double</span> <span class="o">*</span><span class="n">size</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
 
-  <span class="o">//</span> <span class="n">Loop</span> <span class="n">until</span> <span class="n">there</span> <span class="ow">is</span> <span class="n">no</span> <span class="n">longer</span> <span class="nb">input</span> <span class="ow">or</span> <span class="n">the</span> <span class="n">queues</span> <span class="n">are</span> <span class="n">closed</span>
+  <span class="c1">// Loop until there is no longer input or the queues are closed</span>
   <span class="k">while</span> <span class="p">(</span><span class="n">flag</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
   
-    <span class="o">//</span> <span class="n">Receive</span> <span class="nb">input</span> <span class="kn">from</span> <span class="nn">input</span> <span class="nn">channel</span>
-    <span class="o">//</span> <span class="n">If</span> <span class="n">there</span> <span class="ow">is</span> <span class="n">an</span> <span class="n">error</span><span class="p">,</span> <span class="n">the</span> <span class="n">flag</span> <span class="n">will</span> <span class="n">be</span> <span class="n">negative</span>
-    <span class="o">//</span> <span class="n">Otherwise</span><span class="p">,</span> <span class="n">it</span> <span class="ow">is</span> <span class="n">the</span> <span class="n">size</span> <span class="n">of</span> <span class="n">the</span> <span class="n">received</span> <span class="n">message</span>
+    <span class="c1">// Receive input from input channel</span>
+    <span class="c1">// If there is an error, the flag will be negative</span>
+    <span class="c1">// Otherwise, it is the size of the received message</span>
     <span class="n">flag</span> <span class="o">=</span> <span class="n">cisRecv</span><span class="p">(</span><span class="n">in_channel</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">name</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">count</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">size</span><span class="p">);</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">flag</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-      <span class="n">printf</span><span class="p">(</span><span class="s2">&quot;Model A: No more input.</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">);</span>
+      <span class="n">printf</span><span class="p">(</span><span class="s">&quot;Model A: No more input.</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
       <span class="k">break</span><span class="p">;</span>
     <span class="p">}</span>
 
-    <span class="o">//</span> <span class="n">Print</span> <span class="n">received</span> <span class="n">message</span>
-    <span class="nb">int</span> <span class="n">nrows</span> <span class="o">=</span> <span class="n">flag</span><span class="p">;</span>
-    <span class="n">printf</span><span class="p">(</span><span class="s2">&quot;Model A: (</span><span class="si">%d</span><span class="s2"> rows)</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">nrows</span><span class="p">);</span>
-    <span class="nb">int</span> <span class="n">i</span><span class="p">;</span>
+    <span class="c1">// Print received message</span>
+    <span class="kt">int</span> <span class="n">nrows</span> <span class="o">=</span> <span class="n">flag</span><span class="p">;</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;Model A: (%d rows)</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">nrows</span><span class="p">);</span>
+    <span class="kt">int</span> <span class="n">i</span><span class="p">;</span>
     <span class="k">for</span> <span class="p">(</span><span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">nrows</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
-      <span class="n">printf</span><span class="p">(</span><span class="s2">&quot;   </span><span class="si">%.6s</span><span class="s2">, </span><span class="si">%ld</span><span class="s2">, </span><span class="si">%f</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">name</span><span class="p">[</span><span class="mi">6</span><span class="o">*</span><span class="n">i</span><span class="p">],</span> <span class="n">count</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">size</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span>
+      <span class="n">printf</span><span class="p">(</span><span class="s">&quot;   %.6s, %ld, %f</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">name</span><span class="p">[</span><span class="mi">6</span><span class="o">*</span><span class="n">i</span><span class="p">],</span> <span class="n">count</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">size</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span>
 
-    <span class="o">//</span> <span class="n">Send</span> <span class="n">output</span> <span class="n">to</span> <span class="n">output</span> <span class="n">channel</span>
-    <span class="o">//</span> <span class="n">If</span> <span class="n">there</span> <span class="ow">is</span> <span class="n">an</span> <span class="n">error</span><span class="p">,</span> <span class="n">the</span> <span class="n">flag</span> <span class="n">will</span> <span class="n">be</span> <span class="n">negative</span>
+    <span class="c1">// Send output to output channel</span>
+    <span class="c1">// If there is an error, the flag will be negative</span>
     <span class="n">flag</span> <span class="o">=</span> <span class="n">cisSend</span><span class="p">(</span><span class="n">out_channel</span><span class="p">,</span> <span class="n">nrows</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">count</span><span class="p">,</span> <span class="n">size</span><span class="p">);</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">flag</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-      <span class="n">printf</span><span class="p">(</span><span class="s2">&quot;Model A: Error sending output.</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">);</span>
+      <span class="n">printf</span><span class="p">(</span><span class="s">&quot;Model A: Error sending output.</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
       <span class="k">break</span><span class="p">;</span>
     <span class="p">}</span>
 
   <span class="p">}</span>
 
-  <span class="o">//</span> <span class="n">Free</span> <span class="n">dynamically</span> <span class="n">allocated</span> <span class="n">columns</span>
+  <span class="c1">// Free dynamically allocated columns</span>
   <span class="k">if</span> <span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="n">free</span><span class="p">(</span><span class="n">name</span><span class="p">);</span>
   <span class="k">if</span> <span class="p">(</span><span class="n">count</span><span class="p">)</span> <span class="n">free</span><span class="p">(</span><span class="n">count</span><span class="p">);</span>
   <span class="k">if</span> <span class="p">(</span><span class="n">size</span><span class="p">)</span> <span class="n">free</span><span class="p">(</span><span class="n">size</span><span class="p">);</span>
@@ -738,7 +741,7 @@
 
 </pre></div>
 </td></tr></table></div>
-<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+<div class="highlight-c notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
  2
  3
  4
@@ -789,51 +792,51 @@
 49
 50
 51
-52</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="c1">#include &lt;stdio.h&gt;</span>
-<span class="o">//</span> <span class="n">Include</span> <span class="n">methods</span> <span class="k">for</span> <span class="nb">input</span><span class="o">/</span><span class="n">output</span> <span class="n">channels</span>
-<span class="c1">#include &quot;CisInterface.h&quot;</span>
+52</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp"></span>
+<span class="c1">// Include methods for input/output channels</span>
+<span class="cp">#include</span> <span class="cpf">&quot;CisInterface.h&quot;</span><span class="cp"></span>
 
-<span class="nb">int</span> <span class="n">main</span><span class="p">(</span><span class="nb">int</span> <span class="n">argc</span><span class="p">,</span> <span class="n">char</span> <span class="o">*</span><span class="n">argv</span><span class="p">[])</span> <span class="p">{</span>
-  <span class="o">//</span> <span class="n">Initialize</span> <span class="nb">input</span><span class="o">/</span><span class="n">output</span> <span class="n">channels</span>
-  <span class="n">cisAsciiArrayInput_t</span> <span class="n">in_channel</span> <span class="o">=</span> <span class="n">cisAsciiArrayInput</span><span class="p">(</span><span class="s2">&quot;inputB&quot;</span><span class="p">);</span>
-  <span class="n">cisAsciiArrayOutput_t</span> <span class="n">out_channel</span> <span class="o">=</span> <span class="n">cisAsciiArrayOutput</span><span class="p">(</span><span class="s2">&quot;outputB&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">%6s</span><span class="se">\t</span><span class="si">%ld</span><span class="se">\t</span><span class="si">%f</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">);</span>
+<span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">argv</span><span class="p">[])</span> <span class="p">{</span>
+  <span class="c1">// Initialize input/output channels</span>
+  <span class="n">cisAsciiArrayInput_t</span> <span class="n">in_channel</span> <span class="o">=</span> <span class="n">cisAsciiArrayInput</span><span class="p">(</span><span class="s">&quot;inputB&quot;</span><span class="p">);</span>
+  <span class="n">cisAsciiArrayOutput_t</span> <span class="n">out_channel</span> <span class="o">=</span> <span class="n">cisAsciiArrayOutput</span><span class="p">(</span><span class="s">&quot;outputB&quot;</span><span class="p">,</span> <span class="s">&quot;%6s</span><span class="se">\t</span><span class="s">%ld</span><span class="se">\t</span><span class="s">%f</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
 
-  <span class="o">//</span> <span class="n">Declare</span> <span class="n">resulting</span> <span class="n">variables</span> <span class="ow">and</span> <span class="n">create</span> <span class="nb">buffer</span> <span class="k">for</span> <span class="n">received</span> <span class="n">message</span>
-  <span class="nb">int</span> <span class="n">flag</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
-  <span class="n">char</span> <span class="o">*</span><span class="n">name</span> <span class="o">=</span> <span class="n">NULL</span><span class="p">;</span>
-  <span class="nb">long</span> <span class="o">*</span><span class="n">count</span> <span class="o">=</span> <span class="n">NULL</span><span class="p">;</span>
-  <span class="n">double</span> <span class="o">*</span><span class="n">size</span> <span class="o">=</span> <span class="n">NULL</span><span class="p">;</span>
+  <span class="c1">// Declare resulting variables and create buffer for received message</span>
+  <span class="kt">int</span> <span class="n">flag</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+  <span class="kt">char</span> <span class="o">*</span><span class="n">name</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+  <span class="kt">long</span> <span class="o">*</span><span class="n">count</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+  <span class="kt">double</span> <span class="o">*</span><span class="n">size</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
 
-  <span class="o">//</span> <span class="n">Loop</span> <span class="n">until</span> <span class="n">there</span> <span class="ow">is</span> <span class="n">no</span> <span class="n">longer</span> <span class="nb">input</span> <span class="ow">or</span> <span class="n">the</span> <span class="n">queues</span> <span class="n">are</span> <span class="n">closed</span>
+  <span class="c1">// Loop until there is no longer input or the queues are closed</span>
   <span class="k">while</span> <span class="p">(</span><span class="n">flag</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
   
-    <span class="o">//</span> <span class="n">Receive</span> <span class="nb">input</span> <span class="kn">from</span> <span class="nn">input</span> <span class="nn">channel</span>
-    <span class="o">//</span> <span class="n">If</span> <span class="n">there</span> <span class="ow">is</span> <span class="n">an</span> <span class="n">error</span><span class="p">,</span> <span class="n">the</span> <span class="n">flag</span> <span class="n">will</span> <span class="n">be</span> <span class="n">negative</span>
-    <span class="o">//</span> <span class="n">Otherwise</span><span class="p">,</span> <span class="n">it</span> <span class="ow">is</span> <span class="n">the</span> <span class="n">size</span> <span class="n">of</span> <span class="n">the</span> <span class="n">received</span> <span class="n">message</span>
+    <span class="c1">// Receive input from input channel</span>
+    <span class="c1">// If there is an error, the flag will be negative</span>
+    <span class="c1">// Otherwise, it is the size of the received message</span>
     <span class="n">flag</span> <span class="o">=</span> <span class="n">cisRecv</span><span class="p">(</span><span class="n">in_channel</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">name</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">count</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">size</span><span class="p">);</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">flag</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-      <span class="n">printf</span><span class="p">(</span><span class="s2">&quot;Model B: No more input.</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">);</span>
+      <span class="n">printf</span><span class="p">(</span><span class="s">&quot;Model B: No more input.</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
       <span class="k">break</span><span class="p">;</span>
     <span class="p">}</span>
 
-    <span class="o">//</span> <span class="n">Print</span> <span class="n">received</span> <span class="n">message</span>
-    <span class="nb">int</span> <span class="n">nrows</span> <span class="o">=</span> <span class="n">flag</span><span class="p">;</span>
-    <span class="n">printf</span><span class="p">(</span><span class="s2">&quot;Model B: (</span><span class="si">%d</span><span class="s2"> rows)</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">nrows</span><span class="p">);</span>
-    <span class="nb">int</span> <span class="n">i</span><span class="p">;</span>
+    <span class="c1">// Print received message</span>
+    <span class="kt">int</span> <span class="n">nrows</span> <span class="o">=</span> <span class="n">flag</span><span class="p">;</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">&quot;Model B: (%d rows)</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">nrows</span><span class="p">);</span>
+    <span class="kt">int</span> <span class="n">i</span><span class="p">;</span>
     <span class="k">for</span> <span class="p">(</span><span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">nrows</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span>
-      <span class="n">printf</span><span class="p">(</span><span class="s2">&quot;   </span><span class="si">%.6s</span><span class="s2">, </span><span class="si">%ld</span><span class="s2">, </span><span class="si">%f</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">name</span><span class="p">[</span><span class="mi">6</span><span class="o">*</span><span class="n">i</span><span class="p">],</span> <span class="n">count</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">size</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span>
+      <span class="n">printf</span><span class="p">(</span><span class="s">&quot;   %.6s, %ld, %f</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">name</span><span class="p">[</span><span class="mi">6</span><span class="o">*</span><span class="n">i</span><span class="p">],</span> <span class="n">count</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">size</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span>
 
-    <span class="o">//</span> <span class="n">Send</span> <span class="n">output</span> <span class="n">to</span> <span class="n">output</span> <span class="n">channel</span>
-    <span class="o">//</span> <span class="n">If</span> <span class="n">there</span> <span class="ow">is</span> <span class="n">an</span> <span class="n">error</span><span class="p">,</span> <span class="n">the</span> <span class="n">flag</span> <span class="n">will</span> <span class="n">be</span> <span class="n">negative</span>
+    <span class="c1">// Send output to output channel</span>
+    <span class="c1">// If there is an error, the flag will be negative</span>
     <span class="n">flag</span> <span class="o">=</span> <span class="n">cisSend</span><span class="p">(</span><span class="n">out_channel</span><span class="p">,</span> <span class="n">nrows</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">count</span><span class="p">,</span> <span class="n">size</span><span class="p">);</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">flag</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-      <span class="n">printf</span><span class="p">(</span><span class="s2">&quot;Model B: Error sending output.</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">);</span>
+      <span class="n">printf</span><span class="p">(</span><span class="s">&quot;Model B: Error sending output.</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
       <span class="k">break</span><span class="p">;</span>
     <span class="p">}</span>
 
   <span class="p">}</span>
   
-  <span class="o">//</span> <span class="n">Free</span> <span class="n">dynamically</span> <span class="n">allocated</span> <span class="n">columns</span>
+  <span class="c1">// Free dynamically allocated columns</span>
   <span class="k">if</span> <span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="n">free</span><span class="p">(</span><span class="n">name</span><span class="p">);</span>
   <span class="k">if</span> <span class="p">(</span><span class="n">count</span><span class="p">)</span> <span class="n">free</span><span class="p">(</span><span class="n">count</span><span class="p">);</span>
   <span class="k">if</span> <span class="p">(</span><span class="n">size</span><span class="p">)</span> <span class="n">free</span><span class="p">(</span><span class="n">size</span><span class="p">);</span>
@@ -871,7 +874,7 @@
 25
 26</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">models</span><span class="p p-Indicator">:</span>
   <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">c_modelA</span>
-    <span class="l l-Scalar l-Scalar-Plain">driver</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">GCCModelDriver</span>
+    <span class="l l-Scalar l-Scalar-Plain">language</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">c</span>
     <span class="l l-Scalar l-Scalar-Plain">args</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/formatted_io4_modelA.c</span>
     <span class="l l-Scalar l-Scalar-Plain">inputs</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">inputA</span>
     <span class="l l-Scalar l-Scalar-Plain">outputs</span><span class="p p-Indicator">:</span>
@@ -879,7 +882,7 @@
       <span class="l l-Scalar l-Scalar-Plain">field_names</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">name,count,size</span>
 
   <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">c_modelB</span>
-    <span class="l l-Scalar l-Scalar-Plain">driver</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">GCCModelDriver</span>
+    <span class="l l-Scalar l-Scalar-Plain">language</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">c</span>
     <span class="l l-Scalar l-Scalar-Plain">args</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/formatted_io4_modelB.c</span>
     <span class="l l-Scalar l-Scalar-Plain">inputs</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">inputB</span>
     <span class="l l-Scalar l-Scalar-Plain">outputs</span><span class="p p-Indicator">:</span>
@@ -891,17 +894,17 @@
     <span class="l l-Scalar l-Scalar-Plain">output</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">inputB</span>
   <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">input</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/input.txt</span>  <span class="c1"># Connection between file and model A input</span>
     <span class="l l-Scalar l-Scalar-Plain">output</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">inputA</span>
-    <span class="l l-Scalar l-Scalar-Plain">read_meth</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">pandas</span>
+    <span class="l l-Scalar l-Scalar-Plain">filetype</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">pandas</span>
   <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">input</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">outputB</span>  <span class="c1"># Connection between model B output and file</span>
     <span class="l l-Scalar l-Scalar-Plain">output</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">./output.txt</span>
-    <span class="l l-Scalar l-Scalar-Plain">write_meth</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">pandas</span>
+    <span class="l l-Scalar l-Scalar-Plain">filetype</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">pandas</span>
 </pre></div>
 </td></tr></table></div>
 </div>
 <div class="section" id="matlab-version">
 <h2>Matlab Version<a class="headerlink" href="#matlab-version" title="Permalink to this headline">¶</a></h2>
 <p>Model Code:</p>
-<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+<div class="highlight-matlab notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
  2
  3
  4
@@ -935,44 +938,44 @@
 32
 33
 34
-35</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="o">%</span> <span class="n">Initialize</span> <span class="nb">input</span><span class="o">/</span><span class="n">output</span> <span class="n">channels</span> 
-<span class="n">in_channel</span> <span class="o">=</span> <span class="n">CisInterface</span><span class="p">(</span><span class="s1">&#39;CisPandasInput&#39;</span><span class="p">,</span> <span class="s1">&#39;inputA&#39;</span><span class="p">);</span>
-<span class="n">out_channel</span> <span class="o">=</span> <span class="n">CisInterface</span><span class="p">(</span><span class="s1">&#39;CisPandasOutput&#39;</span><span class="p">,</span> <span class="s1">&#39;outputA&#39;</span><span class="p">);</span>
+35</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="c">% Initialize input/output channels </span>
+<span class="n">in_channel</span> <span class="p">=</span> <span class="n">CisInterface</span><span class="p">(</span><span class="s">&#39;CisPandasInput&#39;</span><span class="p">,</span> <span class="s">&#39;inputA&#39;</span><span class="p">);</span>
+<span class="n">out_channel</span> <span class="p">=</span> <span class="n">CisInterface</span><span class="p">(</span><span class="s">&#39;CisPandasOutput&#39;</span><span class="p">,</span> <span class="s">&#39;outputA&#39;</span><span class="p">);</span>
 
-<span class="n">flag</span> <span class="o">=</span> <span class="n">true</span><span class="p">;</span>
+<span class="n">flag</span> <span class="p">=</span> <span class="n">true</span><span class="p">;</span>
 
-<span class="o">%</span> <span class="n">Loop</span> <span class="n">until</span> <span class="n">there</span> <span class="ow">is</span> <span class="n">no</span> <span class="n">longer</span> <span class="nb">input</span> <span class="ow">or</span> <span class="n">the</span> <span class="n">queues</span> <span class="n">are</span> <span class="n">closed</span>
+<span class="c">% Loop until there is no longer input or the queues are closed</span>
 <span class="k">while</span> <span class="n">flag</span>
 
-  <span class="o">%</span> <span class="n">Receive</span> <span class="nb">input</span> <span class="kn">from</span> <span class="nn">input</span> <span class="nn">channel</span>
-  <span class="o">%</span> <span class="n">If</span> <span class="n">there</span> <span class="ow">is</span> <span class="n">an</span> <span class="n">error</span><span class="p">,</span> <span class="n">the</span> <span class="n">flag</span> <span class="n">will</span> <span class="n">be</span> <span class="bp">False</span><span class="o">.</span>
-  <span class="p">[</span><span class="n">flag</span><span class="p">,</span> <span class="n">arr</span><span class="p">]</span> <span class="o">=</span> <span class="n">in_channel</span><span class="o">.</span><span class="n">recv</span><span class="p">();</span>
+  <span class="c">% Receive input from input channel</span>
+  <span class="c">% If there is an error, the flag will be False.</span>
+  <span class="p">[</span><span class="n">flag</span><span class="p">,</span> <span class="n">arr</span><span class="p">]</span> <span class="p">=</span> <span class="n">in_channel</span><span class="p">.</span><span class="n">recv</span><span class="p">();</span>
   <span class="k">if</span> <span class="p">(</span><span class="o">~</span><span class="n">flag</span><span class="p">)</span>
-    <span class="n">disp</span><span class="p">(</span><span class="s1">&#39;Model A: No more input.&#39;</span><span class="p">);</span>
+    <span class="nb">disp</span><span class="p">(</span><span class="s">&#39;Model A: No more input.&#39;</span><span class="p">);</span>
     <span class="k">break</span><span class="p">;</span>
-  <span class="n">end</span><span class="p">;</span>
+  <span class="k">end</span><span class="p">;</span>
 
-  <span class="o">%</span> <span class="n">Print</span> <span class="n">received</span> <span class="n">message</span>
-  <span class="n">nr</span> <span class="o">=</span> <span class="n">size</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
-  <span class="n">fprintf</span><span class="p">(</span><span class="s1">&#39;Model A: (</span><span class="si">%d</span><span class="s1"> rows)</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">nr</span><span class="p">);</span>
-  <span class="k">for</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span><span class="p">:</span><span class="n">nr</span>
-    <span class="n">fprintf</span><span class="p">(</span><span class="s1">&#39;   </span><span class="si">%s</span><span class="s1">, </span><span class="si">%d</span><span class="s1">, </span><span class="si">%f</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">arr</span><span class="p">{</span><span class="n">i</span><span class="p">,</span><span class="mi">1</span><span class="p">},</span> <span class="n">arr</span><span class="p">{</span><span class="n">i</span><span class="p">,</span><span class="mi">2</span><span class="p">},</span> <span class="n">arr</span><span class="p">{</span><span class="n">i</span><span class="p">,</span><span class="mi">3</span><span class="p">});</span>
-  <span class="n">end</span><span class="p">;</span>
+  <span class="c">% Print received message</span>
+  <span class="n">nr</span> <span class="p">=</span> <span class="nb">size</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+  <span class="n">fprintf</span><span class="p">(</span><span class="s">&#39;Model A: (%d rows)\n&#39;</span><span class="p">,</span> <span class="n">nr</span><span class="p">);</span>
+  <span class="k">for</span> <span class="nb">i</span> <span class="p">=</span> <span class="mi">1</span><span class="p">:</span><span class="n">nr</span>
+    <span class="n">fprintf</span><span class="p">(</span><span class="s">&#39;   %s, %d, %f\n&#39;</span><span class="p">,</span> <span class="n">arr</span><span class="p">{</span><span class="nb">i</span><span class="p">,</span><span class="mi">1</span><span class="p">},</span> <span class="n">arr</span><span class="p">{</span><span class="nb">i</span><span class="p">,</span><span class="mi">2</span><span class="p">},</span> <span class="n">arr</span><span class="p">{</span><span class="nb">i</span><span class="p">,</span><span class="mi">3</span><span class="p">});</span>
+  <span class="k">end</span><span class="p">;</span>
 
-  <span class="o">%</span> <span class="n">Send</span> <span class="n">output</span> <span class="n">to</span> <span class="n">output</span> <span class="n">channel</span>
-  <span class="o">%</span> <span class="n">If</span> <span class="n">there</span> <span class="ow">is</span> <span class="n">an</span> <span class="n">error</span><span class="p">,</span> <span class="n">the</span> <span class="n">flag</span> <span class="n">will</span> <span class="n">be</span> <span class="bp">False</span>
-  <span class="n">flag</span> <span class="o">=</span> <span class="n">out_channel</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">arr</span><span class="p">);</span>
+  <span class="c">% Send output to output channel</span>
+  <span class="c">% If there is an error, the flag will be False</span>
+  <span class="n">flag</span> <span class="p">=</span> <span class="n">out_channel</span><span class="p">.</span><span class="n">send</span><span class="p">(</span><span class="n">arr</span><span class="p">);</span>
   <span class="k">if</span> <span class="p">(</span><span class="o">~</span><span class="n">flag</span><span class="p">)</span>
-    <span class="n">disp</span><span class="p">(</span><span class="s1">&#39;Model A: Error sending output.&#39;</span><span class="p">);</span>
+    <span class="nb">disp</span><span class="p">(</span><span class="s">&#39;Model A: Error sending output.&#39;</span><span class="p">);</span>
     <span class="k">break</span><span class="p">;</span>
-  <span class="n">end</span><span class="p">;</span>
+  <span class="k">end</span><span class="p">;</span>
   
-<span class="n">end</span><span class="p">;</span>
+<span class="k">end</span><span class="p">;</span>
 
-<span class="nb">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+<span class="n">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
 </pre></div>
 </td></tr></table></div>
-<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+<div class="highlight-matlab notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
  2
  3
  4
@@ -1006,41 +1009,41 @@
 32
 33
 34
-35</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="o">%</span> <span class="n">Initialize</span> <span class="nb">input</span><span class="o">/</span><span class="n">output</span> <span class="n">channels</span> 
-<span class="n">in_channel</span> <span class="o">=</span> <span class="n">CisInterface</span><span class="p">(</span><span class="s1">&#39;CisPandasInput&#39;</span><span class="p">,</span> <span class="s1">&#39;inputB&#39;</span><span class="p">);</span>
-<span class="n">out_channel</span> <span class="o">=</span> <span class="n">CisInterface</span><span class="p">(</span><span class="s1">&#39;CisPandasOutput&#39;</span><span class="p">,</span> <span class="s1">&#39;outputB&#39;</span><span class="p">);</span>
+35</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="c">% Initialize input/output channels </span>
+<span class="n">in_channel</span> <span class="p">=</span> <span class="n">CisInterface</span><span class="p">(</span><span class="s">&#39;CisPandasInput&#39;</span><span class="p">,</span> <span class="s">&#39;inputB&#39;</span><span class="p">);</span>
+<span class="n">out_channel</span> <span class="p">=</span> <span class="n">CisInterface</span><span class="p">(</span><span class="s">&#39;CisPandasOutput&#39;</span><span class="p">,</span> <span class="s">&#39;outputB&#39;</span><span class="p">);</span>
 
-<span class="n">flag</span> <span class="o">=</span> <span class="n">true</span><span class="p">;</span>
+<span class="n">flag</span> <span class="p">=</span> <span class="n">true</span><span class="p">;</span>
 
-<span class="o">%</span> <span class="n">Loop</span> <span class="n">until</span> <span class="n">there</span> <span class="ow">is</span> <span class="n">no</span> <span class="n">longer</span> <span class="nb">input</span> <span class="ow">or</span> <span class="n">the</span> <span class="n">queues</span> <span class="n">are</span> <span class="n">closed</span>
+<span class="c">% Loop until there is no longer input or the queues are closed</span>
 <span class="k">while</span> <span class="n">flag</span>
 
-  <span class="o">%</span> <span class="n">Receive</span> <span class="nb">input</span> <span class="kn">from</span> <span class="nn">input</span> <span class="nn">channel</span>
-  <span class="o">%</span> <span class="n">If</span> <span class="n">there</span> <span class="ow">is</span> <span class="n">an</span> <span class="n">error</span><span class="p">,</span> <span class="n">the</span> <span class="n">flag</span> <span class="n">will</span> <span class="n">be</span> <span class="bp">False</span><span class="o">.</span>
-  <span class="p">[</span><span class="n">flag</span><span class="p">,</span> <span class="n">arr</span><span class="p">]</span> <span class="o">=</span> <span class="n">in_channel</span><span class="o">.</span><span class="n">recv</span><span class="p">();</span>
+  <span class="c">% Receive input from input channel</span>
+  <span class="c">% If there is an error, the flag will be False.</span>
+  <span class="p">[</span><span class="n">flag</span><span class="p">,</span> <span class="n">arr</span><span class="p">]</span> <span class="p">=</span> <span class="n">in_channel</span><span class="p">.</span><span class="n">recv</span><span class="p">();</span>
   <span class="k">if</span> <span class="p">(</span><span class="o">~</span><span class="n">flag</span><span class="p">)</span>
-    <span class="n">disp</span><span class="p">(</span><span class="s1">&#39;Model B: No more input.&#39;</span><span class="p">);</span>
+    <span class="nb">disp</span><span class="p">(</span><span class="s">&#39;Model B: No more input.&#39;</span><span class="p">);</span>
     <span class="k">break</span><span class="p">;</span>
-  <span class="n">end</span><span class="p">;</span>
+  <span class="k">end</span><span class="p">;</span>
 
-  <span class="o">%</span> <span class="n">Print</span> <span class="n">received</span> <span class="n">message</span>
-  <span class="n">nr</span> <span class="o">=</span> <span class="n">size</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
-  <span class="n">fprintf</span><span class="p">(</span><span class="s1">&#39;Model B: (</span><span class="si">%d</span><span class="s1"> rows)</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">nr</span><span class="p">);</span>
-  <span class="k">for</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span><span class="p">:</span><span class="n">nr</span>
-    <span class="n">fprintf</span><span class="p">(</span><span class="s1">&#39;   </span><span class="si">%s</span><span class="s1">, </span><span class="si">%d</span><span class="s1">, </span><span class="si">%f</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">arr</span><span class="p">{</span><span class="n">i</span><span class="p">,</span><span class="mi">1</span><span class="p">},</span> <span class="n">arr</span><span class="p">{</span><span class="n">i</span><span class="p">,</span><span class="mi">2</span><span class="p">},</span> <span class="n">arr</span><span class="p">{</span><span class="n">i</span><span class="p">,</span><span class="mi">3</span><span class="p">});</span>
-  <span class="n">end</span><span class="p">;</span>
+  <span class="c">% Print received message</span>
+  <span class="n">nr</span> <span class="p">=</span> <span class="nb">size</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+  <span class="n">fprintf</span><span class="p">(</span><span class="s">&#39;Model B: (%d rows)\n&#39;</span><span class="p">,</span> <span class="n">nr</span><span class="p">);</span>
+  <span class="k">for</span> <span class="nb">i</span> <span class="p">=</span> <span class="mi">1</span><span class="p">:</span><span class="n">nr</span>
+    <span class="n">fprintf</span><span class="p">(</span><span class="s">&#39;   %s, %d, %f\n&#39;</span><span class="p">,</span> <span class="n">arr</span><span class="p">{</span><span class="nb">i</span><span class="p">,</span><span class="mi">1</span><span class="p">},</span> <span class="n">arr</span><span class="p">{</span><span class="nb">i</span><span class="p">,</span><span class="mi">2</span><span class="p">},</span> <span class="n">arr</span><span class="p">{</span><span class="nb">i</span><span class="p">,</span><span class="mi">3</span><span class="p">});</span>
+  <span class="k">end</span><span class="p">;</span>
 
-  <span class="o">%</span> <span class="n">Send</span> <span class="n">output</span> <span class="n">to</span> <span class="n">output</span> <span class="n">channel</span>
-  <span class="o">%</span> <span class="n">If</span> <span class="n">there</span> <span class="ow">is</span> <span class="n">an</span> <span class="n">error</span><span class="p">,</span> <span class="n">the</span> <span class="n">flag</span> <span class="n">will</span> <span class="n">be</span> <span class="bp">False</span>
-  <span class="n">flag</span> <span class="o">=</span> <span class="n">out_channel</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">arr</span><span class="p">);</span>
+  <span class="c">% Send output to output channel</span>
+  <span class="c">% If there is an error, the flag will be False</span>
+  <span class="n">flag</span> <span class="p">=</span> <span class="n">out_channel</span><span class="p">.</span><span class="n">send</span><span class="p">(</span><span class="n">arr</span><span class="p">);</span>
   <span class="k">if</span> <span class="p">(</span><span class="o">~</span><span class="n">flag</span><span class="p">)</span>
-    <span class="n">disp</span><span class="p">(</span><span class="s1">&#39;Model B: Error sending output.&#39;</span><span class="p">);</span>
+    <span class="nb">disp</span><span class="p">(</span><span class="s">&#39;Model B: Error sending output.&#39;</span><span class="p">);</span>
     <span class="k">break</span><span class="p">;</span>
-  <span class="n">end</span><span class="p">;</span>
+  <span class="k">end</span><span class="p">;</span>
   
-<span class="n">end</span><span class="p">;</span>
+<span class="k">end</span><span class="p">;</span>
 
-<span class="nb">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+<span class="n">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
 </pre></div>
 </td></tr></table></div>
 <p>Model YAML:</p>
@@ -1071,7 +1074,7 @@
 25
 26</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">models</span><span class="p p-Indicator">:</span>
   <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">matlab_modelA</span>
-    <span class="l l-Scalar l-Scalar-Plain">driver</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">MatlabModelDriver</span>
+    <span class="l l-Scalar l-Scalar-Plain">language</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">matlab</span>
     <span class="l l-Scalar l-Scalar-Plain">args</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/formatted_io4_modelA.m</span>
     <span class="l l-Scalar l-Scalar-Plain">inputs</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">inputA</span>
     <span class="l l-Scalar l-Scalar-Plain">outputs</span><span class="p p-Indicator">:</span>
@@ -1079,7 +1082,7 @@
       <span class="l l-Scalar l-Scalar-Plain">field_names</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">name,count,size</span>
 
   <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">matlab_modelB</span>
-    <span class="l l-Scalar l-Scalar-Plain">driver</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">MatlabModelDriver</span>
+    <span class="l l-Scalar l-Scalar-Plain">language</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">matlab</span>
     <span class="l l-Scalar l-Scalar-Plain">args</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/formatted_io4_modelB.m</span>
     <span class="l l-Scalar l-Scalar-Plain">inputs</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">inputB</span>
     <span class="l l-Scalar l-Scalar-Plain">outputs</span><span class="p p-Indicator">:</span>
@@ -1091,10 +1094,10 @@
     <span class="l l-Scalar l-Scalar-Plain">output</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">inputB</span>
   <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">input</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/input.txt</span>  <span class="c1"># Connection between file and model A input</span>
     <span class="l l-Scalar l-Scalar-Plain">output</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">inputA</span>
-    <span class="l l-Scalar l-Scalar-Plain">read_meth</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">pandas</span>
+    <span class="l l-Scalar l-Scalar-Plain">filetype</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">pandas</span>
   <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">input</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">outputB</span>  <span class="c1"># Connection between model B output and file</span>
     <span class="l l-Scalar l-Scalar-Plain">output</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">./output.txt</span>
-    <span class="l l-Scalar l-Scalar-Plain">write_meth</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">pandas</span>
+    <span class="l l-Scalar l-Scalar-Plain">filetype</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">pandas</span>
 </pre></div>
 </td></tr></table></div>
 </div>
@@ -1108,7 +1111,7 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="rpc_lesson1.html" class="btn btn-neutral float-right" title="rpc_lesson1 Example" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="formatted_io5.html" class="btn btn-neutral float-right" title="formatted_io5 Example" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="formatted_io3.html" class="btn btn-neutral" title="formatted_io3 Example" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
@@ -1142,7 +1145,7 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../',
-            VERSION:'0.2.0',
+            VERSION:'0.3.0',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',

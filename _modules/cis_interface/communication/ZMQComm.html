@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>cis_interface.communication.ZMQComm &mdash; cis_interface 0.2.0 documentation</title>
+  <title>cis_interface.communication.ZMQComm &mdash; cis_interface 0.3.0 documentation</title>
   
 
   
@@ -57,7 +57,7 @@
             
             
               <div class="version">
-                0.2
+                0.3
               </div>
             
           
@@ -97,6 +97,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../model_drivers.html">Model Drivers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../code.html">Code</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../examples/examples_toc.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../release.html">Release Steps</a></li>
 </ul>
 
             
@@ -162,7 +163,9 @@
            <div itemprop="articleBody">
             
   <h1>Source code for cis_interface.communication.ZMQComm</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">uuid</span>
+<span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">tempfile</span>
+<span class="kn">import</span> <span class="nn">uuid</span>
 <span class="kn">import</span> <span class="nn">zmq</span>
 <span class="kn">import</span> <span class="nn">threading</span>
 <span class="kn">import</span> <span class="nn">logging</span>
@@ -185,6 +188,16 @@
 <span class="n">_reply_msg</span> <span class="o">=</span> <span class="n">backwards</span><span class="o">.</span><span class="n">unicode2bytes</span><span class="p">(</span><span class="s1">&#39;CIS_REPLY&#39;</span><span class="p">)</span>
 <span class="n">_purge_msg</span> <span class="o">=</span> <span class="n">backwards</span><span class="o">.</span><span class="n">unicode2bytes</span><span class="p">(</span><span class="s1">&#39;CIS_PURGE&#39;</span><span class="p">)</span>
 <span class="n">_global_context</span> <span class="o">=</span> <span class="n">zmq</span><span class="o">.</span><span class="n">Context</span><span class="o">.</span><span class="n">instance</span><span class="p">()</span>
+
+
+<div class="viewcode-block" id="get_ipc_host"><a class="viewcode-back" href="../../../cis_interface.communication.html#cis_interface.communication.ZMQComm.get_ipc_host">[docs]</a><span class="k">def</span> <span class="nf">get_ipc_host</span><span class="p">():</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get an IPC host using uuid.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str: File path for IPC transport created using uuid.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tempfile</span><span class="o">.</span><span class="n">gettempdir</span><span class="p">(),</span> <span class="nb">str</span><span class="p">(</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">())</span> <span class="o">+</span> <span class="s1">&#39;.ipc&#39;</span><span class="p">)</span></div>
 
         
 <div class="viewcode-block" id="get_socket_type_mate"><a class="viewcode-back" href="../../../cis_interface.communication.html#cis_interface.communication.ZMQComm.get_socket_type_mate">[docs]</a><span class="k">def</span> <span class="nf">get_socket_type_mate</span><span class="p">(</span><span class="n">t_in</span><span class="p">):</span>
@@ -274,7 +287,7 @@
     <span class="k">return</span> <span class="n">out</span></div>
 
 
-<div class="viewcode-block" id="bind_socket"><a class="viewcode-back" href="../../../cis_interface.communication.html#cis_interface.communication.ZMQComm.bind_socket">[docs]</a><span class="k">def</span> <span class="nf">bind_socket</span><span class="p">(</span><span class="n">socket</span><span class="p">,</span> <span class="n">address</span><span class="p">,</span> <span class="n">retry_timeout</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
+<div class="viewcode-block" id="bind_socket"><a class="viewcode-back" href="../../../cis_interface.communication.html#cis_interface.communication.ZMQComm.bind_socket">[docs]</a><span class="k">def</span> <span class="nf">bind_socket</span><span class="p">(</span><span class="n">socket</span><span class="p">,</span> <span class="n">address</span><span class="p">,</span> <span class="n">retry_timeout</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">nretry</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Bind a socket to an address, getting a random port as necessary.</span>
 
 <span class="sd">    Args:</span>
@@ -283,7 +296,9 @@
 <span class="sd">        retry_timeout (float, optional): Time (in seconds) that should be</span>
 <span class="sd">            waited before retrying to bind the socket to the address. If</span>
 <span class="sd">            negative, a retry will not be attempted and an error will be</span>
-<span class="sd">            raised. Defaults to -1;</span>
+<span class="sd">            raised. Defaults to -1.</span>
+<span class="sd">        nretry (int, optional): Number of times to try binding the socket to</span>
+<span class="sd">            the addresses. Defaults to 1.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        str: Address that socket was bound to, including random port if one</span>
@@ -298,14 +313,15 @@
             <span class="n">port</span> <span class="o">=</span> <span class="n">socket</span><span class="o">.</span><span class="n">bind_to_random_port</span><span class="p">(</span><span class="n">address</span><span class="p">)</span>
             <span class="n">address</span> <span class="o">+=</span> <span class="s2">&quot;:</span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">port</span>
     <span class="k">except</span> <span class="n">zmq</span><span class="o">.</span><span class="n">ZMQError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">retry_timeout</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">):</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">retry_timeout</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">nretry</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span>
             <span class="c1"># if (e.errno not in [48, 98]) or (retry_timeout &lt; 0):</span>
             <span class="c1"># print(e, e.errno)</span>
             <span class="k">raise</span> <span class="n">e</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Retrying bind in </span><span class="si">%f</span><span class="s2"> s&quot;</span><span class="p">,</span> <span class="n">retry_timeout</span><span class="p">)</span>
             <span class="n">tools</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">retry_timeout</span><span class="p">)</span>
-            <span class="n">address</span> <span class="o">=</span> <span class="n">bind_socket</span><span class="p">(</span><span class="n">socket</span><span class="p">,</span> <span class="n">address</span><span class="p">)</span>
+            <span class="n">address</span> <span class="o">=</span> <span class="n">bind_socket</span><span class="p">(</span><span class="n">socket</span><span class="p">,</span> <span class="n">address</span><span class="p">,</span> <span class="n">nretry</span><span class="o">=</span><span class="n">nretry</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span>
+                                  <span class="n">retry_timeout</span><span class="o">=</span><span class="n">retry_timeout</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">address</span></div>
 
     
@@ -323,7 +339,9 @@
 <span class="sd">        retry_timeout (float, optional): Time (in seconds) that should be</span>
 <span class="sd">            waited before retrying to bind the sockets to the addresses. If</span>
 <span class="sd">            negative, a retry will not be attempted and an error will be</span>
-<span class="sd">            raised. Defaults to -1;</span>
+<span class="sd">            raised. Defaults to -1.</span>
+<span class="sd">        nretry (int, optional): Number of times to try binding the sockets to</span>
+<span class="sd">            the addresses. Defaults to 1.</span>
 <span class="sd">        **kwargs: Additional keyword arguments are passed to the parent class.</span>
 
 <span class="sd">    Attributes:</span>
@@ -335,7 +353,8 @@
 <span class="sd">        cli_count (int): Number of clients that have connected to this proxy.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">srv_address</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">retry_timeout</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">srv_address</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">retry_timeout</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
+                 <span class="n">nretry</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="c1"># Get parameters</span>
         <span class="n">srv_param</span> <span class="o">=</span> <span class="n">parse_address</span><span class="p">(</span><span class="n">srv_address</span><span class="p">)</span>
         <span class="n">cli_param</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
@@ -344,10 +363,11 @@
         <span class="n">context</span> <span class="o">=</span> <span class="n">context</span> <span class="ow">or</span> <span class="n">_global_context</span>
         <span class="c1"># Create new address for the frontend</span>
         <span class="k">if</span> <span class="n">cli_param</span><span class="p">[</span><span class="s1">&#39;protocol&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;inproc&#39;</span><span class="p">,</span> <span class="s1">&#39;ipc&#39;</span><span class="p">]:</span>
-            <span class="n">cli_param</span><span class="p">[</span><span class="s1">&#39;host&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">())</span>
+            <span class="n">cli_param</span><span class="p">[</span><span class="s1">&#39;host&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">get_ipc_host</span><span class="p">()</span>
         <span class="n">cli_address</span> <span class="o">=</span> <span class="n">format_address</span><span class="p">(</span><span class="n">cli_param</span><span class="p">[</span><span class="s1">&#39;protocol&#39;</span><span class="p">],</span> <span class="n">cli_param</span><span class="p">[</span><span class="s1">&#39;host&#39;</span><span class="p">])</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">cli_socket</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="n">socket</span><span class="p">(</span><span class="n">zmq</span><span class="o">.</span><span class="n">ROUTER</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">cli_address</span> <span class="o">=</span> <span class="n">bind_socket</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cli_socket</span><span class="p">,</span> <span class="n">cli_address</span><span class="p">,</span>
+                                       <span class="n">nretry</span><span class="o">=</span><span class="n">nretry</span><span class="p">,</span>
                                        <span class="n">retry_timeout</span><span class="o">=</span><span class="n">retry_timeout</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">cli_socket</span><span class="o">.</span><span class="n">setsockopt</span><span class="p">(</span><span class="n">zmq</span><span class="o">.</span><span class="n">LINGER</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
         <span class="n">CommBase</span><span class="o">.</span><span class="n">register_comm</span><span class="p">(</span><span class="s1">&#39;ZMQComm&#39;</span><span class="p">,</span> <span class="s1">&#39;ROUTER_server_&#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">cli_address</span><span class="p">,</span>
@@ -356,6 +376,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">srv_socket</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="n">socket</span><span class="p">(</span><span class="n">zmq</span><span class="o">.</span><span class="n">DEALER</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">srv_socket</span><span class="o">.</span><span class="n">setsockopt</span><span class="p">(</span><span class="n">zmq</span><span class="o">.</span><span class="n">LINGER</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">srv_address</span> <span class="o">=</span> <span class="n">bind_socket</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">srv_socket</span><span class="p">,</span> <span class="n">srv_address</span><span class="p">,</span>
+                                       <span class="n">nretry</span><span class="o">=</span><span class="n">nretry</span><span class="p">,</span>
                                        <span class="n">retry_timeout</span><span class="o">=</span><span class="n">retry_timeout</span><span class="p">)</span>
         <span class="n">CommBase</span><span class="o">.</span><span class="n">register_comm</span><span class="p">(</span><span class="s1">&#39;ZMQComm&#39;</span><span class="p">,</span> <span class="s1">&#39;DEALER_server_&#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">srv_address</span><span class="p">,</span>
                                <span class="bp">self</span><span class="o">.</span><span class="n">srv_socket</span><span class="p">)</span>
@@ -526,7 +547,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_n_reply_recv</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_server_class</span> <span class="o">=</span> <span class="n">ZMQProxy</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_server_kwargs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">context</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">,</span>
-                                   <span class="n">retry_timeout</span><span class="o">=</span><span class="mf">0.01</span><span class="p">)</span>  <span class="c1"># 4 * self.sleeptime)</span>
+                                   <span class="n">nretry</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">retry_timeout</span><span class="o">=</span><span class="mf">2.0</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">sleeptime</span><span class="p">)</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">ZMQComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">_init_before_open</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
 <div class="viewcode-block" id="ZMQComm.printStatus"><a class="viewcode-back" href="../../../cis_interface.communication.html#cis_interface.communication.ZMQComm.ZMQComm.printStatus">[docs]</a>    <span class="k">def</span> <span class="nf">printStatus</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nindent</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
@@ -611,7 +632,7 @@
             <span class="n">protocol</span> <span class="o">=</span> <span class="n">_default_protocol</span>
         <span class="k">if</span> <span class="n">host</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">protocol</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;inproc&#39;</span><span class="p">,</span> <span class="s1">&#39;ipc&#39;</span><span class="p">]:</span>
-                <span class="n">host</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">())</span>
+                <span class="n">host</span> <span class="o">=</span> <span class="n">get_ipc_host</span><span class="p">()</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">host</span> <span class="o">=</span> <span class="s1">&#39;localhost&#39;</span>
         <span class="k">if</span> <span class="s1">&#39;address&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
@@ -665,7 +686,8 @@
                            <span class="bp">self</span><span class="o">.</span><span class="n">socket_type_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">address</span><span class="p">)</span>
                 <span class="k">try</span><span class="p">:</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">address</span> <span class="o">=</span> <span class="n">bind_socket</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">socket</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">address</span><span class="p">,</span>
-                                               <span class="n">retry_timeout</span><span class="o">=</span><span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">sleeptime</span><span class="p">)</span>
+                                               <span class="n">retry_timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">sleeptime</span><span class="p">,</span>
+                                               <span class="n">nretry</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
                 <span class="k">except</span> <span class="n">zmq</span><span class="o">.</span><span class="n">ZMQError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
                     <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">socket_type_name</span> <span class="o">==</span> <span class="s1">&#39;PAIR&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">errno</span> <span class="o">==</span> <span class="mi">98</span><span class="p">):</span>
                         <span class="bp">self</span><span class="o">.</span><span class="n">error</span><span class="p">((</span><span class="s2">&quot;There is already a &#39;PAIR&#39; socket sending &quot;</span> <span class="o">+</span>
@@ -877,6 +899,11 @@
                 <span class="c1"># elif self._connected:</span>
                 <span class="c1">#     self.disconnect()</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">socket</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="n">linger</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+                <span class="c1"># if self.protocol == &#39;ipc&#39;:</span>
+                <span class="c1">#     print(self.host, os.path.isfile(self.host))</span>
+                <span class="c1"># if (self.direction == &#39;recv&#39;) and (self.protocol == &#39;ipc&#39;):</span>
+                <span class="c1">#     if os.path.isfile(self.host):</span>
+                <span class="c1">#         os.remove(self.host)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">unregister_comm</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">registry_key</span><span class="p">)</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">ZMQComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">_close_direct</span><span class="p">(</span><span class="n">linger</span><span class="o">=</span><span class="n">linger</span><span class="p">)</span>
 
@@ -1260,7 +1287,7 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../../../',
-            VERSION:'0.2.0',
+            VERSION:'0.3.0',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',

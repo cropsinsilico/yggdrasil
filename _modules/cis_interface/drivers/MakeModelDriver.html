@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>cis_interface.drivers.MakeModelDriver &mdash; cis_interface 0.2.0 documentation</title>
+  <title>cis_interface.drivers.MakeModelDriver &mdash; cis_interface 0.3.0 documentation</title>
   
 
   
@@ -57,7 +57,7 @@
             
             
               <div class="version">
-                0.2
+                0.3
               </div>
             
           
@@ -97,6 +97,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../model_drivers.html">Model Drivers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../code.html">Code</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../examples/examples_toc.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../release.html">Release Steps</a></li>
 </ul>
 
             
@@ -184,7 +185,7 @@
     <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;CISLDFLAGS&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">linker_flags</span> <span class="o">+</span> <span class="n">_linker_flags</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="MakeModelDriver"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.MakeModelDriver.MakeModelDriver">[docs]</a><span class="nd">@register_component</span>
+<div class="viewcode-block" id="MakeModelDriver"><a class="viewcode-back" href="../../../model_drivers.html#cis_interface.drivers.MakeModelDriver.MakeModelDriver">[docs]</a><span class="nd">@register_component</span>
 <span class="k">class</span> <span class="nc">MakeModelDriver</span><span class="p">(</span><span class="n">ModelDriver</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Class for running make file compiled drivers. Before running the</span>
 <span class="sd">    make command, the necessary compiler &amp; linker flags for the interface&#39;s</span>
@@ -257,7 +258,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Making target.&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">make_target</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="p">)</span>
 
-<div class="viewcode-block" id="MakeModelDriver.make_target"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.MakeModelDriver.MakeModelDriver.make_target">[docs]</a>    <span class="k">def</span> <span class="nf">make_target</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="p">):</span>
+<div class="viewcode-block" id="MakeModelDriver.make_target"><a class="viewcode-back" href="../../../model_drivers.html#cis_interface.drivers.MakeModelDriver.MakeModelDriver.make_target">[docs]</a>    <span class="k">def</span> <span class="nf">make_target</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Run the make command to make the target.</span>
 
 <span class="sd">        Args:</span>
@@ -287,7 +288,7 @@
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Make failed with code </span><span class="si">%d</span><span class="s2">.&quot;</span> <span class="o">%</span> <span class="n">exit_code</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Make complete&#39;</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="MakeModelDriver.cleanup"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.MakeModelDriver.MakeModelDriver.cleanup">[docs]</a>    <span class="k">def</span> <span class="nf">cleanup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="MakeModelDriver.cleanup"><a class="viewcode-back" href="../../../model_drivers.html#cis_interface.drivers.MakeModelDriver.MakeModelDriver.cleanup">[docs]</a>    <span class="k">def</span> <span class="nf">cleanup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Remove compile executable.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">target_file</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">target_file</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">make_target</span><span class="p">(</span><span class="s1">&#39;clean&#39;</span><span class="p">)</span>
@@ -326,7 +327,7 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../../../',
-            VERSION:'0.2.0',
+            VERSION:'0.3.0',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',

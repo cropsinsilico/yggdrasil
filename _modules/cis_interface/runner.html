@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>cis_interface.runner &mdash; cis_interface 0.2.0 documentation</title>
+  <title>cis_interface.runner &mdash; cis_interface 0.3.0 documentation</title>
   
 
   
@@ -57,7 +57,7 @@
             
             
               <div class="version">
-                0.2
+                0.3
               </div>
             
           
@@ -97,6 +97,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../model_drivers.html">Model Drivers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../code.html">Code</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../examples/examples_toc.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../release.html">Release Steps</a></li>
 </ul>
 
             
@@ -492,11 +493,20 @@
                       <span class="bp">self</span><span class="o">.</span><span class="n">host</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">namespace</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">rank</span><span class="p">))</span>
         <span class="n">driver</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;name&#39;</span><span class="p">)</span>
         <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Start connections</span>
             <span class="k">for</span> <span class="n">driver</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">io_drivers</span><span class="p">():</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Starting driver </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">driver</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">])</span>
                 <span class="n">d</span> <span class="o">=</span> <span class="n">driver</span><span class="p">[</span><span class="s1">&#39;instance&#39;</span><span class="p">]</span>
                 <span class="k">if</span> <span class="ow">not</span> <span class="n">d</span><span class="o">.</span><span class="n">was_started</span><span class="p">:</span>
                     <span class="n">d</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+            <span class="c1"># Ensure connections in loop</span>
+            <span class="k">for</span> <span class="n">driver</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">io_drivers</span><span class="p">():</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Checking driver </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">driver</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">])</span>
+                <span class="n">d</span> <span class="o">=</span> <span class="n">driver</span><span class="p">[</span><span class="s1">&#39;instance&#39;</span><span class="p">]</span>
+                <span class="n">d</span><span class="o">.</span><span class="n">wait_for_loop</span><span class="p">()</span>
+                <span class="k">assert</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">was_loop</span><span class="p">)</span>
+                <span class="k">assert</span><span class="p">(</span><span class="ow">not</span> <span class="n">d</span><span class="o">.</span><span class="n">errors</span><span class="p">)</span>
+            <span class="c1"># Start models</span>
             <span class="c1"># self.sleep(1)  # on windows comms can take a while start</span>
             <span class="k">for</span> <span class="n">driver</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">modeldrivers</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Starting driver </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">driver</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">])</span>
@@ -532,9 +542,11 @@
                     <span class="k">if</span> <span class="ow">not</span> <span class="n">d</span><span class="o">.</span><span class="n">errors</span><span class="p">:</span>
                         <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> finished running.&quot;</span><span class="p">,</span> <span class="n">drv</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">])</span>
                         <span class="bp">self</span><span class="o">.</span><span class="n">do_model_exits</span><span class="p">(</span><span class="n">drv</span><span class="p">)</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> completed model exits.&quot;</span><span class="p">,</span> <span class="n">drv</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">])</span>
                         <span class="bp">self</span><span class="o">.</span><span class="n">do_client_exits</span><span class="p">(</span><span class="n">drv</span><span class="p">)</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> completed client exits.&quot;</span><span class="p">,</span> <span class="n">drv</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">])</span>
                         <span class="n">running</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">drv</span><span class="p">)</span>
-                        <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> completed model exits.&quot;</span><span class="p">,</span> <span class="n">drv</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">])</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> finished exiting.&quot;</span><span class="p">,</span> <span class="n">drv</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">])</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> still running&#39;</span><span class="p">,</span> <span class="n">drv</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">])</span>
             <span class="n">dead</span> <span class="o">=</span> <span class="p">[]</span>
@@ -553,6 +565,22 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">terminate</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Returning&#39;</span><span class="p">)</span></div>
 
+<div class="viewcode-block" id="CisRunner.do_model_exits"><a class="viewcode-back" href="../../code_python.html#cis_interface.runner.CisRunner.do_model_exits">[docs]</a>    <span class="k">def</span> <span class="nf">do_model_exits</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Perform exits for IO drivers associated with a model.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            model (dict): Dictionary of model parameters including any</span>
+<span class="sd">                associated IO drivers.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">drv</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">io_drivers</span><span class="p">(</span><span class="n">model</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]):</span>
+            <span class="n">drv</span><span class="p">[</span><span class="s1">&#39;models&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">model</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">])</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">drv</span><span class="p">[</span><span class="s1">&#39;instance&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">is_alive</span><span class="p">():</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">drv</span><span class="p">[</span><span class="s1">&#39;models&#39;</span><span class="p">])</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;on_model_exit </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">drv</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">])</span>
+                <span class="n">drv</span><span class="p">[</span><span class="s1">&#39;instance&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">on_model_exit</span><span class="p">()</span></div>
+    
 <div class="viewcode-block" id="CisRunner.do_client_exits"><a class="viewcode-back" href="../../code_python.html#cis_interface.runner.CisRunner.do_client_exits">[docs]</a>    <span class="k">def</span> <span class="nf">do_client_exits</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Perform exits for IO drivers associated with a client model.</span>
 
@@ -571,22 +599,6 @@
                 <span class="n">iod</span><span class="p">[</span><span class="s1">&#39;instance&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">on_client_exit</span><span class="p">()</span>
                 <span class="n">srv</span><span class="p">[</span><span class="s1">&#39;instance&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="CisRunner.do_model_exits"><a class="viewcode-back" href="../../code_python.html#cis_interface.runner.CisRunner.do_model_exits">[docs]</a>    <span class="k">def</span> <span class="nf">do_model_exits</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Perform exits for IO drivers associated with a model.</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            model (dict): Dictionary of model parameters including any</span>
-<span class="sd">                associated IO drivers.</span>
-
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">for</span> <span class="n">drv</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">io_drivers</span><span class="p">(</span><span class="n">model</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]):</span>
-            <span class="n">drv</span><span class="p">[</span><span class="s1">&#39;models&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">model</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">])</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">drv</span><span class="p">[</span><span class="s1">&#39;instance&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">is_alive</span><span class="p">():</span>
-                <span class="k">continue</span>
-            <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">drv</span><span class="p">[</span><span class="s1">&#39;models&#39;</span><span class="p">])</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;on_model_exit </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">drv</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">])</span>
-                <span class="n">drv</span><span class="p">[</span><span class="s1">&#39;instance&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">on_model_exit</span><span class="p">()</span></div>
-    
 <div class="viewcode-block" id="CisRunner.terminate"><a class="viewcode-back" href="../../code_python.html#cis_interface.runner.CisRunner.terminate">[docs]</a>    <span class="k">def</span> <span class="nf">terminate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Immediately stop all drivers, beginning with IO drivers.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
@@ -716,7 +728,7 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../../',
-            VERSION:'0.2.0',
+            VERSION:'0.3.0',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',

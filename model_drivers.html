@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Model Drivers &mdash; cis_interface 0.2.0 documentation</title>
+  <title>Model Drivers &mdash; cis_interface 0.3.0 documentation</title>
   
 
   
@@ -59,7 +59,7 @@
             
             
               <div class="version">
-                0.2
+                0.3
               </div>
             
           
@@ -99,6 +99,7 @@
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Model Drivers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="code.html">Code</a></li>
 <li class="toctree-l1"><a class="reference internal" href="examples/examples_toc.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="release.html">Release Steps</a></li>
 </ul>
 
             
@@ -528,6 +529,221 @@ list.</td>
 
 </dd></dl>
 
+<dl class="class">
+<dt id="cis_interface.drivers.MakeModelDriver.MakeModelDriver">
+<em class="property">class </em><code class="descclassname">cis_interface.drivers.MakeModelDriver.</code><code class="descname">MakeModelDriver</code><span class="sig-paren">(</span><em>name</em>, <em>args</em>, <em>make_command=None</em>, <em>makedir=None</em>, <em>makefile=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/MakeModelDriver.html#MakeModelDriver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.MakeModelDriver.MakeModelDriver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class for running make file compiled drivers. Before running the
+make command, the necessary compiler &amp; linker flags for the interface’s
+C/C++ library are stored the environment variables CISCCFLAGS and CISLDFLAGS
+respectively. These should be used in the make file to correctly compile
+with the interface’s C/C++ libraries.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Driver name.</li>
+<li><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a>) – Executable that should be created (make target) and
+any arguments for the executable.</li>
+<li><strong>make_command</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – Command that should be used for make.
+Defaults to ‘make’ on linux/osx and ‘nmake’ on windows.</li>
+<li><strong>makefile</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – Path to make file either relative to makedir
+or absolute. Defaults to Makefile.</li>
+<li><strong>makedir</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – Directory where make should be invoked from
+if it is not the same as the directory containing the makefile.
+Defaults to directory containing makefile if an absolute path is
+provided, otherwise self.working_dir.</li>
+<li><strong>**kwargs</strong> – Additional keyword arguments are passed to parent class.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="cis_interface.drivers.MakeModelDriver.MakeModelDriver.compiled">
+<code class="descname">compiled</code><a class="headerlink" href="#cis_interface.drivers.MakeModelDriver.MakeModelDriver.compiled" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>bool</em> – True if the compilation was successful, False otherwise.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.drivers.MakeModelDriver.MakeModelDriver.target">
+<code class="descname">target</code><a class="headerlink" href="#cis_interface.drivers.MakeModelDriver.MakeModelDriver.target" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str</em> – Name of executable that should be created and called.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.drivers.MakeModelDriver.MakeModelDriver.make_command">
+<code class="descname">make_command</code><a class="headerlink" href="#cis_interface.drivers.MakeModelDriver.MakeModelDriver.make_command" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str</em> – Command that should be used for make.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.drivers.MakeModelDriver.MakeModelDriver.makedir">
+<code class="descname">makedir</code><a class="headerlink" href="#cis_interface.drivers.MakeModelDriver.MakeModelDriver.makedir" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str</em> – Directory where make should be invoked from.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.drivers.MakeModelDriver.MakeModelDriver.makefile">
+<code class="descname">makefile</code><a class="headerlink" href="#cis_interface.drivers.MakeModelDriver.MakeModelDriver.makefile" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str</em> – Path to make file either relative to makedir or absolute.</p>
+</dd></dl>
+
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#RuntimeError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">RuntimeError</span></code></a> – If neither the IPC or ZMQ C libraries are available.</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="cis_interface.drivers.MakeModelDriver.MakeModelDriver.cleanup">
+<code class="descname">cleanup</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/MakeModelDriver.html#MakeModelDriver.cleanup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.MakeModelDriver.MakeModelDriver.cleanup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove compile executable.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.drivers.MakeModelDriver.MakeModelDriver.make_target">
+<code class="descname">make_target</code><span class="sig-paren">(</span><em>target</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/MakeModelDriver.html#MakeModelDriver.make_target"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.MakeModelDriver.MakeModelDriver.make_target" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run the make command to make the target.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>target</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Target that should be made.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#RuntimeError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">RuntimeError</span></code></a> – If there is an error in running the make.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.drivers.CMakeModelDriver.CMakeModelDriver">
+<em class="property">class </em><code class="descclassname">cis_interface.drivers.CMakeModelDriver.</code><code class="descname">CMakeModelDriver</code><span class="sig-paren">(</span><em>name</em>, <em>args</em>, <em>sourcedir=None</em>, <em>builddir=None</em>, <em>cmakeargs=None</em>, <em>preserve_cache=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/CMakeModelDriver.html#CMakeModelDriver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.CMakeModelDriver.CMakeModelDriver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class for running cmake compiled drivers. Before running the
+cmake command, the cmake commands for setting the necessary compiler &amp; linker
+flags for the interface’s C/C++ library are written to a file called
+‘cis_cmake.txt’ that should be included in the CMakeLists.txt file (after
+the target executable has been added).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Driver name.</li>
+<li><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a>) – Executable that should be created (cmake target) and
+any arguments for the executable.</li>
+<li><strong>sourcedir</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – Source directory to call cmake on. If not
+provided it is set to self.working_dir. This should be the directory
+containing the CMakeLists.txt file. It can be relative to
+self.working_dir or absolute.</li>
+<li><strong>builddir</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – Directory where the build should be saved.
+Defaults to &lt;sourcedir&gt;/build. It can be relative to self.working_dir
+or absolute.</li>
+<li><strong>cmakeargs</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>, </em><em>optional</em>) – Arguments that should be passed to cmake.
+Defaults to [].</li>
+<li><strong>preserve_cache</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) – If True the cmake cache will be kept
+following the run, otherwise all files created by cmake will be
+cleaned up. Defaults to False.</li>
+<li><strong>**kwargs</strong> – Additional keyword arguments are passed to parent class.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="cis_interface.drivers.CMakeModelDriver.CMakeModelDriver.compiled">
+<code class="descname">compiled</code><a class="headerlink" href="#cis_interface.drivers.CMakeModelDriver.CMakeModelDriver.compiled" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>bool</em> – True if the compilation was successful, False otherwise.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.drivers.CMakeModelDriver.CMakeModelDriver.target">
+<code class="descname">target</code><a class="headerlink" href="#cis_interface.drivers.CMakeModelDriver.CMakeModelDriver.target" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str</em> – Name of executable that should be created and called.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.drivers.CMakeModelDriver.CMakeModelDriver.sourcedir">
+<code class="descname">sourcedir</code><a class="headerlink" href="#cis_interface.drivers.CMakeModelDriver.CMakeModelDriver.sourcedir" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str</em> – Source directory to call cmake on.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.drivers.CMakeModelDriver.CMakeModelDriver.builddir">
+<code class="descname">builddir</code><a class="headerlink" href="#cis_interface.drivers.CMakeModelDriver.CMakeModelDriver.builddir" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str</em> – Directory where the build should be saved.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.drivers.CMakeModelDriver.CMakeModelDriver.cmakeargs">
+<code class="descname">cmakeargs</code><a class="headerlink" href="#cis_interface.drivers.CMakeModelDriver.CMakeModelDriver.cmakeargs" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>list</em> – Arguments that should be passed to cmake.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.drivers.CMakeModelDriver.CMakeModelDriver.preserve_cache">
+<code class="descname">preserve_cache</code><a class="headerlink" href="#cis_interface.drivers.CMakeModelDriver.CMakeModelDriver.preserve_cache" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>bool</em> – If True the cmake cache will be kept following the
+run, otherwise all files created by cmake will be cleaned up.</p>
+</dd></dl>
+
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#RuntimeError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">RuntimeError</span></code></a> – If neither the IPC or ZMQ C libraries are available.</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="cis_interface.drivers.CMakeModelDriver.CMakeModelDriver.cleanup">
+<code class="descname">cleanup</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/CMakeModelDriver.html#CMakeModelDriver.cleanup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.CMakeModelDriver.CMakeModelDriver.cleanup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove compile executable.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.drivers.CMakeModelDriver.CMakeModelDriver.run_cmake">
+<code class="descname">run_cmake</code><span class="sig-paren">(</span><em>target=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/CMakeModelDriver.html#CMakeModelDriver.run_cmake"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.CMakeModelDriver.CMakeModelDriver.run_cmake" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run the cmake command on the source.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>target</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – Target to build.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#RuntimeError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">RuntimeError</span></code></a> – If there is an error in running cmake.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.drivers.LPyModelDriver.LPyModelDriver">
+<em class="property">class </em><code class="descclassname">cis_interface.drivers.LPyModelDriver.</code><code class="descname">LPyModelDriver</code><span class="sig-paren">(</span><em>name</em>, <em>args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/LPyModelDriver.html#LPyModelDriver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.LPyModelDriver.LPyModelDriver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class for running LPy models.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Driver name.</li>
+<li><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The LPy l-system file.</li>
+<li><strong>**kwargs</strong> – Additional keyword arguments are passed to parent class’s
+__init__ method.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 </div>
 
 
@@ -572,7 +788,7 @@ list.</td>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'0.2.0',
+            VERSION:'0.3.0',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',

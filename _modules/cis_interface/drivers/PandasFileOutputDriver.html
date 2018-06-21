@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>cis_interface.drivers.PandasFileOutputDriver &mdash; cis_interface 0.2.0 documentation</title>
+  <title>cis_interface.drivers.PandasFileOutputDriver &mdash; cis_interface 0.3.0 documentation</title>
   
 
   
@@ -57,7 +57,7 @@
             
             
               <div class="version">
-                0.2
+                0.3
               </div>
             
           
@@ -97,6 +97,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../model_drivers.html">Model Drivers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../code.html">Code</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../examples/examples_toc.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../release.html">Release Steps</a></li>
 </ul>
 
             
@@ -167,7 +168,7 @@
 <span class="kn">from</span> <span class="nn">cis_interface.schema</span> <span class="k">import</span> <span class="n">register_component</span>
 
 
-<div class="viewcode-block" id="PandasFileOutputDriver"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.PandasFileOutputDriver.PandasFileOutputDriver">[docs]</a><span class="nd">@register_component</span>
+<div class="viewcode-block" id="PandasFileOutputDriver"><a class="viewcode-back" href="../../../io_drivers.html#cis_interface.drivers.PandasFileOutputDriver.PandasFileOutputDriver">[docs]</a><span class="nd">@register_component</span>
 <span class="k">class</span> <span class="nc">PandasFileOutputDriver</span><span class="p">(</span><span class="n">FileOutputDriver</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Class to handle output of received messages to a Pandas csv file.</span>
 
@@ -188,7 +189,7 @@
         <span class="nb">super</span><span class="p">(</span><span class="n">PandasFileOutputDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;(</span><span class="si">%s</span><span class="s1">)&#39;</span><span class="p">,</span> <span class="n">args</span><span class="p">)</span>
 
-<div class="viewcode-block" id="PandasFileOutputDriver.update_serializer"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.PandasFileOutputDriver.PandasFileOutputDriver.update_serializer">[docs]</a>    <span class="k">def</span> <span class="nf">update_serializer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
+<div class="viewcode-block" id="PandasFileOutputDriver.update_serializer"><a class="viewcode-back" href="../../../io_drivers.html#cis_interface.drivers.PandasFileOutputDriver.PandasFileOutputDriver.update_serializer">[docs]</a>    <span class="k">def</span> <span class="nf">update_serializer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Update the serializer for the output comm based on input.&quot;&quot;&quot;</span>
         <span class="n">sinfo</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ocomm</span><span class="o">.</span><span class="n">serializer</span><span class="o">.</span><span class="n">serializer_info</span>
         <span class="n">sinfo</span><span class="p">[</span><span class="s1">&#39;stype&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">6</span>  <span class="c1"># Output as pandas csv</span>
@@ -230,7 +231,7 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../../../',
-            VERSION:'0.2.0',
+            VERSION:'0.3.0',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',

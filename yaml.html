@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>YAML Files &mdash; cis_interface 0.2.0 documentation</title>
+  <title>YAML Files &mdash; cis_interface 0.3.0 documentation</title>
   
 
   
@@ -59,7 +59,7 @@
             
             
               <div class="version">
-                0.2
+                0.3
               </div>
             
           
@@ -94,11 +94,13 @@
 <li class="toctree-l1 current"><a class="current reference internal" href="#">YAML Files</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#model-options">Model Options</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#communication-options">Communication Options</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#driver-method">Driver Method</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#connection-method">Connection Method</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#connection-options">Connection Options</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#connection-options">Connection Options</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#driver-method">Driver Method</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="config.html">Configuration Files</a></li>
@@ -108,6 +110,7 @@
 <li class="toctree-l1"><a class="reference internal" href="model_drivers.html">Model Drivers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="code.html">Code</a></li>
 <li class="toctree-l1"><a class="reference internal" href="examples/examples_toc.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="release.html">Release Steps</a></li>
 </ul>
 
             
@@ -195,17 +198,17 @@ or <code class="docutils literal notranslate"><span class="pre">models:</span></
 be run. The value for this key can be a single model entry:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">models</span><span class="p">:</span>
   <span class="n">name</span><span class="p">:</span> <span class="n">modelA</span>
-  <span class="n">driver</span><span class="p">:</span> <span class="n">PythonModelDriver</span>
+  <span class="n">language</span><span class="p">:</span> <span class="n">python</span>
   <span class="n">args</span><span class="p">:</span> <span class="o">./</span><span class="n">src</span><span class="o">/</span><span class="n">gs_lesson4_modelA</span><span class="o">.</span><span class="n">py</span>
 </pre></div>
 </div>
 <p>or a sequence of model entries:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">models</span><span class="p">:</span>
   <span class="o">-</span> <span class="n">name</span><span class="p">:</span> <span class="n">modelA</span>
-    <span class="n">driver</span><span class="p">:</span> <span class="n">PythonModelDriver</span>
+    <span class="n">language</span><span class="p">:</span> <span class="n">python</span>
     <span class="n">args</span><span class="p">:</span> <span class="o">./</span><span class="n">src</span><span class="o">/</span><span class="n">gs_lesson4_modelA</span><span class="o">.</span><span class="n">py</span>
   <span class="o">-</span> <span class="n">name</span><span class="p">:</span> <span class="n">modelB</span>
-    <span class="n">driver</span><span class="p">:</span> <span class="n">GCCModelDriver</span>
+    <span class="n">language</span><span class="p">:</span> <span class="n">c</span>
     <span class="n">args</span><span class="p">:</span> <span class="o">./</span><span class="n">src</span><span class="o">/</span><span class="n">gs_lesson4_modelB</span><span class="o">.</span><span class="n">c</span>
 </pre></div>
 </div>
@@ -213,36 +216,62 @@ be run. The value for this key can be a single model entry:</p>
 <table border="1" class="docutils">
 <colgroup>
 <col width="12%" />
-<col width="88%" />
+<col width="16%" />
+<col width="72%" />
 </colgroup>
 <thead valign="bottom">
 <tr class="row-odd"><th class="head">Key</th>
-<th class="head">Description</th>
+<th class="head" colspan="2">Description</th>
 </tr>
 </thead>
 <tbody valign="top">
 <tr class="row-even"><td>name</td>
-<td>Unique name used to identify the model. This will be used to
+<td colspan="2">Unique name used to identify the model. This will be used to
 report errors associated with the model.</td>
 </tr>
-<tr class="row-odd"><td>driver</td>
-<td>The name of the driver class that should be used to run the model.
-The list of available drivers can be found
-<a class="reference internal" href="model_drivers.html#model-drivers-rst"><span class="std std-ref">here</span></a>.</td>
+<tr class="row-odd"><td rowspan="10">language</td>
+<td colspan="2">The language that the model is written in. Valid values include:</td>
 </tr>
-<tr class="row-even"><td>args</td>
-<td>The full path to the file containing the model program that will
+<tr class="row-even"><td><strong>Value</strong></td>
+<td><strong>Description</strong></td>
+</tr>
+<tr class="row-odd"><td>executable</td>
+<td>The model is a pre-compiled executable.</td>
+</tr>
+<tr class="row-even"><td>python</td>
+<td>The model is written in Python.</td>
+</tr>
+<tr class="row-odd"><td>matlab</td>
+<td>The model is written in Matlab.</td>
+</tr>
+<tr class="row-even"><td>c</td>
+<td>The model is written in C.</td>
+</tr>
+<tr class="row-odd"><td>c++/c</td>
+<td>The model is written in C++.</td>
+</tr>
+<tr class="row-even"><td>make</td>
+<td>The model is written in C/C++ and has a Makefile.</td>
+</tr>
+<tr class="row-odd"><td>cmake</td>
+<td>The model is written in C/C++ and has a CMakeLists.txt</td>
+</tr>
+<tr class="row-even"><td>lpy</td>
+<td>The model is an LPy lsystem model.</td>
+</tr>
+<tr class="row-odd"><td>args</td>
+<td colspan="2">The full path to the file containing the model program that will
 be run by the driver or a list starting with the program file and
 including any arguments that should be passed as input to the
 program.</td>
 </tr>
-<tr class="row-odd"><td>inputs</td>
-<td>A mapping object containing the entry for a model input channel
+<tr class="row-even"><td>inputs</td>
+<td colspan="2">A mapping object containing the entry for a model input channel
 or a list of input channel entries. If the model does not get
 input from another model, this may be ommitted.</td>
 </tr>
-<tr class="row-even"><td>outputs</td>
-<td>A mapping object containing the entry for a model output channel
+<tr class="row-odd"><td>outputs</td>
+<td colspan="2">A mapping object containing the entry for a model output channel
 or a list of output channel entries. If the model does not output
 to another model, this may be ommitted.</td>
 </tr>
@@ -277,15 +306,142 @@ channel created for each server the model is a client of.</td>
 </tr>
 </tbody>
 </table>
-<p>Any additional keys in the model entry will be passed to the model driver. A
-full description of the available model drivers and potential arguments can be
-found <a class="reference internal" href="model_drivers.html#model-drivers-rst"><span class="std std-ref">here</span></a>.</p>
 </div>
 <div class="section" id="communication-options">
 <h2>Communication Options<a class="headerlink" href="#communication-options" title="Permalink to this headline">¶</a></h2>
 <p>There are two options for specifying communication channels for the models.
-One explicitly specifying the drivers and one specifying the connections
-between communication channels.</p>
+One specifying the connections between communication channels and one
+explicitly specifying the drivers.</p>
+<div class="section" id="connection-method">
+<h3>Connection Method<a class="headerlink" href="#connection-method" title="Permalink to this headline">¶</a></h3>
+<p>To specify communication via connections, each input/output entry for the models
+need only contain a unique name for the communication channel. This can be
+specified as text:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">input</span><span class="p">:</span> <span class="n">channel_name</span>
+</pre></div>
+</div>
+<p>or a key, value mapping:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">input</span><span class="p">:</span>
+  <span class="n">name</span><span class="p">:</span> <span class="n">channel_name</span>
+</pre></div>
+</div>
+<p>The key/value mapping form should be used when other information about the
+communication channel needs to be provided (e.g. message format, field names,
+units).</p>
+<p>When using the connection format for specifying communication patterns, the
+YAML also needs to contains a <code class="docutils literal notranslate"><span class="pre">connections</span></code> key at the same level as the
+<code class="docutils literal notranslate"><span class="pre">models</span></code> key.</p>
+</div>
+</div>
+<div class="section" id="connection-options">
+<h2>Connection Options<a class="headerlink" href="#connection-options" title="Permalink to this headline">¶</a></h2>
+<p>The coordesponding value for the <code class="docutils literal notranslate"><span class="pre">connections</span></code> key should be one or more
+mapping collections with the following keys:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="24%" />
+<col width="76%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Key</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>input/input_file</td>
+<td>The channel/file that messages should be recieved from. To
+specify a model channel, this should be the name of an
+entry in a model’s <code class="docutils literal notranslate"><span class="pre">outputs</span></code> section. If this is a file,
+it should be the absolute path to the file or the relative
+path to the file from the directory containing the YAML.</td>
+</tr>
+<tr class="row-odd"><td>output/output_file</td>
+<td>The channel/file that messages recieved from the <code class="docutils literal notranslate"><span class="pre">input</span></code>
+channel/file should be sent to. If the <code class="docutils literal notranslate"><span class="pre">input</span></code> value is
+a file, the <code class="docutils literal notranslate"><span class="pre">output</span></code> value cannot be a file. To specify
+a model channel, this should be the name of an entry in a
+model’s <code class="docutils literal notranslate"><span class="pre">inputs</span></code> section.</td>
+</tr>
+</tbody>
+</table>
+<p>Connection mappings can also have the following optional keys:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="16%" />
+<col width="17%" />
+<col width="67%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Key</th>
+<th class="head" colspan="2">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>translator</td>
+<td colspan="2">One or more functions that should be used to tranlate messages
+from the connection input before passing it alone to the
+connection output. Translators should be specified as strings
+with the format “&lt;package.module&gt;:&lt;function&gt;” such that
+&lt;function&gt; can be imported from &lt;package&gt;.</td>
+</tr>
+<tr class="row-odd"><td>format_str</td>
+<td colspan="2">A C-style format string specifying how messages should be
+formatted/parsed from/to language specifying types (see
+<a class="reference internal" href="c_format_strings.html#c-style-format-strings-rst"><span class="std std-ref">C-Style Format Strings</span></a>).</td>
+</tr>
+<tr class="row-even"><td>field_names</td>
+<td colspan="2">A sequence collection of names for the fields present in the
+format string.</td>
+</tr>
+<tr class="row-odd"><td>field_units</td>
+<td colspan="2">A sequence collection of units for the fields present in the
+format string (see <a class="reference internal" href="units.html#units-rst"><span class="std std-ref">Units</span></a>).</td>
+</tr>
+<tr class="row-even"><td>as_array</td>
+<td colspan="2">True or False. If True and filetype is table, the table will
+be read in it’s entirety and passed as an array.</td>
+</tr>
+<tr class="row-odd"><td rowspan="8">filetype</td>
+<td colspan="2">Only valid for connections that direct messages from a file to
+a model input channel or from a model output channel to a file.
+Values indicate how messages should be read from the file and
+include:</td>
+</tr>
+<tr class="row-even"><td><strong>Value</strong></td>
+<td><strong>Description</strong></td>
+</tr>
+<tr class="row-odd"><td>binary</td>
+<td>The entire contents of the file are read as a
+single message. This is the default if not
+provided.</td>
+</tr>
+<tr class="row-even"><td>ascii</td>
+<td>The contents of the file are read one line at a
+time.</td>
+</tr>
+<tr class="row-odd"><td>table</td>
+<td>The file is assumed to be an ASCII table and read
+one row at a time. The format of the table is
+either read from the header or inferred from the
+table.</td>
+</tr>
+<tr class="row-even"><td>pandas</td>
+<td>The file is a table created from a Pandas data
+frame.</td>
+</tr>
+<tr class="row-odd"><td>ply</td>
+<td>The file contains a 3D structure in Ply format.</td>
+</tr>
+<tr class="row-even"><td>obj</td>
+<td>The file contains a 3D structure in Obj format.</td>
+</tr>
+</tbody>
+</table>
+<p>The connection entries are used to determine which driver should be used to
+connect communication channels/files. Any additional keys in the connection
+entry will be passed to the input/output driver that is created for the
+connection. A full description of the available input/output drivers and
+potential arguments can be found <a class="reference internal" href="io_drivers.html#io-drivers-rst"><span class="std std-ref">here</span></a>.</p>
 <div class="section" id="driver-method">
 <h3>Driver Method<a class="headerlink" href="#driver-method" title="Permalink to this headline">¶</a></h3>
 <p>In specifying communication via drivers, each input/output entry for the models
@@ -322,143 +478,6 @@ location of the YAML file.</td>
 driver. A full description of the available input/output drivers and potential
 arguments can be found <a class="reference internal" href="io_drivers.html#io-drivers-rst"><span class="std std-ref">here</span></a>.</p>
 </div>
-<div class="section" id="connection-method">
-<h3>Connection Method<a class="headerlink" href="#connection-method" title="Permalink to this headline">¶</a></h3>
-<p>To specify communication via connections, each input/output entry for the models
-need only contain a unique name for the communication channel. This can be
-specified as text:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">input</span><span class="p">:</span> <span class="n">channel_name</span>
-</pre></div>
-</div>
-<p>or a key, value mapping:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">input</span><span class="p">:</span>
-  <span class="n">name</span><span class="p">:</span> <span class="n">channel_name</span>
-</pre></div>
-</div>
-<p>The key/value mapping form should be used when other information about the
-communication channel needs to be provided (e.g. message format, field names,
-units).</p>
-<p>When using the connection format for specifying communication patterns, the
-YAML also needs to contains a <code class="docutils literal notranslate"><span class="pre">connections</span></code> key at the same level as the
-<code class="docutils literal notranslate"><span class="pre">models</span></code> key.</p>
-</div>
-</div>
-<div class="section" id="connection-options">
-<h2>Connection Options<a class="headerlink" href="#connection-options" title="Permalink to this headline">¶</a></h2>
-<p>The coordesponding value for the <code class="docutils literal notranslate"><span class="pre">connections</span></code> key should be one or more
-mapping collections with the following keys:</p>
-<table border="1" class="docutils">
-<colgroup>
-<col width="8%" />
-<col width="92%" />
-</colgroup>
-<thead valign="bottom">
-<tr class="row-odd"><th class="head">Key</th>
-<th class="head">Description</th>
-</tr>
-</thead>
-<tbody valign="top">
-<tr class="row-even"><td>input</td>
-<td>The channel/file that messages should be recieved from. To specify
-a model channel, this should be the name of an entry in a model’s
-<code class="docutils literal notranslate"><span class="pre">outputs</span></code> section. If this is a file, it should be the absolute
-path to the file or the relative path to the file from the directory
-containing the YAML.</td>
-</tr>
-<tr class="row-odd"><td>output</td>
-<td>The channel/file that messages recieved from the <code class="docutils literal notranslate"><span class="pre">input</span></code>
-channel/file should be sent to. If the <code class="docutils literal notranslate"><span class="pre">input</span></code> value is a file,
-the <code class="docutils literal notranslate"><span class="pre">output</span></code> value cannot be a file. To specify a model channel,
-this should be the name of an entry in a model’s <code class="docutils literal notranslate"><span class="pre">inputs</span></code> section.</td>
-</tr>
-</tbody>
-</table>
-<p>Connection mappings can also have the following optional keys:</p>
-<table border="1" class="docutils">
-<colgroup>
-<col width="16%" />
-<col width="17%" />
-<col width="67%" />
-</colgroup>
-<thead valign="bottom">
-<tr class="row-odd"><th class="head">Key</th>
-<th class="head" colspan="2">Description</th>
-</tr>
-</thead>
-<tbody valign="top">
-<tr class="row-even"><td>format_str</td>
-<td colspan="2">A C-style format string specifying how messages should be
-formatted/parsed from/to language specifying types (see
-<a class="reference internal" href="c_format_strings.html#c-style-format-strings-rst"><span class="std std-ref">C-Style Format Strings</span></a>).</td>
-</tr>
-<tr class="row-odd"><td>field_names</td>
-<td colspan="2">A sequence collection of names for the fields present in the
-format string.</td>
-</tr>
-<tr class="row-even"><td>field_untis</td>
-<td colspan="2">A sequence collection of units for the fields present in the
-format string (see <a class="reference internal" href="units.html#units-rst"><span class="std std-ref">Units</span></a>).</td>
-</tr>
-<tr class="row-odd"><td rowspan="6">read_meth</td>
-<td colspan="2">Only valid for connections that direct messages from a file to
-a model input channel. Values indicate how messages should be
-read from the file and include:</td>
-</tr>
-<tr class="row-even"><td><strong>Value</strong></td>
-<td><strong>Description</strong></td>
-</tr>
-<tr class="row-odd"><td>all</td>
-<td>The entire contents of the file are read as a
-single message. This is the default if not
-provided.</td>
-</tr>
-<tr class="row-even"><td>line</td>
-<td>The contents of the file are read one line at a
-time.</td>
-</tr>
-<tr class="row-odd"><td>table</td>
-<td>The file is assumed to be an ASCII table and read
-one row at a time. The format of the table is
-either read from the header or inferred from the
-table.</td>
-</tr>
-<tr class="row-even"><td>table_array</td>
-<td>The file is assumed to be an ASCII table and read
-in its entirety as an array.</td>
-</tr>
-<tr class="row-odd"><td rowspan="6">write_meth</td>
-<td colspan="2">Only valid for connections that direct messages from a model
-output channel to a file. Values indicate how messages should
-written to the file and include:</td>
-</tr>
-<tr class="row-even"><td><strong>Value</strong></td>
-<td><strong>Description</strong></td>
-</tr>
-<tr class="row-odd"><td>all</td>
-<td>The entire contents of the file are written at
-once. This is the default if not provided.</td>
-</tr>
-<tr class="row-even"><td>line</td>
-<td>The contents of the file are written one line at
-a time.</td>
-</tr>
-<tr class="row-odd"><td>table</td>
-<td>The file is assumed to be an ASCII table and is
-written one row at a time. The format of the
-table must be specified by the model in its API
-call or as a value in the connection mapping.</td>
-</tr>
-<tr class="row-even"><td>table_array</td>
-<td>The file is assumed to be an ASCII table and is
-written in its entirety as an array.</td>
-</tr>
-</tbody>
-</table>
-<p>The connection entries are used to determine which driver should be used to
-connect communication channels/files. Any additional keys in the connection
-entry will be passed to the input/output driver that is created for the
-connection. A full description of the available input/output drivers and
-potential arguments can be found <a class="reference internal" href="io_drivers.html#io-drivers-rst"><span class="std std-ref">here</span></a>.</p>
 </div>
 </div>
 
@@ -504,7 +523,7 @@ potential arguments can be found <a class="reference internal" href="io_drivers.
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'0.2.0',
+            VERSION:'0.3.0',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',

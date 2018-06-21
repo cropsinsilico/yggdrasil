@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>cis_interface package &mdash; cis_interface 0.2.0 documentation</title>
+  <title>cis_interface package &mdash; cis_interface 0.3.0 documentation</title>
   
 
   
@@ -57,7 +57,7 @@
             
             
               <div class="version">
-                0.2
+                0.3
               </div>
             
           
@@ -97,6 +97,7 @@
 <li class="toctree-l1"><a class="reference internal" href="model_drivers.html">Model Drivers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="code.html">Code</a></li>
 <li class="toctree-l1"><a class="reference internal" href="examples/examples_toc.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="release.html">Release Steps</a></li>
 </ul>
 
             
@@ -375,6 +376,12 @@ the interface library in a C or C++ program.</p>
 </tr>
 </tbody>
 </table>
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.command_line.regen_schema">
+<code class="descclassname">cis_interface.command_line.</code><code class="descname">regen_schema</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/command_line.html#regen_schema"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.command_line.regen_schema" title="Permalink to this definition">¶</a></dt>
+<dd><p>Regenerate the cis_interface schema.</p>
 </dd></dl>
 
 </div>
@@ -1950,6 +1957,12 @@ Defaults to False.</td>
 </dd></dl>
 
 <dl class="method">
+<dt id="cis_interface.tools.CisThreadLoop.set_loop_flag">
+<code class="descname">set_loop_flag</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tools.html#CisThreadLoop.set_loop_flag"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tools.CisThreadLoop.set_loop_flag" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the loop flag for the thread to True.</p>
+</dd></dl>
+
+<dl class="method">
 <dt id="cis_interface.tools.CisThreadLoop.terminate">
 <code class="descname">terminate</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tools.html#CisThreadLoop.terminate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tools.CisThreadLoop.terminate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Also set break flag.</p>
@@ -1961,10 +1974,43 @@ Defaults to False.</td>
 <dd><p>Set the break flag for the thread to False.</p>
 </dd></dl>
 
+<dl class="method">
+<dt id="cis_interface.tools.CisThreadLoop.unset_loop_flag">
+<code class="descname">unset_loop_flag</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tools.html#CisThreadLoop.unset_loop_flag"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tools.CisThreadLoop.unset_loop_flag" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the loop flag for the thread to False.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.tools.CisThreadLoop.wait_for_loop">
+<code class="descname">wait_for_loop</code><span class="sig-paren">(</span><em>timeout=None</em>, <em>key=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tools.html#CisThreadLoop.wait_for_loop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tools.CisThreadLoop.wait_for_loop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wait until thread enters loop to return using sleeps rather than
+blocking.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>timeout</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>, </em><em>optional</em>) – Maximum time that should be waited for
+the thread to enter loop. Defaults to None and is infinite.</li>
+<li><strong>key</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – Key that should be used to register the timeout.
+Defaults to None and is set based on the stack trace.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 <dl class="attribute">
 <dt id="cis_interface.tools.CisThreadLoop.was_break">
 <code class="descname">was_break</code><a class="headerlink" href="#cis_interface.tools.CisThreadLoop.was_break" title="Permalink to this definition">¶</a></dt>
 <dd><p><em>bool</em> – True if the break flag was set.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.tools.CisThreadLoop.was_loop">
+<code class="descname">was_loop</code><a class="headerlink" href="#cis_interface.tools.CisThreadLoop.was_loop" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>bool</em> – True if the thread was loop. False otherwise.</p>
 </dd></dl>
 
 </dd></dl>
@@ -2517,7 +2563,7 @@ such that they can be run simultaneously, passing input back and forth.</p>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'0.2.0',
+            VERSION:'0.3.0',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',

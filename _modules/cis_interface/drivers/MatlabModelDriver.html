@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>cis_interface.drivers.MatlabModelDriver &mdash; cis_interface 0.2.0 documentation</title>
+  <title>cis_interface.drivers.MatlabModelDriver &mdash; cis_interface 0.3.0 documentation</title>
   
 
   
@@ -57,7 +57,7 @@
             
             
               <div class="version">
-                0.2
+                0.3
               </div>
             
           
@@ -97,6 +97,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../model_drivers.html">Model Drivers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../code.html">Code</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../examples/examples_toc.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../release.html">Release Steps</a></li>
 </ul>
 
             
@@ -425,7 +426,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">print_output</span><span class="p">()</span></div></div>
 
 
-<div class="viewcode-block" id="MatlabModelDriver"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.MatlabModelDriver.MatlabModelDriver">[docs]</a><span class="nd">@register_component</span>
+<div class="viewcode-block" id="MatlabModelDriver"><a class="viewcode-back" href="../../../model_drivers.html#cis_interface.drivers.MatlabModelDriver.MatlabModelDriver">[docs]</a><span class="nd">@register_component</span>
 <span class="k">class</span> <span class="nc">MatlabModelDriver</span><span class="p">(</span><span class="n">ModelDriver</span><span class="p">):</span>  <span class="c1"># pragma: matlab</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Base class for running Matlab models.</span>
 
@@ -461,7 +462,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">mlsession</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fdir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
 
-<div class="viewcode-block" id="MatlabModelDriver.start_matlab"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.MatlabModelDriver.MatlabModelDriver.start_matlab">[docs]</a>    <span class="k">def</span> <span class="nf">start_matlab</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="MatlabModelDriver.start_matlab"><a class="viewcode-back" href="../../../model_drivers.html#cis_interface.drivers.MatlabModelDriver.MatlabModelDriver.start_matlab">[docs]</a>    <span class="k">def</span> <span class="nf">start_matlab</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Start matlab session and connect to it.&quot;&quot;&quot;</span>
         <span class="c1"># Connect to matlab, start if not running</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">matlab</span><span class="o">.</span><span class="n">engine</span><span class="o">.</span><span class="n">find_matlab</span><span class="p">())</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
@@ -487,7 +488,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">mlengine</span><span class="o">.</span><span class="n">addpath</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fdir</span><span class="p">,</span> <span class="n">nargout</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Connected to matlab&quot;</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="MatlabModelDriver.cleanup"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.MatlabModelDriver.MatlabModelDriver.cleanup">[docs]</a>    <span class="k">def</span> <span class="nf">cleanup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="MatlabModelDriver.cleanup"><a class="viewcode-back" href="../../../model_drivers.html#cis_interface.drivers.MatlabModelDriver.MatlabModelDriver.cleanup">[docs]</a>    <span class="k">def</span> <span class="nf">cleanup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Close the Matlab session and engine.&quot;&quot;&quot;</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">stop_matlab</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">screen_session</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mlengine</span><span class="p">,</span>
@@ -501,7 +502,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">mlengine</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">MatlabModelDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">cleanup</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="MatlabModelDriver.before_start"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.MatlabModelDriver.MatlabModelDriver.before_start">[docs]</a>    <span class="k">def</span> <span class="nf">before_start</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="MatlabModelDriver.before_start"><a class="viewcode-back" href="../../../model_drivers.html#cis_interface.drivers.MatlabModelDriver.MatlabModelDriver.before_start">[docs]</a>    <span class="k">def</span> <span class="nf">before_start</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Actions to perform before the run loop.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">target_name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]))[</span><span class="mi">0</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">start_matlab</span><span class="p">()</span>
@@ -528,7 +529,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">model_process</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;MatlabProcess running model.&#39;</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="MatlabModelDriver.run_loop"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.MatlabModelDriver.MatlabModelDriver.run_loop">[docs]</a>    <span class="k">def</span> <span class="nf">run_loop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="MatlabModelDriver.run_loop"><a class="viewcode-back" href="../../../model_drivers.html#cis_interface.drivers.MatlabModelDriver.MatlabModelDriver.run_loop">[docs]</a>    <span class="k">def</span> <span class="nf">run_loop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Loop to check if model is still running and forward output.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">model_process</span><span class="o">.</span><span class="n">print_output</span><span class="p">()</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_process</span><span class="o">.</span><span class="n">is_done</span><span class="p">():</span>
@@ -543,7 +544,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">sleep</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="MatlabModelDriver.after_loop"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.MatlabModelDriver.MatlabModelDriver.after_loop">[docs]</a>    <span class="k">def</span> <span class="nf">after_loop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="MatlabModelDriver.after_loop"><a class="viewcode-back" href="../../../model_drivers.html#cis_interface.drivers.MatlabModelDriver.MatlabModelDriver.after_loop">[docs]</a>    <span class="k">def</span> <span class="nf">after_loop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Actions to perform after run_loop has finished. Mainly checking</span>
 <span class="sd">        if there was an error and then handling it.&quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">MatlabModelDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">after_loop</span><span class="p">()</span>
@@ -583,7 +584,7 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../../../',
-            VERSION:'0.2.0',
+            VERSION:'0.3.0',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',

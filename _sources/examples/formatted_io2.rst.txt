@@ -29,11 +29,11 @@ C++ Version
 Model Code:
 
 .. literalinclude:: /../../cis_interface/examples/formatted_io2/src/formatted_io2_modelA.cpp
-   :language: python
+   :language: c++
    :linenos:
 
 .. literalinclude:: /../../cis_interface/examples/formatted_io2/src/formatted_io2_modelB.cpp
-   :language: python
+   :language: c++
    :linenos:
 
 
@@ -51,11 +51,11 @@ C Version
 Model Code:
 
 .. literalinclude:: /../../cis_interface/examples/formatted_io2/src/formatted_io2_modelA.c
-   :language: python
+   :language: c
    :linenos:
 
 .. literalinclude:: /../../cis_interface/examples/formatted_io2/src/formatted_io2_modelB.c
-   :language: python
+   :language: c
    :linenos:
 
 
@@ -73,11 +73,11 @@ Matlab Version
 Model Code:
 
 .. literalinclude:: /../../cis_interface/examples/formatted_io2/src/formatted_io2_modelA.m
-   :language: python
+   :language: matlab
    :linenos:
 
 .. literalinclude:: /../../cis_interface/examples/formatted_io2/src/formatted_io2_modelB.m
-   :language: python
+   :language: matlab
    :linenos:
 
 

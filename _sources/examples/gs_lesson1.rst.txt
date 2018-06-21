@@ -25,7 +25,7 @@ C++ Version
 Model Code:
 
 .. literalinclude:: /../../cis_interface/examples/gs_lesson1/src/gs_lesson1.cpp
-   :language: python
+   :language: c++
    :linenos:
 
 
@@ -43,7 +43,7 @@ C Version
 Model Code:
 
 .. literalinclude:: /../../cis_interface/examples/gs_lesson1/src/gs_lesson1.c
-   :language: python
+   :language: c
    :linenos:
 
 
@@ -61,7 +61,7 @@ Matlab Version
 Model Code:
 
 .. literalinclude:: /../../cis_interface/examples/gs_lesson1/src/gs_lesson1.m
-   :language: python
+   :language: matlab
    :linenos:
 
 

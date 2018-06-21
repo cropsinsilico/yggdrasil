@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>cis_interface.drivers.ServerRequestDriver &mdash; cis_interface 0.2.0 documentation</title>
+  <title>cis_interface.drivers.ServerRequestDriver &mdash; cis_interface 0.3.0 documentation</title>
   
 
   
@@ -57,7 +57,7 @@
             
             
               <div class="version">
-                0.2
+                0.3
               </div>
             
           
@@ -97,6 +97,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../model_drivers.html">Model Drivers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../code.html">Code</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../examples/examples_toc.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../release.html">Release Steps</a></li>
 </ul>
 
             
@@ -164,8 +165,7 @@
   <h1>Source code for cis_interface.drivers.ServerRequestDriver</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">cis_interface.drivers.ConnectionDriver</span> <span class="k">import</span> <span class="n">ConnectionDriver</span>
 <span class="kn">from</span> <span class="nn">cis_interface.drivers.ServerResponseDriver</span> <span class="k">import</span> <span class="n">ServerResponseDriver</span>
-<span class="kn">from</span> <span class="nn">cis_interface.drivers.ClientRequestDriver</span> <span class="k">import</span> <span class="p">(</span>
-    <span class="n">CIS_CLIENT_INI</span><span class="p">,</span> <span class="n">CIS_CLIENT_EOF</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">cis_interface.drivers.ClientRequestDriver</span> <span class="k">import</span> <span class="n">CIS_CLIENT_INI</span>
 
 
 <div class="viewcode-block" id="ServerRequestDriver"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.ServerRequestDriver.ServerRequestDriver">[docs]</a><span class="k">class</span> <span class="nc">ServerRequestDriver</span><span class="p">(</span><span class="n">ConnectionDriver</span><span class="p">):</span>
@@ -273,8 +273,13 @@
 
 <div class="viewcode-block" id="ServerRequestDriver.on_client_exit"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.ServerRequestDriver.ServerRequestDriver.on_client_exit">[docs]</a>    <span class="k">def</span> <span class="nf">on_client_exit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Close input comm to stop the loop.&quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span></div>
-        <span class="c1"># self.stop()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">wait_close_state</span><span class="p">(</span><span class="s1">&#39;client exit&#39;</span><span class="p">)</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">icomm</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">confirm_output</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Finished&#39;</span><span class="p">)</span></div>
     
 <div class="viewcode-block" id="ServerRequestDriver.on_eof"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.ServerRequestDriver.ServerRequestDriver.on_eof">[docs]</a>    <span class="k">def</span> <span class="nf">on_eof</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;On EOF, decrement number of clients. Only send EOF if the number</span>
@@ -283,7 +288,6 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">nclients</span> <span class="o">-=</span> <span class="mi">1</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Client signed off. nclients = </span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nclients</span><span class="p">)</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">nclients</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">set_close_state</span><span class="p">(</span><span class="s1">&#39;clients signed off&#39;</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;All clients have signed off.&quot;</span><span class="p">)</span>
                 <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">ServerRequestDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">on_eof</span><span class="p">()</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">icomm</span><span class="o">.</span><span class="n">serializer</span><span class="o">.</span><span class="n">empty_msg</span></div>
@@ -306,19 +310,6 @@
                 <span class="k">return</span> <span class="n">msg</span>
         <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">ServerRequestDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">on_message</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span></div>
     
-<div class="viewcode-block" id="ServerRequestDriver.send_eof"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.ServerRequestDriver.ServerRequestDriver.send_eof">[docs]</a>    <span class="k">def</span> <span class="nf">send_eof</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Send EOF message.</span>
-
-<span class="sd">        Returns:</span>
-<span class="sd">            bool: Success or failure of send.</span>
-
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">icomm</span><span class="o">.</span><span class="n">_last_header</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">icomm</span><span class="o">.</span><span class="n">_last_header</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">icomm</span><span class="o">.</span><span class="n">_last_header</span><span class="p">[</span><span class="s1">&#39;response_address&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">CIS_CLIENT_EOF</span>
-        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">ServerRequestDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">send_eof</span><span class="p">()</span></div>
-
 <div class="viewcode-block" id="ServerRequestDriver.send_message"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.ServerRequestDriver.ServerRequestDriver.send_message">[docs]</a>    <span class="k">def</span> <span class="nf">send_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Send a single message.</span>
 
@@ -333,7 +324,8 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ocomm</span><span class="o">.</span><span class="n">is_closed</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">False</span>
         <span class="c1"># Start response driver</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">response_address</span> <span class="o">!=</span> <span class="n">CIS_CLIENT_EOF</span><span class="p">:</span>
+        <span class="n">is_eof</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;is_eof&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">is_eof</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Starting new ServerResponseDriver at: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span>
                        <span class="bp">self</span><span class="o">.</span><span class="n">response_address</span><span class="p">)</span>
             <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
@@ -391,7 +383,7 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../../../',
-            VERSION:'0.2.0',
+            VERSION:'0.3.0',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',

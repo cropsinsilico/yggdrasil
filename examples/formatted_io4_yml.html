@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>&lt;no title&gt; &mdash; cis_interface 0.2.0 documentation</title>
+  <title>&lt;no title&gt; &mdash; cis_interface 0.3.0 documentation</title>
   
 
   
@@ -57,7 +57,7 @@
             
             
               <div class="version">
-                0.2
+                0.3
               </div>
             
           
@@ -97,6 +97,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../model_drivers.html">Model Drivers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../code.html">Code</a></li>
 <li class="toctree-l1"><a class="reference internal" href="examples_toc.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../release.html">Release Steps</a></li>
 </ul>
 
             
@@ -189,7 +190,7 @@
 25
 26</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">models</span><span class="p p-Indicator">:</span>
   <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">python_modelA</span>
-    <span class="l l-Scalar l-Scalar-Plain">driver</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">PythonModelDriver</span>
+    <span class="l l-Scalar l-Scalar-Plain">language</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">python</span>
     <span class="l l-Scalar l-Scalar-Plain">args</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/formatted_io4_modelA.py</span>
     <span class="l l-Scalar l-Scalar-Plain">inputs</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">inputA</span>
     <span class="l l-Scalar l-Scalar-Plain">outputs</span><span class="p p-Indicator">:</span>
@@ -197,7 +198,7 @@
       <span class="l l-Scalar l-Scalar-Plain">field_names</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">name,count,size</span>
 
   <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">python_modelB</span>
-    <span class="l l-Scalar l-Scalar-Plain">driver</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">PythonModelDriver</span>
+    <span class="l l-Scalar l-Scalar-Plain">language</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">python</span>
     <span class="l l-Scalar l-Scalar-Plain">args</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">./src/formatted_io4_modelB.py</span>
     <span class="l l-Scalar l-Scalar-Plain">inputs</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">inputB</span>
     <span class="l l-Scalar l-Scalar-Plain">outputs</span><span class="p p-Indicator">:</span>
@@ -209,10 +210,10 @@
     <span class="l l-Scalar l-Scalar-Plain">output</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">inputB</span>
   <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">input</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">./Input/input.txt</span>  <span class="c1"># Connection between file and model A input</span>
     <span class="l l-Scalar l-Scalar-Plain">output</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">inputA</span>
-    <span class="l l-Scalar l-Scalar-Plain">read_meth</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">pandas</span>
+    <span class="l l-Scalar l-Scalar-Plain">filetype</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">pandas</span>
   <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">input</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">outputB</span>  <span class="c1"># Connection between model B output and file</span>
     <span class="l l-Scalar l-Scalar-Plain">output</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">./output.txt</span>
-    <span class="l l-Scalar l-Scalar-Plain">write_meth</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">pandas</span>
+    <span class="l l-Scalar l-Scalar-Plain">filetype</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">pandas</span>
 </pre></div>
 </td></tr></table></div>
 <p>(<a class="reference external" href="examples/formatted_io4.html">Example in other languages</a>)</p>
@@ -250,7 +251,7 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../',
-            VERSION:'0.2.0',
+            VERSION:'0.3.0',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',

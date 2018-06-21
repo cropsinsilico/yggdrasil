@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>cis_interface.communication package &mdash; cis_interface 0.2.0 documentation</title>
+  <title>cis_interface.communication package &mdash; cis_interface 0.3.0 documentation</title>
   
 
   
@@ -57,7 +57,7 @@
             
             
               <div class="version">
-                0.2
+                0.3
               </div>
             
           
@@ -97,6 +97,7 @@
 <li class="toctree-l1"><a class="reference internal" href="model_drivers.html">Model Drivers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="code.html">Code</a></li>
 <li class="toctree-l1"><a class="reference internal" href="examples/examples_toc.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="release.html">Release Steps</a></li>
 </ul>
 
             
@@ -2447,6 +2448,12 @@ comm object.</p>
 </dd></dl>
 
 <dl class="attribute">
+<dt id="cis_interface.communication.FileComm.FileComm.registry_key">
+<code class="descname">registry_key</code><a class="headerlink" href="#cis_interface.communication.FileComm.FileComm.registry_key" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str</em> – String used to register the socket.</p>
+</dd></dl>
+
+<dl class="attribute">
 <dt id="cis_interface.communication.FileComm.FileComm.remaining_bytes">
 <code class="descname">remaining_bytes</code><a class="headerlink" href="#cis_interface.communication.FileComm.FileComm.remaining_bytes" title="Permalink to this definition">¶</a></dt>
 <dd><p><em>int</em> – Remaining bytes in the file.</p>
@@ -4434,7 +4441,7 @@ comm object.</p>
 
 <dl class="class">
 <dt id="cis_interface.communication.ZMQComm.ZMQProxy">
-<em class="property">class </em><code class="descclassname">cis_interface.communication.ZMQComm.</code><code class="descname">ZMQProxy</code><span class="sig-paren">(</span><em>srv_address</em>, <em>context=None</em>, <em>retry_timeout=-1</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/ZMQComm.html#ZMQProxy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.ZMQComm.ZMQProxy" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">cis_interface.communication.ZMQComm.</code><code class="descname">ZMQProxy</code><span class="sig-paren">(</span><em>srv_address</em>, <em>context=None</em>, <em>retry_timeout=-1</em>, <em>nretry=1</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/ZMQComm.html#ZMQProxy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.ZMQComm.ZMQProxy" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#cis_interface.communication.CommBase.CommServer" title="cis_interface.communication.CommBase.CommServer"><code class="xref py py-class docutils literal notranslate"><span class="pre">cis_interface.communication.CommBase.CommServer</span></code></a></p>
 <p>Start a proxy in a new thread for a server address. A client-side
 address will be randomly generated.</p>
@@ -4452,7 +4459,9 @@ Defaults to None and is set to _default_protocol.</li>
 <li><strong>retry_timeout</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>, </em><em>optional</em>) – Time (in seconds) that should be
 waited before retrying to bind the sockets to the addresses. If
 negative, a retry will not be attempted and an error will be
-raised. Defaults to -1;</li>
+raised. Defaults to -1.</li>
+<li><strong>nretry</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>, </em><em>optional</em>) – Number of times to try binding the sockets to
+the addresses. Defaults to 1.</li>
 <li><strong>**kwargs</strong> – Additional keyword arguments are passed to the parent class.</li>
 </ul>
 </td>
@@ -4540,7 +4549,7 @@ raised. Defaults to -1;</li>
 
 <dl class="function">
 <dt id="cis_interface.communication.ZMQComm.bind_socket">
-<code class="descclassname">cis_interface.communication.ZMQComm.</code><code class="descname">bind_socket</code><span class="sig-paren">(</span><em>socket</em>, <em>address</em>, <em>retry_timeout=-1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/ZMQComm.html#bind_socket"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.ZMQComm.bind_socket" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">cis_interface.communication.ZMQComm.</code><code class="descname">bind_socket</code><span class="sig-paren">(</span><em>socket</em>, <em>address</em>, <em>retry_timeout=-1</em>, <em>nretry=1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/ZMQComm.html#bind_socket"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.ZMQComm.bind_socket" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bind a socket to an address, getting a random port as necessary.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -4552,7 +4561,9 @@ raised. Defaults to -1;</li>
 <li><strong>retry_timeout</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>, </em><em>optional</em>) – Time (in seconds) that should be
 waited before retrying to bind the socket to the address. If
 negative, a retry will not be attempted and an error will be
-raised. Defaults to -1;</li>
+raised. Defaults to -1.</li>
+<li><strong>nretry</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>, </em><em>optional</em>) – Number of times to try binding the socket to
+the addresses. Defaults to 1.</li>
 </ul>
 </td>
 </tr>
@@ -4595,6 +4606,22 @@ None and is not added to the address.</li>
 </tr>
 <tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ValueError</span></code></a> – If the protocol is not recognized.</p>
 </td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.communication.ZMQComm.get_ipc_host">
+<code class="descclassname">cis_interface.communication.ZMQComm.</code><code class="descname">get_ipc_host</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/ZMQComm.html#get_ipc_host"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.ZMQComm.get_ipc_host" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get an IPC host using uuid.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">File path for IPC transport created using uuid.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)">str</a></td>
 </tr>
 </tbody>
 </table>
@@ -4784,7 +4811,7 @@ tools.get_default_comm() if not provided.</td>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'0.2.0',
+            VERSION:'0.3.0',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',

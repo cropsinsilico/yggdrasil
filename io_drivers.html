@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Input/Output Drivers &mdash; cis_interface 0.2.0 documentation</title>
+  <title>Input/Output Drivers &mdash; cis_interface 0.3.0 documentation</title>
   
 
   
@@ -59,7 +59,7 @@
             
             
               <div class="version">
-                0.2
+                0.3
               </div>
             
           
@@ -106,6 +106,7 @@
 <li class="toctree-l1"><a class="reference internal" href="model_drivers.html">Model Drivers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="code.html">Code</a></li>
 <li class="toctree-l1"><a class="reference internal" href="examples/examples_toc.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="release.html">Release Steps</a></li>
 </ul>
 
             
@@ -281,6 +282,71 @@ once as an array. Defaults to False.</li>
 </dd></dl>
 
 <dl class="class">
+<dt id="cis_interface.drivers.PandasFileInputDriver.PandasFileInputDriver">
+<em class="property">class </em><code class="descclassname">cis_interface.drivers.PandasFileInputDriver.</code><code class="descname">PandasFileInputDriver</code><span class="sig-paren">(</span><em>name</em>, <em>args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/PandasFileInputDriver.html#PandasFileInputDriver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.PandasFileInputDriver.PandasFileInputDriver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class to handle input from a Pandas csv file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Name of the input queue to send messages to.</li>
+<li><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) – Path to the file that messages should be read from.</li>
+<li><strong>delimiter</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – String that should be used to separate
+columns. Defaults to ‘t’.</li>
+<li><strong>**kwargs</strong> – Additional keyword arguments are passed to parent class.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="cis_interface.drivers.PandasFileInputDriver.PandasFileInputDriver.update_serializer">
+<code class="descname">update_serializer</code><span class="sig-paren">(</span><em>msg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/PandasFileInputDriver.html#PandasFileInputDriver.update_serializer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.PandasFileInputDriver.PandasFileInputDriver.update_serializer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the serializer for the output comm based on input.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.drivers.PlyFileInputDriver.PlyFileInputDriver">
+<em class="property">class </em><code class="descclassname">cis_interface.drivers.PlyFileInputDriver.</code><code class="descname">PlyFileInputDriver</code><span class="sig-paren">(</span><em>name</em>, <em>args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/PlyFileInputDriver.html#PlyFileInputDriver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.PlyFileInputDriver.PlyFileInputDriver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class that sends messages read from a file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Name of the queue that messages should be sent to.</li>
+<li><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Path to the file that messages should be read from.</li>
+<li><strong>**kwargs</strong> – Additional keyword arguments are passed to the parent class.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.drivers.ObjFileInputDriver.ObjFileInputDriver">
+<em class="property">class </em><code class="descclassname">cis_interface.drivers.ObjFileInputDriver.</code><code class="descname">ObjFileInputDriver</code><span class="sig-paren">(</span><em>name</em>, <em>args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/ObjFileInputDriver.html#ObjFileInputDriver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.ObjFileInputDriver.ObjFileInputDriver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class that sends messages read from a file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Name of the queue that messages should be sent to.</li>
+<li><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Path to the file that messages should be read from.</li>
+<li><strong>**kwargs</strong> – Additional keyword arguments are passed to the parent class.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="class">
 <dt id="cis_interface.drivers.MatInputDriver.MatInputDriver">
 <em class="property">class </em><code class="descclassname">cis_interface.drivers.MatInputDriver.</code><code class="descname">MatInputDriver</code><span class="sig-paren">(</span><em>name</em>, <em>args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/MatInputDriver.html#MatInputDriver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.MatInputDriver.MatInputDriver" title="Permalink to this definition">¶</a></dt>
 <dd><p>Class that sends pickled dictionaries of matricies read from a .mat
@@ -352,6 +418,71 @@ the end of a line. Default set by <code class="xref py py-class docutils literal
 <dl class="class">
 <dt id="cis_interface.drivers.PickleFileOutputDriver.PickleFileOutputDriver">
 <em class="property">class </em><code class="descclassname">cis_interface.drivers.PickleFileOutputDriver.</code><code class="descname">PickleFileOutputDriver</code><span class="sig-paren">(</span><em>name</em>, <em>args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/PickleFileOutputDriver.html#PickleFileOutputDriver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.PickleFileOutputDriver.PickleFileOutputDriver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class that writes received messages to a file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Name of the queue that messages should be sent to.</li>
+<li><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Path to the file that messages should be read from.</li>
+<li><strong>**kwargs</strong> – Additional keyword arguments are passed to the parent class.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.drivers.PandasFileOutputDriver.PandasFileOutputDriver">
+<em class="property">class </em><code class="descclassname">cis_interface.drivers.PandasFileOutputDriver.</code><code class="descname">PandasFileOutputDriver</code><span class="sig-paren">(</span><em>name</em>, <em>args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/PandasFileOutputDriver.html#PandasFileOutputDriver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.PandasFileOutputDriver.PandasFileOutputDriver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class to handle output of received messages to a Pandas csv file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Name of the output queue to receive messages from.</li>
+<li><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) – Path to the file that messages should be written to.</li>
+<li><strong>delimiter</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – String that should be used to separate
+columns. Defaults to ‘t’.</li>
+<li><strong>**kwargs</strong> – Additional keyword arguments are passed to parent class.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="cis_interface.drivers.PandasFileOutputDriver.PandasFileOutputDriver.update_serializer">
+<code class="descname">update_serializer</code><span class="sig-paren">(</span><em>msg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/PandasFileOutputDriver.html#PandasFileOutputDriver.update_serializer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.PandasFileOutputDriver.PandasFileOutputDriver.update_serializer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the serializer for the output comm based on input.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.drivers.PlyFileOutputDriver.PlyFileOutputDriver">
+<em class="property">class </em><code class="descclassname">cis_interface.drivers.PlyFileOutputDriver.</code><code class="descname">PlyFileOutputDriver</code><span class="sig-paren">(</span><em>name</em>, <em>args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/PlyFileOutputDriver.html#PlyFileOutputDriver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.PlyFileOutputDriver.PlyFileOutputDriver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class that writes received messages to a file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Name of the queue that messages should be sent to.</li>
+<li><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Path to the file that messages should be read from.</li>
+<li><strong>**kwargs</strong> – Additional keyword arguments are passed to the parent class.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.drivers.ObjFileOutputDriver.ObjFileOutputDriver">
+<em class="property">class </em><code class="descclassname">cis_interface.drivers.ObjFileOutputDriver.</code><code class="descname">ObjFileOutputDriver</code><span class="sig-paren">(</span><em>name</em>, <em>args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/ObjFileOutputDriver.html#ObjFileOutputDriver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.ObjFileOutputDriver.ObjFileOutputDriver" title="Permalink to this definition">¶</a></dt>
 <dd><p>Class that writes received messages to a file.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -783,7 +914,7 @@ method.</li>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'0.2.0',
+            VERSION:'0.3.0',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',

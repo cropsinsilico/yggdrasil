@@ -37,7 +37,7 @@ Model Code:
    :linenos:
 
 .. literalinclude:: /../../cis_interface/examples/rpc_lesson2/src/client.cpp
-   :language: python
+   :language: c++
    :linenos:
 
 
@@ -63,7 +63,7 @@ Model Code:
    :linenos:
 
 .. literalinclude:: /../../cis_interface/examples/rpc_lesson2/src/client.c
-   :language: python
+   :language: c
    :linenos:
 
 
@@ -89,7 +89,7 @@ Model Code:
    :linenos:
 
 .. literalinclude:: /../../cis_interface/examples/rpc_lesson2/src/client.m
-   :language: python
+   :language: matlab
    :linenos:
 
 

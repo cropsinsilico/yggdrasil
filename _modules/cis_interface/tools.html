@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>cis_interface.tools &mdash; cis_interface 0.2.0 documentation</title>
+  <title>cis_interface.tools &mdash; cis_interface 0.3.0 documentation</title>
   
 
   
@@ -57,7 +57,7 @@
             
             
               <div class="version">
-                0.2
+                0.3
               </div>
             
           
@@ -97,6 +97,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../model_drivers.html">Model Drivers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../code.html">Code</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../examples/examples_toc.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../release.html">Release Steps</a></li>
 </ul>
 
             
@@ -1107,6 +1108,8 @@
         <span class="nb">super</span><span class="p">(</span><span class="n">CisThreadLoop</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_1st_main_terminated</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">break_flag</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">loop_event</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Event</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">loop_flag</span> <span class="o">=</span> <span class="kc">False</span>
 
 <div class="viewcode-block" id="CisThreadLoop.on_main_terminated"><a class="viewcode-back" href="../../code_python.html#cis_interface.tools.CisThreadLoop.on_main_terminated">[docs]</a>    <span class="k">def</span> <span class="nf">on_main_terminated</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dont_break</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Actions performed when 1st main terminated.</span>
@@ -1133,6 +1136,40 @@
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;bool: True if the break flag was set.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">break_flag</span>
 
+<div class="viewcode-block" id="CisThreadLoop.set_loop_flag"><a class="viewcode-back" href="../../code_python.html#cis_interface.tools.CisThreadLoop.set_loop_flag">[docs]</a>    <span class="k">def</span> <span class="nf">set_loop_flag</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Set the loop flag for the thread to True.&quot;&quot;&quot;</span>
+        <span class="c1"># self.loop_event.set()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">loop_flag</span> <span class="o">=</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="CisThreadLoop.unset_loop_flag"><a class="viewcode-back" href="../../code_python.html#cis_interface.tools.CisThreadLoop.unset_loop_flag">[docs]</a>    <span class="k">def</span> <span class="nf">unset_loop_flag</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Set the loop flag for the thread to False.&quot;&quot;&quot;</span>
+        <span class="c1"># self.loop_event.clear()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">loop_flag</span> <span class="o">=</span> <span class="kc">False</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">was_loop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;bool: True if the thread was loop. False otherwise.&quot;&quot;&quot;</span>
+        <span class="c1"># return self.loop_event.is_set()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">loop_flag</span>
+
+<div class="viewcode-block" id="CisThreadLoop.wait_for_loop"><a class="viewcode-back" href="../../code_python.html#cis_interface.tools.CisThreadLoop.wait_for_loop">[docs]</a>    <span class="k">def</span> <span class="nf">wait_for_loop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Wait until thread enters loop to return using sleeps rather than</span>
+<span class="sd">        blocking.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            timeout (float, optional): Maximum time that should be waited for</span>
+<span class="sd">                the thread to enter loop. Defaults to None and is infinite.</span>
+<span class="sd">            key (str, optional): Key that should be used to register the timeout.</span>
+<span class="sd">                Defaults to None and is set based on the stack trace.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">T</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_timeout</span><span class="p">(</span><span class="n">timeout</span><span class="p">,</span> <span class="n">key_level</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">)</span>
+        <span class="k">while</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">is_alive</span><span class="p">()</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">was_loop</span><span class="p">)</span> <span class="ow">and</span>
+               <span class="p">(</span><span class="ow">not</span> <span class="n">T</span><span class="o">.</span><span class="n">is_out</span><span class="p">)):</span>  <span class="c1"># pragma: debug</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">verbose_debug</span><span class="p">(</span><span class="s1">&#39;Waiting for thread to enter loop...&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sleep</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stop_timeout</span><span class="p">(</span><span class="n">key_level</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">)</span></div>
+
 <div class="viewcode-block" id="CisThreadLoop.before_loop"><a class="viewcode-back" href="../../code_python.html#cis_interface.tools.CisThreadLoop.before_loop">[docs]</a>    <span class="k">def</span> <span class="nf">before_loop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Actions performed before the loop.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span></div>
@@ -1153,6 +1190,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Starting loop&quot;</span><span class="p">)</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">before_loop</span><span class="p">()</span>
+            <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">was_break</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">set_loop_flag</span><span class="p">()</span>
             <span class="k">while</span> <span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">was_break</span><span class="p">):</span>
                 <span class="k">if</span> <span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">main_terminated</span> <span class="ow">and</span>
                      <span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_1st_main_terminated</span><span class="p">))):</span>  <span class="c1"># pragma: debug</span>
@@ -1210,7 +1249,7 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../../',
-            VERSION:'0.2.0',
+            VERSION:'0.3.0',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
