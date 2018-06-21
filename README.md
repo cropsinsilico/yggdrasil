@@ -7,8 +7,8 @@
 
 The CiS framework provides support for combining scientific models
 written in different programming languages. To combine two models,
-modelers add simple communications interfaces to the model code
-and provide simple declarative specification files that identfy the
+modelers add communications interfaces to the model code
+and provide declarative specification files that identfy the
 models that should be run and the inputs and outputs those models
 expect.
 
