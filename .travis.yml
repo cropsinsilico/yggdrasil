@@ -159,7 +159,7 @@ before_script:
 
 script:
   - |
-    nosetests --nologcapture --with-coverage --cover-package=cis_interface -svx
+    cistest --nologcapture --with-coverage --cover-package=cis_interface -svx
 
 after_success:
   - coveralls

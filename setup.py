@@ -262,14 +262,14 @@ setup(
         "License :: OSI Approved :: BSD License",
         "Natural Language :: English",
         "Topic :: Scientific/Engineering",
-        "Topic :: Scientific/Engineering :: Bio-Informatics",
         "Development Status :: 3 - Alpha",
     ],
     entry_points = {
         'console_scripts': ['cisrun=cis_interface.command_line:cisrun',
                             'ciscc=cis_interface.command_line:ciscc',
                             'cisccflags=cis_interface.command_line:cc_flags',
-                            'cisldflags=cis_interface.command_line:ld_flags'],
+                            'cisldflags=cis_interface.command_line:ld_flags',
+                            'cistest=cis_interface:run_nose'],
     },
     license="BSD",
 )

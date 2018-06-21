@@ -2,6 +2,8 @@ r"""This package provides a framework for integrating models across languages
 such that they can be run simultaneously, passing input back and forth."""
 from cis_interface import platform
 import os
+import sys
+import nose
 
 
 if platform._is_win:  # pragma: windows
@@ -10,20 +12,42 @@ if platform._is_win:  # pragma: windows
     os.environ['FOR_DISABLE_CONSOLE_CTRL_HANDLER'] = 'T'
 
 
-# from cis_interface import backwards
-# from cis_interface import platform
-# from cis_interface import config
-# from cis_interface import tools
-# from cis_interface import interface
-# from cis_interface import drivers
-# from cis_interface import dataio
-# from cis_interface import tests
-# from cis_interface import examples
-# from cis_interface import runner
+def run_nose(verbose=False, nocapture=False, stop=False,
+             nologcapture=False, withcoverage=False):  # pragma: debug
+    r"""Run nose tests for the package.
 
+    Args:
+        verbose (bool, optional): If True, set nose option '-v' which
+            increases the verbosity. Defaults to False.
+        nocapture (bool, optional): If True, set nose option '--nocapture'
+            which allows messages to be printed to stdout. Defaults to False.
+        stop (bool, optional): If True, set nose option '--stop' which
+            stops tests at the first failure. Defaults to False.
+        nologcapture (bool, optional): If True, set nose option '--nologcapture'
+            which allows logged messages to be printed. Defaults to False.
+        withcoverage (bool, optional): If True, set nose option '--with-coverage'
+            which invokes coverage. Defaults to False.
 
-# __all__ = ['backwards', 'platform', 'config', 'tools',
-#            'interface', 'drivers', 'dataio',
-#            'tests', 'examples', 'runner']
+    """
+    nose_argv = sys.argv
+    nose_argv += ['--detailed-errors', '--exe']
+    if verbose:
+        nose_argv.append('-v')
+    if nocapture:
+        nose_argv.append('--nocapture')
+    if stop:
+        nose_argv.append('--stop')
+    if nologcapture:
+        nose_argv.append('--nologcapture')
+    if withcoverage:
+        nose_argv.append('--with-coverage')
+    initial_dir = os.getcwd()
+    package_dir = os.path.dirname(os.path.abspath(__file__))
+    os.chdir(package_dir)
+    try:
+        nose.run(argv=nose_argv)
+    finally:
+        os.chdir(initial_dir)
+
 
 __all__ = []
