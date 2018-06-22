@@ -217,7 +217,8 @@ except (ImportError, IOError):
         raise IOError("Could not find README.rst or README.md")
 
 # Create requirements list based on platform
-requirements = ["numpy", "scipy", "pyyaml", "pystache", "nose", "zmq", "psutil",
+requirements = ["numpy", "scipy", "pyyaml", "json",
+                "pystache", "nose", "zmq", "psutil",
                 "matplotlib", "cerberus",
                 'pandas; python_version >= "3.5"',
                 'pandas; python_version == "2.7"',

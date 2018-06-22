@@ -23,9 +23,9 @@ def test_str_to_function():
                      '%s:invalid' % __name__)
 
 
-def test_SchemaValidator():
+def test_CisSchemaValidator():
     r"""Test schema validator."""
-    v = schema.SchemaValidator()
+    v = schema.CisSchemaValidator()
     test_vals = {
         'string': [('s', 's'), (1, '1'), (1.0, '1.0'),
                    (['1', 1], ['1', '1']),
@@ -69,6 +69,7 @@ def test_create_schema():
     # Test saving/loading schema
     s0 = schema.create_schema()
     s0.save(fname)
+    assert(s0 is not None)
     assert(os.path.isfile(fname))
     s1 = schema.get_schema(fname)
     nt.assert_equal(s1, s0)

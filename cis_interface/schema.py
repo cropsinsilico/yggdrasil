@@ -8,6 +8,7 @@ import cerberus
 import collections
 from cis_interface.drivers import import_all_drivers
 from cis_interface.communication import import_all_comms
+from cis_interface.types import import_all_types
 
 
 _schema_fname = os.path.abspath(os.path.join(
@@ -67,6 +68,7 @@ def init_registry():
     if not _registry_complete:
         import_all_drivers()
         import_all_comms()
+        import_all_types()
         _registry_complete = True
 
 
@@ -175,7 +177,7 @@ def str_to_function(value):
     return out
 
 
-class SchemaValidator(cerberus.Validator):
+class CisSchemaValidator(cerberus.Validator):
     r"""Class for validating the schema."""
 
     types_mapping = cerberus.Validator.types_mapping.copy()
@@ -183,7 +185,7 @@ class SchemaValidator(cerberus.Validator):
     cis_type_order = ['list', 'string', 'integer', 'boolean', 'function']
 
     def _resolve_rules_set(self, *args, **kwargs):
-        rules = super(SchemaValidator, self)._resolve_rules_set(*args, **kwargs)
+        rules = super(CisSchemaValidator, self)._resolve_rules_set(*args, **kwargs)
         if isinstance(rules, collections.Mapping):
             rules = self._add_coerce(rules)
         return rules
@@ -237,18 +239,44 @@ class ComponentSchema(dict):
 
     Args:
         schema_type (str): The name of the component.
-        subtype_attr (str, optional): The attribute that should be used to
-            log subtypes. Defaults to None.
+        schema_registry (SchemaRegistry, optional): Registry of schemas
+            that this schema is dependent on.
         **kwargs: Additional keyword arguments are entries in the component
             schema.
 
     """
+    _subtype_keys = {'model': 'language', 'comm': 'commtype',
+                     'file': 'filetype', 'type': 'datatype'}
 
-    def __init__(self, schema_type, subtype_attr=None, **kwargs):
+    def __init__(self, schema_type, schema_registry=None, **kwargs):
+        self.schema_registry = schema_registry
         self._schema_type = schema_type
-        self._subtype_attr = subtype_attr
+        self._subtype_key = self._subtype_keys.get(schema_type, None)
+        if self._subtype_key is not None:
+            self._subtype_attr = '_' + self._subtype_key
+        else:
+            self._subtype_attr = None
         self._schema_subtypes = {}
         super(ComponentSchema, self).__init__(**kwargs)
+
+    @classmethod
+    def from_registry(cls, schema_type, schema_classes, **kwargs):
+        r"""Construct a ComponentSchema from a registry entry.
+
+        Args:
+            schema_type (str): Name of component type to build.
+            schema_classes (list): List of classes for the component type.
+            **kwargs: Additional keyword arguments are passed to the class
+                __init__ method.
+
+        Returns:
+            ComponentSchema: Schema with information from classes.
+
+        """
+        out = cls(schema_type, **kwargs)
+        for x in schema_classes:
+            out.append(x)
+        return out
 
     @property
     def class2subtype(self):
@@ -290,14 +318,24 @@ class ComponentSchema(dict):
         assert(comp_cls._schema_type == self._schema_type)
         name = comp_cls.__name__
         rule = comp_cls._schema
-        if (subtype is None) and (self._subtype_attr is not None):
+        # Append subtype
+        if self._schema_type == 'connection':
+            subtype = (comp_cls._icomm_type, comp_cls._ocomm_type, comp_cls.direction())
+        elif (subtype is None) and (self._subtype_attr is not None):
             subtype = getattr(comp_cls, self._subtype_attr)
         if subtype is not None:
             if not isinstance(subtype, list):
-                self._schema_subtypes[name] = [subtype]
+                subtype_list = [subtype]
             else:
-                self._schema_subtypes[name] = subtype
+                subtype_list = subtype
+            self._schema_subtypes[name] = subtype_list
+        # Add rules
         self.append_rules(rule)
+        # Add allowed subtypes
+        if (self._subtype_key is not None) and (self._subtype_key in self):
+            self[self._subtype_key]['allowed'] = self.subtypes
+        # Verify that the schema is valid
+        CisSchemaValidator(self, schema_registry=self.schema_registry)
 
     def append_rules(self, new):
         r"""Add rules from new class's schema to this one.
@@ -306,19 +344,20 @@ class ComponentSchema(dict):
             new (dict): New schema to add.
 
         """
+        old = self
         for k, v in new.items():
-            if k not in self:
-                self[k] = v
+            if k not in old:
+                old[k] = v
             else:
                 diff = []
                 for ik in v.keys():
-                    if (ik not in self[k]) or (v[ik] != self[k][ik]):
+                    if (ik not in old[k]) or (v[ik] != old[k][ik]):
                         diff.append(ik)
                 if (len(diff) == 0):
                     pass
                 elif (len(diff) == 1) and (diff[0] == 'dependencies'):
                     alldeps = {}
-                    deps = [self[k]['dependencies'], v['dependencies']]
+                    deps = [old[k]['dependencies'], v['dependencies']]
                     for idep in deps:
                         for ik, iv in idep.items():
                             if ik not in alldeps:
@@ -331,16 +370,16 @@ class ComponentSchema(dict):
                         alldeps[ik] = list(set(alldeps[ik]))
                     vcopy = copy.deepcopy(v)
                     vcopy['dependencies'] = alldeps
-                    self[k].update(**vcopy)
+                    old[k].update(**vcopy)
                 else:  # pragma: debug
                     print('Existing:')
-                    pprint.pprint(self[k])
+                    pprint.pprint(old[k])
                     print('New:')
                     pprint.pprint(v)
                     raise ValueError("Cannot merge schemas.")
 
 
-class SchemaRegistry(dict):
+class SchemaRegistry(cerberus.schema.SchemaRegistry):
     r"""Registry of schema's for different integration components.
 
     Args:
@@ -356,42 +395,42 @@ class SchemaRegistry(dict):
     """
 
     _component_attr = ['_schema_subtypes', '_subtype_attr']
-    _subtype_attr = {'model': '_language', 'comm': '_commtype',
-                     'file': '_filetype'}
 
     def __init__(self, registry=None, required=None):
+        super(SchemaRegistry, self).__init__()
         comp = {}
         if registry is not None:
             if required is None:
-                required = ['comm', 'file', 'model', 'connection']
+                required = ['type', 'comm', 'file', 'model', 'connection']
             for k in required:
                 if k not in registry:
                     raise ValueError("Component %s required." % k)
+            # Register dummy schemas for each component
+            for k in registry.keys():
+                self[k] = {'hold': {'type': 'string'}}
+            # Create schemas for each component
             for k in registry.keys():
                 if k not in comp:
-                    isubtype_attr = self._subtype_attr.get(k, None)
-                    comp[k] = ComponentSchema(k, subtype_attr=isubtype_attr)
-                for x in registry[k]:
-                    subtype = None
-                    if k == 'connection':
-                        subtype = (x._icomm_type, x._ocomm_type, x.direction())
-                    comp[k].append(x, subtype=subtype)
-                    SchemaValidator(comp[k])
-            # Add lists of required properties
-            comp['file']['filetype']['allowed'] = comp['file'].subtypes
-            comp['model']['language']['allowed'] = comp['model'].subtypes
-            comp['model']['inputs'] = {'type': 'list', 'required': False,
-                                       'schema': {'type': 'dict',
-                                                  'schema': comp['comm']}}
-            comp['model']['outputs'] = {'type': 'list', 'required': False,
-                                        'schema': {'type': 'dict',
-                                                   'schema': comp['comm']}}
-            comp['connection']['input_file']['schema'] = comp['file']
-            comp['connection']['output_file']['schema'] = comp['file']
+                    comp[k] = ComponentSchema.from_registry(k, registry[k],
+                                                            schema_registry=self)
+                self[k] = comp[k]
             # Make sure final versions are valid schemas
             for x in comp.values():
-                SchemaValidator(x)
-        super(SchemaRegistry, self).__init__(**comp)
+                CisSchemaValidator(x, schema_registry=self)
+
+    def __getitem__(self, k):
+        return self.get(k)
+
+    def __setitem__(self, k, v):
+        return self.add(k, v)
+
+    def keys(self):
+        return self.all().keys()
+
+    def __eq__(self, other):
+        if not hasattr(other, 'all'):
+            return False
+        return (self.all() == other.all())
 
     @classmethod
     def from_file(cls, fname):
@@ -415,6 +454,9 @@ class SchemaRegistry(dict):
         with open(fname, 'r') as f:
             contents = f.read()
             schema = yaml.load(contents, Loader=SchemaLoader)
+        if schema is None:
+            raise Exception("Failed to load schema from %s" % fname)
+        comp_list = []
         for k, v in schema.items():
             is_attr = False
             for iattr in self._component_attr:
@@ -423,11 +465,18 @@ class SchemaRegistry(dict):
                     break
             if is_attr:
                 continue
-            self[k] = ComponentSchema(k, **v)
+            comp_list.append(k)
+        # Add dummy schemas to registry
+        for k in comp_list:
+            self[k] = {'hold': {'type': 'string'}}
+        # Create components
+        for k in comp_list:
+            icomp = ComponentSchema(k, schema_registry=self, **schema[k])
             for iattr in self._component_attr:
                 kattr = k + iattr
                 if kattr in schema:
-                    setattr(self[k], iattr, schema[kattr])
+                    setattr(icomp, iattr, schema[kattr])
+            self[k] = icomp
 
     def save(self, fname):
         r"""Save the schema to a file.
@@ -474,13 +523,11 @@ class SchemaRegistry(dict):
     @property
     def validator(self):
         r"""Compose complete schema for parsing yaml."""
-        out = {'models': {'type': 'list',
-                          'schema': {'type': 'dict',
-                                     'schema': self['model']}},
-               'connections': {'type': 'list',
-                               'schema': {'type': 'dict',
-                                          'schema': self['connection']}}}
-        return SchemaValidator(out)
+        out = {'models': {'type': 'list', 'schema': {'type': 'dict',
+                                                     'schema': 'model'}},
+               'connections': {'type': 'list', 'schema': {'type': 'dict',
+                                                          'schema': 'connection'}}}
+        return CisSchemaValidator(out, schema_registry=self)
 
 
 class SchemaLoader(yaml.SafeLoader):
@@ -504,11 +551,13 @@ class SchemaDumper(yaml.Dumper):
         return self.represent_data(out)
 
     def represent_SchemaRegistry(self, data):
-        out = dict(**data)
-        for k in data.keys():
+        out = dict(**data.all())
+        comp_list = [k for k in out.keys()]
+        for k in comp_list:
             for iattr in data._component_attr:
-                if getattr(data[k], iattr, None):
-                    out[k + iattr] = getattr(data[k], iattr)
+                icomp = data[k]
+                if getattr(icomp, iattr, None):
+                    out[k + iattr] = getattr(icomp, iattr)
         return self.represent_data(out)
 
 
