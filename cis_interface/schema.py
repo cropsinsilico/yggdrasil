@@ -246,7 +246,7 @@ class ComponentSchema(dict):
 
     """
     _subtype_keys = {'model': 'language', 'comm': 'commtype',
-                     'file': 'filetype', 'type': 'datatype'}
+                     'file': 'filetype'}  # , 'type': 'datatype'}
 
     def __init__(self, schema_type, schema_registry=None, **kwargs):
         self.schema_registry = schema_registry
@@ -401,7 +401,8 @@ class SchemaRegistry(cerberus.schema.SchemaRegistry):
         comp = {}
         if registry is not None:
             if required is None:
-                required = ['type', 'comm', 'file', 'model', 'connection']
+                # required = ['type', 'comm', 'file', 'model', 'connection']
+                required = ['comm', 'file', 'model', 'connection']
             for k in required:
                 if k not in registry:
                     raise ValueError("Component %s required." % k)
