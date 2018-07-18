@@ -301,14 +301,14 @@ model:
   language:
     allowed:
     - c
-    - executable
-    - lpy
-    - cpp
-    - python
-    - matlab
-    - make
     - c++
     - cmake
+    - cpp
+    - executable
+    - lpy
+    - make
+    - matlab
+    - python
     required: true
     type: string
   make_command:

@@ -2,7 +2,7 @@
 import os
 import sys
 import traceback
-from cis_interface import runner
+from cis_interface import runner, schema
 from cis_interface.drivers import GCCModelDriver
 
 
@@ -52,6 +52,14 @@ def ld_flags():
 
     """
     return ' '.join(GCCModelDriver.get_flags()[1])
+
+
+def regen_schema():
+    r"""Regenerate the cis_interface schema."""
+    if os.path.isfile(schema._schema_fname):
+        os.remove(schema._schema_fname)
+    schema.clear_schema()
+    schema.init_schema()
 
 
 if __name__ == '__main__':

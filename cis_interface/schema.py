@@ -59,6 +59,10 @@ def inherit_schema(orig, key, value, **kwargs):
         out[k].setdefault('dependencies', {})
         out[k]['dependencies'].setdefault(key, [])
         out[k]['dependencies'][key] += value_list
+    # Sort
+    for k in out.keys():
+        if ('dependencies' in out[k]) and (key in out[k]['dependencies']):
+            out[k]['dependencies'][key] = sorted(out[k]['dependencies'][key])
     return out
 
 
@@ -303,7 +307,7 @@ class ComponentSchema(dict):
     @property
     def classes(self):
         r"""list: All available classes for this schema."""
-        return [k for k in self._schema_subtypes.keys()]
+        return sorted([k for k in self._schema_subtypes.keys()])
 
     def append(self, comp_cls, subtype=None):
         r"""Append component class to the schema.
@@ -367,7 +371,7 @@ class ComponentSchema(dict):
                             else:  # pragma: debug
                                 alldeps[ik].append(iv)
                     for ik in alldeps.keys():
-                        alldeps[ik] = list(set(alldeps[ik]))
+                        alldeps[ik] = sorted(list(set(alldeps[ik])))
                     vcopy = copy.deepcopy(v)
                     vcopy['dependencies'] = alldeps
                     old[k].update(**vcopy)

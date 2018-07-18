@@ -271,6 +271,7 @@ setup(
                             'cisccflags=cis_interface.command_line:cc_flags',
                             'cisldflags=cis_interface.command_line:ld_flags',
                             'cistest=cis_interface:run_nose'],
+                            'cisschema=cis_interface.command_line:regen_schema'],
     },
     license="BSD",
 )
