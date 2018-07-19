@@ -46,6 +46,7 @@ def dtype2definition(dtype):
     elif np.issubdtype(dtype, np.dtype('S')):
         out['type'] = 'string'
     else:
+        print("TypeError", dtype)
         raise TypeError('Cannot find type string for dtype %s' % dtype)
     out['precision'] = dtype.itemsize * 8
     return out
