@@ -1,7 +1,7 @@
 import copy
 import numpy as np
 from cis_interface import units
-from cis_interface.types.tests import test_CisBaseType as parent
+from cis_interface.datatypes.tests import test_CisBaseType as parent
 
 
 class TestCisScalarType(parent.TestCisBaseType):

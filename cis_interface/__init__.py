@@ -29,6 +29,7 @@ def run_nose(verbose=False, nocapture=False, stop=False,
             which invokes coverage. Defaults to False.
 
     """
+    error_code = 0
     nose_argv = sys.argv
     nose_argv += ['--detailed-errors', '--exe']
     if verbose:
@@ -46,8 +47,11 @@ def run_nose(verbose=False, nocapture=False, stop=False,
     os.chdir(package_dir)
     try:
         nose.run(argv=nose_argv)
+    except BaseException:
+        error_code = -1
     finally:
         os.chdir(initial_dir)
+    return error_code
 
 
 __all__ = []

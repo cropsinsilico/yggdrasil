@@ -8,7 +8,7 @@ import cerberus
 import collections
 from cis_interface.drivers import import_all_drivers
 from cis_interface.communication import import_all_comms
-from cis_interface.types import import_all_types
+from cis_interface.datatypes import import_all_types
 
 
 _schema_fname = os.path.abspath(os.path.join(

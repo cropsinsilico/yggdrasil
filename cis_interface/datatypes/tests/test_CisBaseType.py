@@ -1,7 +1,7 @@
 import nose.tools as nt
 import jsonschema
 from cis_interface import backwards
-from cis_interface.types import CisBaseType
+from cis_interface.datatypes import CisBaseType
 from cis_interface.tests import CisTestClassInfo
 
 
@@ -25,7 +25,7 @@ class TestCisBaseType(CisTestClassInfo):
     @property
     def mod(self):
         r"""str: Absolute name of module containing class to be tested."""
-        return 'cis_interface.types.%s' % self._mod
+        return 'cis_interface.datatypes.%s' % self._mod
 
     @property
     def typedef(self):

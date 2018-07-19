@@ -32,7 +32,7 @@ def import_all_types():
     for x in glob.glob(os.path.join(os.path.dirname(__file__), '*.py')):
         if not x.startswith('__'):
             type_mod = os.path.basename(x)[:-3]
-            importlib.import_module('cis_interface.types.%s' % type_mod)
+            importlib.import_module('cis_interface.datatypes.%s' % type_mod)
 
 
 import_all_types()

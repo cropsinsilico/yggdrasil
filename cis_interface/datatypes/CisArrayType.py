@@ -1,8 +1,8 @@
 import numpy as np
 import copy
 from cis_interface import units
-from cis_interface.types import register_type
-from cis_interface.types.CisBaseType import CisBaseType
+from cis_interface.datatypes import register_type
+from cis_interface.datatypes.CisBaseType import CisBaseType
 
 
 def data2dtype(data):
@@ -144,8 +144,6 @@ class CisScalarType(CisBaseType):
         except TypeError:
             return False
         datadef['typename'] = cls.name
-        print(datadef)
-        print(typedef)
         for k, v in typedef.items():
             if not cls.check_meta_compat(k, datadef.get(k, None), v):
                 return False
@@ -196,9 +194,6 @@ class CisScalarType(CisBaseType):
 
         """
         dtype = definition2dtype(typedef)
-        print(typedef)
-        print(obj)
-        print(dtype)
         arr = np.fromstring(obj, dtype=dtype)
         if 'shape' in typedef:
             arr = arr.reshape(typedef['shape'])
