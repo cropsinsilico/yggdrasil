@@ -1,8 +1,17 @@
 import numpy as np
 import copy
-from cis_interface import units
+from cis_interface import units, backwards
 from cis_interface.datatypes import register_type
 from cis_interface.datatypes.CisBaseType import CisBaseType
+_valid_numpy_types = ['int', 'uint', 'float', 'complex']
+_valid_types = {k: k for k in _valid_numpy_types}
+_flexible_types = ['string', 'bytes', 'unicode']
+if backwards.PY2:
+    _valid_numpy_types.append('string')
+    _valid_types['string'] = 'string'
+else:
+    _valid_numpy_types.append('bytes')
+    _valid_types['string'] = 'bytes'
 
 
 def data2dtype(data):
@@ -20,7 +29,6 @@ def data2dtype(data):
         dtype = data_nounits.dtype
     else:
         dtype = np.array([data_nounits]).dtype
-        # dtype = np.dtype(type(data_nounits))
     return dtype
 
 
@@ -35,20 +43,13 @@ def dtype2definition(dtype):
 
     """
     out = {}
-    if np.issubdtype(dtype, np.dtype('float')):
-        out['type'] = 'float'
-    elif np.issubdtype(dtype, np.dtype('uint')):
-        out['type'] = 'uint'
-    elif np.issubdtype(dtype, np.dtype('int')):
-        out['type'] = 'int'
-    elif np.issubdtype(dtype, np.dtype('complex')):
-        out['type'] = 'complex'
-    elif np.issubdtype(dtype, np.dtype('S')):
-        out['type'] = 'string'
-    else:
+    for k, v in _valid_types.items():
+        if dtype.name.startswith(v):
+            out['type'] = k
+    if 'type' not in out:
         print("TypeError", dtype)
         raise TypeError('Cannot find type string for dtype %s' % dtype)
-    out['precision'] = dtype.itemsize * 8
+    out['precision'] = dtype.itemsize * 8  # in bits
     return out
 
 
@@ -62,12 +63,11 @@ def definition2dtype(props):
         np.dtype: Numpy data type.
 
     """
-    if props['type'] == 'string':
-        dtype_str = 'S%d' % (props['precision'] / 8)
+    if props['type'] in _flexible_types:
+        out = np.dtype((_valid_types[props['type']], props['precision'] // 8))
     else:
-        dtype_str = props['type']
-        dtype_str += str(int(props['precision']))
-    return np.dtype(dtype_str)
+        out = np.dtype('%s%d' % (_valid_types[props['type']], props['precision']))
+    return out
 
 
 def data2definition(data):
@@ -94,7 +94,7 @@ class CisScalarType(CisBaseType):
     properties = {'type': {
                   'description': 'The base type for each item.',
                   'type': 'string',
-                  'enum': ['int', 'uint', 'float', 'complex', 'string']},
+                  'enum': [k for k in sorted(_valid_types.keys())]},
                   'precision': {
                   'description': 'The size (in bits) of each item.',
                   'type': 'number',
