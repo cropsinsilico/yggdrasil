@@ -21,7 +21,7 @@ env:
 matrix:
   include:
     - python: 2.7
-      env: NUMPY=numpy==1.10.4 MATPLOTLIB=matplotlib==1.5.3 INSTALLZMQ=0 INSTALLRMQ=0
+      env: NUMPY=numpy==1.13.0 MATPLOTLIB=matplotlib==1.5.3 INSTALLZMQ=0 INSTALLRMQ=0
     - python: 2.7
       env: INSTALLRMQ=1 INSTALLLPY=1
     - python: 3.4
@@ -159,7 +159,7 @@ before_script:
 
 script:
   - |
-    cistest --nologcapture --with-coverage --cover-package=cis_interface -svx datatypes/tests/
+    cistest --nologcapture --with-coverage --cover-package=cis_interface -svx
 
 after_success:
   - coveralls
