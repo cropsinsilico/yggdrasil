@@ -22,7 +22,8 @@ import sys
 import sphinx_rtd_theme
 # sys.path.insert(0, os.path.abspath('.'))
 doxydir = os.path.join(os.path.abspath('../'), "doxy", "xml")
-srcdir = os.path.join(os.path.abspath('../../'), "cis_interface")
+rootdir = os.path.abspath('../../')
+srcdir = os.path.join(srcdir, "cis_interface")
 sys.path.append(doxydir)
 
 
@@ -99,10 +100,16 @@ author = u'Meagan Lang, David Raila'
 # |version| and |release|, also used in various other places throughout the
 # built documents.
 #
+with open(os.path.join(rootdir, 'VERSION')) as version_file:
+    cis_ver = version_file.read().strip()
+ver_parts = cis_ver.split('.')
 # The short X.Y version.
-version = u'0.3'
+version = '.'.join(ver_parts[:2])
 # The full version, including alpha/beta/rc tags.
-release = u'0.3.0'
+if len(ver_parts) <= 2:
+    release = version + '.0'
+else:
+    release = cis_ver
 
 # Substitutions
 # .. _Docs: http://cis_interface.readthedocs.io/en/latest/

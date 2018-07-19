@@ -11,7 +11,9 @@ PY_MAJOR_VERSION = sys.version_info[0]
 PY2 = (PY_MAJOR_VERSION == 2)
 IS_WINDOWS = (sys.platform in ['win32', 'cygwin'])
 
-cis_ver = "0.3"
+
+with open(os.path.join(os.path.dirname(__file__), 'VERSION')) as version_file:
+    cis_ver = version_file.read().strip()
 
 
 try:
