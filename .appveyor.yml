@@ -117,7 +117,7 @@ before_test:
   - "flake8 cis_interface"
 
 test_script:
-  - "cistest --nologcapture --with-coverage --cover-package=cis_interface -svx"
+  - "cistest --nologcapture --with-coverage --cover-package=cis_interface -svx datatypes/tests/"
 
 after_test:
   - "codecov"

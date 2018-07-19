@@ -142,10 +142,12 @@ class CisScalarType(CisBaseType):
         try:
             datadef = data2definition(data)
         except TypeError:
+            print("TypeError", type(data), data)
             return False
         datadef['typename'] = cls.name
         for k, v in typedef.items():
             if not cls.check_meta_compat(k, datadef.get(k, None), v):
+                print("Incompat elements: ", k, datadef.get(k, None), v)
                 return False
         return True
 

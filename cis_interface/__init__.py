@@ -31,6 +31,10 @@ def run_nose(verbose=False, nocapture=False, stop=False,
     """
     error_code = 0
     nose_argv = sys.argv
+    if not nose_argv[-1].startswith('-'):
+        test_dir = nose_argv.pop()
+    else:
+        test_dir = None
     nose_argv += ['--detailed-errors', '--exe']
     if verbose:
         nose_argv.append('-v')
@@ -44,7 +48,13 @@ def run_nose(verbose=False, nocapture=False, stop=False,
         nose_argv.append('--with-coverage')
     initial_dir = os.getcwd()
     package_dir = os.path.dirname(os.path.abspath(__file__))
-    os.chdir(package_dir)
+    if (test_dir is None):
+        test_dir = package_dir
+    else:
+        # Assumed relative to package directory
+        if not os.path.isabs(test_dir):
+            test_dir = os.path.join(package_dir, test_dir)
+    os.chdir(test_dir)
     try:
         result = nose.run(argv=nose_argv)
         if not result:

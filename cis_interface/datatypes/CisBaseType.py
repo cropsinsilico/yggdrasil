@@ -229,6 +229,9 @@ class CisBaseType(object):
         try:
             cls.validate_definition(typedef)
         except jsonschema.exceptions.ValidationError:
+            print("invalid definition")
+            import pprint
+            pprint.pprint(typedef)
             return False
         return cls.check_data(obj, typedef)
 
