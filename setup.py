@@ -225,7 +225,7 @@ requirements = ["numpy", "scipy", "pyyaml",
                 'pandas; python_version >= "3.5"',
                 'pandas; python_version == "2.7"',
                 'pandas<0.21; python_version == "3.4"',
-                "pint"]  # "unyt"]
+                "pint", "unyt"]
 # optional_requirements = ["pika", "astropy"]
 if not IS_WINDOWS:
     requirements.append("sysv_ipc")
