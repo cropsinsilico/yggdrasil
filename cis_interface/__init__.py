@@ -46,7 +46,9 @@ def run_nose(verbose=False, nocapture=False, stop=False,
     package_dir = os.path.dirname(os.path.abspath(__file__))
     os.chdir(package_dir)
     try:
-        nose.run(argv=nose_argv)
+        result = nose.run(argv=nose_argv)
+        if not result:
+            error_code = -1
     except BaseException:
         error_code = -1
     finally:
