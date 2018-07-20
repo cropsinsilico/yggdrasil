@@ -6,10 +6,10 @@ from cis_interface.datatypes.CisBaseType import CisBaseType
 _valid_numpy_types = ['int', 'uint', 'float', 'complex']
 _valid_types = {k: k for k in _valid_numpy_types}
 _flexible_types = ['string', 'bytes', 'unicode']
-if backwards.PY2:
+if backwards.PY2:  # pragma: Python 2
     _valid_numpy_types.append('string')
     _valid_types['string'] = 'string'
-else:
+else:  # pragma: Python 3
     _valid_numpy_types.append('bytes')
     _valid_types['string'] = 'bytes'
 
