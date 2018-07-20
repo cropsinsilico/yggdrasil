@@ -46,6 +46,7 @@ def run_nose(verbose=False, nocapture=False, stop=False,
         nose_argv.append('--nologcapture')
     if withcoverage:
         nose_argv.append('--with-coverage')
+        nose_argv.append('--cover-package=cis_interface')
     initial_dir = os.getcwd()
     package_dir = os.path.dirname(os.path.abspath(__file__))
     if (test_dir is None):
