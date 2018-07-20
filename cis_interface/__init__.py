@@ -4,6 +4,7 @@ from cis_interface import platform
 import os
 import sys
 import nose
+from ._version import get_versions
 
 
 if platform._is_win:  # pragma: windows
@@ -68,7 +69,5 @@ def run_nose(verbose=False, nocapture=False, stop=False,
 
 
 __all__ = []
-
-from ._version import get_versions
 __version__ = get_versions()['version']
 del get_versions
