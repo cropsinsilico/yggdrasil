@@ -4,14 +4,17 @@ import shutil
 import warnings
 from setuptools import setup, find_packages
 from distutils.sysconfig import get_python_lib
+import versioneer
 import install_matlab_engine
 import update_config
 import update_coveragerc
 IS_WINDOWS = (sys.platform in ['win32', 'cygwin'])
 
 
-with open(os.path.join(os.path.dirname(__file__), 'VERSION')) as version_file:
-    cis_ver = version_file.read().strip()
+cis_ver = versioneer.get_version()
+# print(cis_ver, type(cis_ver))
+# with open(os.path.join(os.path.dirname(__file__), 'VERSION')) as version_file:
+#     cis_ver = version_file.read().strip()
 
 
 # Attempt to install openalea
@@ -92,6 +95,7 @@ setup(
     packages=find_packages(),
     include_package_data=True,
     version=cis_ver,
+    cmdclass=versioneer.get_cmdclass(),
     description=("A framework for combining interdependent models from "
                  "multiple languages."),
     long_description=long_description,

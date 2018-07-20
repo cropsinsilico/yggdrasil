@@ -100,16 +100,10 @@ author = u'Meagan Lang, David Raila'
 # |version| and |release|, also used in various other places throughout the
 # built documents.
 #
-with open(os.path.join(rootdir, 'VERSION')) as version_file:
-    cis_ver = version_file.read().strip()
-ver_parts = cis_ver.split('.')
 # The short X.Y version.
-version = '.'.join(ver_parts[:2])
+version = cis_interface.__version__
 # The full version, including alpha/beta/rc tags.
-if len(ver_parts) <= 2:
-    release = version + '.0'
-else:
-    release = cis_ver
+release = cis_interface.__version__
 
 # Substitutions
 # .. _Docs: http://cis_interface.readthedocs.io/en/latest/
