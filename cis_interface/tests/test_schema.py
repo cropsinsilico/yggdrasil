@@ -47,7 +47,7 @@ def test_SchemaRegistry():
     r"""Test schema registry."""
     nt.assert_raises(ValueError, schema.SchemaRegistry, {})
     x = schema.SchemaRegistry()
-    nt.assert_equal(x == None, False)
+    nt.assert_equal(x == 0, False)
     nt.assert_raises(Exception, x.load, __file__)
     
 
