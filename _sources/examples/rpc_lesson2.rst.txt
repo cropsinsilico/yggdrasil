@@ -27,8 +27,8 @@ Model YAML:
 
 
 
-C Version
----------
+Python Version
+--------------
 
 Model Code:
 
@@ -36,8 +36,8 @@ Model Code:
    :language: python
    :linenos:
 
-.. literalinclude:: /../../cis_interface/examples/rpc_lesson2/src/client.c
-   :language: c
+.. literalinclude:: /../../cis_interface/examples/rpc_lesson2/src/client.py
+   :language: python
    :linenos:
 
 
@@ -47,7 +47,7 @@ Model YAML:
    :language: yaml
    :linenos:
 
-.. literalinclude:: /../../cis_interface/examples/rpc_lesson2/client_c.yml
+.. literalinclude:: /../../cis_interface/examples/rpc_lesson2/client_python.yml
    :language: yaml
    :linenos:
 
@@ -79,8 +79,8 @@ Model YAML:
 
 
 
-Python Version
---------------
+C Version
+---------
 
 Model Code:
 
@@ -88,8 +88,8 @@ Model Code:
    :language: python
    :linenos:
 
-.. literalinclude:: /../../cis_interface/examples/rpc_lesson2/src/client.py
-   :language: python
+.. literalinclude:: /../../cis_interface/examples/rpc_lesson2/src/client.c
+   :language: c
    :linenos:
 
 
@@ -99,7 +99,7 @@ Model YAML:
    :language: yaml
    :linenos:
 
-.. literalinclude:: /../../cis_interface/examples/rpc_lesson2/client_python.yml
+.. literalinclude:: /../../cis_interface/examples/rpc_lesson2/client_c.yml
    :language: yaml
    :linenos:
 

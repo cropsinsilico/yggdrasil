@@ -19,19 +19,19 @@ Model YAML:
 
 
 
-C Version
----------
+Python Version
+--------------
 
 Model Code:
 
-.. literalinclude:: /../../cis_interface/examples/gs_lesson1/src/gs_lesson1.c
-   :language: c
+.. literalinclude:: /../../cis_interface/examples/gs_lesson1/src/gs_lesson1.py
+   :language: python
    :linenos:
 
 
 Model YAML:
 
-.. literalinclude:: /../../cis_interface/examples/gs_lesson1/gs_lesson1_c.yml
+.. literalinclude:: /../../cis_interface/examples/gs_lesson1/gs_lesson1_python.yml
    :language: yaml
    :linenos:
 
@@ -55,19 +55,19 @@ Model YAML:
 
 
 
-Python Version
---------------
+C Version
+---------
 
 Model Code:
 
-.. literalinclude:: /../../cis_interface/examples/gs_lesson1/src/gs_lesson1.py
-   :language: python
+.. literalinclude:: /../../cis_interface/examples/gs_lesson1/src/gs_lesson1.c
+   :language: c
    :linenos:
 
 
 Model YAML:
 
-.. literalinclude:: /../../cis_interface/examples/gs_lesson1/gs_lesson1_python.yml
+.. literalinclude:: /../../cis_interface/examples/gs_lesson1/gs_lesson1_c.yml
    :language: yaml
    :linenos:
 

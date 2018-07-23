@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>cis_interface.drivers.CMakeModelDriver &mdash; cis_interface 0.4+0.gd8a2a4f.dirty documentation</title>
+  <title>cis_interface.drivers.CMakeModelDriver &mdash; cis_interface 0.4+1.g999f828 documentation</title>
   
 
   
@@ -58,7 +58,7 @@
             
             
               <div class="version">
-                0.4+0.gd8a2a4f.dirty
+                0.4+1.g999f828
               </div>
             
           
@@ -291,7 +291,7 @@
 
 
 <span class="nd">@register_component</span>
-<div class="viewcode-block" id="CMakeModelDriver"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.CMakeModelDriver.CMakeModelDriver">[docs]</a><span class="k">class</span> <span class="nc">CMakeModelDriver</span><span class="p">(</span><span class="n">ModelDriver</span><span class="p">):</span>
+<div class="viewcode-block" id="CMakeModelDriver"><a class="viewcode-back" href="../../../model_drivers.html#cis_interface.drivers.CMakeModelDriver.CMakeModelDriver">[docs]</a><span class="k">class</span> <span class="nc">CMakeModelDriver</span><span class="p">(</span><span class="n">ModelDriver</span><span class="p">):</span>
     <span class="sd">r&quot;&quot;&quot;Class for running cmake compiled drivers. Before running the</span>
 <span class="sd">    cmake command, the cmake commands for setting the necessary compiler &amp; linker</span>
 <span class="sd">    flags for the interface&#39;s C/C++ library are written to a file called</span>
@@ -371,7 +371,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Making target.&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">run_cmake</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="p">)</span>
 
-<div class="viewcode-block" id="CMakeModelDriver.run_cmake"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.CMakeModelDriver.CMakeModelDriver.run_cmake">[docs]</a>    <span class="k">def</span> <span class="nf">run_cmake</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="CMakeModelDriver.run_cmake"><a class="viewcode-back" href="../../../model_drivers.html#cis_interface.drivers.CMakeModelDriver.CMakeModelDriver.run_cmake">[docs]</a>    <span class="k">def</span> <span class="nf">run_cmake</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">r&quot;&quot;&quot;Run the cmake command on the source.</span>
 
 <span class="sd">        Args:</span>
@@ -418,7 +418,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Make complete&#39;</span><span class="p">)</span>
         <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">curdir</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="CMakeModelDriver.cleanup"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.CMakeModelDriver.CMakeModelDriver.cleanup">[docs]</a>    <span class="k">def</span> <span class="nf">cleanup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="CMakeModelDriver.cleanup"><a class="viewcode-back" href="../../../model_drivers.html#cis_interface.drivers.CMakeModelDriver.CMakeModelDriver.cleanup">[docs]</a>    <span class="k">def</span> <span class="nf">cleanup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">r&quot;&quot;&quot;Remove compile executable.&quot;&quot;&quot;</span>
         <span class="c1"># self.run_cmake(&#39;clean&#39;)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">preserve_cache</span><span class="p">:</span>
@@ -470,7 +470,7 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../../../',
-            VERSION:'0.4+0.gd8a2a4f.dirty',
+            VERSION:'0.4+1.g999f828',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
