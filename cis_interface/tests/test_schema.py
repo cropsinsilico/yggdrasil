@@ -1,4 +1,5 @@
 import os
+import tempfile
 import nose.tools as nt
 from cis_interface import schema
 
@@ -48,7 +49,11 @@ def test_SchemaRegistry():
     nt.assert_raises(ValueError, schema.SchemaRegistry, {})
     x = schema.SchemaRegistry()
     nt.assert_equal(x == 0, False)
-    nt.assert_raises(Exception, x.load, __file__)
+    fname = os.path.join(tempfile.gettempdir(), 'temp.yml')
+    with open(fname, 'w') as fd:
+        fd.write('')
+    nt.assert_raises(Exception, x.load, fname)
+    os.remove(fname)
     
 
 def test_default_schema():
