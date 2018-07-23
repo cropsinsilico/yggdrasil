@@ -20,10 +20,11 @@ import os
 import glob
 import sys
 import sphinx_rtd_theme
+import cis_interface
 # sys.path.insert(0, os.path.abspath('.'))
 doxydir = os.path.join(os.path.abspath('../'), "doxy", "xml")
 rootdir = os.path.abspath('../../')
-srcdir = os.path.join(srcdir, "cis_interface")
+srcdir = os.path.join(rootdir, "cis_interface")
 sys.path.append(doxydir)
 
 
