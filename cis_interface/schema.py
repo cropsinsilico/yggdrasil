@@ -337,7 +337,7 @@ class ComponentSchema(dict):
         self.append_rules(rule)
         # Add allowed subtypes
         if (self._subtype_key is not None) and (self._subtype_key in self):
-            self[self._subtype_key]['allowed'] = self.subtypes
+            self[self._subtype_key]['allowed'] = sorted(self.subtypes)
         # Verify that the schema is valid
         CisSchemaValidator(self, schema_registry=self.schema_registry)
 

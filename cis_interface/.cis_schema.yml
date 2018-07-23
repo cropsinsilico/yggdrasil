@@ -191,8 +191,8 @@ file:
   delimiter:
     dependencies:
       filetype:
-      - table
       - pandas
+      - table
     required: false
     type: string
   dtype: *id002
@@ -200,14 +200,14 @@ file:
   field_units: *id004
   filetype:
     allowed:
+    - ascii
     - binary
+    - map
+    - obj
+    - pandas
+    - pickle
     - ply
     - table
-    - pickle
-    - pandas
-    - map
-    - ascii
-    - obj
     default: binary
     required: false
     type: string
