@@ -15,13 +15,10 @@ env:
     INSTALLAPY=0
     INSTALLLPY=0
 
-# services:
-#   - rabbitmq
-
 matrix:
   include:
     - python: 2.7
-      env: NUMPY=numpy==1.10.4 MATPLOTLIB=matplotlib==1.5.3 INSTALLZMQ=0 INSTALLRMQ=0
+      env: NUMPY=numpy==1.13.0 MATPLOTLIB=matplotlib==1.5.3 INSTALLZMQ=0 INSTALLRMQ=0
     - python: 2.7
       env: INSTALLRMQ=1 INSTALLLPY=1
     - python: 3.4
@@ -135,7 +132,7 @@ before_install:
        else
           sh ci/start-rmqserver-linux.sh
        fi
-       
+
     fi
 
 install:
@@ -152,7 +149,7 @@ install:
     pip install nose coverage coveralls codecov flake8
     # Install cis_interface
     pip install -e .
-    
+
 before_script:
   - |
     flake8 cis_interface
@@ -164,3 +161,12 @@ script:
 after_success:
   - coveralls
   - codecov
+
+deploy:
+  provider: pypi
+  distributions: sdist bdist_wheel --universal
+  user: langmm
+  password:
+    secure: cYP65ktykU8vzNpjDxVJ7hb5VIA8pcG0+LfaboyJ/7jJ85OFFMb7k12cuzmcFgyCMzxaMaR74ZwSL1Zs3jwfpsfKt22rdXV3YtAlrbLfHDd1ReoPeg6ZHSHYlZq/pkGowB7OHZMPaF7Pwjl2igWE1ZrJ8q/K2vVCt/cv9JhZXZS3nnC3iTY9jbvq/sWp6QChy61s5ekxf9m3PJBcS3s/n34ZyuQt8eF73YSMlztWNLTBWKIfK2LOpDXXKDWhFRDhlmt3mA88I2HI1ZxFyANIrrMwGEBIJOVWlAfnPOdoI36JW9wqv3DXj9RGVDNcVwfW5/juxMF+DSHORwQDuTn3E6Z0Q/ic6rLndI+vzHjYdjPeLXutggOEGTjq32LP6FkJ+3LyrFoQXwZIZ+FqLRni/HyppoyIQ+S5NneLB7Wj5Hyja7ycmwLZnlnixUz3qHOvIv6Hpv/koDltqyB5gzf0xvbNUMkRCHuuovtbqtmRtxA1BL8VKoGVzZ7zHrWG+iTGZXSFhgrcO1k8OYzxaWR2O/NeeURuy3ViD+xzPSvMASRX0sCULOf3o2rgDdJyTBjW5KZcLqVcOiGZoHgwOjZY0NQ50R7mE7T+CQmoYtil1Ovmm8b6NUhoE0z6jEgDVfEhKo9/WACHamzIQ4afrYsEWlQhDSg+dvrzS7OciILOK+Q=
+  on:
+    tags: true

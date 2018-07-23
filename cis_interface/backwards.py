@@ -15,6 +15,7 @@ if PY2:  # pragma: Python 2
     file_type = types.FileType
     bytes_type = str
     unicode_type = str
+    string_type = str
     np_dtype_str = 'S'
     string_types = (str, unicode)
 else:  # pragma: Python 3
@@ -26,6 +27,7 @@ else:  # pragma: Python 3
     file_type = sio.IOBase
     bytes_type = bytes
     unicode_type = str
+    string_type = str
     unicode = None
     np_dtype_str = 'S'
     string_types = (bytes, str)

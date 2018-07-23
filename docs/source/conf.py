@@ -22,7 +22,8 @@ import sys
 import sphinx_rtd_theme
 # sys.path.insert(0, os.path.abspath('.'))
 doxydir = os.path.join(os.path.abspath('../'), "doxy", "xml")
-srcdir = os.path.join(os.path.abspath('../../'), "cis_interface")
+rootdir = os.path.abspath('../../')
+srcdir = os.path.join(srcdir, "cis_interface")
 sys.path.append(doxydir)
 
 
@@ -100,9 +101,9 @@ author = u'Meagan Lang, David Raila'
 # built documents.
 #
 # The short X.Y version.
-version = u'0.3'
+version = cis_interface.__version__
 # The full version, including alpha/beta/rc tags.
-release = u'0.3.0'
+release = cis_interface.__version__
 
 # Substitutions
 # .. _Docs: http://cis_interface.readthedocs.io/en/latest/

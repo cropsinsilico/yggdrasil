@@ -294,7 +294,7 @@ class CommBase(tools.CisClass):
     _commtype = 'default'
     _schema_type = 'comm'
     _schema = {'name': {'type': 'string', 'required': True},
-               'type': {'type': 'string', 'required': False},  # TODO: add values
+               'dtype': {'type': 'string', 'required': False},  # TODO: add values
                'units': {'type': 'string', 'required': False},  # TODO: add values
                'format_str': {'type': 'string', 'required': False},
                'as_array': {'type': 'boolean', 'required': False},

@@ -271,9 +271,10 @@ class CisTestBase(unittest.TestCase):
 class CisTestClass(CisTestBase):
     r"""Test class for a CisClass."""
 
+    _mod = None
+    _cls = None
+
     def __init__(self, *args, **kwargs):
-        self._mod = None
-        self._cls = None
         self._inst_args = list()
         self._inst_kwargs = dict()
         super(CisTestClass, self).__init__(*args, **kwargs)

@@ -1,4 +1,5 @@
 import os
+import tempfile
 import nose.tools as nt
 from cis_interface import schema
 
@@ -23,9 +24,9 @@ def test_str_to_function():
                      '%s:invalid' % __name__)
 
 
-def test_SchemaValidator():
+def test_CisSchemaValidator():
     r"""Test schema validator."""
-    v = schema.SchemaValidator()
+    v = schema.CisSchemaValidator()
     test_vals = {
         'string': [('s', 's'), (1, '1'), (1.0, '1.0'),
                    (['1', 1], ['1', '1']),
@@ -46,6 +47,13 @@ def test_SchemaValidator():
 def test_SchemaRegistry():
     r"""Test schema registry."""
     nt.assert_raises(ValueError, schema.SchemaRegistry, {})
+    x = schema.SchemaRegistry()
+    nt.assert_equal(x == 0, False)
+    fname = os.path.join(tempfile.gettempdir(), 'temp.yml')
+    with open(fname, 'w') as fd:
+        fd.write('')
+    nt.assert_raises(Exception, x.load, fname)
+    os.remove(fname)
     
 
 def test_default_schema():
@@ -69,6 +77,7 @@ def test_create_schema():
     # Test saving/loading schema
     s0 = schema.create_schema()
     s0.save(fname)
+    assert(s0 is not None)
     assert(os.path.isfile(fname))
     s1 = schema.get_schema(fname)
     nt.assert_equal(s1, s0)
