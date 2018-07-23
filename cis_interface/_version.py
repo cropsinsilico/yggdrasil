@@ -41,7 +41,7 @@ def get_config():
     cfg = VersioneerConfig()
     cfg.VCS = "git"
     cfg.style = "pep440"
-    cfg.tag_prefix = "cis_interface-"
+    cfg.tag_prefix = ""
     cfg.parentdir_prefix = "cis_interface-"
     cfg.versionfile_source = "cis_interface/_version.py"
     cfg.verbose = False
