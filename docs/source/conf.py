@@ -64,7 +64,7 @@ breathe_projects_source = {"cis_interface": (
     srcdir,
     ([os.path.join('interface', f) for f in finterface] +
      [os.path.join('dataio', f) for f in fasciiio] +
-     fserialize))
+     [os.path.join('serialize', f) for f in fserialize]))
     }
 
 # Napoleon settings

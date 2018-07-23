@@ -301,7 +301,7 @@ class ZMQComm(AsyncComm.AsyncComm):
             all messages.
         dealer_identity (str, optional): Identity that should be used to route
             messages to a dealer socket. Defaults to '0'.
-        **kwargs: Additional keyword arguments are passed to CommBase.
+        **kwargs: Additional keyword arguments are passed to :class:.CommBase.
 
     Attributes:
         context (zmq.Context): ZeroMQ context that will be used.
@@ -845,7 +845,7 @@ class ZMQComm(AsyncComm.AsyncComm):
         r"""Get header information from a comm.
 
         Args:
-            comm (CommBase): Work comm that header describes.
+            work_comm (:class:.CommBase): Work comm that header describes.
             **kwargs: Additional keyword arguments are added to the header.
 
         Returns:
@@ -866,7 +866,7 @@ class ZMQComm(AsyncComm.AsyncComm):
             **kwargs: Additional keyword arguments are passed to the parent method.
 
         Returns:
-            CommBase: Work comm.
+            :class:.CommBase: Work comm.
 
         """
         if ('zmq_reply_worker' in header) and (self.direction == 'recv'):

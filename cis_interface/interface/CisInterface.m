@@ -10,14 +10,14 @@
 %> @param varargin Variable number of input arguments passed to specified
 %> python class/function.
 %>
-%> @return pyobj python object returned by the called class/function.
+%> @return out python object returned by the called class/function.
 % =============================================================================
 function out = CisInterface(type, varargin)
   CisInterface = py.importlib.import_module('cis_interface.interface.CisInterface');
   pyobj = CisInterface.CisMatlab(type, py.list(varargin));
-  if (nargin > 1)
+  if (nargin > 1);
     out = CisInterfaceClass(pyobj);
-  else
+  else;
     out = python2matlab(pyobj);
   end;
 end

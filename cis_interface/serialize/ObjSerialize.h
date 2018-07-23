@@ -287,7 +287,7 @@ int alloc_obj(obj_t *p, int nvert, int nface,
   @param[in] s seri_t Structure sepcifying how to serialize arguments.
   @param[in] buf character pointer to memory where serialized message should be
   stored.
-  @param[in] buf_siz size_t Size of memory allocated to buf.
+  @param[in] buf_size size_t Size of memory allocated to buf.
   @param[out] args_used int Number of arguments formatted.
   @param[in] ap va_list Arguments to be formatted.
   @returns: int The length of the serialized message or -1 if there is an error. 

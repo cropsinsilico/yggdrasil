@@ -13,6 +13,6 @@ Subpackages
    cis_interface.drivers
    cis_interface.examples
 	      
-.. include:: cis_interface.rst
-   :start-line: 14
+.. include:: cis_interface.inc
+   :start-line: 16
 	     

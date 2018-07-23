@@ -122,7 +122,7 @@ class CommThreadLoop(tools.CisThreadLoop):
     r"""Thread loop for comms to ensure cleanup.
 
     Args:
-        comm (CommBase): Comm class that thread is for.
+        comm (:class:.CommBase): Comm class that thread is for.
         name (str, optional): Name for the thread. If not provided, one is
             created by combining the comm name and the provided suffix.
         suffix (str, optional): Suffix that should be added to comm name to name
@@ -130,7 +130,7 @@ class CommThreadLoop(tools.CisThreadLoop):
         **kwargs: Additional keyword arguments are passed to the parent class.
 
     Attributes:
-        comm (CommBase): Comm class that thread is for.
+        comm (:class:.CommBase): Comm class that thread is for.
 
     """
     def __init__(self, comm, name=None, suffix='CommThread', **kwargs):
@@ -206,12 +206,12 @@ class CommBase(tools.CisClass):
             through the connection. 'send' if the connection will send
             messages, 'recv' if the connecton will receive messages. Defaults
             to 'send'.
-        serializer (DefaultSerialize, optional): Class with serialize and
+        serializer (:class:.DefaultSerialize, optional): Class with serialize and
             deserialize methods that should be used to process sent and received
             messages. Defaults to None and is constructed using provided
             'serializer_kwargs'.
         serializer_kwargs (dict, optional): Keyword arguments that should be
-            passed to DefaultSerialize to create serializer. Defaults to {}.
+            passed to :class:.DefaultSerialize to create serializer. Defaults to {}.
         format_str (str, optional): String that should be used to format/parse
             messages. Default to None.
         dont_open (bool, optional): If True, the connection will not be opened.
@@ -259,7 +259,7 @@ class CommBase(tools.CisClass):
         address (str): Communication info.
         direction (str): The direction that messages should flow through the
             connection.
-        serializer (DefaultSerialize): Object that will be used to
+        serializer (:class:.DefaultSerialize): Object that will be used to
             serialize/deserialize messages to/from python objects.
         is_interface (bool): True if this comm is a Python interface binding.
         recv_timeout (float): Time that should be waited for an incoming
@@ -851,7 +851,7 @@ class CommBase(tools.CisClass):
             **kwargs: Additional keyword arguments are passed to header2workcomm.
 
         Returns:
-            Comm: Work comm.
+            :class:.CommBase: Work comm.
 
         """
         c = self._work_comms.get(header['id'], None)
@@ -872,7 +872,7 @@ class CommBase(tools.CisClass):
                 work_comm_kwargs.
 
         Returns:
-            Comm: Work comm.
+            :class:.CommBase: Work comm.
 
         """
         kws = self.create_work_comm_kwargs
@@ -888,7 +888,7 @@ class CommBase(tools.CisClass):
         r"""Add work comm to dict.
 
         Args:
-            comm (Comm): Comm that should be added.
+            comm (:class:.CommBase): Comm that should be added.
 
         Raises:
             KeyError: If there is already a comm associated with the key.
@@ -924,7 +924,7 @@ class CommBase(tools.CisClass):
         r"""Get header information from a comm.
 
         Args:
-            comm (CommBase): Work comm that header describes.
+            work_comm (:class:.CommBase): Work comm that header describes.
             **kwargs: Additional keyword arguments are added to the header.
 
         Returns:
@@ -949,7 +949,7 @@ class CommBase(tools.CisClass):
                 dictionary.
 
         Returns:
-            CommBase: Work comm.
+            :class:.CommBase: Work comm.
 
         """
         kws = self.get_work_comm_kwargs

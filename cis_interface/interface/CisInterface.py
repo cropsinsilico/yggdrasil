@@ -137,7 +137,7 @@ def CisRpcServer(name, infmt='%s', outfmt='%s', matlab=False):
             message sent to the response queue. Defautls to '%s'.
 
     Returns:
-        ServerComm: Communication object.
+        :class:.ServerComm: Communication object.
         
     """
     from cis_interface.communication import ServerComm
@@ -164,7 +164,7 @@ def CisRpcClient(name, outfmt='%s', infmt='%s', matlab=False):
             messages received from the response queue. Defautls to '%s'.
 
     Returns:
-        ClientComm: Communication object.
+        :class:.ClientComm: Communication object.
         
     """
     from cis_interface.communication import ClientComm
