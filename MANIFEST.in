@@ -1,4 +1,3 @@
-include VERSION
 include *.md
 include *.png
 include *.svg
