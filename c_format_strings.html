@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>C-Style Format Strings &mdash; cis_interface 0.3.0 documentation</title>
+  <title>C-Style Format Strings &mdash; cis_interface 0.4+0.gd8a2a4f.dirty documentation</title>
   
 
   
@@ -24,7 +24,8 @@
 
   
 
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
@@ -59,7 +60,7 @@
             
             
               <div class="version">
-                0.3
+                0.4+0.gd8a2a4f.dirty
               </div>
             
           
@@ -168,9 +169,9 @@
 <span id="c-style-format-strings-rst"></span><h1>C-Style Format Strings<a class="headerlink" href="#c-style-format-strings" title="Permalink to this headline">¶</a></h1>
 <p>Some types can be serialized/deserialized to/from messages using C-style
 format strings. In C-style format strings, placeholders beginning with the
-<code class="docutils literal notranslate"><span class="pre">%</span></code> character indicate locations in the string that map to variables of
+<code class="docutils literal"><span class="pre">%</span></code> character indicate locations in the string that map to variables of
 the designated type. These placeholders take the form of:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">%</span><span class="p">[</span><span class="n">flags</span><span class="p">][</span><span class="n">width</span><span class="p">][</span><span class="o">.</span><span class="n">precision</span><span class="p">][</span><span class="n">length</span><span class="p">]</span><span class="nb">type</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">%</span><span class="p">[</span><span class="n">flags</span><span class="p">][</span><span class="n">width</span><span class="p">][</span><span class="o">.</span><span class="n">precision</span><span class="p">][</span><span class="n">length</span><span class="p">]</span><span class="nb">type</span>
 </pre></div>
 </div>
 <p>where the fields are:</p>
@@ -208,7 +209,7 @@ This is the only required field.</td>
 </tbody>
 </table>
 <p>These strings can then be used to create messages from a list of variables
-(<code class="docutils literal notranslate"><span class="pre">printf</span></code>) or extract variable from messages (<code class="docutils literal notranslate"><span class="pre">scanf</span></code>).</p>
+(<code class="docutils literal"><span class="pre">printf</span></code>) or extract variable from messages (<code class="docutils literal"><span class="pre">scanf</span></code>).</p>
 <p>Some of the most common types are:</p>
 <table border="1" class="docutils">
 <colgroup>
@@ -221,29 +222,29 @@ This is the only required field.</td>
 </tr>
 </thead>
 <tbody valign="top">
-<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">s</span></code></td>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">s</span></code></td>
 <td>String</td>
 </tr>
-<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">d</span></code></td>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">d</span></code></td>
 <td>Integer</td>
 </tr>
-<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">f</span></code></td>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">f</span></code></td>
 <td>Float</td>
 </tr>
-<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">e</span></code> or <code class="docutils literal notranslate"><span class="pre">E</span></code></td>
-<td>Exponential notation float with <code class="docutils literal notranslate"><span class="pre">e</span></code> or <code class="docutils literal notranslate"><span class="pre">E</span></code> denoting the
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">e</span></code> or <code class="docutils literal"><span class="pre">E</span></code></td>
+<td>Exponential notation float with <code class="docutils literal"><span class="pre">e</span></code> or <code class="docutils literal"><span class="pre">E</span></code> denoting the
 exponent.</td>
 </tr>
-<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">g</span></code> or <code class="docutils literal notranslate"><span class="pre">G</span></code></td>
-<td>General format that uses <code class="docutils literal notranslate"><span class="pre">%f</span></code> for numbers with small
-exponents and <code class="docutils literal notranslate"><span class="pre">%e</span></code> or <code class="docutils literal notranslate"><span class="pre">%E</span></code> for numbers with large
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">g</span></code> or <code class="docutils literal"><span class="pre">G</span></code></td>
+<td>General format that uses <code class="docutils literal"><span class="pre">%f</span></code> for numbers with small
+exponents and <code class="docutils literal"><span class="pre">%e</span></code> or <code class="docutils literal"><span class="pre">%E</span></code> for numbers with large
 exponents.</td>
 </tr>
 </tbody>
 </table>
 <p>For additional information about available types or how the fields are used for
 each type, please see the
-<a class="reference external" href="http://en.cppreference.com/w/cpp/io/c/fprintf">help for C’s printf function</a>.</p>
+<a class="reference external" href="http://en.cppreference.com/w/cpp/io/c/fprintf">help for C&#8217;s printf function</a>.</p>
 </div>
 
 
@@ -288,7 +289,7 @@ each type, please see the
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'0.3.0',
+            VERSION:'0.4+0.gd8a2a4f.dirty',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
@@ -299,15 +300,20 @@ each type, please see the
       <script type="text/javascript" src="_static/jquery.js"></script>
       <script type="text/javascript" src="_static/underscore.js"></script>
       <script type="text/javascript" src="_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 
   
 
-  <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
 
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.Navigation.enable(true);
+          
+          SphinxRtdTheme.Navigation.enableSticky();
+          
       });
   </script> 
 

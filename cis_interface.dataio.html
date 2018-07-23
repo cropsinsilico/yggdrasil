@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>cis_interface.dataio package &mdash; cis_interface 0.3.0 documentation</title>
+  <title>cis_interface.dataio package &mdash; cis_interface 0.4+0.gd8a2a4f.dirty documentation</title>
   
 
   
@@ -24,13 +24,14 @@
 
   
 
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="cis_interface.drivers package" href="cis_interface.drivers.html" />
-    <link rel="prev" title="cis_interface.serialize package" href="cis_interface.serialize.html" /> 
+    <link rel="next" title="cis_interface.dataio.tests package" href="cis_interface.dataio.tests.html" />
+    <link rel="prev" title="cis_interface.serialize.tests package" href="cis_interface.serialize.tests.html" /> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
@@ -59,7 +60,7 @@
             
             
               <div class="version">
-                0.3
+                0.4+0.gd8a2a4f.dirty
               </div>
             
           
@@ -84,7 +85,7 @@
             
             
               <p class="caption"><span class="caption-text">Contents:</span></p>
-<ul>
+<ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="includeme.html">Overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting started</a></li>
@@ -97,7 +98,36 @@
 <li class="toctree-l1"><a class="reference internal" href="c_format_strings.html">C-Style Format Strings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="io_drivers.html">Input/Output Drivers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="model_drivers.html">Model Drivers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="code.html">Code</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="code.html">Code</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="code_python.html">Python Code</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="code_python.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="cis_interface.interface.html">cis_interface.interface package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cis_interface.serialize.html">cis_interface.serialize package</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">cis_interface.dataio package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cis_interface.drivers.html">cis_interface.drivers package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cis_interface.examples.html">cis_interface.examples package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="code_python.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="code_python.html#module-cis_interface.backwards">cis_interface.backwards module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="code_python.html#module-cis_interface.command_line">cis_interface.command_line module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="code_python.html#module-cis_interface.components">cis_interface.components module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="code_python.html#module-cis_interface.config">cis_interface.config module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="code_python.html#module-cis_interface.platform">cis_interface.platform module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="code_python.html#module-cis_interface.runner">cis_interface.runner module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="code_python.html#module-cis_interface.scanf">cis_interface.scanf module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="code_python.html#module-cis_interface.schema">cis_interface.schema module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="code_python.html#module-cis_interface.tools">cis_interface.tools module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="code_python.html#module-cis_interface.units">cis_interface.units module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="code_python.html#module-cis_interface.yamlfile">cis_interface.yamlfile module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="code_python.html#module-cis_interface">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="code_c.html">C Code</a></li>
+<li class="toctree-l2"><a class="reference internal" href="code_cpp.html">C++ Code</a></li>
+<li class="toctree-l2"><a class="reference internal" href="code_matlab.html">Matlab Code</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="examples/examples_toc.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="release.html">Release Steps</a></li>
 </ul>
@@ -170,6 +200,20 @@
             
   <div class="section" id="cis-interface-dataio-package">
 <h1>cis_interface.dataio package<a class="headerlink" href="#cis-interface-dataio-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="cis_interface.dataio.tests.html">cis_interface.dataio.tests package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="cis_interface.dataio.tests.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cis_interface.dataio.tests.html#module-cis_interface.dataio.tests.test_AsciiFile">cis_interface.dataio.tests.test_AsciiFile module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cis_interface.dataio.tests.html#module-cis_interface.dataio.tests.test_AsciiTable">cis_interface.dataio.tests.test_AsciiTable module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cis_interface.dataio.tests.html#module-cis_interface.dataio.tests">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
 <div class="section" id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
 </div>
@@ -177,8 +221,8 @@
 <span id="cis-interface-dataio-asciifile-module"></span><h2>cis_interface.dataio.AsciiFile module<a class="headerlink" href="#module-cis_interface.dataio.AsciiFile" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="cis_interface.dataio.AsciiFile.AsciiFile">
-<em class="property">class </em><code class="descclassname">cis_interface.dataio.AsciiFile.</code><code class="descname">AsciiFile</code><span class="sig-paren">(</span><em>filepath</em>, <em>io_mode</em>, <em>comment='# '</em>, <em>newline='n'</em>, <em>open_as_binary=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/dataio/AsciiFile.html#AsciiFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.dataio.AsciiFile.AsciiFile" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<em class="property">class </em><code class="descclassname">cis_interface.dataio.AsciiFile.</code><code class="descname">AsciiFile</code><span class="sig-paren">(</span><em>filepath</em>, <em>io_mode</em>, <em>comment=b'# '</em>, <em>newline=b'n'</em>, <em>open_as_binary=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/dataio/AsciiFile.html#AsciiFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.dataio.AsciiFile.AsciiFile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
 <dl class="method">
 <dt id="cis_interface.dataio.AsciiFile.AsciiFile.close">
 <code class="descname">close</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/dataio/AsciiFile.html#AsciiFile.close"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.dataio.AsciiFile.AsciiFile.close" title="Permalink to this definition">¶</a></dt>
@@ -188,7 +232,7 @@
 <dl class="attribute">
 <dt id="cis_interface.dataio.AsciiFile.AsciiFile.is_open">
 <code class="descname">is_open</code><a class="headerlink" href="#cis_interface.dataio.AsciiFile.AsciiFile.is_open" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>bool</em> – Returns True if the file descriptor is open.</p>
+<dd><p><em>bool</em> &#8211; Returns True if the file descriptor is open.</p>
 </dd></dl>
 
 <dl class="method">
@@ -200,7 +244,7 @@
 <dl class="attribute">
 <dt id="cis_interface.dataio.AsciiFile.AsciiFile.open_mode">
 <code class="descname">open_mode</code><a class="headerlink" href="#cis_interface.dataio.AsciiFile.AsciiFile.open_mode" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>str</em> – Mode that should be used to open the file.</p>
+<dd><p><em>str</em> &#8211; Mode that should be used to open the file.</p>
 </dd></dl>
 
 <dl class="method">
@@ -218,7 +262,7 @@ encountered</p>
 </dl>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.6)">tuple</a> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)">bool</a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)">str</a>)</td>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)">tuple</a> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)">bool</a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a>)</td>
 </tr>
 </tbody>
 </table>
@@ -239,7 +283,7 @@ a comment, None is returned.</dd>
 </dl>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.6)">tuple</a> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)">bool</a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)">str</a>)</td>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)">tuple</a> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)">bool</a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a>)</td>
 </tr>
 </tbody>
 </table>
@@ -254,10 +298,10 @@ present.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>line</strong> (<em>str/bytes</em>) – Line to be written with/without the newline
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>line</strong> (<em>str/bytes</em>) &#8211; Line to be written with/without the newline
 character.</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#TypeError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">TypeError</span></code></a> – If line is not the correct bytes type.</td>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#TypeError" title="(in Python v3.7)"><code class="xref py py-exc docutils literal"><span class="pre">TypeError</span></code></a> &#8211; If line is not the correct bytes type.</td>
 </tr>
 </tbody>
 </table>
@@ -272,9 +316,9 @@ nothing happens.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>line</strong> (<em>str/bytes</em>) – Line to be written.</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>line</strong> (<em>str/bytes</em>) &#8211; Line to be written.</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#TypeError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">TypeError</span></code></a> – If line is not the correct bytes type.</td>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#TypeError" title="(in Python v3.7)"><code class="xref py py-exc docutils literal"><span class="pre">TypeError</span></code></a> &#8211; If line is not the correct bytes type.</td>
 </tr>
 </tbody>
 </table>
@@ -287,8 +331,8 @@ nothing happens.</p>
 <span id="cis-interface-dataio-asciitable-module"></span><h2>cis_interface.dataio.AsciiTable module<a class="headerlink" href="#module-cis_interface.dataio.AsciiTable" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="cis_interface.dataio.AsciiTable.AsciiTable">
-<em class="property">class </em><code class="descclassname">cis_interface.dataio.AsciiTable.</code><code class="descname">AsciiTable</code><span class="sig-paren">(</span><em>filepath</em>, <em>io_mode</em>, <em>format_str=None</em>, <em>dtype=None</em>, <em>column_names=None</em>, <em>use_astropy=False</em>, <em>column='t'</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/dataio/AsciiTable.html#AsciiTable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.dataio.AsciiTable.AsciiTable" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#cis_interface.dataio.AsciiFile.AsciiFile" title="cis_interface.dataio.AsciiFile.AsciiFile"><code class="xref py py-class docutils literal notranslate"><span class="pre">cis_interface.dataio.AsciiFile.AsciiFile</span></code></a></p>
+<em class="property">class </em><code class="descclassname">cis_interface.dataio.AsciiTable.</code><code class="descname">AsciiTable</code><span class="sig-paren">(</span><em>filepath</em>, <em>io_mode</em>, <em>format_str=None</em>, <em>dtype=None</em>, <em>column_names=None</em>, <em>use_astropy=False</em>, <em>column=b't'</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/dataio/AsciiTable.html#AsciiTable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.dataio.AsciiTable.AsciiTable" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.dataio.AsciiFile.AsciiFile" title="cis_interface.dataio.AsciiFile.AsciiFile"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.dataio.AsciiFile.AsciiFile</span></code></a></p>
 <dl class="attribute">
 <dt id="cis_interface.dataio.AsciiTable.AsciiTable.arr">
 <code class="descname">arr</code><a class="headerlink" href="#cis_interface.dataio.AsciiTable.AsciiTable.arr" title="Permalink to this definition">¶</a></dt>
@@ -304,27 +348,27 @@ nothing happens.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>arr</strong> (<em>np.ndarray</em><em>, </em><em>optional</em>) – Array to write to bytestring. If None
+<li><strong>arr</strong> (<em>np.ndarray</em><em>, </em><em>optional</em>) &#8211; Array to write to bytestring. If None
 the array of table data is used. This can also be a list of
 arrays, one for each field in the table, or a list of lists,
 one for each element containing the fields for that element.</li>
-<li><strong>order</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – Order that array should be written to the
-bytestring. Defaults to ‘C’.</li>
+<li><strong>order</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) &#8211; Order that array should be written to the
+bytestring. Defaults to &#8216;C&#8217;.</li>
 </ul>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Bytestring.</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)">str</a></p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></p>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
-<li><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#TypeError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">TypeError</span></code></a> – If the provided array is not a numpy array, list, or tuple.</li>
-<li><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ValueError</span></code></a> – If the array is not the correct type.</li>
-<li><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ValueError</span></code></a> – If there are not enough arrays in the input list.</li>
-<li><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ValueError</span></code></a> – If any of the listed arrays doesn’t have enough fields.</li>
-<li><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ValueError</span></code></a> – If any of the listed arrays doesn’t have enough elements.</li>
+<li><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#TypeError" title="(in Python v3.7)"><code class="xref py py-exc docutils literal"><span class="pre">TypeError</span></code></a> &#8211; If the provided array is not a numpy array, list, or tuple.</li>
+<li><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.7)"><code class="xref py py-exc docutils literal"><span class="pre">ValueError</span></code></a> &#8211; If the array is not the correct type.</li>
+<li><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.7)"><code class="xref py py-exc docutils literal"><span class="pre">ValueError</span></code></a> &#8211; If there are not enough arrays in the input list.</li>
+<li><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.7)"><code class="xref py py-exc docutils literal"><span class="pre">ValueError</span></code></a> &#8211; If any of the listed arrays doesn&#8217;t have enough fields.</li>
+<li><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.7)"><code class="xref py py-exc docutils literal"><span class="pre">ValueError</span></code></a> &#8211; If any of the listed arrays doesn&#8217;t have enough elements.</li>
 </ul>
 </td>
 </tr>
@@ -342,9 +386,9 @@ array.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>data</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.6)"><em>bytes</em></a>) – Byte string of table data.</li>
-<li><strong>order</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – Order of data for reshaping. Defaults to
-‘C’.</li>
+<li><strong>data</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.7)"><em>bytes</em></a>) &#8211; Byte string of table data.</li>
+<li><strong>order</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) &#8211; Order of data for reshaping. Defaults to
+&#8216;C&#8217;.</li>
 </ul>
 </td>
 </tr>
@@ -363,12 +407,12 @@ array.</p>
 <code class="descname">discover_format_str</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/dataio/AsciiTable.html#AsciiTable.discover_format_str"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.dataio.AsciiTable.AsciiTable.discover_format_str" title="Permalink to this definition">¶</a></dt>
 <dd><p>Determine the format string by reading it from the file. The format
 string is assumed to start with a comment and contain C-style format
-codes (e.g. ‘%f’).</p>
+codes (e.g. &#8216;%f&#8217;).</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#RuntimeError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">RuntimeError</span></code></a> – If a format string cannot be located within the file.</td>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#RuntimeError" title="(in Python v3.7)"><code class="xref py py-exc docutils literal"><span class="pre">RuntimeError</span></code></a> &#8211; If a format string cannot be located within the file.</td>
 </tr>
 </tbody>
 </table>
@@ -377,13 +421,13 @@ codes (e.g. ‘%f’).</p>
 <dl class="attribute">
 <dt id="cis_interface.dataio.AsciiTable.AsciiTable.dtype">
 <code class="descname">dtype</code><a class="headerlink" href="#cis_interface.dataio.AsciiTable.AsciiTable.dtype" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>np.dtype</em> – Data type of the table.</p>
+<dd><p><em>np.dtype</em> &#8211; Data type of the table.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="cis_interface.dataio.AsciiTable.AsciiTable.fmts">
 <code class="descname">fmts</code><a class="headerlink" href="#cis_interface.dataio.AsciiTable.AsciiTable.fmts" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>list</em> – Formats in format string.</p>
+<dd><p><em>list</em> &#8211; Formats in format string.</p>
 </dd></dl>
 
 <dl class="method">
@@ -394,11 +438,11 @@ codes (e.g. ‘%f’).</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>*args</strong> – Arguments to create line from.</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>*args</strong> &#8211; Arguments to create line from.</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The line created from the arguments.</td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)">str</a></td>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
 </tr>
 </tbody>
 </table>
@@ -407,13 +451,13 @@ codes (e.g. ‘%f’).</p>
 <dl class="attribute">
 <dt id="cis_interface.dataio.AsciiTable.AsciiTable.format_str">
 <code class="descname">format_str</code><a class="headerlink" href="#cis_interface.dataio.AsciiTable.AsciiTable.format_str" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>str</em> – Format string describing the table column types.</p>
+<dd><p><em>str</em> &#8211; Format string describing the table column types.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="cis_interface.dataio.AsciiTable.AsciiTable.ncols">
 <code class="descname">ncols</code><a class="headerlink" href="#cis_interface.dataio.AsciiTable.AsciiTable.ncols" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>int</em> – The number of columns in the table.</p>
+<dd><p><em>int</em> &#8211; The number of columns in the table.</p>
 </dd></dl>
 
 <dl class="method">
@@ -424,11 +468,11 @@ codes (e.g. ‘%f’).</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>line</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – String to extract arguments from.</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>line</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; String to extract arguments from.</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The arguments extracted from line.</td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.6)">tuple</a></td>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)">tuple</a></td>
 </tr>
 </tbody>
 </table>
@@ -442,7 +486,7 @@ codes (e.g. ‘%f’).</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>names</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>, </em><em>optional</em>) – List of column names to label columns. If
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>names</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a><em>, </em><em>optional</em>) &#8211; List of column names to label columns. If
 not provided, existing names are used if they exist. Defaults
 to None.</td>
 </tr>
@@ -450,7 +494,7 @@ to None.</td>
 </tr>
 <tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">np.ndarray</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ValueError</span></code></a> – If names are provided, but not the same number as
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.7)"><code class="xref py py-exc docutils literal"><span class="pre">ValueError</span></code></a> &#8211; If names are provided, but not the same number as
 there are columns.</td>
 </tr>
 </tbody>
@@ -466,16 +510,16 @@ there are columns.</td>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>order</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – Order that array should be written to the
-bytestring. Defaults to ‘C’.</li>
-<li><strong>**kwargs</strong> – Additional keyword arguments are passed to read_array.</li>
+<li><strong>order</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) &#8211; Order that array should be written to the
+bytestring. Defaults to &#8216;C&#8217;.</li>
+<li><strong>**kwargs</strong> &#8211; Additional keyword arguments are passed to read_array.</li>
 </ul>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Array as bytes.</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.6)">bytes</a></p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.7)">bytes</a></p>
 </td>
 </tr>
 </tbody>
@@ -498,7 +542,7 @@ None is returned.</dd>
 </dl>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.6)">tuple</a> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)">bool</a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.6)">tuple</a>)</td>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)">tuple</a> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)">bool</a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)">tuple</a>)</td>
 </tr>
 </tbody>
 </table>
@@ -512,7 +556,7 @@ None is returned.</dd>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>validate</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, the line is checked to see if
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>validate</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) &#8211; If True, the line is checked to see if
 it matches the expected table format. Defaults to False.</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="docutils">
@@ -522,7 +566,7 @@ a comment, None is returned.</dd>
 </dl>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.6)">tuple</a> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)">bool</a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)">str</a>)</td>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)">tuple</a> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)">bool</a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a>)</td>
 </tr>
 </tbody>
 </table>
@@ -536,7 +580,7 @@ a comment, None is returned.</dd>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>new_dtype</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em> or </em><em>np.dtype</em>) – New numpy data type.</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>new_dtype</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em> or </em><em>np.dtype</em>) &#8211; New numpy data type.</td>
 </tr>
 </tbody>
 </table>
@@ -550,7 +594,7 @@ a comment, None is returned.</dd>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>new_format_str</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – New format string.</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>new_format_str</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; New format string.</td>
 </tr>
 </tbody>
 </table>
@@ -572,17 +616,17 @@ expected number of values.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>array</strong> (<em>np.ndarray</em>) – Array to be written.</li>
-<li><strong>names</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>, </em><em>optional</em>) – List of column names to write out. If
+<li><strong>array</strong> (<em>np.ndarray</em>) &#8211; Array to be written.</li>
+<li><strong>names</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a><em>, </em><em>optional</em>) &#8211; List of column names to write out. If
 not provided, existing names are used if they exist. Defaults
 to None.</li>
-<li><strong>skip_header</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, no header information is
+<li><strong>skip_header</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) &#8211; If True, no header information is
 written (it is assumed it was already written. Defaults to
 False.</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ValueError</span></code></a> – If names are provided, but not the same number as
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.7)"><code class="xref py py-exc docutils literal"><span class="pre">ValueError</span></code></a> &#8211; If names are provided, but not the same number as
 there are columns.</p>
 </td>
 </tr>
@@ -599,11 +643,11 @@ there are columns.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>data</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.6)"><em>bytes</em></a>) – Bytes string to be interpreted as array and
+<li><strong>data</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.7)"><em>bytes</em></a>) &#8211; Bytes string to be interpreted as array and
 written to file.</li>
-<li><strong>order</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – Order of data for reshaping. Defaults to
-‘C’.</li>
-<li><strong>**kwargs</strong> – Additional keyword arguments are passed to write_array.</li>
+<li><strong>order</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) &#8211; Order of data for reshaping. Defaults to
+&#8216;C&#8217;.</li>
+<li><strong>**kwargs</strong> &#8211; Additional keyword arguments are passed to write_array.</li>
 </ul>
 </td>
 </tr>
@@ -625,7 +669,7 @@ written to file.</li>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>names</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>, </em><em>optional</em>) – List of names of columns. Defaults to
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>names</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a><em>, </em><em>optional</em>) &#8211; List of names of columns. Defaults to
 None and the ones provided at construction are used if they
 exist. Otherwise, no names are written.</td>
 </tr>
@@ -641,7 +685,7 @@ exist. Otherwise, no names are written.</td>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>*args</strong> – Any number of arguments that should be written to the file.</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>*args</strong> &#8211; Any number of arguments that should be written to the file.</td>
 </tr>
 </tbody>
 </table>
@@ -656,8 +700,8 @@ exist. Otherwise, no names are written.</td>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>line</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Line to be written.</li>
-<li><strong>validate</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, the line is checked to see if
+<li><strong>line</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; Line to be written.</li>
+<li><strong>validate</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) &#8211; If True, the line is checked to see if
 it matches the expected table format. Defaults to False.</li>
 </ul>
 </td>
@@ -674,11 +718,11 @@ it matches the expected table format. Defaults to False.</li>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>names</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>, </em><em>optional</em>) – List of names of columns. Defaults to
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>names</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a><em>, </em><em>optional</em>) &#8211; List of names of columns. Defaults to
 None and the ones provided at construction are used if they
 exist. Otherwise, no names are written.</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#IndexError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">IndexError</span></code></a> – If there are not enough names for all of the columns.</td>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#IndexError" title="(in Python v3.7)"><code class="xref py py-exc docutils literal"><span class="pre">IndexError</span></code></a> &#8211; If there are not enough names for all of the columns.</td>
 </tr>
 </tbody>
 </table>
@@ -701,10 +745,10 @@ exist. Otherwise, no names are written.</td>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="cis_interface.drivers.html" class="btn btn-neutral float-right" title="cis_interface.drivers package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="cis_interface.dataio.tests.html" class="btn btn-neutral float-right" title="cis_interface.dataio.tests package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="cis_interface.serialize.html" class="btn btn-neutral" title="cis_interface.serialize package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="cis_interface.serialize.tests.html" class="btn btn-neutral" title="cis_interface.serialize.tests package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -735,7 +779,7 @@ exist. Otherwise, no names are written.</td>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'0.3.0',
+            VERSION:'0.4+0.gd8a2a4f.dirty',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
@@ -746,15 +790,20 @@ exist. Otherwise, no names are written.</td>
       <script type="text/javascript" src="_static/jquery.js"></script>
       <script type="text/javascript" src="_static/underscore.js"></script>
       <script type="text/javascript" src="_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 
   
 
-  <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
 
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.Navigation.enable(true);
+          
+          SphinxRtdTheme.Navigation.enableSticky();
+          
       });
   </script> 
 

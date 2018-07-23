@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Formatted I/O &mdash; cis_interface 0.3.0 documentation</title>
+  <title>Formatted I/O &mdash; cis_interface 0.4+0.gd8a2a4f.dirty documentation</title>
   
 
   
@@ -24,7 +24,8 @@
 
   
 
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
@@ -59,7 +60,7 @@
             
             
               <div class="version">
-                0.3
+                0.4+0.gd8a2a4f.dirty
               </div>
             
           
@@ -107,6 +108,7 @@
 <li class="toctree-l1"><a class="reference internal" href="code.html">Code</a></li>
 <li class="toctree-l1"><a class="reference internal" href="examples/examples_toc.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="release.html">Release Steps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="release.html#docs-checkout">Docs Checkout</a></li>
 </ul>
 
             
@@ -180,12 +182,12 @@ support for formatting/processing messages from/to language native objects.</p>
 <p>The format of messages containing scalar variables (strings, integers, and
 floating point numbers) can be specified using a C-style format string
 (See <a class="reference internal" href="c_format_strings.html#c-style-format-strings-rst"><span class="std std-ref">C-Style Format Strings</span></a> for details). In
-the example below, the format string <code class="docutils literal notranslate"><span class="pre">&quot;%6s\t%d\t%f\n&quot;</span></code> indicates that each
+the example below, the format string <code class="docutils literal"><span class="pre">&quot;%6s\t%d\t%f\n&quot;</span></code> indicates that each
 message will contain a 6 character string, an integer, and a float. In addition
 to providing a format string, the C API requires the use of different functions
 for initializing channels and sending/receiving to/from them.</p>
 <p>Model Code:</p>
-<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+<div class="highlight-python"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
  2
  3
  4
@@ -240,7 +242,7 @@ for initializing channels and sending/receiving to/from them.</p>
         <span class="k">break</span>
 </pre></div>
 </td></tr></table></div>
-<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+<div class="highlight-python"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
  2
  3
  4
@@ -298,10 +300,10 @@ for initializing channels and sending/receiving to/from them.</p>
 <p>(<a class="reference external" href="examples/formatted_io1.html">Example in other languages</a>)</p>
 <p>The same YAML can be used as was used for the example from
 <a class="reference internal" href="getting_started.html#getting-started-rst"><span class="std std-ref">Getting started</span></a> with the modification that
-the files are now read/written line-by-line (<code class="docutils literal notranslate"><span class="pre">filetype:</span> <span class="pre">ascii</span></code>)
+the files are now read/written line-by-line (<code class="docutils literal"><span class="pre">filetype:</span> <span class="pre">ascii</span></code>)
 rather than all at once:</p>
 <p>Model YAML:</p>
-<div class="highlight-yaml notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+<div class="highlight-yaml"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
  2
  3
  4
@@ -353,10 +355,10 @@ rather than all at once:</p>
 <p>Tables can also be passed in a similar manner. For input from a table, the format
 string does not need to be provided and will be determined by the source of the
 table. There are different API classes/functions for I/O from/to table channels
-versus standard channels in each language. (e.g. <code class="docutils literal notranslate"><span class="pre">CisInput</span></code> vs.
-<code class="docutils literal notranslate"><span class="pre">CisAsciiTableInput</span></code> in Python)</p>
+versus standard channels in each language. (e.g. <code class="docutils literal"><span class="pre">CisInput</span></code> vs.
+<code class="docutils literal"><span class="pre">CisAsciiTableInput</span></code> in Python)</p>
 <p>Model Code:</p>
-<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+<div class="highlight-python"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
  2
  3
  4
@@ -413,7 +415,7 @@ versus standard channels in each language. (e.g. <code class="docutils literal n
         <span class="k">break</span>
 </pre></div>
 </td></tr></table></div>
-<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+<div class="highlight-python"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
  2
  3
  4
@@ -471,11 +473,11 @@ versus standard channels in each language. (e.g. <code class="docutils literal n
 </pre></div>
 </td></tr></table></div>
 <p>(<a class="reference external" href="examples/formatted_io2.html">Example in other languages</a>)</p>
-<p>The <code class="docutils literal notranslate"><span class="pre">filetype:</span> <span class="pre">table</span></code> options in the YAML tell the
+<p>The <code class="docutils literal"><span class="pre">filetype:</span> <span class="pre">table</span></code> options in the YAML tell the
 cis_interface framework that the file should be read/written as a table
 row-by-row including verification that each row conforms with the table.</p>
 <p>Model YAML:</p>
-<div class="highlight-yaml notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+<div class="highlight-yaml"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
  2
  3
  4
@@ -525,10 +527,10 @@ row-by-row including verification that each row conforms with the table.</p>
 <div class="section" id="tables-as-arrays">
 <h2>Tables as Arrays<a class="headerlink" href="#tables-as-arrays" title="Permalink to this headline">¶</a></h2>
 <p>Tables can also be passed as arrays. In Python and Matlab, this is done using
-separate classes/functions. In C and C++, this is done by passing 1 to the <code class="docutils literal notranslate"><span class="pre">as_array</span></code>
+separate classes/functions. In C and C++, this is done by passing 1 to the <code class="docutils literal"><span class="pre">as_array</span></code>
 arguments of the table API classes/functions.</p>
 <p>Model Code:</p>
-<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+<div class="highlight-python"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
  2
  3
  4
@@ -587,7 +589,7 @@ arguments of the table API classes/functions.</p>
         <span class="k">break</span>
 </pre></div>
 </td></tr></table></div>
-<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+<div class="highlight-python"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
  2
  3
  4
@@ -647,11 +649,11 @@ arguments of the table API classes/functions.</p>
 </pre></div>
 </td></tr></table></div>
 <p>(<a class="reference external" href="examples/formatted_io3.html">Example in other languages</a>)</p>
-<p>The YAML only differs in that <code class="docutils literal notranslate"><span class="pre">as_array:</span> <span class="pre">True</span></code> for the connections to the files
+<p>The YAML only differs in that <code class="docutils literal"><span class="pre">as_array:</span> <span class="pre">True</span></code> for the connections to the files
 to indicate that the files should be interpreted as tables and that the tables
 should be read/written in their entirety as arrays.</p>
 <p>Model YAML:</p>
-<div class="highlight-yaml notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+<div class="highlight-yaml"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
  2
  3
  4
@@ -715,7 +717,7 @@ should be read/written in their entirety as arrays.</p>
 <p>In Python, tables can also be passed as <a class="reference external" href="https://pandas.pydata.org/">Pandas</a>
 data frames.</p>
 <p>Model Code:</p>
-<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+<div class="highlight-python"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
  2
  3
  4
@@ -774,7 +776,7 @@ data frames.</p>
         <span class="k">break</span>
 </pre></div>
 </td></tr></table></div>
-<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+<div class="highlight-python"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
  2
  3
  4
@@ -834,11 +836,11 @@ data frames.</p>
 </pre></div>
 </td></tr></table></div>
 <p>(<a class="reference external" href="examples/formatted_io4.html">Example in other languages</a>)</p>
-<p>The YAML specifies <code class="docutils literal notranslate"><span class="pre">filetype:</span> <span class="pre">pandas</span></code> for the
+<p>The YAML specifies <code class="docutils literal"><span class="pre">filetype:</span> <span class="pre">pandas</span></code> for the
 connections to files to indicate that the files should be interpreted as CSV
 tables using Pandas.</p>
 <p>Model YAML:</p>
-<div class="highlight-yaml notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+<div class="highlight-yaml"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
  2
  3
  4
@@ -905,7 +907,7 @@ as a Pandas data frame.</p>
 <p>3D structures can be passed around in <a class="reference external" href="http://paulbourke.net/dataformats/ply/">Ply</a>
 or <a class="reference external" href="http://paulbourke.net/dataformats/obj/">Obj</a> formats.</p>
 <p>Model Code:</p>
-<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+<div class="highlight-python"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
  2
  3
  4
@@ -964,7 +966,7 @@ or <a class="reference external" href="http://paulbourke.net/dataformats/obj/">O
         <span class="k">break</span>
 </pre></div>
 </td></tr></table></div>
-<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+<div class="highlight-python"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
  2
  3
  4
@@ -1024,11 +1026,11 @@ or <a class="reference external" href="http://paulbourke.net/dataformats/obj/">O
 </pre></div>
 </td></tr></table></div>
 <p>(<a class="reference external" href="examples/formatted_io5.html">Example in other languages</a>)</p>
-<p>The YAML specifies <code class="docutils literal notranslate"><span class="pre">filetype:</span> <span class="pre">ply</span></code> (<code class="docutils literal notranslate"><span class="pre">filetype:</span> <span class="pre">obj</span></code> for Obj) for the
+<p>The YAML specifies <code class="docutils literal"><span class="pre">filetype:</span> <span class="pre">ply</span></code> (<code class="docutils literal"><span class="pre">filetype:</span> <span class="pre">obj</span></code> for Obj) for the
 connections to files to indicate that the files should be interpreted as
 Ply/Obj file formats.</p>
 <p>Model YAML:</p>
-<div class="highlight-yaml notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+<div class="highlight-yaml"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
  2
  3
  4
@@ -1075,9 +1077,9 @@ Ply/Obj file formats.</p>
 </td></tr></table></div>
 <p>(<a class="reference external" href="examples/formatted_io5.html">Example in other languages</a>)</p>
 <p>In Python the data is returned as a dictionary subclass
-(<a class="reference internal" href="cis_interface.serialize.html#cis_interface.serialize.PlySerialize.PlyDict" title="cis_interface.serialize.PlySerialize.PlyDict"><code class="xref py py-class docutils literal notranslate"><span class="pre">cis_interface.serialize.PlySerialize.PlyDict</span></code></a> or
-<a class="reference internal" href="cis_interface.serialize.html#cis_interface.serialize.ObjSerialize.ObjDict" title="cis_interface.serialize.ObjSerialize.ObjDict"><code class="xref py py-class docutils literal notranslate"><span class="pre">cis_interface.serialize.ObjSerialize.ObjDict</span></code></a>) while in
-C/C++ it is returned as a structure (<code class="xref c c-type docutils literal notranslate"><span class="pre">ply_t</span></code> or <code class="xref c c-type docutils literal notranslate"><span class="pre">obj_t</span></code>).</p>
+(<a class="reference internal" href="cis_interface.serialize.html#cis_interface.serialize.PlySerialize.PlyDict" title="cis_interface.serialize.PlySerialize.PlyDict"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.serialize.PlySerialize.PlyDict</span></code></a> or
+<a class="reference internal" href="cis_interface.serialize.html#cis_interface.serialize.ObjSerialize.ObjDict" title="cis_interface.serialize.ObjSerialize.ObjDict"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.serialize.ObjSerialize.ObjDict</span></code></a>) while in
+C/C++ it is returned as a structure (<code class="xref c c-type docutils literal"><span class="pre">ply_t</span></code> or <code class="xref c c-type docutils literal"><span class="pre">obj_t</span></code>).</p>
 </div>
 </div>
 
@@ -1123,7 +1125,7 @@ C/C++ it is returned as a structure (<code class="xref c c-type docutils literal
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'0.3.0',
+            VERSION:'0.4+0.gd8a2a4f.dirty',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
@@ -1134,15 +1136,20 @@ C/C++ it is returned as a structure (<code class="xref c c-type docutils literal
       <script type="text/javascript" src="_static/jquery.js"></script>
       <script type="text/javascript" src="_static/underscore.js"></script>
       <script type="text/javascript" src="_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 
   
 
-  <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
 
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.Navigation.enable(true);
+          
+          SphinxRtdTheme.Navigation.enableSticky();
+          
       });
   </script> 
 

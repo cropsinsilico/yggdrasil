@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Python Code &mdash; cis_interface 0.3.0 documentation</title>
+  <title>Python Code &mdash; cis_interface 0.4+0.gd8a2a4f.dirty documentation</title>
   
 
   
@@ -24,7 +24,8 @@
 
   
 
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
@@ -59,7 +60,7 @@
             
             
               <div class="version">
-                0.3
+                0.4+0.gd8a2a4f.dirty
               </div>
             
           
@@ -110,6 +111,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#submodules">Submodules</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#module-cis_interface.backwards">cis_interface.backwards module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#module-cis_interface.command_line">cis_interface.command_line module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-cis_interface.components">cis_interface.components module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#module-cis_interface.config">cis_interface.config module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#module-cis_interface.platform">cis_interface.platform module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#module-cis_interface.runner">cis_interface.runner module</a></li>
@@ -128,6 +130,7 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="examples/examples_toc.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="release.html">Release Steps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="release.html#docs-checkout">Docs Checkout</a></li>
 </ul>
 
             
@@ -222,13 +225,13 @@
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>b</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.6)"><em>bytes</em></a><em>, </em><em>unicode</em><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Bytes to be converted into unicode.</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>b</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.7)"><em>bytes</em></a><em>, </em><em>unicode</em><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; Bytes to be converted into unicode.</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">String version of input.</td>
 </tr>
 <tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">unicode/str</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#TypeError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">TypeError</span></code></a> – If supplied type cannot be converted to unicode.</td>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#TypeError" title="(in Python v3.7)"><code class="xref py py-exc docutils literal"><span class="pre">TypeError</span></code></a> &#8211; If supplied type cannot be converted to unicode.</td>
 </tr>
 </tbody>
 </table>
@@ -242,13 +245,13 @@
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>s</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.6)"><em>bytes</em></a><em>, </em><em>unicode</em>) – Object to convert to a bytes version.</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>s</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.7)"><em>bytes</em></a><em>, </em><em>unicode</em>) &#8211; Object to convert to a bytes version.</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Bytes version of input.</td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.6)">bytes</a></td>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.7)">bytes</a></td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#TypeError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">TypeError</span></code></a> – If supplied type cannot be converted to bytes.</td>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#TypeError" title="(in Python v3.7)"><code class="xref py py-exc docutils literal"><span class="pre">TypeError</span></code></a> &#8211; If supplied type cannot be converted to bytes.</td>
 </tr>
 </tbody>
 </table>
@@ -268,7 +271,7 @@ library in a C or C++ program.</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The necessary compiler flags and preprocessor definitions.</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.6)">list</a></td>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a></td>
 </tr>
 </tbody>
 </table>
@@ -297,7 +300,7 @@ the interface library in a C or C++ program.</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The necessary library linking flags.</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.6)">list</a></td>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a></td>
 </tr>
 </tbody>
 </table>
@@ -310,6 +313,42 @@ the interface library in a C or C++ program.</p>
 </dd></dl>
 
 </div>
+<div class="section" id="module-cis_interface.components">
+<span id="cis-interface-components-module"></span><h2>cis_interface.components module<a class="headerlink" href="#module-cis_interface.components" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="cis_interface.components.ComponentBase">
+<em class="property">class </em><code class="descclassname">cis_interface.components.</code><code class="descname">ComponentBase</code><a class="reference internal" href="_modules/cis_interface/components.html#ComponentBase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.components.ComponentBase" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+<p>Base class for components.</p>
+<p>Attributes:</p>
+<dl class="attribute">
+<dt id="cis_interface.components.ComponentBase.component_description">
+<code class="descname">component_description</code><em class="property"> = None</em><a class="headerlink" href="#cis_interface.components.ComponentBase.component_description" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.components.ComponentBase.component_name">
+<code class="descname">component_name</code><em class="property"> = None</em><a class="headerlink" href="#cis_interface.components.ComponentBase.component_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.components.ComponentBase.component_properties">
+<code class="descname">component_properties</code><em class="property"> = {}</em><a class="headerlink" href="#cis_interface.components.ComponentBase.component_properties" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.components.ComponentBase.component_properties_required">
+<code class="descname">component_properties_required</code><em class="property"> = []</em><a class="headerlink" href="#cis_interface.components.ComponentBase.component_properties_required" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.components.ComponentBase.component_type">
+<code class="descname">component_type</code><em class="property"> = None</em><a class="headerlink" href="#cis_interface.components.ComponentBase.component_type" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
 <div class="section" id="module-cis_interface.config">
 <span id="cis-interface-config-module"></span><h2>cis_interface.config module<a class="headerlink" href="#module-cis_interface.config" title="Permalink to this headline">¶</a></h2>
 <p>This module imports the configuration for cis_interface.</p>
@@ -319,8 +358,8 @@ the interface library in a C or C++ program.</p>
 </div>
 <dl class="class">
 <dt id="cis_interface.config.CisConfigParser">
-<em class="property">class </em><code class="descclassname">cis_interface.config.</code><code class="descname">CisConfigParser</code><span class="sig-paren">(</span><em>defaults=None</em>, <em>dict_type=&lt;class 'collections.OrderedDict'&gt;</em>, <em>allow_no_value=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/config.html#CisConfigParser"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.config.CisConfigParser" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ConfigParser.ConfigParser</span></code></p>
+<em class="property">class </em><code class="descclassname">cis_interface.config.</code><code class="descname">CisConfigParser</code><span class="sig-paren">(</span><em>defaults=None</em>, <em>dict_type=&lt;class 'collections.OrderedDict'&gt;</em>, <em>allow_no_value=False</em>, <em>*</em>, <em>delimiters=('='</em>, <em>':')</em>, <em>comment_prefixes=('#'</em>, <em>';')</em>, <em>inline_comment_prefixes=None</em>, <em>strict=True</em>, <em>empty_lines_in_values=True</em>, <em>default_section='DEFAULT'</em>, <em>interpolation=&lt;object object&gt;</em>, <em>converters=&lt;object object&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/config.html#CisConfigParser"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.config.CisConfigParser" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/configparser.html#configparser.ConfigParser" title="(in Python v3.7)"><code class="xref py py-class docutils literal"><span class="pre">configparser.ConfigParser</span></code></a></p>
 <p>Config parser that returns None if option not provided on get.</p>
 <dl class="method">
 <dt id="cis_interface.config.CisConfigParser.get">
@@ -331,13 +370,13 @@ the interface library in a C or C++ program.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>section</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Name of section.</li>
-<li><strong>option</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Name of option in section.</li>
-<li><strong>default</strong> (<em>obj</em><em>, </em><em>optional</em>) – Value that should be returned if the
+<li><strong>section</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; Name of section.</li>
+<li><strong>option</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; Name of option in section.</li>
+<li><strong>default</strong> (<em>obj</em><em>, </em><em>optional</em>) &#8211; Value that should be returned if the
 section and/or option are not found or are an empty string.
 Defaults to None.</li>
-<li><strong>**kwargs</strong> – Additional keyword arguments are passed to the parent
-class’s get.</li>
+<li><strong>**kwargs</strong> &#8211; Additional keyword arguments are passed to the parent
+class&#8217;s get.</li>
 </ul>
 </td>
 </tr>
@@ -362,10 +401,10 @@ class’s get.</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>env</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a><em>, </em><em>optional</em>) – Dictionary of environment variables that should
+<li><strong>env</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a><em>, </em><em>optional</em>) &#8211; Dictionary of environment variables that should
 be updated. Defaults to <cite>os.environ</cite>.</li>
-<li><strong>cfg</strong> (<a class="reference internal" href="#cis_interface.config.CisConfigParser" title="cis_interface.config.CisConfigParser"><code class="xref py py-class docutils literal notranslate"><span class="pre">cis_interface.config.CisConfigParser</span></code></a>, optional) – Config parser with options that should be used to update the
-environment. Defaults to <code class="xref py py-data docutils literal notranslate"><span class="pre">cis_interface.config.cis_cfg</span></code>.</li>
+<li><strong>cfg</strong> (<a class="reference internal" href="#cis_interface.config.CisConfigParser" title="cis_interface.config.CisConfigParser"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.config.CisConfigParser</span></code></a>, optional) &#8211; Config parser with options that should be used to update the
+environment. Defaults to <code class="xref py py-data docutils literal"><span class="pre">cis_interface.config.cis_cfg</span></code>.</li>
 </ul>
 </td>
 </tr>
@@ -381,8 +420,8 @@ environment. Defaults to <code class="xref py py-data docutils literal notransla
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>cfg</strong> (<a class="reference internal" href="#cis_interface.config.CisConfigParser" title="cis_interface.config.CisConfigParser"><code class="xref py py-class docutils literal notranslate"><span class="pre">cis_interface.config.CisConfigParser</span></code></a>, optional) – Config parser with options that should be used to update the
-environment. Defaults to <code class="xref py py-data docutils literal notranslate"><span class="pre">cis_interface.config.cis_cfg</span></code>.</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>cfg</strong> (<a class="reference internal" href="#cis_interface.config.CisConfigParser" title="cis_interface.config.CisConfigParser"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.config.CisConfigParser</span></code></a>, optional) &#8211; Config parser with options that should be used to update the
+environment. Defaults to <code class="xref py py-data docutils literal"><span class="pre">cis_interface.config.cis_cfg</span></code>.</td>
 </tr>
 </tbody>
 </table>
@@ -399,7 +438,7 @@ environment. Defaults to <code class="xref py py-data docutils literal notransla
 <dl class="class">
 <dt id="cis_interface.runner.CisRunner">
 <em class="property">class </em><code class="descclassname">cis_interface.runner.</code><code class="descname">CisRunner</code><span class="sig-paren">(</span><em>modelYmls</em>, <em>namespace</em>, <em>host=None</em>, <em>rank=0</em>, <em>cis_debug_level=None</em>, <em>rmq_debug_level=None</em>, <em>cis_debug_prefix=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/runner.html#CisRunner"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.runner.CisRunner" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#cis_interface.tools.CisClass" title="cis_interface.tools.CisClass"><code class="xref py py-class docutils literal notranslate"><span class="pre">cis_interface.tools.CisClass</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.tools.CisClass" title="cis_interface.tools.CisClass"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.tools.CisClass</span></code></a></p>
 <p>This class handles the orchestration of starting the model and
 IO drivers, monitoring their progress, and cleaning up on exit.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -407,19 +446,19 @@ IO drivers, monitoring their progress, and cleaning up on exit.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>modelYmls</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a>) – List of paths to yaml files specifying the models
+<li><strong>modelYmls</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a>) &#8211; List of paths to yaml files specifying the models
 that should be run.</li>
-<li><strong>namespace</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Name that should be used to uniquely identify any RMQ
+<li><strong>namespace</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; Name that should be used to uniquely identify any RMQ
 exchange.</li>
-<li><strong>host</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – Name of the host that the models will be launched
+<li><strong>host</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) &#8211; Name of the host that the models will be launched
 from. Defaults to None.</li>
-<li><strong>rank</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>, </em><em>optional</em>) – Rank of this set of models if run in parallel.
+<li><strong>rank</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><em>optional</em>) &#8211; Rank of this set of models if run in parallel.
 Defaults to 0.</li>
-<li><strong>cis_debug_level</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – Level for CiS debug messages. Defaults
-to environment variable ‘CIS_DEBUG’.</li>
-<li><strong>rmq_debug_level</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – Level for RabbitMQ debug messages.
-Defaults to environment variable ‘RMQ_DEBUG’.</li>
-<li><strong>cis_debug_prefix</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – Prefix for CiS debug messages.
+<li><strong>cis_debug_level</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) &#8211; Level for CiS debug messages. Defaults
+to environment variable &#8216;CIS_DEBUG&#8217;.</li>
+<li><strong>rmq_debug_level</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) &#8211; Level for RabbitMQ debug messages.
+Defaults to environment variable &#8216;RMQ_DEBUG&#8217;.</li>
+<li><strong>cis_debug_prefix</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) &#8211; Prefix for CiS debug messages.
 Defaults to namespace.</li>
 </ul>
 </td>
@@ -429,64 +468,64 @@ Defaults to namespace.</li>
 <dl class="attribute">
 <dt id="cis_interface.runner.CisRunner.namespace">
 <code class="descname">namespace</code><a class="headerlink" href="#cis_interface.runner.CisRunner.namespace" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>str</em> – Name that should be used to uniquely identify any RMQ
+<dd><p><em>str</em> &#8211; Name that should be used to uniquely identify any RMQ
 exchange.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="cis_interface.runner.CisRunner.host">
 <code class="descname">host</code><a class="headerlink" href="#cis_interface.runner.CisRunner.host" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>str</em> – Name of the host that the models will be launched from.</p>
+<dd><p><em>str</em> &#8211; Name of the host that the models will be launched from.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="cis_interface.runner.CisRunner.rank">
 <code class="descname">rank</code><a class="headerlink" href="#cis_interface.runner.CisRunner.rank" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>int</em> – Rank of this set of models if run in parallel.</p>
+<dd><p><em>int</em> &#8211; Rank of this set of models if run in parallel.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="cis_interface.runner.CisRunner.modeldrivers">
 <code class="descname">modeldrivers</code><a class="headerlink" href="#cis_interface.runner.CisRunner.modeldrivers" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>dict</em> – Model drivers associated with this run.</p>
+<dd><p><em>dict</em> &#8211; Model drivers associated with this run.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="cis_interface.runner.CisRunner.inputdrivers">
 <code class="descname">inputdrivers</code><a class="headerlink" href="#cis_interface.runner.CisRunner.inputdrivers" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>dict</em> – Input drivers associated with this run.</p>
+<dd><p><em>dict</em> &#8211; Input drivers associated with this run.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="cis_interface.runner.CisRunner.outputdrivers">
 <code class="descname">outputdrivers</code><a class="headerlink" href="#cis_interface.runner.CisRunner.outputdrivers" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>dict</em> – Output drivers associated with this run.</p>
+<dd><p><em>dict</em> &#8211; Output drivers associated with this run.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="cis_interface.runner.CisRunner.serverdrivers">
 <code class="descname">serverdrivers</code><a class="headerlink" href="#cis_interface.runner.CisRunner.serverdrivers" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>dict</em> – The addresses associated with different server
+<dd><p><em>dict</em> &#8211; The addresses associated with different server
 drivers.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="cis_interface.runner.CisRunner.interrupt_time">
 <code class="descname">interrupt_time</code><a class="headerlink" href="#cis_interface.runner.CisRunner.interrupt_time" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>float</em> – Time of last interrupt signal.</p>
+<dd><p><em>float</em> &#8211; Time of last interrupt signal.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="cis_interface.runner.CisRunner.error_flag">
 <code class="descname">error_flag</code><a class="headerlink" href="#cis_interface.runner.CisRunner.error_flag" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>bool</em> – True if one or more models raises an error.</p>
+<dd><p><em>bool</em> &#8211; True if one or more models raises an error.</p>
 </dd></dl>
 
 <p>..todo:: namespace, host, and rank do not seem strictly necessary.</p>
 <dl class="attribute">
 <dt id="cis_interface.runner.CisRunner.all_drivers">
 <code class="descname">all_drivers</code><a class="headerlink" href="#cis_interface.runner.CisRunner.all_drivers" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>iterator</em> – For all drivers.</p>
+<dd><p><em>iterator</em> &#8211; For all drivers.</p>
 </dd></dl>
 
 <dl class="method">
@@ -503,7 +542,7 @@ drivers.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>force_stop</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, the terminate method is
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>force_stop</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) &#8211; If True, the terminate method is
 used to stop the drivers. Otherwise, the stop method is used.
 The stop method will try to exit gracefully while terminate
 will exit as quickly as possible. Defaults to False.</td>
@@ -520,11 +559,11 @@ will exit as quickly as possible. Defaults to False.</td>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>yml</strong> (<em>yaml</em>) – Yaml object containing driver information.</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>yml</strong> (<a class="reference internal" href="cis_interface.examples.tests.html#cis_interface.examples.tests.TestExample.yaml" title="cis_interface.examples.tests.TestExample.yaml"><em>yaml</em></a>) &#8211; Yaml object containing driver information.</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">An instance of the specified driver.</td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.6)">object</a></td>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)">object</a></td>
 </tr>
 </tbody>
 </table>
@@ -538,11 +577,11 @@ will exit as quickly as possible. Defaults to False.</td>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>yml</strong> (<em>yaml</em>) – Yaml object containing driver information.</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>yml</strong> (<a class="reference internal" href="cis_interface.examples.tests.html#cis_interface.examples.tests.TestExample.yaml" title="cis_interface.examples.tests.TestExample.yaml"><em>yaml</em></a>) &#8211; Yaml object containing driver information.</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">An instance of the specified driver.</td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.6)">object</a></td>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)">object</a></td>
 </tr>
 </tbody>
 </table>
@@ -556,11 +595,11 @@ will exit as quickly as possible. Defaults to False.</td>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>yml</strong> (<em>yaml</em>) – Yaml object containing driver information.</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>yml</strong> (<a class="reference internal" href="cis_interface.examples.tests.html#cis_interface.examples.tests.TestExample.yaml" title="cis_interface.examples.tests.TestExample.yaml"><em>yaml</em></a>) &#8211; Yaml object containing driver information.</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">An instance of the specified driver.</td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.6)">object</a></td>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)">object</a></td>
 </tr>
 </tbody>
 </table>
@@ -574,11 +613,11 @@ will exit as quickly as possible. Defaults to False.</td>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>yml</strong> (<em>yaml</em>) – Yaml object containing driver information.</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>yml</strong> (<a class="reference internal" href="cis_interface.examples.tests.html#cis_interface.examples.tests.TestExample.yaml" title="cis_interface.examples.tests.TestExample.yaml"><em>yaml</em></a>) &#8211; Yaml object containing driver information.</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">An instance of the specified driver.</td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.6)">object</a></td>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)">object</a></td>
 </tr>
 </tbody>
 </table>
@@ -592,7 +631,7 @@ will exit as quickly as possible. Defaults to False.</td>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>model</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) – Dictionary of model parameters including any
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>model</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) &#8211; Dictionary of model parameters including any
 associated IO drivers.</td>
 </tr>
 </tbody>
@@ -607,7 +646,7 @@ associated IO drivers.</td>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>model</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) – Dictionary of model parameters including any
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>model</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) &#8211; Dictionary of model parameters including any
 associated IO drivers.</td>
 </tr>
 </tbody>
@@ -622,7 +661,7 @@ associated IO drivers.</td>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>model</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – Name of a model that I/O drivers should be
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>model</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) &#8211; Name of a model that I/O drivers should be
 returned for. Defaults to None and all I/O drivers are returned.</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Access to list of I/O drivers.</td>
@@ -672,7 +711,7 @@ and adding IO driver environmental variables back tot he models.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>signal_handler</strong> (<em>function</em><em>, </em><em>optional</em>) – Function that should handle
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>signal_handler</strong> (<em>function</em><em>, </em><em>optional</em>) &#8211; Function that should handle
 received SIGINT and SIGTERM signals. Defaults to
 self.signal_handler.</td>
 </tr>
@@ -717,9 +756,9 @@ environment.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>models</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a>) – List of yaml files containing information on the models
+<li><strong>models</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a>) &#8211; List of yaml files containing information on the models
 that should be run.</li>
-<li><strong>**kwargs</strong> – Additonal keyword arguments are passed to CisRunner.</li>
+<li><strong>**kwargs</strong> &#8211; Additonal keyword arguments are passed to CisRunner.</li>
 </ul>
 </td>
 </tr>
@@ -729,7 +768,7 @@ that should be run.</li>
 <tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first"><a class="reference internal" href="#cis_interface.runner.CisRunner" title="cis_interface.runner.CisRunner">CisRunner</a></p>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.6)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">Exception</span></code></a> – If config option ‘namespace’ in ‘rmq’ section not set.</p>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.7)"><code class="xref py py-exc docutils literal"><span class="pre">Exception</span></code></a> &#8211; If config option &#8216;namespace&#8217; in &#8216;rmq&#8217; section not set.</p>
 </td>
 </tr>
 </tbody>
@@ -775,8 +814,8 @@ skip fields.</p>
 <dd><dl class="first last docutils">
 <dt>2010-10-13</dt>
 <dd><ul class="first last simple">
-<li>Changed regex from ‘match’ (only matches at beginning of line)
-to ‘search’ (matches anywhere in line)</li>
+<li>Changed regex from &#8216;match&#8217; (only matches at beginning of line)
+to &#8216;search&#8217; (matches anywhere in line)</li>
 <li>Bugfix - ignore cast for skipped fields</li>
 </ul>
 </dd>
@@ -786,7 +825,7 @@ to ‘search’ (matches anywhere in line)</li>
 <dd><dl class="first last docutils">
 <dt>2013-05-30</dt>
 <dd><ul class="first last simple">
-<li>Added ‘collapseWhitespace’ flag (defaults to True) to take the search
+<li>Added &#8216;collapseWhitespace&#8217; flag (defaults to True) to take the search
 string and replace all whitespace with regex string to match repeated
 whitespace.  This enables better matching in log files where the data
 has been formatted for easier reading.  These cases have variable
@@ -800,7 +839,7 @@ of characters in the data itself.</li>
 <dd><dl class="first last docutils">
 <dt>2016-01-18</dt>
 <dd><ul class="first last simple">
-<li>Add ‘extractdata’ function.</li>
+<li>Add &#8216;extractdata&#8217; function.</li>
 </ul>
 </dd>
 </dl>
@@ -842,9 +881,9 @@ whitespace padding.</li>
 %s        string terminated by whitespace</dd>
 </dl>
 <p>Examples:
-&gt;&gt;&gt; scanf(“%s - %d errors, %d warnings”, “/usr/sbin/sendmail - 0 errors, 4 warnings”)
-(‘/usr/sbin/sendmail’, 0, 4)
-&gt;&gt;&gt; scanf(“%o %x %d”, “0123 0x123 123”)
+&gt;&gt;&gt; scanf(&#8220;%s - %d errors, %d warnings&#8221;, &#8220;/usr/sbin/sendmail - 0 errors, 4 warnings&#8221;)
+(&#8216;/usr/sbin/sendmail&#8217;, 0, 4)
+&gt;&gt;&gt; scanf(&#8220;%o %x %d&#8221;, &#8220;0123 0x123 123&#8221;)
 (66, 291, 123)</p>
 <p>If the parameter s is a file-like object, s.readline is called.
 If s is not specified, stdin is assumed.</p>
@@ -857,7 +896,7 @@ or None if the format does not match.</p>
 <code class="descclassname">cis_interface.scanf.</code><code class="descname">scanf_compile</code><span class="sig-paren">(</span><em>format</em>, <em>collapseWhitespace=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/scanf.html#scanf_compile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.scanf.scanf_compile" title="Permalink to this definition">¶</a></dt>
 <dd><p>Translate the format into a regular expression</p>
 <p>For example:
-&gt;&gt;&gt; format_re, casts = _scanf_compile(‘%s - %d errors, %d warnings’)
+&gt;&gt;&gt; format_re, casts = _scanf_compile(&#8216;%s - %d errors, %d warnings&#8217;)
 &gt;&gt;&gt; print format_re.pattern
 (S+) - ([+-]?d+) errors, ([+-]?d+) warnings</p>
 <p>Translated formats are cached for faster reuse</p>
@@ -867,19 +906,66 @@ or None if the format does not match.</p>
 <div class="section" id="module-cis_interface.schema">
 <span id="cis-interface-schema-module"></span><h2>cis_interface.schema module<a class="headerlink" href="#module-cis_interface.schema" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
+<dt id="cis_interface.schema.CisSchemaValidator">
+<em class="property">class </em><code class="descclassname">cis_interface.schema.</code><code class="descname">CisSchemaValidator</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/schema.html#CisSchemaValidator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.schema.CisSchemaValidator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">cerberus.validator.Validator</span></code></p>
+<p>Class for validating the schema.</p>
+<dl class="attribute">
+<dt id="cis_interface.schema.CisSchemaValidator.cis_type_order">
+<code class="descname">cis_type_order</code><em class="property"> = ['list', 'string', 'integer', 'boolean', 'function']</em><a class="headerlink" href="#cis_interface.schema.CisSchemaValidator.cis_type_order" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.schema.CisSchemaValidator.coercers">
+<code class="descname">coercers</code><em class="property"> = ('boolean', 'function', 'integer', 'list', 'string')</em><a class="headerlink" href="#cis_interface.schema.CisSchemaValidator.coercers" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.schema.CisSchemaValidator.default_setters">
+<code class="descname">default_setters</code><em class="property"> = ()</em><a class="headerlink" href="#cis_interface.schema.CisSchemaValidator.default_setters" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.schema.CisSchemaValidator.normalization_rules">
+<code class="descname">normalization_rules</code><em class="property"> = {'rename_handler': {'oneof': [{'type': 'callable'}, {'schema': {'oneof': [{'type': 'callable'}, {'allowed': ('boolean', 'function', 'integer', 'list', 'string'), 'type': 'string'}]}, 'type': 'list'}, {'allowed': ('boolean', 'function', 'integer', 'list', 'string'), 'type': 'string'}]}, 'purge_unknown': {'type': 'boolean'}, 'default': {'nullable': True}, 'rename': {'type': 'hashable'}, 'default_setter': {'oneof': [{'type': 'callable'}, {'allowed': (), 'type': 'string'}]}, 'coerce': {'oneof': [{'type': 'callable'}, {'schema': {'oneof': [{'type': 'callable'}, {'allowed': ('boolean', 'function', 'integer', 'list', 'string'), 'type': 'string'}]}, 'type': 'list'}, {'allowed': ('boolean', 'function', 'integer', 'list', 'string'), 'type': 'string'}]}}</em><a class="headerlink" href="#cis_interface.schema.CisSchemaValidator.normalization_rules" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.schema.CisSchemaValidator.rules">
+<code class="descname">rules</code><em class="property"> = {'minlength': {'type': 'integer'}, 'purge_unknown': {'type': 'boolean'}, 'rename_handler': {'oneof': [{'type': 'callable'}, {'schema': {'oneof': [{'type': 'callable'}, {'allowed': ('boolean', 'function', 'integer', 'list', 'string'), 'type': 'string'}]}, 'type': 'list'}, {'allowed': ('boolean', 'function', 'integer', 'list', 'string'), 'type': 'string'}]}, 'valueschema': {'validator': 'bulk_schema', 'forbidden': ['rename', 'rename_handler'], 'type': ['dict', 'string']}, 'validator': {'oneof': [{'type': 'callable'}, {'schema': {'oneof': [{'type': 'callable'}, {'allowed': (), 'type': 'string'}]}, 'type': 'list'}, {'allowed': (), 'type': 'string'}]}, 'maxlength': {'type': 'integer'}, 'nullable': {'type': 'boolean'}, 'allow_unknown': {'oneof': [{'type': 'boolean'}, {'validator': 'bulk_schema', 'type': ['dict', 'string']}]}, 'allof': {'logical': 'allof', 'type': 'list'}, 'required': {'type': 'boolean'}, 'noneof': {'logical': 'noneof', 'type': 'list'}, 'dependencies': {'validator': 'dependencies', 'type': ('dict', 'hashable', 'list')}, 'forbidden': {'type': 'list'}, 'type': {'validator': 'type', 'type': ['string', 'list']}, 'oneof': {'logical': 'oneof', 'type': 'list'}, 'default_setter': {'oneof': [{'type': 'callable'}, {'allowed': (), 'type': 'string'}]}, 'rename': {'type': 'hashable'}, 'default': {'nullable': True}, 'min': {'nullable': False}, 'regex': {'type': 'string'}, 'coerce': {'oneof': [{'type': 'callable'}, {'schema': {'oneof': [{'type': 'callable'}, {'allowed': ('boolean', 'function', 'integer', 'list', 'string'), 'type': 'string'}]}, 'type': 'list'}, {'allowed': ('boolean', 'function', 'integer', 'list', 'string'), 'type': 'string'}]}, 'items': {'validator': 'items', 'type': 'list'}, 'readonly': {'type': 'boolean'}, 'allowed': {'type': 'list'}, 'keyschema': {'validator': 'bulk_schema', 'forbidden': ['rename', 'rename_handler'], 'type': ['dict', 'string']}, 'excludes': {'schema': {'type': 'hashable'}, 'type': ('hashable', 'list')}, 'max': {'nullable': False}, 'schema': {'anyof': [{'validator': 'schema'}, {'validator': 'bulk_schema'}], 'type': ['dict', 'string']}, 'anyof': {'logical': 'anyof', 'type': 'list'}, 'empty': {'type': 'boolean'}}</em><a class="headerlink" href="#cis_interface.schema.CisSchemaValidator.rules" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.schema.CisSchemaValidator.types_mapping">
+<code class="descname">types_mapping</code><em class="property"> = {'dict': TypeDefinition(name='dict', included_types=(&lt;class 'collections.abc.Mapping'&gt;,), excluded_types=()), 'binary': TypeDefinition(name='binary', included_types=(&lt;class 'bytes'&gt;, &lt;class 'bytearray'&gt;), excluded_types=()), 'boolean': TypeDefinition(name='boolean', included_types=(&lt;class 'bool'&gt;,), excluded_types=()), 'integer': TypeDefinition(name='integer', included_types=((&lt;class 'int'&gt;,),), excluded_types=()), 'list': TypeDefinition(name='list', included_types=(&lt;class 'collections.abc.Sequence'&gt;,), excluded_types=(&lt;class 'str'&gt;,)), 'function': TypeDefinition(name='function', included_types=&lt;class 'function'&gt;, excluded_types=()), 'datetime': TypeDefinition(name='datetime', included_types=(&lt;class 'datetime.datetime'&gt;,), excluded_types=()), 'string': TypeDefinition(name='string', included_types=&lt;class 'str'&gt;, excluded_types=()), 'number': TypeDefinition(name='number', included_types=((&lt;class 'int'&gt;,), &lt;class 'float'&gt;), excluded_types=(&lt;class 'bool'&gt;,)), 'date': TypeDefinition(name='date', included_types=(&lt;class 'datetime.date'&gt;,), excluded_types=()), 'float': TypeDefinition(name='float', included_types=(&lt;class 'float'&gt;, (&lt;class 'int'&gt;,)), excluded_types=()), 'set': TypeDefinition(name='set', included_types=(&lt;class 'set'&gt;,), excluded_types=())}</em><a class="headerlink" href="#cis_interface.schema.CisSchemaValidator.types_mapping" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.schema.CisSchemaValidator.validation_rules">
+<code class="descname">validation_rules</code><em class="property"> = {'minlength': {'type': 'integer'}, 'empty': {'type': 'boolean'}, 'valueschema': {'validator': 'bulk_schema', 'forbidden': ['rename', 'rename_handler'], 'type': ['dict', 'string']}, 'validator': {'oneof': [{'type': 'callable'}, {'schema': {'oneof': [{'type': 'callable'}, {'allowed': (), 'type': 'string'}]}, 'type': 'list'}, {'allowed': (), 'type': 'string'}]}, 'maxlength': {'type': 'integer'}, 'nullable': {'type': 'boolean'}, 'allow_unknown': {'oneof': [{'type': 'boolean'}, {'validator': 'bulk_schema', 'type': ['dict', 'string']}]}, 'allof': {'logical': 'allof', 'type': 'list'}, 'required': {'type': 'boolean'}, 'dependencies': {'validator': 'dependencies', 'type': ('dict', 'hashable', 'list')}, 'forbidden': {'type': 'list'}, 'type': {'validator': 'type', 'type': ['string', 'list']}, 'oneof': {'logical': 'oneof', 'type': 'list'}, 'max': {'nullable': False}, 'min': {'nullable': False}, 'regex': {'type': 'string'}, 'items': {'validator': 'items', 'type': 'list'}, 'allowed': {'type': 'list'}, 'keyschema': {'validator': 'bulk_schema', 'forbidden': ['rename', 'rename_handler'], 'type': ['dict', 'string']}, 'excludes': {'schema': {'type': 'hashable'}, 'type': ('hashable', 'list')}, 'noneof': {'logical': 'noneof', 'type': 'list'}, 'schema': {'anyof': [{'validator': 'schema'}, {'validator': 'bulk_schema'}], 'type': ['dict', 'string']}, 'anyof': {'logical': 'anyof', 'type': 'list'}, 'readonly': {'type': 'boolean'}}</em><a class="headerlink" href="#cis_interface.schema.CisSchemaValidator.validation_rules" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.schema.CisSchemaValidator.validators">
+<code class="descname">validators</code><em class="property"> = ()</em><a class="headerlink" href="#cis_interface.schema.CisSchemaValidator.validators" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
 <dt id="cis_interface.schema.ComponentSchema">
-<em class="property">class </em><code class="descclassname">cis_interface.schema.</code><code class="descname">ComponentSchema</code><span class="sig-paren">(</span><em>schema_type</em>, <em>subtype_attr=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/schema.html#ComponentSchema"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.schema.ComponentSchema" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a></p>
+<em class="property">class </em><code class="descclassname">cis_interface.schema.</code><code class="descname">ComponentSchema</code><span class="sig-paren">(</span><em>schema_type</em>, <em>schema_registry=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/schema.html#ComponentSchema"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.schema.ComponentSchema" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><code class="xref py py-class docutils literal"><span class="pre">dict</span></code></a></p>
 <p>Schema information for one component.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>schema_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The name of the component.</li>
-<li><strong>subtype_attr</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – The attribute that should be used to
-log subtypes. Defaults to None.</li>
-<li><strong>**kwargs</strong> – Additional keyword arguments are entries in the component
+<li><strong>schema_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; The name of the component.</li>
+<li><strong>schema_registry</strong> (<a class="reference internal" href="#cis_interface.schema.SchemaRegistry" title="cis_interface.schema.SchemaRegistry"><em>SchemaRegistry</em></a><em>, </em><em>optional</em>) &#8211; Registry of schemas
+that this schema is dependent on.</li>
+<li><strong>**kwargs</strong> &#8211; Additional keyword arguments are entries in the component
 schema.</li>
 </ul>
 </td>
@@ -895,8 +981,8 @@ schema.</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>comp_cls</strong> (<em>class</em>) – Component class that should be added.</li>
-<li><strong>subtype</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.6)"><em>tuple</em></a><em>, </em><em>optional</em>) – Key used to identify the subtype
+<li><strong>comp_cls</strong> (<em>class</em>) &#8211; Component class that should be added.</li>
+<li><strong>subtype</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)"><em>tuple</em></a><em>, </em><em>optional</em>) &#8211; Key used to identify the subtype
 of the component type. Defaults to subtype_attr if one was
 provided, otherwise the subtype will not be logged.</li>
 </ul>
@@ -909,12 +995,12 @@ provided, otherwise the subtype will not be logged.</li>
 <dl class="method">
 <dt id="cis_interface.schema.ComponentSchema.append_rules">
 <code class="descname">append_rules</code><span class="sig-paren">(</span><em>new</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/schema.html#ComponentSchema.append_rules"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.schema.ComponentSchema.append_rules" title="Permalink to this definition">¶</a></dt>
-<dd><p>Add rules from new class’s schema to this one.</p>
+<dd><p>Add rules from new class&#8217;s schema to this one.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>new</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) – New schema to add.</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>new</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) &#8211; New schema to add.</td>
 </tr>
 </tbody>
 </table>
@@ -923,25 +1009,51 @@ provided, otherwise the subtype will not be logged.</li>
 <dl class="attribute">
 <dt id="cis_interface.schema.ComponentSchema.class2subtype">
 <code class="descname">class2subtype</code><a class="headerlink" href="#cis_interface.schema.ComponentSchema.class2subtype" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>dict</em> – Mapping from class to list of subtypes.</p>
+<dd><p><em>dict</em> &#8211; Mapping from class to list of subtypes.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="cis_interface.schema.ComponentSchema.classes">
 <code class="descname">classes</code><a class="headerlink" href="#cis_interface.schema.ComponentSchema.classes" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>list</em> – All available classes for this schema.</p>
+<dd><p><em>list</em> &#8211; All available classes for this schema.</p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="cis_interface.schema.ComponentSchema.from_registry">
+<em class="property">classmethod </em><code class="descname">from_registry</code><span class="sig-paren">(</span><em>schema_type</em>, <em>schema_classes</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/schema.html#ComponentSchema.from_registry"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.schema.ComponentSchema.from_registry" title="Permalink to this definition">¶</a></dt>
+<dd><p>Construct a ComponentSchema from a registry entry.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>schema_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; Name of component type to build.</li>
+<li><strong>schema_classes</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a>) &#8211; List of classes for the component type.</li>
+<li><strong>**kwargs</strong> &#8211; Additional keyword arguments are passed to the class
+__init__ method.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Schema with information from classes.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="#cis_interface.schema.ComponentSchema" title="cis_interface.schema.ComponentSchema">ComponentSchema</a></p>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="cis_interface.schema.ComponentSchema.subtype2class">
 <code class="descname">subtype2class</code><a class="headerlink" href="#cis_interface.schema.ComponentSchema.subtype2class" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>dict</em> – Mapping from subtype to class.</p>
+<dd><p><em>dict</em> &#8211; Mapping from subtype to class.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="cis_interface.schema.ComponentSchema.subtypes">
 <code class="descname">subtypes</code><a class="headerlink" href="#cis_interface.schema.ComponentSchema.subtypes" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>list</em> – All subtypes for this schema type.</p>
+<dd><p><em>list</em> &#8211; All subtypes for this schema type.</p>
 </dd></dl>
 
 </dd></dl>
@@ -949,7 +1061,7 @@ provided, otherwise the subtype will not be logged.</li>
 <dl class="class">
 <dt id="cis_interface.schema.SchemaDumper">
 <em class="property">class </em><code class="descclassname">cis_interface.schema.</code><code class="descname">SchemaDumper</code><span class="sig-paren">(</span><em>stream</em>, <em>default_style=None</em>, <em>default_flow_style=None</em>, <em>canonical=None</em>, <em>indent=None</em>, <em>width=None</em>, <em>allow_unicode=None</em>, <em>line_break=None</em>, <em>encoding=None</em>, <em>explicit_start=None</em>, <em>explicit_end=None</em>, <em>version=None</em>, <em>tags=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/schema.html#SchemaDumper"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.schema.SchemaDumper" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">yaml.dumper.Dumper</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">yaml.dumper.Dumper</span></code></p>
 <p>SafeDumper for schema that includes tuples and Schema classes.</p>
 <dl class="method">
 <dt id="cis_interface.schema.SchemaDumper.represent_ComponentSchema">
@@ -968,7 +1080,7 @@ provided, otherwise the subtype will not be logged.</li>
 
 <dl class="attribute">
 <dt id="cis_interface.schema.SchemaDumper.yaml_representers">
-<code class="descname">yaml_representers</code><em class="property"> = {None: &lt;unbound method SafeRepresenter.represent_undefined&gt;, &lt;class 'cis_interface.schema.ComponentSchema'&gt;: &lt;unbound method SchemaDumper.represent_ComponentSchema&gt;, &lt;class 'cis_interface.schema.SchemaRegistry'&gt;: &lt;unbound method SchemaDumper.represent_SchemaRegistry&gt;, &lt;type 'bool'&gt;: &lt;unbound method SafeRepresenter.represent_bool&gt;, &lt;type 'classobj'&gt;: &lt;unbound method Representer.represent_name&gt;, &lt;type 'complex'&gt;: &lt;unbound method Representer.represent_complex&gt;, &lt;type 'float'&gt;: &lt;unbound method SafeRepresenter.represent_float&gt;, &lt;type 'function'&gt;: &lt;unbound method Representer.represent_name&gt;, &lt;type 'int'&gt;: &lt;unbound method SafeRepresenter.represent_int&gt;, &lt;type 'list'&gt;: &lt;unbound method SafeRepresenter.represent_list&gt;, &lt;type 'long'&gt;: &lt;unbound method Representer.represent_long&gt;, &lt;type 'dict'&gt;: &lt;unbound method SafeRepresenter.represent_dict&gt;, &lt;type 'builtin_function_or_method'&gt;: &lt;unbound method Representer.represent_name&gt;, &lt;type 'module'&gt;: &lt;unbound method Representer.represent_module&gt;, &lt;type 'NoneType'&gt;: &lt;unbound method SafeRepresenter.represent_none&gt;, &lt;type 'set'&gt;: &lt;unbound method SafeRepresenter.represent_set&gt;, &lt;type 'str'&gt;: &lt;unbound method Representer.represent_str&gt;, &lt;type 'tuple'&gt;: &lt;unbound method SchemaDumper.represent_python_tuple&gt;, &lt;type 'type'&gt;: &lt;unbound method Representer.represent_name&gt;, &lt;type 'unicode'&gt;: &lt;unbound method Representer.represent_unicode&gt;, &lt;type 'datetime.datetime'&gt;: &lt;unbound method SafeRepresenter.represent_datetime&gt;, &lt;type 'datetime.date'&gt;: &lt;unbound method SafeRepresenter.represent_date&gt;}</em><a class="headerlink" href="#cis_interface.schema.SchemaDumper.yaml_representers" title="Permalink to this definition">¶</a></dt>
+<code class="descname">yaml_representers</code><em class="property"> = {&lt;class 'dict'&gt;: &lt;function SafeRepresenter.represent_dict&gt;, &lt;class 'cis_interface.schema.ComponentSchema'&gt;: &lt;function SchemaDumper.represent_ComponentSchema&gt;, &lt;class 'int'&gt;: &lt;function SafeRepresenter.represent_int&gt;, &lt;class 'datetime.datetime'&gt;: &lt;function SafeRepresenter.represent_datetime&gt;, &lt;class 'bool'&gt;: &lt;function SafeRepresenter.represent_bool&gt;, &lt;class 'collections.OrderedDict'&gt;: &lt;function Representer.represent_ordered_dict&gt;, &lt;class 'cis_interface.schema.SchemaRegistry'&gt;: &lt;function SchemaDumper.represent_SchemaRegistry&gt;, &lt;class 'builtin_function_or_method'&gt;: &lt;function Representer.represent_name&gt;, &lt;class 'bytes'&gt;: &lt;function SafeRepresenter.represent_binary&gt;, &lt;class 'str'&gt;: &lt;function SafeRepresenter.represent_str&gt;, &lt;class 'type'&gt;: &lt;function Representer.represent_name&gt;, &lt;class 'NoneType'&gt;: &lt;function SafeRepresenter.represent_none&gt;, &lt;class 'float'&gt;: &lt;function SafeRepresenter.represent_float&gt;, &lt;class 'complex'&gt;: &lt;function Representer.represent_complex&gt;, &lt;class 'module'&gt;: &lt;function Representer.represent_module&gt;, None: &lt;function SafeRepresenter.represent_undefined&gt;, &lt;class 'list'&gt;: &lt;function SafeRepresenter.represent_list&gt;, &lt;class 'tuple'&gt;: &lt;function SchemaDumper.represent_python_tuple&gt;, &lt;class 'set'&gt;: &lt;function SafeRepresenter.represent_set&gt;, &lt;class 'datetime.date'&gt;: &lt;function SafeRepresenter.represent_date&gt;, &lt;class 'function'&gt;: &lt;function Representer.represent_name&gt;}</em><a class="headerlink" href="#cis_interface.schema.SchemaDumper.yaml_representers" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -976,7 +1088,7 @@ provided, otherwise the subtype will not be logged.</li>
 <dl class="class">
 <dt id="cis_interface.schema.SchemaLoader">
 <em class="property">class </em><code class="descclassname">cis_interface.schema.</code><code class="descname">SchemaLoader</code><span class="sig-paren">(</span><em>stream</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/schema.html#SchemaLoader"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.schema.SchemaLoader" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">yaml.loader.SafeLoader</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">yaml.loader.SafeLoader</span></code></p>
 <p>SafeLoader for schema that includes tuples.</p>
 <dl class="method">
 <dt id="cis_interface.schema.SchemaLoader.construct_python_tuple">
@@ -985,7 +1097,7 @@ provided, otherwise the subtype will not be logged.</li>
 
 <dl class="attribute">
 <dt id="cis_interface.schema.SchemaLoader.yaml_constructors">
-<code class="descname">yaml_constructors</code><em class="property"> = {None: &lt;unbound method SafeConstructor.construct_undefined&gt;, u'tag:yaml.org,2002:binary': &lt;unbound method SafeConstructor.construct_yaml_binary&gt;, u'tag:yaml.org,2002:bool': &lt;unbound method SafeConstructor.construct_yaml_bool&gt;, u'tag:yaml.org,2002:float': &lt;unbound method SafeConstructor.construct_yaml_float&gt;, u'tag:yaml.org,2002:int': &lt;unbound method SafeConstructor.construct_yaml_int&gt;, u'tag:yaml.org,2002:map': &lt;unbound method SafeConstructor.construct_yaml_map&gt;, u'tag:yaml.org,2002:null': &lt;unbound method SafeConstructor.construct_yaml_null&gt;, u'tag:yaml.org,2002:omap': &lt;unbound method SafeConstructor.construct_yaml_omap&gt;, u'tag:yaml.org,2002:pairs': &lt;unbound method SafeConstructor.construct_yaml_pairs&gt;, 'tag:yaml.org,2002:python/tuple': &lt;unbound method SchemaLoader.construct_python_tuple&gt;, u'tag:yaml.org,2002:seq': &lt;unbound method SafeConstructor.construct_yaml_seq&gt;, u'tag:yaml.org,2002:set': &lt;unbound method SafeConstructor.construct_yaml_set&gt;, u'tag:yaml.org,2002:str': &lt;unbound method SafeConstructor.construct_yaml_str&gt;, u'tag:yaml.org,2002:timestamp': &lt;unbound method SafeConstructor.construct_yaml_timestamp&gt;}</em><a class="headerlink" href="#cis_interface.schema.SchemaLoader.yaml_constructors" title="Permalink to this definition">¶</a></dt>
+<code class="descname">yaml_constructors</code><em class="property"> = {'tag:yaml.org,2002:set': &lt;function SafeConstructor.construct_yaml_set&gt;, 'tag:yaml.org,2002:omap': &lt;function SafeConstructor.construct_yaml_omap&gt;, 'tag:yaml.org,2002:binary': &lt;function SafeConstructor.construct_yaml_binary&gt;, 'tag:yaml.org,2002:seq': &lt;function SafeConstructor.construct_yaml_seq&gt;, 'tag:yaml.org,2002:python/tuple': &lt;function SchemaLoader.construct_python_tuple&gt;, 'tag:yaml.org,2002:timestamp': &lt;function SafeConstructor.construct_yaml_timestamp&gt;, 'tag:yaml.org,2002:int': &lt;function SafeConstructor.construct_yaml_int&gt;, None: &lt;function SafeConstructor.construct_undefined&gt;, 'tag:yaml.org,2002:map': &lt;function SafeConstructor.construct_yaml_map&gt;, 'tag:yaml.org,2002:float': &lt;function SafeConstructor.construct_yaml_float&gt;, 'tag:yaml.org,2002:bool': &lt;function SafeConstructor.construct_yaml_bool&gt;, 'tag:yaml.org,2002:pairs': &lt;function SafeConstructor.construct_yaml_pairs&gt;, 'tag:yaml.org,2002:null': &lt;function SafeConstructor.construct_yaml_null&gt;, 'tag:yaml.org,2002:str': &lt;function SafeConstructor.construct_yaml_str&gt;}</em><a class="headerlink" href="#cis_interface.schema.SchemaLoader.yaml_constructors" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -993,21 +1105,21 @@ provided, otherwise the subtype will not be logged.</li>
 <dl class="class">
 <dt id="cis_interface.schema.SchemaRegistry">
 <em class="property">class </em><code class="descclassname">cis_interface.schema.</code><code class="descname">SchemaRegistry</code><span class="sig-paren">(</span><em>registry=None</em>, <em>required=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/schema.html#SchemaRegistry"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.schema.SchemaRegistry" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a></p>
-<p>Registry of schema’s for different integration components.</p>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">cerberus.schema.SchemaRegistry</span></code></p>
+<p>Registry of schema&#8217;s for different integration components.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>registry</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a><em>, </em><em>optional</em>) – Dictionary of registered components.
+<li><strong>registry</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a><em>, </em><em>optional</em>) &#8211; Dictionary of registered components.
 Defaults to None and the registry will be empty.</li>
-<li><strong>required</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>, </em><em>optional</em>) – Components that are required. Defaults to
-[‘comm’, ‘file’, ‘model’, ‘connection’]. Ignored if registry is None.</li>
+<li><strong>required</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a><em>, </em><em>optional</em>) &#8211; Components that are required. Defaults to
+[&#8216;comm&#8217;, &#8216;file&#8217;, &#8216;model&#8217;, &#8216;connection&#8217;]. Ignored if registry is None.</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ValueError</span></code></a> – If registry is provided and one of the required components
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.7)"><code class="xref py py-exc docutils literal"><span class="pre">ValueError</span></code></a> &#8211; If registry is provided and one of the required components
 is missing.</p>
 </td>
 </tr>
@@ -1016,31 +1128,31 @@ is missing.</p>
 <dl class="attribute">
 <dt id="cis_interface.schema.SchemaRegistry.class2conntype">
 <code class="descname">class2conntype</code><a class="headerlink" href="#cis_interface.schema.SchemaRegistry.class2conntype" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>dict</em> – Mapping from connection class to comm classes &amp; direction.</p>
+<dd><p><em>dict</em> &#8211; Mapping from connection class to comm classes &amp; direction.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="cis_interface.schema.SchemaRegistry.class2filetype">
 <code class="descname">class2filetype</code><a class="headerlink" href="#cis_interface.schema.SchemaRegistry.class2filetype" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>dict</em> – Mapping from communication class to filetype.</p>
+<dd><p><em>dict</em> &#8211; Mapping from communication class to filetype.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="cis_interface.schema.SchemaRegistry.class2language">
 <code class="descname">class2language</code><a class="headerlink" href="#cis_interface.schema.SchemaRegistry.class2language" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>dict</em> – Mapping from ModelDriver class to programming language.</p>
+<dd><p><em>dict</em> &#8211; Mapping from ModelDriver class to programming language.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="cis_interface.schema.SchemaRegistry.conntype2class">
 <code class="descname">conntype2class</code><a class="headerlink" href="#cis_interface.schema.SchemaRegistry.conntype2class" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>dict</em> – Mapping from comm classes &amp; direction to connection class.</p>
+<dd><p><em>dict</em> &#8211; Mapping from comm classes &amp; direction to connection class.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="cis_interface.schema.SchemaRegistry.filetype2class">
 <code class="descname">filetype2class</code><a class="headerlink" href="#cis_interface.schema.SchemaRegistry.filetype2class" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>dict</em> – Mapping from filetype to communication class.</p>
+<dd><p><em>dict</em> &#8211; Mapping from filetype to communication class.</p>
 </dd></dl>
 
 <dl class="classmethod">
@@ -1051,16 +1163,21 @@ is missing.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>fname</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Full path to the file the schema should be loaded from.</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>fname</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; Full path to the file the schema should be loaded from.</td>
 </tr>
 </tbody>
 </table>
 </dd></dl>
 
+<dl class="method">
+<dt id="cis_interface.schema.SchemaRegistry.keys">
+<code class="descname">keys</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/schema.html#SchemaRegistry.keys"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.schema.SchemaRegistry.keys" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="attribute">
 <dt id="cis_interface.schema.SchemaRegistry.language2class">
 <code class="descname">language2class</code><a class="headerlink" href="#cis_interface.schema.SchemaRegistry.language2class" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>dict</em> – Mapping from programming language to ModelDriver class.</p>
+<dd><p><em>dict</em> &#8211; Mapping from programming language to ModelDriver class.</p>
 </dd></dl>
 
 <dl class="method">
@@ -1071,7 +1188,7 @@ is missing.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>fname</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Full path to the file the schema should be loaded from.</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>fname</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; Full path to the file the schema should be loaded from.</td>
 </tr>
 </tbody>
 </table>
@@ -1086,8 +1203,8 @@ is missing.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>fname</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Full path to the file the schema should be saved to.</li>
-<li><strong>schema</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) – cis_interface YAML options.</li>
+<li><strong>fname</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; Full path to the file the schema should be saved to.</li>
+<li><strong>schema</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) &#8211; cis_interface YAML options.</li>
 </ul>
 </td>
 </tr>
@@ -1100,53 +1217,6 @@ is missing.</p>
 <code class="descname">validator</code><a class="headerlink" href="#cis_interface.schema.SchemaRegistry.validator" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compose complete schema for parsing yaml.</p>
 </dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="cis_interface.schema.SchemaValidator">
-<em class="property">class </em><code class="descclassname">cis_interface.schema.</code><code class="descname">SchemaValidator</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/schema.html#SchemaValidator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.schema.SchemaValidator" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">cerberus.validator.Validator</span></code></p>
-<p>Class for validating the schema.</p>
-<dl class="attribute">
-<dt id="cis_interface.schema.SchemaValidator.cis_type_order">
-<code class="descname">cis_type_order</code><em class="property"> = ['list', 'string', 'integer', 'boolean', 'function']</em><a class="headerlink" href="#cis_interface.schema.SchemaValidator.cis_type_order" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="cis_interface.schema.SchemaValidator.coercers">
-<code class="descname">coercers</code><em class="property"> = ('boolean', 'function', 'integer', 'list', 'string')</em><a class="headerlink" href="#cis_interface.schema.SchemaValidator.coercers" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="cis_interface.schema.SchemaValidator.default_setters">
-<code class="descname">default_setters</code><em class="property"> = ()</em><a class="headerlink" href="#cis_interface.schema.SchemaValidator.default_setters" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="cis_interface.schema.SchemaValidator.normalization_rules">
-<code class="descname">normalization_rules</code><em class="property"> = {'coerce': {'oneof': [{'type': 'callable'}, {'type': 'list', 'schema': {'oneof': [{'type': 'callable'}, {'type': 'string', 'allowed': ('boolean', 'function', 'integer', 'list', 'string')}]}}, {'type': 'string', 'allowed': ('boolean', 'function', 'integer', 'list', 'string')}]}, 'default': {'nullable': True}, 'default_setter': {'oneof': [{'type': 'callable'}, {'type': 'string', 'allowed': ()}]}, 'purge_unknown': {'type': 'boolean'}, 'rename': {'type': 'hashable'}, 'rename_handler': {'oneof': [{'type': 'callable'}, {'type': 'list', 'schema': {'oneof': [{'type': 'callable'}, {'type': 'string', 'allowed': ('boolean', 'function', 'integer', 'list', 'string')}]}}, {'type': 'string', 'allowed': ('boolean', 'function', 'integer', 'list', 'string')}]}}</em><a class="headerlink" href="#cis_interface.schema.SchemaValidator.normalization_rules" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="cis_interface.schema.SchemaValidator.rules">
-<code class="descname">rules</code><em class="property"> = {'allof': {'type': 'list', 'logical': 'allof'}, 'allow_unknown': {'oneof': [{'type': 'boolean'}, {'validator': 'bulk_schema', 'type': ['dict', 'string']}]}, 'allowed': {'type': 'list'}, 'anyof': {'type': 'list', 'logical': 'anyof'}, 'coerce': {'oneof': [{'type': 'callable'}, {'type': 'list', 'schema': {'oneof': [{'type': 'callable'}, {'type': 'string', 'allowed': ('boolean', 'function', 'integer', 'list', 'string')}]}}, {'type': 'string', 'allowed': ('boolean', 'function', 'integer', 'list', 'string')}]}, 'default': {'nullable': True}, 'default_setter': {'oneof': [{'type': 'callable'}, {'type': 'string', 'allowed': ()}]}, 'dependencies': {'validator': 'dependencies', 'type': ('dict', 'hashable', 'list')}, 'empty': {'type': 'boolean'}, 'excludes': {'type': ('hashable', 'list'), 'schema': {'type': 'hashable'}}, 'forbidden': {'type': 'list'}, 'items': {'validator': 'items', 'type': 'list'}, 'keyschema': {'forbidden': ['rename', 'rename_handler'], 'validator': 'bulk_schema', 'type': ['dict', 'string']}, 'max': {'nullable': False}, 'maxlength': {'type': 'integer'}, 'min': {'nullable': False}, 'minlength': {'type': 'integer'}, 'noneof': {'type': 'list', 'logical': 'noneof'}, 'nullable': {'type': 'boolean'}, 'oneof': {'type': 'list', 'logical': 'oneof'}, 'purge_unknown': {'type': 'boolean'}, 'readonly': {'type': 'boolean'}, 'regex': {'type': 'string'}, 'rename': {'type': 'hashable'}, 'rename_handler': {'oneof': [{'type': 'callable'}, {'type': 'list', 'schema': {'oneof': [{'type': 'callable'}, {'type': 'string', 'allowed': ('boolean', 'function', 'integer', 'list', 'string')}]}}, {'type': 'string', 'allowed': ('boolean', 'function', 'integer', 'list', 'string')}]}, 'required': {'type': 'boolean'}, 'schema': {'anyof': [{'validator': 'schema'}, {'validator': 'bulk_schema'}], 'type': ['dict', 'string']}, 'type': {'validator': 'type', 'type': ['string', 'list']}, 'validator': {'oneof': [{'type': 'callable'}, {'type': 'list', 'schema': {'oneof': [{'type': 'callable'}, {'type': 'string', 'allowed': ()}]}}, {'type': 'string', 'allowed': ()}]}, 'valueschema': {'forbidden': ['rename', 'rename_handler'], 'validator': 'bulk_schema', 'type': ['dict', 'string']}}</em><a class="headerlink" href="#cis_interface.schema.SchemaValidator.rules" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="cis_interface.schema.SchemaValidator.types_mapping">
-<code class="descname">types_mapping</code><em class="property"> = {'binary': TypeDefinition(name='binary', included_types=(&lt;type 'str'&gt;, &lt;type 'bytearray'&gt;), excluded_types=()), 'boolean': TypeDefinition(name='boolean', included_types=(&lt;type 'bool'&gt;,), excluded_types=()), 'date': TypeDefinition(name='date', included_types=(&lt;type 'datetime.date'&gt;,), excluded_types=()), 'datetime': TypeDefinition(name='datetime', included_types=(&lt;type 'datetime.datetime'&gt;,), excluded_types=()), 'dict': TypeDefinition(name='dict', included_types=(&lt;class '_abcoll.Mapping'&gt;,), excluded_types=()), 'float': TypeDefinition(name='float', included_types=(&lt;type 'float'&gt;, (&lt;type 'int'&gt;, &lt;type 'long'&gt;)), excluded_types=()), 'function': TypeDefinition(name='function', included_types=&lt;type 'function'&gt;, excluded_types=()), 'integer': TypeDefinition(name='integer', included_types=((&lt;type 'int'&gt;, &lt;type 'long'&gt;),), excluded_types=()), 'list': TypeDefinition(name='list', included_types=(&lt;class '_abcoll.Sequence'&gt;,), excluded_types=(&lt;type 'basestring'&gt;,)), 'number': TypeDefinition(name='number', included_types=((&lt;type 'int'&gt;, &lt;type 'long'&gt;), &lt;type 'float'&gt;), excluded_types=(&lt;type 'bool'&gt;,)), 'set': TypeDefinition(name='set', included_types=(&lt;type 'set'&gt;,), excluded_types=()), 'string': TypeDefinition(name='string', included_types=&lt;type 'basestring'&gt;, excluded_types=())}</em><a class="headerlink" href="#cis_interface.schema.SchemaValidator.types_mapping" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="cis_interface.schema.SchemaValidator.validation_rules">
-<code class="descname">validation_rules</code><em class="property"> = {'allof': {'type': 'list', 'logical': 'allof'}, 'allow_unknown': {'oneof': [{'type': 'boolean'}, {'validator': 'bulk_schema', 'type': ['dict', 'string']}]}, 'allowed': {'type': 'list'}, 'anyof': {'type': 'list', 'logical': 'anyof'}, 'dependencies': {'validator': 'dependencies', 'type': ('dict', 'hashable', 'list')}, 'empty': {'type': 'boolean'}, 'excludes': {'type': ('hashable', 'list'), 'schema': {'type': 'hashable'}}, 'forbidden': {'type': 'list'}, 'items': {'validator': 'items', 'type': 'list'}, 'keyschema': {'forbidden': ['rename', 'rename_handler'], 'validator': 'bulk_schema', 'type': ['dict', 'string']}, 'max': {'nullable': False}, 'maxlength': {'type': 'integer'}, 'min': {'nullable': False}, 'minlength': {'type': 'integer'}, 'noneof': {'type': 'list', 'logical': 'noneof'}, 'nullable': {'type': 'boolean'}, 'oneof': {'type': 'list', 'logical': 'oneof'}, 'readonly': {'type': 'boolean'}, 'regex': {'type': 'string'}, 'required': {'type': 'boolean'}, 'schema': {'anyof': [{'validator': 'schema'}, {'validator': 'bulk_schema'}], 'type': ['dict', 'string']}, 'type': {'validator': 'type', 'type': ['string', 'list']}, 'validator': {'oneof': [{'type': 'callable'}, {'type': 'list', 'schema': {'oneof': [{'type': 'callable'}, {'type': 'string', 'allowed': ()}]}}, {'type': 'string', 'allowed': ()}]}, 'valueschema': {'forbidden': ['rename', 'rename_handler'], 'validator': 'bulk_schema', 'type': ['dict', 'string']}}</em><a class="headerlink" href="#cis_interface.schema.SchemaValidator.validation_rules" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="cis_interface.schema.SchemaValidator.validators">
-<code class="descname">validators</code><em class="property"> = ()</em><a class="headerlink" href="#cis_interface.schema.SchemaValidator.validators" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
 
 </dd></dl>
 
@@ -1170,13 +1240,13 @@ is missing.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>fname</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – Full path to the file that the schema should be
-loaded from. If the file dosn’t exist, it is created. Defaults to
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>fname</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) &#8211; Full path to the file that the schema should be
+loaded from. If the file dosn&#8217;t exist, it is created. Defaults to
 _schema_fname.</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">cis_interface YAML options.</td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)">dict</a></td>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></td>
 </tr>
 </tbody>
 </table>
@@ -1192,10 +1262,10 @@ dependencies.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>orig</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) – Schema that will be inherited.</li>
-<li><strong>key</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Field that other fields are dependent on.</li>
-<li><strong>value</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – New value for key that dependent fields should accept.</li>
-<li><strong>**kwargs</strong> – Additional keyword arguments will be added to the schema
+<li><strong>orig</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) &#8211; Schema that will be inherited.</li>
+<li><strong>key</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; Field that other fields are dependent on.</li>
+<li><strong>value</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; New value for key that dependent fields should accept.</li>
+<li><strong>**kwargs</strong> &#8211; Additional keyword arguments will be added to the schema
 with dependency on the provided key/value pair.</li>
 </ul>
 </td>
@@ -1203,7 +1273,7 @@ with dependency on the provided key/value pair.</li>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">New schema.</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)">dict</a></p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></p>
 </td>
 </tr>
 </tbody>
@@ -1230,13 +1300,13 @@ with dependency on the provided key/value pair.</li>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>fname</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – Full path to the file that the schema should be
-loaded from. If the file dosn’t exist, it is created. Defaults to
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>fname</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) &#8211; Full path to the file that the schema should be
+loaded from. If the file dosn&#8217;t exist, it is created. Defaults to
 _schema_fname.</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">cis_interface YAML options.</td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)">dict</a></td>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></td>
 </tr>
 </tbody>
 </table>
@@ -1256,8 +1326,8 @@ _schema_fname.</td>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>value</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a>) – String or list of strings, specifying function(s).
-The format should be “&lt;package.module&gt;:&lt;function&gt;” so that
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>value</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a>) &#8211; String or list of strings, specifying function(s).
+The format should be &#8220;&lt;package.module&gt;:&lt;function&gt;&#8221; so that
 &lt;function&gt; can be imported from &lt;package&gt;.</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Callable function.</td>
@@ -1275,23 +1345,23 @@ The format should be “&lt;package.module&gt;:&lt;function&gt;” so that
 <dl class="class">
 <dt id="cis_interface.tools.CisClass">
 <em class="property">class </em><code class="descclassname">cis_interface.tools.</code><code class="descname">CisClass</code><span class="sig-paren">(</span><em>name</em>, <em>uuid=None</em>, <em>working_dir=None</em>, <em>timeout=60.0</em>, <em>sleeptime=0.01</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tools.html#CisClass"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tools.CisClass" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/logging.html#logging.LoggerAdapter" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">logging.LoggerAdapter</span></code></a></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/logging.html#logging.LoggerAdapter" title="(in Python v3.7)"><code class="xref py py-class docutils literal"><span class="pre">logging.LoggerAdapter</span></code></a></p>
 <p>Base class for CiS classes.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Class name.</li>
-<li><strong>uuid</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – Unique ID for this instance. Defaults to None
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; Class name.</li>
+<li><strong>uuid</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) &#8211; Unique ID for this instance. Defaults to None
 and is assigned.</li>
-<li><strong>working_dir</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – Working directory. If not provided, the
+<li><strong>working_dir</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) &#8211; Working directory. If not provided, the
 current working directory is used.</li>
-<li><strong>timeout</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>, </em><em>optional</em>) – Maximum time (in seconds) that should be
+<li><strong>timeout</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a><em>, </em><em>optional</em>) &#8211; Maximum time (in seconds) that should be
 spent waiting on a process. Defaults to 60.</li>
-<li><strong>sleeptime</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>, </em><em>optional</em>) – Time that class should sleep for when
+<li><strong>sleeptime</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a><em>, </em><em>optional</em>) &#8211; Time that class should sleep for when
 sleep is called. Defaults to 0.01.</li>
-<li><strong>**kwargs</strong> – Additional keyword arguments are assigned to the extra_kwargs
+<li><strong>**kwargs</strong> &#8211; Additional keyword arguments are assigned to the extra_kwargs
 dictionary.</li>
 </ul>
 </td>
@@ -1301,68 +1371,68 @@ dictionary.</li>
 <dl class="attribute">
 <dt id="cis_interface.tools.CisClass.name">
 <code class="descname">name</code><a class="headerlink" href="#cis_interface.tools.CisClass.name" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>str</em> – Class name.</p>
+<dd><p><em>str</em> &#8211; Class name.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="cis_interface.tools.CisClass.uuid">
 <code class="descname">uuid</code><a class="headerlink" href="#cis_interface.tools.CisClass.uuid" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>str</em> – Unique ID for this instance.</p>
+<dd><p><em>str</em> &#8211; Unique ID for this instance.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="cis_interface.tools.CisClass.sleeptime">
 <code class="descname">sleeptime</code><a class="headerlink" href="#cis_interface.tools.CisClass.sleeptime" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>float</em> – Time that class should sleep for when sleep called.</p>
+<dd><p><em>float</em> &#8211; Time that class should sleep for when sleep called.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="cis_interface.tools.CisClass.longsleep">
 <code class="descname">longsleep</code><a class="headerlink" href="#cis_interface.tools.CisClass.longsleep" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>float</em> – Time that the class will sleep for when waiting for
+<dd><p><em>float</em> &#8211; Time that the class will sleep for when waiting for
 longer tasks to complete (10x longer than sleeptime).</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="cis_interface.tools.CisClass.timeout">
 <code class="descname">timeout</code><a class="headerlink" href="#cis_interface.tools.CisClass.timeout" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>float</em> – Maximum time that should be spent waiting on a process.</p>
+<dd><p><em>float</em> &#8211; Maximum time that should be spent waiting on a process.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="cis_interface.tools.CisClass.working_dir">
 <code class="descname">working_dir</code><a class="headerlink" href="#cis_interface.tools.CisClass.working_dir" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>str</em> – Working directory.</p>
+<dd><p><em>str</em> &#8211; Working directory.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="cis_interface.tools.CisClass.errors">
 <code class="descname">errors</code><a class="headerlink" href="#cis_interface.tools.CisClass.errors" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>list</em> – List of errors.</p>
+<dd><p><em>list</em> &#8211; List of errors.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="cis_interface.tools.CisClass.extra_kwargs">
 <code class="descname">extra_kwargs</code><a class="headerlink" href="#cis_interface.tools.CisClass.extra_kwargs" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>dict</em> – Keyword arguments that were not parsed.</p>
+<dd><p><em>dict</em> &#8211; Keyword arguments that were not parsed.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="cis_interface.tools.CisClass.sched_out">
 <code class="descname">sched_out</code><a class="headerlink" href="#cis_interface.tools.CisClass.sched_out" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>obj</em> – Output from the last scheduled task with output.</p>
+<dd><p><em>obj</em> &#8211; Output from the last scheduled task with output.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="cis_interface.tools.CisClass.logger">
 <code class="descname">logger</code><a class="headerlink" href="#cis_interface.tools.CisClass.logger" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>logging.Logger</em> – Logger object for this object.</p>
+<dd><p><em>logging.Logger</em> &#8211; Logger object for this object.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="cis_interface.tools.CisClass.suppress_special_debug">
 <code class="descname">suppress_special_debug</code><a class="headerlink" href="#cis_interface.tools.CisClass.suppress_special_debug" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>bool</em> – If True, special_debug log messages
+<dd><p><em>bool</em> &#8211; If True, special_debug log messages
 are suppressed.</p>
 </dd></dl>
 
@@ -1374,11 +1444,11 @@ are suppressed.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>obj</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.6)"><em>object</em></a>) – Object that should be turned into a string.</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>obj</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><em>object</em></a>) &#8211; Object that should be turned into a string.</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">String version of provided object.</td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)">str</a></td>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
 </tr>
 </tbody>
 </table>
@@ -1393,10 +1463,10 @@ are suppressed.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>key</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – Key for timeout that should be checked.
+<li><strong>key</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) &#8211; Key for timeout that should be checked.
 Defaults to None and is set by the calling class and
 function/method (See <cite>timeout_key</cite>).</li>
-<li><strong>key_level</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>, </em><em>optional</em>) – Positive integer indicating the level of
+<li><strong>key_level</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><em>optional</em>) &#8211; Positive integer indicating the level of
 the calling class and function/method that should be used to
 key the timeout. 0 is the class and function/method that called
 start_timeout. Higher values use classes and function/methods
@@ -1404,7 +1474,7 @@ further up in the stack. Defaults to 0.</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#KeyError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">KeyError</span></code></a> – If there is not a timeout registered for the specified
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#KeyError" title="(in Python v3.7)"><code class="xref py py-exc docutils literal"><span class="pre">KeyError</span></code></a> &#8211; If there is not a timeout registered for the specified
 key.</p>
 </td>
 </tr>
@@ -1427,7 +1497,7 @@ key.</p>
 <dl class="method">
 <dt id="cis_interface.tools.CisClass.dummy_log">
 <code class="descname">dummy_log</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tools.html#CisClass.dummy_log"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tools.CisClass.dummy_log" title="Permalink to this definition">¶</a></dt>
-<dd><p>Dummy log function that dosn’t do anything.</p>
+<dd><p>Dummy log function that dosn&#8217;t do anything.</p>
 </dd></dl>
 
 <dl class="attribute">
@@ -1452,12 +1522,12 @@ function calling get_timeout_key.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>key_level</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>, </em><em>optional</em>) – Positive integer indicating the level of
+<li><strong>key_level</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><em>optional</em>) &#8211; Positive integer indicating the level of
 the calling class and function/method that should be used to
 key the timeout. 0 is the class and function/method that is 2
 steps higher in the stack. Higher values use classes and
 function/methods further up in the stack. Defaults to 0.</li>
-<li><strong>key_suffix</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – String that should be appended to the
+<li><strong>key_suffix</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) &#8211; String that should be appended to the
 end of the generated key. Defaults to None and is ignored.</li>
 </ul>
 </td>
@@ -1465,7 +1535,7 @@ end of the generated key. Defaults to None and is ignored.</li>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Key identifying calling object and method.</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)">str</a></p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></p>
 </td>
 </tr>
 </tbody>
@@ -1493,9 +1563,9 @@ end of the generated key. Defaults to None and is ignored.</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>msg</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.6)"><em>bytes</em></a>) – Message to print.</li>
-<li><strong>*args</strong> – Additional arguments are passed to print.</li>
-<li><strong>**kwargs</strong> – Additional keyword arguments are passed to print.</li>
+<li><strong>msg</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.7)"><em>bytes</em></a>) &#8211; Message to print.</li>
+<li><strong>*args</strong> &#8211; Additional arguments are passed to print.</li>
+<li><strong>**kwargs</strong> &#8211; Additional keyword arguments are passed to print.</li>
 </ul>
 </td>
 </tr>
@@ -1517,7 +1587,7 @@ end of the generated key. Defaults to None and is ignored.</li>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>e</strong> (<a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.6)"><em>Exception</em></a>) – Exception to raise.</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>e</strong> (<a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.7)"><em>Exception</em></a>) &#8211; Exception to raise.</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body">The provided exception.</td>
 </tr>
@@ -1541,14 +1611,14 @@ elapsed.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>t</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – Number of seconds that should be waited before task
+<li><strong>t</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) &#8211; Number of seconds that should be waited before task
 is executed.</li>
-<li><strong>func</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.6)"><em>object</em></a>) – Function that should be executed.</li>
-<li><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>, </em><em>optional</em>) – Arguments for the provided function.
+<li><strong>func</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><em>object</em></a>) &#8211; Function that should be executed.</li>
+<li><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a><em>, </em><em>optional</em>) &#8211; Arguments for the provided function.
 Defaults to [].</li>
-<li><strong>kwargs</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a><em>, </em><em>optional</em>) – Keyword arguments for the provided
+<li><strong>kwargs</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a><em>, </em><em>optional</em>) &#8211; Keyword arguments for the provided
 function. Defaults to {}.</li>
-<li><strong>store_output</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, the output from the
+<li><strong>store_output</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) &#8211; If True, the output from the
 scheduled task is stored in self.sched_out. Otherwise, it is not
 stored. Defaults to False.</li>
 </ul>
@@ -1566,8 +1636,8 @@ stored. Defaults to False.</li>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>t</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>, </em><em>optional</em>) – Time that class should sleep for. If not
-provided, the attribute ‘sleeptime’ is used.</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>t</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a><em>, </em><em>optional</em>) &#8211; Time that class should sleep for. If not
+provided, the attribute &#8216;sleeptime&#8217; is used.</td>
 </tr>
 </tbody>
 </table>
@@ -1588,23 +1658,23 @@ provided, the attribute ‘sleeptime’ is used.</td>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>t</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>, </em><em>optional</em>) – Maximum time that the calling function should
+<li><strong>t</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a><em>, </em><em>optional</em>) &#8211; Maximum time that the calling function should
 wait before timeing out. If not provided, the attribute
-‘timeout’ is used.</li>
-<li><strong>key</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – Key that should be associated with the timeout
+&#8216;timeout&#8217; is used.</li>
+<li><strong>key</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) &#8211; Key that should be associated with the timeout
 that is created. Defaults to None and is set by the calling
 class and function/method (See <cite>get_timeout_key</cite>).</li>
-<li><strong>key_level</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>, </em><em>optional</em>) – Positive integer indicating the level of
+<li><strong>key_level</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><em>optional</em>) &#8211; Positive integer indicating the level of
 the calling class and function/method that should be used to
 key the timeout. 0 is the class and function/method that called
 start_timeout. Higher values use classes and function/methods
 further up in the stack. Defaults to 0.</li>
-<li><strong>key_suffix</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – String that should be appended to the
+<li><strong>key_suffix</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) &#8211; String that should be appended to the
 end of the generated key. Defaults to None and is ignored.</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#KeyError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">KeyError</span></code></a> – If the key already exists.</p>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#KeyError" title="(in Python v3.7)"><code class="xref py py-exc docutils literal"><span class="pre">KeyError</span></code></a> &#8211; If the key already exists.</p>
 </td>
 </tr>
 </tbody>
@@ -1620,22 +1690,22 @@ end of the generated key. Defaults to None and is ignored.</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>key</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – Key for timeout that should be stopped.
+<li><strong>key</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) &#8211; Key for timeout that should be stopped.
 Defaults to None and is set by the calling class and
 function/method (See <cite>timeout_key</cite>).</li>
-<li><strong>key_level</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>, </em><em>optional</em>) – Positive integer indicating the level of
+<li><strong>key_level</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><em>optional</em>) &#8211; Positive integer indicating the level of
 the calling class and function/method that should be used to
 key the timeout. 0 is the class and function/method that called
 start_timeout. Higher values use classes and function/methods
 further up in the stack. Defaults to 0.</li>
-<li><strong>key_suffix</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – String that should be appended to the
+<li><strong>key_suffix</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) &#8211; String that should be appended to the
 end of the generated key. Defaults to None and is ignored.</li>
-<li><strong>quiet</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, error message on timeout exceeded
+<li><strong>quiet</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) &#8211; If True, error message on timeout exceeded
 will be debug log. Defaults to False.</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#KeyError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">KeyError</span></code></a> – If there is not a timeout registered for the specified
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#KeyError" title="(in Python v3.7)"><code class="xref py py-exc docutils literal"><span class="pre">KeyError</span></code></a> &#8211; If there is not a timeout registered for the specified
 key.</p>
 </td>
 </tr>
@@ -1646,7 +1716,7 @@ key.</p>
 <dl class="attribute">
 <dt id="cis_interface.tools.CisClass.timeout_key">
 <code class="descname">timeout_key</code><a class="headerlink" href="#cis_interface.tools.CisClass.timeout_key" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>str</em> – Key identifying calling object and method.</p>
+<dd><p><em>str</em> &#8211; Key identifying calling object and method.</p>
 </dd></dl>
 
 <dl class="method">
@@ -1660,9 +1730,9 @@ key.</p>
 <dl class="class">
 <dt id="cis_interface.tools.CisPopen">
 <em class="property">class </em><code class="descclassname">cis_interface.tools.</code><code class="descname">CisPopen</code><span class="sig-paren">(</span><em>cmd_args</em>, <em>forward_signals=True</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tools.html#CisPopen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tools.CisPopen" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/subprocess.html#subprocess.Popen" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">subprocess.Popen</span></code></a></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/subprocess.html#subprocess.Popen" title="(in Python v3.7)"><code class="xref py py-class docutils literal"><span class="pre">subprocess.Popen</span></code></a></p>
 <p>Uses Popen to open a process without a buffer. If not already set,
-the keyword arguments ‘bufsize’, ‘stdout’, and ‘stderr’ are set to
+the keyword arguments &#8216;bufsize&#8217;, &#8216;stdout&#8217;, and &#8216;stderr&#8217; are set to
 0, subprocess.PIPE, and subprocess.STDOUT respectively. This sets the
 output stream to unbuffered and directs both stdout and stderr to the
 stdout pipe. In addition this class overrides Popen.kill() to allow
@@ -1672,13 +1742,13 @@ processes to be killed with CTRL_BREAK_EVENT on windows.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Shell command or list of arguments that should be
+<li><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; Shell command or list of arguments that should be
 run.</li>
-<li><strong>forward_signals</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, flags will be set such
+<li><strong>forward_signals</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) &#8211; If True, flags will be set such
 that signals received by the spawning process will be forwarded
 to the child process. If False, the signals will not be forwarded.
 Defaults to True.</li>
-<li><strong>**kwargs</strong> – Additional keywords arguments are passed to Popen.</li>
+<li><strong>**kwargs</strong> &#8211; Additional keywords arguments are passed to Popen.</li>
 </ul>
 </td>
 </tr>
@@ -1695,26 +1765,26 @@ Defaults to True.</li>
 <dl class="class">
 <dt id="cis_interface.tools.CisThread">
 <em class="property">class </em><code class="descclassname">cis_interface.tools.</code><code class="descname">CisThread</code><span class="sig-paren">(</span><em>name=None</em>, <em>target=None</em>, <em>args=()</em>, <em>kwargs=None</em>, <em>daemon=False</em>, <em>group=None</em>, <em>**cis_kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tools.html#CisThread"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tools.CisThread" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/threading.html#threading.Thread" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">threading.Thread</span></code></a>, <a class="reference internal" href="#cis_interface.tools.CisClass" title="cis_interface.tools.CisClass"><code class="xref py py-class docutils literal notranslate"><span class="pre">cis_interface.tools.CisClass</span></code></a></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/threading.html#threading.Thread" title="(in Python v3.7)"><code class="xref py py-class docutils literal"><span class="pre">threading.Thread</span></code></a>, <a class="reference internal" href="#cis_interface.tools.CisClass" title="cis_interface.tools.CisClass"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.tools.CisClass</span></code></a></p>
 <p>Thread for CiS that tracks when the thread is started and joined.</p>
 <dl class="attribute">
 <dt id="cis_interface.tools.CisThread.lock">
 <code class="descname">lock</code><a class="headerlink" href="#cis_interface.tools.CisThread.lock" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>threading.RLock</em> – Lock for accessing the sockets from multiple
+<dd><p><em>threading.RLock</em> &#8211; Lock for accessing the sockets from multiple
 threads.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="cis_interface.tools.CisThread.start_event">
 <code class="descname">start_event</code><a class="headerlink" href="#cis_interface.tools.CisThread.start_event" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>threading.Event</em> – Event indicating that the thread was
+<dd><p><em>threading.Event</em> &#8211; Event indicating that the thread was
 started.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="cis_interface.tools.CisThread.terminate_event">
 <code class="descname">terminate_event</code><a class="headerlink" href="#cis_interface.tools.CisThread.terminate_event" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>threading.Event</em> – Event indicating that the thread
+<dd><p><em>threading.Event</em> &#8211; Event indicating that the thread
 should be terminated. The target must exit when this is set.</p>
 </dd></dl>
 
@@ -1739,7 +1809,7 @@ should be terminated. The target must exit when this is set.</p>
 <dl class="attribute">
 <dt id="cis_interface.tools.CisThread.main_terminated">
 <code class="descname">main_terminated</code><a class="headerlink" href="#cis_interface.tools.CisThread.main_terminated" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>bool</em> – True if the main thread has terminated.</p>
+<dd><p><em>bool</em> &#8211; True if the main thread has terminated.</p>
 </dd></dl>
 
 <dl class="method">
@@ -1774,10 +1844,10 @@ should be terminated. The target must exit when this is set.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>no_wait</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, terminate will not block until
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>no_wait</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) &#8211; If True, terminate will not block until
 the thread stops. Defaults to False and blocks.</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#AssertionError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">AssertionError</span></code></a> – If no_wait is False and the thread has not stopped
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#AssertionError" title="(in Python v3.7)"><code class="xref py py-exc docutils literal"><span class="pre">AssertionError</span></code></a> &#8211; If no_wait is False and the thread has not stopped
 after the timeout.</td>
 </tr>
 </tbody>
@@ -1806,9 +1876,9 @@ blocking.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>timeout</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>, </em><em>optional</em>) – Maximum time that should be waited for
+<li><strong>timeout</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a><em>, </em><em>optional</em>) &#8211; Maximum time that should be waited for
 the driver to finish. Defaults to None and is infinite.</li>
-<li><strong>key</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – Key that should be used to register the timeout.
+<li><strong>key</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) &#8211; Key that should be used to register the timeout.
 Defaults to None and is set based on the stack trace.</li>
 </ul>
 </td>
@@ -1820,13 +1890,13 @@ Defaults to None and is set based on the stack trace.</li>
 <dl class="attribute">
 <dt id="cis_interface.tools.CisThread.was_started">
 <code class="descname">was_started</code><a class="headerlink" href="#cis_interface.tools.CisThread.was_started" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>bool</em> – True if the thread was started. False otherwise.</p>
+<dd><p><em>bool</em> &#8211; True if the thread was started. False otherwise.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="cis_interface.tools.CisThread.was_terminated">
 <code class="descname">was_terminated</code><a class="headerlink" href="#cis_interface.tools.CisThread.was_terminated" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>bool</em> – True if the thread was terminated. False otherwise.</p>
+<dd><p><em>bool</em> &#8211; True if the thread was terminated. False otherwise.</p>
 </dd></dl>
 
 </dd></dl>
@@ -1834,7 +1904,7 @@ Defaults to None and is set based on the stack trace.</li>
 <dl class="class">
 <dt id="cis_interface.tools.CisThreadLoop">
 <em class="property">class </em><code class="descclassname">cis_interface.tools.</code><code class="descname">CisThreadLoop</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tools.html#CisThreadLoop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tools.CisThreadLoop" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#cis_interface.tools.CisThread" title="cis_interface.tools.CisThread"><code class="xref py py-class docutils literal notranslate"><span class="pre">cis_interface.tools.CisThread</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.tools.CisThread" title="cis_interface.tools.CisThread"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.tools.CisThread</span></code></a></p>
 <p>Thread that will run a loop until the terminate event is called.</p>
 <dl class="method">
 <dt id="cis_interface.tools.CisThreadLoop.after_loop">
@@ -1856,7 +1926,7 @@ Defaults to None and is set based on the stack trace.</li>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>dont_break</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, the break flag won’t be set.
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>dont_break</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) &#8211; If True, the break flag won&#8217;t be set.
 Defaults to False.</td>
 </tr>
 </tbody>
@@ -1915,9 +1985,9 @@ blocking.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>timeout</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>, </em><em>optional</em>) – Maximum time that should be waited for
+<li><strong>timeout</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a><em>, </em><em>optional</em>) &#8211; Maximum time that should be waited for
 the thread to enter loop. Defaults to None and is infinite.</li>
-<li><strong>key</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – Key that should be used to register the timeout.
+<li><strong>key</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) &#8211; Key that should be used to register the timeout.
 Defaults to None and is set based on the stack trace.</li>
 </ul>
 </td>
@@ -1929,13 +1999,13 @@ Defaults to None and is set based on the stack trace.</li>
 <dl class="attribute">
 <dt id="cis_interface.tools.CisThreadLoop.was_break">
 <code class="descname">was_break</code><a class="headerlink" href="#cis_interface.tools.CisThreadLoop.was_break" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>bool</em> – True if the break flag was set.</p>
+<dd><p><em>bool</em> &#8211; True if the break flag was set.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="cis_interface.tools.CisThreadLoop.was_loop">
 <code class="descname">was_loop</code><a class="headerlink" href="#cis_interface.tools.CisThreadLoop.was_loop" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>bool</em> – True if the thread was loop. False otherwise.</p>
+<dd><p><em>bool</em> &#8211; True if the thread was loop. False otherwise.</p>
 </dd></dl>
 
 </dd></dl>
@@ -1943,17 +2013,17 @@ Defaults to None and is set based on the stack trace.</li>
 <dl class="class">
 <dt id="cis_interface.tools.TimeOut">
 <em class="property">class </em><code class="descclassname">cis_interface.tools.</code><code class="descname">TimeOut</code><span class="sig-paren">(</span><em>max_time</em>, <em>key=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tools.html#TimeOut"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tools.TimeOut" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
 <p>Class for checking if a period of time has been elapsed.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>max_time</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>, </em><em>bbol</em>) – Maximum period of time that should elapse before
-‘is_out’ returns True. If False, ‘is_out’ will never return True.
-Providing 0 indicates that ‘is_out’ should immediately return True.</li>
-<li><strong>key</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – Key that was used to register the timeout. Defaults
+<li><strong>max_time</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a><em>, </em><em>bbol</em>) &#8211; Maximum period of time that should elapse before
+&#8216;is_out&#8217; returns True. If False, &#8216;is_out&#8217; will never return True.
+Providing 0 indicates that &#8216;is_out&#8217; should immediately return True.</li>
+<li><strong>key</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) &#8211; Key that was used to register the timeout. Defaults
 to None.</li>
 </ul>
 </td>
@@ -1963,32 +2033,32 @@ to None.</li>
 <dl class="attribute">
 <dt id="cis_interface.tools.TimeOut.max_time">
 <code class="descname">max_time</code><a class="headerlink" href="#cis_interface.tools.TimeOut.max_time" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>float</em> – Maximum period of time that should elapsed before
-‘is_out’ returns True.</p>
+<dd><p><em>float</em> &#8211; Maximum period of time that should elapsed before
+&#8216;is_out&#8217; returns True.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="cis_interface.tools.TimeOut.start_time">
 <code class="descname">start_time</code><a class="headerlink" href="#cis_interface.tools.TimeOut.start_time" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>float</em> – Result of time.time() at start.</p>
+<dd><p><em>float</em> &#8211; Result of time.time() at start.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="cis_interface.tools.TimeOut.key">
 <code class="descname">key</code><a class="headerlink" href="#cis_interface.tools.TimeOut.key" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>str</em> – Key that was used to register the timeout.</p>
+<dd><p><em>str</em> &#8211; Key that was used to register the timeout.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="cis_interface.tools.TimeOut.elapsed">
 <code class="descname">elapsed</code><a class="headerlink" href="#cis_interface.tools.TimeOut.elapsed" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>float</em> – Total time that has elapsed since the start.</p>
+<dd><p><em>float</em> &#8211; Total time that has elapsed since the start.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="cis_interface.tools.TimeOut.is_out">
 <code class="descname">is_out</code><a class="headerlink" href="#cis_interface.tools.TimeOut.is_out" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>bool</em> – True if there is not any time remaining. False otherwise.</p>
+<dd><p><em>bool</em> &#8211; True if there is not any time remaining. False otherwise.</p>
 </dd></dl>
 
 </dd></dl>
@@ -2025,7 +2095,7 @@ to None.</li>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>x</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>obj</em>) – String to be evaluated as an object or an object.</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>x</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>obj</em>) &#8211; String to be evaluated as an object or an object.</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Result of evaluated string or the input object.</td>
 </tr>
@@ -2057,7 +2127,7 @@ to None.</li>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">True if the IPC libraries are installed, False otherwise.</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)">bool</a></td>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)">bool</a></td>
 </tr>
 </tbody>
 </table>
@@ -2073,7 +2143,7 @@ to None.</li>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">True if both libraries are installed, False otherwise.</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)">bool</a></td>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)">bool</a></td>
 </tr>
 </tbody>
 </table>
@@ -2088,8 +2158,8 @@ to None.</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>pid</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – Process ID.</li>
-<li><strong>signum</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) – Signal that should be sent.</li>
+<li><strong>pid</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) &#8211; Process ID.</li>
+<li><strong>signum</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) &#8211; Signal that should be sent.</li>
 </ul>
 </td>
 </tr>
@@ -2107,7 +2177,7 @@ to None.</li>
 <dt id="cis_interface.tools.popen_nobuffer">
 <code class="descclassname">cis_interface.tools.</code><code class="descname">popen_nobuffer</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tools.html#popen_nobuffer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tools.popen_nobuffer" title="Permalink to this definition">¶</a></dt>
 <dd><p>Uses Popen to open a process without a buffer. If not already set,
-the keyword arguments ‘bufsize’, ‘stdout’, and ‘stderr’ are set to
+the keyword arguments &#8216;bufsize&#8217;, &#8216;stdout&#8217;, and &#8216;stderr&#8217; are set to
 0, subprocess.PIPE, and subprocess.STDOUT respectively. This sets the
 output stream to unbuffered and directs both stdout and stderr to the
 stdout pipe.</p>
@@ -2116,13 +2186,13 @@ stdout pipe.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Shell command or list of arguments that should be
+<li><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; Shell command or list of arguments that should be
 run.</li>
-<li><strong>forward_signals</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, flags will be set such
+<li><strong>forward_signals</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) &#8211; If True, flags will be set such
 that signals received by the spawning process will be forwarded
 to the child process. If False, the signals will not be forwarded.
 Defaults to True.</li>
-<li><strong>**kwargs</strong> – Additional keywords arguments are passed to Popen.</li>
+<li><strong>**kwargs</strong> &#8211; Additional keywords arguments are passed to Popen.</li>
 </ul>
 </td>
 </tr>
@@ -2145,9 +2215,9 @@ Defaults to True.</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>msg</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.6)"><em>bytes</em></a>) – Message to print.</li>
-<li><strong>*args</strong> – Additional arguments are passed to print.</li>
-<li><strong>**kwargs</strong> – Additional keyword arguments are passed to print.</li>
+<li><strong>msg</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.7)"><em>bytes</em></a>) &#8211; Message to print.</li>
+<li><strong>*args</strong> &#8211; Additional arguments are passed to print.</li>
+<li><strong>**kwargs</strong> &#8211; Additional keyword arguments are passed to print.</li>
 </ul>
 </td>
 </tr>
@@ -2163,7 +2233,7 @@ Defaults to True.</li>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>interval</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – Time in seconds that process should sleep.</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>interval</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) &#8211; Time in seconds that process should sleep.</td>
 </tr>
 </tbody>
 </table>
@@ -2173,6 +2243,168 @@ Defaults to True.</li>
 <div class="section" id="module-cis_interface.units">
 <span id="cis-interface-units-module"></span><h2>cis_interface.units module<a class="headerlink" href="#module-cis_interface.units" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
+<dt id="cis_interface.units.add_units">
+<code class="descclassname">cis_interface.units.</code><code class="descname">add_units</code><span class="sig-paren">(</span><em>arr</em>, <em>unit_str</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/units.html#add_units"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.units.add_units" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add units to an array or scalar.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>arr</strong> (<em>np.ndarray</em><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) &#8211; Scalar or array of data to add units to.</li>
+<li><strong>unit_str</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; Unit string.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Array with units.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">unyt.unyt_array</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.units.are_compatible">
+<code class="descclassname">cis_interface.units.</code><code class="descname">are_compatible</code><span class="sig-paren">(</span><em>units1</em>, <em>units2</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/units.html#are_compatible"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.units.are_compatible" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if two units are compatible.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>units1</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; First units string.</li>
+<li><strong>units2</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; Second units string.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">True if the units are compatible, False otherwise.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)">bool</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.units.as_unit">
+<code class="descclassname">cis_interface.units.</code><code class="descname">as_unit</code><span class="sig-paren">(</span><em>ustr</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/units.html#as_unit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.units.as_unit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get unit object for the string.</p>
+<p>Args:</p>
+<p>Returns:</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.7)"><code class="xref py py-exc docutils literal"><span class="pre">ValueError</span></code></a> &#8211; If the string is not a recognized unit.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.units.convert_to">
+<code class="descclassname">cis_interface.units.</code><code class="descname">convert_to</code><span class="sig-paren">(</span><em>arr</em>, <em>new_units</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/units.html#convert_to"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.units.convert_to" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert qunatity with units to new units. Objects without units
+will be returned with the new units.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>arr</strong> (<em>np.ndarray</em><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><em>unyt.unyt_array</em>) &#8211; Quantity with or
+without units.</li>
+<li><strong>new_units</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; New units that should be applied.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Array with new units.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">unyt.unyt_array</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.units.get_data">
+<code class="descclassname">cis_interface.units.</code><code class="descname">get_data</code><span class="sig-paren">(</span><em>obj</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/units.html#get_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.units.get_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the array/scalar assocaited with the object.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>obj</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><em>object</em></a>) &#8211; Object to get data for.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Numpy array representation of the underlying data.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">np.ndarray</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.units.get_units">
+<code class="descclassname">cis_interface.units.</code><code class="descname">get_units</code><span class="sig-paren">(</span><em>obj</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/units.html#get_units"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.units.get_units" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the string representation of the units.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>obj</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><em>object</em></a>) &#8211; Object to get units for.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Units, empty if input object has none.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.units.has_units">
+<code class="descclassname">cis_interface.units.</code><code class="descname">has_units</code><span class="sig-paren">(</span><em>obj</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/units.html#has_units"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.units.has_units" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determine if a Python object has associated units.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>obj</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><em>object</em></a>) &#8211; Object to be tested for units.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">True if the object has units, False otherwise.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)">bool</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.units.is_null_unit">
+<code class="descclassname">cis_interface.units.</code><code class="descname">is_null_unit</code><span class="sig-paren">(</span><em>ustr</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/units.html#is_null_unit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.units.is_null_unit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determines if a string is a null unit.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>ustr</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; String to test.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">True if the string is &#8216;&#8217; or &#8216;n/a&#8217;, False otherwise.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)">bool</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
 <dt id="cis_interface.units.is_unit">
 <code class="descclassname">cis_interface.units.</code><code class="descname">is_unit</code><span class="sig-paren">(</span><em>ustr</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/units.html#is_unit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.units.is_unit" title="Permalink to this definition">¶</a></dt>
 <dd><p>Determine if a string is a valid unit.</p>
@@ -2180,11 +2412,11 @@ Defaults to True.</li>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>ustr</strong> – String representation to test.</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>ustr</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; String representation to test.</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">True if the string is a valid unit. False otherwise.</td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)">bool</a></td>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)">bool</a></td>
 </tr>
 </tbody>
 </table>
@@ -2202,8 +2434,8 @@ Defaults to True.</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>dict</strong> – YAML entry for model output that should be modified.</li>
-<li><strong>iodict</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) – Log of all input/outputs.</li>
+<li><strong>dict</strong> &#8211; YAML entry for model output that should be modified.</li>
+<li><strong>iodict</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) &#8211; Log of all input/outputs.</li>
 </ul>
 </td>
 </tr>
@@ -2219,11 +2451,11 @@ Defaults to True.</li>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>driver</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The name of the connection driver.</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>driver</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; The name of the connection driver.</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The corresponding file type for the driver.</td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)">str</a></td>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
 </tr>
 </tbody>
 </table>
@@ -2237,11 +2469,11 @@ Defaults to True.</li>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>existing</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) – Dictionary of existing components.</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>existing</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) &#8211; Dictionary of existing components.</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Dictionary with I/O drivers added to models.</td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)">dict</a></td>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></td>
 </tr>
 </tbody>
 </table>
@@ -2255,11 +2487,11 @@ Defaults to True.</li>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>fname</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Path to the yaml file.</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>fname</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; Path to the yaml file.</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Contents of yaml file.</td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)">dict</a></td>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></td>
 </tr>
 </tbody>
 </table>
@@ -2275,26 +2507,26 @@ existing components.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>yml</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) – YAML dictionary for a component.</li>
-<li><strong>ctype</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Component type. This can be ‘input’, ‘output’,
-‘model’, or ‘connection’.</li>
-<li><strong>existing</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a><em>, </em><em>optional</em>) – Dictionary of existing components.
+<li><strong>yml</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) &#8211; YAML dictionary for a component.</li>
+<li><strong>ctype</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; Component type. This can be &#8216;input&#8217;, &#8216;output&#8217;,
+&#8216;model&#8217;, or &#8216;connection&#8217;.</li>
+<li><strong>existing</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a><em>, </em><em>optional</em>) &#8211; Dictionary of existing components.
 Defaults to empty dict.</li>
 </ul>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first simple">
-<li><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#TypeError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">TypeError</span></code></a> – If yml is not a dictionary.</li>
-<li><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ValueError</span></code></a> – If dtype is not ‘input’, ‘output’, ‘model’, or
-‘connection’.</li>
-<li><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ValueError</span></code></a> – If the component already exists.</li>
+<li><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#TypeError" title="(in Python v3.7)"><code class="xref py py-exc docutils literal"><span class="pre">TypeError</span></code></a> &#8211; If yml is not a dictionary.</li>
+<li><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.7)"><code class="xref py py-exc docutils literal"><span class="pre">ValueError</span></code></a> &#8211; If dtype is not &#8216;input&#8217;, &#8216;output&#8217;, &#8216;model&#8217;, or
+&#8216;connection&#8217;.</li>
+<li><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.7)"><code class="xref py py-exc docutils literal"><span class="pre">ValueError</span></code></a> &#8211; If the component already exists.</li>
 </ul>
 </td>
 </tr>
 <tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">All components identified.</p>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)">dict</a></p>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></p>
 </td>
 </tr>
 </tbody>
@@ -2310,14 +2542,14 @@ Defaults to empty dict.</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>yml</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) – YAML dictionary for a connection.</li>
-<li><strong>existing</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) – Dictionary of existing components.</li>
+<li><strong>yml</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) &#8211; YAML dictionary for a connection.</li>
+<li><strong>existing</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) &#8211; Dictionary of existing components.</li>
 </ul>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first simple">
-<li><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#RuntimeError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">RuntimeError</span></code></a> – If the ‘input’ entry is not a model output or file.</li>
-<li><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#RuntimeError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">RuntimeError</span></code></a> – If neither the ‘input’ or ‘output’ entries correspond
+<li><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#RuntimeError" title="(in Python v3.7)"><code class="xref py py-exc docutils literal"><span class="pre">RuntimeError</span></code></a> &#8211; If the &#8216;input&#8217; entry is not a model output or file.</li>
+<li><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#RuntimeError" title="(in Python v3.7)"><code class="xref py py-exc docutils literal"><span class="pre">RuntimeError</span></code></a> &#8211; If neither the &#8216;input&#8217; or &#8216;output&#8217; entries correspond
 to model I/O channels.</li>
 </ul>
 </td>
@@ -2325,7 +2557,7 @@ to model I/O channels.</li>
 <tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Updated log of all entries.</p>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)">dict</a></p>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></p>
 </td>
 </tr>
 </tbody>
@@ -2341,15 +2573,15 @@ to model I/O channels.</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>yml</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) – YAML dictionary for a model.</li>
-<li><strong>existing</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) – Dictionary of existing components.</li>
+<li><strong>yml</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) &#8211; YAML dictionary for a model.</li>
+<li><strong>existing</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) &#8211; Dictionary of existing components.</li>
 </ul>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Updated log of all entries.</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)">dict</a></p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></p>
 </td>
 </tr>
 </tbody>
@@ -2364,14 +2596,14 @@ to model I/O channels.</li>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>files</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a>) – Either the path to a single yaml file or a list of
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>files</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a>) &#8211; Either the path to a single yaml file or a list of
 yaml files.</p>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first simple">
-<li><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ValueError</span></code></a> – If the yml dictionary is missing a required keyword or has
+<li><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.7)"><code class="xref py py-exc docutils literal"><span class="pre">ValueError</span></code></a> &#8211; If the yml dictionary is missing a required keyword or has
 an invalid value.</li>
-<li><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#RuntimeError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">RuntimeError</span></code></a> – If one of the I/O channels is not initialized with driver
+<li><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#RuntimeError" title="(in Python v3.7)"><code class="xref py py-exc docutils literal"><span class="pre">RuntimeError</span></code></a> &#8211; If one of the I/O channels is not initialized with driver
 information.</li>
 </ul>
 </td>
@@ -2379,7 +2611,7 @@ information.</li>
 <tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Dictionary of information parsed from the yamls.</p>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)">dict</a></p>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></p>
 </td>
 </tr>
 </tbody>
@@ -2395,8 +2627,8 @@ information.</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>yml</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) – YAML entry for connection that will be modified.</li>
-<li><strong>iodict</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) – Log of all input/outputs.</li>
+<li><strong>yml</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) &#8211; YAML entry for connection that will be modified.</li>
+<li><strong>iodict</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) &#8211; Log of all input/outputs.</li>
 </ul>
 </td>
 </tr>
@@ -2413,8 +2645,8 @@ information.</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>yml</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) – YAML entry for model that will be modified.</li>
-<li><strong>iodict</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) – Log of all input/outputs.</li>
+<li><strong>yml</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) &#8211; YAML entry for model that will be modified.</li>
+<li><strong>iodict</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) &#8211; Log of all input/outputs.</li>
 </ul>
 </td>
 </tr>
@@ -2431,12 +2663,12 @@ backwards compatible options.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>files</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a>) – Either the path to a single yaml file or a list of
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>files</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a>) &#8211; Either the path to a single yaml file or a list of
 yaml files.</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">YAML ready to be parsed using schema.</td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)">dict</a></td>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></td>
 </tr>
 </tbody>
 </table>
@@ -2497,7 +2729,7 @@ such that they can be run simultaneously, passing input back and forth.</p>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'0.3.0',
+            VERSION:'0.4+0.gd8a2a4f.dirty',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
@@ -2508,15 +2740,20 @@ such that they can be run simultaneously, passing input back and forth.</p>
       <script type="text/javascript" src="_static/jquery.js"></script>
       <script type="text/javascript" src="_static/underscore.js"></script>
       <script type="text/javascript" src="_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 
   
 
-  <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
 
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.Navigation.enable(true);
+          
+          SphinxRtdTheme.Navigation.enableSticky();
+          
       });
   </script> 
 

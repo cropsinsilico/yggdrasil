@@ -1,0 +1,37 @@
+cis_interface.datatypes package
+===============================
+
+Subpackages
+-----------
+
+.. toctree::
+
+    cis_interface.datatypes.tests
+
+Submodules
+----------
+
+cis_interface.datatypes.CisArrayType module
+-------------------------------------------
+
+.. automodule:: cis_interface.datatypes.CisArrayType
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+cis_interface.datatypes.CisBaseType module
+------------------------------------------
+
+.. automodule:: cis_interface.datatypes.CisBaseType
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: cis_interface.datatypes
+    :members:
+    :undoc-members:
+    :show-inheritance:

@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>cis_interface.drivers.CommDriver &mdash; cis_interface 0.3.0 documentation</title>
+  <title>cis_interface.drivers.CommDriver &mdash; cis_interface 0.4+0.gd8a2a4f.dirty documentation</title>
   
 
   
@@ -24,7 +24,8 @@
 
   
 
-  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/theme_overrides.css" type="text/css" />
     <link rel="index" title="Index" href="../../../genindex.html" />
@@ -57,7 +58,7 @@
             
             
               <div class="version">
-                0.3
+                0.4+0.gd8a2a4f.dirty
               </div>
             
           
@@ -98,6 +99,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../code.html">Code</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../examples/examples_toc.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../release.html">Release Steps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../release.html#docs-checkout">Docs Checkout</a></li>
 </ul>
 
             
@@ -171,7 +173,7 @@
 
 
 <div class="viewcode-block" id="CommDriver"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.CommDriver.CommDriver">[docs]</a><span class="k">class</span> <span class="nc">CommDriver</span><span class="p">(</span><span class="n">Driver</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Base driver for any driver that does communication.</span>
+    <span class="sd">r&quot;&quot;&quot;Base driver for any driver that does communication.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        name (str): The name of the message queue that the driver should</span>
@@ -188,7 +190,7 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">CommDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">CommDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">=</span> <span class="s1">&#39;Started&#39;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">numSent</span> <span class="o">=</span> <span class="mi">0</span>
@@ -203,43 +205,43 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">maxMsgSize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: Maximum message size.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;int: Maximum message size.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="o">.</span><span class="n">maxMsgSize</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">is_valid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;bool: Returns True if the connection is open and the parent class</span>
+        <span class="sd">r&quot;&quot;&quot;bool: Returns True if the connection is open and the parent class</span>
 <span class="sd">        is valid.&quot;&quot;&quot;</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
             <span class="k">return</span> <span class="p">(</span><span class="nb">super</span><span class="p">(</span><span class="n">CommDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">is_valid</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_comm_open</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">is_comm_open</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;bool: Returns True if the connection is open.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;bool: Returns True if the connection is open.&quot;&quot;&quot;</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="o">.</span><span class="n">is_open</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">is_comm_closed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;bool: Returns True if the connection is closed.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;bool: Returns True if the connection is closed.&quot;&quot;&quot;</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="o">.</span><span class="n">is_closed</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">n_msg</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: The number of messages in the queue.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;int: The number of messages in the queue.&quot;&quot;&quot;</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="o">.</span><span class="n">n_msg</span>
 
 <div class="viewcode-block" id="CommDriver.open_comm"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.CommDriver.CommDriver.open_comm">[docs]</a>    <span class="k">def</span> <span class="nf">open_comm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Open the queue.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;Open the queue.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="o">.</span><span class="n">open</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Returning&#39;</span><span class="p">)</span></div>
         
 <div class="viewcode-block" id="CommDriver.close_comm"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.CommDriver.CommDriver.close_comm">[docs]</a>    <span class="k">def</span> <span class="nf">close_comm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Close the queue.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;Close the queue.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
@@ -247,7 +249,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Returning&#39;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="CommDriver.start"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.CommDriver.CommDriver.start">[docs]</a>    <span class="k">def</span> <span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Open connection before running.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;Open connection before running.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm_name</span> <span class="o">!=</span> <span class="s1">&#39;CommBase&#39;</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">open_comm</span><span class="p">()</span>
             <span class="n">Tout</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_timeout</span><span class="p">()</span>
@@ -259,7 +261,7 @@
         <span class="nb">super</span><span class="p">(</span><span class="n">CommDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">start</span><span class="p">()</span></div>
         
 <div class="viewcode-block" id="CommDriver.graceful_stop"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.CommDriver.CommDriver.graceful_stop">[docs]</a>    <span class="k">def</span> <span class="nf">graceful_stop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Stop the CommDriver, first draining the message queue.</span>
+        <span class="sd">r&quot;&quot;&quot;Stop the CommDriver, first draining the message queue.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            timeout (float, optional): Max time that should be waited. Defaults</span>
@@ -283,19 +285,19 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Returning&#39;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="CommDriver.do_terminate"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.CommDriver.CommDriver.do_terminate">[docs]</a>    <span class="k">def</span> <span class="nf">do_terminate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Stop the CommDriver by closing the comm.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;Stop the CommDriver by closing the comm.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">close_comm</span><span class="p">()</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">CommDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">do_terminate</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="CommDriver.cleanup"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.CommDriver.CommDriver.cleanup">[docs]</a>    <span class="k">def</span> <span class="nf">cleanup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Ensure that the queues are removed.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;Ensure that the queues are removed.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">close_comm</span><span class="p">()</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">CommDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">cleanup</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="CommDriver.printStatus"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.CommDriver.CommDriver.printStatus">[docs]</a>    <span class="k">def</span> <span class="nf">printStatus</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">beg_msg</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">end_msg</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Print information on the status of the CommDriver.</span>
+        <span class="sd">r&quot;&quot;&quot;Print information on the status of the CommDriver.</span>
 
 <span class="sd">        Arguments:</span>
 <span class="sd">            beg_msg (str, optional): Additional message to print at beginning.</span>
@@ -303,7 +305,7 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">msg</span> <span class="o">=</span> <span class="n">beg_msg</span>
-        <span class="n">msg</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="si">%-30s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__module__</span> <span class="o">+</span> <span class="s1">&#39;(&#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s1">&#39;)&#39;</span><span class="p">)</span>
+        <span class="n">msg</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="si">%-30s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__module__</span> <span class="o">+</span> <span class="s1">&#39;(&#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s1">&#39;)&#39;</span><span class="p">)</span>
         <span class="n">msg</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="si">%-30s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="s1">&#39;last action: &#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">)</span>
         <span class="n">msg</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="si">%-15s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">numSent</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39; delivered, &#39;</span><span class="p">)</span>
         <span class="n">msg</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="si">%-15s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">numReceived</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39; accepted, &#39;</span><span class="p">)</span>
@@ -312,7 +314,7 @@
         <span class="nb">print</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="CommDriver.send"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.CommDriver.CommDriver.send">[docs]</a>    <span class="k">def</span> <span class="nf">send</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Send a message smaller than maxMsgSize.</span>
+        <span class="sd">r&quot;&quot;&quot;Send a message smaller than maxMsgSize.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            str: The message to be sent.</span>
@@ -334,7 +336,7 @@
         <span class="k">return</span> <span class="n">ret</span></div>
 
 <div class="viewcode-block" id="CommDriver.recv"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.CommDriver.CommDriver.recv">[docs]</a>    <span class="k">def</span> <span class="nf">recv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Receive a message smaller than maxMsgSize.</span>
+        <span class="sd">r&quot;&quot;&quot;Receive a message smaller than maxMsgSize.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            *args: All arguments are passed to comm recv method.</span>
@@ -356,7 +358,7 @@
         <span class="k">return</span> <span class="n">ret</span></div>
 
 <div class="viewcode-block" id="CommDriver.send_nolimit"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.CommDriver.CommDriver.send_nolimit">[docs]</a>    <span class="k">def</span> <span class="nf">send_nolimit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Send a message larger than maxMsgSize in multiple parts.</span>
+        <span class="sd">r&quot;&quot;&quot;Send a message larger than maxMsgSize in multiple parts.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            str: The message to be sent.</span>
@@ -372,7 +374,7 @@
         <span class="k">return</span> <span class="n">ret</span></div>
 
 <div class="viewcode-block" id="CommDriver.recv_nolimit"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.CommDriver.CommDriver.recv_nolimit">[docs]</a>    <span class="k">def</span> <span class="nf">recv_nolimit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Receive a message larger than maxMsgSize in multiple parts.</span>
+        <span class="sd">r&quot;&quot;&quot;Receive a message larger than maxMsgSize in multiple parts.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            *args: All arguments are passed to comm recv_nolimit method.</span>
@@ -420,7 +422,7 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../../../',
-            VERSION:'0.3.0',
+            VERSION:'0.4+0.gd8a2a4f.dirty',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
@@ -431,15 +433,20 @@
       <script type="text/javascript" src="../../../_static/jquery.js"></script>
       <script type="text/javascript" src="../../../_static/underscore.js"></script>
       <script type="text/javascript" src="../../../_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 
   
 
-  <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
 
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.Navigation.enable(true);
+          
+          SphinxRtdTheme.Navigation.enableSticky();
+          
       });
   </script> 
 

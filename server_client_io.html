@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Server/Client I/O &mdash; cis_interface 0.3.0 documentation</title>
+  <title>Server/Client I/O &mdash; cis_interface 0.4+0.gd8a2a4f.dirty documentation</title>
   
 
   
@@ -24,7 +24,8 @@
 
   
 
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
@@ -59,7 +60,7 @@
             
             
               <div class="version">
-                0.3
+                0.4+0.gd8a2a4f.dirty
               </div>
             
           
@@ -103,6 +104,7 @@
 <li class="toctree-l1"><a class="reference internal" href="code.html">Code</a></li>
 <li class="toctree-l1"><a class="reference internal" href="examples/examples_toc.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="release.html">Release Steps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="release.html#docs-checkout">Docs Checkout</a></li>
 </ul>
 
             
@@ -168,7 +170,7 @@
            <div itemprop="articleBody">
             
   <div class="section" id="server-client-i-o">
-<h1>Server/Client I/O<a class="headerlink" href="#server-client-i-o" title="Permalink to this headline">¶</a></h1>
+<span id="server-client-io-rst"></span><h1>Server/Client I/O<a class="headerlink" href="#server-client-i-o" title="Permalink to this headline">¶</a></h1>
 <p>Often you will want to call one model from another like a functions. This
 would required sending the input variable(s) to the model being called and
 then sending the output variables(s) back to the calling model. We refer to
@@ -177,13 +179,13 @@ a server providing its calculations as a service to the client (the calling mode
 The cis_interface provides options for treating models as server and clients.</p>
 <div class="section" id="one-server-one-client">
 <h2>One Server, One Client<a class="headerlink" href="#one-server-one-client" title="Permalink to this headline">¶</a></h2>
-<p>In the example below, the “server” model computes the nth number in the
-Fibonacci sequence and the “client” model calls the server to get a certain
+<p>In the example below, the &#8220;server&#8221; model computes the nth number in the
+Fibonacci sequence and the &#8220;client&#8221; model calls the server to get a certain
 portion of the Fibonacci sequences and then writes it to a log. The server
 will continue processing requests until all clients connected to it have
 disconnected.</p>
 <p>Model Code:</p>
-<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+<div class="highlight-python"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
  2
  3
  4
@@ -257,7 +259,7 @@ disconnected.</p>
 
 
 <span class="k">def</span> <span class="nf">get_fibonacci</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Compute the nth number of the Fibonacci sequence.</span>
+    <span class="sd">r&quot;&quot;&quot;Compute the nth number of the Fibonacci sequence.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        n (int): Index of the Fibonacci number in the Fibonacci sequence that</span>
@@ -280,7 +282,7 @@ disconnected.</p>
 
 
 <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Function to execute server communication and computation in a loop.</span>
+    <span class="sd">r&quot;&quot;&quot;Function to execute server communication and computation in a loop.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        int: Exit code. Negative if an error occurred.</span>
@@ -319,12 +321,12 @@ disconnected.</p>
     <span class="k">return</span> <span class="n">exit_code</span>
 
     
-<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
     <span class="n">exit_code</span> <span class="o">=</span> <span class="n">main</span><span class="p">()</span>
     <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="n">exit_code</span><span class="p">)</span>
 </pre></div>
 </td></tr></table></div>
-<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+<div class="highlight-python"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
  2
  3
  4
@@ -382,7 +384,7 @@ disconnected.</p>
 
 
 <span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">iterations</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Function to execute client communication with server that computes</span>
+    <span class="sd">r&quot;&quot;&quot;Function to execute client communication with server that computes</span>
 <span class="sd">    numbers in the Fibonacci sequence.</span>
 
 <span class="sd">    Args:</span>
@@ -425,7 +427,7 @@ disconnected.</p>
     <span class="k">return</span> <span class="n">exit_code</span>
 
     
-<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
     <span class="c1"># Take number of iterations from the first argument</span>
     <span class="n">exit_code</span> <span class="o">=</span> <span class="n">main</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
     <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="n">exit_code</span><span class="p">)</span>
@@ -438,17 +440,17 @@ the name of the server model), a format string for input to the server model,
 and a format string for output from the server model. The client-side API call
 (CisRpcClient for Python), also requires 3 input variables: the name of the
 client channel (this is the name of the server model joined with the name of
-the client model by an underscore, <code class="docutils literal notranslate"><span class="pre">&lt;server&gt;_&lt;client&gt;</span></code>, a format string for
+the client model by an underscore, <code class="docutils literal"><span class="pre">&lt;server&gt;_&lt;client&gt;</span></code>, a format string for
 input to the server model, and a format string for output form the server
 model. The last two arguments (the format strings) to both the server and
 client API calls should be the same.</p>
-<p>In the server model YAML, the key/value pair <code class="docutils literal notranslate"><span class="pre">is_server:</span> <span class="pre">True</span></code> needs
+<p>In the server model YAML, the key/value pair <code class="docutils literal"><span class="pre">is_server:</span> <span class="pre">True</span></code> needs
 to be added to the model entry to indicate that the model will be called
 as a server and requires a set of RPC channels. In the client model YAML,
-the key/value pair <code class="docutils literal notranslate"><span class="pre">client_of:</span> <span class="pre">&lt;server_model_name&gt;</span></code> is required to indicate
-that the model will act as a client of the <code class="docutils literal notranslate"><span class="pre">&lt;server_model_name&gt;</span></code> model.</p>
+the key/value pair <code class="docutils literal"><span class="pre">client_of:</span> <span class="pre">&lt;server_model_name&gt;</span></code> is required to indicate
+that the model will act as a client of the <code class="docutils literal"><span class="pre">&lt;server_model_name&gt;</span></code> model.</p>
 <p>Model YAML:</p>
-<div class="highlight-yaml notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+<div class="highlight-yaml"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
 2
 3
 4
@@ -463,7 +465,7 @@ that the model will act as a client of the <code class="docutils literal notrans
   <span class="l l-Scalar l-Scalar-Plain">is_server</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">True</span>  <span class="c1"># Creates a RPC server queue called &quot;server&quot;</span>
 </pre></div>
 </td></tr></table></div>
-<div class="highlight-yaml notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+<div class="highlight-yaml"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
  2
  3
  4
@@ -502,10 +504,10 @@ that the model will act as a client of the <code class="docutils literal notrans
 <p>There is no limit on the number of clients that can connect to a single
 server. In the example below, the server is the same as above. The client
 code is also essentially the same except that it has been modified to take
-a <code class="docutils literal notranslate"><span class="pre">client_index</span></code> variable that provides information to differentiates
+a <code class="docutils literal"><span class="pre">client_index</span></code> variable that provides information to differentiates
 between two clients using the same source code.</p>
 <p>Model Code:</p>
-<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+<div class="highlight-python"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
  2
  3
  4
@@ -579,7 +581,7 @@ between two clients using the same source code.</p>
 
 
 <span class="k">def</span> <span class="nf">get_fibonacci</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Compute the nth number of the Fibonacci sequence.</span>
+    <span class="sd">r&quot;&quot;&quot;Compute the nth number of the Fibonacci sequence.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        n (int): Index of the Fibonacci number in the Fibonacci sequence that</span>
@@ -602,7 +604,7 @@ between two clients using the same source code.</p>
 
 
 <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Function to execute server communication and computation in a loop.</span>
+    <span class="sd">r&quot;&quot;&quot;Function to execute server communication and computation in a loop.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        int: Exit code. Negative if an error occurred.</span>
@@ -641,12 +643,12 @@ between two clients using the same source code.</p>
     <span class="k">return</span> <span class="n">exit_code</span>
 
     
-<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
     <span class="n">exit_code</span> <span class="o">=</span> <span class="n">main</span><span class="p">()</span>
     <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="n">exit_code</span><span class="p">)</span>
 </pre></div>
 </td></tr></table></div>
-<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+<div class="highlight-python"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
  2
  3
  4
@@ -707,7 +709,7 @@ between two clients using the same source code.</p>
 
 
 <span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">iterations</span><span class="p">,</span> <span class="n">client_index</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Function to execute client communication with server that computes</span>
+    <span class="sd">r&quot;&quot;&quot;Function to execute client communication with server that computes</span>
 <span class="sd">    numbers in the Fibonacci sequence.</span>
 
 <span class="sd">    Args:</span>
@@ -752,7 +754,7 @@ between two clients using the same source code.</p>
     <span class="k">return</span> <span class="n">exit_code</span>
 
     
-<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
     <span class="c1"># Take number of iterations from the first argument and the</span>
     <span class="c1"># client index from the second</span>
     <span class="n">exit_code</span> <span class="o">=</span> <span class="n">main</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="nb">int</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">2</span><span class="p">]))</span>
@@ -764,7 +766,7 @@ between two clients using the same source code.</p>
 two models which are both clients of the server model and call the same
 source code.</p>
 <p>Model YAML:</p>
-<div class="highlight-yaml notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+<div class="highlight-yaml"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
 2
 3
 4
@@ -779,7 +781,7 @@ source code.</p>
   <span class="l l-Scalar l-Scalar-Plain">is_server</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">True</span>  <span class="c1"># Creates a RPC server queue called &quot;server&quot;</span>
 </pre></div>
 </td></tr></table></div>
-<div class="highlight-yaml notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+<div class="highlight-yaml"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
  2
  3
  4
@@ -885,7 +887,7 @@ server model which will process the requests in the order they are received.</p>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'0.3.0',
+            VERSION:'0.4+0.gd8a2a4f.dirty',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
@@ -896,15 +898,20 @@ server model which will process the requests in the order they are received.</p>
       <script type="text/javascript" src="_static/jquery.js"></script>
       <script type="text/javascript" src="_static/underscore.js"></script>
       <script type="text/javascript" src="_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 
   
 
-  <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
 
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.Navigation.enable(true);
+          
+          SphinxRtdTheme.Navigation.enableSticky();
+          
       });
   </script> 
 

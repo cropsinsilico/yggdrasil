@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Installation &mdash; cis_interface 0.3.0 documentation</title>
+  <title>Installation &mdash; cis_interface 0.4+0.gd8a2a4f.dirty documentation</title>
   
 
   
@@ -24,7 +24,8 @@
 
   
 
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
@@ -59,7 +60,7 @@
             
             
               <div class="version">
-                0.3
+                0.4+0.gd8a2a4f.dirty
               </div>
             
           
@@ -175,44 +176,44 @@
 <div class="section" id="basic-installation">
 <h2>Basic Installation<a class="headerlink" href="#basic-installation" title="Permalink to this headline">¶</a></h2>
 <p>cis_interface can be installed from either <a class="reference external" href="https://pypi.org/project/cis_interface/">PyPI</a>
-using <code class="docutils literal notranslate"><span class="pre">pip</span></code>:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pip install cis_interface
+using <code class="docutils literal"><span class="pre">pip</span></code>:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ pip install cis_interface
 </pre></div>
 </div>
 <p>or by cloning the <a class="reference external" href="https://git-scm.com/">Git</a> repository on
 <a class="reference external" href="https://github.com/cropsinsilico/cis_interface">Github</a>:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git clone https://github.com/cropsinsilico/cis_interface.git
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ git clone https://github.com/cropsinsilico/cis_interface.git
 </pre></div>
 </div>
 <p>and then building the distribution.:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ cd cis_interface
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ cd cis_interface
 $ python setup.py install
 </pre></div>
 </div>
-<p>If you do not have admin privileges on the target machine, <code class="docutils literal notranslate"><span class="pre">--user</span></code> can be
-added to the end of either the <code class="docutils literal notranslate"><span class="pre">pip</span></code> or <code class="docutils literal notranslate"><span class="pre">setup.py</span></code> installation commands.
-When using the <code class="docutils literal notranslate"><span class="pre">--user</span></code>, you may need to add the directory containing the
-entry point scripts to your <code class="docutils literal notranslate"><span class="pre">PATH</span></code> environment variable in order to use
-cis_interface command line tools (e.g. <code class="docutils literal notranslate"><span class="pre">cisrun</span></code>) without specifying
+<p>If you do not have admin privileges on the target machine, <code class="docutils literal"><span class="pre">--user</span></code> can be
+added to the end of either the <code class="docutils literal"><span class="pre">pip</span></code> or <code class="docutils literal"><span class="pre">setup.py</span></code> installation commands.
+When using the <code class="docutils literal"><span class="pre">--user</span></code>, you may need to add the directory containing the
+entry point scripts to your <code class="docutils literal"><span class="pre">PATH</span></code> environment variable in order to use
+cis_interface command line tools (e.g. <code class="docutils literal"><span class="pre">cisrun</span></code>) without specifying
 their full path. Usually, this directory can be found using the following
 Python commands:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">os</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">os</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">distutils.sysconfig</span> <span class="k">import</span> <span class="n">get_python_lib</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">realpath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">get_python_lib</span><span class="p">(),</span> <span class="s1">&#39;../../../bin/&#39;</span><span class="p">))</span>
 </pre></div>
 </div>
 <p>The displayed path can then be added either on the command link or in a startup
-script (e.g. <code class="docutils literal notranslate"><span class="pre">.bashrc</span></code> or <code class="docutils literal notranslate"><span class="pre">.bash_profile</span></code>), using one of the following:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ export PATH=$PATH:&lt;scripts_dir&gt;  # (linux/osx, bash)
+script (e.g. <code class="docutils literal"><span class="pre">.bashrc</span></code> or <code class="docutils literal"><span class="pre">.bash_profile</span></code>), using one of the following:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ export PATH=$PATH:&lt;scripts_dir&gt;  # (linux/osx, bash)
 $ setenv PATH $PATH:&lt;scripts_dir&gt;  # (linux/osx, tcsh)
 $ set PATH &quot;%PATH%:&lt;scripts_dir&gt;   # (windows)
 </pre></div>
 </div>
 <p>These commands will only add the directory to your path for the current
 session. For the change to be permanent on Linux/OSX, the appropriate command
-from above can be added to your <code class="docutils literal notranslate"><span class="pre">.bashrc</span></code> or <code class="docutils literal notranslate"><span class="pre">.bash_profile</span></code>. On
+from above can be added to your <code class="docutils literal"><span class="pre">.bashrc</span></code> or <code class="docutils literal"><span class="pre">.bash_profile</span></code>. On
 Windows (&gt;=7), the following command will permanently modify your path:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ setx PATH &quot;%PATH%:&lt;scripts_dir&gt;
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ setx PATH &quot;%PATH%:&lt;scripts_dir&gt;
 </pre></div>
 </div>
 <p>The changes will take affect the next time you open the terminal.</p>
@@ -228,7 +229,7 @@ To speed up the search you can (temporarily) add the directories
 containing the libraries to your PATH environment variable prior to
 running one of the above install commands. If cis_interface complains
 that it cannot find these libraries, you can manually set them in your
-<code class="docutils literal notranslate"><span class="pre">.cis_interface.cfg</span></code> file (See <a class="reference internal" href="config.html#config-rst"><span class="std std-ref">Configuration Options</span></a>).</p>
+<code class="docutils literal"><span class="pre">.cis_interface.cfg</span></code> file (See <a class="reference internal" href="config.html#config-rst"><span class="std std-ref">Configuration Options</span></a>).</p>
 </div>
 <div class="section" id="additional-steps-for-matlab-models">
 <h2>Additional Steps for Matlab Models<a class="headerlink" href="#additional-steps-for-matlab-models" title="Permalink to this headline">¶</a></h2>
@@ -244,11 +245,11 @@ you can also do it manually.</p>
 <h2>Additional Steps for RabbitMQ Message Passing<a class="headerlink" href="#additional-steps-for-rabbitmq-message-passing" title="Permalink to this headline">¶</a></h2>
 <p>RabbitMQ connections allow messages to be passed between models when the
 models are not running on the same machine. To use these connections
-(those with the prefix ‘RMQ’), the framework must have access to a
+(those with the prefix &#8216;RMQ&#8217;), the framework must have access to a
 RabbitMQ server. If you have access to an existing RabbitMQ server,
 the information for that server can either be provided to the
 RabbitMQ connection driver
-(See <code class="xref py py-class docutils literal notranslate"><span class="pre">cis_interface.drivers.RMQDriver.RMQDriver</span></code>) or added
+(See <code class="xref py py-class docutils literal"><span class="pre">cis_interface.drivers.RMQDriver.RMQDriver</span></code>) or added
 to the cis_interface config file (See
 <a class="reference internal" href="config.html#config-rst"><span class="std std-ref">Configuration Options</span></a> for information on setting
 config options).</p>
@@ -302,7 +303,7 @@ for starting a RabbitMQ server.</p>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'0.3.0',
+            VERSION:'0.4+0.gd8a2a4f.dirty',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
@@ -313,15 +314,20 @@ for starting a RabbitMQ server.</p>
       <script type="text/javascript" src="_static/jquery.js"></script>
       <script type="text/javascript" src="_static/underscore.js"></script>
       <script type="text/javascript" src="_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 
   
 
-  <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
 
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.Navigation.enable(true);
+          
+          SphinxRtdTheme.Navigation.enableSticky();
+          
       });
   </script> 
 

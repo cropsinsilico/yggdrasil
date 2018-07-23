@@ -1,0 +1,30 @@
+cis_interface.dataio.tests package
+==================================
+
+Submodules
+----------
+
+cis_interface.dataio.tests.test_AsciiFile module
+------------------------------------------------
+
+.. automodule:: cis_interface.dataio.tests.test_AsciiFile
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+cis_interface.dataio.tests.test_AsciiTable module
+-------------------------------------------------
+
+.. automodule:: cis_interface.dataio.tests.test_AsciiTable
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: cis_interface.dataio.tests
+    :members:
+    :undoc-members:
+    :show-inheritance:

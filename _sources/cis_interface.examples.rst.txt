@@ -1,5 +1,12 @@
-cis\_interface.examples package
-===============================
+cis_interface.examples package
+==============================
+
+Subpackages
+-----------
+
+.. toctree::
+
+    cis_interface.examples.tests
 
 Module contents
 ---------------

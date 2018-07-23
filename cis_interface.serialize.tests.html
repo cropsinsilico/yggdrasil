@@ -1,0 +1,648 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>cis_interface.serialize.tests package &mdash; cis_interface 0.4+0.gd8a2a4f.dirty documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="cis_interface.dataio package" href="cis_interface.dataio.html" />
+    <link rel="prev" title="cis_interface.serialize package" href="cis_interface.serialize.html" /> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> cis_interface
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.4+0.gd8a2a4f.dirty
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="includeme.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="formatted_io.html">Formatted I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="server_client_io.html">Server/Client I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="server_client_io.html#one-server-two-clients">One Server, Two Clients</a></li>
+<li class="toctree-l1"><a class="reference internal" href="yaml.html">YAML Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="config.html">Configuration Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="units.html">Units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="c_format_strings.html">C-Style Format Strings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="io_drivers.html">Input/Output Drivers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="model_drivers.html">Model Drivers</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="code.html">Code</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="code_python.html">Python Code</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="code_python.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="cis_interface.interface.html">cis_interface.interface package</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="cis_interface.serialize.html">cis_interface.serialize package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cis_interface.dataio.html">cis_interface.dataio package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cis_interface.drivers.html">cis_interface.drivers package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cis_interface.examples.html">cis_interface.examples package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="code_python.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="code_python.html#module-cis_interface.backwards">cis_interface.backwards module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="code_python.html#module-cis_interface.command_line">cis_interface.command_line module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="code_python.html#module-cis_interface.components">cis_interface.components module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="code_python.html#module-cis_interface.config">cis_interface.config module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="code_python.html#module-cis_interface.platform">cis_interface.platform module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="code_python.html#module-cis_interface.runner">cis_interface.runner module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="code_python.html#module-cis_interface.scanf">cis_interface.scanf module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="code_python.html#module-cis_interface.schema">cis_interface.schema module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="code_python.html#module-cis_interface.tools">cis_interface.tools module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="code_python.html#module-cis_interface.units">cis_interface.units module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="code_python.html#module-cis_interface.yamlfile">cis_interface.yamlfile module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="code_python.html#module-cis_interface">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="code_c.html">C Code</a></li>
+<li class="toctree-l2"><a class="reference internal" href="code_cpp.html">C++ Code</a></li>
+<li class="toctree-l2"><a class="reference internal" href="code_matlab.html">Matlab Code</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="examples/examples_toc.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="release.html">Release Steps</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">cis_interface</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="code.html">Code</a> &raquo;</li>
+        
+          <li><a href="code_python.html">Python Code</a> &raquo;</li>
+        
+          <li><a href="cis_interface.serialize.html">cis_interface.serialize package</a> &raquo;</li>
+        
+      <li>cis_interface.serialize.tests package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/cis_interface.serialize.tests.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="cis-interface-serialize-tests-package">
+<h1>cis_interface.serialize.tests package<a class="headerlink" href="#cis-interface-serialize-tests-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-cis_interface.serialize.tests.test_AsciiMapSerialize">
+<span id="cis-interface-serialize-tests-test-asciimapserialize-module"></span><h2>cis_interface.serialize.tests.test_AsciiMapSerialize module<a class="headerlink" href="#module-cis_interface.serialize.tests.test_AsciiMapSerialize" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="cis_interface.serialize.tests.test_AsciiMapSerialize.TestAsciiMapSerialize">
+<em class="property">class </em><code class="descclassname">cis_interface.serialize.tests.test_AsciiMapSerialize.</code><code class="descname">TestAsciiMapSerialize</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/serialize/tests/test_AsciiMapSerialize.html#TestAsciiMapSerialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.serialize.tests.test_AsciiMapSerialize.TestAsciiMapSerialize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize" title="cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize</span></code></a></p>
+<p>Test class for TestAsciiMapSerialize class.</p>
+<dl class="method">
+<dt id="cis_interface.serialize.tests.test_AsciiMapSerialize.TestAsciiMapSerialize.test_error_delim">
+<code class="descname">test_error_delim</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/serialize/tests/test_AsciiMapSerialize.html#TestAsciiMapSerialize.test_error_delim"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.serialize.tests.test_AsciiMapSerialize.TestAsciiMapSerialize.test_error_delim" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test error for message with too many delimiters on a line.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.serialize.tests.test_AsciiMapSerialize.TestAsciiMapSerialize.test_error_nonstrval">
+<code class="descname">test_error_nonstrval</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/serialize/tests/test_AsciiMapSerialize.html#TestAsciiMapSerialize.test_error_nonstrval"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.serialize.tests.test_AsciiMapSerialize.TestAsciiMapSerialize.test_error_nonstrval" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test error on serializing dictionary with non-string values.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-cis_interface.serialize.tests.test_AsciiTableSerialize">
+<span id="cis-interface-serialize-tests-test-asciitableserialize-module"></span><h2>cis_interface.serialize.tests.test_AsciiTableSerialize module<a class="headerlink" href="#module-cis_interface.serialize.tests.test_AsciiTableSerialize" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="cis_interface.serialize.tests.test_AsciiTableSerialize.TestAsciiTableSerialize">
+<em class="property">class </em><code class="descclassname">cis_interface.serialize.tests.test_AsciiTableSerialize.</code><code class="descname">TestAsciiTableSerialize</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/serialize/tests/test_AsciiTableSerialize.html#TestAsciiTableSerialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.serialize.tests.test_AsciiTableSerialize.TestAsciiTableSerialize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize" title="cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize</span></code></a></p>
+<p>Test class for AsciiTableSerialize class.</p>
+<dl class="method">
+<dt id="cis_interface.serialize.tests.test_AsciiTableSerialize.TestAsciiTableSerialize.test_field_specs">
+<code class="descname">test_field_specs</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/serialize/tests/test_AsciiTableSerialize.html#TestAsciiTableSerialize.test_field_specs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.serialize.tests.test_AsciiTableSerialize.TestAsciiTableSerialize.test_field_specs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test field specifiers.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.serialize.tests.test_AsciiTableSerialize.TestAsciiTableSerializeSingle">
+<em class="property">class </em><code class="descclassname">cis_interface.serialize.tests.test_AsciiTableSerialize.</code><code class="descname">TestAsciiTableSerializeSingle</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/serialize/tests/test_AsciiTableSerialize.html#TestAsciiTableSerializeSingle"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.serialize.tests.test_AsciiTableSerialize.TestAsciiTableSerializeSingle" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize" title="cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize</span></code></a></p>
+<p>Test class for AsciiTableSerialize class.</p>
+<dl class="method">
+<dt id="cis_interface.serialize.tests.test_AsciiTableSerialize.TestAsciiTableSerializeSingle.test_field_specs">
+<code class="descname">test_field_specs</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/serialize/tests/test_AsciiTableSerialize.html#TestAsciiTableSerializeSingle.test_field_specs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.serialize.tests.test_AsciiTableSerialize.TestAsciiTableSerializeSingle.test_field_specs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test field specifiers.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.serialize.tests.test_AsciiTableSerialize.TestAsciiTableSerialize_asarray">
+<em class="property">class </em><code class="descclassname">cis_interface.serialize.tests.test_AsciiTableSerialize.</code><code class="descname">TestAsciiTableSerialize_asarray</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/serialize/tests/test_AsciiTableSerialize.html#TestAsciiTableSerialize_asarray"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.serialize.tests.test_AsciiTableSerialize.TestAsciiTableSerialize_asarray" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.serialize.tests.test_AsciiTableSerialize.TestAsciiTableSerialize" title="cis_interface.serialize.tests.test_AsciiTableSerialize.TestAsciiTableSerialize"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.serialize.tests.test_AsciiTableSerialize.TestAsciiTableSerialize</span></code></a></p>
+<p>Test class for AsciiTableSerialize class with as_array.</p>
+<dl class="method">
+<dt id="cis_interface.serialize.tests.test_AsciiTableSerialize.TestAsciiTableSerialize_asarray.assert_result_equal">
+<code class="descname">assert_result_equal</code><span class="sig-paren">(</span><em>x</em>, <em>y</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/serialize/tests/test_AsciiTableSerialize.html#TestAsciiTableSerialize_asarray.assert_result_equal"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.serialize.tests.test_AsciiTableSerialize.TestAsciiTableSerialize_asarray.assert_result_equal" title="Permalink to this definition">¶</a></dt>
+<dd><p>Assert that serialized/deserialized objects equal.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.serialize.tests.test_AsciiTableSerialize.test_deserialize_nofmt">
+<code class="descclassname">cis_interface.serialize.tests.test_AsciiTableSerialize.</code><code class="descname">test_deserialize_nofmt</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/serialize/tests/test_AsciiTableSerialize.html#test_deserialize_nofmt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.serialize.tests.test_AsciiTableSerialize.test_deserialize_nofmt" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test error on deserialization without a format.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.serialize.tests.test_AsciiTableSerialize.test_serialize_nofmt">
+<code class="descclassname">cis_interface.serialize.tests.test_AsciiTableSerialize.</code><code class="descname">test_serialize_nofmt</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/serialize/tests/test_AsciiTableSerialize.html#test_serialize_nofmt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.serialize.tests.test_AsciiTableSerialize.test_serialize_nofmt" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test error on serialization without a format.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-cis_interface.serialize.tests.test_DefaultSerialize">
+<span id="cis-interface-serialize-tests-test-defaultserialize-module"></span><h2>cis_interface.serialize.tests.test_DefaultSerialize module<a class="headerlink" href="#module-cis_interface.serialize.tests.test_DefaultSerialize" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize">
+<em class="property">class </em><code class="descclassname">cis_interface.serialize.tests.test_DefaultSerialize.</code><code class="descname">TestDefaultSerialize</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/serialize/tests/test_DefaultSerialize.html#TestDefaultSerialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="cis_interface.tests.html#cis_interface.tests.CisTestClassInfo" title="cis_interface.tests.CisTestClassInfo"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.tests.CisTestClassInfo</span></code></a></p>
+<p>Test class for DefaultSerialize class.</p>
+<dl class="method">
+<dt id="cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize.assert_result_equal">
+<code class="descname">assert_result_equal</code><span class="sig-paren">(</span><em>x</em>, <em>y</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/serialize/tests/test_DefaultSerialize.html#TestDefaultSerialize.assert_result_equal"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize.assert_result_equal" title="Permalink to this definition">¶</a></dt>
+<dd><p>Assert that serialized/deserialized objects equal.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize.empty_head">
+<code class="descname">empty_head</code><span class="sig-paren">(</span><em>msg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/serialize/tests/test_DefaultSerialize.html#TestDefaultSerialize.empty_head"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize.empty_head" title="Permalink to this definition">¶</a></dt>
+<dd><p>dict: Empty header for message only contains the size.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize.map_sent2recv">
+<code class="descname">map_sent2recv</code><span class="sig-paren">(</span><em>obj</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/serialize/tests/test_DefaultSerialize.html#TestDefaultSerialize.map_sent2recv"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize.map_sent2recv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert a sent object into a received one.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize.mod">
+<code class="descname">mod</code><a class="headerlink" href="#cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize.mod" title="Permalink to this definition">¶</a></dt>
+<dd><p>Module for class to be tested.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize.test_deserialize_empty">
+<code class="descname">test_deserialize_empty</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/serialize/tests/test_DefaultSerialize.html#TestDefaultSerialize.test_deserialize_empty"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize.test_deserialize_empty" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test call for empty string.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize.test_deserialize_error">
+<code class="descname">test_deserialize_error</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/serialize/tests/test_DefaultSerialize.html#TestDefaultSerialize.test_deserialize_error"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize.test_deserialize_error" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test error when deserializing message that is not bytes.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize.test_field_specs">
+<code class="descname">test_field_specs</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/serialize/tests/test_DefaultSerialize.html#TestDefaultSerialize.test_field_specs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize.test_field_specs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test field specifiers.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize.test_serialize">
+<code class="descname">test_serialize</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/serialize/tests/test_DefaultSerialize.html#TestDefaultSerialize.test_serialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize.test_serialize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test serialize/deserialize.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize.test_serialize_eof">
+<code class="descname">test_serialize_eof</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/serialize/tests/test_DefaultSerialize.html#TestDefaultSerialize.test_serialize_eof"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize.test_serialize_eof" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test serialize/deserialize EOF.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize.test_serialize_eof_header">
+<code class="descname">test_serialize_eof_header</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/serialize/tests/test_DefaultSerialize.html#TestDefaultSerialize.test_serialize_eof_header"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize.test_serialize_eof_header" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test serialize/deserialize EOF with header.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize.test_serialize_header">
+<code class="descname">test_serialize_header</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/serialize/tests/test_DefaultSerialize.html#TestDefaultSerialize.test_serialize_header"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize.test_serialize_header" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test serialize/deserialize with header.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize.test_serialize_no_format">
+<code class="descname">test_serialize_no_format</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/serialize/tests/test_DefaultSerialize.html#TestDefaultSerialize.test_serialize_no_format"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize.test_serialize_no_format" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test serialize/deserialize without format string.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize.test_serialize_sinfo">
+<code class="descname">test_serialize_sinfo</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/serialize/tests/test_DefaultSerialize.html#TestDefaultSerialize.test_serialize_sinfo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize.test_serialize_sinfo" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test serialize/deserialize with serializer info.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_alias">
+<em class="property">class </em><code class="descclassname">cis_interface.serialize.tests.test_DefaultSerialize.</code><code class="descname">TestDefaultSerialize_alias</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/serialize/tests/test_DefaultSerialize.html#TestDefaultSerialize_alias"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_alias" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_format" title="cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_format"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_format</span></code></a></p>
+<p>Test class for DefaultSerialize class with alias.</p>
+<dl class="method">
+<dt id="cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_alias.setup">
+<code class="descname">setup</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/serialize/tests/test_DefaultSerialize.html#TestDefaultSerialize_alias.setup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_alias.setup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create an instance of the class.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_array">
+<em class="property">class </em><code class="descclassname">cis_interface.serialize.tests.test_DefaultSerialize.</code><code class="descname">TestDefaultSerialize_array</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/serialize/tests/test_DefaultSerialize.html#TestDefaultSerialize_array"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_array" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_format" title="cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_format"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_format</span></code></a></p>
+<p>Test class for DefaultSerialize class with format as array.</p>
+<dl class="method">
+<dt id="cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_array.assert_result_equal">
+<code class="descname">assert_result_equal</code><span class="sig-paren">(</span><em>x</em>, <em>y</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/serialize/tests/test_DefaultSerialize.html#TestDefaultSerialize_array.assert_result_equal"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_array.assert_result_equal" title="Permalink to this definition">¶</a></dt>
+<dd><p>Assert that serialized/deserialized objects equal.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_class">
+<em class="property">class </em><code class="descclassname">cis_interface.serialize.tests.test_DefaultSerialize.</code><code class="descname">TestDefaultSerialize_class</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/serialize/tests/test_DefaultSerialize.html#TestDefaultSerialize_class"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_class" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_func" title="cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_func"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_func</span></code></a></p>
+<p>Test class for DefaultSerialize class with classes.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_format">
+<em class="property">class </em><code class="descclassname">cis_interface.serialize.tests.test_DefaultSerialize.</code><code class="descname">TestDefaultSerialize_format</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/serialize/tests/test_DefaultSerialize.html#TestDefaultSerialize_format"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_format" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize" title="cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize</span></code></a></p>
+<p>Test class for DefaultSerialize class with format.</p>
+<dl class="method">
+<dt id="cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_format.test_field_specs">
+<code class="descname">test_field_specs</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/serialize/tests/test_DefaultSerialize.html#TestDefaultSerialize_format.test_field_specs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_format.test_field_specs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test field specifiers.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_func">
+<em class="property">class </em><code class="descclassname">cis_interface.serialize.tests.test_DefaultSerialize.</code><code class="descname">TestDefaultSerialize_func</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/serialize/tests/test_DefaultSerialize.html#TestDefaultSerialize_func"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_func" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize" title="cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize</span></code></a></p>
+<p>Test class for DefaultSerialize class with functions.</p>
+<dl class="method">
+<dt id="cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_func.test_field_specs">
+<code class="descname">test_field_specs</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/serialize/tests/test_DefaultSerialize.html#TestDefaultSerialize_func.test_field_specs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_func.test_field_specs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test field specifiers.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_func.test_serialize_sinfo">
+<code class="descname">test_serialize_sinfo</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/serialize/tests/test_DefaultSerialize.html#TestDefaultSerialize_func.test_serialize_sinfo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_func.test_serialize_sinfo" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test error on serialize with serializer info for function.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_func_error">
+<em class="property">class </em><code class="descclassname">cis_interface.serialize.tests.test_DefaultSerialize.</code><code class="descname">TestDefaultSerialize_func_error</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/serialize/tests/test_DefaultSerialize.html#TestDefaultSerialize_func_error"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_func_error" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_func" title="cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_func"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_func</span></code></a></p>
+<p>Test class for DefaultSerialize class with incorrect functions.</p>
+<dl class="method">
+<dt id="cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_func_error.test_field_specs">
+<code class="descname">test_field_specs</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/serialize/tests/test_DefaultSerialize.html#TestDefaultSerialize_func_error.test_field_specs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_func_error.test_field_specs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Disabled: Test field specifiers.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_func_error.test_serialize">
+<code class="descname">test_serialize</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/serialize/tests/test_DefaultSerialize.html#TestDefaultSerialize_func_error.test_serialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_func_error.test_serialize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test serialize with function that dosn&#8217;t return correct type.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_func_error.test_serialize_header">
+<code class="descname">test_serialize_header</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/serialize/tests/test_DefaultSerialize.html#TestDefaultSerialize_func_error.test_serialize_header"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_func_error.test_serialize_header" title="Permalink to this definition">¶</a></dt>
+<dd><p>Disabled: Test serialize/deserialize with header.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_func_error.test_serialize_sinfo">
+<code class="descname">test_serialize_sinfo</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/serialize/tests/test_DefaultSerialize.html#TestDefaultSerialize_func_error.test_serialize_sinfo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_func_error.test_serialize_sinfo" title="Permalink to this definition">¶</a></dt>
+<dd><p>Disabled: Test serialize/deserialize with serializer info.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-cis_interface.serialize.tests.test_MatSerialize">
+<span id="cis-interface-serialize-tests-test-matserialize-module"></span><h2>cis_interface.serialize.tests.test_MatSerialize module<a class="headerlink" href="#module-cis_interface.serialize.tests.test_MatSerialize" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="cis_interface.serialize.tests.test_MatSerialize.TestMatSerialize">
+<em class="property">class </em><code class="descclassname">cis_interface.serialize.tests.test_MatSerialize.</code><code class="descname">TestMatSerialize</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/serialize/tests/test_MatSerialize.html#TestMatSerialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.serialize.tests.test_MatSerialize.TestMatSerialize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize" title="cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize</span></code></a></p>
+<p>Test class for TestMatSerialize class.</p>
+<dl class="method">
+<dt id="cis_interface.serialize.tests.test_MatSerialize.TestMatSerialize.assert_result_equal">
+<code class="descname">assert_result_equal</code><span class="sig-paren">(</span><em>x</em>, <em>y</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/serialize/tests/test_MatSerialize.html#TestMatSerialize.assert_result_equal"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.serialize.tests.test_MatSerialize.TestMatSerialize.assert_result_equal" title="Permalink to this definition">¶</a></dt>
+<dd><p>Assert that serialized/deserialized objects equal.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.serialize.tests.test_MatSerialize.TestMatSerialize.test_serialize_empty">
+<code class="descname">test_serialize_empty</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/serialize/tests/test_MatSerialize.html#TestMatSerialize.test_serialize_empty"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.serialize.tests.test_MatSerialize.TestMatSerialize.test_serialize_empty" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test serialization of an empty string.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.serialize.tests.test_MatSerialize.TestMatSerialize.test_serialize_errors">
+<code class="descname">test_serialize_errors</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/serialize/tests/test_MatSerialize.html#TestMatSerialize.test_serialize_errors"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.serialize.tests.test_MatSerialize.TestMatSerialize.test_serialize_errors" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test serialize errors.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-cis_interface.serialize.tests.test_ObjSerialize">
+<span id="cis-interface-serialize-tests-test-objserialize-module"></span><h2>cis_interface.serialize.tests.test_ObjSerialize module<a class="headerlink" href="#module-cis_interface.serialize.tests.test_ObjSerialize" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="cis_interface.serialize.tests.test_ObjSerialize.TestObjSerialize">
+<em class="property">class </em><code class="descclassname">cis_interface.serialize.tests.test_ObjSerialize.</code><code class="descname">TestObjSerialize</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/serialize/tests/test_ObjSerialize.html#TestObjSerialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.serialize.tests.test_ObjSerialize.TestObjSerialize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.serialize.tests.test_PlySerialize.TestPlySerialize" title="cis_interface.serialize.tests.test_PlySerialize.TestPlySerialize"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.serialize.tests.test_PlySerialize.TestPlySerialize</span></code></a></p>
+<p>Test class for TestObjSerialize class.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-cis_interface.serialize.tests.test_PandasSerialize">
+<span id="cis-interface-serialize-tests-test-pandasserialize-module"></span><h2>cis_interface.serialize.tests.test_PandasSerialize module<a class="headerlink" href="#module-cis_interface.serialize.tests.test_PandasSerialize" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="cis_interface.serialize.tests.test_PandasSerialize.TestPandasSerialize">
+<em class="property">class </em><code class="descclassname">cis_interface.serialize.tests.test_PandasSerialize.</code><code class="descname">TestPandasSerialize</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/serialize/tests/test_PandasSerialize.html#TestPandasSerialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.serialize.tests.test_PandasSerialize.TestPandasSerialize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize" title="cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize</span></code></a></p>
+<p>Test class for TestPandasSerialize class.</p>
+<dl class="method">
+<dt id="cis_interface.serialize.tests.test_PandasSerialize.TestPandasSerialize.assert_result_equal">
+<code class="descname">assert_result_equal</code><span class="sig-paren">(</span><em>x</em>, <em>y</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/serialize/tests/test_PandasSerialize.html#TestPandasSerialize.assert_result_equal"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.serialize.tests.test_PandasSerialize.TestPandasSerialize.assert_result_equal" title="Permalink to this definition">¶</a></dt>
+<dd><p>Assert that serialized/deserialized objects equal.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-cis_interface.serialize.tests.test_PickleSerialize">
+<span id="cis-interface-serialize-tests-test-pickleserialize-module"></span><h2>cis_interface.serialize.tests.test_PickleSerialize module<a class="headerlink" href="#module-cis_interface.serialize.tests.test_PickleSerialize" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="cis_interface.serialize.tests.test_PickleSerialize.TestPickleSerialize">
+<em class="property">class </em><code class="descclassname">cis_interface.serialize.tests.test_PickleSerialize.</code><code class="descname">TestPickleSerialize</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/serialize/tests/test_PickleSerialize.html#TestPickleSerialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.serialize.tests.test_PickleSerialize.TestPickleSerialize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize" title="cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize</span></code></a></p>
+<p>Test class for TestPickleSerialize class.</p>
+<dl class="method">
+<dt id="cis_interface.serialize.tests.test_PickleSerialize.TestPickleSerialize.assert_result_equal">
+<code class="descname">assert_result_equal</code><span class="sig-paren">(</span><em>x</em>, <em>y</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/serialize/tests/test_PickleSerialize.html#TestPickleSerialize.assert_result_equal"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.serialize.tests.test_PickleSerialize.TestPickleSerialize.assert_result_equal" title="Permalink to this definition">¶</a></dt>
+<dd><p>Assert that serialized/deserialized objects equal.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-cis_interface.serialize.tests.test_PlySerialize">
+<span id="cis-interface-serialize-tests-test-plyserialize-module"></span><h2>cis_interface.serialize.tests.test_PlySerialize module<a class="headerlink" href="#module-cis_interface.serialize.tests.test_PlySerialize" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="cis_interface.serialize.tests.test_PlySerialize.TestPlySerialize">
+<em class="property">class </em><code class="descclassname">cis_interface.serialize.tests.test_PlySerialize.</code><code class="descname">TestPlySerialize</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/serialize/tests/test_PlySerialize.html#TestPlySerialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.serialize.tests.test_PlySerialize.TestPlySerialize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize" title="cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize</span></code></a></p>
+<p>Test class for TestPlySerialize class.</p>
+<dl class="method">
+<dt id="cis_interface.serialize.tests.test_PlySerialize.TestPlySerialize.test_apply_scalar_map">
+<code class="descname">test_apply_scalar_map</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/serialize/tests/test_PlySerialize.html#TestPlySerialize.test_apply_scalar_map"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.serialize.tests.test_PlySerialize.TestPlySerialize.test_apply_scalar_map" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test applying a scalar colormap.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.serialize.tests.test_PlySerialize.TestPlySerialize.test_merge">
+<code class="descname">test_merge</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/serialize/tests/test_PlySerialize.html#TestPlySerialize.test_merge"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.serialize.tests.test_PlySerialize.TestPlySerialize.test_merge" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test mergining two ply objects.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.serialize.tests.test_PlySerialize.TestPlySerialize.test_properties">
+<code class="descname">test_properties</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/serialize/tests/test_PlySerialize.html#TestPlySerialize.test_properties"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.serialize.tests.test_PlySerialize.TestPlySerialize.test_properties" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test properties of PlyDict.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.serialize.tests.test_PlySerialize.TestPlySerialize.test_to_from_scene">
+<code class="descname">test_to_from_scene</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/serialize/tests/test_PlySerialize.html#TestPlySerialize.test_to_from_scene"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.serialize.tests.test_PlySerialize.TestPlySerialize.test_to_from_scene" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test conversion to/from PlantGL scene.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-cis_interface.serialize.tests">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-cis_interface.serialize.tests" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="cis_interface.dataio.html" class="btn btn-neutral float-right" title="cis_interface.dataio package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="cis_interface.serialize.html" class="btn btn-neutral" title="cis_interface.serialize package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Meagan Lang, David Raila.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.4+0.gd8a2a4f.dirty',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          
+          SphinxRtdTheme.Navigation.enableSticky();
+          
+      });
+  </script> 
+
+</body>
+</html>

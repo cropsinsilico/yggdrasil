@@ -1,0 +1,1096 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>cis_interface.datatypes package &mdash; cis_interface 0.4+0.gd8a2a4f.dirty documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> cis_interface
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.4+0.gd8a2a4f.dirty
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="includeme.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="formatted_io.html">Formatted I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="server_client_io.html">Server/Client I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="server_client_io.html#one-server-two-clients">One Server, Two Clients</a></li>
+<li class="toctree-l1"><a class="reference internal" href="yaml.html">YAML Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="config.html">Configuration Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="units.html">Units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="c_format_strings.html">C-Style Format Strings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="io_drivers.html">Input/Output Drivers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="model_drivers.html">Model Drivers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="code.html">Code</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/examples_toc.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="release.html">Release Steps</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">cis_interface</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>cis_interface.datatypes package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/cis_interface.datatypes.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="cis-interface-datatypes-package">
+<h1>cis_interface.datatypes package<a class="headerlink" href="#cis-interface-datatypes-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="cis_interface.datatypes.tests.html">cis_interface.datatypes.tests package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="cis_interface.datatypes.tests.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cis_interface.datatypes.tests.html#module-cis_interface.datatypes.tests.test_CisArrayType">cis_interface.datatypes.tests.test_CisArrayType module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cis_interface.datatypes.tests.html#module-cis_interface.datatypes.tests.test_CisBaseType">cis_interface.datatypes.tests.test_CisBaseType module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cis_interface.datatypes.tests.html#module-cis_interface.datatypes.tests">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-cis_interface.datatypes.CisArrayType">
+<span id="cis-interface-datatypes-cisarraytype-module"></span><h2>cis_interface.datatypes.CisArrayType module<a class="headerlink" href="#module-cis_interface.datatypes.CisArrayType" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="cis_interface.datatypes.CisArrayType.Cis1DArrayType">
+<em class="property">class </em><code class="descclassname">cis_interface.datatypes.CisArrayType.</code><code class="descname">Cis1DArrayType</code><span class="sig-paren">(</span><em>**typedef</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/datatypes/CisArrayType.html#Cis1DArrayType"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.datatypes.CisArrayType.Cis1DArrayType" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.datatypes.CisArrayType.CisScalarType" title="cis_interface.datatypes.CisArrayType.CisScalarType"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.datatypes.CisArrayType.CisScalarType</span></code></a></p>
+<p>Type associated with a scalar.</p>
+<dl class="attribute">
+<dt id="cis_interface.datatypes.CisArrayType.Cis1DArrayType.description">
+<code class="descname">description</code><em class="property"> = 'A 1D array with or without units.'</em><a class="headerlink" href="#cis_interface.datatypes.CisArrayType.Cis1DArrayType.description" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="cis_interface.datatypes.CisArrayType.Cis1DArrayType.encode_type">
+<em class="property">classmethod </em><code class="descname">encode_type</code><span class="sig-paren">(</span><em>obj</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/datatypes/CisArrayType.html#Cis1DArrayType.encode_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.datatypes.CisArrayType.Cis1DArrayType.encode_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Encode an object&#8217;s type definition.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>obj</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><em>object</em></a>) &#8211; Object to encode.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Encoded type definition.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.datatypes.CisArrayType.Cis1DArrayType.metadata_properties">
+<code class="descname">metadata_properties</code><em class="property"> = ['type', 'precision', 'units', 'length']</em><a class="headerlink" href="#cis_interface.datatypes.CisArrayType.Cis1DArrayType.metadata_properties" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.datatypes.CisArrayType.Cis1DArrayType.name">
+<code class="descname">name</code><em class="property"> = '1darray'</em><a class="headerlink" href="#cis_interface.datatypes.CisArrayType.Cis1DArrayType.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.datatypes.CisArrayType.Cis1DArrayType.properties">
+<code class="descname">properties</code><em class="property"> = {'length': {'description': 'Number of elements in the 1D array.', 'minimum': 1, 'type': 'number'}, 'type': {'enum': ['complex', 'float', 'int', 'string', 'uint'], 'description': 'The base type for each item.', 'type': 'string'}, 'units': {'description': 'Physical units.', 'type': 'string'}, 'precision': {'description': 'The size (in bits) of each item.', 'minimum': 1, 'type': 'number'}}</em><a class="headerlink" href="#cis_interface.datatypes.CisArrayType.Cis1DArrayType.properties" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.datatypes.CisArrayType.CisNDArrayType">
+<em class="property">class </em><code class="descclassname">cis_interface.datatypes.CisArrayType.</code><code class="descname">CisNDArrayType</code><span class="sig-paren">(</span><em>**typedef</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/datatypes/CisArrayType.html#CisNDArrayType"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.datatypes.CisArrayType.CisNDArrayType" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.datatypes.CisArrayType.CisScalarType" title="cis_interface.datatypes.CisArrayType.CisScalarType"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.datatypes.CisArrayType.CisScalarType</span></code></a></p>
+<p>Type associated with a scalar.</p>
+<dl class="attribute">
+<dt id="cis_interface.datatypes.CisArrayType.CisNDArrayType.description">
+<code class="descname">description</code><em class="property"> = 'An ND array with or without units.'</em><a class="headerlink" href="#cis_interface.datatypes.CisArrayType.CisNDArrayType.description" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="cis_interface.datatypes.CisArrayType.CisNDArrayType.encode_type">
+<em class="property">classmethod </em><code class="descname">encode_type</code><span class="sig-paren">(</span><em>obj</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/datatypes/CisArrayType.html#CisNDArrayType.encode_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.datatypes.CisArrayType.CisNDArrayType.encode_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Encode an object&#8217;s type definition.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>obj</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><em>object</em></a>) &#8211; Object to encode.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Encoded type definition.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.datatypes.CisArrayType.CisNDArrayType.metadata_properties">
+<code class="descname">metadata_properties</code><em class="property"> = ['type', 'precision', 'units', 'shape']</em><a class="headerlink" href="#cis_interface.datatypes.CisArrayType.CisNDArrayType.metadata_properties" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.datatypes.CisArrayType.CisNDArrayType.name">
+<code class="descname">name</code><em class="property"> = 'ndarray'</em><a class="headerlink" href="#cis_interface.datatypes.CisArrayType.CisNDArrayType.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.datatypes.CisArrayType.CisNDArrayType.properties">
+<code class="descname">properties</code><em class="property"> = {'type': {'enum': ['complex', 'float', 'int', 'string', 'uint'], 'description': 'The base type for each item.', 'type': 'string'}, 'units': {'description': 'Physical units.', 'type': 'string'}, 'precision': {'description': 'The size (in bits) of each item.', 'minimum': 1, 'type': 'number'}, 'shape': {'items': {'type': 'integer', 'minimum': 1}, 'description': 'Shape of the ND array in each dimension.', 'type': 'array'}}</em><a class="headerlink" href="#cis_interface.datatypes.CisArrayType.CisNDArrayType.properties" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.datatypes.CisArrayType.CisScalarType">
+<em class="property">class </em><code class="descclassname">cis_interface.datatypes.CisArrayType.</code><code class="descname">CisScalarType</code><span class="sig-paren">(</span><em>**typedef</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/datatypes/CisArrayType.html#CisScalarType"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.datatypes.CisArrayType.CisScalarType" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.datatypes.CisBaseType.CisBaseType" title="cis_interface.datatypes.CisBaseType.CisBaseType"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.datatypes.CisBaseType.CisBaseType</span></code></a></p>
+<p>Type associated with a scalar.</p>
+<dl class="classmethod">
+<dt id="cis_interface.datatypes.CisArrayType.CisScalarType.check_data">
+<em class="property">classmethod </em><code class="descname">check_data</code><span class="sig-paren">(</span><em>data</em>, <em>typedef</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/datatypes/CisArrayType.html#CisScalarType.check_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.datatypes.CisArrayType.CisScalarType.check_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks if data matches the provided type definition.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>obj</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><em>object</em></a>) &#8211; Object to be tested.</li>
+<li><strong>typedef</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) &#8211; Type properties that object should be tested
+against.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Truth of if the input object is of this type.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)">bool</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="cis_interface.datatypes.CisArrayType.CisScalarType.check_meta_compat">
+<em class="property">classmethod </em><code class="descname">check_meta_compat</code><span class="sig-paren">(</span><em>k</em>, <em>v1</em>, <em>v2</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/datatypes/CisArrayType.html#CisScalarType.check_meta_compat"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.datatypes.CisArrayType.CisScalarType.check_meta_compat" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check that two metadata values are compatible.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>k</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; Key for the entry.</li>
+<li><strong>v1</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><em>object</em></a>) &#8211; Value 1.</li>
+<li><strong>v2</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><em>object</em></a>) &#8211; Value 2.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">True if the two entries are compatible, False otherwise.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)">bool</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="cis_interface.datatypes.CisArrayType.CisScalarType.decode_data">
+<em class="property">classmethod </em><code class="descname">decode_data</code><span class="sig-paren">(</span><em>obj</em>, <em>typedef</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/datatypes/CisArrayType.html#CisScalarType.decode_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.datatypes.CisArrayType.CisScalarType.decode_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Decode an object.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>obj</strong> (<a class="reference external" href="https://docs.python.org/3/library/string.html#module-string" title="(in Python v3.7)"><em>string</em></a>) &#8211; Encoded object to decode.</li>
+<li><strong>typedef</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) &#8211; Type definition that should be used to decode the
+object.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Decoded object.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)">object</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.datatypes.CisArrayType.CisScalarType.definition_properties">
+<code class="descname">definition_properties</code><em class="property"> = ['type']</em><a class="headerlink" href="#cis_interface.datatypes.CisArrayType.CisScalarType.definition_properties" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.datatypes.CisArrayType.CisScalarType.description">
+<code class="descname">description</code><em class="property"> = 'A scalar value with or without units.'</em><a class="headerlink" href="#cis_interface.datatypes.CisArrayType.CisScalarType.description" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="cis_interface.datatypes.CisArrayType.CisScalarType.encode_data">
+<em class="property">classmethod </em><code class="descname">encode_data</code><span class="sig-paren">(</span><em>obj</em>, <em>typedef</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/datatypes/CisArrayType.html#CisScalarType.encode_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.datatypes.CisArrayType.CisScalarType.encode_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Encode an object&#8217;s data.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>obj</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><em>object</em></a>) &#8211; Object to encode.</li>
+<li><strong>typedef</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) &#8211; Type definition that should be used to encode the
+object.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Encoded object.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/string.html#module-string" title="(in Python v3.7)">string</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="cis_interface.datatypes.CisArrayType.CisScalarType.encode_type">
+<em class="property">classmethod </em><code class="descname">encode_type</code><span class="sig-paren">(</span><em>obj</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/datatypes/CisArrayType.html#CisScalarType.encode_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.datatypes.CisArrayType.CisScalarType.encode_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Encode an object&#8217;s type definition.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>obj</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><em>object</em></a>) &#8211; Object to encode.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Encoded type definition.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="cis_interface.datatypes.CisArrayType.CisScalarType.from_array">
+<em class="property">classmethod </em><code class="descname">from_array</code><span class="sig-paren">(</span><em>arr</em>, <em>unit_str=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/datatypes/CisArrayType.html#CisScalarType.from_array"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.datatypes.CisArrayType.CisScalarType.from_array" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get object representation of the data.</p>
+<p>Args:</p>
+<p>Returns:</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.datatypes.CisArrayType.CisScalarType.metadata_properties">
+<code class="descname">metadata_properties</code><em class="property"> = ['type', 'precision', 'units']</em><a class="headerlink" href="#cis_interface.datatypes.CisArrayType.CisScalarType.metadata_properties" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.datatypes.CisArrayType.CisScalarType.name">
+<code class="descname">name</code><em class="property"> = 'scalar'</em><a class="headerlink" href="#cis_interface.datatypes.CisArrayType.CisScalarType.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.datatypes.CisArrayType.CisScalarType.properties">
+<code class="descname">properties</code><em class="property"> = {'type': {'enum': ['complex', 'float', 'int', 'string', 'uint'], 'description': 'The base type for each item.', 'type': 'string'}, 'units': {'description': 'Physical units.', 'type': 'string'}, 'precision': {'description': 'The size (in bits) of each item.', 'minimum': 1, 'type': 'number'}}</em><a class="headerlink" href="#cis_interface.datatypes.CisArrayType.CisScalarType.properties" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="cis_interface.datatypes.CisArrayType.CisScalarType.to_array">
+<em class="property">classmethod </em><code class="descname">to_array</code><span class="sig-paren">(</span><em>obj</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/datatypes/CisArrayType.html#CisScalarType.to_array"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.datatypes.CisArrayType.CisScalarType.to_array" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get np.array representation of the data.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>obj</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><em>object</em></a>) &#8211; Object to get array for.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Array representation of object.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">np.ndarray</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="cis_interface.datatypes.CisArrayType.CisScalarType.transform_type">
+<em class="property">classmethod </em><code class="descname">transform_type</code><span class="sig-paren">(</span><em>obj</em>, <em>typedef=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/datatypes/CisArrayType.html#CisScalarType.transform_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.datatypes.CisArrayType.CisScalarType.transform_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Transform an object based on type info.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>obj</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><em>object</em></a>) &#8211; Object to transform.</li>
+<li><strong>typedef</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) &#8211; Type definition that should be used to transform the
+object.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Transformed object.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)">object</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.datatypes.CisArrayType.data2definition">
+<code class="descclassname">cis_interface.datatypes.CisArrayType.</code><code class="descname">data2definition</code><span class="sig-paren">(</span><em>data</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/datatypes/CisArrayType.html#data2definition"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.datatypes.CisArrayType.data2definition" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the full definition from the data.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>data</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><em>object</em></a>) &#8211; Python object.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Type definition.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.datatypes.CisArrayType.data2dtype">
+<code class="descclassname">cis_interface.datatypes.CisArrayType.</code><code class="descname">data2dtype</code><span class="sig-paren">(</span><em>data</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/datatypes/CisArrayType.html#data2dtype"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.datatypes.CisArrayType.data2dtype" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get numpy data type for an object.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>data</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><em>object</em></a>) &#8211; Python object.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Numpy data type.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">np.dtype</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.datatypes.CisArrayType.definition2dtype">
+<code class="descclassname">cis_interface.datatypes.CisArrayType.</code><code class="descname">definition2dtype</code><span class="sig-paren">(</span><em>props</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/datatypes/CisArrayType.html#definition2dtype"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.datatypes.CisArrayType.definition2dtype" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get numpy data type for a type definition.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>props</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) &#8211; Type definition properties.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Numpy data type.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">np.dtype</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.datatypes.CisArrayType.dtype2definition">
+<code class="descclassname">cis_interface.datatypes.CisArrayType.</code><code class="descname">dtype2definition</code><span class="sig-paren">(</span><em>dtype</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/datatypes/CisArrayType.html#dtype2definition"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.datatypes.CisArrayType.dtype2definition" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get type definition from numpy data type.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>dtype</strong> (<em>np.dtype</em>) &#8211; Numpy data type.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Type definition.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="module-cis_interface.datatypes.CisBaseType">
+<span id="cis-interface-datatypes-cisbasetype-module"></span><h2>cis_interface.datatypes.CisBaseType module<a class="headerlink" href="#module-cis_interface.datatypes.CisBaseType" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="cis_interface.datatypes.CisBaseType.CisBaseType">
+<em class="property">class </em><code class="descclassname">cis_interface.datatypes.CisBaseType.</code><code class="descname">CisBaseType</code><span class="sig-paren">(</span><em>**typedef</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/datatypes/CisBaseType.html#CisBaseType"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.datatypes.CisBaseType.CisBaseType" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+<p>Base type that should be subclassed by user defined types. Attributes
+should be overwritten to match the type.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>**kwargs</strong> &#8211; All keyword arguments are assumed to be type definition
+properties which will be used to validate serialized/deserialized
+messages.</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="cis_interface.datatypes.CisBaseType.CisBaseType.name">
+<code class="descname">name</code><a class="headerlink" href="#cis_interface.datatypes.CisBaseType.CisBaseType.name" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str</em> &#8211; Name of the type for use in YAML files &amp; form options.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.datatypes.CisBaseType.CisBaseType.description">
+<code class="descname">description</code><a class="headerlink" href="#cis_interface.datatypes.CisBaseType.CisBaseType.description" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str</em> &#8211; A short description of the type.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.datatypes.CisBaseType.CisBaseType.properties">
+<code class="descname">properties</code><a class="headerlink" href="#cis_interface.datatypes.CisBaseType.CisBaseType.properties" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>dict</em> &#8211; JSON schema definitions for properties of the
+type.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.datatypes.CisBaseType.CisBaseType.definition_properties">
+<code class="descname">definition_properties</code><a class="headerlink" href="#cis_interface.datatypes.CisBaseType.CisBaseType.definition_properties" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>list</em> &#8211; Type properties that are required for YAML
+or form entries specifying the type. These will also be used to
+validate type definitions.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.datatypes.CisBaseType.CisBaseType.metadata_properties">
+<code class="descname">metadata_properties</code><a class="headerlink" href="#cis_interface.datatypes.CisBaseType.CisBaseType.metadata_properties" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>list</em> &#8211; Type properties that are required for
+deserializing instances of the type that have been serialized.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.datatypes.CisBaseType.CisBaseType.data_schema">
+<code class="descname">data_schema</code><a class="headerlink" href="#cis_interface.datatypes.CisBaseType.CisBaseType.data_schema" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>dict</em> &#8211; JSON schema for validating a JSON friendly
+representation of the type.</p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="cis_interface.datatypes.CisBaseType.CisBaseType.check_data">
+<em class="property">classmethod </em><code class="descname">check_data</code><span class="sig-paren">(</span><em>data</em>, <em>typedef</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/datatypes/CisBaseType.html#CisBaseType.check_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.datatypes.CisBaseType.CisBaseType.check_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks if data matches the provided type definition.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>obj</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><em>object</em></a>) &#8211; Object to be tested.</li>
+<li><strong>typedef</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) &#8211; Type properties that object should be tested
+against.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Truth of if the input object is of this type.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)">bool</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="cis_interface.datatypes.CisBaseType.CisBaseType.check_decoded">
+<em class="property">classmethod </em><code class="descname">check_decoded</code><span class="sig-paren">(</span><em>obj</em>, <em>typedef=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/datatypes/CisBaseType.html#CisBaseType.check_decoded"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.datatypes.CisBaseType.CisBaseType.check_decoded" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks if an object is of the this type.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>obj</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><em>object</em></a>) &#8211; Object to be tested.</li>
+<li><strong>typedef</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) &#8211; Type properties that object should be tested
+against. If None, this will always return True.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Truth of if the input object is of this type.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)">bool</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="cis_interface.datatypes.CisBaseType.CisBaseType.check_encoded">
+<em class="property">classmethod </em><code class="descname">check_encoded</code><span class="sig-paren">(</span><em>metadata</em>, <em>typedef=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/datatypes/CisBaseType.html#CisBaseType.check_encoded"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.datatypes.CisBaseType.CisBaseType.check_encoded" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks if the metadata for an encoded object matches the type
+definition.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>metadata</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) &#8211; Meta data to be tested.</li>
+<li><strong>typedef</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a><em>, </em><em>optional</em>) &#8211; Type properties that object should
+be tested against. Defaults to None and object may have
+any values for the type properties (so long as they match
+the schema.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><dl class="docutils">
+<dt>True if the metadata matches the type definition, False</dt>
+<dd><p class="first last">otherwise.</p>
+</dd>
+</dl>
+</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)">bool</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="cis_interface.datatypes.CisBaseType.CisBaseType.check_meta_compat">
+<em class="property">classmethod </em><code class="descname">check_meta_compat</code><span class="sig-paren">(</span><em>k</em>, <em>v1</em>, <em>v2</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/datatypes/CisBaseType.html#CisBaseType.check_meta_compat"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.datatypes.CisBaseType.CisBaseType.check_meta_compat" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check that two metadata values are compatible.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>k</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; Key for the entry.</li>
+<li><strong>v1</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><em>object</em></a>) &#8211; Value 1.</li>
+<li><strong>v2</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><em>object</em></a>) &#8211; Value 2.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><dl class="docutils">
+<dt>True if the two entries are compatible going from v1 to v2,</dt>
+<dd><p class="first last">False otherwise.</p>
+</dd>
+</dl>
+</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)">bool</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt>
+<code class="descname">data_schema</code><em class="property"> = {'description': 'JSON friendly version of type instance.', 'type': 'string'}</em></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="cis_interface.datatypes.CisBaseType.CisBaseType.decode">
+<em class="property">classmethod </em><code class="descname">decode</code><span class="sig-paren">(</span><em>metadata</em>, <em>data</em>, <em>typedef=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/datatypes/CisBaseType.html#CisBaseType.decode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.datatypes.CisBaseType.CisBaseType.decode" title="Permalink to this definition">¶</a></dt>
+<dd><p>Decode an object.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>metadata</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) &#8211; Meta data describing the data.</li>
+<li><strong>data</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.7)"><em>bytes</em></a>) &#8211; Encoded data.</li>
+<li><strong>typedef</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a><em>, </em><em>optional</em>) &#8211; Type properties that decoded object should
+be tested against. Defaults to None and object may have any
+values for the type properties (so long as they match the schema.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Decoded object.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)">object</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="cis_interface.datatypes.CisBaseType.CisBaseType.decode_data">
+<em class="property">classmethod </em><code class="descname">decode_data</code><span class="sig-paren">(</span><em>obj</em>, <em>typedef</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/datatypes/CisBaseType.html#CisBaseType.decode_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.datatypes.CisBaseType.CisBaseType.decode_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Decode an object.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>obj</strong> (<a class="reference external" href="https://docs.python.org/3/library/string.html#module-string" title="(in Python v3.7)"><em>string</em></a>) &#8211; Encoded object to decode.</li>
+<li><strong>typedef</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) &#8211; Type definition that should be used to decode the
+object.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Decoded object.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)">object</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt>
+<code class="descname">definition_properties</code><em class="property"> = []</em></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="cis_interface.datatypes.CisBaseType.CisBaseType.definition_schema">
+<em class="property">classmethod </em><code class="descname">definition_schema</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/datatypes/CisBaseType.html#CisBaseType.definition_schema"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.datatypes.CisBaseType.CisBaseType.definition_schema" title="Permalink to this definition">¶</a></dt>
+<dd><p>JSON schema for validating a type definition.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt>
+<code class="descname">description</code><em class="property"> = 'A generic base type for users to build on.'</em></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.datatypes.CisBaseType.CisBaseType.deserialize">
+<code class="descname">deserialize</code><span class="sig-paren">(</span><em>msg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/datatypes/CisBaseType.html#CisBaseType.deserialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.datatypes.CisBaseType.CisBaseType.deserialize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deserialize a message.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>msg</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.7)"><em>bytes</em></a>) &#8211; Message to be deserialized.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Deserialized message and header information.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)">tuple</a>(obj, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a>)</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#TypeError" title="(in Python v3.7)"><code class="xref py py-exc docutils literal"><span class="pre">TypeError</span></code></a> &#8211; If msg is not bytes type (str on Python 2).</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="cis_interface.datatypes.CisBaseType.CisBaseType.encode">
+<em class="property">classmethod </em><code class="descname">encode</code><span class="sig-paren">(</span><em>obj</em>, <em>typedef=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/datatypes/CisBaseType.html#CisBaseType.encode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.datatypes.CisBaseType.CisBaseType.encode" title="Permalink to this definition">¶</a></dt>
+<dd><p>Encode an object.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>obj</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><em>object</em></a>) &#8211; Object to encode.</li>
+<li><strong>typedef</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a><em>, </em><em>optional</em>) &#8211; Type properties that object should
+be tested against. Defaults to None and object may have
+any values for the type properties (so long as they match
+the schema.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><dl class="docutils">
+<dt>Encoded object with type definition and data</dt>
+<dd><p class="first last">serialized to bytes.</p>
+</dd>
+</dl>
+</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)">tuple</a>(<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.7)">bytes</a>)</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="cis_interface.datatypes.CisBaseType.CisBaseType.encode_data">
+<em class="property">classmethod </em><code class="descname">encode_data</code><span class="sig-paren">(</span><em>obj</em>, <em>typedef</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/datatypes/CisBaseType.html#CisBaseType.encode_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.datatypes.CisBaseType.CisBaseType.encode_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Encode an object&#8217;s data.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>obj</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><em>object</em></a>) &#8211; Object to encode.</li>
+<li><strong>typedef</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) &#8211; Type definition that should be used to encode the
+object.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Encoded object.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/string.html#module-string" title="(in Python v3.7)">string</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="cis_interface.datatypes.CisBaseType.CisBaseType.encode_type">
+<em class="property">classmethod </em><code class="descname">encode_type</code><span class="sig-paren">(</span><em>obj</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/datatypes/CisBaseType.html#CisBaseType.encode_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.datatypes.CisBaseType.CisBaseType.encode_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Encode an object&#8217;s type definition.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>obj</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><em>object</em></a>) &#8211; Object to encode.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Encoded type definition.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt>
+<code class="descname">metadata_properties</code><em class="property"> = []</em></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="cis_interface.datatypes.CisBaseType.CisBaseType.metadata_schema">
+<em class="property">classmethod </em><code class="descname">metadata_schema</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/datatypes/CisBaseType.html#CisBaseType.metadata_schema"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.datatypes.CisBaseType.CisBaseType.metadata_schema" title="Permalink to this definition">¶</a></dt>
+<dd><p>JSON schema for validating a JSON serialization of the type.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt>
+<code class="descname">name</code><em class="property"> = 'base'</em></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt>
+<code class="descname">properties</code><em class="property"> = {}</em></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.datatypes.CisBaseType.CisBaseType.sep">
+<code class="descname">sep</code><em class="property"> = b':CIS_TAG:'</em><a class="headerlink" href="#cis_interface.datatypes.CisBaseType.CisBaseType.sep" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.datatypes.CisBaseType.CisBaseType.serialize">
+<code class="descname">serialize</code><span class="sig-paren">(</span><em>obj</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/datatypes/CisBaseType.html#CisBaseType.serialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.datatypes.CisBaseType.CisBaseType.serialize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Serialize a message.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>obj</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><em>object</em></a>) &#8211; Python object to be formatted.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Serialized message.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.7)">bytes</a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="cis_interface.datatypes.CisBaseType.CisBaseType.transform_type">
+<em class="property">classmethod </em><code class="descname">transform_type</code><span class="sig-paren">(</span><em>obj</em>, <em>typedef=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/datatypes/CisBaseType.html#CisBaseType.transform_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.datatypes.CisBaseType.CisBaseType.transform_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Transform an object based on type info.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>obj</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><em>object</em></a>) &#8211; Object to transform.</li>
+<li><strong>typedef</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) &#8211; Type definition that should be used to transform the
+object.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Transformed object.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)">object</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="cis_interface.datatypes.CisBaseType.CisBaseType.validate_definition">
+<em class="property">classmethod </em><code class="descname">validate_definition</code><span class="sig-paren">(</span><em>obj</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/datatypes/CisBaseType.html#CisBaseType.validate_definition"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.datatypes.CisBaseType.CisBaseType.validate_definition" title="Permalink to this definition">¶</a></dt>
+<dd><p>Validates a type definition.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>obj</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><em>object</em></a>) &#8211; Type definition to validate.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="cis_interface.datatypes.CisBaseType.CisBaseType.validate_metadata">
+<em class="property">classmethod </em><code class="descname">validate_metadata</code><span class="sig-paren">(</span><em>obj</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/datatypes/CisBaseType.html#CisBaseType.validate_metadata"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.datatypes.CisBaseType.CisBaseType.validate_metadata" title="Permalink to this definition">¶</a></dt>
+<dd><p>Validates an encoded object.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>obj</strong> (<a class="reference external" href="https://docs.python.org/3/library/string.html#module-string" title="(in Python v3.7)"><em>string</em></a>) &#8211; Encoded object to validate.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-cis_interface.datatypes">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-cis_interface.datatypes" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="cis_interface.datatypes.get_type_class">
+<code class="descclassname">cis_interface.datatypes.</code><code class="descname">get_type_class</code><span class="sig-paren">(</span><em>type_name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/datatypes.html#get_type_class"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.datatypes.get_type_class" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a type class given it&#8217;s name.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>type_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; Name of type class.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Type class.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">class</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.datatypes.import_all_types">
+<code class="descclassname">cis_interface.datatypes.</code><code class="descname">import_all_types</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/datatypes.html#import_all_types"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.datatypes.import_all_types" title="Permalink to this definition">¶</a></dt>
+<dd><p>Import all types to ensure they are registered.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.datatypes.register_type">
+<code class="descclassname">cis_interface.datatypes.</code><code class="descname">register_type</code><span class="sig-paren">(</span><em>type_class</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/datatypes.html#register_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.datatypes.register_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Register a type class, recording methods for encoding/decoding.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>type_class</strong> (<em>class</em>) &#8211; Class to be registered.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Meagan Lang, David Raila.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.4+0.gd8a2a4f.dirty',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          
+          SphinxRtdTheme.Navigation.enableSticky();
+          
+      });
+  </script> 
+
+</body>
+</html>

@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>cis_interface.serialize.ObjSerialize &mdash; cis_interface 0.3.0 documentation</title>
+  <title>cis_interface.serialize.ObjSerialize &mdash; cis_interface 0.4+0.gd8a2a4f.dirty documentation</title>
   
 
   
@@ -24,7 +24,8 @@
 
   
 
-  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/theme_overrides.css" type="text/css" />
     <link rel="index" title="Index" href="../../../genindex.html" />
@@ -57,7 +58,7 @@
             
             
               <div class="version">
-                0.3
+                0.4+0.gd8a2a4f.dirty
               </div>
             
           
@@ -98,6 +99,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../code.html">Code</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../examples/examples_toc.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../release.html">Release Steps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../release.html#docs-checkout">Docs Checkout</a></li>
 </ul>
 
             
@@ -167,7 +169,7 @@
 
 
 <div class="viewcode-block" id="ObjDict"><a class="viewcode-back" href="../../../cis_interface.serialize.html#cis_interface.serialize.ObjSerialize.ObjDict">[docs]</a><span class="k">class</span> <span class="nc">ObjDict</span><span class="p">(</span><span class="n">PlyDict</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Class for storing obj information.</span>
+    <span class="sd">r&quot;&quot;&quot;Class for storing obj information.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        vertices (list, optional): 3D positions of vertices comprising the</span>
@@ -196,11 +198,11 @@
             <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="p">[])</span>
         <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;material&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">ObjDict</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">ObjDict</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">standardize</span><span class="p">())</span>
 
 <div class="viewcode-block" id="ObjDict.standardize"><a class="viewcode-back" href="../../../cis_interface.serialize.html#cis_interface.serialize.ObjSerialize.ObjDict.standardize">[docs]</a>    <span class="k">def</span> <span class="nf">standardize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">no_copy</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Put the dictionary in the standard format with face information</span>
+        <span class="sd">r&quot;&quot;&quot;Put the dictionary in the standard format with face information</span>
 <span class="sd">        split into separate fields.</span>
 
 <span class="sd">        Args:</span>
@@ -225,16 +227,16 @@
                 <span class="k">if</span> <span class="n">out</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                     <span class="n">out</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">f</span><span class="p">]</span>
             <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
-                <span class="k">if</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="vm">__class__</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">)):</span>
+                <span class="k">if</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">__class__</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">)):</span>
                     <span class="n">out</span><span class="p">[</span><span class="s1">&#39;faces&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">kindex</span> <span class="ow">in</span> <span class="n">face_keys</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
                         <span class="n">out</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span><span class="p">[</span><span class="n">kindex</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">out</span></div>
 
-<div class="viewcode-block" id="ObjDict.from_shape"><a class="viewcode-back" href="../../../cis_interface.serialize.html#cis_interface.serialize.ObjSerialize.ObjDict.from_shape">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">from_shape</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">shape</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">conversion</span><span class="o">=</span><span class="mf">1.0</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create a ply dictionary from a PlantGL shape and descritizer.</span>
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="ObjDict.from_shape"><a class="viewcode-back" href="../../../cis_interface.serialize.html#cis_interface.serialize.ObjSerialize.ObjDict.from_shape">[docs]</a>    <span class="k">def</span> <span class="nf">from_shape</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">shape</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">conversion</span><span class="o">=</span><span class="mf">1.0</span><span class="p">):</span>
+        <span class="sd">r&quot;&quot;&quot;Create a ply dictionary from a PlantGL shape and descritizer.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            scene (openalea.plantgl.scene): Scene that should be descritized.</span>
@@ -243,7 +245,7 @@
 <span class="sd">                applied to the vertex positions. Defaults to 1.0.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">iobj</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">ObjDict</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">from_shape</span><span class="p">(</span><span class="n">shape</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">conversion</span><span class="o">=</span><span class="n">conversion</span><span class="p">)</span>
+        <span class="n">iobj</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">ObjDict</span><span class="p">,</span> <span class="n">cls</span><span class="p">)</span><span class="o">.</span><span class="n">from_shape</span><span class="p">(</span><span class="n">shape</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">conversion</span><span class="o">=</span><span class="n">conversion</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">iobj</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="c1"># Texcoords</span>
             <span class="k">if</span> <span class="n">d</span><span class="o">.</span><span class="n">result</span><span class="o">.</span><span class="n">texCoordList</span><span class="p">:</span>
@@ -269,7 +271,7 @@
         <span class="k">return</span> <span class="n">iobj</span></div>
 
 <div class="viewcode-block" id="ObjDict.to_geom_args"><a class="viewcode-back" href="../../../cis_interface.serialize.html#cis_interface.serialize.ObjSerialize.ObjDict.to_geom_args">[docs]</a>    <span class="k">def</span> <span class="nf">to_geom_args</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conversion</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get arguments for creating a PlantGL geometry.</span>
+        <span class="sd">r&quot;&quot;&quot;Get arguments for creating a PlantGL geometry.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            conversion (float, optional): Conversion factor that should be</span>
@@ -319,7 +321,7 @@
         <span class="k">return</span> <span class="n">smb_class</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span></div>
 
 <div class="viewcode-block" id="ObjDict.append"><a class="viewcode-back" href="../../../cis_interface.serialize.html#cis_interface.serialize.ObjSerialize.ObjDict.append">[docs]</a>    <span class="k">def</span> <span class="nf">append</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">solf</span><span class="p">,</span> <span class="n">default_rgb</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Append new ply information to this dictionary.</span>
+        <span class="sd">r&quot;&quot;&quot;Append new ply information to this dictionary.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            solf (ObjDict): Another ply to append to this one.</span>
@@ -352,16 +354,16 @@
 
 
 <div class="viewcode-block" id="ObjSerialize"><a class="viewcode-back" href="../../../cis_interface.serialize.html#cis_interface.serialize.ObjSerialize.ObjSerialize">[docs]</a><span class="k">class</span> <span class="nc">ObjSerialize</span><span class="p">(</span><span class="n">PlySerialize</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Class for serializing/deserializing .obj file formats. Reader</span>
+    <span class="sd">r&quot;&quot;&quot;Class for serializing/deserializing .obj file formats. Reader</span>
 <span class="sd">    adapted from https://www.pygame.org/wiki/OBJFileLoader.&quot;&quot;&quot;</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">serializer_type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: Type of serializer.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;int: Type of serializer.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="mi">9</span>
 
 <div class="viewcode-block" id="ObjSerialize.func_serialize"><a class="viewcode-back" href="../../../cis_interface.serialize.html#cis_interface.serialize.ObjSerialize.ObjSerialize.func_serialize">[docs]</a>    <span class="k">def</span> <span class="nf">func_serialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">zero_indexed</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Serialize a message.</span>
+        <span class="sd">r&quot;&quot;&quot;Serialize a message.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            args (ObjDict): Dictionary of obj information.</span>
@@ -419,7 +421,7 @@
         <span class="k">return</span> <span class="n">backwards</span><span class="o">.</span><span class="n">unicode2bytes</span><span class="p">(</span><span class="n">out</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="ObjSerialize.func_deserialize"><a class="viewcode-back" href="../../../cis_interface.serialize.html#cis_interface.serialize.ObjSerialize.ObjSerialize.func_deserialize">[docs]</a>    <span class="k">def</span> <span class="nf">func_deserialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">zero_indexed</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Deserialize a message.</span>
+        <span class="sd">r&quot;&quot;&quot;Deserialize a message.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            msg (str, bytes): Message to be deserialized.</span>
@@ -519,7 +521,7 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../../../',
-            VERSION:'0.3.0',
+            VERSION:'0.4+0.gd8a2a4f.dirty',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
@@ -530,15 +532,20 @@
       <script type="text/javascript" src="../../../_static/jquery.js"></script>
       <script type="text/javascript" src="../../../_static/underscore.js"></script>
       <script type="text/javascript" src="../../../_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 
   
 
-  <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
 
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.Navigation.enable(true);
+          
+          SphinxRtdTheme.Navigation.enableSticky();
+          
       });
   </script> 
 

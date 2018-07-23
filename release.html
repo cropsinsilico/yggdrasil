@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Release Steps &mdash; cis_interface 0.3.0 documentation</title>
+  <title>Release Steps &mdash; cis_interface 0.4+0.gd8a2a4f.dirty documentation</title>
   
 
   
@@ -24,7 +24,8 @@
 
   
 
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
@@ -58,7 +59,7 @@
             
             
               <div class="version">
-                0.3
+                0.4+0.gd8a2a4f.dirty
               </div>
             
           
@@ -99,6 +100,7 @@
 <li class="toctree-l1"><a class="reference internal" href="code.html">Code</a></li>
 <li class="toctree-l1"><a class="reference internal" href="examples/examples_toc.html">Examples</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Release Steps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="#docs-checkout">Docs Checkout</a></li>
 </ul>
 
             
@@ -165,20 +167,56 @@
             
   <div class="section" id="release-steps">
 <h1>Release Steps<a class="headerlink" href="#release-steps" title="Permalink to this headline">¶</a></h1>
-<ol class="arabic simple">
-<li>[on branch] Update docs to reflect new features</li>
-<li>[on branch] Increment version in setup.py</li>
-<li>[on branch] Increment version in docs</li>
-<li>[on branch] Regenerate schema (<code class="docutils literal notranslate"><span class="pre">cisschema</span></code>)</li>
-<li>Merge into master</li>
-<li>Upload to PyPI<ol class="arabic">
-<li>PyPI Test: <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">setup.py</span> <span class="pre">sdist</span> <span class="pre">upload</span> <span class="pre">-r</span> <span class="pre">pypitest</span></code></li>
-<li>PyPI: <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">setup.py</span> <span class="pre">sdist</span> <span class="pre">upload</span> <span class="pre">-r</span> <span class="pre">pypi</span></code></li>
-</ol>
+<ol class="arabic">
+<li><p class="first">[on branch] Regenerate schema:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ cisschema
+$ git add cis_interface/.cis_schema.yml
+$ git commit -m &quot;Updated .cis_schema.yml&quot;
+$ git push origin [BRANCH]
+</pre></div>
+</div>
 </li>
-<li>Update conda-forge</li>
-<li>Regenerate docs</li>
+<li><p class="first">[on branch] Open pull request to merge changes into master</p>
+</li>
+<li><p class="first">[on branch] Update docs to reflect new features and make sure they build locally:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ cd docs
+$ make autodoc
+</pre></div>
+</div>
+</li>
+<li><p class="first">Merge branch into master after tests pass and code review complete</p>
+</li>
+<li><p class="first">Create tag with new version on master:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ git tag x.x.x
+</pre></div>
+</div>
+</li>
+<li><p class="first">Push to github (this triggers deployment of source distribution and wheels to PyPI):</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ git push; git push --tags
+</pre></div>
+</div>
+</li>
+<li><p class="first">Update conda-forge build</p>
+</li>
+<li><p class="first">Checkout <code class="docutils literal"><span class="pre">gh-pages</span></code> branch if it dosn&#8217;t already exist (See below), regenerate docs and push to gh-pages branch:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ cd docs
+$ make ghpages
+</pre></div>
+</div>
+</li>
 </ol>
+</div>
+<div class="section" id="docs-checkout">
+<h1>Docs Checkout<a class="headerlink" href="#docs-checkout" title="Permalink to this headline">¶</a></h1>
+<p>Before running <code class="docutils literal"><span class="pre">make</span> <span class="pre">ghpages</span></code>, you must first checkout the &#8216;ghpages&#8217; branch
+in the appropriate location. This only has to be done once on each machine you
+publish docs from. From the <code class="docutils literal"><span class="pre">cis_interface</span></code> source directory:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ cd ../
+$ git clone https://github.com/cropsinsilico/cis_interface.git cis_interface_docs
+$ cd cis_interface_docs
+$ git checkout gh-pages
+</pre></div>
+</div>
 </div>
 
 
@@ -221,7 +259,7 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'0.3.0',
+            VERSION:'0.4+0.gd8a2a4f.dirty',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
@@ -232,15 +270,20 @@
       <script type="text/javascript" src="_static/jquery.js"></script>
       <script type="text/javascript" src="_static/underscore.js"></script>
       <script type="text/javascript" src="_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 
   
 
-  <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
 
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.Navigation.enable(true);
+          
+          SphinxRtdTheme.Navigation.enableSticky();
+          
       });
   </script> 
 

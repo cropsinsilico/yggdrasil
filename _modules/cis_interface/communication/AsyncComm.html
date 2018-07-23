@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>cis_interface.communication.AsyncComm &mdash; cis_interface 0.3.0 documentation</title>
+  <title>cis_interface.communication.AsyncComm &mdash; cis_interface 0.4+0.gd8a2a4f.dirty documentation</title>
   
 
   
@@ -24,7 +24,8 @@
 
   
 
-  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/theme_overrides.css" type="text/css" />
     <link rel="index" title="Index" href="../../../genindex.html" />
@@ -57,7 +58,7 @@
             
             
               <div class="version">
-                0.3
+                0.4+0.gd8a2a4f.dirty
               </div>
             
           
@@ -98,6 +99,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../code.html">Code</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../examples/examples_toc.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../release.html">Release Steps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../release.html#docs-checkout">Docs Checkout</a></li>
 </ul>
 
             
@@ -169,12 +171,12 @@
 
 
 <div class="viewcode-block" id="AsyncTryAgain"><a class="viewcode-back" href="../../../cis_interface.communication.html#cis_interface.communication.AsyncComm.AsyncTryAgain">[docs]</a><span class="k">class</span> <span class="nc">AsyncTryAgain</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Exception raised when comm open, but send should be attempted again.&quot;&quot;&quot;</span>
+    <span class="sd">r&quot;&quot;&quot;Exception raised when comm open, but send should be attempted again.&quot;&quot;&quot;</span>
     <span class="k">pass</span></div>
 
 
 <div class="viewcode-block" id="AsyncComm"><a class="viewcode-back" href="../../../cis_interface.communication.html#cis_interface.communication.AsyncComm.AsyncComm">[docs]</a><span class="k">class</span> <span class="nc">AsyncComm</span><span class="p">(</span><span class="n">CommBase</span><span class="o">.</span><span class="n">CommBase</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Class for handling asynchronous I/O.</span>
+    <span class="sd">r&quot;&quot;&quot;Class for handling asynchronous I/O.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        name (str): The name of the message queue.</span>
@@ -201,10 +203,10 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">backlog_send_ready</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Event</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">backlog_recv_ready</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Event</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">backlog_open</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">AsyncComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">AsyncComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
 <div class="viewcode-block" id="AsyncComm.printStatus"><a class="viewcode-back" href="../../../cis_interface.communication.html#cis_interface.communication.AsyncComm.AsyncComm.printStatus">[docs]</a>    <span class="k">def</span> <span class="nf">printStatus</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nindent</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Print status of the communicator.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;Print status of the communicator.&quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">AsyncComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">printStatus</span><span class="p">(</span><span class="n">nindent</span><span class="o">=</span><span class="n">nindent</span><span class="p">)</span>
         <span class="n">prefix</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="n">nindent</span> <span class="o">*</span> <span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span>
         <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s%-15s</span><span class="s1">: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="s1">&#39;open (backlog)&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_open_backlog</span><span class="p">))</span>
@@ -220,7 +222,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">backlog_thread</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;tools.CisThread: Thread that will handle sinding or receiving</span>
+        <span class="sd">r&quot;&quot;&quot;tools.CisThread: Thread that will handle sinding or receiving</span>
 <span class="sd">        backlogged messages.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_backlog_thread</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;send&#39;</span><span class="p">:</span>
@@ -232,29 +234,29 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_backlog_thread</span>
 
 <div class="viewcode-block" id="AsyncComm.open"><a class="viewcode-back" href="../../../cis_interface.communication.html#cis_interface.communication.AsyncComm.AsyncComm.open">[docs]</a>    <span class="k">def</span> <span class="nf">open</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Open the connection by connecting to the queue.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;Open the connection by connecting to the queue.&quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">AsyncComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">open</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_open_direct</span><span class="p">()</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_open_direct</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_open_backlog</span><span class="p">()</span></div>
 
     <span class="k">def</span> <span class="nf">_open_direct</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Open the comm directly.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;Open the comm directly.&quot;&quot;&quot;</span>
         <span class="k">pass</span>
 
     <span class="k">def</span> <span class="nf">_open_backlog</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Open the backlog.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;Open the backlog.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_open_backlog</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">backlog_open</span> <span class="o">=</span> <span class="kc">True</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">dont_backlog</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">backlog_thread</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="nf">_close_direct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">linger</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Close the comm directly.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;Close the comm directly.&quot;&quot;&quot;</span>
         <span class="k">pass</span>
 
     <span class="k">def</span> <span class="nf">_close_backlog</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">wait</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Close the backlog thread.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;Close the backlog thread.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">backlog_open</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">backlog_thread</span><span class="o">.</span><span class="n">set_break_flag</span><span class="p">()</span>
@@ -264,7 +266,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">backlog_thread</span><span class="o">.</span><span class="n">wait</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">()))</span>
 
     <span class="k">def</span> <span class="nf">_close</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">linger</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Close the connection.</span>
+        <span class="sd">r&quot;&quot;&quot;Close the connection.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            linger (bool, optional): If True, drain messages before closing the</span>
@@ -277,38 +279,38 @@
         <span class="nb">super</span><span class="p">(</span><span class="n">AsyncComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">_close</span><span class="p">(</span><span class="n">linger</span><span class="o">=</span><span class="n">linger</span><span class="p">)</span>
 
 <div class="viewcode-block" id="AsyncComm.stop_backlog"><a class="viewcode-back" href="../../../cis_interface.communication.html#cis_interface.communication.AsyncComm.AsyncComm.stop_backlog">[docs]</a>    <span class="k">def</span> <span class="nf">stop_backlog</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Stop the asynchronous backlog, turning this into a direct comm.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;Stop the asynchronous backlog, turning this into a direct comm.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_close_backlog</span><span class="p">(</span><span class="n">wait</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">dont_backlog</span> <span class="o">=</span> <span class="kc">True</span></div>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">is_open</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;bool: True if the backlog is open.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;bool: True if the backlog is open.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_open_direct</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_open_backlog</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">is_open_direct</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;bool: True if the direct comm is not None.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;bool: True if the direct comm is not None.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="kc">False</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">is_open_backlog</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;bool: True if the backlog thread is running.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;bool: True if the backlog thread is running.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">backlog_open</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">n_msg_direct_recv</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: Number of messages currently being routed in recv.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;int: Number of messages currently being routed in recv.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="mi">0</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">n_msg_direct_send</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: Number of messages currently being routed in send.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;int: Number of messages currently being routed in send.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="mi">0</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">n_msg_direct</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: Number of messages currently being routed.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;int: Number of messages currently being routed.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;send&#39;</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_msg_direct_send</span>
         <span class="k">else</span><span class="p">:</span>
@@ -316,21 +318,21 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">n_msg_backlog_recv</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: Number of messages in the receive backlog.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;int: Number of messages in the receive backlog.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_open_backlog</span><span class="p">:</span>
             <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">backlog_recv</span><span class="p">)</span>
         <span class="k">return</span> <span class="mi">0</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">n_msg_backlog_send</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: Number of messages in the send backlog.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;int: Number of messages in the send backlog.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_open_backlog</span><span class="p">:</span>
             <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">backlog_send</span><span class="p">)</span>
         <span class="k">return</span> <span class="mi">0</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">n_msg_backlog</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: Number of messages in the backlog.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;int: Number of messages in the backlog.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;recv&#39;</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_msg_backlog_recv</span>
         <span class="k">else</span><span class="p">:</span>
@@ -338,7 +340,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">n_msg_recv</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: Number of messages in the receive backlog.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;int: Number of messages in the receive backlog.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;recv&#39;</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dont_backlog</span><span class="p">:</span>
                 <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_msg_direct_recv</span>
@@ -349,7 +351,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">n_msg_send</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: Number of messages in the send backlog.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;int: Number of messages in the send backlog.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;send&#39;</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dont_backlog</span><span class="p">:</span>
                 <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_msg_direct_send</span>
@@ -360,17 +362,17 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">n_msg_recv_drain</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: Number of messages in the receive backlog and direct comm.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;int: Number of messages in the receive backlog and direct comm.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_msg_direct_recv</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_msg_backlog_recv</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">n_msg_send_drain</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: Number of messages in the send backlog and direct comm.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;int: Number of messages in the send backlog and direct comm.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_msg_direct_send</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_msg_backlog_send</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">is_confirmed_send</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;bool: True if all sent messages have been confirmed.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;bool: True if all sent messages have been confirmed.&quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_work_comms</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
             <span class="k">if</span> <span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;send&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">v</span><span class="o">.</span><span class="n">is_confirmed_send</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
                 <span class="k">return</span> <span class="kc">False</span>
@@ -378,7 +380,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">is_confirmed_recv</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;bool: True if all received messages have been confirmed.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;bool: True if all received messages have been confirmed.&quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_work_comms</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
             <span class="k">if</span> <span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;recv&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">v</span><span class="o">.</span><span class="n">is_confirmed_recv</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
                 <span class="k">return</span> <span class="kc">False</span>
@@ -386,18 +388,18 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">backlog_recv</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;list: Messages that have been received.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;list: Messages that have been received.&quot;&quot;&quot;</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">backlog_thread</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_backlog_recv</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">backlog_send</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;list: Messages that should be sent.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;list: Messages that should be sent.&quot;&quot;&quot;</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">backlog_thread</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_backlog_send</span>
 
 <div class="viewcode-block" id="AsyncComm.add_backlog_recv"><a class="viewcode-back" href="../../../cis_interface.communication.html#cis_interface.communication.AsyncComm.AsyncComm.add_backlog_recv">[docs]</a>    <span class="k">def</span> <span class="nf">add_backlog_recv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Add a message to the backlog of received messages.</span>
+        <span class="sd">r&quot;&quot;&quot;Add a message to the backlog of received messages.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            msg (str): Received message that should be backlogged.</span>
@@ -409,7 +411,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">backlog_recv_ready</span><span class="o">.</span><span class="n">set</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="AsyncComm.add_backlog_send"><a class="viewcode-back" href="../../../cis_interface.communication.html#cis_interface.communication.AsyncComm.AsyncComm.add_backlog_send">[docs]</a>    <span class="k">def</span> <span class="nf">add_backlog_send</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Add a message to the backlog of messages to be sent.</span>
+        <span class="sd">r&quot;&quot;&quot;Add a message to the backlog of messages to be sent.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            msg (str): Message that should be backlogged for sending.</span>
@@ -423,7 +425,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">backlog_send_ready</span><span class="o">.</span><span class="n">set</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="AsyncComm.pop_backlog_recv"><a class="viewcode-back" href="../../../cis_interface.communication.html#cis_interface.communication.AsyncComm.AsyncComm.pop_backlog_recv">[docs]</a>    <span class="k">def</span> <span class="nf">pop_backlog_recv</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Pop a message from the front of the recv backlog.</span>
+        <span class="sd">r&quot;&quot;&quot;Pop a message from the front of the recv backlog.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            str: First backlogged recv message.</span>
@@ -437,7 +439,7 @@
         <span class="k">return</span> <span class="n">msg</span></div>
 
 <div class="viewcode-block" id="AsyncComm.pop_backlog_send"><a class="viewcode-back" href="../../../cis_interface.communication.html#cis_interface.communication.AsyncComm.AsyncComm.pop_backlog_send">[docs]</a>    <span class="k">def</span> <span class="nf">pop_backlog_send</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Pop a message from the front of the send backlog.</span>
+        <span class="sd">r&quot;&quot;&quot;Pop a message from the front of the send backlog.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            tuple (str, dict): First backlogged send message and</span>
@@ -452,7 +454,7 @@
         <span class="k">return</span> <span class="n">msg</span><span class="p">,</span> <span class="n">kwargs</span></div>
 
 <div class="viewcode-block" id="AsyncComm.run_backlog_send"><a class="viewcode-back" href="../../../cis_interface.communication.html#cis_interface.communication.AsyncComm.AsyncComm.run_backlog_send">[docs]</a>    <span class="k">def</span> <span class="nf">run_backlog_send</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Continue trying to send buffered messages.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;Continue trying to send buffered messages.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_open_backlog</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_close_backlog</span><span class="p">()</span>
             <span class="k">return</span>
@@ -462,7 +464,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">sleep</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="AsyncComm.run_backlog_recv"><a class="viewcode-back" href="../../../cis_interface.communication.html#cis_interface.communication.AsyncComm.AsyncComm.run_backlog_recv">[docs]</a>    <span class="k">def</span> <span class="nf">run_backlog_recv</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Continue buffering received messages.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;Continue buffering received messages.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">backlog_thread</span><span class="o">.</span><span class="n">main_terminated</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Main thread terminated&quot;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_close_backlog</span><span class="p">()</span>
@@ -479,7 +481,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">sleep</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="AsyncComm.send_backlog"><a class="viewcode-back" href="../../../cis_interface.communication.html#cis_interface.communication.AsyncComm.AsyncComm.send_backlog">[docs]</a>    <span class="k">def</span> <span class="nf">send_backlog</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Send a message from the send backlog to the queue.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;Send a message from the send backlog to the queue.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">backlog_send</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">confirm_send</span><span class="p">()</span>
             <span class="k">return</span> <span class="kc">True</span>
@@ -498,7 +500,7 @@
         <span class="k">return</span> <span class="n">flag</span></div>
 
 <div class="viewcode-block" id="AsyncComm.recv_backlog"><a class="viewcode-back" href="../../../cis_interface.communication.html#cis_interface.communication.AsyncComm.AsyncComm.recv_backlog">[docs]</a>    <span class="k">def</span> <span class="nf">recv_backlog</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Check for any messages in the queue and add them to the recv</span>
+        <span class="sd">r&quot;&quot;&quot;Check for any messages in the queue and add them to the recv</span>
 <span class="sd">        backlog.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_open_direct</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Direct comm closed.&quot;</span><span class="p">)</span>
@@ -519,7 +521,7 @@
         <span class="k">return</span> <span class="n">flag</span></div>
 
     <span class="k">def</span> <span class="nf">_send_direct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">payload</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Send a message to the comm directly.</span>
+        <span class="sd">r&quot;&quot;&quot;Send a message to the comm directly.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            payload (str): Message to send.</span>
@@ -531,7 +533,7 @@
         <span class="k">return</span> <span class="kc">False</span>
 
     <span class="k">def</span> <span class="nf">_recv_direct</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Receive a message from the comm directly.</span>
+        <span class="sd">r&quot;&quot;&quot;Receive a message from the comm directly.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            tuple (bool, str): The success or failure of receiving a message</span>
@@ -541,7 +543,7 @@
         <span class="k">return</span> <span class="p">(</span><span class="kc">False</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">empty_msg</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_send</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">payload</span><span class="p">,</span> <span class="n">no_backlog</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">no_confirm</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Send a message to the backlog.</span>
+        <span class="sd">r&quot;&quot;&quot;Send a message to the backlog.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            payload (str): Message to send.</span>
@@ -585,7 +587,7 @@
         <span class="k">return</span> <span class="kc">True</span>
 
     <span class="k">def</span> <span class="nf">_recv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">no_backlog</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">no_confirm</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Receive a message from the backlog.</span>
+        <span class="sd">r&quot;&quot;&quot;Receive a message from the backlog.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            timeout (float, optional): Time in seconds to wait for a message.</span>
@@ -647,7 +649,7 @@
         <span class="k">return</span> <span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pop_backlog_recv</span><span class="p">())</span>
 
 <div class="viewcode-block" id="AsyncComm.purge"><a class="viewcode-back" href="../../../cis_interface.communication.html#cis_interface.communication.AsyncComm.AsyncComm.purge">[docs]</a>    <span class="k">def</span> <span class="nf">purge</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Purge all messages from the comm.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;Purge all messages from the comm.&quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">AsyncComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">purge</span><span class="p">()</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">backlog_thread</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;recv&#39;</span><span class="p">:</span>
@@ -691,7 +693,7 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../../../',
-            VERSION:'0.3.0',
+            VERSION:'0.4+0.gd8a2a4f.dirty',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
@@ -702,15 +704,20 @@
       <script type="text/javascript" src="../../../_static/jquery.js"></script>
       <script type="text/javascript" src="../../../_static/underscore.js"></script>
       <script type="text/javascript" src="../../../_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 
   
 
-  <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
 
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.Navigation.enable(true);
+          
+          SphinxRtdTheme.Navigation.enableSticky();
+          
       });
   </script> 
 

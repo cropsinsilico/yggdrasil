@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>cis_interface.communication.PandasFileComm &mdash; cis_interface 0.3.0 documentation</title>
+  <title>cis_interface.communication.PandasFileComm &mdash; cis_interface 0.4+0.gd8a2a4f.dirty documentation</title>
   
 
   
@@ -24,7 +24,8 @@
 
   
 
-  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/theme_overrides.css" type="text/css" />
     <link rel="index" title="Index" href="../../../genindex.html" />
@@ -57,7 +58,7 @@
             
             
               <div class="version">
-                0.3
+                0.4+0.gd8a2a4f.dirty
               </div>
             
           
@@ -98,6 +99,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../code.html">Code</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../examples/examples_toc.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../release.html">Release Steps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../release.html#docs-checkout">Docs Checkout</a></li>
 </ul>
 
             
@@ -168,9 +170,9 @@
 <span class="kn">from</span> <span class="nn">cis_interface.schema</span> <span class="k">import</span> <span class="n">register_component</span><span class="p">,</span> <span class="n">inherit_schema</span>
 
 
-<div class="viewcode-block" id="PandasFileComm"><a class="viewcode-back" href="../../../cis_interface.communication.html#cis_interface.communication.PandasFileComm.PandasFileComm">[docs]</a><span class="nd">@register_component</span>
-<span class="k">class</span> <span class="nc">PandasFileComm</span><span class="p">(</span><span class="n">FileComm</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Class for handling I/O from/to a pandas csv file on disk.</span>
+<span class="nd">@register_component</span>
+<div class="viewcode-block" id="PandasFileComm"><a class="viewcode-back" href="../../../cis_interface.communication.html#cis_interface.communication.PandasFileComm.PandasFileComm">[docs]</a><span class="k">class</span> <span class="nc">PandasFileComm</span><span class="p">(</span><span class="n">FileComm</span><span class="p">):</span>
+    <span class="sd">r&quot;&quot;&quot;Class for handling I/O from/to a pandas csv file on disk.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        name (str): The environment variable where communication address is</span>
@@ -186,7 +188,7 @@
                              <span class="n">delimiter</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">,</span> <span class="s1">&#39;required&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">})</span>
 
     <span class="k">def</span> <span class="nf">_init_before_open</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">serializer_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Set up dataio and attributes.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;Set up dataio and attributes.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">serializer_kwargs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">serializer_kwargs</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="n">serializer_kwargs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">stype</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="n">delimiter</span><span class="p">)</span>
@@ -197,7 +199,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">serializer</span><span class="o">.</span><span class="n">write_header</span> <span class="o">=</span> <span class="kc">False</span>
 
 <div class="viewcode-block" id="PandasFileComm.send_dict"><a class="viewcode-back" href="../../../cis_interface.communication.html#cis_interface.communication.PandasFileComm.PandasFileComm.send_dict">[docs]</a>    <span class="k">def</span> <span class="nf">send_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args_dict</span><span class="p">,</span> <span class="n">field_order</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Send a message with fields specified in the input dictionary.</span>
+        <span class="sd">r&quot;&quot;&quot;Send a message with fields specified in the input dictionary.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            args_dict (dict): Dictionary with fields specifying output fields.</span>
@@ -258,7 +260,7 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../../../',
-            VERSION:'0.3.0',
+            VERSION:'0.4+0.gd8a2a4f.dirty',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
@@ -269,15 +271,20 @@
       <script type="text/javascript" src="../../../_static/jquery.js"></script>
       <script type="text/javascript" src="../../../_static/underscore.js"></script>
       <script type="text/javascript" src="../../../_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 
   
 
-  <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
 
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.Navigation.enable(true);
+          
+          SphinxRtdTheme.Navigation.enableSticky();
+          
       });
   </script> 
 

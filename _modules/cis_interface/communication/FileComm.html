@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>cis_interface.communication.FileComm &mdash; cis_interface 0.3.0 documentation</title>
+  <title>cis_interface.communication.FileComm &mdash; cis_interface 0.4+0.gd8a2a4f.dirty documentation</title>
   
 
   
@@ -24,7 +24,8 @@
 
   
 
-  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/theme_overrides.css" type="text/css" />
     <link rel="index" title="Index" href="../../../genindex.html" />
@@ -57,7 +58,7 @@
             
             
               <div class="version">
-                0.3
+                0.4+0.gd8a2a4f.dirty
               </div>
             
           
@@ -98,6 +99,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../code.html">Code</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../examples/examples_toc.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../release.html">Release Steps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../release.html#docs-checkout">Docs Checkout</a></li>
 </ul>
 
             
@@ -170,9 +172,9 @@
 <span class="kn">from</span> <span class="nn">cis_interface.schema</span> <span class="k">import</span> <span class="n">register_component</span>
 
 
-<div class="viewcode-block" id="FileComm"><a class="viewcode-back" href="../../../cis_interface.communication.html#cis_interface.communication.FileComm.FileComm">[docs]</a><span class="nd">@register_component</span>
-<span class="k">class</span> <span class="nc">FileComm</span><span class="p">(</span><span class="n">CommBase</span><span class="o">.</span><span class="n">CommBase</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Class for handling I/O from/to a file on disk.</span>
+<span class="nd">@register_component</span>
+<div class="viewcode-block" id="FileComm"><a class="viewcode-back" href="../../../cis_interface.communication.html#cis_interface.communication.FileComm.FileComm">[docs]</a><span class="k">class</span> <span class="nc">FileComm</span><span class="p">(</span><span class="n">CommBase</span><span class="o">.</span><span class="n">CommBase</span><span class="p">):</span>
+    <span class="sd">r&quot;&quot;&quot;Class for handling I/O from/to a file on disk.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        name (str): The environment variable where communication address is</span>
@@ -228,12 +230,12 @@
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;close_on_eof_send&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
-        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">FileComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">FileComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_init_before_open</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">read_meth</span><span class="o">=</span><span class="s1">&#39;read&#39;</span><span class="p">,</span> <span class="n">append</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">in_temp</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                           <span class="n">open_as_binary</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">newline</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">is_series</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                           <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get absolute path and set attributes.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;Get absolute path and set attributes.&quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">FileComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">_init_before_open</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_fd&#39;</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_fd</span> <span class="o">=</span> <span class="kc">None</span>
@@ -266,32 +268,32 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">maxMsgSize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: Maximum size of a single message that should be sent.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;int: Maximum size of a single message that should be sent.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="mi">0</span>
 
-<div class="viewcode-block" id="FileComm.underlying_comm_class"><a class="viewcode-back" href="../../../cis_interface.communication.html#cis_interface.communication.FileComm.FileComm.underlying_comm_class">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">underlying_comm_class</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;str: Name of underlying communication class.&quot;&quot;&quot;</span>
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="FileComm.underlying_comm_class"><a class="viewcode-back" href="../../../cis_interface.communication.html#cis_interface.communication.FileComm.FileComm.underlying_comm_class">[docs]</a>    <span class="k">def</span> <span class="nf">underlying_comm_class</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">r&quot;&quot;&quot;str: Name of underlying communication class.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="s1">&#39;FileComm&#39;</span></div>
 
-<div class="viewcode-block" id="FileComm.close_registry_entry"><a class="viewcode-back" href="../../../cis_interface.communication.html#cis_interface.communication.FileComm.FileComm.close_registry_entry">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">close_registry_entry</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Close a registry entry.&quot;&quot;&quot;</span>
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="FileComm.close_registry_entry"><a class="viewcode-back" href="../../../cis_interface.communication.html#cis_interface.communication.FileComm.FileComm.close_registry_entry">[docs]</a>    <span class="k">def</span> <span class="nf">close_registry_entry</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="sd">r&quot;&quot;&quot;Close a registry entry.&quot;&quot;&quot;</span>
         <span class="n">out</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">value</span><span class="o">.</span><span class="n">closed</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
             <span class="n">value</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
             <span class="n">out</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="k">return</span> <span class="n">out</span></div>
 
-<div class="viewcode-block" id="FileComm.new_comm_kwargs"><a class="viewcode-back" href="../../../cis_interface.communication.html#cis_interface.communication.FileComm.FileComm.new_comm_kwargs">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">new_comm_kwargs</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Initialize communication with new queue.&quot;&quot;&quot;</span>
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="FileComm.new_comm_kwargs"><a class="viewcode-back" href="../../../cis_interface.communication.html#cis_interface.communication.FileComm.FileComm.new_comm_kwargs">[docs]</a>    <span class="k">def</span> <span class="nf">new_comm_kwargs</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">r&quot;&quot;&quot;Initialize communication with new queue.&quot;&quot;&quot;</span>
         <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;address&#39;</span><span class="p">,</span> <span class="s1">&#39;file.txt&#39;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span></div>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">open_mode</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;str: Mode that should be used to open the file.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;str: Mode that should be used to open the file.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;recv&#39;</span><span class="p">:</span>
             <span class="n">io_mode</span> <span class="o">=</span> <span class="s1">&#39;r&#39;</span>
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">append</span> <span class="o">==</span> <span class="s1">&#39;ow&#39;</span><span class="p">:</span>
@@ -305,7 +307,7 @@
         <span class="k">return</span> <span class="n">io_mode</span>
 
 <div class="viewcode-block" id="FileComm.opp_comm_kwargs"><a class="viewcode-back" href="../../../cis_interface.communication.html#cis_interface.communication.FileComm.FileComm.opp_comm_kwargs">[docs]</a>    <span class="k">def</span> <span class="nf">opp_comm_kwargs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get keyword arguments to initialize communication with opposite</span>
+        <span class="sd">r&quot;&quot;&quot;Get keyword arguments to initialize communication with opposite</span>
 <span class="sd">        comm object.</span>
 
 <span class="sd">        Returns:</span>
@@ -320,18 +322,18 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">registry_key</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;str: String used to register the socket.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;str: String used to register the socket.&quot;&quot;&quot;</span>
         <span class="c1"># return self.address</span>
         <span class="k">return</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">_</span><span class="si">%s</span><span class="s1">_</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">address</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">direction</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">uuid</span><span class="p">)</span>
 
 <div class="viewcode-block" id="FileComm.record_position"><a class="viewcode-back" href="../../../cis_interface.communication.html#cis_interface.communication.FileComm.FileComm.record_position">[docs]</a>    <span class="k">def</span> <span class="nf">record_position</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Record the current position in the file/series.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;Record the current position in the file/series.&quot;&quot;&quot;</span>
         <span class="n">_rec_pos</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fd</span><span class="o">.</span><span class="n">tell</span><span class="p">()</span>
         <span class="n">_rec_ind</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_series_index</span>
         <span class="k">return</span> <span class="n">_rec_pos</span><span class="p">,</span> <span class="n">_rec_ind</span></div>
 
 <div class="viewcode-block" id="FileComm.change_position"><a class="viewcode-back" href="../../../cis_interface.communication.html#cis_interface.communication.FileComm.FileComm.change_position">[docs]</a>    <span class="k">def</span> <span class="nf">change_position</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_pos</span><span class="p">,</span> <span class="n">series_index</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Change the position in the file/series.</span>
+        <span class="sd">r&quot;&quot;&quot;Change the position in the file/series.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            file_pos (int): Position that should be moved to in the file.</span>
@@ -346,7 +348,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">advance_in_file</span><span class="p">(</span><span class="n">file_pos</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="FileComm.advance_in_file"><a class="viewcode-back" href="../../../cis_interface.communication.html#cis_interface.communication.FileComm.FileComm.advance_in_file">[docs]</a>    <span class="k">def</span> <span class="nf">advance_in_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_pos</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Advance to a certain position in the current file.</span>
+        <span class="sd">r&quot;&quot;&quot;Advance to a certain position in the current file.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            file_pos (int): Position that should be moved to in the current.</span>
@@ -357,7 +359,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">fd</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">file_pos</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="FileComm.advance_in_series"><a class="viewcode-back" href="../../../cis_interface.communication.html#cis_interface.communication.FileComm.FileComm.advance_in_series">[docs]</a>    <span class="k">def</span> <span class="nf">advance_in_series</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">series_index</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Advance to a certain file in a series.</span>
+        <span class="sd">r&quot;&quot;&quot;Advance to a certain file in a series.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            series_index (int, optional): Index of file in the series that</span>
@@ -383,7 +385,7 @@
         <span class="k">return</span> <span class="n">out</span></div>
 
 <div class="viewcode-block" id="FileComm.get_series_address"><a class="viewcode-back" href="../../../cis_interface.communication.html#cis_interface.communication.FileComm.FileComm.get_series_address">[docs]</a>    <span class="k">def</span> <span class="nf">get_series_address</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the address of a file in the series.</span>
+        <span class="sd">r&quot;&quot;&quot;Get the address of a file in the series.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            index (int, optional): Index in series to get address for.</span>
@@ -399,7 +401,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">current_address</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;str: Address of file currently being used.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;str: Address of file currently being used.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_series</span><span class="p">:</span>
             <span class="n">address</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_series_address</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span>
@@ -428,19 +430,19 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_fd</span> <span class="o">=</span> <span class="kc">None</span>
 
 <div class="viewcode-block" id="FileComm.open"><a class="viewcode-back" href="../../../cis_interface.communication.html#cis_interface.communication.FileComm.FileComm.open">[docs]</a>    <span class="k">def</span> <span class="nf">open</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Open the file.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;Open the file.&quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">FileComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">open</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_open</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">register_comm</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">registry_key</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fd</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">_close</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Close the file.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;Close the file.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_file_close</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">unregister_comm</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">registry_key</span><span class="p">)</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">FileComm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">_close</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
 <div class="viewcode-block" id="FileComm.remove_file"><a class="viewcode-back" href="../../../cis_interface.communication.html#cis_interface.communication.FileComm.FileComm.remove_file">[docs]</a>    <span class="k">def</span> <span class="nf">remove_file</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Remove the file.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;Remove the file.&quot;&quot;&quot;</span>
         <span class="k">assert</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">is_closed</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_series</span><span class="p">:</span>
             <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
@@ -456,17 +458,17 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">is_open</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;bool: True if the connection is open.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;bool: True if the connection is open.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fd</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">fd</span><span class="o">.</span><span class="n">closed</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">fd</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Associated file identifier.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;Associated file identifier.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fd</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">remaining_bytes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: Remaining bytes in the file.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;int: Remaining bytes in the file.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_closed</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;send&#39;</span><span class="p">:</span>
             <span class="k">return</span> <span class="mi">0</span>
         <span class="n">pos</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">record_position</span><span class="p">()</span>
@@ -490,7 +492,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">n_msg_recv</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: The number of messages in the file.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;int: The number of messages in the file.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_closed</span><span class="p">:</span>
             <span class="k">return</span> <span class="mi">0</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_meth</span> <span class="o">==</span> <span class="s1">&#39;read&#39;</span><span class="p">:</span>
@@ -512,7 +514,7 @@
         <span class="k">return</span> <span class="n">out</span>
 
 <div class="viewcode-block" id="FileComm.on_send_eof"><a class="viewcode-back" href="../../../cis_interface.communication.html#cis_interface.communication.FileComm.FileComm.on_send_eof">[docs]</a>    <span class="k">def</span> <span class="nf">on_send_eof</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Close file when EOF to be sent.</span>
+        <span class="sd">r&quot;&quot;&quot;Close file when EOF to be sent.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            bool: False so that message not sent.</span>
@@ -524,7 +526,7 @@
         <span class="k">return</span> <span class="n">flag</span><span class="p">,</span> <span class="n">msg_s</span></div>
 
     <span class="k">def</span> <span class="nf">_send</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Write message to a file.</span>
+        <span class="sd">r&quot;&quot;&quot;Write message to a file.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            msg (bytes, str): Data to write to the file.</span>
@@ -546,7 +548,7 @@
         <span class="k">return</span> <span class="kc">True</span>
 
     <span class="k">def</span> <span class="nf">_recv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Reads message from a file.</span>
+        <span class="sd">r&quot;&quot;&quot;Reads message from a file.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            timeout (float, optional): Time in seconds to wait for a message.</span>
@@ -575,7 +577,7 @@
         <span class="k">return</span> <span class="p">(</span><span class="n">flag</span><span class="p">,</span> <span class="n">out</span><span class="p">)</span>
 
 <div class="viewcode-block" id="FileComm.purge"><a class="viewcode-back" href="../../../cis_interface.communication.html#cis_interface.communication.FileComm.FileComm.purge">[docs]</a>    <span class="k">def</span> <span class="nf">purge</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Purge all messages from the comm.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;Purge all messages from the comm.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_open</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">direction</span> <span class="o">==</span> <span class="s1">&#39;recv&#39;</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">fd</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">SEEK_END</span><span class="p">)</span></div></div>
 </pre></div>
@@ -612,7 +614,7 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../../../',
-            VERSION:'0.3.0',
+            VERSION:'0.4+0.gd8a2a4f.dirty',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
@@ -623,15 +625,20 @@
       <script type="text/javascript" src="../../../_static/jquery.js"></script>
       <script type="text/javascript" src="../../../_static/underscore.js"></script>
       <script type="text/javascript" src="../../../_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 
   
 
-  <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
 
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.Navigation.enable(true);
+          
+          SphinxRtdTheme.Navigation.enableSticky();
+          
       });
   </script> 
 

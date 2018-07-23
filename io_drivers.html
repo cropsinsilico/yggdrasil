@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Input/Output Drivers &mdash; cis_interface 0.3.0 documentation</title>
+  <title>Input/Output Drivers &mdash; cis_interface 0.4+0.gd8a2a4f.dirty documentation</title>
   
 
   
@@ -24,7 +24,8 @@
 
   
 
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
@@ -59,7 +60,7 @@
             
             
               <div class="version">
-                0.3
+                0.4+0.gd8a2a4f.dirty
               </div>
             
           
@@ -184,9 +185,9 @@
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Name of the queue that messages should be sent to.</li>
-<li><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Path to the file that messages should be read from.</li>
-<li><strong>**kwargs</strong> – Additional keyword arguments are passed to the parent class.</li>
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; Name of the queue that messages should be sent to.</li>
+<li><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; Path to the file that messages should be read from.</li>
+<li><strong>**kwargs</strong> &#8211; Additional keyword arguments are passed to the parent class.</li>
 </ul>
 </td>
 </tr>
@@ -203,15 +204,15 @@
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Name of the queue that messages should be sent to.</li>
-<li><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) – Path to the file that messages should be read from
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; Name of the queue that messages should be sent to.</li>
+<li><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) &#8211; Path to the file that messages should be read from
 or dictionary containing the filepath and other keyword arguments
 to be passed to the created AsciiFile object.</li>
-<li><strong>comment</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – String that should be used to identify
-comments. Default set by <code class="xref py py-class docutils literal notranslate"><span class="pre">AsciiFile</span></code>.</li>
-<li><strong>newline</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – String that should be used to identify
-the end of a line. Default set by <code class="xref py py-class docutils literal notranslate"><span class="pre">AsciiFile</span></code>.</li>
-<li><strong>**kwargs</strong> – Additional keyword arguments are passed to parent class.</li>
+<li><strong>comment</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) &#8211; String that should be used to identify
+comments. Default set by <code class="xref py py-class docutils literal"><span class="pre">AsciiFile</span></code>.</li>
+<li><strong>newline</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) &#8211; String that should be used to identify
+the end of a line. Default set by <code class="xref py py-class docutils literal"><span class="pre">AsciiFile</span></code>.</li>
+<li><strong>**kwargs</strong> &#8211; Additional keyword arguments are passed to parent class.</li>
 </ul>
 </td>
 </tr>
@@ -228,27 +229,27 @@ the end of a line. Default set by <code class="xref py py-class docutils literal
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Name of the input queue to send messages to.</li>
-<li><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) – Path to the file that messages should be read from
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; Name of the input queue to send messages to.</li>
+<li><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) &#8211; Path to the file that messages should be read from
 or dictionary containing the filepath and other keyword arguments
 to be passed to the created AsciiTable object.</li>
-<li><strong>format_str</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Format string that should be used to format
-output in the case that the io_mode is ‘w’ (write). It is not
+<li><strong>format_str</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; Format string that should be used to format
+output in the case that the io_mode is &#8216;w&#8217; (write). It is not
 required if the io_mode is any other value.</li>
-<li><strong>field_names</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>, </em><em>optional</em>) – List of column names. Defaults to None.</li>
-<li><strong>field_units</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>, </em><em>optional</em>) – List of column units. Defaults to None.</li>
-<li><strong>use_astropy</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, astropy is used to determine
-a table’s format if it is installed. If False, a format string
+<li><strong>field_names</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a><em>, </em><em>optional</em>) &#8211; List of column names. Defaults to None.</li>
+<li><strong>field_units</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a><em>, </em><em>optional</em>) &#8211; List of column units. Defaults to None.</li>
+<li><strong>use_astropy</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) &#8211; If True, astropy is used to determine
+a table&#8217;s format if it is installed. If False, a format string
 must be contained in the table. Defaults to False.</li>
-<li><strong>delimiter</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – String that should be used to separate
+<li><strong>delimiter</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) &#8211; String that should be used to separate
 columns. Default set by serialize._default_delimiter.</li>
-<li><strong>comment</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – String that should be used to identify
+<li><strong>comment</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) &#8211; String that should be used to identify
 comments. Default set by serialize._default_comment.</li>
-<li><strong>newline</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – String that should be used to identify
+<li><strong>newline</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) &#8211; String that should be used to identify
 the end of a line. Default set by serialize._default_newline.</li>
-<li><strong>as_array</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, the table contents are sent all at
+<li><strong>as_array</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) &#8211; If True, the table contents are sent all at
 once as an array. Defaults to False.</li>
-<li><strong>**kwargs</strong> – Additional keyword arguments are passed to parent class.</li>
+<li><strong>**kwargs</strong> &#8211; Additional keyword arguments are passed to parent class.</li>
 </ul>
 </td>
 </tr>
@@ -271,9 +272,9 @@ once as an array. Defaults to False.</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Name of the queue that messages should be sent to.</li>
-<li><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Path to the file that messages should be read from.</li>
-<li><strong>**kwargs</strong> – Additional keyword arguments are passed to the parent class.</li>
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; Name of the queue that messages should be sent to.</li>
+<li><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; Path to the file that messages should be read from.</li>
+<li><strong>**kwargs</strong> &#8211; Additional keyword arguments are passed to the parent class.</li>
 </ul>
 </td>
 </tr>
@@ -290,11 +291,11 @@ once as an array. Defaults to False.</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Name of the input queue to send messages to.</li>
-<li><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) – Path to the file that messages should be read from.</li>
-<li><strong>delimiter</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – String that should be used to separate
-columns. Defaults to ‘t’.</li>
-<li><strong>**kwargs</strong> – Additional keyword arguments are passed to parent class.</li>
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; Name of the input queue to send messages to.</li>
+<li><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) &#8211; Path to the file that messages should be read from.</li>
+<li><strong>delimiter</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) &#8211; String that should be used to separate
+columns. Defaults to &#8216;t&#8217;.</li>
+<li><strong>**kwargs</strong> &#8211; Additional keyword arguments are passed to parent class.</li>
 </ul>
 </td>
 </tr>
@@ -317,9 +318,9 @@ columns. Defaults to ‘t’.</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Name of the queue that messages should be sent to.</li>
-<li><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Path to the file that messages should be read from.</li>
-<li><strong>**kwargs</strong> – Additional keyword arguments are passed to the parent class.</li>
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; Name of the queue that messages should be sent to.</li>
+<li><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; Path to the file that messages should be read from.</li>
+<li><strong>**kwargs</strong> &#8211; Additional keyword arguments are passed to the parent class.</li>
 </ul>
 </td>
 </tr>
@@ -336,9 +337,9 @@ columns. Defaults to ‘t’.</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Name of the queue that messages should be sent to.</li>
-<li><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Path to the file that messages should be read from.</li>
-<li><strong>**kwargs</strong> – Additional keyword arguments are passed to the parent class.</li>
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; Name of the queue that messages should be sent to.</li>
+<li><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; Path to the file that messages should be read from.</li>
+<li><strong>**kwargs</strong> &#8211; Additional keyword arguments are passed to the parent class.</li>
 </ul>
 </td>
 </tr>
@@ -356,9 +357,9 @@ file.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Name of the queue that messages should be sent to.</li>
-<li><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Path to the .mat file that messages should be read from.</li>
-<li><strong>**kwargs</strong> – Additional keyword arguments are passed to parent class.</li>
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; Name of the queue that messages should be sent to.</li>
+<li><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; Path to the .mat file that messages should be read from.</li>
+<li><strong>**kwargs</strong> &#8211; Additional keyword arguments are passed to parent class.</li>
 </ul>
 </td>
 </tr>
@@ -378,11 +379,11 @@ file.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Name of the output queue to receive messages from.</li>
-<li><strong>path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Path to the file that messages should be written to.</li>
-<li><strong>in_temp</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – If True or ‘True’, the path will be
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; Name of the output queue to receive messages from.</li>
+<li><strong>path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; Path to the file that messages should be written to.</li>
+<li><strong>in_temp</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) &#8211; If True or &#8216;True&#8217;, the path will be
 considered relative to the temporary directory. Defaults to False.</li>
-<li><strong>**kwargs</strong> – Additional keyword arguments are passed to the parent class.</li>
+<li><strong>**kwargs</strong> &#8211; Additional keyword arguments are passed to the parent class.</li>
 </ul>
 </td>
 </tr>
@@ -399,15 +400,15 @@ considered relative to the temporary directory. Defaults to False.</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Name of the output queue to receive messages from.</li>
-<li><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) – Path to the file that messages should be written to
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; Name of the output queue to receive messages from.</li>
+<li><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) &#8211; Path to the file that messages should be written to
 or dictionary containing the filepath and other keyword arguments
 to be passed to the created AsciiFile object.</li>
-<li><strong>comment</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – String that should be used to identify
-comments. Default set by <code class="xref py py-class docutils literal notranslate"><span class="pre">AsciiFile</span></code>.</li>
-<li><strong>newline</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – String that should be used to identify
-the end of a line. Default set by <code class="xref py py-class docutils literal notranslate"><span class="pre">AsciiFile</span></code>.</li>
-<li><strong>**kwargs</strong> – Additional keyword arguments are passed to parent class.</li>
+<li><strong>comment</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) &#8211; String that should be used to identify
+comments. Default set by <code class="xref py py-class docutils literal"><span class="pre">AsciiFile</span></code>.</li>
+<li><strong>newline</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) &#8211; String that should be used to identify
+the end of a line. Default set by <code class="xref py py-class docutils literal"><span class="pre">AsciiFile</span></code>.</li>
+<li><strong>**kwargs</strong> &#8211; Additional keyword arguments are passed to parent class.</li>
 </ul>
 </td>
 </tr>
@@ -424,9 +425,9 @@ the end of a line. Default set by <code class="xref py py-class docutils literal
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Name of the queue that messages should be sent to.</li>
-<li><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Path to the file that messages should be read from.</li>
-<li><strong>**kwargs</strong> – Additional keyword arguments are passed to the parent class.</li>
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; Name of the queue that messages should be sent to.</li>
+<li><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; Path to the file that messages should be read from.</li>
+<li><strong>**kwargs</strong> &#8211; Additional keyword arguments are passed to the parent class.</li>
 </ul>
 </td>
 </tr>
@@ -443,11 +444,11 @@ the end of a line. Default set by <code class="xref py py-class docutils literal
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Name of the output queue to receive messages from.</li>
-<li><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) – Path to the file that messages should be written to.</li>
-<li><strong>delimiter</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – String that should be used to separate
-columns. Defaults to ‘t’.</li>
-<li><strong>**kwargs</strong> – Additional keyword arguments are passed to parent class.</li>
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; Name of the output queue to receive messages from.</li>
+<li><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) &#8211; Path to the file that messages should be written to.</li>
+<li><strong>delimiter</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) &#8211; String that should be used to separate
+columns. Defaults to &#8216;t&#8217;.</li>
+<li><strong>**kwargs</strong> &#8211; Additional keyword arguments are passed to parent class.</li>
 </ul>
 </td>
 </tr>
@@ -470,9 +471,9 @@ columns. Defaults to ‘t’.</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Name of the queue that messages should be sent to.</li>
-<li><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Path to the file that messages should be read from.</li>
-<li><strong>**kwargs</strong> – Additional keyword arguments are passed to the parent class.</li>
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; Name of the queue that messages should be sent to.</li>
+<li><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; Path to the file that messages should be read from.</li>
+<li><strong>**kwargs</strong> &#8211; Additional keyword arguments are passed to the parent class.</li>
 </ul>
 </td>
 </tr>
@@ -489,9 +490,9 @@ columns. Defaults to ‘t’.</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Name of the queue that messages should be sent to.</li>
-<li><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Path to the file that messages should be read from.</li>
-<li><strong>**kwargs</strong> – Additional keyword arguments are passed to the parent class.</li>
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; Name of the queue that messages should be sent to.</li>
+<li><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; Path to the file that messages should be read from.</li>
+<li><strong>**kwargs</strong> &#8211; Additional keyword arguments are passed to the parent class.</li>
 </ul>
 </td>
 </tr>
@@ -508,9 +509,9 @@ columns. Defaults to ‘t’.</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Name of the output queue to receive messages from.</li>
-<li><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Path to the file that messages should be written to.</li>
-<li><strong>**kwargs</strong> – Additional keyword arguments are passed to parent class.</li>
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; Name of the output queue to receive messages from.</li>
+<li><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; Path to the file that messages should be written to.</li>
+<li><strong>**kwargs</strong> &#8211; Additional keyword arguments are passed to parent class.</li>
 </ul>
 </td>
 </tr>
@@ -524,17 +525,17 @@ columns. Defaults to ‘t’.</li>
 <dl class="class">
 <dt id="cis_interface.drivers.InputDriver.InputDriver">
 <em class="property">class </em><code class="descclassname">cis_interface.drivers.InputDriver.</code><code class="descname">InputDriver</code><span class="sig-paren">(</span><em>name</em>, <em>args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/InputDriver.html#InputDriver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.drivers.InputDriver.InputDriver" title="Permalink to this definition">¶</a></dt>
-<dd><p>Driver for receiving input from another model’s comm via a local comm.</p>
+<dd><p>Driver for receiving input from another model&#8217;s comm via a local comm.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The name of the local message comm that the driver should
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; The name of the local message comm that the driver should
 connect to.</li>
-<li><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The name of the other message comm that the driver should
+<li><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; The name of the other message comm that the driver should
 connect to.</li>
-<li><strong>**kwargs</strong> – Additional keyword arguments are passed to parent class.</li>
+<li><strong>**kwargs</strong> &#8211; Additional keyword arguments are passed to parent class.</li>
 </ul>
 </td>
 </tr>
@@ -551,11 +552,11 @@ connect to.</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The name of the local message queue that the driver should
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; The name of the local message queue that the driver should
 connect to.</li>
-<li><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The name of the RabbitMQ message queue that the driver
+<li><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; The name of the RabbitMQ message queue that the driver
 should connect to.</li>
-<li><strong>**kwargs</strong> – Additional keyword arguments are passed to parent class.</li>
+<li><strong>**kwargs</strong> &#8211; Additional keyword arguments are passed to parent class.</li>
 </ul>
 </td>
 </tr>
@@ -569,17 +570,17 @@ should connect to.</li>
 <dl class="class">
 <dt>
 <em class="property">class </em><code class="descclassname">cis_interface.drivers.InputDriver.</code><code class="descname">InputDriver</code><span class="sig-paren">(</span><em>name</em>, <em>args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/drivers/InputDriver.html#InputDriver"><span class="viewcode-link">[source]</span></a></dt>
-<dd><p>Driver for receiving input from another model’s comm via a local comm.</p>
+<dd><p>Driver for receiving input from another model&#8217;s comm via a local comm.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The name of the local message comm that the driver should
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; The name of the local message comm that the driver should
 connect to.</li>
-<li><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The name of the other message comm that the driver should
+<li><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; The name of the other message comm that the driver should
 connect to.</li>
-<li><strong>**kwargs</strong> – Additional keyword arguments are passed to parent class.</li>
+<li><strong>**kwargs</strong> &#8211; Additional keyword arguments are passed to parent class.</li>
 </ul>
 </td>
 </tr>
@@ -596,11 +597,11 @@ connect to.</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The name of the local message queue that the driver should
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; The name of the local message queue that the driver should
 connect to.</li>
-<li><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The name of the RabbitMQ message queue that the driver
+<li><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; The name of the RabbitMQ message queue that the driver
 should connect to.</li>
-<li><strong>**kwargs</strong> – Additional keyword arguments are passed to parent class.</li>
+<li><strong>**kwargs</strong> &#8211; Additional keyword arguments are passed to parent class.</li>
 </ul>
 </td>
 </tr>
@@ -621,25 +622,25 @@ queues for RPC type functionality.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The name of the message queue set that the driver should
-connect to. (name + “_IN” and name + “_OUT”)</li>
-<li><strong>**kwargs</strong> – Additional keyword arguments are passed to parent class.</li>
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; The name of the message queue set that the driver should
+connect to. (name + &#8220;_IN&#8221; and name + &#8220;_OUT&#8221;)</li>
+<li><strong>**kwargs</strong> &#8211; Additional keyword arguments are passed to parent class.</li>
 </ul>
 </td>
 </tr>
 </tbody>
 </table>
 <dl class="attribute">
-<dt id="cis_interface.drivers.RPCDriver.RPCDriver.icomm">
-<code class="descname">icomm</code><a class="headerlink" href="#cis_interface.drivers.RPCDriver.RPCDriver.icomm" title="Permalink to this definition">¶</a></dt>
-<dd><p><a class="reference internal" href="cis_interface.drivers.html#module-cis_interface.drivers.CommDriver" title="cis_interface.drivers.CommDriver"><code class="xref py py-class docutils literal notranslate"><span class="pre">cis_interface.drivers.CommDriver</span></code></a> – Driver for the input
+<dt id="RPCDriver.icomm">
+<code class="descname">icomm</code><a class="headerlink" href="#RPCDriver.icomm" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="cis_interface.drivers.html#module-cis_interface.drivers.CommDriver" title="cis_interface.drivers.CommDriver"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.drivers.CommDriver</span></code></a> &#8211; Driver for the input
 message queue.</p>
 </dd></dl>
 
 <dl class="attribute">
-<dt id="cis_interface.drivers.RPCDriver.RPCDriver.ocomm">
-<code class="descname">ocomm</code><a class="headerlink" href="#cis_interface.drivers.RPCDriver.RPCDriver.ocomm" title="Permalink to this definition">¶</a></dt>
-<dd><p><a class="reference internal" href="cis_interface.drivers.html#module-cis_interface.drivers.CommDriver" title="cis_interface.drivers.CommDriver"><code class="xref py py-class docutils literal notranslate"><span class="pre">cis_interface.drivers.CommDriver</span></code></a> – Driver for the output
+<dt id="RPCDriver.ocomm">
+<code class="descname">ocomm</code><a class="headerlink" href="#RPCDriver.ocomm" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="cis_interface.drivers.html#module-cis_interface.drivers.CommDriver" title="cis_interface.drivers.CommDriver"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.drivers.CommDriver</span></code></a> &#8211; Driver for the output
 message ueue.</p>
 </dd></dl>
 
@@ -658,7 +659,7 @@ message ueue.</p>
 <dl class="attribute">
 <dt id="cis_interface.drivers.RPCDriver.RPCDriver.comms_open">
 <code class="descname">comms_open</code><a class="headerlink" href="#cis_interface.drivers.RPCDriver.RPCDriver.comms_open" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>bool</em> – True if both input and output comms open.</p>
+<dd><p><em>bool</em> &#8211; True if both input and output comms open.</p>
 </dd></dl>
 
 <dl class="method">
@@ -676,19 +677,19 @@ message ueue.</p>
 <dl class="attribute">
 <dt id="cis_interface.drivers.RPCDriver.RPCDriver.is_valid">
 <code class="descname">is_valid</code><a class="headerlink" href="#cis_interface.drivers.RPCDriver.RPCDriver.is_valid" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>bool</em> – True if both comms are open and parent class is valid.</p>
+<dd><p><em>bool</em> &#8211; True if both comms are open and parent class is valid.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="cis_interface.drivers.RPCDriver.RPCDriver.n_msg_in">
 <code class="descname">n_msg_in</code><a class="headerlink" href="#cis_interface.drivers.RPCDriver.RPCDriver.n_msg_in" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>int</em> – The number of messages in the input comm.</p>
+<dd><p><em>int</em> &#8211; The number of messages in the input comm.</p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="cis_interface.drivers.RPCDriver.RPCDriver.n_msg_out">
 <code class="descname">n_msg_out</code><a class="headerlink" href="#cis_interface.drivers.RPCDriver.RPCDriver.n_msg_out" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>int</em> – The number of messages in the output comm.</p>
+<dd><p><em>int</em> &#8211; The number of messages in the output comm.</p>
 </dd></dl>
 
 <dl class="method">
@@ -712,8 +713,8 @@ message ueue.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>*args</strong> – Arguments are passed to input comm recv method.</li>
-<li><strong>**kwargs</strong> – Keyword arguments are passed to input comm recv method.</li>
+<li><strong>*args</strong> &#8211; Arguments are passed to input comm recv method.</li>
+<li><strong>**kwargs</strong> &#8211; Keyword arguments are passed to input comm recv method.</li>
 </ul>
 </td>
 </tr>
@@ -725,7 +726,7 @@ message ueue.</p>
 </p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.6)">tuple</a> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)">bool</a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)">str</a>)</p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)">tuple</a> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)">bool</a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a>)</p>
 </td>
 </tr>
 </tbody>
@@ -741,8 +742,8 @@ message ueue.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>*args</strong> – Arguments are passed to input comm recv_nolimit method.</li>
-<li><strong>**kwargs</strong> – Keyword arguments are passed to input comm recv_nolimit
+<li><strong>*args</strong> &#8211; Arguments are passed to input comm recv_nolimit method.</li>
+<li><strong>**kwargs</strong> &#8211; Keyword arguments are passed to input comm recv_nolimit
 method.</li>
 </ul>
 </td>
@@ -755,7 +756,7 @@ method.</li>
 </p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.6)">tuple</a> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)">bool</a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)">str</a>)</p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)">tuple</a> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)">bool</a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a>)</p>
 </td>
 </tr>
 </tbody>
@@ -771,16 +772,16 @@ method.</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>data</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Message to be sent.</li>
-<li><strong>*args</strong> – Arguments are passed to output comm send method.</li>
-<li><strong>**kwargs</strong> – Keyword arguments are passed to output comm send method.</li>
+<li><strong>data</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; Message to be sent.</li>
+<li><strong>*args</strong> &#8211; Arguments are passed to output comm send method.</li>
+<li><strong>**kwargs</strong> &#8211; Keyword arguments are passed to output comm send method.</li>
 </ul>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Succes or failure of send.</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)">bool</a></p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)">bool</a></p>
 </td>
 </tr>
 </tbody>
@@ -796,9 +797,9 @@ method.</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>data</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Message to be sent.</li>
-<li><strong>*args</strong> – Arguments are passed to output comm send_nolimit method.</li>
-<li><strong>**kwargs</strong> – Keyword arguments are passed to output comm send_nolimit
+<li><strong>data</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; Message to be sent.</li>
+<li><strong>*args</strong> &#8211; Arguments are passed to output comm send_nolimit method.</li>
+<li><strong>**kwargs</strong> &#8211; Keyword arguments are passed to output comm send_nolimit
 method.</li>
 </ul>
 </td>
@@ -806,7 +807,7 @@ method.</li>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Succes or failure of send.</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)">bool</a></p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)">bool</a></p>
 </td>
 </tr>
 </tbody>
@@ -842,8 +843,8 @@ method.</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>*args</strong> – Arguments are passed to parent class.</li>
-<li><strong>**kwargs</strong> – Keyword arguments are passed to parent class.</li>
+<li><strong>*args</strong> &#8211; Arguments are passed to parent class.</li>
+<li><strong>**kwargs</strong> &#8211; Keyword arguments are passed to parent class.</li>
 </ul>
 </td>
 </tr>
@@ -860,8 +861,8 @@ method.</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>*args</strong> – Arguments are passed to parent class.</li>
-<li><strong>**kwargs</strong> – Keyword arguments are passed to parent class.</li>
+<li><strong>*args</strong> &#8211; Arguments are passed to parent class.</li>
+<li><strong>**kwargs</strong> &#8211; Keyword arguments are passed to parent class.</li>
 </ul>
 </td>
 </tr>
@@ -914,7 +915,7 @@ method.</li>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'0.3.0',
+            VERSION:'0.4+0.gd8a2a4f.dirty',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
@@ -925,15 +926,20 @@ method.</li>
       <script type="text/javascript" src="_static/jquery.js"></script>
       <script type="text/javascript" src="_static/underscore.js"></script>
       <script type="text/javascript" src="_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 
   
 
-  <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
 
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.Navigation.enable(true);
+          
+          SphinxRtdTheme.Navigation.enableSticky();
+          
       });
   </script> 
 

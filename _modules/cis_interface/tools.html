@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>cis_interface.tools &mdash; cis_interface 0.3.0 documentation</title>
+  <title>cis_interface.tools &mdash; cis_interface 0.4+0.gd8a2a4f.dirty documentation</title>
   
 
   
@@ -24,7 +24,8 @@
 
   
 
-  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  
+    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/theme_overrides.css" type="text/css" />
     <link rel="index" title="Index" href="../../genindex.html" />
@@ -57,7 +58,7 @@
             
             
               <div class="version">
-                0.3
+                0.4+0.gd8a2a4f.dirty
               </div>
             
           
@@ -98,6 +99,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../code.html">Code</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../examples/examples_toc.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../release.html">Release Steps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../release.html#docs-checkout">Docs Checkout</a></li>
 </ul>
 
             
@@ -199,8 +201,8 @@
         <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Could not located MainThread&quot;</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="check_threads"><a class="viewcode-back" href="../../code_python.html#cis_interface.tools.check_threads">[docs]</a><span class="k">def</span> <span class="nf">check_threads</span><span class="p">():</span>  <span class="c1"># pragma: debug</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Check for threads that are still running.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="check_threads"><a class="viewcode-back" href="../../code_python.html#cis_interface.drivers.ModelDriver.check_threads">[docs]</a><span class="k">def</span> <span class="nf">check_threads</span><span class="p">():</span>  <span class="c1"># pragma: debug</span>
+    <span class="sd">r&quot;&quot;&quot;Check for threads that are still running.&quot;&quot;&quot;</span>
     <span class="k">global</span> <span class="n">_thread_registry</span>
     <span class="c1"># logging.info(&quot;Checking %d threads&quot; % len(_thread_registry))</span>
     <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">_thread_registry</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
@@ -212,8 +214,8 @@
             <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> thread running&quot;</span> <span class="o">%</span> <span class="n">t</span><span class="o">.</span><span class="n">name</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="check_locks"><a class="viewcode-back" href="../../code_python.html#cis_interface.tools.check_locks">[docs]</a><span class="k">def</span> <span class="nf">check_locks</span><span class="p">():</span>  <span class="c1"># pragma: debug</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Check for locks in lock registry that are locked.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="check_locks"><a class="viewcode-back" href="../../code_python.html#cis_interface.drivers.ModelDriver.check_locks">[docs]</a><span class="k">def</span> <span class="nf">check_locks</span><span class="p">():</span>  <span class="c1"># pragma: debug</span>
+    <span class="sd">r&quot;&quot;&quot;Check for locks in lock registry that are locked.&quot;&quot;&quot;</span>
     <span class="k">global</span> <span class="n">_lock_registry</span>
     <span class="c1"># logging.info(&quot;Checking %d locks&quot; % len(_lock_registry))</span>
     <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">_lock_registry</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
@@ -224,16 +226,16 @@
             <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Lock could not be acquired: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">k</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="check_sockets"><a class="viewcode-back" href="../../code_python.html#cis_interface.tools.check_sockets">[docs]</a><span class="k">def</span> <span class="nf">check_sockets</span><span class="p">():</span>  <span class="c1"># pragma: debug</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Check registered sockets.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="check_sockets"><a class="viewcode-back" href="../../code_python.html#cis_interface.drivers.ModelDriver.check_sockets">[docs]</a><span class="k">def</span> <span class="nf">check_sockets</span><span class="p">():</span>  <span class="c1"># pragma: debug</span>
+    <span class="sd">r&quot;&quot;&quot;Check registered sockets.&quot;&quot;&quot;</span>
     <span class="kn">from</span> <span class="nn">cis_interface.communication</span> <span class="k">import</span> <span class="n">cleanup_comms</span>
     <span class="n">count</span> <span class="o">=</span> <span class="n">cleanup_comms</span><span class="p">(</span><span class="s1">&#39;ZMQComm&#39;</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">count</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
         <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%d</span><span class="s2"> sockets closed.&quot;</span> <span class="o">%</span> <span class="n">count</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="cis_atexit"><a class="viewcode-back" href="../../code_python.html#cis_interface.tools.cis_atexit">[docs]</a><span class="k">def</span> <span class="nf">cis_atexit</span><span class="p">():</span>  <span class="c1"># pragma: debug</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Things to do at exit.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="cis_atexit"><a class="viewcode-back" href="../../code_python.html#cis_interface.drivers.ModelDriver.cis_atexit">[docs]</a><span class="k">def</span> <span class="nf">cis_atexit</span><span class="p">():</span>  <span class="c1"># pragma: debug</span>
+    <span class="sd">r&quot;&quot;&quot;Things to do at exit.&quot;&quot;&quot;</span>
     <span class="n">check_locks</span><span class="p">()</span>
     <span class="n">check_threads</span><span class="p">()</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;CIS_SUBPROCESS&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
@@ -247,8 +249,8 @@
 <span class="n">atexit</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">cis_atexit</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="locate_path"><a class="viewcode-back" href="../../code_python.html#cis_interface.tools.locate_path">[docs]</a><span class="k">def</span> <span class="nf">locate_path</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">basedir</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="p">)):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Find the full path to a file using where on Windows.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="locate_path"><a class="viewcode-back" href="../../code_python.html#cis_interface.drivers.ModelDriver.locate_path">[docs]</a><span class="k">def</span> <span class="nf">locate_path</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">basedir</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="p">)):</span>
+    <span class="sd">r&quot;&quot;&quot;Find the full path to a file using where on Windows.&quot;&quot;&quot;</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">_is_win</span><span class="p">:</span>  <span class="c1"># pragma: windows</span>
             <span class="n">out</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">check_output</span><span class="p">([</span><span class="s2">&quot;dir&quot;</span><span class="p">,</span> <span class="n">fname</span><span class="p">,</span> <span class="s2">&quot;/s/b&quot;</span><span class="p">],</span> <span class="n">shell</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
@@ -269,8 +271,8 @@
     <span class="k">return</span> <span class="n">out</span></div>
 
 
-<div class="viewcode-block" id="is_ipc_installed"><a class="viewcode-back" href="../../code_python.html#cis_interface.tools.is_ipc_installed">[docs]</a><span class="k">def</span> <span class="nf">is_ipc_installed</span><span class="p">():</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine if the IPC libraries are installed.</span>
+<div class="viewcode-block" id="is_ipc_installed"><a class="viewcode-back" href="../../code_python.html#cis_interface.drivers.ModelDriver.is_ipc_installed">[docs]</a><span class="k">def</span> <span class="nf">is_ipc_installed</span><span class="p">():</span>
+    <span class="sd">r&quot;&quot;&quot;Determine if the IPC libraries are installed.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        bool: True if the IPC libraries are installed, False otherwise.</span>
@@ -279,8 +281,8 @@
     <span class="k">return</span> <span class="p">(</span><span class="n">platform</span><span class="o">.</span><span class="n">_is_linux</span> <span class="ow">or</span> <span class="n">platform</span><span class="o">.</span><span class="n">_is_osx</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="is_zmq_installed"><a class="viewcode-back" href="../../code_python.html#cis_interface.tools.is_zmq_installed">[docs]</a><span class="k">def</span> <span class="nf">is_zmq_installed</span><span class="p">(</span><span class="n">check_c</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine if the libczmq &amp; libzmq libraries are installed.</span>
+<div class="viewcode-block" id="is_zmq_installed"><a class="viewcode-back" href="../../code_python.html#cis_interface.drivers.ModelDriver.is_zmq_installed">[docs]</a><span class="k">def</span> <span class="nf">is_zmq_installed</span><span class="p">(</span><span class="n">check_c</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">r&quot;&quot;&quot;Determine if the libczmq &amp; libzmq libraries are installed.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        bool: True if both libraries are installed, False otherwise.</span>
@@ -334,8 +336,8 @@
 <span class="n">CIS_MSG_BUF</span> <span class="o">=</span> <span class="mi">1024</span> <span class="o">*</span> <span class="mi">2</span>
 
 
-<div class="viewcode-block" id="get_default_comm"><a class="viewcode-back" href="../../code_python.html#cis_interface.tools.get_default_comm">[docs]</a><span class="k">def</span> <span class="nf">get_default_comm</span><span class="p">():</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the default comm that should be used for message passing.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="get_default_comm"><a class="viewcode-back" href="../../code_python.html#cis_interface.drivers.ModelDriver.get_default_comm">[docs]</a><span class="k">def</span> <span class="nf">get_default_comm</span><span class="p">():</span>
+    <span class="sd">r&quot;&quot;&quot;Get the default comm that should be used for message passing.&quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="s1">&#39;CIS_DEFAULT_COMM&#39;</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">:</span>
         <span class="n">_default_comm</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;CIS_DEFAULT_COMM&#39;</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">_default_comm</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;ZMQComm&#39;</span><span class="p">,</span> <span class="s1">&#39;IPCComm&#39;</span><span class="p">,</span> <span class="s1">&#39;RMQComm&#39;</span><span class="p">]:</span>  <span class="c1"># pragma: debug</span>
@@ -352,8 +354,8 @@
     <span class="k">return</span> <span class="n">_default_comm</span></div>
 
 
-<div class="viewcode-block" id="get_CIS_MSG_MAX"><a class="viewcode-back" href="../../code_python.html#cis_interface.tools.get_CIS_MSG_MAX">[docs]</a><span class="k">def</span> <span class="nf">get_CIS_MSG_MAX</span><span class="p">():</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the maximum message size for the default comm.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="get_CIS_MSG_MAX"><a class="viewcode-back" href="../../code_python.html#cis_interface.drivers.ModelDriver.get_CIS_MSG_MAX">[docs]</a><span class="k">def</span> <span class="nf">get_CIS_MSG_MAX</span><span class="p">():</span>
+    <span class="sd">r&quot;&quot;&quot;Get the maximum message size for the default comm.&quot;&quot;&quot;</span>
     <span class="n">_default_comm</span> <span class="o">=</span> <span class="n">get_default_comm</span><span class="p">()</span>
     <span class="k">if</span> <span class="n">_default_comm</span> <span class="o">==</span> <span class="s1">&#39;IPCComm&#39;</span><span class="p">:</span>
         <span class="c1"># OS X limit is 2kb</span>
@@ -368,8 +370,8 @@
 
 <span class="c1"># https://stackoverflow.com/questions/35772001/</span>
 <span class="c1"># how-to-handle-the-signal-in-python-on-windows-machine</span>
-<div class="viewcode-block" id="kill"><a class="viewcode-back" href="../../code_python.html#cis_interface.tools.kill">[docs]</a><span class="k">def</span> <span class="nf">kill</span><span class="p">(</span><span class="n">pid</span><span class="p">,</span> <span class="n">signum</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Kill process by mapping signal number.</span>
+<div class="viewcode-block" id="kill"><a class="viewcode-back" href="../../code_python.html#cis_interface.drivers.ModelDriver.kill">[docs]</a><span class="k">def</span> <span class="nf">kill</span><span class="p">(</span><span class="n">pid</span><span class="p">,</span> <span class="n">signum</span><span class="p">):</span>
+    <span class="sd">r&quot;&quot;&quot;Kill process by mapping signal number.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        pid (int): Process ID.</span>
@@ -414,8 +416,8 @@
         <span class="n">os</span><span class="o">.</span><span class="n">kill</span><span class="p">(</span><span class="n">pid</span><span class="p">,</span> <span class="n">signum</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="sleep"><a class="viewcode-back" href="../../code_python.html#cis_interface.tools.sleep">[docs]</a><span class="k">def</span> <span class="nf">sleep</span><span class="p">(</span><span class="n">interval</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Sleep for a specified number of seconds.</span>
+<div class="viewcode-block" id="sleep"><a class="viewcode-back" href="../../code_python.html#cis_interface.drivers.ModelDriver.sleep">[docs]</a><span class="k">def</span> <span class="nf">sleep</span><span class="p">(</span><span class="n">interval</span><span class="p">):</span>
+    <span class="sd">r&quot;&quot;&quot;Sleep for a specified number of seconds.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        interval (float): Time in seconds that process should sleep.</span>
@@ -441,8 +443,8 @@
         <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">interval</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="eval_kwarg"><a class="viewcode-back" href="../../code_python.html#cis_interface.tools.eval_kwarg">[docs]</a><span class="k">def</span> <span class="nf">eval_kwarg</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;If x is a string, eval it. Otherwise just return it.</span>
+<div class="viewcode-block" id="eval_kwarg"><a class="viewcode-back" href="../../code_python.html#cis_interface.drivers.ModelDriver.eval_kwarg">[docs]</a><span class="k">def</span> <span class="nf">eval_kwarg</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="sd">r&quot;&quot;&quot;If x is a string, eval it. Otherwise just return it.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        x (str, obj): String to be evaluated as an object or an object.</span>
@@ -459,8 +461,8 @@
     <span class="k">return</span> <span class="n">x</span></div>
 
 
-<div class="viewcode-block" id="CisPopen"><a class="viewcode-back" href="../../code_python.html#cis_interface.tools.CisPopen">[docs]</a><span class="k">class</span> <span class="nc">CisPopen</span><span class="p">(</span><span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Uses Popen to open a process without a buffer. If not already set,</span>
+<div class="viewcode-block" id="CisPopen"><a class="viewcode-back" href="../../code_python.html#cis_interface.drivers.ModelDriver.CisPopen">[docs]</a><span class="k">class</span> <span class="nc">CisPopen</span><span class="p">(</span><span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">):</span>
+    <span class="sd">r&quot;&quot;&quot;Uses Popen to open a process without a buffer. If not already set,</span>
 <span class="sd">    the keyword arguments &#39;bufsize&#39;, &#39;stdout&#39;, and &#39;stderr&#39; are set to</span>
 <span class="sd">    0, subprocess.PIPE, and subprocess.STDOUT respectively. This sets the</span>
 <span class="sd">    output stream to unbuffered and directs both stdout and stderr to the</span>
@@ -496,18 +498,18 @@
                 <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;preexec_fn&#39;</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">setpgrp</span><span class="p">)</span>
         <span class="c1"># if platform._is_win:  # pragma: windows</span>
         <span class="c1">#     kwargs.setdefault(&#39;universal_newlines&#39;, True)</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">CisPopen</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">cmd_args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">CisPopen</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">cmd_args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
-<div class="viewcode-block" id="CisPopen.kill"><a class="viewcode-back" href="../../code_python.html#cis_interface.tools.CisPopen.kill">[docs]</a>    <span class="k">def</span> <span class="nf">kill</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;On windows using CTRL_BREAK_EVENT to kill the process.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="CisPopen.kill"><a class="viewcode-back" href="../../code_python.html#cis_interface.drivers.ModelDriver.CisPopen.kill">[docs]</a>    <span class="k">def</span> <span class="nf">kill</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">r&quot;&quot;&quot;On windows using CTRL_BREAK_EVENT to kill the process.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">_is_win</span><span class="p">:</span>  <span class="c1"># pragma: windows</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">send_signal</span><span class="p">(</span><span class="n">signal</span><span class="o">.</span><span class="n">CTRL_BREAK_EVENT</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="nb">super</span><span class="p">(</span><span class="n">CisPopen</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">kill</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div></div>
 
 
-<div class="viewcode-block" id="popen_nobuffer"><a class="viewcode-back" href="../../code_python.html#cis_interface.tools.popen_nobuffer">[docs]</a><span class="k">def</span> <span class="nf">popen_nobuffer</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Uses Popen to open a process without a buffer. If not already set,</span>
+<div class="viewcode-block" id="popen_nobuffer"><a class="viewcode-back" href="../../code_python.html#cis_interface.drivers.ModelDriver.popen_nobuffer">[docs]</a><span class="k">def</span> <span class="nf">popen_nobuffer</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">r&quot;&quot;&quot;Uses Popen to open a process without a buffer. If not already set,</span>
 <span class="sd">    the keyword arguments &#39;bufsize&#39;, &#39;stdout&#39;, and &#39;stderr&#39; are set to</span>
 <span class="sd">    0, subprocess.PIPE, and subprocess.STDOUT respectively. This sets the</span>
 <span class="sd">    output stream to unbuffered and directs both stdout and stderr to the</span>
@@ -529,8 +531,8 @@
     <span class="k">return</span> <span class="n">CisPopen</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="print_encoded"><a class="viewcode-back" href="../../code_python.html#cis_interface.tools.print_encoded">[docs]</a><span class="k">def</span> <span class="nf">print_encoded</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Print bytes to stdout, encoding if possible.</span>
+<div class="viewcode-block" id="print_encoded"><a class="viewcode-back" href="../../code_python.html#cis_interface.drivers.ModelDriver.print_encoded">[docs]</a><span class="k">def</span> <span class="nf">print_encoded</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">r&quot;&quot;&quot;Print bytes to stdout, encoding if possible.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        msg (str, bytes): Message to print.</span>
@@ -551,8 +553,8 @@
             <span class="nb">print</span><span class="p">(</span><span class="n">backwards</span><span class="o">.</span><span class="n">unicode2bytes</span><span class="p">(</span><span class="n">msg</span><span class="p">),</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="TimeOut"><a class="viewcode-back" href="../../code_python.html#cis_interface.tools.TimeOut">[docs]</a><span class="k">class</span> <span class="nc">TimeOut</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Class for checking if a period of time has been elapsed.</span>
+<div class="viewcode-block" id="TimeOut"><a class="viewcode-back" href="../../code_python.html#cis_interface.drivers.ModelDriver.TimeOut">[docs]</a><span class="k">class</span> <span class="nc">TimeOut</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">r&quot;&quot;&quot;Class for checking if a period of time has been elapsed.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        max_time (float, bbol): Maximum period of time that should elapse before</span>
@@ -576,12 +578,12 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">elapsed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;float: Total time that has elapsed since the start.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;float: Total time that has elapsed since the start.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">backwards</span><span class="o">.</span><span class="n">clock_time</span><span class="p">()</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_time</span>
     
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">is_out</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;bool: True if there is not any time remaining. False otherwise.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;bool: True if there is not any time remaining. False otherwise.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_time</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">False</span>
         <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">elapsed</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_time</span><span class="p">)</span></div>
@@ -599,8 +601,8 @@
 <span class="c1">#     return wrapper</span>
 
 
-<div class="viewcode-block" id="CisClass"><a class="viewcode-back" href="../../code_python.html#cis_interface.tools.CisClass">[docs]</a><span class="k">class</span> <span class="nc">CisClass</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">LoggerAdapter</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Base class for CiS classes.</span>
+<div class="viewcode-block" id="CisClass"><a class="viewcode-back" href="../../code_python.html#cis_interface.drivers.ModelDriver.CisClass">[docs]</a><span class="k">class</span> <span class="nc">CisClass</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">LoggerAdapter</span><span class="p">):</span>
+    <span class="sd">r&quot;&quot;&quot;Base class for CiS classes.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        name (str): Class name.</span>
@@ -658,31 +660,31 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_old_loglevel</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_old_encoding</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug_flag</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="n">class_name</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;&#39;&quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">CisClass</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__module__</span><span class="p">),</span>
+        <span class="n">class_name</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__class__</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;&#39;&quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">CisClass</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__module__</span><span class="p">),</span>
                                        <span class="p">{</span><span class="s1">&#39;cis_name&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
                                         <span class="s1">&#39;cis_class&#39;</span><span class="p">:</span> <span class="n">class_name</span><span class="p">})</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Name of the class object.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;Name of the class object.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_name</span>
 
-<div class="viewcode-block" id="CisClass.debug_log"><a class="viewcode-back" href="../../code_python.html#cis_interface.tools.CisClass.debug_log">[docs]</a>    <span class="k">def</span> <span class="nf">debug_log</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Turn on debugging.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="CisClass.debug_log"><a class="viewcode-back" href="../../code_python.html#cis_interface.drivers.ModelDriver.CisClass.debug_log">[docs]</a>    <span class="k">def</span> <span class="nf">debug_log</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
+        <span class="sd">r&quot;&quot;&quot;Turn on debugging.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_old_loglevel</span> <span class="o">=</span> <span class="n">cis_cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;debug&#39;</span><span class="p">,</span> <span class="s1">&#39;cis&#39;</span><span class="p">)</span>
         <span class="n">cis_cfg</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;debug&#39;</span><span class="p">,</span> <span class="s1">&#39;cis&#39;</span><span class="p">,</span> <span class="s1">&#39;DEBUG&#39;</span><span class="p">)</span>
         <span class="n">cfg_logging</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="CisClass.reset_log"><a class="viewcode-back" href="../../code_python.html#cis_interface.tools.CisClass.reset_log">[docs]</a>    <span class="k">def</span> <span class="nf">reset_log</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Resetting logging to prior value.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="CisClass.reset_log"><a class="viewcode-back" href="../../code_python.html#cis_interface.drivers.ModelDriver.CisClass.reset_log">[docs]</a>    <span class="k">def</span> <span class="nf">reset_log</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
+        <span class="sd">r&quot;&quot;&quot;Resetting logging to prior value.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_old_loglevel</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">cis_cfg</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;debug&#39;</span><span class="p">,</span> <span class="s1">&#39;cis&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_old_loglevel</span><span class="p">)</span>
             <span class="n">cfg_logging</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_old_loglevel</span> <span class="o">=</span> <span class="kc">None</span></div>
 
-<div class="viewcode-block" id="CisClass.as_str"><a class="viewcode-back" href="../../code_python.html#cis_interface.tools.CisClass.as_str">[docs]</a>    <span class="k">def</span> <span class="nf">as_str</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Return str version of object if it is not already a string.</span>
+<div class="viewcode-block" id="CisClass.as_str"><a class="viewcode-back" href="../../code_python.html#cis_interface.drivers.ModelDriver.CisClass.as_str">[docs]</a>    <span class="k">def</span> <span class="nf">as_str</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+        <span class="sd">r&quot;&quot;&quot;Return str version of object if it is not already a string.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            obj (object): Object that should be turned into a string.</span>
@@ -697,8 +699,8 @@
             <span class="n">obj_str</span> <span class="o">=</span> <span class="n">obj</span>
         <span class="k">return</span> <span class="n">obj_str</span></div>
 
-<div class="viewcode-block" id="CisClass.process"><a class="viewcode-back" href="../../code_python.html#cis_interface.tools.CisClass.process">[docs]</a>    <span class="k">def</span> <span class="nf">process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Process logging message.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="CisClass.process"><a class="viewcode-back" href="../../code_python.html#cis_interface.drivers.ModelDriver.CisClass.process">[docs]</a>    <span class="k">def</span> <span class="nf">process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">r&quot;&quot;&quot;Process logging message.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">_stack_in_log</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
             <span class="n">stack</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">stack</span><span class="p">()</span>
             <span class="n">the_class</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span>
@@ -711,22 +713,22 @@
         <span class="n">new_msg</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">as_str</span><span class="p">(</span><span class="n">msg</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">new_msg</span><span class="p">,</span> <span class="n">kwargs</span></div>
 
-<div class="viewcode-block" id="CisClass.display"><a class="viewcode-back" href="../../code_python.html#cis_interface.tools.CisClass.display">[docs]</a>    <span class="k">def</span> <span class="nf">display</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Print a message, no log.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="CisClass.display"><a class="viewcode-back" href="../../code_python.html#cis_interface.drivers.ModelDriver.CisClass.display">[docs]</a>    <span class="k">def</span> <span class="nf">display</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">r&quot;&quot;&quot;Print a message, no log.&quot;&quot;&quot;</span>
         <span class="n">msg</span><span class="p">,</span> <span class="n">kwargs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">process</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">)</span>
         <span class="nb">print</span><span class="p">(</span><span class="n">msg</span> <span class="o">%</span> <span class="n">args</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="CisClass.verbose_debug"><a class="viewcode-back" href="../../code_python.html#cis_interface.tools.CisClass.verbose_debug">[docs]</a>    <span class="k">def</span> <span class="nf">verbose_debug</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Log a verbose debug level message.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="CisClass.verbose_debug"><a class="viewcode-back" href="../../code_python.html#cis_interface.drivers.ModelDriver.CisClass.verbose_debug">[docs]</a>    <span class="k">def</span> <span class="nf">verbose_debug</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">r&quot;&quot;&quot;Log a verbose debug level message.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
         
-<div class="viewcode-block" id="CisClass.dummy_log"><a class="viewcode-back" href="../../code_python.html#cis_interface.tools.CisClass.dummy_log">[docs]</a>    <span class="k">def</span> <span class="nf">dummy_log</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Dummy log function that dosn&#39;t do anything.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="CisClass.dummy_log"><a class="viewcode-back" href="../../code_python.html#cis_interface.drivers.ModelDriver.CisClass.dummy_log">[docs]</a>    <span class="k">def</span> <span class="nf">dummy_log</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">r&quot;&quot;&quot;Dummy log function that dosn&#39;t do anything.&quot;&quot;&quot;</span>
         <span class="k">pass</span></div>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">special_debug</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Log debug level message contingent of supression flag.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;Log debug level message contingent of supression flag.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">suppress_special_debug</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span>
         <span class="k">else</span><span class="p">:</span>
@@ -734,13 +736,13 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">error</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Log an error level message.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;Log an error level message.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;ERROR&#39;</span><span class="p">)</span>
         <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">CisClass</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">error</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">exception</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Log an exception level message.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;Log an exception level message.&quot;&quot;&quot;</span>
         <span class="n">exc_info</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">exc_info</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">exc_info</span> <span class="o">!=</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;ERROR&#39;</span><span class="p">)</span>
@@ -748,8 +750,8 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">error</span>
 
-<div class="viewcode-block" id="CisClass.raise_error"><a class="viewcode-back" href="../../code_python.html#cis_interface.tools.CisClass.raise_error">[docs]</a>    <span class="k">def</span> <span class="nf">raise_error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Raise an exception, logging it first.</span>
+<div class="viewcode-block" id="CisClass.raise_error"><a class="viewcode-back" href="../../code_python.html#cis_interface.drivers.ModelDriver.CisClass.raise_error">[docs]</a>    <span class="k">def</span> <span class="nf">raise_error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+        <span class="sd">r&quot;&quot;&quot;Raise an exception, logging it first.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            e (Exception): Exception to raise.</span>
@@ -761,8 +763,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
         <span class="k">raise</span> <span class="n">e</span></div>
 
-<div class="viewcode-block" id="CisClass.print_encoded"><a class="viewcode-back" href="../../code_python.html#cis_interface.tools.CisClass.print_encoded">[docs]</a>    <span class="k">def</span> <span class="nf">print_encoded</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Print bytes to stdout, encoding if possible.</span>
+<div class="viewcode-block" id="CisClass.print_encoded"><a class="viewcode-back" href="../../code_python.html#cis_interface.drivers.ModelDriver.CisClass.print_encoded">[docs]</a>    <span class="k">def</span> <span class="nf">print_encoded</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">r&quot;&quot;&quot;Print bytes to stdout, encoding if possible.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            msg (str, bytes): Message to print.</span>
@@ -773,15 +775,15 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">print_encoded</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="CisClass.printStatus"><a class="viewcode-back" href="../../code_python.html#cis_interface.tools.CisClass.printStatus">[docs]</a>    <span class="k">def</span> <span class="nf">printStatus</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Print the class status.&quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">(</span><span class="si">%s</span><span class="s1">): state:&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__module__</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span></div>
+<div class="viewcode-block" id="CisClass.printStatus"><a class="viewcode-back" href="../../code_python.html#cis_interface.drivers.ModelDriver.CisClass.printStatus">[docs]</a>    <span class="k">def</span> <span class="nf">printStatus</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">r&quot;&quot;&quot;Print the class status.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">(</span><span class="si">%s</span><span class="s1">): state:&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__module__</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">_task_with_output</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sched_out</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
-<div class="viewcode-block" id="CisClass.sched_task"><a class="viewcode-back" href="../../code_python.html#cis_interface.tools.CisClass.sched_task">[docs]</a>    <span class="k">def</span> <span class="nf">sched_task</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">func</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">[],</span> <span class="n">kwargs</span><span class="o">=</span><span class="p">{},</span> <span class="n">store_output</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Schedule a task that will be executed after a certain time has</span>
+<div class="viewcode-block" id="CisClass.sched_task"><a class="viewcode-back" href="../../code_python.html#cis_interface.drivers.ModelDriver.CisClass.sched_task">[docs]</a>    <span class="k">def</span> <span class="nf">sched_task</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">func</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">[],</span> <span class="n">kwargs</span><span class="o">=</span><span class="p">{},</span> <span class="n">store_output</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">r&quot;&quot;&quot;Schedule a task that will be executed after a certain time has</span>
 <span class="sd">        elapsed.</span>
 
 <span class="sd">        Args:</span>
@@ -805,8 +807,8 @@
             <span class="n">tobj</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Timer</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">func</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">=</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="n">tobj</span><span class="o">.</span><span class="n">start</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="CisClass.sleep"><a class="viewcode-back" href="../../code_python.html#cis_interface.tools.CisClass.sleep">[docs]</a>    <span class="k">def</span> <span class="nf">sleep</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Have the class sleep for some period of time.</span>
+<div class="viewcode-block" id="CisClass.sleep"><a class="viewcode-back" href="../../code_python.html#cis_interface.drivers.ModelDriver.CisClass.sleep">[docs]</a>    <span class="k">def</span> <span class="nf">sleep</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">r&quot;&quot;&quot;Have the class sleep for some period of time.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            t (float, optional): Time that class should sleep for. If not</span>
@@ -819,11 +821,11 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">timeout_key</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;str: Key identifying calling object and method.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;str: Key identifying calling object and method.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_timeout_key</span><span class="p">()</span>
 
-<div class="viewcode-block" id="CisClass.get_timeout_key"><a class="viewcode-back" href="../../code_python.html#cis_interface.tools.CisClass.get_timeout_key">[docs]</a>    <span class="k">def</span> <span class="nf">get_timeout_key</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key_level</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">key_suffix</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Return a key for a given level in the stack, relative to the</span>
+<div class="viewcode-block" id="CisClass.get_timeout_key"><a class="viewcode-back" href="../../code_python.html#cis_interface.drivers.ModelDriver.CisClass.get_timeout_key">[docs]</a>    <span class="k">def</span> <span class="nf">get_timeout_key</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key_level</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">key_suffix</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">r&quot;&quot;&quot;Return a key for a given level in the stack, relative to the</span>
 <span class="sd">        function calling get_timeout_key.</span>
 
 <span class="sd">        Args:</span>
@@ -842,18 +844,18 @@
         <span class="k">if</span> <span class="n">_stack_in_timeout</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
             <span class="n">stack</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">stack</span><span class="p">()</span>
             <span class="n">fcn</span> <span class="o">=</span> <span class="n">stack</span><span class="p">[</span><span class="n">key_level</span> <span class="o">+</span> <span class="mi">2</span><span class="p">][</span><span class="mi">3</span><span class="p">]</span>
-            <span class="bp">cls</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">stack</span><span class="p">[</span><span class="n">key_level</span> <span class="o">+</span> <span class="mi">2</span><span class="p">][</span><span class="mi">1</span><span class="p">]))[</span><span class="mi">0</span><span class="p">]</span>
-            <span class="n">key</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">(</span><span class="si">%s</span><span class="s1">).</span><span class="si">%s</span><span class="s1">.</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">fcn</span><span class="p">,</span>
+            <span class="n">cls</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">stack</span><span class="p">[</span><span class="n">key_level</span> <span class="o">+</span> <span class="mi">2</span><span class="p">][</span><span class="mi">1</span><span class="p">]))[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">key</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">(</span><span class="si">%s</span><span class="s1">).</span><span class="si">%s</span><span class="s1">.</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">fcn</span><span class="p">,</span>
                                     <span class="n">threading</span><span class="o">.</span><span class="n">current_thread</span><span class="p">()</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">key</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">(</span><span class="si">%s</span><span class="s1">).</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;&#39;&quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+            <span class="n">key</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">(</span><span class="si">%s</span><span class="s1">).</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__class__</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;&#39;&quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
                                  <span class="n">threading</span><span class="o">.</span><span class="n">current_thread</span><span class="p">()</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">key_suffix</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">key</span> <span class="o">+=</span> <span class="n">key_suffix</span>
         <span class="k">return</span> <span class="n">key</span></div>
 
-<div class="viewcode-block" id="CisClass.start_timeout"><a class="viewcode-back" href="../../code_python.html#cis_interface.tools.CisClass.start_timeout">[docs]</a>    <span class="k">def</span> <span class="nf">start_timeout</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">key_level</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">key_suffix</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Start a timeout for the calling function/method.</span>
+<div class="viewcode-block" id="CisClass.start_timeout"><a class="viewcode-back" href="../../code_python.html#cis_interface.drivers.ModelDriver.CisClass.start_timeout">[docs]</a>    <span class="k">def</span> <span class="nf">start_timeout</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">key_level</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">key_suffix</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">r&quot;&quot;&quot;Start a timeout for the calling function/method.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            t (float, optional): Maximum time that the calling function should</span>
@@ -883,8 +885,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_timeouts</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">TimeOut</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_timeouts</span><span class="p">[</span><span class="n">key</span><span class="p">]</span></div>
 
-<div class="viewcode-block" id="CisClass.check_timeout"><a class="viewcode-back" href="../../code_python.html#cis_interface.tools.CisClass.check_timeout">[docs]</a>    <span class="k">def</span> <span class="nf">check_timeout</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">key_level</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Check timeout for the calling function/method.</span>
+<div class="viewcode-block" id="CisClass.check_timeout"><a class="viewcode-back" href="../../code_python.html#cis_interface.drivers.ModelDriver.CisClass.check_timeout">[docs]</a>    <span class="k">def</span> <span class="nf">check_timeout</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">key_level</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="sd">r&quot;&quot;&quot;Check timeout for the calling function/method.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            key (str, optional): Key for timeout that should be checked.</span>
@@ -908,8 +910,8 @@
         <span class="n">t</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_timeouts</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">t</span><span class="o">.</span><span class="n">is_out</span></div>
         
-<div class="viewcode-block" id="CisClass.stop_timeout"><a class="viewcode-back" href="../../code_python.html#cis_interface.tools.CisClass.stop_timeout">[docs]</a>    <span class="k">def</span> <span class="nf">stop_timeout</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">key_level</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">key_suffix</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">quiet</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Stop a timeout for the calling function method.</span>
+<div class="viewcode-block" id="CisClass.stop_timeout"><a class="viewcode-back" href="../../code_python.html#cis_interface.drivers.ModelDriver.CisClass.stop_timeout">[docs]</a>    <span class="k">def</span> <span class="nf">stop_timeout</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">key_level</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">key_suffix</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">quiet</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">r&quot;&quot;&quot;Stop a timeout for the calling function method.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            key (str, optional): Key for timeout that should be stopped.</span>
@@ -945,8 +947,8 @@
         <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">_timeouts</span><span class="p">[</span><span class="n">key</span><span class="p">]</span></div></div>
 
 
-<div class="viewcode-block" id="CisThread"><a class="viewcode-back" href="../../code_python.html#cis_interface.tools.CisThread">[docs]</a><span class="k">class</span> <span class="nc">CisThread</span><span class="p">(</span><span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">,</span> <span class="n">CisClass</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Thread for CiS that tracks when the thread is started and joined.</span>
+<div class="viewcode-block" id="CisThread"><a class="viewcode-back" href="../../code_python.html#cis_interface.drivers.ModelDriver.CisThread">[docs]</a><span class="k">class</span> <span class="nc">CisThread</span><span class="p">(</span><span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">,</span> <span class="n">CisClass</span><span class="p">):</span>
+    <span class="sd">r&quot;&quot;&quot;Thread for CiS that tracks when the thread is started and joined.</span>
 
 <span class="sd">    Attributes:</span>
 <span class="sd">        lock (threading.RLock): Lock for accessing the sockets from multiple</span>
@@ -964,8 +966,8 @@
             <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="n">thread_kwargs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="n">target</span><span class="p">,</span> <span class="n">group</span><span class="o">=</span><span class="n">group</span><span class="p">,</span>
                              <span class="n">args</span><span class="o">=</span><span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">=</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">CisThread</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">thread_kwargs</span><span class="p">)</span>
-        <span class="n">CisClass</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">cis_kwargs</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">CisThread</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">thread_kwargs</span><span class="p">)</span>
+        <span class="n">CisClass</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">cis_kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_cis_target</span> <span class="o">=</span> <span class="n">target</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_cis_args</span> <span class="o">=</span> <span class="n">args</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_cis_kwargs</span> <span class="o">=</span> <span class="n">kwargs</span>
@@ -986,44 +988,44 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">main_terminated</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;bool: True if the main thread has terminated.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;bool: True if the main thread has terminated.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">(</span><span class="ow">not</span> <span class="n">_main_thread</span><span class="o">.</span><span class="n">is_alive</span><span class="p">())</span>
         <span class="c1"># return (not self._calling_thread.is_alive())</span>
 
-<div class="viewcode-block" id="CisThread.set_started_flag"><a class="viewcode-back" href="../../code_python.html#cis_interface.tools.CisThread.set_started_flag">[docs]</a>    <span class="k">def</span> <span class="nf">set_started_flag</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Set the started flag for the thread to True.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="CisThread.set_started_flag"><a class="viewcode-back" href="../../code_python.html#cis_interface.drivers.ModelDriver.CisThread.set_started_flag">[docs]</a>    <span class="k">def</span> <span class="nf">set_started_flag</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">r&quot;&quot;&quot;Set the started flag for the thread to True.&quot;&quot;&quot;</span>
         <span class="c1"># self.start_event.set()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">start_flag</span> <span class="o">=</span> <span class="kc">True</span></div>
 
-<div class="viewcode-block" id="CisThread.set_terminated_flag"><a class="viewcode-back" href="../../code_python.html#cis_interface.tools.CisThread.set_terminated_flag">[docs]</a>    <span class="k">def</span> <span class="nf">set_terminated_flag</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Set the terminated flag for the thread to True.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="CisThread.set_terminated_flag"><a class="viewcode-back" href="../../code_python.html#cis_interface.drivers.ModelDriver.CisThread.set_terminated_flag">[docs]</a>    <span class="k">def</span> <span class="nf">set_terminated_flag</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">r&quot;&quot;&quot;Set the terminated flag for the thread to True.&quot;&quot;&quot;</span>
         <span class="c1"># self.terminate_event.set()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">terminate_flag</span> <span class="o">=</span> <span class="kc">True</span></div>
 
-<div class="viewcode-block" id="CisThread.unset_started_flag"><a class="viewcode-back" href="../../code_python.html#cis_interface.tools.CisThread.unset_started_flag">[docs]</a>    <span class="k">def</span> <span class="nf">unset_started_flag</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Set the started flag for the thread to False.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="CisThread.unset_started_flag"><a class="viewcode-back" href="../../code_python.html#cis_interface.drivers.ModelDriver.CisThread.unset_started_flag">[docs]</a>    <span class="k">def</span> <span class="nf">unset_started_flag</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
+        <span class="sd">r&quot;&quot;&quot;Set the started flag for the thread to False.&quot;&quot;&quot;</span>
         <span class="c1"># self.start_event.clear()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">start_flag</span> <span class="o">=</span> <span class="kc">False</span></div>
 
-<div class="viewcode-block" id="CisThread.unset_terminated_flag"><a class="viewcode-back" href="../../code_python.html#cis_interface.tools.CisThread.unset_terminated_flag">[docs]</a>    <span class="k">def</span> <span class="nf">unset_terminated_flag</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Set the terminated flag for the thread to False.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="CisThread.unset_terminated_flag"><a class="viewcode-back" href="../../code_python.html#cis_interface.drivers.ModelDriver.CisThread.unset_terminated_flag">[docs]</a>    <span class="k">def</span> <span class="nf">unset_terminated_flag</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
+        <span class="sd">r&quot;&quot;&quot;Set the terminated flag for the thread to False.&quot;&quot;&quot;</span>
         <span class="c1"># self.terminate_event.clear()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">terminated_flag</span> <span class="o">=</span> <span class="kc">False</span></div>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">was_started</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;bool: True if the thread was started. False otherwise.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;bool: True if the thread was started. False otherwise.&quot;&quot;&quot;</span>
         <span class="c1"># return self.start_event.is_set()</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_flag</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">was_terminated</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;bool: True if the thread was terminated. False otherwise.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;bool: True if the thread was terminated. False otherwise.&quot;&quot;&quot;</span>
         <span class="c1"># return self.terminate_event.is_set()</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">terminate_flag</span>
 
-<div class="viewcode-block" id="CisThread.start"><a class="viewcode-back" href="../../code_python.html#cis_interface.tools.CisThread.start">[docs]</a>    <span class="k">def</span> <span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Start thread and print info.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="CisThread.start"><a class="viewcode-back" href="../../code_python.html#cis_interface.drivers.ModelDriver.CisThread.start">[docs]</a>    <span class="k">def</span> <span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">r&quot;&quot;&quot;Start thread and print info.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">was_terminated</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">set_started_flag</span><span class="p">()</span>
@@ -1032,8 +1034,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_calling_thread</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">current_thread</span><span class="p">()</span></div>
         <span class="c1"># print(&quot;Thread = %s, Called by %s&quot; % (self.name, self._calling_thread.name))</span>
 
-<div class="viewcode-block" id="CisThread.run"><a class="viewcode-back" href="../../code_python.html#cis_interface.tools.CisThread.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Continue running until terminate event set.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="CisThread.run"><a class="viewcode-back" href="../../code_python.html#cis_interface.drivers.ModelDriver.CisThread.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">r&quot;&quot;&quot;Continue running until terminate event set.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Starting method&quot;</span><span class="p">)</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="nb">super</span><span class="p">(</span><span class="n">CisThread</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
@@ -1044,16 +1046,16 @@
                 <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
                     <span class="nb">delattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="CisThread.before_start"><a class="viewcode-back" href="../../code_python.html#cis_interface.tools.CisThread.before_start">[docs]</a>    <span class="k">def</span> <span class="nf">before_start</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Actions to perform on the main thread before starting the thread.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="CisThread.before_start"><a class="viewcode-back" href="../../code_python.html#cis_interface.drivers.ModelDriver.CisThread.before_start">[docs]</a>    <span class="k">def</span> <span class="nf">before_start</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">r&quot;&quot;&quot;Actions to perform on the main thread before starting the thread.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="CisThread.cleanup"><a class="viewcode-back" href="../../code_python.html#cis_interface.tools.CisThread.cleanup">[docs]</a>    <span class="k">def</span> <span class="nf">cleanup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Actions to perform to clean up the thread after it has stopped.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="CisThread.cleanup"><a class="viewcode-back" href="../../code_python.html#cis_interface.drivers.ModelDriver.CisThread.cleanup">[docs]</a>    <span class="k">def</span> <span class="nf">cleanup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">r&quot;&quot;&quot;Actions to perform to clean up the thread after it has stopped.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_cleanup_called</span> <span class="o">=</span> <span class="kc">True</span></div>
 
-<div class="viewcode-block" id="CisThread.wait"><a class="viewcode-back" href="../../code_python.html#cis_interface.tools.CisThread.wait">[docs]</a>    <span class="k">def</span> <span class="nf">wait</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Wait until thread finish to return using sleeps rather than</span>
+<div class="viewcode-block" id="CisThread.wait"><a class="viewcode-back" href="../../code_python.html#cis_interface.drivers.ModelDriver.CisThread.wait">[docs]</a>    <span class="k">def</span> <span class="nf">wait</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">r&quot;&quot;&quot;Wait until thread finish to return using sleeps rather than</span>
 <span class="sd">        blocking.</span>
 
 <span class="sd">        Args:</span>
@@ -1069,8 +1071,8 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">sleep</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">stop_timeout</span><span class="p">(</span><span class="n">key_level</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="CisThread.terminate"><a class="viewcode-back" href="../../code_python.html#cis_interface.tools.CisThread.terminate">[docs]</a>    <span class="k">def</span> <span class="nf">terminate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">no_wait</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Set the terminate event and wait for the thread to stop.</span>
+<div class="viewcode-block" id="CisThread.terminate"><a class="viewcode-back" href="../../code_python.html#cis_interface.drivers.ModelDriver.CisThread.terminate">[docs]</a>    <span class="k">def</span> <span class="nf">terminate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">no_wait</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">r&quot;&quot;&quot;Set the terminate event and wait for the thread to stop.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            no_wait (bool, optional): If True, terminate will not block until</span>
@@ -1093,8 +1095,8 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">wait</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">timeout</span><span class="p">)</span>
             <span class="k">assert</span><span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_alive</span><span class="p">())</span></div>
 
-<div class="viewcode-block" id="CisThread.atexit"><a class="viewcode-back" href="../../code_python.html#cis_interface.tools.CisThread.atexit">[docs]</a>    <span class="k">def</span> <span class="nf">atexit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Actions performed when python exits.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="CisThread.atexit"><a class="viewcode-back" href="../../code_python.html#cis_interface.drivers.ModelDriver.CisThread.atexit">[docs]</a>    <span class="k">def</span> <span class="nf">atexit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
+        <span class="sd">r&quot;&quot;&quot;Actions performed when python exits.&quot;&quot;&quot;</span>
         <span class="c1"># self.debug(&#39;is_alive = %s&#39;, self.is_alive())</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_alive</span><span class="p">():</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Thread alive at exit&#39;</span><span class="p">)</span>
@@ -1102,17 +1104,17 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">cleanup</span><span class="p">()</span></div></div>
 
 
-<div class="viewcode-block" id="CisThreadLoop"><a class="viewcode-back" href="../../code_python.html#cis_interface.tools.CisThreadLoop">[docs]</a><span class="k">class</span> <span class="nc">CisThreadLoop</span><span class="p">(</span><span class="n">CisThread</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Thread that will run a loop until the terminate event is called.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="CisThreadLoop"><a class="viewcode-back" href="../../code_python.html#cis_interface.drivers.ModelDriver.CisThreadLoop">[docs]</a><span class="k">class</span> <span class="nc">CisThreadLoop</span><span class="p">(</span><span class="n">CisThread</span><span class="p">):</span>
+    <span class="sd">r&quot;&quot;&quot;Thread that will run a loop until the terminate event is called.&quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">CisThreadLoop</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">CisThreadLoop</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_1st_main_terminated</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">break_flag</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">loop_event</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Event</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">loop_flag</span> <span class="o">=</span> <span class="kc">False</span>
 
-<div class="viewcode-block" id="CisThreadLoop.on_main_terminated"><a class="viewcode-back" href="../../code_python.html#cis_interface.tools.CisThreadLoop.on_main_terminated">[docs]</a>    <span class="k">def</span> <span class="nf">on_main_terminated</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dont_break</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Actions performed when 1st main terminated.</span>
+<div class="viewcode-block" id="CisThreadLoop.on_main_terminated"><a class="viewcode-back" href="../../code_python.html#cis_interface.drivers.ModelDriver.CisThreadLoop.on_main_terminated">[docs]</a>    <span class="k">def</span> <span class="nf">on_main_terminated</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dont_break</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
+        <span class="sd">r&quot;&quot;&quot;Actions performed when 1st main terminated.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            dont_break (bool, optional): If True, the break flag won&#39;t be set.</span>
@@ -1123,37 +1125,37 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="n">dont_break</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">set_break_flag</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="CisThreadLoop.set_break_flag"><a class="viewcode-back" href="../../code_python.html#cis_interface.tools.CisThreadLoop.set_break_flag">[docs]</a>    <span class="k">def</span> <span class="nf">set_break_flag</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Set the break flag for the thread to True.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="CisThreadLoop.set_break_flag"><a class="viewcode-back" href="../../code_python.html#cis_interface.drivers.ModelDriver.CisThreadLoop.set_break_flag">[docs]</a>    <span class="k">def</span> <span class="nf">set_break_flag</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">r&quot;&quot;&quot;Set the break flag for the thread to True.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">break_flag</span> <span class="o">=</span> <span class="kc">True</span></div>
 
-<div class="viewcode-block" id="CisThreadLoop.unset_break_flag"><a class="viewcode-back" href="../../code_python.html#cis_interface.tools.CisThreadLoop.unset_break_flag">[docs]</a>    <span class="k">def</span> <span class="nf">unset_break_flag</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Set the break flag for the thread to False.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="CisThreadLoop.unset_break_flag"><a class="viewcode-back" href="../../code_python.html#cis_interface.drivers.ModelDriver.CisThreadLoop.unset_break_flag">[docs]</a>    <span class="k">def</span> <span class="nf">unset_break_flag</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
+        <span class="sd">r&quot;&quot;&quot;Set the break flag for the thread to False.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">break_flag</span> <span class="o">=</span> <span class="kc">False</span></div>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">was_break</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;bool: True if the break flag was set.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;bool: True if the break flag was set.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">break_flag</span>
 
-<div class="viewcode-block" id="CisThreadLoop.set_loop_flag"><a class="viewcode-back" href="../../code_python.html#cis_interface.tools.CisThreadLoop.set_loop_flag">[docs]</a>    <span class="k">def</span> <span class="nf">set_loop_flag</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Set the loop flag for the thread to True.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="CisThreadLoop.set_loop_flag"><a class="viewcode-back" href="../../code_python.html#cis_interface.drivers.ModelDriver.CisThreadLoop.set_loop_flag">[docs]</a>    <span class="k">def</span> <span class="nf">set_loop_flag</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">r&quot;&quot;&quot;Set the loop flag for the thread to True.&quot;&quot;&quot;</span>
         <span class="c1"># self.loop_event.set()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">loop_flag</span> <span class="o">=</span> <span class="kc">True</span></div>
 
-<div class="viewcode-block" id="CisThreadLoop.unset_loop_flag"><a class="viewcode-back" href="../../code_python.html#cis_interface.tools.CisThreadLoop.unset_loop_flag">[docs]</a>    <span class="k">def</span> <span class="nf">unset_loop_flag</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Set the loop flag for the thread to False.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="CisThreadLoop.unset_loop_flag"><a class="viewcode-back" href="../../code_python.html#cis_interface.drivers.ModelDriver.CisThreadLoop.unset_loop_flag">[docs]</a>    <span class="k">def</span> <span class="nf">unset_loop_flag</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>  <span class="c1"># pragma: debug</span>
+        <span class="sd">r&quot;&quot;&quot;Set the loop flag for the thread to False.&quot;&quot;&quot;</span>
         <span class="c1"># self.loop_event.clear()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">loop_flag</span> <span class="o">=</span> <span class="kc">False</span></div>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">was_loop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;bool: True if the thread was loop. False otherwise.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;bool: True if the thread was loop. False otherwise.&quot;&quot;&quot;</span>
         <span class="c1"># return self.loop_event.is_set()</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">loop_flag</span>
 
-<div class="viewcode-block" id="CisThreadLoop.wait_for_loop"><a class="viewcode-back" href="../../code_python.html#cis_interface.tools.CisThreadLoop.wait_for_loop">[docs]</a>    <span class="k">def</span> <span class="nf">wait_for_loop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Wait until thread enters loop to return using sleeps rather than</span>
+<div class="viewcode-block" id="CisThreadLoop.wait_for_loop"><a class="viewcode-back" href="../../code_python.html#cis_interface.drivers.ModelDriver.CisThreadLoop.wait_for_loop">[docs]</a>    <span class="k">def</span> <span class="nf">wait_for_loop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">r&quot;&quot;&quot;Wait until thread enters loop to return using sleeps rather than</span>
 <span class="sd">        blocking.</span>
 
 <span class="sd">        Args:</span>
@@ -1170,23 +1172,23 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">sleep</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">stop_timeout</span><span class="p">(</span><span class="n">key_level</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="CisThreadLoop.before_loop"><a class="viewcode-back" href="../../code_python.html#cis_interface.tools.CisThreadLoop.before_loop">[docs]</a>    <span class="k">def</span> <span class="nf">before_loop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Actions performed before the loop.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="CisThreadLoop.before_loop"><a class="viewcode-back" href="../../code_python.html#cis_interface.drivers.ModelDriver.CisThreadLoop.before_loop">[docs]</a>    <span class="k">def</span> <span class="nf">before_loop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">r&quot;&quot;&quot;Actions performed before the loop.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="CisThreadLoop.run_loop"><a class="viewcode-back" href="../../code_python.html#cis_interface.tools.CisThreadLoop.run_loop">[docs]</a>    <span class="k">def</span> <span class="nf">run_loop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Actions performed on each loop iteration.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="CisThreadLoop.run_loop"><a class="viewcode-back" href="../../code_python.html#cis_interface.drivers.ModelDriver.CisThreadLoop.run_loop">[docs]</a>    <span class="k">def</span> <span class="nf">run_loop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">r&quot;&quot;&quot;Actions performed on each loop iteration.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cis_target</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_cis_target</span><span class="p">(</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">_cis_args</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">_cis_kwargs</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">set_break_flag</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="CisThreadLoop.after_loop"><a class="viewcode-back" href="../../code_python.html#cis_interface.tools.CisThreadLoop.after_loop">[docs]</a>    <span class="k">def</span> <span class="nf">after_loop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Actions performed after the loop.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="CisThreadLoop.after_loop"><a class="viewcode-back" href="../../code_python.html#cis_interface.drivers.ModelDriver.CisThreadLoop.after_loop">[docs]</a>    <span class="k">def</span> <span class="nf">after_loop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">r&quot;&quot;&quot;Actions performed after the loop.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="CisThreadLoop.run"><a class="viewcode-back" href="../../code_python.html#cis_interface.tools.CisThreadLoop.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Continue running until terminate event set.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="CisThreadLoop.run"><a class="viewcode-back" href="../../code_python.html#cis_interface.drivers.ModelDriver.CisThreadLoop.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">r&quot;&quot;&quot;Continue running until terminate event set.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Starting loop&quot;</span><span class="p">)</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">before_loop</span><span class="p">()</span>
@@ -1211,8 +1213,8 @@
         <span class="k">except</span> <span class="ne">BaseException</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s2">&quot;AFTER LOOP ERROR&quot;</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="CisThreadLoop.terminate"><a class="viewcode-back" href="../../code_python.html#cis_interface.tools.CisThreadLoop.terminate">[docs]</a>    <span class="k">def</span> <span class="nf">terminate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Also set break flag.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="CisThreadLoop.terminate"><a class="viewcode-back" href="../../code_python.html#cis_interface.drivers.ModelDriver.CisThreadLoop.terminate">[docs]</a>    <span class="k">def</span> <span class="nf">terminate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">r&quot;&quot;&quot;Also set break flag.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">set_break_flag</span><span class="p">()</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">CisThreadLoop</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">terminate</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div></div>
 </pre></div>
@@ -1249,7 +1251,7 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../../',
-            VERSION:'0.3.0',
+            VERSION:'0.4+0.gd8a2a4f.dirty',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
@@ -1260,15 +1262,20 @@
       <script type="text/javascript" src="../../_static/jquery.js"></script>
       <script type="text/javascript" src="../../_static/underscore.js"></script>
       <script type="text/javascript" src="../../_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 
   
 
-  <script type="text/javascript" src="../../_static/js/theme.js"></script>
+  
+  
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+  
 
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.Navigation.enable(true);
+          
+          SphinxRtdTheme.Navigation.enableSticky();
+          
       });
   </script> 
 

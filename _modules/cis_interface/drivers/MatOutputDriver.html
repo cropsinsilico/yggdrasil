@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>cis_interface.drivers.MatOutputDriver &mdash; cis_interface 0.3.0 documentation</title>
+  <title>cis_interface.drivers.MatOutputDriver &mdash; cis_interface 0.4+0.gd8a2a4f.dirty documentation</title>
   
 
   
@@ -24,7 +24,8 @@
 
   
 
-  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/theme_overrides.css" type="text/css" />
     <link rel="index" title="Index" href="../../../genindex.html" />
@@ -57,7 +58,7 @@
             
             
               <div class="version">
-                0.3
+                0.4+0.gd8a2a4f.dirty
               </div>
             
           
@@ -98,6 +99,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../code.html">Code</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../examples/examples_toc.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../release.html">Release Steps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../release.html#docs-checkout">Docs Checkout</a></li>
 </ul>
 
             
@@ -167,8 +169,8 @@
 <span class="kn">from</span> <span class="nn">cis_interface.serialize</span> <span class="k">import</span> <span class="n">MatSerialize</span><span class="p">,</span> <span class="n">PickleSerialize</span>
 
 
-<div class="viewcode-block" id="MatOutputDriver"><a class="viewcode-back" href="../../../io_drivers.html#cis_interface.drivers.MatOutputDriver.MatOutputDriver">[docs]</a><span class="k">class</span> <span class="nc">MatOutputDriver</span><span class="p">(</span><span class="n">FileOutputDriver</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Class to handle output to .mat Matlab files.</span>
+<div class="viewcode-block" id="MatOutputDriver"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.MatOutputDriver.MatOutputDriver">[docs]</a><span class="k">class</span> <span class="nc">MatOutputDriver</span><span class="p">(</span><span class="n">FileOutputDriver</span><span class="p">):</span>
+    <span class="sd">r&quot;&quot;&quot;Class to handle output to .mat Matlab files.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        name (str): Name of the output queue to receive messages from.</span>
@@ -183,7 +185,7 @@
         <span class="n">ocomm_kws</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;serializer&#39;</span><span class="p">,</span> <span class="n">MatSerialize</span><span class="o">.</span><span class="n">MatSerialize</span><span class="p">())</span>
         <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;icomm_kws&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">icomm_kws</span>
         <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;ocomm_kws&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ocomm_kws</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">MatOutputDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+        <span class="nb">super</span><span class="p">(</span><span class="n">MatOutputDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 </pre></div>
 
            </div>
@@ -218,7 +220,7 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../../../',
-            VERSION:'0.3.0',
+            VERSION:'0.4+0.gd8a2a4f.dirty',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
@@ -229,15 +231,20 @@
       <script type="text/javascript" src="../../../_static/jquery.js"></script>
       <script type="text/javascript" src="../../../_static/underscore.js"></script>
       <script type="text/javascript" src="../../../_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 
   
 
-  <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
 
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.Navigation.enable(true);
+          
+          SphinxRtdTheme.Navigation.enableSticky();
+          
       });
   </script> 
 

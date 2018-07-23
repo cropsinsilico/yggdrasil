@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>cis_interface.drivers.GCCModelDriver &mdash; cis_interface 0.3.0 documentation</title>
+  <title>cis_interface.drivers.GCCModelDriver &mdash; cis_interface 0.4+0.gd8a2a4f.dirty documentation</title>
   
 
   
@@ -24,7 +24,8 @@
 
   
 
-  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/theme_overrides.css" type="text/css" />
     <link rel="index" title="Index" href="../../../genindex.html" />
@@ -57,7 +58,7 @@
             
             
               <div class="version">
-                0.3
+                0.4+0.gd8a2a4f.dirty
               </div>
             
           
@@ -98,6 +99,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../code.html">Code</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../examples/examples_toc.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../release.html">Release Steps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../release.html#docs-checkout">Docs Checkout</a></li>
 </ul>
 
             
@@ -171,7 +173,7 @@
 <span class="kn">from</span> <span class="nn">cis_interface.schema</span> <span class="k">import</span> <span class="n">register_component</span><span class="p">,</span> <span class="n">inherit_schema</span>
 
 
-<span class="n">_top_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">normpath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span> <span class="s1">&#39;../&#39;</span><span class="p">))</span>
+<span class="n">_top_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">normpath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">__file__</span><span class="p">),</span> <span class="s1">&#39;../&#39;</span><span class="p">))</span>
 <span class="n">_incl_interface</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">_top_dir</span><span class="p">,</span> <span class="s1">&#39;interface&#39;</span><span class="p">)</span>
 <span class="n">_incl_io</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">_top_dir</span><span class="p">,</span> <span class="s1">&#39;io&#39;</span><span class="p">)</span>
 <span class="n">_incl_seri</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">_top_dir</span><span class="p">,</span> <span class="s1">&#39;serialize&#39;</span><span class="p">)</span>
@@ -181,7 +183,7 @@
 
 
 <div class="viewcode-block" id="get_zmq_flags"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.GCCModelDriver.get_zmq_flags">[docs]</a><span class="k">def</span> <span class="nf">get_zmq_flags</span><span class="p">(</span><span class="n">for_cmake</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the necessary flags for compiling &amp; linking with zmq libraries.</span>
+    <span class="sd">r&quot;&quot;&quot;Get the necessary flags for compiling &amp; linking with zmq libraries.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        for_cmake (bool, optional): If True, the returned flags will match the</span>
@@ -214,7 +216,7 @@
 
 
 <div class="viewcode-block" id="get_ipc_flags"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.GCCModelDriver.get_ipc_flags">[docs]</a><span class="k">def</span> <span class="nf">get_ipc_flags</span><span class="p">(</span><span class="n">for_cmake</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the necessary flags for compiling &amp; linking with ipc libraries.</span>
+    <span class="sd">r&quot;&quot;&quot;Get the necessary flags for compiling &amp; linking with ipc libraries.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        for_cmake (bool, optional): If True, the returned flags will match the</span>
@@ -232,7 +234,7 @@
 
 
 <div class="viewcode-block" id="get_flags"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.GCCModelDriver.get_flags">[docs]</a><span class="k">def</span> <span class="nf">get_flags</span><span class="p">(</span><span class="n">for_cmake</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get the necessary flags for compiling &amp; linking with CiS libraries.</span>
+    <span class="sd">r&quot;&quot;&quot;Get the necessary flags for compiling &amp; linking with CiS libraries.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        for_cmake (bool, optional): If True, the returned flags will match the</span>
@@ -270,7 +272,7 @@
 
 
 <div class="viewcode-block" id="build_regex_win32"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.GCCModelDriver.build_regex_win32">[docs]</a><span class="k">def</span> <span class="nf">build_regex_win32</span><span class="p">(</span><span class="n">using_cmake</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>  <span class="c1"># pragma: windows</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Build the regex_win32 library.&quot;&quot;&quot;</span>
+    <span class="sd">r&quot;&quot;&quot;Build the regex_win32 library.&quot;&quot;&quot;</span>
     <span class="n">_regex_win32_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">_regex_win32_lib</span><span class="p">)</span>
     <span class="n">_regex_win32_cpp</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">_regex_win32_dir</span><span class="p">,</span> <span class="s1">&#39;regex_win32.cpp&#39;</span><span class="p">)</span>
     <span class="n">_regex_win32_obj</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">_regex_win32_dir</span><span class="p">,</span> <span class="s1">&#39;regex_win32.obj&#39;</span><span class="p">)</span>
@@ -304,7 +306,7 @@
 
 <div class="viewcode-block" id="do_compile"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.GCCModelDriver.do_compile">[docs]</a><span class="k">def</span> <span class="nf">do_compile</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">cc</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ccflags</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ldflags</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                <span class="n">working_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Compile a C/C++ program with necessary interface libraries.</span>
+    <span class="sd">r&quot;&quot;&quot;Compile a C/C++ program with necessary interface libraries.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        src (list): List of source files.</span>
@@ -391,9 +393,9 @@
     <span class="k">return</span> <span class="n">out</span></div>
 
 
-<div class="viewcode-block" id="GCCModelDriver"><a class="viewcode-back" href="../../../model_drivers.html#cis_interface.drivers.GCCModelDriver.GCCModelDriver">[docs]</a><span class="nd">@register_component</span>
-<span class="k">class</span> <span class="nc">GCCModelDriver</span><span class="p">(</span><span class="n">ModelDriver</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Class for running gcc compiled drivers.</span>
+<span class="nd">@register_component</span>
+<div class="viewcode-block" id="GCCModelDriver"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.GCCModelDriver.GCCModelDriver">[docs]</a><span class="k">class</span> <span class="nc">GCCModelDriver</span><span class="p">(</span><span class="n">ModelDriver</span><span class="p">):</span>
+    <span class="sd">r&quot;&quot;&quot;Class for running gcc compiled drivers.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        name (str): Driver name.</span>
@@ -425,7 +427,7 @@
                              <span class="n">cc</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">,</span> <span class="s1">&#39;required&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">})</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">cc</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">GCCModelDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">GCCModelDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">tools</span><span class="o">.</span><span class="n">_c_library_avail</span><span class="p">:</span>  <span class="c1"># pragma: windows</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;No library available for models written in C/C++.&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
@@ -445,8 +447,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">args</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">run_args</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Compiled executable with </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cc</span><span class="p">)</span>
 
-<div class="viewcode-block" id="GCCModelDriver.parse_arguments"><a class="viewcode-back" href="../../../model_drivers.html#cis_interface.drivers.GCCModelDriver.GCCModelDriver.parse_arguments">[docs]</a>    <span class="k">def</span> <span class="nf">parse_arguments</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Sort arguments based on their syntax. Arguments ending with &#39;.c&#39; or</span>
+<div class="viewcode-block" id="GCCModelDriver.parse_arguments"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.GCCModelDriver.GCCModelDriver.parse_arguments">[docs]</a>    <span class="k">def</span> <span class="nf">parse_arguments</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
+        <span class="sd">r&quot;&quot;&quot;Sort arguments based on their syntax. Arguments ending with &#39;.c&#39; or</span>
 <span class="sd">        &#39;.cpp&#39; are considered source and the first one will be compiled to an</span>
 <span class="sd">        executable. Arguments starting with &#39;-L&#39; or &#39;-l&#39; are treated as linker</span>
 <span class="sd">        flags. Arguments starting with &#39;-&#39; are treated as compiler flags. Any</span>
@@ -502,8 +504,8 @@
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Could not locate a source file in the &quot;</span> <span class="o">+</span>
                                <span class="s2">&quot;provided arguments.&quot;</span><span class="p">)</span></div>
         
-<div class="viewcode-block" id="GCCModelDriver.remove_products"><a class="viewcode-back" href="../../../model_drivers.html#cis_interface.drivers.GCCModelDriver.GCCModelDriver.remove_products">[docs]</a>    <span class="k">def</span> <span class="nf">remove_products</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Delete products produced during the compilation process.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="GCCModelDriver.remove_products"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.GCCModelDriver.GCCModelDriver.remove_products">[docs]</a>    <span class="k">def</span> <span class="nf">remove_products</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">r&quot;&quot;&quot;Delete products produced during the compilation process.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">efile</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
             <span class="k">return</span>
         <span class="n">products</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">efile</span><span class="p">]</span>
@@ -514,8 +516,8 @@
             <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">p</span><span class="p">):</span>
                 <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">p</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="GCCModelDriver.cleanup"><a class="viewcode-back" href="../../../model_drivers.html#cis_interface.drivers.GCCModelDriver.GCCModelDriver.cleanup">[docs]</a>    <span class="k">def</span> <span class="nf">cleanup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Remove compile executable.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="GCCModelDriver.cleanup"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.GCCModelDriver.GCCModelDriver.cleanup">[docs]</a>    <span class="k">def</span> <span class="nf">cleanup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">r&quot;&quot;&quot;Remove compile executable.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">remove_products</span><span class="p">()</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">GCCModelDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">cleanup</span><span class="p">()</span></div></div>
 </pre></div>
@@ -552,7 +554,7 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../../../',
-            VERSION:'0.3.0',
+            VERSION:'0.4+0.gd8a2a4f.dirty',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
@@ -563,15 +565,20 @@
       <script type="text/javascript" src="../../../_static/jquery.js"></script>
       <script type="text/javascript" src="../../../_static/underscore.js"></script>
       <script type="text/javascript" src="../../../_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 
   
 
-  <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
 
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.Navigation.enable(true);
+          
+          SphinxRtdTheme.Navigation.enableSticky();
+          
       });
   </script> 
 

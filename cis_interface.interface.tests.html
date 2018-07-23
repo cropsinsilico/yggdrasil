@@ -1,0 +1,1745 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>cis_interface.interface.tests package &mdash; cis_interface 0.4+0.gd8a2a4f.dirty documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="cis_interface.serialize package" href="cis_interface.serialize.html" />
+    <link rel="prev" title="cis_interface.interface package" href="cis_interface.interface.html" /> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> cis_interface
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.4+0.gd8a2a4f.dirty
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="includeme.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="formatted_io.html">Formatted I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="server_client_io.html">Server/Client I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="server_client_io.html#one-server-two-clients">One Server, Two Clients</a></li>
+<li class="toctree-l1"><a class="reference internal" href="yaml.html">YAML Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="config.html">Configuration Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="units.html">Units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="c_format_strings.html">C-Style Format Strings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="io_drivers.html">Input/Output Drivers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="model_drivers.html">Model Drivers</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="code.html">Code</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="code_python.html">Python Code</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="code_python.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="cis_interface.interface.html">cis_interface.interface package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cis_interface.serialize.html">cis_interface.serialize package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cis_interface.dataio.html">cis_interface.dataio package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cis_interface.drivers.html">cis_interface.drivers package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cis_interface.examples.html">cis_interface.examples package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="code_python.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="code_python.html#module-cis_interface.backwards">cis_interface.backwards module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="code_python.html#module-cis_interface.command_line">cis_interface.command_line module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="code_python.html#module-cis_interface.components">cis_interface.components module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="code_python.html#module-cis_interface.config">cis_interface.config module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="code_python.html#module-cis_interface.platform">cis_interface.platform module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="code_python.html#module-cis_interface.runner">cis_interface.runner module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="code_python.html#module-cis_interface.scanf">cis_interface.scanf module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="code_python.html#module-cis_interface.schema">cis_interface.schema module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="code_python.html#module-cis_interface.tools">cis_interface.tools module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="code_python.html#module-cis_interface.units">cis_interface.units module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="code_python.html#module-cis_interface.yamlfile">cis_interface.yamlfile module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="code_python.html#module-cis_interface">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="code_c.html">C Code</a></li>
+<li class="toctree-l2"><a class="reference internal" href="code_cpp.html">C++ Code</a></li>
+<li class="toctree-l2"><a class="reference internal" href="code_matlab.html">Matlab Code</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="examples/examples_toc.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="release.html">Release Steps</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">cis_interface</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="code.html">Code</a> &raquo;</li>
+        
+          <li><a href="code_python.html">Python Code</a> &raquo;</li>
+        
+          <li><a href="cis_interface.interface.html">cis_interface.interface package</a> &raquo;</li>
+        
+      <li>cis_interface.interface.tests package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/cis_interface.interface.tests.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="cis-interface-interface-tests-package">
+<h1>cis_interface.interface.tests package<a class="headerlink" href="#cis-interface-interface-tests-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-cis_interface.interface.tests.test_CisInterface">
+<span id="cis-interface-interface-tests-test-cisinterface-module"></span><h2>cis_interface.interface.tests.test_CisInterface module<a class="headerlink" href="#module-cis_interface.interface.tests.test_CisInterface" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="cis_interface.interface.tests.test_CisInterface.TestBase">
+<em class="property">class </em><code class="descclassname">cis_interface.interface.tests.test_CisInterface.</code><code class="descname">TestBase</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#TestBase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestBase" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="cis_interface.tests.html#cis_interface.tests.CisTestClassInfo" title="cis_interface.tests.CisTestClassInfo"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.tests.CisTestClassInfo</span></code></a></p>
+<p>Test class for interface classes.</p>
+<dl class="attribute">
+<dt id="cis_interface.interface.tests.test_CisInterface.TestBase.driver_class">
+<code class="descname">driver_class</code><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestBase.driver_class" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>class</em> &#8211; Driver class.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.interface.tests.test_CisInterface.TestBase.driver_kwargs">
+<code class="descname">driver_kwargs</code><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestBase.driver_kwargs" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>dict</em> &#8211; Arguments for the test driver.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.interface.tests.test_CisInterface.TestBase.inst_kwargs">
+<code class="descname">inst_kwargs</code><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestBase.inst_kwargs" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>dict</em> &#8211; Arguments for the interface instance.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.interface.tests.test_CisInterface.TestBase.remove_instance">
+<code class="descname">remove_instance</code><span class="sig-paren">(</span><em>inst</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#TestBase.remove_instance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestBase.remove_instance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove an instance.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.interface.tests.test_CisInterface.TestBase.setup">
+<code class="descname">setup</code><span class="sig-paren">(</span><em>skip_start=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#TestBase.setup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestBase.setup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Start driver and instance.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.interface.tests.test_CisInterface.TestBase.teardown">
+<code class="descname">teardown</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#TestBase.teardown"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestBase.teardown" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stop the driver.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.interface.tests.test_CisInterface.TestCisAsciiArrayInput">
+<em class="property">class </em><code class="descclassname">cis_interface.interface.tests.test_CisInterface.</code><code class="descname">TestCisAsciiArrayInput</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#TestCisAsciiArrayInput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisAsciiArrayInput" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.interface.tests.test_CisInterface.TestCisAsciiTableInput" title="cis_interface.interface.tests.test_CisInterface.TestCisAsciiTableInput"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.interface.tests.test_CisInterface.TestCisAsciiTableInput</span></code></a></p>
+<p>Test input from an ASCII table.</p>
+<dl class="method">
+<dt id="cis_interface.interface.tests.test_CisInterface.TestCisAsciiArrayInput.test_recv_line">
+<code class="descname">test_recv_line</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#TestCisAsciiArrayInput.test_recv_line"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisAsciiArrayInput.test_recv_line" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test receiving an array from a remote table.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.interface.tests.test_CisInterface.TestCisAsciiArrayInput_local">
+<em class="property">class </em><code class="descclassname">cis_interface.interface.tests.test_CisInterface.</code><code class="descname">TestCisAsciiArrayInput_local</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#TestCisAsciiArrayInput_local"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisAsciiArrayInput_local" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.interface.tests.test_CisInterface.TestCisAsciiArrayInput" title="cis_interface.interface.tests.test_CisInterface.TestCisAsciiArrayInput"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.interface.tests.test_CisInterface.TestCisAsciiArrayInput</span></code></a></p>
+<p>Test input from an ASCII table.</p>
+<dl class="method">
+<dt id="cis_interface.interface.tests.test_CisInterface.TestCisAsciiArrayInput_local.test_recv_line">
+<code class="descname">test_recv_line</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#TestCisAsciiArrayInput_local.test_recv_line"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisAsciiArrayInput_local.test_recv_line" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test receiving an array from a local table.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.interface.tests.test_CisInterface.TestCisAsciiArrayOutput">
+<em class="property">class </em><code class="descclassname">cis_interface.interface.tests.test_CisInterface.</code><code class="descname">TestCisAsciiArrayOutput</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#TestCisAsciiArrayOutput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisAsciiArrayOutput" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.interface.tests.test_CisInterface.TestCisAsciiTableOutput" title="cis_interface.interface.tests.test_CisInterface.TestCisAsciiTableOutput"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.interface.tests.test_CisInterface.TestCisAsciiTableOutput</span></code></a></p>
+<p>Test input from an ASCII table.</p>
+<dl class="method">
+<dt id="cis_interface.interface.tests.test_CisInterface.TestCisAsciiArrayOutput.test_send_line">
+<code class="descname">test_send_line</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#TestCisAsciiArrayOutput.test_send_line"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisAsciiArrayOutput.test_send_line" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test sending an array to a remote table.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.interface.tests.test_CisInterface.TestCisAsciiArrayOutput_local">
+<em class="property">class </em><code class="descclassname">cis_interface.interface.tests.test_CisInterface.</code><code class="descname">TestCisAsciiArrayOutput_local</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#TestCisAsciiArrayOutput_local"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisAsciiArrayOutput_local" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.interface.tests.test_CisInterface.TestCisAsciiArrayOutput" title="cis_interface.interface.tests.test_CisInterface.TestCisAsciiArrayOutput"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.interface.tests.test_CisInterface.TestCisAsciiArrayOutput</span></code></a></p>
+<p>Test input from an ASCII table as array.</p>
+<dl class="method">
+<dt id="cis_interface.interface.tests.test_CisInterface.TestCisAsciiArrayOutput_local.test_send_line">
+<code class="descname">test_send_line</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#TestCisAsciiArrayOutput_local.test_send_line"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisAsciiArrayOutput_local.test_send_line" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test sending an array to a local table.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.interface.tests.test_CisInterface.TestCisAsciiFileInput">
+<em class="property">class </em><code class="descclassname">cis_interface.interface.tests.test_CisInterface.</code><code class="descname">TestCisAsciiFileInput</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#TestCisAsciiFileInput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisAsciiFileInput" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.interface.tests.test_CisInterface.TestBase" title="cis_interface.interface.tests.test_CisInterface.TestBase"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.interface.tests.test_CisInterface.TestBase</span></code></a></p>
+<p>Test input from an unformatted text file.</p>
+<dl class="method">
+<dt id="cis_interface.interface.tests.test_CisInterface.TestCisAsciiFileInput.setup">
+<code class="descname">setup</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#TestCisAsciiFileInput.setup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisAsciiFileInput.setup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a test file.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.interface.tests.test_CisInterface.TestCisAsciiFileInput.teardown">
+<code class="descname">teardown</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#TestCisAsciiFileInput.teardown"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisAsciiFileInput.teardown" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove the test file.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.interface.tests.test_CisInterface.TestCisAsciiFileInput.test_recv_line">
+<code class="descname">test_recv_line</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#TestCisAsciiFileInput.test_recv_line"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisAsciiFileInput.test_recv_line" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test receiving a line from a remote file.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.interface.tests.test_CisInterface.TestCisAsciiFileInput_local">
+<em class="property">class </em><code class="descclassname">cis_interface.interface.tests.test_CisInterface.</code><code class="descname">TestCisAsciiFileInput_local</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#TestCisAsciiFileInput_local"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisAsciiFileInput_local" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.interface.tests.test_CisInterface.TestCisAsciiFileInput" title="cis_interface.interface.tests.test_CisInterface.TestCisAsciiFileInput"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.interface.tests.test_CisInterface.TestCisAsciiFileInput</span></code></a></p>
+<p>Test input from an unformatted text file.</p>
+<dl class="method">
+<dt id="cis_interface.interface.tests.test_CisInterface.TestCisAsciiFileInput_local.test_recv_line">
+<code class="descname">test_recv_line</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#TestCisAsciiFileInput_local.test_recv_line"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisAsciiFileInput_local.test_recv_line" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test receiving a line from a local file.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.interface.tests.test_CisInterface.TestCisAsciiFileOutput">
+<em class="property">class </em><code class="descclassname">cis_interface.interface.tests.test_CisInterface.</code><code class="descname">TestCisAsciiFileOutput</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#TestCisAsciiFileOutput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisAsciiFileOutput" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.interface.tests.test_CisInterface.TestBase" title="cis_interface.interface.tests.test_CisInterface.TestBase"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.interface.tests.test_CisInterface.TestBase</span></code></a></p>
+<p>Test output to an unformatted text file.</p>
+<dl class="attribute">
+<dt id="cis_interface.interface.tests.test_CisInterface.TestCisAsciiFileOutput.file_comm">
+<code class="descname">file_comm</code><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisAsciiFileOutput.file_comm" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>FileComm</em> &#8211; File communicator.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.interface.tests.test_CisInterface.TestCisAsciiFileOutput.setup">
+<code class="descname">setup</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#TestCisAsciiFileOutput.setup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisAsciiFileOutput.setup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a test file.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.interface.tests.test_CisInterface.TestCisAsciiFileOutput.teardown">
+<code class="descname">teardown</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#TestCisAsciiFileOutput.teardown"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisAsciiFileOutput.teardown" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove the test file.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.interface.tests.test_CisInterface.TestCisAsciiFileOutput.test_send_line">
+<code class="descname">test_send_line</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#TestCisAsciiFileOutput.test_send_line"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisAsciiFileOutput.test_send_line" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test sending a line to a remote file.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.interface.tests.test_CisInterface.TestCisAsciiFileOutput_local">
+<em class="property">class </em><code class="descclassname">cis_interface.interface.tests.test_CisInterface.</code><code class="descname">TestCisAsciiFileOutput_local</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#TestCisAsciiFileOutput_local"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisAsciiFileOutput_local" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.interface.tests.test_CisInterface.TestCisAsciiFileOutput" title="cis_interface.interface.tests.test_CisInterface.TestCisAsciiFileOutput"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.interface.tests.test_CisInterface.TestCisAsciiFileOutput</span></code></a></p>
+<p>Test input from an unformatted text file.</p>
+<dl class="method">
+<dt id="cis_interface.interface.tests.test_CisInterface.TestCisAsciiFileOutput_local.test_send_line">
+<code class="descname">test_send_line</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#TestCisAsciiFileOutput_local.test_send_line"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisAsciiFileOutput_local.test_send_line" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test sending a line to a local file.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.interface.tests.test_CisInterface.TestCisAsciiTableInput">
+<em class="property">class </em><code class="descclassname">cis_interface.interface.tests.test_CisInterface.</code><code class="descname">TestCisAsciiTableInput</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#TestCisAsciiTableInput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisAsciiTableInput" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.interface.tests.test_CisInterface.TestCisAsciiFileInput" title="cis_interface.interface.tests.test_CisInterface.TestCisAsciiFileInput"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.interface.tests.test_CisInterface.TestCisAsciiFileInput</span></code></a></p>
+<p>Test input from an ascii table.</p>
+<dl class="method">
+<dt id="cis_interface.interface.tests.test_CisInterface.TestCisAsciiTableInput.test_recv_line">
+<code class="descname">test_recv_line</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#TestCisAsciiTableInput.test_recv_line"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisAsciiTableInput.test_recv_line" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test receiving a row from a remote table.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.interface.tests.test_CisInterface.TestCisAsciiTableInput_local">
+<em class="property">class </em><code class="descclassname">cis_interface.interface.tests.test_CisInterface.</code><code class="descname">TestCisAsciiTableInput_local</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#TestCisAsciiTableInput_local"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisAsciiTableInput_local" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.interface.tests.test_CisInterface.TestCisAsciiTableInput" title="cis_interface.interface.tests.test_CisInterface.TestCisAsciiTableInput"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.interface.tests.test_CisInterface.TestCisAsciiTableInput</span></code></a></p>
+<p>Test input from an ASCII table.</p>
+<dl class="method">
+<dt id="cis_interface.interface.tests.test_CisInterface.TestCisAsciiTableInput_local.test_recv_line">
+<code class="descname">test_recv_line</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#TestCisAsciiTableInput_local.test_recv_line"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisAsciiTableInput_local.test_recv_line" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test receiving a row from a local table.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.interface.tests.test_CisInterface.TestCisAsciiTableOutput">
+<em class="property">class </em><code class="descclassname">cis_interface.interface.tests.test_CisInterface.</code><code class="descname">TestCisAsciiTableOutput</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#TestCisAsciiTableOutput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisAsciiTableOutput" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.interface.tests.test_CisInterface.TestCisAsciiFileOutput" title="cis_interface.interface.tests.test_CisInterface.TestCisAsciiFileOutput"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.interface.tests.test_CisInterface.TestCisAsciiFileOutput</span></code></a></p>
+<p>Test output from an ascii table.</p>
+<dl class="attribute">
+<dt id="cis_interface.interface.tests.test_CisInterface.TestCisAsciiTableOutput.driver_kwargs">
+<code class="descname">driver_kwargs</code><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisAsciiTableOutput.driver_kwargs" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>dict</em> &#8211; Keyword arguments for accompanying driver.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.interface.tests.test_CisInterface.TestCisAsciiTableOutput.test_send_line">
+<code class="descname">test_send_line</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#TestCisAsciiTableOutput.test_send_line"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisAsciiTableOutput.test_send_line" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test sending a row to a remote table.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.interface.tests.test_CisInterface.TestCisAsciiTableOutputMatlab">
+<em class="property">class </em><code class="descclassname">cis_interface.interface.tests.test_CisInterface.</code><code class="descname">TestCisAsciiTableOutputMatlab</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#TestCisAsciiTableOutputMatlab"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisAsciiTableOutputMatlab" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.interface.tests.test_CisInterface.TestCisAsciiTableOutput" title="cis_interface.interface.tests.test_CisInterface.TestCisAsciiTableOutput"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.interface.tests.test_CisInterface.TestCisAsciiTableOutput</span></code></a></p>
+<p>Test output from an ascii table as passed through Matlab.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.interface.tests.test_CisInterface.TestCisAsciiTableOutput_local">
+<em class="property">class </em><code class="descclassname">cis_interface.interface.tests.test_CisInterface.</code><code class="descname">TestCisAsciiTableOutput_local</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#TestCisAsciiTableOutput_local"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisAsciiTableOutput_local" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.interface.tests.test_CisInterface.TestCisAsciiTableOutput" title="cis_interface.interface.tests.test_CisInterface.TestCisAsciiTableOutput"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.interface.tests.test_CisInterface.TestCisAsciiTableOutput</span></code></a></p>
+<p>Test input from an ASCII table.</p>
+<dl class="method">
+<dt id="cis_interface.interface.tests.test_CisInterface.TestCisAsciiTableOutput_local.test_send_line">
+<code class="descname">test_send_line</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#TestCisAsciiTableOutput_local.test_send_line"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisAsciiTableOutput_local.test_send_line" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test sending a row to a local table.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.interface.tests.test_CisInterface.TestCisInput">
+<em class="property">class </em><code class="descclassname">cis_interface.interface.tests.test_CisInterface.</code><code class="descname">TestCisInput</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#TestCisInput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisInput" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.interface.tests.test_CisInterface.TestBase" title="cis_interface.interface.tests.test_CisInterface.TestBase"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.interface.tests.test_CisInterface.TestBase</span></code></a></p>
+<p>Test basic input to python.</p>
+<dl class="method">
+<dt id="cis_interface.interface.tests.test_CisInterface.TestCisInput.test_init">
+<code class="descname">test_init</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#TestCisInput.test_init"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisInput.test_init" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test error on init.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.interface.tests.test_CisInterface.TestCisInput.test_recv">
+<code class="descname">test_recv</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#TestCisInput.test_recv"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisInput.test_recv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test receiving small message.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.interface.tests.test_CisInterface.TestCisInput.test_recv_nolimit">
+<code class="descname">test_recv_nolimit</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#TestCisInput.test_recv_nolimit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisInput.test_recv_nolimit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test receiving large message.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.interface.tests.test_CisInterface.TestCisInputMatlab">
+<em class="property">class </em><code class="descclassname">cis_interface.interface.tests.test_CisInterface.</code><code class="descname">TestCisInputMatlab</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#TestCisInputMatlab"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisInputMatlab" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.interface.tests.test_CisInterface.TestCisInput" title="cis_interface.interface.tests.test_CisInterface.TestCisInput"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.interface.tests.test_CisInterface.TestCisInput</span></code></a></p>
+<p>Test basic input to python as passed from matlab.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.interface.tests.test_CisInterface.TestCisObjInput">
+<em class="property">class </em><code class="descclassname">cis_interface.interface.tests.test_CisInterface.</code><code class="descname">TestCisObjInput</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#TestCisObjInput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisObjInput" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.interface.tests.test_CisInterface.TestBase" title="cis_interface.interface.tests.test_CisInterface.TestBase"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.interface.tests.test_CisInterface.TestBase</span></code></a></p>
+<p>Test input from a obj file.</p>
+<dl class="method">
+<dt id="cis_interface.interface.tests.test_CisInterface.TestCisObjInput.setup">
+<code class="descname">setup</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#TestCisObjInput.setup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisObjInput.setup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a test file and start the driver.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.interface.tests.test_CisInterface.TestCisObjInput.teardown">
+<code class="descname">teardown</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#TestCisObjInput.teardown"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisObjInput.teardown" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove the test file.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.interface.tests.test_CisInterface.TestCisObjInput.test_recv">
+<code class="descname">test_recv</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#TestCisObjInput.test_recv"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisObjInput.test_recv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test receiving a obj from a remote file.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.interface.tests.test_CisInterface.TestCisObjInput_local">
+<em class="property">class </em><code class="descclassname">cis_interface.interface.tests.test_CisInterface.</code><code class="descname">TestCisObjInput_local</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#TestCisObjInput_local"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisObjInput_local" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.interface.tests.test_CisInterface.TestCisObjInput" title="cis_interface.interface.tests.test_CisInterface.TestCisObjInput"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.interface.tests.test_CisInterface.TestCisObjInput</span></code></a></p>
+<p>Test input from a obj file.</p>
+<dl class="method">
+<dt id="cis_interface.interface.tests.test_CisInterface.TestCisObjInput_local.test_recv">
+<code class="descname">test_recv</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#TestCisObjInput_local.test_recv"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisObjInput_local.test_recv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test receiving a obj from a local file.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.interface.tests.test_CisInterface.TestCisObjOutput">
+<em class="property">class </em><code class="descclassname">cis_interface.interface.tests.test_CisInterface.</code><code class="descname">TestCisObjOutput</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#TestCisObjOutput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisObjOutput" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.interface.tests.test_CisInterface.TestBase" title="cis_interface.interface.tests.test_CisInterface.TestBase"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.interface.tests.test_CisInterface.TestBase</span></code></a></p>
+<p>Test output from a obj.</p>
+<dl class="attribute">
+<dt id="cis_interface.interface.tests.test_CisInterface.TestCisObjOutput.file_comm">
+<code class="descname">file_comm</code><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisObjOutput.file_comm" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>FileComm</em> &#8211; File communicator.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.interface.tests.test_CisInterface.TestCisObjOutput.setup">
+<code class="descname">setup</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#TestCisObjOutput.setup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisObjOutput.setup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a test file and start the driver.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.interface.tests.test_CisInterface.TestCisObjOutput.teardown">
+<code class="descname">teardown</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#TestCisObjOutput.teardown"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisObjOutput.teardown" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove the test file.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.interface.tests.test_CisInterface.TestCisObjOutput.test_send">
+<code class="descname">test_send</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#TestCisObjOutput.test_send"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisObjOutput.test_send" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test sending a obj to a remote file.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.interface.tests.test_CisInterface.TestCisObjOutput_local">
+<em class="property">class </em><code class="descclassname">cis_interface.interface.tests.test_CisInterface.</code><code class="descname">TestCisObjOutput_local</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#TestCisObjOutput_local"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisObjOutput_local" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.interface.tests.test_CisInterface.TestCisObjOutput" title="cis_interface.interface.tests.test_CisInterface.TestCisObjOutput"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.interface.tests.test_CisInterface.TestCisObjOutput</span></code></a></p>
+<p>Test input from an unformatted text file.</p>
+<dl class="method">
+<dt id="cis_interface.interface.tests.test_CisInterface.TestCisObjOutput_local.test_send">
+<code class="descname">test_send</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#TestCisObjOutput_local.test_send"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisObjOutput_local.test_send" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test sending a obj to a local file.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.interface.tests.test_CisInterface.TestCisOutput">
+<em class="property">class </em><code class="descclassname">cis_interface.interface.tests.test_CisInterface.</code><code class="descname">TestCisOutput</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#TestCisOutput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisOutput" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.interface.tests.test_CisInterface.TestBase" title="cis_interface.interface.tests.test_CisInterface.TestBase"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.interface.tests.test_CisInterface.TestBase</span></code></a></p>
+<p>Test basic output to python.</p>
+<dl class="method">
+<dt id="cis_interface.interface.tests.test_CisInterface.TestCisOutput.test_init">
+<code class="descname">test_init</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#TestCisOutput.test_init"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisOutput.test_init" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test error on init.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.interface.tests.test_CisInterface.TestCisOutput.test_send">
+<code class="descname">test_send</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#TestCisOutput.test_send"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisOutput.test_send" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test sending small message.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.interface.tests.test_CisInterface.TestCisOutput.test_send_nolimit">
+<code class="descname">test_send_nolimit</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#TestCisOutput.test_send_nolimit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisOutput.test_send_nolimit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test sending large message.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.interface.tests.test_CisInterface.TestCisOutputMatlab">
+<em class="property">class </em><code class="descclassname">cis_interface.interface.tests.test_CisInterface.</code><code class="descname">TestCisOutputMatlab</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#TestCisOutputMatlab"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisOutputMatlab" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.interface.tests.test_CisInterface.TestCisOutput" title="cis_interface.interface.tests.test_CisInterface.TestCisOutput"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.interface.tests.test_CisInterface.TestCisOutput</span></code></a></p>
+<p>Test basic output to python as passed from matlab.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.interface.tests.test_CisInterface.TestCisPandasInput">
+<em class="property">class </em><code class="descclassname">cis_interface.interface.tests.test_CisInterface.</code><code class="descname">TestCisPandasInput</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#TestCisPandasInput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisPandasInput" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.interface.tests.test_CisInterface.TestBase" title="cis_interface.interface.tests.test_CisInterface.TestBase"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.interface.tests.test_CisInterface.TestBase</span></code></a></p>
+<p>Test input from a pandas file.</p>
+<dl class="method">
+<dt id="cis_interface.interface.tests.test_CisInterface.TestCisPandasInput.setup">
+<code class="descname">setup</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#TestCisPandasInput.setup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisPandasInput.setup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a test file and start the driver.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.interface.tests.test_CisInterface.TestCisPandasInput.teardown">
+<code class="descname">teardown</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#TestCisPandasInput.teardown"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisPandasInput.teardown" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove the test file.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.interface.tests.test_CisInterface.TestCisPandasInput.test_recv">
+<code class="descname">test_recv</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#TestCisPandasInput.test_recv"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisPandasInput.test_recv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test receiving a pandas from a remote file.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.interface.tests.test_CisInterface.TestCisPandasInput_local">
+<em class="property">class </em><code class="descclassname">cis_interface.interface.tests.test_CisInterface.</code><code class="descname">TestCisPandasInput_local</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#TestCisPandasInput_local"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisPandasInput_local" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.interface.tests.test_CisInterface.TestCisPandasInput" title="cis_interface.interface.tests.test_CisInterface.TestCisPandasInput"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.interface.tests.test_CisInterface.TestCisPandasInput</span></code></a></p>
+<p>Test input from a pandas file.</p>
+<dl class="method">
+<dt id="cis_interface.interface.tests.test_CisInterface.TestCisPandasInput_local.test_recv">
+<code class="descname">test_recv</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#TestCisPandasInput_local.test_recv"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisPandasInput_local.test_recv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test receiving a pandas from a local file.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.interface.tests.test_CisInterface.TestCisPandasOutput">
+<em class="property">class </em><code class="descclassname">cis_interface.interface.tests.test_CisInterface.</code><code class="descname">TestCisPandasOutput</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#TestCisPandasOutput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisPandasOutput" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.interface.tests.test_CisInterface.TestBase" title="cis_interface.interface.tests.test_CisInterface.TestBase"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.interface.tests.test_CisInterface.TestBase</span></code></a></p>
+<p>Test output from a pandas.</p>
+<dl class="attribute">
+<dt id="cis_interface.interface.tests.test_CisInterface.TestCisPandasOutput.file_comm">
+<code class="descname">file_comm</code><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisPandasOutput.file_comm" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>FileComm</em> &#8211; File communicator.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.interface.tests.test_CisInterface.TestCisPandasOutput.setup">
+<code class="descname">setup</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#TestCisPandasOutput.setup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisPandasOutput.setup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a test file and start the driver.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.interface.tests.test_CisInterface.TestCisPandasOutput.teardown">
+<code class="descname">teardown</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#TestCisPandasOutput.teardown"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisPandasOutput.teardown" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove the test file.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.interface.tests.test_CisInterface.TestCisPandasOutput.test_send">
+<code class="descname">test_send</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#TestCisPandasOutput.test_send"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisPandasOutput.test_send" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test sending a pandas to a remote file.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.interface.tests.test_CisInterface.TestCisPandasOutput_local">
+<em class="property">class </em><code class="descclassname">cis_interface.interface.tests.test_CisInterface.</code><code class="descname">TestCisPandasOutput_local</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#TestCisPandasOutput_local"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisPandasOutput_local" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.interface.tests.test_CisInterface.TestCisPandasOutput" title="cis_interface.interface.tests.test_CisInterface.TestCisPandasOutput"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.interface.tests.test_CisInterface.TestCisPandasOutput</span></code></a></p>
+<p>Test input from an unformatted text file.</p>
+<dl class="method">
+<dt id="cis_interface.interface.tests.test_CisInterface.TestCisPandasOutput_local.test_send">
+<code class="descname">test_send</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#TestCisPandasOutput_local.test_send"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisPandasOutput_local.test_send" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test sending a pandas to a local file.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.interface.tests.test_CisInterface.TestCisPickleInput">
+<em class="property">class </em><code class="descclassname">cis_interface.interface.tests.test_CisInterface.</code><code class="descname">TestCisPickleInput</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#TestCisPickleInput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisPickleInput" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.interface.tests.test_CisInterface.TestBase" title="cis_interface.interface.tests.test_CisInterface.TestBase"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.interface.tests.test_CisInterface.TestBase</span></code></a></p>
+<p>Test input from a pickle file.</p>
+<dl class="method">
+<dt id="cis_interface.interface.tests.test_CisInterface.TestCisPickleInput.setup">
+<code class="descname">setup</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#TestCisPickleInput.setup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisPickleInput.setup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a test file and start the driver.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.interface.tests.test_CisInterface.TestCisPickleInput.teardown">
+<code class="descname">teardown</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#TestCisPickleInput.teardown"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisPickleInput.teardown" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove the test file.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.interface.tests.test_CisInterface.TestCisPickleInput.test_recv">
+<code class="descname">test_recv</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#TestCisPickleInput.test_recv"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisPickleInput.test_recv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test receiving a pickle from a remote file.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.interface.tests.test_CisInterface.TestCisPickleInput_local">
+<em class="property">class </em><code class="descclassname">cis_interface.interface.tests.test_CisInterface.</code><code class="descname">TestCisPickleInput_local</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#TestCisPickleInput_local"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisPickleInput_local" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.interface.tests.test_CisInterface.TestCisPickleInput" title="cis_interface.interface.tests.test_CisInterface.TestCisPickleInput"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.interface.tests.test_CisInterface.TestCisPickleInput</span></code></a></p>
+<p>Test input from a pickle file.</p>
+<dl class="method">
+<dt id="cis_interface.interface.tests.test_CisInterface.TestCisPickleInput_local.test_recv">
+<code class="descname">test_recv</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#TestCisPickleInput_local.test_recv"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisPickleInput_local.test_recv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test receiving a pickle from a local file.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.interface.tests.test_CisInterface.TestCisPickleOutput">
+<em class="property">class </em><code class="descclassname">cis_interface.interface.tests.test_CisInterface.</code><code class="descname">TestCisPickleOutput</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#TestCisPickleOutput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisPickleOutput" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.interface.tests.test_CisInterface.TestBase" title="cis_interface.interface.tests.test_CisInterface.TestBase"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.interface.tests.test_CisInterface.TestBase</span></code></a></p>
+<p>Test output from a pickle.</p>
+<dl class="attribute">
+<dt id="cis_interface.interface.tests.test_CisInterface.TestCisPickleOutput.file_comm">
+<code class="descname">file_comm</code><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisPickleOutput.file_comm" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>FileComm</em> &#8211; File communicator.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.interface.tests.test_CisInterface.TestCisPickleOutput.setup">
+<code class="descname">setup</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#TestCisPickleOutput.setup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisPickleOutput.setup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a test file and start the driver.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.interface.tests.test_CisInterface.TestCisPickleOutput.teardown">
+<code class="descname">teardown</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#TestCisPickleOutput.teardown"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisPickleOutput.teardown" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove the test file.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.interface.tests.test_CisInterface.TestCisPickleOutput.test_send">
+<code class="descname">test_send</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#TestCisPickleOutput.test_send"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisPickleOutput.test_send" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test sending a pickle to a remote file.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.interface.tests.test_CisInterface.TestCisPickleOutput_local">
+<em class="property">class </em><code class="descclassname">cis_interface.interface.tests.test_CisInterface.</code><code class="descname">TestCisPickleOutput_local</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#TestCisPickleOutput_local"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisPickleOutput_local" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.interface.tests.test_CisInterface.TestCisPickleOutput" title="cis_interface.interface.tests.test_CisInterface.TestCisPickleOutput"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.interface.tests.test_CisInterface.TestCisPickleOutput</span></code></a></p>
+<p>Test input from an unformatted text file.</p>
+<dl class="method">
+<dt id="cis_interface.interface.tests.test_CisInterface.TestCisPickleOutput_local.test_send">
+<code class="descname">test_send</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#TestCisPickleOutput_local.test_send"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisPickleOutput_local.test_send" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test sending a pickle to a local file.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.interface.tests.test_CisInterface.TestCisPlyInput">
+<em class="property">class </em><code class="descclassname">cis_interface.interface.tests.test_CisInterface.</code><code class="descname">TestCisPlyInput</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#TestCisPlyInput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisPlyInput" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.interface.tests.test_CisInterface.TestBase" title="cis_interface.interface.tests.test_CisInterface.TestBase"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.interface.tests.test_CisInterface.TestBase</span></code></a></p>
+<p>Test input from a ply file.</p>
+<dl class="method">
+<dt id="cis_interface.interface.tests.test_CisInterface.TestCisPlyInput.setup">
+<code class="descname">setup</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#TestCisPlyInput.setup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisPlyInput.setup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a test file and start the driver.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.interface.tests.test_CisInterface.TestCisPlyInput.teardown">
+<code class="descname">teardown</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#TestCisPlyInput.teardown"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisPlyInput.teardown" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove the test file.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.interface.tests.test_CisInterface.TestCisPlyInput.test_recv">
+<code class="descname">test_recv</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#TestCisPlyInput.test_recv"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisPlyInput.test_recv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test receiving a ply from a remote file.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.interface.tests.test_CisInterface.TestCisPlyInput_local">
+<em class="property">class </em><code class="descclassname">cis_interface.interface.tests.test_CisInterface.</code><code class="descname">TestCisPlyInput_local</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#TestCisPlyInput_local"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisPlyInput_local" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.interface.tests.test_CisInterface.TestCisPlyInput" title="cis_interface.interface.tests.test_CisInterface.TestCisPlyInput"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.interface.tests.test_CisInterface.TestCisPlyInput</span></code></a></p>
+<p>Test input from a ply file.</p>
+<dl class="method">
+<dt id="cis_interface.interface.tests.test_CisInterface.TestCisPlyInput_local.test_recv">
+<code class="descname">test_recv</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#TestCisPlyInput_local.test_recv"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisPlyInput_local.test_recv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test receiving a ply from a local file.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.interface.tests.test_CisInterface.TestCisPlyOutput">
+<em class="property">class </em><code class="descclassname">cis_interface.interface.tests.test_CisInterface.</code><code class="descname">TestCisPlyOutput</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#TestCisPlyOutput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisPlyOutput" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.interface.tests.test_CisInterface.TestBase" title="cis_interface.interface.tests.test_CisInterface.TestBase"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.interface.tests.test_CisInterface.TestBase</span></code></a></p>
+<p>Test output from a ply.</p>
+<dl class="attribute">
+<dt id="cis_interface.interface.tests.test_CisInterface.TestCisPlyOutput.file_comm">
+<code class="descname">file_comm</code><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisPlyOutput.file_comm" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>FileComm</em> &#8211; File communicator.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.interface.tests.test_CisInterface.TestCisPlyOutput.setup">
+<code class="descname">setup</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#TestCisPlyOutput.setup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisPlyOutput.setup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a test file and start the driver.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.interface.tests.test_CisInterface.TestCisPlyOutput.teardown">
+<code class="descname">teardown</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#TestCisPlyOutput.teardown"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisPlyOutput.teardown" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove the test file.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.interface.tests.test_CisInterface.TestCisPlyOutput.test_send">
+<code class="descname">test_send</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#TestCisPlyOutput.test_send"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisPlyOutput.test_send" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test sending a ply to a remote file.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.interface.tests.test_CisInterface.TestCisPlyOutput_local">
+<em class="property">class </em><code class="descclassname">cis_interface.interface.tests.test_CisInterface.</code><code class="descname">TestCisPlyOutput_local</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#TestCisPlyOutput_local"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisPlyOutput_local" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.interface.tests.test_CisInterface.TestCisPlyOutput" title="cis_interface.interface.tests.test_CisInterface.TestCisPlyOutput"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.interface.tests.test_CisInterface.TestCisPlyOutput</span></code></a></p>
+<p>Test input from an unformatted text file.</p>
+<dl class="method">
+<dt id="cis_interface.interface.tests.test_CisInterface.TestCisPlyOutput_local.test_send">
+<code class="descname">test_send</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#TestCisPlyOutput_local.test_send"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisPlyOutput_local.test_send" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test sending a ply to a local file.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.interface.tests.test_CisInterface.TestCisRpc">
+<em class="property">class </em><code class="descclassname">cis_interface.interface.tests.test_CisInterface.</code><code class="descname">TestCisRpc</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#TestCisRpc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisRpc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.interface.tests.test_CisInterface.TestBase" title="cis_interface.interface.tests.test_CisInterface.TestBase"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.interface.tests.test_CisInterface.TestBase</span></code></a></p>
+<p>Test basic RPC communication with Python.</p>
+<dl class="attribute">
+<dt id="cis_interface.interface.tests.test_CisInterface.TestCisRpc.client_comm">
+<code class="descname">client_comm</code><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisRpc.client_comm" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>comm</em> &#8211; Client side comm.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.interface.tests.test_CisInterface.TestCisRpc.client_msg">
+<code class="descname">client_msg</code><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisRpc.client_msg" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str</em> &#8211; Test message for client side.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.interface.tests.test_CisInterface.TestCisRpc.driver_kwargs">
+<code class="descname">driver_kwargs</code><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisRpc.driver_kwargs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Keyword arguments for the driver.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.interface.tests.test_CisInterface.TestCisRpc.server_comm">
+<code class="descname">server_comm</code><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisRpc.server_comm" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>comm</em> &#8211; Server side comm.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.interface.tests.test_CisInterface.TestCisRpc.server_msg">
+<code class="descname">server_msg</code><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisRpc.server_msg" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str</em> &#8211; Test message for server side.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.interface.tests.test_CisInterface.TestCisRpc.server_side_call">
+<code class="descname">server_side_call</code><span class="sig-paren">(</span><em>msg_sent</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#TestCisRpc.server_side_call"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisRpc.server_side_call" title="Permalink to this definition">¶</a></dt>
+<dd><p>Actions to respond to a mock call on the server side.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.interface.tests.test_CisInterface.TestCisRpc.test_rpcCall">
+<code class="descname">test_rpcCall</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#TestCisRpc.test_rpcCall"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisRpc.test_rpcCall" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test rpc call.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.interface.tests.test_CisInterface.TestCisRpc.test_rpcSendRecv">
+<code class="descname">test_rpcSendRecv</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#TestCisRpc.test_rpcSendRecv"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisRpc.test_rpcSendRecv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test sending/receiving formated output.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.interface.tests.test_CisInterface.TestCisRpcClient">
+<em class="property">class </em><code class="descclassname">cis_interface.interface.tests.test_CisInterface.</code><code class="descname">TestCisRpcClient</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#TestCisRpcClient"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisRpcClient" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.interface.tests.test_CisInterface.TestCisRpc" title="cis_interface.interface.tests.test_CisInterface.TestCisRpc"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.interface.tests.test_CisInterface.TestCisRpc</span></code></a></p>
+<p>Test client-side RPC communication with Python.</p>
+<dl class="attribute">
+<dt id="cis_interface.interface.tests.test_CisInterface.TestCisRpcClient.driver_kwargs">
+<code class="descname">driver_kwargs</code><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisRpcClient.driver_kwargs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Keyword arguments for the driver.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.interface.tests.test_CisInterface.TestCisRpcClientMatlab">
+<em class="property">class </em><code class="descclassname">cis_interface.interface.tests.test_CisInterface.</code><code class="descname">TestCisRpcClientMatlab</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#TestCisRpcClientMatlab"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisRpcClientMatlab" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.interface.tests.test_CisInterface.TestCisRpcClient" title="cis_interface.interface.tests.test_CisInterface.TestCisRpcClient"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.interface.tests.test_CisInterface.TestCisRpcClient</span></code></a></p>
+<p>Test client-side RPC communication with Python as passed through Matlab.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.interface.tests.test_CisInterface.TestCisRpcMatlab">
+<em class="property">class </em><code class="descclassname">cis_interface.interface.tests.test_CisInterface.</code><code class="descname">TestCisRpcMatlab</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#TestCisRpcMatlab"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisRpcMatlab" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.interface.tests.test_CisInterface.TestCisRpc" title="cis_interface.interface.tests.test_CisInterface.TestCisRpc"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.interface.tests.test_CisInterface.TestCisRpc</span></code></a></p>
+<p>Test basic RPC communication with Python as passed through Matlab.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.interface.tests.test_CisInterface.TestCisRpcServer">
+<em class="property">class </em><code class="descclassname">cis_interface.interface.tests.test_CisInterface.</code><code class="descname">TestCisRpcServer</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#TestCisRpcServer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisRpcServer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.interface.tests.test_CisInterface.TestCisRpc" title="cis_interface.interface.tests.test_CisInterface.TestCisRpc"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.interface.tests.test_CisInterface.TestCisRpc</span></code></a></p>
+<p>Test server-side RPC communication with Python.</p>
+<dl class="attribute">
+<dt id="cis_interface.interface.tests.test_CisInterface.TestCisRpcServer.client_comm">
+<code class="descname">client_comm</code><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisRpcServer.client_comm" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>comm</em> &#8211; Client side comm.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.interface.tests.test_CisInterface.TestCisRpcServer.client_msg">
+<code class="descname">client_msg</code><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisRpcServer.client_msg" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str</em> &#8211; Test message for client side.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.interface.tests.test_CisInterface.TestCisRpcServer.driver_kwargs">
+<code class="descname">driver_kwargs</code><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisRpcServer.driver_kwargs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Keyword arguments for the driver.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.interface.tests.test_CisInterface.TestCisRpcServer.server_comm">
+<code class="descname">server_comm</code><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisRpcServer.server_comm" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>comm</em> &#8211; Server side comm.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.interface.tests.test_CisInterface.TestCisRpcServer.server_msg">
+<code class="descname">server_msg</code><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisRpcServer.server_msg" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str</em> &#8211; Test message for server side.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.interface.tests.test_CisInterface.TestCisRpcServer.test_rpcCall">
+<code class="descname">test_rpcCall</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#TestCisRpcServer.test_rpcCall"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisRpcServer.test_rpcCall" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test rpc call (disabled for server test).</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.interface.tests.test_CisInterface.TestCisRpcServerMatlab">
+<em class="property">class </em><code class="descclassname">cis_interface.interface.tests.test_CisInterface.</code><code class="descname">TestCisRpcServerMatlab</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#TestCisRpcServerMatlab"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisRpcServerMatlab" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.interface.tests.test_CisInterface.TestCisRpcServer" title="cis_interface.interface.tests.test_CisInterface.TestCisRpcServer"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.interface.tests.test_CisInterface.TestCisRpcServer</span></code></a></p>
+<p>Test server-side RPC communication with Python as passed through Matlab.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.interface.tests.test_CisInterface.TestCisRpcSplit">
+<em class="property">class </em><code class="descclassname">cis_interface.interface.tests.test_CisInterface.</code><code class="descname">TestCisRpcSplit</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#TestCisRpcSplit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisRpcSplit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.interface.tests.test_CisInterface.TestCisRpc" title="cis_interface.interface.tests.test_CisInterface.TestCisRpc"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.interface.tests.test_CisInterface.TestCisRpc</span></code></a></p>
+<p>Test basic RPC communication with Python using split comm.</p>
+<dl class="attribute">
+<dt id="cis_interface.interface.tests.test_CisInterface.TestCisRpcSplit.driver_kwargs">
+<code class="descname">driver_kwargs</code><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.TestCisRpcSplit.driver_kwargs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Keyword arguments for the driver.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.interface.tests.test_CisInterface.test_CisMatlab_class">
+<code class="descclassname">cis_interface.interface.tests.test_CisInterface.</code><code class="descname">test_CisMatlab_class</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#test_CisMatlab_class"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.test_CisMatlab_class" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test Matlab interface for classes.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.interface.tests.test_CisInterface.test_CisMatlab_variables">
+<code class="descclassname">cis_interface.interface.tests.test_CisInterface.</code><code class="descname">test_CisMatlab_variables</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#test_CisMatlab_variables"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.test_CisMatlab_variables" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test Matlab interface for variables.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.interface.tests.test_CisInterface.test_bufMsgSize">
+<code class="descclassname">cis_interface.interface.tests.test_CisInterface.</code><code class="descname">test_bufMsgSize</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#test_bufMsgSize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.test_bufMsgSize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test buf message size.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.interface.tests.test_CisInterface.test_eof_msg">
+<code class="descclassname">cis_interface.interface.tests.test_CisInterface.</code><code class="descname">test_eof_msg</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#test_eof_msg"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.test_eof_msg" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test eof message signal.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.interface.tests.test_CisInterface.test_maxMsgSize">
+<code class="descclassname">cis_interface.interface.tests.test_CisInterface.</code><code class="descname">test_maxMsgSize</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_CisInterface.html#test_maxMsgSize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_CisInterface.test_maxMsgSize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test max message size.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-cis_interface.interface.tests.test_PsiInterface">
+<span id="cis-interface-interface-tests-test-psiinterface-module"></span><h2>cis_interface.interface.tests.test_PsiInterface module<a class="headerlink" href="#module-cis_interface.interface.tests.test_PsiInterface" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="cis_interface.interface.tests.test_PsiInterface.TestBase">
+<em class="property">class </em><code class="descclassname">cis_interface.interface.tests.test_PsiInterface.</code><code class="descname">TestBase</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_PsiInterface.html#TestBase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_PsiInterface.TestBase" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="cis_interface.tests.html#cis_interface.tests.CisTestClassInfo" title="cis_interface.tests.CisTestClassInfo"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.tests.CisTestClassInfo</span></code></a></p>
+<p>Test class for interface classes.</p>
+<dl class="attribute">
+<dt id="cis_interface.interface.tests.test_PsiInterface.TestBase.driver_class">
+<code class="descname">driver_class</code><a class="headerlink" href="#cis_interface.interface.tests.test_PsiInterface.TestBase.driver_class" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>class</em> &#8211; Driver class.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.interface.tests.test_PsiInterface.TestBase.driver_kwargs">
+<code class="descname">driver_kwargs</code><a class="headerlink" href="#cis_interface.interface.tests.test_PsiInterface.TestBase.driver_kwargs" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>dict</em> &#8211; Arguments for the test driver.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.interface.tests.test_PsiInterface.TestBase.inst_kwargs">
+<code class="descname">inst_kwargs</code><a class="headerlink" href="#cis_interface.interface.tests.test_PsiInterface.TestBase.inst_kwargs" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>dict</em> &#8211; Arguments for the interface instance.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.interface.tests.test_PsiInterface.TestBase.remove_instance">
+<code class="descname">remove_instance</code><span class="sig-paren">(</span><em>inst</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_PsiInterface.html#TestBase.remove_instance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_PsiInterface.TestBase.remove_instance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove an instance.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.interface.tests.test_PsiInterface.TestBase.setup">
+<code class="descname">setup</code><span class="sig-paren">(</span><em>skip_start=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_PsiInterface.html#TestBase.setup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_PsiInterface.TestBase.setup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Start driver and instance.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.interface.tests.test_PsiInterface.TestBase.teardown">
+<code class="descname">teardown</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_PsiInterface.html#TestBase.teardown"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_PsiInterface.TestBase.teardown" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stop the driver.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.interface.tests.test_PsiInterface.TestPsiAsciiArrayInput">
+<em class="property">class </em><code class="descclassname">cis_interface.interface.tests.test_PsiInterface.</code><code class="descname">TestPsiAsciiArrayInput</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_PsiInterface.html#TestPsiAsciiArrayInput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_PsiInterface.TestPsiAsciiArrayInput" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.interface.tests.test_PsiInterface.TestPsiAsciiTableInput" title="cis_interface.interface.tests.test_PsiInterface.TestPsiAsciiTableInput"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.interface.tests.test_PsiInterface.TestPsiAsciiTableInput</span></code></a></p>
+<p>Test input from an ASCII table.</p>
+<dl class="method">
+<dt id="cis_interface.interface.tests.test_PsiInterface.TestPsiAsciiArrayInput.test_recv_line">
+<code class="descname">test_recv_line</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_PsiInterface.html#TestPsiAsciiArrayInput.test_recv_line"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_PsiInterface.TestPsiAsciiArrayInput.test_recv_line" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test receiving an array from a remote table.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.interface.tests.test_PsiInterface.TestPsiAsciiArrayInput_local">
+<em class="property">class </em><code class="descclassname">cis_interface.interface.tests.test_PsiInterface.</code><code class="descname">TestPsiAsciiArrayInput_local</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_PsiInterface.html#TestPsiAsciiArrayInput_local"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_PsiInterface.TestPsiAsciiArrayInput_local" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.interface.tests.test_PsiInterface.TestPsiAsciiArrayInput" title="cis_interface.interface.tests.test_PsiInterface.TestPsiAsciiArrayInput"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.interface.tests.test_PsiInterface.TestPsiAsciiArrayInput</span></code></a></p>
+<p>Test input from an ASCII table.</p>
+<dl class="method">
+<dt id="cis_interface.interface.tests.test_PsiInterface.TestPsiAsciiArrayInput_local.test_recv_line">
+<code class="descname">test_recv_line</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_PsiInterface.html#TestPsiAsciiArrayInput_local.test_recv_line"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_PsiInterface.TestPsiAsciiArrayInput_local.test_recv_line" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test receiving an array from a local table.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.interface.tests.test_PsiInterface.TestPsiAsciiArrayOutput">
+<em class="property">class </em><code class="descclassname">cis_interface.interface.tests.test_PsiInterface.</code><code class="descname">TestPsiAsciiArrayOutput</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_PsiInterface.html#TestPsiAsciiArrayOutput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_PsiInterface.TestPsiAsciiArrayOutput" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.interface.tests.test_PsiInterface.TestPsiAsciiTableOutput" title="cis_interface.interface.tests.test_PsiInterface.TestPsiAsciiTableOutput"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.interface.tests.test_PsiInterface.TestPsiAsciiTableOutput</span></code></a></p>
+<p>Test input from an ASCII table.</p>
+<dl class="method">
+<dt id="cis_interface.interface.tests.test_PsiInterface.TestPsiAsciiArrayOutput.test_send_line">
+<code class="descname">test_send_line</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_PsiInterface.html#TestPsiAsciiArrayOutput.test_send_line"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_PsiInterface.TestPsiAsciiArrayOutput.test_send_line" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test sending an array to a remote table.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.interface.tests.test_PsiInterface.TestPsiAsciiArrayOutput_local">
+<em class="property">class </em><code class="descclassname">cis_interface.interface.tests.test_PsiInterface.</code><code class="descname">TestPsiAsciiArrayOutput_local</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_PsiInterface.html#TestPsiAsciiArrayOutput_local"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_PsiInterface.TestPsiAsciiArrayOutput_local" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.interface.tests.test_PsiInterface.TestPsiAsciiArrayOutput" title="cis_interface.interface.tests.test_PsiInterface.TestPsiAsciiArrayOutput"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.interface.tests.test_PsiInterface.TestPsiAsciiArrayOutput</span></code></a></p>
+<p>Test input from an ASCII table as array.</p>
+<dl class="method">
+<dt id="cis_interface.interface.tests.test_PsiInterface.TestPsiAsciiArrayOutput_local.test_send_line">
+<code class="descname">test_send_line</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_PsiInterface.html#TestPsiAsciiArrayOutput_local.test_send_line"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_PsiInterface.TestPsiAsciiArrayOutput_local.test_send_line" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test sending an array to a local table.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.interface.tests.test_PsiInterface.TestPsiAsciiFileInput">
+<em class="property">class </em><code class="descclassname">cis_interface.interface.tests.test_PsiInterface.</code><code class="descname">TestPsiAsciiFileInput</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_PsiInterface.html#TestPsiAsciiFileInput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_PsiInterface.TestPsiAsciiFileInput" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.interface.tests.test_PsiInterface.TestBase" title="cis_interface.interface.tests.test_PsiInterface.TestBase"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.interface.tests.test_PsiInterface.TestBase</span></code></a></p>
+<p>Test input from an unformatted text file.</p>
+<dl class="method">
+<dt id="cis_interface.interface.tests.test_PsiInterface.TestPsiAsciiFileInput.setup">
+<code class="descname">setup</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_PsiInterface.html#TestPsiAsciiFileInput.setup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_PsiInterface.TestPsiAsciiFileInput.setup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a test file.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.interface.tests.test_PsiInterface.TestPsiAsciiFileInput.teardown">
+<code class="descname">teardown</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_PsiInterface.html#TestPsiAsciiFileInput.teardown"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_PsiInterface.TestPsiAsciiFileInput.teardown" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove the test file.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.interface.tests.test_PsiInterface.TestPsiAsciiFileInput.test_recv_line">
+<code class="descname">test_recv_line</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_PsiInterface.html#TestPsiAsciiFileInput.test_recv_line"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_PsiInterface.TestPsiAsciiFileInput.test_recv_line" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test receiving a line from a remote file.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.interface.tests.test_PsiInterface.TestPsiAsciiFileInput_local">
+<em class="property">class </em><code class="descclassname">cis_interface.interface.tests.test_PsiInterface.</code><code class="descname">TestPsiAsciiFileInput_local</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_PsiInterface.html#TestPsiAsciiFileInput_local"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_PsiInterface.TestPsiAsciiFileInput_local" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.interface.tests.test_PsiInterface.TestPsiAsciiFileInput" title="cis_interface.interface.tests.test_PsiInterface.TestPsiAsciiFileInput"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.interface.tests.test_PsiInterface.TestPsiAsciiFileInput</span></code></a></p>
+<p>Test input from an unformatted text file.</p>
+<dl class="method">
+<dt id="cis_interface.interface.tests.test_PsiInterface.TestPsiAsciiFileInput_local.test_recv_line">
+<code class="descname">test_recv_line</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_PsiInterface.html#TestPsiAsciiFileInput_local.test_recv_line"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_PsiInterface.TestPsiAsciiFileInput_local.test_recv_line" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test receiving a line from a local file.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.interface.tests.test_PsiInterface.TestPsiAsciiFileOutput">
+<em class="property">class </em><code class="descclassname">cis_interface.interface.tests.test_PsiInterface.</code><code class="descname">TestPsiAsciiFileOutput</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_PsiInterface.html#TestPsiAsciiFileOutput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_PsiInterface.TestPsiAsciiFileOutput" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.interface.tests.test_PsiInterface.TestBase" title="cis_interface.interface.tests.test_PsiInterface.TestBase"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.interface.tests.test_PsiInterface.TestBase</span></code></a></p>
+<p>Test output to an unformatted text file.</p>
+<dl class="attribute">
+<dt id="cis_interface.interface.tests.test_PsiInterface.TestPsiAsciiFileOutput.file_comm">
+<code class="descname">file_comm</code><a class="headerlink" href="#cis_interface.interface.tests.test_PsiInterface.TestPsiAsciiFileOutput.file_comm" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>FileComm</em> &#8211; File communicator.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.interface.tests.test_PsiInterface.TestPsiAsciiFileOutput.setup">
+<code class="descname">setup</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_PsiInterface.html#TestPsiAsciiFileOutput.setup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_PsiInterface.TestPsiAsciiFileOutput.setup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a test file.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.interface.tests.test_PsiInterface.TestPsiAsciiFileOutput.teardown">
+<code class="descname">teardown</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_PsiInterface.html#TestPsiAsciiFileOutput.teardown"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_PsiInterface.TestPsiAsciiFileOutput.teardown" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove the test file.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.interface.tests.test_PsiInterface.TestPsiAsciiFileOutput.test_send_line">
+<code class="descname">test_send_line</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_PsiInterface.html#TestPsiAsciiFileOutput.test_send_line"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_PsiInterface.TestPsiAsciiFileOutput.test_send_line" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test sending a line to a remote file.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.interface.tests.test_PsiInterface.TestPsiAsciiFileOutput_local">
+<em class="property">class </em><code class="descclassname">cis_interface.interface.tests.test_PsiInterface.</code><code class="descname">TestPsiAsciiFileOutput_local</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_PsiInterface.html#TestPsiAsciiFileOutput_local"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_PsiInterface.TestPsiAsciiFileOutput_local" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.interface.tests.test_PsiInterface.TestPsiAsciiFileOutput" title="cis_interface.interface.tests.test_PsiInterface.TestPsiAsciiFileOutput"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.interface.tests.test_PsiInterface.TestPsiAsciiFileOutput</span></code></a></p>
+<p>Test input from an unformatted text file.</p>
+<dl class="method">
+<dt id="cis_interface.interface.tests.test_PsiInterface.TestPsiAsciiFileOutput_local.test_send_line">
+<code class="descname">test_send_line</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_PsiInterface.html#TestPsiAsciiFileOutput_local.test_send_line"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_PsiInterface.TestPsiAsciiFileOutput_local.test_send_line" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test sending a line to a local file.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.interface.tests.test_PsiInterface.TestPsiAsciiTableInput">
+<em class="property">class </em><code class="descclassname">cis_interface.interface.tests.test_PsiInterface.</code><code class="descname">TestPsiAsciiTableInput</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_PsiInterface.html#TestPsiAsciiTableInput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_PsiInterface.TestPsiAsciiTableInput" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.interface.tests.test_PsiInterface.TestPsiAsciiFileInput" title="cis_interface.interface.tests.test_PsiInterface.TestPsiAsciiFileInput"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.interface.tests.test_PsiInterface.TestPsiAsciiFileInput</span></code></a></p>
+<p>Test input from an ascii table.</p>
+<dl class="method">
+<dt id="cis_interface.interface.tests.test_PsiInterface.TestPsiAsciiTableInput.test_recv_line">
+<code class="descname">test_recv_line</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_PsiInterface.html#TestPsiAsciiTableInput.test_recv_line"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_PsiInterface.TestPsiAsciiTableInput.test_recv_line" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test receiving a row from a remote table.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.interface.tests.test_PsiInterface.TestPsiAsciiTableInput_local">
+<em class="property">class </em><code class="descclassname">cis_interface.interface.tests.test_PsiInterface.</code><code class="descname">TestPsiAsciiTableInput_local</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_PsiInterface.html#TestPsiAsciiTableInput_local"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_PsiInterface.TestPsiAsciiTableInput_local" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.interface.tests.test_PsiInterface.TestPsiAsciiTableInput" title="cis_interface.interface.tests.test_PsiInterface.TestPsiAsciiTableInput"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.interface.tests.test_PsiInterface.TestPsiAsciiTableInput</span></code></a></p>
+<p>Test input from an ASCII table.</p>
+<dl class="method">
+<dt id="cis_interface.interface.tests.test_PsiInterface.TestPsiAsciiTableInput_local.test_recv_line">
+<code class="descname">test_recv_line</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_PsiInterface.html#TestPsiAsciiTableInput_local.test_recv_line"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_PsiInterface.TestPsiAsciiTableInput_local.test_recv_line" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test receiving a row from a local table.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.interface.tests.test_PsiInterface.TestPsiAsciiTableOutput">
+<em class="property">class </em><code class="descclassname">cis_interface.interface.tests.test_PsiInterface.</code><code class="descname">TestPsiAsciiTableOutput</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_PsiInterface.html#TestPsiAsciiTableOutput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_PsiInterface.TestPsiAsciiTableOutput" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.interface.tests.test_PsiInterface.TestPsiAsciiFileOutput" title="cis_interface.interface.tests.test_PsiInterface.TestPsiAsciiFileOutput"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.interface.tests.test_PsiInterface.TestPsiAsciiFileOutput</span></code></a></p>
+<p>Test output from an ascii table.</p>
+<dl class="attribute">
+<dt id="cis_interface.interface.tests.test_PsiInterface.TestPsiAsciiTableOutput.driver_kwargs">
+<code class="descname">driver_kwargs</code><a class="headerlink" href="#cis_interface.interface.tests.test_PsiInterface.TestPsiAsciiTableOutput.driver_kwargs" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>dict</em> &#8211; Keyword arguments for accompanying driver.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.interface.tests.test_PsiInterface.TestPsiAsciiTableOutput.test_send_line">
+<code class="descname">test_send_line</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_PsiInterface.html#TestPsiAsciiTableOutput.test_send_line"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_PsiInterface.TestPsiAsciiTableOutput.test_send_line" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test sending a row to a remote table.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.interface.tests.test_PsiInterface.TestPsiAsciiTableOutputMatlab">
+<em class="property">class </em><code class="descclassname">cis_interface.interface.tests.test_PsiInterface.</code><code class="descname">TestPsiAsciiTableOutputMatlab</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_PsiInterface.html#TestPsiAsciiTableOutputMatlab"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_PsiInterface.TestPsiAsciiTableOutputMatlab" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.interface.tests.test_PsiInterface.TestPsiAsciiTableOutput" title="cis_interface.interface.tests.test_PsiInterface.TestPsiAsciiTableOutput"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.interface.tests.test_PsiInterface.TestPsiAsciiTableOutput</span></code></a></p>
+<p>Test output from an ascii table as passed through Matlab.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.interface.tests.test_PsiInterface.TestPsiAsciiTableOutput_local">
+<em class="property">class </em><code class="descclassname">cis_interface.interface.tests.test_PsiInterface.</code><code class="descname">TestPsiAsciiTableOutput_local</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_PsiInterface.html#TestPsiAsciiTableOutput_local"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_PsiInterface.TestPsiAsciiTableOutput_local" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.interface.tests.test_PsiInterface.TestPsiAsciiTableOutput" title="cis_interface.interface.tests.test_PsiInterface.TestPsiAsciiTableOutput"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.interface.tests.test_PsiInterface.TestPsiAsciiTableOutput</span></code></a></p>
+<p>Test input from an ASCII table.</p>
+<dl class="method">
+<dt id="cis_interface.interface.tests.test_PsiInterface.TestPsiAsciiTableOutput_local.test_send_line">
+<code class="descname">test_send_line</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_PsiInterface.html#TestPsiAsciiTableOutput_local.test_send_line"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_PsiInterface.TestPsiAsciiTableOutput_local.test_send_line" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test sending a row to a local table.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.interface.tests.test_PsiInterface.TestPsiInput">
+<em class="property">class </em><code class="descclassname">cis_interface.interface.tests.test_PsiInterface.</code><code class="descname">TestPsiInput</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_PsiInterface.html#TestPsiInput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_PsiInterface.TestPsiInput" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.interface.tests.test_PsiInterface.TestBase" title="cis_interface.interface.tests.test_PsiInterface.TestBase"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.interface.tests.test_PsiInterface.TestBase</span></code></a></p>
+<p>Test basic input to python.</p>
+<dl class="method">
+<dt id="cis_interface.interface.tests.test_PsiInterface.TestPsiInput.test_init">
+<code class="descname">test_init</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_PsiInterface.html#TestPsiInput.test_init"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_PsiInterface.TestPsiInput.test_init" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test error on init.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.interface.tests.test_PsiInterface.TestPsiInput.test_recv">
+<code class="descname">test_recv</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_PsiInterface.html#TestPsiInput.test_recv"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_PsiInterface.TestPsiInput.test_recv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test receiving small message.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.interface.tests.test_PsiInterface.TestPsiInput.test_recv_nolimit">
+<code class="descname">test_recv_nolimit</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_PsiInterface.html#TestPsiInput.test_recv_nolimit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_PsiInterface.TestPsiInput.test_recv_nolimit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test receiving large message.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.interface.tests.test_PsiInterface.TestPsiInputMatlab">
+<em class="property">class </em><code class="descclassname">cis_interface.interface.tests.test_PsiInterface.</code><code class="descname">TestPsiInputMatlab</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_PsiInterface.html#TestPsiInputMatlab"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_PsiInterface.TestPsiInputMatlab" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.interface.tests.test_PsiInterface.TestPsiInput" title="cis_interface.interface.tests.test_PsiInterface.TestPsiInput"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.interface.tests.test_PsiInterface.TestPsiInput</span></code></a></p>
+<p>Test basic input to python as passed from matlab.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.interface.tests.test_PsiInterface.TestPsiOutput">
+<em class="property">class </em><code class="descclassname">cis_interface.interface.tests.test_PsiInterface.</code><code class="descname">TestPsiOutput</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_PsiInterface.html#TestPsiOutput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_PsiInterface.TestPsiOutput" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.interface.tests.test_PsiInterface.TestBase" title="cis_interface.interface.tests.test_PsiInterface.TestBase"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.interface.tests.test_PsiInterface.TestBase</span></code></a></p>
+<p>Test basic output to python.</p>
+<dl class="method">
+<dt id="cis_interface.interface.tests.test_PsiInterface.TestPsiOutput.test_init">
+<code class="descname">test_init</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_PsiInterface.html#TestPsiOutput.test_init"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_PsiInterface.TestPsiOutput.test_init" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test error on init.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.interface.tests.test_PsiInterface.TestPsiOutput.test_send">
+<code class="descname">test_send</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_PsiInterface.html#TestPsiOutput.test_send"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_PsiInterface.TestPsiOutput.test_send" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test sending small message.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.interface.tests.test_PsiInterface.TestPsiOutput.test_send_nolimit">
+<code class="descname">test_send_nolimit</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_PsiInterface.html#TestPsiOutput.test_send_nolimit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_PsiInterface.TestPsiOutput.test_send_nolimit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test sending large message.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.interface.tests.test_PsiInterface.TestPsiOutputMatlab">
+<em class="property">class </em><code class="descclassname">cis_interface.interface.tests.test_PsiInterface.</code><code class="descname">TestPsiOutputMatlab</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_PsiInterface.html#TestPsiOutputMatlab"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_PsiInterface.TestPsiOutputMatlab" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.interface.tests.test_PsiInterface.TestPsiOutput" title="cis_interface.interface.tests.test_PsiInterface.TestPsiOutput"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.interface.tests.test_PsiInterface.TestPsiOutput</span></code></a></p>
+<p>Test basic output to python as passed from matlab.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.interface.tests.test_PsiInterface.TestPsiPandasInput">
+<em class="property">class </em><code class="descclassname">cis_interface.interface.tests.test_PsiInterface.</code><code class="descname">TestPsiPandasInput</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_PsiInterface.html#TestPsiPandasInput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_PsiInterface.TestPsiPandasInput" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.interface.tests.test_PsiInterface.TestBase" title="cis_interface.interface.tests.test_PsiInterface.TestBase"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.interface.tests.test_PsiInterface.TestBase</span></code></a></p>
+<p>Test input from a pandas file.</p>
+<dl class="method">
+<dt id="cis_interface.interface.tests.test_PsiInterface.TestPsiPandasInput.setup">
+<code class="descname">setup</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_PsiInterface.html#TestPsiPandasInput.setup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_PsiInterface.TestPsiPandasInput.setup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a test file and start the driver.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.interface.tests.test_PsiInterface.TestPsiPandasInput.teardown">
+<code class="descname">teardown</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_PsiInterface.html#TestPsiPandasInput.teardown"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_PsiInterface.TestPsiPandasInput.teardown" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove the test file.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.interface.tests.test_PsiInterface.TestPsiPandasInput.test_recv">
+<code class="descname">test_recv</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_PsiInterface.html#TestPsiPandasInput.test_recv"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_PsiInterface.TestPsiPandasInput.test_recv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test receiving a pandas from a remote file.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.interface.tests.test_PsiInterface.TestPsiPandasInput_local">
+<em class="property">class </em><code class="descclassname">cis_interface.interface.tests.test_PsiInterface.</code><code class="descname">TestPsiPandasInput_local</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_PsiInterface.html#TestPsiPandasInput_local"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_PsiInterface.TestPsiPandasInput_local" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.interface.tests.test_PsiInterface.TestPsiPandasInput" title="cis_interface.interface.tests.test_PsiInterface.TestPsiPandasInput"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.interface.tests.test_PsiInterface.TestPsiPandasInput</span></code></a></p>
+<p>Test input from a pandas file.</p>
+<dl class="method">
+<dt id="cis_interface.interface.tests.test_PsiInterface.TestPsiPandasInput_local.test_recv">
+<code class="descname">test_recv</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_PsiInterface.html#TestPsiPandasInput_local.test_recv"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_PsiInterface.TestPsiPandasInput_local.test_recv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test receiving a pandas from a local file.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.interface.tests.test_PsiInterface.TestPsiPandasOutput">
+<em class="property">class </em><code class="descclassname">cis_interface.interface.tests.test_PsiInterface.</code><code class="descname">TestPsiPandasOutput</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_PsiInterface.html#TestPsiPandasOutput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_PsiInterface.TestPsiPandasOutput" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.interface.tests.test_PsiInterface.TestBase" title="cis_interface.interface.tests.test_PsiInterface.TestBase"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.interface.tests.test_PsiInterface.TestBase</span></code></a></p>
+<p>Test output from a pandas.</p>
+<dl class="attribute">
+<dt id="cis_interface.interface.tests.test_PsiInterface.TestPsiPandasOutput.file_comm">
+<code class="descname">file_comm</code><a class="headerlink" href="#cis_interface.interface.tests.test_PsiInterface.TestPsiPandasOutput.file_comm" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>FileComm</em> &#8211; File communicator.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.interface.tests.test_PsiInterface.TestPsiPandasOutput.setup">
+<code class="descname">setup</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_PsiInterface.html#TestPsiPandasOutput.setup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_PsiInterface.TestPsiPandasOutput.setup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a test file and start the driver.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.interface.tests.test_PsiInterface.TestPsiPandasOutput.teardown">
+<code class="descname">teardown</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_PsiInterface.html#TestPsiPandasOutput.teardown"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_PsiInterface.TestPsiPandasOutput.teardown" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove the test file.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.interface.tests.test_PsiInterface.TestPsiPandasOutput.test_send">
+<code class="descname">test_send</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_PsiInterface.html#TestPsiPandasOutput.test_send"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_PsiInterface.TestPsiPandasOutput.test_send" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test sending a pandas to a remote file.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.interface.tests.test_PsiInterface.TestPsiPandasOutput_local">
+<em class="property">class </em><code class="descclassname">cis_interface.interface.tests.test_PsiInterface.</code><code class="descname">TestPsiPandasOutput_local</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_PsiInterface.html#TestPsiPandasOutput_local"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_PsiInterface.TestPsiPandasOutput_local" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.interface.tests.test_PsiInterface.TestPsiPandasOutput" title="cis_interface.interface.tests.test_PsiInterface.TestPsiPandasOutput"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.interface.tests.test_PsiInterface.TestPsiPandasOutput</span></code></a></p>
+<p>Test input from an unformatted text file.</p>
+<dl class="method">
+<dt id="cis_interface.interface.tests.test_PsiInterface.TestPsiPandasOutput_local.test_send">
+<code class="descname">test_send</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_PsiInterface.html#TestPsiPandasOutput_local.test_send"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_PsiInterface.TestPsiPandasOutput_local.test_send" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test sending a pandas to a local file.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.interface.tests.test_PsiInterface.TestPsiPickleInput">
+<em class="property">class </em><code class="descclassname">cis_interface.interface.tests.test_PsiInterface.</code><code class="descname">TestPsiPickleInput</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_PsiInterface.html#TestPsiPickleInput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_PsiInterface.TestPsiPickleInput" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.interface.tests.test_PsiInterface.TestBase" title="cis_interface.interface.tests.test_PsiInterface.TestBase"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.interface.tests.test_PsiInterface.TestBase</span></code></a></p>
+<p>Test input from a pickle file.</p>
+<dl class="method">
+<dt id="cis_interface.interface.tests.test_PsiInterface.TestPsiPickleInput.setup">
+<code class="descname">setup</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_PsiInterface.html#TestPsiPickleInput.setup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_PsiInterface.TestPsiPickleInput.setup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a test file and start the driver.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.interface.tests.test_PsiInterface.TestPsiPickleInput.teardown">
+<code class="descname">teardown</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_PsiInterface.html#TestPsiPickleInput.teardown"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_PsiInterface.TestPsiPickleInput.teardown" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove the test file.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.interface.tests.test_PsiInterface.TestPsiPickleInput.test_recv">
+<code class="descname">test_recv</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_PsiInterface.html#TestPsiPickleInput.test_recv"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_PsiInterface.TestPsiPickleInput.test_recv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test receiving a pickle from a remote file.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.interface.tests.test_PsiInterface.TestPsiPickleInput_local">
+<em class="property">class </em><code class="descclassname">cis_interface.interface.tests.test_PsiInterface.</code><code class="descname">TestPsiPickleInput_local</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_PsiInterface.html#TestPsiPickleInput_local"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_PsiInterface.TestPsiPickleInput_local" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.interface.tests.test_PsiInterface.TestPsiPickleInput" title="cis_interface.interface.tests.test_PsiInterface.TestPsiPickleInput"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.interface.tests.test_PsiInterface.TestPsiPickleInput</span></code></a></p>
+<p>Test input from a pickle file.</p>
+<dl class="method">
+<dt id="cis_interface.interface.tests.test_PsiInterface.TestPsiPickleInput_local.test_recv">
+<code class="descname">test_recv</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_PsiInterface.html#TestPsiPickleInput_local.test_recv"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_PsiInterface.TestPsiPickleInput_local.test_recv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test receiving a pickle from a local file.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.interface.tests.test_PsiInterface.TestPsiPickleOutput">
+<em class="property">class </em><code class="descclassname">cis_interface.interface.tests.test_PsiInterface.</code><code class="descname">TestPsiPickleOutput</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_PsiInterface.html#TestPsiPickleOutput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_PsiInterface.TestPsiPickleOutput" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.interface.tests.test_PsiInterface.TestBase" title="cis_interface.interface.tests.test_PsiInterface.TestBase"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.interface.tests.test_PsiInterface.TestBase</span></code></a></p>
+<p>Test output from a pickle.</p>
+<dl class="attribute">
+<dt id="cis_interface.interface.tests.test_PsiInterface.TestPsiPickleOutput.file_comm">
+<code class="descname">file_comm</code><a class="headerlink" href="#cis_interface.interface.tests.test_PsiInterface.TestPsiPickleOutput.file_comm" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>FileComm</em> &#8211; File communicator.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.interface.tests.test_PsiInterface.TestPsiPickleOutput.setup">
+<code class="descname">setup</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_PsiInterface.html#TestPsiPickleOutput.setup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_PsiInterface.TestPsiPickleOutput.setup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a test file and start the driver.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.interface.tests.test_PsiInterface.TestPsiPickleOutput.teardown">
+<code class="descname">teardown</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_PsiInterface.html#TestPsiPickleOutput.teardown"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_PsiInterface.TestPsiPickleOutput.teardown" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove the test file.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.interface.tests.test_PsiInterface.TestPsiPickleOutput.test_send">
+<code class="descname">test_send</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_PsiInterface.html#TestPsiPickleOutput.test_send"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_PsiInterface.TestPsiPickleOutput.test_send" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test sending a pickle to a remote file.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.interface.tests.test_PsiInterface.TestPsiPickleOutput_local">
+<em class="property">class </em><code class="descclassname">cis_interface.interface.tests.test_PsiInterface.</code><code class="descname">TestPsiPickleOutput_local</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_PsiInterface.html#TestPsiPickleOutput_local"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_PsiInterface.TestPsiPickleOutput_local" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.interface.tests.test_PsiInterface.TestPsiPickleOutput" title="cis_interface.interface.tests.test_PsiInterface.TestPsiPickleOutput"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.interface.tests.test_PsiInterface.TestPsiPickleOutput</span></code></a></p>
+<p>Test input from an unformatted text file.</p>
+<dl class="method">
+<dt id="cis_interface.interface.tests.test_PsiInterface.TestPsiPickleOutput_local.test_send">
+<code class="descname">test_send</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_PsiInterface.html#TestPsiPickleOutput_local.test_send"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_PsiInterface.TestPsiPickleOutput_local.test_send" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test sending a pickle to a local file.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.interface.tests.test_PsiInterface.TestPsiRpc">
+<em class="property">class </em><code class="descclassname">cis_interface.interface.tests.test_PsiInterface.</code><code class="descname">TestPsiRpc</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_PsiInterface.html#TestPsiRpc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_PsiInterface.TestPsiRpc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.interface.tests.test_PsiInterface.TestBase" title="cis_interface.interface.tests.test_PsiInterface.TestBase"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.interface.tests.test_PsiInterface.TestBase</span></code></a></p>
+<p>Test basic RPC communication with Python.</p>
+<dl class="attribute">
+<dt id="cis_interface.interface.tests.test_PsiInterface.TestPsiRpc.client_comm">
+<code class="descname">client_comm</code><a class="headerlink" href="#cis_interface.interface.tests.test_PsiInterface.TestPsiRpc.client_comm" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>comm</em> &#8211; Client side comm.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.interface.tests.test_PsiInterface.TestPsiRpc.client_msg">
+<code class="descname">client_msg</code><a class="headerlink" href="#cis_interface.interface.tests.test_PsiInterface.TestPsiRpc.client_msg" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str</em> &#8211; Test message for client side.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.interface.tests.test_PsiInterface.TestPsiRpc.driver_kwargs">
+<code class="descname">driver_kwargs</code><a class="headerlink" href="#cis_interface.interface.tests.test_PsiInterface.TestPsiRpc.driver_kwargs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Keyword arguments for the driver.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.interface.tests.test_PsiInterface.TestPsiRpc.server_comm">
+<code class="descname">server_comm</code><a class="headerlink" href="#cis_interface.interface.tests.test_PsiInterface.TestPsiRpc.server_comm" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>comm</em> &#8211; Server side comm.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.interface.tests.test_PsiInterface.TestPsiRpc.server_msg">
+<code class="descname">server_msg</code><a class="headerlink" href="#cis_interface.interface.tests.test_PsiInterface.TestPsiRpc.server_msg" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str</em> &#8211; Test message for server side.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.interface.tests.test_PsiInterface.TestPsiRpc.server_side_call">
+<code class="descname">server_side_call</code><span class="sig-paren">(</span><em>msg_sent</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_PsiInterface.html#TestPsiRpc.server_side_call"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_PsiInterface.TestPsiRpc.server_side_call" title="Permalink to this definition">¶</a></dt>
+<dd><p>Actions to respond to a mock call on the server side.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.interface.tests.test_PsiInterface.TestPsiRpc.test_rpcCall">
+<code class="descname">test_rpcCall</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_PsiInterface.html#TestPsiRpc.test_rpcCall"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_PsiInterface.TestPsiRpc.test_rpcCall" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test rpc call.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.interface.tests.test_PsiInterface.TestPsiRpc.test_rpcSendRecv">
+<code class="descname">test_rpcSendRecv</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_PsiInterface.html#TestPsiRpc.test_rpcSendRecv"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_PsiInterface.TestPsiRpc.test_rpcSendRecv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test sending/receiving formated output.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.interface.tests.test_PsiInterface.TestPsiRpcClient">
+<em class="property">class </em><code class="descclassname">cis_interface.interface.tests.test_PsiInterface.</code><code class="descname">TestPsiRpcClient</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_PsiInterface.html#TestPsiRpcClient"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_PsiInterface.TestPsiRpcClient" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.interface.tests.test_PsiInterface.TestPsiRpc" title="cis_interface.interface.tests.test_PsiInterface.TestPsiRpc"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.interface.tests.test_PsiInterface.TestPsiRpc</span></code></a></p>
+<p>Test client-side RPC communication with Python.</p>
+<dl class="attribute">
+<dt id="cis_interface.interface.tests.test_PsiInterface.TestPsiRpcClient.driver_kwargs">
+<code class="descname">driver_kwargs</code><a class="headerlink" href="#cis_interface.interface.tests.test_PsiInterface.TestPsiRpcClient.driver_kwargs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Keyword arguments for the driver.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.interface.tests.test_PsiInterface.TestPsiRpcClientMatlab">
+<em class="property">class </em><code class="descclassname">cis_interface.interface.tests.test_PsiInterface.</code><code class="descname">TestPsiRpcClientMatlab</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_PsiInterface.html#TestPsiRpcClientMatlab"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_PsiInterface.TestPsiRpcClientMatlab" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.interface.tests.test_PsiInterface.TestPsiRpcClient" title="cis_interface.interface.tests.test_PsiInterface.TestPsiRpcClient"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.interface.tests.test_PsiInterface.TestPsiRpcClient</span></code></a></p>
+<p>Test client-side RPC communication with Python as passed through Matlab.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.interface.tests.test_PsiInterface.TestPsiRpcMatlab">
+<em class="property">class </em><code class="descclassname">cis_interface.interface.tests.test_PsiInterface.</code><code class="descname">TestPsiRpcMatlab</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_PsiInterface.html#TestPsiRpcMatlab"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_PsiInterface.TestPsiRpcMatlab" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.interface.tests.test_PsiInterface.TestPsiRpc" title="cis_interface.interface.tests.test_PsiInterface.TestPsiRpc"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.interface.tests.test_PsiInterface.TestPsiRpc</span></code></a></p>
+<p>Test basic RPC communication with Python as passed through Matlab.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.interface.tests.test_PsiInterface.TestPsiRpcServer">
+<em class="property">class </em><code class="descclassname">cis_interface.interface.tests.test_PsiInterface.</code><code class="descname">TestPsiRpcServer</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_PsiInterface.html#TestPsiRpcServer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_PsiInterface.TestPsiRpcServer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.interface.tests.test_PsiInterface.TestPsiRpc" title="cis_interface.interface.tests.test_PsiInterface.TestPsiRpc"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.interface.tests.test_PsiInterface.TestPsiRpc</span></code></a></p>
+<p>Test server-side RPC communication with Python.</p>
+<dl class="attribute">
+<dt id="cis_interface.interface.tests.test_PsiInterface.TestPsiRpcServer.client_comm">
+<code class="descname">client_comm</code><a class="headerlink" href="#cis_interface.interface.tests.test_PsiInterface.TestPsiRpcServer.client_comm" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>comm</em> &#8211; Client side comm.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.interface.tests.test_PsiInterface.TestPsiRpcServer.client_msg">
+<code class="descname">client_msg</code><a class="headerlink" href="#cis_interface.interface.tests.test_PsiInterface.TestPsiRpcServer.client_msg" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str</em> &#8211; Test message for client side.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.interface.tests.test_PsiInterface.TestPsiRpcServer.driver_kwargs">
+<code class="descname">driver_kwargs</code><a class="headerlink" href="#cis_interface.interface.tests.test_PsiInterface.TestPsiRpcServer.driver_kwargs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Keyword arguments for the driver.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.interface.tests.test_PsiInterface.TestPsiRpcServer.server_comm">
+<code class="descname">server_comm</code><a class="headerlink" href="#cis_interface.interface.tests.test_PsiInterface.TestPsiRpcServer.server_comm" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>comm</em> &#8211; Server side comm.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.interface.tests.test_PsiInterface.TestPsiRpcServer.server_msg">
+<code class="descname">server_msg</code><a class="headerlink" href="#cis_interface.interface.tests.test_PsiInterface.TestPsiRpcServer.server_msg" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str</em> &#8211; Test message for server side.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.interface.tests.test_PsiInterface.TestPsiRpcServer.test_rpcCall">
+<code class="descname">test_rpcCall</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_PsiInterface.html#TestPsiRpcServer.test_rpcCall"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_PsiInterface.TestPsiRpcServer.test_rpcCall" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test rpc call (disabled for server test).</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.interface.tests.test_PsiInterface.TestPsiRpcServerMatlab">
+<em class="property">class </em><code class="descclassname">cis_interface.interface.tests.test_PsiInterface.</code><code class="descname">TestPsiRpcServerMatlab</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_PsiInterface.html#TestPsiRpcServerMatlab"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_PsiInterface.TestPsiRpcServerMatlab" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.interface.tests.test_PsiInterface.TestPsiRpcServer" title="cis_interface.interface.tests.test_PsiInterface.TestPsiRpcServer"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.interface.tests.test_PsiInterface.TestPsiRpcServer</span></code></a></p>
+<p>Test server-side RPC communication with Python as passed through Matlab.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.interface.tests.test_PsiInterface.TestPsiRpcSplit">
+<em class="property">class </em><code class="descclassname">cis_interface.interface.tests.test_PsiInterface.</code><code class="descname">TestPsiRpcSplit</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_PsiInterface.html#TestPsiRpcSplit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_PsiInterface.TestPsiRpcSplit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.interface.tests.test_PsiInterface.TestPsiRpc" title="cis_interface.interface.tests.test_PsiInterface.TestPsiRpc"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.interface.tests.test_PsiInterface.TestPsiRpc</span></code></a></p>
+<p>Test basic RPC communication with Python using split comm.</p>
+<dl class="attribute">
+<dt id="cis_interface.interface.tests.test_PsiInterface.TestPsiRpcSplit.driver_kwargs">
+<code class="descname">driver_kwargs</code><a class="headerlink" href="#cis_interface.interface.tests.test_PsiInterface.TestPsiRpcSplit.driver_kwargs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Keyword arguments for the driver.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.interface.tests.test_PsiInterface.test_PsiMatlab_class">
+<code class="descclassname">cis_interface.interface.tests.test_PsiInterface.</code><code class="descname">test_PsiMatlab_class</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_PsiInterface.html#test_PsiMatlab_class"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_PsiInterface.test_PsiMatlab_class" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test Matlab interface for classes.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.interface.tests.test_PsiInterface.test_PsiMatlab_variables">
+<code class="descclassname">cis_interface.interface.tests.test_PsiInterface.</code><code class="descname">test_PsiMatlab_variables</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_PsiInterface.html#test_PsiMatlab_variables"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_PsiInterface.test_PsiMatlab_variables" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test Matlab interface for variables.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.interface.tests.test_PsiInterface.test_bufMsgSize">
+<code class="descclassname">cis_interface.interface.tests.test_PsiInterface.</code><code class="descname">test_bufMsgSize</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_PsiInterface.html#test_bufMsgSize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_PsiInterface.test_bufMsgSize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test buf message size.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.interface.tests.test_PsiInterface.test_eof_msg">
+<code class="descclassname">cis_interface.interface.tests.test_PsiInterface.</code><code class="descname">test_eof_msg</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_PsiInterface.html#test_eof_msg"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_PsiInterface.test_eof_msg" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test eof message signal.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.interface.tests.test_PsiInterface.test_maxMsgSize">
+<code class="descclassname">cis_interface.interface.tests.test_PsiInterface.</code><code class="descname">test_maxMsgSize</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/interface/tests/test_PsiInterface.html#test_maxMsgSize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.interface.tests.test_PsiInterface.test_maxMsgSize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test max message size.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-cis_interface.interface.tests">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-cis_interface.interface.tests" title="Permalink to this headline">¶</a></h2>
+<p>Tests for interface sub-package.</p>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="cis_interface.serialize.html" class="btn btn-neutral float-right" title="cis_interface.serialize package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="cis_interface.interface.html" class="btn btn-neutral" title="cis_interface.interface package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Meagan Lang, David Raila.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.4+0.gd8a2a4f.dirty',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          
+          SphinxRtdTheme.Navigation.enableSticky();
+          
+      });
+  </script> 
+
+</body>
+</html>

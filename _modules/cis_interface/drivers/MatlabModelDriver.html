@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>cis_interface.drivers.MatlabModelDriver &mdash; cis_interface 0.3.0 documentation</title>
+  <title>cis_interface.drivers.MatlabModelDriver &mdash; cis_interface 0.4+0.gd8a2a4f.dirty documentation</title>
   
 
   
@@ -24,7 +24,8 @@
 
   
 
-  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/theme_overrides.css" type="text/css" />
     <link rel="index" title="Index" href="../../../genindex.html" />
@@ -57,7 +58,7 @@
             
             
               <div class="version">
-                0.3
+                0.4+0.gd8a2a4f.dirty
               </div>
             
           
@@ -98,6 +99,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../code.html">Code</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../examples/examples_toc.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../release.html">Release Steps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../release.html#docs-checkout">Docs Checkout</a></li>
 </ul>
 
             
@@ -181,13 +183,13 @@
 <span class="kn">from</span> <span class="nn">cis_interface.schema</span> <span class="k">import</span> <span class="n">register_component</span>
 
 
-<span class="n">_top_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">normpath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span> <span class="s1">&#39;../&#39;</span><span class="p">))</span>
+<span class="n">_top_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">normpath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">__file__</span><span class="p">),</span> <span class="s1">&#39;../&#39;</span><span class="p">))</span>
 <span class="n">_incl_interface</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">_top_dir</span><span class="p">,</span> <span class="s1">&#39;interface&#39;</span><span class="p">)</span>
 <span class="n">_incl_io</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">_top_dir</span><span class="p">,</span> <span class="s1">&#39;io&#39;</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="locate_matlabroot"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.MatlabModelDriver.locate_matlabroot">[docs]</a><span class="k">def</span> <span class="nf">locate_matlabroot</span><span class="p">():</span>  <span class="c1"># pragma: matlab</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Find directory that servers as matlab root.</span>
+    <span class="sd">r&quot;&quot;&quot;Find directory that servers as matlab root.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        str: Full path to matlabroot directory.</span>
@@ -211,7 +213,7 @@
 
 
 <div class="viewcode-block" id="install_matlab_engine"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.MatlabModelDriver.install_matlab_engine">[docs]</a><span class="k">def</span> <span class="nf">install_matlab_engine</span><span class="p">():</span>  <span class="c1"># pragma: matlab</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Install the MATLAB engine API for Python.&quot;&quot;&quot;</span>
+    <span class="sd">r&quot;&quot;&quot;Install the MATLAB engine API for Python.&quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">_matlab_installed</span><span class="p">:</span>
         <span class="n">mtl_root</span> <span class="o">=</span> <span class="n">locate_matlabroot</span><span class="p">()</span>
         <span class="n">mtl_setup</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">mtl_root</span><span class="p">,</span> <span class="s1">&#39;extern&#39;</span><span class="p">,</span> <span class="s1">&#39;engines&#39;</span><span class="p">,</span> <span class="s1">&#39;python&#39;</span><span class="p">)</span>
@@ -221,7 +223,7 @@
     
 
 <div class="viewcode-block" id="start_matlab"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.MatlabModelDriver.start_matlab">[docs]</a><span class="k">def</span> <span class="nf">start_matlab</span><span class="p">():</span>  <span class="c1"># pragma: matlab</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Start a Matlab shared engine session inside a detached screen</span>
+    <span class="sd">r&quot;&quot;&quot;Start a Matlab shared engine session inside a detached screen</span>
 <span class="sd">    session.</span>
 
 <span class="sd">    Returns:</span>
@@ -238,7 +240,7 @@
                          <span class="s1">&#39;_</span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">old_matlab</span><span class="p">))</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="n">args</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;screen&#39;</span><span class="p">,</span> <span class="s1">&#39;-dmS&#39;</span><span class="p">,</span> <span class="n">screen_session</span><span class="p">,</span> <span class="s1">&#39;-c&#39;</span><span class="p">,</span>
-                <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span> <span class="s1">&#39;matlab_screenrc&#39;</span><span class="p">),</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">__file__</span><span class="p">),</span> <span class="s1">&#39;matlab_screenrc&#39;</span><span class="p">),</span>
                 <span class="s1">&#39;matlab&#39;</span><span class="p">,</span> <span class="s1">&#39;-nodisplay&#39;</span><span class="p">,</span> <span class="s1">&#39;-nosplash&#39;</span><span class="p">,</span> <span class="s1">&#39;-nodesktop&#39;</span><span class="p">,</span> <span class="s1">&#39;-nojvm&#39;</span><span class="p">,</span>
                 <span class="s1">&#39;-r&#39;</span><span class="p">,</span> <span class="s1">&#39;&quot;matlab.engine.shareEngine&quot;&#39;</span><span class="p">]</span>
         <span class="n">subprocess</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">args</span><span class="p">),</span> <span class="n">shell</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -258,7 +260,7 @@
 
 
 <div class="viewcode-block" id="stop_matlab"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.MatlabModelDriver.stop_matlab">[docs]</a><span class="k">def</span> <span class="nf">stop_matlab</span><span class="p">(</span><span class="n">screen_session</span><span class="p">,</span> <span class="n">matlab_engine</span><span class="p">,</span> <span class="n">matlab_session</span><span class="p">):</span>  <span class="c1"># pragma: matlab</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Stop a Matlab shared engine session running inside a detached screen</span>
+    <span class="sd">r&quot;&quot;&quot;Stop a Matlab shared engine session running inside a detached screen</span>
 <span class="sd">    session.</span>
 
 <span class="sd">    Args:</span>
@@ -285,7 +287,7 @@
         <span class="k">if</span> <span class="n">matlab_session</span> <span class="ow">in</span> <span class="n">matlab</span><span class="o">.</span><span class="n">engine</span><span class="o">.</span><span class="n">find_matlab</span><span class="p">():</span>
             <span class="n">matlab_engine</span><span class="o">.</span><span class="n">exit</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
-            <span class="n">matlab_engine</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;_matlab&#39;</span><span class="p">)</span>
+            <span class="n">matlab_engine</span><span class="o">.</span><span class="n">__dict__</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;_matlab&#39;</span><span class="p">)</span>
     <span class="c1"># Stop the screen session containing the Matlab shared session</span>
     <span class="k">if</span> <span class="n">screen_session</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">matlab_session</span> <span class="ow">in</span> <span class="n">matlab</span><span class="o">.</span><span class="n">engine</span><span class="o">.</span><span class="n">find_matlab</span><span class="p">():</span>
@@ -300,7 +302,7 @@
 
 
 <div class="viewcode-block" id="MatlabProcess"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.MatlabModelDriver.MatlabProcess">[docs]</a><span class="k">class</span> <span class="nc">MatlabProcess</span><span class="p">(</span><span class="n">tools</span><span class="o">.</span><span class="n">CisClass</span><span class="p">):</span>  <span class="c1"># pragma: matlab</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Add features to mimic subprocess.Popen while running Matlab function</span>
+    <span class="sd">r&quot;&quot;&quot;Add features to mimic subprocess.Popen while running Matlab function</span>
 <span class="sd">    asynchronously.</span>
 
 <span class="sd">    Args:</span>
@@ -340,15 +342,15 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">nargout</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="k">async</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                            <span class="n">stdout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">stdout</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">stderr</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">future</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">MatlabProcess</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">MatlabProcess</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
 
 <div class="viewcode-block" id="MatlabProcess.poll"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.MatlabModelDriver.MatlabProcess.poll">[docs]</a>    <span class="k">def</span> <span class="nf">poll</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Fake poll.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;Fake poll.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">returncode</span></div>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">stdout_line</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;str: Output to stdout from function call.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;str: Output to stdout from function call.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stdout_line</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">stdout</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">line</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">getvalue</span><span class="p">()</span>
@@ -358,7 +360,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">stderr_line</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;str: Output to stderr from function call.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;str: Output to stderr from function call.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stderr_line</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">stderr</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">line</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stderr</span><span class="o">.</span><span class="n">getvalue</span><span class="p">()</span>
@@ -367,22 +369,22 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stderr_line</span>
 
 <div class="viewcode-block" id="MatlabProcess.print_output"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.MatlabModelDriver.MatlabProcess.print_output">[docs]</a>    <span class="k">def</span> <span class="nf">print_output</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Print output from stdout and stderr.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;Print output from stdout and stderr.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">stdout_line</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">print_encoded</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">stdout_line</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">stderr_line</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">print_encoded</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">stderr_line</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span></div>
             
 <div class="viewcode-block" id="MatlabProcess.start"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.MatlabModelDriver.MatlabProcess.start">[docs]</a>    <span class="k">def</span> <span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Start asychronous call.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;Start asychronous call.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">future</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="p">(</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="MatlabProcess.is_started"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.MatlabModelDriver.MatlabProcess.is_started">[docs]</a>    <span class="k">def</span> <span class="nf">is_started</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;bool: Has start been called.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;bool: Has start been called.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">future</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="MatlabProcess.is_cancelled"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.MatlabModelDriver.MatlabProcess.is_cancelled">[docs]</a>    <span class="k">def</span> <span class="nf">is_cancelled</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;bool: Was the async call cancelled or not.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;bool: Was the async call cancelled or not.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_started</span><span class="p">():</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">future</span><span class="o">.</span><span class="n">cancelled</span><span class="p">()</span>
@@ -391,7 +393,7 @@
         <span class="k">return</span> <span class="kc">False</span></div>
 
 <div class="viewcode-block" id="MatlabProcess.is_done"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.MatlabModelDriver.MatlabProcess.is_done">[docs]</a>    <span class="k">def</span> <span class="nf">is_done</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;bool: Is the async call still running.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;bool: Is the async call still running.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_started</span><span class="p">():</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">future</span><span class="o">.</span><span class="n">done</span><span class="p">()</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_cancelled</span><span class="p">()</span>
@@ -400,14 +402,14 @@
         <span class="k">return</span> <span class="kc">False</span></div>
 
 <div class="viewcode-block" id="MatlabProcess.is_alive"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.MatlabModelDriver.MatlabProcess.is_alive">[docs]</a>    <span class="k">def</span> <span class="nf">is_alive</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;bool: Is the async call funning.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;bool: Is the async call funning.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_started</span><span class="p">():</span>
             <span class="k">return</span> <span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_done</span><span class="p">())</span>
         <span class="k">return</span> <span class="kc">False</span></div>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">returncode</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: Return code.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;int: Return code.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_done</span><span class="p">():</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">stderr_line</span><span class="p">:</span>  <span class="c1"># or self.is_cancelled():</span>
                 <span class="k">return</span> <span class="o">-</span><span class="mi">1</span>
@@ -417,7 +419,7 @@
             <span class="k">return</span> <span class="kc">None</span>
 
 <div class="viewcode-block" id="MatlabProcess.kill"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.MatlabModelDriver.MatlabProcess.kill">[docs]</a>    <span class="k">def</span> <span class="nf">kill</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Cancel the async call.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;Cancel the async call.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_alive</span><span class="p">():</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">future</span><span class="o">.</span><span class="n">cancel</span><span class="p">()</span>
@@ -426,9 +428,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">print_output</span><span class="p">()</span></div></div>
 
 
-<div class="viewcode-block" id="MatlabModelDriver"><a class="viewcode-back" href="../../../model_drivers.html#cis_interface.drivers.MatlabModelDriver.MatlabModelDriver">[docs]</a><span class="nd">@register_component</span>
-<span class="k">class</span> <span class="nc">MatlabModelDriver</span><span class="p">(</span><span class="n">ModelDriver</span><span class="p">):</span>  <span class="c1"># pragma: matlab</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Base class for running Matlab models.</span>
+<span class="nd">@register_component</span>
+<div class="viewcode-block" id="MatlabModelDriver"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.MatlabModelDriver.MatlabModelDriver">[docs]</a><span class="k">class</span> <span class="nc">MatlabModelDriver</span><span class="p">(</span><span class="n">ModelDriver</span><span class="p">):</span>  <span class="c1"># pragma: matlab</span>
+    <span class="sd">r&quot;&quot;&quot;Base class for running Matlab models.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        name (str): Driver name.</span>
@@ -455,15 +457,15 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="n">_matlab_installed</span><span class="p">:</span>  <span class="c1"># pragma: no matlab</span>
             <span class="c1"># self.screen_session, self.mlsession = start_matlab()</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Matlab is not installed.&quot;</span><span class="p">)</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">MatlabModelDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">MatlabModelDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">started_matlab</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">screen_session</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">mlengine</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">mlsession</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fdir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
 
-<div class="viewcode-block" id="MatlabModelDriver.start_matlab"><a class="viewcode-back" href="../../../model_drivers.html#cis_interface.drivers.MatlabModelDriver.MatlabModelDriver.start_matlab">[docs]</a>    <span class="k">def</span> <span class="nf">start_matlab</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Start matlab session and connect to it.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="MatlabModelDriver.start_matlab"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.MatlabModelDriver.MatlabModelDriver.start_matlab">[docs]</a>    <span class="k">def</span> <span class="nf">start_matlab</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">r&quot;&quot;&quot;Start matlab session and connect to it.&quot;&quot;&quot;</span>
         <span class="c1"># Connect to matlab, start if not running</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">matlab</span><span class="o">.</span><span class="n">engine</span><span class="o">.</span><span class="n">find_matlab</span><span class="p">())</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Starting a matlab shared engine&quot;</span><span class="p">)</span>
@@ -488,8 +490,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">mlengine</span><span class="o">.</span><span class="n">addpath</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fdir</span><span class="p">,</span> <span class="n">nargout</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Connected to matlab&quot;</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="MatlabModelDriver.cleanup"><a class="viewcode-back" href="../../../model_drivers.html#cis_interface.drivers.MatlabModelDriver.MatlabModelDriver.cleanup">[docs]</a>    <span class="k">def</span> <span class="nf">cleanup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Close the Matlab session and engine.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="MatlabModelDriver.cleanup"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.MatlabModelDriver.MatlabModelDriver.cleanup">[docs]</a>    <span class="k">def</span> <span class="nf">cleanup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">r&quot;&quot;&quot;Close the Matlab session and engine.&quot;&quot;&quot;</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">stop_matlab</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">screen_session</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mlengine</span><span class="p">,</span>
                         <span class="bp">self</span><span class="o">.</span><span class="n">mlsession</span><span class="p">)</span>
@@ -502,8 +504,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">mlengine</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">MatlabModelDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">cleanup</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="MatlabModelDriver.before_start"><a class="viewcode-back" href="../../../model_drivers.html#cis_interface.drivers.MatlabModelDriver.MatlabModelDriver.before_start">[docs]</a>    <span class="k">def</span> <span class="nf">before_start</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Actions to perform before the run loop.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="MatlabModelDriver.before_start"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.MatlabModelDriver.MatlabModelDriver.before_start">[docs]</a>    <span class="k">def</span> <span class="nf">before_start</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">r&quot;&quot;&quot;Actions to perform before the run loop.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">target_name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]))[</span><span class="mi">0</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">start_matlab</span><span class="p">()</span>
 
@@ -529,8 +531,8 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">model_process</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;MatlabProcess running model.&#39;</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="MatlabModelDriver.run_loop"><a class="viewcode-back" href="../../../model_drivers.html#cis_interface.drivers.MatlabModelDriver.MatlabModelDriver.run_loop">[docs]</a>    <span class="k">def</span> <span class="nf">run_loop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Loop to check if model is still running and forward output.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="MatlabModelDriver.run_loop"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.MatlabModelDriver.MatlabModelDriver.run_loop">[docs]</a>    <span class="k">def</span> <span class="nf">run_loop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">r&quot;&quot;&quot;Loop to check if model is still running and forward output.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">model_process</span><span class="o">.</span><span class="n">print_output</span><span class="p">()</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_process</span><span class="o">.</span><span class="n">is_done</span><span class="p">():</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">model_process</span><span class="o">.</span><span class="n">print_output</span><span class="p">()</span>
@@ -544,8 +546,8 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">sleep</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="MatlabModelDriver.after_loop"><a class="viewcode-back" href="../../../model_drivers.html#cis_interface.drivers.MatlabModelDriver.MatlabModelDriver.after_loop">[docs]</a>    <span class="k">def</span> <span class="nf">after_loop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Actions to perform after run_loop has finished. Mainly checking</span>
+<div class="viewcode-block" id="MatlabModelDriver.after_loop"><a class="viewcode-back" href="../../../cis_interface.drivers.html#cis_interface.drivers.MatlabModelDriver.MatlabModelDriver.after_loop">[docs]</a>    <span class="k">def</span> <span class="nf">after_loop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">r&quot;&quot;&quot;Actions to perform after run_loop has finished. Mainly checking</span>
 <span class="sd">        if there was an error and then handling it.&quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">MatlabModelDriver</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">after_loop</span><span class="p">()</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
@@ -584,7 +586,7 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../../../',
-            VERSION:'0.3.0',
+            VERSION:'0.4+0.gd8a2a4f.dirty',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
@@ -595,15 +597,20 @@
       <script type="text/javascript" src="../../../_static/jquery.js"></script>
       <script type="text/javascript" src="../../../_static/underscore.js"></script>
       <script type="text/javascript" src="../../../_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 
   
 
-  <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
 
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.Navigation.enable(true);
+          
+          SphinxRtdTheme.Navigation.enableSticky();
+          
       });
   </script> 
 

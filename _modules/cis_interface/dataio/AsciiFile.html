@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>cis_interface.dataio.AsciiFile &mdash; cis_interface 0.3.0 documentation</title>
+  <title>cis_interface.dataio.AsciiFile &mdash; cis_interface 0.4+0.gd8a2a4f.dirty documentation</title>
   
 
   
@@ -24,7 +24,8 @@
 
   
 
-  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/theme_overrides.css" type="text/css" />
     <link rel="index" title="Index" href="../../../genindex.html" />
@@ -57,7 +58,7 @@
             
             
               <div class="version">
-                0.3
+                0.4+0.gd8a2a4f.dirty
               </div>
             
           
@@ -98,6 +99,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../code.html">Code</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../examples/examples_toc.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../release.html">Release Steps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../release.html#docs-checkout">Docs Checkout</a></li>
 </ul>
 
             
@@ -172,7 +174,7 @@
 <div class="viewcode-block" id="AsciiFile"><a class="viewcode-back" href="../../../cis_interface.dataio.html#cis_interface.dataio.AsciiFile.AsciiFile">[docs]</a><span class="k">class</span> <span class="nc">AsciiFile</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filepath</span><span class="p">,</span> <span class="n">io_mode</span><span class="p">,</span> <span class="n">comment</span><span class="o">=</span><span class="n">_default_args</span><span class="p">[</span><span class="s1">&#39;comment&#39;</span><span class="p">],</span>
                  <span class="n">newline</span><span class="o">=</span><span class="n">_default_args</span><span class="p">[</span><span class="s1">&#39;newline&#39;</span><span class="p">],</span> <span class="n">open_as_binary</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Class for reading/writing an ASCII file.</span>
+        <span class="sd">r&quot;&quot;&quot;Class for reading/writing an ASCII file.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            filepath (str): Full path to the file that should be read from</span>
@@ -219,32 +221,32 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">is_open</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;bool: Returns True if the file descriptor is open.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;bool: Returns True if the file descriptor is open.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fd</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">open_mode</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;str: Mode that should be used to open the file.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;str: Mode that should be used to open the file.&quot;&quot;&quot;</span>
         <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">io_mode</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">open_as_binary</span><span class="p">:</span>
             <span class="n">out</span> <span class="o">+=</span> <span class="s1">&#39;b&#39;</span>
         <span class="k">return</span> <span class="n">out</span>
 
 <div class="viewcode-block" id="AsciiFile.open"><a class="viewcode-back" href="../../../cis_interface.dataio.html#cis_interface.dataio.AsciiFile.AsciiFile.open">[docs]</a>    <span class="k">def</span> <span class="nf">open</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Open the associated file descriptor if it is not already open.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;Open the associated file descriptor if it is not already open.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">io_mode</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Cannot open in memory table.&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_open</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">fd</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filepath</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">open_mode</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="AsciiFile.close"><a class="viewcode-back" href="../../../cis_interface.dataio.html#cis_interface.dataio.AsciiFile.AsciiFile.close">[docs]</a>    <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Close the associated file descriptor if it is open.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;Close the associated file descriptor if it is open.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_open</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">fd</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fd</span> <span class="o">=</span> <span class="kc">None</span></div>
 
 <div class="viewcode-block" id="AsciiFile.readline"><a class="viewcode-back" href="../../../cis_interface.dataio.html#cis_interface.dataio.AsciiFile.AsciiFile.readline">[docs]</a>    <span class="k">def</span> <span class="nf">readline</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Continue reading lines until a valid line (uncommented) is</span>
+        <span class="sd">r&quot;&quot;&quot;Continue reading lines until a valid line (uncommented) is</span>
 <span class="sd">        encountered</span>
 <span class="sd">        </span>
 <span class="sd">        Returns:</span>
@@ -260,7 +262,7 @@
         <span class="k">return</span> <span class="n">eof</span><span class="p">,</span> <span class="n">line</span></div>
 
 <div class="viewcode-block" id="AsciiFile.writeline"><a class="viewcode-back" href="../../../cis_interface.dataio.html#cis_interface.dataio.AsciiFile.AsciiFile.writeline">[docs]</a>    <span class="k">def</span> <span class="nf">writeline</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">line</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Write a line to the file, adding a newline character if it is not</span>
+        <span class="sd">r&quot;&quot;&quot;Write a line to the file, adding a newline character if it is not</span>
 <span class="sd">        present.</span>
 
 <span class="sd">        Args:</span>
@@ -281,7 +283,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">writeline_full</span><span class="p">(</span><span class="n">line</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="AsciiFile.readline_full"><a class="viewcode-back" href="../../../cis_interface.dataio.html#cis_interface.dataio.AsciiFile.AsciiFile.readline_full">[docs]</a>    <span class="k">def</span> <span class="nf">readline_full</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Read a line and return it if it is not a comment.</span>
+        <span class="sd">r&quot;&quot;&quot;Read a line and return it if it is not a comment.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            tuple (bool, str): End of file flag and the line that was read (an</span>
@@ -303,7 +305,7 @@
         <span class="k">return</span> <span class="kc">False</span><span class="p">,</span> <span class="n">line</span></div>
 
 <div class="viewcode-block" id="AsciiFile.writeline_full"><a class="viewcode-back" href="../../../cis_interface.dataio.html#cis_interface.dataio.AsciiFile.AsciiFile.writeline_full">[docs]</a>    <span class="k">def</span> <span class="nf">writeline_full</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">line</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Write a line to the file in its present state. If it is not open,</span>
+        <span class="sd">r&quot;&quot;&quot;Write a line to the file in its present state. If it is not open,</span>
 <span class="sd">        nothing happens.</span>
 
 <span class="sd">        Args:</span>
@@ -357,7 +359,7 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../../../',
-            VERSION:'0.3.0',
+            VERSION:'0.4+0.gd8a2a4f.dirty',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
@@ -368,15 +370,20 @@
       <script type="text/javascript" src="../../../_static/jquery.js"></script>
       <script type="text/javascript" src="../../../_static/underscore.js"></script>
       <script type="text/javascript" src="../../../_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 
   
 
-  <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
 
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.Navigation.enable(true);
+          
+          SphinxRtdTheme.Navigation.enableSticky();
+          
       });
   </script> 
 

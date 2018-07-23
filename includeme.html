@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Overview &mdash; cis_interface 0.3.0 documentation</title>
+  <title>Overview &mdash; cis_interface 0.4+0.gd8a2a4f.dirty documentation</title>
   
 
   
@@ -24,7 +24,8 @@
 
   
 
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
@@ -59,7 +60,7 @@
             
             
               <div class="version">
-                0.3
+                0.4+0.gd8a2a4f.dirty
               </div>
             
           
@@ -166,6 +167,28 @@
             
   <div class="section" id="overview">
 <h1>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h1>
+<p><a class="reference external" href="https://badge.fury.io/py/cis_interface"><img alt="PyPI version" src="https://badge.fury.io/py/cis_interface.svg" /></a> <a class="reference external" href="https://travis-ci.org/cropsinsilico/cis_interface"><img alt="Build Status" src="https://travis-ci.org/cropsinsilico/cis_interface.svg?branch=master" /></a> <a class="reference external" href="https://ci.appveyor.com/project/langmm/cis-interface/branch/master"><img alt="Build status" src="https://ci.appveyor.com/api/projects/status/y9du52gefaw4ees9/branch/master?svg=true" /></a> <a class="reference external" href="https://coveralls.io/github/cropsinsilico/cis_interface?branch=master"><img alt="Coverage Status" src="https://coveralls.io/repos/github/cropsinsilico/cis_interface/badge.svg?branch=master" /></a> <a class="reference external" href="https://codecov.io/gh/cropsinsilico/cis_interface"><img alt="codecov" src="https://codecov.io/gh/cropsinsilico/cis_interface/branch/master/graph/badge.svg" /></a>
+<a class="reference external" href="https://www.python.org/dev/peps/pep-0008/"><img alt="PEP8" src="https://img.shields.io/badge/code%20style-pep8-orange.svg" /></a></p>
+<p>The CiS framework provides support for combining scientific models
+written in different programming languages. To combine two models,
+modelers add simple communications interfaces to the model code and
+provide simple declarative specification files that identfy the models
+that should be run and the inputs and outputs those models expect.</p>
+<p>The system uses the specification file to configure the communications
+channels and expose them to the models. The complexity of the particular
+communications system is managed by the framework which performns
+communication setup, binds the communications to simple interfaces
+within the models, and manages execution of the models. The complexities
+of model registration and discovery, as well as the complexities of
+setup and management of the communications system are handled
+under-the-hood by the framework under direction of the model
+specification, freeing the domain scientist from implementing
+communications protocols or translating models to the same programming
+language.</p>
+<p>Please refer to the package
+<a class="reference external" href="https://cropsinsilico.github.io/cis_interface/">documentation</a> for
+additional information about the package and directions for installing
+it.</p>
 </div>
 
 
@@ -210,7 +233,7 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'0.3.0',
+            VERSION:'0.4+0.gd8a2a4f.dirty',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
@@ -221,15 +244,20 @@
       <script type="text/javascript" src="_static/jquery.js"></script>
       <script type="text/javascript" src="_static/underscore.js"></script>
       <script type="text/javascript" src="_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 
   
 
-  <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
 
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.Navigation.enable(true);
+          
+          SphinxRtdTheme.Navigation.enableSticky();
+          
       });
   </script> 
 

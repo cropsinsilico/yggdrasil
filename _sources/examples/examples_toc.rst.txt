@@ -13,7 +13,6 @@ Examples
    formatted_io3
    formatted_io4
    formatted_io5
-   formatted_io6
    rpc_lesson1
    rpc_lesson2
 

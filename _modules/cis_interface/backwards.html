@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>cis_interface.backwards &mdash; cis_interface 0.3.0 documentation</title>
+  <title>cis_interface.backwards &mdash; cis_interface 0.4+0.gd8a2a4f.dirty documentation</title>
   
 
   
@@ -24,7 +24,8 @@
 
   
 
-  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  
+    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/theme_overrides.css" type="text/css" />
     <link rel="index" title="Index" href="../../genindex.html" />
@@ -57,7 +58,7 @@
             
             
               <div class="version">
-                0.3
+                0.4+0.gd8a2a4f.dirty
               </div>
             
           
@@ -98,6 +99,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../code.html">Code</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../examples/examples_toc.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../release.html">Release Steps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../release.html#docs-checkout">Docs Checkout</a></li>
 </ul>
 
             
@@ -161,7 +163,7 @@
            <div itemprop="articleBody">
             
   <h1>Source code for cis_interface.backwards</h1><div class="highlight"><pre>
-<span></span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;This module allows for backward compatibility.&quot;&quot;&quot;</span>
+<span></span><span class="sd">r&quot;&quot;&quot;This module allows for backward compatibility.&quot;&quot;&quot;</span>
 <span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">import</span> <span class="nn">time</span>
 <span class="kn">from</span> <span class="nn">cis_interface.scanf</span> <span class="k">import</span> <span class="n">scanf</span>
@@ -178,6 +180,7 @@
     <span class="n">file_type</span> <span class="o">=</span> <span class="n">types</span><span class="o">.</span><span class="n">FileType</span>
     <span class="n">bytes_type</span> <span class="o">=</span> <span class="nb">str</span>
     <span class="n">unicode_type</span> <span class="o">=</span> <span class="nb">str</span>
+    <span class="n">string_type</span> <span class="o">=</span> <span class="nb">str</span>
     <span class="n">np_dtype_str</span> <span class="o">=</span> <span class="s1">&#39;S&#39;</span>
     <span class="n">string_types</span> <span class="o">=</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">unicode</span><span class="p">)</span>
 <span class="k">else</span><span class="p">:</span>  <span class="c1"># pragma: Python 3</span>
@@ -189,6 +192,7 @@
     <span class="n">file_type</span> <span class="o">=</span> <span class="n">sio</span><span class="o">.</span><span class="n">IOBase</span>
     <span class="n">bytes_type</span> <span class="o">=</span> <span class="nb">bytes</span>
     <span class="n">unicode_type</span> <span class="o">=</span> <span class="nb">str</span>
+    <span class="n">string_type</span> <span class="o">=</span> <span class="nb">str</span>
     <span class="n">unicode</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">np_dtype_str</span> <span class="o">=</span> <span class="s1">&#39;S&#39;</span>
     <span class="n">string_types</span> <span class="o">=</span> <span class="p">(</span><span class="nb">bytes</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
@@ -199,7 +203,7 @@
 
 
 <span class="k">def</span> <span class="nf">scanf_bytes</span><span class="p">(</span><span class="n">fmt</span><span class="p">,</span> <span class="n">bytes_line</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Extract parameters from a bytes object using scanf.&quot;&quot;&quot;</span>
+    <span class="sd">r&quot;&quot;&quot;Extract parameters from a bytes object using scanf.&quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">PY2</span><span class="p">:</span>  <span class="c1"># pragma: Python 2</span>
         <span class="n">out_byt</span> <span class="o">=</span> <span class="n">scanf</span><span class="p">(</span><span class="n">fmt</span><span class="p">,</span> <span class="n">bytes_line</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>  <span class="c1"># pragma: Python 3</span>
@@ -221,7 +225,7 @@
 
 
 <span class="k">def</span> <span class="nf">assert_bytes</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Assert that the input is in bytes appropriate for the version of</span>
+    <span class="sd">r&quot;&quot;&quot;Assert that the input is in bytes appropriate for the version of</span>
 <span class="sd">    Python.</span>
 
 <span class="sd">    Arguments:</span>
@@ -235,7 +239,7 @@
 
 
 <span class="k">def</span> <span class="nf">assert_unicode</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Assert that the input is in unicode appropriate for the version of</span>
+    <span class="sd">r&quot;&quot;&quot;Assert that the input is in unicode appropriate for the version of</span>
 <span class="sd">    Python.</span>
 
 <span class="sd">    Arguments:</span>
@@ -249,7 +253,7 @@
 
 
 <div class="viewcode-block" id="bytes2unicode"><a class="viewcode-back" href="../../code_python.html#cis_interface.backwards.bytes2unicode">[docs]</a><span class="k">def</span> <span class="nf">bytes2unicode</span><span class="p">(</span><span class="n">b</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Convert from bytes/unicode/str to unicode.</span>
+    <span class="sd">r&quot;&quot;&quot;Convert from bytes/unicode/str to unicode.</span>
 
 <span class="sd">    Arguments:</span>
 <span class="sd">        b (bytes, unicode, str): Bytes to be converted into unicode.</span>
@@ -281,7 +285,7 @@
 
 
 <div class="viewcode-block" id="unicode2bytes"><a class="viewcode-back" href="../../code_python.html#cis_interface.backwards.unicode2bytes">[docs]</a><span class="k">def</span> <span class="nf">unicode2bytes</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Convert from bytes/unicode/str to a bytes object.</span>
+    <span class="sd">r&quot;&quot;&quot;Convert from bytes/unicode/str to a bytes object.</span>
 
 <span class="sd">    Arguments:</span>
 <span class="sd">        s (str, bytes, unicode): Object to convert to a bytes version.</span>
@@ -317,7 +321,7 @@
 
 
 <span class="k">def</span> <span class="nf">match_stype</span><span class="p">(</span><span class="n">s1</span><span class="p">,</span> <span class="n">s2</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Encodes one string to match the type of the second.</span>
+    <span class="sd">r&quot;&quot;&quot;Encodes one string to match the type of the second.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        s1 (str, bytes, bytearray, unicode): Object that type should be taken</span>
@@ -354,7 +358,7 @@
 
 
 <span class="k">def</span> <span class="nf">format_bytes</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Perform format on bytes/str, converting arguments to type of format</span>
+    <span class="sd">r&quot;&quot;&quot;Perform format on bytes/str, converting arguments to type of format</span>
 <span class="sd">    string to ensure there is no prefix. For Python 3.4, if the format string</span>
 <span class="sd">    is bytes, the formats and arguments will be changed to str type before</span>
 <span class="sd">    format and then the resulting string will be changed back to bytes.</span>
@@ -388,7 +392,7 @@
 
 
 <span class="k">def</span> <span class="nf">encode_escape</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Encode escape sequences.</span>
+    <span class="sd">r&quot;&quot;&quot;Encode escape sequences.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        s (str): String that should be encoded.</span>
@@ -405,7 +409,7 @@
 
 
 <span class="k">def</span> <span class="nf">decode_escape</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Decode escape sequences.</span>
+    <span class="sd">r&quot;&quot;&quot;Decode escape sequences.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        s (str): String that should be decoded.</span>
@@ -462,7 +466,7 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../../',
-            VERSION:'0.3.0',
+            VERSION:'0.4+0.gd8a2a4f.dirty',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
@@ -473,15 +477,20 @@
       <script type="text/javascript" src="../../_static/jquery.js"></script>
       <script type="text/javascript" src="../../_static/underscore.js"></script>
       <script type="text/javascript" src="../../_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 
   
 
-  <script type="text/javascript" src="../../_static/js/theme.js"></script>
+  
+  
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+  
 
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.Navigation.enable(true);
+          
+          SphinxRtdTheme.Navigation.enableSticky();
+          
       });
   </script> 
 

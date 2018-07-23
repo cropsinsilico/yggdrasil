@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>cis_interface.dataio.AsciiTable &mdash; cis_interface 0.3.0 documentation</title>
+  <title>cis_interface.dataio.AsciiTable &mdash; cis_interface 0.4+0.gd8a2a4f.dirty documentation</title>
   
 
   
@@ -24,7 +24,8 @@
 
   
 
-  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/theme_overrides.css" type="text/css" />
     <link rel="index" title="Index" href="../../../genindex.html" />
@@ -57,7 +58,7 @@
             
             
               <div class="version">
-                0.3
+                0.4+0.gd8a2a4f.dirty
               </div>
             
           
@@ -98,6 +99,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../code.html">Code</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../examples/examples_toc.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../release.html">Release Steps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../release.html#docs-checkout">Docs Checkout</a></li>
 </ul>
 
             
@@ -188,7 +190,7 @@
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filepath</span><span class="p">,</span> <span class="n">io_mode</span><span class="p">,</span> <span class="n">format_str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="n">column_names</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">use_astropy</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                  <span class="n">column</span><span class="o">=</span><span class="n">_default_args</span><span class="p">[</span><span class="s1">&#39;column&#39;</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Class for reading/writing an ASCII table.</span>
+        <span class="sd">r&quot;&quot;&quot;Class for reading/writing an ASCII table.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            filepath (str): Full path to the file that should be read from</span>
@@ -222,7 +224,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">use_astropy</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="c1"># if self.use_astropy:</span>
         <span class="c1">#     kwargs[&#39;open_as_binary&#39;] = False</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">AsciiTable</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="n">io_mode</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">AsciiTable</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="n">io_mode</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">column_names</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="c1"># Add default args specific to ascii table</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">column</span> <span class="o">=</span> <span class="n">backwards</span><span class="o">.</span><span class="n">unicode2bytes</span><span class="p">(</span><span class="n">column</span><span class="p">)</span>
@@ -242,7 +244,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">format_str</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;str: Format string describing the table column types.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;str: Format string describing the table column types.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_format_str&#39;</span><span class="p">):</span>
             <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_dtype&#39;</span><span class="p">):</span>
                 <span class="n">fmts</span> <span class="o">=</span> <span class="n">serialize</span><span class="o">.</span><span class="n">nptype2cformat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">asbytes</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -254,7 +256,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">dtype</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;np.dtype: Data type of the table.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;np.dtype: Data type of the table.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_dtype&#39;</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_dtype</span> <span class="o">=</span> <span class="n">serialize</span><span class="o">.</span><span class="n">cformat2nptype</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">format_str</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span>
@@ -262,16 +264,16 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">fmts</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;list: Formats in format string.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;list: Formats in format string.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">serialize</span><span class="o">.</span><span class="n">extract_formats</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">format_str</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">ncols</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: The number of columns in the table.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;int: The number of columns in the table.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fmts</span><span class="p">)</span>
 
 <div class="viewcode-block" id="AsciiTable.update_format_str"><a class="viewcode-back" href="../../../cis_interface.dataio.html#cis_interface.dataio.AsciiTable.AsciiTable.update_format_str">[docs]</a>    <span class="k">def</span> <span class="nf">update_format_str</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_format_str</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Change the format string and update the data type.</span>
+        <span class="sd">r&quot;&quot;&quot;Change the format string and update the data type.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            new_format_str (str): New format string.</span>
@@ -282,7 +284,7 @@
             <span class="nb">delattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_dtype&#39;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="AsciiTable.update_dtype"><a class="viewcode-back" href="../../../cis_interface.dataio.html#cis_interface.dataio.AsciiTable.AsciiTable.update_dtype">[docs]</a>    <span class="k">def</span> <span class="nf">update_dtype</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_dtype</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Change the data type and update the format string.</span>
+        <span class="sd">r&quot;&quot;&quot;Change the data type and update the format string.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            new_dtype (str or np.dtype): New numpy data type.</span>
@@ -297,7 +299,7 @@
             <span class="nb">delattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_format_str&#39;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="AsciiTable.writeheader"><a class="viewcode-back" href="../../../cis_interface.dataio.html#cis_interface.dataio.AsciiTable.AsciiTable.writeheader">[docs]</a>    <span class="k">def</span> <span class="nf">writeheader</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Write header including column names and format.</span>
+        <span class="sd">r&quot;&quot;&quot;Write header including column names and format.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            names (list, optional): List of names of columns. Defaults to</span>
@@ -309,7 +311,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">writeformat</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="AsciiTable.writenames"><a class="viewcode-back" href="../../../cis_interface.dataio.html#cis_interface.dataio.AsciiTable.AsciiTable.writenames">[docs]</a>    <span class="k">def</span> <span class="nf">writenames</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Write column names to file.</span>
+        <span class="sd">r&quot;&quot;&quot;Write column names to file.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            names (list, optional): List of names of columns. Defaults to</span>
@@ -331,12 +333,12 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">writeline_full</span><span class="p">(</span><span class="n">line</span><span class="p">)</span></div>
             
 <div class="viewcode-block" id="AsciiTable.writeformat"><a class="viewcode-back" href="../../../cis_interface.dataio.html#cis_interface.dataio.AsciiTable.AsciiTable.writeformat">[docs]</a>    <span class="k">def</span> <span class="nf">writeformat</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Write the format string to the file.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;Write the format string to the file.&quot;&quot;&quot;</span>
         <span class="n">line</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">comment</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">format_str</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">writeline_full</span><span class="p">(</span><span class="n">line</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="AsciiTable.readline"><a class="viewcode-back" href="../../../cis_interface.dataio.html#cis_interface.dataio.AsciiTable.AsciiTable.readline">[docs]</a>    <span class="k">def</span> <span class="nf">readline</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Continue reading lines until a valid line (uncommented) is</span>
+        <span class="sd">r&quot;&quot;&quot;Continue reading lines until a valid line (uncommented) is</span>
 <span class="sd">        encountered and return the arguments found there.</span>
 
 <span class="sd">        Returns:</span>
@@ -356,7 +358,7 @@
         <span class="k">return</span> <span class="n">eof</span><span class="p">,</span> <span class="n">args</span></div>
 
 <div class="viewcode-block" id="AsciiTable.writeline"><a class="viewcode-back" href="../../../cis_interface.dataio.html#cis_interface.dataio.AsciiTable.AsciiTable.writeline">[docs]</a>    <span class="k">def</span> <span class="nf">writeline</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Write arguments to a file in the table format.</span>
+        <span class="sd">r&quot;&quot;&quot;Write arguments to a file in the table format.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            \*args: Any number of arguments that should be written to the file.</span>
@@ -369,7 +371,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">writeline_full</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="n">validate</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="AsciiTable.readline_full"><a class="viewcode-back" href="../../../cis_interface.dataio.html#cis_interface.dataio.AsciiTable.AsciiTable.readline_full">[docs]</a>    <span class="k">def</span> <span class="nf">readline_full</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">validate</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Read a line and return it if it is not a comment.</span>
+        <span class="sd">r&quot;&quot;&quot;Read a line and return it if it is not a comment.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            validate (bool, optional): If True, the line is checked to see if</span>
@@ -387,7 +389,7 @@
         <span class="k">return</span> <span class="n">eof</span><span class="p">,</span> <span class="n">line</span></div>
 
 <div class="viewcode-block" id="AsciiTable.writeline_full"><a class="viewcode-back" href="../../../cis_interface.dataio.html#cis_interface.dataio.AsciiTable.AsciiTable.writeline_full">[docs]</a>    <span class="k">def</span> <span class="nf">writeline_full</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">line</span><span class="p">,</span> <span class="n">validate</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Write a line to the file in its present state.</span>
+        <span class="sd">r&quot;&quot;&quot;Write a line to the file in its present state.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            line (str): Line to be written.</span>
@@ -400,7 +402,7 @@
         <span class="nb">super</span><span class="p">(</span><span class="n">AsciiTable</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">writeline_full</span><span class="p">(</span><span class="n">line</span><span class="p">)</span></div>
         
 <div class="viewcode-block" id="AsciiTable.format_line"><a class="viewcode-back" href="../../../cis_interface.dataio.html#cis_interface.dataio.AsciiTable.AsciiTable.format_line">[docs]</a>    <span class="k">def</span> <span class="nf">format_line</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create a line from the provided arguments using the table format.</span>
+        <span class="sd">r&quot;&quot;&quot;Create a line from the provided arguments using the table format.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            \*args: Arguments to create line from.</span>
@@ -412,7 +414,7 @@
         <span class="k">return</span> <span class="n">serialize</span><span class="o">.</span><span class="n">format_message</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">format_str</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="AsciiTable.process_line"><a class="viewcode-back" href="../../../cis_interface.dataio.html#cis_interface.dataio.AsciiTable.AsciiTable.process_line">[docs]</a>    <span class="k">def</span> <span class="nf">process_line</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">line</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Extract values from the columns in the line using the table format.</span>
+        <span class="sd">r&quot;&quot;&quot;Extract values from the columns in the line using the table format.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            line (str): String to extract arguments from.</span>
@@ -424,12 +426,12 @@
         <span class="k">return</span> <span class="n">serialize</span><span class="o">.</span><span class="n">process_message</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">format_str</span><span class="p">)</span></div>
         
 <div class="viewcode-block" id="AsciiTable.validate_line"><a class="viewcode-back" href="../../../cis_interface.dataio.html#cis_interface.dataio.AsciiTable.AsciiTable.validate_line">[docs]</a>    <span class="k">def</span> <span class="nf">validate_line</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">line</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Assert that the line matches the format string and produces the</span>
+        <span class="sd">r&quot;&quot;&quot;Assert that the line matches the format string and produces the</span>
 <span class="sd">        expected number of values.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">process_line</span><span class="p">(</span><span class="n">line</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="AsciiTable.discover_format_str"><a class="viewcode-back" href="../../../cis_interface.dataio.html#cis_interface.dataio.AsciiTable.AsciiTable.discover_format_str">[docs]</a>    <span class="k">def</span> <span class="nf">discover_format_str</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Determine the format string by reading it from the file. The format</span>
+        <span class="sd">r&quot;&quot;&quot;Determine the format string by reading it from the file. The format</span>
 <span class="sd">        string is assumed to start with a comment and contain C-style format</span>
 <span class="sd">        codes (e.g. &#39;%f&#39;).</span>
 
@@ -449,7 +451,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">arr</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Numpy array of table contents if opened in read mode.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;Numpy array of table contents if opened in read mode.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">io_mode</span> <span class="o">==</span> <span class="s1">&#39;w&#39;</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_arr&#39;</span><span class="p">):</span>
@@ -457,7 +459,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_arr</span>
 
 <div class="viewcode-block" id="AsciiTable.read_array"><a class="viewcode-back" href="../../../cis_interface.dataio.html#cis_interface.dataio.AsciiTable.AsciiTable.read_array">[docs]</a>    <span class="k">def</span> <span class="nf">read_array</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Read the table in as an array.</span>
+        <span class="sd">r&quot;&quot;&quot;Read the table in as an array.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            names (list, optional): List of column names to label columns. If</span>
@@ -492,7 +494,7 @@
         <span class="k">return</span> <span class="n">arr</span></div>
 
 <div class="viewcode-block" id="AsciiTable.write_array"><a class="viewcode-back" href="../../../cis_interface.dataio.html#cis_interface.dataio.AsciiTable.AsciiTable.write_array">[docs]</a>    <span class="k">def</span> <span class="nf">write_array</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">array</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">skip_header</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Write a numpy array to the table.</span>
+        <span class="sd">r&quot;&quot;&quot;Write a numpy array to the table.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            array (np.ndarray): Array to be written.</span>
@@ -531,7 +533,7 @@
             <span class="n">fd</span> <span class="o">=</span> <span class="kc">None</span></div>
 
 <div class="viewcode-block" id="AsciiTable.array_to_bytes"><a class="viewcode-back" href="../../../cis_interface.dataio.html#cis_interface.dataio.AsciiTable.AsciiTable.array_to_bytes">[docs]</a>    <span class="k">def</span> <span class="nf">array_to_bytes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arr</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="s1">&#39;C&#39;</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Convert arr to bytestring.</span>
+        <span class="sd">r&quot;&quot;&quot;Convert arr to bytestring.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            arr (np.ndarray, optional): Array to write to bytestring. If None</span>
@@ -557,7 +559,7 @@
         <span class="k">return</span> <span class="n">serialize</span><span class="o">.</span><span class="n">array_to_bytes</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="n">order</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="AsciiTable.bytes_to_array"><a class="viewcode-back" href="../../../cis_interface.dataio.html#cis_interface.dataio.AsciiTable.AsciiTable.bytes_to_array">[docs]</a>    <span class="k">def</span> <span class="nf">bytes_to_array</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="s1">&#39;C&#39;</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Process bytes according to the table format and return it as an</span>
+        <span class="sd">r&quot;&quot;&quot;Process bytes according to the table format and return it as an</span>
 <span class="sd">        array.</span>
 
 <span class="sd">        Args:</span>
@@ -573,7 +575,7 @@
         <span class="k">return</span> <span class="n">arr</span></div>
 
 <div class="viewcode-block" id="AsciiTable.read_bytes"><a class="viewcode-back" href="../../../cis_interface.dataio.html#cis_interface.dataio.AsciiTable.AsciiTable.read_bytes">[docs]</a>    <span class="k">def</span> <span class="nf">read_bytes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="s1">&#39;C&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Read the table in as array and encode as bytes.</span>
+        <span class="sd">r&quot;&quot;&quot;Read the table in as array and encode as bytes.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            order (str, optional): Order that array should be written to the</span>
@@ -589,7 +591,7 @@
         <span class="k">return</span> <span class="n">out</span></div>
 
 <div class="viewcode-block" id="AsciiTable.write_bytes"><a class="viewcode-back" href="../../../cis_interface.dataio.html#cis_interface.dataio.AsciiTable.AsciiTable.write_bytes">[docs]</a>    <span class="k">def</span> <span class="nf">write_bytes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="s1">&#39;C&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Write a numpy array to the table.</span>
+        <span class="sd">r&quot;&quot;&quot;Write a numpy array to the table.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            data (bytes): Bytes string to be interpreted as array and</span>
@@ -635,7 +637,7 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../../../',
-            VERSION:'0.3.0',
+            VERSION:'0.4+0.gd8a2a4f.dirty',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
@@ -646,15 +648,20 @@
       <script type="text/javascript" src="../../../_static/jquery.js"></script>
       <script type="text/javascript" src="../../../_static/underscore.js"></script>
       <script type="text/javascript" src="../../../_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 
   
 
-  <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
 
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.Navigation.enable(true);
+          
+          SphinxRtdTheme.Navigation.enableSticky();
+          
       });
   </script> 
 

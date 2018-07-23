@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>cis_interface.yamlfile &mdash; cis_interface 0.3.0 documentation</title>
+  <title>cis_interface.yamlfile &mdash; cis_interface 0.4+0.gd8a2a4f.dirty documentation</title>
   
 
   
@@ -24,7 +24,8 @@
 
   
 
-  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  
+    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/theme_overrides.css" type="text/css" />
     <link rel="index" title="Index" href="../../genindex.html" />
@@ -57,7 +58,7 @@
             
             
               <div class="version">
-                0.3
+                0.4+0.gd8a2a4f.dirty
               </div>
             
           
@@ -98,6 +99,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../code.html">Code</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../examples/examples_toc.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../release.html">Release Steps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../release.html#docs-checkout">Docs Checkout</a></li>
 </ul>
 
             
@@ -170,7 +172,7 @@
 
 
 <div class="viewcode-block" id="load_yaml"><a class="viewcode-back" href="../../code_python.html#cis_interface.yamlfile.load_yaml">[docs]</a><span class="k">def</span> <span class="nf">load_yaml</span><span class="p">(</span><span class="n">fname</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Parse a yaml file defining a run.</span>
+    <span class="sd">r&quot;&quot;&quot;Parse a yaml file defining a run.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        fname (str): Path to the yaml file.</span>
@@ -194,7 +196,7 @@
 
 
 <div class="viewcode-block" id="prep_yaml"><a class="viewcode-back" href="../../code_python.html#cis_interface.yamlfile.prep_yaml">[docs]</a><span class="k">def</span> <span class="nf">prep_yaml</span><span class="p">(</span><span class="n">files</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Prepare yaml to be parsed by Cerberus using schema including covering</span>
+    <span class="sd">r&quot;&quot;&quot;Prepare yaml to be parsed by Cerberus using schema including covering</span>
 <span class="sd">    backwards compatible options.</span>
 
 <span class="sd">    Args:</span>
@@ -239,7 +241,7 @@
 
 
 <div class="viewcode-block" id="prep_model"><a class="viewcode-back" href="../../code_python.html#cis_interface.yamlfile.prep_model">[docs]</a><span class="k">def</span> <span class="nf">prep_model</span><span class="p">(</span><span class="n">yml</span><span class="p">,</span> <span class="n">iodict</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Prepare yaml model entry for parsing with schema.</span>
+    <span class="sd">r&quot;&quot;&quot;Prepare yaml model entry for parsing with schema.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        yml (dict): YAML entry for model that will be modified.</span>
@@ -274,7 +276,7 @@
 
 
 <div class="viewcode-block" id="prep_connection"><a class="viewcode-back" href="../../code_python.html#cis_interface.yamlfile.prep_connection">[docs]</a><span class="k">def</span> <span class="nf">prep_connection</span><span class="p">(</span><span class="n">yml</span><span class="p">,</span> <span class="n">iodict</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Prepare yaml connection entry for parsing with schema.</span>
+    <span class="sd">r&quot;&quot;&quot;Prepare yaml connection entry for parsing with schema.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        yml (dict): YAML entry for connection that will be modified.</span>
@@ -362,7 +364,7 @@
         
 
 <div class="viewcode-block" id="bridge_io_drivers"><a class="viewcode-back" href="../../code_python.html#cis_interface.yamlfile.bridge_io_drivers">[docs]</a><span class="k">def</span> <span class="nf">bridge_io_drivers</span><span class="p">(</span><span class="n">yml</span><span class="p">,</span> <span class="n">iodict</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create connection from input/output driver.</span>
+    <span class="sd">r&quot;&quot;&quot;Create connection from input/output driver.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        dict: YAML entry for model output that should be modified.</span>
@@ -462,7 +464,7 @@
 
 
 <div class="viewcode-block" id="cdriver2filetype"><a class="viewcode-back" href="../../code_python.html#cis_interface.yamlfile.cdriver2filetype">[docs]</a><span class="k">def</span> <span class="nf">cdriver2filetype</span><span class="p">(</span><span class="n">driver</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Convert a connection driver to a file type.</span>
+    <span class="sd">r&quot;&quot;&quot;Convert a connection driver to a file type.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        driver (str): The name of the connection driver.</span>
@@ -485,7 +487,7 @@
 
 
 <div class="viewcode-block" id="parse_yaml"><a class="viewcode-back" href="../../code_python.html#cis_interface.yamlfile.parse_yaml">[docs]</a><span class="k">def</span> <span class="nf">parse_yaml</span><span class="p">(</span><span class="n">files</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Parse list of yaml files.</span>
+    <span class="sd">r&quot;&quot;&quot;Parse list of yaml files.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        files (str, list): Either the path to a single yaml file or a list of</span>
@@ -527,7 +529,7 @@
 
 
 <div class="viewcode-block" id="parse_component"><a class="viewcode-back" href="../../code_python.html#cis_interface.yamlfile.parse_component">[docs]</a><span class="k">def</span> <span class="nf">parse_component</span><span class="p">(</span><span class="n">yml</span><span class="p">,</span> <span class="n">ctype</span><span class="p">,</span> <span class="n">existing</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Parse a yaml entry for a component, adding it to the list of</span>
+    <span class="sd">r&quot;&quot;&quot;Parse a yaml entry for a component, adding it to the list of</span>
 <span class="sd">    existing components.</span>
 
 <span class="sd">    Args:</span>
@@ -569,7 +571,7 @@
 
 
 <div class="viewcode-block" id="parse_model"><a class="viewcode-back" href="../../code_python.html#cis_interface.yamlfile.parse_model">[docs]</a><span class="k">def</span> <span class="nf">parse_model</span><span class="p">(</span><span class="n">yml</span><span class="p">,</span> <span class="n">existing</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Parse a yaml entry for a model.</span>
+    <span class="sd">r&quot;&quot;&quot;Parse a yaml entry for a model.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        yml (dict): YAML dictionary for a model.</span>
@@ -612,7 +614,7 @@
             
     
 <div class="viewcode-block" id="parse_connection"><a class="viewcode-back" href="../../code_python.html#cis_interface.yamlfile.parse_connection">[docs]</a><span class="k">def</span> <span class="nf">parse_connection</span><span class="p">(</span><span class="n">yml</span><span class="p">,</span> <span class="n">existing</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Parse a yaml entry for a connection between I/O channels.</span>
+    <span class="sd">r&quot;&quot;&quot;Parse a yaml entry for a connection between I/O channels.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        yml (dict): YAML dictionary for a connection.</span>
@@ -720,7 +722,7 @@
 
 
 <div class="viewcode-block" id="link_model_io"><a class="viewcode-back" href="../../code_python.html#cis_interface.yamlfile.link_model_io">[docs]</a><span class="k">def</span> <span class="nf">link_model_io</span><span class="p">(</span><span class="n">existing</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Link I/O drivers back to the models they communicate with.</span>
+    <span class="sd">r&quot;&quot;&quot;Link I/O drivers back to the models they communicate with.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        existing (dict): Dictionary of existing components.</span>
@@ -776,7 +778,7 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../../',
-            VERSION:'0.3.0',
+            VERSION:'0.4+0.gd8a2a4f.dirty',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
@@ -787,15 +789,20 @@
       <script type="text/javascript" src="../../_static/jquery.js"></script>
       <script type="text/javascript" src="../../_static/underscore.js"></script>
       <script type="text/javascript" src="../../_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 
   
 
-  <script type="text/javascript" src="../../_static/js/theme.js"></script>
+  
+  
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+  
 
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.Navigation.enable(true);
+          
+          SphinxRtdTheme.Navigation.enableSticky();
+          
       });
   </script> 
 

@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>cis_interface.serialize.PlySerialize &mdash; cis_interface 0.3.0 documentation</title>
+  <title>cis_interface.serialize.PlySerialize &mdash; cis_interface 0.4+0.gd8a2a4f.dirty documentation</title>
   
 
   
@@ -24,7 +24,8 @@
 
   
 
-  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/theme_overrides.css" type="text/css" />
     <link rel="index" title="Index" href="../../../genindex.html" />
@@ -57,7 +58,7 @@
             
             
               <div class="version">
-                0.3
+                0.4+0.gd8a2a4f.dirty
               </div>
             
           
@@ -98,6 +99,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../code.html">Code</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../examples/examples_toc.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../release.html">Release Steps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../release.html#docs-checkout">Docs Checkout</a></li>
 </ul>
 
             
@@ -170,7 +172,7 @@
 
 
 <div class="viewcode-block" id="PlyDict"><a class="viewcode-back" href="../../../cis_interface.serialize.html#cis_interface.serialize.PlySerialize.PlyDict">[docs]</a><span class="k">class</span> <span class="nc">PlyDict</span><span class="p">(</span><span class="nb">dict</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Class for storing ply information.</span>
+    <span class="sd">r&quot;&quot;&quot;Class for storing ply information.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        vertices (list, optional): 3D positions of vertices comprising the</span>
@@ -186,23 +188,23 @@
         <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">list_keys</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="p">[])</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">PlyDict</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">PlyDict</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">nvert</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: Number of vertices.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;int: Number of vertices.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="s1">&#39;vertices&#39;</span><span class="p">])</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">nface</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: Number of faces.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;int: Number of faces.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="s1">&#39;faces&#39;</span><span class="p">])</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">bounds</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;tuple: Minimums and maximums of vertices.&quot;&quot;&quot;</span>
-        <span class="n">mins</span> <span class="o">=</span> <span class="mf">1e6</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="s1">&#39;float&#39;</span><span class="p">)</span>
-        <span class="n">maxs</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1e6</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="s1">&#39;float&#39;</span><span class="p">)</span>
+        <span class="sd">r&quot;&quot;&quot;tuple: Minimums and maximums of vertices.&quot;&quot;&quot;</span>
+        <span class="n">mins</span> <span class="o">=</span> <span class="mi">1</span><span class="n">e6</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="s1">&#39;float&#39;</span><span class="p">)</span>
+        <span class="n">maxs</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="n">e6</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="s1">&#39;float&#39;</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">[</span><span class="s1">&#39;vertices&#39;</span><span class="p">]:</span>
             <span class="n">mins</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">minimum</span><span class="p">(</span><span class="n">mins</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">v</span><span class="p">))</span>
             <span class="n">maxs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">maxs</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">v</span><span class="p">))</span>
@@ -210,7 +212,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">mesh</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;list: Vertices for each face in the structure.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;list: Vertices for each face in the structure.&quot;&quot;&quot;</span>
         <span class="n">mesh</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">[</span><span class="s1">&#39;faces&#39;</span><span class="p">]:</span>
             <span class="n">imesh</span> <span class="o">=</span> <span class="p">[]</span>
@@ -219,9 +221,9 @@
             <span class="n">mesh</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">imesh</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">mesh</span>
 
-<div class="viewcode-block" id="PlyDict.from_shape"><a class="viewcode-back" href="../../../cis_interface.serialize.html#cis_interface.serialize.PlySerialize.PlyDict.from_shape">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">from_shape</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">shape</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">conversion</span><span class="o">=</span><span class="mf">1.0</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create a ply dictionary from a PlantGL shape and descritizer.</span>
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="PlyDict.from_shape"><a class="viewcode-back" href="../../../cis_interface.serialize.html#cis_interface.serialize.PlySerialize.PlyDict.from_shape">[docs]</a>    <span class="k">def</span> <span class="nf">from_shape</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">shape</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">conversion</span><span class="o">=</span><span class="mf">1.0</span><span class="p">):</span>
+        <span class="sd">r&quot;&quot;&quot;Create a ply dictionary from a PlantGL shape and descritizer.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            scene (openalea.plantgl.scene): Scene that should be descritized.</span>
@@ -233,7 +235,7 @@
         <span class="n">iply</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="n">d</span><span class="o">.</span><span class="n">process</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">d</span><span class="o">.</span><span class="n">result</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">iply</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">()</span>
+            <span class="n">iply</span> <span class="o">=</span> <span class="n">cls</span><span class="p">()</span>
             <span class="c1"># Vertices</span>
             <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">d</span><span class="o">.</span><span class="n">result</span><span class="o">.</span><span class="n">pointList</span><span class="p">:</span>
                 <span class="n">iply</span><span class="p">[</span><span class="s1">&#39;vertices&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">conversion</span> <span class="o">*</span> <span class="n">p</span><span class="o">.</span><span class="n">x</span><span class="p">,</span>
@@ -260,9 +262,9 @@
                 <span class="n">iply</span><span class="p">[</span><span class="s1">&#39;faces&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">i3</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">i3</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">i3</span><span class="p">[</span><span class="mi">2</span><span class="p">]])</span>
         <span class="k">return</span> <span class="n">iply</span></div>
 
-<div class="viewcode-block" id="PlyDict.from_scene"><a class="viewcode-back" href="../../../cis_interface.serialize.html#cis_interface.serialize.PlySerialize.PlyDict.from_scene">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">from_scene</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">scene</span><span class="p">,</span> <span class="n">d</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">conversion</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">default_rgb</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create a ply dictionary from a PlantGL scene and descritizer.</span>
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="PlyDict.from_scene"><a class="viewcode-back" href="../../../cis_interface.serialize.html#cis_interface.serialize.PlySerialize.PlyDict.from_scene">[docs]</a>    <span class="k">def</span> <span class="nf">from_scene</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">scene</span><span class="p">,</span> <span class="n">d</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">conversion</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">default_rgb</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">r&quot;&quot;&quot;Create a ply dictionary from a PlantGL scene and descritizer.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            scene (openalea.plantgl.scene): Scene that should be descritized.</span>
@@ -277,18 +279,18 @@
         <span class="k">if</span> <span class="n">d</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="kn">from</span> <span class="nn">openalea.plantgl.all</span> <span class="k">import</span> <span class="n">Tesselator</span>
             <span class="n">d</span> <span class="o">=</span> <span class="n">Tesselator</span><span class="p">()</span>
-        <span class="n">out</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">()</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">cls</span><span class="p">()</span>
         <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">shapes</span> <span class="ow">in</span> <span class="n">scene</span><span class="o">.</span><span class="n">todict</span><span class="p">()</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="k">for</span> <span class="n">shape</span> <span class="ow">in</span> <span class="n">shapes</span><span class="p">:</span>
                 <span class="n">d</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
-                <span class="n">iply</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">from_shape</span><span class="p">(</span><span class="n">shape</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">conversion</span><span class="o">=</span><span class="n">conversion</span><span class="p">)</span>
+                <span class="n">iply</span> <span class="o">=</span> <span class="n">cls</span><span class="o">.</span><span class="n">from_shape</span><span class="p">(</span><span class="n">shape</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">conversion</span><span class="o">=</span><span class="n">conversion</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">iply</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                     <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">iply</span><span class="p">,</span> <span class="n">default_rgb</span><span class="o">=</span><span class="n">default_rgb</span><span class="p">)</span>
                 <span class="n">d</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">out</span></div>
 
 <div class="viewcode-block" id="PlyDict.to_scene"><a class="viewcode-back" href="../../../cis_interface.serialize.html#cis_interface.serialize.PlySerialize.PlyDict.to_scene">[docs]</a>    <span class="k">def</span> <span class="nf">to_scene</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conversion</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create a PlantGL scene from a Ply dictionary.</span>
+        <span class="sd">r&quot;&quot;&quot;Create a PlantGL scene from a Ply dictionary.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            conversion (float, optional): Conversion factor that should be</span>
@@ -317,7 +319,7 @@
         <span class="k">return</span> <span class="n">scn</span></div>
 
 <div class="viewcode-block" id="PlyDict.to_geom_args"><a class="viewcode-back" href="../../../cis_interface.serialize.html#cis_interface.serialize.PlySerialize.PlyDict.to_geom_args">[docs]</a>    <span class="k">def</span> <span class="nf">to_geom_args</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conversion</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get arguments for creating a PlantGL geometry.</span>
+        <span class="sd">r&quot;&quot;&quot;Get arguments for creating a PlantGL geometry.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            conversion (float, optional): Conversion factor that should be</span>
@@ -370,7 +372,7 @@
         <span class="k">return</span> <span class="n">smb_class</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span></div>
 
 <div class="viewcode-block" id="PlyDict.set_vertex_colors"><a class="viewcode-back" href="../../../cis_interface.serialize.html#cis_interface.serialize.PlySerialize.PlyDict.set_vertex_colors">[docs]</a>    <span class="k">def</span> <span class="nf">set_vertex_colors</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">default_rgb</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Set the vertex colors to a default if they are not yet set.</span>
+        <span class="sd">r&quot;&quot;&quot;Set the vertex colors to a default if they are not yet set.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            default_rgb (list, optional): Default color in RGB that should be</span>
@@ -384,7 +386,7 @@
         <span class="bp">self</span><span class="p">[</span><span class="s1">&#39;vertex_colors&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">default_rgb</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nvert</span><span class="p">)]</span></div>
 
 <div class="viewcode-block" id="PlyDict.append"><a class="viewcode-back" href="../../../cis_interface.serialize.html#cis_interface.serialize.PlySerialize.PlyDict.append">[docs]</a>    <span class="k">def</span> <span class="nf">append</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">solf</span><span class="p">,</span> <span class="n">default_rgb</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Append new ply information to this dictionary.</span>
+        <span class="sd">r&quot;&quot;&quot;Append new ply information to this dictionary.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            solf (PlyDict): Another ply to append to this one.</span>
@@ -407,7 +409,7 @@
             <span class="bp">self</span><span class="p">[</span><span class="s1">&#39;faces&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">v</span> <span class="o">+</span> <span class="n">nvert</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">f</span><span class="p">])</span></div>
 
 <div class="viewcode-block" id="PlyDict.merge"><a class="viewcode-back" href="../../../cis_interface.serialize.html#cis_interface.serialize.PlySerialize.PlyDict.merge">[docs]</a>    <span class="k">def</span> <span class="nf">merge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ply_list</span><span class="p">,</span> <span class="n">no_copy</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">default_rgb</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Merge a list of ply dictionaries.</span>
+        <span class="sd">r&quot;&quot;&quot;Merge a list of ply dictionaries.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            ply_list (list): Ply dictionaries.</span>
@@ -435,7 +437,7 @@
 <div class="viewcode-block" id="PlyDict.apply_scalar_map"><a class="viewcode-back" href="../../../cis_interface.serialize.html#cis_interface.serialize.PlySerialize.PlyDict.apply_scalar_map">[docs]</a>    <span class="k">def</span> <span class="nf">apply_scalar_map</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scalar_arr</span><span class="p">,</span> <span class="n">color_map</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                          <span class="n">vmin</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">scaling</span><span class="o">=</span><span class="s1">&#39;linear&#39;</span><span class="p">,</span>
                          <span class="n">scale_by_area</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">no_copy</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Set the color of faces in a 3D object based on a scalar map.</span>
+        <span class="sd">r&quot;&quot;&quot;Set the color of faces in a 3D object based on a scalar map.</span>
 <span class="sd">        This creates a copy unless no_copy is True.</span>
 
 <span class="sd">        Args:</span>
@@ -512,7 +514,7 @@
 
 
 <div class="viewcode-block" id="PlySerialize"><a class="viewcode-back" href="../../../cis_interface.serialize.html#cis_interface.serialize.PlySerialize.PlySerialize">[docs]</a><span class="k">class</span> <span class="nc">PlySerialize</span><span class="p">(</span><span class="n">DefaultSerialize</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Class for serializing/deserializing .ply file formats.</span>
+    <span class="sd">r&quot;&quot;&quot;Class for serializing/deserializing .ply file formats.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        write_header (bool, optional): If True, headers will be added to</span>
@@ -533,20 +535,20 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">write_header</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;write_header&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">newline</span> <span class="o">=</span> <span class="n">backwards</span><span class="o">.</span><span class="n">bytes2unicode</span><span class="p">(</span><span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;newline&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">default_rgb</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">PlySerialize</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">PlySerialize</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">serializer_type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: Type of serializer.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;int: Type of serializer.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="mi">8</span>
         
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">empty_msg</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;obj: Object indicating empty message.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;obj: Object indicating empty message.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">backwards</span><span class="o">.</span><span class="n">unicode2bytes</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
             
 <div class="viewcode-block" id="PlySerialize.func_serialize"><a class="viewcode-back" href="../../../cis_interface.serialize.html#cis_interface.serialize.PlySerialize.PlySerialize.func_serialize">[docs]</a>    <span class="k">def</span> <span class="nf">func_serialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Serialize a message.</span>
+        <span class="sd">r&quot;&quot;&quot;Serialize a message.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            args (PlyDict): Dictionary of ply information.</span>
@@ -600,7 +602,7 @@
 
 <div class="viewcode-block" id="PlySerialize.func_deserialize"><a class="viewcode-back" href="../../../cis_interface.serialize.html#cis_interface.serialize.PlySerialize.PlySerialize.func_deserialize">[docs]</a>    <span class="k">def</span> <span class="nf">func_deserialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">nvert</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">nface</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                          <span class="n">do_vertex_colors</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Deserialize a message.</span>
+        <span class="sd">r&quot;&quot;&quot;Deserialize a message.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            msg (str, bytes): Message to be deserialized.</span>
@@ -697,7 +699,7 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../../../',
-            VERSION:'0.3.0',
+            VERSION:'0.4+0.gd8a2a4f.dirty',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
@@ -708,15 +710,20 @@
       <script type="text/javascript" src="../../../_static/jquery.js"></script>
       <script type="text/javascript" src="../../../_static/underscore.js"></script>
       <script type="text/javascript" src="../../../_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 
   
 
-  <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
 
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.Navigation.enable(true);
+          
+          SphinxRtdTheme.Navigation.enableSticky();
+          
       });
   </script> 
 

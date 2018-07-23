@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>cis_interface.schema &mdash; cis_interface 0.3.0 documentation</title>
+  <title>cis_interface.schema &mdash; cis_interface 0.4+0.gd8a2a4f.dirty documentation</title>
   
 
   
@@ -24,7 +24,8 @@
 
   
 
-  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  
+    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/theme_overrides.css" type="text/css" />
     <link rel="index" title="Index" href="../../genindex.html" />
@@ -57,7 +58,7 @@
             
             
               <div class="version">
-                0.3
+                0.4+0.gd8a2a4f.dirty
               </div>
             
           
@@ -98,6 +99,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../code.html">Code</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../examples/examples_toc.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../release.html">Release Steps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../release.html#docs-checkout">Docs Checkout</a></li>
 </ul>
 
             
@@ -171,17 +173,18 @@
 <span class="kn">import</span> <span class="nn">collections</span>
 <span class="kn">from</span> <span class="nn">cis_interface.drivers</span> <span class="k">import</span> <span class="n">import_all_drivers</span>
 <span class="kn">from</span> <span class="nn">cis_interface.communication</span> <span class="k">import</span> <span class="n">import_all_comms</span>
+<span class="kn">from</span> <span class="nn">cis_interface.datatypes</span> <span class="k">import</span> <span class="n">import_all_types</span>
 
 
 <span class="n">_schema_fname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-    <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span> <span class="s1">&#39;.cis_schema.yml&#39;</span><span class="p">))</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">__file__</span><span class="p">),</span> <span class="s1">&#39;.cis_schema.yml&#39;</span><span class="p">))</span>
 <span class="n">_schema</span> <span class="o">=</span> <span class="kc">None</span>
 <span class="n">_registry</span> <span class="o">=</span> <span class="p">{}</span>
 <span class="n">_registry_complete</span> <span class="o">=</span> <span class="kc">False</span>
 
 
 <div class="viewcode-block" id="register_component"><a class="viewcode-back" href="../../code_python.html#cis_interface.schema.register_component">[docs]</a><span class="k">def</span> <span class="nf">register_component</span><span class="p">(</span><span class="n">component_class</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Decorator for registering a class as a yaml component.&quot;&quot;&quot;</span>
+    <span class="sd">r&quot;&quot;&quot;Decorator for registering a class as a yaml component.&quot;&quot;&quot;</span>
     <span class="k">global</span> <span class="n">_registry</span>
     <span class="n">yaml_typ</span> <span class="o">=</span> <span class="n">component_class</span><span class="o">.</span><span class="n">_schema_type</span>
     <span class="k">if</span> <span class="n">yaml_typ</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">_registry</span><span class="p">:</span>
@@ -192,7 +195,7 @@
 
 
 <div class="viewcode-block" id="inherit_schema"><a class="viewcode-back" href="../../code_python.html#cis_interface.schema.inherit_schema">[docs]</a><span class="k">def</span> <span class="nf">inherit_schema</span><span class="p">(</span><span class="n">orig</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create an inherited schema, adding new value to accepted ones for</span>
+    <span class="sd">r&quot;&quot;&quot;Create an inherited schema, adding new value to accepted ones for</span>
 <span class="sd">    dependencies.</span>
 <span class="sd">    </span>
 <span class="sd">    Args:</span>
@@ -229,29 +232,30 @@
 
 
 <div class="viewcode-block" id="init_registry"><a class="viewcode-back" href="../../code_python.html#cis_interface.schema.init_registry">[docs]</a><span class="k">def</span> <span class="nf">init_registry</span><span class="p">():</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Initialize the registries and schema.&quot;&quot;&quot;</span>
+    <span class="sd">r&quot;&quot;&quot;Initialize the registries and schema.&quot;&quot;&quot;</span>
     <span class="k">global</span> <span class="n">_registry_complete</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">_registry_complete</span><span class="p">:</span>
         <span class="n">import_all_drivers</span><span class="p">()</span>
         <span class="n">import_all_comms</span><span class="p">()</span>
+        <span class="n">import_all_types</span><span class="p">()</span>
         <span class="n">_registry_complete</span> <span class="o">=</span> <span class="kc">True</span></div>
 
 
 <div class="viewcode-block" id="clear_schema"><a class="viewcode-back" href="../../code_python.html#cis_interface.schema.clear_schema">[docs]</a><span class="k">def</span> <span class="nf">clear_schema</span><span class="p">():</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Clear global schema.&quot;&quot;&quot;</span>
+    <span class="sd">r&quot;&quot;&quot;Clear global schema.&quot;&quot;&quot;</span>
     <span class="k">global</span> <span class="n">_schema</span>
     <span class="n">_schema</span> <span class="o">=</span> <span class="kc">None</span></div>
 
 
 <div class="viewcode-block" id="init_schema"><a class="viewcode-back" href="../../code_python.html#cis_interface.schema.init_schema">[docs]</a><span class="k">def</span> <span class="nf">init_schema</span><span class="p">(</span><span class="n">fname</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Initialize global schema.&quot;&quot;&quot;</span>
+    <span class="sd">r&quot;&quot;&quot;Initialize global schema.&quot;&quot;&quot;</span>
     <span class="k">global</span> <span class="n">_schema</span>
     <span class="k">if</span> <span class="n">_schema</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">_schema</span> <span class="o">=</span> <span class="n">load_schema</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="create_schema"><a class="viewcode-back" href="../../code_python.html#cis_interface.schema.create_schema">[docs]</a><span class="k">def</span> <span class="nf">create_schema</span><span class="p">():</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create a new schema from the registry.&quot;&quot;&quot;</span>
+    <span class="sd">r&quot;&quot;&quot;Create a new schema from the registry.&quot;&quot;&quot;</span>
     <span class="k">global</span> <span class="n">_registry</span><span class="p">,</span> <span class="n">_registry_complete</span>
     <span class="n">init_registry</span><span class="p">()</span>
     <span class="n">x</span> <span class="o">=</span> <span class="n">SchemaRegistry</span><span class="p">(</span><span class="n">_registry</span><span class="p">)</span>
@@ -259,7 +263,7 @@
 
 
 <div class="viewcode-block" id="load_schema"><a class="viewcode-back" href="../../code_python.html#cis_interface.schema.load_schema">[docs]</a><span class="k">def</span> <span class="nf">load_schema</span><span class="p">(</span><span class="n">fname</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Return the cis_interface schema for YAML options.</span>
+    <span class="sd">r&quot;&quot;&quot;Return the cis_interface schema for YAML options.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        fname (str, optional): Full path to the file that the schema should be</span>
@@ -279,7 +283,7 @@
 
 
 <div class="viewcode-block" id="get_schema"><a class="viewcode-back" href="../../code_python.html#cis_interface.schema.get_schema">[docs]</a><span class="k">def</span> <span class="nf">get_schema</span><span class="p">(</span><span class="n">fname</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Return the cis_interface schema for YAML options.</span>
+    <span class="sd">r&quot;&quot;&quot;Return the cis_interface schema for YAML options.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        fname (str, optional): Full path to the file that the schema should be</span>
@@ -303,7 +307,7 @@
 
 
 <div class="viewcode-block" id="str_to_function"><a class="viewcode-back" href="../../code_python.html#cis_interface.schema.str_to_function">[docs]</a><span class="k">def</span> <span class="nf">str_to_function</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Convert a string to a function.</span>
+    <span class="sd">r&quot;&quot;&quot;Convert a string to a function.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        value (str, list): String or list of strings, specifying function(s).</span>
@@ -342,15 +346,15 @@
     <span class="k">return</span> <span class="n">out</span></div>
 
 
-<div class="viewcode-block" id="SchemaValidator"><a class="viewcode-back" href="../../code_python.html#cis_interface.schema.SchemaValidator">[docs]</a><span class="k">class</span> <span class="nc">SchemaValidator</span><span class="p">(</span><span class="n">cerberus</span><span class="o">.</span><span class="n">Validator</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Class for validating the schema.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="CisSchemaValidator"><a class="viewcode-back" href="../../code_python.html#cis_interface.schema.CisSchemaValidator">[docs]</a><span class="k">class</span> <span class="nc">CisSchemaValidator</span><span class="p">(</span><span class="n">cerberus</span><span class="o">.</span><span class="n">Validator</span><span class="p">):</span>
+    <span class="sd">r&quot;&quot;&quot;Class for validating the schema.&quot;&quot;&quot;</span>
 
     <span class="n">types_mapping</span> <span class="o">=</span> <span class="n">cerberus</span><span class="o">.</span><span class="n">Validator</span><span class="o">.</span><span class="n">types_mapping</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
     <span class="n">types_mapping</span><span class="p">[</span><span class="s1">&#39;function&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">function_type</span>
     <span class="n">cis_type_order</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;list&#39;</span><span class="p">,</span> <span class="s1">&#39;string&#39;</span><span class="p">,</span> <span class="s1">&#39;integer&#39;</span><span class="p">,</span> <span class="s1">&#39;boolean&#39;</span><span class="p">,</span> <span class="s1">&#39;function&#39;</span><span class="p">]</span>
 
     <span class="k">def</span> <span class="nf">_resolve_rules_set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="n">rules</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">SchemaValidator</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">_resolve_rules_set</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">rules</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">CisSchemaValidator</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">_resolve_rules_set</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">rules</span><span class="p">,</span> <span class="n">collections</span><span class="o">.</span><span class="n">Mapping</span><span class="p">):</span>
             <span class="n">rules</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_add_coerce</span><span class="p">(</span><span class="n">rules</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">rules</span>
@@ -400,31 +404,57 @@
 
 
 <div class="viewcode-block" id="ComponentSchema"><a class="viewcode-back" href="../../code_python.html#cis_interface.schema.ComponentSchema">[docs]</a><span class="k">class</span> <span class="nc">ComponentSchema</span><span class="p">(</span><span class="nb">dict</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Schema information for one component.</span>
+    <span class="sd">r&quot;&quot;&quot;Schema information for one component.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        schema_type (str): The name of the component.</span>
-<span class="sd">        subtype_attr (str, optional): The attribute that should be used to</span>
-<span class="sd">            log subtypes. Defaults to None.</span>
+<span class="sd">        schema_registry (SchemaRegistry, optional): Registry of schemas</span>
+<span class="sd">            that this schema is dependent on.</span>
 <span class="sd">        **kwargs: Additional keyword arguments are entries in the component</span>
 <span class="sd">            schema.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">_subtype_keys</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;model&#39;</span><span class="p">:</span> <span class="s1">&#39;language&#39;</span><span class="p">,</span> <span class="s1">&#39;comm&#39;</span><span class="p">:</span> <span class="s1">&#39;commtype&#39;</span><span class="p">,</span>
+                     <span class="s1">&#39;file&#39;</span><span class="p">:</span> <span class="s1">&#39;filetype&#39;</span><span class="p">}</span>  <span class="c1"># , &#39;type&#39;: &#39;datatype&#39;}</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">schema_type</span><span class="p">,</span> <span class="n">subtype_attr</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">schema_type</span><span class="p">,</span> <span class="n">schema_registry</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">schema_registry</span> <span class="o">=</span> <span class="n">schema_registry</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_schema_type</span> <span class="o">=</span> <span class="n">schema_type</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_subtype_attr</span> <span class="o">=</span> <span class="n">subtype_attr</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_subtype_key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_subtype_keys</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">schema_type</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_subtype_key</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_subtype_attr</span> <span class="o">=</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_subtype_key</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_subtype_attr</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_schema_subtypes</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">ComponentSchema</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">ComponentSchema</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="ComponentSchema.from_registry"><a class="viewcode-back" href="../../code_python.html#cis_interface.schema.ComponentSchema.from_registry">[docs]</a>    <span class="k">def</span> <span class="nf">from_registry</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">schema_type</span><span class="p">,</span> <span class="n">schema_classes</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">r&quot;&quot;&quot;Construct a ComponentSchema from a registry entry.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            schema_type (str): Name of component type to build.</span>
+<span class="sd">            schema_classes (list): List of classes for the component type.</span>
+<span class="sd">            **kwargs: Additional keyword arguments are passed to the class</span>
+<span class="sd">                __init__ method.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            ComponentSchema: Schema with information from classes.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">cls</span><span class="p">(</span><span class="n">schema_type</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">schema_classes</span><span class="p">:</span>
+            <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">out</span></div>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">class2subtype</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;dict: Mapping from class to list of subtypes.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;dict: Mapping from class to list of subtypes.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_schema_subtypes</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">subtype2class</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;dict: Mapping from subtype to class.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;dict: Mapping from subtype to class.&quot;&quot;&quot;</span>
         <span class="n">out</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_schema_subtypes</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="k">for</span> <span class="n">iv</span> <span class="ow">in</span> <span class="n">v</span><span class="p">:</span>
@@ -433,7 +463,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">subtypes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;list: All subtypes for this schema type.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;list: All subtypes for this schema type.&quot;&quot;&quot;</span>
         <span class="n">out</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_schema_subtypes</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
             <span class="n">out</span> <span class="o">+=</span> <span class="n">v</span>
@@ -441,11 +471,11 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">classes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;list: All available classes for this schema.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;list: All available classes for this schema.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">sorted</span><span class="p">([</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_schema_subtypes</span><span class="o">.</span><span class="n">keys</span><span class="p">()])</span>
 
 <div class="viewcode-block" id="ComponentSchema.append"><a class="viewcode-back" href="../../code_python.html#cis_interface.schema.ComponentSchema.append">[docs]</a>    <span class="k">def</span> <span class="nf">append</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">comp_cls</span><span class="p">,</span> <span class="n">subtype</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Append component class to the schema.</span>
+        <span class="sd">r&quot;&quot;&quot;Append component class to the schema.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            comp_cls (class): Component class that should be added.</span>
@@ -455,37 +485,48 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">assert</span><span class="p">(</span><span class="n">comp_cls</span><span class="o">.</span><span class="n">_schema_type</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">_schema_type</span><span class="p">)</span>
-        <span class="n">name</span> <span class="o">=</span> <span class="n">comp_cls</span><span class="o">.</span><span class="vm">__name__</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="n">comp_cls</span><span class="o">.</span><span class="n">__name__</span>
         <span class="n">rule</span> <span class="o">=</span> <span class="n">comp_cls</span><span class="o">.</span><span class="n">_schema</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">subtype</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_subtype_attr</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="c1"># Append subtype</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_schema_type</span> <span class="o">==</span> <span class="s1">&#39;connection&#39;</span><span class="p">:</span>
+            <span class="n">subtype</span> <span class="o">=</span> <span class="p">(</span><span class="n">comp_cls</span><span class="o">.</span><span class="n">_icomm_type</span><span class="p">,</span> <span class="n">comp_cls</span><span class="o">.</span><span class="n">_ocomm_type</span><span class="p">,</span> <span class="n">comp_cls</span><span class="o">.</span><span class="n">direction</span><span class="p">())</span>
+        <span class="k">elif</span> <span class="p">(</span><span class="n">subtype</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_subtype_attr</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
             <span class="n">subtype</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">comp_cls</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_subtype_attr</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">subtype</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">subtype</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_schema_subtypes</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">subtype</span><span class="p">]</span>
+                <span class="n">subtype_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">subtype</span><span class="p">]</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_schema_subtypes</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">subtype</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">append_rules</span><span class="p">(</span><span class="n">rule</span><span class="p">)</span></div>
+                <span class="n">subtype_list</span> <span class="o">=</span> <span class="n">subtype</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_schema_subtypes</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">subtype_list</span>
+        <span class="c1"># Add rules</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">append_rules</span><span class="p">(</span><span class="n">rule</span><span class="p">)</span>
+        <span class="c1"># Add allowed subtypes</span>
+        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_subtype_key</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_subtype_key</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">):</span>
+            <span class="bp">self</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_subtype_key</span><span class="p">][</span><span class="s1">&#39;allowed&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">subtypes</span><span class="p">)</span>
+        <span class="c1"># Verify that the schema is valid</span>
+        <span class="n">CisSchemaValidator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">schema_registry</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">schema_registry</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="ComponentSchema.append_rules"><a class="viewcode-back" href="../../code_python.html#cis_interface.schema.ComponentSchema.append_rules">[docs]</a>    <span class="k">def</span> <span class="nf">append_rules</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Add rules from new class&#39;s schema to this one.</span>
+        <span class="sd">r&quot;&quot;&quot;Add rules from new class&#39;s schema to this one.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            new (dict): New schema to add.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">old</span> <span class="o">=</span> <span class="bp">self</span>
         <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">new</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
-                <span class="bp">self</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
+            <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">old</span><span class="p">:</span>
+                <span class="n">old</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">diff</span> <span class="o">=</span> <span class="p">[]</span>
                 <span class="k">for</span> <span class="n">ik</span> <span class="ow">in</span> <span class="n">v</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-                    <span class="k">if</span> <span class="p">(</span><span class="n">ik</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">[</span><span class="n">k</span><span class="p">])</span> <span class="ow">or</span> <span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="n">ik</span><span class="p">]</span> <span class="o">!=</span> <span class="bp">self</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="n">ik</span><span class="p">]):</span>
+                    <span class="k">if</span> <span class="p">(</span><span class="n">ik</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">old</span><span class="p">[</span><span class="n">k</span><span class="p">])</span> <span class="ow">or</span> <span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="n">ik</span><span class="p">]</span> <span class="o">!=</span> <span class="n">old</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="n">ik</span><span class="p">]):</span>
                         <span class="n">diff</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ik</span><span class="p">)</span>
                 <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">diff</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span>
                     <span class="k">pass</span>
                 <span class="k">elif</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">diff</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">diff</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;dependencies&#39;</span><span class="p">):</span>
                     <span class="n">alldeps</span> <span class="o">=</span> <span class="p">{}</span>
-                    <span class="n">deps</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="s1">&#39;dependencies&#39;</span><span class="p">],</span> <span class="n">v</span><span class="p">[</span><span class="s1">&#39;dependencies&#39;</span><span class="p">]]</span>
+                    <span class="n">deps</span> <span class="o">=</span> <span class="p">[</span><span class="n">old</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="s1">&#39;dependencies&#39;</span><span class="p">],</span> <span class="n">v</span><span class="p">[</span><span class="s1">&#39;dependencies&#39;</span><span class="p">]]</span>
                     <span class="k">for</span> <span class="n">idep</span> <span class="ow">in</span> <span class="n">deps</span><span class="p">:</span>
                         <span class="k">for</span> <span class="n">ik</span><span class="p">,</span> <span class="n">iv</span> <span class="ow">in</span> <span class="n">idep</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
                             <span class="k">if</span> <span class="n">ik</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">alldeps</span><span class="p">:</span>
@@ -498,17 +539,17 @@
                         <span class="n">alldeps</span><span class="p">[</span><span class="n">ik</span><span class="p">]</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">alldeps</span><span class="p">[</span><span class="n">ik</span><span class="p">])))</span>
                     <span class="n">vcopy</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
                     <span class="n">vcopy</span><span class="p">[</span><span class="s1">&#39;dependencies&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">alldeps</span>
-                    <span class="bp">self</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="o">**</span><span class="n">vcopy</span><span class="p">)</span>
+                    <span class="n">old</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="o">**</span><span class="n">vcopy</span><span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>  <span class="c1"># pragma: debug</span>
                     <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Existing:&#39;</span><span class="p">)</span>
-                    <span class="n">pprint</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="n">k</span><span class="p">])</span>
+                    <span class="n">pprint</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">old</span><span class="p">[</span><span class="n">k</span><span class="p">])</span>
                     <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;New:&#39;</span><span class="p">)</span>
                     <span class="n">pprint</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
                     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Cannot merge schemas.&quot;</span><span class="p">)</span></div></div>
 
 
-<div class="viewcode-block" id="SchemaRegistry"><a class="viewcode-back" href="../../code_python.html#cis_interface.schema.SchemaRegistry">[docs]</a><span class="k">class</span> <span class="nc">SchemaRegistry</span><span class="p">(</span><span class="nb">dict</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Registry of schema&#39;s for different integration components.</span>
+<div class="viewcode-block" id="SchemaRegistry"><a class="viewcode-back" href="../../code_python.html#cis_interface.schema.SchemaRegistry">[docs]</a><span class="k">class</span> <span class="nc">SchemaRegistry</span><span class="p">(</span><span class="n">cerberus</span><span class="o">.</span><span class="n">schema</span><span class="o">.</span><span class="n">SchemaRegistry</span><span class="p">):</span>
+    <span class="sd">r&quot;&quot;&quot;Registry of schema&#39;s for different integration components.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        registry (dict, optional): Dictionary of registered components.</span>
@@ -523,57 +564,58 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">_component_attr</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;_schema_subtypes&#39;</span><span class="p">,</span> <span class="s1">&#39;_subtype_attr&#39;</span><span class="p">]</span>
-    <span class="n">_subtype_attr</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;model&#39;</span><span class="p">:</span> <span class="s1">&#39;_language&#39;</span><span class="p">,</span> <span class="s1">&#39;comm&#39;</span><span class="p">:</span> <span class="s1">&#39;_commtype&#39;</span><span class="p">,</span>
-                     <span class="s1">&#39;file&#39;</span><span class="p">:</span> <span class="s1">&#39;_filetype&#39;</span><span class="p">}</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">registry</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">SchemaRegistry</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">()</span>
         <span class="n">comp</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">if</span> <span class="n">registry</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">required</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="c1"># required = [&#39;type&#39;, &#39;comm&#39;, &#39;file&#39;, &#39;model&#39;, &#39;connection&#39;]</span>
                 <span class="n">required</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;comm&#39;</span><span class="p">,</span> <span class="s1">&#39;file&#39;</span><span class="p">,</span> <span class="s1">&#39;model&#39;</span><span class="p">,</span> <span class="s1">&#39;connection&#39;</span><span class="p">]</span>
             <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">required</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">registry</span><span class="p">:</span>
                     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Component </span><span class="si">%s</span><span class="s2"> required.&quot;</span> <span class="o">%</span> <span class="n">k</span><span class="p">)</span>
+            <span class="c1"># Register dummy schemas for each component</span>
+            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">registry</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="bp">self</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;hold&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">}}</span>
+            <span class="c1"># Create schemas for each component</span>
             <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">registry</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
                 <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">comp</span><span class="p">:</span>
-                    <span class="n">isubtype_attr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_subtype_attr</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-                    <span class="n">comp</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">ComponentSchema</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">subtype_attr</span><span class="o">=</span><span class="n">isubtype_attr</span><span class="p">)</span>
-                <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">registry</span><span class="p">[</span><span class="n">k</span><span class="p">]:</span>
-                    <span class="n">subtype</span> <span class="o">=</span> <span class="kc">None</span>
-                    <span class="k">if</span> <span class="n">k</span> <span class="o">==</span> <span class="s1">&#39;connection&#39;</span><span class="p">:</span>
-                        <span class="n">subtype</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">_icomm_type</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">_ocomm_type</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">direction</span><span class="p">())</span>
-                    <span class="n">comp</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">subtype</span><span class="o">=</span><span class="n">subtype</span><span class="p">)</span>
-                    <span class="n">SchemaValidator</span><span class="p">(</span><span class="n">comp</span><span class="p">[</span><span class="n">k</span><span class="p">])</span>
-            <span class="c1"># Add lists of required properties</span>
-            <span class="n">comp</span><span class="p">[</span><span class="s1">&#39;file&#39;</span><span class="p">][</span><span class="s1">&#39;filetype&#39;</span><span class="p">][</span><span class="s1">&#39;allowed&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">comp</span><span class="p">[</span><span class="s1">&#39;file&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">subtypes</span><span class="p">)</span>
-            <span class="n">comp</span><span class="p">[</span><span class="s1">&#39;model&#39;</span><span class="p">][</span><span class="s1">&#39;language&#39;</span><span class="p">][</span><span class="s1">&#39;allowed&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">comp</span><span class="p">[</span><span class="s1">&#39;model&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">subtypes</span><span class="p">)</span>
-            <span class="n">comp</span><span class="p">[</span><span class="s1">&#39;model&#39;</span><span class="p">][</span><span class="s1">&#39;inputs&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;list&#39;</span><span class="p">,</span> <span class="s1">&#39;required&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
-                                       <span class="s1">&#39;schema&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;dict&#39;</span><span class="p">,</span>
-                                                  <span class="s1">&#39;schema&#39;</span><span class="p">:</span> <span class="n">comp</span><span class="p">[</span><span class="s1">&#39;comm&#39;</span><span class="p">]}}</span>
-            <span class="n">comp</span><span class="p">[</span><span class="s1">&#39;model&#39;</span><span class="p">][</span><span class="s1">&#39;outputs&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;list&#39;</span><span class="p">,</span> <span class="s1">&#39;required&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
-                                        <span class="s1">&#39;schema&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;dict&#39;</span><span class="p">,</span>
-                                                   <span class="s1">&#39;schema&#39;</span><span class="p">:</span> <span class="n">comp</span><span class="p">[</span><span class="s1">&#39;comm&#39;</span><span class="p">]}}</span>
-            <span class="n">comp</span><span class="p">[</span><span class="s1">&#39;connection&#39;</span><span class="p">][</span><span class="s1">&#39;input_file&#39;</span><span class="p">][</span><span class="s1">&#39;schema&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">comp</span><span class="p">[</span><span class="s1">&#39;file&#39;</span><span class="p">]</span>
-            <span class="n">comp</span><span class="p">[</span><span class="s1">&#39;connection&#39;</span><span class="p">][</span><span class="s1">&#39;output_file&#39;</span><span class="p">][</span><span class="s1">&#39;schema&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">comp</span><span class="p">[</span><span class="s1">&#39;file&#39;</span><span class="p">]</span>
+                    <span class="n">comp</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">ComponentSchema</span><span class="o">.</span><span class="n">from_registry</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">registry</span><span class="p">[</span><span class="n">k</span><span class="p">],</span>
+                                                            <span class="n">schema_registry</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
+                <span class="bp">self</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">comp</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
             <span class="c1"># Make sure final versions are valid schemas</span>
             <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">comp</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
-                <span class="n">SchemaValidator</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">SchemaRegistry</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">comp</span><span class="p">)</span>
+                <span class="n">CisSchemaValidator</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">schema_registry</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
 
-<div class="viewcode-block" id="SchemaRegistry.from_file"><a class="viewcode-back" href="../../code_python.html#cis_interface.schema.SchemaRegistry.from_file">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">from_file</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">fname</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Create a SchemaRegistry from a file.</span>
+    <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__setitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+
+<div class="viewcode-block" id="SchemaRegistry.keys"><a class="viewcode-back" href="../../code_python.html#cis_interface.schema.SchemaRegistry.keys">[docs]</a>    <span class="k">def</span> <span class="nf">keys</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">all</span><span class="p">()</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span></div>
+
+    <span class="k">def</span> <span class="nf">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="s1">&#39;all&#39;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">all</span><span class="p">()</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">all</span><span class="p">())</span>
+
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="SchemaRegistry.from_file"><a class="viewcode-back" href="../../code_python.html#cis_interface.schema.SchemaRegistry.from_file">[docs]</a>    <span class="k">def</span> <span class="nf">from_file</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">fname</span><span class="p">):</span>
+        <span class="sd">r&quot;&quot;&quot;Create a SchemaRegistry from a file.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            fname (str): Full path to the file the schema should be loaded from.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">out</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">()</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">cls</span><span class="p">()</span>
         <span class="n">out</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">out</span></div>
 
 <div class="viewcode-block" id="SchemaRegistry.load"><a class="viewcode-back" href="../../code_python.html#cis_interface.schema.SchemaRegistry.load">[docs]</a>    <span class="k">def</span> <span class="nf">load</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Load schema from a file.</span>
+        <span class="sd">r&quot;&quot;&quot;Load schema from a file.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            fname (str): Full path to the file the schema should be loaded from.</span>
@@ -582,6 +624,9 @@
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="n">contents</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
             <span class="n">schema</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">contents</span><span class="p">,</span> <span class="n">Loader</span><span class="o">=</span><span class="n">SchemaLoader</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">schema</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Failed to load schema from </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">fname</span><span class="p">)</span>
+        <span class="n">comp_list</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">schema</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="n">is_attr</span> <span class="o">=</span> <span class="kc">False</span>
             <span class="k">for</span> <span class="n">iattr</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_component_attr</span><span class="p">:</span>
@@ -590,14 +635,21 @@
                     <span class="k">break</span>
             <span class="k">if</span> <span class="n">is_attr</span><span class="p">:</span>
                 <span class="k">continue</span>
-            <span class="bp">self</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">ComponentSchema</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="o">**</span><span class="n">v</span><span class="p">)</span>
+            <span class="n">comp_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+        <span class="c1"># Add dummy schemas to registry</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">comp_list</span><span class="p">:</span>
+            <span class="bp">self</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;hold&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">}}</span>
+        <span class="c1"># Create components</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">comp_list</span><span class="p">:</span>
+            <span class="n">icomp</span> <span class="o">=</span> <span class="n">ComponentSchema</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">schema_registry</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">schema</span><span class="p">[</span><span class="n">k</span><span class="p">])</span>
             <span class="k">for</span> <span class="n">iattr</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_component_attr</span><span class="p">:</span>
                 <span class="n">kattr</span> <span class="o">=</span> <span class="n">k</span> <span class="o">+</span> <span class="n">iattr</span>
                 <span class="k">if</span> <span class="n">kattr</span> <span class="ow">in</span> <span class="n">schema</span><span class="p">:</span>
-                    <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">iattr</span><span class="p">,</span> <span class="n">schema</span><span class="p">[</span><span class="n">kattr</span><span class="p">])</span></div>
+                    <span class="nb">setattr</span><span class="p">(</span><span class="n">icomp</span><span class="p">,</span> <span class="n">iattr</span><span class="p">,</span> <span class="n">schema</span><span class="p">[</span><span class="n">kattr</span><span class="p">])</span>
+            <span class="bp">self</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">icomp</span></div>
 
 <div class="viewcode-block" id="SchemaRegistry.save"><a class="viewcode-back" href="../../code_python.html#cis_interface.schema.SchemaRegistry.save">[docs]</a>    <span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Save the schema to a file.</span>
+        <span class="sd">r&quot;&quot;&quot;Save the schema to a file.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            fname (str): Full path to the file the schema should be saved to.</span>
@@ -610,48 +662,46 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">class2language</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;dict: Mapping from ModelDriver class to programming language.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;dict: Mapping from ModelDriver class to programming language.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="p">[</span><span class="s1">&#39;model&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">class2subtype</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">language2class</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;dict: Mapping from programming language to ModelDriver class.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;dict: Mapping from programming language to ModelDriver class.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="p">[</span><span class="s1">&#39;model&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">subtype2class</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">class2filetype</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;dict: Mapping from communication class to filetype.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;dict: Mapping from communication class to filetype.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="p">[</span><span class="s1">&#39;file&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">class2subtype</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">filetype2class</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;dict: Mapping from filetype to communication class.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;dict: Mapping from filetype to communication class.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="p">[</span><span class="s1">&#39;file&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">subtype2class</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">class2conntype</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;dict: Mapping from connection class to comm classes &amp; direction.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;dict: Mapping from connection class to comm classes &amp; direction.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="p">[</span><span class="s1">&#39;connection&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">class2subtype</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">conntype2class</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;dict: Mapping from comm classes &amp; direction to connection class.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;dict: Mapping from comm classes &amp; direction to connection class.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="p">[</span><span class="s1">&#39;connection&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">subtype2class</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">validator</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Compose complete schema for parsing yaml.&quot;&quot;&quot;</span>
-        <span class="n">out</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;models&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;list&#39;</span><span class="p">,</span>
-                          <span class="s1">&#39;schema&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;dict&#39;</span><span class="p">,</span>
-                                     <span class="s1">&#39;schema&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="p">[</span><span class="s1">&#39;model&#39;</span><span class="p">]}},</span>
-               <span class="s1">&#39;connections&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;list&#39;</span><span class="p">,</span>
-                               <span class="s1">&#39;schema&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;dict&#39;</span><span class="p">,</span>
-                                          <span class="s1">&#39;schema&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="p">[</span><span class="s1">&#39;connection&#39;</span><span class="p">]}}}</span>
-        <span class="k">return</span> <span class="n">SchemaValidator</span><span class="p">(</span><span class="n">out</span><span class="p">)</span></div>
+        <span class="sd">r&quot;&quot;&quot;Compose complete schema for parsing yaml.&quot;&quot;&quot;</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;models&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;list&#39;</span><span class="p">,</span> <span class="s1">&#39;schema&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;dict&#39;</span><span class="p">,</span>
+                                                     <span class="s1">&#39;schema&#39;</span><span class="p">:</span> <span class="s1">&#39;model&#39;</span><span class="p">}},</span>
+               <span class="s1">&#39;connections&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;list&#39;</span><span class="p">,</span> <span class="s1">&#39;schema&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;dict&#39;</span><span class="p">,</span>
+                                                          <span class="s1">&#39;schema&#39;</span><span class="p">:</span> <span class="s1">&#39;connection&#39;</span><span class="p">}}}</span>
+        <span class="k">return</span> <span class="n">CisSchemaValidator</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">schema_registry</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="SchemaLoader"><a class="viewcode-back" href="../../code_python.html#cis_interface.schema.SchemaLoader">[docs]</a><span class="k">class</span> <span class="nc">SchemaLoader</span><span class="p">(</span><span class="n">yaml</span><span class="o">.</span><span class="n">SafeLoader</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;SafeLoader for schema that includes tuples.&quot;&quot;&quot;</span>
+    <span class="sd">r&quot;&quot;&quot;SafeLoader for schema that includes tuples.&quot;&quot;&quot;</span>
 <div class="viewcode-block" id="SchemaLoader.construct_python_tuple"><a class="viewcode-back" href="../../code_python.html#cis_interface.schema.SchemaLoader.construct_python_tuple">[docs]</a>    <span class="k">def</span> <span class="nf">construct_python_tuple</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
         <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">construct_sequence</span><span class="p">(</span><span class="n">node</span><span class="p">))</span></div></div>
 
@@ -661,7 +711,7 @@
 
 
 <div class="viewcode-block" id="SchemaDumper"><a class="viewcode-back" href="../../code_python.html#cis_interface.schema.SchemaDumper">[docs]</a><span class="k">class</span> <span class="nc">SchemaDumper</span><span class="p">(</span><span class="n">yaml</span><span class="o">.</span><span class="n">Dumper</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;SafeDumper for schema that includes tuples and Schema classes.&quot;&quot;&quot;</span>
+    <span class="sd">r&quot;&quot;&quot;SafeDumper for schema that includes tuples and Schema classes.&quot;&quot;&quot;</span>
 <div class="viewcode-block" id="SchemaDumper.represent_python_tuple"><a class="viewcode-back" href="../../code_python.html#cis_interface.schema.SchemaDumper.represent_python_tuple">[docs]</a>    <span class="k">def</span> <span class="nf">represent_python_tuple</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">represent_sequence</span><span class="p">(</span><span class="s1">&#39;tag:yaml.org,2002:python/tuple&#39;</span><span class="p">,</span>
                                        <span class="nb">list</span><span class="p">(</span><span class="n">data</span><span class="p">),</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
@@ -671,11 +721,13 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">represent_data</span><span class="p">(</span><span class="n">out</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="SchemaDumper.represent_SchemaRegistry"><a class="viewcode-back" href="../../code_python.html#cis_interface.schema.SchemaDumper.represent_SchemaRegistry">[docs]</a>    <span class="k">def</span> <span class="nf">represent_SchemaRegistry</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
-        <span class="n">out</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="o">**</span><span class="n">data</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="o">**</span><span class="n">data</span><span class="o">.</span><span class="n">all</span><span class="p">())</span>
+        <span class="n">comp_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">out</span><span class="o">.</span><span class="n">keys</span><span class="p">()]</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">comp_list</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">iattr</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">_component_attr</span><span class="p">:</span>
-                <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">iattr</span><span class="p">,</span> <span class="kc">None</span><span class="p">):</span>
-                    <span class="n">out</span><span class="p">[</span><span class="n">k</span> <span class="o">+</span> <span class="n">iattr</span><span class="p">]</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">iattr</span><span class="p">)</span>
+                <span class="n">icomp</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+                <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">icomp</span><span class="p">,</span> <span class="n">iattr</span><span class="p">,</span> <span class="kc">None</span><span class="p">):</span>
+                    <span class="n">out</span><span class="p">[</span><span class="n">k</span> <span class="o">+</span> <span class="n">iattr</span><span class="p">]</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">icomp</span><span class="p">,</span> <span class="n">iattr</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">represent_data</span><span class="p">(</span><span class="n">out</span><span class="p">)</span></div></div>
 
 
@@ -718,7 +770,7 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../../',
-            VERSION:'0.3.0',
+            VERSION:'0.4+0.gd8a2a4f.dirty',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
@@ -729,15 +781,20 @@
       <script type="text/javascript" src="../../_static/jquery.js"></script>
       <script type="text/javascript" src="../../_static/underscore.js"></script>
       <script type="text/javascript" src="../../_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 
   
 
-  <script type="text/javascript" src="../../_static/js/theme.js"></script>
+  
+  
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+  
 
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.Navigation.enable(true);
+          
+          SphinxRtdTheme.Navigation.enableSticky();
+          
       });
   </script> 
 

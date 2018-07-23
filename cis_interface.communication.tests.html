@@ -1,0 +1,1542 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>cis_interface.communication.tests package &mdash; cis_interface 0.4+0.gd8a2a4f.dirty documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> cis_interface
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.4+0.gd8a2a4f.dirty
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="includeme.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="formatted_io.html">Formatted I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="server_client_io.html">Server/Client I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="server_client_io.html#one-server-two-clients">One Server, Two Clients</a></li>
+<li class="toctree-l1"><a class="reference internal" href="yaml.html">YAML Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="config.html">Configuration Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="units.html">Units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="c_format_strings.html">C-Style Format Strings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="io_drivers.html">Input/Output Drivers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="model_drivers.html">Model Drivers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="code.html">Code</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/examples_toc.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="release.html">Release Steps</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">cis_interface</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>cis_interface.communication.tests package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/cis_interface.communication.tests.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="cis-interface-communication-tests-package">
+<h1>cis_interface.communication.tests package<a class="headerlink" href="#cis-interface-communication-tests-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-cis_interface.communication.tests.test_AsciiFileComm">
+<span id="cis-interface-communication-tests-test-asciifilecomm-module"></span><h2>cis_interface.communication.tests.test_AsciiFileComm module<a class="headerlink" href="#module-cis_interface.communication.tests.test_AsciiFileComm" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="cis_interface.communication.tests.test_AsciiFileComm.TestAsciiFileComm">
+<em class="property">class </em><code class="descclassname">cis_interface.communication.tests.test_AsciiFileComm.</code><code class="descname">TestAsciiFileComm</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_AsciiFileComm.html#TestAsciiFileComm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_AsciiFileComm.TestAsciiFileComm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.communication.tests.test_FileComm.TestFileComm" title="cis_interface.communication.tests.test_FileComm.TestFileComm"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.communication.tests.test_FileComm.TestFileComm</span></code></a></p>
+<p>Test for AsciiFileComm communication class.</p>
+<dl class="method">
+<dt id="cis_interface.communication.tests.test_AsciiFileComm.TestAsciiFileComm.test_send_recv_comment">
+<code class="descname">test_send_recv_comment</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_AsciiFileComm.html#TestAsciiFileComm.test_send_recv_comment"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_AsciiFileComm.TestAsciiFileComm.test_send_recv_comment" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test send/recv with commented message.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-cis_interface.communication.tests.test_AsciiMapComm">
+<span id="cis-interface-communication-tests-test-asciimapcomm-module"></span><h2>cis_interface.communication.tests.test_AsciiMapComm module<a class="headerlink" href="#module-cis_interface.communication.tests.test_AsciiMapComm" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="cis_interface.communication.tests.test_AsciiMapComm.TestAsciiMapComm">
+<em class="property">class </em><code class="descclassname">cis_interface.communication.tests.test_AsciiMapComm.</code><code class="descname">TestAsciiMapComm</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_AsciiMapComm.html#TestAsciiMapComm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_AsciiMapComm.TestAsciiMapComm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.communication.tests.test_FileComm.TestFileComm" title="cis_interface.communication.tests.test_FileComm.TestFileComm"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.communication.tests.test_FileComm.TestFileComm</span></code></a></p>
+<p>Test for AsciiMapComm communication class.</p>
+<dl class="attribute">
+<dt id="cis_interface.communication.tests.test_AsciiMapComm.TestAsciiMapComm.append_msg">
+<code class="descname">append_msg</code><a class="headerlink" href="#cis_interface.communication.tests.test_AsciiMapComm.TestAsciiMapComm.append_msg" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>dict</em> &#8211; Message that should be sent by second comm.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.communication.tests.test_AsciiMapComm.TestAsciiMapComm.merge_messages">
+<code class="descname">merge_messages</code><span class="sig-paren">(</span><em>msg_list</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_AsciiMapComm.html#TestAsciiMapComm.merge_messages"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_AsciiMapComm.TestAsciiMapComm.merge_messages" title="Permalink to this definition">¶</a></dt>
+<dd><p>Merge multiple messages to produce the expected total message.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>msg_list</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a>) &#8211; Messages to be merged.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Merged message.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">obj</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.communication.tests.test_AsciiMapComm.TestAsciiMapComm.msg_long">
+<code class="descname">msg_long</code><a class="headerlink" href="#cis_interface.communication.tests.test_AsciiMapComm.TestAsciiMapComm.msg_long" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>dict</em> &#8211; Long test message.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.communication.tests.test_AsciiMapComm.TestAsciiMapComm.msg_short">
+<code class="descname">msg_short</code><a class="headerlink" href="#cis_interface.communication.tests.test_AsciiMapComm.TestAsciiMapComm.msg_short" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>dict</em> &#8211; Short test message.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.communication.tests.test_AsciiMapComm.TestAsciiMapComm.test_msg">
+<code class="descname">test_msg</code><a class="headerlink" href="#cis_interface.communication.tests.test_AsciiMapComm.TestAsciiMapComm.test_msg" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>dict</em> &#8211; Test message that should be used for any send/recv tests.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-cis_interface.communication.tests.test_AsciiTableComm">
+<span id="cis-interface-communication-tests-test-asciitablecomm-module"></span><h2>cis_interface.communication.tests.test_AsciiTableComm module<a class="headerlink" href="#module-cis_interface.communication.tests.test_AsciiTableComm" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="cis_interface.communication.tests.test_AsciiTableComm.TestAsciiTableComm">
+<em class="property">class </em><code class="descclassname">cis_interface.communication.tests.test_AsciiTableComm.</code><code class="descname">TestAsciiTableComm</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_AsciiTableComm.html#TestAsciiTableComm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_AsciiTableComm.TestAsciiTableComm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.communication.tests.test_AsciiFileComm.TestAsciiFileComm" title="cis_interface.communication.tests.test_AsciiFileComm.TestAsciiFileComm"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.communication.tests.test_AsciiFileComm.TestAsciiFileComm</span></code></a></p>
+<p>Test for AsciiTableComm communication class.</p>
+<dl class="attribute">
+<dt id="cis_interface.communication.tests.test_AsciiTableComm.TestAsciiTableComm.double_msg">
+<code class="descname">double_msg</code><a class="headerlink" href="#cis_interface.communication.tests.test_AsciiTableComm.TestAsciiTableComm.double_msg" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str</em> &#8211; Message that should result from writing two test messages.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.communication.tests.test_AsciiTableComm.TestAsciiTableComm.merge_messages">
+<code class="descname">merge_messages</code><span class="sig-paren">(</span><em>msg_list</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_AsciiTableComm.html#TestAsciiTableComm.merge_messages"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_AsciiTableComm.TestAsciiTableComm.merge_messages" title="Permalink to this definition">¶</a></dt>
+<dd><p>Merge multiple messages to produce the expected total message.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>msg_list</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a>) &#8211; Messages to be merged.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Merged message.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">obj</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.communication.tests.test_AsciiTableComm.TestAsciiTableComm.msg_long">
+<code class="descname">msg_long</code><a class="headerlink" href="#cis_interface.communication.tests.test_AsciiTableComm.TestAsciiTableComm.msg_long" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str</em> &#8211; Always use file lines as message.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.communication.tests.test_AsciiTableComm.TestAsciiTableComm.msg_short">
+<code class="descname">msg_short</code><a class="headerlink" href="#cis_interface.communication.tests.test_AsciiTableComm.TestAsciiTableComm.msg_short" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str</em> &#8211; Always use file lines as message.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.communication.tests.test_AsciiTableComm.TestAsciiTableComm.send_inst_kwargs">
+<code class="descname">send_inst_kwargs</code><a class="headerlink" href="#cis_interface.communication.tests.test_AsciiTableComm.TestAsciiTableComm.send_inst_kwargs" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>dict</em> &#8211; Keyword arguments for send instance.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.communication.tests.test_AsciiTableComm.TestAsciiTableComm.test_send_recv_comment">
+<code class="descname">test_send_recv_comment</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_AsciiTableComm.html#TestAsciiTableComm.test_send_recv_comment"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_AsciiTableComm.TestAsciiTableComm.test_send_recv_comment" title="Permalink to this definition">¶</a></dt>
+<dd><p>Disabled: Test send/recv with commented message.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.communication.tests.test_AsciiTableComm.TestAsciiTableComm.test_send_recv_dict">
+<code class="descname">test_send_recv_dict</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_AsciiTableComm.html#TestAsciiTableComm.test_send_recv_dict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_AsciiTableComm.TestAsciiTableComm.test_send_recv_dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test send/recv numpy array as dict.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.communication.tests.test_AsciiTableComm.TestAsciiTableComm_AsArray">
+<em class="property">class </em><code class="descclassname">cis_interface.communication.tests.test_AsciiTableComm.</code><code class="descname">TestAsciiTableComm_AsArray</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_AsciiTableComm.html#TestAsciiTableComm_AsArray"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_AsciiTableComm.TestAsciiTableComm_AsArray" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.communication.tests.test_AsciiTableComm.TestAsciiTableComm" title="cis_interface.communication.tests.test_AsciiTableComm.TestAsciiTableComm"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.communication.tests.test_AsciiTableComm.TestAsciiTableComm</span></code></a></p>
+<p>Test for AsciiTableComm communication class.</p>
+<dl class="method">
+<dt id="cis_interface.communication.tests.test_AsciiTableComm.TestAsciiTableComm_AsArray.assert_msg_equal">
+<code class="descname">assert_msg_equal</code><span class="sig-paren">(</span><em>x</em>, <em>y</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_AsciiTableComm.html#TestAsciiTableComm_AsArray.assert_msg_equal"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_AsciiTableComm.TestAsciiTableComm_AsArray.assert_msg_equal" title="Permalink to this definition">¶</a></dt>
+<dd><p>Assert that two messages are equivalent.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.communication.tests.test_AsciiTableComm.TestAsciiTableComm_AsArray.double_msg">
+<code class="descname">double_msg</code><a class="headerlink" href="#cis_interface.communication.tests.test_AsciiTableComm.TestAsciiTableComm_AsArray.double_msg" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str</em> &#8211; Message that should result from writing two test messages.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.communication.tests.test_AsciiTableComm.TestAsciiTableComm_AsArray.merge_messages">
+<code class="descname">merge_messages</code><span class="sig-paren">(</span><em>msg_list</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_AsciiTableComm.html#TestAsciiTableComm_AsArray.merge_messages"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_AsciiTableComm.TestAsciiTableComm_AsArray.merge_messages" title="Permalink to this definition">¶</a></dt>
+<dd><p>Merge multiple messages to produce the expected total message.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>msg_list</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a>) &#8211; Messages to be merged.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Merged message.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">obj</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.communication.tests.test_AsciiTableComm.TestAsciiTableComm_AsArray.msg_long">
+<code class="descname">msg_long</code><a class="headerlink" href="#cis_interface.communication.tests.test_AsciiTableComm.TestAsciiTableComm_AsArray.msg_long" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str</em> &#8211; Always use file bytes as message.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.communication.tests.test_AsciiTableComm.TestAsciiTableComm_AsArray.msg_short">
+<code class="descname">msg_short</code><a class="headerlink" href="#cis_interface.communication.tests.test_AsciiTableComm.TestAsciiTableComm_AsArray.msg_short" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str</em> &#8211; Always use file bytes as message.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.communication.tests.test_AsciiTableComm.TestAsciiTableComm_AsArray.send_inst_kwargs">
+<code class="descname">send_inst_kwargs</code><a class="headerlink" href="#cis_interface.communication.tests.test_AsciiTableComm.TestAsciiTableComm_AsArray.send_inst_kwargs" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>dict</em> &#8211; Keyword arguments for send instance.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.communication.tests.test_AsciiTableComm.TestAsciiTableComm_AsArray.test_send_recv_dict">
+<code class="descname">test_send_recv_dict</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_AsciiTableComm.html#TestAsciiTableComm_AsArray.test_send_recv_dict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_AsciiTableComm.TestAsciiTableComm_AsArray.test_send_recv_dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test send/recv numpy array as dict.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.communication.tests.test_AsciiTableComm.test_AsciiTableComm_nofmt">
+<code class="descclassname">cis_interface.communication.tests.test_AsciiTableComm.</code><code class="descname">test_AsciiTableComm_nofmt</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_AsciiTableComm.html#test_AsciiTableComm_nofmt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_AsciiTableComm.test_AsciiTableComm_nofmt" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test read of asciitable without format.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-cis_interface.communication.tests.test_AsyncComm">
+<span id="cis-interface-communication-tests-test-asynccomm-module"></span><h2>cis_interface.communication.tests.test_AsyncComm module<a class="headerlink" href="#module-cis_interface.communication.tests.test_AsyncComm" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="cis_interface.communication.tests.test_AsyncComm.TestAsyncComm">
+<em class="property">class </em><code class="descclassname">cis_interface.communication.tests.test_AsyncComm.</code><code class="descname">TestAsyncComm</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_AsyncComm.html#TestAsyncComm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_AsyncComm.TestAsyncComm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.communication.tests.test_CommBase.TestCommBase" title="cis_interface.communication.tests.test_CommBase.TestCommBase"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.communication.tests.test_CommBase.TestCommBase</span></code></a></p>
+<p>Tests for AsyncComm communication class.</p>
+<dl class="method">
+<dt id="cis_interface.communication.tests.test_AsyncComm.TestAsyncComm.test_send_recv_after_close">
+<code class="descname">test_send_recv_after_close</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_AsyncComm.html#TestAsyncComm.test_send_recv_after_close"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_AsyncComm.TestAsyncComm.test_send_recv_after_close" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test that send/recv after close returns false.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.communication.tests.test_AsyncComm.TestAsyncComm.test_send_recv_direct">
+<code class="descname">test_send_recv_direct</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_AsyncComm.html#TestAsyncComm.test_send_recv_direct"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_AsyncComm.TestAsyncComm.test_send_recv_direct" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test send/recv direct.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-cis_interface.communication.tests.test_CommBase">
+<span id="cis-interface-communication-tests-test-commbase-module"></span><h2>cis_interface.communication.tests.test_CommBase module<a class="headerlink" href="#module-cis_interface.communication.tests.test_CommBase" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="cis_interface.communication.tests.test_CommBase.TestCommBase">
+<em class="property">class </em><code class="descclassname">cis_interface.communication.tests.test_CommBase.</code><code class="descname">TestCommBase</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_CommBase.html#TestCommBase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_CommBase.TestCommBase" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="cis_interface.tests.html#cis_interface.tests.CisTestClassInfo" title="cis_interface.tests.CisTestClassInfo"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.tests.CisTestClassInfo</span></code></a></p>
+<p>Tests for CommBase communication class.</p>
+<dl class="attribute">
+<dt id="cis_interface.communication.tests.test_CommBase.TestCommBase.send_inst_kwargs">
+<code class="descname">send_inst_kwargs</code><a class="headerlink" href="#cis_interface.communication.tests.test_CommBase.TestCommBase.send_inst_kwargs" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>dict</em> &#8211; Keyword arguments for send half of the comm
+pair.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.communication.tests.test_CommBase.TestCommBase.assert_msg_equal">
+<code class="descname">assert_msg_equal</code><span class="sig-paren">(</span><em>x</em>, <em>y</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_CommBase.html#TestCommBase.assert_msg_equal"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_CommBase.TestCommBase.assert_msg_equal" title="Permalink to this definition">¶</a></dt>
+<dd><p>Assert that two messages are equivalent.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.communication.tests.test_CommBase.TestCommBase.cleanup_comm_classes">
+<code class="descname">cleanup_comm_classes</code><a class="headerlink" href="#cis_interface.communication.tests.test_CommBase.TestCommBase.cleanup_comm_classes" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>list</em> &#8211; Comm classes that should be cleaned up following the test.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.communication.tests.test_CommBase.TestCommBase.cls">
+<code class="descname">cls</code><a class="headerlink" href="#cis_interface.communication.tests.test_CommBase.TestCommBase.cls" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str</em> &#8211; Communication class.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.communication.tests.test_CommBase.TestCommBase.create_instance">
+<code class="descname">create_instance</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_CommBase.html#TestCommBase.create_instance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_CommBase.TestCommBase.create_instance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a new instance of the class.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.communication.tests.test_CommBase.TestCommBase.do_send_recv">
+<code class="descname">do_send_recv</code><span class="sig-paren">(</span><em>send_meth='send'</em>, <em>recv_meth='recv'</em>, <em>msg_send=None</em>, <em>n_msg_send_meth='n_msg_send'</em>, <em>n_msg_recv_meth='n_msg_recv'</em>, <em>reverse_comms=False</em>, <em>send_kwargs=None</em>, <em>recv_kwargs=None</em>, <em>n_send=1</em>, <em>n_recv=1</em>, <em>close_on_send_eof=None</em>, <em>close_on_recv_eof=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_CommBase.html#TestCommBase.do_send_recv"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_CommBase.TestCommBase.do_send_recv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generic send/recv of a message.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.communication.tests.test_CommBase.TestCommBase.get_fresh_error_instance">
+<code class="descname">get_fresh_error_instance</code><span class="sig-paren">(</span><em>recv=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_CommBase.html#TestCommBase.get_fresh_error_instance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_CommBase.TestCommBase.get_fresh_error_instance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get comm instance with ErrorClass parent class.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.communication.tests.test_CommBase.TestCommBase.inst_args">
+<code class="descname">inst_args</code><a class="headerlink" href="#cis_interface.communication.tests.test_CommBase.TestCommBase.inst_args" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>list</em> &#8211; Arguments for tested class.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.communication.tests.test_CommBase.TestCommBase.inst_kwargs">
+<code class="descname">inst_kwargs</code><a class="headerlink" href="#cis_interface.communication.tests.test_CommBase.TestCommBase.inst_kwargs" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>dict</em> &#8211; Keyword arguments for tested class.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.communication.tests.test_CommBase.TestCommBase.is_installed">
+<code class="descname">is_installed</code><a class="headerlink" href="#cis_interface.communication.tests.test_CommBase.TestCommBase.is_installed" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>bool</em> &#8211; Is the communication class installed.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.communication.tests.test_CommBase.TestCommBase.map_sent2recv">
+<code class="descname">map_sent2recv</code><span class="sig-paren">(</span><em>obj</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_CommBase.html#TestCommBase.map_sent2recv"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_CommBase.TestCommBase.map_sent2recv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert a sent object into a received one.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.communication.tests.test_CommBase.TestCommBase.maxMsgSize">
+<code class="descname">maxMsgSize</code><a class="headerlink" href="#cis_interface.communication.tests.test_CommBase.TestCommBase.maxMsgSize" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>int</em> &#8211; Maximum message size.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.communication.tests.test_CommBase.TestCommBase.mod">
+<code class="descname">mod</code><a class="headerlink" href="#cis_interface.communication.tests.test_CommBase.TestCommBase.mod" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str</em> &#8211; Absolute module import.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.communication.tests.test_CommBase.TestCommBase.name">
+<code class="descname">name</code><a class="headerlink" href="#cis_interface.communication.tests.test_CommBase.TestCommBase.name" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str</em> &#8211; Name of the test connection.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.communication.tests.test_CommBase.TestCommBase.recv_instance">
+<code class="descname">recv_instance</code><a class="headerlink" href="#cis_interface.communication.tests.test_CommBase.TestCommBase.recv_instance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for instance.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.communication.tests.test_CommBase.TestCommBase.remove_instance">
+<code class="descname">remove_instance</code><span class="sig-paren">(</span><em>inst</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_CommBase.html#TestCommBase.remove_instance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_CommBase.TestCommBase.remove_instance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove an instance.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt>
+<code class="descname">send_inst_kwargs</code></dt>
+<dd><p><em>dict</em> &#8211; Keyword arguments for send instance.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.communication.tests.test_CommBase.TestCommBase.setup">
+<code class="descname">setup</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_CommBase.html#TestCommBase.setup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_CommBase.TestCommBase.setup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize comm object pair.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.communication.tests.test_CommBase.TestCommBase.teardown">
+<code class="descname">teardown</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_CommBase.html#TestCommBase.teardown"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_CommBase.TestCommBase.teardown" title="Permalink to this definition">¶</a></dt>
+<dd><p>Destroy comm object pair.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.communication.tests.test_CommBase.TestCommBase.test_attributes">
+<code class="descname">test_attributes</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_CommBase.html#TestCommBase.test_attributes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_CommBase.TestCommBase.test_attributes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Assert that the instance has all of the required attributes.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.communication.tests.test_CommBase.TestCommBase.test_double_open">
+<code class="descname">test_double_open</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_CommBase.html#TestCommBase.test_double_open"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_CommBase.TestCommBase.test_double_open" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test that opening twice dosn&#8217;t cause errors.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.communication.tests.test_CommBase.TestCommBase.test_drain_messages">
+<code class="descname">test_drain_messages</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_CommBase.html#TestCommBase.test_drain_messages"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_CommBase.TestCommBase.test_drain_messages" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test waiting for messages to drain.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.communication.tests.test_CommBase.TestCommBase.test_empty_msg">
+<code class="descname">test_empty_msg</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_CommBase.html#TestCommBase.test_empty_msg"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_CommBase.TestCommBase.test_empty_msg" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test identification of empty message.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.communication.tests.test_CommBase.TestCommBase.test_eof">
+<code class="descname">test_eof</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_CommBase.html#TestCommBase.test_eof"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_CommBase.TestCommBase.test_eof" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test send/recv of EOF message.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.communication.tests.test_CommBase.TestCommBase.test_eof_no_close">
+<code class="descname">test_eof_no_close</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_CommBase.html#TestCommBase.test_eof_no_close"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_CommBase.TestCommBase.test_eof_no_close" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test send/recv of EOF message with no close.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.communication.tests.test_CommBase.TestCommBase.test_eof_nolimit">
+<code class="descname">test_eof_nolimit</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_CommBase.html#TestCommBase.test_eof_nolimit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_CommBase.TestCommBase.test_eof_nolimit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test send/recv of EOF message through nolimit.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.communication.tests.test_CommBase.TestCommBase.test_error_name">
+<code class="descname">test_error_name</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_CommBase.html#TestCommBase.test_error_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_CommBase.TestCommBase.test_error_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test error on missing address.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.communication.tests.test_CommBase.TestCommBase.test_error_recv">
+<code class="descname">test_error_recv</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_CommBase.html#TestCommBase.test_error_recv"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_CommBase.TestCommBase.test_error_recv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test error on recv.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.communication.tests.test_CommBase.TestCommBase.test_error_send">
+<code class="descname">test_error_send</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_CommBase.html#TestCommBase.test_error_send"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_CommBase.TestCommBase.test_error_send" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test error on send.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.communication.tests.test_CommBase.TestCommBase.test_invalid_direction">
+<code class="descname">test_invalid_direction</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_CommBase.html#TestCommBase.test_invalid_direction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_CommBase.TestCommBase.test_invalid_direction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check that error raised for invalid direction.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.communication.tests.test_CommBase.TestCommBase.test_maxMsgSize">
+<code class="descname">test_maxMsgSize</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_CommBase.html#TestCommBase.test_maxMsgSize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_CommBase.TestCommBase.test_maxMsgSize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Print maxMsgSize.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.communication.tests.test_CommBase.TestCommBase.test_msg">
+<code class="descname">test_msg</code><a class="headerlink" href="#cis_interface.communication.tests.test_CommBase.TestCommBase.test_msg" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str</em> &#8211; Test message that should be used for any send/recv tests.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.communication.tests.test_CommBase.TestCommBase.test_opp_comm_kwargs">
+<code class="descname">test_opp_comm_kwargs</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_CommBase.html#TestCommBase.test_opp_comm_kwargs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_CommBase.TestCommBase.test_opp_comm_kwargs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test getting keyword arguments for the opposite comm.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.communication.tests.test_CommBase.TestCommBase.test_purge">
+<code class="descname">test_purge</code><span class="sig-paren">(</span><em>nrecv=1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_CommBase.html#TestCommBase.test_purge"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_CommBase.TestCommBase.test_purge" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test purging messages from the comm.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.communication.tests.test_CommBase.TestCommBase.test_recv_nomsg">
+<code class="descname">test_recv_nomsg</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_CommBase.html#TestCommBase.test_recv_nomsg"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_CommBase.TestCommBase.test_recv_nomsg" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test recieve when there is no waiting message.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.communication.tests.test_CommBase.TestCommBase.test_send_recv">
+<code class="descname">test_send_recv</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_CommBase.html#TestCommBase.test_send_recv"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_CommBase.TestCommBase.test_send_recv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test send/recv of a small message.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.communication.tests.test_CommBase.TestCommBase.test_send_recv_after_close">
+<code class="descname">test_send_recv_after_close</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_CommBase.html#TestCommBase.test_send_recv_after_close"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_CommBase.TestCommBase.test_send_recv_after_close" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test that send/recv after close returns false.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.communication.tests.test_CommBase.TestCommBase.test_send_recv_array">
+<code class="descname">test_send_recv_array</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_CommBase.html#TestCommBase.test_send_recv_array"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_CommBase.TestCommBase.test_send_recv_array" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test send/recv of a array message.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.communication.tests.test_CommBase.TestCommBase.test_send_recv_dict">
+<code class="descname">test_send_recv_dict</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_CommBase.html#TestCommBase.test_send_recv_dict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_CommBase.TestCommBase.test_send_recv_dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test send/recv message as dict.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.communication.tests.test_CommBase.TestCommBase.test_send_recv_line">
+<code class="descname">test_send_recv_line</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_CommBase.html#TestCommBase.test_send_recv_line"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_CommBase.TestCommBase.test_send_recv_line" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test send/recv of a line message.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.communication.tests.test_CommBase.TestCommBase.test_send_recv_nolimit">
+<code class="descname">test_send_recv_nolimit</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_CommBase.html#TestCommBase.test_send_recv_nolimit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_CommBase.TestCommBase.test_send_recv_nolimit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test send/recv of a large message.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.communication.tests.test_CommBase.TestCommBase.test_send_recv_row">
+<code class="descname">test_send_recv_row</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_CommBase.html#TestCommBase.test_send_recv_row"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_CommBase.TestCommBase.test_send_recv_row" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test send/recv of a row message.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.communication.tests.test_CommBase.TestCommBase.test_work_comm">
+<code class="descname">test_work_comm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_CommBase.html#TestCommBase.test_work_comm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_CommBase.TestCommBase.test_work_comm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test creating/removing a work comm.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.communication.tests.test_CommBase.test_registry">
+<code class="descclassname">cis_interface.communication.tests.test_CommBase.</code><code class="descname">test_registry</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_CommBase.html#test_registry"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_CommBase.test_registry" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test registry of comm.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-cis_interface.communication.tests.test_FileComm">
+<span id="cis-interface-communication-tests-test-filecomm-module"></span><h2>cis_interface.communication.tests.test_FileComm module<a class="headerlink" href="#module-cis_interface.communication.tests.test_FileComm" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="cis_interface.communication.tests.test_FileComm.TestFileComm">
+<em class="property">class </em><code class="descclassname">cis_interface.communication.tests.test_FileComm.</code><code class="descname">TestFileComm</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_FileComm.html#TestFileComm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_FileComm.TestFileComm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.communication.tests.test_CommBase.TestCommBase" title="cis_interface.communication.tests.test_CommBase.TestCommBase"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.communication.tests.test_CommBase.TestCommBase</span></code></a></p>
+<p>Test for FileComm communication class.</p>
+<dl class="attribute">
+<dt id="cis_interface.communication.tests.test_FileComm.TestFileComm.append_msg">
+<code class="descname">append_msg</code><a class="headerlink" href="#cis_interface.communication.tests.test_FileComm.TestFileComm.append_msg" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str</em> &#8211; Message that should be sent by second comm.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.communication.tests.test_FileComm.TestFileComm.double_msg">
+<code class="descname">double_msg</code><a class="headerlink" href="#cis_interface.communication.tests.test_FileComm.TestFileComm.double_msg" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str</em> &#8211; Message that should result from writing two test messages.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.communication.tests.test_FileComm.TestFileComm.merge_messages">
+<code class="descname">merge_messages</code><span class="sig-paren">(</span><em>msg_list</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_FileComm.html#TestFileComm.merge_messages"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_FileComm.TestFileComm.merge_messages" title="Permalink to this definition">¶</a></dt>
+<dd><p>Merge multiple messages to produce the expected total message.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>msg_list</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a>) &#8211; Messages to be merged.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Merged message.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">obj</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.communication.tests.test_FileComm.TestFileComm.send_inst_kwargs">
+<code class="descname">send_inst_kwargs</code><a class="headerlink" href="#cis_interface.communication.tests.test_FileComm.TestFileComm.send_inst_kwargs" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>dict</em> &#8211; Keyword arguments for send instance.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.communication.tests.test_FileComm.TestFileComm.teardown">
+<code class="descname">teardown</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_FileComm.html#TestFileComm.teardown"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_FileComm.TestFileComm.teardown" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove the file.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.communication.tests.test_FileComm.TestFileComm.test_append">
+<code class="descname">test_append</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_FileComm.html#TestFileComm.test_append"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_FileComm.TestFileComm.test_append" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test open of file comm with append.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.communication.tests.test_FileComm.TestFileComm.test_invalid_read_meth">
+<code class="descname">test_invalid_read_meth</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_FileComm.html#TestFileComm.test_invalid_read_meth"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_FileComm.TestFileComm.test_invalid_read_meth" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test raise of error on invalid read_meth.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.communication.tests.test_FileComm.TestFileComm.test_recv_nomsg">
+<code class="descname">test_recv_nomsg</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_FileComm.html#TestFileComm.test_recv_nomsg"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_FileComm.TestFileComm.test_recv_nomsg" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test recieve when there is no waiting message.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.communication.tests.test_FileComm.TestFileComm.test_remaining_bytes">
+<code class="descname">test_remaining_bytes</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_FileComm.html#TestFileComm.test_remaining_bytes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_FileComm.TestFileComm.test_remaining_bytes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test remaining_bytes.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.communication.tests.test_FileComm.TestFileComm.test_series">
+<code class="descname">test_series</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_FileComm.html#TestFileComm.test_series"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_FileComm.TestFileComm.test_series" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test sending/receiving to/from a series of files.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.communication.tests.test_FileComm.TestFileComm.test_work_comm">
+<code class="descname">test_work_comm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_FileComm.html#TestFileComm.test_work_comm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_FileComm.TestFileComm.test_work_comm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Disabled: Test creating/removing a work comm.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.communication.tests.test_FileComm.TestFileComm_ascii">
+<em class="property">class </em><code class="descclassname">cis_interface.communication.tests.test_FileComm.</code><code class="descname">TestFileComm_ascii</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_FileComm.html#TestFileComm_ascii"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_FileComm.TestFileComm_ascii" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.communication.tests.test_FileComm.TestFileComm" title="cis_interface.communication.tests.test_FileComm.TestFileComm"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.communication.tests.test_FileComm.TestFileComm</span></code></a></p>
+<p>Test for FileComm communication class with open_as_binary = False.</p>
+<dl class="attribute">
+<dt id="cis_interface.communication.tests.test_FileComm.TestFileComm_ascii.send_inst_kwargs">
+<code class="descname">send_inst_kwargs</code><a class="headerlink" href="#cis_interface.communication.tests.test_FileComm.TestFileComm_ascii.send_inst_kwargs" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>dict</em> &#8211; Keyword arguments for send instance.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.communication.tests.test_FileComm.TestFileComm_readline">
+<em class="property">class </em><code class="descclassname">cis_interface.communication.tests.test_FileComm.</code><code class="descname">TestFileComm_readline</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_FileComm.html#TestFileComm_readline"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_FileComm.TestFileComm_readline" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.communication.tests.test_FileComm.TestFileComm" title="cis_interface.communication.tests.test_FileComm.TestFileComm"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.communication.tests.test_FileComm.TestFileComm</span></code></a></p>
+<p>Test for FileComm communication class with read_meth = &#8216;readline&#8217;.</p>
+<dl class="attribute">
+<dt id="cis_interface.communication.tests.test_FileComm.TestFileComm_readline.inst_kwargs">
+<code class="descname">inst_kwargs</code><a class="headerlink" href="#cis_interface.communication.tests.test_FileComm.TestFileComm_readline.inst_kwargs" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>dict</em> &#8211; Keyword arguments for tested class.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-cis_interface.communication.tests.test_ForkComm">
+<span id="cis-interface-communication-tests-test-forkcomm-module"></span><h2>cis_interface.communication.tests.test_ForkComm module<a class="headerlink" href="#module-cis_interface.communication.tests.test_ForkComm" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="cis_interface.communication.tests.test_ForkComm.TestForkComm">
+<em class="property">class </em><code class="descclassname">cis_interface.communication.tests.test_ForkComm.</code><code class="descname">TestForkComm</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_ForkComm.html#TestForkComm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_ForkComm.TestForkComm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.communication.tests.test_CommBase.TestCommBase" title="cis_interface.communication.tests.test_CommBase.TestCommBase"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.communication.tests.test_CommBase.TestCommBase</span></code></a></p>
+<p>Tests for ForkComm communication class.</p>
+<dl class="attribute">
+<dt id="cis_interface.communication.tests.test_ForkComm.TestForkComm.cleanup_comm_classes">
+<code class="descname">cleanup_comm_classes</code><a class="headerlink" href="#cis_interface.communication.tests.test_ForkComm.TestForkComm.cleanup_comm_classes" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>list</em> &#8211; Comm classes that should be cleaned up following the test.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.communication.tests.test_ForkComm.TestForkComm.do_send_recv">
+<code class="descname">do_send_recv</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_ForkComm.html#TestForkComm.do_send_recv"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_ForkComm.TestForkComm.do_send_recv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generic send/recv of a message.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.communication.tests.test_ForkComm.TestForkComm.send_inst_kwargs">
+<code class="descname">send_inst_kwargs</code><a class="headerlink" href="#cis_interface.communication.tests.test_ForkComm.TestForkComm.send_inst_kwargs" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>dict</em> &#8211; Keyword arguments for send instance.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.communication.tests.test_ForkComm.TestForkComm.test_error_name">
+<code class="descname">test_error_name</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_ForkComm.html#TestForkComm.test_error_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_ForkComm.TestForkComm.test_error_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test error on missing address.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.communication.tests.test_ForkComm.TestForkComm.test_error_recv">
+<code class="descname">test_error_recv</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_ForkComm.html#TestForkComm.test_error_recv"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_ForkComm.TestForkComm.test_error_recv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Disabled: Test error on recv.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.communication.tests.test_ForkComm.TestForkComm.test_error_send">
+<code class="descname">test_error_send</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_ForkComm.html#TestForkComm.test_error_send"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_ForkComm.TestForkComm.test_error_send" title="Permalink to this definition">¶</a></dt>
+<dd><p>Disabled: Test error on send.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.communication.tests.test_ForkComm.TestForkComm.test_purge">
+<code class="descname">test_purge</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_ForkComm.html#TestForkComm.test_purge"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_ForkComm.TestForkComm.test_purge" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test purging messages from the comm.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.communication.tests.test_ForkComm.TestForkComm.test_work_comm">
+<code class="descname">test_work_comm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_ForkComm.html#TestForkComm.test_work_comm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_ForkComm.TestForkComm.test_work_comm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Disabled: Test creating/removing a work comm.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.communication.tests.test_ForkComm.TestForkCommList">
+<em class="property">class </em><code class="descclassname">cis_interface.communication.tests.test_ForkComm.</code><code class="descname">TestForkCommList</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_ForkComm.html#TestForkCommList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_ForkComm.TestForkCommList" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.communication.tests.test_ForkComm.TestForkComm" title="cis_interface.communication.tests.test_ForkComm.TestForkComm"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.communication.tests.test_ForkComm.TestForkComm</span></code></a></p>
+<p>Tests for ForkComm communication class with construction from address.</p>
+<dl class="attribute">
+<dt id="cis_interface.communication.tests.test_ForkComm.TestForkCommList.inst_kwargs">
+<code class="descname">inst_kwargs</code><a class="headerlink" href="#cis_interface.communication.tests.test_ForkComm.TestForkCommList.inst_kwargs" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>list</em> &#8211; Keyword arguments for tested class.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-cis_interface.communication.tests.test_IPCComm">
+<span id="cis-interface-communication-tests-test-ipccomm-module"></span><h2>cis_interface.communication.tests.test_IPCComm module<a class="headerlink" href="#module-cis_interface.communication.tests.test_IPCComm" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="cis_interface.communication.tests.test_IPCComm.TestIPCComm">
+<em class="property">class </em><code class="descclassname">cis_interface.communication.tests.test_IPCComm.</code><code class="descname">TestIPCComm</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_IPCComm.html#TestIPCComm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_IPCComm.TestIPCComm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.communication.tests.test_AsyncComm.TestAsyncComm" title="cis_interface.communication.tests.test_AsyncComm.TestAsyncComm"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.communication.tests.test_AsyncComm.TestAsyncComm</span></code></a></p>
+<p>Test for IPCComm communication class.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.communication.tests.test_IPCComm.test_ipc_queues">
+<code class="descclassname">cis_interface.communication.tests.test_IPCComm.</code><code class="descname">test_ipc_queues</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_IPCComm.html#test_ipc_queues"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_IPCComm.test_ipc_queues" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test list of ipc queues.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.communication.tests.test_IPCComm.test_ipcrm">
+<code class="descclassname">cis_interface.communication.tests.test_IPCComm.</code><code class="descname">test_ipcrm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_IPCComm.html#test_ipcrm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_IPCComm.test_ipcrm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test removal of ipc objects.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.communication.tests.test_IPCComm.test_ipcrm_not_isntalled">
+<code class="descclassname">cis_interface.communication.tests.test_IPCComm.</code><code class="descname">test_ipcrm_not_isntalled</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_IPCComm.html#test_ipcrm_not_isntalled"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_IPCComm.test_ipcrm_not_isntalled" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test ipcrm if IPC library is not installed.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.communication.tests.test_IPCComm.test_ipcrm_queues">
+<code class="descclassname">cis_interface.communication.tests.test_IPCComm.</code><code class="descname">test_ipcrm_queues</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_IPCComm.html#test_ipcrm_queues"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_IPCComm.test_ipcrm_queues" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test removal of ipc queues.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.communication.tests.test_IPCComm.test_ipcrm_queues_not_isntalled">
+<code class="descclassname">cis_interface.communication.tests.test_IPCComm.</code><code class="descname">test_ipcrm_queues_not_isntalled</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_IPCComm.html#test_ipcrm_queues_not_isntalled"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_IPCComm.test_ipcrm_queues_not_isntalled" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test ipcrm_queues if IPC library is not installed.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.communication.tests.test_IPCComm.test_ipcs">
+<code class="descclassname">cis_interface.communication.tests.test_IPCComm.</code><code class="descname">test_ipcs</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_IPCComm.html#test_ipcs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_IPCComm.test_ipcs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test list of ipc objects.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.communication.tests.test_IPCComm.test_ipcs_not_isntalled">
+<code class="descclassname">cis_interface.communication.tests.test_IPCComm.</code><code class="descname">test_ipcs_not_isntalled</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_IPCComm.html#test_ipcs_not_isntalled"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_IPCComm.test_ipcs_not_isntalled" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test return of ipcs if IPC library is not installed.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.communication.tests.test_IPCComm.test_not_running">
+<code class="descclassname">cis_interface.communication.tests.test_IPCComm.</code><code class="descname">test_not_running</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_IPCComm.html#test_not_running"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_IPCComm.test_not_running" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test raise of an error if a IPC library is not installed.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.communication.tests.test_IPCComm.test_queue">
+<code class="descclassname">cis_interface.communication.tests.test_IPCComm.</code><code class="descname">test_queue</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_IPCComm.html#test_queue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_IPCComm.test_queue" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test creation/removal of queue.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.communication.tests.test_IPCComm.test_queue_not_installed">
+<code class="descclassname">cis_interface.communication.tests.test_IPCComm.</code><code class="descname">test_queue_not_installed</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_IPCComm.html#test_queue_not_installed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_IPCComm.test_queue_not_installed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test return of get_queue if IPC library is not installed.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-cis_interface.communication.tests.test_ObjFileComm">
+<span id="cis-interface-communication-tests-test-objfilecomm-module"></span><h2>cis_interface.communication.tests.test_ObjFileComm module<a class="headerlink" href="#module-cis_interface.communication.tests.test_ObjFileComm" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="cis_interface.communication.tests.test_ObjFileComm.TestObjFileComm">
+<em class="property">class </em><code class="descclassname">cis_interface.communication.tests.test_ObjFileComm.</code><code class="descname">TestObjFileComm</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_ObjFileComm.html#TestObjFileComm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_ObjFileComm.TestObjFileComm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.communication.tests.test_PlyFileComm.TestPlyFileComm" title="cis_interface.communication.tests.test_PlyFileComm.TestPlyFileComm"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.communication.tests.test_PlyFileComm.TestPlyFileComm</span></code></a></p>
+<p>Test for ObjFileComm communication class.</p>
+<dl class="attribute">
+<dt id="cis_interface.communication.tests.test_ObjFileComm.TestObjFileComm.msg_long">
+<code class="descname">msg_long</code><a class="headerlink" href="#cis_interface.communication.tests.test_ObjFileComm.TestObjFileComm.msg_long" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>dict</em> &#8211; Obj information.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.communication.tests.test_ObjFileComm.TestObjFileComm.msg_short">
+<code class="descname">msg_short</code><a class="headerlink" href="#cis_interface.communication.tests.test_ObjFileComm.TestObjFileComm.msg_short" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>dict</em> &#8211; Obj information.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-cis_interface.communication.tests.test_PandasFileComm">
+<span id="cis-interface-communication-tests-test-pandasfilecomm-module"></span><h2>cis_interface.communication.tests.test_PandasFileComm module<a class="headerlink" href="#module-cis_interface.communication.tests.test_PandasFileComm" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="cis_interface.communication.tests.test_PandasFileComm.TestPandasFileComm">
+<em class="property">class </em><code class="descclassname">cis_interface.communication.tests.test_PandasFileComm.</code><code class="descname">TestPandasFileComm</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_PandasFileComm.html#TestPandasFileComm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_PandasFileComm.TestPandasFileComm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.communication.tests.test_FileComm.TestFileComm" title="cis_interface.communication.tests.test_FileComm.TestFileComm"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.communication.tests.test_FileComm.TestFileComm</span></code></a></p>
+<p>Test for PandasFileComm communication class.</p>
+<dl class="method">
+<dt id="cis_interface.communication.tests.test_PandasFileComm.TestPandasFileComm.assert_msg_equal">
+<code class="descname">assert_msg_equal</code><span class="sig-paren">(</span><em>x</em>, <em>y</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_PandasFileComm.html#TestPandasFileComm.assert_msg_equal"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_PandasFileComm.TestPandasFileComm.assert_msg_equal" title="Permalink to this definition">¶</a></dt>
+<dd><p>Assert that two messages are equivalent.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.communication.tests.test_PandasFileComm.TestPandasFileComm.double_msg">
+<code class="descname">double_msg</code><a class="headerlink" href="#cis_interface.communication.tests.test_PandasFileComm.TestPandasFileComm.double_msg" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>list</em> &#8211; Messages that should result from writing two test messages.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.communication.tests.test_PandasFileComm.TestPandasFileComm.merge_messages">
+<code class="descname">merge_messages</code><span class="sig-paren">(</span><em>msg_list</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_PandasFileComm.html#TestPandasFileComm.merge_messages"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_PandasFileComm.TestPandasFileComm.merge_messages" title="Permalink to this definition">¶</a></dt>
+<dd><p>Merge multiple messages to produce the expected total message.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>msg_list</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a>) &#8211; Messages to be merged.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Merged message.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">obj</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.communication.tests.test_PandasFileComm.TestPandasFileComm.msg_long">
+<code class="descname">msg_long</code><a class="headerlink" href="#cis_interface.communication.tests.test_PandasFileComm.TestPandasFileComm.msg_long" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>pandas.DataFrame</em> &#8211; Pandas data frame.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.communication.tests.test_PandasFileComm.TestPandasFileComm.msg_short">
+<code class="descname">msg_short</code><a class="headerlink" href="#cis_interface.communication.tests.test_PandasFileComm.TestPandasFileComm.msg_short" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>pandas.DataFrame</em> &#8211; Pandas data frame.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.communication.tests.test_PandasFileComm.TestPandasFileComm.send_inst_kwargs">
+<code class="descname">send_inst_kwargs</code><a class="headerlink" href="#cis_interface.communication.tests.test_PandasFileComm.TestPandasFileComm.send_inst_kwargs" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>dict</em> &#8211; Keyword arguments for send instance.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.communication.tests.test_PandasFileComm.TestPandasFileComm.test_send_recv_dict">
+<code class="descname">test_send_recv_dict</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_PandasFileComm.html#TestPandasFileComm.test_send_recv_dict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_PandasFileComm.TestPandasFileComm.test_send_recv_dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test send/recv Pandas data frame as dict.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.communication.tests.test_PandasFileComm.TestPandasFileComm_names">
+<em class="property">class </em><code class="descclassname">cis_interface.communication.tests.test_PandasFileComm.</code><code class="descname">TestPandasFileComm_names</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_PandasFileComm.html#TestPandasFileComm_names"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_PandasFileComm.TestPandasFileComm_names" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.communication.tests.test_PandasFileComm.TestPandasFileComm" title="cis_interface.communication.tests.test_PandasFileComm.TestPandasFileComm"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.communication.tests.test_PandasFileComm.TestPandasFileComm</span></code></a></p>
+<p>Test for PandasFileComm communication class with field names sent.</p>
+<dl class="attribute">
+<dt id="cis_interface.communication.tests.test_PandasFileComm.TestPandasFileComm_names.send_inst_kwargs">
+<code class="descname">send_inst_kwargs</code><a class="headerlink" href="#cis_interface.communication.tests.test_PandasFileComm.TestPandasFileComm_names.send_inst_kwargs" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>dict</em> &#8211; Keyword arguments for send instance.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.communication.tests.test_PandasFileComm.TestPandasFileComm_names.test_send_recv_dict">
+<code class="descname">test_send_recv_dict</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_PandasFileComm.html#TestPandasFileComm_names.test_send_recv_dict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_PandasFileComm.TestPandasFileComm_names.test_send_recv_dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test send/recv Pandas data frame as dict.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.communication.tests.test_PandasFileComm.TestPandasFileComm_single">
+<em class="property">class </em><code class="descclassname">cis_interface.communication.tests.test_PandasFileComm.</code><code class="descname">TestPandasFileComm_single</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_PandasFileComm.html#TestPandasFileComm_single"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_PandasFileComm.TestPandasFileComm_single" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.communication.tests.test_PandasFileComm.TestPandasFileComm" title="cis_interface.communication.tests.test_PandasFileComm.TestPandasFileComm"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.communication.tests.test_PandasFileComm.TestPandasFileComm</span></code></a></p>
+<p>Test for PandasFileComm communication class with field names sent.</p>
+<dl class="method">
+<dt id="cis_interface.communication.tests.test_PandasFileComm.TestPandasFileComm_single.test_send_recv_dict">
+<code class="descname">test_send_recv_dict</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_PandasFileComm.html#TestPandasFileComm_single.test_send_recv_dict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_PandasFileComm.TestPandasFileComm_single.test_send_recv_dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test send/recv Pandas data frame as dict.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-cis_interface.communication.tests.test_PickleFileComm">
+<span id="cis-interface-communication-tests-test-picklefilecomm-module"></span><h2>cis_interface.communication.tests.test_PickleFileComm module<a class="headerlink" href="#module-cis_interface.communication.tests.test_PickleFileComm" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="cis_interface.communication.tests.test_PickleFileComm.TestPickleFileComm">
+<em class="property">class </em><code class="descclassname">cis_interface.communication.tests.test_PickleFileComm.</code><code class="descname">TestPickleFileComm</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_PickleFileComm.html#TestPickleFileComm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_PickleFileComm.TestPickleFileComm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.communication.tests.test_FileComm.TestFileComm" title="cis_interface.communication.tests.test_FileComm.TestFileComm"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.communication.tests.test_FileComm.TestFileComm</span></code></a></p>
+<p>Test for PickleFileComm communication class.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-cis_interface.communication.tests.test_PlyFileComm">
+<span id="cis-interface-communication-tests-test-plyfilecomm-module"></span><h2>cis_interface.communication.tests.test_PlyFileComm module<a class="headerlink" href="#module-cis_interface.communication.tests.test_PlyFileComm" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="cis_interface.communication.tests.test_PlyFileComm.TestPlyFileComm">
+<em class="property">class </em><code class="descclassname">cis_interface.communication.tests.test_PlyFileComm.</code><code class="descname">TestPlyFileComm</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_PlyFileComm.html#TestPlyFileComm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_PlyFileComm.TestPlyFileComm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.communication.tests.test_FileComm.TestFileComm" title="cis_interface.communication.tests.test_FileComm.TestFileComm"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.communication.tests.test_FileComm.TestFileComm</span></code></a></p>
+<p>Test for PlyFileComm communication class.</p>
+<dl class="method">
+<dt id="cis_interface.communication.tests.test_PlyFileComm.TestPlyFileComm.merge_messages">
+<code class="descname">merge_messages</code><span class="sig-paren">(</span><em>msg_list</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_PlyFileComm.html#TestPlyFileComm.merge_messages"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_PlyFileComm.TestPlyFileComm.merge_messages" title="Permalink to this definition">¶</a></dt>
+<dd><p>Merge multiple messages to produce the expected total message.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>msg_list</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a>) &#8211; Messages to be merged.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Merged message.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">obj</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.communication.tests.test_PlyFileComm.TestPlyFileComm.msg_long">
+<code class="descname">msg_long</code><a class="headerlink" href="#cis_interface.communication.tests.test_PlyFileComm.TestPlyFileComm.msg_long" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>dict</em> &#8211; Ply information.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.communication.tests.test_PlyFileComm.TestPlyFileComm.msg_short">
+<code class="descname">msg_short</code><a class="headerlink" href="#cis_interface.communication.tests.test_PlyFileComm.TestPlyFileComm.msg_short" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>dict</em> &#8211; Ply information.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-cis_interface.communication.tests.test_RMQAsyncComm">
+<span id="cis-interface-communication-tests-test-rmqasynccomm-module"></span><h2>cis_interface.communication.tests.test_RMQAsyncComm module<a class="headerlink" href="#module-cis_interface.communication.tests.test_RMQAsyncComm" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="cis_interface.communication.tests.test_RMQAsyncComm.TestRMQAsyncComm">
+<em class="property">class </em><code class="descclassname">cis_interface.communication.tests.test_RMQAsyncComm.</code><code class="descname">TestRMQAsyncComm</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_RMQAsyncComm.html#TestRMQAsyncComm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_RMQAsyncComm.TestRMQAsyncComm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.communication.tests.test_RMQComm.TestRMQComm" title="cis_interface.communication.tests.test_RMQComm.TestRMQComm"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.communication.tests.test_RMQComm.TestRMQComm</span></code></a></p>
+<p>Test for RMQAsyncComm communication class.</p>
+<dl class="method">
+<dt id="cis_interface.communication.tests.test_RMQAsyncComm.TestRMQAsyncComm.test_reconnect">
+<code class="descname">test_reconnect</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_RMQAsyncComm.html#TestRMQAsyncComm.test_reconnect"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_RMQAsyncComm.TestRMQAsyncComm.test_reconnect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test reconnect after unexpected disconnect.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.communication.tests.test_RMQAsyncComm.test_not_running">
+<code class="descclassname">cis_interface.communication.tests.test_RMQAsyncComm.</code><code class="descname">test_not_running</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_RMQAsyncComm.html#test_not_running"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_RMQAsyncComm.test_not_running" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test raise of an error if a RMQ server is not running.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-cis_interface.communication.tests.test_RMQComm">
+<span id="cis-interface-communication-tests-test-rmqcomm-module"></span><h2>cis_interface.communication.tests.test_RMQComm module<a class="headerlink" href="#module-cis_interface.communication.tests.test_RMQComm" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="cis_interface.communication.tests.test_RMQComm.TestRMQComm">
+<em class="property">class </em><code class="descclassname">cis_interface.communication.tests.test_RMQComm.</code><code class="descname">TestRMQComm</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_RMQComm.html#TestRMQComm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_RMQComm.TestRMQComm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.communication.tests.test_AsyncComm.TestAsyncComm" title="cis_interface.communication.tests.test_AsyncComm.TestAsyncComm"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.communication.tests.test_AsyncComm.TestAsyncComm</span></code></a></p>
+<p>Test for RMQComm communication class.</p>
+<dl class="method">
+<dt id="cis_interface.communication.tests.test_RMQComm.TestRMQComm.test_double_open">
+<code class="descname">test_double_open</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_RMQComm.html#TestRMQComm.test_double_open"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_RMQComm.TestRMQComm.test_double_open" title="Permalink to this definition">¶</a></dt>
+<dd><p>test that opening/binding twice dosn&#8217;t cause errors.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.communication.tests.test_RMQComm.test_not_running">
+<code class="descclassname">cis_interface.communication.tests.test_RMQComm.</code><code class="descname">test_not_running</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_RMQComm.html#test_not_running"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_RMQComm.test_not_running" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test raise of an error if a RMQ server is not running.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-cis_interface.communication.tests.test_RPCComm">
+<span id="cis-interface-communication-tests-test-rpccomm-module"></span><h2>cis_interface.communication.tests.test_RPCComm module<a class="headerlink" href="#module-cis_interface.communication.tests.test_RPCComm" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="cis_interface.communication.tests.test_RPCComm.TestRPCComm">
+<em class="property">class </em><code class="descclassname">cis_interface.communication.tests.test_RPCComm.</code><code class="descname">TestRPCComm</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_RPCComm.html#TestRPCComm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_RPCComm.TestRPCComm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.communication.tests.test_CommBase.TestCommBase" title="cis_interface.communication.tests.test_CommBase.TestCommBase"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.communication.tests.test_CommBase.TestCommBase</span></code></a></p>
+<p>Tests for RPCComm communication class.</p>
+<dl class="method">
+<dt id="cis_interface.communication.tests.test_RPCComm.TestRPCComm.test_call">
+<code class="descname">test_call</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_RPCComm.html#TestRPCComm.test_call"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_RPCComm.TestRPCComm.test_call" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test RPC call.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.communication.tests.test_RPCComm.TestRPCComm.test_call_alias">
+<code class="descname">test_call_alias</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_RPCComm.html#TestRPCComm.test_call_alias"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_RPCComm.TestRPCComm.test_call_alias" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test RPC call aliases.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.communication.tests.test_RPCComm.TestRPCComm.test_call_nolimit">
+<code class="descname">test_call_nolimit</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_RPCComm.html#TestRPCComm.test_call_nolimit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_RPCComm.TestRPCComm.test_call_nolimit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test RPC nolimit call.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.communication.tests.test_RPCComm.TestRPCComm.test_eof">
+<code class="descname">test_eof</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_RPCComm.html#TestRPCComm.test_eof"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_RPCComm.TestRPCComm.test_eof" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test send/recv of EOF message.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.communication.tests.test_RPCComm.TestRPCComm.test_eof_no_close">
+<code class="descname">test_eof_no_close</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_RPCComm.html#TestRPCComm.test_eof_no_close"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_RPCComm.TestRPCComm.test_eof_no_close" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test send/recv of EOF message with no close.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.communication.tests.test_RPCComm.TestRPCComm.test_eof_nolimit">
+<code class="descname">test_eof_nolimit</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_RPCComm.html#TestRPCComm.test_eof_nolimit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_RPCComm.TestRPCComm.test_eof_nolimit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test send/recv of EOF message through nolimit.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.communication.tests.test_RPCComm.TestRPCComm.test_error_recv">
+<code class="descname">test_error_recv</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_RPCComm.html#TestRPCComm.test_error_recv"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_RPCComm.TestRPCComm.test_error_recv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Disabled: Test error on recv.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.communication.tests.test_RPCComm.TestRPCComm.test_error_send">
+<code class="descname">test_error_send</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_RPCComm.html#TestRPCComm.test_error_send"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_RPCComm.TestRPCComm.test_error_send" title="Permalink to this definition">¶</a></dt>
+<dd><p>Disabled: Test error on send.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.communication.tests.test_RPCComm.TestRPCComm.test_work_comm">
+<code class="descname">test_work_comm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_RPCComm.html#TestRPCComm.test_work_comm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_RPCComm.TestRPCComm.test_work_comm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Disabled: Test creating/removing a work comm.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-cis_interface.communication.tests.test_ServerComm">
+<span id="cis-interface-communication-tests-test-servercomm-module"></span><h2>cis_interface.communication.tests.test_ServerComm module<a class="headerlink" href="#module-cis_interface.communication.tests.test_ServerComm" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="cis_interface.communication.tests.test_ServerComm.TestServerComm">
+<em class="property">class </em><code class="descclassname">cis_interface.communication.tests.test_ServerComm.</code><code class="descname">TestServerComm</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_ServerComm.html#TestServerComm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_ServerComm.TestServerComm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.communication.tests.test_CommBase.TestCommBase" title="cis_interface.communication.tests.test_CommBase.TestCommBase"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.communication.tests.test_CommBase.TestCommBase</span></code></a></p>
+<p>Tests for ServerComm communication class.</p>
+<dl class="attribute">
+<dt id="cis_interface.communication.tests.test_ServerComm.TestServerComm.send_inst_kwargs">
+<code class="descname">send_inst_kwargs</code><a class="headerlink" href="#cis_interface.communication.tests.test_ServerComm.TestServerComm.send_inst_kwargs" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>dict</em> &#8211; Keyword arguments for send instance.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.communication.tests.test_ServerComm.TestServerComm.test_call">
+<code class="descname">test_call</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_ServerComm.html#TestServerComm.test_call"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_ServerComm.TestServerComm.test_call" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test RPC call.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.communication.tests.test_ServerComm.TestServerComm.test_call_alias">
+<code class="descname">test_call_alias</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_ServerComm.html#TestServerComm.test_call_alias"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_ServerComm.TestServerComm.test_call_alias" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test RPC call aliases.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.communication.tests.test_ServerComm.TestServerComm.test_call_nolimit">
+<code class="descname">test_call_nolimit</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_ServerComm.html#TestServerComm.test_call_nolimit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_ServerComm.TestServerComm.test_call_nolimit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test RPC nolimit call.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.communication.tests.test_ServerComm.TestServerComm.test_close_in_thread">
+<code class="descname">test_close_in_thread</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_ServerComm.html#TestServerComm.test_close_in_thread"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_ServerComm.TestServerComm.test_close_in_thread" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test close of comm in thread.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.communication.tests.test_ServerComm.TestServerComm.test_eof_no_close">
+<code class="descname">test_eof_no_close</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_ServerComm.html#TestServerComm.test_eof_no_close"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_ServerComm.TestServerComm.test_eof_no_close" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test send/recv of EOF message with no close.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.communication.tests.test_ServerComm.TestServerComm.test_error_recv">
+<code class="descname">test_error_recv</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_ServerComm.html#TestServerComm.test_error_recv"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_ServerComm.TestServerComm.test_error_recv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Disabled: Test error on recv.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.communication.tests.test_ServerComm.TestServerComm.test_error_send">
+<code class="descname">test_error_send</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_ServerComm.html#TestServerComm.test_error_send"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_ServerComm.TestServerComm.test_error_send" title="Permalink to this definition">¶</a></dt>
+<dd><p>Disabled: Test error on send.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.communication.tests.test_ServerComm.TestServerComm.test_invalid_direction">
+<code class="descname">test_invalid_direction</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_ServerComm.html#TestServerComm.test_invalid_direction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_ServerComm.TestServerComm.test_invalid_direction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Disabled: Test of error on incorrect direction.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.communication.tests.test_ServerComm.TestServerComm.test_newcomm_server">
+<code class="descname">test_newcomm_server</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_ServerComm.html#TestServerComm.test_newcomm_server"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_ServerComm.TestServerComm.test_newcomm_server" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test creation of server using newcomm.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.communication.tests.test_ServerComm.TestServerComm.test_work_comm">
+<code class="descname">test_work_comm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_ServerComm.html#TestServerComm.test_work_comm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_ServerComm.TestServerComm.test_work_comm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Disabled: Test creating/removing a work comm.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-cis_interface.communication.tests.test_ZMQComm">
+<span id="cis-interface-communication-tests-test-zmqcomm-module"></span><h2>cis_interface.communication.tests.test_ZMQComm module<a class="headerlink" href="#module-cis_interface.communication.tests.test_ZMQComm" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="cis_interface.communication.tests.test_ZMQComm.TestZMQComm">
+<em class="property">class </em><code class="descclassname">cis_interface.communication.tests.test_ZMQComm.</code><code class="descname">TestZMQComm</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_ZMQComm.html#TestZMQComm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_ZMQComm.TestZMQComm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.communication.tests.test_AsyncComm.TestAsyncComm" title="cis_interface.communication.tests.test_AsyncComm.TestAsyncComm"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.communication.tests.test_AsyncComm.TestAsyncComm</span></code></a></p>
+<p>Test for ZMQComm communication class.</p>
+<dl class="attribute">
+<dt id="cis_interface.communication.tests.test_ZMQComm.TestZMQComm.description_prefix">
+<code class="descname">description_prefix</code><a class="headerlink" href="#cis_interface.communication.tests.test_ZMQComm.TestZMQComm.description_prefix" title="Permalink to this definition">¶</a></dt>
+<dd><p>String prefix to prepend docstr test message with.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.communication.tests.test_ZMQComm.TestZMQComm.send_inst_kwargs">
+<code class="descname">send_inst_kwargs</code><a class="headerlink" href="#cis_interface.communication.tests.test_ZMQComm.TestZMQComm.send_inst_kwargs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Keyword arguments for send instance.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.communication.tests.test_ZMQComm.TestZMQCommINPROC">
+<em class="property">class </em><code class="descclassname">cis_interface.communication.tests.test_ZMQComm.</code><code class="descname">TestZMQCommINPROC</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_ZMQComm.html#TestZMQCommINPROC"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_ZMQComm.TestZMQCommINPROC" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.communication.tests.test_ZMQComm.TestZMQComm" title="cis_interface.communication.tests.test_ZMQComm.TestZMQComm"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.communication.tests.test_ZMQComm.TestZMQComm</span></code></a></p>
+<p>Test for ZMQComm communication class with INPROC socket.</p>
+<dl class="method">
+<dt id="cis_interface.communication.tests.test_ZMQComm.TestZMQCommINPROC.test_send_recv_nolimit">
+<code class="descname">test_send_recv_nolimit</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_ZMQComm.html#TestZMQCommINPROC.test_send_recv_nolimit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_ZMQComm.TestZMQCommINPROC.test_send_recv_nolimit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Disabled send/recv of large message.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.communication.tests.test_ZMQComm.TestZMQCommIPC">
+<em class="property">class </em><code class="descclassname">cis_interface.communication.tests.test_ZMQComm.</code><code class="descname">TestZMQCommIPC</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_ZMQComm.html#TestZMQCommIPC"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_ZMQComm.TestZMQCommIPC" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.communication.tests.test_ZMQComm.TestZMQComm" title="cis_interface.communication.tests.test_ZMQComm.TestZMQComm"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.communication.tests.test_ZMQComm.TestZMQComm</span></code></a></p>
+<p>Test for ZMQComm communication class with IPC socket.</p>
+<dl class="method">
+<dt id="cis_interface.communication.tests.test_ZMQComm.TestZMQCommIPC.test_send_recv_nolimit">
+<code class="descname">test_send_recv_nolimit</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_ZMQComm.html#TestZMQCommIPC.test_send_recv_nolimit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_ZMQComm.TestZMQCommIPC.test_send_recv_nolimit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Disabled send/recv of large message.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.communication.tests.test_ZMQComm.TestZMQCommIPC_client">
+<em class="property">class </em><code class="descclassname">cis_interface.communication.tests.test_ZMQComm.</code><code class="descname">TestZMQCommIPC_client</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_ZMQComm.html#TestZMQCommIPC_client"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_ZMQComm.TestZMQCommIPC_client" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.communication.tests.test_ZMQComm.TestZMQComm_client" title="cis_interface.communication.tests.test_ZMQComm.TestZMQComm_client"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.communication.tests.test_ZMQComm.TestZMQComm_client</span></code></a>, <a class="reference internal" href="#cis_interface.communication.tests.test_ZMQComm.TestZMQCommIPC" title="cis_interface.communication.tests.test_ZMQComm.TestZMQCommIPC"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.communication.tests.test_ZMQComm.TestZMQCommIPC</span></code></a></p>
+<p>Test for ZMQComm communication class with IPC socket.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.communication.tests.test_ZMQComm.TestZMQCommPAIR">
+<em class="property">class </em><code class="descclassname">cis_interface.communication.tests.test_ZMQComm.</code><code class="descname">TestZMQCommPAIR</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_ZMQComm.html#TestZMQCommPAIR"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_ZMQComm.TestZMQCommPAIR" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.communication.tests.test_ZMQComm.TestZMQComm" title="cis_interface.communication.tests.test_ZMQComm.TestZMQComm"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.communication.tests.test_ZMQComm.TestZMQComm</span></code></a></p>
+<p>Test for ZMQComm communication class with PAIR/PAIR socket.</p>
+<dl class="method">
+<dt id="cis_interface.communication.tests.test_ZMQComm.TestZMQCommPAIR.test_send_recv_nolimit">
+<code class="descname">test_send_recv_nolimit</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_ZMQComm.html#TestZMQCommPAIR.test_send_recv_nolimit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_ZMQComm.TestZMQCommPAIR.test_send_recv_nolimit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Disabled send/recv of large message.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.communication.tests.test_ZMQComm.TestZMQCommPUB">
+<em class="property">class </em><code class="descclassname">cis_interface.communication.tests.test_ZMQComm.</code><code class="descname">TestZMQCommPUB</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_ZMQComm.html#TestZMQCommPUB"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_ZMQComm.TestZMQCommPUB" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.communication.tests.test_ZMQComm.TestZMQComm" title="cis_interface.communication.tests.test_ZMQComm.TestZMQComm"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.communication.tests.test_ZMQComm.TestZMQComm</span></code></a></p>
+<p>Test for ZMQComm communication class with PUB/SUB socket.</p>
+<dl class="method">
+<dt id="cis_interface.communication.tests.test_ZMQComm.TestZMQCommPUB.test_send_recv_nolimit">
+<code class="descname">test_send_recv_nolimit</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_ZMQComm.html#TestZMQCommPUB.test_send_recv_nolimit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_ZMQComm.TestZMQCommPUB.test_send_recv_nolimit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Disabled send/recv of large message.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.communication.tests.test_ZMQComm.TestZMQCommPUSH">
+<em class="property">class </em><code class="descclassname">cis_interface.communication.tests.test_ZMQComm.</code><code class="descname">TestZMQCommPUSH</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_ZMQComm.html#TestZMQCommPUSH"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_ZMQComm.TestZMQCommPUSH" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.communication.tests.test_ZMQComm.TestZMQComm" title="cis_interface.communication.tests.test_ZMQComm.TestZMQComm"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.communication.tests.test_ZMQComm.TestZMQComm</span></code></a></p>
+<p>Test for ZMQComm communication class with PUSH/PULL socket.</p>
+<dl class="method">
+<dt id="cis_interface.communication.tests.test_ZMQComm.TestZMQCommPUSH.test_send_recv_nolimit">
+<code class="descname">test_send_recv_nolimit</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_ZMQComm.html#TestZMQCommPUSH.test_send_recv_nolimit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_ZMQComm.TestZMQCommPUSH.test_send_recv_nolimit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Disabled send/recv of large message.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.communication.tests.test_ZMQComm.TestZMQCommPUSH_INPROC">
+<em class="property">class </em><code class="descclassname">cis_interface.communication.tests.test_ZMQComm.</code><code class="descname">TestZMQCommPUSH_INPROC</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_ZMQComm.html#TestZMQCommPUSH_INPROC"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_ZMQComm.TestZMQCommPUSH_INPROC" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.communication.tests.test_ZMQComm.TestZMQCommINPROC" title="cis_interface.communication.tests.test_ZMQComm.TestZMQCommINPROC"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.communication.tests.test_ZMQComm.TestZMQCommINPROC</span></code></a></p>
+<p>Test for ZMQComm communication class with INPROC PUSH/PULL socket.</p>
+<dl class="method">
+<dt id="cis_interface.communication.tests.test_ZMQComm.TestZMQCommPUSH_INPROC.test_send_recv_nolimit">
+<code class="descname">test_send_recv_nolimit</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_ZMQComm.html#TestZMQCommPUSH_INPROC.test_send_recv_nolimit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_ZMQComm.TestZMQCommPUSH_INPROC.test_send_recv_nolimit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Disabled send/recv of large message.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.communication.tests.test_ZMQComm.TestZMQCommREQ">
+<em class="property">class </em><code class="descclassname">cis_interface.communication.tests.test_ZMQComm.</code><code class="descname">TestZMQCommREQ</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_ZMQComm.html#TestZMQCommREQ"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_ZMQComm.TestZMQCommREQ" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.communication.tests.test_ZMQComm.TestZMQComm" title="cis_interface.communication.tests.test_ZMQComm.TestZMQComm"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.communication.tests.test_ZMQComm.TestZMQComm</span></code></a></p>
+<p>Test for ZMQComm communication class with REP/REQ socket.</p>
+<dl class="method">
+<dt id="cis_interface.communication.tests.test_ZMQComm.TestZMQCommREQ.test_send_recv_nolimit">
+<code class="descname">test_send_recv_nolimit</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_ZMQComm.html#TestZMQCommREQ.test_send_recv_nolimit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_ZMQComm.TestZMQCommREQ.test_send_recv_nolimit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Disabled send/recv of large message.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.communication.tests.test_ZMQComm.TestZMQCommROUTER">
+<em class="property">class </em><code class="descclassname">cis_interface.communication.tests.test_ZMQComm.</code><code class="descname">TestZMQCommROUTER</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_ZMQComm.html#TestZMQCommROUTER"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_ZMQComm.TestZMQCommROUTER" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.communication.tests.test_ZMQComm.TestZMQComm" title="cis_interface.communication.tests.test_ZMQComm.TestZMQComm"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.communication.tests.test_ZMQComm.TestZMQComm</span></code></a></p>
+<p>Test for ZMQComm communication class with DEALER/ROUTER socket.</p>
+<dl class="method">
+<dt id="cis_interface.communication.tests.test_ZMQComm.TestZMQCommROUTER.test_router_recv">
+<code class="descname">test_router_recv</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_ZMQComm.html#TestZMQCommROUTER.test_router_recv"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_ZMQComm.TestZMQCommROUTER.test_router_recv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test router receipt of message from the dealer with an identity.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.communication.tests.test_ZMQComm.TestZMQCommROUTER.test_send_recv_nolimit">
+<code class="descname">test_send_recv_nolimit</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_ZMQComm.html#TestZMQCommROUTER.test_send_recv_nolimit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_ZMQComm.TestZMQCommROUTER.test_send_recv_nolimit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Disabled send/recv of large message.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.communication.tests.test_ZMQComm.TestZMQCommTCP">
+<em class="property">class </em><code class="descclassname">cis_interface.communication.tests.test_ZMQComm.</code><code class="descname">TestZMQCommTCP</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_ZMQComm.html#TestZMQCommTCP"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_ZMQComm.TestZMQCommTCP" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.communication.tests.test_ZMQComm.TestZMQComm" title="cis_interface.communication.tests.test_ZMQComm.TestZMQComm"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.communication.tests.test_ZMQComm.TestZMQComm</span></code></a></p>
+<p>Test for ZMQComm communication class with TCP socket.</p>
+<dl class="method">
+<dt id="cis_interface.communication.tests.test_ZMQComm.TestZMQCommTCP.test_send_recv_nolimit">
+<code class="descname">test_send_recv_nolimit</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_ZMQComm.html#TestZMQCommTCP.test_send_recv_nolimit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_ZMQComm.TestZMQCommTCP.test_send_recv_nolimit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Disabled send/recv of large message.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.communication.tests.test_ZMQComm.TestZMQComm_client">
+<em class="property">class </em><code class="descclassname">cis_interface.communication.tests.test_ZMQComm.</code><code class="descname">TestZMQComm_client</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_ZMQComm.html#TestZMQComm_client"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_ZMQComm.TestZMQComm_client" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.communication.tests.test_ZMQComm.TestZMQComm" title="cis_interface.communication.tests.test_ZMQComm.TestZMQComm"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.communication.tests.test_ZMQComm.TestZMQComm</span></code></a></p>
+<p>Test for ZMQComm communication class for client/server.</p>
+<dl class="attribute">
+<dt id="cis_interface.communication.tests.test_ZMQComm.TestZMQComm_client.send_inst_kwargs">
+<code class="descname">send_inst_kwargs</code><a class="headerlink" href="#cis_interface.communication.tests.test_ZMQComm.TestZMQComm_client.send_inst_kwargs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Keyword arguments for send instance.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.communication.tests.test_ZMQComm.TestZMQComm_client.test_send_recv_nolimit">
+<code class="descname">test_send_recv_nolimit</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_ZMQComm.html#TestZMQComm_client.test_send_recv_nolimit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_ZMQComm.TestZMQComm_client.test_send_recv_nolimit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Disabled send/recv of large message.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.communication.tests.test_ZMQComm.test_error_on_send_open_twice">
+<code class="descclassname">cis_interface.communication.tests.test_ZMQComm.</code><code class="descname">test_error_on_send_open_twice</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_ZMQComm.html#test_error_on_send_open_twice"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_ZMQComm.test_error_on_send_open_twice" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test creation of the same send socket twice for an error.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.communication.tests.test_ZMQComm.test_format_address">
+<code class="descclassname">cis_interface.communication.tests.test_ZMQComm.</code><code class="descname">test_format_address</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_ZMQComm.html#test_format_address"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_ZMQComm.test_format_address" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test format/parse of address.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.communication.tests.test_ZMQComm.test_get_socket_type_mate">
+<code class="descclassname">cis_interface.communication.tests.test_ZMQComm.</code><code class="descname">test_get_socket_type_mate</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_ZMQComm.html#test_get_socket_type_mate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_ZMQComm.test_get_socket_type_mate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test socket type matching.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.communication.tests.test_ZMQComm.test_invalid_protocol">
+<code class="descclassname">cis_interface.communication.tests.test_ZMQComm.</code><code class="descname">test_invalid_protocol</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_ZMQComm.html#test_invalid_protocol"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_ZMQComm.test_invalid_protocol" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test raise of an error in the event of an invalid protocol.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.communication.tests.test_ZMQComm.test_not_running">
+<code class="descclassname">cis_interface.communication.tests.test_ZMQComm.</code><code class="descname">test_not_running</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_ZMQComm.html#test_not_running"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_ZMQComm.test_not_running" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test raise of an error if a ZMQ library is not installed.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-cis_interface.communication.tests">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-cis_interface.communication.tests" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Meagan Lang, David Raila.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.4+0.gd8a2a4f.dirty',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          
+          SphinxRtdTheme.Navigation.enableSticky();
+          
+      });
+  </script> 
+
+</body>
+</html>

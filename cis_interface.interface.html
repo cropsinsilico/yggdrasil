@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>cis_interface.interface package &mdash; cis_interface 0.3.0 documentation</title>
+  <title>cis_interface.interface package &mdash; cis_interface 0.4+0.gd8a2a4f.dirty documentation</title>
   
 
   
@@ -24,12 +24,13 @@
 
   
 
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="cis_interface.serialize package" href="cis_interface.serialize.html" />
+    <link rel="next" title="cis_interface.interface.tests package" href="cis_interface.interface.tests.html" />
     <link rel="prev" title="Python Code" href="code_python.html" /> 
 
   
@@ -59,7 +60,7 @@
             
             
               <div class="version">
-                0.3
+                0.4+0.gd8a2a4f.dirty
               </div>
             
           
@@ -84,7 +85,7 @@
             
             
               <p class="caption"><span class="caption-text">Contents:</span></p>
-<ul>
+<ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="includeme.html">Overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting started</a></li>
@@ -97,7 +98,36 @@
 <li class="toctree-l1"><a class="reference internal" href="c_format_strings.html">C-Style Format Strings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="io_drivers.html">Input/Output Drivers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="model_drivers.html">Model Drivers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="code.html">Code</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="code.html">Code</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="code_python.html">Python Code</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="code_python.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4 current"><a class="current reference internal" href="#">cis_interface.interface package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cis_interface.serialize.html">cis_interface.serialize package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cis_interface.dataio.html">cis_interface.dataio package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cis_interface.drivers.html">cis_interface.drivers package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="cis_interface.examples.html">cis_interface.examples package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="code_python.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="code_python.html#module-cis_interface.backwards">cis_interface.backwards module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="code_python.html#module-cis_interface.command_line">cis_interface.command_line module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="code_python.html#module-cis_interface.components">cis_interface.components module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="code_python.html#module-cis_interface.config">cis_interface.config module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="code_python.html#module-cis_interface.platform">cis_interface.platform module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="code_python.html#module-cis_interface.runner">cis_interface.runner module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="code_python.html#module-cis_interface.scanf">cis_interface.scanf module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="code_python.html#module-cis_interface.schema">cis_interface.schema module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="code_python.html#module-cis_interface.tools">cis_interface.tools module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="code_python.html#module-cis_interface.units">cis_interface.units module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="code_python.html#module-cis_interface.yamlfile">cis_interface.yamlfile module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="code_python.html#module-cis_interface">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="code_c.html">C Code</a></li>
+<li class="toctree-l2"><a class="reference internal" href="code_cpp.html">C++ Code</a></li>
+<li class="toctree-l2"><a class="reference internal" href="code_matlab.html">Matlab Code</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="examples/examples_toc.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="release.html">Release Steps</a></li>
 </ul>
@@ -170,6 +200,20 @@
             
   <div class="section" id="cis-interface-interface-package">
 <h1>cis_interface.interface package<a class="headerlink" href="#cis-interface-interface-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="cis_interface.interface.tests.html">cis_interface.interface.tests package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="cis_interface.interface.tests.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cis_interface.interface.tests.html#module-cis_interface.interface.tests.test_CisInterface">cis_interface.interface.tests.test_CisInterface module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cis_interface.interface.tests.html#module-cis_interface.interface.tests.test_PsiInterface">cis_interface.interface.tests.test_PsiInterface module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cis_interface.interface.tests.html#module-cis_interface.interface.tests">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
 <div class="section" id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
 </div>
@@ -184,20 +228,20 @@
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The path to the local file to read input from (if src_type
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; The path to the local file to read input from (if src_type
 == 0) or the name of the message queue input should be received
 from.</li>
-<li><strong>src_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>, </em><em>optional</em>) – If 0, input is read from a local file.
+<li><strong>src_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><em>optional</em>) &#8211; If 0, input is read from a local file.
 Otherwise, the input is received from a message queue. Defaults to
 1.</li>
-<li><strong>**kwargs</strong> – Additional keyword arguments are passed to the base comm.</li>
+<li><strong>**kwargs</strong> &#8211; Additional keyword arguments are passed to the base comm.</li>
 </ul>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Communication object.</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">DefaultComm</p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="cis_interface.communication.html#cis_interface.communication.DefaultComm" title="cis_interface.communication.DefaultComm">DefaultComm</a></p>
 </td>
 </tr>
 </tbody>
@@ -213,21 +257,21 @@ Otherwise, the input is received from a message queue. Defaults to
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The path to the local file where output should be saved
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; The path to the local file where output should be saved
 (if dst_type == 0) or the name of the message queue where the
 output should be sent.</li>
-<li><strong>fmt</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – A C style format string specifying how each ‘row’ of output
+<li><strong>fmt</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; A C style format string specifying how each &#8216;row&#8217; of output
 should be formated. This should include the newline character.</li>
-<li><strong>dst_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>, </em><em>optional</em>) – If 0, output is sent to a local file.
+<li><strong>dst_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><em>optional</em>) &#8211; If 0, output is sent to a local file.
 Otherwise, the output is sent to a message queue. Defaults to 1.</li>
-<li><strong>**kwargs</strong> – Additional keyword arguments are passed to the base comm.</li>
+<li><strong>**kwargs</strong> &#8211; Additional keyword arguments are passed to the base comm.</li>
 </ul>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Communication object.</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">DefaultComm</p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="cis_interface.communication.html#cis_interface.communication.DefaultComm" title="cis_interface.communication.DefaultComm">DefaultComm</a></p>
 </td>
 </tr>
 </tbody>
@@ -244,19 +288,19 @@ queue.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Path to the local file that input should be read from (if
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; Path to the local file that input should be read from (if
 src_type == 0) or the name of the input message queue that input
 should be received from.</li>
-<li><strong>src_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>, </em><em>optional</em>) – If 0, input is read from a local file.
+<li><strong>src_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><em>optional</em>) &#8211; If 0, input is read from a local file.
 Otherwise input is received from a message queue. Defauts to 1.</li>
-<li><strong>**kwargs</strong> – Additional keyword arguments are passed to the base comm.</li>
+<li><strong>**kwargs</strong> &#8211; Additional keyword arguments are passed to the base comm.</li>
 </ul>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Communication object.</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">DefaultComm</p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="cis_interface.communication.html#cis_interface.communication.DefaultComm" title="cis_interface.communication.DefaultComm">DefaultComm</a></p>
 </td>
 </tr>
 </tbody>
@@ -273,19 +317,19 @@ queue.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Path to the local file where output should be written (if
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; Path to the local file where output should be written (if
 dst_type == 0) or the name of the message queue where output
 should be sent.</li>
-<li><strong>dst_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>, </em><em>optional</em>) – If 0, output is written to a local file.
+<li><strong>dst_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><em>optional</em>) &#8211; If 0, output is written to a local file.
 Otherwise, output is sent to a message queue. Defaults to 1.</li>
-<li><strong>**kwargs</strong> – Additional keyword arguments are passed to the base comm.</li>
+<li><strong>**kwargs</strong> &#8211; Additional keyword arguments are passed to the base comm.</li>
 </ul>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Communication object.</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">DefaultComm</p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="cis_interface.communication.html#cis_interface.communication.DefaultComm" title="cis_interface.communication.DefaultComm">DefaultComm</a></p>
 </td>
 </tr>
 </tbody>
@@ -301,23 +345,23 @@ Otherwise, output is sent to a message queue. Defaults to 1.</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The path to the local file to read input from (if src_type
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; The path to the local file to read input from (if src_type
 == 0) or the name of the message queue input should be received
 from.</li>
-<li><strong>as_array</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, recv returns the entire table
+<li><strong>as_array</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) &#8211; If True, recv returns the entire table
 array and can only be called once. If False, recv returns row
 entries. Default to False.</li>
-<li><strong>src_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>, </em><em>optional</em>) – If 0, input is read from a local file.
+<li><strong>src_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><em>optional</em>) &#8211; If 0, input is read from a local file.
 Otherwise, the input is received from a message queue. Defaults to
 1.</li>
-<li><strong>**kwargs</strong> – Additional keyword arguments are passed to the base comm.</li>
+<li><strong>**kwargs</strong> &#8211; Additional keyword arguments are passed to the base comm.</li>
 </ul>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Communication object.</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">DefaultComm</p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="cis_interface.communication.html#cis_interface.communication.DefaultComm" title="cis_interface.communication.DefaultComm">DefaultComm</a></p>
 </td>
 </tr>
 </tbody>
@@ -333,24 +377,24 @@ Otherwise, the input is received from a message queue. Defaults to
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The path to the local file where output should be saved
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; The path to the local file where output should be saved
 (if dst_type == 0) or the name of the message queue where the
 output should be sent.</li>
-<li><strong>fmt</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – A C style format string specifying how each ‘row’ of output
+<li><strong>fmt</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; A C style format string specifying how each &#8216;row&#8217; of output
 should be formated. This should include the newline character.</li>
-<li><strong>as_array</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, send expects and entire array.
+<li><strong>as_array</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a><em>, </em><em>optional</em>) &#8211; If True, send expects and entire array.
 If False, send expects the entries for one table row. Defaults to
 False.</li>
-<li><strong>dst_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>, </em><em>optional</em>) – If 0, output is sent to a local file.
+<li><strong>dst_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><em>optional</em>) &#8211; If 0, output is sent to a local file.
 Otherwise, the output is sent to a message queue. Defaults to 1.</li>
-<li><strong>**kwargs</strong> – Additional keyword arguments are passed to the base comm.</li>
+<li><strong>**kwargs</strong> &#8211; Additional keyword arguments are passed to the base comm.</li>
 </ul>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Communication object.</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">DefaultComm</p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="cis_interface.communication.html#cis_interface.communication.DefaultComm" title="cis_interface.communication.DefaultComm">DefaultComm</a></p>
 </td>
 </tr>
 </tbody>
@@ -366,10 +410,10 @@ Otherwise, the output is sent to a message queue. Defaults to 1.</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The name of the message queue. Combined with the
-suffix ‘_IN’, it should match an environment variable containing
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; The name of the message queue. Combined with the
+suffix &#8216;_IN&#8217;, it should match an environment variable containing
 a message queue key.</li>
-<li><strong>format_str</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – C style format string that should be used
+<li><strong>format_str</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) &#8211; C style format string that should be used
 to deserialize messages that are receieved into a list of python
 objects. Defaults to None and raw string messages are returned.</li>
 </ul>
@@ -378,7 +422,7 @@ objects. Defaults to None and raw string messages are returned.</li>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Communication object.</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">DefaultComm</p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="cis_interface.communication.html#cis_interface.communication.DefaultComm" title="cis_interface.communication.DefaultComm">DefaultComm</a></p>
 </td>
 </tr>
 </tbody>
@@ -394,8 +438,8 @@ objects. Defaults to None and raw string messages are returned.</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Name of class that should be returned.</li>
-<li><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a>) – Additional arguments that should be passed to class
+<li><strong>_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; Name of class that should be returned.</li>
+<li><strong>args</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a>) &#8211; Additional arguments that should be passed to class
 initializer.</li>
 </ul>
 </td>
@@ -419,20 +463,20 @@ initializer.</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The path to the local file to read input from (if src_type
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; The path to the local file to read input from (if src_type
 == 0) or the name of the message queue input should be received
 from.</li>
-<li><strong>src_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>, </em><em>optional</em>) – If 0, input is read from a local file.
+<li><strong>src_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><em>optional</em>) &#8211; If 0, input is read from a local file.
 Otherwise, the input is received from a message queue. Defaults to
 1.</li>
-<li><strong>**kwargs</strong> – Additional keyword arguments are passed to the base comm.</li>
+<li><strong>**kwargs</strong> &#8211; Additional keyword arguments are passed to the base comm.</li>
 </ul>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Communication object.</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">DefaultComm</p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="cis_interface.communication.html#cis_interface.communication.DefaultComm" title="cis_interface.communication.DefaultComm">DefaultComm</a></p>
 </td>
 </tr>
 </tbody>
@@ -448,19 +492,19 @@ Otherwise, the input is received from a message queue. Defaults to
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The path to the local file where output should be saved
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; The path to the local file where output should be saved
 (if dst_type == 0) or the name of the message queue where the
 output should be sent.</li>
-<li><strong>dst_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>, </em><em>optional</em>) – If 0, output is sent to a local file.
+<li><strong>dst_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><em>optional</em>) &#8211; If 0, output is sent to a local file.
 Otherwise, the output is sent to a message queue. Defaults to 1.</li>
-<li><strong>**kwargs</strong> – Additional keyword arguments are passed to the base comm.</li>
+<li><strong>**kwargs</strong> &#8211; Additional keyword arguments are passed to the base comm.</li>
 </ul>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Communication object.</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">DefaultComm</p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="cis_interface.communication.html#cis_interface.communication.DefaultComm" title="cis_interface.communication.DefaultComm">DefaultComm</a></p>
 </td>
 </tr>
 </tbody>
@@ -476,10 +520,10 @@ Otherwise, the output is sent to a message queue. Defaults to 1.</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The name of the message queue. Combined with the
-suffix ‘_OUT’, it should match an environment variable containing
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; The name of the message queue. Combined with the
+suffix &#8216;_OUT&#8217;, it should match an environment variable containing
 a message queue key.</li>
-<li><strong>format_str</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – C style format string that should be used
+<li><strong>format_str</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) &#8211; C style format string that should be used
 to create a message from a list of python ojbects. Defaults to None
 and raw string messages are sent.</li>
 </ul>
@@ -488,7 +532,7 @@ and raw string messages are sent.</li>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Communication object.</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">DefaultComm</p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="cis_interface.communication.html#cis_interface.communication.DefaultComm" title="cis_interface.communication.DefaultComm">DefaultComm</a></p>
 </td>
 </tr>
 </tbody>
@@ -504,20 +548,20 @@ and raw string messages are sent.</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The path to the local file to read input from (if src_type
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; The path to the local file to read input from (if src_type
 == 0) or the name of the message queue input should be received
 from.</li>
-<li><strong>src_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>, </em><em>optional</em>) – If 0, input is read from a local file.
+<li><strong>src_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><em>optional</em>) &#8211; If 0, input is read from a local file.
 Otherwise, the input is received from a message queue. Defaults to
 1.</li>
-<li><strong>**kwargs</strong> – Additional keyword arguments are passed to the base comm.</li>
+<li><strong>**kwargs</strong> &#8211; Additional keyword arguments are passed to the base comm.</li>
 </ul>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Communication object.</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">DefaultComm</p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="cis_interface.communication.html#cis_interface.communication.DefaultComm" title="cis_interface.communication.DefaultComm">DefaultComm</a></p>
 </td>
 </tr>
 </tbody>
@@ -533,19 +577,19 @@ Otherwise, the input is received from a message queue. Defaults to
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The path to the local file where output should be saved
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; The path to the local file where output should be saved
 (if dst_type == 0) or the name of the message queue where the
 output should be sent.</li>
-<li><strong>dst_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>, </em><em>optional</em>) – If 0, output is sent to a local file.
+<li><strong>dst_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><em>optional</em>) &#8211; If 0, output is sent to a local file.
 Otherwise, the output is sent to a message queue. Defaults to 1.</li>
-<li><strong>**kwargs</strong> – Additional keyword arguments are passed to the base comm.</li>
+<li><strong>**kwargs</strong> &#8211; Additional keyword arguments are passed to the base comm.</li>
 </ul>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Communication object.</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">DefaultComm</p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="cis_interface.communication.html#cis_interface.communication.DefaultComm" title="cis_interface.communication.DefaultComm">DefaultComm</a></p>
 </td>
 </tr>
 </tbody>
@@ -561,20 +605,20 @@ Otherwise, the output is sent to a message queue. Defaults to 1.</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The path to the local file to read input from (if src_type
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; The path to the local file to read input from (if src_type
 == 0) or the name of the message queue input should be received
 from.</li>
-<li><strong>src_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>, </em><em>optional</em>) – If 0, input is read from a local file.
+<li><strong>src_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><em>optional</em>) &#8211; If 0, input is read from a local file.
 Otherwise, the input is received from a message queue. Defaults to
 1.</li>
-<li><strong>**kwargs</strong> – Additional keyword arguments are passed to the base comm.</li>
+<li><strong>**kwargs</strong> &#8211; Additional keyword arguments are passed to the base comm.</li>
 </ul>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Communication object.</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">DefaultComm</p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="cis_interface.communication.html#cis_interface.communication.DefaultComm" title="cis_interface.communication.DefaultComm">DefaultComm</a></p>
 </td>
 </tr>
 </tbody>
@@ -590,19 +634,19 @@ Otherwise, the input is received from a message queue. Defaults to
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The path to the local file where output should be saved
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; The path to the local file where output should be saved
 (if dst_type == 0) or the name of the message queue where the
 output should be sent.</li>
-<li><strong>dst_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>, </em><em>optional</em>) – If 0, output is sent to a local file.
+<li><strong>dst_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><em>optional</em>) &#8211; If 0, output is sent to a local file.
 Otherwise, the output is sent to a message queue. Defaults to 1.</li>
-<li><strong>**kwargs</strong> – Additional keyword arguments are passed to the base comm.</li>
+<li><strong>**kwargs</strong> &#8211; Additional keyword arguments are passed to the base comm.</li>
 </ul>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Communication object.</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">DefaultComm</p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="cis_interface.communication.html#cis_interface.communication.DefaultComm" title="cis_interface.communication.DefaultComm">DefaultComm</a></p>
 </td>
 </tr>
 </tbody>
@@ -618,20 +662,20 @@ Otherwise, the output is sent to a message queue. Defaults to 1.</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The path to the local file to read input from (if src_type
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; The path to the local file to read input from (if src_type
 == 0) or the name of the message queue input should be received
 from.</li>
-<li><strong>src_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>, </em><em>optional</em>) – If 0, input is read from a local file.
+<li><strong>src_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><em>optional</em>) &#8211; If 0, input is read from a local file.
 Otherwise, the input is received from a message queue. Defaults to
 1.</li>
-<li><strong>**kwargs</strong> – Additional keyword arguments are passed to the base comm.</li>
+<li><strong>**kwargs</strong> &#8211; Additional keyword arguments are passed to the base comm.</li>
 </ul>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Communication object.</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">DefaultComm</p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="cis_interface.communication.html#cis_interface.communication.DefaultComm" title="cis_interface.communication.DefaultComm">DefaultComm</a></p>
 </td>
 </tr>
 </tbody>
@@ -647,19 +691,19 @@ Otherwise, the input is received from a message queue. Defaults to
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The path to the local file where output should be saved
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; The path to the local file where output should be saved
 (if dst_type == 0) or the name of the message queue where the
 output should be sent.</li>
-<li><strong>dst_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>, </em><em>optional</em>) – If 0, output is sent to a local file.
+<li><strong>dst_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><em>optional</em>) &#8211; If 0, output is sent to a local file.
 Otherwise, the output is sent to a message queue. Defaults to 1.</li>
-<li><strong>**kwargs</strong> – Additional keyword arguments are passed to the base comm.</li>
+<li><strong>**kwargs</strong> &#8211; Additional keyword arguments are passed to the base comm.</li>
 </ul>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Communication object.</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">DefaultComm</p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="cis_interface.communication.html#cis_interface.communication.DefaultComm" title="cis_interface.communication.DefaultComm">DefaultComm</a></p>
 </td>
 </tr>
 </tbody>
@@ -675,11 +719,11 @@ Otherwise, the output is sent to a message queue. Defaults to 1.</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>outname</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The name of the output message queue.</li>
-<li><strong>outfmt</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Format string used to format variables in a
+<li><strong>outname</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; The name of the output message queue.</li>
+<li><strong>outfmt</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; Format string used to format variables in a
 message sent to the output message queue.</li>
-<li><strong>inname</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The name of the input message queue.</li>
-<li><strong>infmt</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Format string used to recover variables from
+<li><strong>inname</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; The name of the input message queue.</li>
+<li><strong>infmt</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; Format string used to recover variables from
 messages received from the input message queue.</li>
 </ul>
 </td>
@@ -687,7 +731,7 @@ messages received from the input message queue.</li>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Communication object.</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">DefaultComm</p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="cis_interface.communication.html#cis_interface.communication.DefaultComm" title="cis_interface.communication.DefaultComm">DefaultComm</a></p>
 </td>
 </tr>
 </tbody>
@@ -704,18 +748,15 @@ client.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The name of the server queues.</li>
-<li><strong>outfmt</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – Format string used to format variables in a
-message sent to the request queue. Defautls to ‘%s’.</li>
-<li><strong>infmt</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – Format string used to recover variables from
-messages received from the response queue. Defautls to ‘%s’.</li>
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; The name of the server queues.</li>
+<li><strong>outfmt</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) &#8211; Format string used to format variables in a
+message sent to the request queue. Defautls to &#8216;%s&#8217;.</li>
+<li><strong>infmt</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) &#8211; Format string used to recover variables from
+messages received from the response queue. Defautls to &#8216;%s&#8217;.</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Communication object.</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="cis_interface.communication.html#cis_interface.communication.ClientComm.ClientComm" title="cis_interface.communication.ClientComm.ClientComm">ClientComm</a></p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">class:.ClientComm: Communication object.</p>
 </td>
 </tr>
 </tbody>
@@ -731,18 +772,15 @@ messages received from the response queue. Defautls to ‘%s’.</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The name of the server queues.</li>
-<li><strong>infmt</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – Format string used to recover variables from
-messages received from the request queue. Defaults to ‘%s’.</li>
-<li><strong>outfmt</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – Format string used to format variables in a
-message sent to the response queue. Defautls to ‘%s’.</li>
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; The name of the server queues.</li>
+<li><strong>infmt</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) &#8211; Format string used to recover variables from
+messages received from the request queue. Defaults to &#8216;%s&#8217;.</li>
+<li><strong>outfmt</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) &#8211; Format string used to format variables in a
+message sent to the response queue. Defautls to &#8216;%s&#8217;.</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Communication object.</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="cis_interface.communication.html#cis_interface.communication.ServerComm.ServerComm" title="cis_interface.communication.ServerComm.ServerComm">ServerComm</a></p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">class:.ServerComm: Communication object.</p>
 </td>
 </tr>
 </tbody>
@@ -783,10 +821,10 @@ message sent to the response queue. Defautls to ‘%s’.</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The name of the message queue. Combined with the
-suffix ‘_IN’, it should match an environment variable containing
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; The name of the message queue. Combined with the
+suffix &#8216;_IN&#8217;, it should match an environment variable containing
 a message queue key.</li>
-<li><strong>format_str</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – C style format string that should be used
+<li><strong>format_str</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) &#8211; C style format string that should be used
 to deserialize messages that are receieved into a list of python
 objects. Defaults to None and raw string messages are returned.</li>
 </ul>
@@ -795,7 +833,7 @@ objects. Defaults to None and raw string messages are returned.</li>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Communication object.</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">DefaultComm</p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="cis_interface.communication.html#cis_interface.communication.DefaultComm" title="cis_interface.communication.DefaultComm">DefaultComm</a></p>
 </td>
 </tr>
 </tbody>
@@ -811,10 +849,10 @@ objects. Defaults to None and raw string messages are returned.</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The name of the message queue. Combined with the
-suffix ‘_OUT’, it should match an environment variable containing
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; The name of the message queue. Combined with the
+suffix &#8216;_OUT&#8217;, it should match an environment variable containing
 a message queue key.</li>
-<li><strong>format_str</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>optional</em>) – C style format string that should be used
+<li><strong>format_str</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) &#8211; C style format string that should be used
 to create a message from a list of python ojbects. Defaults to None
 and raw string messages are sent.</li>
 </ul>
@@ -823,7 +861,7 @@ and raw string messages are sent.</li>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Communication object.</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">DefaultComm</p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="cis_interface.communication.html#cis_interface.communication.DefaultComm" title="cis_interface.communication.DefaultComm">DefaultComm</a></p>
 </td>
 </tr>
 </tbody>
@@ -839,11 +877,11 @@ and raw string messages are sent.</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>outname</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The name of the output message queue.</li>
-<li><strong>outfmt</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Format string used to format variables in a
+<li><strong>outname</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; The name of the output message queue.</li>
+<li><strong>outfmt</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; Format string used to format variables in a
 message sent to the output message queue.</li>
-<li><strong>inname</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The name of the input message queue.</li>
-<li><strong>infmt</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Format string used to recover variables from
+<li><strong>inname</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; The name of the input message queue.</li>
+<li><strong>infmt</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; Format string used to recover variables from
 messages received from the input message queue.</li>
 </ul>
 </td>
@@ -851,7 +889,7 @@ messages received from the input message queue.</li>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Communication object.</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">DefaultComm</p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="cis_interface.communication.html#cis_interface.communication.DefaultComm" title="cis_interface.communication.DefaultComm">DefaultComm</a></p>
 </td>
 </tr>
 </tbody>
@@ -869,7 +907,7 @@ messages received from the input message queue.</li>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="cis_interface.serialize.html" class="btn btn-neutral float-right" title="cis_interface.serialize package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="cis_interface.interface.tests.html" class="btn btn-neutral float-right" title="cis_interface.interface.tests package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="code_python.html" class="btn btn-neutral" title="Python Code" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
@@ -903,7 +941,7 @@ messages received from the input message queue.</li>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'0.3.0',
+            VERSION:'0.4+0.gd8a2a4f.dirty',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
@@ -914,15 +952,20 @@ messages received from the input message queue.</li>
       <script type="text/javascript" src="_static/jquery.js"></script>
       <script type="text/javascript" src="_static/underscore.js"></script>
       <script type="text/javascript" src="_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 
   
 
-  <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
 
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.Navigation.enable(true);
+          
+          SphinxRtdTheme.Navigation.enableSticky();
+          
       });
   </script> 
 

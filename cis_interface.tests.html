@@ -1,0 +1,1373 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>cis_interface.tests package &mdash; cis_interface 0.4+0.gd8a2a4f.dirty documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> cis_interface
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.4+0.gd8a2a4f.dirty
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="includeme.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="formatted_io.html">Formatted I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="server_client_io.html">Server/Client I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="server_client_io.html#one-server-two-clients">One Server, Two Clients</a></li>
+<li class="toctree-l1"><a class="reference internal" href="yaml.html">YAML Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="config.html">Configuration Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="units.html">Units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="c_format_strings.html">C-Style Format Strings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="io_drivers.html">Input/Output Drivers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="model_drivers.html">Model Drivers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="code.html">Code</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/examples_toc.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="release.html">Release Steps</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">cis_interface</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>cis_interface.tests package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/cis_interface.tests.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="cis-interface-tests-package">
+<h1>cis_interface.tests package<a class="headerlink" href="#cis-interface-tests-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-cis_interface.tests.test_backwards">
+<span id="cis-interface-tests-test-backwards-module"></span><h2>cis_interface.tests.test_backwards module<a class="headerlink" href="#module-cis_interface.tests.test_backwards" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="cis_interface.tests.test_backwards.test_assert_bytes">
+<code class="descclassname">cis_interface.tests.test_backwards.</code><code class="descname">test_assert_bytes</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tests/test_backwards.html#test_assert_bytes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tests.test_backwards.test_assert_bytes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Ensure that the proper byte types are identified.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.tests.test_backwards.test_assert_unicode">
+<code class="descclassname">cis_interface.tests.test_backwards.</code><code class="descname">test_assert_unicode</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tests/test_backwards.html#test_assert_unicode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tests.test_backwards.test_assert_unicode" title="Permalink to this definition">¶</a></dt>
+<dd><p>Ensure that the proper unicode types are identified.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.tests.test_backwards.test_bytes2unicode">
+<code class="descclassname">cis_interface.tests.test_backwards.</code><code class="descname">test_bytes2unicode</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tests/test_backwards.html#test_bytes2unicode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tests.test_backwards.test_bytes2unicode" title="Permalink to this definition">¶</a></dt>
+<dd><p>Ensure what results is proper bytes type.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.tests.test_backwards.test_decode_escape">
+<code class="descclassname">cis_interface.tests.test_backwards.</code><code class="descname">test_decode_escape</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tests/test_backwards.html#test_decode_escape"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tests.test_backwards.test_decode_escape" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test esscape decoding.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.tests.test_backwards.test_encode_escape">
+<code class="descclassname">cis_interface.tests.test_backwards.</code><code class="descname">test_encode_escape</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tests/test_backwards.html#test_encode_escape"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tests.test_backwards.test_encode_escape" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test escape encoding.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.tests.test_backwards.test_format_bytes">
+<code class="descclassname">cis_interface.tests.test_backwards.</code><code class="descname">test_format_bytes</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tests/test_backwards.html#test_format_bytes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tests.test_backwards.test_format_bytes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test formating of bytes string.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.tests.test_backwards.test_match_stype">
+<code class="descclassname">cis_interface.tests.test_backwards.</code><code class="descname">test_match_stype</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tests/test_backwards.html#test_match_stype"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tests.test_backwards.test_match_stype" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test string type matching.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.tests.test_backwards.test_unicode2bytes">
+<code class="descclassname">cis_interface.tests.test_backwards.</code><code class="descname">test_unicode2bytes</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tests/test_backwards.html#test_unicode2bytes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tests.test_backwards.test_unicode2bytes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Ensure what results is proper bytes type.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-cis_interface.tests.test_config">
+<span id="cis-interface-tests-test-config-module"></span><h2>cis_interface.tests.test_config module<a class="headerlink" href="#module-cis_interface.tests.test_config" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="cis_interface.tests.test_config.test_CisConfigParser">
+<code class="descclassname">cis_interface.tests.test_config.</code><code class="descname">test_CisConfigParser</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tests/test_config.html#test_CisConfigParser"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tests.test_config.test_CisConfigParser" title="Permalink to this definition">¶</a></dt>
+<dd><p>Ensure that get returns proper defaults etc.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-cis_interface.tests.test_platform">
+<span id="cis-interface-tests-test-platform-module"></span><h2>cis_interface.tests.test_platform module<a class="headerlink" href="#module-cis_interface.tests.test_platform" title="Permalink to this headline">¶</a></h2>
+<p>Tests for platform compatiblity.</p>
+<dl class="function">
+<dt id="cis_interface.tests.test_platform.test_os">
+<code class="descclassname">cis_interface.tests.test_platform.</code><code class="descname">test_os</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tests/test_platform.html#test_os"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tests.test_platform.test_os" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test that only one OS selected.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-cis_interface.tests.test_runner">
+<span id="cis-interface-tests-test-runner-module"></span><h2>cis_interface.tests.test_runner module<a class="headerlink" href="#module-cis_interface.tests.test_runner" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="cis_interface.tests.test_runner.TestCisRunner">
+<em class="property">class </em><code class="descclassname">cis_interface.tests.test_runner.</code><code class="descname">TestCisRunner</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tests/test_runner.html#TestCisRunner"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tests.test_runner.TestCisRunner" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.tests.CisTestBase" title="cis_interface.tests.CisTestBase"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.tests.CisTestBase</span></code></a></p>
+<p>Tests of the CisRunner class.</p>
+<dl class="method">
+<dt id="cis_interface.tests.test_runner.TestCisRunner.setup">
+<code class="descname">setup</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tests/test_runner.html#TestCisRunner.setup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tests.test_runner.TestCisRunner.setup" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.tests.test_runner.TestCisRunner.test_createIODriver">
+<code class="descname">test_createIODriver</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tests/test_runner.html#TestCisRunner.test_createIODriver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tests.test_runner.TestCisRunner.test_createIODriver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test createInputDriver and createOutputDriver.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.tests.test_runner.test_Arunner_interrupt">
+<code class="descclassname">cis_interface.tests.test_runner.</code><code class="descname">test_Arunner_interrupt</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tests/test_runner.html#test_Arunner_interrupt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tests.test_runner.test_Arunner_interrupt" title="Permalink to this definition">¶</a></dt>
+<dd><p>Start a runner then stop it with a keyboard interrupt.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.tests.test_runner.test_get_runner">
+<code class="descclassname">cis_interface.tests.test_runner.</code><code class="descname">test_get_runner</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tests/test_runner.html#test_get_runner"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tests.test_runner.test_get_runner" title="Permalink to this definition">¶</a></dt>
+<dd><p>Use get_runner to start a run.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.tests.test_runner.test_runner_error">
+<code class="descclassname">cis_interface.tests.test_runner.</code><code class="descname">test_runner_error</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tests/test_runner.html#test_runner_error"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tests.test_runner.test_runner_error" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test error on missing yaml.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.tests.test_runner.test_runner_terminate">
+<code class="descclassname">cis_interface.tests.test_runner.</code><code class="descname">test_runner_terminate</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tests/test_runner.html#test_runner_terminate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tests.test_runner.test_runner_terminate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Start a runner, then stop it early.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-cis_interface.tests.test_scanf">
+<span id="cis-interface-tests-test-scanf-module"></span><h2>cis_interface.tests.test_scanf module<a class="headerlink" href="#module-cis_interface.tests.test_scanf" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="cis_interface.tests.test_scanf.test_scanf">
+<code class="descclassname">cis_interface.tests.test_scanf.</code><code class="descname">test_scanf</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tests/test_scanf.html#test_scanf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tests.test_scanf.test_scanf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test scanf.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-cis_interface.tests.test_schema">
+<span id="cis-interface-tests-test-schema-module"></span><h2>cis_interface.tests.test_schema module<a class="headerlink" href="#module-cis_interface.tests.test_schema" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="cis_interface.tests.test_schema.direct_translate">
+<code class="descclassname">cis_interface.tests.test_schema.</code><code class="descname">direct_translate</code><span class="sig-paren">(</span><em>msg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tests/test_schema.html#direct_translate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tests.test_schema.direct_translate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test translator that just returns passed message.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.tests.test_schema.test_CisSchemaValidator">
+<code class="descclassname">cis_interface.tests.test_schema.</code><code class="descname">test_CisSchemaValidator</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tests/test_schema.html#test_CisSchemaValidator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tests.test_schema.test_CisSchemaValidator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test schema validator.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.tests.test_schema.test_SchemaRegistry">
+<code class="descclassname">cis_interface.tests.test_schema.</code><code class="descname">test_SchemaRegistry</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tests/test_schema.html#test_SchemaRegistry"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tests.test_schema.test_SchemaRegistry" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test schema registry.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.tests.test_schema.test_create_schema">
+<code class="descclassname">cis_interface.tests.test_schema.</code><code class="descname">test_create_schema</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tests/test_schema.html#test_create_schema"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tests.test_schema.test_create_schema" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test creating new schema.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.tests.test_schema.test_default_schema">
+<code class="descclassname">cis_interface.tests.test_schema.</code><code class="descname">test_default_schema</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tests/test_schema.html#test_default_schema"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tests.test_schema.test_default_schema" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test getting default schema.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.tests.test_schema.test_str_to_function">
+<code class="descclassname">cis_interface.tests.test_schema.</code><code class="descname">test_str_to_function</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tests/test_schema.html#test_str_to_function"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tests.test_schema.test_str_to_function" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test conversion from string to function.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-cis_interface.tests.test_tests">
+<span id="cis-interface-tests-test-tests-module"></span><h2>cis_interface.tests.test_tests module<a class="headerlink" href="#module-cis_interface.tests.test_tests" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="cis_interface.tests.test_tests.TestCisTest">
+<em class="property">class </em><code class="descclassname">cis_interface.tests.test_tests.</code><code class="descname">TestCisTest</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tests/test_tests.html#TestCisTest"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tests.test_tests.TestCisTest" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.tests.CisTestClass" title="cis_interface.tests.CisTestClass"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.tests.CisTestClass</span></code></a></p>
+<p>Test errors for uninitialized CisTestClass.</p>
+<dl class="method">
+<dt id="cis_interface.tests.test_tests.TestCisTest.create_instance">
+<code class="descname">create_instance</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tests/test_tests.html#TestCisTest.create_instance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tests.test_tests.TestCisTest.create_instance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dummy overload to prevent initialization.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.tests.test_tests.TestCisTest.test_description">
+<code class="descname">test_description</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tests/test_tests.html#TestCisTest.test_description"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tests.test_tests.TestCisTest.test_description" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get uninitialized description.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.tests.test_tests.TestCisTest.test_import_cls">
+<code class="descname">test_import_cls</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tests/test_tests.html#TestCisTest.test_import_cls"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tests.test_tests.TestCisTest.test_import_cls" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test import class with mod/cls unset.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.tests.test_tests.TestCisTest.test_post_teardown_ref">
+<code class="descname">test_post_teardown_ref</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tests/test_tests.html#TestCisTest.test_post_teardown_ref"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tests.test_tests.TestCisTest.test_post_teardown_ref" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test errors on instance ref post teardown.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.tests.test_tests.test_IOInfo">
+<code class="descclassname">cis_interface.tests.test_tests.</code><code class="descname">test_IOInfo</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tests/test_tests.html#test_IOInfo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tests.test_tests.test_IOInfo" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test funcitonality of IOInfo.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-cis_interface.tests.test_tools">
+<span id="cis-interface-tests-test-tools-module"></span><h2>cis_interface.tests.test_tools module<a class="headerlink" href="#module-cis_interface.tests.test_tools" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="cis_interface.tests.test_tools.test_eval_kwarg">
+<code class="descclassname">cis_interface.tests.test_tools.</code><code class="descname">test_eval_kwarg</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tests/test_tools.html#test_eval_kwarg"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tests.test_tools.test_eval_kwarg" title="Permalink to this definition">¶</a></dt>
+<dd><p>Ensure strings &amp; objects properly evaluated.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.tests.test_tools.test_is_ipc_installed">
+<code class="descclassname">cis_interface.tests.test_tools.</code><code class="descname">test_is_ipc_installed</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tests/test_tools.html#test_is_ipc_installed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tests.test_tools.test_is_ipc_installed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test determination if ipc is installed or not.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.tests.test_tools.test_is_zmq_installed">
+<code class="descclassname">cis_interface.tests.test_tools.</code><code class="descname">test_is_zmq_installed</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tests/test_tools.html#test_is_zmq_installed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tests.test_tools.test_is_zmq_installed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test determination if zmq is installed or not.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.tests.test_tools.test_locate_path">
+<code class="descclassname">cis_interface.tests.test_tools.</code><code class="descname">test_locate_path</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tests/test_tools.html#test_locate_path"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tests.test_tools.test_locate_path" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test file location.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.tests.test_tools.test_popen_nobuffer">
+<code class="descclassname">cis_interface.tests.test_tools.</code><code class="descname">test_popen_nobuffer</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tests/test_tools.html#test_popen_nobuffer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tests.test_tools.test_popen_nobuffer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test open of process without buffer.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-cis_interface.tests.test_units">
+<span id="cis-interface-tests-test-units-module"></span><h2>cis_interface.tests.test_units module<a class="headerlink" href="#module-cis_interface.tests.test_units" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="cis_interface.tests.test_units.TestPint">
+<em class="property">class </em><code class="descclassname">cis_interface.tests.test_units.</code><code class="descname">TestPint</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tests/test_units.html#TestPint"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tests.test_units.TestPint" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.tests.CisTestBase" title="cis_interface.tests.CisTestBase"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.tests.CisTestBase</span></code></a></p>
+<p>Tests for using pint for units.</p>
+<dl class="method">
+<dt id="cis_interface.tests.test_units.TestPint.setup">
+<code class="descname">setup</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tests/test_units.html#TestPint.setup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tests.test_units.TestPint.setup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set use_unyt for tests.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.tests.test_units.TestPint.teardown">
+<code class="descname">teardown</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tests/test_units.html#TestPint.teardown"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tests.test_units.TestPint.teardown" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reset use_unyt to default.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.tests.test_units.TestPint.test_add_units">
+<code class="descname">test_add_units</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tests/test_units.html#TestPint.test_add_units"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tests.test_units.TestPint.test_add_units" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test add_units.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.tests.test_units.TestPint.test_are_compatible">
+<code class="descname">test_are_compatible</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tests/test_units.html#TestPint.test_are_compatible"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tests.test_units.TestPint.test_are_compatible" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test are_compatible.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.tests.test_units.TestPint.test_as_unit">
+<code class="descname">test_as_unit</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tests/test_units.html#TestPint.test_as_unit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tests.test_units.TestPint.test_as_unit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test as_unit.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.tests.test_units.TestPint.test_convert_to">
+<code class="descname">test_convert_to</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tests/test_units.html#TestPint.test_convert_to"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tests.test_units.TestPint.test_convert_to" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test convert_to.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.tests.test_units.TestPint.test_get_data">
+<code class="descname">test_get_data</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tests/test_units.html#TestPint.test_get_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tests.test_units.TestPint.test_get_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test get_data.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.tests.test_units.TestPint.test_get_units">
+<code class="descname">test_get_units</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tests/test_units.html#TestPint.test_get_units"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tests.test_units.TestPint.test_get_units" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test get_units.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.tests.test_units.TestPint.test_has_units">
+<code class="descname">test_has_units</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tests/test_units.html#TestPint.test_has_units"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tests.test_units.TestPint.test_has_units" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test has_units.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.tests.test_units.TestPint.test_is_null_unit">
+<code class="descname">test_is_null_unit</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tests/test_units.html#TestPint.test_is_null_unit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tests.test_units.TestPint.test_is_null_unit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test is_null_unit.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.tests.test_units.TestPint.test_is_unit">
+<code class="descname">test_is_unit</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tests/test_units.html#TestPint.test_is_unit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tests.test_units.TestPint.test_is_unit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test is_unit.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.tests.test_units.TestUnyt">
+<em class="property">class </em><code class="descclassname">cis_interface.tests.test_units.</code><code class="descname">TestUnyt</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tests/test_units.html#TestUnyt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tests.test_units.TestUnyt" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.tests.test_units.TestPint" title="cis_interface.tests.test_units.TestPint"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.tests.test_units.TestPint</span></code></a></p>
+<p>Test for using unyt for units.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-cis_interface.tests.test_yamlfile">
+<span id="cis-interface-tests-test-yamlfile-module"></span><h2>cis_interface.tests.test_yamlfile module<a class="headerlink" href="#module-cis_interface.tests.test_yamlfile" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="cis_interface.tests.test_yamlfile.TestYamlComponentError">
+<em class="property">class </em><code class="descclassname">cis_interface.tests.test_yamlfile.</code><code class="descname">TestYamlComponentError</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tests/test_yamlfile.html#TestYamlComponentError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tests.test_yamlfile.TestYamlComponentError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.tests.test_yamlfile.YamlTestBaseError" title="cis_interface.tests.test_yamlfile.YamlTestBaseError"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.tests.test_yamlfile.YamlTestBaseError</span></code></a></p>
+<p>Test error for non-dictionary component.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.tests.test_yamlfile.TestYamlConnection">
+<em class="property">class </em><code class="descclassname">cis_interface.tests.test_yamlfile.</code><code class="descname">TestYamlConnection</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tests/test_yamlfile.html#TestYamlConnection"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tests.test_yamlfile.TestYamlConnection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.tests.test_yamlfile.YamlTestBase" title="cis_interface.tests.test_yamlfile.YamlTestBase"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.tests.test_yamlfile.YamlTestBase</span></code></a></p>
+<p>Test connection between I/O channels.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.tests.test_yamlfile.TestYamlConnectionError">
+<em class="property">class </em><code class="descclassname">cis_interface.tests.test_yamlfile.</code><code class="descname">TestYamlConnectionError</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tests/test_yamlfile.html#TestYamlConnectionError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tests.test_yamlfile.TestYamlConnectionError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.tests.test_yamlfile.YamlTestBaseError" title="cis_interface.tests.test_yamlfile.YamlTestBaseError"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.tests.test_yamlfile.YamlTestBaseError</span></code></a></p>
+<p>Test error when there is not connection for a model I/O channel.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.tests.test_yamlfile.TestYamlConnectionError_forkin">
+<em class="property">class </em><code class="descclassname">cis_interface.tests.test_yamlfile.</code><code class="descname">TestYamlConnectionError_forkin</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tests/test_yamlfile.html#TestYamlConnectionError_forkin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tests.test_yamlfile.TestYamlConnectionError_forkin" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.tests.test_yamlfile.YamlTestBaseError" title="cis_interface.tests.test_yamlfile.YamlTestBaseError"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.tests.test_yamlfile.YamlTestBaseError</span></code></a></p>
+<p>Test error when there is not connection for a fork input channel.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.tests.test_yamlfile.TestYamlConnectionError_forkout">
+<em class="property">class </em><code class="descclassname">cis_interface.tests.test_yamlfile.</code><code class="descname">TestYamlConnectionError_forkout</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tests/test_yamlfile.html#TestYamlConnectionError_forkout"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tests.test_yamlfile.TestYamlConnectionError_forkout" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.tests.test_yamlfile.YamlTestBaseError" title="cis_interface.tests.test_yamlfile.YamlTestBaseError"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.tests.test_yamlfile.YamlTestBaseError</span></code></a></p>
+<p>Test error when there is not connection for a fork output channel.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.tests.test_yamlfile.TestYamlConnectionError_readmeth">
+<em class="property">class </em><code class="descclassname">cis_interface.tests.test_yamlfile.</code><code class="descname">TestYamlConnectionError_readmeth</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tests/test_yamlfile.html#TestYamlConnectionError_readmeth"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tests.test_yamlfile.TestYamlConnectionError_readmeth" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.tests.test_yamlfile.YamlTestBaseError" title="cis_interface.tests.test_yamlfile.YamlTestBaseError"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.tests.test_yamlfile.YamlTestBaseError</span></code></a></p>
+<p>Test error when read_meth is specified for non-file.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.tests.test_yamlfile.TestYamlConnectionError_writemeth">
+<em class="property">class </em><code class="descclassname">cis_interface.tests.test_yamlfile.</code><code class="descname">TestYamlConnectionError_writemeth</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tests/test_yamlfile.html#TestYamlConnectionError_writemeth"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tests.test_yamlfile.TestYamlConnectionError_writemeth" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.tests.test_yamlfile.YamlTestBaseError" title="cis_interface.tests.test_yamlfile.YamlTestBaseError"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.tests.test_yamlfile.YamlTestBaseError</span></code></a></p>
+<p>Test error when write_meth is specified for non-file.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.tests.test_yamlfile.TestYamlConnectionFork">
+<em class="property">class </em><code class="descclassname">cis_interface.tests.test_yamlfile.</code><code class="descname">TestYamlConnectionFork</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tests/test_yamlfile.html#TestYamlConnectionFork"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tests.test_yamlfile.TestYamlConnectionFork" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.tests.test_yamlfile.YamlTestBase" title="cis_interface.tests.test_yamlfile.YamlTestBase"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.tests.test_yamlfile.YamlTestBase</span></code></a></p>
+<p>Test connection between I/O channels.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.tests.test_yamlfile.TestYamlConnectionInputAsciiFile">
+<em class="property">class </em><code class="descclassname">cis_interface.tests.test_yamlfile.</code><code class="descname">TestYamlConnectionInputAsciiFile</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tests/test_yamlfile.html#TestYamlConnectionInputAsciiFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tests.test_yamlfile.TestYamlConnectionInputAsciiFile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.tests.test_yamlfile.YamlTestBase" title="cis_interface.tests.test_yamlfile.YamlTestBase"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.tests.test_yamlfile.YamlTestBase</span></code></a></p>
+<p>Test connection with AsciiFile.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.tests.test_yamlfile.TestYamlConnectionInputAsciiMap">
+<em class="property">class </em><code class="descclassname">cis_interface.tests.test_yamlfile.</code><code class="descname">TestYamlConnectionInputAsciiMap</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tests/test_yamlfile.html#TestYamlConnectionInputAsciiMap"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tests.test_yamlfile.TestYamlConnectionInputAsciiMap" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.tests.test_yamlfile.YamlTestBase" title="cis_interface.tests.test_yamlfile.YamlTestBase"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.tests.test_yamlfile.YamlTestBase</span></code></a></p>
+<p>Test connection with AsciiMap.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.tests.test_yamlfile.TestYamlConnectionInputAsciiTable">
+<em class="property">class </em><code class="descclassname">cis_interface.tests.test_yamlfile.</code><code class="descname">TestYamlConnectionInputAsciiTable</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tests/test_yamlfile.html#TestYamlConnectionInputAsciiTable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tests.test_yamlfile.TestYamlConnectionInputAsciiTable" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.tests.test_yamlfile.YamlTestBase" title="cis_interface.tests.test_yamlfile.YamlTestBase"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.tests.test_yamlfile.YamlTestBase</span></code></a></p>
+<p>Test connection with AsciiTable.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.tests.test_yamlfile.TestYamlConnectionInputAsciiTableArray">
+<em class="property">class </em><code class="descclassname">cis_interface.tests.test_yamlfile.</code><code class="descname">TestYamlConnectionInputAsciiTableArray</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tests/test_yamlfile.html#TestYamlConnectionInputAsciiTableArray"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tests.test_yamlfile.TestYamlConnectionInputAsciiTableArray" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.tests.test_yamlfile.YamlTestBase" title="cis_interface.tests.test_yamlfile.YamlTestBase"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.tests.test_yamlfile.YamlTestBase</span></code></a></p>
+<p>Test connection with AsciiTable as array.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.tests.test_yamlfile.TestYamlConnectionInputFile">
+<em class="property">class </em><code class="descclassname">cis_interface.tests.test_yamlfile.</code><code class="descname">TestYamlConnectionInputFile</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tests/test_yamlfile.html#TestYamlConnectionInputFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tests.test_yamlfile.TestYamlConnectionInputFile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.tests.test_yamlfile.YamlTestBase" title="cis_interface.tests.test_yamlfile.YamlTestBase"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.tests.test_yamlfile.YamlTestBase</span></code></a></p>
+<p>Test connection with File.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.tests.test_yamlfile.TestYamlConnectionInputFileReadMethError">
+<em class="property">class </em><code class="descclassname">cis_interface.tests.test_yamlfile.</code><code class="descname">TestYamlConnectionInputFileReadMethError</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tests/test_yamlfile.html#TestYamlConnectionInputFileReadMethError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tests.test_yamlfile.TestYamlConnectionInputFileReadMethError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.tests.test_yamlfile.YamlTestBaseError" title="cis_interface.tests.test_yamlfile.YamlTestBaseError"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.tests.test_yamlfile.YamlTestBaseError</span></code></a></p>
+<p>Test error for invalid read_meth.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.tests.test_yamlfile.TestYamlConnectionInputFileWriteMethError">
+<em class="property">class </em><code class="descclassname">cis_interface.tests.test_yamlfile.</code><code class="descname">TestYamlConnectionInputFileWriteMethError</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tests/test_yamlfile.html#TestYamlConnectionInputFileWriteMethError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tests.test_yamlfile.TestYamlConnectionInputFileWriteMethError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.tests.test_yamlfile.YamlTestBaseError" title="cis_interface.tests.test_yamlfile.YamlTestBaseError"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.tests.test_yamlfile.YamlTestBaseError</span></code></a></p>
+<p>Test error for invalid write_meth.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.tests.test_yamlfile.TestYamlConnectionInputObj">
+<em class="property">class </em><code class="descclassname">cis_interface.tests.test_yamlfile.</code><code class="descname">TestYamlConnectionInputObj</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tests/test_yamlfile.html#TestYamlConnectionInputObj"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tests.test_yamlfile.TestYamlConnectionInputObj" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.tests.test_yamlfile.YamlTestBase" title="cis_interface.tests.test_yamlfile.YamlTestBase"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.tests.test_yamlfile.YamlTestBase</span></code></a></p>
+<p>Test connection with Obj file.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.tests.test_yamlfile.TestYamlConnectionInputPandas">
+<em class="property">class </em><code class="descclassname">cis_interface.tests.test_yamlfile.</code><code class="descname">TestYamlConnectionInputPandas</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tests/test_yamlfile.html#TestYamlConnectionInputPandas"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tests.test_yamlfile.TestYamlConnectionInputPandas" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.tests.test_yamlfile.YamlTestBase" title="cis_interface.tests.test_yamlfile.YamlTestBase"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.tests.test_yamlfile.YamlTestBase</span></code></a></p>
+<p>Test connection with Pandas csv.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.tests.test_yamlfile.TestYamlConnectionInputPickle">
+<em class="property">class </em><code class="descclassname">cis_interface.tests.test_yamlfile.</code><code class="descname">TestYamlConnectionInputPickle</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tests/test_yamlfile.html#TestYamlConnectionInputPickle"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tests.test_yamlfile.TestYamlConnectionInputPickle" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.tests.test_yamlfile.YamlTestBase" title="cis_interface.tests.test_yamlfile.YamlTestBase"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.tests.test_yamlfile.YamlTestBase</span></code></a></p>
+<p>Test connection with Pickle.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.tests.test_yamlfile.TestYamlConnectionInputPly">
+<em class="property">class </em><code class="descclassname">cis_interface.tests.test_yamlfile.</code><code class="descname">TestYamlConnectionInputPly</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tests/test_yamlfile.html#TestYamlConnectionInputPly"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tests.test_yamlfile.TestYamlConnectionInputPly" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.tests.test_yamlfile.YamlTestBase" title="cis_interface.tests.test_yamlfile.YamlTestBase"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.tests.test_yamlfile.YamlTestBase</span></code></a></p>
+<p>Test connection with Ply file.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.tests.test_yamlfile.TestYamlConnectionTranslator">
+<em class="property">class </em><code class="descclassname">cis_interface.tests.test_yamlfile.</code><code class="descname">TestYamlConnectionTranslator</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tests/test_yamlfile.html#TestYamlConnectionTranslator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tests.test_yamlfile.TestYamlConnectionTranslator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.tests.test_yamlfile.YamlTestBase" title="cis_interface.tests.test_yamlfile.YamlTestBase"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.tests.test_yamlfile.YamlTestBase</span></code></a></p>
+<p>Test connection between I/O channels.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.tests.test_yamlfile.TestYamlDuplicateError">
+<em class="property">class </em><code class="descclassname">cis_interface.tests.test_yamlfile.</code><code class="descname">TestYamlDuplicateError</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tests/test_yamlfile.html#TestYamlDuplicateError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tests.test_yamlfile.TestYamlDuplicateError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.tests.test_yamlfile.YamlTestBaseError" title="cis_interface.tests.test_yamlfile.YamlTestBaseError"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.tests.test_yamlfile.YamlTestBaseError</span></code></a></p>
+<p>Test error when there are two components with the same name.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.tests.test_yamlfile.TestYamlIODrivers">
+<em class="property">class </em><code class="descclassname">cis_interface.tests.test_yamlfile.</code><code class="descname">TestYamlIODrivers</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tests/test_yamlfile.html#TestYamlIODrivers"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tests.test_yamlfile.TestYamlIODrivers" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.tests.test_yamlfile.YamlTestBase" title="cis_interface.tests.test_yamlfile.YamlTestBase"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.tests.test_yamlfile.YamlTestBase</span></code></a></p>
+<p>Test full specification of IO drivers.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.tests.test_yamlfile.TestYamlMissingConnArgsError">
+<em class="property">class </em><code class="descclassname">cis_interface.tests.test_yamlfile.</code><code class="descname">TestYamlMissingConnArgsError</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tests/test_yamlfile.html#TestYamlMissingConnArgsError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tests.test_yamlfile.TestYamlMissingConnArgsError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.tests.test_yamlfile.YamlTestBaseError" title="cis_interface.tests.test_yamlfile.YamlTestBaseError"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.tests.test_yamlfile.YamlTestBaseError</span></code></a></p>
+<p>Test error when there is a missing arguments to a connection.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.tests.test_yamlfile.TestYamlMissingConnIOError">
+<em class="property">class </em><code class="descclassname">cis_interface.tests.test_yamlfile.</code><code class="descname">TestYamlMissingConnIOError</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tests/test_yamlfile.html#TestYamlMissingConnIOError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tests.test_yamlfile.TestYamlMissingConnIOError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.tests.test_yamlfile.YamlTestBaseError" title="cis_interface.tests.test_yamlfile.YamlTestBaseError"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.tests.test_yamlfile.YamlTestBaseError</span></code></a></p>
+<p>Test error when there is no model input/output matching connection.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.tests.test_yamlfile.TestYamlMissingConnInputError">
+<em class="property">class </em><code class="descclassname">cis_interface.tests.test_yamlfile.</code><code class="descname">TestYamlMissingConnInputError</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tests/test_yamlfile.html#TestYamlMissingConnInputError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tests.test_yamlfile.TestYamlMissingConnInputError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.tests.test_yamlfile.YamlTestBaseError" title="cis_interface.tests.test_yamlfile.YamlTestBaseError"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.tests.test_yamlfile.YamlTestBaseError</span></code></a></p>
+<p>Test error when there is no model output matching connection input.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.tests.test_yamlfile.TestYamlMissingConnInputFileError">
+<em class="property">class </em><code class="descclassname">cis_interface.tests.test_yamlfile.</code><code class="descname">TestYamlMissingConnInputFileError</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tests/test_yamlfile.html#TestYamlMissingConnInputFileError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tests.test_yamlfile.TestYamlMissingConnInputFileError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.tests.test_yamlfile.YamlTestBaseError" title="cis_interface.tests.test_yamlfile.YamlTestBaseError"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.tests.test_yamlfile.YamlTestBaseError</span></code></a></p>
+<p>Test error when there is no file for missing connection input.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.tests.test_yamlfile.TestYamlMissingIOArgsError">
+<em class="property">class </em><code class="descclassname">cis_interface.tests.test_yamlfile.</code><code class="descname">TestYamlMissingIOArgsError</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tests/test_yamlfile.html#TestYamlMissingIOArgsError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tests.test_yamlfile.TestYamlMissingIOArgsError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.tests.test_yamlfile.YamlTestBaseError" title="cis_interface.tests.test_yamlfile.YamlTestBaseError"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.tests.test_yamlfile.YamlTestBaseError</span></code></a></p>
+<p>Test error when there is a missing arguments to an I/O driver.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.tests.test_yamlfile.TestYamlMissingModelArgsError">
+<em class="property">class </em><code class="descclassname">cis_interface.tests.test_yamlfile.</code><code class="descname">TestYamlMissingModelArgsError</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tests/test_yamlfile.html#TestYamlMissingModelArgsError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tests.test_yamlfile.TestYamlMissingModelArgsError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.tests.test_yamlfile.YamlTestBaseError" title="cis_interface.tests.test_yamlfile.YamlTestBaseError"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.tests.test_yamlfile.YamlTestBaseError</span></code></a></p>
+<p>Test error when there is a missing arguments to a model.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.tests.test_yamlfile.TestYamlModelOnly">
+<em class="property">class </em><code class="descclassname">cis_interface.tests.test_yamlfile.</code><code class="descname">TestYamlModelOnly</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tests/test_yamlfile.html#TestYamlModelOnly"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tests.test_yamlfile.TestYamlModelOnly" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.tests.test_yamlfile.YamlTestBase" title="cis_interface.tests.test_yamlfile.YamlTestBase"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.tests.test_yamlfile.YamlTestBase</span></code></a></p>
+<p>Test parsing of different numbers/styles of models.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.tests.test_yamlfile.TestYamlServerClient">
+<em class="property">class </em><code class="descclassname">cis_interface.tests.test_yamlfile.</code><code class="descname">TestYamlServerClient</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tests/test_yamlfile.html#TestYamlServerClient"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tests.test_yamlfile.TestYamlServerClient" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.tests.test_yamlfile.YamlTestBase" title="cis_interface.tests.test_yamlfile.YamlTestBase"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.tests.test_yamlfile.YamlTestBase</span></code></a></p>
+<p>Test specification of server/client models.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.tests.test_yamlfile.YamlTestBase">
+<em class="property">class </em><code class="descclassname">cis_interface.tests.test_yamlfile.</code><code class="descname">YamlTestBase</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tests/test_yamlfile.html#YamlTestBase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tests.test_yamlfile.YamlTestBase" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.tests.CisTestClass" title="cis_interface.tests.CisTestClass"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.tests.CisTestClass</span></code></a></p>
+<p>Test base for yamlfile.</p>
+<dl class="attribute">
+<dt id="cis_interface.tests.test_yamlfile.YamlTestBase.contents">
+<code class="descname">contents</code><a class="headerlink" href="#cis_interface.tests.test_yamlfile.YamlTestBase.contents" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>tuple</em> &#8211; Contents of files.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.tests.test_yamlfile.YamlTestBase.create_instance">
+<code class="descname">create_instance</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tests/test_yamlfile.html#YamlTestBase.create_instance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tests.test_yamlfile.YamlTestBase.create_instance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Disabled: Create a new instance of the class.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.tests.test_yamlfile.YamlTestBase.get_fname">
+<code class="descname">get_fname</code><span class="sig-paren">(</span><em>idx=0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tests/test_yamlfile.html#YamlTestBase.get_fname"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tests.test_yamlfile.YamlTestBase.get_fname" title="Permalink to this definition">¶</a></dt>
+<dd><p>Path to temporary file.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.tests.test_yamlfile.YamlTestBase.nfiles">
+<code class="descname">nfiles</code><a class="headerlink" href="#cis_interface.tests.test_yamlfile.YamlTestBase.nfiles" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>int</em> &#8211; Number of files.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.tests.test_yamlfile.YamlTestBase.setup">
+<code class="descname">setup</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tests/test_yamlfile.html#YamlTestBase.setup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tests.test_yamlfile.YamlTestBase.setup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write contents to temp file.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.tests.test_yamlfile.YamlTestBase.teardown">
+<code class="descname">teardown</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tests/test_yamlfile.html#YamlTestBase.teardown"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tests.test_yamlfile.YamlTestBase.teardown" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove the temporary file if it exists.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.tests.test_yamlfile.YamlTestBase.test_parse_yaml">
+<code class="descname">test_parse_yaml</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tests/test_yamlfile.html#YamlTestBase.test_parse_yaml"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tests.test_yamlfile.YamlTestBase.test_parse_yaml" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test successfully reading &amp; parsing yaml.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.tests.test_yamlfile.YamlTestBase.yaml_env">
+<code class="descname">yaml_env</code><a class="headerlink" href="#cis_interface.tests.test_yamlfile.YamlTestBase.yaml_env" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str</em> &#8211; Environment variable where file path is stored.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.tests.test_yamlfile.YamlTestBaseError">
+<em class="property">class </em><code class="descclassname">cis_interface.tests.test_yamlfile.</code><code class="descname">YamlTestBaseError</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tests/test_yamlfile.html#YamlTestBaseError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tests.test_yamlfile.YamlTestBaseError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.tests.test_yamlfile.YamlTestBase" title="cis_interface.tests.test_yamlfile.YamlTestBase"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.tests.test_yamlfile.YamlTestBase</span></code></a></p>
+<p>Test error for yamlfile.</p>
+<dl class="method">
+<dt id="cis_interface.tests.test_yamlfile.YamlTestBaseError.test_parse_yaml">
+<code class="descname">test_parse_yaml</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tests/test_yamlfile.html#YamlTestBaseError.test_parse_yaml"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tests.test_yamlfile.YamlTestBaseError.test_parse_yaml" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test error reading &amp; parsing yaml.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.tests.test_yamlfile.direct_translate">
+<code class="descclassname">cis_interface.tests.test_yamlfile.</code><code class="descname">direct_translate</code><span class="sig-paren">(</span><em>msg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tests/test_yamlfile.html#direct_translate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tests.test_yamlfile.direct_translate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test translator that just returns passed message.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.tests.test_yamlfile.test_cdriver2filetype_error">
+<code class="descclassname">cis_interface.tests.test_yamlfile.</code><code class="descname">test_cdriver2filetype_error</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tests/test_yamlfile.html#test_cdriver2filetype_error"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tests.test_yamlfile.test_cdriver2filetype_error" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test errors in cdriver2filetype.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.tests.test_yamlfile.test_load_yaml_error">
+<code class="descclassname">cis_interface.tests.test_yamlfile.</code><code class="descname">test_load_yaml_error</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tests/test_yamlfile.html#test_load_yaml_error"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tests.test_yamlfile.test_load_yaml_error" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test error on loading invalid file.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.tests.test_yamlfile.test_parse_component_error">
+<code class="descclassname">cis_interface.tests.test_yamlfile.</code><code class="descname">test_parse_component_error</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tests/test_yamlfile.html#test_parse_component_error"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tests.test_yamlfile.test_parse_component_error" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test errors in parse_component.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-contents">
+<h2>Module contents<a class="headerlink" href="#module-contents" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-cis_interface.tests"></span><p>Testing things.</p>
+<dl class="class">
+<dt id="cis_interface.tests.IOInfo">
+<em class="property">class </em><code class="descclassname">cis_interface.tests.</code><code class="descname">IOInfo</code><a class="reference internal" href="_modules/cis_interface/tests.html#IOInfo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tests.IOInfo" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+<p>Simple class for useful IO attributes.</p>
+<dl class="attribute">
+<dt id="cis_interface.tests.IOInfo.fmt_str">
+<code class="descname">fmt_str</code><a class="headerlink" href="#cis_interface.tests.IOInfo.fmt_str" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str</em> &#8211; Format string for lines of a table.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.tests.IOInfo.file_rows">
+<code class="descname">file_rows</code><a class="headerlink" href="#cis_interface.tests.IOInfo.file_rows" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>list</em> &#8211; List of mock table rows.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.tests.IOInfo.assert_equal_data_dict">
+<code class="descname">assert_equal_data_dict</code><span class="sig-paren">(</span><em>x</em>, <em>y=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tests.html#IOInfo.assert_equal_data_dict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tests.IOInfo.assert_equal_data_dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Assert that the provided object is equivalent to data_dict.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>x</strong> (<em>obj</em>) &#8211; Object to check.</li>
+<li><strong>y</strong> (<em>obj</em><em>, </em><em>optional</em>) &#8211; Object to check against. Defaults to self.data_dict.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#AssertionError" title="(in Python v3.7)"><code class="xref py py-exc docutils literal"><span class="pre">AssertionError</span></code></a> &#8211; If the two are not equal.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.tests.IOInfo.data_dict">
+<code class="descname">data_dict</code><a class="headerlink" href="#cis_interface.tests.IOInfo.data_dict" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>dict</em> &#8211; Mock dictionary of arrays.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.tests.IOInfo.file_array">
+<code class="descname">file_array</code><a class="headerlink" href="#cis_interface.tests.IOInfo.file_array" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>np.ndarray</em> &#8211; Numpy structure array of mock file contents.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.tests.IOInfo.file_contents">
+<code class="descname">file_contents</code><a class="headerlink" href="#cis_interface.tests.IOInfo.file_contents" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str</em> &#8211; Complete contents of mock file.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.tests.IOInfo.file_lines">
+<code class="descname">file_lines</code><a class="headerlink" href="#cis_interface.tests.IOInfo.file_lines" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>list</em> &#8211; Lines in a mock file.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt>
+<code class="descname">file_rows</code></dt>
+<dd><p><em>list</em> &#8211; File rows.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.tests.IOInfo.header_lines">
+<code class="descname">header_lines</code><a class="headerlink" href="#cis_interface.tests.IOInfo.header_lines" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>list</em> &#8211; Lines in a mock file header.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.tests.IOInfo.load_mat">
+<code class="descname">load_mat</code><span class="sig-paren">(</span><em>fd</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tests.html#IOInfo.load_mat"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tests.IOInfo.load_mat" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load mat data from an open file object.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>fd</strong> (<em>file</em>) &#8211; Open file object.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Loaded dictionary of matrices.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.tests.IOInfo.mapfile_contents">
+<code class="descname">mapfile_contents</code><a class="headerlink" href="#cis_interface.tests.IOInfo.mapfile_contents" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>bytes</em> &#8211; The contents of the test ASCII map file.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.tests.IOInfo.mat_data">
+<code class="descname">mat_data</code><a class="headerlink" href="#cis_interface.tests.IOInfo.mat_data" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str</em> &#8211; Mat data.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.tests.IOInfo.maxMsgSize">
+<code class="descname">maxMsgSize</code><a class="headerlink" href="#cis_interface.tests.IOInfo.maxMsgSize" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>int</em> &#8211; Maximum message size.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.tests.IOInfo.msg_long">
+<code class="descname">msg_long</code><a class="headerlink" href="#cis_interface.tests.IOInfo.msg_long" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str</em> &#8211; Small test message for sending.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.tests.IOInfo.msg_short">
+<code class="descname">msg_short</code><a class="headerlink" href="#cis_interface.tests.IOInfo.msg_short" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str</em> &#8211; Small test message for sending.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.tests.IOInfo.obj_file_contents">
+<code class="descname">obj_file_contents</code><a class="headerlink" href="#cis_interface.tests.IOInfo.obj_file_contents" title="Permalink to this definition">¶</a></dt>
+<dd><p>The contents of a file containing the obj data.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.tests.IOInfo.pandas_file_contents">
+<code class="descname">pandas_file_contents</code><a class="headerlink" href="#cis_interface.tests.IOInfo.pandas_file_contents" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str</em> &#8211; Contents of mock Pandas file.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.tests.IOInfo.pandas_frame">
+<code class="descname">pandas_frame</code><a class="headerlink" href="#cis_interface.tests.IOInfo.pandas_frame" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>pandas.DataFrame</em> &#8211; Pandas data frame.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.tests.IOInfo.pickled_data">
+<code class="descname">pickled_data</code><a class="headerlink" href="#cis_interface.tests.IOInfo.pickled_data" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str</em> &#8211; Pickled mock data dictionary.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.tests.IOInfo.ply_file_contents">
+<code class="descname">ply_file_contents</code><a class="headerlink" href="#cis_interface.tests.IOInfo.ply_file_contents" title="Permalink to this definition">¶</a></dt>
+<dd><p>The contents of a file containing the ply data.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.tests.IOInfo.write_map">
+<code class="descname">write_map</code><span class="sig-paren">(</span><em>fname</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tests.html#IOInfo.write_map"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tests.IOInfo.write_map" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write the map dictionary out to a file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>fname</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; Full path to the file that the map should be
+written to.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.tests.IOInfo.write_obj">
+<code class="descname">write_obj</code><span class="sig-paren">(</span><em>fname</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tests.html#IOInfo.write_obj"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tests.IOInfo.write_obj" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write the obj data out to a file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>fname</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; Full path to the file that the obj should be
+written to.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.tests.IOInfo.write_pandas">
+<code class="descname">write_pandas</code><span class="sig-paren">(</span><em>fname</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tests.html#IOInfo.write_pandas"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tests.IOInfo.write_pandas" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write the pandas data frame out to a file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>fname</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; Full path to the file that the pickle should be
+written to.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.tests.IOInfo.write_pickle">
+<code class="descname">write_pickle</code><span class="sig-paren">(</span><em>fname</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tests.html#IOInfo.write_pickle"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tests.IOInfo.write_pickle" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write the pickled table out to a file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>fname</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; Full path to the file that the pickle should be
+written to.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.tests.IOInfo.write_ply">
+<code class="descname">write_ply</code><span class="sig-paren">(</span><em>fname</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tests.html#IOInfo.write_ply"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tests.IOInfo.write_ply" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write the ply data out to a file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>fname</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; Full path to the file that the ply should be
+written to.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.tests.IOInfo.write_table">
+<code class="descname">write_table</code><span class="sig-paren">(</span><em>fname</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tests.html#IOInfo.write_table"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tests.IOInfo.write_table" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write the table out to a file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>fname</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) &#8211; Full path to the file that the table should be
+written to.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.tests.ErrorClass">
+<code class="descclassname">cis_interface.tests.</code><code class="descname">ErrorClass</code><span class="sig-paren">(</span><em>base_class</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tests.html#ErrorClass"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tests.ErrorClass" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wrapper to return errored version of a class.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>base_class</strong> (<em>class</em>) &#8211; Base class to use.</li>
+<li><strong>*args</strong> &#8211; Additional arguments are passed to the class constructor.</li>
+<li><strong>**kwargs</strong> &#8211; Additional keyword arguments are passed to the class
+constructor.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.tests.CisTestBase">
+<em class="property">class </em><code class="descclassname">cis_interface.tests.</code><code class="descname">CisTestBase</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tests.html#CisTestBase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tests.CisTestBase" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">unittest.case.TestCase</span></code></p>
+<p>Wrapper for unittest.TestCase that allows use of nose setup and
+teardown methods along with description prefix.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>description_prefix</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) &#8211; String to prepend docstring
+test message with. Default to empty string.</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="cis_interface.tests.CisTestBase.uuid">
+<code class="descname">uuid</code><a class="headerlink" href="#cis_interface.tests.CisTestBase.uuid" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str</em> &#8211; Random unique identifier.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.tests.CisTestBase.attr_list">
+<code class="descname">attr_list</code><a class="headerlink" href="#cis_interface.tests.CisTestBase.attr_list" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>list</em> &#8211; List of attributes that should be checked for after
+initialization.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.tests.CisTestBase.timeout">
+<code class="descname">timeout</code><a class="headerlink" href="#cis_interface.tests.CisTestBase.timeout" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>float</em> &#8211; Maximum time in seconds for timeouts.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.tests.CisTestBase.sleeptime">
+<code class="descname">sleeptime</code><a class="headerlink" href="#cis_interface.tests.CisTestBase.sleeptime" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>float</em> &#8211; Time in seconds that should be waited for sleeps.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.tests.CisTestBase.cleanup_comm_classes">
+<code class="descname">cleanup_comm_classes</code><a class="headerlink" href="#cis_interface.tests.CisTestBase.cleanup_comm_classes" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>list</em> &#8211; Comm classes that should be cleaned up following the test.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.tests.CisTestBase.cleanup_comms">
+<code class="descname">cleanup_comms</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tests.html#CisTestBase.cleanup_comms"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tests.CisTestBase.cleanup_comms" title="Permalink to this definition">¶</a></dt>
+<dd><p>Cleanup all comms.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.tests.CisTestBase.comm_count">
+<code class="descname">comm_count</code><a class="headerlink" href="#cis_interface.tests.CisTestBase.comm_count" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>int</em> &#8211; The number of comms.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.tests.CisTestBase.debug_log">
+<code class="descname">debug_log</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tests.html#CisTestBase.debug_log"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tests.CisTestBase.debug_log" title="Permalink to this definition">¶</a></dt>
+<dd><p>Turn on debugging.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.tests.CisTestBase.description_prefix">
+<code class="descname">description_prefix</code><a class="headerlink" href="#cis_interface.tests.CisTestBase.description_prefix" title="Permalink to this definition">¶</a></dt>
+<dd><p>String prefix to prepend docstr test message with.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.tests.CisTestBase.fd_count">
+<code class="descname">fd_count</code><a class="headerlink" href="#cis_interface.tests.CisTestBase.fd_count" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>int</em> &#8211; The number of open file descriptors.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.tests.CisTestBase.reset_encoding">
+<code class="descname">reset_encoding</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tests.html#CisTestBase.reset_encoding"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tests.CisTestBase.reset_encoding" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reset the encoding to the original value before the test.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.tests.CisTestBase.reset_log">
+<code class="descname">reset_log</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tests.html#CisTestBase.reset_log"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tests.CisTestBase.reset_log" title="Permalink to this definition">¶</a></dt>
+<dd><p>Resetting logging to prior value.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.tests.CisTestBase.setUp">
+<code class="descname">setUp</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tests.html#CisTestBase.setUp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tests.CisTestBase.setUp" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.tests.CisTestBase.set_utf8_encoding">
+<code class="descname">set_utf8_encoding</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tests.html#CisTestBase.set_utf8_encoding"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tests.CisTestBase.set_utf8_encoding" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the encoding to utf-8 if it is not already.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.tests.CisTestBase.setup">
+<code class="descname">setup</code><span class="sig-paren">(</span><em>nprev_comm=None</em>, <em>nprev_thread=None</em>, <em>nprev_fd=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tests.html#CisTestBase.setup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tests.CisTestBase.setup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Record the number of open comms, threads, and file descriptors.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>nprev_comm</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><em>optional</em>) &#8211; Number of previous comm channels.
+If not provided, it is determined to be the present number of
+default comms.</li>
+<li><strong>nprev_thread</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><em>optional</em>) &#8211; Number of previous threads.
+If not provided, it is determined to be the present number of
+threads.</li>
+<li><strong>nprev_fd</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><em>optional</em>) &#8211; Number of previous open file descriptors.
+If not provided, it is determined to be the present number of
+open file descriptors.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.tests.CisTestBase.shortDescription">
+<code class="descname">shortDescription</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tests.html#CisTestBase.shortDescription"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tests.CisTestBase.shortDescription" title="Permalink to this definition">¶</a></dt>
+<dd><p>Prefix first line of doc string.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.tests.CisTestBase.tearDown">
+<code class="descname">tearDown</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tests.html#CisTestBase.tearDown"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tests.CisTestBase.tearDown" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.tests.CisTestBase.teardown">
+<code class="descname">teardown</code><span class="sig-paren">(</span><em>ncurr_comm=None</em>, <em>ncurr_thread=None</em>, <em>ncurr_fd=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tests.html#CisTestBase.teardown"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tests.CisTestBase.teardown" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check the number of open comms, threads, and file descriptors.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>ncurr_comm</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><em>optional</em>) &#8211; Number of current comms. If not
+provided, it is determined to be the present number of comms.</li>
+<li><strong>ncurr_thread</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><em>optional</em>) &#8211; Number of current threads. If not
+provided, it is determined to be the present number of threads.</li>
+<li><strong>ncurr_fd</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><em>optional</em>) &#8211; Number of current open file descriptors.
+If not provided, it is determined to be the present number of
+open file descriptors.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.tests.CisTestBase.thread_count">
+<code class="descname">thread_count</code><a class="headerlink" href="#cis_interface.tests.CisTestBase.thread_count" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>int</em> &#8211; The number of active threads.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.tests.CisTestClass">
+<em class="property">class </em><code class="descclassname">cis_interface.tests.</code><code class="descname">CisTestClass</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tests.html#CisTestClass"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tests.CisTestClass" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.tests.CisTestBase" title="cis_interface.tests.CisTestBase"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.tests.CisTestBase</span></code></a></p>
+<p>Test class for a CisClass.</p>
+<dl class="attribute">
+<dt id="cis_interface.tests.CisTestClass.cls">
+<code class="descname">cls</code><a class="headerlink" href="#cis_interface.tests.CisTestClass.cls" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str</em> &#8211; Class to be tested.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.tests.CisTestClass.create_instance">
+<code class="descname">create_instance</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tests.html#CisTestClass.create_instance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tests.CisTestClass.create_instance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a new instance of the class.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.tests.CisTestClass.description_prefix">
+<code class="descname">description_prefix</code><a class="headerlink" href="#cis_interface.tests.CisTestClass.description_prefix" title="Permalink to this definition">¶</a></dt>
+<dd><p>String prefix to prepend docstr test message with.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.tests.CisTestClass.import_cls">
+<code class="descname">import_cls</code><a class="headerlink" href="#cis_interface.tests.CisTestClass.import_cls" title="Permalink to this definition">¶</a></dt>
+<dd><p>Import the tested class from its module</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.tests.CisTestClass.inst_args">
+<code class="descname">inst_args</code><a class="headerlink" href="#cis_interface.tests.CisTestClass.inst_args" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>list</em> &#8211; Arguments for creating a class instance.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.tests.CisTestClass.inst_kwargs">
+<code class="descname">inst_kwargs</code><a class="headerlink" href="#cis_interface.tests.CisTestClass.inst_kwargs" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>dict</em> &#8211; Keyword arguments for creating a class instance.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.tests.CisTestClass.instance">
+<code class="descname">instance</code><a class="headerlink" href="#cis_interface.tests.CisTestClass.instance" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>object</em> &#8211; Instance of the test driver.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.tests.CisTestClass.mod">
+<code class="descname">mod</code><a class="headerlink" href="#cis_interface.tests.CisTestClass.mod" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str</em> &#8211; Absolute name of module containing class to be tested.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.tests.CisTestClass.remove_instance">
+<code class="descname">remove_instance</code><span class="sig-paren">(</span><em>inst</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tests.html#CisTestClass.remove_instance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tests.CisTestClass.remove_instance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove an instance of the class.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.tests.CisTestClass.setup">
+<code class="descname">setup</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tests.html#CisTestClass.setup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tests.CisTestClass.setup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create an instance of the class.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.tests.CisTestClass.teardown">
+<code class="descname">teardown</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tests.html#CisTestClass.teardown"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tests.CisTestClass.teardown" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove the instance.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.tests.CisTestClassInfo">
+<em class="property">class </em><code class="descclassname">cis_interface.tests.</code><code class="descname">CisTestClassInfo</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/tests.html#CisTestClassInfo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.tests.CisTestClassInfo" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.tests.CisTestClass" title="cis_interface.tests.CisTestClass"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.tests.CisTestClass</span></code></a>, <a class="reference internal" href="#cis_interface.tests.IOInfo" title="cis_interface.tests.IOInfo"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.tests.IOInfo</span></code></a></p>
+<p>Test class for a CisClass with IOInfo available.</p>
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Meagan Lang, David Raila.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.4+0.gd8a2a4f.dirty',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          
+          SphinxRtdTheme.Navigation.enableSticky();
+          
+      });
+  </script> 
+
+</body>
+</html>

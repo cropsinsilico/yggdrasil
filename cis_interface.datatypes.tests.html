@@ -1,0 +1,501 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>cis_interface.datatypes.tests package &mdash; cis_interface 0.4+0.gd8a2a4f.dirty documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> cis_interface
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.4+0.gd8a2a4f.dirty
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="includeme.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="formatted_io.html">Formatted I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="server_client_io.html">Server/Client I/O</a></li>
+<li class="toctree-l1"><a class="reference internal" href="server_client_io.html#one-server-two-clients">One Server, Two Clients</a></li>
+<li class="toctree-l1"><a class="reference internal" href="yaml.html">YAML Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="config.html">Configuration Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="units.html">Units</a></li>
+<li class="toctree-l1"><a class="reference internal" href="c_format_strings.html">C-Style Format Strings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="io_drivers.html">Input/Output Drivers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="model_drivers.html">Model Drivers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="code.html">Code</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/examples_toc.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="release.html">Release Steps</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">cis_interface</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>cis_interface.datatypes.tests package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/cis_interface.datatypes.tests.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="cis-interface-datatypes-tests-package">
+<h1>cis_interface.datatypes.tests package<a class="headerlink" href="#cis-interface-datatypes-tests-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-cis_interface.datatypes.tests.test_CisArrayType">
+<span id="cis-interface-datatypes-tests-test-cisarraytype-module"></span><h2>cis_interface.datatypes.tests.test_CisArrayType module<a class="headerlink" href="#module-cis_interface.datatypes.tests.test_CisArrayType" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="cis_interface.datatypes.tests.test_CisArrayType.TestCis1DArrayType">
+<em class="property">class </em><code class="descclassname">cis_interface.datatypes.tests.test_CisArrayType.</code><code class="descname">TestCis1DArrayType</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/datatypes/tests/test_CisArrayType.html#TestCis1DArrayType"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.datatypes.tests.test_CisArrayType.TestCis1DArrayType" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.datatypes.tests.test_CisArrayType.TestCisScalarType" title="cis_interface.datatypes.tests.test_CisArrayType.TestCisScalarType"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.datatypes.tests.test_CisArrayType.TestCisScalarType</span></code></a></p>
+<p>Test class for CisArrayType class.</p>
+<dl class="method">
+<dt id="cis_interface.datatypes.tests.test_CisArrayType.TestCis1DArrayType.assert_result_equal">
+<code class="descname">assert_result_equal</code><span class="sig-paren">(</span><em>x</em>, <em>y</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/datatypes/tests/test_CisArrayType.html#TestCis1DArrayType.assert_result_equal"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.datatypes.tests.test_CisArrayType.TestCis1DArrayType.assert_result_equal" title="Permalink to this definition">¶</a></dt>
+<dd><p>Assert that serialized/deserialized objects equal.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.datatypes.tests.test_CisArrayType.TestCisNDArrayType">
+<em class="property">class </em><code class="descclassname">cis_interface.datatypes.tests.test_CisArrayType.</code><code class="descname">TestCisNDArrayType</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/datatypes/tests/test_CisArrayType.html#TestCisNDArrayType"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.datatypes.tests.test_CisArrayType.TestCisNDArrayType" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.datatypes.tests.test_CisArrayType.TestCisScalarType" title="cis_interface.datatypes.tests.test_CisArrayType.TestCisScalarType"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.datatypes.tests.test_CisArrayType.TestCisScalarType</span></code></a></p>
+<p>Test class for CisArrayType class with 2D array.</p>
+<dl class="method">
+<dt id="cis_interface.datatypes.tests.test_CisArrayType.TestCisNDArrayType.assert_result_equal">
+<code class="descname">assert_result_equal</code><span class="sig-paren">(</span><em>x</em>, <em>y</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/datatypes/tests/test_CisArrayType.html#TestCisNDArrayType.assert_result_equal"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.datatypes.tests.test_CisArrayType.TestCisNDArrayType.assert_result_equal" title="Permalink to this definition">¶</a></dt>
+<dd><p>Assert that serialized/deserialized objects equal.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.datatypes.tests.test_CisArrayType.TestCisScalarType">
+<em class="property">class </em><code class="descclassname">cis_interface.datatypes.tests.test_CisArrayType.</code><code class="descname">TestCisScalarType</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/datatypes/tests/test_CisArrayType.html#TestCisScalarType"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.datatypes.tests.test_CisArrayType.TestCisScalarType" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.datatypes.tests.test_CisBaseType.TestCisBaseType" title="cis_interface.datatypes.tests.test_CisBaseType.TestCisBaseType"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.datatypes.tests.test_CisBaseType.TestCisBaseType</span></code></a></p>
+<p>Test class for CisScalarType class with float.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.datatypes.tests.test_CisArrayType.TestCisScalarType_complex">
+<em class="property">class </em><code class="descclassname">cis_interface.datatypes.tests.test_CisArrayType.</code><code class="descname">TestCisScalarType_complex</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/datatypes/tests/test_CisArrayType.html#TestCisScalarType_complex"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.datatypes.tests.test_CisArrayType.TestCisScalarType_complex" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.datatypes.tests.test_CisArrayType.TestCisScalarType" title="cis_interface.datatypes.tests.test_CisArrayType.TestCisScalarType"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.datatypes.tests.test_CisArrayType.TestCisScalarType</span></code></a></p>
+<p>Test class for CisScalarType class with complex.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.datatypes.tests.test_CisArrayType.TestCisScalarType_int">
+<em class="property">class </em><code class="descclassname">cis_interface.datatypes.tests.test_CisArrayType.</code><code class="descname">TestCisScalarType_int</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/datatypes/tests/test_CisArrayType.html#TestCisScalarType_int"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.datatypes.tests.test_CisArrayType.TestCisScalarType_int" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.datatypes.tests.test_CisArrayType.TestCisScalarType" title="cis_interface.datatypes.tests.test_CisArrayType.TestCisScalarType"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.datatypes.tests.test_CisArrayType.TestCisScalarType</span></code></a></p>
+<p>Test class for CisScalarType class with int.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.datatypes.tests.test_CisArrayType.TestCisScalarType_prec">
+<em class="property">class </em><code class="descclassname">cis_interface.datatypes.tests.test_CisArrayType.</code><code class="descname">TestCisScalarType_prec</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/datatypes/tests/test_CisArrayType.html#TestCisScalarType_prec"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.datatypes.tests.test_CisArrayType.TestCisScalarType_prec" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.datatypes.tests.test_CisArrayType.TestCisScalarType" title="cis_interface.datatypes.tests.test_CisArrayType.TestCisScalarType"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.datatypes.tests.test_CisArrayType.TestCisScalarType</span></code></a></p>
+<p>Test class for CisScalarType class with precision.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.datatypes.tests.test_CisArrayType.TestCisScalarType_string">
+<em class="property">class </em><code class="descclassname">cis_interface.datatypes.tests.test_CisArrayType.</code><code class="descname">TestCisScalarType_string</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/datatypes/tests/test_CisArrayType.html#TestCisScalarType_string"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.datatypes.tests.test_CisArrayType.TestCisScalarType_string" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.datatypes.tests.test_CisArrayType.TestCisScalarType" title="cis_interface.datatypes.tests.test_CisArrayType.TestCisScalarType"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.datatypes.tests.test_CisArrayType.TestCisScalarType</span></code></a></p>
+<p>Test class for CisScalarType class with string.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.datatypes.tests.test_CisArrayType.TestCisScalarType_uint">
+<em class="property">class </em><code class="descclassname">cis_interface.datatypes.tests.test_CisArrayType.</code><code class="descname">TestCisScalarType_uint</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/datatypes/tests/test_CisArrayType.html#TestCisScalarType_uint"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.datatypes.tests.test_CisArrayType.TestCisScalarType_uint" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.datatypes.tests.test_CisArrayType.TestCisScalarType" title="cis_interface.datatypes.tests.test_CisArrayType.TestCisScalarType"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.datatypes.tests.test_CisArrayType.TestCisScalarType</span></code></a></p>
+<p>Test class for CisScalarType class with uint.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.datatypes.tests.test_CisArrayType.TestCisScalarType_units">
+<em class="property">class </em><code class="descclassname">cis_interface.datatypes.tests.test_CisArrayType.</code><code class="descname">TestCisScalarType_units</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/datatypes/tests/test_CisArrayType.html#TestCisScalarType_units"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.datatypes.tests.test_CisArrayType.TestCisScalarType_units" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.datatypes.tests.test_CisArrayType.TestCisScalarType" title="cis_interface.datatypes.tests.test_CisArrayType.TestCisScalarType"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.datatypes.tests.test_CisArrayType.TestCisScalarType</span></code></a></p>
+<p>Test class for CisScalarType class with units.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-cis_interface.datatypes.tests.test_CisBaseType">
+<span id="cis-interface-datatypes-tests-test-cisbasetype-module"></span><h2>cis_interface.datatypes.tests.test_CisBaseType module<a class="headerlink" href="#module-cis_interface.datatypes.tests.test_CisBaseType" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="cis_interface.datatypes.tests.test_CisBaseType.CisErrorType">
+<em class="property">class </em><code class="descclassname">cis_interface.datatypes.tests.test_CisBaseType.</code><code class="descname">CisErrorType</code><span class="sig-paren">(</span><em>**typedef</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/datatypes/tests/test_CisBaseType.html#CisErrorType"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.datatypes.tests.test_CisBaseType.CisErrorType" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="cis_interface.datatypes.html#cis_interface.datatypes.CisBaseType.CisBaseType" title="cis_interface.datatypes.CisBaseType.CisBaseType"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.datatypes.CisBaseType.CisBaseType</span></code></a></p>
+<p>Class with impropert user defined methods.</p>
+<dl class="classmethod">
+<dt id="cis_interface.datatypes.tests.test_CisBaseType.CisErrorType.check_decoded">
+<em class="property">classmethod </em><code class="descname">check_decoded</code><span class="sig-paren">(</span><em>obj</em>, <em>typedef=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/datatypes/tests/test_CisBaseType.html#CisErrorType.check_decoded"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.datatypes.tests.test_CisBaseType.CisErrorType.check_decoded" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return constant.</p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="cis_interface.datatypes.tests.test_CisBaseType.CisErrorType.check_encoded">
+<em class="property">classmethod </em><code class="descname">check_encoded</code><span class="sig-paren">(</span><em>metadata</em>, <em>typedef=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/datatypes/tests/test_CisBaseType.html#CisErrorType.check_encoded"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.datatypes.tests.test_CisBaseType.CisErrorType.check_encoded" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return constant.</p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="cis_interface.datatypes.tests.test_CisBaseType.CisErrorType.decode_data">
+<em class="property">classmethod </em><code class="descname">decode_data</code><span class="sig-paren">(</span><em>obj</em>, <em>typedef</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/datatypes/tests/test_CisBaseType.html#CisErrorType.decode_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.datatypes.tests.test_CisBaseType.CisErrorType.decode_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Decode data.</p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="cis_interface.datatypes.tests.test_CisBaseType.CisErrorType.encode_data">
+<em class="property">classmethod </em><code class="descname">encode_data</code><span class="sig-paren">(</span><em>obj</em>, <em>typedef</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/datatypes/tests/test_CisBaseType.html#CisErrorType.encode_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.datatypes.tests.test_CisBaseType.CisErrorType.encode_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Encode data.</p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="cis_interface.datatypes.tests.test_CisBaseType.CisErrorType.encode_type">
+<em class="property">classmethod </em><code class="descname">encode_type</code><span class="sig-paren">(</span><em>obj</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/datatypes/tests/test_CisBaseType.html#CisErrorType.encode_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.datatypes.tests.test_CisBaseType.CisErrorType.encode_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Encode type.</p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="cis_interface.datatypes.tests.test_CisBaseType.CisErrorType.transform_type">
+<em class="property">classmethod </em><code class="descname">transform_type</code><span class="sig-paren">(</span><em>obj</em>, <em>typedef=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/datatypes/tests/test_CisBaseType.html#CisErrorType.transform_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.datatypes.tests.test_CisBaseType.CisErrorType.transform_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Transform an object based on type info.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.datatypes.tests.test_CisBaseType.CisErrorType_decode">
+<em class="property">class </em><code class="descclassname">cis_interface.datatypes.tests.test_CisBaseType.</code><code class="descname">CisErrorType_decode</code><span class="sig-paren">(</span><em>**typedef</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/datatypes/tests/test_CisBaseType.html#CisErrorType_decode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.datatypes.tests.test_CisBaseType.CisErrorType_decode" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.datatypes.tests.test_CisBaseType.CisErrorType" title="cis_interface.datatypes.tests.test_CisBaseType.CisErrorType"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.datatypes.tests.test_CisBaseType.CisErrorType</span></code></a></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.datatypes.tests.test_CisBaseType.CisErrorType_encode">
+<em class="property">class </em><code class="descclassname">cis_interface.datatypes.tests.test_CisBaseType.</code><code class="descname">CisErrorType_encode</code><span class="sig-paren">(</span><em>**typedef</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/datatypes/tests/test_CisBaseType.html#CisErrorType_encode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.datatypes.tests.test_CisBaseType.CisErrorType_encode" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#cis_interface.datatypes.tests.test_CisBaseType.CisErrorType" title="cis_interface.datatypes.tests.test_CisBaseType.CisErrorType"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.datatypes.tests.test_CisBaseType.CisErrorType</span></code></a></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="cis_interface.datatypes.tests.test_CisBaseType.TestCisBaseType">
+<em class="property">class </em><code class="descclassname">cis_interface.datatypes.tests.test_CisBaseType.</code><code class="descname">TestCisBaseType</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/datatypes/tests/test_CisBaseType.html#TestCisBaseType"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.datatypes.tests.test_CisBaseType.TestCisBaseType" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="cis_interface.tests.html#cis_interface.tests.CisTestClassInfo" title="cis_interface.tests.CisTestClassInfo"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.tests.CisTestClassInfo</span></code></a></p>
+<p>Test class for CisBaseType class.</p>
+<dl class="method">
+<dt id="cis_interface.datatypes.tests.test_CisBaseType.TestCisBaseType.assert_result_equal">
+<code class="descname">assert_result_equal</code><span class="sig-paren">(</span><em>x</em>, <em>y</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/datatypes/tests/test_CisBaseType.html#TestCisBaseType.assert_result_equal"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.datatypes.tests.test_CisBaseType.TestCisBaseType.assert_result_equal" title="Permalink to this definition">¶</a></dt>
+<dd><p>Assert that serialized/deserialized objects equal.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.datatypes.tests.test_CisBaseType.TestCisBaseType.inst_kwargs">
+<code class="descname">inst_kwargs</code><a class="headerlink" href="#cis_interface.datatypes.tests.test_CisBaseType.TestCisBaseType.inst_kwargs" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>dict</em> &#8211; Keyword arguments for creating a class instance.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.datatypes.tests.test_CisBaseType.TestCisBaseType.mod">
+<code class="descname">mod</code><a class="headerlink" href="#cis_interface.datatypes.tests.test_CisBaseType.TestCisBaseType.mod" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str</em> &#8211; Absolute name of module containing class to be tested.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.datatypes.tests.test_CisBaseType.TestCisBaseType.test_check_decoded">
+<code class="descname">test_check_decoded</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/datatypes/tests/test_CisBaseType.html#TestCisBaseType.test_check_decoded"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.datatypes.tests.test_CisBaseType.TestCisBaseType.test_check_decoded" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test check_decoded.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.datatypes.tests.test_CisBaseType.TestCisBaseType.test_check_encoded">
+<code class="descname">test_check_encoded</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/datatypes/tests/test_CisBaseType.html#TestCisBaseType.test_check_encoded"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.datatypes.tests.test_CisBaseType.TestCisBaseType.test_check_encoded" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test check_encoded.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.datatypes.tests.test_CisBaseType.TestCisBaseType.test_decode_errors">
+<code class="descname">test_decode_errors</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/datatypes/tests/test_CisBaseType.html#TestCisBaseType.test_decode_errors"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.datatypes.tests.test_CisBaseType.TestCisBaseType.test_decode_errors" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test error on decode.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.datatypes.tests.test_CisBaseType.TestCisBaseType.test_definition_schema">
+<code class="descname">test_definition_schema</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/datatypes/tests/test_CisBaseType.html#TestCisBaseType.test_definition_schema"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.datatypes.tests.test_CisBaseType.TestCisBaseType.test_definition_schema" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test definition schema.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.datatypes.tests.test_CisBaseType.TestCisBaseType.test_deserialize_empty">
+<code class="descname">test_deserialize_empty</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/datatypes/tests/test_CisBaseType.html#TestCisBaseType.test_deserialize_empty"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.datatypes.tests.test_CisBaseType.TestCisBaseType.test_deserialize_empty" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test call for empty string.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.datatypes.tests.test_CisBaseType.TestCisBaseType.test_deserialize_error">
+<code class="descname">test_deserialize_error</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/datatypes/tests/test_CisBaseType.html#TestCisBaseType.test_deserialize_error"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.datatypes.tests.test_CisBaseType.TestCisBaseType.test_deserialize_error" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test error when deserializing message that is not bytes.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.datatypes.tests.test_CisBaseType.TestCisBaseType.test_encode_data">
+<code class="descname">test_encode_data</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/datatypes/tests/test_CisBaseType.html#TestCisBaseType.test_encode_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.datatypes.tests.test_CisBaseType.TestCisBaseType.test_encode_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test encode/decode data &amp; type.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.datatypes.tests.test_CisBaseType.TestCisBaseType.test_encode_errors">
+<code class="descname">test_encode_errors</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/datatypes/tests/test_CisBaseType.html#TestCisBaseType.test_encode_errors"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.datatypes.tests.test_CisBaseType.TestCisBaseType.test_encode_errors" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test error on encode.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.datatypes.tests.test_CisBaseType.TestCisBaseType.test_metadata_schema">
+<code class="descname">test_metadata_schema</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/datatypes/tests/test_CisBaseType.html#TestCisBaseType.test_metadata_schema"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.datatypes.tests.test_CisBaseType.TestCisBaseType.test_metadata_schema" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test metadata schema.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.datatypes.tests.test_CisBaseType.TestCisBaseType.test_serialize">
+<code class="descname">test_serialize</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/datatypes/tests/test_CisBaseType.html#TestCisBaseType.test_serialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.datatypes.tests.test_CisBaseType.TestCisBaseType.test_serialize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test serialize/deserialize.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cis_interface.datatypes.tests.test_CisBaseType.TestCisBaseType.test_transform_type">
+<code class="descname">test_transform_type</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/datatypes/tests/test_CisBaseType.html#TestCisBaseType.test_transform_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.datatypes.tests.test_CisBaseType.TestCisBaseType.test_transform_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test transform_type.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cis_interface.datatypes.tests.test_CisBaseType.TestCisBaseType.typedef">
+<code class="descname">typedef</code><a class="headerlink" href="#cis_interface.datatypes.tests.test_CisBaseType.TestCisBaseType.typedef" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>dict</em> &#8211; Type definition.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.datatypes.tests.test_CisBaseType.test_decode_error_decoded">
+<code class="descclassname">cis_interface.datatypes.tests.test_CisBaseType.</code><code class="descname">test_decode_error_decoded</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/datatypes/tests/test_CisBaseType.html#test_decode_error_decoded"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.datatypes.tests.test_CisBaseType.test_decode_error_decoded" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test error in decode for failed decode_data.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.datatypes.tests.test_CisBaseType.test_encode_error_bytes">
+<code class="descclassname">cis_interface.datatypes.tests.test_CisBaseType.</code><code class="descname">test_encode_error_bytes</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/datatypes/tests/test_CisBaseType.html#test_encode_error_bytes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.datatypes.tests.test_CisBaseType.test_encode_error_bytes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test error in encode for encode that dosn&#8217;t produce bytes.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.datatypes.tests.test_CisBaseType.test_encode_error_encoded">
+<code class="descclassname">cis_interface.datatypes.tests.test_CisBaseType.</code><code class="descname">test_encode_error_encoded</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/datatypes/tests/test_CisBaseType.html#test_encode_error_encoded"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.datatypes.tests.test_CisBaseType.test_encode_error_encoded" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test error in encode for failed encode_data.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-cis_interface.datatypes.tests">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-cis_interface.datatypes.tests" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="cis_interface.datatypes.tests.test_error_duplicate">
+<code class="descclassname">cis_interface.datatypes.tests.</code><code class="descname">test_error_duplicate</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/datatypes/tests.html#test_error_duplicate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.datatypes.tests.test_error_duplicate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test error in register_type for duplicate.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="cis_interface.datatypes.tests.test_get_type_class">
+<code class="descclassname">cis_interface.datatypes.tests.</code><code class="descname">test_get_type_class</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/datatypes/tests.html#test_get_type_class"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.datatypes.tests.test_get_type_class" title="Permalink to this definition">¶</a></dt>
+<dd><p>Test get_type_class.</p>
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Meagan Lang, David Raila.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.4+0.gd8a2a4f.dirty',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          
+          SphinxRtdTheme.Navigation.enableSticky();
+          
+      });
+  </script> 
+
+</body>
+</html>

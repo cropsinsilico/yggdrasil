@@ -1,0 +1,30 @@
+cis_interface.datatypes.tests package
+=====================================
+
+Submodules
+----------
+
+cis_interface.datatypes.tests.test_CisArrayType module
+------------------------------------------------------
+
+.. automodule:: cis_interface.datatypes.tests.test_CisArrayType
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+cis_interface.datatypes.tests.test_CisBaseType module
+-----------------------------------------------------
+
+.. automodule:: cis_interface.datatypes.tests.test_CisBaseType
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: cis_interface.datatypes.tests
+    :members:
+    :undoc-members:
+    :show-inheritance:

@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>cis_interface.serialize.DefaultSerialize &mdash; cis_interface 0.3.0 documentation</title>
+  <title>cis_interface.serialize.DefaultSerialize &mdash; cis_interface 0.4+0.gd8a2a4f.dirty documentation</title>
   
 
   
@@ -24,7 +24,8 @@
 
   
 
-  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/theme_overrides.css" type="text/css" />
     <link rel="index" title="Index" href="../../../genindex.html" />
@@ -57,7 +58,7 @@
             
             
               <div class="version">
-                0.3
+                0.4+0.gd8a2a4f.dirty
               </div>
             
           
@@ -98,6 +99,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../code.html">Code</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../examples/examples_toc.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../release.html">Release Steps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../release.html#docs-checkout">Docs Checkout</a></li>
 </ul>
 
             
@@ -171,7 +173,7 @@
 
 
 <div class="viewcode-block" id="DefaultSerialize"><a class="viewcode-back" href="../../../cis_interface.serialize.html#cis_interface.serialize.DefaultSerialize.DefaultSerialize">[docs]</a><span class="k">class</span> <span class="nc">DefaultSerialize</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Default class for serializing/deserializing a python object into/from</span>
+    <span class="sd">r&quot;&quot;&quot;Default class for serializing/deserializing a python object into/from</span>
 <span class="sd">    a bytes message.</span>
 
 <span class="sd">    Args:</span>
@@ -237,24 +239,24 @@
     <span class="c1">#     return cls</span>
 
 <div class="viewcode-block" id="DefaultSerialize.__getattribute__"><a class="viewcode-back" href="../../../cis_interface.serialize.html#cis_interface.serialize.DefaultSerialize.DefaultSerialize.__getattribute__">[docs]</a>    <span class="k">def</span> <span class="nf">__getattribute__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Return alias result if there is one.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;Return alias result if there is one.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;_alias&#39;</span><span class="p">:</span>
-            <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">DefaultSerialize</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__getattribute__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+            <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">DefaultSerialize</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__getattribute__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_alias&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">DefaultSerialize</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__getattribute__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+            <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">DefaultSerialize</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__getattribute__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_alias</span><span class="o">.</span><span class="fm">__getattribute__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span></div>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_alias</span><span class="o">.</span><span class="n">__getattribute__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span></div>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">is_user_defined</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;bool: True if serialization or deserialization function was user</span>
+        <span class="sd">r&quot;&quot;&quot;bool: True if serialization or deserialization function was user</span>
 <span class="sd">        defined.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">_func_serialize</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span>
                 <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_func_deserialize</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">))</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">serializer_type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: Type of serializer.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;int: Type of serializer.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_user_defined</span><span class="p">:</span>
             <span class="n">out</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">format_str</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -267,7 +269,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">empty_msg</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;obj: Object indicating empty message.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;obj: Object indicating empty message.&quot;&quot;&quot;</span>
         <span class="n">stype</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">serializer_type</span>
         <span class="k">if</span> <span class="n">stype</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">out</span> <span class="o">=</span> <span class="n">backwards</span><span class="o">.</span><span class="n">unicode2bytes</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
@@ -277,7 +279,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">serializer_info</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;dict: Information about serializer required to reconstruct it.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;dict: Information about serializer required to reconstruct it.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_user_defined</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Cannot get serializer info for user &quot;</span> <span class="o">+</span>
                                <span class="s2">&quot;defined functions.&quot;</span><span class="p">)</span>
@@ -294,32 +296,32 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">field_formats</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;list: Format codes for each field in the format string.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;list: Format codes for each field in the format string.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">format_str</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="p">[]</span>
         <span class="k">return</span> <span class="n">serialize</span><span class="o">.</span><span class="n">extract_formats</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">format_str</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">nfields</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;int: Number of fields in the format string.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;int: Number of fields in the format string.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">field_formats</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">numpy_dtype</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;np.dtype: Data type associated with the format string.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;np.dtype: Data type associated with the format string.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">format_str</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">None</span>
         <span class="k">return</span> <span class="n">serialize</span><span class="o">.</span><span class="n">cformat2nptype</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">format_str</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">field_names</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">scanf_format_str</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;str: Simplified format string for scanf.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;str: Simplified format string for scanf.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">format_str</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">None</span>
         <span class="k">return</span> <span class="n">serialize</span><span class="o">.</span><span class="n">cformat2pyscanf</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">format_str</span><span class="p">)</span>
         
 <div class="viewcode-block" id="DefaultSerialize.func_serialize"><a class="viewcode-back" href="../../../cis_interface.serialize.html#cis_interface.serialize.DefaultSerialize.DefaultSerialize.func_serialize">[docs]</a>    <span class="k">def</span> <span class="nf">func_serialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Default method for serializing object into message.</span>
+        <span class="sd">r&quot;&quot;&quot;Default method for serializing object into message.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            args (obj): List of arguments to be formatted or a ready made message.</span>
@@ -353,7 +355,7 @@
         <span class="k">return</span> <span class="n">out</span></div>
 
 <div class="viewcode-block" id="DefaultSerialize.func_deserialize"><a class="viewcode-back" href="../../../cis_interface.serialize.html#cis_interface.serialize.DefaultSerialize.DefaultSerialize.func_deserialize">[docs]</a>    <span class="k">def</span> <span class="nf">func_deserialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Default method for deseserializing a message.</span>
+        <span class="sd">r&quot;&quot;&quot;Default method for deseserializing a message.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            msg (str, bytes): Message to be deserialized.</span>
@@ -381,7 +383,7 @@
         <span class="k">return</span> <span class="n">out</span></div>
 
 <div class="viewcode-block" id="DefaultSerialize.serialize"><a class="viewcode-back" href="../../../cis_interface.serialize.html#cis_interface.serialize.DefaultSerialize.DefaultSerialize.serialize">[docs]</a>    <span class="k">def</span> <span class="nf">serialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">header_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">add_serializer_info</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Serialize a message.</span>
+        <span class="sd">r&quot;&quot;&quot;Serialize a message.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            args (obj): List of arguments to be formatted or a ready made message.</span>
@@ -416,7 +418,7 @@
         <span class="k">return</span> <span class="n">out</span></div>
 
 <div class="viewcode-block" id="DefaultSerialize.update_from_message"><a class="viewcode-back" href="../../../cis_interface.serialize.html#cis_interface.serialize.DefaultSerialize.DefaultSerialize.update_from_message">[docs]</a>    <span class="k">def</span> <span class="nf">update_from_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Update serializer information based on the message.</span>
+        <span class="sd">r&quot;&quot;&quot;Update serializer information based on the message.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            msg (obj): Python object being sent as a message.</span>
@@ -427,7 +429,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">update_serializer</span><span class="p">(</span><span class="o">**</span><span class="n">sinfo</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="DefaultSerialize.update_serializer"><a class="viewcode-back" href="../../../cis_interface.serialize.html#cis_interface.serialize.DefaultSerialize.DefaultSerialize.update_serializer">[docs]</a>    <span class="k">def</span> <span class="nf">update_serializer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Update serializer with provided information.&quot;&quot;&quot;</span>
+        <span class="sd">r&quot;&quot;&quot;Update serializer with provided information.&quot;&quot;&quot;</span>
         <span class="n">key_list</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;format_str&#39;</span><span class="p">,</span> <span class="s1">&#39;as_array&#39;</span><span class="p">,</span> <span class="s1">&#39;field_names&#39;</span><span class="p">,</span> <span class="s1">&#39;field_units&#39;</span><span class="p">]</span>
         <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">key_list</span><span class="p">:</span>
             <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">)))</span>
@@ -440,7 +442,7 @@
                 <span class="k">assert</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">serializer_type</span> <span class="o">==</span> <span class="n">stype</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="DefaultSerialize.deserialize"><a class="viewcode-back" href="../../../cis_interface.serialize.html#cis_interface.serialize.DefaultSerialize.DefaultSerialize.deserialize">[docs]</a>    <span class="k">def</span> <span class="nf">deserialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Deserialize a message.</span>
+        <span class="sd">r&quot;&quot;&quot;Deserialize a message.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            msg (str, bytes): Message to be deserialized.</span>
@@ -470,7 +472,7 @@
         <span class="k">return</span> <span class="n">out</span><span class="p">,</span> <span class="n">header_info</span></div>
 
 <div class="viewcode-block" id="DefaultSerialize.format_header"><a class="viewcode-back" href="../../../cis_interface.serialize.html#cis_interface.serialize.DefaultSerialize.DefaultSerialize.format_header">[docs]</a>    <span class="k">def</span> <span class="nf">format_header</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">header_info</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Format header info to form a string that should prepend a message.</span>
+        <span class="sd">r&quot;&quot;&quot;Format header info to form a string that should prepend a message.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            header_info (dict): Properties that should be included in the header.</span>
@@ -497,7 +499,7 @@
         <span class="k">return</span> <span class="n">backwards</span><span class="o">.</span><span class="n">unicode2bytes</span><span class="p">(</span><span class="n">header</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="DefaultSerialize.parse_header"><a class="viewcode-back" href="../../../cis_interface.serialize.html#cis_interface.serialize.DefaultSerialize.DefaultSerialize.parse_header">[docs]</a>    <span class="k">def</span> <span class="nf">parse_header</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Extract header info from a message.</span>
+        <span class="sd">r&quot;&quot;&quot;Extract header info from a message.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            msg (str): Message to extract header from.</span>
@@ -560,7 +562,7 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../../../',
-            VERSION:'0.3.0',
+            VERSION:'0.4+0.gd8a2a4f.dirty',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
@@ -571,15 +573,20 @@
       <script type="text/javascript" src="../../../_static/jquery.js"></script>
       <script type="text/javascript" src="../../../_static/underscore.js"></script>
       <script type="text/javascript" src="../../../_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 
   
 
-  <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
 
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.Navigation.enable(true);
+          
+          SphinxRtdTheme.Navigation.enableSticky();
+          
       });
   </script> 
 

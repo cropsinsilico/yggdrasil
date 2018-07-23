@@ -1,4 +1,4 @@
-.. _server_client_io_rst
+.. _server_client_io_rst:
 
 Server/Client I/O
 =================
