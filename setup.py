@@ -51,19 +51,19 @@ update_coveragerc.update_coveragerc()
 
 
 # Create .rst README from .md and get long description
-try:
-    import pypandoc
-    pypandoc.convert_file('README.md', 'rst', outputfile='README.rst')
-    long_description = pypandoc.convert_file('README.md', 'rst')
-except (ImportError, IOError):
-    if os.path.isfile('README.rst'):
-        with open('README.rst', 'r') as file:
-            long_description = file.read()
-    elif os.path.isfile('README.md'):
+if os.path.isfile('README.rst'):
+    with open('README.rst', 'r') as file:
+        long_description = file.read()
+elif os.path.isfile('README.md'):
+    try:
+        import pypandoc
+        pypandoc.convert_file('README.md', 'rst', outputfile='README.rst')
+        long_description = pypandoc.convert_file('README.md', 'rst')
+    except (ImportError, IOError):
         with open('README.md', 'r') as file:
             long_description = file.read()
-    else:
-        raise IOError("Could not find README.rst or README.md")
+else:
+    raise IOError("Could not find README.rst or README.md")
 
 
 # Create requirements list based on platform
