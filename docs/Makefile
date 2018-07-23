@@ -20,7 +20,7 @@ help:
 ghpages: autodoc
 
 	cp -a $(BUILDDIR)/html/. $(REPODIR)/
-	cd $(REPODIR) ; git add . ; git commit -m "rebuilt docs" ; git push origin gh-pages
+	cd $(REPODIR) ; git pull ; git add . ; git commit -m "rebuilt docs" ; git push origin gh-pages
 
 .PHONY: autodoc
 autodoc: doxy

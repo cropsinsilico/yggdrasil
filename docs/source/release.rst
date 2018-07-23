@@ -25,7 +25,20 @@ Release Steps
    $ git push; git push --tags
    
 #. Update conda-forge build
-#. Regenerate docs and push to gh-pages branch::
+#. Checkout ``gh-pages`` branch if it dosn't already exist (See below), regenerate docs and push to gh-pages branch::
 
    $ cd docs
    $ make ghpages
+
+
+Docs Checkout
+=============
+
+Before running ``make ghpages``, you must first checkout the 'ghpages' branch 
+in the appropriate location. This only has to be done once on each machine you 
+publish docs from. From the ``cis_interface`` source directory::
+
+   $ cd ../
+   $ git clone https://github.com/cropsinsilico/cis_interface.git cis_interface_docs
+   $ cd cis_interface_docs
+   $ git checkout gh-pages
