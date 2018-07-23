@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>cis_interface.datatypes package &mdash; cis_interface 0.4+1.g999f828 documentation</title>
+  <title>cis_interface.datatypes package &mdash; cis_interface 0.4 documentation</title>
   
 
   
@@ -58,7 +58,7 @@
             
             
               <div class="version">
-                0.4+1.g999f828
+                0.4
               </div>
             
           
@@ -225,7 +225,7 @@
 
 <dl class="attribute">
 <dt id="cis_interface.datatypes.CisArrayType.Cis1DArrayType.properties">
-<code class="descname">properties</code><em class="property"> = {'precision': {'minimum': 1, 'type': 'number', 'description': 'The size (in bits) of each item.'}, 'type': {'type': 'string', 'description': 'The base type for each item.', 'enum': ['complex', 'float', 'int', 'string', 'uint']}, 'units': {'type': 'string', 'description': 'Physical units.'}, 'length': {'minimum': 1, 'type': 'number', 'description': 'Number of elements in the 1D array.'}}</em><a class="headerlink" href="#cis_interface.datatypes.CisArrayType.Cis1DArrayType.properties" title="Permalink to this definition">¶</a></dt>
+<code class="descname">properties</code><em class="property"> = {'type': {'type': 'string', 'enum': ['complex', 'float', 'int', 'string', 'uint'], 'description': 'The base type for each item.'}, 'precision': {'minimum': 1, 'type': 'number', 'description': 'The size (in bits) of each item.'}, 'units': {'type': 'string', 'description': 'Physical units.'}, 'length': {'minimum': 1, 'type': 'number', 'description': 'Number of elements in the 1D array.'}}</em><a class="headerlink" href="#cis_interface.datatypes.CisArrayType.Cis1DArrayType.properties" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -270,7 +270,7 @@
 
 <dl class="attribute">
 <dt id="cis_interface.datatypes.CisArrayType.CisNDArrayType.properties">
-<code class="descname">properties</code><em class="property"> = {'precision': {'minimum': 1, 'type': 'number', 'description': 'The size (in bits) of each item.'}, 'shape': {'type': 'array', 'description': 'Shape of the ND array in each dimension.', 'items': {'minimum': 1, 'type': 'integer'}}, 'type': {'type': 'string', 'description': 'The base type for each item.', 'enum': ['complex', 'float', 'int', 'string', 'uint']}, 'units': {'type': 'string', 'description': 'Physical units.'}}</em><a class="headerlink" href="#cis_interface.datatypes.CisArrayType.CisNDArrayType.properties" title="Permalink to this definition">¶</a></dt>
+<code class="descname">properties</code><em class="property"> = {'shape': {'type': 'array', 'description': 'Shape of the ND array in each dimension.', 'items': {'minimum': 1, 'type': 'integer'}}, 'type': {'type': 'string', 'enum': ['complex', 'float', 'int', 'string', 'uint'], 'description': 'The base type for each item.'}, 'precision': {'minimum': 1, 'type': 'number', 'description': 'The size (in bits) of each item.'}, 'units': {'type': 'string', 'description': 'Physical units.'}}</em><a class="headerlink" href="#cis_interface.datatypes.CisArrayType.CisNDArrayType.properties" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -428,7 +428,7 @@ object.</li>
 
 <dl class="attribute">
 <dt id="cis_interface.datatypes.CisArrayType.CisScalarType.properties">
-<code class="descname">properties</code><em class="property"> = {'precision': {'minimum': 1, 'type': 'number', 'description': 'The size (in bits) of each item.'}, 'type': {'type': 'string', 'description': 'The base type for each item.', 'enum': ['complex', 'float', 'int', 'string', 'uint']}, 'units': {'type': 'string', 'description': 'Physical units.'}}</em><a class="headerlink" href="#cis_interface.datatypes.CisArrayType.CisScalarType.properties" title="Permalink to this definition">¶</a></dt>
+<code class="descname">properties</code><em class="property"> = {'units': {'type': 'string', 'description': 'Physical units.'}, 'precision': {'minimum': 1, 'type': 'number', 'description': 'The size (in bits) of each item.'}, 'type': {'type': 'string', 'enum': ['complex', 'float', 'int', 'string', 'uint'], 'description': 'The base type for each item.'}}</em><a class="headerlink" href="#cis_interface.datatypes.CisArrayType.CisScalarType.properties" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="classmethod">
@@ -1065,7 +1065,7 @@ object.</li>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'0.4+1.g999f828',
+            VERSION:'0.4',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
