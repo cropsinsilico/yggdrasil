@@ -122,16 +122,17 @@ test_script:
 after_test:
   - "codecov"
 
-
 # Deploy to PyPI
 on_success:
   - echo "Starting Artifact Deployment"
+  - "pip install twine"
+  - "python setup.py bdist_wheel"
+
   # Specify account details for PyPI
   - echo [distutils]                                  > %USERPROFILE%\\.pypirc
   - echo index-servers =                             >> %USERPROFILE%\\.pypirc
   - echo     pypi                                    >> %USERPROFILE%\\.pypirc
   - echo [pypi]                                      >> %USERPROFILE%\\.pypirc
-  - echo repository=https://pypi.python.org/pypi     >> %USERPROFILE%\\.pypirc
   - echo username=langmm                             >> %USERPROFILE%\\.pypirc
   - echo password=%PYPI_PASSWORD%                    >> %USERPROFILE%\\.pypirc
 
@@ -139,4 +140,5 @@ on_success:
   - set HOME=%USERPROFILE%
 
   # Deploy wheel on tags
-  - if "%APPVEYOR_REPO_TAG%"=="true" ( python setup.py bdist_wheel upload ) else ( echo "Not deploying because not a tagged commit." )
+  - ps: If ($env:APPVEYOR_REPO_TAG -eq "true" -And $env:APPVEYOR_REPO_BRANCH -eq "master") { Invoke-Expression "twine upload --skip-existing dist/*" 2>$null } Else { write-output "Not on a tag on master, won't deploy to pypi"}
+  # - if "%APPVEYOR_REPO_TAG%"=="true" ( python setup.py bdist_wheel upload ) else ( echo "Not deploying because not a tagged commit." )
