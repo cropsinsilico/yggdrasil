@@ -7,14 +7,9 @@ from distutils.sysconfig import get_python_lib
 import versioneer
 import install_matlab_engine
 import update_config
-import update_coveragerc
+import create_coveragerc
 IS_WINDOWS = (sys.platform in ['win32', 'cygwin'])
-
-
 cis_ver = versioneer.get_version()
-# print(cis_ver, type(cis_ver))
-# with open(os.path.join(os.path.dirname(__file__), 'VERSION')) as version_file:
-#     cis_ver = version_file.read().strip()
 
 
 # Attempt to install openalea
@@ -47,7 +42,7 @@ update_config.update_config(usr_config_file)
 
 
 # Set coverage options in .coveragerc
-update_coveragerc.update_coveragerc()
+create_coveragerc.create_coveragerc()
 
 
 # Create .rst README from .md and get long description

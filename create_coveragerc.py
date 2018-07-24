@@ -44,9 +44,12 @@ def rm_excl_rule(excl_list, new_rule):
     return excl_list
 
 
-def update_coveragerc(matlab_installed=False, lpy_installed=False):
-    r"""Update the coveragerc to reflect the OS, Python version, and availability
-    of matlab.
+def create_coveragerc(matlab_installed=False, lpy_installed=False):
+    r"""Create the coveragerc to reflect the OS, Python version, and availability
+    of matlab. Parameters from the setup.cfg file will be added. If the
+    .coveragerc file already exists, it will be read first before adding setup.cfg
+    options.
+    
 
     Args:
         matlab_installed (bool, optional): Truth of if matlab is installed or not.
@@ -55,15 +58,37 @@ def update_coveragerc(matlab_installed=False, lpy_installed=False):
             Defaults to False.
 
     Returns:
-        bool: True if the file was updated successfully, False otherwise.
+        bool: True if the file was created/updated successfully, False otherwise.
 
     """
     if HandyConfigParser is None:
         return False
-    # Read options
     covrc = os.path.join(os.path.dirname(__file__), '.coveragerc')
     cp = HandyConfigParser("")
-    cp.read(covrc)
+    # Read from existing .coveragerc
+    if os.path.isfile(covrc):
+        cp.read(covrc)
+    # Read options from setup.cfg
+    setup_cfg = os.path.join(os.path.dirname(__file__), 'setup.cfg')
+    cp_cfg = HandyConfigParser("")
+    cp_cfg.read(setup_cfg)
+    # Transfer options
+    for x in cp_cfg.sections():
+        if x.startswith('coverage:'):
+            sect_cp = x.split('coverage:')[-1]
+            if not cp.has_section(sect_cp):
+                cp.add_section(sect_cp)
+            for opt in cp_cfg.options(x):
+                if cp.has_option(sect_cp, opt):
+                    val_old = [l.strip() for l in cp.get(sect_cp, opt).split('\n')]
+                    val_new = [l.strip() for l in cp_cfg.get(x, opt).split('\n')]
+                    for v in val_new:
+                        if v not in val_old:
+                            val_old.append(v)
+                    opt_new = '\n'.join(val_old)
+                else:
+                    opt_new = cp_cfg.get(x, opt)
+                cp.set(sect_cp, opt, opt_new)
     # Exclude rules for all files
     if not cp.has_section('report'):
         cp.add_section('report')
@@ -118,7 +143,7 @@ if __name__ == "__main__":
         lpy_installed = True
     except ImportError:
         lpy_installed = False
-    flag = update_coveragerc(matlab_installed=matlab_installed,
+    flag = create_coveragerc(matlab_installed=matlab_installed,
                              lpy_installed=lpy_installed)
     if not flag:
-        raise Exception("Failed to update converagerc file.")
+        raise Exception("Failed to create/update converagerc file.")

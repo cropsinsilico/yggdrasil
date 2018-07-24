@@ -10,6 +10,7 @@ docs/source/modules.rst
 docs/source/examples/*.rst
 
 # Coverage
+.coveragerc
 .coverage
 htmlcov
 
