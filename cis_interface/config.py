@@ -99,7 +99,9 @@ def locate_file(fname):
     """
     out = []
     for path in os.environ.get('PATH').split(os.pathsep):
-        out += find_all(fname, path)
+        if path:
+            print('searching %s for %s' % (path, fname))
+            out += find_all(fname, path)
     if not out:
         return False
     first = out[0]
