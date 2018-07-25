@@ -12,7 +12,7 @@ import logging
 # import pprint
 import subprocess
 from cis_interface.backwards import configparser
-from cis_interface import platform
+from cis_interface import platform, backwards
 config_file = '.cis_interface.cfg'
 def_config_file = os.path.join(os.path.dirname(__file__), 'defaults.cfg')
 usr_config_file = os.path.expanduser(os.path.join('~', config_file))
@@ -74,7 +74,7 @@ def find_all(name, path):
                                                "-name", name],
                                               stderr=subprocess.STDOUT)
             except subprocess.CalledProcessError as e:
-                if 'Permission denied' in e.output:
+                if backwards.unicode2bytes('Permission denied') in e.output:
                     out = ''
                 else:
                     raise e
