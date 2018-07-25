@@ -6,7 +6,6 @@ from setuptools import setup, find_packages
 from distutils.sysconfig import get_python_lib
 import versioneer
 import install_matlab_engine
-import update_config
 import create_coveragerc
 IS_WINDOWS = (sys.platform in ['win32', 'cygwin'])
 cis_ver = versioneer.get_version()
@@ -31,18 +30,9 @@ else:
     matlab_installed = False
 
     
-# Create config file if one does not exist and update it to reflect the
-# system
-usr_config_file = os.path.expanduser(os.path.join('~', '.cis_interface.cfg'))
-def_config_file = os.path.join(os.path.dirname(__file__),
-                               'cis_interface', 'defaults.cfg')
-if not os.path.isfile(usr_config_file):
-    shutil.copy(def_config_file, usr_config_file)
-update_config.update_config(usr_config_file)
-
-
 # Set coverage options in .coveragerc
-create_coveragerc.create_coveragerc()
+create_coveragerc.create_coveragerc(matlab_installed=matlab_installed,
+                                    lpy_installed=lpy_installed)
 
 
 # Create .rst README from .md and get long description
@@ -69,7 +59,7 @@ requirements = ['numpy>=1.13.0', "scipy", "pyyaml",
                 'pandas; python_version == "2.7"',
                 'pandas<0.21; python_version == "3.4"',
                 "pint", "unyt"]
-test_requirements = ['pytest']
+test_requirements = ['pytest', 'nose']
 # optional_requirements = ["pika", "astropy"]
 if not IS_WINDOWS:
     requirements.append("sysv_ipc")
@@ -120,7 +110,8 @@ setup(
                             'cisccflags=cis_interface.command_line:cc_flags',
                             'cisldflags=cis_interface.command_line:ld_flags',
                             'cistest=cis_interface:run_nose',
-                            'cisschema=cis_interface.command_line:regen_schema'],
+                            'cisschema=cis_interface.command_line:regen_schema',
+                            'cisconfig=cis_interface.command_line:update_config'],
     },
     license="BSD",
 )

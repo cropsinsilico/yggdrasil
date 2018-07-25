@@ -2,7 +2,7 @@
 import os
 import sys
 import traceback
-from cis_interface import runner, schema
+from cis_interface import runner, schema, config
 from cis_interface.drivers import GCCModelDriver
 
 
@@ -60,6 +60,11 @@ def regen_schema():
         os.remove(schema._schema_fname)
     schema.clear_schema()
     schema.init_schema()
+
+
+def update_config():
+    r"""Update the user config file for cis_interface."""
+    config.update_config(config.usr_config_file, config.def_config_file)
 
 
 if __name__ == '__main__':
