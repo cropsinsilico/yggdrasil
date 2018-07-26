@@ -7,7 +7,6 @@ from distutils.sysconfig import get_python_lib
 import versioneer
 import install_matlab_engine
 import create_coveragerc
-IS_WINDOWS = (sys.platform in ['win32', 'cygwin'])
 cis_ver = versioneer.get_version()
 
 
@@ -58,11 +57,11 @@ requirements = ['numpy>=1.13.0', "scipy", "pyyaml",
                 'pandas; python_version >= "3.5"',
                 'pandas; python_version == "2.7"',
                 'pandas<0.21; python_version == "3.4"',
-                "pint", "unyt"]
+                'pandas<0.23.3; platform_system == "Windows"',
+                "pint", "unyt",
+                'sysv_ipc; platform_system != "Windows"']
 test_requirements = ['pytest', 'nose']
 # optional_requirements = ["pika", "astropy"]
-if not IS_WINDOWS:
-    requirements.append("sysv_ipc")
 
 
 # Warn that local install may not have entry points on path
