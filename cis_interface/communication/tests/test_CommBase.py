@@ -96,11 +96,14 @@ class TestCommBase(CisTestClassInfo):
     def setup(self, *args, **kwargs):
         r"""Initialize comm object pair."""
         assert(self.is_installed)
+        sleep_after_connect = kwargs.pop('sleep_after_connect', False)
         send_inst_kwargs = self.send_inst_kwargs
         kwargs.setdefault('nprev_comm', self.comm_count)
         kwargs.setdefault('nprev_fd', self.fd_count)
         self.send_instance = new_comm(self.name, **send_inst_kwargs)
         super(TestCommBase, self).setup(*args, **kwargs)
+        if sleep_after_connect:
+            self.send_instance.sleep()
         # CommBase is dummy class that never opens
         if self.comm in ['CommBase', 'AsyncComm']:
             assert(not self.send_instance.is_open)
