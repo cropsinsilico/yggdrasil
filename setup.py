@@ -54,10 +54,9 @@ else:
 requirements = ['numpy>=1.13.0', "scipy", "pyyaml",
                 "pystache", "nose", "zmq", "psutil",
                 "matplotlib", "cerberus", "jsonschema",
-                'pandas; python_version >= "3.5"',
-                'pandas; python_version == "2.7"',
                 'pandas<0.21; python_version == "3.4"',
-                'pandas<0.23.3; platform_system == "Windows"',
+                'pandas<0.23.3; python_version != "3.4" and platform_system == "Windows"',
+                'pandas; python_version != "3.4" and platform_system != "Windows"',
                 "pint", "unyt",
                 'sysv_ipc; platform_system != "Windows"']
 test_requirements = ['pytest', 'nose']
