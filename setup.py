@@ -55,7 +55,7 @@ requirements = ['numpy>=1.13.0', "scipy", "pyyaml",
                 "pystache", "nose", "zmq", "psutil",
                 "matplotlib", "cerberus", "jsonschema",
                 'pandas<0.21; python_version == "3.4"',
-                'pandas<0.23.3; python_version != "3.4" and platform_system == "Windows"',
+                'pandas<0.23.2; python_version != "3.4" and platform_system == "Windows"',
                 'pandas; python_version != "3.4" and platform_system != "Windows"',
                 "pint", "unyt",
                 'sysv_ipc; platform_system != "Windows"']

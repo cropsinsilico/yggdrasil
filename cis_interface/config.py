@@ -67,7 +67,8 @@ def find_all(name, path):
     result = []
     try:
         if platform._is_win:  # pragma: windows
-            out = subprocess.check_output(["where", "/r", path, name])
+            out = subprocess.check_output(["where", "/r", path, name],
+                                          stderr=subprocess.STDOUT)
         else:
             try:
                 out = subprocess.check_output(["find", path, "-type", "f",
@@ -100,7 +101,7 @@ def locate_file(fname):
     out = []
     for path in os.environ.get('PATH').split(os.pathsep):
         if path:
-            print('searching %s for %s' % (path, fname))
+            # print('searching %s for %s' % (path, fname))
             out += find_all(fname, path)
     if not out:
         return False
