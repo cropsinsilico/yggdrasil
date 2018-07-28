@@ -25,3 +25,5 @@ include cis_interface/examples/*/Input/*.txt
 graft docs
 include versioneer.py
 include cis_interface/_version.py
+include install_matlab_engine
+include create_coveragerc
