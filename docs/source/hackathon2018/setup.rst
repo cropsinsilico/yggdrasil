@@ -45,7 +45,13 @@ Checkout Hackathon Example
 To get started, we will walk through transforming an example model and 
 connecting it to other models. To get the necessary materials, fork 
 the `hackathon2018 repository <https://github.com/cropsinsilico/hackathon2018>`_ 
-on GitHub (Fork button in the upper right) and clone your fork on your machine.::
+on GitHub (Fork button in the upper right), create a 'cis_home' directory for the 
+hackathon 
+
+  $ mkdir cis_home
+  $ cd cis_home
+
+and clone your fork on your machine into the 'cis_home' directory.::
 
   $ git clone https://github.com/[your username]/hackathon2018.git
 
@@ -57,4 +63,4 @@ is working::
 
 The tests script will display output from some of the models we will be using. 
 If you have any errors, please let us know so we can track down any issues you 
-might be having.
+might be having. Warnings are OK.

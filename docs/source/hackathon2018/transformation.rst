@@ -3,7 +3,7 @@ Model Transformation
 ####################
 
 For the first part of this example we will be transforming a 
-toy growth model written in Python. Withing the hackathon2018 
+toy growth model written in Python. Within the hackathon2018 
 repository this model is ``growth.py``. The model takes 
 command line arguments defining the path to an input file and 
 an output file. The model then reads photosynthesis rates from 
@@ -156,7 +156,8 @@ your model.
 .. image:: interface_images/interface_model_form.png
 
 You can give your model any name, but make sure that you select 'Python' as 
-the model language, use the name of your transformed model (e.g. growth_mlang.py), 
+the model language, use the name of your transformed model with the `hackathon2018`
+directory included (e.g. `hackathon2018/growth_mlang.py`), 
 and the correct names of your input and output channels. For the example we have an 
 input channel called 'photosynthesis_rate' and an output channel called 'growth_rate'. 
 For the input and output channels to be added, you will need to click on the blue '+' 
@@ -210,7 +211,8 @@ and a form will pop up asking for information about the input port.
 .. image:: interface_images/interface_input_form.png
 
 For this example 
-you should select the 'file' type, a file name of 'Input/photosynthesis_rate.txt' 
+you should select the 'file' type, a file name of 
+'hackathon2018/Input/photosynthesis_rate.txt' 
 and a read method of 'table'. This tells the input port that it should read values 
 from a tab-delimited table line-by-line from the indicated file.
 
@@ -228,7 +230,8 @@ and a form will pop up asking for information about the output port.
 .. image:: interface_images/interface_output_form.png
 
 For this example 
-you should select the 'file' type, a file name of 'Output/growth_rate.txt', 
+you should select the 'file' type, a file name of 
+'hackathon2018/Output/growth_rate.txt', 
 and a write method of 'table'. This tells the output port that it should write values 
 to a tab-delimited table line-by-line in the indicated file.
 
@@ -275,7 +278,7 @@ running your model with connections to the file.
 .. image:: interface_images/interface_manifest.png
 
 You can then copy that information to your clipboard and past it into a new file 
-called `growth_to_file.yml` in the `hackthon2018` directory.
+called `growth_to_file.yml` in the `cis_home` directory.
 
 
 Running the Model-to-File Integration
@@ -285,10 +288,10 @@ You can run the integration you just created by executing::
 
   $ cisrun growth_to_file.yml
 
-from the `hackathon2018` directory. This will output information on the 
+from the `cis_home` directory. This will output information on the 
 calculated growth rates to the screen and generate the output file 
-'Output/growth_rate.txt'. If the model ran correctly, the output file should look 
-like this::
+'hackathon2018/Output/growth_rate.txt'. If the model ran correctly, the output file 
+should look like this::
 
   # %f
   2.500000
