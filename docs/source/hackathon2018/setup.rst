@@ -14,7 +14,7 @@ as it will help to ensure that you are using the same version of
 |cis_interface| and its dependencies as everyone else.
 
 If you do not already have conda on your machine, download and 
-install Anaconda from [here](https://www.anaconda.com/download/).
+install Anaconda from `here <https://www.anaconda.com/download/>`_.
 
 Once Anaconda (or Miniconda) is installed you can create a new Python 3.6 
 environment for the hackathon by entering the following at your terminal 
@@ -36,7 +36,7 @@ Installing |cis_interface|
 
 Directions for installing the |cis_interface| package and its dependencies 
 can be found :ref:`here <install_rst>`. We recommend installing via 
-conda.
+conda and pip for the purpose of the hackathon.
 
 
 Checkout Hackathon Example
@@ -44,7 +44,7 @@ Checkout Hackathon Example
 
 To get started, we will walk through transforming an example model and 
 connecting it to other models. To get the necessary materials, fork 
-the `hackathon2018 repository <https://github.com/cropsinsilico/hackathon2018>` 
+the `hackathon2018 repository <https://github.com/cropsinsilico/hackathon2018>`_ 
 on GitHub (Fork button in the upper right) and clone your fork on your machine.::
 
   $ git clone https://github.com/[your username]/hackathon2018.git
@@ -53,4 +53,8 @@ From the hackathon2018 directory, run the tests to ensure that everything
 is working::
 
   $ cd hackathon2018
-  $ ./test.sh
+  $ ./run_tests.sh
+
+The tests script will display output from some of the models we will be using. 
+If you have any errors, please let us know so we can track down any issues you 
+might be having.

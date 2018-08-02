@@ -4,20 +4,35 @@
 Installation
 ############
 
-Conda Installation (recommended)
---------------------------------
+Conda Installation + pip (recommended)
+--------------------------------------
 
-There are conda wheels available for |cis_interface| on 
-`conda-forge <>`_. You can install |cis_interface| by calling::
+We are still working to create conda wheels for |cis_interface| on 
+`conda-forge`, but you can install some of the more difficult dependencies 
+using conda, particularly the ZeroMQ C and C++ libraries. To do so call::
+
+  $ conda install -c conda-forge zeromq czmq
+
+You can then install |cis_interface| from 
+`PyPI <https://pypi.org/project/cis_interface/>`_ using ``pip``::
+
+  $ pip install cis_interface
+
+.. There are conda wheels available for |cis_interface| on 
+   `conda-forge <>`_. You can install |cis_interface| by calling::
+   $ conda install -c conda-forge cis_interface
+   from your terminal prompt (or Anaconda prompt on Windows). This will 
+   install |cis_interface| and all of its dependencies in your active
+   conda environment.
+
+In the future when the conda wheels are available, you will only need to 
+run::
 
   $ conda install -c conda-forge cis_interface
 
-from your terminal prompt (or Anaconda prompt on Windows). This will 
-install |cis_interface| and all of its dependencies in your active
-conda environment.
 
-Alternate Installation
-----------------------
+Manual Installation
+-------------------
 
 .. note::
    Before installing |cis_interface| from ``pip`` or source, you 
