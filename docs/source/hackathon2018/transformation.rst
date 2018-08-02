@@ -191,7 +191,7 @@ next to your model in the model palatte.
 
 Your model will then appear on the canvas. 
 
-.. image:: interface_images/interface_model_added.png
+.. image:: interface_images/interface_model_selected.png
 
 Your model input and output channels are represented by white dots. Inputs are on 
 the left and outputs are on the right. But we need something to connect them to. 

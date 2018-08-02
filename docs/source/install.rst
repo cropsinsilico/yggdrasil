@@ -119,8 +119,8 @@ Python. This requires that you have an existing Matlab installation and license.
 install, but should it fail or if you want to use a non-default version of Matlab,
 you can also do it manually.
 
-Instructions for installing the Matlab engine as a python package can be found
-`here <https://www.mathworks.com/help/matlab/matlab_external/install-the-matlab-engine-for-python.html>`_.
+Instructions for installing the Matlab engine as a python package can be found on the 
+`Mathworks website <https://www.mathworks.com/help/matlab/matlab_external/install-the-matlab-engine-for-python.html>`_.
 
 
 Additional Steps for RabbitMQ Message Passing
