@@ -24,6 +24,7 @@ Welcome to cis_interface's documentation!
    code
    examples/examples_toc
    release
+   hackathon2018/index
    
 Indices and tables
 ==================
