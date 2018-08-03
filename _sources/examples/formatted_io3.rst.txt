@@ -1,28 +1,6 @@
 formatted_io3 Example
 =====================
 
-C++ Version
------------
-
-Model Code:
-
-.. literalinclude:: /../../cis_interface/examples/formatted_io3/src/formatted_io3_modelA.cpp
-   :language: c++
-   :linenos:
-
-.. literalinclude:: /../../cis_interface/examples/formatted_io3/src/formatted_io3_modelB.cpp
-   :language: c++
-   :linenos:
-
-
-Model YAML:
-
-.. literalinclude:: /../../cis_interface/examples/formatted_io3/formatted_io3_cpp.yml
-   :language: yaml
-   :linenos:
-
-
-
 Python Version
 --------------
 
@@ -45,28 +23,6 @@ Model YAML:
 
 
 
-Matlab Version
---------------
-
-Model Code:
-
-.. literalinclude:: /../../cis_interface/examples/formatted_io3/src/formatted_io3_modelA.m
-   :language: matlab
-   :linenos:
-
-.. literalinclude:: /../../cis_interface/examples/formatted_io3/src/formatted_io3_modelB.m
-   :language: matlab
-   :linenos:
-
-
-Model YAML:
-
-.. literalinclude:: /../../cis_interface/examples/formatted_io3/formatted_io3_matlab.yml
-   :language: yaml
-   :linenos:
-
-
-
 C Version
 ---------
 
@@ -84,6 +40,50 @@ Model Code:
 Model YAML:
 
 .. literalinclude:: /../../cis_interface/examples/formatted_io3/formatted_io3_c.yml
+   :language: yaml
+   :linenos:
+
+
+
+C++ Version
+-----------
+
+Model Code:
+
+.. literalinclude:: /../../cis_interface/examples/formatted_io3/src/formatted_io3_modelA.cpp
+   :language: c++
+   :linenos:
+
+.. literalinclude:: /../../cis_interface/examples/formatted_io3/src/formatted_io3_modelB.cpp
+   :language: c++
+   :linenos:
+
+
+Model YAML:
+
+.. literalinclude:: /../../cis_interface/examples/formatted_io3/formatted_io3_cpp.yml
+   :language: yaml
+   :linenos:
+
+
+
+Matlab Version
+--------------
+
+Model Code:
+
+.. literalinclude:: /../../cis_interface/examples/formatted_io3/src/formatted_io3_modelA.m
+   :language: matlab
+   :linenos:
+
+.. literalinclude:: /../../cis_interface/examples/formatted_io3/src/formatted_io3_modelB.m
+   :language: matlab
+   :linenos:
+
+
+Model YAML:
+
+.. literalinclude:: /../../cis_interface/examples/formatted_io3/formatted_io3_matlab.yml
    :language: yaml
    :linenos:
 

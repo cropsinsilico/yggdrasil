@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>cis_interface.communication.tests.test_CommBase &mdash; cis_interface 0.4 documentation</title>
+  <title>cis_interface.communication.tests.test_CommBase &mdash; cis_interface 0.5.3 documentation</title>
   
 
   
@@ -58,7 +58,7 @@
             
             
               <div class="version">
-                0.4
+                0.5.3
               </div>
             
           
@@ -100,6 +100,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../examples/examples_toc.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../release.html">Release Steps</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../release.html#docs-checkout">Docs Checkout</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
 </ul>
 
             
@@ -263,11 +264,14 @@
 <div class="viewcode-block" id="TestCommBase.setup"><a class="viewcode-back" href="../../../../cis_interface.communication.tests.html#cis_interface.communication.tests.test_CommBase.TestCommBase.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">r&quot;&quot;&quot;Initialize comm object pair.&quot;&quot;&quot;</span>
         <span class="k">assert</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">is_installed</span><span class="p">)</span>
+        <span class="n">sleep_after_connect</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;sleep_after_connect&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
         <span class="n">send_inst_kwargs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">send_inst_kwargs</span>
         <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;nprev_comm&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm_count</span><span class="p">)</span>
         <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;nprev_fd&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fd_count</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">send_instance</span> <span class="o">=</span> <span class="n">new_comm</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">send_inst_kwargs</span><span class="p">)</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">TestCommBase</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">sleep_after_connect</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">send_instance</span><span class="o">.</span><span class="n">sleep</span><span class="p">()</span>
         <span class="c1"># CommBase is dummy class that never opens</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;CommBase&#39;</span><span class="p">,</span> <span class="s1">&#39;AsyncComm&#39;</span><span class="p">]:</span>
             <span class="k">assert</span><span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">send_instance</span><span class="o">.</span><span class="n">is_open</span><span class="p">)</span>
@@ -649,7 +653,7 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../../../../',
-            VERSION:'0.4',
+            VERSION:'0.5.3',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',

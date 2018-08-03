@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Index &mdash; cis_interface 0.4 documentation</title>
+  <title>Index &mdash; cis_interface 0.5.3 documentation</title>
   
 
   
@@ -59,7 +59,7 @@
             
             
               <div class="version">
-                0.4
+                0.5.3
               </div>
             
           
@@ -101,6 +101,7 @@
 <li class="toctree-l1"><a class="reference internal" href="examples/examples_toc.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="release.html">Release Steps</a></li>
 <li class="toctree-l1"><a class="reference internal" href="release.html#docs-checkout">Docs Checkout</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
 </ul>
 
             
@@ -2213,6 +2214,8 @@
 </li>
       <li><a href="code_python.html#cis_interface.schema.SchemaRegistry.filetype2class">filetype2class (cis_interface.schema.SchemaRegistry attribute)</a>
 </li>
+      <li><a href="code_python.html#cis_interface.config.find_all">find_all() (in module cis_interface.config)</a>
+</li>
       <li><a href="dataio_c.html#c.FMT_LEN">FMT_LEN (C macro)</a>
 </li>
       <li><a href="cis_interface.tests.html#cis_interface.tests.IOInfo.fmt_str">fmt_str (cis_interface.tests.IOInfo attribute)</a>
@@ -2789,15 +2792,17 @@
 </li>
       <li><a href="code_python.html#cis_interface.schema.SchemaRegistry.load">load() (cis_interface.schema.SchemaRegistry method)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="cis_interface.tests.html#cis_interface.tests.IOInfo.load_mat">load_mat() (cis_interface.tests.IOInfo method)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="code_python.html#cis_interface.schema.load_schema">load_schema() (in module cis_interface.schema)</a>
 </li>
       <li><a href="code_python.html#cis_interface.yamlfile.load_yaml">load_yaml() (in module cis_interface.yamlfile)</a>
 </li>
       <li><a href="code_python.html#cis_interface.runner.CisRunner.loadDrivers">loadDrivers() (cis_interface.runner.CisRunner method)</a>
+</li>
+      <li><a href="code_python.html#cis_interface.config.locate_file">locate_file() (in module cis_interface.config)</a>
 </li>
       <li><a href="cis_interface.drivers.html#cis_interface.drivers.MatlabModelDriver.locate_matlabroot">locate_matlabroot() (in module cis_interface.drivers.MatlabModelDriver)</a>
 </li>
@@ -4300,6 +4305,8 @@
       <li><a href="cis_interface.communication.tests.html#cis_interface.communication.tests.test_CommBase.TestCommBase.setup">setup() (cis_interface.communication.tests.test_CommBase.TestCommBase method)</a>
 
       <ul>
+        <li><a href="cis_interface.communication.tests.html#cis_interface.communication.tests.test_ZMQComm.TestZMQCommROUTER.setup">(cis_interface.communication.tests.test_ZMQComm.TestZMQCommROUTER method)</a>
+</li>
         <li><a href="cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_AsciiMapInputDriver.TestAsciiMapInputParam.setup">(cis_interface.drivers.tests.test_AsciiMapInputDriver.TestAsciiMapInputParam method)</a>
 </li>
         <li><a href="cis_interface.drivers.tests.html#cis_interface.drivers.tests.test_ClientDriver.TestClientDriver.setup">(cis_interface.drivers.tests.test_ClientDriver.TestClientDriver method)</a>
@@ -4935,6 +4942,8 @@
         <li><a href="cis_interface.serialize.tests.html#cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_func_error.test_field_specs">(cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize_func_error method)</a>
 </li>
       </ul></li>
+      <li><a href="cis_interface.tests.html#cis_interface.tests.test_config.test_find_all">test_find_all() (in module cis_interface.tests.test_config)</a>
+</li>
       <li><a href="cis_interface.communication.tests.html#cis_interface.communication.tests.test_ZMQComm.test_format_address">test_format_address() (in module cis_interface.communication.tests.test_ZMQComm)</a>
 </li>
       <li><a href="cis_interface.tests.html#cis_interface.tests.test_backwards.test_format_bytes">test_format_bytes() (in module cis_interface.tests.test_backwards)</a>
@@ -5012,6 +5021,8 @@
       <li><a href="cis_interface.tests.html#cis_interface.tests.test_tools.test_is_zmq_installed">test_is_zmq_installed() (in module cis_interface.tests.test_tools)</a>
 </li>
       <li><a href="cis_interface.tests.html#cis_interface.tests.test_yamlfile.test_load_yaml_error">test_load_yaml_error() (in module cis_interface.tests.test_yamlfile)</a>
+</li>
+      <li><a href="cis_interface.tests.html#cis_interface.tests.test_config.test_locate_file">test_locate_file() (in module cis_interface.tests.test_config)</a>
 </li>
       <li><a href="cis_interface.tests.html#cis_interface.tests.test_tools.test_locate_path">test_locate_path() (in module cis_interface.tests.test_tools)</a>
 </li>
@@ -5379,10 +5390,10 @@
       </ul></li>
       <li><a href="cis_interface.serialize.tests.html#cis_interface.serialize.tests.test_MatSerialize.TestMatSerialize.test_serialize_empty">test_serialize_empty() (cis_interface.serialize.tests.test_MatSerialize.TestMatSerialize method)</a>
 </li>
-      <li><a href="cis_interface.serialize.tests.html#cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize.test_serialize_eof">test_serialize_eof() (cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize method)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="cis_interface.serialize.tests.html#cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize.test_serialize_eof">test_serialize_eof() (cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize method)</a>
+</li>
       <li><a href="cis_interface.serialize.tests.html#cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize.test_serialize_eof_header">test_serialize_eof_header() (cis_interface.serialize.tests.test_DefaultSerialize.TestDefaultSerialize method)</a>
 </li>
       <li><a href="cis_interface.serialize.tests.html#cis_interface.serialize.tests.test_MatSerialize.TestMatSerialize.test_serialize_errors">test_serialize_errors() (cis_interface.serialize.tests.test_MatSerialize.TestMatSerialize method)</a>
@@ -6197,11 +6208,19 @@
 </li>
       <li><a href="code_python.html#cis_interface.tools.CisThreadLoop.unset_loop_flag">unset_loop_flag() (cis_interface.tools.CisThreadLoop method)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="code_python.html#cis_interface.tools.CisThread.unset_started_flag">unset_started_flag() (cis_interface.tools.CisThread method)</a>
 </li>
       <li><a href="code_python.html#cis_interface.tools.CisThread.unset_terminated_flag">unset_terminated_flag() (cis_interface.tools.CisThread method)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="code_python.html#cis_interface.command_line.update_config">update_config() (in module cis_interface.command_line)</a>
+
+      <ul>
+        <li><a href="code_python.html#cis_interface.config.update_config">(in module cis_interface.config)</a>
+</li>
+      </ul></li>
+      <li><a href="code_python.html#cis_interface.config.update_config_windows">update_config_windows() (in module cis_interface.config)</a>
 </li>
       <li><a href="cis_interface.dataio.html#cis_interface.dataio.AsciiTable.AsciiTable.update_dtype">update_dtype() (cis_interface.dataio.AsciiTable.AsciiTable method)</a>
 </li>
@@ -6442,7 +6461,7 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'0.4',
+            VERSION:'0.5.3',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',

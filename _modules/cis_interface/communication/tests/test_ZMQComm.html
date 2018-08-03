@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>cis_interface.communication.tests.test_ZMQComm &mdash; cis_interface 0.4 documentation</title>
+  <title>cis_interface.communication.tests.test_ZMQComm &mdash; cis_interface 0.5.3 documentation</title>
   
 
   
@@ -58,7 +58,7 @@
             
             
               <div class="version">
-                0.4
+                0.5.3
               </div>
             
           
@@ -100,6 +100,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../examples/examples_toc.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../release.html">Release Steps</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../release.html#docs-checkout">Docs Checkout</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
 </ul>
 
             
@@ -413,6 +414,12 @@
         <span class="nb">super</span><span class="p">(</span><span class="n">TestZMQCommROUTER</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">socket_type</span> <span class="o">=</span> <span class="s1">&#39;ROUTER&#39;</span>
 
+<div class="viewcode-block" id="TestZMQCommROUTER.setup"><a class="viewcode-back" href="../../../../cis_interface.communication.tests.html#cis_interface.communication.tests.test_ZMQComm.TestZMQCommROUTER.setup">[docs]</a>    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">r&quot;&quot;&quot;Initialize comm object pair with sleep after setup to ensure</span>
+<span class="sd">        dealer has connected.&quot;&quot;&quot;</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;sleep_after_connect&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">TestZMQCommROUTER</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
 <div class="viewcode-block" id="TestZMQCommROUTER.test_router_recv"><a class="viewcode-back" href="../../../../cis_interface.communication.tests.html#cis_interface.communication.tests.test_ZMQComm.TestZMQCommROUTER.test_router_recv">[docs]</a>    <span class="k">def</span> <span class="nf">test_router_recv</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">r&quot;&quot;&quot;Test router receipt of message from the dealer with an identity.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">do_send_recv</span><span class="p">(</span><span class="n">reverse_comms</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">send_kwargs</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
@@ -462,7 +469,7 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../../../../',
-            VERSION:'0.4',
+            VERSION:'0.5.3',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',

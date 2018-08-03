@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>cis_interface.command_line &mdash; cis_interface 0.4 documentation</title>
+  <title>cis_interface.command_line &mdash; cis_interface 0.5.3 documentation</title>
   
 
   
@@ -58,7 +58,7 @@
             
             
               <div class="version">
-                0.4
+                0.5.3
               </div>
             
           
@@ -100,6 +100,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../examples/examples_toc.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../release.html">Release Steps</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../release.html#docs-checkout">Docs Checkout</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
 </ul>
 
             
@@ -167,7 +168,7 @@
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">import</span> <span class="nn">traceback</span>
-<span class="kn">from</span> <span class="nn">cis_interface</span> <span class="k">import</span> <span class="n">runner</span><span class="p">,</span> <span class="n">schema</span>
+<span class="kn">from</span> <span class="nn">cis_interface</span> <span class="k">import</span> <span class="n">runner</span><span class="p">,</span> <span class="n">schema</span><span class="p">,</span> <span class="n">config</span>
 <span class="kn">from</span> <span class="nn">cis_interface.drivers</span> <span class="k">import</span> <span class="n">GCCModelDriver</span>
 
 
@@ -227,6 +228,11 @@
     <span class="n">schema</span><span class="o">.</span><span class="n">init_schema</span><span class="p">()</span></div>
 
 
+<div class="viewcode-block" id="update_config"><a class="viewcode-back" href="../../code_python.html#cis_interface.command_line.update_config">[docs]</a><span class="k">def</span> <span class="nf">update_config</span><span class="p">():</span>
+    <span class="sd">r&quot;&quot;&quot;Update the user config file for cis_interface.&quot;&quot;&quot;</span>
+    <span class="n">config</span><span class="o">.</span><span class="n">update_config</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">usr_config_file</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">def_config_file</span><span class="p">)</span></div>
+
+
 <span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
     <span class="n">cisrun</span><span class="p">()</span>
     <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
@@ -264,7 +270,7 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../../',
-            VERSION:'0.4',
+            VERSION:'0.5.3',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',

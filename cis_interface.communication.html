@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>cis_interface.communication package &mdash; cis_interface 0.4 documentation</title>
+  <title>cis_interface.communication package &mdash; cis_interface 0.5.3 documentation</title>
   
 
   
@@ -58,7 +58,7 @@
             
             
               <div class="version">
-                0.4
+                0.5.3
               </div>
             
           
@@ -100,6 +100,7 @@
 <li class="toctree-l1"><a class="reference internal" href="examples/examples_toc.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="release.html">Release Steps</a></li>
 <li class="toctree-l1"><a class="reference internal" href="release.html#docs-checkout">Docs Checkout</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
 </ul>
 
             
@@ -1118,7 +1119,7 @@ name.</li>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong></strong><strong>(</strong><strong></strong> (<a class="reference internal" href="cis_interface.drivers.html#cis_interface.drivers.ServerRequestDriver.ServerRequestDriver.comm" title="cis_interface.drivers.ServerRequestDriver.ServerRequestDriver.comm"><em>comm</em></a>) &#8211; class:.CommBase): Comm that should be added.</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong></strong><strong>(</strong><strong></strong> (<a class="reference internal" href="cis_interface.drivers.html#cis_interface.drivers.CommDriver.CommDriver.comm" title="cis_interface.drivers.CommDriver.CommDriver.comm"><em>comm</em></a>) &#8211; class:.CommBase): Comm that should be added.</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#KeyError" title="(in Python v3.7)"><code class="xref py py-exc docutils literal"><span class="pre">KeyError</span></code></a> &#8211; If there is already a comm associated with the key.</td>
 </tr>
@@ -2040,7 +2041,7 @@ _send_multipart_worker.</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong></strong><strong>(</strong><strong></strong> (<a class="reference internal" href="cis_interface.drivers.html#cis_interface.drivers.ServerRequestDriver.ServerRequestDriver.comm" title="cis_interface.drivers.ServerRequestDriver.ServerRequestDriver.comm"><em>comm</em></a>) &#8211; class:.CommBase): Comm class that thread is for.</li>
+<li><strong></strong><strong>(</strong><strong></strong> (<a class="reference internal" href="cis_interface.drivers.html#cis_interface.drivers.CommDriver.CommDriver.comm" title="cis_interface.drivers.CommDriver.CommDriver.comm"><em>comm</em></a>) &#8211; class:.CommBase): Comm class that thread is for.</li>
 <li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) &#8211; Name for the thread. If not provided, one is
 created by combining the comm name and the provided suffix.</li>
 <li><strong>suffix</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) &#8211; Suffix that should be added to comm name to name
@@ -4828,7 +4829,7 @@ tools.get_default_comm() if not provided.</td>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'0.4',
+            VERSION:'0.5.3',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',

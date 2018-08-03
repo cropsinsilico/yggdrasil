@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>cis_interface.communication.tests package &mdash; cis_interface 0.4 documentation</title>
+  <title>cis_interface.communication.tests package &mdash; cis_interface 0.5.3 documentation</title>
   
 
   
@@ -58,7 +58,7 @@
             
             
               <div class="version">
-                0.4
+                0.5.3
               </div>
             
           
@@ -100,6 +100,7 @@
 <li class="toctree-l1"><a class="reference internal" href="examples/examples_toc.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="release.html">Release Steps</a></li>
 <li class="toctree-l1"><a class="reference internal" href="release.html#docs-checkout">Docs Checkout</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
 </ul>
 
             
@@ -1397,6 +1398,13 @@ pair.</p>
 <dd><p>Bases: <a class="reference internal" href="#cis_interface.communication.tests.test_ZMQComm.TestZMQComm" title="cis_interface.communication.tests.test_ZMQComm.TestZMQComm"><code class="xref py py-class docutils literal"><span class="pre">cis_interface.communication.tests.test_ZMQComm.TestZMQComm</span></code></a></p>
 <p>Test for ZMQComm communication class with DEALER/ROUTER socket.</p>
 <dl class="method">
+<dt id="cis_interface.communication.tests.test_ZMQComm.TestZMQCommROUTER.setup">
+<code class="descname">setup</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_ZMQComm.html#TestZMQCommROUTER.setup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_ZMQComm.TestZMQCommROUTER.setup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize comm object pair with sleep after setup to ensure
+dealer has connected.</p>
+</dd></dl>
+
+<dl class="method">
 <dt id="cis_interface.communication.tests.test_ZMQComm.TestZMQCommROUTER.test_router_recv">
 <code class="descname">test_router_recv</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cis_interface/communication/tests/test_ZMQComm.html#TestZMQCommROUTER.test_router_recv"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cis_interface.communication.tests.test_ZMQComm.TestZMQCommROUTER.test_router_recv" title="Permalink to this definition">¶</a></dt>
 <dd><p>Test router receipt of message from the dealer with an identity.</p>
@@ -1511,7 +1519,7 @@ pair.</p>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'0.4',
+            VERSION:'0.5.3',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',

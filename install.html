@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Installation &mdash; cis_interface 0.4 documentation</title>
+  <title>Installation &mdash; cis_interface 0.5.3 documentation</title>
   
 
   
@@ -60,7 +60,7 @@
             
             
               <div class="version">
-                0.4
+                0.5.3
               </div>
             
           
@@ -88,7 +88,8 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="includeme.html">Overview</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Installation</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#basic-installation">Basic Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#conda-installation-pip-recommended">Conda Installation + pip (recommended)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#manual-installation">Manual Installation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#additional-steps-on-windows">Additional Steps on Windows</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#additional-steps-for-matlab-models">Additional Steps for Matlab Models</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#additional-steps-for-rabbitmq-message-passing">Additional Steps for RabbitMQ Message Passing</a></li>
@@ -108,6 +109,7 @@
 <li class="toctree-l1"><a class="reference internal" href="examples/examples_toc.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="release.html">Release Steps</a></li>
 <li class="toctree-l1"><a class="reference internal" href="release.html#docs-checkout">Docs Checkout</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hackathon2018/index.html">Welcome to the 2018 Crops in Silico Hackathon!</a></li>
 </ul>
 
             
@@ -173,10 +175,36 @@
            <div itemprop="articleBody">
             
   <div class="section" id="installation">
-<h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="basic-installation">
-<h2>Basic Installation<a class="headerlink" href="#basic-installation" title="Permalink to this headline">¶</a></h2>
-<p>cis_interface can be installed from either <a class="reference external" href="https://pypi.org/project/cis_interface/">PyPI</a>
+<span id="install-rst"></span><h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="conda-installation-pip-recommended">
+<h2>Conda Installation + pip (recommended)<a class="headerlink" href="#conda-installation-pip-recommended" title="Permalink to this headline">¶</a></h2>
+<p>We are still working to create conda wheels for cis_interface on
+<cite>conda-forge</cite>, but you can install some of the more difficult dependencies
+using conda, particularly the ZeroMQ C and C++ libraries. To do so call:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ conda install -c conda-forge zeromq czmq
+</pre></div>
+</div>
+<p>You can then install cis_interface from
+<a class="reference external" href="https://pypi.org/project/cis_interface/">PyPI</a> using <code class="docutils literal"><span class="pre">pip</span></code>:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ pip install cis_interface
+</pre></div>
+</div>
+<p>In the future when the conda wheels are available, you will only need to
+run:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ conda install -c conda-forge cis_interface
+</pre></div>
+</div>
+</div>
+<div class="section" id="manual-installation">
+<h2>Manual Installation<a class="headerlink" href="#manual-installation" title="Permalink to this headline">¶</a></h2>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Before installing cis_interface from <code class="docutils literal"><span class="pre">pip</span></code> or source, you
+should install the non-Python dependencies, particularly the
+ZeroMQ C and C++ libraries (see below).</p>
+</div>
+<p>If you do not want to use conda, cis_interface can also be installed
+from either <a class="reference external" href="https://pypi.org/project/cis_interface/">PyPI</a>
 using <code class="docutils literal"><span class="pre">pip</span></code>:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span>$ pip install cis_interface
 </pre></div>
@@ -222,7 +250,10 @@ Windows (&gt;=7), the following command will permanently modify your path:</p>
 <div class="section" id="additional-steps-on-windows">
 <h2>Additional Steps on Windows<a class="headerlink" href="#additional-steps-on-windows" title="Permalink to this headline">¶</a></h2>
 <p>As local communication on Windows is handled by ZeroMQ, running models written
-in C or C++ will require installing the ZeroMQ libraries for C and C++.</p>
+in C or C++ will require installing the ZeroMQ libraries for C and C++.
+If you install cis_interface using conda, these will be installed
+automatically as depencies. If you are not using conda, you will need to
+install them yourself.</p>
 <p>Instructions for installing the ZeroMQ C and C++ libraries can be found
 <a class="reference external" href="https://github.com/zeromq/czmq#building-and-installing">here</a>
 At install, cis_interface will attempt to search for those libraries.
@@ -231,16 +262,24 @@ containing the libraries to your PATH environment variable prior to
 running one of the above install commands. If cis_interface complains
 that it cannot find these libraries, you can manually set them in your
 <code class="docutils literal"><span class="pre">.cis_interface.cfg</span></code> file (See <a class="reference internal" href="config.html#config-rst"><span class="std std-ref">Configuration Options</span></a>).</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Although not required, the ZeroMQ libraries are also recommended for message
+passing on Linux and Mac OSX operating systems as the IPC V message queues
+have default upper limits of 2048 bytes on some operating systems and will
+have to send larger messages piecemeal, adding to the message passing
+overhead.</p>
+</div>
 </div>
 <div class="section" id="additional-steps-for-matlab-models">
 <h2>Additional Steps for Matlab Models<a class="headerlink" href="#additional-steps-for-matlab-models" title="Permalink to this headline">¶</a></h2>
 <p>To run Matlab models, you will also need to install the Matlab engine for
 Python. This requires that you have an existing Matlab installation and license.
 cis_interface will attempt to install the Matlab engine for Python at
-install, but should it fail or you will to use a non-default version of Matlab,
+install, but should it fail or if you want to use a non-default version of Matlab,
 you can also do it manually.</p>
-<p>Instructions for installing the Matlab engine as a python package can be found
-<a class="reference external" href="https://www.mathworks.com/help/matlab/matlab_external/install-the-matlab-engine-for-python.html">here</a>.</p>
+<p>Instructions for installing the Matlab engine as a python package can be found on the
+<a class="reference external" href="https://www.mathworks.com/help/matlab/matlab_external/install-the-matlab-engine-for-python.html">Mathworks website</a>.</p>
 </div>
 <div class="section" id="additional-steps-for-rabbitmq-message-passing">
 <h2>Additional Steps for RabbitMQ Message Passing<a class="headerlink" href="#additional-steps-for-rabbitmq-message-passing" title="Permalink to this headline">¶</a></h2>
@@ -304,7 +343,7 @@ for starting a RabbitMQ server.</p>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'0.4',
+            VERSION:'0.5.3',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
