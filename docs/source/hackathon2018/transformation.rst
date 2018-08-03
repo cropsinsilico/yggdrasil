@@ -3,8 +3,8 @@ Model Transformation
 ####################
 
 For the first part of this example we will be transforming a 
-toy growth model written in Python. Within the hackathon2018 
-repository this model is ``growth.py``. The model takes 
+toy growth model written in Python. Within the ``hackathon2018`` 
+repository directory this model is ``growth.py``. The model takes 
 command line arguments defining the path to an input file and 
 an output file. The model then reads photosynthesis rates from 
 the input file, calculates the growth rate (incorrectly) and 
@@ -15,9 +15,13 @@ model from the command line using the following command::
 
 Then you can take a look at the output produced by the model. We will 
 be transforming this model so make a copy, adding your name to the end of 
-the file.
+the file.::
 
   $ cp growth.py growth_mlang.py
+
+Then move back up into the ``cis_home`` direcotry.
+
+  $ cd ../
 
 
 Adding API Calls
@@ -109,7 +113,7 @@ Lets break this down into the important lines. The line::
   flag, data_input = input.recv()
 
 Is where the model is receiving data from the input channel. It returns a 
-flag indicating whether or not the receive was successfull and a tuple 
+flag indicating whether or not the receive was successful and a tuple 
 containing all of the received variables (in this case a single float). 
 The flag will return False if the channel has been closed (usually if there 
 is not any more input) or if there is an error. It can be used to break out 
@@ -155,12 +159,12 @@ your model.
 
 .. image:: interface_images/interface_model_form.png
 
-You can give your model any name, but make sure that you select 'Python' as 
-the model language, use the name of your transformed model with the `hackathon2018`
-directory included (e.g. `hackathon2018/growth_mlang.py`), 
+You can give your model any name, but make sure that you select ``Python`` as 
+the model language, use the name of your transformed model with the ``hackathon2018``
+directory included (e.g. ``hackathon2018/growth_mlang.py``), 
 and the correct names of your input and output channels. For the example we have an 
-input channel called 'photosynthesis_rate' and an output channel called 'growth_rate'. 
-For the input and output channels to be added, you will need to click on the blue '+' 
+input channel called ``photosynthesis_rate`` and an output channel called ``growth_rate``. 
+For the input and output channels to be added, you will need to click on the blue ``+`` 
 buttons after filling in the name. You can enter as many channels as your model requires, 
 but for now our model only requires one of each.
 
@@ -185,7 +189,7 @@ as the original model.
 Adding Your Model
 -----------------
 
-To add your model to the canvas, click the blue '+' button 
+To add your model to the canvas, click the blue ``+`` button 
 next to your model in the model palatte.
 
 .. image:: interface_images/interface_your_model.png
@@ -205,15 +209,15 @@ First we will add an input file. From the model palette, select an input port.
 
 .. image:: interface_images/interface_select_input.png
 
-When you click the blue '+' button, an input port will be added to the canvas 
+When you click the blue ``+`` button, an input port will be added to the canvas 
 and a form will pop up asking for information about the input port. 
 
 .. image:: interface_images/interface_input_form.png
 
 For this example 
-you should select the 'file' type, a file name of 
-'hackathon2018/Input/photosynthesis_rate.txt' 
-and a read method of 'table'. This tells the input port that it should read values 
+you should select the ``file`` type, a file name of 
+``hackathon2018/Input/photosynthesis_rate.txt`` 
+and a read method of ``table``. This tells the input port that it should read values 
 from a tab-delimited table line-by-line from the indicated file.
 
 
@@ -224,15 +228,15 @@ Next we will add an output file. From th emodel palette, select an output port.
 
 .. image:: interface_images/interface_select_output.png
 
-When you click the blue '+' button, an output port will be added to the canvas 
+When you click the blue ``+`` button, an output port will be added to the canvas 
 and a form will pop up asking for information about the output port. 
 
 .. image:: interface_images/interface_output_form.png
 
 For this example 
-you should select the 'file' type, a file name of 
-'hackathon2018/Output/growth_rate.txt', 
-and a write method of 'table'. This tells the output port that it should write values 
+you should select the ``file`` type, a file name of 
+``hackathon2018/Output/growth_rate.txt``, 
+and a write method of ``table``. This tells the output port that it should write values 
 to a tab-delimited table line-by-line in the indicated file.
 
 
@@ -267,7 +271,7 @@ Creating the YAML
 -----------------
 
 Once you are finished creating your input and output connections, you can 
-use the interface to create your YAML file. If you click the 'Generate Manifest' 
+use the interface to create your YAML file. If you click the ``Generate Manifest`` 
 button, 
 
 .. image:: interface_images/interface_generate.png
@@ -278,7 +282,7 @@ running your model with connections to the file.
 .. image:: interface_images/interface_manifest.png
 
 You can then copy that information to your clipboard and past it into a new file 
-called `growth_to_file.yml` in the `cis_home` directory.
+called ``growth_to_file.yml`` in the ``cis_home`` directory.
 
 
 Running the Model-to-File Integration
@@ -288,9 +292,9 @@ You can run the integration you just created by executing::
 
   $ cisrun growth_to_file.yml
 
-from the `cis_home` directory. This will output information on the 
+from the ``cis_home`` directory. This will output information on the 
 calculated growth rates to the screen and generate the output file 
-'hackathon2018/Output/growth_rate.txt'. If the model ran correctly, the output file 
+``hackathon2018/Output/growth_rate.txt``. If the model ran correctly, the output file 
 should look like this::
 
   # %f

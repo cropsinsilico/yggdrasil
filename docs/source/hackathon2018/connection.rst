@@ -4,7 +4,7 @@ Connecting Models to Models
 
 
 Next we will connect your growth model to an existing network of models. From 
-the user interface, load the `hackathon2018` integration network. 
+the user interface, load the ``hackathon2018`` integration network. 
 
 .. image:: interface_images/interface_load.png
 
@@ -66,7 +66,7 @@ model from the canvas.
 Adding Your Model
 -----------------
 
-You can then add your model by clicking the blue '+' button next to your 
+You can then add your model by clicking the blue ``+`` button next to your 
 model in the model palette.
 
 .. image:: interface_images/network_add.png
@@ -101,12 +101,12 @@ Creating the YAML
 =================
 
 Once you have finalized your model connections, you can use the interface to 
-create your YAML file by clicking the 'Generate Manifest' button,
+create your YAML file by clicking the ``Generate Manifest`` button,
 
 .. image:: interface_images/network_manifest.png
 
 Copy this information to you clipboard and past it into a new file 
-called `growth_network.yml` in the `hackthon2018` directory.
+called ``growth_network.yml`` in the ``hackthon2018`` directory.
 
 
 Running the Model-to-Model Integration
@@ -116,5 +116,5 @@ You can run the integration you just created by executing::
 
   $ cisrun growth_network.yml
 
-from the `hackathon2018` directory. This will output information on the 
+from the ``hackathon2018`` directory. This will output information on the 
 screen from all of the models being run.
