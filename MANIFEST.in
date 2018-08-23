@@ -9,19 +9,30 @@ recursive-include cis_interface *.sh
 recursive-include cis_interface *.m
 recursive-include cis_interface *.h
 recursive-include cis_interface *.hpp
+recursive-include cis_interface *.lpy
+recursive-include cis_interface *.obj
 include cis_interface/tests/data/*.txt
 include cis_interface/tests/yaml/*.yml
 include cis_interface/tests/scripts/*.m
+include cis_interface/tests/scripts/*.h
 include cis_interface/tests/scripts/*.c
 include cis_interface/tests/scripts/*.cpp
 include cis_interface/tests/scripts/*.py
+include cis_interface/tests/scripts/*.lpy
+include cis_interface/tests/scripts/CMakeLists.txt
+include cis_interface/tests/scripts/Makefile_linux
+include cis_interface/tests/scripts/Makefile_windows
 include cis_interface/examples/*.sh
 include cis_interface/examples/*.yml
 include cis_interface/examples/*/src/*.m
+include cis_interface/examples/*/src/*.h
 include cis_interface/examples/*/src/*.c
 include cis_interface/examples/*/src/*.cpp
 include cis_interface/examples/*/src/*.py
+include cis_interface/examples/*/src/*.lpy
 include cis_interface/examples/*/Input/*.txt
+include cis_interface/examples/*/Input/*.ply
+include cis_interface/examples/*/Input/*.obj
 graft docs
 include versioneer.py
 include cis_interface/_version.py
