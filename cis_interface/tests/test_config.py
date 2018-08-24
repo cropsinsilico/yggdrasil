@@ -1,7 +1,7 @@
 import os
 import tempfile
 import nose.tools as nt
-from cis_interface import config, backwards
+from cis_interface import config, backwards, platform
 
 
 def make_temp(fname_base, count=1):
@@ -14,7 +14,10 @@ def make_temp(fname_base, count=1):
     out = []
     for i in range(count):
         fname_i = '%s.%d' % (fname, i)
-        out.append(fname_i)
+        if platform._is_win:  # pragma: windows
+            out.append(fname_i.lower())  # case insensitive
+        else:
+            out.append(fname_i)
         if not os.path.isfile(fname_i):
             with open(fname_i, 'w') as fd:
                 fd.write('Test file %d' % i)
