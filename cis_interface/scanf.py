@@ -346,7 +346,7 @@ def scanf_compile(format, collapseWhitespace=True):
     if DEBUG:
         print("DEBUG: %r -> %s" % (format, format_pat))
     if collapseWhitespace:
-        format_pat = re.sub('\s+', r'\s+', format_pat)
+        format_pat = re.sub('\s+', r'\\s+', format_pat)
 
     format_re = re.compile(format_pat)
     if len(scanf_cache) > SCANF_CACHE_SIZE:
