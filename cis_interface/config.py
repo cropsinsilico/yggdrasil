@@ -58,7 +58,9 @@ def find_all(name, path):
 
     Args:
         name (str): Name of the file to be found (with the extension).
-        path (str): Directory where search should start.
+        path (str, None): Directory where search should start. If set to
+            None on Windows, the current directory and PATH variable are
+            searched.
 
     Returns:
         list: All instances of the specified file.
@@ -67,8 +69,12 @@ def find_all(name, path):
     result = []
     try:
         if platform._is_win:  # pragma: windows
-            out = subprocess.check_output(["where", "/r", path, name],
-                                          stderr=subprocess.STDOUT)
+            if path is None:
+                out = subprocess.check_output(["where", name],
+                                              stderr=subprocess.STDOUT)
+            else:
+                out = subprocess.check_output(["where", "/r", path, name],
+                                              stderr=subprocess.STDOUT)
         else:
             try:
                 out = subprocess.check_output(["find", path, "-type", "f",
@@ -99,10 +105,13 @@ def locate_file(fname):
 
     """
     out = []
-    for path in os.environ.get('PATH').split(os.pathsep):
-        if path:
-            # print('searching %s for %s' % (path, fname))
-            out += find_all(fname, path)
+    if platform._is_win:  # pragma: windows
+        out += find_all(fname, None)
+    else:
+        for path in os.environ.get('PATH').split(os.pathsep):
+            if path:
+                # print('searching %s for %s' % (path, fname))
+                out += find_all(fname, path)
     if not out:
         return False
     first = out[0]
