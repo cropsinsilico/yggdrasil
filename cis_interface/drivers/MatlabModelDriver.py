@@ -118,7 +118,7 @@ def stop_matlab(screen_session, matlab_engine, matlab_session):  # pragma: matla
                 matlab.engine._engines.remove(x)
         # Either exit the engine or remove its reference
         if matlab_session in matlab.engine.find_matlab():
-            matlab_engine.exit()
+            matlab_engine.eval('exit', nargout=0)
         else:  # pragma: no cover
             matlab_engine.__dict__.pop('_matlab')
     # Stop the screen session containing the Matlab shared session
@@ -131,7 +131,7 @@ def stop_matlab(screen_session, matlab_engine, matlab_session):  # pragma: matla
             debug("Waiting for matlab engine to exit")
             sleep(1)
         if (matlab_session in matlab.engine.find_matlab()):  # pragma: debug
-            raise Exception("stp[_matlab timed out at %f s" % T.elapsed)
+            raise Exception("stop_matlab timed out at %f s" % T.elapsed)
 
 
 class MatlabProcess(tools.CisClass):  # pragma: matlab
@@ -143,6 +143,10 @@ class MatlabProcess(tools.CisClass):  # pragma: matlab
         args (list, tuple): Arguments that should be passed to target.
         kwargs (dict, optional): Keyword arguments that should be passed to
             target. Defaults to empty dict.
+        name (str, optional): A name for the process. Generated if not provided.
+        matlab_engine (MatlabEngine, optional): MatlabEngine that should be used
+            to get errors. Defaults to None and errors will not be recovered
+            unless passed through stdout and stderr before shutdown.
 
     Attributes:
         stdout (StringIO): File like string buffer that stdout from target will
@@ -154,13 +158,15 @@ class MatlabProcess(tools.CisClass):  # pragma: matlab
         kwargs (dict): Keyword arguments that should be passed to target.
         future (MatlabFutureResult): Future result from async function. This
             will be None until start is called.
+        matlab_engine (MatlabEngine): MatlabEngine that should be used to get
+            errors.
 
     Raises:
         RuntimeError: If Matlab is not installed.
 
     """
 
-    def __init__(self, target, args, kwargs=None, name=None):
+    def __init__(self, target, args, kwargs=None, name=None, matlab_engine=None):
         if not _matlab_installed:  # pragma: no matlab
             raise RuntimeError("Matlab is not installed.")
         if kwargs is None:
@@ -172,9 +178,10 @@ class MatlabProcess(tools.CisClass):  # pragma: matlab
         self.target = target
         self.args = args
         self.kwargs = kwargs
-        self.kwargs.update(nargout=0, async=True,
-                           stdout=self.stdout, stderr=self.stderr)
+        self.kwargs.update(nargout=0, stdout=self.stdout, stderr=self.stderr)
+        self.kwargs['async'] = True  # For python 3.7 where async is reserved
         self.future = None
+        self.matlab_engine = matlab_engine
         super(MatlabProcess, self).__init__(name)
 
     def poll(self, *args, **kwargs):
@@ -221,6 +228,9 @@ class MatlabProcess(tools.CisClass):  # pragma: matlab
         if self.is_started():
             try:
                 return self.future.cancelled()
+            except matlab.engine.EngineError:
+                self.on_matlab_error()
+                return True
             except BaseException:
                 return True
         return False
@@ -230,6 +240,9 @@ class MatlabProcess(tools.CisClass):  # pragma: matlab
         if self.is_started():
             try:
                 return self.future.done() or self.is_cancelled()
+            except matlab.engine.EngineError:
+                self.on_matlab_error()
+                return True
             except BaseException:
                 return True
         return False
@@ -256,9 +269,21 @@ class MatlabProcess(tools.CisClass):  # pragma: matlab
         if self.is_alive():
             try:
                 self.future.cancel()
+            except matlab.engine.EngineError:
+                self.on_matlab_error()
             except BaseException:
                 pass
         self.print_output()
+
+    def on_matlab_error(self):
+        r"""Actions performed on error in Matlab engine."""
+        # self.print_output()
+        if self.matlab_engine is not None:
+            try:
+                self.matlab_engine.eval('exception = MException.last;', nargout=0)
+                self.matlab_engine.eval('getReport(exception)')
+            except matlab.engine.EngineError:
+                pass
 
 
 @register_component
@@ -328,8 +353,8 @@ class MatlabModelDriver(ModelDriver):  # pragma: matlab
         try:
             stop_matlab(self.screen_session, self.mlengine,
                         self.mlsession)
-        except SystemError as e:  # pragma: debug
-            self.error('cleanup(): Failed to exit matlab engine')
+        except (SystemError, Exception) as e:  # pragma: debug
+            self.error('Failed to exit matlab engine')
             self.raise_error(e)
         self.screen_session = None
         self.mlsession = None
@@ -359,7 +384,7 @@ class MatlabModelDriver(ModelDriver):  # pragma: matlab
             self.model_process = MatlabProcess(
                 target=getattr(self.mlengine, self.target_name),
                 name=self.name + '.MatlabProcess',
-                args=self.args[1:])
+                args=self.args[1:], matlab_engine=self.mlengine)
             self.debug('Starting MatlabProcess')
             self.model_process.start()
             self.debug('MatlabProcess running model.')
@@ -373,7 +398,11 @@ class MatlabModelDriver(ModelDriver):  # pragma: matlab
             try:
                 self.model_process.future.result()
                 self.model_process.print_output()
-            except BaseException:
+            except matlab.engine.EngineError as e:
+                self.model_process.print_output()
+                # self.model_process.on_matlab_error()
+                # self.exception("EngineError while running Matlab model.")
+            except BaseException as e:
                 self.model_process.print_output()
                 self.exception("Error running model.")
         else:
