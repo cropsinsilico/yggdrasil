@@ -71,14 +71,17 @@ def find_all(name, path):
         if platform._is_win:  # pragma: windows
             if path is None:
                 out = subprocess.check_output(["where", name],
+                                              env=os.environ,
                                               stderr=subprocess.STDOUT)
             else:
                 out = subprocess.check_output(["where", "/r", path, name],
+                                              env=os.environ,
                                               stderr=subprocess.STDOUT)
         else:
             try:
-                out = subprocess.check_output(["find", path, "-type", "f",
+                out = subprocess.check_output(["find", "-L", path, "-type", "f",
                                                "-name", name],
+                                              env=os.environ,
                                               stderr=subprocess.STDOUT)
             except subprocess.CalledProcessError as e:
                 if backwards.unicode2bytes('Permission denied') in e.output:
@@ -110,7 +113,6 @@ def locate_file(fname):
     else:
         for path in os.environ.get('PATH').split(os.pathsep):
             if path:
-                # print('searching %s for %s' % (path, fname))
                 out += find_all(fname, path)
     if not out:
         return False
