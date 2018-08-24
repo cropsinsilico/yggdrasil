@@ -1,4 +1,5 @@
 import os
+import tempfile
 import nose.tools as nt
 from cis_interface import config
 
@@ -34,3 +35,12 @@ def test_find_all():
     test_ans = __file__
     nt.assert_equal(config.find_all(test_fil, test_dir), [test_ans])
     assert(not config.find_all(test_fil, 'invalid'))
+
+
+def test_update_config():
+    r"""Test update_config."""
+    test_cfg = os.path.join(tempfile.gettempdir(), 'test.cfg')
+    assert(not os.path.isfile(test_cfg))
+    config.update_config(test_cfg)
+    assert(os.path.isfile(test_cfg))
+    os.remove(test_cfg)
