@@ -118,7 +118,10 @@ def stop_matlab(screen_session, matlab_engine, matlab_session):  # pragma: matla
                 matlab.engine._engines.remove(x)
         # Either exit the engine or remove its reference
         if matlab_session in matlab.engine.find_matlab():
-            matlab_engine.eval('exit', nargout=0)
+            try:
+                matlab_engine.eval('exit', nargout=0)
+            except matlab.engine.EngineError:
+                pass
         else:  # pragma: no cover
             matlab_engine.__dict__.pop('_matlab')
     # Stop the screen session containing the Matlab shared session
@@ -398,11 +401,9 @@ class MatlabModelDriver(ModelDriver):  # pragma: matlab
             try:
                 self.model_process.future.result()
                 self.model_process.print_output()
-            except matlab.engine.EngineError as e:
+            except matlab.engine.EngineError:
                 self.model_process.print_output()
-                # self.model_process.on_matlab_error()
-                # self.exception("EngineError while running Matlab model.")
-            except BaseException as e:
+            except BaseException:
                 self.model_process.print_output()
                 self.exception("Error running model.")
         else:
