@@ -1,12 +1,13 @@
 import os
 import tempfile
 import nose.tools as nt
-from cis_interface import config, backwards, platform
+from cis_interface import config, backwards
 
 
 def make_temp(fname_base, count=1):
     r"""Create temporary copies of same file with different extensions."""
-    tempdir = tempfile.gettempdir()
+    fname_base = fname_base.lower()
+    tempdir = os.path.normcase(os.path.normpath(tempfile.gettempdir()))
     if tempdir not in os.environ['PATH']:
         os.environ['PATH'] = os.pathsep.join([tempdir, os.environ.get('PATH')])
     fname_pattern = fname_base + '.*'
@@ -14,10 +15,7 @@ def make_temp(fname_base, count=1):
     out = []
     for i in range(count):
         fname_i = '%s.%d' % (fname, i)
-        if platform._is_win:  # pragma: windows
-            out.append(fname_i.lower())  # case insensitive
-        else:
-            out.append(fname_i)
+        out.append(fname_i)
         if not os.path.isfile(fname_i):
             with open(fname_i, 'w') as fd:
                 fd.write('Test file %d' % i)

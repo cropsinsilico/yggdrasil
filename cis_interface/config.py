@@ -84,15 +84,14 @@ def find_all(name, path):
                                               env=os.environ,
                                               stderr=subprocess.STDOUT)
             except subprocess.CalledProcessError as e:
-                if backwards.unicode2bytes('Permission denied') in e.output:
-                    out = ''
-                else:
+                out = ''
+                if backwards.unicode2bytes('Permission denied') not in e.output:
                     raise e
     except subprocess.CalledProcessError:
         out = ''
     if not out.isspace():
         result = out.splitlines()
-    result = [m.decode('utf-8') for m in result]
+    result = [os.path.normcase(os.path.normpath(m.decode('utf-8'))) for m in result]
     return result
 
 
