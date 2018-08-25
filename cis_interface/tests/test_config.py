@@ -51,6 +51,7 @@ def test_locate_file():
     # Single file
     sdir, spat, sans = make_temp_single()
     sout = config.locate_file(spat)
+    print(sout, type(sout))
     assert(isinstance(sout, backwards.string_types))
     nt.assert_equal(sout, sans[0])
     # Multiple files
