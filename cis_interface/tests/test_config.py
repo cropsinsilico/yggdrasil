@@ -8,7 +8,7 @@ def make_temp(fname_base, count=1):
     r"""Create temporary copies of same file with different extensions."""
     fname_base = fname_base.lower()
     tempdir = os.path.normcase(os.path.normpath(tempfile.gettempdir()))
-    if tempdir not in os.environ['PATH']:
+    if (tempdir + os.pathsep) not in os.environ['PATH']:
         os.environ['PATH'] = os.pathsep.join([tempdir, os.environ.get('PATH')])
     fname_pattern = fname_base + '.*'
     fname = os.path.join(tempdir, fname_base)
@@ -51,7 +51,6 @@ def test_locate_file():
     # Single file
     sdir, spat, sans = make_temp_single()
     sout = config.locate_file(spat)
-    print(sout, type(sout))
     assert(isinstance(sout, backwards.string_types))
     nt.assert_equal(sout, sans[0])
     # Multiple files

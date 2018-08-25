@@ -78,19 +78,21 @@ def find_all(name, path):
                                               env=os.environ,
                                               stderr=subprocess.STDOUT)
         else:
-            try:
-                out = subprocess.check_output(["find", "-L", path, "-type", "f",
-                                               "-name", name],
-                                              env=os.environ,
-                                              stderr=subprocess.STDOUT)
-            except subprocess.CalledProcessError as e:
-                out = ''
-                if backwards.unicode2bytes('Permission denied') not in e.output:
-                    raise e
+            args = ["find", path, "-type", "f", "-name", name]
+            pfind = subprocess.Popen(args, env=os.environ,
+                                     stderr=subprocess.PIPE,
+                                     stdout=subprocess.PIPE)
+            (stdoutdata, stderrdata) = pfind.communicate()
+            out = stdoutdata
+            for l in stderrdata.splitlines():
+                if backwards.unicode2bytes('Permission denied') not in l:
+                    raise subprocess.CalledProcessError(pfind.returncode,
+                                                        ' '.join(args),
+                                                        output=stderrdata)
     except subprocess.CalledProcessError:
         out = ''
     if not out.isspace():
-        result = out.splitlines()
+        result = sorted(out.splitlines())
     result = [os.path.normcase(os.path.normpath(m.decode('utf-8'))) for m in result]
     return result
 
